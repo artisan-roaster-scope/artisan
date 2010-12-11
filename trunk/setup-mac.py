@@ -18,6 +18,7 @@ QTDIR = r'/Developer/Applications/Qt/'
 APP = ['artisan.pyw']
 
 DATA_FILES = [
+    "index.html",
     ("../PlugIns/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
     ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib'])
   ]
