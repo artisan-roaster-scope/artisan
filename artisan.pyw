@@ -33,7 +33,7 @@
 # version 00028: improve flavor star graph
 # version 00029: adds support for Omega HH506RA (reported to work also as Extech 421509). Thanks to Marko Luther.
 # version 00030: FINISHED PXR3 control Dlg 
-# version 00031: FINISHED PXG4 control Dlg
+# version 00031: FINISHED PXG4 control Dlg and enhanced background options
 
 __version__ = "0.00031"
 
@@ -99,6 +99,7 @@ from PyQt4.QtCore import (Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTime
 
 
 from matplotlib.figure import Figure
+from matplotlib.colors import cnames as cnames
 import matplotlib.patches as patches
 import matplotlib.transforms as transforms
 import matplotlib.font_manager as font_manager
@@ -188,6 +189,10 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundET,self.backgroundBT,self.timeB = [],[],[]
         self.startendB,self.varCB = [0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.,0.,0.]
         self.backgroundalpha = 0.3
+        self.backgroundwidth = 2
+        self.backgroundmetcolor = self.palette["met"]
+        self.backgroundbtcolor = self.palette["bt"]
+        self.backgroundstyle = "-"
 
         #Initial flavor parameters. 
         self.flavors = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5]
@@ -498,9 +503,12 @@ class tgraphcanvas(FigureCanvas):
                     self.startendB[0] = self.startend[0]
 
             #draw background
-            self.l_back1, = self.ax.plot(self.timeB, self.backgroundET,color=self.palette["met"],linewidth=2, alpha=self.backgroundalpha)
-            self.l_back2, = self.ax.plot(self.timeB, self.backgroundBT,color=self.palette["bt"],linewidth=2, alpha=self.backgroundalpha)
-            
+            self.l_back1, = self.ax.plot(self.timeB, self.backgroundET,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha)
+            self.l_back2, = self.ax.plot(self.timeB, self.backgroundBT,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha)
+
+            #check backgroundDetails flag
             if self.backgroundDetails:
                 rect = patches.Rectangle( (self.startendB[0],0), width=.1, height=self.startendB[1], color = self.palette["markers"],alpha=self.backgroundalpha)
                 self.ax.add_patch(rect)               
@@ -1247,28 +1255,32 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText(message)
             self.ax.text(self.timex[i],self.temp2[i],Nevents,color=self.palette["text"])
 
-    def movebackground(self,direction,speed):
-        if len(self.timeB):
+    def movebackground(self,direction,step):
+        lt = len(self.timeB)
+        le = len(self.backgroundET)
+        lb = len(self.backgroundBT)
+        #all background curves must have same dimension in order to plot. Check just in case.
+        if lt > 1 and lt == le and lb == le:
             if  direction == "up":
-                for i in range(len(self.timeB)):
-                    self.backgroundET[i] += speed
-                    self.backgroundBT[i] += speed
+                for i in range(lt):
+                    self.backgroundET[i] += step
+                    self.backgroundBT[i] += step
                 self.redraw()
                     
             elif direction == "left":
-                for i in range(len(self.timeB)):
-                    self.timeB[i] -= speed
+                for i in range(lt):
+                    self.timeB[i] -= step
                 self.redraw()
                     
             elif direction == "right":
-                for i in range(len(self.timeB)):
-                    self.timeB[i] += speed
+                for i in range(lt):
+                    self.timeB[i] += step
                 self.redraw()
                     
             elif direction == "down":
-                for i in range(len(self.timeB)):
-                    self.backgroundET[i] -= speed
-                    self.backgroundBT[i] -= speed
+                for i in range(lt):
+                    self.backgroundET[i] -= step
+                    self.backgroundBT[i] -= step
                 self.redraw()
 
 
@@ -1278,6 +1290,7 @@ class tgraphcanvas(FigureCanvas):
             
 class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
+        self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         # set window title
         self.setWindowTitle("Artisan " + __version__)        
@@ -1321,7 +1334,8 @@ class ApplicationWindow(QMainWindow):
         #create a serial port object
         self.ser = serialport()
         # create a PID object
-        self.pid = FujiPID()        
+        self.pid = FujiPID()
+        
 
         ###################################################################################
         #restore SETTINGS  after creating serial port and the display (self.qmc = tgraphcanvas)
@@ -1697,7 +1711,7 @@ class ApplicationWindow(QMainWindow):
         self.main_widget.setFocus()
 
         # set the central widget of MainWindow to main_widget
-        self.setCentralWidget(self.main_widget)
+        self.setCentralWidget(self.main_widget)   
 
 
     #loads stored profiles. Called from file menu        
@@ -2148,8 +2162,8 @@ class ApplicationWindow(QMainWindow):
         try:
         
             settings = QSettings()
-            #restore window geometry
-            self.restoreGeometry(settings.value("Geometry").toByteArray())   
+            #restore geometry
+            self.restoreGeometry(settings.value("Geometry").toByteArray())     
             #restore mode
             self.qmc.mode = str(settings.value("Mode",self.qmc.mode).toString())
             if self.qmc.mode == "F":
@@ -2190,22 +2204,21 @@ class ApplicationWindow(QMainWindow):
             self.ser.parity = str(settings.value("parity",self.ser.parity).toString())
             self.ser.timeout = settings.value("timeout",self.ser.timeout).toInt()[0]
             settings.endGroup();
-                            
-            
+
             #restore pid settings
             settings.beginGroup("PXR");
             for key in self.pid.PXR.keys():
                 if type(self.pid.PXR[key][0]) == type(float()):
-                    self.pid.PXR[key] = settings.value(key,self.pid.PXR[key]).toFloat()[0]
+                    self.pid.PXR[key][0] = settings.value(key,self.pid.PXR[key]).toDouble()[0]
                 elif type(self.pid.PXR[key][0]) == type(int()):
-                    self.pid.PXR[key] = settings.value(key,self.pid.PXR[key]).toInt()[0]
+                    self.pid.PXR[key][0] = settings.value(key,self.pid.PXR[key]).toInt()[0]
             settings.endGroup()
             settings.beginGroup("PXG4");
             for key in self.pid.PXG4.keys():
                 if type(self.pid.PXG4[key][0]) == type(float()):
-                    self.pid.PXG4[key] = [settings.value(key,self.pid.PXG4[key][0]).toFloat()[0]]
+                    self.pid.PXG4[key][0] = settings.value(key,self.pid.PXG4[key][0]).toDouble()[0]
                 elif type(self.pid.PXG4[key][0]) == type(int()):
-                    self.pid.PXG4[key] = [settings.value(key,self.pid.PXG4[key][0]).toInt()[0]]
+                    self.pid.PXG4[key][0] = settings.value(key,self.pid.PXG4[key][0]).toInt()[0]
             settings.endGroup()
             
             #need to update timer delay (otherwise it uses default 5 seconds)
@@ -2264,7 +2277,7 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue(key,self.pid.PXR[key][0])
             settings.endGroup()
             settings.beginGroup("PXG4");
-            for key in self.pid.PXG4.keys():
+            for key in self.pid.PXG4.keys():            
                 settings.setValue(key,self.pid.PXG4[key][0])
             settings.endGroup()
 
@@ -2518,7 +2531,7 @@ class ApplicationWindow(QMainWindow):
                 creditsto))
 
     def helpHelp(self):
-        QDesktopServices.openUrl(QUrl("index.html"))
+        QDesktopServices.openUrl(QUrl("file:///" + self.applicationDirectory + "/index.html", QUrl.TolerantMode))
 
     def calibratedelay(self):
         calSpinBox = QSpinBox()
@@ -3165,8 +3178,9 @@ class editGraphDlg(QDialog):
             for i in range(len(aw.qmc.timex)):
                 if aw.qmc.timex[i] > seconds:
                     break
-            return float(aw.qmc.temp2[i-1])           #return the temperature
+            return float(aw.qmc.temp2[i-1])           #return the BT temperature
 
+    # adds a new event to the Dlg
     def addevent(self):
         if len(aw.qmc.timex) > 1:
             aw.qmc.specialevents.append(0)
@@ -3175,6 +3189,7 @@ class editGraphDlg(QDialog):
         else:
             aw.messagelabel.setText("Events need time and data")
 
+    # pops an event from the Dlg
     def delevent(self):
         if len(aw.qmc.specialevents) > 0:
              aw.qmc.specialevents.pop()
@@ -3537,46 +3552,83 @@ class backgroundDLG(QDialog):
         loadButton = QPushButton("Load")
         delButton = QPushButton("Delete")
         cancelButton = QPushButton("Close")
-        selectButton =QPushButton("Select Profile")        
+        selectButton =QPushButton("Select Profile")
         
         self.connect(loadButton, SIGNAL("clicked()"),self.load)
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
         self.connect(selectButton, SIGNAL("clicked()"), self.selectpath)
-
 
         self.speedSpinBox = QSpinBox()
         self.speedSpinBox.setRange(10,90)
         self.speedSpinBox.setSingleStep(10)
         self.speedSpinBox.setValue(30)
         
-        intensitylabel =QLabel("Intensity")
+        intensitylabel =QLabel("Opaqueness")
         intensitylabel.setAlignment(Qt.AlignRight)
         self.intensitySpinBox = QSpinBox()
         self.intensitySpinBox.setRange(1,9)
         self.intensitySpinBox.setSingleStep(1)
         self.intensitySpinBox.setValue(3)
 
-        upButton = QPushButton("Up")
-        downButton = QPushButton("Down")
-        leftButton = QPushButton("Left")
-        rightButton = QPushButton("Right")
+        widthlabel =QLabel("Line Width")
+        widthlabel.setAlignment(Qt.AlignRight)
+        self.widthSpinBox = QSpinBox()
+        self.widthSpinBox.setRange(1,20)
+        self.widthSpinBox.setSingleStep(1)
+        self.widthSpinBox.setValue(2)
+
+        stylelabel =QLabel("Line Style")
+        stylelabel.setAlignment(Qt.AlignRight)        
+        self.styleComboBox = QComboBox()
+        self.styleComboBox.addItems(["-","--",":","-.","steps"])
+        self.styleComboBox.setCurrentIndex(0)
+
+
+        colors = [""]
+        for key in cnames:
+            colors.append(key)
+        colors.sort()
+        colors.insert(0,"met")
+        colors.insert(1,"bt")
+        colors.pop(2)
+        
+        btcolorlabel = QLabel("BT color")
+        btcolorlabel.setAlignment(Qt.AlignRight)        
+        self.btcolorComboBox = QComboBox()
+        self.btcolorComboBox.addItems(colors)
+        self.btcolorComboBox.setCurrentIndex(1)
+
+        metcolorlabel = QLabel("MET color")
+        metcolorlabel.setAlignment(Qt.AlignRight)        
+        self.metcolorComboBox = QComboBox()
+        self.metcolorComboBox.addItems(colors)
+        self.metcolorComboBox.setCurrentIndex(0)
+        
+        self.upButton = QPushButton("Up")
+        self.downButton = QPushButton("Down")
+        self.leftButton = QPushButton("Left")
+        self.rightButton = QPushButton("Right")
 
         self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundDetails, SIGNAL("clicked()"),self.readChecks)
         self.connect(delButton, SIGNAL("clicked()"),self.delete)
-        self.connect(upButton, SIGNAL("clicked()"), lambda m= "up": self.move(m))
-        self.connect(downButton, SIGNAL("clicked()"), lambda m="down": self.move(m))
-        self.connect(leftButton, SIGNAL("clicked()"), lambda m="left": self.move(m))
-        self.connect(rightButton, SIGNAL("clicked()"),lambda m="right": self.move(m))
+        self.connect(self.upButton, SIGNAL("clicked()"), lambda m= "up": self.move(m))
+        self.connect(self.downButton, SIGNAL("clicked()"), lambda m="down": self.move(m))
+        self.connect(self.leftButton, SIGNAL("clicked()"), lambda m="left": self.move(m))
+        self.connect(self.rightButton, SIGNAL("clicked()"),lambda m="right": self.move(m))
         self.connect(self.intensitySpinBox, SIGNAL("valueChanged(int)"),self.adjustintensity)
+        self.connect(self.widthSpinBox, SIGNAL("valueChanged(int)"),self.adjustwidth)
+        self.connect(self.btcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color="", curve = "bt": self.adjustcolor(color,curve))
+        self.connect(self.metcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color= "", curve = "met": self.adjustcolor(color,curve))
+        self.connect(self.styleComboBox, SIGNAL("currentIndexChanged(QString)"),self.adjuststyle)
+        
 
         movelayout = QGridLayout()
-        movelayout.addWidget(upButton,0,1)
-        movelayout.addWidget(leftButton,1,0)
+        movelayout.addWidget(self.upButton,0,1)
+        movelayout.addWidget(self.leftButton,1,0)
         movelayout.addWidget(self.speedSpinBox,1,1)
-        movelayout.addWidget(rightButton,1,2)
-        movelayout.addWidget(downButton,2,1)
-       
+        movelayout.addWidget(self.rightButton,1,2)
+        movelayout.addWidget(self.downButton,2,1)
 
         layout = QGridLayout()
         layout.addWidget(self.backgroundCheck,0,0)
@@ -3585,9 +3637,17 @@ class backgroundDLG(QDialog):
         layout.addWidget(self.pathedit,1,1)
         layout.addWidget(loadButton,2,0)
         layout.addWidget(delButton,2,1)
-        layout.addWidget(intensitylabel,3,0)
-        layout.addWidget(self.intensitySpinBox,3,1)
-        layout.addWidget(cancelButton,4,1)
+        layout.addWidget(widthlabel,3,0)
+        layout.addWidget(self.widthSpinBox,3,1)
+        layout.addWidget(intensitylabel,4,0)
+        layout.addWidget(self.intensitySpinBox,4,1)
+        layout.addWidget(metcolorlabel,5,0)
+        layout.addWidget(self.metcolorComboBox,5,1)
+        layout.addWidget(btcolorlabel,6,0)
+        layout.addWidget(self.btcolorComboBox,6,1)
+        layout.addWidget(stylelabel,7,0)
+        layout.addWidget(self.styleComboBox,7,1)
+        layout.addWidget(cancelButton,8,1)
 
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.status,0)
@@ -3597,12 +3657,65 @@ class backgroundDLG(QDialog):
         
         self.setLayout(mainlayout)
 
+    def adjuststyle(self):
+        
+        self.status.showMessage("Processing...",5000)
+        #block button
+        self.styleComboBox.setDisabled(True) 
+        aw.qmc.backgroundstyle = str(self.styleComboBox.currentText())
+        aw.qmc.redraw()
+        #reactivate button
+        self.styleComboBox.setDisabled(False)
+        self.status.showMessage("Ready",5000)         
+
+    def adjustcolor(self,color,curve):
+        color = str(color)
+        self.status.showMessage("Processing...",5000)
+     
+        self.btcolorComboBox.setDisabled(True)
+        self.metcolorComboBox.setDisabled(True)
+        
+        if curve == "met":
+            if color == "met":
+                aw.qmc.backgroundmetcolor = aw.qmc.palette["met"]
+            elif color == "bt":
+                aw.qmc.backgroundmetcolor = aw.qmc.palette["bt"]
+            else:
+                aw.qmc.backgroundmetcolor = color
+                
+        elif curve == "bt":
+            if color == "bt":
+                aw.qmc.backgroundbtcolor = aw.qmc.palette["bt"]
+            elif color == "met":
+                aw.qmc.backgroundbtcolor = aw.qmc.palette["met"]                
+            else:
+                aw.qmc.backgroundbtcolor = color
+
+        aw.qmc.redraw()
+        self.btcolorComboBox.setDisabled(False)
+        self.metcolorComboBox.setDisabled(False)
+        self.status.showMessage("Ready",5000) 
+
+    def adjustwidth(self):
+        
+        self.status.showMessage("Processing...",5000)
+        #block button
+        self.widthSpinBox.setDisabled(True)
+        aw.qmc.backgroundwidth = self.widthSpinBox.value()
+        aw.qmc.redraw()
+        #reactivate button
+        self.widthSpinBox.setDisabled(False)
+        self.status.showMessage("Ready",5000)        
+
     def adjustintensity(self):
         
         self.status.showMessage("Processing...",5000)
+        #block button
+        self.intensitySpinBox.setDisabled(True)
         aw.qmc.backgroundalpha = self.intensitySpinBox.value()/10.
         aw.qmc.redraw()
-        time.sleep(0.3)
+        #reactivate button
+        self.intensitySpinBox.setDisabled(False)
         self.status.showMessage("Ready",5000)   
         
     def delete(self):
@@ -3620,9 +3733,29 @@ class backgroundDLG(QDialog):
         
     def move(self,m):        
          self.status.showMessage("Processing...",5000)
+         #block button
+         if m == "up":
+             self.upButton.setDisabled(True)
+         elif m == "down":
+            self.downButton.setDisabled(True)
+         elif m == "left":
+            self.leftButton.setDisabled(True)
+         elif m == "right":
+            self.rightButton.setDisabled(True)
+
          speed = self.speedSpinBox.value()
          aw.qmc.movebackground(m,speed)
-         self.pathedit.setText("")
+         
+         #reactivate button
+         if m == "up":
+             self.upButton.setDisabled(False)
+         elif m == "down":
+            self.downButton.setDisabled(False)
+         elif m == "left":
+            self.leftButton.setDisabled(False)
+         elif m == "right":
+            self.rightButton.setDisabled(False)
+            
          self.status.showMessage("Ready",5000)       
 
     def readChecks(self):
@@ -3980,6 +4113,202 @@ class serialport(object):
                 serHH.close()        
 
 
+#########################################################################
+#############  SERIAL PORT DIALOG #######################################                                   
+#########################################################################
+
+            
+class comportDlg(QDialog):
+    def __init__(self, parent = None):
+        super(comportDlg,self).__init__(parent)
+
+        comportlabel =QLabel("&Comm Port:")
+        self.comportEdit = QComboBox()
+        self.comportEdit.addItems([aw.ser.comport])
+        self.comportEdit.setEditable(True)
+        comportlabel.setBuddy(self.comportEdit)
+        
+        baudratelabel = QLabel("&Baud Rate:")
+        self.baudrateComboBox = QComboBox()
+        baudratelabel.setBuddy(self.baudrateComboBox)
+        self.baudrateComboBox.addItems(["2400","9600","19200"])
+        if aw.ser.baudrate == 2400:
+            self.baudrateComboBox.setCurrentIndex(0)
+        elif aw.ser.baudrate == 9600:
+            self.baudrateComboBox.setCurrentIndex(1)     
+        elif aw.ser.baudrate == 19200:
+            self.baudrateComboBox.setCurrentIndex(2)
+        else:
+            pass
+                   
+        bytesizelabel = QLabel("&Byte Size:")
+        self.bytesizeComboBox = QComboBox()
+        bytesizelabel.setBuddy(self.bytesizeComboBox)
+        self.bytesizeComboBox.addItems(["8","7"])
+        if aw.ser.bytesize == 8:
+            self.bytesizeComboBox.setCurrentIndex(0)
+        elif aw.ser.bytesize == 7:
+            self.bytesizeComboBox.setCurrentIndex(1)
+        else:
+            pass
+
+        paritylabel = QLabel("&Parity:")
+        self.parityComboBox = QComboBox()
+        paritylabel.setBuddy(self.parityComboBox)
+        self.parityComboBox.addItems(["O","E","N"])
+        if aw.ser.parity == "O":
+            self.parityComboBox.setCurrentIndex(0)
+        elif aw.ser.parity == "E":
+            self.parityComboBox.setCurrentIndex(1)
+        elif aw.ser.parity == "N":
+            self.parityComboBox.setCurrentIndex(2)
+        else:
+            pass
+
+        
+        stopbitslabel = QLabel("&Stopbits:")
+        self.stopbitsComboBox = QComboBox()
+        stopbitslabel.setBuddy(self.stopbitsComboBox)
+        self.stopbitsComboBox.addItems(["1","0","2"])
+        if aw.ser.stopbits == 1:
+            self.stopbitsComboBox.setCurrentIndex(0)
+        elif aw.ser.stopbits == 0:
+            self.stopbitsComboBox.setCurrentIndex(1)
+        elif aw.ser.stopbits == 2:
+            self.stopbitsComboBox.setCurrentIndex(2)
+        else:
+            pass
+        
+        timeoutlabel = QLabel("Timeout:")
+        self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
+        regex = QRegExp(r"^[0-9]$")
+        self.timeoutEdit.setValidator(QRegExpValidator(regex,self))
+
+        self.messagelabel = QLabel()
+        
+        okButton = QPushButton("&OK")
+        cancelButton = QPushButton("Cancel")
+        scanButton = QPushButton("Scan for Ports")
+        
+        buttonLayout = QGridLayout()
+        buttonLayout.addWidget(scanButton,0,0)
+        buttonLayout.addWidget(okButton,1,0)
+        buttonLayout.addWidget(cancelButton,1,1)
+
+
+        grid = QGridLayout()
+        grid.addWidget(comportlabel,0,0)
+        grid.addWidget(self.comportEdit,0,1)
+        grid.addWidget(baudratelabel,1,0)
+        grid.addWidget(self.baudrateComboBox,1,1)
+        grid.addWidget(bytesizelabel,2,0)
+        grid.addWidget(self.bytesizeComboBox,2,1)
+        grid.addWidget(paritylabel,3,0)
+        grid.addWidget(self.parityComboBox,3,1)
+        grid.addWidget(stopbitslabel,4,0)
+        grid.addWidget(self.stopbitsComboBox,4,1)
+        grid.addWidget(timeoutlabel,5,0)
+        grid.addWidget(self.timeoutEdit,5,1)
+        grid.addWidget(self.messagelabel,6,1)
+        
+        grid.addLayout(buttonLayout,7,1)
+        self.setLayout(grid)
+
+        self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
+        self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)
+        self.setWindowTitle("Serial Communication Configuration")
+
+    def accept(self):
+        #validate serial parameter against input errors
+        class comportError(Exception): pass
+        class baudrateError(Exception): pass
+        class bytesizeError(Exception): pass
+        class parityError(Exception): pass
+        class stopbitsError(Exception): pass
+        class timeoutError(Exception): pass
+        
+        comport = self.comportEdit.currentText()
+        baudrate = self.baudrateComboBox.currentText()
+        bytesize = self.bytesizeComboBox.currentText()
+        parity = self.parityComboBox.currentText()
+        stopbits = self.stopbitsComboBox.currentText()
+        timeout = self.timeoutEdit.text()
+        
+        try:
+            #check here comport errors
+            if comport.isEmpty():
+                raise comportError
+            if timeout.isEmpty():
+                raise timeoutError
+            #add more checks here
+            
+        except comportError,e:
+            aw.qmc.errorlog.append("Invalid serial Comm entry " + str(e) + " ")
+            self.messagelabel.setText("Invalid Comm entry")
+            self.comportEdit.selectAll()
+            self.comportEdit.setFocus()           
+            return
+
+        except timeoutError,e:
+            aw.qmc.errorlog.append("Invalid serial Timeout entry" + str(e) + " ")
+            self.messagelabel.setText("Invalid Timeout entry")
+            self.timeoutEdit.selectAll()
+            self.timeoutEdit.setFocus()           
+            return
+        
+        QDialog.accept(self)
+
+
+    def scanforport(self):
+        available = []      
+        if platf in ('Windows', 'Microsoft'):
+            #scans serial ports in Windows computer
+            for i in range(100):
+                try:
+                    s = serial.Serial(i)
+                    available.append(s.portstr)
+                    s.close()  
+                except serial.SerialException,e:
+                    aw.qmc.errorlog.append("Exception during port scan:" + str(e)) 
+                
+        elif platf == 'Darwin':
+            #scans serial ports in Mac computer
+            results={}
+            for name in glob.glob("/dev/cu.*"):
+                if name.upper().rfind("MODEM") < 0:
+                    try:
+                        with file(name, 'rw'):
+                            available.append(name)
+                    except Exception, e:
+                        pass
+                    
+        elif platf == 'Linux':
+            maxnum=9
+            for prefix, description, klass in ( 
+                ("/dev/cua", "Standard serial port", "serial"), 
+                ("/dev/ttyUSB", "USB to serial convertor", "serial"),
+                ("/dev/usb/ttyUSB", "USB to serial convertor", "serial"), 
+                ("/dev/usb/tts/", "USB to serial convertor", "serial")
+                ):
+                for num in range(maxnum+1):
+                    name=prefix+`num`
+                    if not os.path.exists(name):
+                        continue
+                    try:
+                        with file(name, 'rw'):
+                            available.append(name)
+                    except Exception, e:
+                        pass
+        else:
+            self.messagelabel.setText("Port scan on this platform not yet supported")
+                                
+        self.comportEdit.clear()              
+        self.comportEdit.addItems(available)
+        if len(available) > 1:
+            self.comportEdit.setCurrentIndex(1)
+
+
 #################################################################################            
 ##################   Device assignments DIALOG for reading temperature   ########
 #################################################################################
@@ -4332,201 +4661,6 @@ class graphColorDlg(QDialog):
             aw.messagelabel.setText(str(color) + " " + str(labelcolor))
 
 
-#########################################################################
-#############  SERIAL PORT DIALOG #######################################                                   
-#########################################################################
-
-            
-class comportDlg(QDialog):
-    def __init__(self, parent = None):
-        super(comportDlg,self).__init__(parent)
-
-        comportlabel =QLabel("&Comm Port:")
-        self.comportEdit = QComboBox()
-        self.comportEdit.addItems([aw.ser.comport])
-        self.comportEdit.setEditable(True)
-        comportlabel.setBuddy(self.comportEdit)
-        
-        baudratelabel = QLabel("&Baud Rate:")
-        self.baudrateComboBox = QComboBox()
-        baudratelabel.setBuddy(self.baudrateComboBox)
-        self.baudrateComboBox.addItems(["2400","9600","19200"])
-        if aw.ser.baudrate == 2400:
-            self.baudrateComboBox.setCurrentIndex(0)
-        elif aw.ser.baudrate == 9600:
-            self.baudrateComboBox.setCurrentIndex(1)     
-        elif aw.ser.baudrate == 19200:
-            self.baudrateComboBox.setCurrentIndex(2)
-        else:
-            pass
-                   
-        bytesizelabel = QLabel("&Byte Size:")
-        self.bytesizeComboBox = QComboBox()
-        bytesizelabel.setBuddy(self.bytesizeComboBox)
-        self.bytesizeComboBox.addItems(["8","7"])
-        if aw.ser.bytesize == 8:
-            self.bytesizeComboBox.setCurrentIndex(0)
-        elif aw.ser.bytesize == 7:
-            self.bytesizeComboBox.setCurrentIndex(1)
-        else:
-            pass
-
-        paritylabel = QLabel("&Parity:")
-        self.parityComboBox = QComboBox()
-        paritylabel.setBuddy(self.parityComboBox)
-        self.parityComboBox.addItems(["O","E","N"])
-        if aw.ser.parity == "O":
-            self.parityComboBox.setCurrentIndex(0)
-        elif aw.ser.parity == "E":
-            self.parityComboBox.setCurrentIndex(1)
-        elif aw.ser.parity == "N":
-            self.parityComboBox.setCurrentIndex(2)
-        else:
-            pass
-
-        
-        stopbitslabel = QLabel("&Stopbits:")
-        self.stopbitsComboBox = QComboBox()
-        stopbitslabel.setBuddy(self.stopbitsComboBox)
-        self.stopbitsComboBox.addItems(["1","0","2"])
-        if aw.ser.stopbits == 1:
-            self.stopbitsComboBox.setCurrentIndex(0)
-        elif aw.ser.stopbits == 0:
-            self.stopbitsComboBox.setCurrentIndex(1)
-        elif aw.ser.stopbits == 2:
-            self.stopbitsComboBox.setCurrentIndex(2)
-        else:
-            pass
-        
-        timeoutlabel = QLabel("Timeout:")
-        self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
-        regex = QRegExp(r"^[0-9]$")
-        self.timeoutEdit.setValidator(QRegExpValidator(regex,self))
-
-        self.messagelabel = QLabel()
-        
-        okButton = QPushButton("&OK")
-        cancelButton = QPushButton("Cancel")
-        scanButton = QPushButton("Scan for Ports")
-        
-        buttonLayout = QGridLayout()
-        buttonLayout.addWidget(scanButton,0,0)
-        buttonLayout.addWidget(okButton,1,0)
-        buttonLayout.addWidget(cancelButton,1,1)
-
-
-        grid = QGridLayout()
-        grid.addWidget(comportlabel,0,0)
-        grid.addWidget(self.comportEdit,0,1)
-        grid.addWidget(baudratelabel,1,0)
-        grid.addWidget(self.baudrateComboBox,1,1)
-        grid.addWidget(bytesizelabel,2,0)
-        grid.addWidget(self.bytesizeComboBox,2,1)
-        grid.addWidget(paritylabel,3,0)
-        grid.addWidget(self.parityComboBox,3,1)
-        grid.addWidget(stopbitslabel,4,0)
-        grid.addWidget(self.stopbitsComboBox,4,1)
-        grid.addWidget(timeoutlabel,5,0)
-        grid.addWidget(self.timeoutEdit,5,1)
-        grid.addWidget(self.messagelabel,6,1)
-        
-        grid.addLayout(buttonLayout,7,1)
-        self.setLayout(grid)
-
-        self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
-        self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)
-        self.setWindowTitle("Serial Communication Configuration")
-
-    def accept(self):
-        #validate serial parameter against input errors
-        class comportError(Exception): pass
-        class baudrateError(Exception): pass
-        class bytesizeError(Exception): pass
-        class parityError(Exception): pass
-        class stopbitsError(Exception): pass
-        class timeoutError(Exception): pass
-        
-        comport = self.comportEdit.currentText()
-        baudrate = self.baudrateComboBox.currentText()
-        bytesize = self.bytesizeComboBox.currentText()
-        parity = self.parityComboBox.currentText()
-        stopbits = self.stopbitsComboBox.currentText()
-        timeout = self.timeoutEdit.text()
-        
-        try:
-            #check here comport errors
-            if comport.isEmpty():
-                raise comportError
-            if timeout.isEmpty():
-                raise timeoutError
-            #add more checks here
-            
-        except comportError,e:
-            aw.qmc.errorlog.append("Invalid serial Comm entry " + str(e) + " ")
-            self.messagelabel.setText("Invalid Comm entry")
-            self.comportEdit.selectAll()
-            self.comportEdit.setFocus()           
-            return
-
-        except timeoutError,e:
-            aw.qmc.errorlog.append("Invalid serial Timeout entry" + str(e) + " ")
-            self.messagelabel.setText("Invalid Timeout entry")
-            self.timeoutEdit.selectAll()
-            self.timeoutEdit.setFocus()           
-            return
-        
-        QDialog.accept(self)
-
-
-    def scanforport(self):
-        available = []      
-        if platf in ('Windows', 'Microsoft'):
-            #scans serial ports in Windows computer
-            for i in range(100):
-                try:
-                    s = serial.Serial(i)
-                    available.append(s.portstr)
-                    s.close()  
-                except serial.SerialException,e:
-                    aw.qmc.errorlog.append("Exception during port scan:" + str(e)) 
-                
-        elif platf == 'Darwin':
-            #scans serial ports in Mac computer
-            results={}
-            for name in glob.glob("/dev/cu.*"):
-                if name.upper().rfind("MODEM") < 0:
-                    try:
-                        with file(name, 'rw'):
-                            available.append(name)
-                    except Exception, e:
-                        pass
-                    
-        elif platf == 'Linux':
-            maxnum=9
-            for prefix, description, klass in ( 
-                ("/dev/cua", "Standard serial port", "serial"), 
-                ("/dev/ttyUSB", "USB to serial convertor", "serial"),
-                ("/dev/usb/ttyUSB", "USB to serial convertor", "serial"), 
-                ("/dev/usb/tts/", "USB to serial convertor", "serial")
-                ):
-                for num in range(maxnum+1):
-                    name=prefix+`num`
-                    if not os.path.exists(name):
-                        continue
-                    try:
-                        with file(name, 'rw'):
-                            available.append(name)
-                    except Exception, e:
-                        pass
-        else:
-            self.messagelabel.setText("Port scan on this platform not yet supported")
-                                
-        self.comportEdit.clear()              
-        self.comportEdit.addItems(available)
-        if len(available) > 1:
-            self.comportEdit.setCurrentIndex(1)
-
             
 
 #########################################################################
@@ -4730,14 +4864,14 @@ class PXRpidDlgControl(QDialog):
 
     def paintlabels(self):
         
-        str1 = "T= " + "%.1f" % aw.pid.PXR["segment1sv"][0] + "\nRamp " + str(aw.pid.PXR["segment1ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment1soak"][0])
-        str2 = "T= " + "%.1f" % aw.pid.PXR["segment2sv"][0] + "\nRamp " + str(aw.pid.PXR["segment2ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment2soak"][0])
-        str3 = "T= " + "%.1f" % aw.pid.PXR["segment3sv"][0] + "\nRamp " + str(aw.pid.PXR["segment3ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment3soak"][0])
-        str4 = "T= " + "%.1f" % aw.pid.PXR["segment4sv"][0] + "\nRamp " + str(aw.pid.PXR["segment4ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment4soak"][0])
-        str5 = "T= " + "%.1f" % aw.pid.PXR["segment5sv"][0] + "\nRamp " + str(aw.pid.PXR["segment5ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment5soak"][0])
-        str6 = "T= " + "%.1f" % aw.pid.PXR["segment6sv"][0] + "\nRamp " + str(aw.pid.PXR["segment6ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment6soak"][0])
-        str7 = "T= " + "%.1f" % aw.pid.PXR["segment7sv"][0] + "\nRamp " + str(aw.pid.PXR["segment7ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment7soak"][0])
-        str8 = "T= " + "%.1f" % aw.pid.PXR["segment8sv"][0] + "\nRamp " + str(aw.pid.PXR["segment8ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment8soak"][0])
+        str1 = "T= " + str(aw.pid.PXR["segment1sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment1ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment1soak"][0])
+        str2 = "T= " + str(aw.pid.PXR["segment2sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment2ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment2soak"][0])
+        str3 = "T= " + str(aw.pid.PXR["segment3sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment3ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment3soak"][0])
+        str4 = "T= " + str(aw.pid.PXR["segment4sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment4ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment4soak"][0])
+        str5 = "T= " + str(aw.pid.PXR["segment5sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment5ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment5soak"][0])
+        str6 = "T= " + str(aw.pid.PXR["segment6sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment6ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment6soak"][0])
+        str7 = "T= " + str(aw.pid.PXR["segment7sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment7ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment7soak"][0])
+        str8 = "T= " + str(aw.pid.PXR["segment8sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment8ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment8soak"][0])
 
         self.label_rs1.setText(QString(str1))
         self.label_rs2.setText(QString(str2))
@@ -5383,7 +5517,7 @@ class PXG4pidDlgControl(QDialog):
         self.d6edit.setMaximumSize(50, 42)
         self.d7edit.setMaximumSize(50, 42)
 
-        regexpid = QRegExp(r"^[0-9]{1,3}.[0-9]$")
+        regexpid = QRegExp(r"^[0-9]{1,3}[0-9]$")
         self.p1edit.setValidator(QRegExpValidator(regexpid,self))
         self.p2edit.setValidator(QRegExpValidator(regexpid,self))
         self.p3edit.setValidator(QRegExpValidator(regexpid,self))
@@ -5571,22 +5705,22 @@ class PXG4pidDlgControl(QDialog):
 
     def paintlabels(self):
         #read values of variables to place in buttons
-        str1 = "1 T= " + "%.1f" % aw.pid.PXG4["segment1sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment1ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment1soak"][0])
-        str2 = "2 T= " + "%.1f" % aw.pid.PXG4["segment2sv"][0]  + "\nRamp " + str(aw.pid.PXG4["segment2ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment2soak"][0])
-        str3 = "3 T= " + "%.1f" % aw.pid.PXG4["segment3sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment3ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment3soak"][0])
-        str4 = "4 T= " + "%.1f" % aw.pid.PXG4["segment4sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment4ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment4soak"][0])
-        str5 = "5 T= " + "%.1f" % aw.pid.PXG4["segment5sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment5ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment5soak"][0])
-        str6 = "6 T= " + "%.1f" % aw.pid.PXG4["segment6sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment6ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment6soak"][0])
-        str7 = "7 T= " + "%.1f" % aw.pid.PXG4["segment7sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment7ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment7soak"][0])
-        str8 = "8 T= " + "%.1f" % aw.pid.PXG4["segment8sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment8ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment8soak"][0])
-        str9 = "9 T= " + "%.1f" % aw.pid.PXG4["segment9sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment9ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment9soak"][0])
-        str10 ="10 T= " + "%.1f" % aw.pid.PXG4["segment10sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment10ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment10soak"][0])
-        str11 = "11 T= "+ "%.1f" % aw.pid.PXG4["segment11sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment11ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment11soak"][0])
-        str12 = "12 T= "+ "%.1f" % aw.pid.PXG4["segment12sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment12ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment12soak"][0])
-        str13 = "13 T= "+ "%.1f" % aw.pid.PXG4["segment13sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment13ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment13soak"][0])
-        str14 = "14 T= "+ "%.1f" % aw.pid.PXG4["segment14sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment14ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment14soak"][0])
-        str15 = "15 T= "+ "%.1f" % aw.pid.PXG4["segment15sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment15ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment15soak"][0])
-        str16 = "16 T= "+ "%.1f" % aw.pid.PXG4["segment16sv"][0] + "\nRamp " + str(aw.pid.PXG4["segment16ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment16soak"][0])
+        str1 = "1 T= " + str(aw.pid.PXG4["segment1sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment1ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment1soak"][0])
+        str2 = "2 T= " + str(aw.pid.PXG4["segment2sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment2ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment2soak"][0])
+        str3 = "3 T= " + str(aw.pid.PXG4["segment3sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment3ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment3soak"][0])
+        str4 = "4 T= " + str(aw.pid.PXG4["segment4sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment4ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment4soak"][0])
+        str5 = "5 T= " + str(aw.pid.PXG4["segment5sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment5ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment5soak"][0])
+        str6 = "6 T= " + str(aw.pid.PXG4["segment6sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment6ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment6soak"][0])
+        str7 = "7 T= " + str(aw.pid.PXG4["segment7sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment7ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment7soak"][0])
+        str8 = "8 T= " + str(aw.pid.PXG4["segment8sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment8ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment8soak"][0])
+        str9 = "9 T= " + str(aw.pid.PXG4["segment9sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment9ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment9soak"][0])
+        str10 ="10 T= " + str(aw.pid.PXG4["segment10sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment10ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment10soak"][0])
+        str11 = "11 T= "+ str(aw.pid.PXG4["segment11sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment11ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment11soak"][0])
+        str12 = "12 T= "+ str(aw.pid.PXG4["segment12sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment12ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment12soak"][0])
+        str13 = "13 T= "+ str(aw.pid.PXG4["segment13sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment13ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment13soak"][0])
+        str14 = "14 T= "+ str(aw.pid.PXG4["segment14sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment14ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment14soak"][0])
+        str15 = "15 T= "+ str(aw.pid.PXG4["segment15sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment15ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment15soak"][0])
+        str16 = "16 T= "+ str(aw.pid.PXG4["segment16sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment16ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment16soak"][0])
 
         self.label_rs1.setText(QString(str1))
         self.label_rs2.setText(QString(str2))
