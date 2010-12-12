@@ -704,7 +704,7 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError,e:
             aw.messagelabel.setText(str(e))
-            aw.qmc.errorlog.append("value error in stringfromseconds(): " + str(e) + " ")
+            aw.qmc.errorlog.append("value error in stringfromseconds(): " + str(e))
             return -1          
 
 
@@ -1932,12 +1932,12 @@ class ApplicationWindow(QMainWindow):
 
         except IOError,e:
             self.messagelabel.setText("error in fileload() " + str(e) + " ")
-            aw.qmc.errorlog.append("Unable to open file " + str(e) + " ")
+            aw.qmc.errorlog.append("Unable to open file " + str(e))
             return
 
         except ValueError,e:
             self.messagelabel.setText(str(e))
-            self.qmc.errorlog.append("value error in fileload() " + str(e) + " ")
+            self.qmc.errorlog.append("value error in fileload() " + str(e))
             return
         
         finally:
@@ -2088,12 +2088,12 @@ class ApplicationWindow(QMainWindow):
 
         except IOError,e:
             self.messagelabel.setText("error in fileload() " + str(e) + " ")
-            aw.qmc.errorlog.append("Unable to open file " + str(e) + " ")
+            aw.qmc.errorlog.append("Unable to open file " + str(e) )
             return
 
         except ValueError,e:
             self.messagelabel.setText(str(e))
-            self.qmc.errorlog.append("value error in fileload() " + str(e) + " ")
+            self.qmc.errorlog.append("value error in fileload() " + str(e))
             return
         
         finally:
@@ -2163,7 +2163,7 @@ class ApplicationWindow(QMainWindow):
 
         except IOError,e:
             self.messagelabel.setText("Error in filesave() " + str(e) + " ")
-            aw.qmc.errorlog.append("Error in filesave() " + str(e) + " ")
+            aw.qmc.errorlog.append("Error in filesave() " + str(e))
             return
         finally:
             if f:
@@ -2241,7 +2241,7 @@ class ApplicationWindow(QMainWindow):
 
         except Exception,e:
             print e
-            self.qmc.errorlog.append("Error loading settings " + str(e) + " ")         
+            self.qmc.errorlog.append("Error loading settings " + str(e))         
             return                            
 
 
@@ -2296,7 +2296,7 @@ class ApplicationWindow(QMainWindow):
 
             
         except Exception,e:
-            self.qmc.errorlog.append("Error saving settings " + str(e) + " ")   
+            self.qmc.errorlog.append("Error saving settings " + str(e))   
             
 
     def filePrint(self):
@@ -2510,7 +2510,7 @@ class ApplicationWindow(QMainWindow):
                 
             except IOError,e:
                 self.messagelabel.setText("Error in htmlReport() " + str(e) + " ")
-                aw.qmc.errorlog.append("Error in htmlReport() " + str(e) + " ")
+                aw.qmc.errorlog.append("Error in htmlReport() " + str(e))
                 return
         finally:
             if f:
@@ -2518,8 +2518,9 @@ class ApplicationWindow(QMainWindow):
 
         
     def viewErrorLog(self):
-        QMessageBox.about(self,"Error log",str(self.qmc.errorlog))
-
+        error = errorDlg(self)
+        error.show()
+        
     def helpAbout(self):
         creditsto = "<br>Rafael Cobo <br> Marko Luther"
         box = QMessageBox()
@@ -2666,12 +2667,12 @@ class ApplicationWindow(QMainWindow):
 
         except IOError,e:
             self.messagelabel.setText(str(e))
-            self.qmc.errorlog.append("file error in importHH506RA(): " + str(e) + " ")
+            self.qmc.errorlog.append("file error in importHH506RA(): " + str(e))
             return            
 
         except ValueError,e:
             self.messagelabel.setText(str(e))
-            self.qmc.errorlog.append("value error in importHH506RA(): " + str(e) + " ")
+            self.qmc.errorlog.append("value error in importHH506RA(): " + str(e))
             return
 
 
@@ -2724,7 +2725,7 @@ class ApplicationWindow(QMainWindow):
 
         except IOError,e:
             self.messagelabel.setText("Error in resize() " + str(e) + " ")
-            aw.qmc.errorlog.append("Error in resize() " + str(e) + " ")
+            aw.qmc.errorlog.append("Error in resize() " + str(e))
             return
                                         
 ########################################################################################            
@@ -3208,6 +3209,38 @@ class editGraphDlg(QDialog):
              aw.qmc.specialevents.pop()
              self.close()
              aw.editgraph()
+
+
+
+##########################################################################
+#####################  VIEW ERROR LOG DLG  ###############################
+##########################################################################
+        
+class errorDlg(QDialog):
+    def __init__(self, parent = None):
+        super(errorDlg,self).__init__(parent)
+        self.setWindowTitle("Error Log")
+
+        #convert list of errors to an html string
+        htmlerr = ""
+        if len(aw.qmc.errorlog):
+            for i in range(len(aw.qmc.errorlog)):
+                htmlerr += "<b>" + str(i+1) + "</b> : <i>" + aw.qmc.errorlog[i] + "</i><br><br>"
+
+        enumber = len(aw.qmc.errorlog)
+        labelstr =  "Number of errors found: " + str(enumber)
+        elabel = QLabel(labelstr)
+        errorEdit = QTextEdit()
+        errorEdit.setHtml(htmlerr)
+
+        layout = QVBoxLayout()
+        layout.addWidget(elabel,0)
+        layout.addWidget(errorEdit,1)
+                               
+        self.setLayout(layout)
+
+
+
 
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
@@ -3817,7 +3850,7 @@ class StatisticsDLG(QDialog):
         self.time = QCheckBox("Time")
         self.bar = QCheckBox("Bar")
         self.flavor = QCheckBox("Flavor")
-        self.area = QCheckBox("Area under curves")
+        self.area = QCheckBox("Other Data")
         
         self.mindryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))        
         self.maxdryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[1]))        
@@ -4040,7 +4073,7 @@ class serialport(object):
                     return -1,-1
         except serial.SerialException, e:
             self.messagelabel.setText("ser.HH806AUtemperature(): " + str(e))
-            self.qmc.errorlog.append("ser.HH806AUtemperature(): " + str(e) + " ")
+            self.qmc.errorlog.append("ser.HH806AUtemperature(): " + str(e) )
             return -1,-1
         finally:
             if serHH:
@@ -4091,7 +4124,7 @@ class serialport(object):
         
         except serial.SerialException, e:
             aw.messagelabel.setText("ser.HH506RAtemperature(): " + str(e))
-            aw.qmc.errorlog.append("ser.HH506RAtemperature(): " + str(e) + " ")
+            aw.qmc.errorlog.append("ser.HH506RAtemperature(): " + str(e) )
             return -1,-1
         
         finally:
@@ -4119,7 +4152,7 @@ class serialport(object):
         
         except serial.SerialException, e:
             aw.messagelabel.setText("ser.HH506RAGetID()" + str(e))
-            aw.qmc.errorlog.append("ser.HH506RAGetID()" + str(e) + " ")
+            aw.qmc.errorlog.append("ser.HH506RAGetID()" + str(e) )
             
         finally:
             if serHH:
@@ -4257,14 +4290,14 @@ class comportDlg(QDialog):
             #add more checks here
             
         except comportError,e:
-            aw.qmc.errorlog.append("Invalid serial Comm entry " + str(e) + " ")
+            aw.qmc.errorlog.append("Invalid serial Comm entry " + str(e))
             self.messagelabel.setText("Invalid Comm entry")
             self.comportEdit.selectAll()
             self.comportEdit.setFocus()           
             return
 
         except timeoutError,e:
-            aw.qmc.errorlog.append("Invalid serial Timeout entry" + str(e) + " ")
+            aw.qmc.errorlog.append("Invalid serial Timeout entry" + str(e))
             self.messagelabel.setText("Invalid Timeout entry")
             self.timeoutEdit.selectAll()
             self.timeoutEdit.setFocus()           
