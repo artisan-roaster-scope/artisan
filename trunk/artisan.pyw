@@ -34,8 +34,9 @@
 # version 00029: adds support for Omega HH506RA (reported to work also as Extech 421509). Thanks to Marko Luther.
 # version 00030: FINISHED PXR3 control Dlg 
 # version 00031: FINISHED PXG4 control Dlg and enhanced background options
+# END OF ALPHA.  BEGUINING BETA TESTING 
 
-__version__ = "0.00031"
+__version__ = "0.1"
 
 
 # ABOUT
@@ -459,6 +460,7 @@ class tgraphcanvas(FigureCanvas):
         self.specialevents = []
         self.specialeventsStrings = ["1","2","3","4","5","6","7","8","9","10"]
         self.roastdate = QDate.currentDate()
+        
         self.redraw()
 
     #Redraws data   
@@ -1238,8 +1240,19 @@ class tgraphcanvas(FigureCanvas):
                     AccMET += self.temp1[k]*timeD
                     
                 deltaAcc = int(AccMET) - int(AccBT)
-            
-                strline = "BT area= " + str(int(AccBT)) + "; MET area = " + str(int(AccMET)) +  "; delta = " + str(deltaAcc)
+                
+                #find Lowest Point in BT
+                LP = 1000 
+                for i in range(len(self.temp2)):
+                    if self.temp2[i] < LP:
+                        LP = self.temp2[i]
+                        
+                lowestBT = str(LP)
+                timeLP = str(self.stringfromseconds(self.timex[k] - self.startend[0]))
+                
+                strline = "[Delta area = " + str(deltaAcc) + "] [Lowest BT = " + lowestBT + self.mode +"]"
+                
+                #text statistics  
                 self.ax.text(self.startend[0]+10,15, strline,color = self.palette["text"])
 
     #Marks location in graph of special events. For example change a fan setting.
@@ -2515,10 +2528,10 @@ class ApplicationWindow(QMainWindow):
                 "Platform",
                 """<b>Version:</b> {0} 
                 <p>
-                <b>Python</b> {1} <br>
-                <b>Qt:</b> {2} <br>
-                <b>PyQt:</b> {3} <br>
-                <b>OS:</b/> {4}
+                <b>Python:</b> [ {1} ]
+                <b>Qt:</b> [ {2} ]
+                <b>PyQt:</b> [ {3} ]
+                <b>OS:</b/>[ {4} ]
                 </p>
                 <p>
                 <b>Credits:</b> {5}
