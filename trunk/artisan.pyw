@@ -34,7 +34,7 @@
 # version 00029: adds support for Omega HH506RA (reported to work also as Extech 421509). Thanks to Marko Luther.
 # version 00030: FINISHED PXR3 control Dlg 
 # version 00031: FINISHED PXG4 control Dlg and enhanced background options
-# END OF ALPHA.  BEGUINING BETA TESTING 
+# END OF ALPHA.  BEGINNING BETA TESTING 
 
 __version__ = "0.1"
 
@@ -495,7 +495,7 @@ class tgraphcanvas(FigureCanvas):
 
         #check BACKGROUND flag
         if self.background:
-            #check to see if there is both a profile loaded and a background
+            #check to see if there is both a profile loaded and a background loaded
             if self.startend[0] and self.startendB[0] and (self.startend[0] != self.startendB[0]):
                 #align the background profile so they both plot with the same CHARGE time
                 difference = self.startend[0] - self.startendB[0]
@@ -876,9 +876,7 @@ class tgraphcanvas(FigureCanvas):
     #Turns ON flag self.flagon to read and plot. Called from push button_1. It tells when to start recording.
     def OnMonitor(self):
         #reinitialized these variables if turning on after loading a profile to compare while keeping loaded profile in screen
-        self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
-        self.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
-        self.startend = [0.,0.,0.,0.]
+        self.reset()
         self.ax.set_xlim(0,self.endofx)
         self.flagon = True
         self.timeclock.start()
@@ -1685,12 +1683,16 @@ class ApplicationWindow(QMainWindow):
         self.GraphMenu.addAction(phasesGraphAction)
        
         StatisticsAction = QAction("Statistics",self)
-        self.connect(StatisticsAction,SIGNAL("triggered()"),self.showstatisticsdlg)
+        self.connect(StatisticsAction,SIGNAL("triggered()"),self.showstatistics)
         self.GraphMenu.addAction(StatisticsAction)     
 
 
+        calculatorAction = QAction("Calculator",self)
+        self.connect(calculatorAction,SIGNAL("triggered()"),self.calculator)
+        self.GraphMenu.addAction(calculatorAction)   
+
         backgroundAction = QAction("Profile Background",self)
-        self.connect(backgroundAction,SIGNAL("triggered()"),self.backgrounddlg)
+        self.connect(backgroundAction,SIGNAL("triggered()"),self.background)
         self.GraphMenu.addAction(backgroundAction)  
         
         # CONFIGURATION menu
@@ -2583,11 +2585,15 @@ class ApplicationWindow(QMainWindow):
         dialog = DeviceAssignmentDLG(self)
         dialog.show()        
 
-    def showstatisticsdlg(self):
+    def showstatistics(self):
         dialog = StatisticsDLG(self)
         dialog.show()
 
-    def backgrounddlg(self):
+    def calculator(self):
+        dialog = calculatorDlg(self)
+        dialog.show()
+
+    def background(self):
         dialog = backgroundDLG(self)
         dialog.show()       
 
@@ -3223,15 +3229,15 @@ class errorDlg(QDialog):
 
         #convert list of errors to an html string
         htmlerr = ""
-        if len(aw.qmc.errorlog):
-            for i in range(len(aw.qmc.errorlog)):
-                htmlerr += "<b>" + str(i+1) + "</b> : <i>" + aw.qmc.errorlog[i] + "</i><br><br>"
+        for i in range(len(aw.qmc.errorlog)):
+            htmlerr += "<b>" + str(i+1) + "</b> <i>" + aw.qmc.errorlog[i] + "</i><br><br>"
 
         enumber = len(aw.qmc.errorlog)
-        labelstr =  "Number of errors found: " + str(enumber)
+        labelstr =  "Number of errors found <b>" + str(enumber) +"</b>"
         elabel = QLabel(labelstr)
         errorEdit = QTextEdit()
         errorEdit.setHtml(htmlerr)
+        errorEdit.setReadOnly(True)
 
         layout = QVBoxLayout()
         layout.addWidget(elabel,0)
@@ -3239,8 +3245,113 @@ class errorDlg(QDialog):
                                
         self.setLayout(layout)
 
+##########################################################################
+#####################  CALCULATOR DLG   ##################################
+##########################################################################
+        
+class calculatorDlg(QDialog):
+    def __init__(self, parent = None):
+        super(calculatorDlg,self).__init__(parent)
+        self.setWindowTitle("Rate of change calculator")
 
+        self.result1 = QLabel("Finds rate of change between: Start - End")
+        self.result2 = QLabel()
 
+        startlabel = QLabel("Start time (00:00)")
+        endlabel = QLabel("End time (00:00)")
+        self.startEdit = QLineEdit()
+        self.endEdit = QLineEdit()
+        regextime = QRegExp(r"^[0-9]{1,2}:[0-9]{1,2}$")
+        self.startEdit.setValidator(QRegExpValidator(regextime,self))
+        self.endEdit.setValidator(QRegExpValidator(regextime,self))
+        
+
+        okButton = QPushButton("OK")  
+        cancelButton = QPushButton("Cancel")
+        
+        self.connect(okButton,SIGNAL("clicked()"),self.calculate)
+        self.connect(cancelButton,SIGNAL("clicked()"),self.close)
+
+        calLayout = QGridLayout()
+        calLayout.addWidget(startlabel,0,0)
+        calLayout.addWidget(endlabel,0,1)
+        calLayout.addWidget(self.startEdit,1,0)
+        calLayout.addWidget(self.endEdit,1,1)
+        calLayout.addWidget(okButton,2,0)
+        calLayout.addWidget(cancelButton,2,1)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.result1,0)
+        layout.addWidget(self.result2,0)
+        layout.addLayout(calLayout,1)        
+      
+        self.setLayout(layout)
+
+    #selects closest time index in aw.qmc.timex from secons
+    #used by calculate()
+    def choice(self,seconds):
+
+        #find where given seconds crosses aw.qmc.timex
+        if len(aw.qmc.timex):                           #check that time is not empty just in case
+            for i in range(len(aw.qmc.timex)):
+                # first find the index i where seconds crosses timex
+                if aw.qmc.timex[i] > seconds:
+                    break
+            choice1 = aw.qmc.timex[i]   # after
+            choice2 = aw.qmc.timex[i-1] # before
+
+            if (choice1-seconds) <= (choice2-seconds):  #return closest of the two
+                return i
+            else:
+                return i-1
+        
+    def calculate(self):
+        if len(aw.qmc.timex)>2:
+            starttime = aw.qmc.stringtoseconds(str(self.startEdit.text()))
+            endtime = aw.qmc.stringtoseconds(str(self.endEdit.text()))
+
+            if starttime == -1 or endtime == -1:
+                self.result1.setText("time sintax error. Time not valid")
+                return
+
+            if  endtime > aw.qmc.timex[-1] or endtime < starttime:
+                self.result1.setText("time profile error")
+                return
+
+            #if profile has a CHARGE time (time is referenced to charge time)
+            if aw.qmc.startend[0]:
+                starttime += aw.qmc.startend[0]
+                endtime += aw.qmc.startend[0]
+                startindex = self.choice(starttime)
+                endindex = self.choice(endtime)
+                
+            #if profile does not have a CHARGE time (time is absolute time)   
+            else:
+                startindex = self.choice(starttime)
+                endindex = self.choice(endtime)
+
+            #delta
+            deltatime = float(aw.qmc.timex[endindex] -  aw.qmc.timex[startindex])
+            deltatemperature = float(aw.qmc.temp2[endindex] - aw.qmc.temp2[startindex])
+            if deltatime == 0:
+                deltaseconds = 0
+            else:
+                deltaseconds = deltatemperature/deltatime
+            deltaminutes = deltaseconds*60.
+            
+            if aw.qmc.startend[0]:
+                string1 = ( "from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]-aw.qmc.startend[0]) +
+                            " to " + aw.qmc.stringfromseconds(aw.qmc.timex[endindex]-aw.qmc.startend[0] ))
+            else:
+                string1 = ("from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]) + " to " +
+                           aw.qmc.stringfromseconds(aw.qmc.timex[endindex]))
+                
+            string2 = "d/second = " + "%.2f"%(deltaseconds) + "  d/minute = " + "%.2f"%(deltaminutes)
+            
+            self.result1.setText(string1)        
+            self.result2.setText(string2)
+        else:
+            self.result1.setText("No profile time found")  
 
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
@@ -3574,10 +3685,6 @@ class backgroundDLG(QDialog):
         super(backgroundDLG,self).__init__(parent)
         self.setWindowTitle("Profile background")
 
-        self.status = QStatusBar()
-        self.status.setSizeGripEnabled(False)
-        self.status.showMessage("Ready",3000)
-
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
         self.fname = ""
@@ -3589,6 +3696,10 @@ class backgroundDLG(QDialog):
             self.backgroundCheck.setChecked(True)
         else:
             self.backgroundCheck.setChecked(False)
+
+        self.status = QStatusBar()
+        self.status.setSizeGripEnabled(False)
+        self.status.showMessage("Ready",3000)
 
         if aw.qmc.backgroundDetails:
             self.backgroundDetails.setChecked(True)
@@ -4065,15 +4176,15 @@ class serialport(object):
 
                 return t1, t2
             else:
-                self.messagelabel.setText("No RX data from HH806AUtemperature()")
-                self.qmc.errorlog.append("No RX data from HH806AUtemperature() ")
+                aw.messagelabel.setText("No RX data from HH806AUtemperature()")
+                aw.qmc.qmc.errorlog.append("No RX data from HH806AUtemperature() ")
                 if len(self.qmc.timex) > 2:
                     return self.qmc.temp1[-1], self.qmc.temp2[-1]
                 else:
                     return -1,-1
         except serial.SerialException, e:
-            self.messagelabel.setText("ser.HH806AUtemperature(): " + str(e))
-            self.qmc.errorlog.append("ser.HH806AUtemperature(): " + str(e) )
+            aw.messagelabel.setText("ser.HH806AUtemperature(): " + str(e))
+            aw.qmc.errorlog.append("ser.HH806AUtemperature(): " + str(e) )
             return -1,-1
         finally:
             if serHH:
