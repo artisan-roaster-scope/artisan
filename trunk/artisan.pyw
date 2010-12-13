@@ -1293,7 +1293,25 @@ class tgraphcanvas(FigureCanvas):
                     self.backgroundET[i] -= step
                     self.backgroundBT[i] -= step
                 self.redraw()
+        else:
+            aw.messagelabel.setText("unable to move background")
+            return
 
+#######################################################################################
+#####   temporary hack for windows till better solution found about toolbar icon problem
+#####   with py2exe and svg
+
+# changed "NavigationToolbar" for "VMToolbar" in ApplicationWindow
+        
+class VMToolbar(NavigationToolbar):
+    def __init__(self, plotCanvas, parent):
+        NavigationToolbar.__init__(self, plotCanvas, parent)
+
+    def _icon(self, name):
+        #dirty hack to use exclusively .png and thus avoid .svg usage
+        #because .exe generation is problematic with .svg
+        name = name.replace('.svg','.png')
+        return QIcon(os.path.join(self.basedir, name)) 
 
 ########################################################################################                            
 #################### MAIN APPLICATION WINDOW ###########################################
@@ -1340,7 +1358,7 @@ class ApplicationWindow(QMainWindow):
         #create Matplotlib canvas widget 
         self.qmc = tgraphcanvas(self.main_widget)
         #create  navigation toolbar
-        ntb = NavigationToolbar(self.qmc, self.main_widget)
+        ntb = VMToolbar(self.qmc, self.main_widget)
         
         #create a serial port object
         self.ser = serialport()
@@ -3254,11 +3272,13 @@ class calculatorDlg(QDialog):
         super(calculatorDlg,self).__init__(parent)
         self.setWindowTitle("Rate of change calculator")
 
-        self.result1 = QLabel("Finds rate of change between: Start - End")
+        self.result1 = QLabel("Enter two times along profile")
         self.result2 = QLabel()
+        self.result2.setStyleSheet("background-color:'lightgrey';")
 
-        startlabel = QLabel("Start time (00:00)")
-        endlabel = QLabel("End time (00:00)")
+
+        startlabel = QLabel("Start (00:00)")
+        endlabel = QLabel("End (00:00)")
         self.startEdit = QLineEdit()
         self.endEdit = QLineEdit()
         regextime = QRegExp(r"^[0-9]{1,2}:[0-9]{1,2}$")
@@ -3312,10 +3332,12 @@ class calculatorDlg(QDialog):
 
             if starttime == -1 or endtime == -1:
                 self.result1.setText("time sintax error. Time not valid")
+                self.result2.setText("")
                 return
 
             if  endtime > aw.qmc.timex[-1] or endtime < starttime:
                 self.result1.setText("time profile error")
+                self.result2.setText("")
                 return
 
             #if profile has a CHARGE time (time is referenced to charge time)
@@ -3340,19 +3362,19 @@ class calculatorDlg(QDialog):
             deltaminutes = deltaseconds*60.
             
             if aw.qmc.startend[0]:
-                string1 = ( "from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]-aw.qmc.startend[0]) +
+                string1 = ( "Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]-aw.qmc.startend[0]) +
                             " to " + aw.qmc.stringfromseconds(aw.qmc.timex[endindex]-aw.qmc.startend[0] ))
             else:
-                string1 = ("from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]) + " to " +
+                string1 = ("Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]) + " to " +
                            aw.qmc.stringfromseconds(aw.qmc.timex[endindex]))
                 
-            string2 = "d/second = " + "%.2f"%(deltaseconds) + "  d/minute = " + "%.2f"%(deltaminutes)
+            string2 = "deg/sec = " + "%.2f"%(deltaseconds) + "    deg/min = " + "%.2f"%(deltaminutes)
             
             self.result1.setText(string1)        
             self.result2.setText(string2)
         else:
-            self.result1.setText("No profile time found")  
-
+            self.result1.setText("No profile found")  
+            self.result2.setText("")
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
 ##########################################################################
@@ -3788,12 +3810,12 @@ class backgroundDLG(QDialog):
         movelayout.addWidget(self.downButton,2,1)
 
         layout = QGridLayout()
-        layout.addWidget(self.backgroundCheck,0,0)
-        layout.addWidget(self.backgroundDetails,0,1)
-        layout.addWidget(selectButton,1,0)
-        layout.addWidget(self.pathedit,1,1)
-        layout.addWidget(loadButton,2,0)
-        layout.addWidget(delButton,2,1)
+        layout.addWidget(selectButton,0,0)
+        layout.addWidget(self.pathedit,0,1)
+        layout.addWidget(loadButton,1,0)
+        layout.addWidget(delButton,1,1)
+        layout.addWidget(self.backgroundCheck,2,0)
+        layout.addWidget(self.backgroundDetails,2,1)
         layout.addWidget(widthlabel,3,0)
         layout.addWidget(self.widthSpinBox,3,1)
         layout.addWidget(intensitylabel,4,0)
@@ -4586,7 +4608,9 @@ class DeviceAssignmentDLG(QDialog):
 
             message = "PID to control ET set to " + str1 + " " + str(aw.ser.controlETpid[1]) + \
             " ; PID to read BT set to " + str2 + " " + str(aw.ser.readBTpid[1])
-
+            
+            aw.button_10.setDisabled(False)
+            aw.button_10.setFlat(False)
             
         if self.nonpidButton.isChecked():
             meter = str(self.devicetypeComboBox.currentText())
@@ -4597,7 +4621,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'E'
                 aw.ser.stopbits = 1
-                aw.ser.timeout=1
+                aw.ser.timeout=1            
 
             if meter == "Omega HH506RA":
                 aw.qmc.device = 2
@@ -4609,8 +4633,13 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.timeout=1
                 
             message = "Device set to " + meter
-            
+            aw.button_10.setDisabled(True)
+            aw.button_10.setFlat(True)
         aw.messagelabel.setText(message)
+
+
+
+            
         self.close()
 
 ############################################################
@@ -5399,15 +5428,15 @@ class PXG4pidDlgControl(QDialog):
         labelrs1.setMargin(10)
         labelrs1.setStyleSheet("background-color:'#CCCCCC';")
         labelrs1.setText( "<font color='white'><b>RampSoak<br>(1-7)<\b></font>")
-        labelrs1.setMaximumSize(90, 42)
-        labelrs1.setMinimumHeight(50)
+        #labelrs1.setMaximumSize(90, 42)
+        #labelrs1.setMinimumHeight(50)
 
         labelrs2 = QLabel()
         labelrs2.setMargin(10)
         labelrs2.setStyleSheet("background-color:'#CCCCCC';")
         labelrs2.setText( "<font color='white'><b>RampSoak<br>(8-16)<\b></font>")
-        labelrs2.setMaximumSize(90, 42)
-        labelrs2.setMinimumHeight(50)
+        #labelrs2.setMaximumSize(90, 42)
+        #labelrs2.setMinimumHeight(50)
 
         self.label_rs1 =  QLabel()
         self.label_rs2 =  QLabel()
@@ -5481,6 +5510,7 @@ class PXG4pidDlgControl(QDialog):
         buttonRampSoakLayout1.addWidget(self.label_rs2)
         buttonRampSoakLayout1.addWidget(self.label_rs3)
         buttonRampSoakLayout1.addWidget(self.label_rs4)
+        
         buttonRampSoakLayout1.addWidget(self.label_rs5)
         buttonRampSoakLayout1.addWidget(self.label_rs6)
         buttonRampSoakLayout1.addWidget(self.label_rs7)        
@@ -5740,6 +5770,7 @@ class PXG4pidDlgControl(QDialog):
         # LAYOUTS        
         tab1Layout = QGridLayout() #TAB1
         tab1Layout.setSpacing(10)
+        tab1Layout.setSizeConstraint(2)
 
         tab1Layout.addLayout(buttonRampSoakLayout1,0,0)
         tab1Layout.addLayout(buttonRampSoakLayout2,0,1)
@@ -5753,7 +5784,8 @@ class PXG4pidDlgControl(QDialog):
         tab1Layout.addWidget(button_exit,4,1)
 
         tab2Layout = QGridLayout() #TAB2
-        tab2Layout.setSpacing(10) 
+        tab2Layout.setSpacing(10)
+        tab2Layout.setSizeConstraint(2)
         
         tab2Layout.addWidget(labelsv,0,0)
         tab2Layout.addWidget(labelsvedit,0,1)
@@ -5862,22 +5894,22 @@ class PXG4pidDlgControl(QDialog):
 
     def paintlabels(self):
         #read values of variables to place in buttons
-        str1 = "1 T= " + str(aw.pid.PXG4["segment1sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment1ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment1soak"][0])
-        str2 = "2 T= " + str(aw.pid.PXG4["segment2sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment2ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment2soak"][0])
-        str3 = "3 T= " + str(aw.pid.PXG4["segment3sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment3ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment3soak"][0])
-        str4 = "4 T= " + str(aw.pid.PXG4["segment4sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment4ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment4soak"][0])
-        str5 = "5 T= " + str(aw.pid.PXG4["segment5sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment5ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment5soak"][0])
-        str6 = "6 T= " + str(aw.pid.PXG4["segment6sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment6ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment6soak"][0])
-        str7 = "7 T= " + str(aw.pid.PXG4["segment7sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment7ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment7soak"][0])
-        str8 = "8 T= " + str(aw.pid.PXG4["segment8sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment8ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment8soak"][0])
-        str9 = "9 T= " + str(aw.pid.PXG4["segment9sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment9ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment9soak"][0])
-        str10 ="10 T= " + str(aw.pid.PXG4["segment10sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment10ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment10soak"][0])
-        str11 = "11 T= "+ str(aw.pid.PXG4["segment11sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment11ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment11soak"][0])
-        str12 = "12 T= "+ str(aw.pid.PXG4["segment12sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment12ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment12soak"][0])
-        str13 = "13 T= "+ str(aw.pid.PXG4["segment13sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment13ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment13soak"][0])
-        str14 = "14 T= "+ str(aw.pid.PXG4["segment14sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment14ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment14soak"][0])
-        str15 = "15 T= "+ str(aw.pid.PXG4["segment15sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment15ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment15soak"][0])
-        str16 = "16 T= "+ str(aw.pid.PXG4["segment16sv"][0]) + "\nRamp " + str(aw.pid.PXG4["segment16ramp"][0]) + "\nSoak " + str(aw.pid.PXG4["segment16soak"][0])
+        str1 = "1 [T " + str(aw.pid.PXG4["segment1sv"][0]) + "] [R " + str(aw.pid.PXG4["segment1ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment1soak"][0])+"]"
+        str2 = "2 [T " + str(aw.pid.PXG4["segment2sv"][0]) + "] [R " + str(aw.pid.PXG4["segment2ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment2soak"][0])+"]"
+        str3 = "3 [T " + str(aw.pid.PXG4["segment3sv"][0]) + "] [R " + str(aw.pid.PXG4["segment3ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment3soak"][0])+"]"
+        str4 = "4 [T " + str(aw.pid.PXG4["segment4sv"][0]) + "] [R " + str(aw.pid.PXG4["segment4ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment4soak"][0])+"]"
+        str5 = "5 [T " + str(aw.pid.PXG4["segment5sv"][0]) + "] [R " + str(aw.pid.PXG4["segment5ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment5soak"][0])+"]"
+        str6 = "6 [T " + str(aw.pid.PXG4["segment6sv"][0]) + "] [R " + str(aw.pid.PXG4["segment6ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment6soak"][0])+"]"
+        str7 = "7 [T " + str(aw.pid.PXG4["segment7sv"][0]) + "] [R " + str(aw.pid.PXG4["segment7ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment7soak"][0])+"]"
+        str8 = "8 [T " + str(aw.pid.PXG4["segment8sv"][0]) + "] [R " + str(aw.pid.PXG4["segment8ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment8soak"][0])+"]"
+        str9 = "9 [T " + str(aw.pid.PXG4["segment9sv"][0]) + "] [R " + str(aw.pid.PXG4["segment9ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment9soak"][0])+"]"
+        str10 ="10 [T " + str(aw.pid.PXG4["segment10sv"][0]) + "] [R " + str(aw.pid.PXG4["segment10ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment10soak"][0])+"]"
+        str11 = "11 [T "+ str(aw.pid.PXG4["segment11sv"][0]) + "] [R " + str(aw.pid.PXG4["segment11ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment11soak"][0])+"]"
+        str12 = "12 [T "+ str(aw.pid.PXG4["segment12sv"][0]) + "] [R " + str(aw.pid.PXG4["segment12ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment12soak"][0])+"]"
+        str13 = "13 [T "+ str(aw.pid.PXG4["segment13sv"][0]) + "] [R " + str(aw.pid.PXG4["segment13ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment13soak"][0])+"]"
+        str14 = "14 [T "+ str(aw.pid.PXG4["segment14sv"][0]) + "] [R " + str(aw.pid.PXG4["segment14ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment14soak"][0])+"]"
+        str15 = "15 [T "+ str(aw.pid.PXG4["segment15sv"][0]) + "] [R " + str(aw.pid.PXG4["segment15ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment15soak"][0])+"]"
+        str16 = "16 [T "+ str(aw.pid.PXG4["segment16sv"][0]) + "] [R " + str(aw.pid.PXG4["segment16ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment16soak"][0])+"]"
 
         self.label_rs1.setText(QString(str1))
         self.label_rs2.setText(QString(str2))
