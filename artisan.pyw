@@ -1310,7 +1310,8 @@ class VMToolbar(NavigationToolbar):
     def _icon(self, name):
         #dirty hack to use exclusively .png and thus avoid .svg usage
         #because .exe generation is problematic with .svg
-        name = name.replace('.svg','.png')
+        if platf != 'Darwin':
+            name = name.replace('.svg','.png')
         return QIcon(os.path.join(self.basedir, name)) 
 
 ########################################################################################                            
