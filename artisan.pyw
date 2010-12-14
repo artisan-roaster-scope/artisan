@@ -147,7 +147,7 @@ class tgraphcanvas(FigureCanvas):
         # device 1 (with index 1 bellow) is Omega HH806
         # device 2 (with index 2 bellow) is omega HH506 ; Logger Extech 421509 has been reported to be the same as Omega HH506RA
         self.device = 0 
-        self.devicefunctionlist = [self.fujitemperature, self.HH806AU, self.HH506RA,]
+        self.devicefunctionlist = [self.fujitemperature, self.HH806AU, self.HH506RA,self.CENTER309]
         
         self.fig = Figure(facecolor='lightgrey')
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
@@ -399,6 +399,13 @@ class tgraphcanvas(FigureCanvas):
          tx = self.timeclock.elapsed()/1000.
 
          return tx,t2,t1
+
+    def CENTER309(self):
+
+         t2,t1 = aw.ser.CENTER309temperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1         
                                    
     #creates X axis labels ticks in mm:ss acording to the endofx limit
     def xaxistosm(self):
@@ -1092,37 +1099,36 @@ class tgraphcanvas(FigureCanvas):
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
         if self.flagon:
-            if self.varC[0]:
-                self.startend[2] = self.timeclock.elapsed()/1000.
-                self.startend[3] = self.temp2[-1]
+        
+            self.startend[2] = self.timeclock.elapsed()/1000.
+            self.startend[3] = self.temp2[-1]
+            
+            #calculate time elapsed since charge time
+            ti = self.startend[2] - self.startend[0]
+            st1 = self.stringfromseconds(ti)
                 
-                #calculate time elapsed since charge time
-                ti = self.startend[2] - self.startend[0]
-                st1 = self.stringfromseconds(ti)
-                    
-                # put a white marker on graph
-                rect = patches.Rectangle( (self.startend[2]-1,0), width=.1, height=self.temp2[-1], color = 'black')
-                self.ax.add_patch(rect)
+            # put a white marker on graph
+            rect = patches.Rectangle( (self.startend[2]-1,0), width=.1, height=self.temp2[-1], color = 'black')
+            self.ax.add_patch(rect)
 
-                self.ax.annotate(str(self.startend[3]), xy=(self.startend[2]-1, self.startend[3]),xytext=(self.startend[2]-5,self.startend[3]+30),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            self.ax.annotate(str(self.startend[3]), xy=(self.startend[2]-1, self.startend[3]),xytext=(self.startend[2]-5,self.startend[3]+30),
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
 
-                self.ax.annotate(st1, xy=(self.startend[2]-1, self.startend[3]),xytext=(self.startend[2],self.startend[3]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-                
-                st2 = "DR " + st1
-                self.ax.text(self.startend[2],10, st2,color = self.palette["text"])
-                self.writestatistics()
-                
-                aw.label1.setStyleSheet("background-color:'#66FF66';")
-                aw.label1.setText( "<font color='black'><b>Monitor time<\b></font>")
-                
-                aw.button_9.setDisabled(True)
-                aw.button_9.setFlat(True)
-                
-                message = "Roast ENDED at " + st1 + " BT = " + str(self.startend[-1]) + "F"
-            else:
-                message = "Didn't reach minimum of 1C START"
+            self.ax.annotate(st1, xy=(self.startend[2]-1, self.startend[3]),xytext=(self.startend[2],self.startend[3]-50),
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            
+            st2 = "DR " + st1
+            self.ax.text(self.startend[2],10, st2,color = self.palette["text"])
+            self.writestatistics()
+            
+            aw.label1.setStyleSheet("background-color:'#66FF66';")
+            aw.label1.setText( "<font color='black'><b>Monitor time<\b></font>")
+            
+            aw.button_9.setDisabled(True)
+            aw.button_9.setFlat(True)
+            
+            message = "Roast ENDED at " + st1 + " BT = " + str(self.startend[-1]) + "F"
+
         else:
             message = "Scope is OFF"
             
@@ -1408,7 +1414,7 @@ class ApplicationWindow(QMainWindow):
         
 
         ###################################################################################
-        #restore SETTINGS  after creating serial port and the display (self.qmc = tgraphcanvas)
+        #restore SETTINGS  after creating serial port, tgraphcanvas, and PID. 
         self.settingsLoad()        
         
         #create a Label object to display program status information
@@ -4163,6 +4169,9 @@ class serialport(object):
         self.controlETpid = [0,1]        # [ 0 = FujiPXG 1= FujiPXR3, second number is unitID] Can be changed in PID menu. Reads/Controls ET
         self.readBTpid = [1,2]           # [ 0 = FujiPXG 1= FujiPXR3, second number is unitID] Can be changed in PID menu. Reads BT
 
+        #initial message flag for CENTER 309 meter
+        self.CENTER309flag = 0
+
 
     # function used by Fuji PIDs
     def sendFUJIcommand(self,binstring,nbytes):
@@ -4255,7 +4264,6 @@ class serialport(object):
                 serHH.close()
 
 
-
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
     def HH506RAtemperature(self):
@@ -4332,6 +4340,101 @@ class serialport(object):
         finally:
             if serHH:
                 serHH.close()        
+
+
+    def CENTER309temperature(self):  
+        ##    command = "\x4B" returns 4 bytes but unknown purpose
+        ##    command = "\x41" returns 45 bytes (8x5 + 5 = 45) as follows:
+        ##    
+        ##    "\x02\x80\xUU\xUU\xUU\xUU\xUU\xAA"  \x80 means "Celsi" (if \x00 then "Faren") UUs unknown
+        ##    "\xAA\xBB\xBB\xCC\xCC\xDD\xDD\x00"  Temprerature T1 = AAAA, T2=BBBB, T3= CCCC, T4 = DDDD
+        ##    "\x00\x00\x00\x00\x00\x00\x00\x00"  unknown (possible data containers but found empty)
+        ##    "\x00\x00\x00\x00\x00\x00\x00\x00"  unknown
+        ##    "\x00\x00\x00\x00\x00\x00\x00\x00"  unknown
+        ##    "\x00\x00\x00\x0E\x03"              The byte r[43] \x0E changes depending on what thermocouple(s) are connected.
+        ##                                        If T1 thermocouple connected alone, then r[43]  = \x0E = 14
+        ##                                        If T2 thermocouple connected alone, then r[43]  = \x0D = 13
+        ##                                        If T1 + T2 thermocouples connected, then r[43]  = \x0C = 12
+        ##                                        If T3 thermocouple connected alone, then r[43]  = \x0B = 11
+        ##                                        If T4 thermocouple connected alone, then r[43]  = \x07 = 7
+        ##                                        Note: Print r[43] if you want to find other connect-combinations
+                
+        serCENTER = None
+        try:
+            serCENTER = serial.Serial(self.comport, baudrate=self.baudrate, bytesize = self.bytesize, parity=self.parity,
+                                    stopbits=self.stopbits, timeout=self.timeout)
+            command = "\x41"                 
+            serCENTER.write(command)
+            r = serCENTER.read(45)
+            serCENTER.close()
+            
+            if len(r) == 45:
+                
+                #check r[43]: Only allow T1 & T2 when two thermocouples are connected
+                #Allow to plot when any other single thermocouple is connected
+
+                Tcheck = int(binascii.hexlify(r[43]),16)
+                if Tcheck != 12:
+                    if Tcheck == 14:
+                        if not self.CENTER309flag:
+                            aw.messagelabel.setText("CENTER 309 connected: T1")
+                            self.CENTER309flag = 1
+                        T1 = int(binascii.hexlify(r[7] + r[8]),16)
+                        T2 = 0.
+                    elif Tcheck == 13:
+                        if not self.CENTER309flag:
+                            aw.messagelabel.setText("CENTER 309 connected: T2")
+                            self.CENTER309flag = 1
+                        T1 = 0.
+                        T2 = int(binascii.hexlify(r[9] + r[10]),16)
+                    elif Tcheck == 11:
+                        if not self.CENTER309flag:
+                            aw.messagelabel.setText("CENTER 309 connected: T3")
+                            self.CENTER309flag = 1
+                        T1 = 0.
+                        T2 = int(binascii.hexlify(r[11] + r[12]),16)
+                    elif Tcheck == 7:
+                        if not self.CENTER309flag:
+                            print 
+                            aw.messagelabel.setText("CENTER 309 connected: T4")
+                            self.CENTER309flag = 1
+                        T1 = 0.
+                        T2 = int(binascii.hexlify(r[13] + r[14]),16)
+                    else:
+                        aw.messagelabel.setText("Connections allowed: T1&T2, or T1, or T2, or T3, or T4")
+                        T1 = 0.
+                        T2 = 0.
+                else:
+                    if not self.CENTER309flag:
+                        aw.messagelabel.setText("CENTER 309 connected: T1 & T2")
+                        self.CENTER309flag = 1
+                        
+                    T1 = int(binascii.hexlify(r[7] + r[8]),16)
+                    T2 = int(binascii.hexlify(r[9] + r[10]),16)
+                    
+                return T1/10.,T2/10.
+            
+            else:
+                nbytes = len(r)
+                message = "%i bytes from CENTER309 but 45 needed"%nbytes
+                aw.messagelabel.setText(message)
+                aw.qmc.errorlog.append(message)
+                
+                if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
+                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+                else:
+                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+        
+        
+        except serial.SerialException, e:
+            aw.messagelabel.setText("ser.CENTER309temperature()" + str(e))
+            aw.qmc.errorlog.append("ser.CENTER309temperature()" + str(e) )
+            return -1,-1
+            
+        finally:
+            if serCENTER:
+                serCENTER.close()
+
 
 
 #########################################################################
@@ -4542,7 +4645,7 @@ class DeviceAssignmentDLG(QDialog):
         self.pidButton = QRadioButton("PID")
 
         self.devicetypeComboBox = QComboBox()
-        self.devicetypeComboBox.addItems(["Omega HH806AU","Omega HH506RA"])
+        self.devicetypeComboBox.addItems(["Omega HH806AU","Omega HH506RA","CENTER 309"])
         
         controllabel =QLabel("Control PID for ET:")                            
         self.controlpidtypeComboBox = QComboBox()
@@ -4561,14 +4664,16 @@ class DeviceAssignmentDLG(QDialog):
 
         #check previous pid settings for radio button
         if aw.qmc.device == 0:
-            
             self.devicetypeComboBox.setCurrentIndex(2)
         else:
             self.nonpidButton.setChecked(True)
             if aw.qmc.device == 1:
                 self.devicetypeComboBox.setCurrentIndex(0)
             if aw.qmc.device == 2:
-                self.devicetypeComboBox.setCurrentIndex(1)        
+                self.devicetypeComboBox.setCurrentIndex(1)
+            if aw.qmc.device == 3:
+                self.devicetypeComboBox.setCurrentIndex(2)
+                
         if aw.ser.controlETpid[0] == 0 :       # control is PXG4
             self.controlpidtypeComboBox.setCurrentIndex(0)
         else:
@@ -4674,9 +4779,21 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 
-            message = "Device set to " + meter
+            if meter == "CENTER 309":
+                aw.qmc.device = 3
+                aw.ser.comport = "COM14"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                
+                
             aw.button_10.setDisabled(True)
             aw.button_10.setFlat(True)
+            
+            message = "Device set to " + meter
+            
         aw.messagelabel.setText(message)
 
 
