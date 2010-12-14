@@ -132,7 +132,7 @@ class tgraphcanvas(FigureCanvas):
         # default delay between readings in miliseconds
         self.delay = 5000
 
-        #dryphase1, dryphase2, midphase, and finish phase Y limits
+        #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases = [200,300,390,450]
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area
@@ -213,9 +213,6 @@ class tgraphcanvas(FigureCanvas):
         #stores text descriptions for each event. Max 10
         self.specialeventsStrings = ["1","2","3","4","5","6","7","8","9","10"]
 
-        #create an object time to count the time (miliseconds)
-        self.timeclock = QTime()
-
         # set limits for X and Y axes. Default is in Farenheit units
         self.ylimit = 750
         self.endofx = 60
@@ -289,10 +286,23 @@ class tgraphcanvas(FigureCanvas):
         # draw of the Figure
         self.fig.canvas.draw()
 
+        ###########################  TIME  CLOCK     ##########################
+        # NOTE: there are two times that can cause confusion: one is a trigger-timer to trigger timerevent at every
+        # delay (ie. read temp, update graph, etc.), and then this one (self.timeclock), which
+        # is used to record temperature-reading-time in self.timex[]. It is also used to display time in the LCD.
+        
+        # create an object time to measure and record time (in miliseconds) 
+    
+        self.timeclock = QTime()
+
+        ############################    TRIGGER  TIMER       ##################################
         # start a Qtimer object (Qt) with delay (self.delay 5000 millisecs). This calls event handler timerEvent() on every delay.
+        # do not confuse this timer with self.timeclock (above), which is used to log clock time and put it in the LCD.
+        # This timer just triggers timerEvent at every self.delay (ie. reads temperature at every delay, updates graph, etc).
         
         self.timerid = self.startTimer(self.delay)
 
+        # DESCRIPTION of TRIGGER TIMER
         # Python26/Lib/site-packages/PyQt4/doc/html/qobject.html#startTimer
         # int QObject.startTimer (self, int interval)
         # Starts a timer and returns a timer identifier, or returns zero if it could not start a timer.
@@ -302,7 +312,7 @@ class tgraphcanvas(FigureCanvas):
         # The virtual timerEvent() function is called with the QTimerEvent event parameter class when a timer
         # event occurs. Reimplement this function to get timer events. If multiple timers are running, the QTimerEvent.timerId()
         # can be used to find out which timer was activated.
-        
+
     
     #event handler from startTimer()
     def timerEvent(self, evt):
@@ -367,12 +377,12 @@ class tgraphcanvas(FigureCanvas):
 
     #finds time, ET and BT when using Fuji PID
     def fujitemperature(self):
-        # get the temperature for BT. RS485 unit ID 2
+        # get the temperature for BT. RS485 unit ID (2)
         t2 = aw.pid.gettemperature(2)/10.
         #get time of each temperature reading in seconds from start; .elapsed() returns miliseconds
         tx = self.timeclock.elapsed()/1000.
-        # get the temperature for MET. RS485 unit ID 1
-        t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. 843 = 84.3)
+        # get the temperature for MET. RS485 unit ID (1)
+        t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
                 
         return tx,t2,t1
 
@@ -408,6 +418,9 @@ class tgraphcanvas(FigureCanvas):
                 labels.append(stringlabel)              
         self.ax.set_xticklabels(labels,color=self.palette["xlabel"],horizontalalignment='center')
 
+        #update label colors
+        for label in self.ax.xaxis.get_ticklabels():
+            label.set_color(self.palette["xlabel"])  
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
@@ -417,7 +430,6 @@ class tgraphcanvas(FigureCanvas):
         #reset all variables that need to be reseted
         self.flagon = False
         self.flagclock = False
-        self.timeclock.restart()
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
         self.sensitivity = 20.0      
@@ -460,6 +472,9 @@ class tgraphcanvas(FigureCanvas):
         self.specialevents = []
         self.specialeventsStrings = ["1","2","3","4","5","6","7","8","9","10"]
         self.roastdate = QDate.currentDate()
+
+        #restart() clock 
+        self.timeclock.restart()
         
         self.redraw()
 
@@ -477,6 +492,8 @@ class tgraphcanvas(FigureCanvas):
         self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')
         for tick in self.ax.yaxis.get_major_ticks():
             tick.label2On = True
+            
+        #draw water marks for dry phase region, mid phase region, and finish phase region
         trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
         rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
                                   transform=trans, color=self.palette["rect1"],alpha=0.3)
@@ -589,45 +606,50 @@ class tgraphcanvas(FigureCanvas):
         self.ax.legend(handles,labels,loc=2,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
     
         #Add markers for CHARGE
-        rect = patches.Rectangle( (self.startend[0],0), width=.1, height=self.startend[1], color = self.palette["markers"])
-        self.ax.add_patch(rect)
-        self.ax.annotate(str(self.startend[1]), xy=(self.startend[0]-1, self.startend[1]),xytext=(self.startend[0]-5,
-                            self.startend[1]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))              
-        self.ax.annotate("0:00", xy=(self.startend[0]-1, self.startend[1]),xytext=(self.startend[0],
-                            self.startend[1]-50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+        if self.startend[0]:
+            #anotate temperature
+            self.ax.annotate(str(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
+                                self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            #anotate time
+            self.ax.annotate("0:00\nSTART", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
+                                self.startend[1]-100),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            
         #Add 1Cs markers
         if self.varC[0]:
-            st1 = self.stringfromseconds(self.varC[0]-self.startend[0])
+            st1 = self.stringfromseconds(self.varC[0]-self.startend[0]) +"\n1CS"
+            #anotate temperature
             self.ax.annotate(str(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
-                                self.varC[1]+30), color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-            
-            self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-50),
+                                self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            #anotate time
+            self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-100),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
         #Add 1Ce markers
         if self.varC[2]:
-            st1 = self.stringfromseconds(self.varC[2]-self.startend[0])           
+            st1 = self.stringfromseconds(self.varC[2]-self.startend[0]) + "\n1CE"
+            #anotate temperature
             self.ax.annotate(str(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
-                                self.varC[3]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))              
-            self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-50),
+                                self.varC[3]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            #anotate time
+            self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-100),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
             #add a water mark
             self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
-            #middle line between 1C and 2C
-            middle = (self.varC[0]+self.varC[2])/2
-            self.ax.axvline(x=middle, ymin=0, ymax=1,color=self.palette["Cline"])
+
         #Add 2Cs markers
         if self.varC[4]:
-            st1 = self.stringfromseconds(self.varC[4]-self.startend[0])
+            st1 = self.stringfromseconds(self.varC[4]-self.startend[0]) + "\n2CS"
             self.ax.annotate(str(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
-                                self.varC[5]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))      
-            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-50),
+                                self.varC[5]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))      
+            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-100),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
         #Add 2Ce markers
         if self.varC[6]:
-            st1 = self.stringfromseconds(self.varC[6]-self.startend[0])
+            st1 = self.stringfromseconds(self.varC[6]-self.startend[0]) + "\n2CE"
+            #anotate temperature
             self.ax.annotate(str(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
-                                self.varC[7]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))                
-            self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-50),
+                                self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            #anotate time
+            self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-100),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
             #do water mark
             self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -636,12 +658,12 @@ class tgraphcanvas(FigureCanvas):
             self.ax.axvline(x=middle, ymin=0, ymax=1,color=self.palette["Cline"])
         #Add DROP markers
         if self.startend[2]:
-            st1 = self.stringfromseconds(self.startend[2]-self.startend[0])
-            rect = patches.Rectangle( (self.startend[2]-1,0), width=.1, height=self.startend[3], color = self.palette["text"])
-            self.ax.add_patch(rect)
-            self.ax.annotate(str(self.startend[3]), xy=(self.startend[2]-1, self.startend[3]),xytext=(self.startend[2]-5,
-                                self.startend[3]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-50),
+            st1 = self.stringfromseconds(self.startend[2]-self.startend[0]) +"\nEND"
+            #anotate temperature
+            self.ax.annotate(str(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
+                                self.startend[3]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            #anotate time
+            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-100),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
             
 
@@ -652,7 +674,14 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.text(self.timex[int(self.specialevents[i])],self.temp2[int(self.specialevents[i])],
                                  str(i+1), color=self.palette["text"])
                 
+        #update X label names and colors        
         self.xaxistosm()
+
+        #update Y label colors
+        for label in self.ax.yaxis.get_ticklabels():
+            label.set_color(self.palette["ylabel"])
+
+        #ready to plot    
         self.fig.canvas.draw()     
 
     # used to put time in LCD timer. input int, output string
@@ -664,8 +693,8 @@ class tgraphcanvas(FigureCanvas):
             st2 = str(int(mins))+ ":" + str(int(secs))
         return st2
 
-    #Converts a string into seconds integer. Use to interpret times from Roaster Properties Dlg
-    # "00:00:00","00:00","0:00"
+    #Converts a string into seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
+    #acepted formats: "00:00:00","00:00","0:00"
     def stringtoseconds(self, string):
         try:
             seconds = 0
@@ -704,7 +733,7 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError,e:
             aw.messagelabel.setText(str(e))
-            aw.qmc.errorlog.append("value error in stringfromseconds(): " + str(e))
+            aw.qmc.errorlog.append("stringfromseconds(): input error " + str(e))
             return -1          
 
 
@@ -730,11 +759,9 @@ class tgraphcanvas(FigureCanvas):
     def fahrenheitMode(self):
         self.mode = "F"
         self.ylimit = 750
-        self.phases[0] = 200
-        self.phases[1] = 300
-        self.phases[2] = 390
-        self.phases[3] = 450
-        self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"])
+        #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
+        self.phases = [200,300,390,450]
+        self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"]) #Write "F" on Y axis
         self.statisticsheight = 650
         self.statisticsupper = 655
         self.statisticslower = 617
@@ -745,14 +772,12 @@ class tgraphcanvas(FigureCanvas):
     def celsiusMode(self):
         self.mode = "C"
         self.ylimit = 400
-        self.phases[0] = 95
-        self.phases[1] = 150
-        self.phases[2] = 200
-        self.phases[3] = 230
+        #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
+        self.phases = [95,150,200,230]
+        self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"]) #Write "C" on Y axis
         self.statisticsheight = 650
         self.statisticsupper = 343
         self.statisticslower = 325
-        self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"])
         self.redraw()
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
@@ -798,16 +823,12 @@ class tgraphcanvas(FigureCanvas):
 
         #update screen with new colors
         self.fig.canvas.redraw()
-
-        #change yaxis label colors
-        for label in self.ax.yaxis.get_ticklabels():
-            label.set_color(self.palette["ylabel"])
- 
             
-    #draws a polar star graph for score cupping. It does not delete profile data.            
+    #draws a polar star graph to score cupping. It does not delete any profile data.            
     def flavorchart(self):
             pi = math.pi
             self.fig.clf()
+            #create a new name ax1 instead of ax
             self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg='white')
             g_angle = range(10,360,40) 
             self.ax1.set_thetagrids(g_angle)
@@ -819,14 +840,13 @@ class tgraphcanvas(FigureCanvas):
             for tick in self.ax1.xaxis.get_major_ticks():
                 tick.label1On = False
 
-            #rename xaxis ticks in mins:secs
+            #rename yaxis 
             locs = self.ax1.get_yticks()
             labels = []
             for i in range(len(locs)):
                     stringlabel = str(int(locs[i]*10))
                     labels.append(stringlabel)              
             self.ax1.set_yticklabels(labels,color=self.palette["xlabel"])
-
                         
             angles = [pi/2.]
             for i in range(9): angles.append(angles[-1] + 2.*pi/9.)
@@ -866,20 +886,21 @@ class tgraphcanvas(FigureCanvas):
 
             self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
             
-            #fill in between: needs matplotlib version 1.0+
+            #fill in between with color: needs matplotlib version 1.0+
             self.ax1.fill_between(angles,0,self.flavors, facecolor='blue', alpha=0.1, interpolate=True)
                
             self.ax1.plot(angles,self.flavors)
             self.fig.canvas.draw()
             
 
-    #Turns ON flag self.flagon to read and plot. Called from push button_1. It tells when to start recording.
+    #Turns ON flag self.flagon to read and plot. Called from push button_1. 
     def OnMonitor(self):
-        #reinitialized these variables if turning on after loading a profile to compare while keeping loaded profile in screen
-        self.reset()
+        #Call start() to start the first measurement if no data collected
+        if not len(self.timex):
+            self.timeclock.start()
+            
         self.ax.set_xlim(0,self.endofx)
         self.flagon = True
-        self.timeclock.start()
         aw.messagelabel.setText("Scope recording...")     
         aw.button_1.setDisabled(True)                     #button ON
         aw.button_1.setFlat(True)
@@ -1109,22 +1130,25 @@ class tgraphcanvas(FigureCanvas):
 
     # Writes information about the finished profile in the graph
     def writestatistics(self):
-        #find when BT crosses end of dryphase happens (dry phase ends) 
+        #find when dry phase ends 
         for i in range(len(self.temp2)):
             #count from the back [-i] (high temps towards low temps)
             if self.temp2[-i] < self.phases[1] and i > 0:
                 break
             
-        #self.timex [1C start time,1C start Temp,1C end time,1C end temp,2C start time, 2C start Temp,2C end time, 2C end temp]
-        #self.startend [starttime, starttempBT, endtime,endtempBT]      
+        BTdrycross = self.temp2[-i]
+        #self.varC [1C starttime[0],1C startTemp[1],  1C endtime[2],1C endtemp[3],  2C starttime[4], 2C startTemp[5],  2C endtime[6], 2C endtemp[7]]
+        #self.startend [starttime[0], starttempBT[1], endtime[2],endtempBT[3]]      
         if self.startend[2]:
             totaltime = int(self.startend[2]-self.startend[0])
             self.statisticstimes[0] = totaltime
             #if 1Ce use middle point of 1Cs and 1Ce
             if self.varC[2]:
+                
                 dryphasetime = int(self.timex[-i] - self.startend[0])
-                midphasetime = int((self.varC[2]+self.varC[0])/2 - self.timex[-i])
-                finishphasetime = int(self.startend[2]- (self.varC[2]+self.varC[0])/2)
+                midphasetime = int(self.varC[0] - self.timex[-i])
+                finishphasetime = int(self.startend[2]- self.varC[0])
+                                   
             else: #very light roast)
                 #use 1Cs (start of 1C) as 1C
                 dryphasetime = int(self.timex[-i] - self.startend[0])
@@ -1147,13 +1171,8 @@ class tgraphcanvas(FigureCanvas):
             if self.statisticsflags[1]:
                 #Draw finish phase rectangle
                 #chech to see if end of 1C exists. If so, use half between start of 1C and end of 1C. Otherwise use only the start of 1C
-                if self.varC[2]:
-                    rect = patches.Rectangle( ((self.varC[2]+self.varC[0])/2, self.statisticsheight), width = finishphasetime, height = 5,
-                                              color =self.palette["rect3"],alpha=0.5)
-                else:
-                    rect = patches.Rectangle( (self.varC[0], self.statisticsheight), width = finishphasetime, height = 5,
-                                              color = self.palette["rect3"],alpha=0.5)
-                    
+                rect = patches.Rectangle( (self.varC[0], self.statisticsheight), width = finishphasetime, height = 5,
+                                            color = self.palette["rect3"],alpha=0.5)
                 self.ax.add_patch(rect)
                 
                 # Draw mid phase rectangle
@@ -1179,11 +1198,11 @@ class tgraphcanvas(FigureCanvas):
             if self.statisticsflags[2]:       
                 #Flavor defect estimation chart for each leg. Thanks to Jim Schulman 
                 ShortDryingPhase = "Grassy"
-                LongDryingPhase = "Dusty, leathery"
+                LongDryingPhase = "Leathery"
                 ShortTo1CPhase = "Toasty"
                 LongTo1CPhase = "Bready"
                 ShortFinishPhase = "Acidic"
-                LongFinishPhase = "Flat, caramelly"
+                LongFinishPhase = "Flat"
 
                 #CHECK CONDITIONS
                 
@@ -1212,15 +1231,35 @@ class tgraphcanvas(FigureCanvas):
                 elif finishphasetime > self.statisticsconditions[5]:
                     st3 = LongFinishPhase
                 else:
-                    st3 = "OK"             
+                    st3 = "OK"
 
+                #find Lowest Point in BT
+                LP = 1000 
+                for i in range(len(self.temp2)):
+                    if self.temp2[i] < LP:
+                        LP = self.temp2[i]
+        #self.varC [1C starttime[0],1C startTemp[1],  1C endtime[2],1C endtemp[3],  2C starttime[4], 2C startTemp[5],  2C endtime[6], 2C endtemp[7]]
+        #self.startend [starttime[0], starttempBT[1], endtime[2],endtempBT[3]]                        
+                #Find rate of change of each phase
+                
+                rc1 = ((BTdrycross - LP) /dryphasetime)*60.
+                if self.varC[0]:
+                    rc2 = ((self.varC[1] - BTdrycross)/midphasetime)*60.
+                    rc3 = ((self.startend[3] - self.varC[1])/finishphasetime)*60.
+                else:
+                    rc2 = 0.
+                    rc3 = 0.
+
+                st2 += "  (%.1f deg/min)"%rc2
+                st3 += "  (%.1f deg/min)"%rc3
+        
                 #Write flavor estimation
-                self.ax.text(self.startend[0]+ dryphasetime/6,self.statisticslower,st1,color=self.palette["text"])
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime/6,self.statisticslower,st2,color=self.palette["text"])
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/6,self.statisticslower,st3,color=self.palette["text"])
+                self.ax.text(self.startend[0],self.statisticslower,st1,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0]+ dryphasetime,self.statisticslower,st2,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0]+ dryphasetime+midphasetime,self.statisticslower,st3,color=self.palette["text"],fontsize=11)
 
             if self.statisticsflags[3]:          
-                #calculate AREA under BT (Accumulated Energy = Energy absorved by beans) and MET area (delivered energy)
+                #calculate AREA under BT and ET
                 AccBT = 0.0
                 AccMET = 0.0
 
@@ -1238,20 +1277,21 @@ class tgraphcanvas(FigureCanvas):
                     AccMET += self.temp1[k]*timeD
                     
                 deltaAcc = int(AccMET) - int(AccBT)
-                
-                #find Lowest Point in BT
-                LP = 1000 
-                for i in range(len(self.temp2)):
-                    if self.temp2[i] < LP:
-                        LP = self.temp2[i]
                         
                 lowestBT = str(LP)
                 timeLP = str(self.stringfromseconds(self.timex[k] - self.startend[0]))
+                time = self.stringfromseconds(self.startend[2]-self.startend[0])
+                #end temperature 
                 
-                strline = "[Delta area = " + str(deltaAcc) + "] [Lowest BT = " + lowestBT + self.mode +"]"
-                
-                #text statistics  
-                self.ax.text(self.startend[0]+10,15, strline,color = self.palette["text"])
+                strline = ("[BT = " + lowestBT + self.mode + " - " + str(self.startend[3]) + self.mode +
+                            "] [ETarea - BTarea = " + str(deltaAcc) + "] [Time = " +time +"]")
+                            
+                #text metrics 
+                if self.mode == "C":
+                    dist = -47
+                else:
+                    dist = -90
+                self.ax.text(-100,dist, strline,color = self.palette["text"],fontsize=11)
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
@@ -2314,7 +2354,6 @@ class ApplicationWindow(QMainWindow):
             for key in self.pid.PXG4.keys():            
                 settings.setValue(key,self.pid.PXG4[key][0])
             settings.endGroup()
-
             
         except Exception,e:
             self.qmc.errorlog.append("Error saving settings " + str(e))   
@@ -3376,6 +3415,8 @@ class calculatorDlg(QDialog):
         else:
             self.result1.setText("No profile found")  
             self.result2.setText("")
+
+            
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
 ##########################################################################
@@ -3971,7 +4012,7 @@ class backgroundDLG(QDialog):
 
 
 #############################################################################
-################  EDIT  Statistics to display DIALOG ########################
+################  Statistics DIALOG ########################
 #############################################################################
             
 class StatisticsDLG(QDialog):       
@@ -3984,7 +4025,7 @@ class StatisticsDLG(QDialog):
         self.time = QCheckBox("Time")
         self.bar = QCheckBox("Bar")
         self.flavor = QCheckBox("Flavor")
-        self.area = QCheckBox("Other Data")
+        self.area = QCheckBox("Text data")
         
         self.mindryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))        
         self.maxdryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[1]))        
