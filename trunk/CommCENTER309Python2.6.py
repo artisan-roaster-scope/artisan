@@ -32,7 +32,6 @@ def main():
         time.sleep(delay)                    # wait delay before next reading in while loop
 
 
-#TEMPERATURE function reads the temperature and compares it with the CRC16 received. Returns an int
 def temperature():
 ##    
 ##    command = "\x4B" returns 4 bytes but unknown meaning
