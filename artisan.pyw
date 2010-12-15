@@ -188,7 +188,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundDetails = False
         self.backgroundpath = ""
         self.backgroundET,self.backgroundBT,self.timeB = [],[],[]
-        self.startendB,self.varCB = [0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.,0.,0.]
+        self.startendB,self.varCB = [0.,0.,0.,0.],[0.,0.,0.,0.,0.,0.,0.,0.]
         self.backgroundalpha = 0.3
         self.backgroundwidth = 2
         self.backgroundmetcolor = self.palette["met"]
@@ -615,7 +615,7 @@ class tgraphcanvas(FigureCanvas):
         #Add markers for CHARGE
         if self.startend[0]:
             #anotate temperature
-            self.ax.annotate(str(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
+            self.ax.annotate("%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
                                 self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
             #anotate time
             self.ax.annotate("0:00\nSTART", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
@@ -625,7 +625,7 @@ class tgraphcanvas(FigureCanvas):
         if self.varC[0]:
             st1 = self.stringfromseconds(self.varC[0]-self.startend[0]) +"\n1CS"
             #anotate temperature
-            self.ax.annotate(str(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
+            self.ax.annotate("%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
                                 self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
             #anotate time
             self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-100),
@@ -634,7 +634,7 @@ class tgraphcanvas(FigureCanvas):
         if self.varC[2]:
             st1 = self.stringfromseconds(self.varC[2]-self.startend[0]) + "\n1CE"
             #anotate temperature
-            self.ax.annotate(str(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
+            self.ax.annotate("%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
                                 self.varC[3]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
             #anotate time
             self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-100),
@@ -645,7 +645,7 @@ class tgraphcanvas(FigureCanvas):
         #Add 2Cs markers
         if self.varC[4]:
             st1 = self.stringfromseconds(self.varC[4]-self.startend[0]) + "\n2CS"
-            self.ax.annotate(str(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
+            self.ax.annotate("%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
                                 self.varC[5]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))      
             self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-100),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
@@ -653,7 +653,7 @@ class tgraphcanvas(FigureCanvas):
         if self.varC[6]:
             st1 = self.stringfromseconds(self.varC[6]-self.startend[0]) + "\n2CE"
             #anotate temperature
-            self.ax.annotate(str(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
+            self.ax.annotate("%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
                                 self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
             #anotate time
             self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-100),
@@ -667,7 +667,7 @@ class tgraphcanvas(FigureCanvas):
         if self.startend[2]:
             st1 = self.stringfromseconds(self.startend[2]-self.startend[0]) +"\nEND"
             #anotate temperature
-            self.ax.annotate(str(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
+            self.ax.annotate("%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
                                 self.startend[3]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
             #anotate time
             self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-100),
@@ -756,11 +756,11 @@ class tgraphcanvas(FigureCanvas):
             st2 = str(int(mins))
         return st2
 
-##    def fromFtoC(self,Ffloat):
-##        return (Ffloat-32.0)*(5.0/9.0)
-##
-##    def fromCtoF(self,CFloat):
-##        return (CFloat*9.0/5.0)+32.0
+    def fromFtoC(self,Ffloat):
+        return (Ffloat-32.0)*(5.0/9.0)
+
+    def fromCtoF(self,CFloat):
+        return (CFloat*9.0/5.0)+32.0
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
@@ -782,10 +782,106 @@ class tgraphcanvas(FigureCanvas):
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases = [95,150,200,230]
         self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"]) #Write "C" on Y axis
-        self.statisticsheight = 650
-        self.statisticsupper = 343
+        self.statisticsheight = 341
+        self.statisticsupper = 346
         self.statisticslower = 325
         self.redraw()
+
+    #converts a loaded profile to a different temperature scale. t input is the requested mode (F or C).
+    def convertTemperature(self,t):
+        #verify there is a loaded profile
+        profilelength = len(self.timex)
+        if profilelength > 0:
+            if t == "F":
+                    string = "Convert profile data to Fahrenheit?"
+                    reply = QMessageBox.question(self,"Convert Profile Temperature",string,
+                            QMessageBox.Yes|QMessageBox.Cancel)
+                    if reply == QMessageBox.Cancel:
+                        return 
+                    elif reply == QMessageBox.Yes:
+                        if self.mode == "C":
+                            for i in range(profilelength):
+                                self.temp1[i] = self.fromCtoF(self.temp1[i])    #ET
+                                self.temp2[i] = self.fromCtoF(self.temp2[i])    #BT
+                                self.delta1[i] = self.fromCtoF(self.delta1[i])  #Delta ET
+                                self.delta2[i] = self.fromCtoF(self.delta2[i])  #Delta BT
+                                
+                            self.varC[1] =   self.fromCtoF(self.varC[1])        #1C start temp
+                            self.varC[3] =   self.fromCtoF(self.varC[3])        #1C end temp
+                            self.varC[5] =   self.fromCtoF(self.varC[1])        #2C start temp
+                            self.varC[7] =   self.fromCtoF(self.varC[1])        #2C end temp
+                            self.startend[1] = self.fromCtoF(self.startend[1])  #CHARGE temp
+                            self.startend[3] = self.fromCtoF(self.startend[3])  #DROP temp
+
+                            backgroundlength = len(self.timeB)
+                            if backgroundlength > 0:
+                                for i in range(backgroundlength):
+                                    self.backgroundET[i] = self.fromCtoF(self.backgroundET[i])
+                                    self.backgroundBT[i] = self.fromCtoF(self.backgroundBT[i])                           
+                                    
+                                self.varCB[1] =   self.fromCtoF(self.varCB[1])       #1C start temp B
+                                self.varCB[3] =   self.fromCtoF(self.varCB[3])       #1C end temp B
+                                self.varCB[5] =   self.fromCtoF(self.varCB[1])       #2C start temp B
+                                self.varCB[7] =   self.fromCtoF(self.varCB[1])       #2C end temp B
+                                self.startendB[1] = self.fromCtoF(self.startendB[1]) #CHARGE temp B
+                                self.startendB[3] = self.fromCtoF(self.startendB[3]) #DROP temp B
+
+                            self.fahrenheitMode()
+                            aw.messagelabel.setText("Profile changed to Fahrenheit")
+
+                        else:
+                            QMessageBox.information(self,"Convert Profile Temperature",
+                                                    "Unable to comply. You already are in Fahrenheit")
+                            aw.messagelabel.setText("Conflict found. Profile scale change prevented")
+                            return
+
+            elif t == "C":
+                    string = "Convert profile data to Celsius?"
+                    reply = QMessageBox.question(self,"Convert Profile Temperature",string,
+                            QMessageBox.Yes|QMessageBox.Cancel)
+                    if reply == QMessageBox.Cancel:
+                        return 
+                    elif reply == QMessageBox.Yes:
+                        if self.mode == "F":         
+                            for i in range(profilelength):
+                                self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
+                                self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
+                                self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
+                                self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
+                                
+                            self.varC[1] =   self.fromFtoC(self.varC[1])        #1C start temp
+                            self.varC[3] =   self.fromFtoC(self.varC[3])        #1C end temp
+                            self.varC[5] =   self.fromFtoC(self.varC[1])        #2C start temp
+                            self.varC[7] =   self.fromFtoC(self.varC[1])        #2C end temp
+                            self.startend[1] = self.fromFtoC(self.startend[1])  #CHARGE temp
+                            self.startend[3] = self.fromFtoC(self.startend[3])  #DROP temp
+
+                            backgroundlength = len(self.timeB)
+                            if backgroundlength > 0:
+                                for i in range(backgroundlength):
+                                    self.backgroundET[i] = self.fromFtoC(self.backgroundET[i]) #ET B
+                                    self.backgroundBT[i] = self.fromFtoC(self.backgroundBT[i]) #BT B                          
+                                    
+                                self.varCB[1] =   self.fromFtoC(self.varCB[1])       #1C start temp B
+                                self.varCB[3] =   self.fromFtoC(self.varCB[3])       #1C end temp B
+                                self.varCB[5] =   self.fromFtoC(self.varCB[1])       #2C start temp B
+                                self.varCB[7] =   self.fromFtoC(self.varCB[1])       #2C end temp B
+                                self.startendB[1] = self.fromFtoC(self.startendB[1]) #CHARGE temp B
+                                self.startendB[3] = self.fromFtoC(self.startendB[3]) #DROP temp B
+                        else:
+                            QMessageBox.information(self,"Convert Profile Temperature",
+                                                    "Unable to comply. You already are in Celsius")
+                            aw.messagelabel.setText("Conflict found. Profile scale change prevented")
+                            return
+
+                        self.celsiusMode()
+                        aw.messagelabel.setText("Profile changed to Celsius")
+
+            self.redraw()
+
+        else:
+             QMessageBox.information(self,"Convert Profile Scale","No profile data found")
+                                    
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
     def changeGColor(self,color):
@@ -1243,15 +1339,19 @@ class tgraphcanvas(FigureCanvas):
                 LP = 1000 
                 for i in range(len(self.temp2)):
                     if self.temp2[i] < LP:
-                        LP = self.temp2[i]
-        #self.varC [1C starttime[0],1C startTemp[1],  1C endtime[2],1C endtemp[3],  2C starttime[4], 2C startTemp[5],  2C endtime[6], 2C endtemp[7]]
-        #self.startend [starttime[0], starttempBT[1], endtime[2],endtempBT[3]]                        
+                        LP = self.temp2[i]                     
                 #Find rate of change of each phase
                 
                 rc1 = ((BTdrycross - LP) /dryphasetime)*60.
                 if self.varC[0]:
-                    rc2 = ((self.varC[1] - BTdrycross)/midphasetime)*60.
-                    rc3 = ((self.startend[3] - self.varC[1])/finishphasetime)*60.
+                    if midphasetime:
+                        rc2 = ((self.varC[1] - BTdrycross)/midphasetime)*60.
+                    else:
+                        rc2 = 0.
+                    if finishphasetime:
+                        rc3 = ((self.startend[3] - self.varC[1])/finishphasetime)*60.
+                    else:
+                        rc3 = 0
                 else:
                     rc2 = 0.
                     rc3 = 0.
@@ -1405,8 +1505,9 @@ class ApplicationWindow(QMainWindow):
         #create Matplotlib canvas widget 
         self.qmc = tgraphcanvas(self.main_widget)
         #create  navigation toolbar
-        ntb = VMToolbar(self.qmc, self.main_widget)
         
+        ntb = NavigationToolbar(self.qmc, self.main_widget)
+        #ntb = VMToolbar(self.qmc, self.main_widget)
         #create a serial port object
         self.ser = serialport()
         # create a PID object
@@ -1711,7 +1812,7 @@ class ApplicationWindow(QMainWindow):
         self.fileMenu.addMenu(importMenu)       
 
 
-        # GRAPH menu
+        # ROAST menu
         editGraphAction = QAction("Roast properties",self)
         self.connect(editGraphAction ,SIGNAL("triggered()"),self.editgraph)
         self.GraphMenu.addAction(editGraphAction)
@@ -1735,13 +1836,22 @@ class ApplicationWindow(QMainWindow):
         self.connect(graphModeAction3,SIGNAL("triggered()"),lambda x=3:self.qmc.changeGColor(x))
         colorMenu.addAction(graphModeAction3)
 
-        FahrenheiAction = QAction("Fahrenheit Mode",self)
-        self.connect(FahrenheiAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
-        temperatureMenu.addAction(FahrenheiAction)
+        FahrenheitAction = QAction("Set Display in Fahrenheit Mode",self)
+        self.connect(FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
+        temperatureMenu.addAction(FahrenheitAction)
 
-        CelsiusAction = QAction("Celsius Mode",self)
+        CelsiusAction = QAction("Set Display in Celsius Mode",self)
         self.connect(CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusMode)
         temperatureMenu.addAction(CelsiusAction)
+
+        ConvertToFahrenheitAction = QAction("Convert profile to Fahrenheit",self)
+        self.connect(ConvertToFahrenheitAction,SIGNAL("triggered()"),lambda t="F":self.qmc.convertTemperature(t))
+        temperatureMenu.addAction(ConvertToFahrenheitAction)
+
+        ConvertToCelsiusAction = QAction("Convert profile to Celsius",self)
+        self.connect(ConvertToCelsiusAction,SIGNAL("triggered()"),lambda t="C":self.qmc.convertTemperature(t))
+        temperatureMenu.addAction(ConvertToCelsiusAction)
+
 
         phasesGraphAction = QAction("Phases",self)
         self.connect(phasesGraphAction,SIGNAL("triggered()"),self.editphases)
@@ -3310,18 +3420,21 @@ class errorDlg(QDialog):
         self.setLayout(layout)
 
 ##########################################################################
-#####################  CALCULATOR DLG   ##################################
+#####################  ROAST CALCULATOR DLG   ############################
 ##########################################################################
         
 class calculatorDlg(QDialog):
     def __init__(self, parent = None):
         super(calculatorDlg,self).__init__(parent)
-        self.setWindowTitle("Rate of change calculator")
+        self.setWindowTitle("Roast calculator")
 
+        usagelabel = QLabel("<center>USAGE: Press ENTER inside a box</center>")
+
+        #RATE OF CHANGE
+        rateofchangelabel = QLabel("<b>Rate of change</b>")
         self.result1 = QLabel("Enter two times along profile")
         self.result2 = QLabel()
         self.result2.setStyleSheet("background-color:'lightgrey';")
-
 
         startlabel = QLabel("Start (00:00)")
         endlabel = QLabel("End (00:00)")
@@ -3331,27 +3444,51 @@ class calculatorDlg(QDialog):
         self.startEdit.setValidator(QRegExpValidator(regextime,self))
         self.endEdit.setValidator(QRegExpValidator(regextime,self))
         
+        self.connect(self.startEdit,SIGNAL("returnPressed()"),self.calculateRC)
+        self.connect(self.endEdit,SIGNAL("returnPressed()"),self.calculateRC)
 
-        okButton = QPushButton("OK")  
-        cancelButton = QPushButton("Cancel")
+        #TEMPERATURE CONVERSION
+        tconversionLabel = QLabel("<b>Temperature conversion</b>")
+        flabel = QLabel("Fahrenheit")
+        clabel = QLabel("Celsius")
+        self.faEdit = QLineEdit()
+        self.ceEdit = QLineEdit()        
+        regextempe = QRegExp(r"^[0-9]{1,3}.[0-9]$")
+        self.faEdit.setValidator(QRegExpValidator(regextempe,self))
+        self.ceEdit.setValidator(QRegExpValidator(regextempe,self))        
+        self.connect(self.faEdit,SIGNAL("returnPressed()"),lambda x="FtoC":self.convertTemp(x))
+        self.connect(self.ceEdit,SIGNAL("returnPressed()"),lambda x="CtoF":self.convertTemp(x))        
+
+        #LAYOUTS
+        #Rate of chage
+        calrcLayout = QGridLayout()
+        calrcLayout.addWidget(startlabel,0,0)
+        calrcLayout.addWidget(endlabel,0,1)
+        calrcLayout.addWidget(self.startEdit,1,0)
+        calrcLayout.addWidget(self.endEdit,1,1)
         
-        self.connect(okButton,SIGNAL("clicked()"),self.calculate)
-        self.connect(cancelButton,SIGNAL("clicked()"),self.close)
+        rclayout = QVBoxLayout()
+        rclayout.addWidget(rateofchangelabel,0)
+        rclayout.addWidget(self.result1,1)
+        rclayout.addWidget(self.result2,2)
+        rclayout.addLayout(calrcLayout,3)
 
-        calLayout = QGridLayout()
-        calLayout.addWidget(startlabel,0,0)
-        calLayout.addWidget(endlabel,0,1)
-        calLayout.addWidget(self.startEdit,1,0)
-        calLayout.addWidget(self.endEdit,1,1)
-        calLayout.addWidget(okButton,2,0)
-        calLayout.addWidget(cancelButton,2,1)
+        #temperature conversion
+        tempLayout = QGridLayout()        
+        tempLayout.addWidget(flabel,0,0)
+        tempLayout.addWidget(clabel,0,1)
+        tempLayout.addWidget(self.faEdit,1,0)
+        tempLayout.addWidget(self.ceEdit,1,1)
 
-        layout = QVBoxLayout()
-        layout.addWidget(self.result1,0)
-        layout.addWidget(self.result2,0)
-        layout.addLayout(calLayout,1)        
-      
-        self.setLayout(layout)
+        #main
+        mainlayout = QVBoxLayout()
+        mainlayout.setSpacing(10)
+        mainlayout.addWidget(usagelabel,0)
+        mainlayout.addLayout(rclayout,1)
+        mainlayout.addWidget(tconversionLabel,2)
+        mainlayout.addLayout(tempLayout,3)
+
+        self.setLayout(mainlayout)
 
     #selects closest time index in aw.qmc.timex from secons
     #used by calculate()
@@ -3371,7 +3508,7 @@ class calculatorDlg(QDialog):
             else:
                 return i-1
         
-    def calculate(self):
+    def calculateRC(self):
         if len(aw.qmc.timex)>2:
             starttime = aw.qmc.stringtoseconds(str(self.startEdit.text()))
             endtime = aw.qmc.stringtoseconds(str(self.endEdit.text()))
@@ -3422,6 +3559,16 @@ class calculatorDlg(QDialog):
             self.result1.setText("No profile found")  
             self.result2.setText("")
 
+    def convertTemp(self,x):
+        if x == "FtoC":
+           newC = aw.qmc.fromFtoC(float(str(self.faEdit.text())))
+           result = "%.2f"%newC
+           self.ceEdit.setText(result)
+            
+        elif x == "CtoF":
+           newF = aw.qmc.fromCtoF(float(str(self.ceEdit.text())))
+           result = "%.2f"%newF
+           self.faEdit.setText(result)          
             
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
