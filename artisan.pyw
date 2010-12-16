@@ -94,7 +94,8 @@ import os
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,QPixmap,QColor,
-                         QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,QStatusBar,QRegExpValidator)
+                         QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,QStatusBar,QRegExpValidator,
+                         QDoubleValidator,QIntValidator)
 from PyQt4.QtCore import (Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant)
 
@@ -1504,9 +1505,12 @@ class ApplicationWindow(QMainWindow):
         
         #create Matplotlib canvas widget 
         self.qmc = tgraphcanvas(self.main_widget)
-        #create  navigation toolbar
-        
+
+
+        ###################################################################
+        #create  navigation toolbar NavigationToolbar VMToolbar
         ntb = NavigationToolbar(self.qmc, self.main_widget)
+        #########################################################
         #ntb = VMToolbar(self.qmc, self.main_widget)
         #create a serial port object
         self.ser = serialport()
@@ -3138,10 +3142,11 @@ class editGraphDlg(QDialog):
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
-        self.weightinedit.setValidator(QRegExpValidator(regexweight,self))
+        
+        self.weightinedit.setValidator(QDoubleValidator(0, 999.0, 1, self.weightinedit))
         self.weightinedit.setMaximumWidth(50)
         self.weightoutedit = QLineEdit(outw)
-        self.weightoutedit.setValidator(QRegExpValidator(regexweight,self))
+        self.weightoutedit.setValidator(QDoubleValidator(0, 999.0, 1, self.weightoutedit))
         self.weightoutedit.setMaximumWidth(50)
         self.weightpercentlabel = QLabel(" %")
 
@@ -3452,10 +3457,9 @@ class calculatorDlg(QDialog):
         flabel = QLabel("Fahrenheit")
         clabel = QLabel("Celsius")
         self.faEdit = QLineEdit()
-        self.ceEdit = QLineEdit()        
-        regextempe = QRegExp(r"^[0-9]{1,3}.[0-9]{1,2}$")
-        self.faEdit.setValidator(QRegExpValidator(regextempe,self))
-        self.ceEdit.setValidator(QRegExpValidator(regextempe,self))        
+        self.ceEdit = QLineEdit()                
+        self.faEdit.setValidator(QDoubleValidator(-999.0, 999.0, 2, self.faEdit))
+        self.ceEdit.setValidator(QDoubleValidator(-999.0, 999.0, 2, self.ceEdit))
         self.connect(self.faEdit,SIGNAL("returnPressed()"),lambda x="FtoC":self.convertTemp(x))
         self.connect(self.ceEdit,SIGNAL("returnPressed()"),lambda x="CtoF":self.convertTemp(x))
 
@@ -3471,9 +3475,8 @@ class calculatorDlg(QDialog):
         self.outEdit = QLineEdit()
         self.inEdit.setMaximumWidth(60)
         self.outEdit.setMaximumWidth(60)
-        regexweight = QRegExp(r"^[0-9]{0,4}.[0-9]{0,2}$")        
-        self.inEdit.setValidator(QRegExpValidator(regexweight,self))
-        self.outEdit.setValidator(QRegExpValidator(regexweight,self))        
+        self.inEdit.setValidator(QDoubleValidator(0, 999.0, 2, self.inEdit))
+        self.outEdit.setValidator(QDoubleValidator(0, 999.0, 2, self.outEdit))
         self.connect(self.inEdit,SIGNAL("returnPressed()"),lambda x="ItoO":self.convertWeight(x))
         self.connect(self.outEdit,SIGNAL("returnPressed()"),lambda x="OtoI":self.convertWeight(x))
         
@@ -4837,7 +4840,8 @@ class DeviceAssignmentDLG(QDialog):
         self.nonpidButton = QRadioButton("Device")
         self.pidButton = QRadioButton("PID")
 
-
+        self.devicetypeComboBox = QComboBox()
+        self.devicetypeComboBox.addItems(["Omega HH806AU","Omega HH506RA","CENTER 309"])
         
         controllabel =QLabel("Control PID for ET:")                            
         self.controlpidtypeComboBox = QComboBox()
@@ -4856,7 +4860,8 @@ class DeviceAssignmentDLG(QDialog):
 
         #check previous pid settings for radio button
         if aw.qmc.device == 0:
-            self.devicetypeComboBox.setCurrentIndex(2)
+            self.pidButton.setChecked(True)
+            
         else:
             self.nonpidButton.setChecked(True)
             if aw.qmc.device == 1:
@@ -4973,7 +4978,7 @@ class DeviceAssignmentDLG(QDialog):
                 
             if meter == "CENTER 309":
                 aw.qmc.device = 3
-                aw.ser.comport = "COM14"
+                aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -5279,9 +5284,8 @@ class PXRpidDlgControl(QDialog):
         svwarning2 = QLabel("<CENTER><b>WARNING</b><br>After <u>writing</u> an adjustment,<br>never power down the pid<br>"
                             "for the nex 5 seconds <br>or the pid may never recover.<br>Read operations manual</CENTER>")
         self.svedit = QLineEdit()
-        regexsv = QRegExp(r"^[0-9]{1,3}.[0-9]$")
-        self.svedit.setValidator(QRegExpValidator(regexsv,self))
-
+        self.svedit.setValidator(QDoubleValidator(0., 999., 1, self.svedit))
+        
         #TAB 3
         button_p = QPushButton("Set p")
         button_i = QPushButton("Set i")
@@ -5295,10 +5299,9 @@ class PXRpidDlgControl(QDialog):
         self.pedit.setMaximumWidth(60)
         self.iedit.setMaximumWidth(60)
         self.dedit.setMaximumWidth(60)
-        regexpid = QRegExp(r"^[0-9]{1,4}$")
-        self.pedit.setValidator(QRegExpValidator(regexpid,self))
-        self.iedit.setValidator(QRegExpValidator(regexpid,self))
-        self.dedit.setValidator(QRegExpValidator(regexpid,self))
+        self.pedit.setValidator(QDoubleValidator(0., 999., 1, self.pedit))
+        self.iedit.setValidator(QIntValidator(0, 3200, self.iedit))
+        self.dedit.setValidator(QDoubleValidator(0., 999.0, 1, self.dedit))
         button_autotuneON = QPushButton("Autotune ON")
         button_autotuneOFF = QPushButton("Autotune OFF")
         button_readpid = QPushButton("Read PID values")
@@ -5699,9 +5702,10 @@ class PXRpidDlgControl(QDialog):
         else:
             self.pedit.setText(str(p))
             aw.pid.PXR["p"][0] = p
-            
+
+        #i is int range 0-3200
         icommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR["i"][1],1)
-        i = aw.pid.readoneword(icommand)/10.
+        i = aw.pid.readoneword(icommand)/10
         if i == -1:
             return -1
         else:
@@ -5928,14 +5932,14 @@ class PXG4pidDlgControl(QDialog):
         self.sv6edit.setMaximumWidth(80)
         self.sv7edit.setMaximumWidth(80)
         
-        regexsv = QRegExp(r"^[0-9]{1,3}.[0-9]$")
-        self.sv1edit.setValidator(QRegExpValidator(regexsv,self))
-        self.sv2edit.setValidator(QRegExpValidator(regexsv,self))
-        self.sv3edit.setValidator(QRegExpValidator(regexsv,self))
-        self.sv4edit.setValidator(QRegExpValidator(regexsv,self))
-        self.sv5edit.setValidator(QRegExpValidator(regexsv,self))
-        self.sv6edit.setValidator(QRegExpValidator(regexsv,self))
-        self.sv7edit.setValidator(QRegExpValidator(regexsv,self))
+
+        self.sv1edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv1edit))
+        self.sv2edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv2edit))
+        self.sv3edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv3edit))
+        self.sv4edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv4edit))
+        self.sv5edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv5edit))
+        self.sv6edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv6edit))
+        self.sv7edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv7edit))
 
         self.radiosv1 = QRadioButton()
         self.radiosv2 = QRadioButton()
@@ -6054,30 +6058,30 @@ class PXG4pidDlgControl(QDialog):
         self.d5edit.setMaximumSize(50, 42)
         self.d6edit.setMaximumSize(50, 42)
         self.d7edit.setMaximumSize(50, 42)
-
-        regexpid = QRegExp(r"^[0-9]{1,3}[0-9]$")
-        self.p1edit.setValidator(QRegExpValidator(regexpid,self))
-        self.p2edit.setValidator(QRegExpValidator(regexpid,self))
-        self.p3edit.setValidator(QRegExpValidator(regexpid,self))
-        self.p4edit.setValidator(QRegExpValidator(regexpid,self))
-        self.p5edit.setValidator(QRegExpValidator(regexpid,self))
-        self.p6edit.setValidator(QRegExpValidator(regexpid,self))
-        self.p7edit.setValidator(QRegExpValidator(regexpid,self))
-        self.i1edit.setValidator(QRegExpValidator(regexpid,self))
-        self.i2edit.setValidator(QRegExpValidator(regexpid,self))
-        self.i3edit.setValidator(QRegExpValidator(regexpid,self))
-        self.i4edit.setValidator(QRegExpValidator(regexpid,self))
-        self.i5edit.setValidator(QRegExpValidator(regexpid,self))
-        self.i6edit.setValidator(QRegExpValidator(regexpid,self))
-        self.i7edit.setValidator(QRegExpValidator(regexpid,self))
-        self.d1edit.setValidator(QRegExpValidator(regexpid,self))
-        self.d2edit.setValidator(QRegExpValidator(regexpid,self))
-        self.d3edit.setValidator(QRegExpValidator(regexpid,self))
-        self.d4edit.setValidator(QRegExpValidator(regexpid,self))
-        self.d5edit.setValidator(QRegExpValidator(regexpid,self))
-        self.d6edit.setValidator(QRegExpValidator(regexpid,self))
-        self.d7edit.setValidator(QRegExpValidator(regexpid,self))
-
+        #p = 0-999.9
+        self.p1edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p1edit))
+        self.p2edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p2edit))
+        self.p3edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p3edit))
+        self.p4edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p4edit))
+        self.p5edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p5edit))
+        self.p6edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p6edit))
+        self.p7edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p7edit))
+        #i are int 0-3200
+        self.i1edit.setValidator(QIntValidator(0, 3200, self.i1edit))
+        self.i2edit.setValidator(QIntValidator(0, 3200, self.i2edit))
+        self.i3edit.setValidator(QIntValidator(0, 3200, self.i3edit))
+        self.i4edit.setValidator(QIntValidator(0, 3200, self.i4edit))
+        self.i5edit.setValidator(QIntValidator(0, 3200, self.i5edit))
+        self.i6edit.setValidator(QIntValidator(0, 3200, self.i6edit))
+        self.i7edit.setValidator(QIntValidator(0, 3200, self.i7edit))
+        #d 0-999.9
+        self.d1edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d1edit))
+        self.d2edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d2edit))
+        self.d3edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d3edit))
+        self.d4edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d4edit))
+        self.d5edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d5edit))
+        self.d6edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d6edit))
+        self.d7edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d7edit))
         
         pid1button = QPushButton("pid 1")
         pid2button = QPushButton("pid 2")
