@@ -832,7 +832,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             QMessageBox.information(self,"Convert Profile Temperature",
                                                     "Unable to comply. You already are in Fahrenheit")
-                            aw.messagelabel.setText("Conflict found. Profile scale change prevented")
+                            aw.messagelabel.setText("Profile not changed")
                             return
 
             elif t == "C":
@@ -871,7 +871,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             QMessageBox.information(self,"Convert Profile Temperature",
                                                     "Unable to comply. You already are in Celsius")
-                            aw.messagelabel.setText("Conflict found. Profile scale change prevented")
+                            aw.messagelabel.setText("Profile not changed")
                             return
 
                         self.celsiusMode()
@@ -1384,12 +1384,12 @@ class tgraphcanvas(FigureCanvas):
                     
                 deltaAcc = int(AccMET) - int(AccBT)
                         
-                lowestBT = str(LP)
+                lowestBT = "%.1f"%LP
                 timeLP = str(self.stringfromseconds(self.timex[k] - self.startend[0]))
                 time = self.stringfromseconds(self.startend[2]-self.startend[0])
                 #end temperature 
                 
-                strline = ("[BT = " + lowestBT + self.mode + " - " + str(self.startend[3]) + self.mode +
+                strline = ("[BT = " + lowestBT + self.mode + " - " + "%.1f"%self.startend[3] + self.mode +
                             "] [ETarea - BTarea = " + str(deltaAcc) + "] [Time = " +time +"]")
                             
                 #text metrics 
@@ -1648,7 +1648,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_17, SIGNAL("clicked()"),lambda x=-5: self.pid.adjustsv(x))
         
         #only leave operational the control button if the device is Fuji PID
-        #the other buttons need to be activated in the PID control panel 
+        #the SV buttons are activated from the PID control panel 
         if self.qmc.device > 0:
             self.button_10.setDisabled(True)
             self.button_10.setFlat(True)
@@ -2542,13 +2542,13 @@ class ApplicationWindow(QMainWindow):
         CS,CE,CCS,CCE = "","","",""
         
         if self.qmc.varC[0]:
-            CS += self.qmc.stringfromseconds(self.qmc.varC[0] - self.qmc.startend[0])+ " at " + str(self.qmc.varC[1]) + self.qmc.mode
+            CS += self.qmc.stringfromseconds(self.qmc.varC[0] - self.qmc.startend[0])+ " at " + "%.1f"%self.qmc.varC[1] + self.qmc.mode
         if self.qmc.varC[2]:
-            CE += self.qmc.stringfromseconds(self.qmc.varC[2] - self.qmc.startend[0]) + " at " + str(self.qmc.varC[3]) + self.qmc.mode
+            CE += self.qmc.stringfromseconds(self.qmc.varC[2] - self.qmc.startend[0]) + " at " + "%.1f"%self.qmc.varC[3] + self.qmc.mode
         if self.qmc.varC[4]:
-            CCS += self.qmc.stringfromseconds(self.qmc.varC[4] - self.qmc.startend[0])  + " at " + str(self.qmc.varC[5])+ self.qmc.mode 
+            CCS += self.qmc.stringfromseconds(self.qmc.varC[4] - self.qmc.startend[0])  + " at " + "%.1f"%self.qmc.varC[5]+ self.qmc.mode 
         if self.qmc.varC[6]:
-            CCE += self.qmc.stringfromseconds(self.qmc.varC[6] - self.qmc.startend[0])+ " at " + str(self.qmc.varC[7]) + self.qmc.mode
+            CCE += self.qmc.stringfromseconds(self.qmc.varC[6] - self.qmc.startend[0])+ " at " + "%.1f"%self.qmc.varC[7] + self.qmc.mode
 
         #CHARGE += self.qmc.stringfromseconds(0) + " at " + str(self.qmc.startend[1])
         #DROP = self.qmc.stringfromseconds(self.qmc.startend[2] - self.qmc.startend[0] ) + " at " + str(self.qmc.startend[3])
@@ -2653,10 +2653,10 @@ class ApplicationWindow(QMainWindow):
         html += "<tr>\n<td><p><center><b>Events</b><br>\n<table cellpadding=2>\n"
         for i in range(len(self.qmc.specialevents)):
             html += ("<tr>"+
-                     "\n<td>" + str(i+1) + "</td><td>" +
+                     "\n<td>" + str(i+1) + "</td><td>[" +
                      self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[i]]-self.qmc.startend[0])) +
-                     "</td><td> - " + str(self.qmc.temp2[self.qmc.specialevents[i]]) + self.qmc.mode +
-                     "</td><td>" + self.qmc.specialeventsStrings[i] +"</td></tr>\n")           
+                     "</td><td> at " + "%.1f"%self.qmc.temp2[self.qmc.specialevents[i]] + self.qmc.mode +
+                     "]</td><td>" + self.qmc.specialeventsStrings[i] +"</td></tr>\n")           
         html += "</td>\n</table>\n</center>\n"
         html += "\n<!-- THIRD ROW SECOND COLUMN -->\n"
         html += "<td><center><b>Cupping Notes</b></center><p>\n"
@@ -2664,7 +2664,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.cupingnotes[i] == " ":
                 html += " &nbsp "
             elif ord(self.qmc.cupingnotes[i]) == 9:
-                html += " &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp "
+                html += " &nbsp&nbsp&nbsp&nbsp "
             elif self.qmc.cupingnotes[i] == "\n":
                 html += "<br>\n"
             else:           
@@ -3453,12 +3453,30 @@ class calculatorDlg(QDialog):
         clabel = QLabel("Celsius")
         self.faEdit = QLineEdit()
         self.ceEdit = QLineEdit()        
-        regextempe = QRegExp(r"^[0-9]{1,3}.[0-9]$")
+        regextempe = QRegExp(r"^[0-9]{1,3}.[0-9]{1,2}$")
         self.faEdit.setValidator(QRegExpValidator(regextempe,self))
         self.ceEdit.setValidator(QRegExpValidator(regextempe,self))        
         self.connect(self.faEdit,SIGNAL("returnPressed()"),lambda x="FtoC":self.convertTemp(x))
-        self.connect(self.ceEdit,SIGNAL("returnPressed()"),lambda x="CtoF":self.convertTemp(x))        
+        self.connect(self.ceEdit,SIGNAL("returnPressed()"),lambda x="CtoF":self.convertTemp(x))
 
+        #WEIGHT CONVERSION
+        wconversionLabel = QLabel("<b>Weight conversion</b>")
+        self.inComboBox = QComboBox()
+        self.inComboBox.addItems(["g","Kg","lb"])
+        self.inComboBox.setMaximumWidth(40)
+        self.outComboBox = QComboBox()
+        self.outComboBox.setMaximumWidth(40)
+        self.outComboBox.addItems(["g","Kg","lb"])
+        self.inEdit = QLineEdit()
+        self.outEdit = QLineEdit()
+        self.inEdit.setMaximumWidth(60)
+        self.outEdit.setMaximumWidth(60)
+        regexweight = QRegExp(r"^[0-9]{0,4}.[0-9]{0,2}$")        
+        self.inEdit.setValidator(QRegExpValidator(regexweight,self))
+        self.outEdit.setValidator(QRegExpValidator(regexweight,self))        
+        self.connect(self.inEdit,SIGNAL("returnPressed()"),lambda x="ItoO":self.convertWeight(x))
+        self.connect(self.outEdit,SIGNAL("returnPressed()"),lambda x="OtoI":self.convertWeight(x))
+        
         #LAYOUTS
         #Rate of chage
         calrcLayout = QGridLayout()
@@ -3480,6 +3498,14 @@ class calculatorDlg(QDialog):
         tempLayout.addWidget(self.faEdit,1,0)
         tempLayout.addWidget(self.ceEdit,1,1)
 
+        #weight conversions
+        weightLayout = QHBoxLayout()
+        weightLayout.addWidget(self.inComboBox,0)
+        weightLayout.addWidget(self.inEdit,1)
+        weightLayout.addWidget(self.outEdit,2)
+        weightLayout.addWidget(self.outComboBox,3)
+
+
         #main
         mainlayout = QVBoxLayout()
         mainlayout.setSpacing(10)
@@ -3487,7 +3513,9 @@ class calculatorDlg(QDialog):
         mainlayout.addLayout(rclayout,1)
         mainlayout.addWidget(tconversionLabel,2)
         mainlayout.addLayout(tempLayout,3)
-
+        mainlayout.addWidget(wconversionLabel,4)
+        mainlayout.addLayout(weightLayout,5)
+        
         self.setLayout(mainlayout)
 
     #selects closest time index in aw.qmc.timex from secons
@@ -3569,7 +3597,25 @@ class calculatorDlg(QDialog):
            newF = aw.qmc.fromCtoF(float(str(self.ceEdit.text())))
            result = "%.2f"%newF
            self.faEdit.setText(result)          
+
+    def convertWeight(self,x):
+        #                g,            kg,         lb
+        convtable = [
+                        [1.,           0.001,      0.00220462262     ],    # g
+                        [1000,         1.,         2.20500000000     ],    # Kg
+                        [453.591999,   0.45359237, 1.                ]     #lb
+                    ]
+        
+        if x == "ItoO":
+           inx = float(str(self.inEdit.text()))
+           outx = inx*convtable[self.inComboBox.currentIndex()][self.outComboBox.currentIndex()]
+           self.outEdit.setText("%.2f"%outx)
             
+        elif x == "OtoI":
+           outx = float(str(self.outEdit.text()))
+           inx = outx*convtable[self.outComboBox.currentIndex()][self.inComboBox.currentIndex()]
+           self.inEdit.setText("%.2f"%inx)
+        
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
 ##########################################################################
@@ -4791,8 +4837,7 @@ class DeviceAssignmentDLG(QDialog):
         self.nonpidButton = QRadioButton("Device")
         self.pidButton = QRadioButton("PID")
 
-        self.devicetypeComboBox = QComboBox()
-        self.devicetypeComboBox.addItems(["Omega HH806AU","Omega HH506RA","CENTER 309"])
+
         
         controllabel =QLabel("Control PID for ET:")                            
         self.controlpidtypeComboBox = QComboBox()
