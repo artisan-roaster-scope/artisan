@@ -94,8 +94,8 @@ import os
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,QPixmap,QColor,
-                         QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,QStatusBar,QRegExpValidator,
-                         QDoubleValidator,QIntValidator)
+                         QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,QStatusBar,
+                         QRegExpValidator,QDoubleValidator,QIntValidator)
 from PyQt4.QtCore import (Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant)
 
@@ -195,6 +195,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundmetcolor = self.palette["met"]
         self.backgroundbtcolor = self.palette["bt"]
         self.backgroundstyle = "-"
+        self.backmoveflag = 1
 
         #Initial flavor parameters. 
         self.flavors = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5]
@@ -521,14 +522,15 @@ class tgraphcanvas(FigureCanvas):
         #check BACKGROUND flag
         if self.background:
             #check to see if there is both a profile loaded and a background loaded
-            if self.startend[0] and self.startendB[0] and (self.startend[0] != self.startendB[0]):
+            if self.startend[0] and self.startendB[0] and (self.startend[0] != self.startendB[0]) and self.backmoveflag:
                 #align the background profile so they both plot with the same CHARGE time
                 difference = self.startend[0] - self.startendB[0]
-                if difference != 0:
-                    for i in range(len(self.timeB)):
-                        self.timeB[i] -= difference
-                    self.startendB[0] = self.startend[0]
-
+                if difference > 0:
+                    self.movebackground("left",difference)
+                elif difference < 0:
+                    self.movebackground("right",difference)
+                self.backmoveflag = 0
+                
             #draw background
             self.l_back1, = self.ax.plot(self.timeB, self.backgroundET,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
                                          linestyle=self.backgroundstyle,alpha=self.backgroundalpha)
@@ -538,15 +540,16 @@ class tgraphcanvas(FigureCanvas):
             #check backgroundDetails flag
             if self.backgroundDetails:
                 rect = patches.Rectangle( (self.startendB[0],0), width=.1, height=self.startendB[1], color = self.palette["markers"],alpha=self.backgroundalpha)
-                self.ax.add_patch(rect)               
-                self.ax.annotate(str(self.startendB[1]), xy=(self.startendB[0]-1, self.startendB[1]),xytext=(self.startendB[0]-5,
+                self.ax.add_patch(rect)
+                st1 = self.stringfromseconds(self.startendB[0]-self.startend[0])
+                self.ax.annotate(str(self.startendB[1]), xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]-5,
                                 self.startendB[1]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                  alpha=self.backgroundalpha)
-                self.ax.annotate("0:00", xy=(self.startendB[0]-1, self.startendB[1]),xytext=(self.startendB[0],
+                self.ax.annotate(st1, xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0],
                                 self.startendB[1]-50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                 alpha=self.backgroundalpha)
                 if self.varCB[0]:
-                    st1 = self.stringfromseconds(self.varCB[0]-self.startendB[0])
+                    st1 = self.stringfromseconds(self.varCB[0]-self.startend[0])
                     self.ax.annotate(str(self.varCB[1]), xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0]-5,
                                      self.varCB[1]+30), color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)
@@ -554,7 +557,7 @@ class tgraphcanvas(FigureCanvas):
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)
                 if self.varCB[2]:
-                    st1 = self.stringfromseconds(self.varCB[2]-self.startendB[0])           
+                    st1 = self.stringfromseconds(self.varCB[2]-self.startend[0])           
                     self.ax.annotate(str(self.varCB[3]), xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2]-5,
                                     self.varCB[3]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)              
@@ -562,7 +565,7 @@ class tgraphcanvas(FigureCanvas):
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)
                 if self.varCB[4]:
-                    st1 = self.stringfromseconds(self.varCB[4]-self.startendB[0])
+                    st1 = self.stringfromseconds(self.varCB[4]-self.startend[0])
                     self.ax.annotate(str(self.varCB[5]), xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4]-5,
                                     self.varCB[5]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)      
@@ -570,7 +573,7 @@ class tgraphcanvas(FigureCanvas):
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)                
                 if self.varCB[6]:
-                    st1 = self.stringfromseconds(self.varCB[6]-self.startendB[0])
+                    st1 = self.stringfromseconds(self.varCB[6]-self.startend[0])
                     self.ax.annotate(str(self.varCB[7]), xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6]-5,
                                     self.varCB[7]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)                
@@ -578,10 +581,8 @@ class tgraphcanvas(FigureCanvas):
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)          
                 if self.startend[2]:
-                    st1 = self.stringfromseconds(self.startendB[2]-self.startendB[0])
-                    rect = patches.Rectangle( (self.startendB[2]-1,0), width=.1, height=self.startendB[3], color = self.palette["text"],alpha=self.backgroundalpha)
-                    self.ax.add_patch(rect)
-                    self.ax.annotate(str(self.startendB[3]), xy=(self.startendB[2]-1, self.startendB[3]),xytext=(self.startendB[2]-5,
+                    st1 = self.stringfromseconds(self.startendB[2]-self.startend[0])
+                    self.ax.annotate(str(self.startendB[3]), xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2]-5,
                                     self.startendB[3]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                     alpha=self.backgroundalpha)
                     self.ax.annotate(st1, xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2],self.startendB[3]-50),
@@ -1413,6 +1414,7 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText(message)
             self.ax.text(self.timex[i],self.temp2[i],Nevents,color=self.palette["text"])
 
+
     def movebackground(self,direction,step):
         lt = len(self.timeB)
         le = len(self.backgroundET)
@@ -1423,23 +1425,63 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(lt):
                     self.backgroundET[i] += step
                     self.backgroundBT[i] += step
-                self.redraw()
                     
+                if self.varCB[1]:
+                   self.varCB[1] += step
+                if self.varCB[3]:
+                   self.varCB[3] += step
+                if self.varCB[5]:
+                   self.varCB[5] += step
+                if self.varCB[7]:
+                   self.varCB[7] += step
+                self.startendB[1] += step
+                self.startendB[3] += step
+                
             elif direction == "left":
                 for i in range(lt):
                     self.timeB[i] -= step
-                self.redraw()
                     
+                if self.varCB[0]:
+                   self.varCB[0] -= step
+                if self.varCB[2]:
+                   self.varCB[2] -= step
+                if self.varCB[4]:
+                   self.varCB[4] -= step
+                if self.varCB[6]:
+                   self.varCB[6] -= step
+                self.startendB[0] -= step
+                self.startendB[2] -= step
+                
             elif direction == "right":
                 for i in range(lt):
                     self.timeB[i] += step
-                self.redraw()
+                    
+                if self.varCB[0]:
+                   self.varCB[0] += step
+                if self.varCB[2]:
+                   self.varCB[2] += step
+                if self.varCB[4]:
+                   self.varCB[4] += step
+                if self.varCB[6]:
+                   self.varCB[6] += step
+                self.startendB[0] += step
+                self.startendB[2] += step
                     
             elif direction == "down":
                 for i in range(lt):
                     self.backgroundET[i] -= step
                     self.backgroundBT[i] -= step
-                self.redraw()
+                    
+                if self.varCB[1]:
+                   self.varCB[1] -= step
+                if self.varCB[3]:
+                   self.varCB[3] -= step
+                if self.varCB[5]:
+                   self.varCB[5] -= step
+                if self.varCB[7]:
+                   self.varCB[7] -= step  
+                self.startendB[1] -= step
+                self.startendB[3] -= step    
         else:
             aw.messagelabel.setText("unable to move background")
             return
@@ -1508,8 +1550,8 @@ class ApplicationWindow(QMainWindow):
 
 
         ###################################################################
-        #create  navigation toolbar NavigationToolbar VMToolbar
-        ntb = NavigationToolbar(self.qmc, self.main_widget)
+        # NavigationToolbar VMToolbar
+        ntb = VMToolbar(self.qmc, self.main_widget)
         #########################################################
         #ntb = VMToolbar(self.qmc, self.main_widget)
         #create a serial port object
@@ -1840,14 +1882,6 @@ class ApplicationWindow(QMainWindow):
         self.connect(graphModeAction3,SIGNAL("triggered()"),lambda x=3:self.qmc.changeGColor(x))
         colorMenu.addAction(graphModeAction3)
 
-        FahrenheitAction = QAction("Set Display in Fahrenheit Mode",self)
-        self.connect(FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
-        temperatureMenu.addAction(FahrenheitAction)
-
-        CelsiusAction = QAction("Set Display in Celsius Mode",self)
-        self.connect(CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusMode)
-        temperatureMenu.addAction(CelsiusAction)
-
         ConvertToFahrenheitAction = QAction("Convert profile to Fahrenheit",self)
         self.connect(ConvertToFahrenheitAction,SIGNAL("triggered()"),lambda t="F":self.qmc.convertTemperature(t))
         temperatureMenu.addAction(ConvertToFahrenheitAction)
@@ -1856,6 +1890,13 @@ class ApplicationWindow(QMainWindow):
         self.connect(ConvertToCelsiusAction,SIGNAL("triggered()"),lambda t="C":self.qmc.convertTemperature(t))
         temperatureMenu.addAction(ConvertToCelsiusAction)
 
+        FahrenheitAction = QAction("Set Display in Fahrenheit Mode",self)
+        self.connect(FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
+        temperatureMenu.addAction(FahrenheitAction)
+
+        CelsiusAction = QAction("Set Display in Celsius Mode",self)
+        self.connect(CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusMode)
+        temperatureMenu.addAction(CelsiusAction)
 
         phasesGraphAction = QAction("Phases",self)
         self.connect(phasesGraphAction,SIGNAL("triggered()"),self.editphases)
@@ -2261,9 +2302,6 @@ class ApplicationWindow(QMainWindow):
             #CLOSE FILE
             f.close()
 
-            #Plot everything
-            self.qmc.redraw()
-
             message =  "Background " + str(fname) + " loaded successfully"
             self.messagelabel.setText(message)
 
@@ -2606,7 +2644,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.roastingnotes[i] == " ":
                 html += " &nbsp "
             elif ord(self.qmc.roastingnotes[i]) == 9:
-                html += " &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp "
+                html += " &nbsp&nbsp&nbsp&nbsp "
                          
             elif self.qmc.roastingnotes[i] == "\n":
                 html += "<br>\n"
@@ -3467,16 +3505,17 @@ class calculatorDlg(QDialog):
         wconversionLabel = QLabel("<b>Weight conversion</b>")
         self.inComboBox = QComboBox()
         self.inComboBox.addItems(["g","Kg","lb"])
-        self.inComboBox.setMaximumWidth(40)
+        self.inComboBox.setMaximumWidth(50)
         self.outComboBox = QComboBox()
-        self.outComboBox.setMaximumWidth(40)
+        self.outComboBox.setMaximumWidth(50)
         self.outComboBox.addItems(["g","Kg","lb"])
+        self.outComboBox.setCurrentIndex(2)
         self.inEdit = QLineEdit()
         self.outEdit = QLineEdit()
         self.inEdit.setMaximumWidth(60)
         self.outEdit.setMaximumWidth(60)
-        self.inEdit.setValidator(QDoubleValidator(0, 999.0, 2, self.inEdit))
-        self.outEdit.setValidator(QDoubleValidator(0, 999.0, 2, self.outEdit))
+        self.inEdit.setValidator(QDoubleValidator(0, 99999., 2, self.inEdit))
+        self.outEdit.setValidator(QDoubleValidator(0, 99999., 2, self.outEdit))
         self.connect(self.inEdit,SIGNAL("returnPressed()"),lambda x="ItoO":self.convertWeight(x))
         self.connect(self.outEdit,SIGNAL("returnPressed()"),lambda x="OtoI":self.convertWeight(x))
         
@@ -3605,7 +3644,7 @@ class calculatorDlg(QDialog):
         #                g,            kg,         lb
         convtable = [
                         [1.,           0.001,      0.00220462262     ],    # g
-                        [1000,         1.,         2.20500000000     ],    # Kg
+                        [1000,         1.,         2.205             ],    # Kg
                         [453.591999,   0.45359237, 1.                ]     #lb
                     ]
         
@@ -4144,14 +4183,17 @@ class backgroundDLG(QDialog):
     def delete(self):
         
         self.status.showMessage("Processing...",5000)
-        aw.qmc.backgroundpath = ""
-        aw.qmc.backgroundET,self.backgroundBT,self.timeB = [],[],[]
-        aw.qmc.startendB,self.varCB = [0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.,0.,0.]
-        aw.qmc.background = False
-        aw.qmc.backgroundDetails = False
+        self.pathedit.setText("")
         self.backgroundDetails.setChecked(False)
         self.backgroundCheck.setChecked(False)
+        
+        aw.qmc.backgroundET, aw.qmc.backgroundBT, aw.qmc.timeB = [],[],[]
+        aw.qmc.startendB, aw.qmc.varCB = [0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.,0.,0.]
+        aw.qmc.background = False
+        aw.qmc.backgroundDetails = False
+        aw.qmc.backmoveflag = 1
         aw.qmc.redraw()
+        
         self.status.showMessage("Ready",5000)   
         
     def move(self,m):        
@@ -4166,10 +4208,11 @@ class backgroundDLG(QDialog):
          elif m == "right":
             self.rightButton.setDisabled(True)
 
-         speed = self.speedSpinBox.value()
-         aw.qmc.movebackground(m,speed)
+         step = self.speedSpinBox.value()
+         aw.qmc.movebackground(m,step)
          
-         #reactivate button
+         aw.qmc.redraw()
+         #activate button
          if m == "up":
              self.upButton.setDisabled(False)
          elif m == "down":
@@ -4209,7 +4252,8 @@ class backgroundDLG(QDialog):
         self.status.showMessage("Reading file...",5000)   
         aw.qmc.backgroundpath = str(self.pathedit.text())
         aw.loadbackground(str(self.pathedit.text()))
-        aw.qmc.background = True
+        self.backgroundCheck.setChecked(True)
+        self.backgroundDetails.setChecked(True)
         self.readChecks()
 
 
@@ -7395,7 +7439,7 @@ app.setApplicationName("Artisan")                                       #needed 
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("questm3.groups.google.com")                  #needed by QSettings() to store windows geometry in operating system 
 if platf == 'Windows':
-    app.setWindowIcon(QIcon("settings\icon.png"))
+    app.setWindowIcon(QIcon("artisan.png"))
 aw = ApplicationWindow()
 aw.show()
 app.exec_()
