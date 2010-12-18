@@ -10,7 +10,7 @@ from setuptools import setup
 
 
 # current version of Artisan
-VERSION = '0.0.31'
+VERSION = '0.1.0'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
@@ -19,6 +19,7 @@ APP = ['artisan.pyw']
 
 DATA_FILES = [
     "index.html",
+    "LICENSE.txt",
     ("../PlugIns/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
     ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib'])
   ]
@@ -35,9 +36,10 @@ OPTIONS = {
                  'PyQt4.QtGui',
                  'PyQt4.QtSvg',
                  'PyQt4.QtXml'],
-    'excludes' : ['_tkagg','_ps','_fltkagg',
-                  '_agg','_cairo','_gtk','gtkcairo',
-                  '_wxagg','_tkagg','_cocoaagg','_wx'],
+    'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
+                      '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
+                      'bsddb','curses','tcl',
+                      '_wxagg','_gtagg','_cocoaagg','_wx'],
     'plist'    : {  'CFBundleDisplayName': 'Artisan',
                     'CFBundleGetInfoString' : 'Artisan, Roast Logger',
                     'CFBundleIdentifier':'com.google.groups.questm3',
