@@ -489,7 +489,7 @@ class tgraphcanvas(FigureCanvas):
 
     #Redraws data   
     def redraw(self):
-        self.fig.clf()
+        self.fig.clf()   #wipe out figure
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         #Set axes same as in __init__
         self.ax.set_xlim(self.startofx, self.endofx)
@@ -539,8 +539,6 @@ class tgraphcanvas(FigureCanvas):
 
             #check backgroundDetails flag
             if self.backgroundDetails:
-                rect = patches.Rectangle( (self.startendB[0],0), width=.1, height=self.startendB[1], color = self.palette["markers"],alpha=self.backgroundalpha)
-                self.ax.add_patch(rect)
                 st1 = self.stringfromseconds(self.startendB[0]-self.startend[0])
                 self.ax.annotate(str(self.startendB[1]), xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]-5,
                                 self.startendB[1]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
@@ -3994,8 +3992,8 @@ class backgroundDLG(QDialog):
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
         self.fname = ""
         
-        self.backgroundCheck = QCheckBox("Show Background")
-        self.backgroundDetails = QCheckBox("Show Background details")
+        self.backgroundCheck = QCheckBox("Show")
+        self.backgroundDetails = QCheckBox("Text")
         
         if aw.qmc.background:
             self.backgroundCheck.setChecked(True)
