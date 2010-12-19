@@ -75,7 +75,8 @@ __version__ = "0.1"
 
 #   EXTRA PYTHON LIBRARIES NEEDED (install after installing python 2.6.6)
 # 6) pyserial for python 2.6: http://sourceforge.net/projects/pyserial/files/pyserial/2.5/pyserial-2.5-rc1.win32.exe/download
-# 7) numpy: http://sourceforge.net/projects/numpy/files/NumPy/1.5.1/numpy-1.5.1-win32-superpack-python2.6.exe/download
+#    NOTE: at the present time, numpy 1.5 is incompatible with py2exe. Instead, use numpy 1.3 if compiling a binary exe
+# 7) http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0-win32-superpack-python2.6.exe/download 
 # 8) matplotlib: http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib 
 # 9) pyqt4 for python 2.6: http://pyqwt.sourceforge.net/support/PyQt-Py2.6-gpl-4.5.4-1.exe 
 
