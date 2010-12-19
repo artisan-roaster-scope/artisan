@@ -16,7 +16,7 @@ There are usually two downloads needed in order to get the `artisan` software up
 _NOTE: for now a binary is only provided for OS X 10.6 Snow Leopard_
 
   # Install USB/serial driver
-    ** for Omega meters download and run the VCP driver [http://www.ftdichip.com/Drivers/VCP.htm FTDI OS X installer]
+    ** for Omega meters download and run the [http://www.ftdichip.com/Drivers/VCP.htm FTDI VCP OS X installer]
   # Download and run the [http://code.google.com/p/artisan/downloads/list artisan OS X installer]
   ## Double click on the `dmg` file you just downloaded
   ## Double click the disk image which appears on your desktop
