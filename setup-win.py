@@ -6,7 +6,7 @@ USAGE: python setup-win py2exe
 """
 
 from distutils.core import setup
-import matplotlib
+import matplotlib as mpl
 import py2exe
 
 INCLUDES = [
@@ -19,7 +19,6 @@ EXCLUDES = ['_tkagg',
             '_fltkagg',
             'Tkinter',
             'Tkconstants',
-            '_agg',
             '_cairo',
             '_gtk',
             'gtkcairo',
@@ -35,17 +34,16 @@ EXCLUDES = ['_tkagg',
 
 setup(
     name ="Artisan",
-    author = "YOUcouldbeTOO",
-    author_email="zaub.ERASE.org@yahoo.com",
+    author = "YOU",
     windows=[{"script" : "E:\\Artisan\\artisan\\trunk\\artisan.pyw"}],
-    data_files = matplotlib.get_py2exe_datafiles(),
-    # using zipfile to reduce number of files in \dist output
-    zipfile = r'lib\library.zip',
+    data_files = mpl.get_py2exe_datafiles(),
+    zipfile = None,
     options={"py2exe" :{
                         "packages": ['matplotlib','pytz'],
-                        "compressed":False,
+                        "compressed": True,
                         "unbuffered": True,
-                        "optimize":0,
+                        "optimize":1,
+                        "bundle_files": 1,
                         "dll_excludes":[
                             'tcl84.dll','tk84.dll','libgdk-win32-2.0-0.dll',
                             'libgdk_pixbuf-2.0-0.dll','libgobject-2.0-0.dll'],
