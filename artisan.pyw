@@ -75,9 +75,9 @@ __version__ = "0.1"
 
 #   EXTRA PYTHON LIBRARIES NEEDED (install after installing python 2.6.6)
 # 6) pyserial for python 2.6: http://sourceforge.net/projects/pyserial/files/pyserial/2.5/pyserial-2.5-rc1.win32.exe/download
-#    NOTE: at the present time, numpy 1.5 is incompatible with py2exe. Instead, use numpy 1.3 if compiling a binary exe
+#    NOTE: at the present time, numpy 1.5 is incompatible with py2exe. Instead, use numpy 1.3 if compiling for Win executable
 # 7) http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0-win32-superpack-python2.6.exe/download 
-# 8) matplotlib: http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib 
+# 8) http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-0.99.1/
 # 9) pyqt4 for python 2.6: http://pyqwt.sourceforge.net/support/PyQt-Py2.6-gpl-4.5.4-1.exe 
 
 
@@ -111,6 +111,7 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as Naviga
 
 
 platf = platform.system()
+
 
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
@@ -991,7 +992,8 @@ class tgraphcanvas(FigureCanvas):
             self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
             
             #fill in between with color: needs matplotlib version 1.0+
-            self.ax1.fill_between(angles,0,self.flavors, facecolor='blue', alpha=0.1, interpolate=True)
+            #commented out to go back to matplotlib 0.99.1
+            #self.ax1.fill_between(angles,0,self.flavors, facecolor='blue', alpha=0.1, interpolate=True)
                
             self.ax1.plot(angles,self.flavors)
             self.fig.canvas.draw()
