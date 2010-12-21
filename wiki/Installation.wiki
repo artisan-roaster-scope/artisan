@@ -1,15 +1,32 @@
-#summary How to install the artisan sofware
+#summary How to install the artisan software
 
 = Introduction =
 
-There are usually two downloads needed in order to get the `artisan` software up and running on your platform, a driver for your meter and the `artisan` application itself.
+There are usually two downloads needed in order to get the `artisan` software up and running on your platform, a driver for your meter (if it is USB) and the `artisan` application itself. 
 
-  # Install USB/serial driver
+  # Install USB driver
   # Install `artisan` application
   # Connect your meter via USB/serial
   # Launch `artisan` application
 
 == Windows ==
+
+  # The main application is called artisan.exe and it is located inside the zip file.
+  # There are three steps needed after downloading and unziping the artisan zip file.  
+ 
+  # 1 VISUAL C++ LIBRARY CHECK
+  # Artisan for Windows uses a Visual C++ runtime library (file) from Microsoft. If artisan cannot start, it is because your computer is missing this file. The included INSTALL.txt file has links to download a free program that installs this file.
+  # If artisan starts (a window appears with many buttons), then your computer already have this file and you don't need to install anything.
+
+  # 2 DEVICE CONFIGURATION
+  # chose your device in the Conf/device menu. At the time of writing, the devices supported are Omega HH806, Omega HH506, CENTER 309, Fuji PXR PID, and Fuji PXG PID.
+  # RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers.
+  # To install a USB driver. Plug the meter in USB port. Let Windows find and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one.
+
+  # 3 SERIAL CONFIGURATION
+  # The serial settings for the meters (devices) are already configured by the artisan software automatically when you select a device. Once you have chosen a device, the correct serial configuration is loaded. The only setting that is not configured is the serial port number being used. 
+  # To find out your serial port, you can press the scan button and select the correct comm port from the options found. You can test to see if you have the correct comm port by clicking the button START. If you see the two temperatures from the meter on the LCDs, you have completed all the steps.
+
 
 == Mac OS X ==
 
