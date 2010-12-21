@@ -15,7 +15,7 @@ The main application is called artisan.exe and it is located inside the zip file
 There are three configuration steps needed after downloading and unziping the artisan zip file.  
 
  
-1 VISUAL C++ LIBRARY REQUIREMENT
+    1 VISUAL C++ LIBRARY REQUIREMENT
 
 Artisan for Windows needs a Visual C++ runtime library (file) from Microsoft. If artisan cannot start it will open a window error. This is because your computer is missing this file.
 If you get a window error when you try to start artisan, install this program:
@@ -29,18 +29,22 @@ If artisan starts when clicling on artisan.exe (a window pops open with many but
 Proceed to the second step
 
 
-2 DEVICE CONFIGURATION
+    2 DEVICE CONFIGURATION
 
 Once artisan is up, chose your device in the Conf/device menu. At the time of writing, the devices supported are Omega HH806, Omega HH506, CENTER 309, Fuji PXR PID, and Fuji PXG PID.
 RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers.
 
 To install a USB driver. Plug the meter in USB port. Let Windows find and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one.
 
+Once you have selected your device, proceed to step three.
 
-3 SERIAL CONFIGURATION
+    3 SERIAL CONFIGURATION
 
-The serial settings for the meters (devices) are already configured by the artisan software automatically when you select a device for the first time (or when you change devices). Once you have chosen a device, the correct serial configuration is loaded and they will remain in memory. The only setting that is not configured is the serial port number being used. 
-To find out your serial port, you can press the scan button and select the correct comm port from the options found by the Scan button. You can test to see if you have the correct comm port by clicking the button START. If you see the two temperatures from the meter on the LCDs, you have completed all the steps.
+The serial settings for the meters (devices) are already configured by the artisan software automatically when you select a device for the first time (or when you change devices). Once you have chosen a device, the correct serial configuration is loaded and it will remain in memory. The only setting that is not configured is the serial port number being used. 
+To find out your serial port, you can press the scan button and select the correct comm port from the options found by the Scan button.
+
+You can test to see if you have the correct comm port by clicking the green button "ON" on the lower left corner. If you see the two temperatures from the meter come up on the LCDs, you have completed all the configuration steps. You can now start using artisan.
+
 
 
 == Mac OS X ==
