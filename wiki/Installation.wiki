@@ -31,7 +31,14 @@ Proceed to the second step
 
     2 DEVICE CONFIGURATION
 
-Once artisan is up, chose your device in the Conf/device menu. At the time of writing, the devices supported are Omega HH806, Omega HH506, CENTER 309, Fuji PXR PID, and Fuji PXG PID.
+Once artisan is up, chose your device in the Conf/device menu. At the time of writing, the devices supported are:
+
+    # Omega HH806
+    # Omega HH506
+    # CENTER 309
+    # Fuji PXR PID (with RS485 mod bus protocol purchase option)
+    # Fuji PXG PID (with RS485 mod bus protocol purchase option)
+    
 RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers.
 
 To install a USB driver. Plug the meter in USB port. Let Windows find and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one.
