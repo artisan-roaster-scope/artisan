@@ -542,7 +542,7 @@ class tgraphcanvas(FigureCanvas):
             #check backgroundDetails flag
             if self.backgroundDetails:
                 st1 = self.stringfromseconds(self.startendB[0]-self.startend[0])
-                self.ax.annotate(str(self.startendB[1]), xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]-5,
+                self.ax.annotate("%.1f"%(self.startendB[1]), xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]-5,
                                 self.startendB[1]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                  alpha=self.backgroundalpha)
                 self.ax.annotate(st1, xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0],
@@ -550,7 +550,7 @@ class tgraphcanvas(FigureCanvas):
                                 alpha=self.backgroundalpha)
                 if self.varCB[0]:
                     st1 = self.stringfromseconds(self.varCB[0]-self.startend[0])
-                    self.ax.annotate(str(self.varCB[1]), xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0]-5,
+                    self.ax.annotate("%.1f"%(self.varCB[1]), xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0]-5,
                                      self.varCB[1]+30), color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)
                     self.ax.annotate(st1, xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0],self.varCB[1]-50),
@@ -558,7 +558,7 @@ class tgraphcanvas(FigureCanvas):
                                      alpha=self.backgroundalpha)
                 if self.varCB[2]:
                     st1 = self.stringfromseconds(self.varCB[2]-self.startend[0])           
-                    self.ax.annotate(str(self.varCB[3]), xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2]-5,
+                    self.ax.annotate("%.1f"%(self.varCB[3]), xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2]-5,
                                     self.varCB[3]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)              
                     self.ax.annotate(st1, xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2],self.varCB[3]-50),
@@ -566,7 +566,7 @@ class tgraphcanvas(FigureCanvas):
                                      alpha=self.backgroundalpha)
                 if self.varCB[4]:
                     st1 = self.stringfromseconds(self.varCB[4]-self.startend[0])
-                    self.ax.annotate(str(self.varCB[5]), xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4]-5,
+                    self.ax.annotate("%.1f"%(self.varCB[5]), xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4]-5,
                                     self.varCB[5]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)      
                     self.ax.annotate(st1, xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4],self.varCB[5]-50),
@@ -574,7 +574,7 @@ class tgraphcanvas(FigureCanvas):
                                      alpha=self.backgroundalpha)                
                 if self.varCB[6]:
                     st1 = self.stringfromseconds(self.varCB[6]-self.startend[0])
-                    self.ax.annotate(str(self.varCB[7]), xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6]-5,
+                    self.ax.annotate("%.1f"%(self.varCB[7]), xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6]-5,
                                     self.varCB[7]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)                
                     self.ax.annotate(st1, xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6],self.varCB[7]-50),
@@ -582,7 +582,7 @@ class tgraphcanvas(FigureCanvas):
                                      alpha=self.backgroundalpha)          
                 if self.startend[2]:
                     st1 = self.stringfromseconds(self.startendB[2]-self.startend[0])
-                    self.ax.annotate(str(self.startendB[3]), xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2]-5,
+                    self.ax.annotate("%.1f"%(self.startendB[3]), xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2]-5,
                                     self.startendB[3]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
                                     alpha=self.backgroundalpha)
                     self.ax.annotate(st1, xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2],self.startendB[3]-50),
@@ -2771,7 +2771,7 @@ class ApplicationWindow(QMainWindow):
         calSpinBox.setRange(1,30)
         calSpinBox.setValue(self.qmc.delay/1000)
         secondsdelay, ok = QInputDialog.getInteger(self,
-                "How often to read temp", "Enter seconds (default 5):",
+                "Sampling period", "Enter seconds:",
                 calSpinBox.value(),1,30)
         if ok:
             self.qmc.killTimer(self.qmc.timerid) 
