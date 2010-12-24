@@ -542,51 +542,58 @@ class tgraphcanvas(FigureCanvas):
             #check backgroundDetails flag
             if self.backgroundDetails:
                 st1 = self.stringfromseconds(self.startendB[0]-self.startend[0])
-                self.ax.annotate("%.1f"%(self.startendB[1]), xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]-5,
-                                self.startendB[1]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
+                self.ax.annotate("%.1f"%(self.startendB[1]), xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]-5,self.startendB[1]+50),fontsize=10,
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                  alpha=self.backgroundalpha)
-                self.ax.annotate(st1, xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0],
-                                self.startendB[1]-50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
+                
+                self.ax.annotate(st1, xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]+5,self.startendB[1]-100),fontsize=10,
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                 alpha=self.backgroundalpha)
+                
                 if self.varCB[0]:
                     st1 = self.stringfromseconds(self.varCB[0]-self.startend[0])
-                    self.ax.annotate("%.1f"%(self.varCB[1]), xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0]-5,
-                                     self.varCB[1]+30), color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
+                    self.ax.annotate("%.1f"%(self.varCB[1]), xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0]-5,self.varCB[1]+50),fontsize=10,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)
-                    self.ax.annotate(st1, xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0],self.varCB[1]-50),
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
+                    self.ax.annotate(st1, xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0],self.varCB[1]-50),fontsize=10,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)
+                    
                 if self.varCB[2]:
                     st1 = self.stringfromseconds(self.varCB[2]-self.startend[0])           
-                    self.ax.annotate("%.1f"%(self.varCB[3]), xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2]-5,
-                                    self.varCB[3]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
+                    self.ax.annotate("%.1f"%(self.varCB[3]), xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2]-5,self.varCB[3]+70),fontsize=10,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)              
-                    self.ax.annotate(st1, xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2],self.varCB[3]-50),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
+                    self.ax.annotate(st1, xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2],self.varCB[3]-80),fontsize=10,
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)
+                    
                 if self.varCB[4]:
                     st1 = self.stringfromseconds(self.varCB[4]-self.startend[0])
-                    self.ax.annotate("%.1f"%(self.varCB[5]), xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4]-5,
-                                    self.varCB[5]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
+                    self.ax.annotate("%.1f"%(self.varCB[5]), xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4]-5,self.varCB[5]+90),fontsize=10,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)      
-                    self.ax.annotate(st1, xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4],self.varCB[5]-50),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)                
+                    self.ax.annotate(st1, xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4],self.varCB[5]-110),fontsize=10,
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
+                                     alpha=self.backgroundalpha)
+                    
                 if self.varCB[6]:
                     st1 = self.stringfromseconds(self.varCB[6]-self.startend[0])
-                    self.ax.annotate("%.1f"%(self.varCB[7]), xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6]-5,
-                                    self.varCB[7]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
+                    self.ax.annotate("%.1f"%(self.varCB[7]), xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6]-5,self.varCB[7]+50),fontsize=10,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)                
-                    self.ax.annotate(st1, xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6],self.varCB[7]-50),
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)          
-                if self.startend[2]:
+                    self.ax.annotate(st1, xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6],self.varCB[7]-40),fontsize=10,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
+                                     alpha=self.backgroundalpha)
+                    
+                if self.startendB[2]:
                     st1 = self.stringfromseconds(self.startendB[2]-self.startend[0])
-                    self.ax.annotate("%.1f"%(self.startendB[3]), xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2]-5,
-                                    self.startendB[3]+30),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),
+                    self.ax.annotate("%.1f"%(self.startendB[3]), xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2]-5,self.startendB[3]+70),
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,
                                     alpha=self.backgroundalpha)
-                    self.ax.annotate(st1, xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2],self.startendB[3]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    self.ax.annotate(st1, xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2],self.startendB[3]-80),fontsize=10,
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+
 
             #END of Background
             
@@ -618,48 +625,48 @@ class tgraphcanvas(FigureCanvas):
         if self.startend[0]:
             #anotate temperature
             self.ax.annotate("%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
-                                self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+                                self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
-            self.ax.annotate("0:00\nSTART", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
-                                self.startend[1]-100),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            self.ax.annotate("START 0:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
+                                self.startend[1]-100),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             
         #Add 1Cs markers
         if self.varC[0]:
-            st1 = self.stringfromseconds(self.varC[0]-self.startend[0]) +"\n1CS"
+            st1 = "1CS " + self.stringfromseconds(self.varC[0]-self.startend[0])
             #anotate temperature
             self.ax.annotate("%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
-                                self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+                                self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
-            self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-100),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-50),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
         #Add 1Ce markers
         if self.varC[2]:
-            st1 = self.stringfromseconds(self.varC[2]-self.startend[0]) + "\n1CE"
+            st1 = "1CE " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
             #anotate temperature
             self.ax.annotate("%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
-                                self.varC[3]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+                                self.varC[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
-            self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-100),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-80),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #add a water mark
             self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
 
         #Add 2Cs markers
         if self.varC[4]:
-            st1 = self.stringfromseconds(self.varC[4]-self.startend[0]) + "\n2CS"
+            st1 = "2CS " + self.stringfromseconds(self.varC[4]-self.startend[0]) 
             self.ax.annotate("%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
-                                self.varC[5]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))      
-            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-100),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+                                self.varC[5]+90),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)      
+            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-110),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
         #Add 2Ce markers
         if self.varC[6]:
-            st1 = self.stringfromseconds(self.varC[6]-self.startend[0]) + "\n2CE"
+            st1 =  "2CE " + self.stringfromseconds(self.varC[6]-self.startend[0])
             #anotate temperature
             self.ax.annotate("%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
-                                self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+                                self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
-            self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-100),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-40),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #do water mark
             self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
             #make vertical line in the MIDDLE of 2Cs and 2Ce
@@ -667,21 +674,22 @@ class tgraphcanvas(FigureCanvas):
             self.ax.axvline(x=middle, ymin=0, ymax=1,color=self.palette["Cline"])
         #Add DROP markers
         if self.startend[2]:
-            st1 = self.stringfromseconds(self.startend[2]-self.startend[0]) +"\nEND"
+            st1 = "END " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
             #anotate temperature
             self.ax.annotate("%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
-                                self.startend[3]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+                                self.startend[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
-            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-100),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-80),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             
-
             self.writestatistics()
+            
             #write events
             Nevents = len(self.specialevents)
             for i in range(Nevents):
-                self.ax.text(self.timex[int(self.specialevents[i])],self.temp2[int(self.specialevents[i])],
-                                 str(i+1), color=self.palette["text"])
+                self.ax.annotate("e" + str(i+1), xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                                 xytext=(self.timex[int(self.specialevents[i])]-15,self.temp2[int(self.specialevents[i])]+ 40),alpha=0.8,
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=12)
                 
         #update X label names and colors        
         self.xaxistosm()
@@ -810,8 +818,8 @@ class tgraphcanvas(FigureCanvas):
                                 
                             self.varC[1] =   self.fromCtoF(self.varC[1])        #1C start temp
                             self.varC[3] =   self.fromCtoF(self.varC[3])        #1C end temp
-                            self.varC[5] =   self.fromCtoF(self.varC[1])        #2C start temp
-                            self.varC[7] =   self.fromCtoF(self.varC[1])        #2C end temp
+                            self.varC[5] =   self.fromCtoF(self.varC[5])        #2C start temp
+                            self.varC[7] =   self.fromCtoF(self.varC[7])        #2C end temp
                             self.startend[1] = self.fromCtoF(self.startend[1])  #CHARGE temp
                             self.startend[3] = self.fromCtoF(self.startend[3])  #DROP temp
 
@@ -823,8 +831,8 @@ class tgraphcanvas(FigureCanvas):
                                     
                                 self.varCB[1] =   self.fromCtoF(self.varCB[1])       #1C start temp B
                                 self.varCB[3] =   self.fromCtoF(self.varCB[3])       #1C end temp B
-                                self.varCB[5] =   self.fromCtoF(self.varCB[1])       #2C start temp B
-                                self.varCB[7] =   self.fromCtoF(self.varCB[1])       #2C end temp B
+                                self.varCB[5] =   self.fromCtoF(self.varCB[5])       #2C start temp B
+                                self.varCB[7] =   self.fromCtoF(self.varCB[7])       #2C end temp B
                                 self.startendB[1] = self.fromCtoF(self.startendB[1]) #CHARGE temp B
                                 self.startendB[3] = self.fromCtoF(self.startendB[3]) #DROP temp B
 
@@ -853,8 +861,8 @@ class tgraphcanvas(FigureCanvas):
                                 
                             self.varC[1] =   self.fromFtoC(self.varC[1])        #1C start temp
                             self.varC[3] =   self.fromFtoC(self.varC[3])        #1C end temp
-                            self.varC[5] =   self.fromFtoC(self.varC[1])        #2C start temp
-                            self.varC[7] =   self.fromFtoC(self.varC[1])        #2C end temp
+                            self.varC[5] =   self.fromFtoC(self.varC[5])        #2C start temp
+                            self.varC[7] =   self.fromFtoC(self.varC[7])        #2C end temp
                             self.startend[1] = self.fromFtoC(self.startend[1])  #CHARGE temp
                             self.startend[3] = self.fromFtoC(self.startend[3])  #DROP temp
 
@@ -866,8 +874,8 @@ class tgraphcanvas(FigureCanvas):
                                     
                                 self.varCB[1] =   self.fromFtoC(self.varCB[1])       #1C start temp B
                                 self.varCB[3] =   self.fromFtoC(self.varCB[3])       #1C end temp B
-                                self.varCB[5] =   self.fromFtoC(self.varCB[1])       #2C start temp B
-                                self.varCB[7] =   self.fromFtoC(self.varCB[1])       #2C end temp B
+                                self.varCB[5] =   self.fromFtoC(self.varCB[5])       #2C start temp B
+                                self.varCB[7] =   self.fromFtoC(self.varCB[7])       #2C end temp B
                                 self.startendB[1] = self.fromFtoC(self.startendB[1]) #CHARGE temp B
                                 self.startendB[3] = self.fromFtoC(self.startendB[3]) #DROP temp B
                         else:
