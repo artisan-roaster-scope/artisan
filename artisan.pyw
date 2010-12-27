@@ -202,6 +202,10 @@ class tgraphcanvas(FigureCanvas):
         #Initial flavor parameters. 
         self.flavors = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5]
 
+        # projection variables of change of rate
+        self.HUDcounter = 1
+        self.HUDflag = 0
+
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
         self.roastertype = ""
         self.roastingnotes = ""
@@ -317,7 +321,7 @@ class tgraphcanvas(FigureCanvas):
         # event occurs. Reimplement this function to get timer events. If multiple timers are running, the QTimerEvent.timerId()
         # can be used to find out which timer was activated.
 
-    
+
     #event handler from startTimer()
     def timerEvent(self, evt):
                                    
@@ -375,9 +379,40 @@ class tgraphcanvas(FigureCanvas):
             aw.lcd3.display(t2)                          # BT
             aw.lcd4.display(int(self.rateofchange1*60))       # rate of change MET (degress per minute)
             aw.lcd5.display(int(self.rateofchange2*60))       # rate of change BT (degrees per minute)
-       
+
+               
             #update the graph
             self.fig.canvas.draw()
+
+            #display projection of delta BT
+            if self.HUDflag:
+                self.viewHUD()
+
+    def toggleHUD(self):
+        if self.HUDflag:
+            self.HUDflag = False
+            aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+            aw.messagelabel.setText("HUD OFF")
+        else:
+            self.HUDflag = True
+            aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
+            aw.messagelabel.setText("HUD ON")
+
+
+    #make a projection of change of rate of BT on the graph
+    def viewHUD(self):
+        #calculate the temperature endpoint at endofx acording to the latest rate of change of BT
+        projection = self.temp2[-1] + self.rateofchange1*(self.endofx - self.timex[-1])
+
+        #draw projection line
+        self.ax.plot([self.timex[-1],self.endofx], [self.temp2[-1], projection], self.palette["text"], linestyle = '-.', linewidth= 8, alpha = .3)
+        
+        #erase every two trigger events to make it look like a radar
+        l,p = divmod(self.HUDcounter,3)
+        if p == 0:
+            self.ax.lines = self.ax.lines[0:5]
+            
+        self.HUDcounter += 1
 
     #finds time, ET and BT when using Fuji PID
     def fujitemperature(self):
@@ -488,6 +523,8 @@ class tgraphcanvas(FigureCanvas):
         self.timeclock.restart()
         
         self.redraw()
+
+        self.HUDcounter = 1
 
     #Redraws data   
     def redraw(self):
@@ -1040,14 +1077,14 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.add_patch(rect)
 
                 #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-                self.ax.annotate(str(self.startend[1]), xy=(self.startend[0]-1, self.startend[1]),xytext=(self.startend[0]-5,self.startend[1]+30),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-                
-                self.ax.annotate("0:00", xy=(self.startend[0]-1, self.startend[1]),xytext=(self.startend[0],self.startend[1]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-                
-                message = "Roast time starts now. BT = " + str(self.startend[1]) + "F"
-                self.ax.text(self.startend[0], 8, "CH 0:00", color=self.palette["text"])
+                self.ax.annotate("%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
+                                self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                #anotate time
+                self.ax.annotate("START 0:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
+                                self.startend[1]-50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+
+                message = "Roast time starts now. 00:00 BT = " + str(self.startend[1]) + self.mode
+
                 aw.label1.setStyleSheet("background-color:'#FF9966';")
                 aw.label1.setText( "<font color='black'><b>Roast time<\b></font>")
 
@@ -1070,20 +1107,18 @@ class tgraphcanvas(FigureCanvas):
                 self.varC[1] = self.temp2[-1]
                 
                 #calculate time elapsed since charge time
-                ti = self.varC[0] - self.startend[0]
-                st1 = self.stringfromseconds(ti)
-                
-                #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-                self.ax.annotate(str(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,self.varC[1]+30),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))                
-                
+                st1 = "1CS " + self.stringfromseconds(self.varC[0]-self.startend[0])
+                #anotate temperature
+                self.ax.annotate("%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
+                                self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                #anotate time
                 self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
                 aw.button_3.setDisabled(True)
                 aw.button_3.setFlat(True)
                 
-                message = "1C START recorded at " + st1 + " BT = " + str(self.varC[1]) + "F"
+                message = "1C START recorded at " + st1 + " BT = " + str(self.varC[1]) + self.mode
             
             else:
                 message = "Charge mark is missing. Do that first"
@@ -1102,30 +1137,20 @@ class tgraphcanvas(FigureCanvas):
                 self.varC[3] = self.temp2[-1]
                 
                 #calculate time elapsed since charge time
-                ti = self.varC[2] - self.startend[0]
-                st1 = self.stringfromseconds(ti)                
+                st1 = "1CE " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
+                #anotate temperature
+                self.ax.annotate("%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
+                                self.varC[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-80),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
-                #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-                self.ax.annotate(str(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,self.varC[3]+30),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-                
-                self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-
-
-                #make vertical line in the middle of 1Cs and 1Ce
-                middle = (self.varC[0]+self.varC[2])/2
-                self.ax.axvline(x=middle, ymin=0, ymax=1,color=self.palette["Cline"])
-                
-                #mark the MIDDLE time between 1C START and 1C END
-                mins2, secs2 = divmod(middle-self.startend[0],60)
-                st2 = "1C " + str(int(mins2)) + ":" + str(int(secs2))
                 self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
 
                 aw.button_4.setDisabled(True)
                 aw.button_4.setFlat(True)
 
-                message = "1C END recorded at " + st1 + " BT = " + str(self.varC[3]) + "F"
+                message = "1C END recorded at " + st1 + " BT = " + str(self.varC[3]) + self.mode
             else:
                 message = "1Cs mark missing. Do that first"
         else:
@@ -1139,21 +1164,16 @@ class tgraphcanvas(FigureCanvas):
             self.varC[4] = self.timeclock.elapsed()/1000.
             self.varC[5] = self.temp2[-1]
             
-            #calculate time elapsed since charge time
-            ti = self.varC[4] - self.startend[0]
-            st1 = self.stringfromseconds(ti)
-
-            #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-            self.ax.annotate(str(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,self.varC[5]+30),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-            
-            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-50),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            st1 = "2CS " + self.stringfromseconds(self.varC[4]-self.startend[0]) 
+            self.ax.annotate("%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
+                                self.varC[5]+90),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)      
+            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-110),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
             aw.button_5.setDisabled(True)
             aw.button_5.setFlat(True)
 
-            message = "2C START recorded at " + st1 + " BT = " + str(self.varC[5]) + "F"
+            message = "2C START recorded at " + st1 + " BT = " + str(self.varC[5]) + self.mode
         else:
             message = "Scope is OFF"
             
@@ -1167,35 +1187,22 @@ class tgraphcanvas(FigureCanvas):
                 
                 self.varC[6] = self.timeclock.elapsed()/1000. 
                 self.varC[7] = self.temp2[-1]
-                
-                #calculate time elapsed since charge time
-                ti = self.varC[6] - self.startend[0]
-                mins, secs = divmod(ti,60)
-                st1 = self.stringfromseconds(ti)
                     
-                #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-                self.ax.annotate(str(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,self.varC[7]+30),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-                
-                self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-                
+                st1 =  "2CE " + self.stringfromseconds(self.varC[6]-self.startend[0])
+                #anotate temperature
+                self.ax.annotate("%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
+                                self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-40),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
-                #make vertical line in the MIDDLE of 2Cs and 2Ce
-                middle = (self.varC[4]+self.varC[6])/2
-                self.ax.axvline(x=middle, ymin=0, ymax=1,color=self.palette["Cline"])
-                
-                #write the MIDDLE time
-                mins2, secs2 = divmod(middle-self.startend[0],60)                
-                st2 = "2C " + str(int(mins2)) + ":" + str(int(secs2))
-                # draw text and transparency
-                self.ax.text(((self.varC[4]+self.varC[6])/2),10, st2, color = self.palette["text"])
+
                 self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
 
                 aw.button_6.setDisabled(True)
                 aw.button_6.setFlat(True)
 
-                message = "2C END recorded at " + st1 + " BT = " + str(self.varC[7]) + "F"
+                message = "2C END recorded at " + st1 + " BT = " + str(self.varC[7]) + self.mode
             else:
                 message = "2Cs mark missing. Do that first"
         else:
@@ -1210,22 +1217,14 @@ class tgraphcanvas(FigureCanvas):
             self.startend[2] = self.timeclock.elapsed()/1000.
             self.startend[3] = self.temp2[-1]
             
-            #calculate time elapsed since charge time
-            ti = self.startend[2] - self.startend[0]
-            st1 = self.stringfromseconds(ti)
-                
-            # put a white marker on graph
-            rect = patches.Rectangle( (self.startend[2]-1,0), width=.1, height=self.temp2[-1], color = 'black')
-            self.ax.add_patch(rect)
-
-            self.ax.annotate(str(self.startend[3]), xy=(self.startend[2]-1, self.startend[3]),xytext=(self.startend[2]-5,self.startend[3]+30),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
-
-            self.ax.annotate(st1, xy=(self.startend[2]-1, self.startend[3]),xytext=(self.startend[2],self.startend[3]-50),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"]))
+            st1 = "END " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
+            #anotate temperature
+            self.ax.annotate("%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
+                                self.startend[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+            #anotate time
+            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-80),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             
-            st2 = "DR " + st1
-            self.ax.text(self.startend[2],10, st2,color = self.palette["text"])
             self.writestatistics()
             
             aw.label1.setStyleSheet("background-color:'#66FF66';")
@@ -1234,7 +1233,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_9.setDisabled(True)
             aw.button_9.setFlat(True)
             
-            message = "Roast ENDED at " + st1 + " BT = " + str(self.startend[-1]) + "F"
+            message = "Roast ENDED at " + st1 + " BT = " + str(self.startend[-1]) + self.mode
 
         else:
             message = "Scope is OFF"
@@ -1562,7 +1561,6 @@ class ApplicationWindow(QMainWindow):
         # NavigationToolbar VMToolbar
         ntb = VMToolbar(self.qmc, self.main_widget)
         #########################################################
-        #ntb = VMToolbar(self.qmc, self.main_widget)
         #create a serial port object
         self.ser = serialport()
         # create a PID object
@@ -1694,6 +1692,14 @@ class ApplicationWindow(QMainWindow):
         self.button_17.setMaximumSize(90, 50)
         self.button_17.setMinimumHeight(50)
 
+        #create HUD button
+        self.button_18 = QPushButton("HUD")
+        self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+        self.button_18.setMaximumSize(90, 50)
+        self.button_18.setMinimumHeight(50)
+        self.button_18.setToolTip("<font color=red size=2><b>" +"BT projection" + "</font></b>")
+        self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
+
         #connect PID sv easy buttons
         self.connect(self.button_12, SIGNAL("clicked()"),lambda x=5: self.pid.adjustsv(x))
         self.connect(self.button_13, SIGNAL("clicked()"),lambda x=10: self.pid.adjustsv(x))
@@ -1796,6 +1802,7 @@ class ApplicationWindow(QMainWindow):
         pidHHbl.addWidget(self.button_15)
         pidHHbl.addWidget(self.button_16)
         pidHHbl.addWidget(self.button_17)
+        pidHHbl.addWidget(self.button_18)
         pidHHbl.addWidget(self.button_7)
 
         #pack all into the grid MASTER layout manager (widget,row,column)
@@ -2152,13 +2159,14 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.endofx = self.qmc.timex[-1] + 40
 
             #change Title
-            self.qmc.ax.set_title(self.qmc.title,size=20,color='orange',fontweight='bold')
+            self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"], fontweight='bold')
         
             #Plot everything
             self.qmc.redraw()
 
             message =  str(fname) + " loaded successfully"
             self.messagelabel.setText(message)
+            
             self.editgraph()
 
         except IOError,e:
@@ -3190,10 +3198,10 @@ class editGraphDlg(QDialog):
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
         
-        self.weightinedit.setValidator(QDoubleValidator(0, 999.0, 1, self.weightinedit))
+        self.weightinedit.setValidator(QDoubleValidator(0., 999., 1, self.weightinedit))
         self.weightinedit.setMaximumWidth(50)
         self.weightoutedit = QLineEdit(outw)
-        self.weightoutedit.setValidator(QDoubleValidator(0, 999.0, 1, self.weightoutedit))
+        self.weightoutedit.setValidator(QDoubleValidator(0., 999., 1, self.weightoutedit))
         self.weightoutedit.setMaximumWidth(50)
         self.weightpercentlabel = QLabel(" %")
 
@@ -3221,7 +3229,7 @@ class editGraphDlg(QDialog):
         
 
         # Save button
-        saveButton = QPushButton("Save")
+        saveButton = QPushButton("Update")
         saveButton.setFocusPolicy(Qt.NoFocus)
         self.connect(saveButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         saveButton.setMaximumSize(70, 30)
@@ -3362,7 +3370,6 @@ class editGraphDlg(QDialog):
                 aw.qmc.specialevents[9] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line10b.text()))))
                 aw.qmc.specialeventsStrings[9] = str(self.line10.text())
 
-
             # Update Title
             aw.qmc.ax.set_title(str(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
             aw.qmc.title = str(self.titleedit.text())
@@ -3387,9 +3394,11 @@ class editGraphDlg(QDialog):
             aw.qmc.roastingnotes = str(self.roastingeditor.toPlainText())
             aw.qmc.cupingnotes = str(self.cupingeditor.toPlainText())
            
-            aw.messagelabel.setText("Graph properties saved")            
+            aw.messagelabel.setText("Graph properties updated (but file not saved in hard-drive)")            
             aw.qmc.redraw()
             self.close()
+
+            
             
         else:
             aw.messagelabel.setText("No data")
@@ -3505,8 +3514,8 @@ class calculatorDlg(QDialog):
         clabel = QLabel("Celsius")
         self.faEdit = QLineEdit()
         self.ceEdit = QLineEdit()                
-        self.faEdit.setValidator(QDoubleValidator(-999.0, 999.0, 2, self.faEdit))
-        self.ceEdit.setValidator(QDoubleValidator(-999.0, 999.0, 2, self.ceEdit))
+        self.faEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.faEdit))
+        self.ceEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.ceEdit))
         self.connect(self.faEdit,SIGNAL("returnPressed()"),lambda x="FtoC":self.convertTemp(x))
         self.connect(self.ceEdit,SIGNAL("returnPressed()"),lambda x="CtoF":self.convertTemp(x))
 
@@ -3523,8 +3532,8 @@ class calculatorDlg(QDialog):
         self.outEdit = QLineEdit()
         self.inEdit.setMaximumWidth(60)
         self.outEdit.setMaximumWidth(60)
-        self.inEdit.setValidator(QDoubleValidator(0, 99999., 2, self.inEdit))
-        self.outEdit.setValidator(QDoubleValidator(0, 99999., 2, self.outEdit))
+        self.inEdit.setValidator(QDoubleValidator(0., 99999., 2, self.inEdit))
+        self.outEdit.setValidator(QDoubleValidator(0., 99999., 2, self.outEdit))
         self.connect(self.inEdit,SIGNAL("returnPressed()"),lambda x="ItoO":self.convertWeight(x))
         self.connect(self.outEdit,SIGNAL("returnPressed()"),lambda x="OtoI":self.convertWeight(x))
         
@@ -3687,11 +3696,7 @@ class phasesGraphDlg(QDialog):
         self.endmid = QSpinBox()
         self.startfinish = QSpinBox()
         self.endfinish = QSpinBox()
-        self.connect(self.enddry,SIGNAL("valueChanged(int)"),self.startmid.setValue)
-        self.connect(self.startmid,SIGNAL("valueChanged(int)"),self.enddry.setValue)
-        self.connect(self.endmid,SIGNAL("valueChanged(int)"),self.startfinish.setValue)
-        self.connect(self.startfinish,SIGNAL("valueChanged(int)"),self.endmid.setValue)  
-                                                         
+        
         if aw.qmc.mode == "F":
              self.startdry.setSuffix(" F")
              self.enddry.setSuffix(" F")
@@ -3700,14 +3705,14 @@ class phasesGraphDlg(QDialog):
              self.startfinish.setSuffix(" F")
              self.endfinish.setSuffix(" F")
 
-             self.startdry.setRange(175,225)
-             self.enddry.setRange(275,325)
-             self.startmid.setRange(275,325)
-             self.endmid.setRange(370,430)
-             self.startfinish.setRange(370,430)
-             self.endfinish.setRange(400,480)               
+             self.startdry.setRange(0,1000)    #(min,max)
+             self.enddry.setRange(0,1000)
+             self.startmid.setRange(0,1000)
+             self.endmid.setRange(0,1000)
+             self.startfinish.setRange(0,1000)
+             self.endfinish.setRange(0,1000)               
                                         
-        else:
+        elif aw.qmc.mode == "C":
              self.startdry.setSuffix(" C")
              self.enddry.setSuffix(" C")
              self.startmid.setSuffix(" C")
@@ -3715,12 +3720,18 @@ class phasesGraphDlg(QDialog):
              self.startfinish.setSuffix(" C")
              self.endfinish.setSuffix(" C")
 
-             self.startdry.setRange(75,125)
-             self.enddry.setRange(125,80)
-             self.startmid.setRange(125,80)
-             self.endmid.setRange(175,230)
-             self.startfinish.setRange(175,230)
-             self.endfinish.setRange(200,260)
+             self.startdry.setRange(0,1000)    #(min,max)
+             self.enddry.setRange(0,1000)
+             self.startmid.setRange(0,1000)
+             self.endmid.setRange(0,1000)
+             self.startfinish.setRange(0,1000)
+             self.endfinish.setRange(0,1000)
+
+        self.connect(self.enddry,SIGNAL("valueChanged(int)"),self.startmid.setValue)
+        self.connect(self.startmid,SIGNAL("valueChanged(int)"),self.enddry.setValue)
+        self.connect(self.endmid,SIGNAL("valueChanged(int)"),self.startfinish.setValue)
+        self.connect(self.startfinish,SIGNAL("valueChanged(int)"),self.endmid.setValue)  
+
 
         self.startdry.setValue(aw.qmc.phases[0])
         self.enddry.setValue(aw.qmc.phases[1])
@@ -3732,9 +3743,11 @@ class phasesGraphDlg(QDialog):
 
         okButton = QPushButton("OK")  
         cancelButton = QPushButton("Cancel")
+        setDefaultButton = QPushButton("Default")
         
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatephases)
+        self.connect(setDefaultButton,SIGNAL("clicked()"),self.setdefault)
                                      
         phaseLayout = QGridLayout()
         phaseLayout.addWidget(dryLabel,0,0)
@@ -3746,8 +3759,9 @@ class phasesGraphDlg(QDialog):
         phaseLayout.addWidget(finishLabel,2,0)
         phaseLayout.addWidget(self.startfinish,2,1)
         phaseLayout.addWidget(self.endfinish,2,2)
-        phaseLayout.addWidget(cancelButton,3,1)
-        phaseLayout.addWidget(okButton,3,2)
+        phaseLayout.addWidget(setDefaultButton,3,1)
+        phaseLayout.addWidget(cancelButton,4,1)
+        phaseLayout.addWidget(okButton,4,2)
                              
         self.setLayout(phaseLayout)
 
@@ -3760,6 +3774,16 @@ class phasesGraphDlg(QDialog):
         aw.qmc.redraw()
         self.close()
 
+    def setdefault(self):
+        if aw.qmc.mode == "F":
+            aw.qmc.phases = [200,300,390,450]
+            aw.messagelabel.setText("Phases changed to F default: [200,300,390,450]")
+
+        elif aw.qmc.mode == "C":
+            aw.qmc.phases = [95,150,200,230]
+            aw.messagelabel.setText("Phases changed to C default: [95,150,200,230]")
+        aw.qmc.redraw()
+        self.close()
 
 ############################################################################        
 #####################   FLAVOR STAR PROPERTIES DIALOG   ####################
@@ -5863,6 +5887,22 @@ class PXG4pidDlgControl(QDialog):
         self.label_rs15 =  QLabel()
         self.label_rs16 =  QLabel()
 
+        self.label_rs1.setMinimumWidth(170)
+        self.label_rs2.setMinimumWidth(170)
+        self.label_rs3.setMinimumWidth(170)
+        self.label_rs4.setMinimumWidth(170)
+        self.label_rs5.setMinimumWidth(170)
+        self.label_rs6.setMinimumWidth(170)
+        self.label_rs7.setMinimumWidth(170)
+        self.label_rs8.setMinimumWidth(170)
+        self.label_rs9.setMinimumWidth(170)
+        self.label_rs10.setMinimumWidth(170)
+        self.label_rs11.setMinimumWidth(170)
+        self.label_rs12.setMinimumWidth(170)
+        self.label_rs13.setMinimumWidth(170)
+        self.label_rs14.setMinimumWidth(170)
+        self.label_rs15.setMinimumWidth(170)
+        self.label_rs16.setMinimumWidth(170)
 
         self.label_rs1.setMargin(10)
         self.label_rs2.setMargin(10)
@@ -5986,13 +6026,13 @@ class PXG4pidDlgControl(QDialog):
         self.sv7edit.setMaximumWidth(80)
         
 
-        self.sv1edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv1edit))
-        self.sv2edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv2edit))
-        self.sv3edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv3edit))
-        self.sv4edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv4edit))
-        self.sv5edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv5edit))
-        self.sv6edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv6edit))
-        self.sv7edit.setValidator(QDoubleValidator(0, 999.0, 1, self.sv7edit))
+        self.sv1edit.setValidator(QDoubleValidator(0., 999., 1, self.sv1edit))
+        self.sv2edit.setValidator(QDoubleValidator(0., 999., 1, self.sv2edit))
+        self.sv3edit.setValidator(QDoubleValidator(0., 999., 1, self.sv3edit))
+        self.sv4edit.setValidator(QDoubleValidator(0., 999., 1, self.sv4edit))
+        self.sv5edit.setValidator(QDoubleValidator(0., 999., 1, self.sv5edit))
+        self.sv6edit.setValidator(QDoubleValidator(0., 999., 1, self.sv6edit))
+        self.sv7edit.setValidator(QDoubleValidator(0., 999., 1, self.sv7edit))
 
         self.radiosv1 = QRadioButton()
         self.radiosv2 = QRadioButton()
@@ -6112,13 +6152,13 @@ class PXG4pidDlgControl(QDialog):
         self.d6edit.setMaximumSize(50, 42)
         self.d7edit.setMaximumSize(50, 42)
         #p = 0-999.9
-        self.p1edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p1edit))
-        self.p2edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p2edit))
-        self.p3edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p3edit))
-        self.p4edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p4edit))
-        self.p5edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p5edit))
-        self.p6edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p6edit))
-        self.p7edit.setValidator(QDoubleValidator(0, 999.0, 1, self.p7edit))
+        self.p1edit.setValidator(QDoubleValidator(0., 999., 1, self.p1edit))
+        self.p2edit.setValidator(QDoubleValidator(0., 999., 1, self.p2edit))
+        self.p3edit.setValidator(QDoubleValidator(0., 999., 1, self.p3edit))
+        self.p4edit.setValidator(QDoubleValidator(0., 999., 1, self.p4edit))
+        self.p5edit.setValidator(QDoubleValidator(0., 999., 1, self.p5edit))
+        self.p6edit.setValidator(QDoubleValidator(0., 999., 1, self.p6edit))
+        self.p7edit.setValidator(QDoubleValidator(0., 999., 1, self.p7edit))
         #i are int 0-3200
         self.i1edit.setValidator(QIntValidator(0, 3200, self.i1edit))
         self.i2edit.setValidator(QIntValidator(0, 3200, self.i2edit))
@@ -6128,13 +6168,13 @@ class PXG4pidDlgControl(QDialog):
         self.i6edit.setValidator(QIntValidator(0, 3200, self.i6edit))
         self.i7edit.setValidator(QIntValidator(0, 3200, self.i7edit))
         #d 0-999.9
-        self.d1edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d1edit))
-        self.d2edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d2edit))
-        self.d3edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d3edit))
-        self.d4edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d4edit))
-        self.d5edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d5edit))
-        self.d6edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d6edit))
-        self.d7edit.setValidator(QDoubleValidator(0, 999.0, 1, self.d7edit))
+        self.d1edit.setValidator(QDoubleValidator(0., 999., 1, self.d1edit))
+        self.d2edit.setValidator(QDoubleValidator(0., 999., 1, self.d2edit))
+        self.d3edit.setValidator(QDoubleValidator(0., 999., 1, self.d3edit))
+        self.d4edit.setValidator(QDoubleValidator(0., 999., 1, self.d4edit))
+        self.d5edit.setValidator(QDoubleValidator(0., 999., 1, self.d5edit))
+        self.d6edit.setValidator(QDoubleValidator(0., 999., 1, self.d6edit))
+        self.d7edit.setValidator(QDoubleValidator(0., 999., 1, self.d7edit))
         
         pid1button = QPushButton("pid 1")
         pid2button = QPushButton("pid 2")
