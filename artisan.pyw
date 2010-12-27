@@ -164,7 +164,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.VOLTCRAFTK204,
                                    self.VOLTCRAFTK202,
                                    self.VOLTCRAFT300K,
-                                   self.VOLTCRAFT302KJ
+                                   self.VOLTCRAFT302KJ,
+                                   self.EXTECH421509
                                    ]
         
         self.fig = Figure(facecolor='lightgrey')
@@ -538,8 +539,14 @@ class tgraphcanvas(FigureCanvas):
          tx = self.timeclock.elapsed()/1000.
          
          return tx,t2,t1
-
         
+    def EXTECH421509(self):
+        
+        t2,t1 = aw.ser.HH506RAtemperature()
+        tx = self.timeclock.elapsed()/1000.
+
+        return tx,t2,t1
+
     #creates X axis labels ticks in mm:ss acording to the endofx limit
     def xaxistosm(self):
         #aligns the 00:00 with the start of the roast if it exists    
@@ -4713,7 +4720,7 @@ class serialport(object):
                                     stopbits=self.stopbits, timeout=self.timeout)
             command = "\x41"                 
             serCENTER.write(command)
-            r = serCENTER.read(10)
+            r = serCENTER.read(10)                                  #NOTE: different
             serCENTER.close()
             
             if len(r) == 10:
@@ -4749,7 +4756,7 @@ class serialport(object):
                                     stopbits=self.stopbits, timeout=self.timeout)
             command = "\x41"                 
             serCENTER.write(command)
-            r = serCENTER.read(8)
+            r = serCENTER.read(8)                                   #NOTE: different
             serCENTER.close()
             
             if len(r) == 8:
@@ -5101,7 +5108,8 @@ class DeviceAssignmentDLG(QDialog):
                                           "VOLTCRAFT K204",
                                           "VOLTCRAFT K202",
                                           "VOLTCRAFT 300K",
-                                          "VOLTCRAFT 302KJ"
+                                          "VOLTCRAFT 302KJ",
+                                          "EXTECH 421509"
                                           ])
         
         controllabel =QLabel("Control PID for ET:")                            
@@ -5354,7 +5362,17 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = "Device set to VOLTCRAFT 302KJ, which is equivalent to CENTER 303. Now, chose serial port"
-                
+
+            elif meter == "EXTECH 421509":
+                aw.qmc.device = 15
+                aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
+                aw.ser.baudrate = 2400
+                aw.ser.bytesize = 7
+                aw.ser.parity= 'E'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to EXTECH 421509, which is equivalent to Omega HH506RA. Now, chose serial port"
+
             aw.button_10.setDisabled(True)
             aw.button_10.setFlat(True)
                         
