@@ -41,16 +41,16 @@ Once artisan is up, chose your device in the Conf/device menu. At the time of wr
 
     # new devices under testing as of version 0.1.1
     # CENTER 306(under testing)
-    # CENTER305 (under testing)
-    # CENTER304 (under testing)
-    # CENTER303 (under testing)
-    # CENTER302 (under testing)
-    # CENTER301 (under testing)
-    # CENTER300 (under testing)
+    # CENTER 305 (under testing)
+    # CENTER 304 (under testing)
+    # CENTER 303 (under testing)
+    # CENTER 302 (under testing)
+    # CENTER 301 (under testing)
+    # CENTER 300 (under testing)
     # VOLTCRAFT K204 (under testing)
     # VOLTCRAFT K202 (under testing)
     # VOLTCRAFT 300K (under testing)
-    # VOLTCRAFT302KJ (under testing)
+    # VOLTCRAFT 302KJ (under testing)
     # EXTECH 421509 (under testing)
     
 RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers (but they need an RS485-RS232 converter).
