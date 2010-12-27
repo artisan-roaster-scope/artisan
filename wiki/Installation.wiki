@@ -13,7 +13,6 @@ There are usually two downloads needed in order to get the `artisan` software up
 
 The main application is called artisan.exe and it is located inside the zip file. To start artisan click on artisan.exe.
 There are three configuration steps needed after downloading and unziping the artisan zip file.  
-
  
     1 VISUAL C++ LIBRARY REQUIREMENT
 
@@ -25,6 +24,7 @@ Microsoft Visual C++ 2008 SP1 Redistributable Package (x86)
 http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
 
 If artisan starts when clicling on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything.
+Newer OS like Windows 7 come with this file.
 
 Proceed to the second step
 
@@ -33,15 +33,15 @@ Proceed to the second step
 
 Once artisan is up, chose your device in the Conf/device menu. At the time of writing, the devices supported are:
 
-    # Omega HH806
+    # Omega HH806 (Check availability of your Operating system USB driver: http://www.ftdichip.com/Drivers/VCP.htm )
     # Omega HH506
     # CENTER 309
     # Fuji PXR PID (with RS485 mod bus protocol purchase option)
     # Fuji PXG PID (with RS485 mod bus protocol purchase option)
     
-RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers.
+RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers (but they need an RS485-RS232 converter).
 
-To install a USB driver. Plug the meter in USB port. Let Windows find and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one.
+To install a USB driver. Plug the meter in USB port. Let Windows find and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one, or thorugh the manufacturer webpage
 
 Once you have selected your device, proceed to step three.
 
@@ -52,7 +52,10 @@ To find out your serial port, you can press the scan button and select the corre
 
 You can test to see if you have the correct comm port by clicking the green button "ON" on the lower left corner. If you see the two temperatures from the meter come up on the LCDs, you have completed all the configuration steps. You can now start using artisan.
 
+Report problems here:
 
+    http://groups.google.com/group/artisan-coffee-roasting
+    
 
 == Mac OS X ==
 
