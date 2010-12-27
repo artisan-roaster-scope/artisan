@@ -337,8 +337,8 @@ class tgraphcanvas(FigureCanvas):
             if len(self.timex) > 2:
                 timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
                 #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
-                self.rateofchange1 = (self.temp1[-1] - self.temp1[-2]) / timed  #delta BT (degress / second)
-                self.rateofchange2 = (self.temp2[-1] - self.temp2[-2]) / timed  #delta  ET (degress / second)
+                self.rateofchange1 = (self.temp1[-1] - self.temp1[-2]) / timed  #delta ET (degress / second)
+                self.rateofchange2 = (self.temp2[-1] - self.temp2[-2]) / timed  #delta  BT (degress / second)
                 rateofchange1plot = 100 + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 100
                 rateofchange2plot = 50 + self.sensitivity*self.rateofchange2    #lift to plot on the grpah at Temp  = 50
             else:
@@ -402,7 +402,7 @@ class tgraphcanvas(FigureCanvas):
     #make a projection of change of rate of BT on the graph
     def viewHUD(self):
         #calculate the temperature endpoint at endofx acording to the latest rate of change of BT
-        projection = self.temp2[-1] + self.rateofchange1*(self.endofx - self.timex[-1])
+        projection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1])
 
         #draw projection line
         self.ax.plot([self.timex[-1],self.endofx], [self.temp2[-1], projection], self.palette["text"], linestyle = '-.', linewidth= 8, alpha = .3)
