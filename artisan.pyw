@@ -36,7 +36,7 @@
 # version 00031: FINISHED PXG4 control Dlg and enhanced background options
 # END OF ALPHA.  BEGINNING BETA TESTING 
 
-__version__ = "0.1"
+__version__ = "0.1.1"
 
 
 # ABOUT
@@ -150,7 +150,22 @@ class tgraphcanvas(FigureCanvas):
         # device 1 (with index 1 bellow) is Omega HH806
         # device 2 (with index 2 bellow) is omega HH506 ; Logger Extech 421509 has been reported to be the same as Omega HH506RA
         self.device = 0 
-        self.devicefunctionlist = [self.fujitemperature, self.HH806AU, self.HH506RA,self.CENTER309]
+        self.devicefunctionlist = [self.fujitemperature,
+                                   self.HH806AU,
+                                   self.HH506RA,
+                                   self.CENTER309,
+                                   self.CENTER306,
+                                   self.CENTER305,
+                                   self.CENTER304,
+                                   self.CENTER303,
+                                   self.CENTER302,
+                                   self.CENTER301,
+                                   self.CENTER300,
+                                   self.VOLTCRAFTK204,
+                                   self.VOLTCRAFTK202,
+                                   self.VOLTCRAFT300K,
+                                   self.VOLTCRAFT302KJ
+                                   ]
         
         self.fig = Figure(facecolor='lightgrey')
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
@@ -357,8 +372,8 @@ class tgraphcanvas(FigureCanvas):
             self.l_delta2.set_data(self.timex, self.delta2)
 
             #readjust xlimit of plot if needed
-            if  self.timex[-1] > (self.endofx - 30):            # if difference is smaller than 30 seconds  
-                self.endofx = int(self.timex[-1] + 120)         # increase x limit by two minutes
+            if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds  
+                self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
                 self.ax.set_xlim(self.startofx,self.endofx)
                 self.xaxistosm()
 
@@ -445,7 +460,86 @@ class tgraphcanvas(FigureCanvas):
          tx = self.timeclock.elapsed()/1000.
 
          return tx,t2,t1         
-                                   
+
+    def CENTER306(self):
+
+         t2,t1 = aw.ser.CENTER306temperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+        
+    def CENTER305(self):
+
+         t2,t1 = aw.ser.CENTER306temperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+
+    def CENTER304(self):
+
+         t2,t1 = aw.ser.CENTER309temperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1         
+
+
+    def CENTER303(self):
+
+         t2,t1 = aw.ser.CENTER303temperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1    
+
+    def CENTER302(self):
+
+         t2,t1 = aw.ser.CENTER303temperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1  
+
+    def CENTER301(self):
+
+         t2,t1 = aw.ser.CENTER303temperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+
+    def CENTER300(self):
+
+         t2,t1 = aw.ser.CENTER303temperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1  
+        
+    def VOLTCRAFTK204(self):
+        
+         t2,t1 = aw.ser.CENTER309temperature()
+         tx = self.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1
+
+    def VOLTCRAFTK202(self):
+        
+         t2,t1 = aw.ser.CENTER306temperature()
+         tx = self.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1
+        
+    def VOLTCRAFT300K(self):
+        
+         t2,t1 = aw.ser.CENTER303temperature()
+         tx = self.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1
+
+    def VOLTCRAFT302KJ(self):
+        
+         t2,t1 = aw.ser.CENTER303temperature()
+         tx = self.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1
+
+        
     #creates X axis labels ticks in mm:ss acording to the endofx limit
     def xaxistosm(self):
         #aligns the 00:00 with the start of the roast if it exists    
@@ -1048,20 +1142,18 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         #Call start() to start the first measurement if no data collected
         if not len(self.timex):
-            self.timeclock.start()
-            
-        self.ax.set_xlim(0,self.endofx)
+            self.timeclock.start()        
         self.flagon = True
         aw.messagelabel.setText("Scope recording...")     
         aw.button_1.setDisabled(True)                     #button ON
-        aw.button_1.setFlat(True)
+        aw.button_1.setStyleSheet("QPushButton { background-color: #c4ff00}")
         
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
         self.flagon = False
         aw.messagelabel.setText("Scope stopped")
         aw.button_1.setDisabled(False)
-        aw.button_1.setFlat(False)
+        aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
@@ -1576,7 +1668,7 @@ class ApplicationWindow(QMainWindow):
 
         #create START STOP buttons        
         self.button_1 = QPushButton("ON")
-        self.button_1.setStyleSheet("QPushButton { background-color: #88ff18 }")
+        self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         self.button_1.setMaximumSize(90, 50)
         self.button_1.setMinimumHeight(50)
         self.button_1.setToolTip("<font color=red size=2><b>" + "Press here to Start monitoring" + "</font></b>")
@@ -4523,9 +4615,9 @@ class serialport(object):
                 return t1, t2
             else:
                 aw.messagelabel.setText("No RX data from HH806AUtemperature()")
-                aw.qmc.qmc.errorlog.append("No RX data from HH806AUtemperature() ")
-                if len(self.qmc.timex) > 2:
-                    return self.qmc.temp1[-1], self.qmc.temp2[-1]
+                aw.qmc.errorlog.append("No RX data from HH806AUtemperature() ")
+                if len(aw.qmc.timex) > 2:
+                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]
                 else:
                     return -1,-1
         except serial.SerialException, e:
@@ -4614,9 +4706,87 @@ class serialport(object):
             if serHH:
                 serHH.close()        
 
+    def CENTER306temperature(self):
+        serCENTER = None
+        try:
+            serCENTER = serial.Serial(self.comport, baudrate=self.baudrate, bytesize = self.bytesize, parity=self.parity,
+                                    stopbits=self.stopbits, timeout=self.timeout)
+            command = "\x41"                 
+            serCENTER.write(command)
+            r = serCENTER.read(10)
+            serCENTER.close()
+            
+            if len(r) == 10:
+                T1 = int(binascii.hexlify(r[3] + r[4]),16)          # __NOTE__ : different than CENTER 309
+                T2 = int(binascii.hexlify(r[7] + r[8]),16)
 
+            else:
+                nbytes = len(r)
+                message = "%i bytes received but 10 needed"%nbytes
+                aw.messagelabel.setText(message)
+                aw.qmc.errorlog.append(message)
+                
+                if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
+                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+                else:
+                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+
+            return T1/10.,T2/10.
+        
+        except serial.SerialException, e:
+            aw.messagelabel.setText("ser.CENTER306temperature()" + str(e))
+            aw.qmc.errorlog.append("ser.CENTER306temperature()" + str(e) )
+            return -1,-1
+            
+        finally:
+            if serCENTER:
+                serCENTER.close()
+
+    def CENTER303temperature(self):
+        serCENTER = None
+        try:
+            serCENTER = serial.Serial(self.comport, baudrate=self.baudrate, bytesize = self.bytesize, parity=self.parity,
+                                    stopbits=self.stopbits, timeout=self.timeout)
+            command = "\x41"                 
+            serCENTER.write(command)
+            r = serCENTER.read(8)
+            serCENTER.close()
+            
+            if len(r) == 8:
+                T1 = int(binascii.hexlify(r[3] + r[4]),16)          
+                T2 = int(binascii.hexlify(r[5] + r[6]),16)          #NOTE: different
+
+            else:
+                nbytes = len(r)
+                message = "%i bytes received but 8 needed"%nbytes
+                aw.messagelabel.setText(message)
+                aw.qmc.errorlog.append(message)
+                
+                if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
+                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+                else:
+                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+
+            return T1/10.,T2/10.
+        
+        except serial.SerialException, e:
+            aw.messagelabel.setText("ser.CENTER303temperature()" + str(e))
+            aw.qmc.errorlog.append("ser.CENTER303temperature()" + str(e) )
+            return -1,-1
+            
+        finally:
+            if serCENTER:
+                serCENTER.close()
+                
     def CENTER309temperature(self):  
-        ##    command = "\x4B" returns 4 bytes but unknown purpose
+        ##    command = "\x4B" returns 4 bytes . Model number.
+        ##    command = "\x48" simulates HOLD button
+        ##    command = "\x4D" simulates MAX/MIN button
+        ##    command = "\x4E" simulates EXIT MAX/MIN button
+        ##    command = "\x52" simulates TIME button
+        ##    command = "\x43" simulates C/F button
+        ##    command = "\x55" dump all memmory
+        ##    command = "\x50" Load recorded data
         ##    command = "\x41" returns 45 bytes (8x5 + 5 = 45) as follows:
         ##    
         ##    "\x02\x80\xUU\xUU\xUU\xUU\xUU\xAA"  \x80 means "Celsi" (if \x00 then "Faren") UUs unknown
@@ -4918,7 +5088,21 @@ class DeviceAssignmentDLG(QDialog):
         self.pidButton = QRadioButton("PID")
 
         self.devicetypeComboBox = QComboBox()
-        self.devicetypeComboBox.addItems(["Omega HH806AU","Omega HH506RA","CENTER 309"])
+        self.devicetypeComboBox.addItems(["Omega HH806AU",
+                                          "Omega HH506RA",
+                                          "CENTER 309",
+                                          "CENTER 306",
+                                          "CENTER 305",
+                                          "CENTER 304",
+                                          "CENTER 303",
+                                          "CENTER 302",
+                                          "CENTER 301",
+                                          "CENTER 300",
+                                          "VOLTCRAFT K204",
+                                          "VOLTCRAFT K202",
+                                          "VOLTCRAFT 300K",
+                                          "VOLTCRAFT 302KJ"
+                                          ])
         
         controllabel =QLabel("Control PID for ET:")                            
         self.controlpidtypeComboBox = QComboBox()
@@ -4941,12 +5125,7 @@ class DeviceAssignmentDLG(QDialog):
             
         else:
             self.nonpidButton.setChecked(True)
-            if aw.qmc.device == 1:
-                self.devicetypeComboBox.setCurrentIndex(0)
-            if aw.qmc.device == 2:
-                self.devicetypeComboBox.setCurrentIndex(1)
-            if aw.qmc.device == 3:
-                self.devicetypeComboBox.setCurrentIndex(2)
+            self.devicetypeComboBox.setCurrentIndex(aw.qmc.device - 1)            
                 
         if aw.ser.controlETpid[0] == 0 :       # control is PXG4
             self.controlpidtypeComboBox.setCurrentIndex(0)
@@ -5035,6 +5214,7 @@ class DeviceAssignmentDLG(QDialog):
             
         if self.nonpidButton.isChecked():
             meter = str(self.devicetypeComboBox.currentText())
+            message = "device err"
             if meter == "Omega HH806AU":
                 aw.qmc.device = 1
                 aw.ser.comport = "COM11"
@@ -5042,9 +5222,10 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'E'
                 aw.ser.stopbits = 1
-                aw.ser.timeout=1            
+                aw.ser.timeout=1
+                message = "Device set to " + meter + ". Now, chose serial port"
 
-            if meter == "Omega HH506RA":
+            elif meter == "Omega HH506RA":
                 aw.qmc.device = 2
                 aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
                 aw.ser.baudrate = 2400
@@ -5052,8 +5233,9 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'E'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
+                message = "Device set to " + meter + ". Now, chose serial port"
                 
-            if meter == "CENTER 309":
+            elif meter == "CENTER 309":
                 aw.qmc.device = 3
                 aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
@@ -5061,17 +5243,122 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
+                message = "Device set to " + meter + ". Now, chose serial port"
+
+            elif meter == "CENTER 306":
+                aw.qmc.device = 4
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to " + meter + ". Now, chose serial port"
+
+            elif meter == "CENTER 305":
+                aw.qmc.device = 5
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port"
                 
+            elif meter == "CENTER 304":
+                aw.qmc.device = 6
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to CENTER 304, which is equivalent to CENTER 309. Now, chose serial port"
+
+            elif meter == "CENTER 303":
+                aw.qmc.device = 7
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to CENTER 303. Now, chose serial port"
+
+            elif meter == "CENTER 302":
+                aw.qmc.device = 8
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to CENTER 302, which is equivalent to CENTER 303. Now, chose serial port"
+                
+            elif meter == "CENTER 301":
+                aw.qmc.device = 9
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to CENTER 301, which is equivalent to CENTER 303. Now, chose serial port"
+
+            elif meter == "CENTER 300":
+                aw.qmc.device = 10
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to CENTER 300, which is equivalent to CENTER 303. Now, chose serial port"
+                
+            elif meter == "VOLTCRAFT K204":
+                aw.qmc.device = 11
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to VOLTCRAFT K204, which is equivalent to CENTER 309. Now, chose serial port"
+
+            elif meter == "VOLTCRAFT K202":
+                aw.qmc.device = 12
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to VOLTCRAFT K202, which is equivalent to CENTER 306. Now, chose serial port"
+
+            elif meter == "VOLTCRAFT 300K":
+                aw.qmc.device = 13
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to VOLTCRAFT 300K, which is equivalent to CENTER 303. Now, chose serial port"
+
+            elif meter == "VOLTCRAFT 302KJ":
+                aw.qmc.device = 14
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to VOLTCRAFT 302KJ, which is equivalent to CENTER 303. Now, chose serial port"
                 
             aw.button_10.setDisabled(True)
             aw.button_10.setFlat(True)
-            
-            message = "Device set to " + meter
-            
+                        
         aw.messagelabel.setText(message)
-
-
-
             
         self.close()
 
