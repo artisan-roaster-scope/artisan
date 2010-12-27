@@ -221,6 +221,8 @@ class tgraphcanvas(FigureCanvas):
         # projection variables of change of rate
         self.HUDcounter = 1
         self.HUDflag = 0
+        self.ETtarget = 350
+        self.BTtarget = 250
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
         self.roastertype = ""
@@ -408,22 +410,48 @@ class tgraphcanvas(FigureCanvas):
         if self.HUDflag:
             self.HUDflag = False
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
-            aw.messagelabel.setText("HUD OFF")
+            aw.HUDstatus.showMessage("HUD OFF",3000)
+            self.ax.lines = self.ax.lines[0:5]
+
         else:
             self.HUDflag = True
             aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
-            aw.messagelabel.setText("HUD ON")
-
+            aw.HUDstatus.showMessage("HUD ON",3000)
+            aw.hudshow()
 
     #make a projection of change of rate of BT on the graph
     def viewHUD(self):
-        #calculate the temperature endpoint at endofx acording to the latest rate of change of BT
-        projection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1])
+        #calculate the temperature endpoint at endofx acording to the latest rate of change
+        BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx + - self.timex[-1])
+        ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx + - self.timex[-1])
+        #plot proyections
+        self.ax.plot([self.timex[-1],self.endofx + self.startend[0]], [self.temp2[-1], BTprojection], self.palette["bt"], linestyle = '-.', linewidth= 8, alpha = .3)
+        self.ax.plot([self.timex[-1],self.endofx + self.startend[0]], [self.temp1[-1], ETprojection], self.palette["met"], linestyle = '-.', linewidth= 8, alpha = .3)
 
-        #draw projection line
-        self.ax.plot([self.timex[-1],self.endofx], [self.temp2[-1], projection], self.palette["text"], linestyle = '-.', linewidth= 8, alpha = .3)
-        
-        #erase every two trigger events to make it look like a radar
+        if self.rateofchange1 > 0:
+            ETreachTime = (self.ETtarget - self.temp1[-1])/self.rateofchange1
+        else:
+            ETreachTime = -1
+            
+        if self.rateofchange2 > 0:
+            BTreachTime = (self.BTtarget - self.temp2[-1])/self.rateofchange2
+        else:
+            BTreachTime = -1
+            
+        if ETreachTime > 0 and ETreachTime < 5940:
+            stringET = "[ " + self.stringfromseconds(int(ETreachTime)) + " to reach ET target " + str(self.ETtarget) + self.mode +  " ] "
+        else:
+            stringET = "[ xx:xx to reach ET target " + str(self.ETtarget) + self.mode +  " ] "
+            
+        if BTreachTime > 0 and BTreachTime < 5940:    
+            stringBT = "[ " + self.stringfromseconds(int(BTreachTime)) + " to reach BT target " + str(self.BTtarget) + self.mode + " ] "
+        else:
+            stringBT = "[ xx:xx to reach BT target " + str(self.BTtarget) + self.mode + " ] "
+
+        string = stringET + stringBT
+        aw.HUDstatus.showMessage(string,10000)
+
+        #erase every three trigger events to make it look like a radar
         l,p = divmod(self.HUDcounter,3)
         if p == 0:
             self.ax.lines = self.ax.lines[0:5]
@@ -846,6 +874,8 @@ class tgraphcanvas(FigureCanvas):
             st2 = str(int(mins)) + ":" + "0" + str(int(secs))
         else:
             st2 = str(int(mins))+ ":" + str(int(secs))
+        if mins < 10:
+            st2 = "0" + st2
         return st2
 
     #Converts a string into seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
@@ -1672,6 +1702,10 @@ class ApplicationWindow(QMainWindow):
         
         #create a Label object to display program status information
         self.messagelabel = QLabel()
+        
+        self.HUDstatus = QStatusBar()
+        self.HUDstatus.setSizeGripEnabled(False)
+        self.HUDstatus .setStyleSheet("background-color:'lightgrey';")
 
         #create START STOP buttons        
         self.button_1 = QPushButton("ON")
@@ -1909,9 +1943,10 @@ class ApplicationWindow(QMainWindow):
         gl.addWidget(self.lcd1,0,1)  #timer LCD
         gl.addWidget(self.messagelabel,1,0) #add a message label to give program feedback to user
         gl.addLayout(pidHHbl,2,0)  #pid button + LCDS
-        gl.addWidget(self.qmc,3,0)
-        gl.addLayout(buttonVVbl,3,1) #place buttonlayout manager inside grid box layout manager
-        gl.addLayout(buttonHHbl,4,0) #place buttonlayout manager inside grid box layout manager
+        gl.addWidget(self.HUDstatus,3,0)
+        gl.addWidget(self.qmc,4,0)
+        gl.addLayout(buttonVVbl,4,1) #place buttonlayout manager inside grid box layout manager
+        gl.addLayout(buttonHHbl,5,0) #place buttonlayout manager inside grid box layout manager
 
         ###############  create MENUS 
         self.fileMenu = self.menuBar().addMenu("&File")
@@ -2029,6 +2064,10 @@ class ApplicationWindow(QMainWindow):
         backgroundAction = QAction("Profile Background",self)
         self.connect(backgroundAction,SIGNAL("triggered()"),self.background)
         self.GraphMenu.addAction(backgroundAction)  
+
+        hudAction = QAction("HUD targets",self)
+        self.connect(hudAction,SIGNAL("triggered()"),self.hudshow)
+        self.GraphMenu.addAction(hudAction)  
         
         # CONFIGURATION menu
         deviceAction = QAction("Device", self)
@@ -2854,6 +2893,10 @@ class ApplicationWindow(QMainWindow):
     def viewErrorLog(self):
         error = errorDlg(self)
         error.show()
+
+    def hudshow(self):
+        hud = HUDDlg(self)
+        hud.show()        
         
     def helpAbout(self):
         creditsto = "<br>Rafael Cobo <br> Marko Luther"
@@ -3774,7 +3817,45 @@ class calculatorDlg(QDialog):
            outx = float(str(self.outEdit.text()))
            inx = outx*convtable[self.outComboBox.currentIndex()][self.inComboBox.currentIndex()]
            self.inEdit.setText("%.2f"%inx)
+           
+##########################################################################
+############################     HUD  DLG     ############################
+##########################################################################
         
+class HUDDlg(QDialog):
+    def __init__(self, parent = None):
+        super(HUDDlg,self).__init__(parent)
+
+        self.setWindowTitle("HUD config")
+        ETLabel = QLabel("ET target")
+        BTLabel = QLabel("BT target")
+        self.ETlineEdit = QLineEdit(str(aw.qmc.ETtarget))           
+        self.BTlineEdit = QLineEdit(str(aw.qmc.BTtarget))
+        self.ETlineEdit.setValidator(QIntValidator(0, 1000, self.ETlineEdit))
+        self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
+
+        okButton = QPushButton("OK")  
+        cancelButton = QPushButton("Cancel")        
+        self.connect(cancelButton,SIGNAL("clicked()"),self.close)
+        self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
+                                     
+        hudLayout = QGridLayout()
+        hudLayout.addWidget(ETLabel,0,0)
+        hudLayout.addWidget(self.ETlineEdit,0,1)
+        hudLayout.addWidget(BTLabel,1,0)
+        hudLayout.addWidget(self.BTlineEdit,1,1)
+        hudLayout.addWidget(okButton,2,0)
+        hudLayout.addWidget(cancelButton,2,1)   
+        self.setLayout(hudLayout)
+
+    def updatetargets(self):
+        aw.qmc.ETtarget = int(str(self.ETlineEdit.text()))
+        aw.qmc.BTtarget = int(str(self.BTlineEdit.text()))
+        string = "[ET target = " + str(self.ETlineEdit.text()) + "] [BT target = " + str(self.BTlineEdit.text()) + "]"
+        aw.HUDstatus.showMessage(string,3000)
+        self.close()
+        
+
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
 ##########################################################################
@@ -3894,7 +3975,7 @@ class flavorDlg(QDialog):
 
         self.setWindowTitle("Cup Profile")
 
-        self.line0edit = QLineEdit(aw.qmc.flavorlabels[0])
+        
         self.line1edit = QLineEdit(aw.qmc.flavorlabels[1])
         self.line2edit = QLineEdit(aw.qmc.flavorlabels[2])
         self.line3edit = QLineEdit(aw.qmc.flavorlabels[3])
