@@ -46,7 +46,7 @@ OPTIONS = {
                     'CFBundleShortVersionString':VERSION,
                     'CFBundleVersion': 'Artisan ' + VERSION,
                     'LSMinimumSystemVersion':'10.6',
-                    'LSMultipleInstancesProhibited':'true',
+                    'LSMultipleInstancesProhibited':'false',
                     'NSHumanReadableCopyright':LICENSE
                 }}
 
