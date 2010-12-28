@@ -422,11 +422,18 @@ class tgraphcanvas(FigureCanvas):
     #make a projection of change of rate of BT on the graph
     def viewHUD(self):
         #calculate the temperature endpoint at endofx acording to the latest rate of change
-        BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx + - self.timex[-1])
-        ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx + - self.timex[-1])
+        BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)
+        ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
         #plot proyections
-        self.ax.plot([self.timex[-1],self.endofx + self.startend[0]], [self.temp2[-1], BTprojection], self.palette["bt"], linestyle = '-.', linewidth= 8, alpha = .3)
-        self.ax.plot([self.timex[-1],self.endofx + self.startend[0]], [self.temp1[-1], ETprojection], self.palette["met"], linestyle = '-.', linewidth= 8, alpha = .3)
+        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"], linestyle = '-.', linewidth= 8, alpha = .3)
+        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"], linestyle = '-.', linewidth= 8, alpha = .3)
+
+        #erase every three trigger events to make it look like a radar
+        l,p = divmod(self.HUDcounter,3)
+        if p == 0:
+            self.ax.lines = self.ax.lines[0:5]
+            
+        self.HUDcounter += 1
 
         if self.rateofchange1 > 0:
             ETreachTime = (self.ETtarget - self.temp1[-1])/self.rateofchange1
@@ -441,22 +448,15 @@ class tgraphcanvas(FigureCanvas):
         if ETreachTime > 0 and ETreachTime < 5940:
             stringET = "[ " + self.stringfromseconds(int(ETreachTime)) + " to reach ET target " + str(self.ETtarget) + self.mode +  " ] "
         else:
-            stringET = "[ xx:xx to reach ET target " + str(self.ETtarget) + self.mode +  " ] "
+            stringET = "[ XX:XX to reach ET target " + str(self.ETtarget) + self.mode +  " ] "
             
         if BTreachTime > 0 and BTreachTime < 5940:    
             stringBT = "[ " + self.stringfromseconds(int(BTreachTime)) + " to reach BT target " + str(self.BTtarget) + self.mode + " ] "
         else:
-            stringBT = "[ xx:xx to reach BT target " + str(self.BTtarget) + self.mode + " ] "
+            stringBT = "[ XX:XX to reach BT target " + str(self.BTtarget) + self.mode + " ] "
 
         string = stringET + stringBT
         aw.HUDstatus.showMessage(string,10000)
-
-        #erase every three trigger events to make it look like a radar
-        l,p = divmod(self.HUDcounter,3)
-        if p == 0:
-            self.ax.lines = self.ax.lines[0:5]
-            
-        self.HUDcounter += 1
 
     #finds time, ET and BT when using Fuji PID
     def fujitemperature(self):
@@ -3975,7 +3975,7 @@ class flavorDlg(QDialog):
 
         self.setWindowTitle("Cup Profile")
 
-        
+        self.line0edit = QLineEdit(aw.qmc.flavorlabels[0])        
         self.line1edit = QLineEdit(aw.qmc.flavorlabels[1])
         self.line2edit = QLineEdit(aw.qmc.flavorlabels[2])
         self.line3edit = QLineEdit(aw.qmc.flavorlabels[3])
