@@ -91,6 +91,8 @@ import tempfile
 import time
 import glob
 import os
+import string
+import cgi
 
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
@@ -199,7 +201,7 @@ class tgraphcanvas(FigureCanvas):
         #1C start time [0],1C start Temp [1],1C end time [2],1C end temp [3],2C start time [4], 2C start Temp [5],
         #2C end time [6], 2C end temp [7]
         self.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
-        #variable to mark the beguining and end of the roast [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
+        #variable to mark the begining and end of the roast [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
         self.startend = [0.,0.,0.,0.]
 
         #background profile
@@ -226,8 +228,9 @@ class tgraphcanvas(FigureCanvas):
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
         self.roastertype = ""
+        self.operator = ""
         self.roastingnotes = ""
-        self.cupingnotes = ""
+        self.cuppingnotes = ""
         self.roastdate = QDate.currentDate()
         self.beans = ""
         #[0]weight in, [1]weight out, [2]units
@@ -579,7 +582,7 @@ class tgraphcanvas(FigureCanvas):
     def xaxistosm(self):
         #aligns the 00:00 with the start of the roast if it exists    
         if int(self.startend[0]):
-            LLL =  self.endofx/60
+            LLL = int(self.endofx/60)
             newlocs = [self.startend[0]]
             for i in range(LLL):    
                 newlocs.append(newlocs[-1]+60)              
@@ -640,8 +643,9 @@ class tgraphcanvas(FigureCanvas):
         aw.button_9.setFlat(False)
         
         self.roastertype = ""
+        self.operator = ""
         self.roastingnotes = ""
-        self.cupingnotes = ""
+        self.cuppingnotes = ""
         self.errorlog = []
         self.weight = [0,0,"g"]
         self.specialevents = []
@@ -1372,12 +1376,9 @@ class tgraphcanvas(FigureCanvas):
     # Writes information about the finished profile in the graph
     def writestatistics(self):
         #find when dry phase ends 
-        for i in range(len(self.temp2)):
-            #count from the back [-i] (high temps towards low temps)
-            if self.temp2[-i] < self.phases[1] and i > 0:
-                break
-            
-        BTdrycross = self.temp2[-i]
+        dryEndIndex = aw.findDryEnd()
+        BTdrycross = self.temp2[dryEndIndex]
+        
         #self.varC [1C starttime[0],1C startTemp[1],  1C endtime[2],1C endtemp[3],  2C starttime[4], 2C startTemp[5],  2C endtime[6], 2C endtemp[7]]
         #self.startend [starttime[0], starttempBT[1], endtime[2],endtempBT[3]]      
         if self.startend[2]:
@@ -1386,14 +1387,14 @@ class tgraphcanvas(FigureCanvas):
             #if 1Ce use middle point of 1Cs and 1Ce
             if self.varC[2]:
                 
-                dryphasetime = int(self.timex[-i] - self.startend[0])
-                midphasetime = int(self.varC[0] - self.timex[-i])
+                dryphasetime = int(self.timex[dryEndIndex] - self.startend[0])
+                midphasetime = int(self.varC[0] - self.timex[dryEndIndex])
                 finishphasetime = int(self.startend[2]- self.varC[0])
                                    
             else: #very light roast)
                 #use 1Cs (start of 1C) as 1C
-                dryphasetime = int(self.timex[-i] - self.startend[0])
-                midphasetime = int(self.varC[0] - self.timex[-i])     
+                dryphasetime = int(self.timex[dryEndIndex] - self.startend[0])
+                midphasetime = int(self.varC[0] - self.timex[dryEndIndex])     
                 finishphasetime = int(self.startend[2] - self.varC[0])
                 
             self.statisticstimes[1] = dryphasetime
@@ -1436,67 +1437,20 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.text(self.startend[0]+ dryphasetime+midphasetime/3,self.statisticsupper,st2+ " " + str(int(midphaseP))+"%",color=self.palette["text"])
                 self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/3,self.statisticsupper,st3 + " " +str(int(finishphaseP))+ "%",color=self.palette["text"])
 
-            if self.statisticsflags[2]:       
-                #Flavor defect estimation chart for each leg. Thanks to Jim Schulman 
-                ShortDryingPhase = "Grassy"
-                LongDryingPhase = "Leathery"
-                ShortTo1CPhase = "Toasty"
-                LongTo1CPhase = "Bready"
-                ShortFinishPhase = "Acidic"
-                LongFinishPhase = "Flat"
-
-                #CHECK CONDITIONS
-                
-                #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
-                if dryphasetime < self.statisticsconditions[0]:
-                    st1 = ShortDryingPhase
-                #if dry phase time > 6 mins or more than 40% of the total time
-                elif dryphasetime > self.statisticsconditions[1]:
-                    st1 = LongDryingPhase
-                else:
-                    st1 = "OK"
-
-                #if mid phase time < 5 minutes
-                if midphasetime < self.statisticsconditions[2]:
-                    st2 = ShortTo1CPhase
-                #if mid phase time > 10 minutes
-                elif midphasetime > self.statisticsconditions[3]:
-                    st2 = LongTo1CPhase
-                else:
-                    st2 = "OK"            
-
-                #if finish phase is less than 3 mins
-                if finishphasetime < self.statisticsconditions[4]:
-                    st3 = ShortFinishPhase
-                #if finish pahse is over 6 minutes
-                elif finishphasetime > self.statisticsconditions[5]:
-                    st3 = LongFinishPhase
-                else:
-                    st3 = "OK"
+            if self.statisticsflags[2]:
+                (st1,st2,st3) = aw.defect_estimation()
 
                 #find Lowest Point in BT
                 LP = 1000 
-                for i in range(len(self.temp2)):
-                    if self.temp2[i] < LP:
-                        LP = self.temp2[i]                     
-                #Find rate of change of each phase
-                
-                rc1 = ((BTdrycross - LP) /dryphasetime)*60.
-                if self.varC[0]:
-                    if midphasetime:
-                        rc2 = ((self.varC[1] - BTdrycross)/midphasetime)*60.
-                    else:
-                        rc2 = 0.
-                    if finishphasetime:
-                        rc3 = ((self.startend[3] - self.varC[1])/finishphasetime)*60.
-                    else:
-                        rc3 = 0
-                else:
-                    rc2 = 0.
-                    rc3 = 0.
+                TP_index = aw.findTP()
+                if TP_index >= 0:
+                    LP = self.temp2[TP_index]
+                    
+                rates_of_changes = aw.RoR(TP_index,dryEndIndex)
 
-                st2 += "  (%.1f deg/min)"%rc2
-                st3 += "  (%.1f deg/min)"%rc3
+                st1 += "  (%.1f deg/min)"%rates_of_changes[0]
+                st2 += "  (%.1f deg/min)"%rates_of_changes[1]
+                st3 += "  (%.1f deg/min)"%rates_of_changes[2]
         
                 #Write flavor estimation
                 self.ax.text(self.startend[0],self.statisticslower,st1,color=self.palette["text"],fontsize=11)
@@ -2223,9 +2177,16 @@ class ApplicationWindow(QMainWindow):
             #Read next line roaster type
             line = stream.readLine().trimmed()
             self.qmc.roastertype = str(line)
-
-            #Read date tag
+            
+            #read next line OPERATOR tag
             line = stream.readLine().trimmed()                   
+            if line.startsWith("[[OPERATOR]]"):
+                #Read next line roaster type
+                line = stream.readLine().trimmed()
+                self.qmc.operator = str(line)
+                line = stream.readLine().trimmed() 
+                
+            #Read date tag
             if not line.startsWith("[[DATE]]"):
                 raise ValueError, " Invalid Artisan file format: DATE tag missing"            
             #Read date
@@ -2270,7 +2231,7 @@ class ApplicationWindow(QMainWindow):
                 line = stream.readLine().trimmed()                   
                 if line.startsWith("[[DATA]]"):
                     break
-                self.qmc.cupingnotes += str(line) + "\n"
+                self.qmc.cuppingnotes += str(line) + "\n"
                 
             #Read DATA values till the end of the file
             while not stream.atEnd():
@@ -2508,6 +2469,8 @@ class ApplicationWindow(QMainWindow):
                     f.write("    ")
                 f.write("\n[[ROASTER-TYPE]]\n")
                 f.write(self.qmc.roastertype)
+                f.write("\n[[OPERATOR]]\n")
+                f.write(self.qmc.operator)
                 f.write("\n[[DATE]]\n")
                 f.write(str(self.qmc.roastdate.toString()))            
                 f.write("\n[[EVENTS]]\n")
@@ -2525,7 +2488,7 @@ class ApplicationWindow(QMainWindow):
                 f.write("[[ROASTING-NOTES]]\n")
                 f.write(self.qmc.roastingnotes)
                 f.write("\n[[CUPPING-NOTES]]\n")
-                f.write(self.qmc.cupingnotes)
+                f.write(self.qmc.cuppingnotes)
                 f.write("\n[[DATA]]\n")
                 for i in range(len(self.qmc.timex)):
                     f.write(str(self.qmc.timex[i])+"    " + str(self.qmc.temp1[i])+"    " + str(self.qmc.temp2[i]) + "\n")
@@ -2702,9 +2665,339 @@ class ApplicationWindow(QMainWindow):
             else:
                 painter.drawImage(0, 0, image)
 
-
     def htmlReport(self):
+        HTML_REPORT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>Roasting Report</title>
+<style type="text/css">
+td { 
+  vertical-align: top;
+  padding: 0px 0px 0px 5px;
+}
+th {
+  text-align: right;
+  vertical-align: top;
+}
+</style>
+</head>
+<body>
+<center>
+<h1>$title</h1>
+
+<table border="1" cellpadding="10">
+<tr>
+<td>
+<center>
+<table>
+<tr>
+<td>
+<table width="220">
+<tr>
+<th>Date:</th>
+<td>$datetime</td>
+</tr>
+<tr>
+<th>Beans:</th>
+<td>$beans</td>
+</tr>
+<tr>
+<th>Weight:</th>
+<td>$weight</td>
+</tr>
+<tr>
+<th>Roaster:</th>
+<td>$roaster</td>
+</tr>
+<tr>
+<th>Operator:</th>
+<td>$operator</td>
+</tr>
+</table>
+</td>
+<td>
+<table width="180">
+<tr>
+<th>Charge:</th>
+<td>$charge</td>
+</tr>
+<tr>
+<th>TP:</th>
+<td>$TP</td>
+</tr>
+<tr>
+<th>FCs:</th>
+<td>$FCs</td>
+</tr>
+<tr>
+<th>FCe:</th>
+<td>$FCe</td>
+</tr>
+<tr>
+<th>SCs:</th>
+<td>$SCs</td>
+</tr>
+<tr>
+<th>SCe:</th>
+<td>$SCe</td>
+</tr>
+<tr>
+<th>Drop:</th>
+<td>$drop</td>
+</tr>
+</table>
+</td>
+<td>
+<table width="210">
+<tr>
+<th>Dry phase:</th>
+<td>$dry_phase</td>
+</tr>
+<tr>
+<th>Mid phase:</th>
+<td>$mid_phase</td>
+</tr>
+<tr>
+<th>Finish phase:</th>
+<td>$finish_phase</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</center>
+</td>
+<td>
+<center><b>Roasting Notes</b></center>
+$roasting_notes
+</td>
+</tr>
+<tr>
+<td style="vertical-align:middle" align="center"><img alt='roast graph' src='$graph_image'/></td>
+<td style="vertical-align:middle" align="center"><img alt='flavor graph' src='$flavor_image'/></td>
+</tr>
+<tr>
+<td><center><b>Events</b></center><br/>
+$specialevents
+</td>
+<td><center><b>Cupping Notes</b></center>
+$cupping_notes
+</td>
+</tr>
+</table>
+</center>
+</body>
+</html>
+        """
+        beans = cgi.escape(self.qmc.beans)
+        if len(beans) > 43:
+            beans = beans[:41] + "&hellip;"
+        TP_index = self.findTP()
+        TP_time = None
+        if TP_index >= 0:
+            TP_time = aw.qmc.timex[TP_index]
+        dryEndIndex = self.findDryEnd()
+        rates_of_changes = aw.RoR(TP_index,dryEndIndex)
+        evaluations = aw.defect_estimation()        
+        #print graph
+        self.qmc.redraw()        
+        #resize GRAPH image to 600 pixels width
+        tempFile = tempfile.TemporaryFile()
+        aw.qmc.fig.savefig(tempFile.name)
+        image = QImage(tempFile.name)
+        image = image.scaledToWidth(600,1)
+        #save GRAPH image
+        graph_image = "artisan-graph.png"
+        image.save(graph_image)
+        #obtain flavor chart image
+        self.qmc.flavorchart()
+        #resize FLAVOR image to 400 pixels width
+        tempFile = tempfile.TemporaryFile()
+        aw.qmc.fig.savefig(tempFile.name)
+        image = QImage(tempFile.name)
+        image = image.scaledToWidth(500,1)
+        #save GRAPH image
+        flavor_image = "artisan-flavor.png"
+        image.save(flavor_image)
+        #return screen to GRAPH profile mode
+        self.qmc.redraw()
+        
+        html = string.Template(HTML_REPORT_TEMPLATE).safe_substitute(
+            title=cgi.escape(self.qmc.title),
+            datetime=str(self.qmc.roastdate.toString()), #alt: str(self.qmc.roastdate.toString('MM.dd.yyyy')),
+            beans=beans,
+            weight=str(self.qmc.weight[0]) + self.qmc.weight[2] + " (" + "%.1f" % aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1]) + "%)",
+            roaster=cgi.escape(self.qmc.roastertype),
+            operator=cgi.escape(self.qmc.operator),
+            charge="BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode,
+            TP=self.event2html(TP_time,aw.qmc.temp2[TP_index]),
+            FCs=self.event2html(self.qmc.varC[0],self.qmc.varC[1]),
+            FCe=self.event2html(self.qmc.varC[2],self.qmc.varC[3]),
+            SCs=self.event2html(self.qmc.varC[4],self.qmc.varC[5]),
+            SCe=self.event2html(self.qmc.varC[6],self.qmc.varC[7]),
+            drop=self.event2html(self.qmc.startend[2],self.qmc.startend[3]),
+            dry_phase=self.phase2html(self.qmc.statisticstimes[1],rates_of_changes[0],evaluations[0]),
+            mid_phase=self.phase2html(self.qmc.statisticstimes[2],rates_of_changes[1],evaluations[1]),
+            finish_phase=self.phase2html(self.qmc.statisticstimes[3],rates_of_changes[2],evaluations[2]),
+            roasting_notes=self.note2html(self.qmc.roastingnotes),
+            graph_image=graph_image,
+            flavor_image=flavor_image,
+            specialevents=self.specialevents2html(),
+            cupping_notes=self.note2html(self.qmc.cuppingnotes))
+        f = None
+        try:      
+            f = open("Artisanreport.html", 'w')
+            for i in range(len(html)):
+                f.write(html[i])
+            f.close()
+            QDesktopServices.openUrl(QUrl("file:///" + QDir().current().absolutePath() + "/Artisanreport.html", QUrl.TolerantMode))            
+        except IOError,e:
+            self.messagelabel.setText("Error in htmlReport() " + str(e) + " ")
+            aw.qmc.errorlog.append("Error in htmlReport() " + str(e))
+            return
+        finally:
+            if f:
+                f.close()  
+                
+    def phase2html(self,time,RoR,eval):
+        if self.qmc.statisticstimes[0] > 0 and time and time > 0:
+            return self.qmc.stringfromseconds(time) + " (%.2f" %(time*100./self.qmc.statisticstimes[0])+"%)<br/>" + "%.1f deg/min"%RoR + "<br/>" + eval
+        else:
+            return "--"
+            
+    def event2html(self,time,temp):
+        if time:
+            return self.qmc.stringfromseconds(time - self.qmc.startend[0])+ " (%.1f"%temp + "&deg;" + self.qmc.mode + ")"
+        else:
+            return "--"
+            
+    def specialevents2html(self): 
+        html = ""  
+        if self.qmc.specialevents and len(self.qmc.specialevents) > 0:
+            html += '<center>\n<table cellpadding="2">\n'
+            for i in range(len(self.qmc.specialevents)):
+                html += ("<tr>"+
+                     "\n<td>" + str(i+1) + "</td><td>[" +
+                     self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[i]]-self.qmc.startend[0])) +
+                     "</td><td>at " + "%.1f"%self.qmc.temp2[self.qmc.specialevents[i]] + self.qmc.mode +
+                     "]</td><td>" + self.qmc.specialeventsStrings[i] +"</td></tr>\n")     
+            html += '</table>\n</center>'
+        return html
+            
+    def note2html(self,notes):
+        notes_html = ""
+        for i in range(len(notes)):
+            #if notes[i] == " ":
+            #    notes_html += " &nbsp "
+            if ord(notes[i]) == 9:
+                notes_html += " &nbsp&nbsp&nbsp&nbsp "                         
+            elif notes[i] == "\n":
+                notes_html += "<br/>\n"
+            else:           
+                notes_html += notes[i]
+        return notes_html
+    
+
+    #finds closest Bean Temperature in aw.qmc.temp2 given an input time. timex and temp2 always have same dimension
+    def BTfromseconds(self,seconds):
+        if len(aw.qmc.timex):
+            #find when input time crosses timex
+            for i in range(len(aw.qmc.timex)):
+                if aw.qmc.timex[i] > seconds:
+                    break
+            return float(aw.qmc.temp2[i-1])           #return the BT temperature
+            
+    #finds closest Environmental Temperature in aw.qmc.temp1 given an input time. timex and temp1 always have same dimension
+    def ETfromseconds(self,seconds):
+        if len(aw.qmc.timex):
+            #find when input time crosses timex
+            for i in range(len(aw.qmc.timex)):
+                if aw.qmc.timex[i] > seconds:
+                    break
+            return float(aw.qmc.temp1[i-1])           #return the ET temperature
+            
+    #returns the index of the lowest point in BT; return -1 if no such value exists
+    def findTP(self):
+        if len(aw.qmc.temp2) > 0:
+            TP = aw.qmc.temp2[0]
+            idx = -1
+            for i in range(len(aw.qmc.temp2) - 1, 0, -1):
+                if aw.qmc.temp2[i] < TP:
+                    TP = aw.qmc.temp2[i]
+                    idx = i
+            return idx
+        else:
+            return -1
+    
+    #Flavor defect estimation chart for each leg. Thanks to Jim Schulman 
+    def defect_estimation(self):    
+        dryphasetime = aw.qmc.statisticstimes[1]
+        midphasetime = aw.qmc.statisticstimes[2]
+        finishphasetime = aw.qmc.statisticstimes[3]
+        ShortDryingPhase = "Grassy"
+        LongDryingPhase = "Leathery"
+        ShortTo1CPhase = "Toasty"
+        LongTo1CPhase = "Bready"
+        ShortFinishPhase = "Acidic"
+        LongFinishPhase = "Flat"        
+        st1 = st2 = st3 = 'OK'
+        #CHECK CONDITIONS                
+        #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
+        if dryphasetime < aw.qmc.statisticsconditions[0]:
+            st1 = ShortDryingPhase
+        #if dry phase time > 6 mins or more than 40% of the total time
+        elif dryphasetime > aw.qmc.statisticsconditions[1]:
+            st1 = LongDryingPhase
+
+        #if mid phase time < 5 minutes
+        if midphasetime < aw.qmc.statisticsconditions[2]:
+            st2 = ShortTo1CPhase
+        #if mid phase time > 10 minutes
+        elif midphasetime > aw.qmc.statisticsconditions[3]:
+            st2 = LongTo1CPhase
+
+        #if finish phase is less than 3 mins
+        if finishphasetime < aw.qmc.statisticsconditions[4]:
+            st3 = ShortFinishPhase
+        #if finish phase is over 6 minutes
+        elif finishphasetime > aw.qmc.statisticsconditions[5]:
+            st3 = LongFinishPhase
+        return (st1,st2,st3)
+    
+    #returns the index of the end of the dry phase
+    def findDryEnd(self):
+        idx = -1
+        for i in range(len(aw.qmc.temp2)):
+            #count from the back [-i] (high temps towards low temps)
+            if aw.qmc.temp2[-i] < aw.qmc.phases[1] and i > 0:
+                idx = i
+                break
+        return len(aw.qmc.temp2) - idx
+        
+    #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
+    def RoR(self,TP_index,dryEndIndex):
+        dryphasetime = aw.qmc.statisticstimes[1]
+        midphasetime = aw.qmc.statisticstimes[2]
+        finishphasetime = aw.qmc.statisticstimes[3]
+        BTdrycross = aw.qmc.temp2[dryEndIndex]
+        rc1 = rc2 = rc3 = 0.
+        if TP_index < 1000 and TP_index >= 0 and dryphasetime:
+            LP = aw.qmc.temp2[TP_index]
+            rc1 = ((BTdrycross - LP) / (dryphasetime - aw.qmc.timex[TP_index]))*60.
+        if aw.qmc.varC[0]:
+            if midphasetime:
+                rc2 = ((aw.qmc.varC[1] - BTdrycross)/midphasetime)*60.
+            if finishphasetime:
+                rc3 = ((aw.qmc.startend[3] - aw.qmc.varC[1])/finishphasetime)*60.
+        return (rc1,rc2,rc3)
+            
+    def htmlReport_org(self):
         html = u""
+        beans = self.qmc.beans
+        if len(beans) > 40:
+            beans = beans[:38] + "&hellip;"
         #Basic information
         html += (
                 "<HTML>\n<HEAD>\n<TITLE>Roasting Report</TITLE>\n</HEAD>\n"
@@ -2729,8 +3022,9 @@ class ApplicationWindow(QMainWindow):
                 
                 "<td>"
                 + str(self.qmc.roastdate.toString()) + "<br>"
-                + self.qmc.beans +"<br>"
-                + str(self.qmc.weight[0]) + " " + str(self.qmc.weight[1]) + " " + self.qmc.weight[2]+"<br>"
+                + beans +"<br>"
+                #+ str(self.qmc.weight[0]) + " " + str(self.qmc.weight[1]) + " " + self.qmc.weight[2]+"<br>"
+                + str(self.qmc.weight[0]) + self.qmc.weight[2] + " (" + "%.1f" % aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1]) + "%)" +"<br>"
                 + self.qmc.roastertype
                 + "</td>\n"
                 )
@@ -2857,15 +3151,15 @@ class ApplicationWindow(QMainWindow):
         html += "</td>\n</table>\n</center>\n"
         html += "\n<!-- THIRD ROW SECOND COLUMN -->\n"
         html += "<td><center><b>Cupping Notes</b></center><p>\n"
-        for i in range(len(self.qmc.cupingnotes)):
-            if self.qmc.cupingnotes[i] == " ":
+        for i in range(len(self.qmc.cuppingnotes)):
+            if self.qmc.cuppingnotes[i] == " ":
                 html += " &nbsp "
-            elif ord(self.qmc.cupingnotes[i]) == 9:
+            elif ord(self.qmc.cuppingnotes[i]) == 9:
                 html += " &nbsp&nbsp&nbsp&nbsp "
-            elif self.qmc.cupingnotes[i] == "\n":
+            elif self.qmc.cuppingnotes[i] == "\n":
                 html += "<br>\n"
             else:           
-                html += self.qmc.cupingnotes[i]
+                html += self.qmc.cuppingnotes[i]
         html += "</p>\n</td>"
 
         html += "</tr>\n\n\n</table>\n</center>\n"
@@ -2983,6 +3277,14 @@ class ApplicationWindow(QMainWindow):
     def editphases(self):
         dialog = phasesGraphDlg(self)
         dialog.show()
+        
+    # takes the weight of the green and roasted coffee as floats and
+    # returns the weight loos in percentage as float
+    def weight_loss(self,green,roasted):
+      if float(green) == 0.0 or float(green) < float(roasted):
+        return 0.
+      else:
+        return 100. * ((float(green) - float(roasted)) / float(green))
 
     def importHH506RA(self):
         try:
@@ -3330,30 +3632,37 @@ class editGraphDlg(QDialog):
 
         #roaster
         self.roaster = QLineEdit(aw.qmc.roastertype)
+
+        #operator
+        self.operator = QLineEdit(aw.qmc.operator)
         
         #weight
-        weightlabel = QLabel("<b>WEIGHT: </b>")
+        weightlabel = QLabel("<b>Weight</b> ")
         weightinlabel = QLabel(" in")
-        #weightinlabel.setAlignment(Qt.AlignRight)
         weightoutlabel = QLabel(" out")
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
         
-        self.weightinedit.setValidator(QDoubleValidator(0., 999., 1, self.weightinedit))
+        #self.weightinedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightinedit))
+        self.weightinedit.setMinimumWidth(50)
         self.weightinedit.setMaximumWidth(50)
         self.weightoutedit = QLineEdit(outw)
-        self.weightoutedit.setValidator(QDoubleValidator(0., 999., 1, self.weightoutedit))
+        #self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
+        self.weightoutedit.setMinimumWidth(50)
         self.weightoutedit.setMaximumWidth(50)
         self.weightpercentlabel = QLabel(" %")
+        self.weightpercentlabel.setMinimumWidth(45)
+        self.weightpercentlabel.setMaximumWidth(45)
 
         self.percent()
-        self.connect(self.weightoutedit,SIGNAL("returnPressed()"),self.percent)
-        self.connect(self.weightinedit,SIGNAL("returnPressed()"),self.percent)
+        self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.percent)
+        self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.percent)
 
 
         self.unitsComboBox = QComboBox()
-        self.unitsComboBox.setMaximumWidth(40)
+        self.unitsComboBox.setMaximumWidth(60)
+        self.unitsComboBox.setMinimumWidth(55)
         self.unitsComboBox.addItems(["g","Kg"])
 
 
@@ -3361,13 +3670,16 @@ class editGraphDlg(QDialog):
         roastertypelabel = QLabel()
         roastertypelabel.setText("<b>Roaster<\b>")
 
+        operatorlabel = QLabel()
+        operatorlabel.setText("<b>Operator<\b>")
+
         roastinglabel = QLabel("<b>Roasting Notes<\b>")
         self.roastingeditor = QTextEdit()
         self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
 
         cupinglabel = QLabel("<b>Cuping Notes<\b>")
         self.cupingeditor =  QTextEdit()
-        self.cupingeditor.setPlainText(QString(aw.qmc.cupingnotes))
+        self.cupingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
         
 
         # Save button
@@ -3413,6 +3725,8 @@ class editGraphDlg(QDialog):
         textLayout.addWidget(self.beansedit,2,1)
         textLayout.addWidget(roastertypelabel,3,0)
         textLayout.addWidget(self.roaster,3,1)
+        textLayout.addWidget(operatorlabel,4,0)
+        textLayout.addWidget(self.operator,4,1)
 
         weightLayout = QHBoxLayout()
         weightLayout.setSpacing(0)
@@ -3420,12 +3734,12 @@ class editGraphDlg(QDialog):
         weightLayout.addWidget(weightlabel,0)
         weightLayout.addSpacing(10)
         weightLayout.addWidget(self.unitsComboBox,1)
+        weightLayout.addSpacing(40)
+        weightLayout.addWidget(self.weightinedit,2)
+        weightLayout.addWidget(weightinlabel,3)
         weightLayout.addSpacing(10)
-        weightLayout.addWidget(weightinlabel,2)
-        weightLayout.addWidget(self.weightinedit,3)
-        weightLayout.addSpacing(10)
-        weightLayout.addWidget(weightoutlabel,4)
-        weightLayout.addWidget(self.weightoutedit,5)
+        weightLayout.addWidget(self.weightoutedit,4)
+        weightLayout.addWidget(weightoutlabel,5)
         weightLayout.addSpacing(10)
         weightLayout.addWidget(self.weightpercentlabel,6)
         
@@ -3449,13 +3763,13 @@ class editGraphDlg(QDialog):
         totalLayout.addLayout(okLayout,6)
 
         self.setLayout(totalLayout)
-
+        
     def percent(self):
-        if int(float(self.weightoutedit.text())) != 0:
-            percent = 100. - (float(self.weightoutedit.text())*100/float(self.weightinedit.text()))
+        if float(self.weightoutedit.text()) != 0.0:
+            percent = aw.weight_loss(float(self.weightinedit.text()),float(self.weightoutedit.text()))
         else:
             percent = 0.
-        percentstring =  "%.1f" %(percent) + "% loss"
+        percentstring =  "%.1f" %(percent) + "%"
         self.weightpercentlabel.setText(QString(percentstring))    #weight percent loss
         
                 
@@ -3472,12 +3786,12 @@ class editGraphDlg(QDialog):
             aw.qmc.varC[6] = self.choice(aw.qmc.stringtoseconds(str(self.CCendedit.text())))        #2C END   time
             aw.qmc.startend[2] = self.choice(aw.qmc.stringtoseconds(str(self.dropedit.text())))     #DROP     time
             #find corresponding temperatures
-            aw.qmc.startend[1] = self.BTfromseconds(aw.qmc.startend[0])                             #CHARGE   temperature
-            aw.qmc.varC[1] = self.BTfromseconds(aw.qmc.varC[0])                                     #1C START temperature
-            aw.qmc.varC[3] = self.BTfromseconds(aw.qmc.varC[2])                                     #1C END   temperature
-            aw.qmc.varC[5] = self.BTfromseconds(aw.qmc.varC[4])                                     #2C START temperature
-            aw.qmc.varC[7] = self.BTfromseconds(aw.qmc.varC[6])                                     #2C END   temperature
-            aw.qmc.startend[3] = self.BTfromseconds(aw.qmc.startend[2])                                                        
+            aw.qmc.startend[1] = aw.BTfromseconds(aw.qmc.startend[0])                             #CHARGE   temperature
+            aw.qmc.varC[1] = aw.BTfromseconds(aw.qmc.varC[0])                                     #1C START temperature
+            aw.qmc.varC[3] = aw.BTfromseconds(aw.qmc.varC[2])                                     #1C END   temperature
+            aw.qmc.varC[5] = aw.BTfromseconds(aw.qmc.varC[4])                                     #2C START temperature
+            aw.qmc.varC[7] = aw.BTfromseconds(aw.qmc.varC[6])                                     #2C END   temperature
+            aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2])                                                        
 
             #update events             
             ntlines = len(aw.qmc.specialevents)         #number of events found            
@@ -3533,8 +3847,9 @@ class editGraphDlg(QDialog):
 
             #update notes
             aw.qmc.roastertype = str(self.roaster.text())
+            aw.qmc.operator = str(self.operator.text())
             aw.qmc.roastingnotes = str(self.roastingeditor.toPlainText())
-            aw.qmc.cupingnotes = str(self.cupingeditor.toPlainText())
+            aw.qmc.cuppingnotes = str(self.cupingeditor.toPlainText())
            
             aw.messagelabel.setText("Graph properties updated (but file not saved in hard-drive)")            
             aw.qmc.redraw()
@@ -3567,16 +3882,7 @@ class editGraphDlg(QDialog):
                     return float(choice1)
                 else:
                     return float(choice2)
-                                                   
-    #finds closest Bean Temperature in aw.qmc.temp2 given an input time. timex and temp2 always have same dimension
-    def BTfromseconds(self,seconds):
-        if len(aw.qmc.timex):
-            #find when input time crosses timex
-            for i in range(len(aw.qmc.timex)):
-                if aw.qmc.timex[i] > seconds:
-                    break
-            return float(aw.qmc.temp2[i-1])           #return the BT temperature
-
+            
     # adds a new event to the Dlg
     def addevent(self):
         if len(aw.qmc.timex) > 1:
