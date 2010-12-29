@@ -2795,9 +2795,10 @@ $cupping_notes
         if len(beans) > 43:
             beans = beans[:41] + "&hellip;"
         TP_index = self.findTP()
-        TP_time = None
+        TP_time = TP_temp = None
         if TP_index >= 0:
-            TP_time = aw.qmc.timex[TP_index]
+            TP_time = aw.qmc.timex[TP_index]            
+            TP_temp = aw.qmc.temp2[TP_index]
         dryEndIndex = self.findDryEnd()
         rates_of_changes = aw.RoR(TP_index,dryEndIndex)
         evaluations = aw.defect_estimation()        
@@ -2823,7 +2824,6 @@ $cupping_notes
         image.save(flavor_image)
         #return screen to GRAPH profile mode
         self.qmc.redraw()
-        
         html = string.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             title=cgi.escape(self.qmc.title),
             datetime=str(self.qmc.roastdate.toString()), #alt: str(self.qmc.roastdate.toString('MM.dd.yyyy')),
@@ -2832,7 +2832,7 @@ $cupping_notes
             roaster=cgi.escape(self.qmc.roastertype),
             operator=cgi.escape(self.qmc.operator),
             charge="BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode,
-            TP=self.event2html(TP_time,aw.qmc.temp2[TP_index]),
+            TP=self.event2html(TP_time,TP_temp),
             FCs=self.event2html(self.qmc.varC[0],self.qmc.varC[1]),
             FCe=self.event2html(self.qmc.varC[2],self.qmc.varC[3]),
             SCs=self.event2html(self.qmc.varC[4],self.qmc.varC[5]),
@@ -2908,6 +2908,8 @@ $cupping_notes
                 if aw.qmc.timex[i] > seconds:
                     break
             return float(aw.qmc.temp2[i-1])           #return the BT temperature
+        else:
+            return 0.0
             
     #finds closest Environmental Temperature in aw.qmc.temp1 given an input time. timex and temp1 always have same dimension
     def ETfromseconds(self,seconds):
@@ -2917,6 +2919,8 @@ $cupping_notes
                 if aw.qmc.timex[i] > seconds:
                     break
             return float(aw.qmc.temp1[i-1])           #return the ET temperature
+        else:
+            return 0.0
             
     #returns the index of the lowest point in BT; return -1 if no such value exists
     def findTP(self):
@@ -2966,7 +2970,7 @@ $cupping_notes
             st3 = LongFinishPhase
         return (st1,st2,st3)
     
-    #returns the index of the end of the dry phase
+    #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
     def findDryEnd(self):
         idx = -1
         for i in range(len(aw.qmc.temp2)):
@@ -2974,20 +2978,25 @@ $cupping_notes
             if aw.qmc.temp2[-i] < aw.qmc.phases[1] and i > 0:
                 idx = i
                 break
-        return len(aw.qmc.temp2) - idx
+        if idx < 0:
+            return idx
+        else:
+            return len(aw.qmc.temp2) - idx
         
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
     def RoR(self,TP_index,dryEndIndex):
         dryphasetime = aw.qmc.statisticstimes[1]
         midphasetime = aw.qmc.statisticstimes[2]
         finishphasetime = aw.qmc.statisticstimes[3]
-        BTdrycross = aw.qmc.temp2[dryEndIndex]
+        BTdrycross = None
         rc1 = rc2 = rc3 = 0.
-        if TP_index < 1000 and TP_index >= 0 and dryphasetime:
+        if dryEndIndex > -1 and dryEndIndex < len(aw.qmc.temp2):
+            BTdrycross = aw.qmc.temp2[dryEndIndex]
+        if BTdrycross and TP_index < 1000 and TP_index > -1 and dryphasetime and TP_index < len(aw.qmc.temp2):
             LP = aw.qmc.temp2[TP_index]
             rc1 = ((BTdrycross - LP) / (dryphasetime - aw.qmc.timex[TP_index]))*60.
         if aw.qmc.varC[0]:
-            if midphasetime:
+            if midphasetime and BTdrycross:
                 rc2 = ((aw.qmc.varC[1] - BTdrycross)/midphasetime)*60.
             if finishphasetime:
                 rc3 = ((aw.qmc.startend[3] - aw.qmc.varC[1])/finishphasetime)*60.
