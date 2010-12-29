@@ -2,7 +2,7 @@
 #####################################################################################
 # COMM TEST PROGRAM FOR CENTER 306 DATA LOGGER  (www.centertek.com)
 # This program shows how to read Temp from a CENTER 306 thermometer data logger using T1 and T2
-# USAGE: edit "COMx" port in temperature() at line 57, plug T1 and T2 thermocouples
+# USAGE: edit "COMx" port in temperature() at line 39, plug T1 and T2 thermocouples
 # ##################################################################################################
 
 # REQUIREMENTS
@@ -38,7 +38,7 @@ def temperature():
         ##########   CHANGE HERE  "COMx" port to match your computer   ################################
         serCENTER = serial.Serial("COM13", baudrate=9600, bytesize=8, parity='N', stopbits=1, timeout=1)
         
-        command = "\x41"                  #this comand makes the meter answer back with 45 bytes
+        command = "\x41"                  #this comand makes the meter answer back with 10 bytes
         serCENTER.write(command)
         r = serCENTER.read(10)
         serCENTER.close()
