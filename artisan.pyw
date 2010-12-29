@@ -4909,6 +4909,8 @@ class serialport(object):
             if serHH:
                 serHH.close()        
 
+
+###########   UNDER TEST ############################################################
     def CENTER306temperature(self):
         serCENTER = None
         try:
@@ -4920,9 +4922,19 @@ class serialport(object):
             serCENTER.close()
             
             if len(r) == 10:
-                T1 = int(binascii.hexlify(r[3] + r[4]),16)          # __NOTE__ : different than CENTER 309
-                T2 = int(binascii.hexlify(r[7] + r[8]),16)
-
+                #extract T1
+                B34 = binascii.hexlify(r[3]+r[4])
+                if B34[0].isdigit():
+                    T1 = int(B34)
+                else:
+                    T1 = int(B34[1:])
+                    
+                #extract T2
+                B78 = binascii.hexlify(r[7]+r[8])
+                if B78[0].isdigit():
+                    T2 = int(B78)
+                else:
+                    T2 = int(B78[1:])                
             else:
                 nbytes = len(r)
                 message = "%i bytes received but 10 needed"%nbytes
@@ -4945,6 +4957,8 @@ class serialport(object):
             if serCENTER:
                 serCENTER.close()
 
+                
+###########   UNDER TEST ############################################################
     def CENTER303temperature(self):
         serCENTER = None
         try:
@@ -4956,9 +4970,19 @@ class serialport(object):
             serCENTER.close()
             
             if len(r) == 8:
-                T1 = int(binascii.hexlify(r[3] + r[4]),16)          
-                T2 = int(binascii.hexlify(r[5] + r[6]),16)          #NOTE: different
-
+                #extract T1
+                B34 = binascii.hexlify(r[3]+r[4])
+                if B34[0].isdigit():
+                    T1 = int(B34)
+                else:
+                    T1 = int(B34[1:])
+                    
+                #extract T2
+                B56 = binascii.hexlify(r[5]+r[6])
+                if B56[0].isdigit():
+                    T2 = int(B56)
+                else:
+                    T2 = int(B56[1:]) 
             else:
                 nbytes = len(r)
                 message = "%i bytes received but 8 needed"%nbytes
