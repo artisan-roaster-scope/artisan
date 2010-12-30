@@ -2497,7 +2497,7 @@ class ApplicationWindow(QMainWindow):
                 f.write(self.qmc.cuppingnotes)
                 f.write("\n[[DATA]]\n")
                 for i in range(len(self.qmc.timex)):
-                    f.write( "%.1f"%self.qmc.timex[i] + "    " + "%.1f"%self.qmc.temp1[i] + "    " + "%.1f"%self.qmc.temp2[i] + "\n")
+                    f.write( u"%.2f"%self.qmc.timex[i] + "    " + u"%.1f"%self.qmc.temp1[i] + "    " + u"%.1f"%self.qmc.temp2[i] + "\n")
 
                 f.close()
                 self.messagelabel.setText("Profile saved to FILE:  " + filename)
