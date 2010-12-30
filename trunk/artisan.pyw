@@ -93,6 +93,8 @@ import glob
 import os
 import string
 import cgi
+import codecs
+
 
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
@@ -2832,9 +2834,9 @@ $cupping_notes
         self.qmc.redraw()
         html = string.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             title=cgi.escape(self.qmc.title),
-            datetime=str(self.qmc.roastdate.toString()), #alt: str(self.qmc.roastdate.toString('MM.dd.yyyy')),
+            datetime=unicode(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
             beans=beans,
-            weight=str(self.qmc.weight[0]) + self.qmc.weight[2] + " (" + "%.1f" % aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1]) + "%)",
+            weight=unicode(self.qmc.weight[0]) + self.qmc.weight[2] + " (" + "%.1f" % aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1]) + "%)",
             roaster=cgi.escape(self.qmc.roastertype),
             operator=cgi.escape(self.qmc.operator),
             charge="BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode,
@@ -2854,7 +2856,7 @@ $cupping_notes
             cupping_notes=self.note2html(self.qmc.cuppingnotes))
         f = None
         try:      
-            f = open("Artisanreport.html", 'w')
+            f = codecs.open("Artisanreport.html", 'w', encoding='utf-8')
             for i in range(len(html)):
                 f.write(html[i])
             f.close()
@@ -2885,7 +2887,7 @@ $cupping_notes
             html += '<center>\n<table cellpadding="2">\n'
             for i in range(len(self.qmc.specialevents)):
                 html += ("<tr>"+
-                     "\n<td>" + str(i+1) + "</td><td>[" +
+                     "\n<td>" + unicode(i+1) + "</td><td>[" +
                      self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[i]]-self.qmc.startend[0])) +
                      "</td><td>at " + "%.1f"%self.qmc.temp2[self.qmc.specialevents[i]] + self.qmc.mode +
                      "]</td><td>" + self.qmc.specialeventsStrings[i] +"</td></tr>\n")     
@@ -3672,7 +3674,7 @@ class editGraphDlg(QDialog):
             #update notes
             aw.qmc.roastertype = str(self.roaster.text())
             aw.qmc.operator = str(self.operator.text())
-            aw.qmc.roastingnotes = str(self.roastingeditor.toPlainText())
+            aw.qmc.roastingnotes = unicode(self.roastingeditor.toPlainText())
             aw.qmc.cuppingnotes = str(self.cupingeditor.toPlainText())
            
             aw.messagelabel.setText("Graph properties updated (but file not saved in hard-drive)")            
