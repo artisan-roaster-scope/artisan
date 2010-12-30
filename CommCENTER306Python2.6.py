@@ -44,21 +44,39 @@ def temperature():
         serCENTER.close()
         
         if len(r) == 10:
+
+            #DECIMAL POINT
+            #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
+            #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
+            #if bit 5 of byte 3 = 1 then T2 = ####
+            #if bit 5 of byte 3 = 0 then T2 = ###.#
+            
+            #extract bit 2, and bit 5 of BYTE 3
+            b3bin = bin(ord(r[2]))[2:]          #bits string order "[7][6][5][4][3][2][1][0]"
+            bit2 = b3bin[5]
+            bit5 = b3bin[2]
+            
             #extract T1
             B34 = binascii.hexlify(r[3]+r[4])
             if B34[0].isdigit():
-                T1 = int(B34)
+                T1 = float(B34)
             else:
-                T1 = int(B34[1:])
+                T1 = float(B34[1:])
                 
             #extract T2
             B78 = binascii.hexlify(r[7]+r[8])
             if B78[0].isdigit():
-                T2 = int(B78)
+                T2 = float(B78)
             else:
-                T2 = int(B78[1:])
-            
-            return T1/10.,T2/10.
+                T2 = float(B78[1:])
+
+            #check decimal point
+            if bit2 == "0":
+                T1 /= 10.
+            if bit5 == "0":
+                T2 /= 10.
+
+            return T1,T2
         
         else:
             l = len(r)
