@@ -31,27 +31,15 @@ Proceed to the second step
 
     2 DEVICE CONFIGURATION
 
-Once artisan is up, chose your device in the Conf/device menu. At the time of writing, the devices supported are:
+Once artisan is up, chose your device in the Conf/device menu. From version 0.2.0 on, the following devices supported are:
 
     # Fuji PXR PID (with RS485 mod bus protocol purchase option)
     # Fuji PXG PID (with RS485 mod bus protocol purchase option)
     # Omega HH806 (Check USB driver here: http://www.ftdichip.com/Drivers/VCP.htm )
     # Omega HH506
-    # CENTER 309
-
-    # new devices under testing as of version 0.1.1
-    # CENTER 306(under testing)
-    # CENTER 305 (under testing)
-    # CENTER 304 (under testing)
-    # CENTER 303 (under testing)
-    # CENTER 302 (under testing)
-    # CENTER 301 (under testing)
-    # CENTER 300 (under testing)
-    # VOLTCRAFT K204 (under testing)
-    # VOLTCRAFT K202 (under testing)
-    # VOLTCRAFT 300K (under testing)
-    # VOLTCRAFT 302KJ (under testing)
-    # EXTECH 421509 (under testing)
+    # CENTER 300, 301, 302, 303, 304, 305, 306, 309
+    # VOLTCRAFT K202, K204, 300K, 302KJ
+    # EXTECH 421509
     
 RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers (but they need an RS485-RS232 converter).
 
