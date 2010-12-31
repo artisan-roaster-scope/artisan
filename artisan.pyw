@@ -5334,9 +5334,9 @@ class comportDlg(QDialog):
         
         try:
             #check here comport errors
-            if comport.isEmpty():
+            if not comport:
                 raise comportError
-            if timeout.isEmpty():
+            if not timeout:
                 raise timeoutError
             #add more checks here
             
