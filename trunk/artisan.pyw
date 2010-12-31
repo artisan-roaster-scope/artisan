@@ -36,7 +36,7 @@
 # version 00031: FINISHED PXG4 control Dlg and enhanced background options
 # END OF ALPHA.  BEGINNING BETA TESTING 
 
-__version__ = "0.1.1"
+__version__ = u"0.1.1"
 
 
 # ABOUT
@@ -78,8 +78,20 @@ __version__ = "0.1.1"
 #    NOTE: at the present time, numpy 1.5 is incompatible with py2exe. Instead, use numpy 1.3 if compiling for Win executable
 # 7) http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0-win32-superpack-python2.6.exe/download 
 # 8) http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-0.99.1/
-# 9) pyqt4 for python 2.6: http://pyqwt.sourceforge.net/support/PyQt-Py2.6-gpl-4.5.4-1.exe 
+# 9) pyqt4 for python 2.6: http://pyqwt.sourceforge.net/support/PyQt-Py2.6-gpl-4.5.4-1.exe
 
+
+#########################   POLICIES  ###########################################################################
+# 1  STRINGS
+#
+# When possible, use QString and Unicode characters in user inputs. Use ASCII only for serial comm (raw data).
+# There are two ways to create a unicode string: u"one way" and unicode("second way").
+# There are two ways to create a QString: QString("one way") and the return of QTfunction()
+# There are several ways to create ASCII strings: "one way", str("second way"), and return of python function().
+# Inmideately convert ascii strings to Unicode at return of functions by using unicode().
+# There is 7 bits Ascii, and then there is 8 bit Western Europe Ascii.
+# WARNING: If an ascii str contains characters outside the 7 bit range, Python raises UnicodeEncodeError exception.
+#################################################################################################################
 
 
 import sys
@@ -114,7 +126,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 
 
-platf = platform.system()
+platf = unicode(platform.system())
 
 
 #######################################################################################
@@ -125,15 +137,15 @@ class tgraphcanvas(FigureCanvas):
     def __init__(self,parent):
 
         #default palette of colors
-        self.palette = {"background":'white',"grid":'green',"ylabel":'black',"xlabel":'black',"title":'black',"rect1":'green',
-                        "rect2":'orange',"rect3":'#996633',"met":'red',"bt":'#00007f',"deltamet":'orange',
-                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'brown'}
+        self.palette = {"background":u'white',"grid":u'green',"ylabel":u'black',"xlabel":u'black',"title":u'black',"rect1":u'green',
+                        "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
+                        "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'brown'}
         
-        self.flavorlabels = ['Acidity','After taste','Clean cup','Head','Fragance','Sweetness','Aroma','Balance','Body']
+        self.flavorlabels = [u'Acidity',u'After taste',u'Clean cup',u'Head',u'Fragance',u'Sweetness',u'Aroma',u'Balance',u'Body']
         
 
         #F = Fahrenheit; C = Celsius
-        self.mode = "F"
+        self.mode = u"F"
         self.errorlog = []
 
         # default delay between readings in miliseconds
@@ -172,7 +184,7 @@ class tgraphcanvas(FigureCanvas):
                                    self.EXTECH421509
                                    ]
         
-        self.fig = Figure(facecolor='lightgrey')
+        self.fig = Figure(facecolor=u'lightgrey')
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
         FigureCanvas.__init__(self, self.fig)
 
@@ -190,7 +202,7 @@ class tgraphcanvas(FigureCanvas):
         self.flagon = False
         self.flagclock = False
         
-        self.title = "Roaster Scope"
+        self.title = u"Roaster Scope"
 
         #list to store the time of each reading. Most IMPORTANT variable.
         self.timex = []
@@ -229,20 +241,20 @@ class tgraphcanvas(FigureCanvas):
         self.BTtarget = 250
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
-        self.roastertype = ""
-        self.operator = ""
-        self.roastingnotes = ""
-        self.cuppingnotes = ""
+        self.roastertype = u""
+        self.operator = u""
+        self.roastingnotes = u""
+        self.cuppingnotes = u""
         self.roastdate = QDate.currentDate()
-        self.beans = ""
-        #[0]weight in, [1]weight out, [2]units
-        self.weight = [0,0,"g"]
+        self.beans = u""
+        #[0]weight in, [1]weight out, [2]units (string)
+        self.weight = [0,0,u"g"]
         
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event
         self.specialevents = []
         #stores text descriptions for each event. Max 10
-        self.specialeventsStrings = ["1","2","3","4","5","6","7","8","9","10"]
+        self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
 
         # set limits for X and Y axes. Default is in Farenheit units
         self.ylimit = 750
@@ -264,7 +276,7 @@ class tgraphcanvas(FigureCanvas):
         self.ax.grid(True,linewidth=2,color=self.palette["grid"])
             
         self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"])
-        self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
+        self.ax.set_xlabel(u'Time',size=16,color = self.palette["xlabel"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')
 
         #put a right tick on the graph
@@ -311,7 +323,7 @@ class tgraphcanvas(FigureCanvas):
 
         # add legend to plot.
         handles = [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2]
-        labels = ["ET","BT","DeltaET","DeltaBT"]
+        labels = [u"ET",u"BT",u"DeltaET",u"DeltaBT"]
         self.ax.legend(handles,labels,loc=2,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
         # draw of the Figure
@@ -415,13 +427,13 @@ class tgraphcanvas(FigureCanvas):
         if self.HUDflag:
             self.HUDflag = False
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
-            aw.HUDstatus.showMessage("HUD OFF",3000)
+            aw.HUDstatus.showMessage(u"HUD OFF",3000)
             self.ax.lines = self.ax.lines[0:5]
 
         else:
             self.HUDflag = True
             aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
-            aw.HUDstatus.showMessage("HUD ON",3000)
+            aw.HUDstatus.showMessage(u"HUD ON",3000)
             aw.hudshow()
 
     #make a projection of change of rate of BT on the graph
@@ -451,14 +463,14 @@ class tgraphcanvas(FigureCanvas):
             BTreachTime = -1
             
         if ETreachTime > 0 and ETreachTime < 5940:
-            stringET = "[ " + self.stringfromseconds(int(ETreachTime)) + " to reach ET target " + str(self.ETtarget) + self.mode +  " ] "
+            stringET = u"[ " + self.stringfromseconds(int(ETreachTime)) + u" to reach ET target " + unicode(self.ETtarget) + self.mode +  u" ] "
         else:
-            stringET = "[ XX:XX to reach ET target " + str(self.ETtarget) + self.mode +  " ] "
+            stringET = u"[ XX:XX to reach ET target " + unicode(self.ETtarget) + self.mode +  u" ] "
             
         if BTreachTime > 0 and BTreachTime < 5940:    
-            stringBT = "[ " + self.stringfromseconds(int(BTreachTime)) + " to reach BT target " + str(self.BTtarget) + self.mode + " ] "
+            stringBT = u"[ " + self.stringfromseconds(int(BTreachTime)) + u" to reach BT target " + unicode(self.BTtarget) + self.mode + u" ] "
         else:
-            stringBT = "[ XX:XX to reach BT target " + str(self.BTtarget) + self.mode + " ] "
+            stringBT = u"[ XX:XX to reach BT target " + unicode(self.BTtarget) + self.mode + u" ] "
 
         string = stringET + stringBT
         aw.HUDstatus.showMessage(string,10000)
@@ -596,7 +608,7 @@ class tgraphcanvas(FigureCanvas):
         locs = self.ax.get_xticks()
         labels = []
         for i in range(len(locs)):
-                stringlabel = self.minutesfromseconds(locs[i]-int(self.startend[0]))
+                stringlabel = unicode(self.minutesfromseconds(locs[i]-int(self.startend[0])))
                 labels.append(stringlabel)              
         self.ax.set_xticklabels(labels,color=self.palette["xlabel"],horizontalalignment='center')
 
@@ -626,7 +638,7 @@ class tgraphcanvas(FigureCanvas):
         aw.lcd3.display(0.0)
         aw.lcd4.display(0.0)
         aw.lcd5.display(0.0)
-        aw.messagelabel.setText("Scope has been resetted")
+        aw.messagelabel.setText(u"Scope has been resetted")
         aw.button_1.setDisabled(False)
         aw.button_2.setDisabled(False)        
         aw.button_3.setDisabled(False)
@@ -646,14 +658,14 @@ class tgraphcanvas(FigureCanvas):
         aw.button_8.setFlat(False)
         aw.button_9.setFlat(False)
         
-        self.roastertype = ""
-        self.operator = ""
-        self.roastingnotes = ""
-        self.cuppingnotes = ""
+        self.roastertype = u""
+        self.operator = u""
+        self.roastingnotes = u""
+        self.cuppingnotes = u""
         self.errorlog = []
-        self.weight = [0,0,"g"]
+        self.weight = [0,0,u"g"]
         self.specialevents = []
-        self.specialeventsStrings = ["1","2","3","4","5","6","7","8","9","10"]
+        self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.roastdate = QDate.currentDate()
 
         #restart() clock 
@@ -702,9 +714,9 @@ class tgraphcanvas(FigureCanvas):
                 #align the background profile so they both plot with the same CHARGE time
                 difference = self.startend[0] - self.startendB[0]
                 if difference > 0:
-                    self.movebackground("left",difference)
+                    self.movebackground(u"left",difference)
                 elif difference < 0:
-                    self.movebackground("right",difference)
+                    self.movebackground(u"right",difference)
                 self.backmoveflag = 0
                 
             #draw background
@@ -715,8 +727,8 @@ class tgraphcanvas(FigureCanvas):
 
             #check backgroundDetails flag
             if self.backgroundDetails:
-                st1 = self.stringfromseconds(self.startendB[0]-self.startend[0])
-                self.ax.annotate("%.1f"%(self.startendB[1]), xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]-5,self.startendB[1]+50),fontsize=10,
+                st1 = unicode(self.stringfromseconds(self.startendB[0]-self.startend[0]))
+                self.ax.annotate(u"%.1f"%(self.startendB[1]), xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]-5,self.startendB[1]+50),fontsize=10,
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                  alpha=self.backgroundalpha)
                 
@@ -725,8 +737,8 @@ class tgraphcanvas(FigureCanvas):
                                 alpha=self.backgroundalpha)
                 
                 if self.varCB[0]:
-                    st1 = self.stringfromseconds(self.varCB[0]-self.startend[0])
-                    self.ax.annotate("%.1f"%(self.varCB[1]), xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0]-5,self.varCB[1]+50),fontsize=10,
+                    st1 = unicode(self.stringfromseconds(self.varCB[0]-self.startend[0]))
+                    self.ax.annotate(u"%.1f"%(self.varCB[1]), xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0]-5,self.varCB[1]+50),fontsize=10,
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)
                     self.ax.annotate(st1, xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0],self.varCB[1]-50),fontsize=10,
@@ -734,8 +746,8 @@ class tgraphcanvas(FigureCanvas):
                                      alpha=self.backgroundalpha)
                     
                 if self.varCB[2]:
-                    st1 = self.stringfromseconds(self.varCB[2]-self.startend[0])           
-                    self.ax.annotate("%.1f"%(self.varCB[3]), xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2]-5,self.varCB[3]+70),fontsize=10,
+                    st1 = unicode(self.stringfromseconds(self.varCB[2]-self.startend[0]))          
+                    self.ax.annotate(u"%.1f"%(self.varCB[3]), xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2]-5,self.varCB[3]+70),fontsize=10,
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)              
                     self.ax.annotate(st1, xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2],self.varCB[3]-80),fontsize=10,
@@ -743,8 +755,8 @@ class tgraphcanvas(FigureCanvas):
                                      alpha=self.backgroundalpha)
                     
                 if self.varCB[4]:
-                    st1 = self.stringfromseconds(self.varCB[4]-self.startend[0])
-                    self.ax.annotate("%.1f"%(self.varCB[5]), xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4]-5,self.varCB[5]+90),fontsize=10,
+                    st1 = unicode(self.stringfromseconds(self.varCB[4]-self.startend[0]))
+                    self.ax.annotate(u"%.1f"%(self.varCB[5]), xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4]-5,self.varCB[5]+90),fontsize=10,
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)      
                     self.ax.annotate(st1, xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4],self.varCB[5]-110),fontsize=10,
@@ -752,8 +764,8 @@ class tgraphcanvas(FigureCanvas):
                                      alpha=self.backgroundalpha)
                     
                 if self.varCB[6]:
-                    st1 = self.stringfromseconds(self.varCB[6]-self.startend[0])
-                    self.ax.annotate("%.1f"%(self.varCB[7]), xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6]-5,self.varCB[7]+50),fontsize=10,
+                    st1 = unicode(self.stringfromseconds(self.varCB[6]-self.startend[0]))
+                    self.ax.annotate(u"%.1f"%(self.varCB[7]), xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6]-5,self.varCB[7]+50),fontsize=10,
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                      alpha=self.backgroundalpha)                
                     self.ax.annotate(st1, xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6],self.varCB[7]-40),fontsize=10,
@@ -761,13 +773,12 @@ class tgraphcanvas(FigureCanvas):
                                      alpha=self.backgroundalpha)
                     
                 if self.startendB[2]:
-                    st1 = self.stringfromseconds(self.startendB[2]-self.startend[0])
-                    self.ax.annotate("%.1f"%(self.startendB[3]), xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2]-5,self.startendB[3]+70),
+                    st1 = unicode(self.stringfromseconds(self.startendB[2]-self.startend[0]))
+                    self.ax.annotate(u"%.1f"%(self.startendB[3]), xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2]-5,self.startendB[3]+70),
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,
                                     alpha=self.backgroundalpha)
                     self.ax.annotate(st1, xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2],self.startendB[3]-80),fontsize=10,
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-
 
             #END of Background
             
@@ -790,7 +801,7 @@ class tgraphcanvas(FigureCanvas):
         self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2)
         
         handles = [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2] # for leyend
-        labels = ["ET","BT","DeltaET","DeltaBT"]                          # for leyend
+        labels = [u"ET",u"BT",u"DeltaET",u"DeltaBT"]                          # for leyend
         
         #write legend
         self.ax.legend(handles,labels,loc=2,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
@@ -798,26 +809,26 @@ class tgraphcanvas(FigureCanvas):
         #Add markers for CHARGE
         if self.startend[0]:
             #anotate temperature
-            self.ax.annotate("%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
+            self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
                                 self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
-            self.ax.annotate("START 0:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
+            self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
                                 self.startend[1]-100),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             
         #Add 1Cs markers
         if self.varC[0]:
-            st1 = "1CS " + self.stringfromseconds(self.varC[0]-self.startend[0])
+            st1 = u"1CS " + unicode(self.stringfromseconds(self.varC[0]-self.startend[0]))
             #anotate temperature
-            self.ax.annotate("%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
+            self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
                                 self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
             self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-50),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
         #Add 1Ce markers
         if self.varC[2]:
-            st1 = "1CE " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
+            st1 = u"1CE " + unicode(self.stringfromseconds(self.varC[2]-self.startend[0]))
             #anotate temperature
-            self.ax.annotate("%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
+            self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
                                 self.varC[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
             self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-80),
@@ -827,16 +838,16 @@ class tgraphcanvas(FigureCanvas):
 
         #Add 2Cs markers
         if self.varC[4]:
-            st1 = "2CS " + self.stringfromseconds(self.varC[4]-self.startend[0]) 
-            self.ax.annotate("%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
+            st1 = u"2CS " + unicode(self.stringfromseconds(self.varC[4]-self.startend[0]))
+            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
                                 self.varC[5]+90),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)      
             self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-110),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
         #Add 2Ce markers
         if self.varC[6]:
-            st1 =  "2CE " + self.stringfromseconds(self.varC[6]-self.startend[0])
+            st1 =  u"2CE " + unicode(self.stringfromseconds(self.varC[6]-self.startend[0]))
             #anotate temperature
-            self.ax.annotate("%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
+            self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
                                 self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
             self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-40),
@@ -848,9 +859,9 @@ class tgraphcanvas(FigureCanvas):
             self.ax.axvline(x=middle, ymin=0, ymax=1,color=self.palette["Cline"])
         #Add DROP markers
         if self.startend[2]:
-            st1 = "END " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
+            st1 = u"END " + unicode(self.stringfromseconds(self.startend[2]-self.startend[0]))
             #anotate temperature
-            self.ax.annotate("%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
+            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
                                 self.startend[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
             self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-80),
@@ -861,7 +872,7 @@ class tgraphcanvas(FigureCanvas):
             #write events
             Nevents = len(self.specialevents)
             for i in range(Nevents):
-                self.ax.annotate("e" + str(i+1), xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                self.ax.annotate(u"e" + str(i+1), xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
                                  xytext=(self.timex[int(self.specialevents[i])]-15,self.temp2[int(self.specialevents[i])]+ 40),alpha=0.8,
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=12)
                 
@@ -879,11 +890,11 @@ class tgraphcanvas(FigureCanvas):
     def stringfromseconds(self, seconds):
         mins, secs = divmod(seconds,60)
         if secs < 10:
-            st2 = str(int(mins)) + ":" + "0" + str(int(secs))
+            st2 = unicode(int(mins)) + u":" + u"0" + unicode(int(secs))
         else:
-            st2 = str(int(mins))+ ":" + str(int(secs))
+            st2 = unicode(int(mins))+ u":" + unicode(int(secs))
         if mins < 10:
-            st2 = "0" + st2
+            st2 =u"0" + st2
         return st2
 
     #Converts a string into seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
@@ -893,29 +904,29 @@ class tgraphcanvas(FigureCanvas):
             seconds = 0
             length = len(string)
             if length > 8:
-                raise ValueError, "Invalid time format, too long."                
+                raise ValueError, u"Invalid time format, too long."                
             
             if length > 0 and string[-1].isdigit():
                 seconds += int(string[-1])
                 
             if length > 1 and string[-2].isdigit():
                 if int(string[-2]) > 5:
-                    raise ValueError,"Invalid seconds xx:59 max"
+                    raise ValueError,u"Invalid seconds xx:59 max"
                 seconds += 10*int(string[-2])
 
             if length > 2 and string[-3] != ":":
-                raise ValueError, "invalid time format mm:ss (: separator missing)"
+                raise ValueError, u"invalid time format mm:ss (: separator missing)"
             
             if length > 3 and string[-4].isdigit():            
                 seconds += 60*int(string[-4])
                 
             if length > 4 and string[-5].isdigit():
                 if int(string[-5]) > 5:
-                    raise ValueError,"Invalid minutes 59:xx max"                
+                    raise ValueError,u"Invalid minutes 59:xx max"                
                 seconds += 600*int(string[-5])
 
             if length > 5 and string[-6] != ":":
-                raise ValueError, "invalid time format hh:mm:ss (: separators missing)"
+                raise ValueError, u"invalid time format hh:mm:ss (: separators missing)"
                 
             if length > 6 and string[-7].isdigit():
                 seconds += 3600*int(string[-7])
@@ -925,8 +936,8 @@ class tgraphcanvas(FigureCanvas):
             return seconds
 
         except ValueError,e:
-            aw.messagelabel.setText(str(e))
-            aw.qmc.errorlog.append("stringfromseconds(): input error " + str(e))
+            aw.messagelabel.setText(unicode(e))
+            aw.qmc.errorlog.append(u"stringfromseconds(): input error " + unicode(e))
             return -1          
 
 
@@ -939,7 +950,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 st2 = str(int(mins))+ ":" + str(int(secs))
         else:
-            st2 = str(int(mins))
+            st2 = unicode(int(mins))
         return st2
 
     def fromFtoC(self,Ffloat):
@@ -950,7 +961,7 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
-        self.mode = "F"
+        self.mode = u"F"
         self.ylimit = 750
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases = [200,300,390,450]
@@ -963,7 +974,7 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
-        self.mode = "C"
+        self.mode = u"C"
         self.ylimit = 400
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases = [95,150,200,230]
@@ -978,108 +989,108 @@ class tgraphcanvas(FigureCanvas):
         #verify there is a loaded profile
         profilelength = len(self.timex)
         if profilelength > 0:
-            if t == "F":
-                    string = "Convert profile data to Fahrenheit?"
-                    reply = QMessageBox.question(self,"Convert Profile Temperature",string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-                    if reply == QMessageBox.Cancel:
-                        return 
-                    elif reply == QMessageBox.Yes:
-                        if self.mode == "C":
-                            for i in range(profilelength):
-                                self.temp1[i] = self.fromCtoF(self.temp1[i])    #ET
-                                self.temp2[i] = self.fromCtoF(self.temp2[i])    #BT
-                                self.delta1[i] = self.fromCtoF(self.delta1[i])  #Delta ET
-                                self.delta2[i] = self.fromCtoF(self.delta2[i])  #Delta BT
+            if t == u"F":
+                string = u"Convert profile data to Fahrenheit?"
+                reply = QMessageBox.question(self,u"Convert Profile Temperature",string,
+                        QMessageBox.Yes|QMessageBox.Cancel)
+                if reply == QMessageBox.Cancel:
+                    return 
+                elif reply == QMessageBox.Yes:
+                    if self.mode == u"C":
+                        for i in range(profilelength):
+                            self.temp1[i] = self.fromCtoF(self.temp1[i])    #ET
+                            self.temp2[i] = self.fromCtoF(self.temp2[i])    #BT
+                            self.delta1[i] = self.fromCtoF(self.delta1[i])  #Delta ET
+                            self.delta2[i] = self.fromCtoF(self.delta2[i])  #Delta BT
+                            
+                        self.varC[1] =   self.fromCtoF(self.varC[1])        #1C start temp
+                        self.varC[3] =   self.fromCtoF(self.varC[3])        #1C end temp
+                        self.varC[5] =   self.fromCtoF(self.varC[5])        #2C start temp
+                        self.varC[7] =   self.fromCtoF(self.varC[7])        #2C end temp
+                        self.startend[1] = self.fromCtoF(self.startend[1])  #CHARGE temp
+                        self.startend[3] = self.fromCtoF(self.startend[3])  #DROP temp
+
+                        backgroundlength = len(self.timeB)
+                        if backgroundlength > 0:
+                            for i in range(backgroundlength):
+                                self.backgroundET[i] = self.fromCtoF(self.backgroundET[i])
+                                self.backgroundBT[i] = self.fromCtoF(self.backgroundBT[i])                           
                                 
-                            self.varC[1] =   self.fromCtoF(self.varC[1])        #1C start temp
-                            self.varC[3] =   self.fromCtoF(self.varC[3])        #1C end temp
-                            self.varC[5] =   self.fromCtoF(self.varC[5])        #2C start temp
-                            self.varC[7] =   self.fromCtoF(self.varC[7])        #2C end temp
-                            self.startend[1] = self.fromCtoF(self.startend[1])  #CHARGE temp
-                            self.startend[3] = self.fromCtoF(self.startend[3])  #DROP temp
+                            self.varCB[1] =   self.fromCtoF(self.varCB[1])       #1C start temp B
+                            self.varCB[3] =   self.fromCtoF(self.varCB[3])       #1C end temp B
+                            self.varCB[5] =   self.fromCtoF(self.varCB[5])       #2C start temp B
+                            self.varCB[7] =   self.fromCtoF(self.varCB[7])       #2C end temp B
+                            self.startendB[1] = self.fromCtoF(self.startendB[1]) #CHARGE temp B
+                            self.startendB[3] = self.fromCtoF(self.startendB[3]) #DROP temp B
 
-                            backgroundlength = len(self.timeB)
-                            if backgroundlength > 0:
-                                for i in range(backgroundlength):
-                                    self.backgroundET[i] = self.fromCtoF(self.backgroundET[i])
-                                    self.backgroundBT[i] = self.fromCtoF(self.backgroundBT[i])                           
-                                    
-                                self.varCB[1] =   self.fromCtoF(self.varCB[1])       #1C start temp B
-                                self.varCB[3] =   self.fromCtoF(self.varCB[3])       #1C end temp B
-                                self.varCB[5] =   self.fromCtoF(self.varCB[5])       #2C start temp B
-                                self.varCB[7] =   self.fromCtoF(self.varCB[7])       #2C end temp B
-                                self.startendB[1] = self.fromCtoF(self.startendB[1]) #CHARGE temp B
-                                self.startendB[3] = self.fromCtoF(self.startendB[3]) #DROP temp B
+                        self.fahrenheitMode()
+                        aw.messagelabel.setText(u"Profile changed to Fahrenheit")
 
-                            self.fahrenheitMode()
-                            aw.messagelabel.setText("Profile changed to Fahrenheit")
+                    else:
+                        QMessageBox.information(self,u"Convert Profile Temperature",
+                                                u"Unable to comply. You already are in Fahrenheit")
+                        aw.messagelabel.setText(u"Profile not changed")
+                        return
 
-                        else:
-                            QMessageBox.information(self,"Convert Profile Temperature",
-                                                    "Unable to comply. You already are in Fahrenheit")
-                            aw.messagelabel.setText("Profile not changed")
-                            return
-
-            elif t == "C":
-                    string = "Convert profile data to Celsius?"
-                    reply = QMessageBox.question(self,"Convert Profile Temperature",string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-                    if reply == QMessageBox.Cancel:
-                        return 
-                    elif reply == QMessageBox.Yes:
-                        if self.mode == "F":         
-                            for i in range(profilelength):
-                                self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
-                                self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
-                                self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
-                                self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
+            elif t == u"C":
+                string = u"Convert profile data to Celsius?"
+                reply = QMessageBox.question(self,u"Convert Profile Temperature",string,
+                        QMessageBox.Yes|QMessageBox.Cancel)
+                if reply == QMessageBox.Cancel:
+                    return 
+                elif reply == QMessageBox.Yes:
+                    if self.mode == u"F":         
+                        for i in range(profilelength):
+                            self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
+                            self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
+                            self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
+                            self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
+                            
+                        self.varC[1] =   self.fromFtoC(self.varC[1])        #1C start temp
+                        self.varC[3] =   self.fromFtoC(self.varC[3])        #1C end temp
+                        self.varC[5] =   self.fromFtoC(self.varC[5])        #2C start temp
+                        self.varC[7] =   self.fromFtoC(self.varC[7])        #2C end temp
+                        self.startend[1] = self.fromFtoC(self.startend[1])  #CHARGE temp
+                        self.startend[3] = self.fromFtoC(self.startend[3])  #DROP temp
+                        
+                        backgroundlength = len(self.timeB)
+                        if backgroundlength > 0:
+                            for i in range(backgroundlength):
+                                self.backgroundET[i] = self.fromFtoC(self.backgroundET[i]) #ET B
+                                self.backgroundBT[i] = self.fromFtoC(self.backgroundBT[i]) #BT B                          
                                 
-                            self.varC[1] =   self.fromFtoC(self.varC[1])        #1C start temp
-                            self.varC[3] =   self.fromFtoC(self.varC[3])        #1C end temp
-                            self.varC[5] =   self.fromFtoC(self.varC[5])        #2C start temp
-                            self.varC[7] =   self.fromFtoC(self.varC[7])        #2C end temp
-                            self.startend[1] = self.fromFtoC(self.startend[1])  #CHARGE temp
-                            self.startend[3] = self.fromFtoC(self.startend[3])  #DROP temp
+                            self.varCB[1] =   self.fromFtoC(self.varCB[1])       #1C start temp B
+                            self.varCB[3] =   self.fromFtoC(self.varCB[3])       #1C end temp B
+                            self.varCB[5] =   self.fromFtoC(self.varCB[5])       #2C start temp B
+                            self.varCB[7] =   self.fromFtoC(self.varCB[7])       #2C end temp B
+                            self.startendB[1] = self.fromFtoC(self.startendB[1]) #CHARGE temp B
+                            self.startendB[3] = self.fromFtoC(self.startendB[3]) #DROP temp B
+                    else:
+                        QMessageBox.information(self,u"Convert Profile Temperature",
+                                                u"Unable to comply. You already are in Celsius")
+                        aw.messagelabel.setText(u"Profile not changed")
+                        return
 
-                            backgroundlength = len(self.timeB)
-                            if backgroundlength > 0:
-                                for i in range(backgroundlength):
-                                    self.backgroundET[i] = self.fromFtoC(self.backgroundET[i]) #ET B
-                                    self.backgroundBT[i] = self.fromFtoC(self.backgroundBT[i]) #BT B                          
-                                    
-                                self.varCB[1] =   self.fromFtoC(self.varCB[1])       #1C start temp B
-                                self.varCB[3] =   self.fromFtoC(self.varCB[3])       #1C end temp B
-                                self.varCB[5] =   self.fromFtoC(self.varCB[5])       #2C start temp B
-                                self.varCB[7] =   self.fromFtoC(self.varCB[7])       #2C end temp B
-                                self.startendB[1] = self.fromFtoC(self.startendB[1]) #CHARGE temp B
-                                self.startendB[3] = self.fromFtoC(self.startendB[3]) #DROP temp B
-                        else:
-                            QMessageBox.information(self,"Convert Profile Temperature",
-                                                    "Unable to comply. You already are in Celsius")
-                            aw.messagelabel.setText("Profile not changed")
-                            return
-
-                        self.celsiusMode()
-                        aw.messagelabel.setText("Profile changed to Celsius")
-
+                    self.celsiusMode()
+                    aw.messagelabel.setText(u"Profile changed to Celsius")
+                    
             self.redraw()
 
         else:
-             QMessageBox.information(self,"Convert Profile Scale","No profile data found")
+             QMessageBox.information(self,u"Convert Profile Scale","No profile data found")
                                     
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
     def changeGColor(self,color):
         #COLOR (option 1) Default
-        palette1 = {"background":'white',"grid":'green',"ylabel":'black',"xlabel":'black',"title":'black',"rect1":'green',
-                        "rect2":'orange',"rect3":'#996633',"met":'red',"bt":'#00007f',"deltamet":'orange',
-                        "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'brown'}
+        palette1 = {"background":u'white',"grid":u'green',"ylabel":u'black',"xlabel":u'black',"title":u'black',"rect1":u'green',
+                        "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
+                        "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'brown'}
 
         #BLACK & WHITE (option 2) best for printing
-        palette2 = {"background":'white',"grid":'grey',"ylabel":'black',"xlabel":'black',"title":'black',"rect1":'lightgrey',
-                   "rect2":'darkgrey',"rect3":'grey',"met":'black',"bt":'black',"deltamet":'grey',
-                   "deltabt":'grey',"markers":'grey',"text":'black',"watermarks":'lightgrey',"Cline":'grey'}
+        palette2 = {"background":u'white',"grid":u'grey',"ylabel":u'black',"xlabel":u'black',"title":u'black',"rect1":u'lightgrey',
+                   "rect2":u'darkgrey',"rect3":u'grey',"met":u'black',"bt":u'black',"deltamet":u'grey',
+                   "deltabt":u'grey',"markers":u'grey',"text":u'black',"watermarks":u'lightgrey',"Cline":u'grey'}
         
         #load selected dictionary
         if color == 1:
@@ -1093,22 +1104,22 @@ class tgraphcanvas(FigureCanvas):
         if color == 3:
             dialog = graphColorDlg(self)
             if dialog.exec_():
-                self.palette["background"] = str(dialog.backgroundLabel.text())
-                self.palette["grid"] = str(dialog.gridLabel.text())
-                self.palette["ylabel"] = str(dialog.yLabel.text())
-                self.palette["xlabel"] = str(dialog.xLabel.text())
-                self.palette["title"] = str(dialog.titleLabel.text())
-                self.palette["rect1"] = str(dialog.rect1Label.text())
-                self.palette["rect2"] = str(dialog.rect2Label.text())
-                self.palette["rect3"] = str(dialog.rect3Label.text())
-                self.palette["met"] = str(dialog.metLabel.text())
-                self.palette["bt"] = str(dialog.btLabel.text())
-                self.palette["deltamet"] = str(dialog.deltametLabel.text())
-                self.palette["deltabt"] = str(dialog.deltabtLabel.text())
-                self.palette["markers"] = str(dialog.markersLabel.text())
-                self.palette["text"] = str(dialog.textLabel.text())
-                self.palette["watermarks"] = str(dialog.watermarksLabel.text())
-                self.palette["Cline"] = str(dialog.ClineLabel.text())
+                self.palette["background"] = unicode(dialog.backgroundLabel.text())
+                self.palette["grid"] = unicode(dialog.gridLabel.text())
+                self.palette["ylabel"] = unicode(dialog.yLabel.text())
+                self.palette["xlabel"] = unicode(dialog.xLabel.text())
+                self.palette["title"] = unicode(dialog.titleLabel.text())
+                self.palette["rect1"] = unicode(dialog.rect1Label.text())
+                self.palette["rect2"] = unicode(dialog.rect2Label.text())
+                self.palette["rect3"] = unicode(dialog.rect3Label.text())
+                self.palette["met"] = unicode(dialog.metLabel.text())
+                self.palette["bt"] = unicode(dialog.btLabel.text())
+                self.palette["deltamet"] = unicode(dialog.deltametLabel.text())
+                self.palette["deltabt"] = unicode(dialog.deltabtLabel.text())
+                self.palette["markers"] = unicode(dialog.markersLabel.text())
+                self.palette["text"] = unicode(dialog.textLabel.text())
+                self.palette["watermarks"] = unicode(dialog.watermarksLabel.text())
+                self.palette["Cline"] = unicode(dialog.ClineLabel.text())
 
         #update screen with new colors
         self.fig.canvas.redraw()
@@ -1142,23 +1153,23 @@ class tgraphcanvas(FigureCanvas):
             
 
             #anotate labels
-            self.ax1.annotate(self.flavorlabels[0] + " - " + str(int(self.flavors[0]*10)),xy =(angles[0],.9),
+            self.ax1.annotate(self.flavorlabels[0] + u" - " + unicode(int(self.flavors[0]*10)),xy =(angles[0],.9),
                               xytext=(angles[0],1.1),horizontalalignment='left',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[1]+ " - " + str(int(self.flavors[1]*10)),xy=(angles[1],.9),
+            self.ax1.annotate(self.flavorlabels[1]+ u" - " + unicode(int(self.flavors[1]*10)),xy=(angles[1],.9),
                               xytext=(angles[1],1.1),horizontalalignment='right',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[2]+ " - " + str(int(self.flavors[2]*10)),xy=(angles[2],.9),
+            self.ax1.annotate(self.flavorlabels[2]+ u" - " + unicode(int(self.flavors[2]*10)),xy=(angles[2],.9),
                               xytext=(angles[2],1.1),horizontalalignment='right',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[3]+ " - " + str(int(self.flavors[3]*10)),xy=(angles[3],.9),
+            self.ax1.annotate(self.flavorlabels[3]+ u" - " + unicode(int(self.flavors[3]*10)),xy=(angles[3],.9),
                               xytext=(angles[3],1.1),horizontalalignment='right',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[4]+ " - " + str(int(self.flavors[4]*10)),
+            self.ax1.annotate(self.flavorlabels[4]+ u" - " + unicode(int(self.flavors[4]*10)),
                               xy=(angles[4],.9),xytext=(angles[4],1.1),horizontalalignment='right',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[5]+ " - " + str(int(self.flavors[5]*10)),xy=(angles[5],.9),
+            self.ax1.annotate(self.flavorlabels[5]+ u" - " + unicode(int(self.flavors[5]*10)),xy=(angles[5],.9),
                               xytext=(angles[5],1.1),horizontalalignment='left',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[6]+ " - " + str(int(self.flavors[6]*10)),xy=(angles[6],.9),
+            self.ax1.annotate(self.flavorlabels[6]+ u" - " + unicode(int(self.flavors[6]*10)),xy=(angles[6],.9),
                               xytext=(angles[6],1.1),horizontalalignment='left',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[7]+ " - " + str(int(self.flavors[7]*10)),xy=(angles[7],.9),
+            self.ax1.annotate(self.flavorlabels[7]+ u" - " + unicode(int(self.flavors[7]*10)),xy=(angles[7],.9),
                               xytext=(angles[7],1.1),horizontalalignment='left',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[8]+ " - " + str(int(self.flavors[8]*10)),xy=(angles[8],.9),
+            self.ax1.annotate(self.flavorlabels[8]+ u" - " + unicode(int(self.flavors[8]*10)),xy=(angles[8],.9),
                               xytext=(angles[8],1.1),horizontalalignment='left',verticalalignment='bottom')
 
             #Needs same dimension in order to plot. To close circle we may need one more element. 
@@ -1171,7 +1182,7 @@ class tgraphcanvas(FigureCanvas):
             score /= 9.
             score *= 100.
             
-            txt = "%.2f" %score
+            txt = u"%.2f" %score
 
             self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
             
@@ -1189,14 +1200,14 @@ class tgraphcanvas(FigureCanvas):
         if not len(self.timex):
             self.timeclock.start()        
         self.flagon = True
-        aw.messagelabel.setText("Scope recording...")     
+        aw.messagelabel.setText(u"Scope recording...")     
         aw.button_1.setDisabled(True)                     #button ON
         aw.button_1.setStyleSheet("QPushButton { background-color: #c4ff00}")
         
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
         self.flagon = False
-        aw.messagelabel.setText("Scope stopped")
+        aw.messagelabel.setText(u"Scope stopped")
         aw.button_1.setDisabled(False)
         aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         
@@ -1214,13 +1225,13 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.add_patch(rect)
 
                 #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-                self.ax.annotate("%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
+                self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
                                 self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
                 #anotate time
-                self.ax.annotate("START 0:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
+                self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
                                 self.startend[1]-50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
-                message = "Roast time starts now. 00:00 BT = " + str(self.startend[1]) + self.mode
+                message = u"Roast time starts now. 00:00 BT = " + unicode(self.startend[1]) + self.mode
 
                 aw.label1.setStyleSheet("background-color:'#FF9966';")
                 aw.label1.setText( "<font color='black'><b>Roast time<\b></font>")
@@ -1228,9 +1239,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_8.setDisabled(True)
                 aw.button_8.setFlat(True)
             else:
-                message = "Not enough variables collected yet. Try again in a few seconds"
+                message = u"Not enough variables collected yet. Try again in a few seconds"
         else:
-            message = "Scope is OFF"
+            message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)
 
@@ -1244,9 +1255,9 @@ class tgraphcanvas(FigureCanvas):
                 self.varC[1] = self.temp2[-1]
                 
                 #calculate time elapsed since charge time
-                st1 = "1CS " + self.stringfromseconds(self.varC[0]-self.startend[0])
+                st1 = u"1CS " + self.stringfromseconds(self.varC[0]-self.startend[0])
                 #anotate temperature
-                self.ax.annotate("%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
+                self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
                                 self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-50),
@@ -1255,12 +1266,12 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_3.setDisabled(True)
                 aw.button_3.setFlat(True)
                 
-                message = "1C START recorded at " + st1 + " BT = " + str(self.varC[1]) + self.mode
+                message = u"1C START recorded at " + st1 + u" BT = " + unicode(self.varC[1]) + self.mode
             
             else:
-                message = "Charge mark is missing. Do that first"
+                message = u"Charge mark is missing. Do that first"
         else:
-            message = "Scope is OFF"
+            message = u"Scope is OFF"
 
         #set message at bottom
         aw.messagelabel.setText(message)
@@ -1274,9 +1285,9 @@ class tgraphcanvas(FigureCanvas):
                 self.varC[3] = self.temp2[-1]
                 
                 #calculate time elapsed since charge time
-                st1 = "1CE " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
+                st1 = u"1CE " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
                 #anotate temperature
-                self.ax.annotate("%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
+                self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
                                 self.varC[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-80),
@@ -1287,11 +1298,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_4.setDisabled(True)
                 aw.button_4.setFlat(True)
 
-                message = "1C END recorded at " + st1 + " BT = " + str(self.varC[3]) + self.mode
+                message = u"1C END recorded at " + st1 + " BT = " + unicode(self.varC[3]) + self.mode
             else:
-                message = "1Cs mark missing. Do that first"
+                message = u"1Cs mark missing. Do that first"
         else:
-            message = "Scope is OFF"
+            message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)
         
@@ -1301,8 +1312,8 @@ class tgraphcanvas(FigureCanvas):
             self.varC[4] = self.timeclock.elapsed()/1000.
             self.varC[5] = self.temp2[-1]
             
-            st1 = "2CS " + self.stringfromseconds(self.varC[4]-self.startend[0]) 
-            self.ax.annotate("%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
+            st1 = u"2CS " + self.stringfromseconds(self.varC[4]-self.startend[0]) 
+            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
                                 self.varC[5]+90),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)      
             self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-110),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
@@ -1310,9 +1321,9 @@ class tgraphcanvas(FigureCanvas):
             aw.button_5.setDisabled(True)
             aw.button_5.setFlat(True)
 
-            message = "2C START recorded at " + st1 + " BT = " + str(self.varC[5]) + self.mode
+            message = u"2C START recorded at " + st1 + " BT = " + unicode(self.varC[5]) + self.mode
         else:
-            message = "Scope is OFF"
+            message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)
         
@@ -1325,9 +1336,9 @@ class tgraphcanvas(FigureCanvas):
                 self.varC[6] = self.timeclock.elapsed()/1000. 
                 self.varC[7] = self.temp2[-1]
                     
-                st1 =  "2CE " + self.stringfromseconds(self.varC[6]-self.startend[0])
+                st1 =  u"2CE " + self.stringfromseconds(self.varC[6]-self.startend[0])
                 #anotate temperature
-                self.ax.annotate("%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
+                self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
                                 self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-40),
@@ -1339,11 +1350,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_6.setDisabled(True)
                 aw.button_6.setFlat(True)
 
-                message = "2C END recorded at " + st1 + " BT = " + str(self.varC[7]) + self.mode
+                message = u"2C END recorded at " + st1 + " BT = " + unicode(self.varC[7]) + self.mode
             else:
-                message = "2Cs mark missing. Do that first"
+                message = u"2Cs mark missing. Do that first"
         else:
-            message = "Scope is OFF"
+            message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)            
 
@@ -1354,9 +1365,9 @@ class tgraphcanvas(FigureCanvas):
             self.startend[2] = self.timeclock.elapsed()/1000.
             self.startend[3] = self.temp2[-1]
             
-            st1 = "END " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
+            st1 = u"END " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
             #anotate temperature
-            self.ax.annotate("%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
+            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
                                 self.startend[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
             self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-80),
@@ -1370,10 +1381,10 @@ class tgraphcanvas(FigureCanvas):
             aw.button_9.setDisabled(True)
             aw.button_9.setFlat(True)
             
-            message = "Roast ENDED at " + st1 + " BT = " + str(self.startend[-1]) + self.mode
+            message = u"Roast ENDED at " + st1 + " BT = " + unicode(self.startend[-1]) + self.mode
 
         else:
-            message = "Scope is OFF"
+            message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)
 
@@ -1437,9 +1448,9 @@ class tgraphcanvas(FigureCanvas):
             finishphaseP = finishphasetime*100/totaltime
 
             if self.statisticsflags[0]:            
-                self.ax.text(self.startend[0]+ dryphasetime/3,self.statisticsupper,st1 + " "+ str(int(dryphaseP))+"%",color=self.palette["text"])
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime/3,self.statisticsupper,st2+ " " + str(int(midphaseP))+"%",color=self.palette["text"])
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/3,self.statisticsupper,st3 + " " +str(int(finishphaseP))+ "%",color=self.palette["text"])
+                self.ax.text(self.startend[0]+ dryphasetime/3,self.statisticsupper,st1 + u" "+ unicode(int(dryphaseP))+u"%",color=self.palette["text"])
+                self.ax.text(self.startend[0]+ dryphasetime+midphasetime/3,self.statisticsupper,st2+ " " + unicode(int(midphaseP))+u"%",color=self.palette["text"])
+                self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/3,self.statisticsupper,st3 + u" " + unicode(int(finishphaseP))+ u"%",color=self.palette["text"])
 
             if self.statisticsflags[2]:
                 (st1,st2,st3) = aw.defect_estimation()
@@ -1452,9 +1463,9 @@ class tgraphcanvas(FigureCanvas):
                     
                 rates_of_changes = aw.RoR(TP_index,dryEndIndex)
 
-                st1 += "  (%.1f deg/min)"%rates_of_changes[0]
-                st2 += "  (%.1f deg/min)"%rates_of_changes[1]
-                st3 += "  (%.1f deg/min)"%rates_of_changes[2]
+                st1 += u"  (%.1f deg/min)"%rates_of_changes[0]
+                st2 += u"  (%.1f deg/min)"%rates_of_changes[1]
+                st3 += u"  (%.1f deg/min)"%rates_of_changes[2]
         
                 #Write flavor estimation
                 self.ax.text(self.startend[0],self.statisticslower,st1,color=self.palette["text"],fontsize=11)
@@ -1481,16 +1492,16 @@ class tgraphcanvas(FigureCanvas):
                     
                 deltaAcc = int(AccMET) - int(AccBT)
                         
-                lowestBT = "%.1f"%LP
-                timeLP = str(self.stringfromseconds(self.timex[k] - self.startend[0]))
+                lowestBT = u"%.1f"%LP
+                timeLP = unicode(self.stringfromseconds(self.timex[k] - self.startend[0]))
                 time = self.stringfromseconds(self.startend[2]-self.startend[0])
                 #end temperature 
                 
-                strline = ("[BT = " + lowestBT + self.mode + " - " + "%.1f"%self.startend[3] + self.mode +
-                            "] [ETarea - BTarea = " + str(deltaAcc) + "] [Time = " +time +"]")
+                strline = (u"[BT = " + lowestBT + self.mode + u" - " + u"%.1f"%self.startend[3] + self.mode +
+                            u"] [ETarea - BTarea = " + unicode(deltaAcc) + u"] [Time = " +time +u"]")
                             
                 #text metrics 
-                if self.mode == "C":
+                if self.mode == u"C":
                     dist = -47
                 else:
                     dist = -90
@@ -1503,9 +1514,9 @@ class tgraphcanvas(FigureCanvas):
         if i > 0:
             self.specialevents.append(i)
             Nevents = len(self.specialevents)
-            temp = str(self.temp2[i])
+            temp = unicode(self.temp2[i])
             time = self.stringfromseconds(self.timex[i])
-            message = "Event number "+ str(Nevents) + "recorded at " + str(Nevents) +" BT = " + temp + " Time = " + time
+            message = u"Event number "+ unicode(Nevents) + u"recorded at " + unicode(Nevents) +u" BT = " + temp + u" Time = " + time
             aw.messagelabel.setText(message)
             self.ax.text(self.timex[i],self.temp2[i],Nevents,color=self.palette["text"])
 
@@ -1516,7 +1527,7 @@ class tgraphcanvas(FigureCanvas):
         lb = len(self.backgroundBT)
         #all background curves must have same dimension in order to plot. Check just in case.
         if lt > 1 and lt == le and lb == le:
-            if  direction == "up":
+            if  direction == u"up":
                 for i in range(lt):
                     self.backgroundET[i] += step
                     self.backgroundBT[i] += step
@@ -1532,7 +1543,7 @@ class tgraphcanvas(FigureCanvas):
                 self.startendB[1] += step
                 self.startendB[3] += step
                 
-            elif direction == "left":
+            elif direction == u"left":
                 for i in range(lt):
                     self.timeB[i] -= step
                     
@@ -1547,7 +1558,7 @@ class tgraphcanvas(FigureCanvas):
                 self.startendB[0] -= step
                 self.startendB[2] -= step
                 
-            elif direction == "right":
+            elif direction == u"right":
                 for i in range(lt):
                     self.timeB[i] += step
                     
@@ -1562,7 +1573,7 @@ class tgraphcanvas(FigureCanvas):
                 self.startendB[0] += step
                 self.startendB[2] += step
                     
-            elif direction == "down":
+            elif direction == u"down":
                 for i in range(lt):
                     self.backgroundET[i] -= step
                     self.backgroundBT[i] -= step
@@ -1578,7 +1589,7 @@ class tgraphcanvas(FigureCanvas):
                 self.startendB[1] -= step
                 self.startendB[3] -= step    
         else:
-            aw.messagelabel.setText("unable to move background")
+            aw.messagelabel.setText(u"unable to move background")
             return
 
 #######################################################################################
@@ -1595,7 +1606,7 @@ class VMToolbar(NavigationToolbar):
     def _icon(self, name):
         #dirty hack to use exclusively .png and thus avoid .svg usage
         #because .exe generation is problematic with .svg
-        if platf != 'Darwin':
+        if platf != u'Darwin':
             name = name.replace('.svg','.png')
         return QIcon(os.path.join(self.basedir, name))
     
@@ -1609,13 +1620,13 @@ class ApplicationWindow(QMainWindow):
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         # set window title
-        self.setWindowTitle("Artisan " + __version__)        
+        self.setWindowTitle(u"Artisan " + __version__)        
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month. file-open/save will point to profilepath
-        self.profilepath = ""
+        self.profilepath = u""
 
         # on the Mac preferences should be stored outside of applications in the users ~/Library/Preferences path
-        if platf == 'Darwin':
+        if platf == u'Darwin':
             preference_path = QDir().homePath().append(QString("/Library/Preferences/Artisan/"))
             preference_dir = QDir()
             preference_dir.setPath(preference_path)
@@ -2077,55 +2088,54 @@ class ApplicationWindow(QMainWindow):
                 raise IOError, unicode(f.errorString())
             
             stream = QTextStream(f)
-            stream.setCodec("ASCII")
 
             #variables to read on the text file are initialized as empty lists
             self.qmc.varC,self.qmc.startend, self.qmc.timex, self.qmc.temp1, self.qmc.temp2, self.qmc.flavors = [],[],[],[],[],[]
 
             #Read first line. STARTEND tag
             line = stream.readLine().trimmed()
-            if not line.startsWith("[[MODE]]"):
-                raise ValueError, " Invalid Artisan file format: MODE tag missing"
+            if not line.startsWith(u"[[MODE]]"):
+                raise ValueError, u" Invalid Artisan file format: MODE tag missing"
             line = stream.readLine().trimmed()
-            self.qmc.mode = str(line)        
+            self.qmc.mode = unicode(line)        
             
             line = stream.readLine()
-            if not line.startsWith("[[STARTEND]]"):
-                raise ValueError, " Invalid Artisan file format: STARTEND tag missing"
+            if not line.startsWith(u"[[STARTEND]]"):
+                raise ValueError, u" Invalid Artisan file format: STARTEND tag missing"
 
             #Read second line with the STARTEND values
             line = stream.readLine().trimmed()
-            parts = line.split("    ")
+            parts = line.split(u"    ")
             if parts.count() != 4:
-                raise ValueError, "invalid STARTEND values"
+                raise ValueError, u"invalid STARTEND values"
             else:
                 for i in range(4):
                     self.qmc.startend.append(float(parts[i]))
 
             #Read third line. CRACKS tag
             line = stream.readLine().trimmed()                    
-            if not line.startsWith("[[CRACKS]]"):
-                raise ValueError, " Invalid Artisan file format: CRACKS tag missing"
+            if not line.startsWith(u"[[CRACKS]]"):
+                raise ValueError, u" Invalid Artisan file format: CRACKS tag missing"
 
             #Read fourth line with CRACKS values
             line = stream.readLine().trimmed() 
-            parts = line.split("    ")
+            parts = line.split(u"    ")
             if parts.count() != 8:
-                raise ValueError, "invalid CRACK values"
+                raise ValueError, u"invalid CRACK values"
             else:
                 for i in range(8):
                     self.qmc.varC.append(float(parts[i]))
 
             #Read fith line. FLAVORS tag
             line = stream.readLine().trimmed()                    
-            if not line.startsWith("[[FLAVORS]]"):
-                raise ValueError, " Invalid Artisan file format: FLAVORS tag missing"
+            if not line.startsWith(u"[[FLAVORS]]"):
+                raise ValueError, u" Invalid Artisan file format: FLAVORS tag missing"
 
             #Read six line with FLAVOR values
-            line = stream.readLine().trimmed() 
-            parts = line.split("    ")
+            line = stream.readLine().trimmed()
+            parts = line.split(u"    ")
             if parts.count() != 10:
-                raise ValueError, "invalid FLAVOR values"
+                raise ValueError, u"invalid FLAVOR values"
             else:
                 for i in range(10):
                     self.qmc.flavors.append(float(parts[i]))
@@ -2134,119 +2144,119 @@ class ApplicationWindow(QMainWindow):
             
             #Read FLAVORS-LABEL tag
             line = stream.readLine().trimmed()
-            if not line.startsWith("[[FLAVOR-LABELS]]"):
-                raise ValueError, "FLAVOR LABELS tag missing"
+            if not line.startsWith(u"[[FLAVOR-LABELS]]"):
+                raise ValueError, u"FLAVOR LABELS tag missing"
             #Read FLAVOR-LABEL values
             line = stream.readLine().trimmed()
-            parts = line.split(";;;")
+            parts = line.split(u";;;")
             if parts.count() != 9:
-                raise ValueError, "Incorrect N flavors found"
+                raise ValueError, u"Incorrect N flavors found"
             for i in range(9):
-                self.qmc.flavorlabels[i] = str(parts[i])
+                self.qmc.flavorlabels[i] = unicode(parts[i])
 
             #read next line TITLE tag
             line = stream.readLine().trimmed()                   
-            if not line.startsWith("[[TITLE]]"):
-                raise ValueError, " Invalid Artisan file format: TITLE tag missing"
+            if not line.startsWith(u"[[TITLE]]"):
+                raise ValueError, u" Invalid Artisan file format: TITLE tag missing"
 
             #Read next line beans type
             line = stream.readLine().trimmed()
-            self.qmc.title = str(line)            
+            self.qmc.title = unicode(line)            
 
             #read next line BEANS tag
             line = stream.readLine().trimmed()                   
-            if not line.startsWith("[[BEANS]]"):
-                raise ValueError, " Invalid Artisan file format: BEANS tag missing"
+            if not line.startsWith(u"[[BEANS]]"):
+                raise ValueError, u" Invalid Artisan file format: BEANS tag missing"
 
             #Read next line beans type
             line = stream.readLine().trimmed()
-            self.qmc.beans = str(line)            
+            self.qmc.beans = unicode(line)           
 
             #read next line WEIGHT tag
             line = stream.readLine().trimmed()
-            if not line.startsWith("[[WEIGHT]]"):
-                raise ValueError, " Invalid Artisan file format: WEIGHT tag missing"
+            if not line.startsWith(u"[[WEIGHT]]"):
+                raise ValueError, u" Invalid Artisan file format: WEIGHT tag missing"
 
             #Read Weight
             line = stream.readLine().trimmed()
-            parts = line.split("    ")
+            parts = line.split(u"    ")
             if parts.count() != 3:
-                raise ValueError, "Weight needs three values"
+                raise ValueError, u"Weight needs three values"
             else:
                 self.qmc.weight[0] = int(parts[0])
                 self.qmc.weight[1] = int(parts[1])
-                self.qmc.weight[2] = str(parts[2])
+                self.qmc.weight[2] = unicode(parts[2])
                 
             #read next line ROASTER-TYPE tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith("[[ROASTER-TYPE]]"):
-                raise ValueError, " Invalid Artisan file format: ROASTER-TYPE tag missing"
+            line = stream.readLine().trimmed()                  
+            if not line.startsWith(u"[[ROASTER-TYPE]]"):
+                raise ValueError, u" Invalid Artisan file format: ROASTER-TYPE tag missing"
 
             #Read next line roaster type
             line = stream.readLine().trimmed()
-            self.qmc.roastertype = str(line)
+            self.qmc.roastertype = unicode(line)
             
             #read next line OPERATOR tag
             line = stream.readLine().trimmed()                   
-            if line.startsWith("[[OPERATOR]]"):
+            if line.startsWith(u"[[OPERATOR]]"):
                 #Read next line roaster type
                 line = stream.readLine().trimmed()
-                self.qmc.operator = str(line)
+                self.qmc.operator = unicode(line)
                 line = stream.readLine().trimmed() 
                 
             #Read date tag
-            if not line.startsWith("[[DATE]]"):
-                raise ValueError, " Invalid Artisan file format: DATE tag missing"            
+            if not line.startsWith(u"[[DATE]]"):
+                raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
             #Read date
             line = stream.readLine().trimmed()
             self.qmc.roastdate = QDate.fromString(line)
 
             #Read event tag
             line = stream.readLine().trimmed()                   
-            if not line.startsWith("[[EVENTS]]"):
-                raise ValueError, " Invalid Artisan file format: DATE tag missing"
+            if not line.startsWith(u"[[EVENTS]]"):
+                raise ValueError, u" Invalid Artisan file format: DATE tag missing"
             
             #Read events contents
             line = stream.readLine().trimmed()
-            parts = line.split("    ")
+            parts = line.split(u"    ")
             eventn = parts.count()              #number of events
-            if str(parts[0]).isdigit():
+            if unicode(parts[0]).isdigit():
                 for i in range(eventn):
                     self.qmc.specialevents.append(int(parts[i]))
                 #read events data
             line = stream.readLine().trimmed()
-            if not line.startsWith("[[EVENTS-DATA]]"):
-                raise ValueError, " Invalid Artisan file format: DATA tag missing"
+            if not line.startsWith(u"[[EVENTS-DATA]]"):
+                raise ValueError, u" Invalid Artisan file format: DATA tag missing"
             if len(self.qmc.specialevents):
                 for i in range(len(self.qmc.specialevents)):
-                        self.qmc.specialeventsStrings[i] = str(stream.readLine().trimmed())               
+                        self.qmc.specialeventsStrings[i] = unicode(stream.readLine().trimmed())               
             else:
                 stream.readLine() #read blank line
             #Read roasting notes tag
             line = stream.readLine().trimmed()                   
-            if not line.startsWith("[[ROASTING-NOTES]]"):
-                raise ValueError, " Invalid Artisan file format: ROASTING-NOTES tag missing"            
+            if not line.startsWith(u"[[ROASTING-NOTES]]"):
+                raise ValueError, u" Invalid Artisan file format: ROASTING-NOTES tag missing"            
 
             #Read Roasting notes
             while not stream.atEnd():
                 line = stream.readLine().trimmed()                   
-                if line.startsWith("[[CUPPING-NOTES]]"):
+                if line.startsWith(u"[[CUPPING-NOTES]]"):
                     break
-                self.qmc.roastingnotes += str(line) + "\n"
+                self.qmc.roastingnotes += unicode(line) + u"\n"
 
             #Read cuping notes
             while not stream.atEnd():
-                line = stream.readLine().trimmed()                   
-                if line.startsWith("[[DATA]]"):
+                line = stream.readLine().trimmed()                  
+                if line.startsWith(u"[[DATA]]"):
                     break
-                self.qmc.cuppingnotes += str(line) + "\n"
+                self.qmc.cuppingnotes += unicode(line) + u"\n"
                 
             #Read DATA values till the end of the file
             while not stream.atEnd():
                 line = stream.readLine().trimmed()
-                parts = line.split("    ")
+                parts = line.split(u"    ")
                 if parts.count() != 3:
-                    raise ValueError, "invalid DATA values"
+                    raise ValueError, u"invalid DATA values"
                 else:
                     self.qmc.timex.append(float(parts[0]))
                     self.qmc.temp1.append(float(parts[1]))
@@ -2256,9 +2266,9 @@ class ApplicationWindow(QMainWindow):
             f.close()
 
             #select mode        
-            if self.qmc.mode == "F":
+            if self.qmc.mode == u"F":
                 self.qmc.fahrenheitMode()
-            if self.qmc.mode == "C":
+            if self.qmc.mode == u"C":
                 self.qmc.celsiusMode()
 
             #Set the xlimits
@@ -2271,19 +2281,19 @@ class ApplicationWindow(QMainWindow):
             #Plot everything
             self.qmc.redraw()
 
-            message =  str(fname) + " loaded successfully"
+            message =  unicode(fname) + u" loaded successfully"
             self.messagelabel.setText(message)
             
             self.editgraph()
 
         except IOError,e:
-            self.messagelabel.setText("error in fileload() " + str(e) + " ")
-            aw.qmc.errorlog.append("Unable to open file " + str(e))
+            self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
+            aw.qmc.errorlog.append(u"Unable to open file " + unicode(e))
             return
 
         except ValueError,e:
-            self.messagelabel.setText(str(e))
-            self.qmc.errorlog.append("value error in fileload() " + str(e))
+            self.messagelabel.setText(unicode(e))
+            self.qmc.errorlog.append(u"value error in fileload() " + unicode(e))
             return
         
         finally:
@@ -2298,7 +2308,6 @@ class ApplicationWindow(QMainWindow):
             if not f.open(QIODevice.ReadOnly):
                 raise IOError, unicode(f.errorString())
             stream = QTextStream(f)
-            stream.setCodec("ASCII")
             
             #variables to read on the text file are initialized as empty lists
             self.qmc.backgroundET,self.qmc.backgroundBT,self.qmc.timeB = [],[],[]
@@ -2306,91 +2315,91 @@ class ApplicationWindow(QMainWindow):
             
             #Read first line. STARTEND tag
             line = stream.readLine().trimmed()
-            if not line.startsWith("[[MODE]]"):
-                raise ValueError, " Invalid Artisan file format: MODE tag missing"
+            if not line.startsWith(u"[[MODE]]"):
+                raise ValueError, u" Invalid Artisan file format: MODE tag missing"
             line = stream.readLine()       
             line = stream.readLine()
-            if not line.startsWith("[[STARTEND]]"):
-                raise ValueError, " Invalid Artisan file format: STARTEND tag missing"
+            if not line.startsWith(u"[[STARTEND]]"):
+                raise ValueError, u" Invalid Artisan file format: STARTEND tag missing"
             #Read second line with the STARTEND values
             line = stream.readLine().trimmed()
-            parts = line.split("    ")
+            parts = line.split(u"    ")
             if parts.count() != 4:
-                raise ValueError, "invalid STARTEND values"
+                raise ValueError, u"invalid STARTEND values"
             else:
                 for i in range(4):
                     self.qmc.startendB.append(float(parts[i]))
                     
             #Read third line. CRACKS tag
             line = stream.readLine().trimmed()                    
-            if not line.startsWith("[[CRACKS]]"):
-                raise ValueError, " Invalid Artisan file format: CRACKS tag missing"
+            if not line.startsWith(u"[[CRACKS]]"):
+                raise ValueError, u" Invalid Artisan file format: CRACKS tag missing"
             #Read fourth line with CRACKS values
             line = stream.readLine().trimmed() 
-            parts = line.split("    ")
+            parts = line.split(u"    ")
             if parts.count() != 8:
-                raise ValueError, "invalid CRACK values"
+                raise ValueError, u"invalid CRACK values"
             else:
                 for i in range(8):
                     self.qmc.varCB.append(float(parts[i]))
 
             #Read fith line. FLAVORS tag
             line = stream.readLine().trimmed()                    
-            if not line.startsWith("[[FLAVORS]]"):
-                raise ValueError, " Invalid Artisan file format: FLAVORS tag missing"
+            if not line.startsWith(u"[[FLAVORS]]"):
+                raise ValueError, u" Invalid Artisan file format: FLAVORS tag missing"
             #Read six line with FLAVOR values
             line = stream.readLine().trimmed() 
             #pass
             #Read FLAVORS-LABEL tag
             line = stream.readLine().trimmed()
-            if not line.startsWith("[[FLAVOR-LABELS]]"):
-                raise ValueError, "FLAVOR LABELS tag missing"
+            if not line.startsWith(u"[[FLAVOR-LABELS]]"):
+                raise ValueError, u"FLAVOR LABELS tag missing"
             #Read FLAVOR-LABEL values
             line = stream.readLine().trimmed()
             #read next line TITLE tag
             line = stream.readLine().trimmed()                   
-            if not line.startsWith("[[TITLE]]"):
-                raise ValueError, " Invalid Artisan file format: TITLE tag missing"
+            if not line.startsWith(u"[[TITLE]]"):
+                raise ValueError, u" Invalid Artisan file format: TITLE tag missing"
             #Read next line beans type
             line = stream.readLine()
             #read next line BEANS tag
             line = stream.readLine().trimmed()                  
-            if not line.startsWith("[[BEANS]]"):
-                raise ValueError, " Invalid Artisan file format: BEANS tag missing"
+            if not line.startsWith(u"[[BEANS]]"):
+                raise ValueError, u" Invalid Artisan file format: BEANS tag missing"
             #Read next line beans type
             line = stream.readLine().trimmed()
             #read next line WEIGHT tag
             line = stream.readLine().trimmed()                  
-            if not line.startsWith("[[WEIGHT]]"):
-                raise ValueError, " Invalid Artisan file format: WEIGHT tag missing"
+            if not line.startsWith(u"[[WEIGHT]]"):
+                raise ValueError, u" Invalid Artisan file format: WEIGHT tag missing"
             #Read next weight
             line = stream.readLine()
             #read next line ROASTER-TYPE tag
             line = stream.readLine().trimmed()                   
-            if not line.startsWith("[[ROASTER-TYPE]]"):
-                raise ValueError, " Invalid Artisan file format: ROASTER-TYPE tag missing"
+            if not line.startsWith(u"[[ROASTER-TYPE]]"):
+                raise ValueError, u" Invalid Artisan file format: ROASTER-TYPE tag missing"
             #Read next line roaster type
             line = stream.readLine()
             #Read data tag
             line = stream.readLine().trimmed()                   
-            if not line.startsWith("[[DATE]]"):
-                raise ValueError, " Invalid Artisan file format: DATE tag missing"            
+            if not line.startsWith(u"[[DATE]]"):
+                raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
             #Read date
             line = stream.readLine()
             #Read event tag
             line = stream.readLine().trimmed()                   
-            if not line.startsWith("[[EVENTS]]"):
-                raise ValueError, " Invalid Artisan file format: DATE tag missing"            
+            if not line.startsWith(u"[[EVENTS]]"):
+                raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
             #Read events contents
             line = stream.readLine().trimmed()
 
-            parts = line.split("    ")
+            parts = line.split(u"    ")
             specialevents = parts.count()              #number of events
 
             #read events data
             line = stream.readLine().trimmed()
-            if not line.startsWith("[[EVENTS-DATA]]"):
-                raise ValueError, " Invalid Artisan file format: DATA tag missing"
+            if not line.startsWith(u"[[EVENTS-DATA]]"):
+                raise ValueError, u" Invalid Artisan file format: DATA tag missing"
             
             if specialevents:
                 for i in range(specialevents):
@@ -2400,25 +2409,25 @@ class ApplicationWindow(QMainWindow):
                 
             #Read roasting notes tag
             line = stream.readLine().trimmed()
-            if not line.startsWith("[[ROASTING-NOTES]]"):
-                raise ValueError, " Invalid Artisan file format: ROASTING-NOTES tag missing"            
+            if not line.startsWith(u"[[ROASTING-NOTES]]"):
+                raise ValueError, u" Invalid Artisan file format: ROASTING-NOTES tag missing"            
             #Read Roasting notes
             while not stream.atEnd():
                 line = stream.readLine().trimmed()                   
-                if line.startsWith("[[CUPPING-NOTES]]"):
+                if line.startsWith(u"[[CUPPING-NOTES]]"):
                     break
             #Read cuping notes
             while not stream.atEnd():
                 line = stream.readLine().trimmed()                   
-                if line.startsWith("[[DATA]]"):
+                if line.startsWith(u"[[DATA]]"):
                     break
                 
             #Read DATA values till the end of the file
             while not stream.atEnd():
                 line = stream.readLine().trimmed()
-                parts = line.split("    ")
+                parts = line.split(u"    ")
                 if parts.count() != 3:
-                    raise ValueError, "invalid DATA values"
+                    raise ValueError, u"invalid DATA values"
                 else:
                     self.qmc.timeB.append(float(parts[0]))
                     self.qmc.backgroundET.append(float(parts[1]))
@@ -2426,17 +2435,17 @@ class ApplicationWindow(QMainWindow):
             #CLOSE FILE
             f.close()
 
-            message =  "Background " + str(fname) + " loaded successfully"
+            message =  u"Background " + unicode(fname) + u" loaded successfully"
             self.messagelabel.setText(message)
 
         except IOError,e:
-            self.messagelabel.setText("error in fileload() " + str(e) + " ")
-            aw.qmc.errorlog.append("Unable to open file " + str(e) )
+            self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
+            aw.qmc.errorlog.append(u"Unable to open file " + unicode(e) )
             return
 
         except ValueError,e:
-            self.messagelabel.setText(str(e))
-            self.qmc.errorlog.append("value error in fileload() " + str(e))
+            self.messagelabel.setText(unicode(e))
+            self.qmc.errorlog.append(u"value error in fileload() " + unicode(e))
             return
         
         finally:
@@ -2449,66 +2458,66 @@ class ApplicationWindow(QMainWindow):
         try:         
             filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))
             if filename:
-                if ".txt" not in filename:
-                    filename += ".txt"
+                if u".txt" not in filename:
+                    filename += u".txt"
                 f = open(filename, 'w')
-                f.write("[[MODE]]\n")
+                f.write(u"[[MODE]]\n")
                 f.write(self.qmc.mode)
-                f.write("\n[[STARTEND]]\n")
+                f.write(u"\n[[STARTEND]]\n")
                 for i in range(4):
-                    f.write(str(self.qmc.startend[i]) + "    ")       
-                f.write("\n[[CRACKS]]\n")
+                    f.write(unicode(self.qmc.startend[i]) + u"    ")       
+                f.write(u"\n[[CRACKS]]\n")
                 for i in range(8):
-                    f.write(str(self.qmc.varC[i]) + "    ")
-                f.write("\n[[FLAVORS]]\n")
+                    f.write(unicode(self.qmc.varC[i]) + u"    ")
+                f.write(u"\n[[FLAVORS]]\n")
                 for i in range(10):
-                    f.write(str(self.qmc.flavors[i])+"    ")
-                f.write("\n[[FLAVOR-LABELS]]\n")
+                    f.write(unicode(self.qmc.flavors[i])+ u"    ")
+                f.write(u"\n[[FLAVOR-LABELS]]\n")
                 for i in range(8):
-                    f.write(self.qmc.flavorlabels[i] + ";;;")
+                    f.write(self.qmc.flavorlabels[i] + u";;;")
                 f.write(self.qmc.flavorlabels[i+1])
-                f.write("\n[[TITLE]]\n")
+                f.write(u"\n[[TITLE]]\n")
                 f.write(self.qmc.title)
-                f.write("\n[[BEANS]]\n")
+                f.write(u"\n[[BEANS]]\n")
                 f.write(self.qmc.beans)
-                f.write("\n[[WEIGHT]]\n")
+                f.write(u"\n[[WEIGHT]]\n")
                 for i in range(3):
-                    f.write(str(self.qmc.weight[i]))
-                    f.write("    ")
-                f.write("\n[[ROASTER-TYPE]]\n")
+                    f.write(unicode(self.qmc.weight[i]))
+                    f.write(u"    ")
+                f.write(u"\n[[ROASTER-TYPE]]\n")
                 f.write(self.qmc.roastertype)
-                f.write("\n[[OPERATOR]]\n")
+                f.write(u"\n[[OPERATOR]]\n")
                 f.write(self.qmc.operator)
-                f.write("\n[[DATE]]\n")
-                f.write(str(self.qmc.roastdate.toString()))            
-                f.write("\n[[EVENTS]]\n")
+                f.write(u"\n[[DATE]]\n")
+                f.write(unicode(self.qmc.roastdate.toString()))            
+                f.write(u"\n[[EVENTS]]\n")
                 if len(self.qmc.specialevents):
                     for i in range(len(self.qmc.specialevents)):
-                        f.write(str(self.qmc.specialevents[i]) + "    ")
+                        f.write(unicode(self.qmc.specialevents[i]) + u"    ")
                 else:
-                    f.write("")
-                f.write("\n[[EVENTS-DATA]]\n")
+                    f.write(u"")
+                f.write(u"\n[[EVENTS-DATA]]\n")
                 if len(self.qmc.specialevents):
                     for i in range(len(self.qmc.specialevents)):
-                        f.write(self.qmc.specialeventsStrings[i] + "\n")
+                        f.write(self.qmc.specialeventsStrings[i] + u"\n")
                 else:
-                    f.write("\n")
-                f.write("[[ROASTING-NOTES]]\n")
+                    f.write(u"\n")
+                f.write(u"[[ROASTING-NOTES]]\n")
                 f.write(self.qmc.roastingnotes)
-                f.write("\n[[CUPPING-NOTES]]\n")
+                f.write(u"\n[[CUPPING-NOTES]]\n")
                 f.write(self.qmc.cuppingnotes)
-                f.write("\n[[DATA]]\n")
+                f.write(u"\n[[DATA]]\n")
                 for i in range(len(self.qmc.timex)):
-                    f.write( u"%.2f"%self.qmc.timex[i] + "    " + u"%.1f"%self.qmc.temp1[i] + "    " + u"%.1f"%self.qmc.temp2[i] + "\n")
+                    f.write( u"%.2f"%self.qmc.timex[i] + u"    " + u"%.1f"%self.qmc.temp1[i] + u"    " + u"%.1f"%self.qmc.temp2[i] + u"\n")
 
                 f.close()
-                self.messagelabel.setText("Profile saved to FILE:  " + filename)
+                self.messagelabel.setText(u"Profile saved to FILE:  " + filename)
             else:
-                self.messagelabel.setText("Profile NOT saved")        
+                self.messagelabel.setText(u"Profile NOT saved")        
 
         except IOError,e:
-            self.messagelabel.setText("Error in filesave() " + str(e) + " ")
-            aw.qmc.errorlog.append("Error in filesave() " + str(e))
+            self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
+            aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
             return
         finally:
             if f:
@@ -2523,10 +2532,10 @@ class ApplicationWindow(QMainWindow):
             #restore geometry
             self.restoreGeometry(settings.value("Geometry").toByteArray())     
             #restore mode
-            self.qmc.mode = str(settings.value("Mode",self.qmc.mode).toString())
-            if self.qmc.mode == "F":
+            self.qmc.mode = unicode(settings.value("Mode",self.qmc.mode).toString())
+            if self.qmc.mode == u"F":
                 self.qmc.fahrenheitMode()
-            if self.qmc.mode == "C":
+            if self.qmc.mode == u"C":
                 self.qmc.celsiusMode()
             #restore device
             settings.beginGroup("Device");
@@ -2547,7 +2556,7 @@ class ApplicationWindow(QMainWindow):
             
             #restore colors
             for (k, v) in settings.value("Colors").toMap().items():
-                self.qmc.palette[str(k)] = str(v.toString())
+                self.qmc.palette[unicode(k)] = unicode(v.toString())
             #update colors
             self.qmc.redraw()
             
@@ -2555,11 +2564,11 @@ class ApplicationWindow(QMainWindow):
             self.qmc.flavorlabels = settings.value("Flavors",self.qmc.flavorlabels).toStringList()
             #restore serial port     
             settings.beginGroup("SerialPort");
-            self.ser.comport = str(settings.value("comport",self.ser.comport).toString())
+            self.ser.comport = unicode(settings.value("comport",self.ser.comport).toString())
             self.ser.baudrate = settings.value("baudrate",int(self.ser.baudrate)).toInt()[0]
             self.ser.bytesize = settings.value("bytesize",self.ser.bytesize).toInt()[0]       
             self.ser.stopbits = settings.value("stopbits",self.ser.stopbits).toInt()[0]
-            self.ser.parity = str(settings.value("parity",self.ser.parity).toString())
+            self.ser.parity = unicode(settings.value("parity",self.ser.parity).toString())
             self.ser.timeout = settings.value("timeout",self.ser.timeout).toInt()[0]
             settings.endGroup();
 
@@ -2586,7 +2595,7 @@ class ApplicationWindow(QMainWindow):
 
         except Exception,e:
             print e
-            self.qmc.errorlog.append("Error loading settings " + str(e))         
+            self.qmc.errorlog.append(u"Error loading settings " + unicode(e))         
             return                            
 
 
@@ -2871,7 +2880,7 @@ $cupping_notes
                 
     def phase2html(self,time,RoR,eval):
         if self.qmc.statisticstimes[0] > 0 and time and time > 0:
-            return self.qmc.stringfromseconds(time) + " (%.2f" %(time*100./self.qmc.statisticstimes[0])+"%)<br/>" + "%.1f deg/min"%RoR + "<br/>" + eval
+            return self.qmc.stringfromseconds(time) + " (%.2f" %(time*100./self.qmc.statisticstimes[0])+ "%)<br/>" + "%.1f deg/min"%RoR + "<br/>" + eval
         else:
             return "--"
             
@@ -2930,7 +2939,7 @@ $cupping_notes
         else:
             return 0.0
             
-    #returns the index of the lowest point in BT; return -1 if no such value exists
+    #returns the index of the lowest point in BT; return -1 if no such value found
     def findTP(self):
         if len(aw.qmc.temp2) > 0:
             TP = aw.qmc.temp2[0]
@@ -3059,11 +3068,11 @@ $cupping_notes
     def setcommport(self):
         dialog = comportDlg(self)
         if dialog.exec_():
-            self.ser.comport = str(dialog.comportEdit.currentText())                #str changes QString to a python string
+            self.ser.comport = unicode(dialog.comportEdit.currentText())                #str changes QString to a python string
             self.ser.baudrate = int(dialog.baudrateComboBox.currentText())          #int changes QString to int
             self.ser.bytesize = int(dialog.bytesizeComboBox.currentText())
             self.ser.stopbits = int(dialog.stopbitsComboBox.currentText())
-            self.ser.parity = str(dialog.parityComboBox.currentText())
+            self.ser.parity = unicode(dialog.parityComboBox.currentText())
             self.ser.timeout = int(dialog.timeoutEdit.text())
 
 
@@ -3114,8 +3123,8 @@ $cupping_notes
 
     def importHH506RA(self):
         try:
-            fname = ""
-            fname = QFileDialog.getOpenFileName(self,"Load Profile for a HH506RA")
+            fname = u""
+            fname = QFileDialog.getOpenFileName(self,u"Load Profile for a HH506RA")
             if  fname == "":
                 return
             self.qmc.reset()
@@ -3124,7 +3133,6 @@ $cupping_notes
                 raise IOError, unicode(f.errorString())
                 return
             stream = QTextStream(f)
-            stream.setCodec("ASCII")
 
             #variables to read on the text file are initialized as empty lists
             self.qmc.timex, self.qmc.temp1, self.qmc.temp2 = [],[],[]
@@ -3135,16 +3143,16 @@ $cupping_notes
             regex = QRegExp(r"\s")
             parts = line.split(regex)
             if parts.count() != 3:
-                raise ValueError, "invalid header values"
+                raise ValueError, u"invalid header values"
             else:
-                self.qmc.title = (parts[0])
+                self.qmc.title = unicode(parts[0])
             line = stream.readLine().trimmed()
             line = stream.readLine().trimmed()
 
             parts = line.split(regex, QString.SkipEmptyParts)
-            if parts[2] == "F":
+            if parts[2] == u"F":
                 self.qmc.fahrenheitMode()
-            if parts[2] == "C":
+            if parts[2] == u"C":
                 self.qmc.celsiusMode()
 
             value = float(self.qmc.stringtoseconds(str(parts[8])))
@@ -3159,8 +3167,8 @@ $cupping_notes
                 line = stream.readLine().trimmed()                   
                 parts = line.split(regex, QString.SkipEmptyParts)
                 if parts.count() != 9:
-                    raise ValueError, "invalid data values"
-                newtime = float(self.qmc.stringtoseconds(str(parts[8])))-zero
+                    raise ValueError, u"invalid data values"
+                newtime = float(self.qmc.stringtoseconds(unicode(parts[8])))-zero
                 self.qmc.timex.append(newtime)
                 self.qmc.temp1.append(float(parts[1]))
                 self.qmc.temp2.append(float(parts[4]))
@@ -3171,28 +3179,28 @@ $cupping_notes
                 self.qmc.temp1 = self.qmc.temp2
                 self.qmc.temp2 = tmp
             self.qmc.endofx = self.qmc.timex[-1]
-            self.messagelabel.setText("HH506RA file loaded successfully")
+            self.messagelabel.setText(u"HH506RA file loaded successfully")
             self.qmc.redraw()
 
         except IOError,e:
-            self.messagelabel.setText(str(e))
-            self.qmc.errorlog.append("file error in importHH506RA(): " + str(e))
+            self.messagelabel.setText(unicode(e))
+            self.qmc.errorlog.append(u"file error in importHH506RA(): " + unicode(e))
             return            
 
         except ValueError,e:
-            self.messagelabel.setText(str(e))
-            self.qmc.errorlog.append("value error in importHH506RA(): " + str(e))
+            self.messagelabel.setText(unicode(e))
+            self.qmc.errorlog.append(u"value error in importHH506RA(): " + unicode(e))
             return
 
 
     #checks or creates directory structure
     def dirstruct(self):
         currentdir = QDir().current()     #selects the current dir
-        if not currentdir.exists("profiles"):
-            profilesdir = currentdir.mkdir("profiles")
+        if not currentdir.exists(u"profiles"):
+            profilesdir = currentdir.mkdir(u"profiles")
 
         #check/create 'other' directory inside profiles/
-        otherpath = QString("profiles/other")
+        otherpath = QString(u"profiles/other")
         if not currentdir.exists(otherpath):
             yeardir = currentdir.mkdir(otherpath)
             
@@ -3200,12 +3208,12 @@ $cupping_notes
         date =  QDate.currentDate()       
         
         #check / create year dir 
-        yearpath = QString("profiles/" + str(date.year()))
+        yearpath = QString(u"profiles/" + unicode(date.year()))
         if not currentdir.exists(yearpath):
             yeardir = currentdir.mkdir(yearpath)
 
         #check /create month dir to store profiles
-        monthpath = QString("profiles/" + str(date.year()) + "/" + str(date.month()))
+        monthpath = QString(u"profiles/" + unicode(date.year()) + u"/" + unicode(date.month()))
         if not currentdir.exists(monthpath):
             monthdir = currentdir.mkdir(monthpath)
         self.profilepath = monthpath
@@ -3222,19 +3230,19 @@ $cupping_notes
         
             filename = unicode(QFileDialog.getSaveFileName(self,"Save Image for web","","*.png"))
             if filename:
-                if ".png" not in filename:
-                    filename += ".png"
+                if u".png" not in filename:
+                    filename += u".png"
                     
             image.save(filename)
             
             x = image.width()
             y = image.height()
             
-            self.messagelabel.setText(filename + " (" + str(x) + "x" + str(y) + ") saved")
+            self.messagelabel.setText(filename + u" (" + unicode(x) + u"x" + unicode(y) + u") saved")
 
         except IOError,e:
-            self.messagelabel.setText("Error in resize() " + str(e) + " ")
-            aw.qmc.errorlog.append("Error in resize() " + str(e))
+            self.messagelabel.setText(u"Error in resize() " + unicode(e) + u" ")
+            aw.qmc.errorlog.append(u"Error in resize() " + unicode(e))
             return
                                         
 ########################################################################################            
@@ -3245,7 +3253,7 @@ class editGraphDlg(QDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
 
-        self.setWindowTitle("Roast properties")
+        self.setWindowTitle(u"Roast properties")
 
         regextime = QRegExp(r"^[0-9]{1,2}:[0-9]{1,2}$")
         regexweight = QRegExp(r"^[0-9]{1,3}[.0-9]{1,2}$")
@@ -3336,31 +3344,31 @@ class editGraphDlg(QDialog):
             self.line6b = QLineEdit(time6)
             self.line6b.setValidator(QRegExpValidator(regextime,self))
             self.line6b.setMaximumWidth(50)
-            self.line6 = QLineEdit(time6 + " " + aw.qmc.specialeventsStrings[5])
+            self.line6 = QLineEdit(time6 + u" " + aw.qmc.specialeventsStrings[5])
         if ntlines > 6 and nslines > 6:
             time7 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[6])]))
             self.line7b = QLineEdit(time7)
             self.line7b.setValidator(QRegExpValidator(regextime,self))
             self.line7b.setMaximumWidth(50)
-            self.line7 = QLineEdit(time6 + " " + aw.qmc.specialeventsStrings[6])
+            self.line7 = QLineEdit(time6 + u" " + aw.qmc.specialeventsStrings[6])
         if ntlines > 7 and nslines > 7:
             time8 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[7])]))
             self.line8b = QLineEdit(time8)
             self.line8b.setValidator(QRegExpValidator(regextime,self))
             self.line8b.setMaximumWidth(50)
-            self.line8 = QLineEdit(time8 + " " + aw.qmc.specialeventsStrings[7])
+            self.line8 = QLineEdit(time8 + u" " + aw.qmc.specialeventsStrings[7])
         if ntlines > 8 and nslines > 8:
             time9 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[8])]))
             self.line9b = QLineEdit(time9)
             self.line9b.setValidator(QRegExpValidator(regextime,self))
             self.line9b.setMaximumWidth(50)
-            self.line9 = QLineEdit(time9 + " " + aw.qmc.specialeventsStrings[8])
+            self.line9 = QLineEdit(time9 + u" " + aw.qmc.specialeventsStrings[8])
         if ntlines > 9 and nslines > 9:
             time10 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[9])]))
             self.line10b = QLineEdit(time10)
             self.line10b.setValidator(QRegExpValidator(regextime,self))
             self.line10b.setMaximumWidth(50)
-            self.line10 = QLineEdit(time10 + " " + aw.qmc.specialeventsStrings[9])
+            self.line10 = QLineEdit(time10 + u" " + aw.qmc.specialeventsStrings[9])
 
         numberlabel1 = QLabel("Event 1")
         numberlabel2 = QLabel("Event 2")
@@ -3605,12 +3613,12 @@ class editGraphDlg(QDialog):
             # update graph time variables
             #varC = 1C start time [0],1C start Temp [1],1C end time [2],1C end temp [3],2C start time [4], 2C start Temp [5],2C end time [6], 2C end temp [7]
             #startend = [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
-            aw.qmc.startend[0] = self.choice(aw.qmc.stringtoseconds(str(self.chargeedit.text())))   #CHARGE   time
-            aw.qmc.varC[0] = self.choice(aw.qmc.stringtoseconds(str(self.Cstartedit.text())))       #1C START time
-            aw.qmc.varC[2] = self.choice(aw.qmc.stringtoseconds(str(self.Cendedit.text())))         #1C END   time
-            aw.qmc.varC[4] = self.choice(aw.qmc.stringtoseconds(str(self.CCstartedit.text())))      #2C START time
-            aw.qmc.varC[6] = self.choice(aw.qmc.stringtoseconds(str(self.CCendedit.text())))        #2C END   time
-            aw.qmc.startend[2] = self.choice(aw.qmc.stringtoseconds(str(self.dropedit.text())))     #DROP     time
+            aw.qmc.startend[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))   #CHARGE   time
+            aw.qmc.varC[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))       #1C START time
+            aw.qmc.varC[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))         #1C END   time
+            aw.qmc.varC[4] = self.choice(aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))      #2C START time
+            aw.qmc.varC[6] = self.choice(aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))        #2C END   time
+            aw.qmc.startend[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.dropedit.text())))     #DROP     time
             #find corresponding temperatures
             aw.qmc.startend[1] = aw.BTfromseconds(aw.qmc.startend[0])                             #CHARGE   temperature
             aw.qmc.varC[1] = aw.BTfromseconds(aw.qmc.varC[0])                                     #1C START temperature
@@ -3622,102 +3630,107 @@ class editGraphDlg(QDialog):
             #update events             
             ntlines = len(aw.qmc.specialevents)         #number of events found            
             if ntlines > 0:
-                aw.qmc.specialevents[0] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line1b.text()))))
-                aw.qmc.specialeventsStrings[0] = str(self.line1.text())
+                aw.qmc.specialevents[0] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line1b.text()))))
+                aw.qmc.specialeventsStrings[0] = unicode(self.line1.text())
             if ntlines > 1:
-                aw.qmc.specialevents[1] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line2b.text()))))
-                aw.qmc.specialeventsStrings[1] = str(self.line2.text())
+                aw.qmc.specialevents[1] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line2b.text()))))
+                aw.qmc.specialeventsStrings[1] = unicode(self.line2.text())
             if ntlines > 2:
-                aw.qmc.specialevents[2] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line3b.text()))))
-                aw.qmc.specialeventsStrings[2] = str(self.line3.text())
+                aw.qmc.specialevents[2] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line3b.text()))))
+                aw.qmc.specialeventsStrings[2] = unicode(self.line3.text())
             if ntlines > 3:
-                aw.qmc.specialevents[3] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line4b.text()))))
-                aw.qmc.specialeventsStrings[3] = str(self.line4.text())
+                aw.qmc.specialevents[3] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line4b.text()))))
+                aw.qmc.specialeventsStrings[3] = unicode(self.line4.text())
             if ntlines > 4:
-                aw.qmc.specialevents[4] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line5b.text()))))
-                aw.qmc.specialeventsStrings[4] = str(self.line5.text())
+                aw.qmc.specialevents[4] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line5b.text()))))
+                aw.qmc.specialeventsStrings[4] = unicode(self.line5.text())
             if ntlines > 5:
-                aw.qmc.specialevents[5] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line6b.text()))))
-                aw.qmc.specialeventsStrings[5] = str(self.line6.text())
+                aw.qmc.specialevents[5] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line6b.text()))))
+                aw.qmc.specialeventsStrings[5] = unicode(self.line6.text())
             if ntlines > 6:
-                aw.qmc.specialevents[6] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line7b.text()))))
-                aw.qmc.specialeventsStrings[6] = str(self.line7.text())
+                aw.qmc.specialevents[6] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line7b.text()))))
+                aw.qmc.specialeventsStrings[6] = unicode(self.line7.text())
             if ntlines > 7:
-                aw.qmc.specialevents[7] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line8b.text()))))
-                aw.qmc.specialeventsStrings[7] = str(self.line8.text())
+                aw.qmc.specialevents[7] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line8b.text()))))
+                aw.qmc.specialeventsStrings[7] = unicode(self.line8.text())
             if ntlines > 8:
-                aw.qmc.specialevents[8] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line9b.text()))))
-                aw.qmc.specialeventsStrings[8] = str(self.line9.text())
+                aw.qmc.specialevents[8] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line9b.text()))))
+                aw.qmc.specialeventsStrings[8] = unicode(self.line9.text())
             if ntlines > 9:
-                aw.qmc.specialevents[9] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(str(self.line10b.text()))))
-                aw.qmc.specialeventsStrings[9] = str(self.line10.text())
+                aw.qmc.specialevents[9] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line10b.text()))))
+                aw.qmc.specialeventsStrings[9] = unicode(self.line10.text())
 
             # Update Title
-            aw.qmc.ax.set_title(str(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
-            aw.qmc.title = str(self.titleedit.text())
+            aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
+            aw.qmc.title = unicode(self.titleedit.text())
             # Update beans
-            aw.qmc.beans = str(self.beansedit.text())
+            aw.qmc.beans = unicode(self.beansedit.text())
             #update roaster
-            aw.qmc.roaster = str(self.roaster.text())
+            aw.qmc.roaster = unicode(self.roaster.text())
 
             #update weight
-            if str(self.weightinedit.text()).isdigit():
+            if unicode(self.weightinedit.text()).isdigit():
                 aw.qmc.weight[0] = int(self.weightinedit.text())
             else:
                 pass
-            if str(self.weightoutedit.text()).isdigit():
+            if unicode(self.weightoutedit.text()).isdigit():
                 aw.qmc.weight[1] = int(self.weightoutedit.text())
             else:
                 pass
-            aw.qmc.weight[2] = str(self.unitsComboBox.currentText())
+            aw.qmc.weight[2] = unicode(self.unitsComboBox.currentText())
 
             #update notes
-            aw.qmc.roastertype = str(self.roaster.text())
-            aw.qmc.operator = str(self.operator.text())
+            aw.qmc.roastertype = unicode(self.roaster.text())
+            aw.qmc.operator = unicode(self.operator.text())
             aw.qmc.roastingnotes = unicode(self.roastingeditor.toPlainText())
-            aw.qmc.cuppingnotes = str(self.cupingeditor.toPlainText())
+            aw.qmc.cuppingnotes = unicode(self.cupingeditor.toPlainText())
            
-            aw.messagelabel.setText("Graph properties updated (but file not saved in hard-drive)")            
+            aw.messagelabel.setText(u"Graph properties updated (but profile not saved in hard-drive)")            
             aw.qmc.redraw()
             self.close()
 
             
-            
         else:
-            aw.messagelabel.setText("No data")
+            aw.messagelabel.setText(u"No data")
             self.close()
             
 
     #selects the closest match from the available data in timex for a given number of seconds.
     #this helps ploting an event in a recorded spot of the graph, so that we don't need to interpolate.
-    #interpolation would cause plotting dimension problems.
+    #interpolation would cause plotting dimension problems because several graphs depend on the dimension of aw.qmc.timex
     def choice(self,seconds):
         if seconds == 0:
             return 0.0
         else:
             #find where given seconds crosses aw.qmc.timex
             if len(aw.qmc.timex):                           #check that time is not empty just in case
-                for i in range(len(aw.qmc.timex)):
+                if aw.qmc.timex[-1] < seconds:
+                    aw.messagelabel.setText(u"Time out of reach")
+                    return aw.qmc.timex[-1]
+
+                for i in range(len(aw.qmc.timex)):                    
                     # first find the index i where seconds crosses timex
-                    if aw.qmc.timex[i] > seconds:
+                    if aw.qmc.timex[i] >= seconds:
                         break
+
                 choice1 = aw.qmc.timex[i]   # after
                 choice2 = aw.qmc.timex[i-1] # before
 
-                if (choice1-seconds) <= (choice2-seconds):  #return closest of the two
-                    return float(choice1)
+                if (choice1 - seconds) < (choice2 - seconds):  #return closest of the two
+                    return choice1
                 else:
-                    return float(choice2)
+                    return choice2
+
             
     # adds a new event to the Dlg
     def addevent(self):
-        self.accept()                       #saves edited events before adding new event
+        self.accept()                       #saves edited events or notes before adding new event
         if len(aw.qmc.timex) > 1:
             aw.qmc.specialevents.append(0)
             self.close()
             aw.editgraph()
         else:
-            aw.messagelabel.setText("Events need time and data")
+            aw.messagelabel.setText(u"Events need time and data")
 
     # pops an event from the Dlg
     def delevent(self):
@@ -3743,7 +3756,7 @@ class errorDlg(QDialog):
             htmlerr += "<b>" + str(i+1) + "</b> <i>" + aw.qmc.errorlog[i] + "</i><br><br>"
 
         enumber = len(aw.qmc.errorlog)
-        labelstr =  "Number of errors found <b>" + str(enumber) +"</b>"
+        labelstr =  "Number of errors found <b>" + unicode(enumber) +"</b>"
         elabel = QLabel(labelstr)
         errorEdit = QTextEdit()
         errorEdit.setHtml(htmlerr)
@@ -3853,28 +3866,32 @@ class calculatorDlg(QDialog):
         
         self.setLayout(mainlayout)
 
-    #selects closest time index in aw.qmc.timex from secons
+    #selects closest time INDEX in aw.qmc.timex from secons
     #used by calculate()
     def choice(self,seconds):
-
+        if seconds == 0:
+            return 0.0
         #find where given seconds crosses aw.qmc.timex
         if len(aw.qmc.timex):                           #check that time is not empty just in case
+            if aw.qmc.timex[-1] < seconds:
+                return aw.qmc.timex[-1]            
             for i in range(len(aw.qmc.timex)):
                 # first find the index i where seconds crosses timex
                 if aw.qmc.timex[i] > seconds:
                     break
-            choice1 = aw.qmc.timex[i]   # after
+            choice1 = aw.qmc.timex[i]   # after or equal
             choice2 = aw.qmc.timex[i-1] # before
 
-            if (choice1-seconds) <= (choice2-seconds):  #return closest of the two
+            if (choice1-seconds) < (choice2-seconds):  #return closest INDEX 
                 return i
             else:
                 return i-1
-        
+
+    #calculate rate of change        
     def calculateRC(self):
         if len(aw.qmc.timex)>2:
-            starttime = aw.qmc.stringtoseconds(str(self.startEdit.text()))
-            endtime = aw.qmc.stringtoseconds(str(self.endEdit.text()))
+            starttime = aw.qmc.stringtoseconds(unicode(self.startEdit.text()))
+            endtime = aw.qmc.stringtoseconds(unicode(self.endEdit.text()))
 
             if starttime == -1 or endtime == -1:
                 self.result1.setText("time sintax error. Time not valid")
@@ -3908,13 +3925,13 @@ class calculatorDlg(QDialog):
             deltaminutes = deltaseconds*60.
             
             if aw.qmc.startend[0]:
-                string1 = ( "Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]-aw.qmc.startend[0]) +
-                            " to " + aw.qmc.stringfromseconds(aw.qmc.timex[endindex]-aw.qmc.startend[0] ))
+                string1 = ( u"Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]-aw.qmc.startend[0]) +
+                            u" to " + aw.qmc.stringfromseconds(aw.qmc.timex[endindex]-aw.qmc.startend[0] ))
             else:
-                string1 = ("Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]) + " to " +
+                string1 = (u"Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]) + u" to " +
                            aw.qmc.stringfromseconds(aw.qmc.timex[endindex]))
                 
-            string2 = "deg/sec = " + "%.2f"%(deltaseconds) + "    deg/min = " + "%.2f"%(deltaminutes)
+            string2 = u"deg/sec = " + u"%.2f"%(deltaseconds) + u"    deg/min = " + u"%.2f"%(deltaminutes)
             
             self.result1.setText(string1)        
             self.result2.setText(string2)
@@ -3925,12 +3942,12 @@ class calculatorDlg(QDialog):
     def convertTemp(self,x):
         if x == "FtoC":
            newC = aw.qmc.fromFtoC(float(str(self.faEdit.text())))
-           result = "%.2f"%newC
+           result = u"%.2f"%newC
            self.ceEdit.setText(result)
             
         elif x == "CtoF":
            newF = aw.qmc.fromCtoF(float(str(self.ceEdit.text())))
-           result = "%.2f"%newF
+           result = u"%.2f"%newF
            self.faEdit.setText(result)          
 
     def convertWeight(self,x):
@@ -3942,14 +3959,14 @@ class calculatorDlg(QDialog):
                     ]
         
         if x == "ItoO":
-           inx = float(str(self.inEdit.text()))
+           inx = float(unicode(self.inEdit.text()))
            outx = inx*convtable[self.inComboBox.currentIndex()][self.outComboBox.currentIndex()]
-           self.outEdit.setText("%.2f"%outx)
+           self.outEdit.setText(u"%.2f"%outx)
             
         elif x == "OtoI":
-           outx = float(str(self.outEdit.text()))
+           outx = float(unicode(self.outEdit.text()))
            inx = outx*convtable[self.outComboBox.currentIndex()][self.inComboBox.currentIndex()]
-           self.inEdit.setText("%.2f"%inx)
+           self.inEdit.setText(u"%.2f"%inx)
            
 ##########################################################################
 ############################     HUD  DLG     ############################
@@ -3982,9 +3999,9 @@ class HUDDlg(QDialog):
         self.setLayout(hudLayout)
 
     def updatetargets(self):
-        aw.qmc.ETtarget = int(str(self.ETlineEdit.text()))
-        aw.qmc.BTtarget = int(str(self.BTlineEdit.text()))
-        string = "[ET target = " + str(self.ETlineEdit.text()) + "] [BT target = " + str(self.BTlineEdit.text()) + "]"
+        aw.qmc.ETtarget = int(unicode(self.ETlineEdit.text()))
+        aw.qmc.BTtarget = int(unicode(self.BTlineEdit.text()))
+        string = u"[ET target = " + unicode(self.ETlineEdit.text()) + u"] [BT target = " + unicode(self.BTlineEdit.text()) + u"]"
         aw.HUDstatus.showMessage(string,3000)
         self.close()
         
@@ -4010,7 +4027,7 @@ class phasesGraphDlg(QDialog):
         self.startfinish = QSpinBox()
         self.endfinish = QSpinBox()
         
-        if aw.qmc.mode == "F":
+        if aw.qmc.mode == u"F":
              self.startdry.setSuffix(" F")
              self.enddry.setSuffix(" F")
              self.startmid.setSuffix(" F")
@@ -4025,7 +4042,7 @@ class phasesGraphDlg(QDialog):
              self.startfinish.setRange(0,1000)
              self.endfinish.setRange(0,1000)               
                                         
-        elif aw.qmc.mode == "C":
+        elif aw.qmc.mode == u"C":
              self.startdry.setSuffix(" C")
              self.enddry.setSuffix(" C")
              self.startmid.setSuffix(" C")
@@ -4088,13 +4105,13 @@ class phasesGraphDlg(QDialog):
         self.close()
 
     def setdefault(self):
-        if aw.qmc.mode == "F":
+        if aw.qmc.mode == u"F":
             aw.qmc.phases = [200,300,390,450]
-            aw.messagelabel.setText("Phases changed to F default: [200,300,390,450]")
+            aw.messagelabel.setText(u"Phases changed to F default: [200,300,390,450]")
 
-        elif aw.qmc.mode == "C":
+        elif aw.qmc.mode == u"C":
             aw.qmc.phases = [95,150,200,230]
-            aw.messagelabel.setText("Phases changed to C default: [95,150,200,230]")
+            aw.messagelabel.setText(u"Phases changed to C default: [95,150,200,230]")
         aw.qmc.redraw()
         self.close()
 
@@ -4294,20 +4311,20 @@ class flavorDlg(QDialog):
         aw.qmc.flavorchart()
 
     def updatelabels(self):
-        aw.qmc.flavorlabels[0] = str(self.line0edit.displayText())
-        aw.qmc.flavorlabels[1] = str(self.line1edit.displayText())
-        aw.qmc.flavorlabels[2] = str(self.line2edit.displayText())
-        aw.qmc.flavorlabels[3] = str(self.line3edit.displayText())
-        aw.qmc.flavorlabels[4] = str(self.line4edit.displayText())
-        aw.qmc.flavorlabels[5] = str(self.line5edit.displayText())
-        aw.qmc.flavorlabels[6] = str(self.line6edit.displayText())
-        aw.qmc.flavorlabels[7] = str(self.line7edit.displayText())
-        aw.qmc.flavorlabels[8] = str(self.line8edit.displayText())   
+        aw.qmc.flavorlabels[0] = unicode(self.line0edit.displayText())
+        aw.qmc.flavorlabels[1] = unicode(self.line1edit.displayText())
+        aw.qmc.flavorlabels[2] = unicode(self.line2edit.displayText())
+        aw.qmc.flavorlabels[3] = unicode(self.line3edit.displayText())
+        aw.qmc.flavorlabels[4] = unicode(self.line4edit.displayText())
+        aw.qmc.flavorlabels[5] = unicode(self.line5edit.displayText())
+        aw.qmc.flavorlabels[6] = unicode(self.line6edit.displayText())
+        aw.qmc.flavorlabels[7] = unicode(self.line7edit.displayText())
+        aw.qmc.flavorlabels[8] = unicode(self.line8edit.displayText())   
 
         aw.qmc.flavorchart()
 
     def defaultlabels(self):
-        aw.qmc.flavorlabels = ['Acidity','After taste','Clean cup','Head','Fragance','Sweetness','Aroma','Balance','Body']
+        aw.qmc.flavorlabels = [u'Acidity',u'After taste',u'Clean cup',u'Head',u'Fragance',u'Sweetness',u'Aroma',u'Balance',u'Body']
         
         aw.qmc.flavorchart()
         
@@ -4338,7 +4355,7 @@ class backgroundDLG(QDialog):
 
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
-        self.fname = ""
+        self.fname = u""
         
         self.backgroundCheck = QCheckBox("Show")
         self.backgroundDetails = QCheckBox("Text")
@@ -4392,12 +4409,12 @@ class backgroundDLG(QDialog):
         self.styleComboBox.setCurrentIndex(0)
 
 
-        colors = [""]
+        colors = [u""]
         for key in cnames:
-            colors.append(key)
+            colors.append(unicode(key))
         colors.sort()
-        colors.insert(0,"met")
-        colors.insert(1,"bt")
+        colors.insert(0,u"met")
+        colors.insert(1,u"bt")
         colors.pop(2)
         
         btcolorlabel = QLabel("BT color")
@@ -4470,7 +4487,7 @@ class backgroundDLG(QDialog):
         self.status.showMessage("Processing...",5000)
         #block button
         self.styleComboBox.setDisabled(True) 
-        aw.qmc.backgroundstyle = str(self.styleComboBox.currentText())
+        aw.qmc.backgroundstyle = unicode(self.styleComboBox.currentText())
         aw.qmc.redraw()
         #reactivate button
         self.styleComboBox.setDisabled(False)
@@ -4483,18 +4500,18 @@ class backgroundDLG(QDialog):
         self.btcolorComboBox.setDisabled(True)
         self.metcolorComboBox.setDisabled(True)
         
-        if curve == "met":
-            if color == "met":
+        if curve == u"met":
+            if color == u"met":
                 aw.qmc.backgroundmetcolor = aw.qmc.palette["met"]
-            elif color == "bt":
+            elif color == u"bt":
                 aw.qmc.backgroundmetcolor = aw.qmc.palette["bt"]
             else:
                 aw.qmc.backgroundmetcolor = color
                 
-        elif curve == "bt":
-            if color == "bt":
+        elif curve == u"bt":
+            if color == u"bt":
                 aw.qmc.backgroundbtcolor = aw.qmc.palette["bt"]
-            elif color == "met":
+            elif color == u"met":
                 aw.qmc.backgroundbtcolor = aw.qmc.palette["met"]                
             else:
                 aw.qmc.backgroundbtcolor = color
@@ -4529,7 +4546,7 @@ class backgroundDLG(QDialog):
     def delete(self):
         
         self.status.showMessage("Processing...",5000)
-        self.pathedit.setText("")
+        self.pathedit.setText(u"")
         self.backgroundDetails.setChecked(False)
         self.backgroundCheck.setChecked(False)
         
@@ -4592,12 +4609,12 @@ class backgroundDLG(QDialog):
         self.fname = filename
 
     def load(self):        
-        if str(self.pathedit.text()) == "":
+        if unicode(self.pathedit.text()) == "":
             self.status.showMessage("Empty file path",5000)   
             return
         self.status.showMessage("Reading file...",5000)   
-        aw.qmc.backgroundpath = str(self.pathedit.text())
-        aw.loadbackground(str(self.pathedit.text()))
+        aw.qmc.backgroundpath = unicode(self.pathedit.text())
+        aw.loadbackground(unicode(self.pathedit.text()))
         self.backgroundCheck.setChecked(True)
         self.backgroundDetails.setChecked(True)
         self.readChecks()
@@ -4690,12 +4707,12 @@ class StatisticsDLG(QDialog):
 
     def accept(self):
 
-        mindry = aw.qmc.stringtoseconds(str(self.mindryedit.text()))
-        maxdry = aw.qmc.stringtoseconds(str(self.maxdryedit.text()))
-        minmid = aw.qmc.stringtoseconds(str(self.minmidedit.text()))
-        maxmid = aw.qmc.stringtoseconds(str(self.maxmidedit.text()))
-        minfinish = aw.qmc.stringtoseconds(str(self.minfinishedit.text()))
-        maxfinish = aw.qmc.stringtoseconds(str(self.maxfinishedit.text()))
+        mindry = aw.qmc.stringtoseconds(unicode(self.mindryedit.text()))
+        maxdry = aw.qmc.stringtoseconds(unicode(self.maxdryedit.text()))
+        minmid = aw.qmc.stringtoseconds(unicode(self.minmidedit.text()))
+        maxmid = aw.qmc.stringtoseconds(unicode(self.maxmidedit.text()))
+        minfinish = aw.qmc.stringtoseconds(unicode(self.minfinishedit.text()))
+        maxfinish = aw.qmc.stringtoseconds(unicode(self.maxfinishedit.text()))
 
         if mindry != -1 and maxdry != -1 and minmid != -1 and maxmid != -1 and minfinish != -1 and maxfinish != -1:
             aw.qmc.statisticsconditions[0] = mindry
@@ -4773,18 +4790,18 @@ class serialport(object):
                 # CHECK FOR RECEIVED ERROR CODES
                 if ord(r[1]) == 128:
                         if ord(r[2]) == 1:
-                             errorcode = " F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. "
-                             aw.messagelabel.setText("sendFUJIcommand(): ERROR 1 Illegal Function in unit %i" %ord(command[0]))
+                             errorcode = u" F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. "
+                             aw.messagelabel.setText(u"sendFUJIcommand(): ERROR 1 Illegal Function in unit %i" %ord(command[0]))
                              aw.qmc.errorlog.append(errorcode)
                         if ord(r[2]) == 2:
-                             errorcode = "F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n \
+                             errorcode = u"F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n \
                                          number cannot be used by the specified function code."
-                             aw.messagelabel.setText("sendFUJIcommand() ERROR 2 Illegal Address for unit %i"%(ord(command[0])))
+                             aw.messagelabel.setText(u"sendFUJIcommand() ERROR 2 Illegal Address for unit %i"%(ord(command[0])))
                              aw.qmc.errorlog.append(errorcode)
                         if ord(r[2]) == 3:
-                             errorcode = "F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n \
+                             errorcode = u"F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n \
                                           coil numbers or resistor numbers."
-                             aw.messagelabel.setText("sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i"%(ord(command[0])))
+                             aw.messagelabel.setText(u"sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i"%(ord(command[0])))
                              aw.qmc.errorlog.append(errorcode)
                 else:
                     #Check crc16
@@ -4793,19 +4810,19 @@ class serialport(object):
                     if crcCal1 == crcRx:  
                         return r           #OK. Return r after it has been checked for errors
                     else:
-                        aw.messagelabel.setText("Crc16 data corruption ERROR. TX does not match RX. Check wiring")
-                        aw.qmc.errorlog.append("Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
-                        return "0"
+                        aw.messagelabel.setText(u"Crc16 data corruption ERROR. TX does not match RX. Check wiring")
+                        aw.qmc.errorlog.append(u"Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
+                        return u"0"
 
             else:
-                aw.messagelabel.setText("No RX data received")
-                return "0"                  #return "0" if something went wrong
+                aw.messagelabel.setText(u"No RX data received")
+                return u"0"                  #return "0" if something went wrong
 
 
         except serial.SerialException,e:
-            aw.messagelabel.setText("ser.sendFUJIcommand(): Error in serial port" + str(e))
-            aw.qmc.errorlog.append("ser.sendFUJIcommand): Error in serial port " + str(e))
-            return "0"
+            aw.messagelabel.setText(u"ser.sendFUJIcommand(): Error in serial port" + unicode(e))
+            aw.qmc.errorlog.append(u"ser.sendFUJIcommand): Error in serial port " + unicode(e))
+            return u"0"
         
         finally:
             if serTX:
@@ -4835,15 +4852,15 @@ class serialport(object):
 
                 return t1, t2
             else:
-                aw.messagelabel.setText("No RX data from HH806AUtemperature()")
-                aw.qmc.errorlog.append("No RX data from HH806AUtemperature() ")
+                aw.messagelabel.setText(u"No RX data from HH806AUtemperature()")
+                aw.qmc.errorlog.append(u"No RX data from HH806AUtemperature() ")
                 if len(aw.qmc.timex) > 2:
                     return aw.qmc.temp1[-1], aw.qmc.temp2[-1]
                 else:
                     return -1,-1
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.HH806AUtemperature(): " + str(e))
-            aw.qmc.errorlog.append("ser.HH806AUtemperature(): " + str(e) )
+            aw.messagelabel.setText(u"ser.HH806AUtemperature(): " + unicode(e))
+            aw.qmc.errorlog.append(u"ser.HH806AUtemperature(): " + unicode(e) )
             return -1,-1
         finally:
             if serHH:
@@ -4857,8 +4874,8 @@ class serialport(object):
         if self.HH506RAid == "X":                                         
             self.HH506RAGetID()                       # obtain new id one time; self.HH506RAid should not be "X" any more
             if self.HH506RAid == "X":                 # if self.HH506RAGetID() went wrong and self.HH506RAid is still "X" 
-                aw.messagelabel.setText("unable to get id from HH506RA device")
-                aw.qmc.errorlog.append("unable to get id from HH506RA device")
+                aw.messagelabel.setText(u"unable to get id from HH506RA device")
+                aw.qmc.errorlog.append(u"unable to get id from HH506RA device")
                 return -1,-1
            
         serHH = None
@@ -4883,8 +4900,8 @@ class serialport(object):
                 return t1,t2
             
             else:
-                aw.messagelabel.setText("No RX data from HH506RAtemperature()")
-                aw.qmc.errorlog.append("No RX data from HH506RAtemperature()")
+                aw.messagelabel.setText(u"No RX data from HH506RAtemperature()")
+                aw.qmc.errorlog.append(u"No RX data from HH506RAtemperature()")
                 
                 if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
                     return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
@@ -4892,8 +4909,8 @@ class serialport(object):
                     return -1,-1                                    #return something out of scope to avoid function error (expects two values)
         
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.HH506RAtemperature(): " + str(e))
-            aw.qmc.errorlog.append("ser.HH506RAtemperature(): " + str(e) )
+            aw.messagelabel.setText(u"ser.HH506RAtemperature(): " + unicode(e))
+            aw.qmc.errorlog.append(u"ser.HH506RAtemperature(): " + unicode(e) )
             return -1,-1
         
         finally:
@@ -4920,8 +4937,8 @@ class serialport(object):
             serHH.close()
         
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.HH506RAGetID()" + str(e))
-            aw.qmc.errorlog.append("ser.HH506RAGetID()" + str(e) )
+            aw.messagelabel.setText(u"ser.HH506RAGetID()" + unicode(e))
+            aw.qmc.errorlog.append(u"ser.HH506RAGetID()" + unicode(e) )
             
         finally:
             if serHH:
@@ -4975,7 +4992,7 @@ class serialport(object):
                 
             else:
                 nbytes = len(r)
-                message = "%i bytes received but 10 needed"%nbytes
+                message = u"%i bytes received but 10 needed"%nbytes
                 aw.messagelabel.setText(message)
                 aw.qmc.errorlog.append(message)
                 
@@ -4987,8 +5004,8 @@ class serialport(object):
             
         
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.CENTER306temperature()" + str(e))
-            aw.qmc.errorlog.append("ser.CENTER306temperature()" + str(e) )
+            aw.messagelabel.setText(u"ser.CENTER306temperature()" + unicode(e))
+            aw.qmc.errorlog.append(u"ser.CENTER306temperature()" + unicode(e) )
             return -1,-1
             
         finally:
@@ -5043,7 +5060,7 @@ class serialport(object):
 
             else:
                 nbytes = len(r)
-                message = "%i bytes received but 8 needed"%nbytes
+                message = u"%i bytes received but 8 needed"%nbytes
                 aw.messagelabel.setText(message)
                 aw.qmc.errorlog.append(message)
                 
@@ -5053,8 +5070,8 @@ class serialport(object):
                     return -1,-1                                    #return something out of scope to avoid function error (expects two values)
         
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.CENTER303temperature()" + str(e))
-            aw.qmc.errorlog.append("ser.CENTER303temperature()" + str(e) )
+            aw.messagelabel.setText(u"ser.CENTER303temperature()" + unicode(e))
+            aw.qmc.errorlog.append(u"ser.CENTER303temperature()" + unicode(e) )
             return -1,-1
             
         finally:
@@ -5103,36 +5120,36 @@ class serialport(object):
                 if Tcheck != 12:
                     if Tcheck == 14:
                         if not self.CENTER309flag:
-                            aw.messagelabel.setText("CENTER 309 connected: T1")
+                            aw.messagelabel.setText(u"CENTER 309 connected: T1")
                             self.CENTER309flag = 1
                         T1 = int(binascii.hexlify(r[7] + r[8]),16)
                         T2 = 0.
                     elif Tcheck == 13:
                         if not self.CENTER309flag:
-                            aw.messagelabel.setText("CENTER 309 connected: T2")
+                            aw.messagelabel.setText(u"CENTER 309 connected: T2")
                             self.CENTER309flag = 1
                         T1 = 0.
                         T2 = int(binascii.hexlify(r[9] + r[10]),16)
                     elif Tcheck == 11:
                         if not self.CENTER309flag:
-                            aw.messagelabel.setText("CENTER 309 connected: T3")
+                            aw.messagelabel.setText(u"CENTER 309 connected: T3")
                             self.CENTER309flag = 1
                         T1 = 0.
                         T2 = int(binascii.hexlify(r[11] + r[12]),16)
                     elif Tcheck == 7:
                         if not self.CENTER309flag:
                             print 
-                            aw.messagelabel.setText("CENTER 309 connected: T4")
+                            aw.messagelabel.setText(u"CENTER 309 connected: T4")
                             self.CENTER309flag = 1
                         T1 = 0.
                         T2 = int(binascii.hexlify(r[13] + r[14]),16)
                     else:
-                        aw.messagelabel.setText("Connections allowed: T1&T2, or T1, or T2, or T3, or T4")
+                        aw.messagelabel.setText(u"Connections allowed: T1&T2, or T1, or T2, or T3, or T4")
                         T1 = 0.
                         T2 = 0.
                 else:
                     if not self.CENTER309flag:
-                        aw.messagelabel.setText("CENTER 309 connected: T1 & T2")
+                        aw.messagelabel.setText(u"CENTER 309 connected: T1 & T2")
                         self.CENTER309flag = 1
                         
                     T1 = int(binascii.hexlify(r[7] + r[8]),16)
@@ -5142,7 +5159,7 @@ class serialport(object):
             
             else:
                 nbytes = len(r)
-                message = "%i bytes from CENTER309 but 45 needed"%nbytes
+                message = u"%i bytes from CENTER309 but 45 needed"%nbytes
                 aw.messagelabel.setText(message)
                 aw.qmc.errorlog.append(message)
                 
@@ -5153,8 +5170,8 @@ class serialport(object):
         
         
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.CENTER309temperature()" + str(e))
-            aw.qmc.errorlog.append("ser.CENTER309temperature()" + str(e) )
+            aw.messagelabel.setText(u"ser.CENTER309temperature()" + unicode(e))
+            aw.qmc.errorlog.append(u"ser.CENTER309temperature()" + unicode(e) )
             return -1,-1
             
         finally:
@@ -5278,12 +5295,12 @@ class comportDlg(QDialog):
         class stopbitsError(Exception): pass
         class timeoutError(Exception): pass
         
-        comport = self.comportEdit.currentText()
-        baudrate = self.baudrateComboBox.currentText()
-        bytesize = self.bytesizeComboBox.currentText()
-        parity = self.parityComboBox.currentText()
-        stopbits = self.stopbitsComboBox.currentText()
-        timeout = self.timeoutEdit.text()
+        comport = unicode(self.comportEdit.currentText())
+        baudrate = unicode(self.baudrateComboBox.currentText())
+        bytesize = unicode(self.bytesizeComboBox.currentText())
+        parity = unicode(self.parityComboBox.currentText())
+        stopbits = unicode(self.stopbitsComboBox.currentText())
+        timeout = unicode(self.timeoutEdit.text())
         
         try:
             #check here comport errors
@@ -5294,15 +5311,15 @@ class comportDlg(QDialog):
             #add more checks here
             
         except comportError,e:
-            aw.qmc.errorlog.append("Invalid serial Comm entry " + str(e))
-            self.messagelabel.setText("Invalid Comm entry")
+            aw.qmc.errorlog.append(u"Invalid serial Comm entry " + unicode(e))
+            self.messagelabel.setText(u"Invalid Comm entry")
             self.comportEdit.selectAll()
             self.comportEdit.setFocus()           
             return
 
         except timeoutError,e:
-            aw.qmc.errorlog.append("Invalid serial Timeout entry" + str(e))
-            self.messagelabel.setText("Invalid Timeout entry")
+            aw.qmc.errorlog.append(u"Invalid serial Timeout entry" + unicode(e))
+            self.messagelabel.setText(u"Invalid Timeout entry")
             self.timeoutEdit.selectAll()
             self.timeoutEdit.setFocus()           
             return
@@ -5320,7 +5337,7 @@ class comportDlg(QDialog):
                     available.append(s.portstr)
                     s.close()  
                 except serial.SerialException,e:
-                    aw.qmc.errorlog.append("Exception during port scan:" + str(e)) 
+                    aw.qmc.errorlog.append(u"Exception during port scan:" + unicode(e)) 
                 
         elif platf == 'Darwin':
             #scans serial ports in Mac computer
@@ -5967,9 +5984,9 @@ class PXRpidDlgControl(QDialog):
 
         self.connect(button_autotuneON, SIGNAL("clicked()"), lambda flag=1: self.setONOFFautotune(flag))
         self.connect(button_autotuneOFF, SIGNAL("clicked()"), lambda flag=0: self.setONOFFautotune(flag))
-        self.connect(button_p, SIGNAL("clicked()"), lambda var="p": self.setpid(var))
-        self.connect(button_i, SIGNAL("clicked()"), lambda var="i": self.setpid(var))
-        self.connect(button_d, SIGNAL("clicked()"), lambda var="d": self.setpid(var))
+        self.connect(button_p, SIGNAL("clicked()"), lambda var=u"p": self.setpid(var))
+        self.connect(button_i, SIGNAL("clicked()"), lambda var=u"i": self.setpid(var))
+        self.connect(button_d, SIGNAL("clicked()"), lambda var=u"d": self.setpid(var))
         self.connect(tab3cancelbutton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(button_readpid, SIGNAL("clicked()"), self.getpid)
         
@@ -6062,14 +6079,14 @@ class PXRpidDlgControl(QDialog):
 
     def paintlabels(self):
         
-        str1 = "T= " + str(aw.pid.PXR["segment1sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment1ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment1soak"][0])
-        str2 = "T= " + str(aw.pid.PXR["segment2sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment2ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment2soak"][0])
-        str3 = "T= " + str(aw.pid.PXR["segment3sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment3ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment3soak"][0])
-        str4 = "T= " + str(aw.pid.PXR["segment4sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment4ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment4soak"][0])
-        str5 = "T= " + str(aw.pid.PXR["segment5sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment5ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment5soak"][0])
-        str6 = "T= " + str(aw.pid.PXR["segment6sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment6ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment6soak"][0])
-        str7 = "T= " + str(aw.pid.PXR["segment7sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment7ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment7soak"][0])
-        str8 = "T= " + str(aw.pid.PXR["segment8sv"][0]) + "\nRamp " + str(aw.pid.PXR["segment8ramp"][0]) + "\nSoak " + str(aw.pid.PXR["segment8soak"][0])
+        str1 = u"T= " + unicode(aw.pid.PXR["segment1sv"][0]) + u"\nRamp " + unicode(aw.pid.PXR["segment1ramp"][0]) + u"\nSoak " + unicode(aw.pid.PXR["segment1soak"][0])
+        str2 = u"T= " + unicode(aw.pid.PXR["segment2sv"][0]) + u"\nRamp " + unicode(aw.pid.PXR["segment2ramp"][0]) + u"\nSoak " + unicode(aw.pid.PXR["segment2soak"][0])
+        str3 = u"T= " + unicode(aw.pid.PXR["segment3sv"][0]) + u"\nRamp " + unicode(aw.pid.PXR["segment3ramp"][0]) + u"\nSoak " + unicode(aw.pid.PXR["segment3soak"][0])
+        str4 = u"T= " + unicode(aw.pid.PXR["segment4sv"][0]) + u"\nRamp " + unicode(aw.pid.PXR["segment4ramp"][0]) + u"\nSoak " + unicode(aw.pid.PXR["segment4soak"][0])
+        str5 = u"T= " + unicode(aw.pid.PXR["segment5sv"][0]) + u"\nRamp " + unicode(aw.pid.PXR["segment5ramp"][0]) + u"\nSoak " + unicode(aw.pid.PXR["segment5soak"][0])
+        str6 = u"T= " + unicode(aw.pid.PXR["segment6sv"][0]) + u"\nRamp " + unicode(aw.pid.PXR["segment6ramp"][0]) + u"\nSoak " + unicode(aw.pid.PXR["segment6soak"][0])
+        str7 = u"T= " + unicode(aw.pid.PXR["segment7sv"][0]) + u"\nRamp " + unicode(aw.pid.PXR["segment7ramp"][0]) + u"\nSoak " + unicode(aw.pid.PXR["segment7soak"][0])
+        str8 = u"T= " + unicode(aw.pid.PXR["segment8sv"][0]) + u"\nRamp " + unicode(aw.pid.PXR["segment8ramp"][0]) + u"\nSoak " + unicode(aw.pid.PXR["segment8soak"][0])
 
         self.label_rs1.setText(QString(str1))
         self.label_rs2.setText(QString(str2))
@@ -6122,38 +6139,38 @@ class PXRpidDlgControl(QDialog):
 
             
     def setONOFFautotune(self,flag):
-        self.status.showMessage("setting autotune...",500)
+        self.status.showMessage(u"setting autotune...",500)
         command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["autotuning"][1],flag)
         #TX and RX
         r = aw.ser.sendFUJIcommand(command,8)
         if len(r) == 8:
             if flag == 0:
                 aw.pid.PXR["autotuning"][0] = 0
-                self.status.showMessage("Autotune successfully turned OFF",5000)
+                self.status.showMessage(u"Autotune successfully turned OFF",5000)
             if flag == 1:
                 aw.pid.PXR["autotuning"][0] = 1
-                self.status.showMessage("Autotune successfully turned ON",5000) 
+                self.status.showMessage(u"Autotune successfully turned ON",5000) 
         else:
-            mssg = "setONOFFautotune() problem "
+            mssg = u"setONOFFautotune() problem "
             self.status.showMessage(mssg,5000)
             aw.qmc.errorlog.append(mssg)
         
     def setONOFFstandby(self,flag):
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-        self.status.showMessage("wait...",500)
+        self.status.showMessage(u"wait...",500)
         command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["runstandby"][1],flag)
         #TX and RX
         r = aw.ser.sendFUJIcommand(command,8)
         if r == command:               
             if flag == 1:
-                message = "PID OFF"     #put pid in standby 1 (pid on)
+                message = u"PID OFF"     #put pid in standby 1 (pid on)
                 aw.pid.PXR["runstandby"][0] = 1
             elif flag == 0:
-                message = "PID ON"      #put pid in standby 0 (pid off)
+                message = u"PID ON"      #put pid in standby 0 (pid off)
                 aw.pid.PXR["runstandby"][0] = 0
         else:
-            mssg = "setONOFFstandby() problem "
+            mssg = u"setONOFFstandby() problem "
             self.status.showMessage(mssg,5000)
             aw.qmc.errorlog.append(mssg)
 
@@ -6163,25 +6180,25 @@ class PXRpidDlgControl(QDialog):
             command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["sv0"][1],newSVvalue)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                message = " SV successfully set to " + self.svedit.text()
+                message = u" SV successfully set to " + self.svedit.text()
                 aw.pid.PXR["sv0"][0] = float(self.svedit.text())
                 aw.lcd6.display(aw.pid.PXR["sv0"][0])
                 self.status.showMessage(message,5000)
             else:
-                mssg = "setsv(): unable to set sv"
+                mssg = u"setsv(): unable to set sv"
                 self.status.showMessage(mssg,5000)
                 aw.qmc.errorlog.append(mssg)                
         else:
-            self.status.showMessage("Empty SV box",5000)
+            self.status.showMessage(u"Empty SV box",5000)
 
     def getsv(self):
         temp = aw.pid.readcurrentsv()
         if temp != -1:
             aw.pid.PXR["sv0"][0] =  temp
             aw.lcd6.display(aw.pid.PXR["sv0"][0])
-            self.readsvedit.setText(str(aw.pid.PXR["sv0"][0]))
+            self.readsvedit.setText(unicode(aw.pid.PXR["sv0"][0]))
         else:
-            self.status.showMessage("Unable to read SV",5000)
+            self.status.showMessage(u"Unable to read SV",5000)
 
             
     def checkrampsoakmode(self):
@@ -6189,55 +6206,55 @@ class PXRpidDlgControl(QDialog):
         currentmode = aw.pid.readoneword(msg)
         aw.pid.PXR["rampsoakstartend"][0] = currentmode
         if currentmode == 0:
-            mode = ["0","OFF","CONTINUOUS CONTROL","CONTINUOUS CONTROL","OFF"]
+            mode = [u"0",u"OFF",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"OFF"]
         elif currentmode == 1:
-            mode = ["1","OFF","CONTINUOUS CONTROL","CONTINUOUS CONTROL","ON"]
+            mode = [u"1",u"OFF",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"ON"]
         elif currentmode == 2:
-            mode = ["2","OFF","CONTINUOUS CONTROL","STANDBY MODE","OFF"]
+            mode = [u"2",u"OFF",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"OFF"]
         elif currentmode == 3:
-            mode = ["3","OFF","CONTINUOUS CONTROL","STANDBY MODE","ON"]
+            mode = [u"3",u"OFF",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"ON"]
         elif currentmode == 4:
-            mode = ["4","OFF","STANDBY MODE","CONTINUOUS CONTROL","OFF"]
+            mode = [u"4",u"OFF",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"OFF"]
         elif currentmode == 5:
-            mode = ["5","OFF","STANDBY MODE","CONTINUOUS CONTROL","ON"]
+            mode = [u"5",u"OFF",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"ON"]
         elif currentmode == 6:
-            mode = ["6","OFF","STANDBY MODE","STANDBY MODE","OFF"]
+            mode = [u"6",u"OFF",u"STANDBY MODE",u"STANDBY MODE",u"OFF"]
         elif currentmode == 7:
-            mode = ["7","OFF","STANDBY MODE","STANDBY MODE","ON"]
+            mode = [u"7",u"OFF",u"STANDBY MODE",u"STANDBY MODE",u"ON"]
         elif currentmode == 8:
-            mode = ["8","ON","CONTINUOUS CONTROL","CONTINUOUS CONTROL","OFF"]
+            mode = [u"8",u"ON",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"OFF"]
         elif currentmode == 9:
-            mode = ["9","ON","CONTINUOUS CONTROL","CONTINUOUS CONTROL","ON"]
+            mode = [u"9",u"ON",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"ON"]
         elif currentmode == 10:
-            mode = ["10","ON","CONTINUOUS CONTROL","STANDBY MODE","OFF"]
+            mode = [u"10",u"ON",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"OFF"]
         elif currentmode == 11:
-            mode = ["11","ON","CONTINUOUS CONTROL","STANDBY MODE","ON"]
+            mode = [u"11",u"ON",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"ON"]
         elif currentmode == 12:
-            mode = ["12","ON","STANDBY MODE","CONTINUOUS CONTROL","OFF"]
+            mode = [u"12",u"ON",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"OFF"]
         elif currentmode == 13:
-            mode = ["13","ON","STANDBY MODE","CONTINUOUS CONTROL","ON"]
+            mode = [u"13",u"ON","STANDBY MODE",u"CONTINUOUS CONTROL",u"ON"]
         elif currentmode == 14:
-            mode = ["14","ON","STANDBY MODE","STANDBY MODE","OFF"]
+            mode = [u"14",u"ON",u"STANDBY MODE","STANDBY MODE",u"OFF"]
         elif currentmode == 15:
-            mode = ["15","ON","STANDBY MODE","STANDBY MODE","ON"]
+            mode = [u"15",u"ON",u"STANDBY MODE",u"STANDBY MODE",u"ON"]
         else:
             return -1
 
-        string = "The rampsoak-mode tells how to start and end the ramp/soak\n\n"
-        string += "Your rampsoak mode in this pid is:\n"
-        string += "\nMode = " + mode[0]
-        string += "\n-----------------------------------------------------------------------"
-        string += "\nStart to run from PV value: " + mode[1]
-        string += "\nEnd output status at the end of ramp/soak: " + mode[2]
-        string += "\nOutput status while ramp/soak opearion set to OFF: " + mode[3] 
-        string += "\nRepeat Operation at the end: " + mode[4]
-        string += "\n-----------------------------------------------------------------------"
-        string += "\n\nRecomended Mode = 0\n"
-        string += "\nIf you need to change it, change it now and come back later"
-        string += "\nUse the Parameter Loader Software by Fuji if you need to\n\n"
-        string += "\n\n\nContinue?" 
+        string = u"The rampsoak-mode tells how to start and end the ramp/soak\n\n"
+        string += u"Your rampsoak mode in this pid is:\n"
+        string += u"\nMode = " + mode[0]
+        string += u"\n-----------------------------------------------------------------------"
+        string += u"\nStart to run from PV value: " + mode[1]
+        string += u"\nEnd output status at the end of ramp/soak: " + mode[2]
+        string += u"\nOutput status while ramp/soak opearion set to OFF: " + mode[3] 
+        string += u"\nRepeat Operation at the end: " + mode[4]
+        string += u"\n-----------------------------------------------------------------------"
+        string += u"\n\nRecomended Mode = 0\n"
+        string += u"\nIf you need to change it, change it now and come back later"
+        string += u"\nUse the Parameter Loader Software by Fuji if you need to\n\n"
+        string += u"\n\n\nContinue?" 
  
-        reply = QMessageBox.question(self,"Ramp Soak start-end mode",string,
+        reply = QMessageBox.question(self,u"Ramp Soak start-end mode",string,
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             return 0
@@ -6251,12 +6268,12 @@ class PXRpidDlgControl(QDialog):
         if flag == 1:
             check = self.checkrampsoakmode()
             if check == 0:
-                self.status.showMessage("Ramp/Soak operation cancelled", 5000)
+                self.status.showMessage(u"Ramp/Soak operation cancelled", 5000)
                 return
             elif check == -1:
-                self.status.showMessage("No RX data", 5000)
+                self.status.showMessage(u"No RX data", 5000)
                 
-            self.status.showMessage("Setting RS ON...",500)
+            self.status.showMessage(u"Setting RS ON...",500)
             #0 = 1-4
             #1 = 5-8
             #2 = 1-8
@@ -6267,68 +6284,68 @@ class PXRpidDlgControl(QDialog):
                 aw.pid.PXR["rampsoakpattern"][0] = currentmode
                 if currentmode != selectedmode:
                     #set mode in pid to match the mode selected in the combobox
-                    self.status.showMessage("Need to change pattern mode...",1000)
+                    self.status.showMessage(u"Need to change pattern mode...",1000)
                     command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["rampsoakpattern"][1],selectedmode)
                     r = aw.ser.sendFUJIcommand(command,8)
                     if len(r) == 8:
-                        self.status.showMessage("Pattern has been changed. Wait 5 secs.", 500)
+                        self.status.showMessage(u"Pattern has been changed. Wait 5 secs.", 500)
                         aw.pid.PXR["rampsoakpattern"][0] = selectedmode
                         time.sleep(5) #wait 5 seconds to set eeprom memory
                     else:
-                        self.status.showMessage("Pattern could not be changed", 5000)
+                        self.status.showMessage(u"Pattern could not be changed", 5000)
                         return
                 #combobox mode matches pid mode
                 #set ramp soak mode ON
                 command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["rampsoak"][1],flag)
                 r = aw.ser.sendFUJIcommand(command,8)
                 if r == command:
-                    self.status.showMessage("RS ON and running...", 5000)
+                    self.status.showMessage(u"RS ON and running...", 5000)
                 else:
-                    self.status.showMessage("RampSoak could not be turned ON", 5000)
+                    self.status.showMessage(u"RampSoak could not be turned ON", 5000)
             else:
-                mssg = "setONOFFrampsoak() problem "
+                mssg = u"setONOFFrampsoak() problem "
                 self.status.showMessage(mssg,5000)
                 aw.qmc.errorlog.append(mssg)
                   
         #set ramp soak OFF       
         elif flag == 0:
-            self.status.showMessage("setting RS OFF...",500)
+            self.status.showMessage(u"setting RS OFF...",500)
             command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["rampsoak"][1],flag)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                self.status.showMessage("RS successfully turned OFF", 5000)
+                self.status.showMessage(u"RS successfully turned OFF", 5000)
                 aw.pid.PXR["rampsoak"][0] = flag
             else:
-                mssg = "Ramp Soak could not be set OFF"
+                mssg = u"Ramp Soak could not be set OFF"
                 self.status.showMessage(mssg,5000)
                 aw.qmc.errorlog.append(mssg)
 
     def getsegment(self, idn):
-        svkey = "segment" + str(idn) + "sv"
+        svkey = u"segment" + unicode(idn) + u"sv"
         svcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR[svkey][1],1)
         sv = aw.pid.readoneword(svcommand)
         if sv == -1:
-            mssg = "getsegment(): problem reading sv "
+            mssg = u"getsegment(): problem reading sv "
             self.status.showMessage(mssg,5000)
             aw.qmc.errorlog.append(mssg)
             return -1
         aw.pid.PXR[svkey][0] = sv/10.              #divide by 10 because the decimal point is not sent by the PID
 
-        rampkey = "segment" + str(idn) + "ramp"
+        rampkey = u"segment" +unicode(idn) + u"ramp"
         rampcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR[rampkey][1],1)
         ramp = aw.pid.readoneword(rampcommand)
         if ramp == -1:
-            mssg = "getsegment(): problem reading ramp "
+            mssg = u"getsegment(): problem reading ramp "
             self.status.showMessage(mssg,5000)
             aw.qmc.errorlog.append(mssg)
             return -1
         aw.pid.PXR[rampkey][0] = ramp/10.
         
-        soakkey = "segment" + str(idn) + "soak"
+        soakkey = u"segment" + unicode(idn) + u"soak"
         soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR[soakkey][1],1)
         soak = aw.pid.readoneword(soakcommand)
         if soak == -1:
-            mssg = "getsegment(): problem reading soak "
+            mssg = u"getsegment(): problem reading soak "
             self.status.showMessage(mssg,5000)
             aw.qmc.errorlog.append(mssg)
             return -1
@@ -6339,18 +6356,18 @@ class PXRpidDlgControl(QDialog):
     #get all Ramp Soak values for all 8 segments                                  
     def getallsegments(self):
         for i in range(8):
-            msg = "Reading Ramp/Soak #" + str(i+1)
+            msg = u"Reading Ramp/Soak #" + unicode(i+1)
             self.status.showMessage(msg,500)
             k = self.getsegment(i+1)
             time.sleep(0.035)
             if k == -1:
-                mssg = "getallsegments(): problem reading R/S "
+                mssg = u"getallsegments(): problem reading R/S "
                 self.status.showMessage(mssg,5000)
                 aw.qmc.errorlog.append(mssg)
                 return
             self.paintlabels()
             
-        self.status.showMessage("Finished reading Ramp/Soak val.",5000)
+        self.status.showMessage(u"Finished reading Ramp/Soak val.",5000)
         
     def getpid(self):        
         pcommand= aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR["p"][1],1)
@@ -6367,7 +6384,7 @@ class PXRpidDlgControl(QDialog):
         if i == -1:
             return -1
         else:
-            self.iedit.setText(str(int(i)))
+            self.iedit.setText(unicode(int(i)))
             aw.pid.PXR["i"][0] = i
 
         dcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR["d"][1],1)
@@ -6375,30 +6392,30 @@ class PXRpidDlgControl(QDialog):
         if d == -1:
             return -1
         else:
-            self.dedit.setText(str(d))
+            self.dedit.setText(unicode(d))
             aw.pid.PXR["d"][0] = d
             
-        self.status.showMessage("Finished reading pid values",5000)
+        self.status.showMessage(u"Finished reading pid values",5000)
         
 
     def setpid(self,var):
-        r = ""
-        if var == "p":
-            if str(self.pedit.text()).isdigit():
+        r = u""
+        if var == u"p":
+            if unicode(self.pedit.text()).isdigit():
                 p = int(self.pedit.text())*10
                 command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["p"][1],p)
                 r = aw.ser.sendFUJIcommand(command,8)
             else:
                 return -1
-        elif var == "i":
+        elif var == u"i":
             if str(self.iedit.text()).isdigit():
                 i = int(self.iedit.text())*10
                 command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["i"][1],i)
                 r = aw.ser.sendFUJIcommand(command,8)
             else:
                 return -1
-        elif var == "d":
-            if str(self.dedit.text()).isdigit():
+        elif var == u"d":
+            if unicode(self.dedit.text()).isdigit():
                 d = int(self.dedit.text())*10
                 command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["d"][1],d)
                 r = aw.ser.sendFUJIcommand(command,8)
@@ -6406,17 +6423,17 @@ class PXRpidDlgControl(QDialog):
                 return -1
                 
         if len(r) == 8:
-            message = var + " successfully send to pid "
+            message = var + u" successfully send to pid "
             self.status.showMessage(message,5000)
-            if var == "p":
+            if var == u"p":
                 aw.pid.PXR["p"][0] = p
-            elif var == "i":
+            elif var == u"i":
                 aw.pid.PXR["i"][0] = i
-            elif var == "d":
+            elif var == u"d":
                 aw.pid.PXR["i"][0] = d
             
         else:
-            mssg = "setpid(): There was a problem setting " + var 
+            mssg = u"setpid(): There was a problem setting " + var 
             self.status.showMessage(mssg,5000)        
             aw.qmc.errorlog.append(mssg)
 
@@ -6689,27 +6706,27 @@ class PXG4pidDlgControl(QDialog):
         wlabel.setMaximumSize(50, 42)
         wlabel.setMinimumHeight(50)
         
-        self.p1edit =  QLineEdit(QString(str(aw.pid.PXG4["p1"][0])))
-        self.p2edit =  QLineEdit(QString(str(aw.pid.PXG4["p2"][0])))
-        self.p3edit =  QLineEdit(QString(str(aw.pid.PXG4["p3"][0])))
-        self.p4edit =  QLineEdit(QString(str(aw.pid.PXG4["p4"][0])))
-        self.p5edit =  QLineEdit(QString(str(aw.pid.PXG4["p5"][0])))
-        self.p6edit =  QLineEdit(QString(str(aw.pid.PXG4["p6"][0])))
-        self.p7edit =  QLineEdit(QString(str(aw.pid.PXG4["p7"][0])))
-        self.i1edit =  QLineEdit(QString(str(aw.pid.PXG4["i1"][0])))
-        self.i2edit =  QLineEdit(QString(str(aw.pid.PXG4["i2"][0])))
-        self.i3edit =  QLineEdit(QString(str(aw.pid.PXG4["i3"][0])))
-        self.i4edit =  QLineEdit(QString(str(aw.pid.PXG4["i4"][0])))
-        self.i5edit =  QLineEdit(QString(str(aw.pid.PXG4["i5"][0])))
-        self.i6edit =  QLineEdit(QString(str(aw.pid.PXG4["i6"][0])))
-        self.i7edit =  QLineEdit(QString(str(aw.pid.PXG4["i7"][0])))
-        self.d1edit =  QLineEdit(QString(str(aw.pid.PXG4["d1"][0])))
-        self.d2edit =  QLineEdit(QString(str(aw.pid.PXG4["d2"][0])))
-        self.d3edit =  QLineEdit(QString(str(aw.pid.PXG4["d3"][0])))
-        self.d4edit =  QLineEdit(QString(str(aw.pid.PXG4["d4"][0])))
-        self.d5edit =  QLineEdit(QString(str(aw.pid.PXG4["d5"][0])))
-        self.d6edit =  QLineEdit(QString(str(aw.pid.PXG4["d6"][0])))
-        self.d7edit =  QLineEdit(QString(str(aw.pid.PXG4["d7"][0])))
+        self.p1edit =  QLineEdit(QString(unicode(aw.pid.PXG4["p1"][0])))
+        self.p2edit =  QLineEdit(QString(unicode(aw.pid.PXG4["p2"][0])))
+        self.p3edit =  QLineEdit(QString(unicode(aw.pid.PXG4["p3"][0])))
+        self.p4edit =  QLineEdit(QString(unicode(aw.pid.PXG4["p4"][0])))
+        self.p5edit =  QLineEdit(QString(unicode(aw.pid.PXG4["p5"][0])))
+        self.p6edit =  QLineEdit(QString(unicode(aw.pid.PXG4["p6"][0])))
+        self.p7edit =  QLineEdit(QString(unicode(aw.pid.PXG4["p7"][0])))
+        self.i1edit =  QLineEdit(QString(unicode(aw.pid.PXG4["i1"][0])))
+        self.i2edit =  QLineEdit(QString(unicode(aw.pid.PXG4["i2"][0])))
+        self.i3edit =  QLineEdit(QString(unicode(aw.pid.PXG4["i3"][0])))
+        self.i4edit =  QLineEdit(QString(unicode(aw.pid.PXG4["i4"][0])))
+        self.i5edit =  QLineEdit(QString(unicode(aw.pid.PXG4["i5"][0])))
+        self.i6edit =  QLineEdit(QString(unicode(aw.pid.PXG4["i6"][0])))
+        self.i7edit =  QLineEdit(QString(unicode(aw.pid.PXG4["i7"][0])))
+        self.d1edit =  QLineEdit(QString(unicode(aw.pid.PXG4["d1"][0])))
+        self.d2edit =  QLineEdit(QString(unicode(aw.pid.PXG4["d2"][0])))
+        self.d3edit =  QLineEdit(QString(unicode(aw.pid.PXG4["d3"][0])))
+        self.d4edit =  QLineEdit(QString(unicode(aw.pid.PXG4["d4"][0])))
+        self.d5edit =  QLineEdit(QString(unicode(aw.pid.PXG4["d5"][0])))
+        self.d6edit =  QLineEdit(QString(unicode(aw.pid.PXG4["d6"][0])))
+        self.d7edit =  QLineEdit(QString(unicode(aw.pid.PXG4["d7"][0])))
 
         self.p1edit.setMaximumSize(50, 42)
         self.p2edit.setMaximumSize(50, 42)
@@ -6923,22 +6940,22 @@ class PXG4pidDlgControl(QDialog):
 
     def paintlabels(self):
         #read values of variables to place in buttons
-        str1 = "1 [T " + str(aw.pid.PXG4["segment1sv"][0]) + "] [R " + str(aw.pid.PXG4["segment1ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment1soak"][0])+"]"
-        str2 = "2 [T " + str(aw.pid.PXG4["segment2sv"][0]) + "] [R " + str(aw.pid.PXG4["segment2ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment2soak"][0])+"]"
-        str3 = "3 [T " + str(aw.pid.PXG4["segment3sv"][0]) + "] [R " + str(aw.pid.PXG4["segment3ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment3soak"][0])+"]"
-        str4 = "4 [T " + str(aw.pid.PXG4["segment4sv"][0]) + "] [R " + str(aw.pid.PXG4["segment4ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment4soak"][0])+"]"
-        str5 = "5 [T " + str(aw.pid.PXG4["segment5sv"][0]) + "] [R " + str(aw.pid.PXG4["segment5ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment5soak"][0])+"]"
-        str6 = "6 [T " + str(aw.pid.PXG4["segment6sv"][0]) + "] [R " + str(aw.pid.PXG4["segment6ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment6soak"][0])+"]"
-        str7 = "7 [T " + str(aw.pid.PXG4["segment7sv"][0]) + "] [R " + str(aw.pid.PXG4["segment7ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment7soak"][0])+"]"
-        str8 = "8 [T " + str(aw.pid.PXG4["segment8sv"][0]) + "] [R " + str(aw.pid.PXG4["segment8ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment8soak"][0])+"]"
-        str9 = "9 [T " + str(aw.pid.PXG4["segment9sv"][0]) + "] [R " + str(aw.pid.PXG4["segment9ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment9soak"][0])+"]"
-        str10 ="10 [T " + str(aw.pid.PXG4["segment10sv"][0]) + "] [R " + str(aw.pid.PXG4["segment10ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment10soak"][0])+"]"
-        str11 = "11 [T "+ str(aw.pid.PXG4["segment11sv"][0]) + "] [R " + str(aw.pid.PXG4["segment11ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment11soak"][0])+"]"
-        str12 = "12 [T "+ str(aw.pid.PXG4["segment12sv"][0]) + "] [R " + str(aw.pid.PXG4["segment12ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment12soak"][0])+"]"
-        str13 = "13 [T "+ str(aw.pid.PXG4["segment13sv"][0]) + "] [R " + str(aw.pid.PXG4["segment13ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment13soak"][0])+"]"
-        str14 = "14 [T "+ str(aw.pid.PXG4["segment14sv"][0]) + "] [R " + str(aw.pid.PXG4["segment14ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment14soak"][0])+"]"
-        str15 = "15 [T "+ str(aw.pid.PXG4["segment15sv"][0]) + "] [R " + str(aw.pid.PXG4["segment15ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment15soak"][0])+"]"
-        str16 = "16 [T "+ str(aw.pid.PXG4["segment16sv"][0]) + "] [R " + str(aw.pid.PXG4["segment16ramp"][0]) + "] [S " + str(aw.pid.PXG4["segment16soak"][0])+"]"
+        str1 = u"1 [T " + unicode(aw.pid.PXG4["segment1sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment1ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment1soak"][0])+u"]"
+        str2 = u"2 [T " + unicode(aw.pid.PXG4["segment2sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment2ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment2soak"][0])+u"]"
+        str3 = u"3 [T " + unicode(aw.pid.PXG4["segment3sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment3ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment3soak"][0])+u"]"
+        str4 = u"4 [T " + unicode(aw.pid.PXG4["segment4sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment4ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment4soak"][0])+u"]"
+        str5 = u"5 [T " + unicode(aw.pid.PXG4["segment5sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment5ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment5soak"][0])+u"]"
+        str6 = u"6 [T " + unicode(aw.pid.PXG4["segment6sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment6ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment6soak"][0])+u"]"
+        str7 = u"7 [T " + unicode(aw.pid.PXG4["segment7sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment7ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment7soak"][0])+u"]"
+        str8 = u"8 [T " + unicode(aw.pid.PXG4["segment8sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment8ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment8soak"][0])+u"]"
+        str9 = u"9 [T " + unicode(aw.pid.PXG4["segment9sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment9ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment9soak"][0])+u"]"
+        str10 = u"10 [T " + unicode(aw.pid.PXG4["segment10sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment10ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment10soak"][0])+u"]"
+        str11 = u"11 [T "+ unicode(aw.pid.PXG4["segment11sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment11ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment11soak"][0])+u"]"
+        str12 = u"12 [T "+ unicode(aw.pid.PXG4["segment12sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment12ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment12soak"][0])+u"]"
+        str13 = u"13 [T "+ unicode(aw.pid.PXG4["segment13sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment13ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment13soak"][0])+u"]"
+        str14 = u"14 [T "+ unicode(aw.pid.PXG4["segment14sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment14ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment14soak"][0])+u"]"
+        str15 = u"15 [T "+ unicode(aw.pid.PXG4["segment15sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment15ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment15soak"][0])+u"]"
+        str16 = u"16 [T "+ unicode(aw.pid.PXG4["segment16sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment16ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment16soak"][0])+u"]"
 
         self.label_rs1.setText(QString(str1))
         self.label_rs2.setText(QString(str2))
@@ -7042,8 +7059,8 @@ class PXG4pidDlgControl(QDialog):
         # if current svN is different than requested svN
         if N != -1:
             if N != svn:
-                string = "Current sv = " + str(N) + " .Change now to sv =" + str(svn) + "?"
-                reply = QMessageBox.question(self,"Change svN",string,
+                string = u"Current sv = " + unicode(N) + u" .Change now to sv =" + unicode(svn) + u"?"
+                reply = QMessageBox.question(self,u"Change svN",string,
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     #change variable svN
@@ -7053,14 +7070,14 @@ class PXG4pidDlgControl(QDialog):
                     #check response from pid and update message on main window
                     if r == command:
                         aw.pid.PXG4["selectsv"][0] = svn
-                        key = "sv" + str(svn)
-                        message = "SV" + str(svn) + " set to " + str(aw.pid.PXG4[key][0])
+                        key = u"sv" + unicode(svn)
+                        message = u"SV" + unicode(svn) + u" set to " + unicode(aw.pid.PXG4[key][0])
                         aw.lcd6.display(aw.pid.PXG4[key][0])
                         self.status.showMessage(message, 5000)
                     else:
-                        self.status.showMessage("Problem setting SV",5000)
+                        self.status.showMessage(u"Problem setting SV",5000)
                 elif reply == QMessageBox.Cancel:
-                    self.status.showMessage("Cancelled svN change",5000)
+                    self.status.showMessage(u"Cancelled svN change",5000)
                     #set radio button
                     if N == 1:
                         self.radiosv1.setChecked(True)
@@ -7078,10 +7095,10 @@ class PXG4pidDlgControl(QDialog):
                         self.radiosv7.setChecked(True)
                     return 
             else:
-                mssg = "PID already using sv" + str(N)
+                mssg = u"PID already using sv" + unicode(N)
                 self.status.showMessage(mssg,1000)
         else:
-            mssg = "setNsv(): bad response"
+            mssg = u"setNsv(): bad response"
             self.status.showMessage(mssg,1000)
             aw.qmc.errorlog.append(mssg)
 
@@ -7095,7 +7112,7 @@ class PXG4pidDlgControl(QDialog):
             aw.pid.PXG4["selectedpid"][0] = N
             # if current svN is different than requested svN
             if N != pidn:
-                string = "Current pid = " + str(N) + " .Change now to pid =" + str(pidn) + "?"
+                string = u"Current pid = " + unicode(N) + u" .Change now to pid =" + unicode(pidn) + u"?"
                 reply = QMessageBox.question(self,"Change svN",string,
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
@@ -7106,16 +7123,16 @@ class PXG4pidDlgControl(QDialog):
                     #check response from pid and update message on main window
                     if r == command:
                         aw.pid.PXG4["selectedpid"][0] = pidn
-                        key = "sv" + str(pidn)
-                        message = "pid" + str(pidn) + " changed to " + str(aw.pid.PXG4[key][0])
+                        key = u"sv" + unicode(pidn)
+                        message = u"pid" + unicode(pidn) + u" changed to " + unicode(aw.pid.PXG4[key][0])
                         self.status.showMessage(message, 5000)
                     else:
-                        mssg = "setNpid(): bad confirmation" 
+                        mssg = u"setNpid(): bad confirmation" 
                         self.status.showMessage(mssg,1000)
                         aw.qmc.errorlog.append(mssg)
                         
                 elif reply == QMessageBox.Cancel:
-                    self.status.showMessage("Cancelled pid change",5000)
+                    self.status.showMessage(u"Cancelled pid change",5000)
                     #put back radio button
                     if N == 1:
                         self.radiosv1.setChecked(True)
@@ -7133,10 +7150,10 @@ class PXG4pidDlgControl(QDialog):
                         self.radiosv7.setChecked(True)
                     return
             else:
-                mssg = "PID was already using pid " + str(N) 
+                mssg = u"PID was already using pid " + unicode(N) 
                 self.status.showMessage(mssg,1000)
         else:
-            mssg = "setNpid(): Unable to set pid " + str(N) + " "
+            mssg = u"setNpid(): Unable to set pid " + unicode(N) + u" "
             self.status.showMessage(mssg,1000)
             aw.qmc.errorlog.append(mssg)
 
@@ -7144,29 +7161,29 @@ class PXG4pidDlgControl(QDialog):
     def setsv(self,i):
         #first get the new sv value from the correspondig edit ine
         if i == 1:
-            if self.sv1edit.text() != "":
+            if self.sv1edit.text() != u"":
                 newSVvalue = int(float(self.sv1edit.text())*10.) #multiply by 10 because of decimal point. Then convert to int.
         elif i == 2:
-            if self.sv2edit.text() != "":
+            if self.sv2edit.text() != u"":
                 newSVvalue = int(float(self.sv2edit.text())*10.) 
         elif i == 3:
-            if self.sv3edit.text() != "":
+            if self.sv3edit.text() != u"":
                 newSVvalue = int(float(self.sv3edit.text())*10.)
         elif i == 4:
-            if self.sv4edit.text() != "":
+            if self.sv4edit.text() != u"":
                 newSVvalue = int(float(self.sv4edit.text())*10.) 
         elif i == 5:
-            if self.sv5edit.text() != "":
+            if self.sv5edit.text() != u"":
                 newSVvalue = int(float(self.sv5edit.text())*10.) 
         elif i == 6:
-            if self.sv6edit.text() != "":
+            if self.sv6edit.text() != u"":
                 newSVvalue = int(float(self.sv6edit.text())*10.) 
         elif i == 7:
-            if self.sv7edit.text() != "":
+            if self.sv7edit.text() != u"":
                 newSVvalue = int(float(self.sv7edit.text())*10.) 
 
         #send command to the right sv
-        svkey = "sv"+ str(i)
+        svkey = u"sv"+ unicode(i)
         command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[svkey][1],newSVvalue)
         r = aw.ser.sendFUJIcommand(command,8)
 
@@ -7174,43 +7191,43 @@ class PXG4pidDlgControl(QDialog):
         if len(r) == 8:
             if i == 1:               
                  aw.pid.PXG4[svkey][0] = float(self.sv1edit.text())
-                 message = "SV" + str(i)+ " successfully set to " + str(self.sv1edit.text())
+                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv1edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(1)
             elif i == 2:
                  aw.pid.PXG4[svkey][0] = float(self.sv2edit.text())
-                 message = "SV" + str(i)+ " successfully set to " + str(self.sv2edit.text())
+                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv2edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(2)
             elif i == 3:
                  aw.pid.PXG4[svkey][0] = float(self.sv3edit.text())
-                 message = "SV" + str(i)+ " successfully set to " + str(self.sv3edit.text())
+                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv3edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(3)
             elif i == 4:
                  aw.pid.PXG4[svkey][0] = float(self.sv4edit.text())
-                 message = "SV" + str(i)+ " successfully set to " + str(self.sv4edit.text())
+                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv4edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(4)
             elif i == 5:
                  aw.pid.PXG4[svkey][0] = float(self.sv5edit.text())
-                 message = "SV" + str(i)+ " successfully set to " + str(self.sv5edit.text())
+                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv5edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(5)
             elif i == 6:
                  aw.pid.PXG4[svkey][0] = float(self.sv6edit.text())
-                 message = "SV" + str(i)+ " successfully set to " + str(self.sv6edit.text())
+                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv6edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(6)
             elif i == 7:
                  aw.pid.PXG4[svkey][0] = float(self.sv7edit.text())
-                 message = "SV" + str(i)+ " successfully set to " + str(self.sv7edit.text())
+                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv7edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(7)
 
             #call 
         else:
-            mssg = "setsv(): Unable to set SV "
+            mssg = u"setsv(): Unable to set SV "
             self.status.showMessage(mssg,5000)
             aw.qmc.errorlog.append(mssg)
 
@@ -7218,46 +7235,46 @@ class PXG4pidDlgControl(QDialog):
     def setpid(self,k):
         #first get the new sv value from the correspondig edit ine
         if k == 1:
-            if self.p1edit.text() != "" and self.i1edit.text() != "" and self.d1edit.text() != "":
+            if self.p1edit.text() != u"" and self.i1edit.text() != u"" and self.d1edit.text() != u"":
                 newPvalue = int(float(self.p1edit.text())*10.) #multiply by 10 because of decimal point. Then convert to int.
                 newIvalue = int(float(self.i1edit.text())*10.)
                 newDvalue = int(float(self.d1edit.text())*10.)
                 
         elif k == 2:
-            if self.p2edit.text() != "" and self.i2edit.text() != "" and self.d2edit.text() != "":
+            if self.p2edit.text() != u"" and self.i2edit.text() != u"" and self.d2edit.text() != u"":
                 newPvalue = int(float(self.p2edit.text())*10.) #multiply by 10 because of decimal point. Then convert to int.
                 newIvalue = int(float(self.i2edit.text())*10.)
                 newDvalue = int(float(self.d2edit.text())*10.) 
         elif k == 3:
-            if self.p3edit.text() != "" and self.i3edit.text() != "" and self.d3edit.text() != "":
+            if self.p3edit.text() != u"" and self.i3edit.text() != u"" and self.d3edit.text() != u"":
                 newPvalue = int(float(self.p3edit.text())*10.) #multiply by 10 because of decimal point. Then convert to int.
                 newIvalue = int(float(self.i3edit.text())*10.)
                 newDvalue = int(float(self.d3edit.text())*10.)
         elif k == 4:
-            if self.p4edit.text() != "" and self.i4edit.text() != "" and self.d4edit.text() != "":
+            if self.p4edit.text() != u"" and self.i4edit.text() != u"" and self.d4edit.text() != u"":
                 newPvalue = int(float(self.p4edit.text())*10.) #multiply by 10 because of decimal point. Then convert to int.
                 newIvalue = int(float(self.i4edit.text())*10.)
                 newDvalue = int(float(self.d4edit.text())*10.) 
         elif k == 5:
-            if self.p5edit.text() != "" and self.i5edit.text() != "" and self.d5edit.text() != "":
+            if self.p5edit.text() != u"" and self.i5edit.text() != u"" and self.d5edit.text() != u"":
                 newPvalue = int(float(self.p5edit.text())*10.) #multiply by 10 because of decimal point. Then convert to int.
                 newIvalue = int(float(self.i5edit.text())*10.)
                 newDvalue = int(float(self.d5edit.text())*10.) 
         elif k == 6:
-            if self.p6edit.text() != "" and self.i6edit.text() != "" and self.d6edit.text() != "":
+            if self.p6edit.text() != u"" and self.i6edit.text() != u"" and self.d6edit.text() != u"":
                 newPvalue = int(float(self.p6edit.text())*10.) #multiply by 10 because of decimal point. Then convert to int.
                 newIvalue = int(float(self.i6edit.text())*10.)
                 newDvalue = int(float(self.d6edit.text())*10.) 
         elif k == 7:
-            if self.p7edit.text() != "" and self.i7edit.text() != "" and self.d7edit.text() != "":
+            if self.p7edit.text() != u"" and self.i7edit.text() != u"" and self.d7edit.text() != u"":
                 newPvalue = int(float(self.p7edit.text())*10.) #multiply by 10 because of decimal point. Then convert to int.
                 newIvalue = int(float(self.i7edit.text())*10.)
                 newDvalue = int(float(self.d7edit.text())*10.) 
 
         #send command to the right sv
-        pkey = "p" + str(k)
-        ikey = "i" + str(k)
-        dkey = "d" + str(k)
+        pkey = u"p" + unicode(k)
+        ikey = u"i" + unicode(k)
+        dkey = u"d" + unicode(k)
         
         commandp = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[pkey][1],newPvalue)
         commandi = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[ikey][1],newIvalue)
@@ -7275,74 +7292,74 @@ class PXG4pidDlgControl(QDialog):
                  aw.pid.PXG4[pkey][0] = float(self.p1edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i1edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d1edit.text())
-                 message = ("pid #" + str(k)+ " successfully set to (" + str(self.p1edit.text()) + "," +
-                            str(self.i1edit.text()) + "," + str(self.d1edit.text())+ ")")              
+                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p1edit.text()) + u"," +
+                            unicode(self.i1edit.text()) + u"," + unicode(self.d1edit.text())+ u")")              
                  self.status.showMessage(message,5000)
                  self.setNpid(1)
             elif k == 2:
                  aw.pid.PXG4[pkey][0] = float(self.p2edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i2edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d2edit.text())
-                 message = ("pid #" + str(k)+ " successfully set to (" + str(self.p2edit.text())+ "," +
-                            str(self.i2edit.text()) + "," + str(self.d2edit.text())+ ")")
+                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p2edit.text())+ u"," +
+                            unicode(self.i2edit.text()) + u"," + unicode(self.d2edit.text())+ u")")
                  self.status.showMessage(message,5000)
                  self.setNpid(2)
             elif k == 3:
                  aw.pid.PXG4[pkey][0] = float(self.p3edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i3edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d3edit.text())
-                 message = ("pid #" + str(k)+ " successfully set to (" + str(self.p3edit.text()) + "," +
-                            str(self.i3edit.text()) + "," + str(self.d3edit.text()) + ")")
+                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p3edit.text()) + u"," +
+                            unicode(self.i3edit.text()) + u"," + unicode(self.d3edit.text()) + u")")
                  self.status.showMessage(message,5000)
                  self.setNpid(3)
             elif k == 4:
                  aw.pid.PXG4[pkey][0] = float(self.p4edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i4edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d4edit.text())
-                 message = ("pid #" + str(k)+ " successfully set to (" + str(self.p4edit.text()) + "," +
-                            str(self.i4edit.text()) + "," + str(self.d4edit.text()) + ")")
+                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p4edit.text()) + u"," +
+                            unicode(self.i4edit.text()) + u"," + unicode(self.d4edit.text()) + u")")
                  self.status.showMessage(message,5000)
                  self.setNpid(4)
             elif k == 5:
                  aw.pid.PXG4[pkey][0] = float(self.p5edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i5edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d5edit.text())
-                 message = ("pid #" + str(k)+ " successfully set to (" + str(self.p5edit.text()) + "," +
-                             str(self.i5edit.text()) + "," + str(self.d5edit.text()) + ")")
+                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p5edit.text()) + u"," +
+                             unicode(self.i5edit.text()) + u"," + unicode(self.d5edit.text()) + u")")
                  self.status.showMessage(message,5000)
                  self.setNpid(5)
             elif k == 6:
                  aw.pid.PXG4[pkey][0] = float(self.p6edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i6edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d6edit.text())
-                 message = ("pid" + str(k) + " successfully set to (" + str(self.p6edit.text()) + "," +
-                            str(self.i6edit.text()) + "," + str(self.d6edit.text()) + ")")
+                 message = (u"pid" + unicode(k) + u" successfully set to (" + unicode(self.p6edit.text()) + u"," +
+                            unicode(self.i6edit.text()) + u"," + unicode(self.d6edit.text()) + u")")
                  self.status.showMessage(message,5000)
                  self.setNpid(6)
             elif k == 7:
                  aw.pid.PXG4[pkey][0] = float(self.p7edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i7edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d7edit.text())
-                 message = ("pid" + str(k)+ " successfully set to (" + str(self.p7edit.text()) + "," +
-                            str(self.i7edit.text()) + "," + str(self.d7edit.text()) + ")")
+                 message = (u"pid" + unicode(k)+ u" successfully set to (" + unicode(self.p7edit.text()) + u"," +
+                            unicode(self.i7edit.text()) + u"," + unicode(self.d7edit.text()) + u")")
                  self.status.showMessage(message,5000)
                  self.setNpid(7) 
         else:
             lp = len(p)
             li = len(i)
             ld = len(d)
-            mssg = "pid command failed. Bad data at pid" + str(k) + " (8,8,8): (" + str(lp)+ "," + str(li)+"," + str(ld) + ") "
+            mssg = u"pid command failed. Bad data at pid" + unicode(k) + u" (8,8,8): (" + unicode(lp)+ u"," + unicode(li)+u"," + unicode(ld) + u") "
             self.status.showMessage(mssg,5000)
             aw.qmc.errorlog.append(mssg)
 
 
     def getallpid(self):
         for k in range(1,8):
-            pkey = "p" + str(k)
-            ikey = "i" + str(k)
-            dkey = "d" + str(k)
+            pkey = u"p" + unicode(k)
+            ikey = u"i" + unicode(k)
+            dkey = u"d" + unicode(k)
 
-            msg = "sending commands for p" + str(k) + " i" + str(k) + " d" + str(k) 
+            msg = u"sending commands for p" + unicode(k) + u" i" + unicode(k) + u" d" + unicode(k) 
             self.status.showMessage(msg,1000)
             commandp = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[pkey][1],1)
             p = aw.pid.readoneword(commandp)/10.
@@ -7359,49 +7376,49 @@ class PXG4pidDlgControl(QDialog):
                 aw.pid.PXG4[dkey][0] = d
                 
                 if k == 1:
-                    self.p1edit.setText(str(p))
-                    self.i1edit.setText(str(i))
-                    self.d1edit.setText(str(d))                
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(d)
+                    self.p1edit.setText(unicode(p))
+                    self.i1edit.setText(unicode(i))
+                    self.d1edit.setText(unicode(d))                
+                    mssg = pkey + u"=" + unicode(p) + u" " + ikey + u"=" + unicode(i) + u" " + dkey + u"=" + unicode(d)
                     self.status.showMessage(mssg,1000)
                 if k == 2:
-                    self.p2edit.setText(str(p))
-                    self.i2edit.setText(str(i))
-                    self.d2edit.setText(str(d))                
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(d)
+                    self.p2edit.setText(unicode(p))
+                    self.i2edit.setText(unicode(i))
+                    self.d2edit.setText(unicode(d))                
+                    mssg = pkey + u"=" + unicode(p) + u" " + ikey + u"=" + unicode(i) + u" " + dkey + u"=" + unicode(d)
                     self.status.showMessage(mssg,1000)
                 elif k == 3:
-                    self.p3edit.setText(str(p))
-                    self.i3edit.setText(str(i))
-                    self.d3edit.setText(str(d))                
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(d)
+                    self.p3edit.setText(unicode(p))
+                    self.i3edit.setText(unicode(i))
+                    self.d3edit.setText(unicode(d))                
+                    mssg = pkey + u"=" + unicode(p) + u" " + ikey + u"=" + unicode(i) + u" " + dkey + u"=" + unicode(d)
                     self.status.showMessage(mssg,1000)
                 elif k == 4:
-                    self.p4edit.setText(str(p))
-                    self.i4edit.setText(str(i))
-                    self.d4edit.setText(str(d))                
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(d)
+                    self.p4edit.setText(unicode(p))
+                    self.i4edit.setText(unicode(i))
+                    self.d4edit.setText(unicode(d))                
+                    mssg = pkey + u"=" + unicode(p) + u" " + ikey + u"=" + unicode(i) + u" " + dkey + u"=" + unicode(d)
                     self.status.showMessage(mssg,1000)
                 elif k == 5:
-                    self.p5edit.setText(str(p))
-                    self.i5edit.setText(str(i))
-                    self.d5edit.setText(str(d))                
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(d)
+                    self.p5edit.setText(unicode(p))
+                    self.i5edit.setText(unicode(i))
+                    self.d5edit.setText(unicode(d))                
+                    mssg = pkey + u"=" + unicode(p) + u" " + ikey + u"=" + unicode(i) + u" " + dkey + u"=" + unicode(d)
                     self.status.showMessage(mssg,1000)
                 elif k == 6:
-                    self.p6edit.setText(str(p))
-                    self.i6edit.setText(str(i))
-                    self.d6edit.setText(str(d))                
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(d)
+                    self.p6edit.setText(unicode(p))
+                    self.i6edit.setText(unicode(i))
+                    self.d6edit.setText(unicode(d))                
+                    mssg = pkey + u"=" + unicode(p) + u" " + ikey + u"=" + unicode(i) + u" " + dkey + u"=" + unicode(d)
                     self.status.showMessage(mssg,1000)
                 elif k == 7:
-                    self.p7edit.setText(str(p))
-                    self.i7edit.setText(str(i))
-                    self.d7edit.setText(str(d))                
-                    mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(d)
+                    self.p7edit.setText(unicode(p))
+                    self.i7edit.setText(unicode(i))
+                    self.d7edit.setText(unicode(d))                
+                    mssg = pkey + u"=" + unicode(p) + u" " + ikey + u"=" + unicode(i) + u" " + dkey + u"=" + unicode(d)
                     self.status.showMessage(mssg,1000)
             else:
-                mssg = "getallpid(): Unable to read pid values "
+                mssg = u"getallpid(): Unable to read pid values "
                 self.status.showMessage(mssg,5000)
                 aw.qmc.errorlog.append(mssg)
                 return
@@ -7427,47 +7444,47 @@ class PXG4pidDlgControl(QDialog):
             elif N == 7:
                 self.radiopid7.setChecked(True)
 
-            mssg = "PID is using pid = " + str(N)
+            mssg = u"PID is using pid = " + unicode(N)
             self.status.showMessage(mssg,5000)
         else:
-            mssg = "getallpid(): Unable to read current sv "
+            mssg = u"getallpid(): Unable to read current sv "
             self.status.showMessage(mssg,5000)
             aw.qmc.errorlog.append(mssg)
             
     def getallsv(self):
         for i in reversed(range(1,8)):
-            svkey = "sv" + str(i)
+            svkey = u"sv" + unicode(i)
             command = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[svkey][1],1)
             sv = aw.pid.readoneword(command)/10.
             aw.pid.PXG4[svkey][0] = sv
             if i == 1:
-                self.sv1edit.setText(str(sv))
-                mssg = svkey + " = " + str(sv)
+                self.sv1edit.setText(unicode(sv))
+                mssg = svkey + u" = " + unicode(sv)
                 self.status.showMessage(mssg,1000)
             elif i == 2:
                 self.sv2edit.setText(str(sv))
-                mssg = svkey + " = " + str(sv)
+                mssg = svkey + u" = " + unicode(sv)
                 self.status.showMessage(mssg,1000)
             elif i == 3:
-                mssg = svkey + " = " + str(sv)
+                mssg = svkey + u" = " + unicode(sv)
                 self.status.showMessage(mssg,1000)
-                self.sv3edit.setText(str(sv))
+                self.sv3edit.setText(unicode(sv))
             elif i == 4:
-                mssg = svkey + " = " + str(sv)
+                mssg = svkey + u" = " + unicode(sv)
                 self.status.showMessage(mssg,1000)
                 self.sv4edit.setText(str(sv))
             elif i == 5:
-                mssg = svkey + " = " + str(sv)
+                mssg = svkey + u" = " + unicode(sv)
                 self.status.showMessage(mssg,1000)
-                self.sv5edit.setText(str(sv))
+                self.sv5edit.setText(unicode(sv))
             elif i == 6:
-                mssg = svkey + " = " + str(sv)
+                mssg = svkey + u" = " + unicode(sv)
                 self.status.showMessage(mssg,1000)
-                self.sv6edit.setText(str(sv))
+                self.sv6edit.setText(unicode(sv))
             elif i == 7:
-                mssg = svkey + " = " + str(sv)
+                mssg = svkey + u" = " + unicode(sv)
                 self.status.showMessage(mssg,1000)
-                self.sv7edit.setText(str(sv))
+                self.sv7edit.setText(unicode(sv))
 
         #read current svN
         command = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4["selectsv"][1],1)
@@ -7489,7 +7506,7 @@ class PXG4pidDlgControl(QDialog):
         elif N == 7:
             self.radiosv7.setChecked(True)
 
-        mssg = "PID is using SV = " + str(N)
+        mssg = u"PID is using SV = " + unicode(N)
         self.status.showMessage(mssg,5000)
          
     def checkrampsoakmode(self):
@@ -7497,55 +7514,55 @@ class PXG4pidDlgControl(QDialog):
         currentmode = aw.pid.readoneword(msg)
         aw.pid.PXG4["rampsoakmode"][0] = currentmode
         if currentmode == 0:
-            mode = ["0","OFF","CONTINUOUS CONTROL","CONTINUOUS CONTROL","OFF"]
+            mode = [u"0",u"OFF",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"OFF"]
         elif currentmode == 1:
-            mode = ["1","OFF","CONTINUOUS CONTROL","CONTINUOUS CONTROL","ON"]
+            mode = [u"1",u"OFF",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"ON"]
         elif currentmode == 2:
-            mode = ["2","OFF","CONTINUOUS CONTROL","STANDBY MODE","OFF"]
+            mode = [u"2",u"OFF",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"OFF"]
         elif currentmode == 3:
-            mode = ["3","OFF","CONTINUOUS CONTROL","STANDBY MODE","ON"]
+            mode = [u"3",u"OFF",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"ON"]
         elif currentmode == 4:
-            mode = ["4","OFF","STANDBY MODE","CONTINUOUS CONTROL","OFF"]
+            mode = [u"4",u"OFF",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"OFF"]
         elif currentmode == 5:
-            mode = ["5","OFF","STANDBY MODE","CONTINUOUS CONTROL","ON"]
+            mode = [u"5",u"OFF",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"ON"]
         elif currentmode == 6:
-            mode = ["6","OFF","STANDBY MODE","STANDBY MODE","OFF"]
+            mode = [u"6",u"OFF",u"STANDBY MODE",u"STANDBY MODE",u"OFF"]
         elif currentmode == 7:
-            mode = ["7","OFF","STANDBY MODE","STANDBY MODE","ON"]
+            mode = [u"7",u"OFF",u"STANDBY MODE",u"STANDBY MODE",u"ON"]
         elif currentmode == 8:
-            mode = ["8","ON","CONTINUOUS CONTROL","CONTINUOUS CONTROL","OFF"]
+            mode = [u"8",u"ON",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"OFF"]
         elif currentmode == 9:
-            mode = ["9","ON","CONTINUOUS CONTROL","CONTINUOUS CONTROL","ON"]
+            mode = [u"9",u"ON",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"ON"]
         elif currentmode == 10:
-            mode = ["10","ON","CONTINUOUS CONTROL","STANDBY MODE","OFF"]
+            mode = [u"10",u"ON",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"OFF"]
         elif currentmode == 11:
-            mode = ["11","ON","CONTINUOUS CONTROL","STANDBY MODE","ON"]
+            mode = [u"11",u"ON",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"ON"]
         elif currentmode == 12:
-            mode = ["12","ON","STANDBY MODE","CONTINUOUS CONTROL","OFF"]
+            mode = [u"12",u"ON",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"OFF"]
         elif currentmode == 13:
-            mode = ["13","ON","STANDBY MODE","CONTINUOUS CONTROL","ON"]
+            mode = [u"13",u"ON",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"ON"]
         elif currentmode == 14:
-            mode = ["14","ON","STANDBY MODE","STANDBY MODE","OFF"]
+            mode = [u"14",u"ON",u"STANDBY MODE",u"STANDBY MODE",u"OFF"]
         elif currentmode == 15:
-            mode = ["15","ON","STANDBY MODE","STANDBY MODE","ON"]
+            mode = [u"15",u"ON",u"STANDBY MODE",u"STANDBY MODE",u"ON"]
         else:
             return -1
 
-        string = "The rampsoak-mode tells how to start and end the ramp/soak\n\n"
-        string += "Your rampsoak mode in this pid is:\n"
-        string += "\nMode = " + mode[0]
-        string += "\n-----------------------------------------------------------------------"
-        string += "\nStart to run from PV value: " + mode[1]
-        string += "\nEnd output status at the end of ramp/soak: " + mode[2]
-        string += "\nOutput status while ramp/soak opearion set to OFF: " + mode[3] 
-        string += "\nRepeat Operation at the end: " + mode[4]
-        string += "\n-----------------------------------------------------------------------"
-        string += "\n\nRecomended Mode = 0\n"
-        string += "\nIf you need to change it, change it now and come back later"
-        string += "\nUse the Parameter Loader Software by Fuji if you need to\n\n"
-        string += "\n\n\nContinue?" 
+        string = u"The rampsoak-mode tells how to start and end the ramp/soak\n\n"
+        string += u"Your rampsoak mode in this pid is:\n"
+        string += u"\nMode = " + mode[0]
+        string += u"\n-----------------------------------------------------------------------"
+        string += u"\nStart to run from PV value: " + mode[1]
+        string += u"\nEnd output status at the end of ramp/soak: " + mode[2]
+        string += u"\nOutput status while ramp/soak opearion set to OFF: " + mode[3] 
+        string += u"\nRepeat Operation at the end: " + mode[4]
+        string += u"\n-----------------------------------------------------------------------"
+        string += u"\n\nRecomended Mode = 0\n"
+        string += u"\nIf you need to change it, change it now and come back later"
+        string += u"\nUse the Parameter Loader Software by Fuji if you need to\n\n"
+        string += u"\n\n\nContinue?" 
         
-        reply = QMessageBox.question(self,"Ramp Soak start-end mode",string,
+        reply = QMessageBox.question(self,u"Ramp Soak start-end mode",string,
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             return 0
@@ -7563,12 +7580,12 @@ class PXG4pidDlgControl(QDialog):
         if flag == 1:
             check = self.checkrampsoakmode()
             if check == 0:
-                self.status.showMessage("Ramp/Soak operation cancelled", 5000)
+                self.status.showMessage(u"Ramp/Soak operation cancelled", 5000)
                 return
             elif check == -1:
-                self.status.showMessage("No RX data", 5000)
+                self.status.showMessage(u"No RX data", 5000)
                 
-            self.status.showMessage("Setting RS ON...",500)
+            self.status.showMessage(u"Setting RS ON...",500)
 
             selectedmode = self.patternComboBox.currentIndex()
             msg = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4["rampsoakpattern"][1],1)
@@ -7577,32 +7594,32 @@ class PXG4pidDlgControl(QDialog):
             
             if currentmode != selectedmode:
                 #set mode in pid to match the mode selected in the combobox
-                self.status.showMessage("Need to change pattern mode...",1000)
+                self.status.showMessage(u"Need to change pattern mode...",1000)
                 command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4["rampsoakpattern"][1],selectedmode)
                 r = aw.ser.sendFUJIcommand(command,8)
                 if len(r) == 8:
-                    self.status.showMessage("Pattern has been changed. Wait 5 secs.", 500)
+                    self.status.showMessage(u"Pattern has been changed. Wait 5 secs.", 500)
                     aw.pid.PXG4["rampsoakpattern"][0] = selectedmode
                     time.sleep(5) #wait 5 seconds to set eeprom memory
                 else:
-                    self.status.showMessage("Pattern could not be changed", 5000)
+                    self.status.showMessage(u"Pattern could not be changed", 5000)
                     return
             #combobox mode matches pid mode
             #set ramp soak mode ON
             command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4["rampsoak"][1],flag)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                self.status.showMessage("RS ON and running...", 5000)
+                self.status.showMessage(u"RS ON and running...", 5000)
             else:
-                self.status.showMessage("RampSoak could not be turned ON", 5000)
+                self.status.showMessage(u"RampSoak could not be turned ON", 5000)
                 
         #set ramp soak OFF       
         elif flag == 0:
-            self.status.showMessage("setting RS OFF...",500)
+            self.status.showMessage(u"setting RS OFF...",500)
             command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4["rampsoak"][1],flag)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                self.status.showMessage("RS successfully turned OFF", 5000)
+                self.status.showMessage(u"RS successfully turned OFF", 5000)
                 aw.pid.PXG4["rampsoak"][0] = flag
             else:
                 self.status.showMessage("Ramp Soak could not be set OFF", 5000)
@@ -7618,41 +7635,41 @@ class PXG4pidDlgControl(QDialog):
             #check response from pid and update message on main window
             if r == command:
                 patterns = ["1-4","5-8","1-8","9-12","13-16","9-16","1-16"]
-                message = "Pattern changed to " + patterns[aw.pid.PXG4CH4["rampsoakpattern"][0]]
+                message = u"Pattern changed to " + patterns[aw.pid.PXG4CH4["rampsoakpattern"][0]]
 
             else:
-                message = "Pattern did not changed"
+                message = u"Pattern did not changed"
             aw.messagelabel.setText(message)
         elif onoff == 1:
-            aw.messagelabel.setText("Ramp/Soak was found ON! Turn it off before changing the pattern")
+            aw.messagelabel.setText(u"Ramp/Soak was found ON! Turn it off before changing the pattern")
         elif onoff == 2:
-            aw.messagelabel.setText("Ramp/Soak was found in Hold! Turn it off before changing the pattern")
+            aw.messagelabel.setText(u"Ramp/Soak was found in Hold! Turn it off before changing the pattern")
           
 
     def setONOFFstandby(self,flag):
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-        self.status.showMessage("wait...",500)
+        self.status.showMessage(u"wait...",500)
         command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4["runstandby"][1],flag)
         #TX and RX
         r = aw.ser.sendFUJIcommand(command,8)
                         
         if r == command and flag == 1:
-            message = "PID set to OFF"     #put pid in standby 1 (pid on)
+            message = u"PID set to OFF"     #put pid in standby 1 (pid on)
             aw.pid.PXG4["runstandby"][0] = 1
         elif r == command and flag == 0:
-            message = "PID set to ON"      #put pid in standby 0 (pid off)
+            message = u"PID set to ON"      #put pid in standby 0 (pid off)
             aw.pid.PXG4["runstandby"][0] = 0
         else:
-            message = "Unable"
+            message = u"Unable"
         if r:
             self.status.showMessage(message,5000)
         else:
-            self.status.showMessage("No data received",5000)            
+            self.status.showMessage(u"No data received",5000)            
 
 
     def getsegment(self, idn):
-        svkey = "segment" + str(idn) + "sv"
+        svkey = u"segment" + unicode(idn) + u"sv"
         svcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[svkey][1],1)
         
         sv = aw.pid.readoneword(svcommand)
@@ -7660,14 +7677,14 @@ class PXG4pidDlgControl(QDialog):
             return -1
         aw.pid.PXG4[svkey][0] = sv/10.              #divide by 10 because the decimal point is not sent by the PID
     
-        rampkey = "segment" + str(idn) + "ramp"
+        rampkey = u"segment" + unicode(idn) + u"ramp"
         rampcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[rampkey][1],1)
         ramp = aw.pid.readoneword(rampcommand)
         if ramp == -1:
             return -1
         aw.pid.PXG4[rampkey][0] = ramp/10.
         
-        soakkey = "segment" + str(idn) + "soak"
+        soakkey = u"segment" + unicode(idn) + u"soak"
         soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[soakkey][1],1)
         soak = aw.pid.readoneword(soakcommand)
         if soak == -1:
@@ -7677,28 +7694,28 @@ class PXG4pidDlgControl(QDialog):
     #get all Ramp Soak values for all 8 segments                                  
     def getallsegments(self):
         for i in range(1,17):
-            msg = "Reading Ramp/Soak " + str(i) + " ..."
+            msg = u"Reading Ramp/Soak " + unicode(i) + u" ..."
             self.status.showMessage(msg,500)
             k = self.getsegment(i)
             time.sleep(0.03)
             if k == -1:
-                self.status.showMessage("problem reading Ramp/Soak",5000)
+                self.status.showMessage(u"problem reading Ramp/Soak",5000)
                 return
             self.paintlabels()
-        self.status.showMessage("Finished reading Ramp/Soak val.",5000)
+        self.status.showMessage(u"Finished reading Ramp/Soak val.",5000)
 
     def setONOFFautotune(self,flag):
-        self.status.showMessage("setting autotune...",500)
+        self.status.showMessage(u"setting autotune...",500)
         #read current pidN
         command = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4["selectedpid"][1],1)
         N = aw.pid.readoneword(command)
         aw.pid.PXG4["selectedpid"][0] = N
 
-        string = "Current pid = " + str(N) + ". Proceed with autotune command?"
-        reply = QMessageBox.question(self,"Ramp Soak start-end mode",string,
+        string = u"Current pid = " + unicode(N) + u". Proceed with autotune command?"
+        reply = QMessageBox.question(self,u"Ramp Soak start-end mode",string,
                             QMessageBox.Yes|QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
-            self.status.showMessage("Autotune cancelled",5000)
+            self.status.showMessage(u"Autotune cancelled",5000)
             return 0
         elif reply == QMessageBox.Yes:
             command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4["autotuning"][1],flag)
@@ -7707,12 +7724,12 @@ class PXG4pidDlgControl(QDialog):
             if len(r) == 8:
                 if flag == 0:
                     aw.pid.PXG4["autotuning"][0] = 0
-                    self.status.showMessage("Autotune successfully turned OFF",5000)
+                    self.status.showMessage(u"Autotune successfully turned OFF",5000)
                 if flag == 1:
                     aw.pid.PXG4["autotuning"][0] = 1
-                    self.status.showMessage("Autotune successfully turned ON",5000) 
+                    self.status.showMessage(u"Autotune successfully turned ON",5000) 
             else:
-                self.status.showMessage("UNABLE to set Autotune",5000) 
+                self.status.showMessage(u"UNABLE to set Autotune",5000) 
 
 ###################################################################################
 ##########################  FUJI PID CLASS DEFINITION  ############################
@@ -7886,8 +7903,8 @@ class FujiPID(object):
         #turn on
         elif flag == 1:
             A = QLabel()
-            reply = QMessageBox.question(A,"Activate PID front buttons",
-                                         "Remember SV memory has a finite\nlife of ~10,000 writes.\n\nProceed?",
+            reply = QMessageBox.question(A,u"Activate PID front buttons",
+                                         u"Remember SV memory has a finite\nlife of ~10,000 writes.\n\nProceed?",
                                          QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Cancel:
                 return 
@@ -7940,17 +7957,17 @@ class FujiPID(object):
                 N = aw.pid.readoneword(command)
                 if N != -1:
                     self.PXG4["selectsv"][0] = N
-                    svkey = "sv" + str(N)
+                    svkey = u"sv" + unicode(N)
                     command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],newsv)
                     r = aw.ser.sendFUJIcommand(command,8)
                     if len(r) == 8:
-                        message = "SV" + str(N) + " changed from " + str(currentsv) + " to " + str(newsv/10.)
+                        message = u"SV" + unicode(N) + u" changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
                         aw.messagelabel.setText(message)
                         aw.lcd6.display(newsv/10.)
                         self.PXG4[svkey][0] = newsv
                         
                     else:
-                        msg = "Unable to set sv" + str(N)
+                        msg = u"Unable to set sv" + unicode(N)
                         aw.messagelabel.setText(msg)       
 
             #   or if control pid is fuji PXR3
@@ -7958,14 +7975,14 @@ class FujiPID(object):
                 command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
                 r = aw.ser.sendFUJIcommand(command,8)
                 if len(r) == 8:
-                    message = " SV changed from " + str(currentsv) + " to " + str(newsv/10.)
+                    message = u" SV changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
                     aw.messagelabel.setText(message)
                     aw.lcd6.display(newsv/10.)
                     self.PXR["sv"][0] = newsv
                 else:
-                    aw.messagelabel.setText("Unable to set sv")
+                    aw.messagelabel.setText(u"Unable to set sv")
         else:
-            aw.messagelabel.setText("Unable to set new sv")
+            aw.messagelabel.setText(u"Unable to set new sv")
 
     def dec2HexRaw(self,decimal):
         # This method converts a decimal to a raw string appropiate for Fuji serial TX
@@ -8028,7 +8045,7 @@ class FujiPID(object):
             return int(s1,16)
         else:
             #bad number of RX bytes 
-            errorcode = "pid.readoneword(): %i RX bytes received (7 needed) for unit ID=%i" %(len(r),ord(command[0]))
+            errorcode = u"pid.readoneword(): %i RX bytes received (7 needed) for unit ID=%i" %(len(r),ord(command[0]))
             aw.messagelabel.setText(errorcode)
             aw.qmc.errorlog.append(errorcode)            
             return -1
