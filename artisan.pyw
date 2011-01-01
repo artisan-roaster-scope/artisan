@@ -2948,20 +2948,30 @@ $cupping_notes
         
     #returns the index of the lowest point in BT; return -1 if no such value found
     def findTP(self):
-        end = len(aw.qmc.temp2) - 1
-        # try to consider only indices until the roast end and not beyond
-        if aw.qmc.startend[2] > 0.:
-            end = self.time2index(aw.qmc.startend[2])
-        if end > 0:
-            TP = aw.qmc.temp2[0]
-            idx = -1
-            for i in range(end, 0, -1):
-                if aw.qmc.temp2[i] < TP:
-                    TP = aw.qmc.temp2[i]
-                    idx = i
-            return idx
-        else:
-            return -1
+##        end = len(aw.qmc.temp2) - 1
+##        # try to consider only indices until the roast end and not beyond
+##        if aw.qmc.startend[2] > 0.:                                         #if endtime > 0.
+##            end = self.time2index(aw.qmc.startend[2])
+##            
+##        if end > 0:
+##            TP = aw.qmc.temp2[0]
+##            idx = -1
+##        
+##            for i in range(end, 0, -1):
+##                if aw.qmc.temp2[i] < TP:
+##                    TP = aw.qmc.temp2[i]
+##                    idx = i
+##            return idx
+##        else:
+##            return -1
+        
+        TP  = 1000
+        for i in range(len(aw.qmc.timex) - 1, 0, -1):
+            if aw.qmc.temp2[i] < TP:
+                TP = aw.qmc.temp2[i]
+                idx = i
+        return idx
+        
     
     #Flavor defect estimation chart for each leg. Thanks to Jim Schulman 
     def defect_estimation(self):    
@@ -3757,9 +3767,9 @@ class editGraphDlg(QDialog):
                         index = i
                         
                 #compare sorroundings to find smallest
-                check1 =  abs(aw.qmc.timex[index] - seconds)   #return i
-                check2 =  abs(aw.qmc.timex[index-1] - seconds) #return i-1
-                check3 =  abs(aw.qmc.timex[index+1] - seconds) #return i +1
+                check1 =  abs(aw.qmc.timex[index] - seconds)   
+                check2 =  abs(aw.qmc.timex[index-1] - seconds) 
+                check3 =  abs(aw.qmc.timex[index+1] - seconds) 
                 #find smallest of three
 
                 if check1 < check2 and check1 < check3:
@@ -3916,13 +3926,12 @@ class calculatorDlg(QDialog):
 
     #selects closest time INDEX in aw.qmc.timex from secons
     #used by calculate()
-    def choice(self,seconds):
-        if seconds == 0:
-            return 0.0
+    def choice(self,seconds):        
         #find where given seconds crosses aw.qmc.timex
         if len(aw.qmc.timex):                           #check that time is not empty just in case
             if aw.qmc.timex[-1] < seconds:
-                return aw.qmc.timex[-1]            
+                return aw.qmc.timex[-1]
+            
             for i in range(len(aw.qmc.timex)):
                 # first find the index i where seconds crosses timex
                 if aw.qmc.timex[i] > seconds:
@@ -3934,6 +3943,7 @@ class calculatorDlg(QDialog):
                 return i
             else:
                 return i-1
+
 
     #calculate rate of change        
     def calculateRC(self):
