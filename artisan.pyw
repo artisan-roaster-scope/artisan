@@ -2373,13 +2373,17 @@ class ApplicationWindow(QMainWindow):
             if not line.startsWith(u"[[WEIGHT]]"):
                 raise ValueError, u" Invalid Artisan file format: WEIGHT tag missing"
             #Read next weight
-            line = stream.readLine()
+            line = stream.readLine().trimmed()            
             #read next line ROASTER-TYPE tag
             line = stream.readLine().trimmed()                   
             if not line.startsWith(u"[[ROASTER-TYPE]]"):
                 raise ValueError, u" Invalid Artisan file format: ROASTER-TYPE tag missing"
-            #Read next line roaster type
-            line = stream.readLine()
+            line = stream.readLine().trimmed()                   
+            #read next line OPERATOR tag
+            line = stream.readLine().trimmed()                   
+            if not line.startsWith(u"[[OPERATOR]]"):
+                raise ValueError, u" Invalid Artisan file format: OPERATOR tag missing"
+            line = stream.readLine().trimmed()                   
             #Read data tag
             line = stream.readLine().trimmed()                   
             if not line.startsWith(u"[[DATE]]"):
@@ -2433,6 +2437,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.backgroundET.append(float(parts[1]))
                     self.qmc.backgroundBT.append(float(parts[2]))
             #CLOSE FILE
+
+            
             f.close()
 
             message =  u"Background " + unicode(fname) + u" loaded successfully"
