@@ -1406,8 +1406,6 @@ class tgraphcanvas(FigureCanvas):
                 dryphasetime = int(self.timex[dryEndIndex] - self.startend[0])
                 midphasetime = int(self.varC[0] - self.timex[dryEndIndex])
                 finishphasetime = int(self.startend[2]- self.varC[0])
-
-                print dryphasetime,midphasetime,finishphasetime
                                    
             else: #very light roast)
                 #use 1Cs (start of 1C) as 1C
@@ -3002,10 +3000,11 @@ $cupping_notes
     
     #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
     #if given, starts at TP_index and looks forward, otherwise it looks backwards from end of roast (EoR)
+
+    #find index with smallest abs() difference between aw.qmc.phases[1] and BT (temp2)
     def findDryEnd(self,TP_index=None):
         sd = 1000
         nsd = 1000
-        print aw.qmc.phases[1]
         for i in range(len(aw.qmc.timex)):
              nsd = abs(aw.qmc.temp2[i]- aw.qmc.phases[1])
              if nsd < sd:
@@ -3745,25 +3744,31 @@ class editGraphDlg(QDialog):
         if seconds == 0:
             return 0.0
         else:
-            #find where given seconds crosses aw.qmc.timex
             if len(aw.qmc.timex):                           #check that time is not empty just in case
                 if aw.qmc.timex[-1] < seconds:
                     aw.messagelabel.setText(u"Time out of reach")
                     return aw.qmc.timex[-1]
 
+                #find where given seconds crosses aw.qmc.timex
+                sd = 1000
                 for i in range(len(aw.qmc.timex)):                    
-                    # first find the index i where seconds crosses timex
-                    if aw.qmc.timex[i] >= seconds:
-                        break
+                    if abs(aw.qmc.timex[i] - seconds) < sd:
+                        sd = abs(aw.qmc.timex[i] - seconds)
+                        index = i
+                        
+                #compare sorroundings to find smallest
+                check1 =  abs(aw.qmc.timex[index] - seconds)   #return i
+                check2 =  abs(aw.qmc.timex[index-1] - seconds) #return i-1
+                check3 =  abs(aw.qmc.timex[index+1] - seconds) #return i +1
+                #find smallest of three
 
-                choice1 = aw.qmc.timex[i]   # after
-                choice2 = aw.qmc.timex[i-1] # before
-
-                if (choice1 - seconds) < (choice2 - seconds):  #return closest of the two
-                    return choice1
-                else:
-                    return choice2
-
+                if check1 < check2 and check1 < check3:
+                    return aw.qmc.timex[index]
+                elif check2 < check1 and check2 < check3:
+                    return aw.qmc.timex[index-1]
+                elif check3 < check2 and check3 < check1:
+                    return aw.qmc.timex[index + 1]
+                
             
     # adds a new event to the Dlg
     def addevent(self):
