@@ -1393,7 +1393,7 @@ class tgraphcanvas(FigureCanvas):
         TP_index = aw.findTP()
         #find when dry phase ends 
         dryEndIndex = aw.findDryEnd(TP_index)
-        BTdrycross = self.temp2[dryEndIndex]
+        BTdrycross = self.temp2[dryEndIndex]    
         
         #self.varC [1C starttime[0],1C startTemp[1],  1C endtime[2],1C endtemp[3],  2C starttime[4], 2C startTemp[5],  2C endtime[6], 2C endtemp[7]]
         #self.startend [starttime[0], starttempBT[1], endtime[2],endtempBT[3]]      
@@ -1406,6 +1406,8 @@ class tgraphcanvas(FigureCanvas):
                 dryphasetime = int(self.timex[dryEndIndex] - self.startend[0])
                 midphasetime = int(self.varC[0] - self.timex[dryEndIndex])
                 finishphasetime = int(self.startend[2]- self.varC[0])
+
+                print dryphasetime,midphasetime,finishphasetime
                                    
             else: #very light roast)
                 #use 1Cs (start of 1C) as 1C
@@ -3001,35 +3003,46 @@ $cupping_notes
     #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
     #if given, starts at TP_index and looks forward, otherwise it looks backwards from end of roast (EoR)
     def findDryEnd(self,TP_index=None):
-        idx = -1
-        end = len(aw.qmc.temp2)
-        # try to consider only indices until the roast end and not beyond
-        if aw.qmc.startend[2] > 0.:
-            end = self.time2index(aw.qmc.startend[2])            
-        TP = TP_index
-        # if TP not yet computed, let's try to compute it
-        if not TP:
-            TP = self.findTP()
-            if TP < 0:
-                TP = None
-        if TP:
-          for i in range(TP,end):
-              #count from TP forward (low temps towards high temps)
-              if aw.qmc.temp2[i] > aw.qmc.phases[1]:
-                  idx = i
-                  break
-          return idx                
-        else:
-          for i in range(end):
-              #count from the back [-i] (high temps towards low temps)
-              if aw.qmc.temp2[-i] < aw.qmc.phases[1] and i > 0:
-                  idx = i
-                  break
-          if idx < 0:
-              return idx
-          else:
-              return len(aw.qmc.temp2) - idx
-        
+        sd = 1000
+        nsd = 1000
+        print aw.qmc.phases[1]
+        for i in range(len(aw.qmc.timex)):
+             nsd = abs(aw.qmc.temp2[i]- aw.qmc.phases[1])
+             if nsd < sd:
+                 sd = nsd
+                 index = i
+        return index
+##
+##        
+##        idx = -1
+##        end = len(aw.qmc.temp2)
+##        # try to consider only indices until the roast end and not beyond
+##        if aw.qmc.startend[2] > 0.:
+##            end = self.time2index(aw.qmc.startend[2])            
+##        TP = TP_index
+##        # if TP not yet computed, let's try to compute it
+##        if not TP:
+##            TP = self.findTP()
+##            if TP < 0:
+##                TP = None
+##        if TP:
+##          for i in range(TP,end):
+##              #count from TP forward (low temps towards high temps)
+##              if aw.qmc.temp2[i] > aw.qmc.phases[1]:
+##                  idx = i
+##                  break
+##          return idx                
+##        else:
+##          for i in range(end):
+##              #count from the back [-i] (high temps towards low temps)
+##              if aw.qmc.temp2[-i] < aw.qmc.phases[1] and i > 0:
+##                  idx = i
+##                  break
+##          if idx < 0:
+##              return idx
+##          else:
+##              return len(aw.qmc.temp2) - idx
+##        
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
     def RoR(self,TP_index,dryEndIndex):
         dryphasetime = aw.qmc.statisticstimes[1]
