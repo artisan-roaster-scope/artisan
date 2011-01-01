@@ -3319,6 +3319,7 @@ class editGraphDlg(QDialog):
         #MARKERS
         chargelabel  = QLabel("<b>CHARGE</b>")
         chargelabel.setStyleSheet("background-color:'#f07800';")
+        
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.startend[0])))
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
@@ -3368,61 +3369,61 @@ class editGraphDlg(QDialog):
 
         #Dynamic content of events depending on number of events found    
         if ntlines > 0 and nslines > 0:
-            time1 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[0])]))
+            time1 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[0]]))
             self.line1b = QLineEdit(time1)
             self.line1b.setValidator(QRegExpValidator(regextime,self))
             self.line1b.setMaximumWidth(50)
             self.line1 = QLineEdit(aw.qmc.specialeventsStrings[0])
         if ntlines > 1 and nslines > 1:
-            time2 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[1])]))
+            time2 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[1]]))
             self.line2b = QLineEdit(time2)
             self.line2b.setValidator(QRegExpValidator(regextime,self))
             self.line2b.setMaximumWidth(50)
             self.line2 = QLineEdit(aw.qmc.specialeventsStrings[1])
         if ntlines > 2 and nslines > 2:
-            time3 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[2])]))
+            time3 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[2]]))
             self.line3b = QLineEdit(time3)
             self.line3b.setValidator(QRegExpValidator(regextime,self))
             self.line3b.setMaximumWidth(50)
             self.line3 = QLineEdit(aw.qmc.specialeventsStrings[2])
         if ntlines > 3 and nslines > 3:
-            time4 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[3])]))
+            time4 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[3]]))
             self.line4b = QLineEdit(time4)
             self.line4b.setValidator(QRegExpValidator(regextime,self))
             self.line4b.setMaximumWidth(50)
             self.line4 = QLineEdit(aw.qmc.specialeventsStrings[3])
         if ntlines > 4 and nslines > 4:
-            time5 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[4])]))
+            time5 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[4]]))
             self.line5b = QLineEdit(time5)
             self.line5b.setValidator(QRegExpValidator(regextime,self))
             self.line5b.setMaximumWidth(50)
             self.line5 = QLineEdit(aw.qmc.specialeventsStrings[4])
         if ntlines > 5 and nslines > 5:
-            time6 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[5])]))
+            time6 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[5]]))
             self.line6b = QLineEdit(time6)
             self.line6b.setValidator(QRegExpValidator(regextime,self))
             self.line6b.setMaximumWidth(50)
             self.line6 = QLineEdit(time6 + u" " + aw.qmc.specialeventsStrings[5])
         if ntlines > 6 and nslines > 6:
-            time7 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[6])]))
+            time7 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[6]]))
             self.line7b = QLineEdit(time7)
             self.line7b.setValidator(QRegExpValidator(regextime,self))
             self.line7b.setMaximumWidth(50)
             self.line7 = QLineEdit(time6 + u" " + aw.qmc.specialeventsStrings[6])
         if ntlines > 7 and nslines > 7:
-            time8 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[7])]))
+            time8 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[7]]))
             self.line8b = QLineEdit(time8)
             self.line8b.setValidator(QRegExpValidator(regextime,self))
             self.line8b.setMaximumWidth(50)
             self.line8 = QLineEdit(time8 + u" " + aw.qmc.specialeventsStrings[7])
         if ntlines > 8 and nslines > 8:
-            time9 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[8])]))
+            time9 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[8]]))
             self.line9b = QLineEdit(time9)
             self.line9b.setValidator(QRegExpValidator(regextime,self))
             self.line9b.setMaximumWidth(50)
             self.line9 = QLineEdit(time9 + u" " + aw.qmc.specialeventsStrings[8])
         if ntlines > 9 and nslines > 9:
-            time10 = aw.qmc.stringfromseconds(int(aw.qmc.timex[int(aw.qmc.specialevents[9])]))
+            time10 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[9]]))
             self.line10b = QLineEdit(time10)
             self.line10b.setValidator(QRegExpValidator(regextime,self))
             self.line10b.setMaximumWidth(50)
@@ -3655,6 +3656,14 @@ class editGraphDlg(QDialog):
         totalLayout.addLayout(okLayout,6)
 
         self.setLayout(totalLayout)
+
+    #find better approximation than int() alone
+    def approx(self,number):
+        integer, deci = divmod(number,1)
+        if deci >= .5:
+            return int(number) + 1
+        else:
+            return int(number)
         
     def percent(self):
         if float(self.weightoutedit.text()) != 0.0:
