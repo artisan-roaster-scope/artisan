@@ -36,7 +36,7 @@
 # version 00031: FINISHED PXG4 control Dlg and enhanced background options
 # END OF ALPHA.  BEGINNING BETA TESTING 
 
-__version__ = u"0.2.0"
+__version__ = u"0.2.1"
 
 
 # ABOUT
