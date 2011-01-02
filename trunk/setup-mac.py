@@ -10,7 +10,7 @@ from setuptools import setup
 
 
 # current version of Artisan
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
