@@ -4105,7 +4105,7 @@ class HUDDlg(QDialog):
         aw.qmc.ETtarget = int(unicode(self.ETlineEdit.text()))
         aw.qmc.BTtarget = int(unicode(self.BTlineEdit.text()))
         string = u"[ET target = " + unicode(self.ETlineEdit.text()) + u"] [BT target = " + unicode(self.BTlineEdit.text()) + u"]"
-        aw.HUDstatus.showMessage(string,3000)
+        aw.messagelabel.setText(string)
         self.close()
         
 
