@@ -36,7 +36,7 @@
 # version 00031: FINISHED PXG4 control Dlg and enhanced background options
 # END OF ALPHA.  BEGINNING BETA TESTING 
 
-__version__ = u"0.2.1"
+__version__ = u"0.2.2"
 
 
 # ABOUT
@@ -428,18 +428,19 @@ class tgraphcanvas(FigureCanvas):
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.stack.setCurrentIndex(0)
             self.ax.lines = self.ax.lines[0:5]
+            aw.messagelabel.setText(u"HUD OFF")       
 
         else:
-            if len(self.temp2) > 2:  #Need this because the Projections need rate of change
+            if len(self.temp2) > 2:  #Need this because viewProjections use rate of change (two values needed)
                 self.HUDflag = True
                 aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
                 aw.stack.setCurrentIndex(1)
+                aw.messagelabel.setText(u"HUD ON")
             else:
-                aw.messagelabel.setText(u"Scope off. Need more data")                
+                aw.messagelabel.setText(u"Need some data for HUD to work")                
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
-
         #calculate the temperature endpoint at endofx acording to the latest rate of change
         BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)
         ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
@@ -620,6 +621,9 @@ class tgraphcanvas(FigureCanvas):
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
+        if self.HUDflag:
+            self.toggleHUD()
+            
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')  
 
@@ -3312,20 +3316,18 @@ $cupping_notes
     def showHUD(self):
         img = QPixmap().grabWidget(aw.qmc)
         text = QString(aw.qmc.getApprox())
-        p = QPainter(img)
-        
+        p = QPainter(img)        
         #chose font
         font = QFont('Utopia', 14, -1)
         p.setFont(font)
-
-        #Draw 
+        #Draw begins
         p.begin(self)
-        p.setPen(QColor(96,255,237))
+        p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
         p.drawRect(10,10, aw.qmc.size().width()-20, aw.qmc.size().height()-20)
-        p.setPen(Qt.blue)
+        p.setPen(QColor("blue"))
         #change opacity for things inside the canvas
         p.setOpacity(0.4)
-        p.drawText(QPoint(aw.qmc.size().width()/6,aw.qmc.size().height()-70),text)
+        p.drawText(QPoint(aw.qmc.size().width()/7,aw.qmc.size().height()-70),text)
         p.end()
         
         self.HUD.setPixmap(img)
