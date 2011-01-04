@@ -110,11 +110,11 @@ import codecs
 
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
-                         QSlider,QDockWidget,QTabWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,QPixmap,QColor,
-                         QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,QStatusBar,
-                         QRegExpValidator,QDoubleValidator,QIntValidator)
+                         QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
+                         QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
+                         QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont)
 from PyQt4.QtCore import (Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize)
 
 
 from matplotlib.figure import Figure
@@ -359,7 +359,6 @@ class tgraphcanvas(FigureCanvas):
 
     #event handler from startTimer()
     def timerEvent(self, evt):
-                                   
         if self.flagon:
             #read timer, ET (t2) and BT (t1) TEMPERATURE
             tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
@@ -410,34 +409,37 @@ class tgraphcanvas(FigureCanvas):
                 timelcd = QString(st2)
                 aw.lcd1.display(timelcd)                
                 
-            aw.lcd2.display(t1)                          # MET
-            aw.lcd3.display(t2)                          # BT
+            aw.lcd2.display(t1)                               # MET
+            aw.lcd3.display(t2)                               # BT
             aw.lcd4.display(int(self.rateofchange1*60))       # rate of change MET (degress per minute)
             aw.lcd5.display(int(self.rateofchange2*60))       # rate of change BT (degrees per minute)
 
-               
-            #update the graph
             self.fig.canvas.draw()
-
-            #display projection of delta BT
+            
+            #update the graph
             if self.HUDflag:
-                self.viewHUD()
+                self.viewProjection()
+                aw.showHUD()
 
     def toggleHUD(self):
         if self.HUDflag:
+            self.viewProjection()
             self.HUDflag = False
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
-            aw.HUDstatus.showMessage(u"HUD OFF",3000)
+            aw.stack.setCurrentIndex(0)
             self.ax.lines = self.ax.lines[0:5]
 
         else:
-            self.HUDflag = True
-            aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
-            aw.HUDstatus.showMessage(u"HUD ON",3000)
-            aw.hudshow()
+            if len(self.temp2) > 2:  #Need this because the Projections need rate of change
+                self.HUDflag = True
+                aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
+                aw.stack.setCurrentIndex(1)
+            else:
+                aw.messagelabel.setText(u"Scope off. Need more data")                
 
     #make a projection of change of rate of BT on the graph
-    def viewHUD(self):
+    def viewProjection(self):
+
         #calculate the temperature endpoint at endofx acording to the latest rate of change
         BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)
         ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
@@ -452,6 +454,8 @@ class tgraphcanvas(FigureCanvas):
             
         self.HUDcounter += 1
 
+    def getApprox(self):
+        
         if self.rateofchange1 > 0:
             ETreachTime = (self.ETtarget - self.temp1[-1])/self.rateofchange1
         else:
@@ -472,9 +476,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             stringBT = u"[ XX:XX to reach BT target " + unicode(self.BTtarget) + self.mode + u" ] "
 
-        string = stringET + stringBT
-        aw.HUDstatus.showMessage(string,10000)
-
+        return stringET + stringBT
 
 
     #finds time, ET and BT when using Fuji PID
@@ -1592,6 +1594,7 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText(u"unable to move background")
             return
 
+
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem
 #####   with py2exe and svg
@@ -1609,7 +1612,8 @@ class VMToolbar(NavigationToolbar):
         if platf != u'Darwin':
             name = name.replace('.svg','.png')
         return QIcon(os.path.join(self.basedir, name))
-    
+
+
 
 ########################################################################################                            
 #################### MAIN APPLICATION WINDOW ###########################################
@@ -1653,14 +1657,19 @@ class ApplicationWindow(QMainWindow):
         buttonHHbl = QHBoxLayout()
         pidHHbl = QHBoxLayout()
         
-        #create Matplotlib canvas widget 
+        ###############      create Matplotlib canvas widget  #############
         self.qmc = tgraphcanvas(self.main_widget)
 
+        
+        self.HUD = QLabel()
+        
+        self.stack = QStackedWidget()
+        self.stack.addWidget(self.qmc)
+        self.stack.addWidget(self.HUD)
 
         ###################################################################
         # NavigationToolbar VMToolbar
-        ntb = VMToolbar(self.qmc, self.main_widget)
-
+        ntb = VMToolbar(self.qmc, self.main_widget)        
         
         #########################################################
         #create a serial port object
@@ -1668,7 +1677,6 @@ class ApplicationWindow(QMainWindow):
         # create a PID object
         self.pid = FujiPID()
         
-
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID. 
         self.settingsLoad()        
@@ -1676,9 +1684,7 @@ class ApplicationWindow(QMainWindow):
         #create a Label object to display program status information
         self.messagelabel = QLabel()
         
-        self.HUDstatus = QStatusBar()
-        self.HUDstatus.setSizeGripEnabled(False)
-        self.HUDstatus .setStyleSheet("background-color:'lightgrey';")
+        
 
         #create START STOP buttons        
         self.button_1 = QPushButton("ON")
@@ -1916,10 +1922,10 @@ class ApplicationWindow(QMainWindow):
         gl.addWidget(self.lcd1,0,1)  #timer LCD
         gl.addWidget(self.messagelabel,1,0) #add a message label to give program feedback to user
         gl.addLayout(pidHHbl,2,0)  #pid button + LCDS
-        gl.addWidget(self.HUDstatus,3,0)
-        gl.addWidget(self.qmc,4,0)
-        gl.addLayout(buttonVVbl,4,1) #place buttonlayout manager inside grid box layout manager
-        gl.addLayout(buttonHHbl,5,0) #place buttonlayout manager inside grid box layout manager
+        gl.addWidget(self.stack,3,0)
+        #gl.addWidget(self.hudimag,4,0)
+        gl.addLayout(buttonVVbl,3,1) #place buttonlayout manager inside grid box layout manager
+        gl.addLayout(buttonHHbl,4,0) #place buttonlayout manager inside grid box layout manager
 
         ###############  create MENUS 
         self.fileMenu = self.menuBar().addMenu("&File")
@@ -2039,7 +2045,7 @@ class ApplicationWindow(QMainWindow):
         self.GraphMenu.addAction(backgroundAction)  
 
         hudAction = QAction("HUD targets",self)
-        self.connect(hudAction,SIGNAL("triggered()"),self.hudshow)
+        self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.GraphMenu.addAction(hudAction)  
         
         # CONFIGURATION menu
@@ -3079,11 +3085,7 @@ $cupping_notes
         
     def viewErrorLog(self):
         error = errorDlg(self)
-        error.show()
-
-    def hudshow(self):
-        hud = HUDDlg(self)
-        hud.show()        
+        error.show()      
         
     def helpAbout(self):
         creditsto = "<br>Rafael Cobo <br> Marko Luther"
@@ -3302,7 +3304,33 @@ $cupping_notes
             self.messagelabel.setText(u"Error in resize() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Error in resize() " + unicode(e))
             return
-                                        
+
+    def hudset(self):
+        hudDl = HUDDlg(self)
+        hudDl.show()
+        
+    def showHUD(self):
+        img = QPixmap().grabWidget(aw.qmc)
+        text = QString(aw.qmc.getApprox())
+        p = QPainter(img)
+        
+        #chose font
+        font = QFont('Utopia', 14, -1)
+        p.setFont(font)
+
+        #Draw 
+        p.begin(self)
+        p.setPen(QColor(96,255,237))
+        p.drawRect(10,10, aw.qmc.size().width()-20, aw.qmc.size().height()-20)
+        p.setPen(Qt.blue)
+        #change opacity for things inside the canvas
+        p.setOpacity(0.4)
+        p.drawText(QPoint(aw.qmc.size().width()/6,aw.qmc.size().height()-70),text)
+        p.end()
+        
+        self.HUD.setPixmap(img)
+        
+           
 ########################################################################################            
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
 ########################################################################################        
