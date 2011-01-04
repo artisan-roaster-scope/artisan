@@ -959,6 +959,14 @@ class tgraphcanvas(FigureCanvas):
             st2 = unicode(int(mins))
         return st2
 
+    #find better approximation than int() alone
+    def approx(self,number):
+        integer, deci = divmod(number,1)
+        if deci >= .5:
+            return int(number) + 1
+        else:
+            return int(number)
+        
     def fromFtoC(self,Ffloat):
         return (Ffloat-32.0)*(5.0/9.0)
 
@@ -970,7 +978,8 @@ class tgraphcanvas(FigureCanvas):
         self.mode = u"F"
         self.ylimit = 750
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
-        self.phases = [200,300,390,450]
+        for i in range(4):
+            self.phases[i] = self.approx(self.fromCtoF(self.phases[i]))          
         self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"]) #Write "F" on Y axis
         self.statisticsheight = 650
         self.statisticsupper = 655
@@ -983,7 +992,8 @@ class tgraphcanvas(FigureCanvas):
         self.mode = u"C"
         self.ylimit = 400
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
-        self.phases = [95,150,200,230]
+        for i in range(4):
+            self.phases[i] = self.approx(self.fromFtoC(self.phases[i]))
         self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"]) #Write "C" on Y axis
         self.statisticsheight = 341
         self.statisticsupper = 346
