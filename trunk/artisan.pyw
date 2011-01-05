@@ -37,7 +37,7 @@
 # END OF ALPHA.  BEGINNING BETA TESTING 
 
 __version__ = u"0.2.2"
-import pdb
+
 
 # ABOUT
 # This program shows how to plot the temperature and its rate of change from a Fuji PID or a dual thermocouple meter
@@ -434,7 +434,7 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText(u"HUD OFF")       
 
         else:
-            if len(self.temp2) > 2:  #Need this because viewProjections use rate of change (two values needed)
+            if len(self.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
                 self.HUDflag = True
                 aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
                 aw.stack.setCurrentIndex(1)
@@ -1685,7 +1685,7 @@ class ApplicationWindow(QMainWindow):
         #This is a list of different HUD functions. They are called at the end of qmc.timerEvent()
         self.showHUD = [self.showHUDmetrics, self.showHUDthermal]
         #this holds the index of the HUD functions above
-        self.HUDfunction = 1
+        self.HUDfunction = 0
         
         self.stack = QStackedWidget()
         self.stack.addWidget(self.qmc)
@@ -3338,22 +3338,27 @@ $cupping_notes
     def showHUDmetrics(self):
         img = QPixmap().grabWidget(aw.qmc)
         text = QString(self.qmc.getApprox())
+        Wwidth = aw.qmc.size().width()
+        Wheight = aw.qmc.size().height()
+        
         p = QPainter(img)        
         #chose font
         font = QFont('Utopia', 14, -1)
         p.setFont(font)
         #Draw begins
         p.begin(self)
-        #darken image
-        p.setOpacity(0.1)
-        p.fillRect(0,0, aw.qmc.size().width(), aw.qmc.size().height(),QColor("green"))
         p.setOpacity(1.)
         p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
-        p.drawRect(10,10, aw.qmc.size().width()-20, aw.qmc.size().height()-20)
-        #change opacity for things inside the canvas
-        p.setPen(QColor("black"))
-        p.setOpacity(0.8)
-        p.drawText(QPoint(aw.qmc.size().width()/7,aw.qmc.size().height()-70),text)
+        p.drawRect(10,10, Wwidth-20, Wheight-20)
+        
+        p.setOpacity(0.7)
+        p.setBrush(QBrush(QColor("black")))
+        p.drawRect(40,                      #p(x,)
+                   Wheight - Wheight/3,     #p(,y)  
+                   Wwidth-Wwidth/9,         #size x
+                   Wheight/4)               #size y
+        p.setPen(QColor("white"))
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/4),text)
         p.end()
         
         self.HUD.setPixmap(img)
@@ -3368,29 +3373,42 @@ $cupping_notes
         #Draw begins
         p.begin(self)
         #darken image
-        p.setOpacity(0.1)
-        p.fillRect(0,0, aw.qmc.size().width(), aw.qmc.size().height(),QColor("red"))
+        p.setOpacity(0.05)
+        p.fillRect(0,0, aw.qmc.size().width(), aw.qmc.size().height(),QColor("blue"))
+        
         p.setOpacity(1)
         p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
         p.drawRect(10,10, Wwidth - 20, Wheight - 20)
-        
-        ETradious = int(self.qmc.temp1[-1]*400/self.qmc.ylimit)
-        BTradious = int(self.qmc.temp2[-1]*400/self.qmc.ylimit)       
-        p.setOpacity(0.4)
-        g = QRadialGradient(Wwidth/2 - BTradious/2, Wheight/2 - BTradious/2,ETradious-BTradious)
-        
-        #hot  = QColor(0.,1.,1.0)
-        #cold = QColor(0.3333,1.0,1.0)
-        
-        #g.setColorAt(0.0, cold)
-        #g.setColorAt(1., hot)
-        p.setBrush(QBrush(g))
-        p.setPen(QColor(96,255,237))
-        #draw BT circle
-        p.drawEllipse (Wwidth/2 - BTradious/2, Wheight/2 - BTradious/2 , BTradious, BTradious)
-        #draw ET circle
-        p.drawEllipse (Wwidth/2 - ETradious/2, Wheight/2 - ETradious/2 , ETradious, ETradious)
 
+        if self.qmc.mode == "F":
+            ETradious = int(self.qmc.temp1[-1]/3)
+            BTradious = int(self.qmc.temp2[-1]/3)
+        else:
+            ETradious = int(self.qmc.fromCtoF(self.qmc.temp1[-1]/3))
+            BTradious = int(self.qmc.fromCtoF(self.qmc.temp2[-1]/3))
+            
+        Tradious = 300
+    
+        p.setOpacity(0.4)
+        g = QRadialGradient(Wwidth/2, Wheight/2, ETradious-BTradious)
+        g.setColorAt(0.0, QColor("green")) #the bean je je
+        g.setColorAt(.3, Qt.yellow)
+        g.setColorAt(1., Qt.red)
+        p.setBrush(QBrush(g))        
+        p.setPen(QColor("black"))
+        #draw thermal circle
+        p.drawEllipse (Wwidth/2 -Tradious/2 , Wheight/2 - Tradious/2 , Tradious,Tradious)
+
+        #draw ET circle
+        p.setBrush(0)        
+        p.drawEllipse (Wwidth/2 -ETradious/2 , Wheight/2 - ETradious/2 , ETradious,ETradious)
+        #draw BT circle
+        p.drawEllipse (Wwidth/2 -BTradious/2 , Wheight/2 - BTradious/2 , BTradious,BTradious)
+
+        delta = "ET-BT = %.1f%s"%(self.qmc.temp1[-1]- self.qmc.temp2[-1],self.qmc.mode)
+        p.setFont(QFont('Utopia', 14, -1))
+        p.drawText(QPoint(Wwidth/2,Wheight/2),QString(delta))
+        
         p.end()
         self.HUD.setPixmap(img)
         
