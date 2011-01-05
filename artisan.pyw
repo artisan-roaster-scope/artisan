@@ -37,7 +37,7 @@
 # END OF ALPHA.  BEGINNING BETA TESTING 
 
 __version__ = u"0.2.2"
-
+import pdb
 
 # ABOUT
 # This program shows how to plot the temperature and its rate of change from a Fuji PID or a dual thermocouple meter
@@ -108,11 +108,13 @@ import cgi
 import codecs
 
 
+
+
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
-                         QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont)
+                         QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient)
 from PyQt4.QtCore import (Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize)
 
@@ -164,7 +166,8 @@ class tgraphcanvas(FigureCanvas):
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
         # device 1 (with index 1 bellow) is Omega HH806
-        # device 2 (with index 2 bellow) is omega HH506 ; Logger Extech 421509 has been reported to be the same as Omega HH506RA
+        # device 2 (with index 2 bellow) is omega HH506
+        # etc
         self.device = 0 
         self.devicefunctionlist = [self.fujitemperature,
                                    self.HH806AU,
@@ -208,7 +211,7 @@ class tgraphcanvas(FigureCanvas):
         self.timex = []
 
         #lists to store temps and rates of change. Second most IMPORTANT variables. All need same dimension.
-        #self.temp1 = MET ; self.temp2 = BT; self.delta1 = deltaMET; self.delta2 = deltaBT
+        #self.temp1 = ET ; self.temp2 = BT; self.delta1 = deltaMET; self.delta2 = deltaBT
         self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]
         
         #variables to record 1C and 2C. Store as list of 8 elements:
@@ -235,8 +238,8 @@ class tgraphcanvas(FigureCanvas):
         self.flavors = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5]
 
         # projection variables of change of rate
-        self.HUDcounter = 1
         self.HUDflag = 0
+        self.ProjCounter = 1
         self.ETtarget = 350
         self.BTtarget = 250
 
@@ -419,7 +422,7 @@ class tgraphcanvas(FigureCanvas):
             #update the graph
             if self.HUDflag:
                 self.viewProjection()
-                aw.showHUD()
+                aw.showHUD[aw.HUDfunction]()
 
     def toggleHUD(self):
         if self.HUDflag:
@@ -445,15 +448,17 @@ class tgraphcanvas(FigureCanvas):
         BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)
         ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
         #plot proyections
-        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"], linestyle = '-.', linewidth= 8, alpha = .3)
-        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"], linestyle = '-.', linewidth= 8, alpha = .3)
+        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
+                         linestyle = '-.', linewidth= 8, alpha = .3)
+        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"],
+                         linestyle = '-.', linewidth= 8, alpha = .3)
 
         #erase every three trigger events to make it look like a radar
-        l,p = divmod(self.HUDcounter,3)
+        l,p = divmod(self.ProjCounter,3)
+        self.ProjCounter += 1
         if p == 0:
             self.ax.lines = self.ax.lines[0:5]
-            
-        self.HUDcounter += 1
+            self.ProjCounter = 1
 
     def getApprox(self):
         
@@ -621,8 +626,11 @@ class tgraphcanvas(FigureCanvas):
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
+        
         if self.HUDflag:
             self.toggleHUD()
+        self.ProjCounter = 1
+
             
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')  
@@ -678,8 +686,6 @@ class tgraphcanvas(FigureCanvas):
         self.timeclock.restart()
         
         self.redraw()
-
-        self.HUDcounter = 1
 
     #Redraws data   
     def redraw(self):
@@ -1671,21 +1677,24 @@ class ApplicationWindow(QMainWindow):
         buttonHHbl = QHBoxLayout()
         pidHHbl = QHBoxLayout()
         
-        ###############      create Matplotlib canvas widget  #############
+        ###############      create Matplotlib canvas widget 
         self.qmc = tgraphcanvas(self.main_widget)
 
-        
-        self.HUD = QLabel()
+        ####################    HUD   
+        self.HUD = QLabel()  #main canvas for hud widget
+        #This is a list of different HUD functions. They are called at the end of qmc.timerEvent()
+        self.showHUD = [self.showHUDmetrics, self.showHUDthermal]
+        #this holds the index of the HUD functions above
+        self.HUDfunction = 1
         
         self.stack = QStackedWidget()
         self.stack.addWidget(self.qmc)
         self.stack.addWidget(self.HUD)
 
-        ###################################################################
+
         # NavigationToolbar VMToolbar
         ntb = VMToolbar(self.qmc, self.main_widget)        
         
-        #########################################################
         #create a serial port object
         self.ser = serialport()
         # create a PID object
@@ -3292,7 +3301,7 @@ $cupping_notes
             monthdir = currentdir.mkdir(monthpath)
         self.profilepath = monthpath
 
-    #resizes and saves graph to a new width x 
+    #resizes and saves graph to a new width w 
     def resize(self,w,transformationmode):
         try: 
             tempFile = tempfile.TemporaryFile()
@@ -3319,28 +3328,127 @@ $cupping_notes
             aw.qmc.errorlog.append(u"Error in resize() " + unicode(e))
             return
 
+    #displays Dialog for the setting the HUD
     def hudset(self):
         hudDl = HUDDlg(self)
         hudDl.show()
+
+################# WORK IN PROGRESS
         
-    def showHUD(self):
+    def showHUDmetrics(self):
         img = QPixmap().grabWidget(aw.qmc)
-        text = QString(aw.qmc.getApprox())
+        text = QString(self.qmc.getApprox())
         p = QPainter(img)        
         #chose font
         font = QFont('Utopia', 14, -1)
         p.setFont(font)
         #Draw begins
         p.begin(self)
+        #darken image
+        p.setOpacity(0.1)
+        p.fillRect(0,0, aw.qmc.size().width(), aw.qmc.size().height(),QColor("green"))
+        p.setOpacity(1.)
         p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
         p.drawRect(10,10, aw.qmc.size().width()-20, aw.qmc.size().height()-20)
-        p.setPen(QColor("blue"))
         #change opacity for things inside the canvas
-        p.setOpacity(0.4)
+        p.setPen(QColor("black"))
+        p.setOpacity(0.8)
         p.drawText(QPoint(aw.qmc.size().width()/7,aw.qmc.size().height()-70),text)
         p.end()
         
         self.HUD.setPixmap(img)
+
+################# WORK IN PROGRESS
+        
+    def showHUDthermal(self): 
+        img = QPixmap().grabWidget(aw.qmc)
+        p = QPainter(img)
+        Wwidth= aw.qmc.size().width()
+        Wheight = aw.qmc.size().height()
+        #Draw begins
+        p.begin(self)
+        #darken image
+        p.setOpacity(0.1)
+        p.fillRect(0,0, aw.qmc.size().width(), aw.qmc.size().height(),QColor("red"))
+        p.setOpacity(1)
+        p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
+        p.drawRect(10,10, Wwidth - 20, Wheight - 20)
+        
+        ETradious = int(self.qmc.temp1[-1]*400/self.qmc.ylimit)
+        BTradious = int(self.qmc.temp2[-1]*400/self.qmc.ylimit)       
+        p.setOpacity(0.4)
+        g = QRadialGradient(Wwidth/2 - BTradious/2, Wheight/2 - BTradious/2,ETradious-BTradious)
+        
+        #hot  = QColor(0.,1.,1.0)
+        #cold = QColor(0.3333,1.0,1.0)
+        
+        #g.setColorAt(0.0, cold)
+        #g.setColorAt(1., hot)
+        p.setBrush(QBrush(g))
+        p.setPen(QColor(96,255,237))
+        #draw BT circle
+        p.drawEllipse (Wwidth/2 - BTradious/2, Wheight/2 - BTradious/2 , BTradious, BTradious)
+        #draw ET circle
+        p.drawEllipse (Wwidth/2 - ETradious/2, Wheight/2 - ETradious/2 , ETradious, ETradious)
+
+        p.end()
+        self.HUD.setPixmap(img)
+        
+        
+##########################################################################
+#####################     HUD  EDIT DLG     ##############################
+##########################################################################
+        
+class HUDDlg(QDialog):
+    def __init__(self, parent = None):
+        super(HUDDlg,self).__init__(parent)
+
+        self.setWindowTitle("HUD config")
+        ETLabel = QLabel("ET target")
+        BTLabel = QLabel("BT target")
+        
+        modeLabel = QLabel("HUD mode")
+        
+        self.modeComboBox = QComboBox()
+        self.modeComboBox.setMaximumWidth(100)
+        self.modeComboBox.setMinimumWidth(55)
+        self.modeComboBox.addItems([u"metrics",u"thermal"])
+        self.modeComboBox.setCurrentIndex(aw.HUDfunction)
+        
+        self.ETlineEdit = QLineEdit(str(aw.qmc.ETtarget))           
+        self.BTlineEdit = QLineEdit(str(aw.qmc.BTtarget))
+        self.ETlineEdit.setValidator(QIntValidator(0, 1000, self.ETlineEdit))
+        self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
+
+        okButton = QPushButton("OK")  
+        cancelButton = QPushButton("Cancel")        
+        self.connect(cancelButton,SIGNAL("clicked()"),self.close)
+        self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
+                                     
+        hudLayout = QGridLayout()
+        hudLayout.addWidget(ETLabel,0,0)
+        hudLayout.addWidget(self.ETlineEdit,0,1)
+        hudLayout.addWidget(BTLabel,1,0)
+        hudLayout.addWidget(self.BTlineEdit,1,1)
+        hudLayout.addWidget(modeLabel,2,0)
+        hudLayout.addWidget(self.modeComboBox,2,1)
+        hudLayout.addWidget(okButton,3,0)
+        hudLayout.addWidget(cancelButton,3,1)   
+        self.setLayout(hudLayout)
+
+    def updatetargets(self):
+        mode = unicode(self.modeComboBox.currentText())
+        if mode == u"metrics":
+            aw.HUDfunction = 0
+        elif mode == u"thermal":
+            aw.HUDfunction = 1
+            
+        aw.qmc.ETtarget = int(unicode(self.ETlineEdit.text()))
+        aw.qmc.BTtarget = int(unicode(self.BTlineEdit.text()))
+        string = u"[ET target = " + unicode(self.ETlineEdit.text()) + u"] [BT target = " + unicode(self.BTlineEdit.text()) + u"]"
+        aw.messagelabel.setText(string)
+        self.close()
+
         
            
 ########################################################################################            
@@ -4080,44 +4188,7 @@ class calculatorDlg(QDialog):
            outx = float(unicode(self.outEdit.text()))
            inx = outx*convtable[self.outComboBox.currentIndex()][self.inComboBox.currentIndex()]
            self.inEdit.setText(u"%.2f"%inx)
-           
-##########################################################################
-############################     HUD  DLG     ############################
-##########################################################################
-        
-class HUDDlg(QDialog):
-    def __init__(self, parent = None):
-        super(HUDDlg,self).__init__(parent)
-
-        self.setWindowTitle("HUD config")
-        ETLabel = QLabel("ET target")
-        BTLabel = QLabel("BT target")
-        self.ETlineEdit = QLineEdit(str(aw.qmc.ETtarget))           
-        self.BTlineEdit = QLineEdit(str(aw.qmc.BTtarget))
-        self.ETlineEdit.setValidator(QIntValidator(0, 1000, self.ETlineEdit))
-        self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
-
-        okButton = QPushButton("OK")  
-        cancelButton = QPushButton("Cancel")        
-        self.connect(cancelButton,SIGNAL("clicked()"),self.close)
-        self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
-                                     
-        hudLayout = QGridLayout()
-        hudLayout.addWidget(ETLabel,0,0)
-        hudLayout.addWidget(self.ETlineEdit,0,1)
-        hudLayout.addWidget(BTLabel,1,0)
-        hudLayout.addWidget(self.BTlineEdit,1,1)
-        hudLayout.addWidget(okButton,2,0)
-        hudLayout.addWidget(cancelButton,2,1)   
-        self.setLayout(hudLayout)
-
-    def updatetargets(self):
-        aw.qmc.ETtarget = int(unicode(self.ETlineEdit.text()))
-        aw.qmc.BTtarget = int(unicode(self.BTlineEdit.text()))
-        string = u"[ET target = " + unicode(self.ETlineEdit.text()) + u"] [BT target = " + unicode(self.BTlineEdit.text()) + u"]"
-        aw.messagelabel.setText(string)
-        self.close()
-        
+                   
 
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
