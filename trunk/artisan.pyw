@@ -250,6 +250,7 @@ class tgraphcanvas(FigureCanvas):
         self.cuppingnotes = u""
         self.roastdate = QDate.currentDate()
         self.beans = u""
+        self.projectFlag = False
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight = [0,0,u"g"]
         
@@ -417,12 +418,14 @@ class tgraphcanvas(FigureCanvas):
             aw.lcd4.display(int(self.rateofchange1*60))       # rate of change MET (degress per minute)
             aw.lcd5.display(int(self.rateofchange2*60))       # rate of change BT (degrees per minute)
 
+
             self.fig.canvas.draw()
             
-            #update the graph
-            if self.HUDflag:
+            if self.projectFlag:
                 self.viewProjection()
+            if self.HUDflag:
                 aw.showHUD[aw.HUDfunction]()
+
 
     def toggleHUD(self):
         if self.HUDflag:
@@ -662,6 +665,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_7.setDisabled(False)
         aw.button_8.setDisabled(False)
         aw.button_9.setDisabled(False)
+        
         aw.button_1.setFlat(False)
         aw.button_2.setFlat(False)
         aw.button_3.setFlat(False)
@@ -981,29 +985,29 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
-        self.mode = u"F"
         self.ylimit = 750
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
             self.phases[i] = self.approx(self.fromCtoF(self.phases[i]))          
-        self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"]) #Write "F" on Y axis
+        self.ax.set_ylabel("F",size=16,color = self.palette["ylabel"]) #Write "F" on Y axis
         self.statisticsheight = 650
         self.statisticsupper = 655
         self.statisticslower = 617
+        self.mode = u"F"
         self.redraw()
 
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
-        self.mode = u"C"
         self.ylimit = 400
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
             self.phases[i] = self.approx(self.fromFtoC(self.phases[i]))
-        self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"]) #Write "C" on Y axis
+        self.ax.set_ylabel("C",size=16,color = self.palette["ylabel"]) #Write "C" on Y axis
         self.statisticsheight = 341
         self.statisticsupper = 346
         self.statisticslower = 325
+        self.mode = u"C"
         self.redraw()
 
     #converts a loaded profile to a different temperature scale. t input is the requested mode (F or C).
@@ -1634,7 +1638,6 @@ class VMToolbar(NavigationToolbar):
         return QIcon(os.path.join(self.basedir, name))
 
 
-
 ########################################################################################                            
 #################### MAIN APPLICATION WINDOW ###########################################
 ########################################################################################
@@ -1673,9 +1676,9 @@ class ApplicationWindow(QMainWindow):
         gl = QGridLayout(self.main_widget)
                 
         #create vertical/horizontal boxes layout managers for buttons,etc
-        buttonVVbl = QVBoxLayout()
+        LCDlayout = QVBoxLayout()
         buttonHHbl = QHBoxLayout()
-        pidHHbl = QHBoxLayout()
+        controlLayout = QVBoxLayout()
         
         ###############      create Matplotlib canvas widget 
         self.qmc = tgraphcanvas(self.main_widget)
@@ -1689,11 +1692,7 @@ class ApplicationWindow(QMainWindow):
         
         self.stack = QStackedWidget()
         self.stack.addWidget(self.qmc)
-        self.stack.addWidget(self.HUD)
-
-
-        # NavigationToolbar VMToolbar
-        ntb = VMToolbar(self.qmc, self.main_widget)        
+        self.stack.addWidget(self.HUD)        
         
         #create a serial port object
         self.ser = serialport()
@@ -1756,8 +1755,7 @@ class ApplicationWindow(QMainWindow):
         #create RESET button
         self.button_7 = QPushButton("RESET")
         self.button_7.setStyleSheet("QPushButton { background-color: white }")
-        self.button_7.setMaximumSize(90, 50)
-        self.button_7.setMinimumHeight(50)
+        self.button_7.setMaximumSize(90, 40)
         self.button_7.setToolTip("<font color=red size=2><b>" + "Reset graphs and time" + "</font></b>")
         self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset)
 
@@ -1780,8 +1778,7 @@ class ApplicationWindow(QMainWindow):
         #create PID control button
         self.button_10 = QPushButton("PID")
         self.button_10.setStyleSheet("QPushButton { background-color: '#92C3FF'}")
-        self.button_10.setMaximumSize(90, 50)
-        self.button_10.setMinimumHeight(50)
+        self.button_10.setMaximumSize(90, 40)
         self.connect(self.button_10, SIGNAL("clicked()"), self.PIDcontrol)        
 
         #create Event record button
@@ -1830,8 +1827,7 @@ class ApplicationWindow(QMainWindow):
         #create HUD button
         self.button_18 = QPushButton("HUD")
         self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
-        self.button_18.setMaximumSize(90, 50)
-        self.button_18.setMinimumHeight(50)
+        self.button_18.setMaximumSize(90, 30)
         self.button_18.setToolTip("<font color=red size=2><b>" +"BT projection" + "</font></b>")
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
 
@@ -1842,25 +1838,26 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_15, SIGNAL("clicked()"),lambda x=-20: self.pid.adjustsv(x))
         self.connect(self.button_16, SIGNAL("clicked()"),lambda x=-10: self.pid.adjustsv(x))
         self.connect(self.button_17, SIGNAL("clicked()"),lambda x=-5: self.pid.adjustsv(x))
+
+
+        # NavigationToolbar VMToolbar
+        ntb = VMToolbar(self.qmc, self.main_widget)
+        naviLayout = QHBoxLayout()
+        naviLayout.addWidget(ntb,0)
+        naviLayout.addWidget(self.button_10,2)
+        naviLayout.addWidget(self.button_18,1)
+        naviLayout.addWidget(self.button_7,2)
         
         #only leave operational the control button if the device is Fuji PID
         #the SV buttons are activated from the PID control panel 
         if self.qmc.device > 0:
-            self.button_10.setDisabled(True)
-            self.button_10.setFlat(True)
-            
-        self.button_12.setDisabled(True)
-        self.button_13.setDisabled(True)
-        self.button_14.setDisabled(True)
-        self.button_15.setDisabled(True)
-        self.button_16.setDisabled(True)
-        self.button_17.setDisabled(True)            
-        self.button_12.setFlat(True)
-        self.button_13.setFlat(True)
-        self.button_14.setFlat(True)
-        self.button_15.setFlat(True)
-        self.button_16.setFlat(True)
-        self.button_17.setFlat(True)
+            self.button_10.setVisible(False)        
+        self.button_12.setVisible(False)
+        self.button_13.setVisible(False)
+        self.button_14.setVisible(False)
+        self.button_15.setVisible(False)
+        self.button_16.setVisible(False)
+        self.button_17.setVisible(False)
         
         #create LCD displays
         #RIGHT COLUMN
@@ -1905,20 +1902,19 @@ class ApplicationWindow(QMainWindow):
         label6.setText( "<font color='black'><b>PID S.V.<\b></font>")
 
         #place control buttons + LCDs inside vertical button layout manager      
-        buttonVVbl.addWidget(label6)
-        buttonVVbl.addWidget(self.lcd6)
-        buttonVVbl.addWidget(label2)
-        buttonVVbl.addWidget(self.lcd2)
-        buttonVVbl.addWidget(label3)
-        buttonVVbl.addWidget(self.lcd3)
-        buttonVVbl.addWidget(label4)
-        buttonVVbl.addWidget(self.lcd4)
-        buttonVVbl.addWidget(label5)
-        buttonVVbl.addWidget(self.lcd5)
+        LCDlayout.addWidget(label6)
+        LCDlayout.addWidget(self.lcd6)
+        LCDlayout.addWidget(label2)
+        LCDlayout.addWidget(self.lcd2)
+        LCDlayout.addWidget(label3)
+        LCDlayout.addWidget(self.lcd3)
+        LCDlayout.addWidget(label4)
+        LCDlayout.addWidget(self.lcd4)
+        LCDlayout.addWidget(label5)
+        LCDlayout.addWidget(self.lcd5)
 
         
-        #place mark buttons inside the horizontal button layout manager
-        
+        #place RECORDING buttons inside the horizontal button layout manager
         buttonHHbl.addWidget(self.button_1)
         buttonHHbl.addWidget(self.button_8)
         buttonHHbl.addWidget(self.button_3)
@@ -1929,26 +1925,29 @@ class ApplicationWindow(QMainWindow):
         buttonHHbl.addWidget(self.button_2)
         buttonHHbl.addWidget(self.button_11)
 
-        # place pid button + LCDs in pid layout manager
-        pidHHbl.addWidget(self.button_10)
-        pidHHbl.addWidget(self.button_12)
-        pidHHbl.addWidget(self.button_13)
-        pidHHbl.addWidget(self.button_14)
-        pidHHbl.addWidget(self.button_15)
-        pidHHbl.addWidget(self.button_16)
-        pidHHbl.addWidget(self.button_17)
-        pidHHbl.addWidget(self.button_18)
-        pidHHbl.addWidget(self.button_7)
 
-        #pack all into the grid MASTER layout manager (widget,row,column)
-        gl.addWidget(ntb,0,0)
-        gl.addWidget(self.lcd1,0,1)  #timer LCD
+        # control Buttuns                
+        controlLayout.addWidget(self.button_14)       
+        controlLayout.addWidget(self.button_13)
+        controlLayout.addWidget(self.button_12)
+        controlLayout.addWidget(self.button_17)
+        controlLayout.addWidget(self.button_16)
+        controlLayout.addWidget(self.button_15)
+
+
+        #pack RESET buttons + GRAPHS
+        midLayout = QHBoxLayout()
+        midLayout.addLayout(controlLayout,0)
+        midLayout.addWidget(self.stack,1)
+        
+
+        #pack all into the grid MASTER LAYOUT manager (widget,row,column)
+        gl.addLayout(naviLayout,0,0)               #Navigation Tool bar
+        gl.addWidget(self.lcd1,0,1)         #timer LCD
         gl.addWidget(self.messagelabel,1,0) #add a message label to give program feedback to user
-        gl.addLayout(pidHHbl,2,0)  #pid button + LCDS
-        gl.addWidget(self.stack,3,0)
-        #gl.addWidget(self.hudimag,4,0)
-        gl.addLayout(buttonVVbl,3,1) #place buttonlayout manager inside grid box layout manager
-        gl.addLayout(buttonHHbl,4,0) #place buttonlayout manager inside grid box layout manager
+        gl.addLayout(midLayout,2,0)         #GRAPHS
+        gl.addLayout(LCDlayout,2,1)         #place LCD manager inside grid box layout manager
+        gl.addLayout(buttonHHbl,4,0)        #place buttonlayout manager inside grid box layout manager
 
         ###############  create MENUS 
         self.fileMenu = self.menuBar().addMenu("&File")
@@ -2108,6 +2107,7 @@ class ApplicationWindow(QMainWindow):
     #loads stored profiles. Called from file menu        
     def fileLoad(self):
         f = None
+        old_mode = self.qmc.mode
         try:        
             fname = unicode(QFileDialog.getOpenFileName(self,"Load Profile",self.profilepath,"*.txt"))
             self.qmc.reset()
@@ -2127,6 +2127,8 @@ class ApplicationWindow(QMainWindow):
                 raise ValueError, u" Invalid Artisan file format: MODE tag missing"
             line = stream.readLine().trimmed()
             self.qmc.mode = unicode(line)        
+
+
             
             line = stream.readLine()
             if not line.startsWith(u"[[STARTEND]]"):
@@ -2294,10 +2296,11 @@ class ApplicationWindow(QMainWindow):
             #CLOSE FILE
             f.close()
 
-            #select mode        
-            if self.qmc.mode == u"F":
-                self.qmc.fahrenheitMode()
-            if self.qmc.mode == u"C":
+            #convert modes only if needed comparing the new uploaded mode to the old one.
+            #otherwise it would incorrectly convert the uploaded phases
+            if self.qmc.mode == u"F" and old_mode == "C":
+                    self.qmc.fahrenheitMode()
+            if self.qmc.mode == u"C" and old_mode == "F":
                 self.qmc.celsiusMode()
 
             #Set the xlimits
@@ -3355,18 +3358,20 @@ $cupping_notes
         p.setFont(font)
         #Draw begins
         p.begin(self)
-        p.setOpacity(1.)
-        p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
-        p.drawRect(10,10, Wwidth-20, Wheight-20)
-        
         p.setOpacity(0.7)
-        p.setBrush(QBrush(QColor("black")))
-        p.drawRect(40,                      #p(x,)
-                   Wheight - Wheight/3,     #p(,y)  
-                   Wwidth-Wwidth/9,         #size x
+        p.setBrush(QBrush(QColor("grey")))
+        p.drawRect(0,                       #p(x,)
+                   Wheight - Wheight/4,     #p(,y)  
+                   Wwidth,                  #size x
                    Wheight/4)               #size y
         p.setPen(QColor("white"))
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/4),text)
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),text)
+
+        p.setOpacity(1.)
+        p.setBrush(0) 
+        p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
+        p.drawRect(10,10, Wwidth-20, Wheight-20)
+    
         p.end()
         
         self.HUD.setPixmap(img)
@@ -3388,30 +3393,39 @@ $cupping_notes
         p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
         p.drawRect(10,10, Wwidth - 20, Wheight - 20)
 
-        if self.qmc.mode == "F":
-            ETradious = int(self.qmc.temp1[-1]/3)
-            BTradious = int(self.qmc.temp2[-1]/3)
+        if self.qmc.mode == "F" and self.qmc.temp1:
+            ETradius = int(self.qmc.temp1[-1]/3)
+            BTradius = int(self.qmc.temp2[-1]/3)
+        elif self.qmc.mode == "C" and self.qmc.temp1:
+            ETradius = int(self.qmc.fromCtoF(self.qmc.temp1[-1]/3))
+            BTradius = int(self.qmc.fromCtoF(self.qmc.temp2[-1]/3))
         else:
-            ETradious = int(self.qmc.fromCtoF(self.qmc.temp1[-1]/3))
-            BTradious = int(self.qmc.fromCtoF(self.qmc.temp2[-1]/3))
+            ETradius = 50
+            BTradius = 50
             
-        Tradious = 300
-    
-        p.setOpacity(0.4)
-        g = QRadialGradient(Wwidth/2, Wheight/2, ETradious-BTradious)
-        g.setColorAt(0.0, QColor("green")) #the bean je je
-        g.setColorAt(.3, Qt.yellow)
-        g.setColorAt(1., Qt.red)
-        p.setBrush(QBrush(g))        
-        p.setPen(QColor("black"))
+        Tradius = 300
+
+        p.setOpacity(0.5)
+        
+        g = QRadialGradient(Wwidth/2, Wheight/2, ETradius)
+        
+        beanbright =  100 - ETradius        
+        g.setColorAt(0.0, QColor(240,255,beanbright) )  #bean center
+        
+        g.setColorAt(.5, Qt.yellow)
+        g.setColorAt(.8, Qt.red)     	
+        g.setColorAt(1.,QColor("lightgrey"))
+        p.setBrush(QBrush(g))
         #draw thermal circle
-        p.drawEllipse (Wwidth/2 -Tradious/2 , Wheight/2 - Tradious/2 , Tradious,Tradious)
+        p.setPen(0)
+        p.drawEllipse (Wwidth/2 -Tradius/2 , Wheight/2 - Tradius/2 , Tradius,Tradius)
 
         #draw ET circle
-        p.setBrush(0)        
-        p.drawEllipse (Wwidth/2 -ETradious/2 , Wheight/2 - ETradious/2 , ETradious,ETradious)
+        p.setBrush(0)
+        p.setPen(QColor("black"))
+        p.drawEllipse (Wwidth/2 -ETradius/2 , Wheight/2 - ETradius/2 , ETradius,ETradius)
         #draw BT circle
-        p.drawEllipse (Wwidth/2 -BTradious/2 , Wheight/2 - BTradious/2 , BTradious,BTradious)
+        p.drawEllipse (Wwidth/2 -BTradius/2 , Wheight/2 - BTradius/2 , BTradius,BTradius)
 
         delta = "ET-BT = %.1f%s"%(self.qmc.temp1[-1]- self.qmc.temp2[-1],self.qmc.mode)
         p.setFont(QFont('Utopia', 14, -1))
@@ -3430,10 +3444,16 @@ class HUDDlg(QDialog):
         super(HUDDlg,self).__init__(parent)
 
         self.setWindowTitle("HUD config")
-        ETLabel = QLabel("ET target")
-        BTLabel = QLabel("BT target")
+        ETLabel = QLabel("ET metric target")
+        BTLabel = QLabel("BT metric target")
         
         modeLabel = QLabel("HUD mode")
+
+        self.projectCheck = QCheckBox("Projection")
+        if aw.qmc.projectFlag == True:
+            self.projectCheck.setChecked(True)
+        else:
+            self.projectCheck.setChecked(False)
         
         self.modeComboBox = QComboBox()
         self.modeComboBox.setMaximumWidth(100)
@@ -3450,7 +3470,8 @@ class HUDDlg(QDialog):
         cancelButton = QPushButton("Cancel")        
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
-                                     
+        self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
+                                             
         hudLayout = QGridLayout()
         hudLayout.addWidget(ETLabel,0,0)
         hudLayout.addWidget(self.ETlineEdit,0,1)
@@ -3458,8 +3479,10 @@ class HUDDlg(QDialog):
         hudLayout.addWidget(self.BTlineEdit,1,1)
         hudLayout.addWidget(modeLabel,2,0)
         hudLayout.addWidget(self.modeComboBox,2,1)
-        hudLayout.addWidget(okButton,3,0)
-        hudLayout.addWidget(cancelButton,3,1)   
+        hudLayout.addWidget(self.projectCheck,3,1)
+       
+        hudLayout.addWidget(okButton,4,0)
+        hudLayout.addWidget(cancelButton,4,1)   
         self.setLayout(hudLayout)
 
     def updatetargets(self):
@@ -3468,6 +3491,12 @@ class HUDDlg(QDialog):
             aw.HUDfunction = 0
         elif mode == u"thermal":
             aw.HUDfunction = 1
+
+        if self.projectCheck.isChecked():
+            aw.qmc.projectFlag = True
+        else:
+            aw.qmc.projectFlag = False
+            aw.qmc.ax.lines = aw.qmc.ax.lines[0:5]
             
         aw.qmc.ETtarget = int(unicode(self.ETlineEdit.text()))
         aw.qmc.BTtarget = int(unicode(self.BTlineEdit.text()))
@@ -5729,8 +5758,7 @@ class DeviceAssignmentDLG(QDialog):
             message = "PID to control ET set to " + str1 + " " + str(aw.ser.controlETpid[1]) + \
             " ; PID to read BT set to " + str2 + " " + str(aw.ser.readBTpid[1])
             
-            aw.button_10.setDisabled(False)
-            aw.button_10.setFlat(False)
+            aw.button_10.setVisible(True)
             
         if self.nonpidButton.isChecked():
             meter = str(self.devicetypeComboBox.currentText())
@@ -5885,8 +5913,13 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.timeout=1
                 message = "Device set to EXTECH 421509, which is equivalent to Omega HH506RA. Now, chose serial port"
 
-            aw.button_10.setDisabled(True)
-            aw.button_10.setFlat(True)
+            aw.button_10.setVisible(False)
+            aw.button_12.setVisible(False)
+            aw.button_13.setVisible(False)
+            aw.button_14.setVisible(False)
+            aw.button_15.setVisible(False)
+            aw.button_16.setVisible(False)
+            aw.button_17.setVisible(False)
                         
         aw.messagelabel.setText(message)
             
@@ -8106,18 +8139,13 @@ class FujiPID(object):
     def activateONOFFeasySV(self,flag):
         #turn off
         if flag == 0:            
-            aw.button_12.setDisabled(True)
-            aw.button_13.setDisabled(True)
-            aw.button_14.setDisabled(True)
-            aw.button_15.setDisabled(True)
-            aw.button_16.setDisabled(True)
-            aw.button_17.setDisabled(True)            
-            aw.button_12.setFlat(True)
-            aw.button_13.setFlat(True)
-            aw.button_14.setFlat(True)
-            aw.button_15.setFlat(True)
-            aw.button_16.setFlat(True)
-            aw.button_17.setFlat(True)
+            aw.button_12.setVisible(False)
+            aw.button_13.setVisible(False)
+            aw.button_14.setVisible(False)
+            aw.button_15.setVisible(False)
+            aw.button_16.setVisible(False)
+            aw.button_17.setVisible(False)            
+
             
         #turn on
         elif flag == 1:
@@ -8128,18 +8156,12 @@ class FujiPID(object):
             if reply == QMessageBox.Cancel:
                 return 
             elif reply == QMessageBox.Yes:
-                aw.button_12.setDisabled(False)
-                aw.button_13.setDisabled(False)
-                aw.button_14.setDisabled(False)
-                aw.button_15.setDisabled(False)
-                aw.button_16.setDisabled(False)
-                aw.button_17.setDisabled(False)            
-                aw.button_12.setFlat(False)
-                aw.button_13.setFlat(False)
-                aw.button_14.setFlat(False)
-                aw.button_15.setFlat(False)
-                aw.button_16.setFlat(False)
-                aw.button_17.setFlat(False)
+                aw.button_12.setVisible(True)
+                aw.button_13.setVisible(True)
+                aw.button_14.setVisible(True)
+                aw.button_15.setVisible(True)
+                aw.button_16.setVisible(True)
+                aw.button_17.setVisible(True)
                 
 
     def readcurrentsv(self):
