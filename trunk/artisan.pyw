@@ -36,7 +36,7 @@
 # version 00031: FINISHED PXG4 control Dlg and enhanced background options
 # END OF ALPHA.  BEGINNING BETA TESTING 
 
-__version__ = u"0.2.2"
+__version__ = u"0.3.0"
 
 
 # ABOUT
@@ -116,7 +116,7 @@ from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainW
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient)
 from PyQt4.QtCore import (Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList)
 
 
 from matplotlib.figure import Figure
@@ -1827,7 +1827,8 @@ class ApplicationWindow(QMainWindow):
         #create HUD button
         self.button_18 = QPushButton("HUD")
         self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
-        self.button_18.setMaximumSize(90, 30)
+        self.button_18.setMaximumSize(90, 40)
+
         self.button_18.setToolTip("<font color=red size=2><b>" +"BT projection" + "</font></b>")
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
 
@@ -2109,192 +2110,198 @@ class ApplicationWindow(QMainWindow):
         f = None
         old_mode = self.qmc.mode
         try:        
-            fname = unicode(QFileDialog.getOpenFileName(self,"Load Profile",self.profilepath,"*.txt"))
+            filename = unicode(QFileDialog.getOpenFileName(self,"Load Profile",self.profilepath,"*.txt"))
             self.qmc.reset()
 
-            f = QFile(fname)
+            f = QFile(filename)
             if not f.open(QIODevice.ReadOnly):
                 raise IOError, unicode(f.errorString())
             
             stream = QTextStream(f)
-
+            
             #variables to read on the text file are initialized as empty lists
             self.qmc.varC,self.qmc.startend, self.qmc.timex, self.qmc.temp1, self.qmc.temp2, self.qmc.flavors = [],[],[],[],[],[]
-
-            #Read first line. STARTEND tag
-            line = stream.readLine().trimmed()
-            if not line.startsWith(u"[[MODE]]"):
-                raise ValueError, u" Invalid Artisan file format: MODE tag missing"
-            line = stream.readLine().trimmed()
-            self.qmc.mode = unicode(line)        
-
-
-            
-            line = stream.readLine()
-            if not line.startsWith(u"[[STARTEND]]"):
-                raise ValueError, u" Invalid Artisan file format: STARTEND tag missing"
-
-            #Read second line with the STARTEND values
-            line = stream.readLine().trimmed()
-            parts = line.split(u"    ")
-            if parts.count() != 4:
-                raise ValueError, u"invalid STARTEND values"
-            else:
-                for i in range(4):
-                    self.qmc.startend.append(float(parts[i]))
-
-            #Read third line. CRACKS tag
-            line = stream.readLine().trimmed()                    
-            if not line.startsWith(u"[[CRACKS]]"):
-                raise ValueError, u" Invalid Artisan file format: CRACKS tag missing"
-
-            #Read fourth line with CRACKS values
-            line = stream.readLine().trimmed() 
-            parts = line.split(u"    ")
-            if parts.count() != 8:
-                raise ValueError, u"invalid CRACK values"
-            else:
-                for i in range(8):
-                    self.qmc.varC.append(float(parts[i]))
-
-            #Read fith line. FLAVORS tag
-            line = stream.readLine().trimmed()                    
-            if not line.startsWith(u"[[FLAVORS]]"):
-                raise ValueError, u" Invalid Artisan file format: FLAVORS tag missing"
-
-            #Read six line with FLAVOR values
-            line = stream.readLine().trimmed()
-            parts = line.split(u"    ")
-            if parts.count() != 10:
-                raise ValueError, u"invalid FLAVOR values"
-            else:
-                for i in range(10):
-                    self.qmc.flavors.append(float(parts[i]))
-            #add 10th flavor to close the circle gap when drawing STAR graph
-            self.qmc.flavors.append(self.qmc.flavors[0])
-            
-            #Read FLAVORS-LABEL tag
-            line = stream.readLine().trimmed()
-            if not line.startsWith(u"[[FLAVOR-LABELS]]"):
-                raise ValueError, u"FLAVOR LABELS tag missing"
-            #Read FLAVOR-LABEL values
-            line = stream.readLine().trimmed()
-            parts = line.split(u";;;")
-            if parts.count() != 9:
-                raise ValueError, u"Incorrect N flavors found"
-            for i in range(9):
-                self.qmc.flavorlabels[i] = unicode(parts[i])
-
-            #read next line TITLE tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith(u"[[TITLE]]"):
-                raise ValueError, u" Invalid Artisan file format: TITLE tag missing"
-
-            #Read next line beans type
-            line = stream.readLine().trimmed()
-            self.qmc.title = unicode(line)            
-
-            #read next line BEANS tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith(u"[[BEANS]]"):
-                raise ValueError, u" Invalid Artisan file format: BEANS tag missing"
-
-            #Read next line beans type
-            line = stream.readLine().trimmed()
-            self.qmc.beans = unicode(line)           
-
-            #read next line WEIGHT tag
-            line = stream.readLine().trimmed()
-            if not line.startsWith(u"[[WEIGHT]]"):
-                raise ValueError, u" Invalid Artisan file format: WEIGHT tag missing"
-
-            #Read Weight
-            line = stream.readLine().trimmed()
-            parts = line.split(u"    ")
-            if parts.count() != 3:
-                raise ValueError, u"Weight needs three values"
-            else:
-                self.qmc.weight[0] = int(parts[0])
-                self.qmc.weight[1] = int(parts[1])
-                self.qmc.weight[2] = unicode(parts[2])
                 
-            #read next line ROASTER-TYPE tag
-            line = stream.readLine().trimmed()                  
-            if not line.startsWith(u"[[ROASTER-TYPE]]"):
-                raise ValueError, u" Invalid Artisan file format: ROASTER-TYPE tag missing"
-
-            #Read next line roaster type
-            line = stream.readLine().trimmed()
-            self.qmc.roastertype = unicode(line)
-            
-            #read next line OPERATOR tag
-            line = stream.readLine().trimmed()                   
-            if line.startsWith(u"[[OPERATOR]]"):
-                #Read next line roaster type
+            firstChar = stream.read(1)
+            if firstChar == "{":            
+                f.close()
+                self.setProfile(self.deserialize(filename))
+            else:
+    
+                #Read first line. STARTEND tag
+                line = firstChar + stream.readLine().trimmed()
+                if not line.startsWith(u"[[MODE]]"):
+                    raise ValueError, u" Invalid Artisan file format: MODE tag missing"
                 line = stream.readLine().trimmed()
-                self.qmc.operator = unicode(line)
+                self.qmc.mode = unicode(line)        
+    
+    
+                
+                line = stream.readLine()
+                if not line.startsWith(u"[[STARTEND]]"):
+                    raise ValueError, u" Invalid Artisan file format: STARTEND tag missing"
+    
+                #Read second line with the STARTEND values
+                line = stream.readLine().trimmed()
+                parts = line.split(u"    ")
+                if parts.count() != 4:
+                    raise ValueError, u"invalid STARTEND values"
+                else:
+                    for i in range(4):
+                        self.qmc.startend.append(float(parts[i]))
+    
+                #Read third line. CRACKS tag
+                line = stream.readLine().trimmed()                    
+                if not line.startsWith(u"[[CRACKS]]"):
+                    raise ValueError, u" Invalid Artisan file format: CRACKS tag missing"
+    
+                #Read fourth line with CRACKS values
                 line = stream.readLine().trimmed() 
+                parts = line.split(u"    ")
+                if parts.count() != 8:
+                    raise ValueError, u"invalid CRACK values"
+                else:
+                    for i in range(8):
+                        self.qmc.varC.append(float(parts[i]))
+    
+                #Read fith line. FLAVORS tag
+                line = stream.readLine().trimmed()                    
+                if not line.startsWith(u"[[FLAVORS]]"):
+                    raise ValueError, u" Invalid Artisan file format: FLAVORS tag missing"
+    
+                #Read six line with FLAVOR values
+                line = stream.readLine().trimmed()
+                parts = line.split(u"    ")
+                if parts.count() != 10:
+                    raise ValueError, u"invalid FLAVOR values"
+                else:
+                    for i in range(10):
+                        self.qmc.flavors.append(float(parts[i]))
+                #add 10th flavor to close the circle gap when drawing STAR graph
+                self.qmc.flavors.append(self.qmc.flavors[0])
                 
-            #Read date tag
-            if not line.startsWith(u"[[DATE]]"):
-                raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
-            #Read date
-            line = stream.readLine().trimmed()
-            self.qmc.roastdate = QDate.fromString(line)
-
-            #Read event tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith(u"[[EVENTS]]"):
-                raise ValueError, u" Invalid Artisan file format: DATE tag missing"
-            
-            #Read events contents
-            line = stream.readLine().trimmed()
-            parts = line.split(u"    ")
-            eventn = parts.count()              #number of events
-            if unicode(parts[0]).isdigit():
-                for i in range(eventn):
-                    self.qmc.specialevents.append(int(parts[i]))
-                #read events data
-            line = stream.readLine().trimmed()
-            if not line.startsWith(u"[[EVENTS-DATA]]"):
-                raise ValueError, u" Invalid Artisan file format: DATA tag missing"
-            if len(self.qmc.specialevents):
-                for i in range(len(self.qmc.specialevents)):
-                        self.qmc.specialeventsStrings[i] = unicode(stream.readLine().trimmed())               
-            else:
-                stream.readLine() #read blank line
-            #Read roasting notes tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith(u"[[ROASTING-NOTES]]"):
-                raise ValueError, u" Invalid Artisan file format: ROASTING-NOTES tag missing"            
-
-            #Read Roasting notes
-            while not stream.atEnd():
+                #Read FLAVORS-LABEL tag
+                line = stream.readLine().trimmed()
+                if not line.startsWith(u"[[FLAVOR-LABELS]]"):
+                    raise ValueError, u"FLAVOR LABELS tag missing"
+                #Read FLAVOR-LABEL values
+                line = stream.readLine().trimmed()
+                parts = line.split(u";;;")
+                if parts.count() != 9:
+                    raise ValueError, u"Incorrect N flavors found"
+                for i in range(9):
+                    self.qmc.flavorlabels[i] = unicode(parts[i])
+    
+                #read next line TITLE tag
                 line = stream.readLine().trimmed()                   
-                if line.startsWith(u"[[CUPPING-NOTES]]"):
-                    break
-                self.qmc.roastingnotes += unicode(line) + u"\n"
-
-            #Read cuping notes
-            while not stream.atEnd():
-                line = stream.readLine().trimmed()                  
-                if line.startsWith(u"[[DATA]]"):
-                    break
-                self.qmc.cuppingnotes += unicode(line) + u"\n"
-                
-            #Read DATA values till the end of the file
-            while not stream.atEnd():
+                if not line.startsWith(u"[[TITLE]]"):
+                    raise ValueError, u" Invalid Artisan file format: TITLE tag missing"
+    
+                #Read next line beans type
+                line = stream.readLine().trimmed()
+                self.qmc.title = unicode(line)            
+    
+                #read next line BEANS tag
+                line = stream.readLine().trimmed()                   
+                if not line.startsWith(u"[[BEANS]]"):
+                    raise ValueError, u" Invalid Artisan file format: BEANS tag missing"
+    
+                #Read next line beans type
+                line = stream.readLine().trimmed()
+                self.qmc.beans = unicode(line)           
+    
+                #read next line WEIGHT tag
+                line = stream.readLine().trimmed()
+                if not line.startsWith(u"[[WEIGHT]]"):
+                    raise ValueError, u" Invalid Artisan file format: WEIGHT tag missing"
+    
+                #Read Weight
                 line = stream.readLine().trimmed()
                 parts = line.split(u"    ")
                 if parts.count() != 3:
-                    raise ValueError, u"invalid DATA values"
+                    raise ValueError, u"Weight needs three values"
                 else:
-                    self.qmc.timex.append(float(parts[0]))
-                    self.qmc.temp1.append(float(parts[1]))
-                    self.qmc.temp2.append(float(parts[2]))
-
-            #CLOSE FILE
-            f.close()
+                    self.qmc.weight[0] = int(parts[0])
+                    self.qmc.weight[1] = int(parts[1])
+                    self.qmc.weight[2] = unicode(parts[2])
+                    
+                #read next line ROASTER-TYPE tag
+                line = stream.readLine().trimmed()                  
+                if not line.startsWith(u"[[ROASTER-TYPE]]"):
+                    raise ValueError, u" Invalid Artisan file format: ROASTER-TYPE tag missing"
+    
+                #Read next line roaster type
+                line = stream.readLine().trimmed()
+                self.qmc.roastertype = unicode(line)
+                
+                #read next line OPERATOR tag
+                line = stream.readLine().trimmed()                   
+                if line.startsWith(u"[[OPERATOR]]"):
+                    #Read next line roaster type
+                    line = stream.readLine().trimmed()
+                    self.qmc.operator = unicode(line)
+                    line = stream.readLine().trimmed() 
+                    
+                #Read date tag
+                if not line.startsWith(u"[[DATE]]"):
+                    raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
+                #Read date
+                line = stream.readLine().trimmed()
+                self.qmc.roastdate = QDate.fromString(line)
+    
+                #Read event tag
+                line = stream.readLine().trimmed()                   
+                if not line.startsWith(u"[[EVENTS]]"):
+                    raise ValueError, u" Invalid Artisan file format: DATE tag missing"
+                
+                #Read events contents
+                line = stream.readLine().trimmed()
+                parts = line.split(u"    ")
+                eventn = parts.count()              #number of events
+                if unicode(parts[0]).isdigit():
+                    for i in range(eventn):
+                        self.qmc.specialevents.append(int(parts[i]))
+                    #read events data
+                line = stream.readLine().trimmed()
+                if not line.startsWith(u"[[EVENTS-DATA]]"):
+                    raise ValueError, u" Invalid Artisan file format: DATA tag missing"
+                if len(self.qmc.specialevents):
+                    for i in range(len(self.qmc.specialevents)):
+                            self.qmc.specialeventsStrings[i] = unicode(stream.readLine().trimmed())               
+                else:
+                    stream.readLine() #read blank line
+                #Read roasting notes tag
+                line = stream.readLine().trimmed()                   
+                if not line.startsWith(u"[[ROASTING-NOTES]]"):
+                    raise ValueError, u" Invalid Artisan file format: ROASTING-NOTES tag missing"            
+    
+                #Read Roasting notes
+                while not stream.atEnd():
+                    line = stream.readLine().trimmed()                   
+                    if line.startsWith(u"[[CUPPING-NOTES]]"):
+                        break
+                    self.qmc.roastingnotes += unicode(line) + u"\n"
+    
+                #Read cuping notes
+                while not stream.atEnd():
+                    line = stream.readLine().trimmed()                  
+                    if line.startsWith(u"[[DATA]]"):
+                        break
+                    self.qmc.cuppingnotes += unicode(line) + u"\n"
+                    
+                #Read DATA values till the end of the file
+                while not stream.atEnd():
+                    line = stream.readLine().trimmed()
+                    parts = line.split(u"    ")
+                    if parts.count() != 3:
+                        raise ValueError, u"invalid DATA values"
+                    else:
+                        self.qmc.timex.append(float(parts[0]))
+                        self.qmc.temp1.append(float(parts[1]))
+                        self.qmc.temp2.append(float(parts[2]))
+    
+                #CLOSE FILE
+                f.close()
 
             #convert modes only if needed comparing the new uploaded mode to the old one.
             #otherwise it would incorrectly convert the uploaded phases
@@ -2313,7 +2320,7 @@ class ApplicationWindow(QMainWindow):
             #Plot everything
             self.qmc.redraw()
 
-            message =  unicode(fname) + u" loaded successfully"
+            message =  unicode(filename) + u" loaded successfully"
             self.messagelabel.setText(message)
             
             self.editgraph()
@@ -2327,6 +2334,11 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(unicode(e))
             self.qmc.errorlog.append(u"value error in fileload() " + unicode(e))
             return
+
+        except Exception,e:
+            self.messagelabel.setText(unicode(e))
+            self.qmc.errorlog.append(u"error in fileload() " + unicode(e))
+            return
         
         finally:
             if f:
@@ -2334,146 +2346,153 @@ class ApplicationWindow(QMainWindow):
 
 
     # Loads background profile
-    def loadbackground(self,fname):
+    def loadbackground(self,filename):
         try:        
-            f = QFile(fname)
+            f = QFile(filename)
             if not f.open(QIODevice.ReadOnly):
                 raise IOError, unicode(f.errorString())
             stream = QTextStream(f)
             
-            #variables to read on the text file are initialized as empty lists
-            self.qmc.backgroundET,self.qmc.backgroundBT,self.qmc.timeB = [],[],[]
-            self.qmc.startendB,self.qmc.varCB = [],[]
-            
-            #Read first line. STARTEND tag
-            line = stream.readLine().trimmed()
-            if not line.startsWith(u"[[MODE]]"):
-                raise ValueError, u" Invalid Artisan file format: MODE tag missing"
-            line = stream.readLine()       
-            line = stream.readLine()
-            if not line.startsWith(u"[[STARTEND]]"):
-                raise ValueError, u" Invalid Artisan file format: STARTEND tag missing"
-            #Read second line with the STARTEND values
-            line = stream.readLine().trimmed()
-            parts = line.split(u"    ")
-            if parts.count() != 4:
-                raise ValueError, u"invalid STARTEND values"
-            else:
-                for i in range(4):
-                    self.qmc.startendB.append(float(parts[i]))
-                    
-            #Read third line. CRACKS tag
-            line = stream.readLine().trimmed()                    
-            if not line.startsWith(u"[[CRACKS]]"):
-                raise ValueError, u" Invalid Artisan file format: CRACKS tag missing"
-            #Read fourth line with CRACKS values
-            line = stream.readLine().trimmed() 
-            parts = line.split(u"    ")
-            if parts.count() != 8:
-                raise ValueError, u"invalid CRACK values"
-            else:
-                for i in range(8):
-                    self.qmc.varCB.append(float(parts[i]))
-
-            #Read fith line. FLAVORS tag
-            line = stream.readLine().trimmed()                    
-            if not line.startsWith(u"[[FLAVORS]]"):
-                raise ValueError, u" Invalid Artisan file format: FLAVORS tag missing"
-            #Read six line with FLAVOR values
-            line = stream.readLine().trimmed() 
-            #pass
-            #Read FLAVORS-LABEL tag
-            line = stream.readLine().trimmed()
-            if not line.startsWith(u"[[FLAVOR-LABELS]]"):
-                raise ValueError, u"FLAVOR LABELS tag missing"
-            #Read FLAVOR-LABEL values
-            line = stream.readLine().trimmed()
-            #read next line TITLE tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith(u"[[TITLE]]"):
-                raise ValueError, u" Invalid Artisan file format: TITLE tag missing"
-            #Read next line beans type
-            line = stream.readLine()
-            #read next line BEANS tag
-            line = stream.readLine().trimmed()                  
-            if not line.startsWith(u"[[BEANS]]"):
-                raise ValueError, u" Invalid Artisan file format: BEANS tag missing"
-            #Read next line beans type
-            line = stream.readLine().trimmed()
-            #read next line WEIGHT tag
-            line = stream.readLine().trimmed()                  
-            if not line.startsWith(u"[[WEIGHT]]"):
-                raise ValueError, u" Invalid Artisan file format: WEIGHT tag missing"
-            #Read next weight
-            line = stream.readLine().trimmed()            
-            #read next line ROASTER-TYPE tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith(u"[[ROASTER-TYPE]]"):
-                raise ValueError, u" Invalid Artisan file format: ROASTER-TYPE tag missing"
-            line = stream.readLine().trimmed()                   
-            #read next line OPERATOR tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith(u"[[OPERATOR]]"):
-                raise ValueError, u" Invalid Artisan file format: OPERATOR tag missing"
-            line = stream.readLine().trimmed()                   
-            #Read data tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith(u"[[DATE]]"):
-                raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
-            #Read date
-            line = stream.readLine()
-            #Read event tag
-            line = stream.readLine().trimmed()                   
-            if not line.startsWith(u"[[EVENTS]]"):
-                raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
-            #Read events contents
-            line = stream.readLine().trimmed()
-
-            parts = line.split(u"    ")
-            specialevents = parts.count()              #number of events
-
-            #read events data
-            line = stream.readLine().trimmed()
-            if not line.startsWith(u"[[EVENTS-DATA]]"):
-                raise ValueError, u" Invalid Artisan file format: DATA tag missing"
-            
-            if specialevents:
-                for i in range(specialevents):
-                    stream.readLine()                             
-            else:
-                stream.readLine() #read a blank line
-                
-            #Read roasting notes tag
-            line = stream.readLine().trimmed()
-            if not line.startsWith(u"[[ROASTING-NOTES]]"):
-                raise ValueError, u" Invalid Artisan file format: ROASTING-NOTES tag missing"            
-            #Read Roasting notes
-            while not stream.atEnd():
-                line = stream.readLine().trimmed()                   
-                if line.startsWith(u"[[CUPPING-NOTES]]"):
-                    break
-            #Read cuping notes
-            while not stream.atEnd():
-                line = stream.readLine().trimmed()                   
-                if line.startsWith(u"[[DATA]]"):
-                    break
-                
-            #Read DATA values till the end of the file
-            while not stream.atEnd():
+            firstChar = stream.read(1)
+            if firstChar == "{":            
+                f.close()
+                profile = self.deserialize(filename)
+                self.qmc.timeB = profile["timex"]
+                self.qmc.backgroundET = profile["temp1"]
+                self.qmc.backgroundBT = profile["temp2"]
+                self.qmc.startendB = profile["startend"]
+                self.qmc.varCB = profile["cracks"]
+            else:      
+                #variables to read on the text file are initialized as empty lists
+                self.qmc.backgroundET,self.qmc.backgroundBT,self.qmc.timeB = [],[],[]
+                self.qmc.startendB,self.qmc.varCB = [],[]
+                #Read first line. STARTEND tag
+                line = firstChar + stream.readLine().trimmed()
+                if not line.startsWith(u"[[MODE]]"):
+                    raise ValueError, u" Invalid Artisan file format: MODE tag missing"
+                line = stream.readLine()       
+                line = stream.readLine()
+                if not line.startsWith(u"[[STARTEND]]"):
+                    raise ValueError, u" Invalid Artisan file format: STARTEND tag missing"
+                #Read second line with the STARTEND values
                 line = stream.readLine().trimmed()
                 parts = line.split(u"    ")
-                if parts.count() != 3:
-                    raise ValueError, u"invalid DATA values"
+                if parts.count() != 4:
+                    raise ValueError, u"invalid STARTEND values"
                 else:
-                    self.qmc.timeB.append(float(parts[0]))
-                    self.qmc.backgroundET.append(float(parts[1]))
-                    self.qmc.backgroundBT.append(float(parts[2]))
-            #CLOSE FILE
+                    for i in range(4):
+                        self.qmc.startendB.append(float(parts[i]))
+                        
+                #Read third line. CRACKS tag
+                line = stream.readLine().trimmed()                    
+                if not line.startsWith(u"[[CRACKS]]"):
+                    raise ValueError, u" Invalid Artisan file format: CRACKS tag missing"
+                #Read fourth line with CRACKS values
+                line = stream.readLine().trimmed() 
+                parts = line.split(u"    ")
+                if parts.count() != 8:
+                    raise ValueError, u"invalid CRACK values"
+                else:
+                    for i in range(8):
+                        self.qmc.varCB.append(float(parts[i]))
+    
+                #Read fith line. FLAVORS tag
+                line = stream.readLine().trimmed()                    
+                if not line.startsWith(u"[[FLAVORS]]"):
+                    raise ValueError, u" Invalid Artisan file format: FLAVORS tag missing"
+                #Read six line with FLAVOR values
+                line = stream.readLine().trimmed() 
+                #pass
+                #Read FLAVORS-LABEL tag
+                line = stream.readLine().trimmed()
+                if not line.startsWith(u"[[FLAVOR-LABELS]]"):
+                    raise ValueError, u"FLAVOR LABELS tag missing"
+                #Read FLAVOR-LABEL values
+                line = stream.readLine().trimmed()
+                #read next line TITLE tag
+                line = stream.readLine().trimmed()                   
+                if not line.startsWith(u"[[TITLE]]"):
+                    raise ValueError, u" Invalid Artisan file format: TITLE tag missing"
+                #Read next line beans type
+                line = stream.readLine()
+                #read next line BEANS tag
+                line = stream.readLine().trimmed()                  
+                if not line.startsWith(u"[[BEANS]]"):
+                    raise ValueError, u" Invalid Artisan file format: BEANS tag missing"
+                #Read next line beans type
+                line = stream.readLine().trimmed()
+                #read next line WEIGHT tag
+                line = stream.readLine().trimmed()                  
+                if not line.startsWith(u"[[WEIGHT]]"):
+                    raise ValueError, u" Invalid Artisan file format: WEIGHT tag missing"
+                #Read next weight
+                line = stream.readLine().trimmed()            
+                #read next line ROASTER-TYPE tag
+                line = stream.readLine().trimmed()                   
+                if not line.startsWith(u"[[ROASTER-TYPE]]"):
+                    raise ValueError, u" Invalid Artisan file format: ROASTER-TYPE tag missing"
+                line = stream.readLine().trimmed()                   
+                #read next line OPERATOR tag
+                line = stream.readLine().trimmed()                   
+                if not line.startsWith(u"[[OPERATOR]]"):
+                    raise ValueError, u" Invalid Artisan file format: OPERATOR tag missing"
+                line = stream.readLine().trimmed()                   
+                #Read data tag
+                line = stream.readLine().trimmed()                   
+                if not line.startsWith(u"[[DATE]]"):
+                    raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
+                #Read date
+                line = stream.readLine()
+                #Read event tag
+                line = stream.readLine().trimmed()                   
+                if not line.startsWith(u"[[EVENTS]]"):
+                    raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
+                #Read events contents
+                line = stream.readLine().trimmed()
+    
+                parts = line.split(u"    ")
+                specialevents = parts.count()              #number of events
+    
+                #read events data
+                line = stream.readLine().trimmed()
+                if not line.startsWith(u"[[EVENTS-DATA]]"):
+                    raise ValueError, u" Invalid Artisan file format: DATA tag missing"
+                
+                if specialevents:
+                    for i in range(specialevents):
+                        stream.readLine()                             
+                else:
+                    stream.readLine() #read a blank line
+                    
+                #Read roasting notes tag
+                line = stream.readLine().trimmed()
+                if not line.startsWith(u"[[ROASTING-NOTES]]"):
+                    raise ValueError, u" Invalid Artisan file format: ROASTING-NOTES tag missing"            
+                #Read Roasting notes
+                while not stream.atEnd():
+                    line = stream.readLine().trimmed()                   
+                    if line.startsWith(u"[[CUPPING-NOTES]]"):
+                        break
+                #Read cuping notes
+                while not stream.atEnd():
+                    line = stream.readLine().trimmed()                   
+                    if line.startsWith(u"[[DATA]]"):
+                        break
+                    
+                #Read DATA values till the end of the file
+                while not stream.atEnd():
+                    line = stream.readLine().trimmed()
+                    parts = line.split(u"    ")
+                    if parts.count() != 3:
+                        raise ValueError, u"invalid DATA values"
+                    else:
+                        self.qmc.timeB.append(float(parts[0]))
+                        self.qmc.backgroundET.append(float(parts[1]))
+                        self.qmc.backgroundBT.append(float(parts[2]))
+                #CLOSE FILE
+                f.close()
 
-            
-            f.close()
-
-            message =  u"Background " + unicode(fname) + u" loaded successfully"
+            message =  u"Background " + unicode(filename) + u" loaded successfully"
             self.messagelabel.setText(message)
 
         except IOError,e:
@@ -2485,81 +2504,167 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(unicode(e))
             self.qmc.errorlog.append(u"value error in fileload() " + unicode(e))
             return
+
+        except Exception,e:
+            self.messagelabel.setText(unicode(e))
+            self.qmc.errorlog.append(u"error in fileload() " + unicode(e))
+            return
         
         finally:
             if f:
                 f.close()
+                
+                
+    #Write object to file
+    def serialize(self,filename,obj):
+        f = open(filename, 'w+')
+        f.write(repr(obj))
+        f.close()
+    
+    #Read object from file 
+    def deserialize(self,filename):
+        obj = None
+        if os.path.exists(filename):
+            if (os.path.exists(filename)):
+                f = open(filename, 'r')
+                obj=eval(f.read())
+                f.close()
+        return obj
 
+
+    def setProfile(self,profile):
+        self.qmc.mode = profile["mode"]
+        self.qmc.startend = profile["startend"]        
+        self.qmc.varC = profile["cracks"]
+        self.qmc.flavors = profile["flavors"]
+        self.qmc.flavorlabels = QStringList(profile["flavorlabels"])
+        self.qmc.title = profile["title"]
+        self.qmc.beans = profile["beans"]
+        self.qmc.weight = profile["weight"]
+        self.qmc.roastertype = profile["roastertype"]
+        self.qmc.operator = profile["operator"]
+        self.qmc.roastdate = QDate.fromString(profile["roastdate"])
+        self.qmc.specialevents = profile["specialevents"]
+        self.qmc.specialeventsStrings = profile["specialeventsStrings"]
+        self.qmc.roastingnotes = profile["roastingnotes"]
+        self.qmc.cuppingnotes = profile["cuppingnotes"]
+        self.qmc.timex = profile["timex"]
+        self.qmc.temp1 = profile["temp1"]
+        self.qmc.temp2 = profile["temp2"]
+        
+    def getProfile(self):
+        profile = {}
+        profile["mode"] = self.qmc.mode
+        profile["startend"] = self.qmc.startend
+        profile["cracks"] = self.qmc.varC
+        profile["flavors"] = self.qmc.flavors
+        profile["flavorlabels"] = [str(fl) for fl in self.qmc.flavorlabels]
+        profile["title"] = self.qmc.title
+        profile["beans"] = self.qmc.beans
+        profile["weight"] = self.qmc.weight
+        profile["roastertype"] = self.qmc.roastertype
+        profile["operator"] = self.qmc.operator
+        profile["roastdate"] = unicode(self.qmc.roastdate.toString())
+        profile["specialevents"] = self.qmc.specialevents
+        profile["specialeventsStrings"] = self.qmc.specialeventsStrings
+        profile["roastingnotes"] = self.qmc.roastingnotes
+        profile["cuppingnotes"] = self.qmc.cuppingnotes
+        profile["timex"] = self.qmc.timex
+        profile["temp1"] = self.qmc.temp1
+        profile["temp2"] = self.qmc.temp2
+        return profile
+    
     #saves recorded profile in hard drive. Called from file menu 
     def fileSave(self):
-        f = None
         try:         
-            filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))
-            if filename:
-                if u".txt" not in filename:
-                    filename += u".txt"
-                f = open(filename, 'w')
-                f.write(u"[[MODE]]\n")
-                f.write(self.qmc.mode)
-                f.write(u"\n[[STARTEND]]\n")
-                for i in range(4):
-                    f.write(unicode(self.qmc.startend[i]) + u"    ")       
-                f.write(u"\n[[CRACKS]]\n")
-                for i in range(8):
-                    f.write(unicode(self.qmc.varC[i]) + u"    ")
-                f.write(u"\n[[FLAVORS]]\n")
-                for i in range(10):
-                    f.write(unicode(self.qmc.flavors[i])+ u"    ")
-                f.write(u"\n[[FLAVOR-LABELS]]\n")
-                for i in range(8):
-                    f.write(self.qmc.flavorlabels[i] + u";;;")
-                f.write(self.qmc.flavorlabels[i+1])
-                f.write(u"\n[[TITLE]]\n")
-                f.write(self.qmc.title)
-                f.write(u"\n[[BEANS]]\n")
-                f.write(self.qmc.beans)
-                f.write(u"\n[[WEIGHT]]\n")
-                for i in range(3):
-                    f.write(unicode(self.qmc.weight[i]))
-                    f.write(u"    ")
-                f.write(u"\n[[ROASTER-TYPE]]\n")
-                f.write(self.qmc.roastertype)
-                f.write(u"\n[[OPERATOR]]\n")
-                f.write(self.qmc.operator)
-                f.write(u"\n[[DATE]]\n")
-                f.write(unicode(self.qmc.roastdate.toString()))            
-                f.write(u"\n[[EVENTS]]\n")
-                if len(self.qmc.specialevents):
-                    for i in range(len(self.qmc.specialevents)):
-                        f.write(unicode(self.qmc.specialevents[i]) + u"    ")
-                else:
-                    f.write(u"")
-                f.write(u"\n[[EVENTS-DATA]]\n")
-                if len(self.qmc.specialevents):
-                    for i in range(len(self.qmc.specialevents)):
-                        f.write(self.qmc.specialeventsStrings[i] + u"\n")
-                else:
-                    f.write(u"\n")
-                f.write(u"[[ROASTING-NOTES]]\n")
-                f.write(self.qmc.roastingnotes)
-                f.write(u"\n[[CUPPING-NOTES]]\n")
-                f.write(self.qmc.cuppingnotes)
-                f.write(u"\n[[DATA]]\n")
-                for i in range(len(self.qmc.timex)):
-                    f.write( u"%.2f"%self.qmc.timex[i] + u"    " + u"%.1f"%self.qmc.temp1[i] + u"    " + u"%.1f"%self.qmc.temp2[i] + u"\n")
-
-                f.close()
-                self.messagelabel.setText(u"Profile saved to FILE:  " + filename)
-            else:
-                self.messagelabel.setText(u"Profile NOT saved")        
-
+            filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))            
+            self.serialize(filename,self.getProfile())
         except IOError,e:
             self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
             return
-        finally:
-            if f:
-                f.close()
+  
+## Saves profiles in the old format:          
+#    #saves recorded profile in hard drive. Called from file menu 
+#    def fileSave(self):
+#        f = None
+#        try:         
+#            filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))
+#            
+#            self.serialize(filename + ".art",self.getProfile())
+#        except IOError,e:
+#            self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
+#            aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
+#            return
+#        finally:
+#            if f:
+#                f.close()
+#            
+#            if filename:
+#                if u".txt" not in filename:
+#                    filename += u".txt"
+#                f = open(filename, 'w')
+#                f.write(u"[[MODE]]\n")
+#                f.write(self.qmc.mode)
+#                f.write(u"\n[[STARTEND]]\n")
+#                for i in range(4):
+#                    f.write(unicode(self.qmc.startend[i]) + u"    ")       
+#                f.write(u"\n[[CRACKS]]\n")
+#                for i in range(8):
+#                    f.write(unicode(self.qmc.varC[i]) + u"    ")
+#                f.write(u"\n[[FLAVORS]]\n")
+#                for i in range(10):
+#                    f.write(unicode(self.qmc.flavors[i])+ u"    ")
+#                f.write(u"\n[[FLAVOR-LABELS]]\n")
+#                for i in range(8):
+#                    f.write(self.qmc.flavorlabels[i] + u";;;")
+#                f.write(self.qmc.flavorlabels[i+1])
+#                f.write(u"\n[[TITLE]]\n")
+#                f.write(self.qmc.title)
+#                f.write(u"\n[[BEANS]]\n")
+#                f.write(self.qmc.beans)
+#                f.write(u"\n[[WEIGHT]]\n")
+#                for i in range(3):
+#                    f.write(unicode(self.qmc.weight[i]))
+#                    f.write(u"    ")
+#                f.write(u"\n[[ROASTER-TYPE]]\n")
+#                f.write(self.qmc.roastertype)
+#                f.write(u"\n[[OPERATOR]]\n")
+#                f.write(self.qmc.operator)
+#                f.write(u"\n[[DATE]]\n")
+#                f.write(unicode(self.qmc.roastdate.toString()))            
+#                f.write(u"\n[[EVENTS]]\n")
+#                if len(self.qmc.specialevents):
+#                    for i in range(len(self.qmc.specialevents)):
+#                        f.write(unicode(self.qmc.specialevents[i]) + u"    ")
+#                else:
+#                    f.write(u"")
+#                f.write(u"\n[[EVENTS-DATA]]\n")
+#                if len(self.qmc.specialevents):
+#                    for i in range(len(self.qmc.specialevents)):
+#                        f.write(self.qmc.specialeventsStrings[i] + u"\n")
+#                else:
+#                    f.write(u"\n")
+#                f.write(u"[[ROASTING-NOTES]]\n")
+#                f.write(self.qmc.roastingnotes)
+#                f.write(u"\n[[CUPPING-NOTES]]\n")
+#                f.write(self.qmc.cuppingnotes)
+#                f.write(u"\n[[DATA]]\n")
+#                for i in range(len(self.qmc.timex)):
+#                    f.write( u"%.2f"%self.qmc.timex[i] + u"    " + u"%.1f"%self.qmc.temp1[i] + u"    " + u"%.1f"%self.qmc.temp2[i] + u"\n")
+#
+#                f.close()
+#                self.messagelabel.setText(u"Profile saved to FILE:  " + filename)
+#            else:
+#                self.messagelabel.setText(u"Profile NOT saved")        
+#
+#        except IOError,e:
+#            self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
+#            aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
+#            return
+#        finally:
+#            if f:
+#                f.close()
 
 
     #loads the settings at the start of application. See the oppposite closeEvent()
@@ -2986,11 +3091,11 @@ $cupping_notes
             return 0.0
         
     # converts times (values of timex) to indices in aw.qmc.temp1 and aw.qmc.temp2
-    def time2index(self,time):
-        for i in range(len(aw.qmc.timex)):
-            if aw.qmc.timex[i] == time:
-                return i
-        return -1
+##    def time2index(self,time):
+##        for i in range(len(aw.qmc.timex)):
+##            if aw.qmc.timex[i] == time:
+##                return i
+##        return -1
         
     #returns the index of the lowest point in BT; return -1 if no such value found
     def findTP(self):
@@ -3012,6 +3117,7 @@ $cupping_notes
 ##            return -1
         
         TP  = 1000
+        idx = 0
         for i in range(len(aw.qmc.timex) - 1, 0, -1):
             if aw.qmc.temp2[i] < TP:
                 TP = aw.qmc.temp2[i]
@@ -3061,6 +3167,7 @@ $cupping_notes
     def findDryEnd(self,TP_index=None):
         sd = 1000
         nsd = 1000
+        index = 0
         for i in range(len(aw.qmc.timex)):
              nsd = abs(aw.qmc.temp2[i]- aw.qmc.phases[1])
              if nsd < sd:
@@ -3217,12 +3324,12 @@ $cupping_notes
 
     def importHH506RA(self):
         try:
-            fname = u""
-            fname = QFileDialog.getOpenFileName(self,u"Load Profile for a HH506RA")
-            if  fname == "":
+            filename = u""
+            filename = QFileDialog.getOpenFileName(self,u"Load Profile for a HH506RA")
+            if  filename == "":
                 return
             self.qmc.reset()
-            f = QFile(fname)
+            f = QFile(filename)
             if not f.open(QIODevice.ReadOnly):
                 raise IOError, unicode(f.errorString())
                 return
@@ -4594,7 +4701,7 @@ class backgroundDLG(QDialog):
 
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
-        self.fname = u""
+        self.filename = u""
         
         self.backgroundCheck = QCheckBox("Show")
         self.backgroundDetails = QCheckBox("Text")
@@ -4845,7 +4952,7 @@ class backgroundDLG(QDialog):
     def selectpath(self):
         filename = unicode(QFileDialog.getOpenFileName(self,"Load Profile",aw.profilepath,"*.txt"))
         self.pathedit.setText(filename)
-        self.fname = filename
+        self.filename = filename
 
     def load(self):        
         if unicode(self.pathedit.text()) == "":
