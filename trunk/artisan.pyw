@@ -171,6 +171,7 @@ class tgraphcanvas(FigureCanvas):
         self.device = 0 
         self.devicefunctionlist = [self.fujitemperature,
                                    self.HH806AU,
+                                   self.HH802U,
                                    self.HH506RA,
                                    self.CENTER309,
                                    self.CENTER306,
@@ -507,6 +508,13 @@ class tgraphcanvas(FigureCanvas):
         return tx,t2,t1
 
     def HH806AU(self):
+
+         t2,t1 = aw.ser.HH806AUtemperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+
+    def HH802U(self):
 
          t2,t1 = aw.ser.HH806AUtemperature()
          tx = self.timeclock.elapsed()/1000.
@@ -5195,7 +5203,7 @@ class serialport(object):
                 r2 = -1
         return r1,r2
 
-    #t2 and t1 from Omega HH806 meter 
+    #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
         serHH = None
         try:
@@ -5744,6 +5752,7 @@ class DeviceAssignmentDLG(QDialog):
 
         self.devicetypeComboBox = QComboBox()
         self.devicetypeComboBox.addItems(["Omega HH806AU",
+                                          "Omega HH802U",
                                           "Omega HH506RA",
                                           "CENTER 309",
                                           "CENTER 306",
@@ -5879,6 +5888,16 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = "Device set to " + meter + ". Now, chose serial port"
+                                
+            elif meter == "Omega HH802U":
+                aw.qmc.device = 1
+                aw.ser.comport = "COM11"
+                aw.ser.baudrate = 19200
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'E'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to " + meter + ", which is equivalent to Omega HH806AU. Now, chose serial port"
 
             elif meter == "Omega HH506RA":
                 aw.qmc.device = 2
