@@ -738,7 +738,7 @@ class tgraphcanvas(FigureCanvas):
                 #align the background profile so they both plot with the same CHARGE time
                 difference = self.startend[0] - self.startendB[0]
                 if difference > 0:
-                    self.movebackground(u"left",difference)
+                    self.movebackground(u"left",-difference)
                 elif difference < 0:
                     self.movebackground(u"right",difference)
                 self.backmoveflag = 0
@@ -2117,6 +2117,7 @@ class ApplicationWindow(QMainWindow):
     def fileLoad(self):
         f = None
         old_mode = self.qmc.mode
+        aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
         try:        
             filename = unicode(QFileDialog.getOpenFileName(self,"Load Profile",self.profilepath,"*.txt"))
             self.qmc.reset()
