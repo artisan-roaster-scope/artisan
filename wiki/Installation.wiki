@@ -14,7 +14,7 @@ There are usually two downloads needed in order to get the `artisan` software up
 The main application is called artisan.exe and it is located inside the zip file. To start artisan click on artisan.exe.
 There are three configuration steps needed after downloading and unziping the artisan zip file.  
  
-    1 VISUAL C++ LIBRARY REQUIREMENT
+ # VISUAL C++ LIBRARY REQUIREMENT
 
 Artisan for Windows needs a Visual C++ runtime library (file) from Microsoft. If artisan cannot start it will open a window error. This is because your computer is missing this file.
 If you get a window error when you try to start artisan, install this program:
@@ -29,16 +29,16 @@ Newer OS like Windows 7 come with this file.
 Proceed to the second step
 
 
-    2 DEVICE CONFIGURATION
+ # DEVICE CONFIGURATION
 
 Once artisan is up, chose your device in the Conf/device menu. From version 0.2.0 on, the following devices supported are:
 
-    # Fuji PXR PID (with RS485 mod bus protocol purchase option)
-    # Fuji PXG PID (with RS485 mod bus protocol purchase option)
-    # Omega HH506RA, HH802U, HH806AU (Check USB driver here: http://www.ftdichip.com/Drivers/VCP.htm )
-    # CENTER 300, 301, 302, 303, 304, 305, 306, 309
-    # VOLTCRAFT K202, K204, 300K, 302KJ
-    # EXTECH 421509
+** Fuji PXR PID (with RS485 mod bus protocol purchase option)
+** Fuji PXG PID (with RS485 mod bus protocol purchase option)
+ ** Omega HH506RA, HH802U, HH806AU (Check USB driver here: http://www.ftdichip.com/Drivers/VCP.htm )
+ ** CENTER 300, 301, 302, 303, 304, 305, 306, 309
+ ** VOLTCRAFT K202, K204, 300K, 302KJ
+ ** EXTECH 421509
     
 RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers (but they need an RS485-RS232 converter).
 
@@ -46,7 +46,7 @@ To install a USB driver. Plug the meter in USB port. Let Windows find and instal
 
 Once you have selected your device, proceed to step three.
 
-    3 SERIAL CONFIGURATION
+# SERIAL CONFIGURATION
 
 The serial settings for the meters (devices) are already configured by the artisan software automatically when you select a device for the first time (or when you change devices). Once you have chosen a device, the correct serial configuration is loaded and it will remain in memory. The only setting that is not configured is the serial port number being used. 
 To find out your serial port, you can press the scan button and select the correct comm port from the options found by the Scan button.
@@ -71,4 +71,4 @@ _NOTE: for now a binary is only provided for OS X 10.6 Snow Leopard_
 
 == Linux ==
 
-= Running artisan ==
+= Running artisan =
