@@ -1682,7 +1682,7 @@ class ApplicationWindow(QMainWindow):
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         # set window title
-        self.setWindowTitle(u"Artisan " + __version__)        
+        self.setWindowTitle(u"Artisan " + str(__version__))
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month. file-open/save will point to profilepath
         self.profilepath = u""
