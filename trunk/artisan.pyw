@@ -106,11 +106,12 @@ import os
 import string
 import cgi
 import codecs
+import numpy
 
 
 
 
-from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QDialog,QLineEdit,
+from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
@@ -143,7 +144,8 @@ class tgraphcanvas(FigureCanvas):
                         "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
                         "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'brown'}
         
-        self.flavorlabels = [u'Acidity',u'After taste',u'Clean cup',u'Head',u'Fragance',u'Sweetness',u'Aroma',u'Balance',u'Body']
+        self.flavordefaultlabels = [u'Acidity',u'After Taste',u'Clean Cup',u'Head',u'Fragance',u'Sweetness',u'Aroma',u'Balance',u'Body']
+        self.flavorlabels = self.flavordefaultlabels
         
 
         #F = Fahrenheit; C = Celsius
@@ -171,7 +173,6 @@ class tgraphcanvas(FigureCanvas):
         self.device = 0 
         self.devicefunctionlist = [self.fujitemperature,
                                    self.HH806AU,
-                                   self.HH802U,
                                    self.HH506RA,
                                    self.CENTER309,
                                    self.CENTER306,
@@ -185,7 +186,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.VOLTCRAFTK202,
                                    self.VOLTCRAFT300K,
                                    self.VOLTCRAFT302KJ,
-                                   self.EXTECH421509
+                                   self.EXTECH421509,
+                                   self.HH802U
                                    ]
         
         self.fig = Figure(facecolor=u'lightgrey')
@@ -201,7 +203,7 @@ class tgraphcanvas(FigureCanvas):
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
         # multiplication factor to increment sensitivity of rateofchange
-        self.sensitivity = 20.0      
+        self.sensitivity = 100.0 # was 20.0
         #read and plot on/off flag
         self.flagon = False
         self.flagclock = False
@@ -252,6 +254,8 @@ class tgraphcanvas(FigureCanvas):
         self.roastdate = QDate.currentDate()
         self.beans = u""
         self.projectFlag = False
+        self.DeltaETflag = True
+        self.DeltaBTflag = True
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight = [0,0,u"g"]
         
@@ -367,10 +371,19 @@ class tgraphcanvas(FigureCanvas):
         if self.flagon:
             #read timer, ET (t2) and BT (t1) TEMPERATURE
             tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
+            
+            #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
+            #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
+            if len(self.timex) > 2 and t1 == self.temp2[-1] and t2 == self.temp1[-1]:
+                #let's better swap the readings (also they are just repeating the previous ones)
+                self.temp2.append(t1)
+                self.temp1.append(t2)
+            else:
+                #the readings seem to be "in order"
+                self.temp2.append(t2)
+                self.temp1.append(t1)
 
             self.timex.append(tx)
-            self.temp2.append(t2)
-            self.temp1.append(t1)
 
             #we need a minimum of two readings to calculate rate of change
             if len(self.timex) > 2:
@@ -635,6 +648,10 @@ class tgraphcanvas(FigureCanvas):
         for label in self.ax.xaxis.get_ticklabels():
             label.set_color(self.palette["xlabel"])  
         
+    def reset_and_redraw(self):
+        self.reset()
+        self.redraw()
+        
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
         
@@ -651,7 +668,7 @@ class tgraphcanvas(FigureCanvas):
         self.flagclock = False
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
-        self.sensitivity = 20.0      
+        self.sensitivity = 100.0 # was 20.0
         self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
         self.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
         self.startend = [0.,0.,0.,0.]
@@ -684,18 +701,24 @@ class tgraphcanvas(FigureCanvas):
         aw.button_8.setFlat(False)
         aw.button_9.setFlat(False)
         
+        self.title = u"Roaster Scope"
         self.roastertype = u""
         self.operator = u""
         self.roastingnotes = u""
         self.cuppingnotes = u""
+        self.roastdate = QDate.currentDate()
+        self.beans = u""
+        self.projectFlag = False
         self.errorlog = []
         self.weight = [0,0,u"g"]
         self.specialevents = []
         self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
-        self.roastdate = QDate.currentDate()
+        self.roastdate = QDate.currentDate()        
 
         #restart() clock 
         self.timeclock.restart()
+        
+        aw.settingsLoad()
         
         self.redraw()
 
@@ -1128,10 +1151,12 @@ class tgraphcanvas(FigureCanvas):
         
         #load selected dictionary
         if color == 1:
+            aw.messagelabel.setText("Colors set to defaults")
             for key in palette1.keys():
                 self.palette[key] = palette1[key]
             
         if color == 2:
+            aw.messagelabel.setText("Colors set to grey")
             for key in palette1.keys():
                 self.palette[key] = palette2[key]
                 
@@ -1220,9 +1245,10 @@ class tgraphcanvas(FigureCanvas):
 
             self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
             
-            #fill in between with color: needs matplotlib version 1.0+
-            #commented out to go back to matplotlib 0.99.1
-            #self.ax1.fill_between(angles,0,self.flavors, facecolor='blue', alpha=0.1, interpolate=True)
+            #not on Windows yet as there is a conflict between py2exe and matplotlib (go back to matplotlib 0.99.1)
+            if platf == u'Darwin':
+                #fill in between with color: needs matplotlib version 1.0+
+                self.ax1.fill_between(angles,0,self.flavors, facecolor='blue', alpha=0.1, interpolate=True)
                
             self.ax1.plot(angles,self.flavors)
             self.fig.canvas.draw()
@@ -1481,6 +1507,11 @@ class tgraphcanvas(FigureCanvas):
             dryphaseP = dryphasetime*100/totaltime
             midphaseP = midphasetime*100/totaltime
             finishphaseP = finishphasetime*100/totaltime
+                        
+            #find Lowest Point in BT
+            LP = 1000 
+            if TP_index >= 0:
+                LP = self.temp2[TP_index]
 
             if self.statisticsflags[0]:            
                 self.ax.text(self.startend[0]+ dryphasetime/3,self.statisticsupper,st1 + u" "+ unicode(int(dryphaseP))+u"%",color=self.palette["text"])
@@ -1490,10 +1521,6 @@ class tgraphcanvas(FigureCanvas):
             if self.statisticsflags[2]:
                 (st1,st2,st3) = aw.defect_estimation()
 
-                #find Lowest Point in BT
-                LP = 1000 
-                if TP_index >= 0:
-                    LP = self.temp2[TP_index]
                     
                 rates_of_changes = aw.RoR(TP_index,dryEndIndex)
 
@@ -1765,7 +1792,7 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setStyleSheet("QPushButton { background-color: white }")
         self.button_7.setMaximumSize(90, 40)
         self.button_7.setToolTip("<font color=red size=2><b>" + "Reset graphs and time" + "</font></b>")
-        self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset)
+        self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset_and_redraw)
 
         #create CHARGE button
         self.button_8 = QPushButton("CHARGE")
@@ -1790,7 +1817,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_10, SIGNAL("clicked()"), self.PIDcontrol)        
 
         #create Event record button
-        self.button_11 = QPushButton("Event")
+        self.button_11 = QPushButton("EVENT")
         self.button_11.setStyleSheet("QPushButton { background-color: yellow}")
         self.button_11.setMaximumSize(90, 50)
         self.button_11.setMinimumHeight(50)
@@ -1892,23 +1919,23 @@ class ApplicationWindow(QMainWindow):
         #MET
         label2 = QLabel()
         #label2.setStyleSheet("background-color:'#CCCCCC';")
-        label2.setText( "<font color='black'><b>E.T.<\b></font>")
+        label2.setText( "<font color='black'><b>ET<\b></font>")
         #BT
         label3 = QLabel()
         #label3.setStyleSheet("background-color:'#CCCCCC';")
-        label3.setText( "<font color='black'><b>B.T.<\b></font>")
+        label3.setText( "<font color='black'><b>BT<\b></font>")
         #DELTA MET
         label4 = QLabel()
         #label4.setStyleSheet("background-color:'#CCCCCC';")
-        label4.setText( "<font color='black'><b>Delta E.T.<\b></font>")
+        label4.setText( "<font color='black'><b>DeltaET<\b></font>")
         # DELTA BT
         label5 = QLabel()
         #label5.setStyleSheet("background-color:'#CCCCCC';")
-        label5.setText( "<font color='black'><b>Delta B.T.<\b></font>")
+        label5.setText( "<font color='black'><b>DeltaBT<\b></font>")
         # pid sv
         label6 = QLabel()
         #label6.setStyleSheet("background-color:'#CCCCCC';")
-        label6.setText( "<font color='black'><b>PID S.V.<\b></font>")
+        label6.setText( "<font color='black'><b>PID SV<\b></font>")
 
         #place control buttons + LCDs inside vertical button layout manager      
         LCDlayout.addWidget(label6)
@@ -1964,134 +1991,141 @@ class ApplicationWindow(QMainWindow):
         self.ConfMenu = self.menuBar().addMenu("&Conf")
         self.helpMenu = self.menuBar().addMenu("&Help")
         #FILE menu
-        fileLoadAction = QAction("Open Profile",self)
+        fileLoadAction = QAction("Open Profile...",self)
         fileLoadAction.setShortcut(QKeySequence.Open)
         self.connect(fileLoadAction,SIGNAL("triggered()"),self.fileLoad)
         self.fileMenu.addAction(fileLoadAction)
         
-        fileSaveAction = QAction("Save Profile",self)
+
+        importMenu = self.fileMenu.addMenu("Import Readings")
+
+        importHH506RAAction = QAction("HH506RA...",self)
+        self.connect(importHH506RAAction,SIGNAL("triggered()"),self.importHH506RA)
+        importMenu.addAction(importHH506RAAction)
+
+        self.fileMenu.addMenu(importMenu)    
+        
+        self.fileMenu.addSeparator()  
+
+        fileSaveAction = QAction("Save Profile...",self)
         fileSaveAction.setShortcut(QKeySequence.Save)
         self.connect(fileSaveAction,SIGNAL("triggered()"),self.fileSave)
-        self.fileMenu.addAction(fileSaveAction)        
+        self.fileMenu.addAction(fileSaveAction)    
+
+
+        
+        self.fileMenu.addSeparator()    
 
         saveGraphMenu = self.fileMenu.addMenu("Save Graph Image")
 
-        fullsizeAction = QAction("Full size",self)
+        fullsizeAction = QAction("Full Size...",self)
         self.connect(fullsizeAction,SIGNAL("triggered()"),lambda x=0,y=1:self.resize(x,y))
         saveGraphMenu.addAction(fullsizeAction)
 
         saveGraphMenuHB = saveGraphMenu.addMenu("Home-Barista.com")
         saveGraphMenuCG = saveGraphMenu.addMenu("CoffeeGeek.com")
 
-        HomeBaristaActionLow = QAction("Low quality",self)
+        HomeBaristaActionLow = QAction("Low Quality...",self)
         self.connect(HomeBaristaActionLow,SIGNAL("triggered()"),lambda x=700,y=0:self.resize(x,y))
         saveGraphMenuHB.addAction(HomeBaristaActionLow)
 
-        HomeBaristaActionHigh = QAction("High quality",self)
+        HomeBaristaActionHigh = QAction("High Quality...",self)
         self.connect(HomeBaristaActionHigh,SIGNAL("triggered()"),lambda x=700,y=1:self.resize(x,y))
         saveGraphMenuHB.addAction(HomeBaristaActionHigh)
 
-        CoffeeGeekActionLow = QAction("Low quality",self)
+        CoffeeGeekActionLow = QAction("Low Quality...",self)
         self.connect(CoffeeGeekActionLow,SIGNAL("triggered()"),lambda x=500,y=0:self.resize(x,y))
         saveGraphMenuCG.addAction(CoffeeGeekActionLow)
 
-        CoffeeGeekActionHigh = QAction("High quality",self)
+        CoffeeGeekActionHigh = QAction("High Quality...",self)
         self.connect(CoffeeGeekActionHigh,SIGNAL("triggered()"),lambda x=500,y=1:self.resize(x,y))
         saveGraphMenuCG.addAction(CoffeeGeekActionHigh)
-
-        printAction = QAction("Print Graph Image",self)
-        printAction.setShortcut(QKeySequence.Print)
-        self.connect(printAction,SIGNAL("triggered()"),self.filePrint)
-        self.fileMenu.addAction(printAction)
 
         htmlAction = QAction("Create HTML Report",self)
         self.connect(htmlAction,SIGNAL("triggered()"),self.htmlReport)
         htmlAction.setShortcut("Ctrl+R")
         self.fileMenu.addAction(htmlAction)
 
-        importMenu = self.fileMenu.addMenu("Import other formats")
-
-        importHH506RAAction = QAction("HH506RA",self)
-        self.connect(importHH506RAAction,SIGNAL("triggered()"),self.importHH506RA)
-        importMenu.addAction(importHH506RAAction)
-
-        self.fileMenu.addMenu(importMenu)       
+        
+        self.fileMenu.addSeparator()
+        
+        printAction = QAction("Print Graph...",self)
+        printAction.setShortcut(QKeySequence.Print)
+        self.connect(printAction,SIGNAL("triggered()"),self.filePrint)
+        self.fileMenu.addAction(printAction)
+   
 
 
         # ROAST menu
-        editGraphAction = QAction("Roast properties",self)
+        editGraphAction = QAction("Roast Properties...",self)
         self.connect(editGraphAction ,SIGNAL("triggered()"),self.editgraph)
         self.GraphMenu.addAction(editGraphAction)
 
-        flavorAction = QAction("View Flavor",self)
+        backgroundAction = QAction("Profile Background...",self)
+        self.connect(backgroundAction,SIGNAL("triggered()"),self.background)
+        self.GraphMenu.addAction(backgroundAction)  
+
+        flavorAction = QAction("Cup Profile...",self)
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
         self.GraphMenu.addAction(flavorAction)
-
-        temperatureMenu = self.GraphMenu.addMenu("Temperature")
-        colorMenu = self.GraphMenu.addMenu("Color")
         
-        graphModeAction1 = QAction("Default Color mode",self)
-        self.connect(graphModeAction1,SIGNAL("triggered()"),lambda x=1:self.qmc.changeGColor(x))
-        colorMenu.addAction(graphModeAction1)
-
-        graphModeAction2 = QAction("Black and White color mode",self)
-        self.connect(graphModeAction2,SIGNAL("triggered()"),lambda x=2:self.qmc.changeGColor(x))
-        colorMenu.addAction(graphModeAction2)
-
-        graphModeAction3 = QAction("Customize colors",self)
-        self.connect(graphModeAction3,SIGNAL("triggered()"),lambda x=3:self.qmc.changeGColor(x))
-        colorMenu.addAction(graphModeAction3)
-
-        ConvertToFahrenheitAction = QAction("Convert profile to Fahrenheit",self)
+        self.GraphMenu.addSeparator()
+        
+        temperatureMenu = self.GraphMenu.addMenu("Temperature")
+        
+        ConvertToFahrenheitAction = QAction("Convert to Fahrenheit",self)
         self.connect(ConvertToFahrenheitAction,SIGNAL("triggered()"),lambda t="F":self.qmc.convertTemperature(t))
         temperatureMenu.addAction(ConvertToFahrenheitAction)
 
-        ConvertToCelsiusAction = QAction("Convert profile to Celsius",self)
+        ConvertToCelsiusAction = QAction("Convert to Celsius",self)
         self.connect(ConvertToCelsiusAction,SIGNAL("triggered()"),lambda t="C":self.qmc.convertTemperature(t))
         temperatureMenu.addAction(ConvertToCelsiusAction)
 
-        FahrenheitAction = QAction("Set Display in Fahrenheit Mode",self)
+        FahrenheitAction = QAction("Fahrenheit Mode",self)
         self.connect(FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
         temperatureMenu.addAction(FahrenheitAction)
 
-        CelsiusAction = QAction("Set Display in Celsius Mode",self)
+        CelsiusAction = QAction("Celsius Mode",self)
         self.connect(CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusMode)
         temperatureMenu.addAction(CelsiusAction)
 
-        phasesGraphAction = QAction("Phases",self)
-        self.connect(phasesGraphAction,SIGNAL("triggered()"),self.editphases)
-        self.GraphMenu.addAction(phasesGraphAction)
-       
-        StatisticsAction = QAction("Statistics",self)
-        self.connect(StatisticsAction,SIGNAL("triggered()"),self.showstatistics)
-        self.GraphMenu.addAction(StatisticsAction)     
 
+        self.GraphMenu.addSeparator()
 
         calculatorAction = QAction("Calculator",self)
         self.connect(calculatorAction,SIGNAL("triggered()"),self.calculator)
         self.GraphMenu.addAction(calculatorAction)   
 
-        backgroundAction = QAction("Profile Background",self)
-        self.connect(backgroundAction,SIGNAL("triggered()"),self.background)
-        self.GraphMenu.addAction(backgroundAction)  
 
-        hudAction = QAction("HUD targets",self)
-        self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
-        self.GraphMenu.addAction(hudAction)  
-        
         # CONFIGURATION menu
-        deviceAction = QAction("Device", self)
+        deviceAction = QAction("Device...", self)
         self.connect(deviceAction,SIGNAL("triggered()"),self.deviceassigment)
         self.ConfMenu.addAction(deviceAction) 
         
-        commportAction = QAction("Serial Port",self)
+        commportAction = QAction("Serial Port...",self)
         self.connect(commportAction,SIGNAL("triggered()"),self.setcommport)
         self.ConfMenu.addAction(commportAction)
 
-        calibrateDelayAction = QAction("Set time interval between readings",self)
+        calibrateDelayAction = QAction("Sampling Interval...",self)
         self.connect(calibrateDelayAction,SIGNAL("triggered()"),self.calibratedelay)
         self.ConfMenu.addAction(calibrateDelayAction)
+        
+        colorsAction = QAction("Colors...",self)
+        self.connect(colorsAction,SIGNAL("triggered()"),lambda x=3:self.qmc.changeGColor(x))
+        self.ConfMenu.addAction(colorsAction)
 
+        phasesGraphAction = QAction("Phases...",self)
+        self.connect(phasesGraphAction,SIGNAL("triggered()"),self.editphases)
+        self.ConfMenu.addAction(phasesGraphAction)
+       
+        StatisticsAction = QAction("Statistics...",self)
+        self.connect(StatisticsAction,SIGNAL("triggered()"),self.showstatistics)
+        self.ConfMenu.addAction(StatisticsAction)     
+
+        hudAction = QAction("Extras...",self)
+        self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
+        self.ConfMenu.addAction(hudAction)  
+        
         
         # HELP menu
         helpAboutAction = QAction("About",self)
@@ -2102,7 +2136,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(helpDocumentationAction,SIGNAL("triggered()"),self.helpHelp)
         self.helpMenu.addAction(helpDocumentationAction)        
 
-        errorAction = QAction("Error log",self)
+        errorAction = QAction("Errors",self)
         self.connect(errorAction,SIGNAL("triggered()"),self.viewErrorLog)
         self.helpMenu.addAction(errorAction)
 
@@ -2117,19 +2151,15 @@ class ApplicationWindow(QMainWindow):
     def fileLoad(self):
         f = None
         old_mode = self.qmc.mode
-        aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
         try:        
             filename = unicode(QFileDialog.getOpenFileName(self,"Load Profile",self.profilepath,"*.txt"))
-            self.qmc.reset()
-
+            
             f = QFile(filename)
             if not f.open(QIODevice.ReadOnly):
-                raise IOError, unicode(f.errorString())
-            
+                raise IOError, unicode(f.errorString())            
             stream = QTextStream(f)
             
-            #variables to read on the text file are initialized as empty lists
-            self.qmc.varC,self.qmc.startend, self.qmc.timex, self.qmc.temp1, self.qmc.temp2, self.qmc.flavors = [],[],[],[],[],[]
+            self.qmc.reset()
                 
             firstChar = stream.read(1)
             if firstChar == "{":            
@@ -2311,6 +2341,8 @@ class ApplicationWindow(QMainWindow):
     
                 #CLOSE FILE
                 f.close()
+
+            aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
 
             #convert modes only if needed comparing the new uploaded mode to the old one.
             #otherwise it would incorrectly convert the uploaded phases
@@ -2739,6 +2771,17 @@ class ApplicationWindow(QMainWindow):
                 elif type(self.pid.PXG4[key][0]) == type(int()):
                     self.pid.PXG4[key][0] = settings.value(key,self.pid.PXG4[key][0]).toInt()[0]
             settings.endGroup()
+            settings.beginGroup("RoC")
+            self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag)
+            self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaETflag)
+            self.qmc.sensitivity = settings.value("Sensitivity",self.qmc.sensitivity).toInt()[0]
+            settings.endGroup()
+            settings.beginGroup("HUD")
+            self.qmc.projectCheck = settings.value("Projection",self.qmc.projectFlag)
+            self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
+            self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
+            self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
+            settings.endGroup()
             
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
@@ -2746,7 +2789,6 @@ class ApplicationWindow(QMainWindow):
 
 
         except Exception,e:
-            print e
             self.qmc.errorlog.append(u"Error loading settings " + unicode(e))         
             return                            
 
@@ -2798,6 +2840,17 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("PXG4");
             for key in self.pid.PXG4.keys():            
                 settings.setValue(key,self.pid.PXG4[key][0])
+            settings.endGroup()
+            settings.beginGroup("RoC")
+            settings.setValue("DeltaET",self.qmc.DeltaETflag)
+            settings.setValue("DeltaBT",self.qmc.DeltaBTflag)
+            settings.setValue("Sensitivity",self.qmc.sensitivity)
+            settings.endGroup()
+            settings.beginGroup("HUD")
+            settings.setValue("Projection",self.qmc.projectFlag)
+            settings.setValue("ETtarget",self.qmc.ETtarget)
+            settings.setValue("BTtarget",self.qmc.BTtarget)
+            settings.setValue("Mode",self.HUDfunction)
             settings.endGroup()
             
         except Exception,e:
@@ -2877,12 +2930,20 @@ th {
 <td>$weight</td>
 </tr>
 <tr>
+<th></th>
+<td>$degree</td>
+</tr>
+<tr>
 <th>Roaster:</th>
 <td>$roaster</td>
 </tr>
 <tr>
 <th>Operator:</th>
 <td>$operator</td>
+</tr>
+<tr>
+<th>Cupping:</th>
+<td>$cup</td>
 </tr>
 </table>
 </td>
@@ -2965,7 +3026,7 @@ $cupping_notes
             beans = beans[:41] + "&hellip;"
         TP_index = self.findTP()
         TP_time = TP_temp = None
-        if TP_index >= 0:
+        if TP_index > 0 and len(aw.qmc.timex) > 0:
             TP_time = aw.qmc.timex[TP_index]            
             TP_temp = aw.qmc.temp2[TP_index]
         dryEndIndex = self.findDryEnd(TP_index)
@@ -2999,15 +3060,18 @@ $cupping_notes
             #save GRAPH image
             flavor_image = "artisan-flavor.png"
             image.save(flavor_image)
+        weight_loss = aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1])
         #return screen to GRAPH profile mode
         self.qmc.redraw()
         html = string.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             title=cgi.escape(self.qmc.title),
             datetime=unicode(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
             beans=beans,
-            weight=unicode(self.qmc.weight[0]) + self.qmc.weight[2] + " (" + "%.1f" % aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1]) + "%)",
+            weight=unicode(self.qmc.weight[0]) + self.qmc.weight[2] + " (" + "%.1f"%weight_loss + "%)",
+            degree=aw.roast_degree(weight_loss),
             roaster=cgi.escape(self.qmc.roastertype),
             operator=cgi.escape(self.qmc.operator),
+            cup=str(self.cuppingSum()),
             charge="BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode,
             TP=self.event2html(TP_time,TP_temp),
             FCs=self.event2html(self.qmc.varC[0],self.qmc.varC[1]),
@@ -3037,6 +3101,12 @@ $cupping_notes
         finally:
             if f:
                 f.close()  
+                
+    def cuppingSum(self):
+        sum = 10 # includes the correction to have a maximum of 100
+        for i in range(8):
+            sum += int(aw.qmc.flavors[i]*10.)
+        return sum
                 
     def phase2html(self,time,RoR,eval):
         if self.qmc.statisticstimes[0] > 0 and time and time > 0:
@@ -3268,7 +3338,7 @@ $cupping_notes
         calSpinBox.setRange(1,30)
         calSpinBox.setValue(self.qmc.delay/1000)
         secondsdelay, ok = QInputDialog.getInteger(self,
-                "Sampling period", "Enter seconds:",
+                "Sampling Interval", "Seconds",
                 calSpinBox.value(),1,30)
         if ok:
             self.qmc.killTimer(self.qmc.timerid) 
@@ -3331,6 +3401,24 @@ $cupping_notes
       else:
         return 100. * ((float(green) - float(roasted)) / float(green))
 
+
+    # from RoastMagazin (corrected by substracting 1% based on experience)
+    def roast_degree(self,percent):
+        if percent < 13.5:
+            return ""
+        elif percent < 14.5:
+            return "City"
+        elif percent < 15.5:
+            return "City+"
+        elif percent < 16.5:
+            return "Full City"
+        elif percent < 17.5:
+            return "Full City+"
+        elif percent < 18.5:
+            return "Light French"
+        else:
+            return "French"
+            
     def importHH506RA(self):
         try:
             filename = u""
@@ -3559,18 +3647,52 @@ class HUDDlg(QDialog):
     def __init__(self, parent = None):
         super(HUDDlg,self).__init__(parent)
 
-        self.setWindowTitle("HUD config")
-        ETLabel = QLabel("ET metric target")
-        BTLabel = QLabel("BT metric target")
+        self.setWindowTitle("Extras")
+        self.setModal(True)
         
-        modeLabel = QLabel("HUD mode")
-
-        self.projectCheck = QCheckBox("Projection")
+        # keep old values to be restored on Cancel
+        self.org_DeltaET = aw.qmc.DeltaETflag
+        self.org_DeltaBT = aw.qmc.DeltaBTflag
+        self.org_Sensitivity = aw.qmc.sensitivity
+        self.org_Projection = aw.qmc.projectFlag
+        
+        ETLabel = QLabel("ET Target")
+        ETLabel.setAlignment(Qt.AlignRight)
+        BTLabel = QLabel("BT Target")
+        BTLabel.setAlignment(Qt.AlignRight)        
+        modeLabel = QLabel("Mode")
+        modeLabel.setAlignment(Qt.AlignRight)
+        
+        self.DeltaET = QCheckBox("DeltaET")
+        if aw.qmc.DeltaETflag == True:
+            self.DeltaET.setChecked(True)
+        else:
+            self.DeltaET.setChecked(False)
+        self.DeltaBT = QCheckBox("DeltaBT")
+        if aw.qmc.DeltaBTflag == True:
+            self.DeltaBT.setChecked(True)
+        else:
+            self.DeltaBT.setChecked(False)        
+        self.projectCheck = QCheckBox("ET/BT Projection")
         if aw.qmc.projectFlag == True:
             self.projectCheck.setChecked(True)
         else:
             self.projectCheck.setChecked(False)
-        
+            
+        self.connect(self.DeltaET,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaET(i))
+        self.connect(self.DeltaBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaBT(i))
+        self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.changeProjection(i))
+            
+        self.sensitivityValues = map(str,range(10,0,-1))
+        self.sensitivitylabel  = QLabel("Delta Sensitivity")                          
+        self.sensitivityComboBox = QComboBox()
+        self.sensitivityComboBox.addItems(self.sensitivityValues)
+        try:
+            self.sensitivityComboBox.setCurrentIndex(self.sensitivityValues.index(self.sensitivityInt2String(aw.qmc.sensitivity)))
+        except Exception,e:
+            self.sensitivityComboBox.setCurrentIndex = 0
+        self.connect(self.sensitivityComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.sensitivityComboBox.currentIndex():self.changeSensitivity(i))
+                        
         self.modeComboBox = QComboBox()
         self.modeComboBox.setMaximumWidth(100)
         self.modeComboBox.setMinimumWidth(55)
@@ -3583,9 +3705,9 @@ class HUDDlg(QDialog):
         self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
 
         okButton = QPushButton("OK")  
-        cancelButton = QPushButton("Cancel")        
+        cancelButton = QPushButton("Cancel")   
+        cancelButton.setFocusPolicy(Qt.NoFocus)     
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
-        self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
         self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
                                              
         hudLayout = QGridLayout()
@@ -3595,11 +3717,75 @@ class HUDDlg(QDialog):
         hudLayout.addWidget(self.BTlineEdit,1,1)
         hudLayout.addWidget(modeLabel,2,0)
         hudLayout.addWidget(self.modeComboBox,2,1)
-        hudLayout.addWidget(self.projectCheck,3,1)
-       
-        hudLayout.addWidget(okButton,4,0)
-        hudLayout.addWidget(cancelButton,4,1)   
-        self.setLayout(hudLayout)
+        
+        rorLayout = QGridLayout()
+        rorLayout.addWidget(self.projectCheck,0,0)
+        rorLayout.addWidget(self.DeltaET,1,0)
+        rorLayout.addWidget(self.DeltaBT,1,1)
+        
+        rorBoxLayout = QHBoxLayout()
+        rorBoxLayout.addLayout(rorLayout)
+        rorBoxLayout.addStretch()
+        
+        sensitivityLayout = QHBoxLayout()
+        sensitivityLayout.addWidget(self.sensitivitylabel)
+        sensitivityLayout.addWidget(self.sensitivityComboBox)
+        sensitivityLayout.addStretch()
+        
+        curvesLayout = QVBoxLayout()
+        curvesLayout.addLayout(rorBoxLayout)
+        curvesLayout.addLayout(sensitivityLayout)
+        
+        rorGroupLayout = QGroupBox("Curves")        
+        rorGroupLayout.setLayout(curvesLayout)
+        
+        hudGroupLayout = QGroupBox("HUD")
+        hudGroupLayout.setLayout(hudLayout)
+        
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(cancelButton)
+        buttonsLayout.addWidget(okButton)
+                                
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(rorGroupLayout)
+        mainLayout.addWidget(hudGroupLayout)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonsLayout)
+        
+        self.setLayout(mainLayout)
+        
+    def changeDeltaET(self,i):
+        aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
+        aw.qmc.redraw()
+        
+    def changeDeltaBT(self,i):
+        aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
+        aw.qmc.redraw()
+        
+    def changeProjection(self,i):
+        aw.qmc.projectFlag = not aw.qmc.projectFlag
+        
+    def changeSensitivity(self,i):
+        aw.qmc.sensitivity = self.sensitivityString2Int(self.sensitivityValues[i])
+        aw.qmc.redraw()         
+         
+    def sensitivityString2Int(self,s):
+        return int(s) * 20
+        
+    def sensitivityInt2String(self,i):
+        if i < 20:
+            return "10"
+        else:
+            return str(i / 20)
+            
+    def close(self):    
+        #restore settings
+        aw.qmc.DeltaETflag = self.org_DeltaET
+        aw.qmc.DeltaBTflag = self.org_DeltaBT
+        aw.qmc.sensitivity = self.org_Sensitivity
+        aw.qmc.projectFlag = self.org_Projection
+        self.accept()
 
     def updatetargets(self):
         mode = unicode(self.modeComboBox.currentText())
@@ -3618,7 +3804,8 @@ class HUDDlg(QDialog):
         aw.qmc.BTtarget = int(unicode(self.BTlineEdit.text()))
         string = u"[ET target = " + unicode(self.ETlineEdit.text()) + u"] [BT target = " + unicode(self.BTlineEdit.text()) + u"]"
         aw.messagelabel.setText(string)
-        self.close()
+        #self.close()
+        self.accept()
 
         
            
@@ -3630,7 +3817,9 @@ class editGraphDlg(QDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
 
-        self.setWindowTitle(u"Roast properties")
+        self.setModal(True)
+
+        self.setWindowTitle(u"Roast Properties")
 
         regextime = QRegExp(r"^[0-9]{1,2}:[0-9]{1,2}$")
         regexweight = QRegExp(r"^[0-9]{1,3}[.0-9]{1,2}$")
@@ -3683,8 +3872,9 @@ class editGraphDlg(QDialog):
         ntlines = len(aw.qmc.specialevents)         #number of events found
         nslines = len(aw.qmc.specialeventsStrings)  #number of descriptions for each event
 
-        msg1label = QLabel("Times are from begining of data (absolute)")
-        msg1label.setAlignment(Qt.AlignLeft)
+        #why to put documentation in dialogs
+        #msg1label = QLabel("Times are from begining of data (absolute)")
+        #msg1label.setAlignment(Qt.AlignLeft)
 
         #Dynamic content of events depending on number of events found    
         if ntlines > 0 and nslines > 0:
@@ -3769,8 +3959,8 @@ class editGraphDlg(QDialog):
         numberlabel9.setStyleSheet("background-color:'yellow';")
         numberlabel10.setStyleSheet("background-color:'yellow';")
         
+             
         eventsLayout = QGridLayout()
-        eventsLayout.addWidget(msg1label,0,1)
 
         if ntlines:
             eventsLayout.addWidget(numberlabel1,1,0)
@@ -3814,14 +4004,18 @@ class editGraphDlg(QDialog):
             eventsLayout.addWidget(self.line10,10,2)
 
         
-        neweventButton = QPushButton("New")
+        neweventButton = QPushButton("Add")
         neweventButton.setFocusPolicy(Qt.NoFocus)
-        neweventButton.setMaximumSize(70, 30)
+        #neweventButton.setMaximumSize(70, 30)
+        neweventButton.setMaximumSize(neweventButton.sizeHint())
+        neweventButton.setMinimumSize(neweventButton.minimumSizeHint())
         self.connect(neweventButton,SIGNAL("clicked()"),self.addevent)
 
         deleventButton = QPushButton("Delete")
         deleventButton.setFocusPolicy(Qt.NoFocus)
-        deleventButton.setMaximumSize(70, 30)
+        #deleventButton.setMaximumSize(70, 30)
+        deleventButton.setMaximumSize(deleventButton.sizeHint())
+        deleventButton.setMinimumSize(deleventButton.minimumSizeHint())
         self.connect(deleventButton,SIGNAL("clicked()"),self.delevent)
         
         if len(aw.qmc.timex) < 1:
@@ -3856,16 +4050,19 @@ class editGraphDlg(QDialog):
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw)
         
-        #self.weightinedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightinedit))
+        self.weightinedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightinedit))
         self.weightinedit.setMinimumWidth(50)
         self.weightinedit.setMaximumWidth(50)
         self.weightoutedit = QLineEdit(outw)
-        #self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
+        self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
         self.weightoutedit.setMinimumWidth(50)
         self.weightoutedit.setMaximumWidth(50)
         self.weightpercentlabel = QLabel(" %")
         self.weightpercentlabel.setMinimumWidth(45)
         self.weightpercentlabel.setMaximumWidth(45)
+        self.roastdegreelabel = QLabel("")
+        self.roastdegreelabel.setMinimumWidth(80)
+        self.roastdegreelabel.setMaximumWidth(80)
 
         self.percent()
         self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.percent)
@@ -3874,7 +4071,7 @@ class editGraphDlg(QDialog):
 
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
-        self.unitsComboBox.setMinimumWidth(55)
+        self.unitsComboBox.setMinimumWidth(60)
         self.unitsComboBox.addItems(["g","Kg"])
 
 
@@ -3895,18 +4092,26 @@ class editGraphDlg(QDialog):
         
 
         # Save button
-        saveButton = QPushButton("Update")
-        saveButton.setFocusPolicy(Qt.NoFocus)
+        saveButton = QPushButton("OK")
+        #why not have the focus on the OK 
+        #saveButton.setFocusPolicy(Qt.NoFocus)
         self.connect(saveButton, SIGNAL("clicked()"),self, SLOT("accept()"))
-        saveButton.setMaximumSize(70, 30)
-        if len(aw.qmc.timex) < 1:
-            saveButton.setDisabled(True)
+        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
+        #saveButton.setMaximumSize(70, 30)
+        saveButton.setMaximumSize(saveButton.sizeHint())
+        saveButton.setMinimumSize(saveButton.minimumSizeHint())
+        
+        # why this restriction (anyhow tested in accept())? can't I add the beans name before roasting/recording..
+        #if len(aw.qmc.timex) < 1:
+        #    saveButton.setDisabled(True)
         
         #Cancel Button
         cancelButton = QPushButton("Cancel")
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        cancelButton.setMaximumSize(70, 30)
+        #cancelButton.setMaximumSize(70, 30)
+        cancelButton.setMaximumSize(cancelButton.sizeHint())
+        cancelButton.setMinimumSize(cancelButton.minimumSizeHint())
 
         ##### LAYOUTS
 
@@ -3925,8 +4130,9 @@ class editGraphDlg(QDialog):
         timeLayout.addWidget(self.dropedit,1,5)
 
         eventbuttonLayout = QHBoxLayout()
-        eventbuttonLayout.addWidget(neweventButton,0)
-        eventbuttonLayout.addWidget(deleventButton,1)
+        eventbuttonLayout.addStretch()  
+        eventbuttonLayout.addWidget(deleventButton)
+        eventbuttonLayout.addWidget(neweventButton)
         
         textLayout = QGridLayout()
         textLayout.addWidget(datelabel1,0,0)
@@ -3942,37 +4148,53 @@ class editGraphDlg(QDialog):
 
         weightLayout = QHBoxLayout()
         weightLayout.setSpacing(0)
-
-        weightLayout.addWidget(weightlabel,0)
+        weightLayout.addWidget(weightlabel)
+        weightLayout.addSpacing(18)
+        weightLayout.addWidget(self.unitsComboBox)
+        weightLayout.addSpacing(15)
+        weightLayout.addWidget(self.weightinedit)
+        weightLayout.addSpacing(1)
+        weightLayout.addWidget(weightinlabel)
+        weightLayout.addSpacing(15)
+        weightLayout.addWidget(self.weightoutedit)
+        weightLayout.addSpacing(1)
+        weightLayout.addWidget(weightoutlabel)
+        weightLayout.addSpacing(15)
+        weightLayout.addWidget(self.weightpercentlabel)  
         weightLayout.addSpacing(10)
-        weightLayout.addWidget(self.unitsComboBox,1)
-        weightLayout.addSpacing(40)
-        weightLayout.addWidget(self.weightinedit,2)
-        weightLayout.addWidget(weightinlabel,3)
-        weightLayout.addSpacing(10)
-        weightLayout.addWidget(self.weightoutedit,4)
-        weightLayout.addWidget(weightoutlabel,5)
-        weightLayout.addSpacing(10)
-        weightLayout.addWidget(self.weightpercentlabel,6)
+        weightLayout.addWidget(self.roastdegreelabel)  
+        weightLayout.addStretch()  
         
         anotationLayout = QVBoxLayout()
-        anotationLayout.addWidget(roastinglabel,0)
-        anotationLayout.addWidget(self.roastingeditor,1)
-        anotationLayout.addWidget(cupinglabel,2)
-        anotationLayout.addWidget(self.cupingeditor,3)
+        anotationLayout.addWidget(roastinglabel)
+        anotationLayout.addWidget(self.roastingeditor)
+        anotationLayout.addWidget(cupinglabel)
+        anotationLayout.addWidget(self.cupingeditor)
 
         okLayout = QHBoxLayout()
+        okLayout.addStretch()
         okLayout.addWidget(cancelButton,0)
         okLayout.addWidget(saveButton,1)
 
+        timeLayoutBox = QHBoxLayout()
+        timeLayoutBox.addLayout(timeLayout)
+        timeLayoutBox.addStretch()
+        
+        allEventsLayout = QVBoxLayout()
+        allEventsLayout.addLayout(timeLayoutBox)
+        allEventsLayout.addLayout(eventsLayout)
+        allEventsLayout.addLayout(eventbuttonLayout)
+        
+        eventsGroupLayout = QGroupBox("Events")
+        eventsGroupLayout.setLayout(allEventsLayout)
+
         totalLayout = QVBoxLayout()
-        totalLayout.addLayout(timeLayout,0)
-        totalLayout.addLayout(eventsLayout,1)
-        totalLayout.addLayout(eventbuttonLayout,2)
-        totalLayout.addLayout(textLayout,3)
-        totalLayout.addLayout(weightLayout,4)
-        totalLayout.addLayout(anotationLayout,5)
-        totalLayout.addLayout(okLayout,6)
+        totalLayout.addWidget(eventsGroupLayout)
+        totalLayout.addLayout(textLayout)
+        totalLayout.addLayout(weightLayout)
+        totalLayout.addLayout(anotationLayout)
+        totalLayout.addStretch()  
+        totalLayout.addLayout(okLayout)
 
         self.setLayout(totalLayout)
 
@@ -3984,6 +4206,7 @@ class editGraphDlg(QDialog):
         else:
             return int(number)
         
+    
     def percent(self):
         if float(self.weightoutedit.text()) != 0.0:
             percent = aw.weight_loss(float(self.weightinedit.text()),float(self.weightoutedit.text()))
@@ -3991,6 +4214,10 @@ class editGraphDlg(QDialog):
             percent = 0.
         percentstring =  "%.1f" %(percent) + "%"
         self.weightpercentlabel.setText(QString(percentstring))    #weight percent loss
+        roastdegreestring = ""
+        if percent > 0.:
+            roastdegreestring = aw.roast_degree(percent)
+        self.roastdegreelabel.setText(QString(roastdegreestring))
         
                 
     def accept(self):
@@ -4046,39 +4273,35 @@ class editGraphDlg(QDialog):
                 aw.qmc.specialevents[9] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line10b.text()))))
                 aw.qmc.specialeventsStrings[9] = unicode(self.line10.text())
 
-            # Update Title
-            aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
-            aw.qmc.title = unicode(self.titleedit.text())
-            # Update beans
-            aw.qmc.beans = unicode(self.beansedit.text())
-            #update roaster
-            aw.qmc.roaster = unicode(self.roaster.text())
+        # Update Title
+        aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
+        aw.qmc.title = unicode(self.titleedit.text())
+        # Update beans
+        aw.qmc.beans = unicode(self.beansedit.text())
+        #update roaster
+        aw.qmc.roaster = unicode(self.roaster.text())
 
-            #update weight
-            if unicode(self.weightinedit.text()).isdigit():
-                aw.qmc.weight[0] = int(self.weightinedit.text())
-            else:
-                pass
-            if unicode(self.weightoutedit.text()).isdigit():
-                aw.qmc.weight[1] = int(self.weightoutedit.text())
-            else:
-                pass
-            aw.qmc.weight[2] = unicode(self.unitsComboBox.currentText())
-
-            #update notes
-            aw.qmc.roastertype = unicode(self.roaster.text())
-            aw.qmc.operator = unicode(self.operator.text())
-            aw.qmc.roastingnotes = unicode(self.roastingeditor.toPlainText())
-            aw.qmc.cuppingnotes = unicode(self.cupingeditor.toPlainText())
-           
-            aw.messagelabel.setText(u"Graph properties updated (but profile not saved in hard-drive)")            
-            aw.qmc.redraw()
-            self.close()
-
-            
+        #update weight
+        if unicode(self.weightinedit.text()).isdigit():
+            aw.qmc.weight[0] = int(self.weightinedit.text())
         else:
-            aw.messagelabel.setText(u"No data")
-            self.close()
+            pass
+        if unicode(self.weightoutedit.text()).isdigit():
+            aw.qmc.weight[1] = int(self.weightoutedit.text())
+        else:
+            pass
+        aw.qmc.weight[2] = unicode(self.unitsComboBox.currentText())
+
+        #update notes
+        aw.qmc.roastertype = unicode(self.roaster.text())
+        aw.qmc.operator = unicode(self.operator.text())
+        aw.qmc.roastingnotes = unicode(self.roastingeditor.toPlainText())
+        aw.qmc.cuppingnotes = unicode(self.cupingeditor.toPlainText())
+           
+        aw.messagelabel.setText(u"Graph properties updated (but profile not saved to disk)")            
+        aw.qmc.redraw()
+        self.close()
+
             
 
     #selects the closest match from the available data in timex for a given number of seconds.
@@ -4167,12 +4390,10 @@ class errorDlg(QDialog):
 class calculatorDlg(QDialog):
     def __init__(self, parent = None):
         super(calculatorDlg,self).__init__(parent)
-        self.setWindowTitle("Roast calculator")
+        self.setWindowTitle("Roast Calculator")
 
-        usagelabel = QLabel("<center>USAGE: Press ENTER inside a box</center>")
-
+        
         #RATE OF CHANGE
-        rateofchangelabel = QLabel("<b>Rate of change</b>")
         self.result1 = QLabel("Enter two times along profile")
         self.result2 = QLabel()
         self.result2.setStyleSheet("background-color:'lightgrey';")
@@ -4185,22 +4406,20 @@ class calculatorDlg(QDialog):
         self.startEdit.setValidator(QRegExpValidator(regextime,self))
         self.endEdit.setValidator(QRegExpValidator(regextime,self))
         
-        self.connect(self.startEdit,SIGNAL("returnPressed()"),self.calculateRC)
-        self.connect(self.endEdit,SIGNAL("returnPressed()"),self.calculateRC)
+        self.connect(self.startEdit,SIGNAL("editingFinished()"),self.calculateRC)
+        self.connect(self.endEdit,SIGNAL("editingFinished()"),self.calculateRC)
 
         #TEMPERATURE CONVERSION
-        tconversionLabel = QLabel("<b>Temperature conversion</b>")
         flabel = QLabel("Fahrenheit")
         clabel = QLabel("Celsius")
         self.faEdit = QLineEdit()
         self.ceEdit = QLineEdit()                
         self.faEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.faEdit))
         self.ceEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.ceEdit))
-        self.connect(self.faEdit,SIGNAL("returnPressed()"),lambda x="FtoC":self.convertTemp(x))
-        self.connect(self.ceEdit,SIGNAL("returnPressed()"),lambda x="CtoF":self.convertTemp(x))
+        self.connect(self.faEdit,SIGNAL("editingFinished()"),lambda x="FtoC":self.convertTemp(x))
+        self.connect(self.ceEdit,SIGNAL("editingFinished()"),lambda x="CtoF":self.convertTemp(x))
 
         #WEIGHT CONVERSION
-        wconversionLabel = QLabel("<b>Weight conversion</b>")
         self.inComboBox = QComboBox()
         self.inComboBox.addItems(["g","Kg","lb"])
         self.inComboBox.setMaximumWidth(50)
@@ -4214,8 +4433,8 @@ class calculatorDlg(QDialog):
         self.outEdit.setMaximumWidth(60)
         self.inEdit.setValidator(QDoubleValidator(0., 99999., 2, self.inEdit))
         self.outEdit.setValidator(QDoubleValidator(0., 99999., 2, self.outEdit))
-        self.connect(self.inEdit,SIGNAL("returnPressed()"),lambda x="ItoO":self.convertWeight(x))
-        self.connect(self.outEdit,SIGNAL("returnPressed()"),lambda x="OtoI":self.convertWeight(x))
+        self.connect(self.inEdit,SIGNAL("editingFinished()"),lambda x="ItoO":self.convertWeight(x))
+        self.connect(self.outEdit,SIGNAL("editingFinished()"),lambda x="OtoI":self.convertWeight(x))
         
         #LAYOUTS
         #Rate of chage
@@ -4226,10 +4445,9 @@ class calculatorDlg(QDialog):
         calrcLayout.addWidget(self.endEdit,1,1)
         
         rclayout = QVBoxLayout()
-        rclayout.addWidget(rateofchangelabel,0)
-        rclayout.addWidget(self.result1,1)
-        rclayout.addWidget(self.result2,2)
-        rclayout.addLayout(calrcLayout,3)
+        rclayout.addWidget(self.result1,0)
+        rclayout.addWidget(self.result2,1)
+        rclayout.addLayout(calrcLayout,2)
 
         #temperature conversion
         tempLayout = QGridLayout()        
@@ -4245,16 +4463,22 @@ class calculatorDlg(QDialog):
         weightLayout.addWidget(self.outEdit,2)
         weightLayout.addWidget(self.outComboBox,3)
 
+        RoCGroup = QGroupBox("Rate of Change")
+        RoCGroup.setLayout(rclayout)
+        
+        tempConvGroup = QGroupBox("Temperature Conversion")
+        tempConvGroup.setLayout(tempLayout)
+        
+        weightConvGroup = QGroupBox("Weight Conversion")
+        weightConvGroup.setLayout(weightLayout)
 
         #main
         mainlayout = QVBoxLayout()
         mainlayout.setSpacing(10)
-        mainlayout.addWidget(usagelabel,0)
-        mainlayout.addLayout(rclayout,1)
-        mainlayout.addWidget(tconversionLabel,2)
-        mainlayout.addLayout(tempLayout,3)
-        mainlayout.addWidget(wconversionLabel,4)
-        mainlayout.addLayout(weightLayout,5)
+        mainlayout.addWidget(RoCGroup)
+        mainlayout.addWidget(tempConvGroup)
+        mainlayout.addWidget(weightConvGroup)
+        mainlayout.addStretch()  
         
         self.setLayout(mainlayout)
 
@@ -4369,7 +4593,8 @@ class phasesGraphDlg(QDialog):
     def __init__(self, parent = None):
         super(phasesGraphDlg,self).__init__(parent)
 
-        self.setWindowTitle("Phases of roast")
+        self.setWindowTitle("Roast Phases")
+        self.setModal(True)
 
         dryLabel = QLabel("Dry")
         midLabel = QLabel("Mid")
@@ -4412,7 +4637,7 @@ class phasesGraphDlg(QDialog):
              self.startfinish.setRange(0,1000)
              self.endfinish.setRange(0,1000)
 
-        self.connect(self.enddry,SIGNAL("valueChanged(int)"),self.startmid.setValue)
+        self.connect(self.enddry,SIGNAL("valuehanged(int)"),self.startmid.setValue)
         self.connect(self.startmid,SIGNAL("valueChanged(int)"),self.enddry.setValue)
         self.connect(self.endmid,SIGNAL("valueChanged(int)"),self.startfinish.setValue)
         self.connect(self.startfinish,SIGNAL("valueChanged(int)"),self.endmid.setValue)  
@@ -4428,27 +4653,43 @@ class phasesGraphDlg(QDialog):
 
         okButton = QPushButton("OK")  
         cancelButton = QPushButton("Cancel")
-        setDefaultButton = QPushButton("Default")
+        setDefaultButton = QPushButton("Defaults")
+        
+        cancelButton.setFocusPolicy(Qt.NoFocus)
+        setDefaultButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatephases)
         self.connect(setDefaultButton,SIGNAL("clicked()"),self.setdefault)
                                      
         phaseLayout = QGridLayout()
-        phaseLayout.addWidget(dryLabel,0,0)
+        phaseLayout.addWidget(dryLabel,0,0,Qt.AlignRight)
         phaseLayout.addWidget(self.startdry,0,1)
         phaseLayout.addWidget(self.enddry,0,2)
-        phaseLayout.addWidget(midLabel,1,0)
+        phaseLayout.addWidget(midLabel,1,0,Qt.AlignRight)
         phaseLayout.addWidget(self.startmid,1,1)
         phaseLayout.addWidget(self.endmid,1,2)
-        phaseLayout.addWidget(finishLabel,2,0)
+        phaseLayout.addWidget(finishLabel,2,0,Qt.AlignRight)
         phaseLayout.addWidget(self.startfinish,2,1)
         phaseLayout.addWidget(self.endfinish,2,2)
-        phaseLayout.addWidget(setDefaultButton,3,1)
-        phaseLayout.addWidget(cancelButton,4,1)
-        phaseLayout.addWidget(okButton,4,2)
+        
+        boxedPhaseLayout = QHBoxLayout()
+        boxedPhaseLayout.addStretch()
+        boxedPhaseLayout.addLayout(phaseLayout)
+        boxedPhaseLayout.addStretch()
+                
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addWidget(setDefaultButton)
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(cancelButton)
+        buttonsLayout.addWidget(okButton)
                              
-        self.setLayout(phaseLayout)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(boxedPhaseLayout)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonsLayout)
+
+        self.setLayout(mainLayout)
 
     def updatephases(self):
         aw.qmc.phases[0] = self.startdry.value()
@@ -4478,17 +4719,28 @@ class flavorDlg(QDialog):
     def __init__(self, parent = None):
         super(flavorDlg,self).__init__(parent)
 
-        self.setWindowTitle("Cup Profile")
+        self.setWindowTitle("Cup Profile")        
+        self.setModal(True)
 
-        self.line0edit = QLineEdit(aw.qmc.flavorlabels[0])        
-        self.line1edit = QLineEdit(aw.qmc.flavorlabels[1])
-        self.line2edit = QLineEdit(aw.qmc.flavorlabels[2])
-        self.line3edit = QLineEdit(aw.qmc.flavorlabels[3])
+        self.line0edit = QLineEdit(aw.qmc.flavorlabels[0])  
+        self.line1edit = QLineEdit(aw.qmc.flavorlabels[1])       
+        self.line2edit = QLineEdit(aw.qmc.flavorlabels[2])       
+        self.line3edit = QLineEdit(aw.qmc.flavorlabels[3])      
         self.line4edit = QLineEdit(aw.qmc.flavorlabels[4])
         self.line5edit = QLineEdit(aw.qmc.flavorlabels[5])
         self.line6edit = QLineEdit(aw.qmc.flavorlabels[6])
         self.line7edit = QLineEdit(aw.qmc.flavorlabels[7])
         self.line8edit = QLineEdit(aw.qmc.flavorlabels[8])
+                
+        self.connect(self.line0edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(0,unicode(self.line0edit.displayText())))
+        self.connect(self.line1edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(1,unicode(self.line1edit.displayText())))
+        self.connect(self.line2edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(2,unicode(self.line2edit.displayText())))
+        self.connect(self.line3edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(3,unicode(self.line3edit.displayText())))
+        self.connect(self.line4edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(4,unicode(self.line4edit.displayText())))
+        self.connect(self.line5edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(5,unicode(self.line5edit.displayText())))
+        self.connect(self.line6edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(6,unicode(self.line6edit.displayText())))
+        self.connect(self.line7edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(7,unicode(self.line7edit.displayText())))
+        self.connect(self.line8edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(8,unicode(self.line8edit.displayText())))
         
         aciditySlider = QSlider(Qt.Horizontal)
         aciditySlider.setRange(0,10)
@@ -4565,10 +4817,11 @@ class flavorDlg(QDialog):
         self.bodySpinbox.setValue((int(aw.qmc.flavors[8]*10.)))        
 
 
-        backButton = QPushButton("Save and Close")
-        cancelButton = QPushButton("Cancel")
-        updatelabelsButton = QPushButton("Update labels")
-        defaultButton = QPushButton("Default labels")
+        backButton = QPushButton("OK")
+        #cancelButton = QPushButton("Cancel")
+        #updatelabelsButton = QPushButton("Update Labels")
+        defaultButton = QPushButton("Defaults")
+        defaultButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(self.aciditySpinbox,SIGNAL("valueChanged(int)"),aciditySlider.setValue)
         self.connect(self.aciditySpinbox,SIGNAL("valueChanged(int)"), lambda val=self.aciditySpinbox.value(): self.adjustflavor(0,val))
@@ -4625,9 +4878,11 @@ class flavorDlg(QDialog):
 
         
         self.connect(backButton,SIGNAL("clicked()"),self.close)
-        self.connect(cancelButton,SIGNAL("clicked()"),self.cancel)
-        self.connect(updatelabelsButton,SIGNAL("clicked()"),self.updatelabels)
         self.connect(defaultButton,SIGNAL("clicked()"),self.defaultlabels)
+
+
+        self.sumLabel = QLabel("total: %i"%aw.cuppingSum())
+        self.sumLabel.setAlignment(Qt.AlignRight)
 
         flavorLayout = QGridLayout()
         flavorLayout.addWidget(self.line0edit,0,0)
@@ -4657,47 +4912,51 @@ class flavorDlg(QDialog):
         flavorLayout.addWidget(self.line8edit,8,0)
         flavorLayout.addWidget(bodySlider,8,1)
         flavorLayout.addWidget(self.bodySpinbox,8,2)
-        flavorLayout.addWidget(updatelabelsButton,9,0)
-        flavorLayout.addWidget(backButton,9,1)
-        flavorLayout.addWidget(defaultButton,10,0)
-        flavorLayout.addWidget(cancelButton,10,1)
         
-        self.setLayout(flavorLayout)
+        
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addWidget(defaultButton,0)
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(backButton)
+        
+        
+        allFlavorLayout = QVBoxLayout()
+        allFlavorLayout.addLayout(flavorLayout)
+        allFlavorLayout.addWidget(self.sumLabel)
+        allFlavorLayout.addStretch()
+        allFlavorLayout.addLayout(buttonsLayout)
+        
+        self.setLayout(allFlavorLayout)
         aw.qmc.flavorchart()
-
-    def updatelabels(self):
-        aw.qmc.flavorlabels[0] = unicode(self.line0edit.displayText())
-        aw.qmc.flavorlabels[1] = unicode(self.line1edit.displayText())
-        aw.qmc.flavorlabels[2] = unicode(self.line2edit.displayText())
-        aw.qmc.flavorlabels[3] = unicode(self.line3edit.displayText())
-        aw.qmc.flavorlabels[4] = unicode(self.line4edit.displayText())
-        aw.qmc.flavorlabels[5] = unicode(self.line5edit.displayText())
-        aw.qmc.flavorlabels[6] = unicode(self.line6edit.displayText())
-        aw.qmc.flavorlabels[7] = unicode(self.line7edit.displayText())
-        aw.qmc.flavorlabels[8] = unicode(self.line8edit.displayText())   
-
+        
+    def updatelabel(self,i,val):
+        aw.qmc.flavorlabels[i] = val
         aw.qmc.flavorchart()
 
     def defaultlabels(self):
-        aw.qmc.flavorlabels = [u'Acidity',u'After taste',u'Clean cup',u'Head',u'Fragance',u'Sweetness',u'Aroma',u'Balance',u'Body']
-        
+        aw.qmc.flavorlabels = aw.qmc.flavordefaultlabels
+        self.line0edit.setText(aw.qmc.flavorlabels[0])    
+        self.line1edit.setText(aw.qmc.flavorlabels[1])
+        self.line2edit.setText(aw.qmc.flavorlabels[2])
+        self.line3edit.setText(aw.qmc.flavorlabels[3])
+        self.line4edit.setText(aw.qmc.flavorlabels[4])
+        self.line5edit.setText(aw.qmc.flavorlabels[5])
+        self.line6edit.setText(aw.qmc.flavorlabels[6])
+        self.line7edit.setText(aw.qmc.flavorlabels[7])
+        self.line8edit.setText(aw.qmc.flavorlabels[8])        
         aw.qmc.flavorchart()
         
     def adjustflavor(self,key,val):
+        self.sumLabel.setText("total: %i"%aw.cuppingSum())
         aw.qmc.flavors[key] = float(val)/10.
 
-    def closeEvent(self, event):
-        aw.qmc.redraw()
+    def closeEvent(self, event):    
         self.accept()
+        aw.qmc.redraw()
         
-    def close(self):
-        self.updatelabels()
-        aw.qmc.redraw()
+    def close(self):    
         self.accept()
-
-    def cancel(self):
         aw.qmc.redraw()
-        self.accept()
 
 #################################################################
 #################### BACKGROUND DIALOG  #########################
@@ -4706,7 +4965,7 @@ class flavorDlg(QDialog):
 class backgroundDLG(QDialog):
     def __init__(self, parent = None):
         super(backgroundDLG,self).__init__(parent)
-        self.setWindowTitle("Profile background")
+        self.setWindowTitle("Profile Background")
 
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
@@ -4730,9 +4989,16 @@ class backgroundDLG(QDialog):
             self.backgroundDetails.setChecked(False)
 
         loadButton = QPushButton("Load")
+        loadButton.setFocusPolicy(Qt.NoFocus)
+
         delButton = QPushButton("Delete")
-        cancelButton = QPushButton("Close")
+        delButton.setFocusPolicy(Qt.NoFocus)
+        
+        cancelButton = QPushButton("OK")
+        
         selectButton =QPushButton("Select Profile")
+        selectButton.setFocusPolicy(Qt.NoFocus)
+
         
         self.connect(loadButton, SIGNAL("clicked()"),self.load)
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
@@ -4785,9 +5051,13 @@ class backgroundDLG(QDialog):
         self.metcolorComboBox.setCurrentIndex(0)
         
         self.upButton = QPushButton("Up")
+        self.upButton.setFocusPolicy(Qt.NoFocus)
         self.downButton = QPushButton("Down")
+        self.downButton.setFocusPolicy(Qt.NoFocus)
         self.leftButton = QPushButton("Left")
+        self.leftButton.setFocusPolicy(Qt.NoFocus)
         self.rightButton = QPushButton("Right")
+        self.rightButton.setFocusPolicy(Qt.NoFocus)
 
         self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundDetails, SIGNAL("clicked()"),self.readChecks)
@@ -4827,13 +5097,25 @@ class backgroundDLG(QDialog):
         layout.addWidget(self.btcolorComboBox,6,1)
         layout.addWidget(stylelabel,7,0)
         layout.addWidget(self.styleComboBox,7,1)
-        layout.addWidget(cancelButton,8,1)
+        
+        upperlayout = QVBoxLayout()
+        upperlayout.addWidget(self.status)
+        upperlayout.addLayout(movelayout)
+        upperlayout.addSpacing(30)
+        upperlayout.addLayout(layout) 
+        
+        layoutBoxed = QHBoxLayout()
+        layoutBoxed.addLayout(upperlayout)
+        layoutBoxed.addStretch()
 
+        cancelButtonBoxed = QHBoxLayout()
+        cancelButtonBoxed.addStretch()
+        cancelButtonBoxed.addWidget(cancelButton)
+        
         mainlayout = QVBoxLayout()
-        mainlayout.addWidget(self.status,0)
-        mainlayout.addLayout(movelayout,1)
-        mainlayout.addSpacing(30)
-        mainlayout.addLayout(layout,2)
+        mainlayout.addLayout(layoutBoxed)  
+        mainlayout.addStretch()
+        mainlayout.addLayout(cancelButtonBoxed)
         
         self.setLayout(mainlayout)
 
@@ -4982,14 +5264,16 @@ class backgroundDLG(QDialog):
 class StatisticsDLG(QDialog):       
     def __init__(self, parent = None):
         super(StatisticsDLG,self).__init__(parent)
-        self.setWindowTitle("Chose statistics to display")
+        self.setWindowTitle("Statistics")
+        self.setModal(True)
+
 
         regextime = QRegExp(r"^[0-9]{1,2}:[0-9]{1,2}$")
 
         self.time = QCheckBox("Time")
         self.bar = QCheckBox("Bar")
-        self.flavor = QCheckBox("Flavor")
-        self.area = QCheckBox("Text data")
+        self.flavor = QCheckBox("Evaluation")
+        self.area = QCheckBox("Characteristics")
         
         self.mindryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))        
         self.maxdryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[1]))        
@@ -5005,10 +5289,9 @@ class StatisticsDLG(QDialog):
         self.minfinishedit.setValidator(QRegExpValidator(regextime,self))
         self.maxfinishedit.setValidator(QRegExpValidator(regextime,self))
 
-        drylabel =QLabel("Dry phase:")
-        midlabel =QLabel("Mid phase:")
-        finishlabel =QLabel("Finish phase:")
-        flavor = QLabel("Set Flavor Conditions")
+        drylabel =QLabel("Dry")
+        midlabel =QLabel("Mid")
+        finishlabel =QLabel("Finish")
         minf = QLabel("Min")
         maxf = QLabel("Max")
 
@@ -5020,45 +5303,69 @@ class StatisticsDLG(QDialog):
             self.flavor.setChecked(True)
         if aw.qmc.statisticsflags[3]:
             self.area.setChecked(True)
+            
+        self.connect(self.time,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,0)) 
+        self.connect(self.bar,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,1)) 
+        self.connect(self.flavor,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,2)) 
+        self.connect(self.area,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,3)) 
+
 
         okButton = QPushButton("OK")
-        cancelButton = QPushButton("Cancel")
-        resetButton = QPushButton("Reset to Default")
+        resetButton = QPushButton("Defaults")
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
-        self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))   
         self.connect(resetButton, SIGNAL("clicked()"),self.initialsettings)   
         
+        flagsLayout = QGridLayout()
+        flagsLayout.addWidget(self.time,0,0)
+        flagsLayout.addWidget(self.bar,0,1)
+        flagsLayout.addWidget(self.flavor,0,2)
+        flagsLayout.addWidget(self.area,0,3)
+        
         layout = QGridLayout()
-        layout.addWidget(self.time,0,0)
-        layout.addWidget(self.bar,0,1)
-        layout.addWidget(self.flavor,1,0)
-        layout.addWidget(self.area,1,1)
+        layout.addWidget(minf,0,1)
+        layout.addWidget(maxf,0,2)
 
-        layout.addWidget(flavor,2,0)
-        layout.addWidget(minf,2,1)
-        layout.addWidget(maxf,2,2)
+        layout.addWidget(drylabel,1,0,Qt.AlignRight)
+        layout.addWidget(self.mindryedit,1,1)
+        layout.addWidget(self.maxdryedit,1,2)
+        layout.addWidget(midlabel,2,0,Qt.AlignRight)
+        layout.addWidget(self.minmidedit,2,1)
+        layout.addWidget(self.maxmidedit,2,2)
+        layout.addWidget(finishlabel,3,0,Qt.AlignRight)
+        layout.addWidget(self.minfinishedit,3,1)
+        layout.addWidget(self.maxfinishedit,3,2)
         
+        resetButton.setFocusPolicy(Qt.NoFocus)
+        
+        eventsGroupLayout = QGroupBox("Evaluation")
+        eventsGroupLayout.setLayout(layout)
+        
+        displayGroupLayout = QGroupBox("Display")
+        displayGroupLayout.setLayout(flagsLayout)
+        
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addWidget(resetButton)
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(okButton)
+                
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(displayGroupLayout)
+        mainLayout.addWidget(eventsGroupLayout)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonsLayout)
+        
+        self.setLayout(mainLayout)        
 
-        layout.addWidget(drylabel,3,0)
-        layout.addWidget(self.mindryedit,3,1)
-        layout.addWidget(self.maxdryedit,3,2)
-        layout.addWidget(midlabel,4,0)
-        layout.addWidget(self.minmidedit,4,1)
-        layout.addWidget(self.maxmidedit,4,2)
-        layout.addWidget(finishlabel,5,0)
-        layout.addWidget(self.minfinishedit,5,1)
-        layout.addWidget(self.maxfinishedit,5,2)
         
-        layout.addWidget(resetButton,6,0)
-        layout.addWidget(cancelButton,6,1)
-        layout.addWidget(okButton,6,2)
-        
-        self.setLayout(layout)        
+    def changeStatisticsflag(self,value,i):
+        aw.qmc.statisticsflags[i] = value
+        aw.qmc.redraw()
 
+            
     def initialsettings(self):
         aw.qmc.statisticsconditions = [180,360,180,600,180,360]        
         self.close()
-        aw.showstatisticsdlg()
+        aw.showstatistics()
 
     def accept(self):
 
@@ -5552,14 +5859,16 @@ class serialport(object):
 class comportDlg(QDialog):
     def __init__(self, parent = None):
         super(comportDlg,self).__init__(parent)
+              
+        self.setModal(True)
 
-        comportlabel =QLabel("&Comm Port:")
+        comportlabel =QLabel("Comm Port")
         self.comportEdit = QComboBox()
         self.comportEdit.addItems([aw.ser.comport])
         self.comportEdit.setEditable(True)
         comportlabel.setBuddy(self.comportEdit)
         
-        baudratelabel = QLabel("&Baud Rate:")
+        baudratelabel = QLabel("Baud Rate")
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
         self.baudrateComboBox.addItems(["2400","9600","19200"])
@@ -5572,7 +5881,7 @@ class comportDlg(QDialog):
         else:
             pass
                    
-        bytesizelabel = QLabel("&Byte Size:")
+        bytesizelabel = QLabel("Byte Size")
         self.bytesizeComboBox = QComboBox()
         bytesizelabel.setBuddy(self.bytesizeComboBox)
         self.bytesizeComboBox.addItems(["8","7"])
@@ -5583,7 +5892,7 @@ class comportDlg(QDialog):
         else:
             pass
 
-        paritylabel = QLabel("&Parity:")
+        paritylabel = QLabel("Parity")
         self.parityComboBox = QComboBox()
         paritylabel.setBuddy(self.parityComboBox)
         self.parityComboBox.addItems(["O","E","N"])
@@ -5597,7 +5906,7 @@ class comportDlg(QDialog):
             pass
 
         
-        stopbitslabel = QLabel("&Stopbits:")
+        stopbitslabel = QLabel("Stopbits")
         self.stopbitsComboBox = QComboBox()
         stopbitslabel.setBuddy(self.stopbitsComboBox)
         self.stopbitsComboBox.addItems(["1","0","2"])
@@ -5610,7 +5919,7 @@ class comportDlg(QDialog):
         else:
             pass
         
-        timeoutlabel = QLabel("Timeout:")
+        timeoutlabel = QLabel("Timeout")
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
         regex = QRegExp(r"^[0-9]$")
         self.timeoutEdit.setValidator(QRegExpValidator(regex,self))
@@ -5619,36 +5928,48 @@ class comportDlg(QDialog):
         
         okButton = QPushButton("&OK")
         cancelButton = QPushButton("Cancel")
+        cancelButton.setFocusPolicy(Qt.NoFocus)
         scanButton = QPushButton("Scan for Ports")
+        scanButton.setFocusPolicy(Qt.NoFocus)
         
-        buttonLayout = QGridLayout()
-        buttonLayout.addWidget(scanButton,0,0)
-        buttonLayout.addWidget(okButton,1,0)
-        buttonLayout.addWidget(cancelButton,1,1)
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(scanButton)
+        buttonLayout.addStretch()  
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
 
 
         grid = QGridLayout()
-        grid.addWidget(comportlabel,0,0)
+        grid.addWidget(comportlabel,0,0,Qt.AlignRight)
         grid.addWidget(self.comportEdit,0,1)
-        grid.addWidget(baudratelabel,1,0)
+        grid.addWidget(baudratelabel,1,0,Qt.AlignRight)
         grid.addWidget(self.baudrateComboBox,1,1)
-        grid.addWidget(bytesizelabel,2,0)
+        grid.addWidget(bytesizelabel,2,0,Qt.AlignRight)
         grid.addWidget(self.bytesizeComboBox,2,1)
-        grid.addWidget(paritylabel,3,0)
+        grid.addWidget(paritylabel,3,0,Qt.AlignRight)
         grid.addWidget(self.parityComboBox,3,1)
-        grid.addWidget(stopbitslabel,4,0)
+        grid.addWidget(stopbitslabel,4,0,Qt.AlignRight)
         grid.addWidget(self.stopbitsComboBox,4,1)
-        grid.addWidget(timeoutlabel,5,0)
+        grid.addWidget(timeoutlabel,5,0,Qt.AlignRight)
         grid.addWidget(self.timeoutEdit,5,1)
         grid.addWidget(self.messagelabel,6,1)
         
-        grid.addLayout(buttonLayout,7,1)
-        self.setLayout(grid)
+        gridBoxLayout = QHBoxLayout()
+        gridBoxLayout.addLayout(grid)
+        gridBoxLayout.addStretch()  
+        
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(gridBoxLayout)
+        mainLayout.addStretch()  
+        mainLayout.addLayout(buttonLayout)
+
+        self.setLayout(mainLayout)
 
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)
-        self.setWindowTitle("Serial Communication Configuration")
+        self.setWindowTitle("Serial Port Settings")
 
     def accept(self):
         #validate serial parameter against input errors
@@ -5747,13 +6068,14 @@ class comportDlg(QDialog):
 class DeviceAssignmentDLG(QDialog):       
     def __init__(self, parent = None):
         super(DeviceAssignmentDLG,self).__init__(parent)
+        
+        self.setModal(True)
 
         self.nonpidButton = QRadioButton("Device")
         self.pidButton = QRadioButton("PID")
 
         self.devicetypeComboBox = QComboBox()
         self.devicetypeComboBox.addItems(["Omega HH806AU",
-                                          "Omega HH802U",
                                           "Omega HH506RA",
                                           "CENTER 309",
                                           "CENTER 306",
@@ -5767,19 +6089,20 @@ class DeviceAssignmentDLG(QDialog):
                                           "VOLTCRAFT K202",
                                           "VOLTCRAFT 300K",
                                           "VOLTCRAFT 302KJ",
-                                          "EXTECH 421509"
+                                          "EXTECH 421509",
+                                          "Omega HH802U"
                                           ])
         
-        controllabel =QLabel("Control PID for ET:")                            
+        controllabel =QLabel("Control ET")                            
         self.controlpidtypeComboBox = QComboBox()
         self.controlpidunitidComboBox = QComboBox()
         self.controlpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR"])
         self.controlpidunitidComboBox.addItems(["1","2"])
 
-        label1 = QLabel("PID type") 
-        label2 = QLabel("Unit ID number")
+        label1 = QLabel("Type") 
+        label2 = QLabel("Unit ID")
 
-        btlabel =QLabel("PID to read BT:")                            
+        btlabel =QLabel("Read BT")                            
         self.btpidtypeComboBox = QComboBox()
         self.btpidunitidComboBox = QComboBox()
         self.btpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR"])
@@ -5813,6 +6136,7 @@ class DeviceAssignmentDLG(QDialog):
 
         okButton = QPushButton("OK")
         cancelButton = QPushButton("Cancel")
+        cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
 
@@ -5824,21 +6148,43 @@ class DeviceAssignmentDLG(QDialog):
         grid.addWidget(self.devicetypeComboBox,0,1)
         
         grid.addWidget(self.pidButton,2,0)
-        
-        grid.addWidget(label1,3,1)
-        grid.addWidget(label2,3,2)
-        grid.addWidget(controllabel,4,0)
-        grid.addWidget(self.controlpidtypeComboBox,4,1)
-        grid.addWidget(self.controlpidunitidComboBox,4,2)
-                                   
-        grid.addWidget(btlabel,5,0)
-        grid.addWidget(self.btpidtypeComboBox,5,1)
-        grid.addWidget(self.btpidunitidComboBox,5,2)
 
-        grid.addWidget(okButton,6,2)
-        grid.addWidget(cancelButton,6,1)
+        gridBox = QHBoxLayout()
+        gridBox.addLayout(grid)
+        gridBox.addStretch()
         
-        self.setLayout(grid)
+        PIDgrid = QGridLayout()
+
+        PIDgrid.addWidget(label1,0,1)
+        PIDgrid.addWidget(label2,0,2)
+        PIDgrid.addWidget(controllabel,1,0,Qt.AlignRight)
+        PIDgrid.addWidget(self.controlpidtypeComboBox,1,1)
+        PIDgrid.addWidget(self.controlpidunitidComboBox,1,2)
+                                   
+        PIDgrid.addWidget(btlabel,2,0,Qt.AlignRight)
+        PIDgrid.addWidget(self.btpidtypeComboBox,2,1)
+        PIDgrid.addWidget(self.btpidunitidComboBox,2,2)
+        
+        PIDBox = QHBoxLayout()
+        PIDBox.addLayout(PIDgrid)
+        PIDBox.addStretch()
+        
+        PIDGroupLayout = QGroupBox("PID")
+        PIDGroupLayout.setLayout(PIDBox)
+        
+        
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()  
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
+        
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(gridBox)
+        mainLayout.addWidget(PIDGroupLayout)
+        mainLayout.addStretch()  
+        mainLayout.addLayout(buttonLayout)
+        
+        self.setLayout(mainLayout)
 
 
 
@@ -5889,16 +6235,6 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = "Device set to " + meter + ". Now, chose serial port"
-                                
-            elif meter == "Omega HH802U":
-                aw.qmc.device = 1
-                aw.ser.comport = "COM11"
-                aw.ser.baudrate = 19200
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'E'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = "Device set to " + meter + ", which is equivalent to Omega HH806AU. Now, chose serial port"
 
             elif meter == "Omega HH506RA":
                 aw.qmc.device = 2
@@ -6039,6 +6375,16 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = "Device set to EXTECH 421509, which is equivalent to Omega HH506RA. Now, chose serial port"
+                                
+            elif meter == "Omega HH802U":
+                aw.qmc.device = 16
+                aw.ser.comport = "COM11"
+                aw.ser.baudrate = 19200
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'E'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to " + meter + ", which is equivalent to Omega HH806AU. Now, chose serial port"
 
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
@@ -6059,138 +6405,165 @@ class DeviceAssignmentDLG(QDialog):
 class graphColorDlg(QDialog):
     def __init__(self, parent = None):
         super(graphColorDlg,self).__init__(parent)
-        self.setWindowTitle("Graph colors")
+        self.setWindowTitle("Colors")
         frameStyle = QFrame.Sunken | QFrame.Panel
 
-        self.backgroundLabel =QLabel(aw.qmc.palette["background"])
+        self.backgroundLabel = QLabel(aw.qmc.palette["background"])
         self.backgroundLabel.setPalette(QPalette(QColor(aw.qmc.palette["background"])))
         self.backgroundLabel.setAutoFillBackground(True)
         self.backgroundButton = QPushButton("Background")
+        self.backgroundButton.setFocusPolicy(Qt.NoFocus)
         self.backgroundLabel.setFrameStyle(frameStyle)
-        self.connect(self.backgroundButton, SIGNAL("clicked()"), lambda var=self.backgroundLabel,color=aw.qmc.palette["background"]: self.setColor(var,color))
+        self.connect(self.backgroundButton, SIGNAL("clicked()"), lambda var=self.backgroundLabel,color="background": self.setColor("Background",var,color))
 
         
         self.gridLabel =QLabel(aw.qmc.palette["grid"])
         self.gridLabel.setPalette(QPalette(QColor(aw.qmc.palette["grid"])))
         self.gridLabel.setAutoFillBackground(True)
         self.gridButton = QPushButton("Grid")
+        self.gridButton.setFocusPolicy(Qt.NoFocus)
         self.gridLabel.setFrameStyle(frameStyle)
-        self.connect(self.gridButton, SIGNAL("clicked()"), lambda var=self.gridLabel, color= aw.qmc.palette["grid"]: self.setColor(var,color))
+        self.connect(self.gridButton, SIGNAL("clicked()"), lambda var=self.gridLabel, color= "grid": self.setColor("Grid",var,color))
 
 
         self.titleLabel =QLabel(aw.qmc.palette["title"])
         self.titleLabel.setPalette(QPalette(QColor(aw.qmc.palette["title"])))
         self.titleLabel.setAutoFillBackground(True)
         self.titleButton = QPushButton("Title")
+        self.titleButton.setFocusPolicy(Qt.NoFocus)
         self.titleLabel.setFrameStyle(frameStyle)
-        self.connect(self.titleButton, SIGNAL("clicked()"), lambda var=self.titleLabel,color=aw.qmc.palette["title"]: self.setColor(var,color))
+        self.connect(self.titleButton, SIGNAL("clicked()"), lambda var=self.titleLabel,color="title": self.setColor("Title",var,color))
         
         
         self.yLabel =QLabel(aw.qmc.palette["ylabel"])
         self.yLabel.setPalette(QPalette(QColor(aw.qmc.palette["ylabel"])))
         self.yLabel.setAutoFillBackground(True)
         self.yButton = QPushButton("Y Label")
+        self.yButton.setFocusPolicy(Qt.NoFocus)
         self.yLabel.setFrameStyle(frameStyle)
-        self.connect(self.yButton, SIGNAL("clicked()"), lambda var=self.yLabel,color=aw.qmc.palette["ylabel"]: self.setColor(var,color))
+        self.connect(self.yButton, SIGNAL("clicked()"), lambda var=self.yLabel,color="ylabel": self.setColor("Y Label",var,color))
 
         
         self.xLabel =QLabel(aw.qmc.palette["xlabel"])
         self.xLabel.setPalette(QPalette(QColor(aw.qmc.palette["xlabel"])))
         self.xLabel.setAutoFillBackground(True)
         self.xButton = QPushButton("X Label")
+        self.xButton.setFocusPolicy(Qt.NoFocus)
         self.xLabel.setFrameStyle(frameStyle)
-        self.connect(self.xButton, SIGNAL("clicked()"), lambda var=self.xLabel,color=aw.qmc.palette["xlabel"]: self.setColor(var,color))
+        self.connect(self.xButton, SIGNAL("clicked()"), lambda var=self.xLabel,color="xlabel": self.setColor("X Label",var,color))
 
         
         self.rect1Label =QLabel(aw.qmc.palette["rect1"])
         self.rect1Label.setPalette(QPalette(QColor(aw.qmc.palette["rect1"])))
         self.rect1Label.setAutoFillBackground(True)
-        self.rect1Button = QPushButton("Dry phase")
+        self.rect1Button = QPushButton("Dry Phase")
+        self.rect1Button.setFocusPolicy(Qt.NoFocus)
         self.rect1Label.setFrameStyle(frameStyle)
-        self.connect(self.rect1Button, SIGNAL("clicked()"), lambda var=self.rect1Label,color=aw.qmc.palette["rect1"]: self.setColor(var,color))
+        self.connect(self.rect1Button, SIGNAL("clicked()"), lambda var=self.rect1Label,color="rect1": self.setColor("Dry Phase",var,color))
 
         
         self.rect2Label =QLabel(aw.qmc.palette["rect2"])
         self.rect2Label.setPalette(QPalette(QColor(aw.qmc.palette["rect2"])))
         self.rect2Label.setAutoFillBackground(True)
-        self.rect2Button = QPushButton("Mid 1C phase")
+        self.rect2Button = QPushButton("Mid FC Phase")
+        self.rect2Button.setFocusPolicy(Qt.NoFocus)
         self.rect2Label.setFrameStyle(frameStyle)
-        self.connect(self.rect2Button, SIGNAL("clicked()"), lambda var=self.rect2Label,color=aw.qmc.palette["rect2"]: self.setColor(var,color))
+        self.connect(self.rect2Button, SIGNAL("clicked()"), lambda var=self.rect2Label,color="rect2": self.setColor("Mid FC Phase",var,color))
 
         
         self.rect3Label =QLabel(aw.qmc.palette["rect3"])
         self.rect3Label.setPalette(QPalette(QColor(aw.qmc.palette["rect3"])))
         self.rect3Label.setAutoFillBackground(True)
-        self.rect3Button = QPushButton("Finish phase")
+        self.rect3Button = QPushButton("Finish Phase")
+        self.rect3Button.setFocusPolicy(Qt.NoFocus)
         self.rect3Label.setFrameStyle(frameStyle)
-        self.connect(self.rect3Button, SIGNAL("clicked()"), lambda var=self.rect3Label,color=aw.qmc.palette["rect3"]: self.setColor(var,color))
+        self.connect(self.rect3Button, SIGNAL("clicked()"), lambda var=self.rect3Label,color="rect3": self.setColor("Finish Phase",var,color))
 
         
         self.metLabel =QLabel(aw.qmc.palette["met"])
         self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["met"])))
         self.metLabel.setAutoFillBackground(True)
-        self.metButton = QPushButton("MET")
+        self.metButton = QPushButton("ET")
+        self.metButton.setFocusPolicy(Qt.NoFocus)
         self.metLabel.setFrameStyle(frameStyle)
-        self.connect(self.metButton, SIGNAL("clicked()"), lambda var=self.metLabel,color=aw.qmc.palette["met"]: self.setColor(var,color))
+        self.connect(self.metButton, SIGNAL("clicked()"), lambda var=self.metLabel,color="met": self.setColor("ET",var,color))
 
         
         self.btLabel =QLabel(aw.qmc.palette["bt"])
         self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
         self.btLabel.setAutoFillBackground(True)
         self.btButton = QPushButton("BT")
+        self.btButton.setFocusPolicy(Qt.NoFocus)
         self.btLabel.setFrameStyle(frameStyle)
-        self.connect(self.btButton, SIGNAL("clicked()"), lambda var=self.btLabel,color=aw.qmc.palette["bt"]: self.setColor(var,color))
+        self.connect(self.btButton, SIGNAL("clicked()"), lambda var=self.btLabel,color="bt": self.setColor("BT",var,color))
 
         
         self.deltametLabel =QLabel(aw.qmc.palette["deltamet"])
         self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltamet"])))
         self.deltametLabel.setAutoFillBackground(True)
-        self.deltametButton = QPushButton("Delta MET")
+        self.deltametButton = QPushButton("DeltaET")
+        self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
-        self.connect(self.deltametButton, SIGNAL("clicked()"), lambda var=self.deltametLabel,color=aw.qmc.palette["deltamet"]: self.setColor(var,color))
+        self.connect(self.deltametButton, SIGNAL("clicked()"), lambda var=self.deltametLabel,color="deltamet": self.setColor("DeltaET",var,color))
 
         
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
         self.deltabtLabel.setAutoFillBackground(True)
-        self.deltabtButton = QPushButton("Delta BT")
+        self.deltabtButton = QPushButton("DeltaBT")
+        self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtLabel.setFrameStyle(frameStyle)
-        self.connect(self.deltabtButton, SIGNAL("clicked()"), lambda var=self.deltabtLabel,color=aw.qmc.palette["deltabt"]: self.setColor(var,color))
+        self.connect(self.deltabtButton, SIGNAL("clicked()"), lambda var=self.deltabtLabel,color="deltabt": self.setColor("DeltaBT",var,color))
 
         
         self.markersLabel =QLabel(aw.qmc.palette["markers"])
         self.markersLabel.setPalette(QPalette(QColor(aw.qmc.palette["markers"])))
         self.markersLabel.setAutoFillBackground(True)
         self.markersButton = QPushButton("Markers")
+        self.markersButton.setFocusPolicy(Qt.NoFocus)
         self.markersLabel.setFrameStyle(frameStyle)
-        self.connect(self.markersButton, SIGNAL("clicked()"), lambda var=self.markersLabel,color=aw.qmc.palette["markers"]: self.setColor(var,color))
+        self.connect(self.markersButton, SIGNAL("clicked()"), lambda var=self.markersLabel,color="markers": self.setColor("Markers",var,color))
 
         
         self.textLabel =QLabel(aw.qmc.palette["text"])
         self.textLabel.setPalette(QPalette(QColor(aw.qmc.palette["text"])))
         self.textLabel.setAutoFillBackground(True)
         self.textButton = QPushButton("Text")
+        self.textButton.setFocusPolicy(Qt.NoFocus)
         self.textLabel.setFrameStyle(frameStyle)
-        self.connect(self.textButton, SIGNAL("clicked()"), lambda var=self.textLabel,color=aw.qmc.palette["text"]: self.setColor(var,color))
+        self.connect(self.textButton, SIGNAL("clicked()"), lambda var=self.textLabel,color="text": self.setColor("Text",var,color))
 
         self.watermarksLabel =QLabel(aw.qmc.palette["watermarks"])
         self.watermarksLabel.setPalette(QPalette(QColor(aw.qmc.palette["watermarks"])))
         self.watermarksLabel.setAutoFillBackground(True)
         self.watermarksButton = QPushButton("Watermarks")
+        self.watermarksButton.setFocusPolicy(Qt.NoFocus)
         self.watermarksLabel.setFrameStyle(frameStyle)
-        self.connect(self.watermarksButton, SIGNAL("clicked()"), lambda var=self.watermarksLabel,color=aw.qmc.palette["watermarks"]: self.setColor(var,color))
+        self.connect(self.watermarksButton, SIGNAL("clicked()"), lambda var=self.watermarksLabel,color="watermarks": self.setColor("Watermarks",var,color))
         
         self.ClineLabel =QLabel(aw.qmc.palette["Cline"])
         self.ClineLabel.setPalette(QPalette(QColor(aw.qmc.palette["Cline"])))
         self.ClineLabel.setAutoFillBackground(True)
-        self.ClineButton = QPushButton("C lines")
+        self.ClineButton = QPushButton("C Lines")
+        self.ClineButton.setFocusPolicy(Qt.NoFocus)
         self.ClineLabel.setFrameStyle(frameStyle)
-        self.connect(self.ClineButton, SIGNAL("clicked()"), lambda var=self.ClineLabel,color=aw.qmc.palette["Cline"]: self.setColor(var,colorbbb))
+        self.connect(self.ClineButton, SIGNAL("clicked()"), lambda var=self.ClineLabel,color="Cline": self.setColor("C Lines",var,color))
 
-        okButton = QPushButton("Update Colors")
-        self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))        
+        okButton = QPushButton("OK")
+        self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))   
+
+        defaultsButton = QPushButton("Defaults")
+        defaultsButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(defaultsButton, SIGNAL("clicked()"),lambda x=1:self.recolor(x))   
+        
+        greyButton = QPushButton("Grey")
+        greyButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(greyButton, SIGNAL("clicked()"),lambda x=2:self.recolor(x))             
 
         grid = QGridLayout()
+        
+        grid.setColumnStretch(1,10)
+        grid.setColumnMinimumWidth(1,200)
 
         grid.addWidget(self.backgroundButton,0,0)                                          
         grid.addWidget(self.backgroundLabel,0,1)
@@ -6240,21 +6613,92 @@ class graphColorDlg(QDialog):
         
         grid.addWidget(self.ClineButton,15,0)
         grid.addWidget(self.ClineLabel,15,1)
+                
+                
+        defaultsLayout = QHBoxLayout()
+        defaultsLayout.addStretch()
+        defaultsLayout.addWidget(greyButton)
+        defaultsLayout.addWidget(defaultsButton)
         
-        grid.addWidget(okButton,16,1)
+        grid.addLayout(defaultsLayout,16,1)
+        
+        okLayout = QHBoxLayout()
+        okLayout.addWidget(defaultsButton)
+        okLayout.addWidget(greyButton)
+        okLayout.addStretch()
+        okLayout.addWidget(okButton)
 
-        self.setLayout(grid)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(grid)
+        mainLayout.addLayout(okLayout)
 
+
+        self.setLayout(mainLayout)
+        
+        
+    # adds a new event to the Dlg
+    def recolor(self, x):
+        aw.qmc.changeGColor(x)
+        
+        self.gridLabel.setText(aw.qmc.palette["grid"])
+        self.gridLabel.setPalette(QPalette(QColor(aw.qmc.palette["grid"])))
+        
+        self.backgroundLabel.setText(aw.qmc.palette["background"])
+        self.backgroundLabel.setPalette(QPalette(QColor(aw.qmc.palette["background"])))
+
+        self.titleLabel.setText(aw.qmc.palette["title"])
+        self.titleLabel.setPalette(QPalette(QColor(aw.qmc.palette["title"])))
+        
+        self.yLabel.setText(aw.qmc.palette["ylabel"])
+        self.yLabel.setPalette(QPalette(QColor(aw.qmc.palette["ylabel"])))
+        
+        self.xLabel.setText(aw.qmc.palette["xlabel"])
+        self.xLabel.setPalette(QPalette(QColor(aw.qmc.palette["xlabel"])))
+        
+        self.rect1Label.setText(aw.qmc.palette["rect1"])
+        self.rect1Label.setPalette(QPalette(QColor(aw.qmc.palette["rect1"])))
+        
+        self.rect2Label.setText(aw.qmc.palette["rect2"])
+        self.rect2Label.setPalette(QPalette(QColor(aw.qmc.palette["rect2"])))
+        
+        self.rect3Label.setText(aw.qmc.palette["rect3"])
+        self.rect3Label.setPalette(QPalette(QColor(aw.qmc.palette["rect3"])))
+        
+        self.metLabel.setText(aw.qmc.palette["met"])
+        self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["met"])))
+        
+        self.btLabel.setText(aw.qmc.palette["bt"])
+        self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
+        
+        self.deltametLabel.setText(aw.qmc.palette["deltamet"])
+        self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltamet"])))
+        
+        self.deltabtLabel.setText(aw.qmc.palette["deltabt"])
+        self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
+        
+        self.markersLabel.setText(aw.qmc.palette["markers"])
+        self.markersLabel.setPalette(QPalette(QColor(aw.qmc.palette["markers"])))
+        
+        self.textLabel.setText(aw.qmc.palette["text"])
+        self.textLabel.setPalette(QPalette(QColor(aw.qmc.palette["text"])))
+
+        self.watermarksLabel.setText(aw.qmc.palette["watermarks"])
+        self.watermarksLabel.setPalette(QPalette(QColor(aw.qmc.palette["watermarks"])))
+        
+        self.ClineLabel.setText(aw.qmc.palette["Cline"])
+        self.ClineLabel.setPalette(QPalette(QColor(aw.qmc.palette["Cline"])))
                         
-    def setColor(self,var,color):
-        labelcolor = QColor(color)
+    def setColor(self,title,var,color):
+        labelcolor = QColor(aw.qmc.palette[color])
         colorf = QColorDialog.getColor(labelcolor,self)
         if colorf.isValid(): 
+            aw.qmc.palette[color] = unicode(colorf.name())
             var.setText(colorf.name())
             var.setPalette(QPalette(colorf))
-            var.setAutoFillBackground(True)
-        else:
-            aw.messagelabel.setText(str(color) + " " + str(labelcolor))
+            var.setAutoFillBackground(True)            
+            aw.qmc.fig.canvas.redraw()
+            aw.messagelabel.setText("Color of " + title + " set to " + str(aw.qmc.palette[color]))
+
 
 
             
@@ -8457,7 +8901,9 @@ if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
 aw = ApplicationWindow()
 aw.show()
-app.exec_()
+#the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
+with numpy.errstate(invalid='ignore'):
+    app.exec_()
 
 ##############################################################################################################################################
 ##############################################################################################################################################
