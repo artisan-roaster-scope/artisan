@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+ #!/usr/bin/env python
 #
 # version 00002: readjust length graph on the fly + display digital readouts + cosmetic changes
 # version 00003: added buttons + knob.
@@ -253,9 +253,12 @@ class tgraphcanvas(FigureCanvas):
         self.cuppingnotes = u""
         self.roastdate = QDate.currentDate()
         self.beans = u""
+
+        #flags to show projections, draw Delta ET, and draw Delta BT        
         self.projectFlag = False
-        self.DeltaETflag = True
-        self.DeltaBTflag = True
+        self.DeltaETflag = 0
+        self.DeltaBTflag = 0
+        
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight = [0,0,u"g"]
         
@@ -405,8 +408,11 @@ class tgraphcanvas(FigureCanvas):
             # update lines data using the lists with new data
             self.l_temp1.set_data(self.timex, self.temp1)
             self.l_temp2.set_data(self.timex, self.temp2)
-            self.l_delta1.set_data(self.timex, self.delta1)
-            self.l_delta2.set_data(self.timex, self.delta2)
+
+            if self.DeltaETflag:
+                self.l_delta1.set_data(self.timex, self.delta1)
+            if self.DeltaBTflag:
+                self.l_delta2.set_data(self.timex, self.delta2)
 
             #readjust xlimit of plot if needed
             if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds  
@@ -442,16 +448,27 @@ class tgraphcanvas(FigureCanvas):
 
 
     def toggleHUD(self):
+        #OFF
         if self.HUDflag:
             self.viewProjection()
             self.HUDflag = False
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.stack.setCurrentIndex(0)
-            self.ax.lines = self.ax.lines[0:5]
-            aw.messagelabel.setText(u"HUD OFF")       
-
+            count = 3
+            if self.DeltaETflag:
+                count += 1
+            if self.DeltaBTflag:
+                count += 1
+            self.ax.lines = self.ax.lines[0:count]
+            aw.messagelabel.setText(u"HUD OFF")
+            
+        #ON
         else:
             if len(self.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
+                #load
+                img = QPixmap().grabWidget(self)
+                aw.HUD.setPixmap(img)
+                
                 self.HUDflag = True
                 aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
                 aw.stack.setCurrentIndex(1)
@@ -490,16 +507,16 @@ class tgraphcanvas(FigureCanvas):
             BTreachTime = -1
             
         if ETreachTime > 0 and ETreachTime < 5940:
-            stringET = u"[ " + self.stringfromseconds(int(ETreachTime)) + u" to reach ET target " + unicode(self.ETtarget) + self.mode +  u" ] "
+            stringET =  self.stringfromseconds(int(ETreachTime)) + u" to reach ET target " + unicode(self.ETtarget) + self.mode
         else:
-            stringET = u"[ XX:XX to reach ET target " + unicode(self.ETtarget) + self.mode +  u" ] "
+            stringET = u"XX:XX to reach ET target " + unicode(self.ETtarget) + self.mode
             
         if BTreachTime > 0 and BTreachTime < 5940:    
-            stringBT = u"[ " + self.stringfromseconds(int(BTreachTime)) + u" to reach BT target " + unicode(self.BTtarget) + self.mode + u" ] "
+            stringBT =  self.stringfromseconds(int(BTreachTime)) + u" to reach BT target " + unicode(self.BTtarget) + self.mode 
         else:
-            stringBT = u"[ XX:XX to reach BT target " + unicode(self.BTtarget) + self.mode + u" ] "
+            stringBT = u"XX:XX to reach BT target " + unicode(self.BTtarget) + self.mode
 
-        return stringET + stringBT
+        return stringET, stringBT
 
 
     #finds time, ET and BT when using Fuji PID
@@ -689,8 +706,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_6.setDisabled(False)
         aw.button_7.setDisabled(False)
         aw.button_8.setDisabled(False)
-        aw.button_9.setDisabled(False)
-        
+        aw.button_9.setDisabled(False)        
         aw.button_1.setFlat(False)
         aw.button_2.setFlat(False)
         aw.button_3.setFlat(False)
@@ -717,8 +733,6 @@ class tgraphcanvas(FigureCanvas):
 
         #restart() clock 
         self.timeclock.restart()
-        
-        aw.settingsLoad()
         
         self.redraw()
 
@@ -828,6 +842,7 @@ class tgraphcanvas(FigureCanvas):
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
 
             #END of Background
+
             
         #populate delta BT (self.delta2) and delta MET (self.delta1)
         self.delta1,self.delta2,d1,d2=[],[],[],[]
@@ -844,12 +859,23 @@ class tgraphcanvas(FigureCanvas):
             self.delta2.append(d2)
 
         ##### DeltaET,DeltaBT curves
-        self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2)
-        self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2)
+        if self.DeltaETflag:
+            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2)
+        if self.DeltaBTflag:
+            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2)
         
-        handles = [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2] # for leyend
-        labels = [u"ET",u"BT",u"DeltaET",u"DeltaBT"]                          # for leyend
-        
+        handles = [self.l_temp1,self.l_temp2]
+        labels = [u"ET",u"BT"]
+
+        #add Rate of Change if flags are True
+        if  self.DeltaETflag:
+            handles.append(self.l_delta1)
+            labels.append(u"DeltaET")
+            
+        if  self.DeltaBTflag:
+            handles.append(self.l_delta2)
+            labels.append(u"DeltaBT")
+                    
         #write legend
         self.ax.legend(handles,labels,loc=2,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
     
@@ -1262,7 +1288,7 @@ class tgraphcanvas(FigureCanvas):
         self.flagon = True
         aw.messagelabel.setText(u"Scope recording...")     
         aw.button_1.setDisabled(True)                     #button ON
-        aw.button_1.setStyleSheet("QPushButton { background-color: #c4ff00}")
+        aw.button_1.setStyleSheet("QPushButton { background-color: #88ff18}")
         
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
@@ -1741,8 +1767,6 @@ class ApplicationWindow(QMainWindow):
         #create a Label object to display program status information
         self.messagelabel = QLabel()
         
-        
-
         #create START STOP buttons        
         self.button_1 = QPushButton("ON")
         self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
@@ -1790,7 +1814,7 @@ class ApplicationWindow(QMainWindow):
         #create RESET button
         self.button_7 = QPushButton("RESET")
         self.button_7.setStyleSheet("QPushButton { background-color: white }")
-        self.button_7.setMaximumSize(90, 40)
+        self.button_7.setMaximumSize(90, 45)
         self.button_7.setToolTip("<font color=red size=2><b>" + "Reset graphs and time" + "</font></b>")
         self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset_and_redraw)
 
@@ -1813,7 +1837,7 @@ class ApplicationWindow(QMainWindow):
         #create PID control button
         self.button_10 = QPushButton("PID")
         self.button_10.setStyleSheet("QPushButton { background-color: '#92C3FF'}")
-        self.button_10.setMaximumSize(90, 40)
+        self.button_10.setMaximumSize(90, 45)
         self.connect(self.button_10, SIGNAL("clicked()"), self.PIDcontrol)        
 
         #create Event record button
@@ -1828,31 +1852,31 @@ class ApplicationWindow(QMainWindow):
         self.button_12.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_12.setMaximumSize(90, 50)
         self.button_12.setMinimumHeight(50)
-        #self.connect(self.button_12, SIGNAL("clicked()"), )
+
         #create PID+10 button
         self.button_13 = QPushButton("SV +10")
         self.button_13.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_13.setMaximumSize(90, 50)
         self.button_13.setMinimumHeight(50)
-        #self.connect(self.button_13, SIGNAL("clicked()"),)
+
         #create PID+20 button
         self.button_14 = QPushButton("SV +20")
         self.button_14.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_14.setMaximumSize(90, 50)
         self.button_14.setMinimumHeight(50)
-        #self.connect(self.button_14, SIGNAL("clicked()"),)
+
         #create PID-20 button
         self.button_15 = QPushButton("SV -20")
         self.button_15.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_15.setMaximumSize(90, 50)
         self.button_15.setMinimumHeight(50)
-        #self.connect(self.button_15, SIGNAL("clicked()"),)
+
         #create PID-10 button
         self.button_16 = QPushButton("SV -10")
         self.button_16.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_16.setMaximumSize(90, 50)
         self.button_16.setMinimumHeight(50)
-        #self.connect(self.button_16, SIGNAL("clicked()"),)
+
         #create PID-5 button
         self.button_17 = QPushButton("SV -5")
         self.button_17.setStyleSheet("QPushButton { background-color: lightblue}")
@@ -1862,8 +1886,8 @@ class ApplicationWindow(QMainWindow):
         #create HUD button
         self.button_18 = QPushButton("HUD")
         self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
-        self.button_18.setMaximumSize(90, 40)
-
+        self.button_18.setMaximumSize(90, 45)
+        
         self.button_18.setToolTip("<font color=red size=2><b>" +"BT projection" + "</font></b>")
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
 
@@ -2151,6 +2175,7 @@ class ApplicationWindow(QMainWindow):
     def fileLoad(self):
         f = None
         old_mode = self.qmc.mode
+
         try:        
             filename = unicode(QFileDialog.getOpenFileName(self,"Load Profile",self.profilepath,"*.txt"))
             
@@ -2160,7 +2185,7 @@ class ApplicationWindow(QMainWindow):
             stream = QTextStream(f)
             
             self.qmc.reset()
-                
+
             firstChar = stream.read(1)
             if firstChar == "{":            
                 f.close()
@@ -2174,21 +2199,20 @@ class ApplicationWindow(QMainWindow):
                 line = stream.readLine().trimmed()
                 self.qmc.mode = unicode(line)        
     
-    
-                
                 line = stream.readLine()
                 if not line.startsWith(u"[[STARTEND]]"):
                     raise ValueError, u" Invalid Artisan file format: STARTEND tag missing"
-    
+
                 #Read second line with the STARTEND values
                 line = stream.readLine().trimmed()
                 parts = line.split(u"    ")
                 if parts.count() != 4:
                     raise ValueError, u"invalid STARTEND values"
                 else:
+                    self.qmc.startend = []
                     for i in range(4):
                         self.qmc.startend.append(float(parts[i]))
-    
+
                 #Read third line. CRACKS tag
                 line = stream.readLine().trimmed()                    
                 if not line.startsWith(u"[[CRACKS]]"):
@@ -2200,9 +2224,10 @@ class ApplicationWindow(QMainWindow):
                 if parts.count() != 8:
                     raise ValueError, u"invalid CRACK values"
                 else:
+                    self.qmc.varC = []
                     for i in range(8):
                         self.qmc.varC.append(float(parts[i]))
-    
+
                 #Read fith line. FLAVORS tag
                 line = stream.readLine().trimmed()                    
                 if not line.startsWith(u"[[FLAVORS]]"):
@@ -2214,6 +2239,7 @@ class ApplicationWindow(QMainWindow):
                 if parts.count() != 10:
                     raise ValueError, u"invalid FLAVOR values"
                 else:
+                    self.qmc.flavors = []
                     for i in range(10):
                         self.qmc.flavors.append(float(parts[i]))
                 #add 10th flavor to close the circle gap when drawing STAR graph
@@ -2227,7 +2253,7 @@ class ApplicationWindow(QMainWindow):
                 line = stream.readLine().trimmed()
                 parts = line.split(u";;;")
                 if parts.count() != 9:
-                    raise ValueError, u"Incorrect N flavors found"
+                    raise ValueError, u"Incorrect N flavors found"           
                 for i in range(9):
                     self.qmc.flavorlabels[i] = unicode(parts[i])
     
@@ -2298,6 +2324,7 @@ class ApplicationWindow(QMainWindow):
                 parts = line.split(u"    ")
                 eventn = parts.count()              #number of events
                 if unicode(parts[0]).isdigit():
+                    self.qmc.specialevents = []
                     for i in range(eventn):
                         self.qmc.specialevents.append(int(parts[i]))
                     #read events data
@@ -2344,6 +2371,7 @@ class ApplicationWindow(QMainWindow):
 
             aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
 
+
             #convert modes only if needed comparing the new uploaded mode to the old one.
             #otherwise it would incorrectly convert the uploaded phases
             if self.qmc.mode == u"F" and old_mode == "C":
@@ -2357,7 +2385,8 @@ class ApplicationWindow(QMainWindow):
 
             #change Title
             self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"], fontweight='bold')
-        
+
+
             #Plot everything
             self.qmc.redraw()
 
@@ -2772,8 +2801,8 @@ class ApplicationWindow(QMainWindow):
                     self.pid.PXG4[key][0] = settings.value(key,self.pid.PXG4[key][0]).toInt()[0]
             settings.endGroup()
             settings.beginGroup("RoC")
-            self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag)
-            self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaETflag)
+            self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toInt()[0]
+            self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toInt()[0]
             self.qmc.sensitivity = settings.value("Sensitivity",self.qmc.sensitivity).toInt()[0]
             settings.endGroup()
             settings.beginGroup("HUD")
@@ -3005,8 +3034,8 @@ $roasting_notes
 </td>
 </tr>
 <tr>
-<td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='$graph_image'/></td>
-<td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'/></td>
+<td style="vertical-align:middle" align="center"><img alt='roast graph' src='$graph_image'/></td>
+<td style="vertical-align:middle" align="center"><img alt='flavor graph' src='$flavor_image'/></td>
 </tr>
 <tr>
 <td><center><b>Events</b></center><br/>
@@ -3033,33 +3062,25 @@ $cupping_notes
         rates_of_changes = aw.RoR(TP_index,dryEndIndex)
         evaluations = aw.defect_estimation()        
         #print graph
-        self.qmc.redraw()   
-        if platf == u'Darwin':
-            graph_image = "artisan-graph.svg"
-            aw.qmc.fig.savefig(graph_image)
-        else:
-            #resize GRAPH image to 600 pixels width
-            tempFile = tempfile.TemporaryFile()
-            aw.qmc.fig.savefig(tempFile.name)
-            image = QImage(tempFile.name)
-            image = image.scaledToWidth(650,1)
-            #save GRAPH image
-            graph_image = "artisan-graph.png"
-            image.save(graph_image)
+        self.qmc.redraw()        
+        #resize GRAPH image to 600 pixels width
+        tempFile = tempfile.TemporaryFile()
+        aw.qmc.fig.savefig(tempFile.name)
+        image = QImage(tempFile.name)
+        image = image.scaledToWidth(600,1)
+        #save GRAPH image
+        graph_image = "artisan-graph.png"
+        image.save(graph_image)
         #obtain flavor chart image
         self.qmc.flavorchart()
-        if platf == u'Darwin':
-            flavor_image = "artisan-flavor.svg"
-            aw.qmc.fig.savefig(flavor_image)
-        else:
-            #resize FLAVOR image to 400 pixels width
-            tempFile = tempfile.TemporaryFile()
-            aw.qmc.fig.savefig(tempFile.name)
-            image = QImage(tempFile.name)
-            image = image.scaledToWidth(550,1)
-            #save GRAPH image
-            flavor_image = "artisan-flavor.png"
-            image.save(flavor_image)
+        #resize FLAVOR image to 400 pixels width
+        tempFile = tempfile.TemporaryFile()
+        aw.qmc.fig.savefig(tempFile.name)
+        image = QImage(tempFile.name)
+        image = image.scaledToWidth(500,1)
+        #save GRAPH image
+        flavor_image = "artisan-flavor.png"
+        image.save(flavor_image)
         weight_loss = aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1])
         #return screen to GRAPH profile mode
         self.qmc.redraw()
@@ -3547,12 +3568,10 @@ $cupping_notes
     def hudset(self):
         hudDl = HUDDlg(self)
         hudDl.show()
-
-################# WORK IN PROGRESS
         
     def showHUDmetrics(self):
         img = QPixmap().grabWidget(aw.qmc)
-        text = QString(self.qmc.getApprox())
+        text1,text2 = self.qmc.getApprox()
         Wwidth = aw.qmc.size().width()
         Wheight = aw.qmc.size().height()
         
@@ -3562,14 +3581,23 @@ $cupping_notes
         p.setFont(font)
         #Draw begins
         p.begin(self)
-        p.setOpacity(0.7)
+        p.setOpacity(0.2)
         p.setBrush(QBrush(QColor("grey")))
         p.drawRect(0,                       #p(x,)
                    Wheight - Wheight/4,     #p(,y)  
                    Wwidth,                  #size x
                    Wheight/4)               #size y
-        p.setPen(QColor("white"))
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),text)
+        
+        p.setOpacity(0.6)
+        p.setPen(QColor(self.qmc.palette["met"]))
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),QString(text1))
+        
+        p.setPen(QColor(self.qmc.palette["bt"]))
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8),QString(text2))
+        
+        p.setPen(QColor(self.qmc.palette["text"]))
+        delta = "ET - BT = " + "%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])
+        p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/6),QString(delta))        
 
         p.setOpacity(1.)
         p.setBrush(0) 
@@ -3579,11 +3607,9 @@ $cupping_notes
         p.end()
         
         self.HUD.setPixmap(img)
-
-################# WORK IN PROGRESS
         
     def showHUDthermal(self): 
-        img = QPixmap().grabWidget(aw.qmc)
+        img = QPixmap().grabWidget(aw.qmc)        
         p = QPainter(img)
         Wwidth= aw.qmc.size().width()
         Wheight = aw.qmc.size().height()
@@ -3602,13 +3628,12 @@ $cupping_notes
             BTradius = int(self.qmc.temp2[-1]/3)
         elif self.qmc.mode == "C" and self.qmc.temp1:
             ETradius = int(self.qmc.fromCtoF(self.qmc.temp1[-1]/3))
-            BTradius = int(self.qmc.fromCtoF(self.qmc.temp2[-1]/3))
+            BTradius = int(self.qmc.fromCtoF(self.qmc.temp2[-1]/3))            
         else:
             ETradius = 50
             BTradius = 50
-            
+    
         Tradius = 300
-
         p.setOpacity(0.5)
         
         g = QRadialGradient(Wwidth/2, Wheight/2, ETradius)
@@ -3617,7 +3642,7 @@ $cupping_notes
         g.setColorAt(0.0, QColor(240,255,beanbright) )  #bean center
         
         g.setColorAt(.5, Qt.yellow)
-        g.setColorAt(.8, Qt.red)     	
+        g.setColorAt(.8, Qt.red)
         g.setColorAt(1.,QColor("lightgrey"))
         p.setBrush(QBrush(g))
         #draw thermal circle
@@ -3662,26 +3687,31 @@ class HUDDlg(QDialog):
         BTLabel.setAlignment(Qt.AlignRight)        
         modeLabel = QLabel("Mode")
         modeLabel.setAlignment(Qt.AlignRight)
-        
+
+        #delta ET    
         self.DeltaET = QCheckBox("DeltaET")
         if aw.qmc.DeltaETflag == True:
             self.DeltaET.setChecked(True)
         else:
             self.DeltaET.setChecked(False)
+
+        #delta BT   
         self.DeltaBT = QCheckBox("DeltaBT")
         if aw.qmc.DeltaBTflag == True:
             self.DeltaBT.setChecked(True)
         else:
-            self.DeltaBT.setChecked(False)        
+            self.DeltaBT.setChecked(False)
+
+        #show projection
         self.projectCheck = QCheckBox("ET/BT Projection")
         if aw.qmc.projectFlag == True:
             self.projectCheck.setChecked(True)
         else:
             self.projectCheck.setChecked(False)
             
-        self.connect(self.DeltaET,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaET(i))
-        self.connect(self.DeltaBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaBT(i))
-        self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.changeProjection(i))
+        self.connect(self.DeltaET,SIGNAL("stateChanged(int)"),self.changeDeltaET)         #toggle
+        self.connect(self.DeltaBT,SIGNAL("stateChanged(int)"),self.changeDeltaBT)         #toggle
+        self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),self.changeProjection) #toggle
             
         self.sensitivityValues = map(str,range(10,0,-1))
         self.sensitivitylabel  = QLabel("Delta Sensitivity")                          
@@ -3755,16 +3785,25 @@ class HUDDlg(QDialog):
         
         self.setLayout(mainLayout)
         
-    def changeDeltaET(self,i):
-        aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
+    def changeDeltaET(self):
+        if aw.qmc.DeltaETflag:
+            aw.qmc.DeltaETflag = 0
+        else:
+            aw.qmc.DeltaETflag = 1
         aw.qmc.redraw()
         
-    def changeDeltaBT(self,i):
-        aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
+    def changeDeltaBT(self):
+        if aw.qmc.DeltaBTflag:
+            aw.qmc.DeltaBTflag = 0
+        else:
+            aw.qmc.DeltaBTflag = 1
         aw.qmc.redraw()
         
-    def changeProjection(self,i):
-        aw.qmc.projectFlag = not aw.qmc.projectFlag
+    def changeProjection(self):
+        if aw.qmc.projectFlag:
+            aw.qmc.projectFlag = 0
+        else:
+            aw.qmc.projectFlag = 1
         
     def changeSensitivity(self,i):
         aw.qmc.sensitivity = self.sensitivityString2Int(self.sensitivityValues[i])
@@ -3827,7 +3866,7 @@ class editGraphDlg(QDialog):
         #MARKERS
         chargelabel  = QLabel("<b>CHARGE</b>")
         chargelabel.setStyleSheet("background-color:'#f07800';")
-        
+
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.startend[0])))
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
@@ -5490,26 +5529,6 @@ class serialport(object):
             if serTX:
                 serTX.close()
 
-    # predicate that returns true if the given temperature reading is out of range
-    def outOfRange(self,t):
-        return t < -25 or t > 700
-        
-    # return -1 for probes not connected with output outside of range: -25 to 700 or 
-    # the previous values if available
-    def filterDropOuts(self,t1,t2):
-        r1 = t1
-        r2 = t2
-        if self.outOfRange(t1):
-            if len(aw.qmc.timex) > 2:
-                r1 = aw.qmc.temp1[-1]
-            else:
-                r1 = -1
-        if self.outOfRange(t2):
-            if len(aw.qmc.timex) > 2:
-                r2 = aw.qmc.temp2[-1]
-            else:
-                r2 = -1
-        return r1,r2
 
     #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
@@ -5529,7 +5548,10 @@ class serialport(object):
                 s2 = binascii.hexlify(r[10]+ r[11])
 
                 #we convert the strings to integers. Divide by 10.0 (decimal position)
-                return self.filterDropOuts(int(s1,16)/10, int(s2,16)/10.)
+                t1 = int(s1,16)/10. 
+                t2 = int(s2,16)/10. 
+
+                return t1, t2
             else:
                 aw.messagelabel.setText(u"No RX data from HH806AUtemperature()")
                 aw.qmc.errorlog.append(u"No RX data from HH806AUtemperature() ")
@@ -5544,7 +5566,8 @@ class serialport(object):
         finally:
             if serHH:
                 serHH.close()
-        
+
+
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
     def HH506RAtemperature(self):
@@ -5568,7 +5591,14 @@ class serialport(object):
 
             if len(r) == 14: 
                 #we convert the hex strings to integers. Divide by 10.0 (decimal position)
-                return self.filterDropOuts(int(r[1:5],16)/10., int(r[7:11],16)/10.)
+                t1 = int(r[1:5],16)/10.
+                t2 = int(r[7:11],16)/10.
+                # return -1 for probes not connected with output outside of range: -50 to 800F
+                if t1 < -50 or t1 > 800:
+                    t1 = -1
+                if t2 < -50 or t2 > 800:
+                    t2 = -1
+                return t1,t2
             
             else:
                 aw.messagelabel.setText(u"No RX data from HH506RAtemperature()")
