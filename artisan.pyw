@@ -470,7 +470,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.messagelabel.setText(u"Need some data for HUD to work")                
 
     def resetlines(self):
-        count = 2
+        count = 2 #ET + BT
         if self.DeltaETflag:
             count += 1
         if self.DeltaBTflag:
@@ -1748,7 +1748,7 @@ class ApplicationWindow(QMainWindow):
         self.stack.addWidget(self.HUD)        
         #self.stack.addWidget(self.profDesign)
 
-        self.stack.setCurrentIndex(2)
+        self.stack.setCurrentIndex(0)
         
         #create a serial port object
         self.ser = serialport()
@@ -1882,7 +1882,6 @@ class ApplicationWindow(QMainWindow):
         self.button_18 = QPushButton("HUD")
         self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
         self.button_18.setMaximumSize(90, 45)
-        self.button_18.setToolTip("<font color=red size=2><b>" +"BT projection" + "</font></b>")
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
 
         #connect PID sv easy buttons
