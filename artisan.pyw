@@ -2892,11 +2892,6 @@ class ApplicationWindow(QMainWindow):
         
         if image.isNull():
             return
-
-        if self.printer is None:
-            self.printer = QPrinter(QPrinter.HighResolution)
-            self.printer.setPageSize(QPrinter.Letter)
-
         if self.printer is None:
             self.printer = QPrinter(QPrinter.HighResolution)
             self.printer.setPageSize(QPrinter.Letter)
@@ -3032,8 +3027,8 @@ $roasting_notes
 </td>
 </tr>
 <tr>
-<td style="vertical-align:middle" align="center"><img alt='roast graph' src='$graph_image'/></td>
-<td style="vertical-align:middle" align="center"><img alt='flavor graph' src='$flavor_image'/></td>
+<td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='$graph_image'/></td>
+<td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'/></td>
 </tr>
 <tr>
 <td><center><b>Events</b></center><br/>
@@ -3060,25 +3055,33 @@ $cupping_notes
         rates_of_changes = aw.RoR(TP_index,dryEndIndex)
         evaluations = aw.defect_estimation()        
         #print graph
-        self.qmc.redraw()        
-        #resize GRAPH image to 600 pixels width
-        tempFile = tempfile.TemporaryFile()
-        aw.qmc.fig.savefig(tempFile.name)
-        image = QImage(tempFile.name)
-        image = image.scaledToWidth(600,1)
-        #save GRAPH image
-        graph_image = "artisan-graph.png"
-        image.save(graph_image)
+        self.qmc.redraw()   
+        if platf == u'Darwin':
+            graph_image = "artisan-graph.svg"
+            aw.qmc.fig.savefig(graph_image)
+        else:
+            #resize GRAPH image to 600 pixels width
+            tempFile = tempfile.TemporaryFile()
+            aw.qmc.fig.savefig(tempFile.name)
+            image = QImage(tempFile.name)
+            image = image.scaledToWidth(650,1)
+            #save GRAPH image
+            graph_image = "artisan-graph.png"
+            image.save(graph_image)
         #obtain flavor chart image
         self.qmc.flavorchart()
-        #resize FLAVOR image to 400 pixels width
-        tempFile = tempfile.TemporaryFile()
-        aw.qmc.fig.savefig(tempFile.name)
-        image = QImage(tempFile.name)
-        image = image.scaledToWidth(500,1)
-        #save GRAPH image
-        flavor_image = "artisan-flavor.png"
-        image.save(flavor_image)
+        if platf == u'Darwin':
+            flavor_image = "artisan-flavor.svg"
+            aw.qmc.fig.savefig(flavor_image)
+        else:
+            #resize FLAVOR image to 400 pixels width
+            tempFile = tempfile.TemporaryFile()
+            aw.qmc.fig.savefig(tempFile.name)
+            image = QImage(tempFile.name)
+            image = image.scaledToWidth(550,1)
+            #save GRAPH image
+            flavor_image = "artisan-flavor.png"
+            image.save(flavor_image)
         weight_loss = aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1])
         #return screen to GRAPH profile mode
         self.qmc.redraw()
@@ -5619,8 +5622,28 @@ class serialport(object):
             if serTX:
                 serTX.close()
 
+    # predicate that returns true if the given temperature reading is out of range
+    def outOfRange(self,t):
+        return t < -25 or t > 700
+        
+    # return -1 for probes not connected with output outside of range: -25 to 700 or 
+    # the previous values if available
+    def filterDropOuts(self,t1,t2):
+        r1 = t1
+        r2 = t2
+        if self.outOfRange(t1):
+            if len(aw.qmc.timex) > 2:
+                r1 = aw.qmc.temp1[-1]
+            else:
+                r1 = -1
+        if self.outOfRange(t2):
+            if len(aw.qmc.timex) > 2:
+                r2 = aw.qmc.temp2[-1]
+            else:
+                r2 = -1
+        return r1,r2
 
-    #t2 and t1 from Omega HH806 or HH802 meter 
+     #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
         serHH = None
         try:
@@ -5638,10 +5661,7 @@ class serialport(object):
                 s2 = binascii.hexlify(r[10]+ r[11])
 
                 #we convert the strings to integers. Divide by 10.0 (decimal position)
-                t1 = int(s1,16)/10. 
-                t2 = int(s2,16)/10. 
-
-                return t1, t2
+                return self.filterDropOuts(int(s1,16)/10, int(s2,16)/10.)
             else:
                 aw.messagelabel.setText(u"No RX data from HH806AUtemperature()")
                 aw.qmc.errorlog.append(u"No RX data from HH806AUtemperature() ")
@@ -5656,8 +5676,7 @@ class serialport(object):
         finally:
             if serHH:
                 serHH.close()
-
-
+        
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
     def HH506RAtemperature(self):
@@ -5681,14 +5700,7 @@ class serialport(object):
 
             if len(r) == 14: 
                 #we convert the hex strings to integers. Divide by 10.0 (decimal position)
-                t1 = int(r[1:5],16)/10.
-                t2 = int(r[7:11],16)/10.
-                # return -1 for probes not connected with output outside of range: -50 to 800F
-                if t1 < -50 or t1 > 800:
-                    t1 = -1
-                if t2 < -50 or t2 > 800:
-                    t2 = -1
-                return t1,t2
+                return self.filterDropOuts(int(r[1:5],16)/10., int(r[7:11],16)/10.)
             
             else:
                 aw.messagelabel.setText(u"No RX data from HH506RAtemperature()")
