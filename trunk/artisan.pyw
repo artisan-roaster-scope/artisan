@@ -125,6 +125,7 @@ from matplotlib.colors import cnames as cnames
 import matplotlib.patches as patches
 import matplotlib.transforms as transforms
 import matplotlib.font_manager as font_manager
+import matplotlib.path as mpath
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 
@@ -321,10 +322,7 @@ class tgraphcanvas(FigureCanvas):
         rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
                                   transform=trans, color=self.palette["rect3"],alpha=0.3)
         self.ax.add_patch(rect3)
-
-        # mark the base lines for DeltaBT
-        self.ax.axhline(y=50, linestyle = ':',color = self.palette["grid"])
-
+        
         self.delta1, self.delta2 = [],[]
 
         # generates first "empty" plot of temperature and deltaT
@@ -454,12 +452,7 @@ class tgraphcanvas(FigureCanvas):
             self.HUDflag = False
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.stack.setCurrentIndex(0)
-            count = 3
-            if self.DeltaETflag:
-                count += 1
-            if self.DeltaBTflag:
-                count += 1
-            self.ax.lines = self.ax.lines[0:count]
+            self.resetlines()
             aw.messagelabel.setText(u"HUD OFF")
             
         #ON
@@ -476,6 +469,15 @@ class tgraphcanvas(FigureCanvas):
             else:
                 aw.messagelabel.setText(u"Need some data for HUD to work")                
 
+    def resetlines(self):
+        count = 2
+        if self.DeltaETflag:
+            count += 1
+        if self.DeltaBTflag:
+            count += 1
+
+        self.ax.lines = self.ax.lines[0:count]
+
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
         #calculate the temperature endpoint at endofx acording to the latest rate of change
@@ -486,15 +488,14 @@ class tgraphcanvas(FigureCanvas):
                          linestyle = '-.', linewidth= 8, alpha = .3)
         self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"],
                          linestyle = '-.', linewidth= 8, alpha = .3)
-
+        
         #erase every three trigger events to make it look like a radar
         l,p = divmod(self.ProjCounter,3)
-        self.ProjCounter += 1
         if p == 0:
-            self.ax.lines = self.ax.lines[0:5]
-            self.ProjCounter = 1
+            self.resetlines()
+        self.ProjCounter += 1
 
-    def getApprox(self):
+    def getTargetTime(self):
         
         if self.rateofchange1 > 0:
             ETreachTime = (self.ETtarget - self.temp1[-1])/self.rateofchange1
@@ -505,18 +506,8 @@ class tgraphcanvas(FigureCanvas):
             BTreachTime = (self.BTtarget - self.temp2[-1])/self.rateofchange2
         else:
             BTreachTime = -1
-            
-        if ETreachTime > 0 and ETreachTime < 5940:
-            stringET =  self.stringfromseconds(int(ETreachTime)) + u" to reach ET target " + unicode(self.ETtarget) + self.mode
-        else:
-            stringET = u"XX:XX to reach ET target " + unicode(self.ETtarget) + self.mode
-            
-        if BTreachTime > 0 and BTreachTime < 5940:    
-            stringBT =  self.stringfromseconds(int(BTreachTime)) + u" to reach BT target " + unicode(self.BTtarget) + self.mode 
-        else:
-            stringBT = u"XX:XX to reach BT target " + unicode(self.BTtarget) + self.mode
 
-        return stringET, stringBT
+        return ETreachTime, BTreachTime
 
 
     #finds time, ET and BT when using Fuji PID
@@ -762,7 +753,6 @@ class tgraphcanvas(FigureCanvas):
         rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
                                   transform=trans, color=self.palette["rect3"],alpha=0.3)
         self.ax.add_patch(rect3)
-        self.ax.axhline(y=50, linestyle = ':',color = self.palette["grid"])
 
         ##### ET,BT curves
         self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2)
@@ -999,7 +989,7 @@ class tgraphcanvas(FigureCanvas):
                 seconds += 600*int(string[-5])
 
             if length > 5 and string[-6] != ":":
-                raise ValueError, u"invalid time format hh:mm:ss (: separators missing)"
+                raise ValueError, u"invalid time format hh:mm:ss (: separator missing)"
                 
             if length > 6 and string[-7].isdigit():
                 seconds += 3600*int(string[-7])
@@ -1270,11 +1260,9 @@ class tgraphcanvas(FigureCanvas):
             txt = u"%.2f" %score
 
             self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
-            
-            #not on Windows yet as there is a conflict between py2exe and matplotlib (go back to matplotlib 0.99.1)
-            if platf == u'Darwin':
-                #fill in between with color: needs matplotlib version 1.0+
-                self.ax1.fill_between(angles,0,self.flavors, facecolor='blue', alpha=0.1, interpolate=True)
+
+            #needs matplotlib 1.0.0+
+            self.ax1.fill_between(angles,0,self.flavors, facecolor='blue', alpha=0.1, interpolate=True)
                
             self.ax1.plot(angles,self.flavors)
             self.fig.canvas.draw()
@@ -1750,10 +1738,15 @@ class ApplicationWindow(QMainWindow):
         self.showHUD = [self.showHUDmetrics, self.showHUDthermal]
         #this holds the index of the HUD functions above
         self.HUDfunction = 0
+
+        #self.profDesign = profiledesigner(QWidget)
         
         self.stack = QStackedWidget()
         self.stack.addWidget(self.qmc)
         self.stack.addWidget(self.HUD)        
+        #self.stack.addWidget(self.profDesign)
+
+        self.stack.setCurrentIndex(2)
         
         #create a serial port object
         self.ser = serialport()
@@ -1882,12 +1875,11 @@ class ApplicationWindow(QMainWindow):
         self.button_17.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_17.setMaximumSize(90, 50)
         self.button_17.setMinimumHeight(50)
-
+        
         #create HUD button
         self.button_18 = QPushButton("HUD")
         self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
         self.button_18.setMaximumSize(90, 45)
-        
         self.button_18.setToolTip("<font color=red size=2><b>" +"BT projection" + "</font></b>")
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
 
@@ -2145,6 +2137,10 @@ class ApplicationWindow(QMainWindow):
         StatisticsAction = QAction("Statistics...",self)
         self.connect(StatisticsAction,SIGNAL("triggered()"),self.showstatistics)
         self.ConfMenu.addAction(StatisticsAction)     
+
+        WindowconfigAction = QAction("Window Config...",self)
+        self.connect(WindowconfigAction,SIGNAL("triggered()"),self.Windowconfig)
+        self.ConfMenu.addAction(WindowconfigAction) 
 
         hudAction = QAction("Extras...",self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
@@ -2562,7 +2558,8 @@ class ApplicationWindow(QMainWindow):
                 #CLOSE FILE
                 f.close()
 
-            message =  u"Background " + unicode(filename) + u" loaded successfully"
+            message =  u"Background " + unicode(filename) + u" loaded successfully "+unicode(self.qmc.stringfromseconds(self.qmc.startendB[2]))
+
             self.messagelabel.setText(message)
 
         except IOError,e:
@@ -3393,6 +3390,10 @@ $cupping_notes
     def showstatistics(self):
         dialog = StatisticsDLG(self)
         dialog.show()
+        
+    def Windowconfig(self):
+        dialog = WindowsDlg(self)
+        dialog.show()
 
     def calculator(self):
         dialog = calculatorDlg(self)
@@ -3570,8 +3571,20 @@ $cupping_notes
         hudDl.show()
         
     def showHUDmetrics(self):
+        ETreachTime,BTreachTime = self.qmc.getTargetTime()
+        
+        if ETreachTime > 0 and BTreachTime < 5940:
+            text1 =  self.qmc.stringfromseconds(int(ETreachTime)) + u" to reach ET target " + unicode(self.qmc.ETtarget) + self.qmc.mode
+        else:
+            text1 = u"xx:xx to reach ET target " + unicode(self.qmc.ETtarget) + self.qmc.mode
+            
+        if BTreachTime > 0 and BTreachTime < 5940:    
+            text2 =  self.qmc.stringfromseconds(int(BTreachTime)) + u" to reach BT target " + unicode(self.qmc.BTtarget) + self.qmc.mode 
+        else:
+            text2 = u"xx:xx to reach BT target " + unicode(self.qmc.BTtarget) + self.qmc.mode
+
         img = QPixmap().grabWidget(aw.qmc)
-        text1,text2 = self.qmc.getApprox()
+
         Wwidth = aw.qmc.size().width()
         Wheight = aw.qmc.size().height()
         
@@ -3800,8 +3813,12 @@ class HUDDlg(QDialog):
         aw.qmc.redraw()
         
     def changeProjection(self):
+        #turn off
         if aw.qmc.projectFlag:
             aw.qmc.projectFlag = 0
+            #erase old projections
+            aw.qmc.resetlines()            
+        #turn on
         else:
             aw.qmc.projectFlag = 1
         
@@ -3824,6 +3841,7 @@ class HUDDlg(QDialog):
         aw.qmc.DeltaBTflag = self.org_DeltaBT
         aw.qmc.sensitivity = self.org_Sensitivity
         aw.qmc.projectFlag = self.org_Projection
+        aw.qmc.resetlines()
         self.accept()
 
     def updatetargets(self):
@@ -3837,7 +3855,7 @@ class HUDDlg(QDialog):
             aw.qmc.projectFlag = True
         else:
             aw.qmc.projectFlag = False
-            aw.qmc.ax.lines = aw.qmc.ax.lines[0:5]
+            aw.qmc.resetlines()
             
         aw.qmc.ETtarget = int(unicode(self.ETlineEdit.text()))
         aw.qmc.BTtarget = int(unicode(self.BTlineEdit.text()))
@@ -3860,7 +3878,7 @@ class editGraphDlg(QDialog):
 
         self.setWindowTitle(u"Roast Properties")
 
-        regextime = QRegExp(r"^[0-9]{1,2}:[0-9]{1,2}$")
+        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
         regexweight = QRegExp(r"^[0-9]{1,3}[.0-9]{1,2}$")
 
         #MARKERS
@@ -4422,6 +4440,52 @@ class errorDlg(QDialog):
                                
         self.setLayout(layout)
 
+
+##########################################################################
+#####################  WINDOW PROPERTIES DLG  ############################
+##########################################################################
+        
+class WindowsDlg(QDialog):
+    def __init__(self, parent = None):
+        super(WindowsDlg,self).__init__(parent)
+        self.setWindowTitle("Window Properties")
+
+        ylimitLabel = QLabel("Y limit")
+        xlimitLabel = QLabel("X limit")
+        self.ylimitEdit = QLineEdit()
+        self.xlimitEdit = QLineEdit()
+        self.ylimitEdit.setValidator(QIntValidator(0, 1000, self.ylimitEdit))
+        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
+        self.xlimitEdit.setValidator(QRegExpValidator(regextime,self))
+
+        self.ylimitEdit.setText(unicode(aw.qmc.ylimit))
+        self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx))
+
+        okButton = QPushButton("OK")  
+        cancelButton = QPushButton("Cancel")
+
+        self.connect(cancelButton,SIGNAL("clicked()"),self.close)
+        self.connect(okButton,SIGNAL("clicked()"),self.updatewindow)
+        
+        layout = QGridLayout()
+        layout.addWidget(ylimitLabel,0,0)
+        layout.addWidget(self.ylimitEdit,0,1)
+        layout.addWidget(xlimitLabel,1,0)
+        layout.addWidget(self.xlimitEdit,1,1)
+        layout.addWidget(okButton,2,0)
+        layout.addWidget(cancelButton,2,1)
+        
+        self.setLayout(layout)
+
+    def updatewindow(self):
+        aw.qmc.ylimit = int(self.ylimitEdit.text())
+        aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))      
+        aw.qmc.redraw()
+        string = u"[ylimit = " + unicode(self.ylimitEdit.text()) + u"] [xlimit = " + unicode(self.xlimitEdit.text()) + u"]"
+        aw.messagelabel.setText(string)
+
+        self.close()
+
 ##########################################################################
 #####################  ROAST CALCULATOR DLG   ############################
 ##########################################################################
@@ -4441,7 +4505,7 @@ class calculatorDlg(QDialog):
         endlabel = QLabel("End (00:00)")
         self.startEdit = QLineEdit()
         self.endEdit = QLineEdit()
-        regextime = QRegExp(r"^[0-9]{1,2}:[0-9]{1,2}$")
+        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
         self.startEdit.setValidator(QRegExpValidator(regextime,self))
         self.endEdit.setValidator(QRegExpValidator(regextime,self))
         
@@ -5033,15 +5097,18 @@ class backgroundDLG(QDialog):
         delButton = QPushButton("Delete")
         delButton.setFocusPolicy(Qt.NoFocus)
         
-        cancelButton = QPushButton("OK")
+        cancelButton = QPushButton("Close")
         
         selectButton =QPushButton("Select Profile")
         selectButton.setFocusPolicy(Qt.NoFocus)
 
+        alignButton = QPushButton("Align")
+        alignButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(loadButton, SIGNAL("clicked()"),self.load)
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
         self.connect(selectButton, SIGNAL("clicked()"), self.selectpath)
+        self.connect(alignButton, SIGNAL("clicked()"), self.timealign)
 
         self.speedSpinBox = QSpinBox()
         self.speedSpinBox.setRange(10,90)
@@ -5149,6 +5216,7 @@ class backgroundDLG(QDialog):
 
         cancelButtonBoxed = QHBoxLayout()
         cancelButtonBoxed.addStretch()
+        cancelButtonBoxed.addWidget(alignButton)
         cancelButtonBoxed.addWidget(cancelButton)
         
         mainlayout = QVBoxLayout()
@@ -5157,6 +5225,17 @@ class backgroundDLG(QDialog):
         mainlayout.addLayout(cancelButtonBoxed)
         
         self.setLayout(mainlayout)
+
+    def timealign(self):
+        btime = aw.qmc.startendB[0]
+        ptime = aw.qmc.startend[0]
+        difference = ptime - btime
+        if difference > 0:
+           aw.qmc.movebackground("right",abs(difference))
+        elif difference < 0:
+           aw.qmc.movebackground("left",abs(difference))
+        
+        aw.qmc.redraw()
 
     def adjuststyle(self):
         
@@ -5306,8 +5385,7 @@ class StatisticsDLG(QDialog):
         self.setWindowTitle("Statistics")
         self.setModal(True)
 
-
-        regextime = QRegExp(r"^[0-9]{1,2}:[0-9]{1,2}$")
+        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
 
         self.time = QCheckBox("Time")
         self.bar = QCheckBox("Bar")
@@ -7290,6 +7368,80 @@ class PXRpidDlgControl(QDialog):
             self.status.showMessage(mssg,5000)        
             aw.qmc.errorlog.append(mssg)
 
+
+# UNDER WORK 
+#######################################################################################
+#################### PROFILE DESIGNER   ###############################################
+#######################################################################################
+
+class profiledesigner(FigureCanvas):
+    def __init__(self,parent):
+        self.fig = Figure(facecolor=u'lightgrey')
+        FigureCanvas.__init__(self, self.fig)
+
+        self.ax = self.fig.add_subplot(111, axisbg= aw.qmc.palette["background"])
+
+
+        #Set axes same as in __init__
+        self.ax.set_xlim(0, 1200)               #(0-20 mins)
+            
+        self.ax.grid(True,linewidth=2,color=aw.qmc.palette["grid"])
+        self.ax.set_ylabel(aw.qmc.mode,size=16,color =aw.qmc.palette["ylabel"])
+        self.ax.set_xlabel('Time',size=16,color = aw.qmc.palette["xlabel"])
+        self.ax.set_title("Profile Designer",size=20,color=aw.qmc.palette["title"],fontweight='bold')
+        for tick in self.ax.yaxis.get_major_ticks():
+            tick.label2On = True
+            
+        #draw water marks for dry phase region, mid phase region, and finish phase region
+        trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
+        rect1 = patches.Rectangle((0,aw.qmc.phases[0]), width=1, height=(aw.qmc.phases[1]-aw.qmc.phases[0]),
+                                  transform=trans, color=aw.qmc.palette["rect1"],alpha=0.3)
+        self.ax.add_patch(rect1)
+        rect2 = patches.Rectangle((0,aw.qmc.phases[1]), width=1, height=(aw.qmc.phases[2]-aw.qmc.phases[1]),
+                                  transform=trans, color=aw.qmc.palette["rect2"],alpha=0.3)
+        self.ax.add_patch(rect2)
+        rect3 = patches.Rectangle((0,aw.qmc.phases[2]), width=1, height=(aw.qmc.phases[3] - aw.qmc.phases[2]),
+                                  transform=trans, color=aw.qmc.palette["rect3"],alpha=0.3)
+        self.ax.add_patch(rect3)
+
+        #update Y label colors
+        for label in self.ax.yaxis.get_ticklabels():
+            label.set_color(aw.qmc.palette["ylabel"])
+
+        self.xaxistosm()
+
+        self.ax.plot([20,60],[300, 200],color =  "blue")
+        self.ax.plot([60,180],[200, 300],color =  "blue")
+        self.ax.plot([180,360],[300, 400],color =  "blue")
+        self.ax.plot([360,500],[400, 450],color =  "blue")
+       
+        
+        #ready to plot
+        self.ax.set_ylim(0,aw.qmc.ylimit)
+
+        self.fig.canvas.draw() 
+
+    #creates X axis labels ticks in mm:ss acording to the endofx limit
+    def xaxistosm(self):
+        #aligns the 00:00 with the start of the roast if it exists    
+        LLL = int(1200/60)
+        newlocs = [0]
+        for i in range(LLL):    
+            newlocs.append(newlocs[-1]+60)              
+        self.ax.xaxis.set_ticks(newlocs)
+
+        #rename xaxis ticks in mins:secs
+        locs = self.ax.get_xticks()
+        labels = []
+        for i in range(len(locs)):
+                stringlabel = unicode(aw.qmc.minutesfromseconds(locs[i]))
+                part1 = stringlabel.split(":")[0]
+                labels.append(part1)              
+        self.ax.set_xticklabels(labels,color=aw.qmc.palette["xlabel"],horizontalalignment='center')
+
+        #update label colors
+        for label in self.ax.xaxis.get_ticklabels():
+            label.set_color(aw.qmc.palette["xlabel"]) 
 
 ############################################################################
 ######################## FUJI PXG4 PID CONTROL DIALOG ######################
