@@ -1,4 +1,4 @@
- #!/usr/bin/env python
+#!/usr/bin/env python
 #
 # version 00002: readjust length graph on the fly + display digital readouts + cosmetic changes
 # version 00003: added buttons + knob.
@@ -722,6 +722,8 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.roastdate = QDate.currentDate()        
 
+        aw.settingsLoad()
+        
         #restart() clock 
         self.timeclock.restart()
         
@@ -2138,7 +2140,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(StatisticsAction,SIGNAL("triggered()"),self.showstatistics)
         self.ConfMenu.addAction(StatisticsAction)     
 
-        WindowconfigAction = QAction("Window Config...",self)
+        WindowconfigAction = QAction("Axis...",self)
         self.connect(WindowconfigAction,SIGNAL("triggered()"),self.Windowconfig)
         self.ConfMenu.addAction(WindowconfigAction) 
 
@@ -4448,10 +4450,12 @@ class errorDlg(QDialog):
 class WindowsDlg(QDialog):
     def __init__(self, parent = None):
         super(WindowsDlg,self).__init__(parent)
-        self.setWindowTitle("Window Properties")
+        self.setWindowTitle("Axis")
+        
+        self.setModal(True)
 
-        ylimitLabel = QLabel("Y limit")
-        xlimitLabel = QLabel("X limit")
+        ylimitLabel = QLabel("Y Limit")
+        xlimitLabel = QLabel("X Limit")
         self.ylimitEdit = QLineEdit()
         self.xlimitEdit = QLineEdit()
         self.ylimitEdit.setValidator(QIntValidator(0, 1000, self.ylimitEdit))
@@ -4463,6 +4467,7 @@ class WindowsDlg(QDialog):
 
         okButton = QPushButton("OK")  
         cancelButton = QPushButton("Cancel")
+        cancelButton.setFocusPolicy(Qt.NoFocus)
 
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatewindow)
@@ -4472,10 +4477,18 @@ class WindowsDlg(QDialog):
         layout.addWidget(self.ylimitEdit,0,1)
         layout.addWidget(xlimitLabel,1,0)
         layout.addWidget(self.xlimitEdit,1,1)
-        layout.addWidget(okButton,2,0)
-        layout.addWidget(cancelButton,2,1)
+                
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()  
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
         
-        self.setLayout(layout)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(layout)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonLayout)
+        
+        self.setLayout(mainLayout)
 
     def updatewindow(self):
         aw.qmc.ylimit = int(self.ylimitEdit.text())
