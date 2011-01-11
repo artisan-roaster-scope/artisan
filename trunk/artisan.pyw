@@ -662,7 +662,6 @@ class tgraphcanvas(FigureCanvas):
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
-        
         if self.HUDflag:
             self.toggleHUD()
         self.ProjCounter = 1
@@ -1043,6 +1042,10 @@ class tgraphcanvas(FigureCanvas):
         self.statisticsupper = 655
         self.statisticslower = 617
         self.mode = u"F"
+        aw.FahrenheitAction.setDisabled(True)
+        aw.CelsiusAction.setEnabled(True)
+        aw.ConvertToFahrenheitAction.setDisabled(True)
+        aw.ConvertToCelsiusAction.setEnabled(True) 
         self.redraw()
 
 
@@ -1057,6 +1060,10 @@ class tgraphcanvas(FigureCanvas):
         self.statisticsupper = 346
         self.statisticslower = 325
         self.mode = u"C"
+        aw.CelsiusAction.setDisabled(True)
+        aw.FahrenheitAction.setEnabled(True)
+        aw.ConvertToCelsiusAction.setDisabled(True)
+        aw.ConvertToFahrenheitAction.setEnabled(True)
         self.redraw()
 
     #converts a loaded profile to a different temperature scale. t input is the requested mode (F or C).
@@ -1072,6 +1079,10 @@ class tgraphcanvas(FigureCanvas):
                     return 
                 elif reply == QMessageBox.Yes:
                     if self.mode == u"C":
+                        aw.CelsiusAction.setDisabled(True)
+                        aw.FahrenheitAction.setEnabled(True)
+                        aw.ConvertToCelsiusAction.setDisabled(True)
+                        aw.ConvertToFahrenheitAction.setEnabled(True)
                         for i in range(profilelength):
                             self.temp1[i] = self.fromCtoF(self.temp1[i])    #ET
                             self.temp2[i] = self.fromCtoF(self.temp2[i])    #BT
@@ -1114,7 +1125,11 @@ class tgraphcanvas(FigureCanvas):
                 if reply == QMessageBox.Cancel:
                     return 
                 elif reply == QMessageBox.Yes:
-                    if self.mode == u"F":         
+                    if self.mode == u"F":    
+                        aw.ConvertToFahrenheitAction.setDisabled(True)
+                        aw.ConvertToCelsiusAction.setEnabled(True) 
+                        aw.FahrenheitAction.setDisabled(True)
+                        aw.CelsiusAction.setEnabled(True)   
                         for i in range(profilelength):
                             self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
                             self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
@@ -2098,22 +2113,28 @@ class ApplicationWindow(QMainWindow):
         
         temperatureMenu = self.GraphMenu.addMenu("Temperature")
         
-        ConvertToFahrenheitAction = QAction("Convert to Fahrenheit",self)
-        self.connect(ConvertToFahrenheitAction,SIGNAL("triggered()"),lambda t="F":self.qmc.convertTemperature(t))
-        temperatureMenu.addAction(ConvertToFahrenheitAction)
+        self.ConvertToFahrenheitAction = QAction("Convert to Fahrenheit",self)
+        self.connect(self.ConvertToFahrenheitAction,SIGNAL("triggered()"),lambda t="F":self.qmc.convertTemperature(t))
+        temperatureMenu.addAction(self.ConvertToFahrenheitAction)
 
-        ConvertToCelsiusAction = QAction("Convert to Celsius",self)
-        self.connect(ConvertToCelsiusAction,SIGNAL("triggered()"),lambda t="C":self.qmc.convertTemperature(t))
-        temperatureMenu.addAction(ConvertToCelsiusAction)
+        self.ConvertToCelsiusAction = QAction("Convert to Celsius",self)
+        self.connect(self.ConvertToCelsiusAction,SIGNAL("triggered()"),lambda t="C":self.qmc.convertTemperature(t))
+        temperatureMenu.addAction(self.ConvertToCelsiusAction)
 
-        FahrenheitAction = QAction("Fahrenheit Mode",self)
-        self.connect(FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
-        temperatureMenu.addAction(FahrenheitAction)
+        self.FahrenheitAction = QAction("Fahrenheit Mode",self)
+        self.connect(self.FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
+        temperatureMenu.addAction(self.FahrenheitAction)
 
-        CelsiusAction = QAction("Celsius Mode",self)
-        self.connect(CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusMode)
-        temperatureMenu.addAction(CelsiusAction)
-
+        self.CelsiusAction = QAction("Celsius Mode",self)
+        self.connect(self.CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusMode)
+        temperatureMenu.addAction(self.CelsiusAction)
+        
+        if self.qmc.mode == u"F":
+            self.FahrenheitAction.setDisabled(True)
+            self.ConvertToFahrenheitAction.setDisabled(True)
+        else:
+            self.CelsiusAction.setDisabled(True)
+            self.ConvertToCelsiusAction.setDisabled(True)
 
         self.GraphMenu.addSeparator()
 
@@ -2373,16 +2394,15 @@ class ApplicationWindow(QMainWindow):
     
                 #CLOSE FILE
                 f.close()
+                #convert modes only if needed comparing the new uploaded mode to the old one.
+                #otherwise it would incorrectly convert the uploaded phases
+                if self.qmc.mode == u"F" and old_mode == "C":
+                    self.qmc.fahrenheitMode()
+                if self.qmc.mode == u"C" and old_mode == "F":
+                    self.qmc.celsiusMode()
 
             aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
 
-
-            #convert modes only if needed comparing the new uploaded mode to the old one.
-            #otherwise it would incorrectly convert the uploaded phases
-            if self.qmc.mode == u"F" and old_mode == "C":
-                    self.qmc.fahrenheitMode()
-            if self.qmc.mode == u"C" and old_mode == "F":
-                self.qmc.celsiusMode()
 
             #Set the xlimits
             if self.qmc.timex:
@@ -2609,24 +2629,51 @@ class ApplicationWindow(QMainWindow):
 
 
     def setProfile(self,profile):
-        self.qmc.mode = profile["mode"]
-        self.qmc.startend = profile["startend"]        
-        self.qmc.varC = profile["cracks"]
-        self.qmc.flavors = profile["flavors"]
-        self.qmc.flavorlabels = QStringList(profile["flavorlabels"])
-        self.qmc.title = profile["title"]
-        self.qmc.beans = profile["beans"]
-        self.qmc.weight = profile["weight"]
-        self.qmc.roastertype = profile["roastertype"]
-        self.qmc.operator = profile["operator"]
-        self.qmc.roastdate = QDate.fromString(profile["roastdate"])
-        self.qmc.specialevents = profile["specialevents"]
-        self.qmc.specialeventsStrings = profile["specialeventsStrings"]
-        self.qmc.roastingnotes = profile["roastingnotes"]
-        self.qmc.cuppingnotes = profile["cuppingnotes"]
-        self.qmc.timex = profile["timex"]
-        self.qmc.temp1 = profile["temp1"]
-        self.qmc.temp2 = profile["temp2"]
+        old_mode = self.qmc.mode
+        if "mode" in profile:
+            self.qmc.mode = profile["mode"]
+        #convert modes only if needed comparing the new uploaded mode to the old one.
+        #otherwise it would incorrectly convert the uploaded phases
+        if self.qmc.mode == u"F" and old_mode == "C":
+            self.qmc.fahrenheitMode()
+        if self.qmc.mode == u"C" and old_mode == "F":
+            self.qmc.celsiusMode()
+        if "startend" in profile:
+            self.qmc.startend = profile["startend"]        
+        if "cracks" in profile:
+            self.qmc.varC = profile["cracks"]
+        if "flavors" in profile:
+            self.qmc.flavors = profile["flavors"]
+        if "flavorlabels" in profile:
+            self.qmc.flavorlabels = QStringList(profile["flavorlabels"])
+        if "title" in profile:
+            self.qmc.title = profile["title"]
+        if "beans" in profile:
+            self.qmc.beans = profile["beans"]
+        if "weight" in profile:
+            self.qmc.weight = profile["weight"]
+        if "roastertype" in profile:
+            self.qmc.roastertype = profile["roastertype"]
+        if "operator" in profile:
+            self.qmc.operator = profile["operator"]
+        if "roastdate" in profile:
+            self.qmc.roastdate = QDate.fromString(profile["roastdate"])
+        if "specialevents" in profile:
+            self.qmc.specialevents = profile["specialevents"]
+        if "specialeventsStrings" in profile:
+            self.qmc.specialeventsStrings = profile["specialeventsStrings"]
+        if "roastingnotes" in profile:
+            self.qmc.roastingnotes = profile["roastingnotes"]
+        if "cuppingnotes" in profile:
+            self.qmc.cuppingnotes = profile["cuppingnotes"]
+        if "timex" in profile:
+            self.qmc.timex = profile["timex"]
+        if "temp1" in profile:
+            self.qmc.temp1 = profile["temp1"]
+        if "temp2" in profile:
+            self.qmc.temp2 = profile["temp2"]
+        if "phases" in profile:
+            self.qmc.phases = profile["phases"]
         
     def getProfile(self):
         profile = {}
@@ -2648,6 +2695,7 @@ class ApplicationWindow(QMainWindow):
         profile["timex"] = self.qmc.timex
         profile["temp1"] = self.qmc.temp1
         profile["temp2"] = self.qmc.temp2
+        profile["phases"] = self.qmc.phases
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -2746,15 +2794,17 @@ class ApplicationWindow(QMainWindow):
     #loads the settings at the start of application. See the oppposite closeEvent()
     def settingsLoad(self):
         try:
-        
             settings = QSettings()
             #restore geometry
             self.restoreGeometry(settings.value("Geometry").toByteArray())     
             #restore mode
+            old_mode = self.qmc.mode
             self.qmc.mode = unicode(settings.value("Mode",self.qmc.mode).toString())
-            if self.qmc.mode == u"F":
-                self.qmc.fahrenheitMode()
-            if self.qmc.mode == u"C":
+            #convert modes only if needed comparing the new uploaded mode to the old one.
+            #otherwise it would incorrectly convert the uploaded phases
+            if self.qmc.mode == u"F" and old_mode == "C":
+                    self.qmc.fahrenheitMode()
+            if self.qmc.mode == u"C" and old_mode == "F":
                 self.qmc.celsiusMode()
             #restore device
             settings.beginGroup("Device");
