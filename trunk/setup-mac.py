@@ -5,12 +5,19 @@ Usage:
     python setup.py py2app
 """
 
+from distutils import sysconfig
+their_parse_makefile = sysconfig.parse_makefile
+def my_parse_makefile(filename, g):
+    their_parse_makefile(filename, g)
+    g['MACOSX_DEPLOYMENT_TARGET'] = '10.5'
+sysconfig.parse_makefile = my_parse_makefile
+
 import sys, os
 from setuptools import setup
 
 
 # current version of Artisan
-VERSION = '0.2.1'
+VERSION = '0.3.0'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
@@ -28,7 +35,8 @@ OPTIONS = {
     'argv_emulation': False,
     'semi_standalone': False,
     'site_packages': True,
-    'optimize':  2,
+    'packages':['matplotlib'],
+    'optimize':  0,
     'iconfile': 'artisan.icns',
     'includes': ['sip',
                  'serial',
@@ -45,7 +53,7 @@ OPTIONS = {
                     'CFBundleIdentifier':'com.google.groups.questm3',
                     'CFBundleShortVersionString':VERSION,
                     'CFBundleVersion': 'Artisan ' + VERSION,
-                    'LSMinimumSystemVersion':'10.6',
+                    'LSMinimumSystemVersion':'10.5',
                     'LSMultipleInstancesProhibited':'false',
                     'NSHumanReadableCopyright':LICENSE
                 }}
