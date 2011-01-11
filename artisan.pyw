@@ -257,8 +257,8 @@ class tgraphcanvas(FigureCanvas):
 
         #flags to show projections, draw Delta ET, and draw Delta BT        
         self.projectFlag = False
-        self.DeltaETflag = 0
-        self.DeltaBTflag = 0
+        self.DeltaETflag = False
+        self.DeltaBTflag = False
         
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight = [0,0,u"g"]
@@ -2003,10 +2003,18 @@ class ApplicationWindow(QMainWindow):
         gl.addLayout(buttonHHbl,4,0)        #place buttonlayout manager inside grid box layout manager
 
         ###############  create MENUS 
-        self.fileMenu = self.menuBar().addMenu("&File")
-        self.GraphMenu = self.menuBar().addMenu("&Roast")
-        self.ConfMenu = self.menuBar().addMenu("&Conf")
-        self.helpMenu = self.menuBar().addMenu("&Help")
+        
+        if platf == u'Darwin':
+            self.fileMenu = self.menuBar().addMenu("File")
+            self.GraphMenu = self.menuBar().addMenu("Roast")
+            self.ConfMenu = self.menuBar().addMenu("Conf")
+            self.helpMenu = self.menuBar().addMenu("Help")
+        else:
+            self.fileMenu = self.menuBar().addMenu("&File")
+            self.GraphMenu = self.menuBar().addMenu("&Roast")
+            self.ConfMenu = self.menuBar().addMenu("&Conf")
+            self.helpMenu = self.menuBar().addMenu("&Help")
+            
         #FILE menu
         fileLoadAction = QAction("Open Profile...",self)
         fileLoadAction.setShortcut(QKeySequence.Open)
@@ -2768,8 +2776,6 @@ class ApplicationWindow(QMainWindow):
             #restore colors
             for (k, v) in settings.value("Colors").toMap().items():
                 self.qmc.palette[unicode(k)] = unicode(v.toString())
-            #update colors
-            self.qmc.redraw()
             
             #restore flavors
             self.qmc.flavorlabels = settings.value("Flavors",self.qmc.flavorlabels).toStringList()
@@ -2799,12 +2805,12 @@ class ApplicationWindow(QMainWindow):
                     self.pid.PXG4[key][0] = settings.value(key,self.pid.PXG4[key][0]).toInt()[0]
             settings.endGroup()
             settings.beginGroup("RoC")
-            self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toInt()[0]
-            self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toInt()[0]
+            self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
+            self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
             self.qmc.sensitivity = settings.value("Sensitivity",self.qmc.sensitivity).toInt()[0]
             settings.endGroup()
             settings.beginGroup("HUD")
-            self.qmc.projectCheck = settings.value("Projection",self.qmc.projectFlag)
+            self.qmc.projectCheck = settings.value("Projection",self.qmc.projectFlag).toBool()
             self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
@@ -2813,6 +2819,9 @@ class ApplicationWindow(QMainWindow):
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
             self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
+            
+            #update display
+            self.qmc.redraw()
 
 
         except Exception,e:
@@ -3726,9 +3735,9 @@ class HUDDlg(QDialog):
         else:
             self.projectCheck.setChecked(False)
             
-        self.connect(self.DeltaET,SIGNAL("stateChanged(int)"),self.changeDeltaET)         #toggle
-        self.connect(self.DeltaBT,SIGNAL("stateChanged(int)"),self.changeDeltaBT)         #toggle
-        self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),self.changeProjection) #toggle
+        self.connect(self.DeltaET,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaET(i))         #toggle
+        self.connect(self.DeltaBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaBT(i))         #toggle
+        self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.changeProjection(i)) #toggle
             
         self.sensitivityValues = map(str,range(10,0,-1))
         self.sensitivitylabel  = QLabel("Delta Sensitivity")                          
@@ -3802,29 +3811,19 @@ class HUDDlg(QDialog):
         
         self.setLayout(mainLayout)
         
-    def changeDeltaET(self):
-        if aw.qmc.DeltaETflag:
-            aw.qmc.DeltaETflag = 0
-        else:
-            aw.qmc.DeltaETflag = 1
+    def changeDeltaET(self,i):
+        aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
         aw.qmc.redraw()
         
-    def changeDeltaBT(self):
-        if aw.qmc.DeltaBTflag:
-            aw.qmc.DeltaBTflag = 0
-        else:
-            aw.qmc.DeltaBTflag = 1
+    def changeDeltaBT(self,i):
+        aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
         aw.qmc.redraw()
         
-    def changeProjection(self):
-        #turn off
-        if aw.qmc.projectFlag:
-            aw.qmc.projectFlag = 0
+    def changeProjection(self,i):
+        aw.qmc.projectFlag = not aw.qmc.projectFlag
+        if not aw.qmc.projectFlag:
             #erase old projections
-            aw.qmc.resetlines()            
-        #turn on
-        else:
-            aw.qmc.projectFlag = 1
+            aw.qmc.resetlines()    
         
     def changeSensitivity(self,i):
         aw.qmc.sensitivity = self.sensitivityString2Int(self.sensitivityValues[i])
@@ -5941,7 +5940,6 @@ class serialport(object):
                         T2 = int(binascii.hexlify(r[11] + r[12]),16)
                     elif Tcheck == 7:
                         if not self.CENTER309flag:
-                            print 
                             aw.messagelabel.setText(u"CENTER 309 connected: T4")
                             self.CENTER309flag = 1
                         T1 = 0.
