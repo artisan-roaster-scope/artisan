@@ -271,6 +271,7 @@ class tgraphcanvas(FigureCanvas):
 
         # set limits for X and Y axes. Default is in Farenheit units
         self.ylimit = 750
+        self.ylimit_min = 0
         self.endofx = 60
         self.startofx = 0
         
@@ -280,7 +281,7 @@ class tgraphcanvas(FigureCanvas):
         self.statisticslower = 617
         
         self.ax.set_xlim(self.startofx, self.endofx)
-        self.ax.set_ylim(0,self.ylimit)
+        self.ax.set_ylim(self.ylimit_min,self.ylimit)
 
         # disable figure autoscale
         self.ax.set_autoscale_on(False)
@@ -734,7 +735,7 @@ class tgraphcanvas(FigureCanvas):
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         #Set axes same as in __init__
         self.ax.set_xlim(self.startofx, self.endofx)
-        self.ax.set_ylim(0, self.ylimit)
+        self.ax.set_ylim(self.ylimit_min, self.ylimit)
         self.ax.set_autoscale_on(False)
         self.ax.grid(True,linewidth=2,color=self.palette["grid"])
         self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"])
@@ -1033,6 +1034,7 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
+        self.ylimit = 0
         self.ylimit = 750
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
@@ -1051,6 +1053,7 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
+        self.ylimit_min = 0
         self.ylimit = 400
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
@@ -2400,13 +2403,14 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.fahrenheitMode()
                 if self.qmc.mode == u"C" and old_mode == "F":
                     self.qmc.celsiusMode()
+                    
+                #Set the xlimits
+                if self.qmc.timex:
+                    self.qmc.endofx = self.qmc.timex[-1] + 40
 
             aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
 
 
-            #Set the xlimits
-            if self.qmc.timex:
-                self.qmc.endofx = self.qmc.timex[-1] + 40
 
             #change Title
             self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"], fontweight='bold')
@@ -2674,6 +2678,26 @@ class ApplicationWindow(QMainWindow):
             self.qmc.temp2 = profile["temp2"]
         if "phases" in profile:
             self.qmc.phases = profile["phases"]
+        if "ymin" in profile:
+            self.qmc.ylimit_min = profile["ymin"]
+        if "ymax" in profile:
+            self.qmc.ylimit = profile["ymax"]
+        if "xmin" in profile:
+            self.qmc.startofx = profile["xmin"]
+        if "xmax" in profile:
+            self.qmc.endofx = profile["xmax"]   
+        else:
+            #Set the xlimits
+            if self.qmc.timex:
+                self.qmc.endofx = self.qmc.timex[-1] + 40         
+        if "statisticsflags" in profile:
+            self.qmc.statisticsflags = profile["statisticsflags"]
+        if "statisticsconditions" in profile:
+            self.qmc.statisticsconditions = profile["statisticsconditions"]
+        if "DeltaET" in profile:
+            self.qmc.DeltaETflag = profile["DeltaET"]
+        if "DeltaBT" in profile:
+            self.qmc.DeltaBTflag = profile["DeltaBT"]
         
     def getProfile(self):
         profile = {}
@@ -2695,7 +2719,15 @@ class ApplicationWindow(QMainWindow):
         profile["timex"] = self.qmc.timex
         profile["temp1"] = self.qmc.temp1
         profile["temp2"] = self.qmc.temp2
-        profile["phases"] = self.qmc.phases
+        profile["phases"] = self.qmc.phases        
+        profile["ymin"] = self.qmc.ylimit_min
+        profile["ymax"] = self.qmc.ylimit
+        profile["xmin"] = self.qmc.startofx
+        profile["xmax"] = self.qmc.endofx        
+        profile["statisticsflags"] = self.qmc.statisticsflags
+        profile["statisticsconditions"] = self.qmc.statisticsconditions
+        profile["DeltaET"] = self.qmc.DeltaETflag
+        profile["DeltaBT"] = self.qmc.DeltaBTflag
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -4505,16 +4537,24 @@ class WindowsDlg(QDialog):
         
         self.setModal(True)
 
-        ylimitLabel = QLabel("Y Limit")
-        xlimitLabel = QLabel("X Limit")
+        ylimitLabel = QLabel("Max")
+        ylimitLabel_min = QLabel("Min")
+        xlimitLabel = QLabel("Max")
+        xlimitLabel_min = QLabel("Min")
         self.ylimitEdit = QLineEdit()
+        self.ylimitEdit_min = QLineEdit()
         self.xlimitEdit = QLineEdit()
+        self.xlimitEdit_min = QLineEdit()
         self.ylimitEdit.setValidator(QIntValidator(0, 1000, self.ylimitEdit))
+        self.ylimitEdit_min.setValidator(QIntValidator(0, 1000, self.ylimitEdit_min))
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
         self.xlimitEdit.setValidator(QRegExpValidator(regextime,self))
+        self.xlimitEdit_min.setValidator(QRegExpValidator(regextime,self))
 
         self.ylimitEdit.setText(unicode(aw.qmc.ylimit))
+        self.ylimitEdit_min.setText(unicode(aw.qmc.ylimit_min))
         self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx))
+        self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx))
 
         okButton = QPushButton("OK")  
         cancelButton = QPushButton("Cancel")
@@ -4523,11 +4563,22 @@ class WindowsDlg(QDialog):
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatewindow)
         
-        layout = QGridLayout()
-        layout.addWidget(ylimitLabel,0,0)
-        layout.addWidget(self.ylimitEdit,0,1)
-        layout.addWidget(xlimitLabel,1,0)
-        layout.addWidget(self.xlimitEdit,1,1)
+        xlayout = QGridLayout()
+        xlayout.addWidget(xlimitLabel_min,0,0)
+        xlayout.addWidget(self.xlimitEdit_min,0,1)
+        xlayout.addWidget(xlimitLabel,1,0)
+        xlayout.addWidget(self.xlimitEdit,1,1)
+        
+        ylayout = QGridLayout()
+        ylayout.addWidget(ylimitLabel_min,0,0)
+        ylayout.addWidget(self.ylimitEdit_min,0,1)
+        ylayout.addWidget(ylimitLabel,1,0)
+        ylayout.addWidget(self.ylimitEdit,1,1)
+        
+        xGroupLayout = QGroupBox("Time")
+        xGroupLayout.setLayout(xlayout)
+        yGroupLayout = QGroupBox("Temperature")
+        yGroupLayout.setLayout(ylayout)
                 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()  
@@ -4535,7 +4586,8 @@ class WindowsDlg(QDialog):
         buttonLayout.addWidget(okButton)
         
         mainLayout = QVBoxLayout()
-        mainLayout.addLayout(layout)
+        mainLayout.addWidget(xGroupLayout)
+        mainLayout.addWidget(yGroupLayout)
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         
@@ -4543,9 +4595,11 @@ class WindowsDlg(QDialog):
 
     def updatewindow(self):
         aw.qmc.ylimit = int(self.ylimitEdit.text())
-        aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))      
+        aw.qmc.ylimit_min = int(self.ylimitEdit_min.text())
+        aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))     
+        aw.qmc.startofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit_min.text())) 
         aw.qmc.redraw()
-        string = u"[ylimit = " + unicode(self.ylimitEdit.text()) + u"] [xlimit = " + unicode(self.xlimitEdit.text()) + u"]"
+        string = u"[ylimit = (" + unicode(self.ylimitEdit_min.text()) + u"," + unicode(self.ylimitEdit.text()) + u")] [xlimit = " + unicode(self.xlimitEdit.text()) + u"," + unicode(self.xlimitEdit_min.text()) + u")]"
         aw.messagelabel.setText(string)
 
         self.close()
@@ -7489,7 +7543,7 @@ class profiledesigner(FigureCanvas):
        
         
         #ready to plot
-        self.ax.set_ylim(0,aw.qmc.ylimit)
+        self.ax.set_ylim(aw.qmc.ylimit_min,aw.qmc.ylimit)
 
         self.fig.canvas.draw() 
 

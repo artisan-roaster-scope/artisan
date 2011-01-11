@@ -83,6 +83,6 @@ for root, dirs, files in os.walk('./dist'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
             
-        
-os.chdir('dist')
-os.system(r'macdeployqt Artisan.app -dmg')
+os.chdir('./dist')
+os.system(r'macdeployqt Artisan.app -dmg -verbose=0')
+# otool -L dist/Artisan.app/Contents/MacOS/Artisan
