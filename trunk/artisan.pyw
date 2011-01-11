@@ -722,7 +722,7 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.roastdate = QDate.currentDate()        
 
-        aw.settingsLoad()
+        #aw.settingsLoad()
         
         #restart() clock 
         self.timeclock.restart()
@@ -4858,7 +4858,7 @@ class phasesGraphDlg(QDialog):
              self.startfinish.setRange(0,1000)
              self.endfinish.setRange(0,1000)
 
-        self.connect(self.enddry,SIGNAL("valuehanged(int)"),self.startmid.setValue)
+        self.connect(self.enddry,SIGNAL("valueChanged(int)"),self.startmid.setValue)
         self.connect(self.startmid,SIGNAL("valueChanged(int)"),self.enddry.setValue)
         self.connect(self.endmid,SIGNAL("valueChanged(int)"),self.startfinish.setValue)
         self.connect(self.startfinish,SIGNAL("valueChanged(int)"),self.endmid.setValue)  
