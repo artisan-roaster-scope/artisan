@@ -1044,10 +1044,11 @@ class tgraphcanvas(FigureCanvas):
         self.statisticsupper = 655
         self.statisticslower = 617
         self.mode = u"F"
-        aw.FahrenheitAction.setDisabled(True)
-        aw.CelsiusAction.setEnabled(True)
-        aw.ConvertToFahrenheitAction.setDisabled(True)
-        aw.ConvertToCelsiusAction.setEnabled(True) 
+        if aw: # during initialization aw is still None
+            aw.FahrenheitAction.setDisabled(True)
+            aw.CelsiusAction.setEnabled(True)
+            aw.ConvertToFahrenheitAction.setDisabled(True)
+            aw.ConvertToCelsiusAction.setEnabled(True) 
         self.redraw()
 
 
@@ -1063,10 +1064,11 @@ class tgraphcanvas(FigureCanvas):
         self.statisticsupper = 346
         self.statisticslower = 325
         self.mode = u"C"
-        aw.CelsiusAction.setDisabled(True)
-        aw.FahrenheitAction.setEnabled(True)
-        aw.ConvertToCelsiusAction.setDisabled(True)
-        aw.ConvertToFahrenheitAction.setEnabled(True)
+        if aw: # during initialization aw is still None
+            aw.CelsiusAction.setDisabled(True)
+            aw.FahrenheitAction.setEnabled(True)
+            aw.ConvertToCelsiusAction.setDisabled(True)
+            aw.ConvertToFahrenheitAction.setEnabled(True)
         self.redraw()
 
     #converts a loaded profile to a different temperature scale. t input is the requested mode (F or C).
@@ -9207,6 +9209,7 @@ app.setOrganizationName("YourQuest")                                    #needed 
 app.setOrganizationDomain("questm3.groups.google.com")                  #needed by QSettings() to store windows geometry in operating system 
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
+aw = None # this is to ensure that the variable aw is already defined during application initialization
 aw = ApplicationWindow()
 aw.show()
 #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
