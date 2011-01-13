@@ -36,7 +36,7 @@
 # version 00031: FINISHED PXG4 control Dlg and enhanced background options
 # END OF ALPHA.  BEGINNING BETA TESTING 
 
-__version__ = u"0.3.1"
+__version__ = u"0.3.2"
 
 
 # ABOUT
@@ -128,7 +128,7 @@ import matplotlib.font_manager as font_manager
 import matplotlib.path as mpath
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
-
+from scipy  import interpolate as inter
 
 platf = unicode(platform.system())
 
@@ -1689,7 +1689,148 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText(u"unable to move background")
             return
 
+    def findpoints(self,origin):
+        
+        if self.startend[0]:
+            Xpoints = []
+            Ypoints = []
+            if origin == 0:
+                #start points
+                Xpoints.append(self.timex[0])
+                Ypoints.append(self.temp2[0])
+                #drop
+                Xpoints.append(self.startend[0])
+                Ypoints.append(self.startend[1])
 
+            LPind = aw.findTP()
+            DE = aw.findDryEnd()
+            if LPind < DE:
+                Xpoints.append(self.timex[LPind])
+                Ypoints.append(self.temp2[LPind])
+                Xpoints.append(self.timex[DE])
+                Ypoints.append(self.temp2[DE])
+            else:
+                Xpoints.append(self.timex[DE])
+                Ypoints.append(self.temp2[DE])                
+                Xpoints.append(self.timex[LPind])
+                Ypoints.append(self.temp2[LPind])
+
+            if self.varC[0]:
+                Xpoints.append(self.varC[0])
+                Ypoints.append(self.varC[1])
+            if self.varC[2]:
+                Xpoints.append(self.varC[2])
+                Ypoints.append(self.varC[3])            
+            if self.varC[4]:
+                Xpoints.append(self.varC[4])
+                Ypoints.append(self.varC[5])       
+            if self.varC[6]:
+                Xpoints.append(self.varC[6])
+                Ypoints.append(self.varC[7])
+                
+            if self.startend[2]:
+                Xpoints.append(self.startend[2])
+                Ypoints.append(self.startend[3])            
+            
+            #end points
+            Xpoints.append(self.timex[-1])
+            Ypoints.append(self.temp2[-1])
+
+        else:
+            aw.messagelabel.setText(u"No finished profile found")
+
+
+        return Xpoints,Ypoints
+    def univariateinfo(self):
+        try:
+            
+            Xpoints,Ypoints = self.findpoints(1)  #from lowest point
+            
+            equ = inter.UnivariateSpline(Xpoints, Ypoints)
+            coeffs = equ.get_coeffs().tolist()
+            knots = equ.get_knots().tolist()
+            resid = equ.get_residual()
+            roots = equ.roots().tolist()
+
+            #interpretation of coefficients: http://www.sagenb.org/home/pub/1708/
+            #spline=[ans[0,i]+(x-xi)*(ans[1,i]+(x-xi)*(ans[2,i]+(x-xi)*ans[3,i]/3)/2) for i,xi in enumerate(a[:-1])]
+            
+            string = "<b>Polynomial coefficients (Horner form):</b><br><br>"
+            string += str(coeffs) + "<br><br>"
+            string += "<b>Knots:</b><br><br>"
+            string += str(knots)+ "<br><br>"
+            string += "<b>Residual:</b><br><br>"
+            string += str(resid)  + "<br><br>"      
+            string += "<b>Roots:</b><br><br>"
+            string += str(roots)
+            
+            QMessageBox.information(self,u"Profile information",string)
+
+
+    ##       derivatives(self, x)
+    ##       Return all derivatives of the spline at the point x.
+    ##       
+    ##       integral(self, a, b)
+    ##       Return definite integral of the spline between two
+    ##       given points.
+
+        except ValueError,e:
+            aw.messagelabel.setText(unicode(e))
+            self.errorlog.append(u"value error in drawinterp() " + unicode(e))
+            return
+
+        except Exception,e:
+            aw.messagelabel.setText(unicode(e))
+            self.errorlog.append(u"Exception error in drawinterp() " + unicode(e))
+            return  
+            
+
+    def univariate(self):
+        try:           
+            Xpoints,Ypoints = self.findpoints(1)  #from lowest point
+            
+            func = inter.UnivariateSpline(Xpoints, Ypoints)
+            
+            #print equ.get_coeffs()
+            xa = numpy.array(self.timex)
+            newX = func(xa).tolist()
+               
+            self.ax.plot(self.timex, newX, color="black", linestyle = '-.', linewidth=3)            
+            self.ax.plot(Xpoints, Ypoints, "ro")
+            
+            self.fig.canvas.draw()
+
+        except ValueError,e:
+            aw.messagelabel.setText(unicode(e))
+            self.errorlog.append(u"value error in drawinterp() " + unicode(e))
+            return
+
+        except Exception,e:
+            aw.messagelabel.setText(unicode(e))
+            self.errorlog.append(u"Exception error in drawinterp() " + unicode(e))
+            return  
+            
+    def drawinterp(self,mode):
+        try:
+            
+            Xpoints,Ypoints = self.findpoints(0) #from 0 origin
+            func = inter.interp1d(Xpoints, Ypoints, kind=mode)
+            newY = func(self.timex)          
+            self.ax.plot(self.timex, newY, color="black", linestyle = '-.', linewidth=3)            
+            self.ax.plot(Xpoints, Ypoints, "ro")
+            
+            self.fig.canvas.draw()
+
+        except ValueError,e:
+            aw.messagelabel.setText(unicode(e))
+            self.errorlog.append(u"value error in drawinterp() " + unicode(e))
+            return
+
+        except Exception,e:
+            aw.messagelabel.setText(unicode(e))
+            self.errorlog.append(u"Exception error in drawinterp() " + unicode(e))
+            return        
+                
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem
 #####   with py2exe and svg
@@ -2412,15 +2553,12 @@ class ApplicationWindow(QMainWindow):
 
             aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
 
-
-
             #change Title
             self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"], fontweight='bold')
 
-
             #Plot everything
             self.qmc.redraw()
-
+            
             message =  unicode(filename) + u" loaded successfully"
             self.messagelabel.setText(message)
             
@@ -3784,6 +3922,12 @@ class HUDDlg(QDialog):
 
         self.setWindowTitle("Extras")
         self.setModal(True)
+
+        self.status = QStatusBar()
+        self.status.setSizeGripEnabled(False)
+        self.status.showMessage("Ready",1000)
+
+        #### TAB 1
         
         # keep old values to be restored on Cancel
         self.org_DeltaET = aw.qmc.DeltaETflag
@@ -3887,14 +4031,103 @@ class HUDDlg(QDialog):
         buttonsLayout.addWidget(cancelButton)
         buttonsLayout.addWidget(okButton)
                                 
-        mainLayout = QVBoxLayout()
-        mainLayout.addWidget(rorGroupLayout)
-        mainLayout.addWidget(hudGroupLayout)
-        mainLayout.addStretch()
-        mainLayout.addLayout(buttonsLayout)
+        tab1Layout = QVBoxLayout()
+        tab1Layout.addWidget(rorGroupLayout)
+        tab1Layout.addWidget(hudGroupLayout)
+        tab1Layout.addStretch()
+        tab1Layout.addLayout(buttonsLayout)
+
+
+        ##### TAB 2
+        self.interpCheck = QCheckBox("Interpolation")
+        self.connect(self.interpCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.interpolation(i)) #toggle
         
-        self.setLayout(mainLayout)
+        self.interpComboBox = QComboBox()
+        self.interpComboBox.setMaximumWidth(100)
+        self.interpComboBox.setMinimumWidth(55)
+        self.interpComboBox.addItems([u"linear", u"cubic","nearest"])
         
+        """
+         'linear' : linear interpolation, same as the default
+         'cubic' : 3rd order spline interpolation
+         'nearest' : take the y value of the nearest point
+        """
+
+        self.univarCheck = QCheckBox("Univariate")
+        self.connect(self.univarCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.univar(i)) #toggle
+
+        univarButton = QPushButton("Info")
+        univarButton.setFocusPolicy(Qt.NoFocus)
+        univarButton.setMaximumSize(50, 30)
+        self.connect(univarButton,SIGNAL("clicked()"),self.showunivarinfo)
+        
+        tab2Layout = QVBoxLayout()
+        interLayout = QHBoxLayout()
+        interLayout.addWidget(self.interpCheck,0)
+        interLayout.addWidget(self.interpComboBox,0)
+
+        interGroupLayout = QGroupBox("Interp.")
+        interGroupLayout.setLayout(interLayout)
+
+        uniLayout = QHBoxLayout()
+        uniLayout.addWidget(self.univarCheck,0)
+        uniLayout.addWidget(univarButton,1)
+
+        univarGroupLayout = QGroupBox("Univariate")
+        univarGroupLayout.setLayout(uniLayout)
+
+        tab2Layout.addWidget(interGroupLayout)
+        tab2Layout.addWidget(univarGroupLayout)        
+
+        ############################  TABS LAYOUT
+        TabWidget = QTabWidget()
+        
+        C1Widget = QWidget()
+        C1Widget.setLayout(tab1Layout)
+        TabWidget.addTab(C1Widget,"HUD")
+        
+        C2Widget = QWidget()
+        C2Widget.setLayout(tab2Layout)
+        TabWidget.addTab(C2Widget,"Math")
+
+
+        #incorporate layouts
+        Slayout = QVBoxLayout()
+        Slayout.addWidget(self.status,0)
+        Slayout.addWidget(TabWidget,1)
+        self.setLayout(Slayout)
+
+    def showunivarinfo(self):
+        if aw.qmc.startend[2]:
+            aw.qmc.univariateinfo()
+        else:
+            self.status.showMessage("Need to load a finished profile first",5000)            
+    def univar(self,i):
+        if self.univarCheck.isChecked():
+            #check for finished roast
+            if aw.qmc.startend[2]:
+                aw.qmc.univariate()
+            else:
+                self.status.showMessage("Need to load a finished profile first",5000)
+                self.interpCheck.setChecked(False)               
+        else:
+            aw.qmc.resetlines()
+            aw.qmc.redraw()                
+
+    def interpolation(self,i):
+        mode = unicode(self.interpComboBox.currentText())
+        if self.interpCheck.isChecked():
+            #check for finished roast
+            if aw.qmc.startend[2]:
+                aw.qmc.drawinterp(mode)
+            else:
+                self.status.showMessage("Need to load a finished profile first",5000)
+                self.interpCheck.setChecked(False)
+                
+        else:
+            aw.qmc.resetlines()
+            aw.qmc.redraw()
+            
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
         aw.qmc.redraw()
@@ -3951,7 +4184,10 @@ class HUDDlg(QDialog):
         #self.close()
         self.accept()
 
-        
+    def closeEvent(self, event):    
+        self.accept()
+        aw.qmc.resetlines()
+        aw.qmc.redraw()        
            
 ########################################################################################            
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
@@ -7569,8 +7805,10 @@ class profiledesigner(FigureCanvas):
 
         #update label colors
         for label in self.ax.xaxis.get_ticklabels():
-            label.set_color(aw.qmc.palette["xlabel"]) 
-
+            label.set_color(aw.qmc.palette["xlabel"])
+                
+                
+        
 ############################################################################
 ######################## FUJI PXG4 PID CONTROL DIALOG ######################
 ############################################################################
