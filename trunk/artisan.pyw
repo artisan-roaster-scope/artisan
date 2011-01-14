@@ -116,7 +116,7 @@ from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainW
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient)
-from PyQt4.QtCore import (Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
+from PyQt4.QtCore import (QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList)
 
 
@@ -1855,11 +1855,20 @@ class VMToolbar(NavigationToolbar):
 ########################################################################################
             
 class ApplicationWindow(QMainWindow):
+    
     def __init__(self, parent = None):
+        self.MaxRecentFiles = 10
+        self.recentFileActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         # set window title
-        self.setWindowTitle(u"Artisan " + str(__version__))
+        self.windowTitle = u"Artisan " + str(__version__)
+        self.setWindowTitle(self.windowTitle)
+        
+        for i in range(self.MaxRecentFiles):
+            self.recentFileActs.append(
+                    QAction(self, visible=False,
+                            triggered=self.openRecentFile))        
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month. file-open/save will point to profilepath
         self.profilepath = u""
@@ -2177,11 +2186,15 @@ class ApplicationWindow(QMainWindow):
             self.helpMenu = self.menuBar().addMenu("&Help")
             
         #FILE menu
-        fileLoadAction = QAction("Open Profile...",self)
+        fileLoadAction = QAction("Open...",self)
         fileLoadAction.setShortcut(QKeySequence.Open)
         self.connect(fileLoadAction,SIGNAL("triggered()"),self.fileLoad)
         self.fileMenu.addAction(fileLoadAction)
         
+        self.openRecentMenu = self.fileMenu.addMenu("Open Recent")
+        for i in range(self.MaxRecentFiles):
+            self.openRecentMenu.addAction(self.recentFileActs[i])
+        self.updateRecentFileActions()
 
         importMenu = self.fileMenu.addMenu("Import Readings")
 
@@ -2340,17 +2353,65 @@ class ApplicationWindow(QMainWindow):
         self.main_widget.setFocus()
 
         # set the central widget of MainWindow to main_widget
-        self.setCentralWidget(self.main_widget)   
+        self.setCentralWidget(self.main_widget) 
+                
+    def strippedName(self, fullFileName):
+        return QFileInfo(fullFileName).fileName()
+          
+    def setCurrentFile(self, fileName):
+        self.curFile = fileName
+        if self.curFile:
+            self.setWindowTitle(("%s - " + self.windowTitle) % self.strippedName(self.curFile))
+        else:
+            self.setWindowTitle("Recent Files")
 
+        settings = QSettings()
+        files = settings.value('recentFileList').toStringList()
 
-    #loads stored profiles. Called from file menu        
+        try:
+            files.removeAll(fileName)
+        except ValueError:
+            pass
+
+        files.insert(0, fileName)
+        del files[self.MaxRecentFiles:]
+
+        settings.setValue('recentFileList', files)
+
+        for widget in QApplication.topLevelWidgets():
+            if isinstance(widget, ApplicationWindow):
+                widget.updateRecentFileActions()
+
+    def updateRecentFileActions(self):
+        settings = QSettings()
+        files = settings.value('recentFileList').toStringList()
+        numRecentFiles = min(len(files), self.MaxRecentFiles)
+
+        for i in range(numRecentFiles):
+            text = "&%s" % self.strippedName(files[i])
+            self.recentFileActs[i].setText(text)
+            self.recentFileActs[i].setData(files[i])
+            self.recentFileActs[i].setVisible(True)
+
+        for j in range(numRecentFiles, self.MaxRecentFiles):
+            self.recentFileActs[j].setVisible(False)
+                
+    def openRecentFile(self):
+        action = self.sender()
+        if action:
+            self.loadFile(action.data().toString())
+                        
     def fileLoad(self):
+        fileName = QFileDialog.getOpenFileName(self,"Open",self.profilepath,"*.txt")
+        if fileName:
+            self.loadFile(fileName)
+            
+    #loads stored profiles. Called from file menu        
+    def loadFile(self,filename):
         f = None
         old_mode = self.qmc.mode
 
         try:        
-            filename = unicode(QFileDialog.getOpenFileName(self,"Load Profile",self.profilepath,"*.txt"))
-            
             f = QFile(filename)
             if not f.open(QIODevice.ReadOnly):
                 raise IOError, unicode(f.errorString())            
@@ -2562,7 +2623,8 @@ class ApplicationWindow(QMainWindow):
             message =  unicode(filename) + u" loaded successfully"
             self.messagelabel.setText(message)
             
-            self.editgraph()
+            #self.editgraph()
+            self.setCurrentFile(filename)
 
         except IOError,e:
             self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
@@ -2875,6 +2937,7 @@ class ApplicationWindow(QMainWindow):
         try:         
             filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))            
             self.serialize(filename,self.getProfile())
+            self.setCurrentFile(filename)
         except IOError,e:
             self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
