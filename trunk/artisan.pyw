@@ -486,9 +486,9 @@ class tgraphcanvas(FigureCanvas):
         ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
         #plot proyections
         self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
-                         linestyle = '-.', linewidth= 8, alpha = .3)
+                         linestyle = '-.', linewidth= 8, alpha = .3, label="ET Proj")
         self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"],
-                         linestyle = '-.', linewidth= 8, alpha = .3)
+                         linestyle = '-.', linewidth= 8, alpha = .3, label="BT Proj")
         
         #erase every three trigger events to make it look like a radar
         l,p = divmod(self.ProjCounter,3)
@@ -757,8 +757,8 @@ class tgraphcanvas(FigureCanvas):
         self.ax.add_patch(rect3)
 
         ##### ET,BT curves
-        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2)
-        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2)
+        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label="ET")
+        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label="BT")
 
         #check BACKGROUND flag
         if self.background:
@@ -774,9 +774,9 @@ class tgraphcanvas(FigureCanvas):
                 
             #draw background
             self.l_back1, = self.ax.plot(self.timeB, self.backgroundET,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha)
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label="ET Back")
             self.l_back2, = self.ax.plot(self.timeB, self.backgroundBT,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha)
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label="BT Back")
 
             #check backgroundDetails flag
             if self.backgroundDetails:
@@ -852,9 +852,9 @@ class tgraphcanvas(FigureCanvas):
 
         ##### DeltaET,DeltaBT curves
         if self.DeltaETflag:
-            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2)
+            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label="DeltaET")
         if self.DeltaBTflag:
-            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2)
+            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label="DeltaBT")
         
         handles = [self.l_temp1,self.l_temp2]
         labels = [u"ET",u"BT"]
