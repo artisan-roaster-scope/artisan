@@ -266,7 +266,11 @@ class tgraphcanvas(FigureCanvas):
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event
         self.specialevents = []
-        #stores text descriptions for each event. Max 10
+        #Combobox text items in editGraphDlg
+        self.etypes = ["None","Power","Dumper","Fan"]
+        #stores indexes (for ComboBox) in etypes above for each event. Max 10 events
+        self.specialeventstype = [0,0,0,0,0,0,0,0,0,0] 
+        #stores text descriptions for each event. Max 10 events
         self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
 
         # set limits for X and Y axes. Default is in Farenheit units
@@ -371,7 +375,7 @@ class tgraphcanvas(FigureCanvas):
     #event handler from startTimer()
     def timerEvent(self, evt):
         if self.flagon:
-            #read timer, ET (t2) and BT (t1) TEMPERATURE
+            #read time, ET (t2) and BT (t1) TEMPERATURE
             tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
             
             #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
@@ -434,9 +438,9 @@ class tgraphcanvas(FigureCanvas):
                 
             aw.lcd2.display(t1)                               # MET
             aw.lcd3.display(t2)                               # BT
-            aw.lcd4.display(int(self.rateofchange1*60))       # rate of change MET (degress per minute)
-            aw.lcd5.display(int(self.rateofchange2*60))       # rate of change BT (degrees per minute)
-
+            aw.lcd4.display(self.approx(self.rateofchange1*60))       # rate of change MET (degress per minute)
+            print self.approx(self.rateofchange2*60)
+            aw.lcd5.display(self.approx(self.rateofchange2*60))       # rate of change BT (degrees per minute)
 
             self.fig.canvas.draw()
             
@@ -686,8 +690,8 @@ class tgraphcanvas(FigureCanvas):
         aw.lcd1.display(0.0)
         aw.lcd2.display(0.0)
         aw.lcd3.display(0.0)
-        aw.lcd4.display(0.0)
-        aw.lcd5.display(0.0)
+        aw.lcd4.display(0)
+        aw.lcd5.display(0)
         aw.messagelabel.setText(u"Scope has been resetted")
         aw.button_1.setDisabled(False)
         aw.button_2.setDisabled(False)        
@@ -719,6 +723,7 @@ class tgraphcanvas(FigureCanvas):
         self.errorlog = []
         self.weight = [0,0,u"g"]
         self.specialevents = []
+        self.specialeventstype = [0,0,0,0,0,0,0,0,0,0]
         self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.roastdate = QDate.currentDate()        
 
@@ -937,9 +942,11 @@ class tgraphcanvas(FigureCanvas):
             #write events
             Nevents = len(self.specialevents)
             for i in range(Nevents):
-                self.ax.annotate(u"e" + str(i+1), xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                firstletter = self.etypes[self.specialeventstype[i]][0]
+                self.ax.annotate(str(i+1)+ firstletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
                                  xytext=(self.timex[int(self.specialevents[i])]-15,self.temp2[int(self.specialevents[i])]+ 40),alpha=0.8,
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=12)
+                
                 
         #update X label names and colors        
         self.xaxistosm()
@@ -2833,7 +2840,7 @@ class ApplicationWindow(QMainWindow):
                 f.close()
         return obj
 
-
+    #used by fileLoad()
     def setProfile(self,profile):
         old_mode = self.qmc.mode
         if "mode" in profile:
@@ -2866,6 +2873,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.roastdate = QDate.fromString(profile["roastdate"])
         if "specialevents" in profile:
             self.qmc.specialevents = profile["specialevents"]
+        if "specialeventstype" in profile:
+            self.qmc.specialeventstype = profile["specialeventstype"]
         if "specialeventsStrings" in profile:
             self.qmc.specialeventsStrings = profile["specialeventsStrings"]
         if "roastingnotes" in profile:
@@ -2900,7 +2909,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.DeltaETflag = profile["DeltaET"]
         if "DeltaBT" in profile:
             self.qmc.DeltaBTflag = profile["DeltaBT"]
-        
+
+    #used by filesave()
     def getProfile(self):
         profile = {}
         profile["mode"] = self.qmc.mode
@@ -2915,6 +2925,7 @@ class ApplicationWindow(QMainWindow):
         profile["operator"] = self.qmc.operator
         profile["roastdate"] = unicode(self.qmc.roastdate.toString())
         profile["specialevents"] = self.qmc.specialevents
+        profile["specialeventstype"] = self.qmc.specialeventstype
         profile["specialeventsStrings"] = self.qmc.specialeventsStrings
         profile["roastingnotes"] = self.qmc.roastingnotes
         profile["cuppingnotes"] = self.qmc.cuppingnotes
@@ -2930,6 +2941,8 @@ class ApplicationWindow(QMainWindow):
         profile["statisticsconditions"] = self.qmc.statisticsconditions
         profile["DeltaET"] = self.qmc.DeltaETflag
         profile["DeltaBT"] = self.qmc.DeltaBTflag
+
+        
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -2942,88 +2955,6 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
             return
-  
-## Saves profiles in the old format:          
-#    #saves recorded profile in hard drive. Called from file menu 
-#    def fileSave(self):
-#        f = None
-#        try:         
-#            filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))
-#            
-#            self.serialize(filename + ".art",self.getProfile())
-#        except IOError,e:
-#            self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
-#            aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
-#            return
-#        finally:
-#            if f:
-#                f.close()
-#            
-#            if filename:
-#                if u".txt" not in filename:
-#                    filename += u".txt"
-#                f = open(filename, 'w')
-#                f.write(u"[[MODE]]\n")
-#                f.write(self.qmc.mode)
-#                f.write(u"\n[[STARTEND]]\n")
-#                for i in range(4):
-#                    f.write(unicode(self.qmc.startend[i]) + u"    ")       
-#                f.write(u"\n[[CRACKS]]\n")
-#                for i in range(8):
-#                    f.write(unicode(self.qmc.varC[i]) + u"    ")
-#                f.write(u"\n[[FLAVORS]]\n")
-#                for i in range(10):
-#                    f.write(unicode(self.qmc.flavors[i])+ u"    ")
-#                f.write(u"\n[[FLAVOR-LABELS]]\n")
-#                for i in range(8):
-#                    f.write(self.qmc.flavorlabels[i] + u";;;")
-#                f.write(self.qmc.flavorlabels[i+1])
-#                f.write(u"\n[[TITLE]]\n")
-#                f.write(self.qmc.title)
-#                f.write(u"\n[[BEANS]]\n")
-#                f.write(self.qmc.beans)
-#                f.write(u"\n[[WEIGHT]]\n")
-#                for i in range(3):
-#                    f.write(unicode(self.qmc.weight[i]))
-#                    f.write(u"    ")
-#                f.write(u"\n[[ROASTER-TYPE]]\n")
-#                f.write(self.qmc.roastertype)
-#                f.write(u"\n[[OPERATOR]]\n")
-#                f.write(self.qmc.operator)
-#                f.write(u"\n[[DATE]]\n")
-#                f.write(unicode(self.qmc.roastdate.toString()))            
-#                f.write(u"\n[[EVENTS]]\n")
-#                if len(self.qmc.specialevents):
-#                    for i in range(len(self.qmc.specialevents)):
-#                        f.write(unicode(self.qmc.specialevents[i]) + u"    ")
-#                else:
-#                    f.write(u"")
-#                f.write(u"\n[[EVENTS-DATA]]\n")
-#                if len(self.qmc.specialevents):
-#                    for i in range(len(self.qmc.specialevents)):
-#                        f.write(self.qmc.specialeventsStrings[i] + u"\n")
-#                else:
-#                    f.write(u"\n")
-#                f.write(u"[[ROASTING-NOTES]]\n")
-#                f.write(self.qmc.roastingnotes)
-#                f.write(u"\n[[CUPPING-NOTES]]\n")
-#                f.write(self.qmc.cuppingnotes)
-#                f.write(u"\n[[DATA]]\n")
-#                for i in range(len(self.qmc.timex)):
-#                    f.write( u"%.2f"%self.qmc.timex[i] + u"    " + u"%.1f"%self.qmc.temp1[i] + u"    " + u"%.1f"%self.qmc.temp2[i] + u"\n")
-#
-#                f.close()
-#                self.messagelabel.setText(u"Profile saved to FILE:  " + filename)
-#            else:
-#                self.messagelabel.setText(u"Profile NOT saved")        
-#
-#        except IOError,e:
-#            self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
-#            aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
-#            return
-#        finally:
-#            if f:
-#                f.close()
 
 
     #loads the settings at the start of application. See the oppposite closeEvent()
@@ -4315,69 +4246,116 @@ class editGraphDlg(QDialog):
         ntlines = len(aw.qmc.specialevents)         #number of events found
         nslines = len(aw.qmc.specialeventsStrings)  #number of descriptions for each event
 
-        #why to put documentation in dialogs
-        #msg1label = QLabel("Times are from begining of data (absolute)")
-        #msg1label.setAlignment(Qt.AlignLeft)
-
         #Dynamic content of events depending on number of events found    
         if ntlines > 0 and nslines > 0:
             time1 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[0]]))
             self.line1b = QLineEdit(time1)
             self.line1b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox1 = QComboBox()
+            self.etypeComboBox1.addItems(aw.qmc.etypes)
+            self.etypeComboBox1.setMaximumWidth(60)
+            self.etypeComboBox1.setMinimumWidth(60)
+            self.etypeComboBox1.setCurrentIndex(aw.qmc.specialeventstype[0])
             self.line1b.setMaximumWidth(50)
             self.line1 = QLineEdit(aw.qmc.specialeventsStrings[0])
+            
         if ntlines > 1 and nslines > 1:
             time2 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[1]]))
             self.line2b = QLineEdit(time2)
             self.line2b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox2 = QComboBox()
+            self.etypeComboBox2.addItems(aw.qmc.etypes)
+            self.etypeComboBox2.setMaximumWidth(60)
+            self.etypeComboBox2.setMinimumWidth(60)
+            self.etypeComboBox2.setCurrentIndex(aw.qmc.specialeventstype[1])
             self.line2b.setMaximumWidth(50)
             self.line2 = QLineEdit(aw.qmc.specialeventsStrings[1])
         if ntlines > 2 and nslines > 2:
             time3 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[2]]))
             self.line3b = QLineEdit(time3)
             self.line3b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox3 = QComboBox()
+            self.etypeComboBox3.addItems(aw.qmc.etypes)
+            self.etypeComboBox3.setMaximumWidth(60)
+            self.etypeComboBox3.setMinimumWidth(60)
+            self.etypeComboBox3.setCurrentIndex(aw.qmc.specialeventstype[2])
             self.line3b.setMaximumWidth(50)
             self.line3 = QLineEdit(aw.qmc.specialeventsStrings[2])
         if ntlines > 3 and nslines > 3:
             time4 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[3]]))
             self.line4b = QLineEdit(time4)
             self.line4b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox4 = QComboBox()
+            self.etypeComboBox4.addItems(aw.qmc.etypes)
+            self.etypeComboBox4.setMaximumWidth(60)
+            self.etypeComboBox4.setMinimumWidth(60)
+            self.etypeComboBox4.setCurrentIndex(aw.qmc.specialeventstype[3])
             self.line4b.setMaximumWidth(50)
             self.line4 = QLineEdit(aw.qmc.specialeventsStrings[3])
         if ntlines > 4 and nslines > 4:
             time5 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[4]]))
             self.line5b = QLineEdit(time5)
             self.line5b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox5 = QComboBox()
+            self.etypeComboBox5.addItems(aw.qmc.etypes)
+            self.etypeComboBox5.setMaximumWidth(60)
+            self.etypeComboBox5.setMinimumWidth(60)
+            self.etypeComboBox5.setCurrentIndex(aw.qmc.specialeventstype[4])
             self.line5b.setMaximumWidth(50)
             self.line5 = QLineEdit(aw.qmc.specialeventsStrings[4])
         if ntlines > 5 and nslines > 5:
             time6 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[5]]))
             self.line6b = QLineEdit(time6)
             self.line6b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox6 = QComboBox()
+            self.etypeComboBox6.addItems(aw.qmc.etypes)
+            self.etypeComboBox6.setMaximumWidth(60)
+            self.etypeComboBox6.setMinimumWidth(60)
+            self.etypeComboBox6.setCurrentIndex(aw.qmc.specialeventstype[5])
             self.line6b.setMaximumWidth(50)
             self.line6 = QLineEdit(time6 + u" " + aw.qmc.specialeventsStrings[5])
         if ntlines > 6 and nslines > 6:
             time7 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[6]]))
             self.line7b = QLineEdit(time7)
             self.line7b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox7 = QComboBox()
+            self.etypeComboBox7.addItems(aw.qmc.etypes)
+            self.etypeComboBox7.setMaximumWidth(60)
+            self.etypeComboBox7.setMinimumWidth(60)
+            self.etypeComboBox7.setCurrentIndex(aw.qmc.specialeventstype[6])
             self.line7b.setMaximumWidth(50)
             self.line7 = QLineEdit(time6 + u" " + aw.qmc.specialeventsStrings[6])
         if ntlines > 7 and nslines > 7:
             time8 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[7]]))
             self.line8b = QLineEdit(time8)
             self.line8b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox8 = QComboBox()
+            self.etypeComboBox8.addItems(aw.qmc.etypes)
+            self.etypeComboBox8.setMaximumWidth(60)
+            self.etypeComboBox8.setMinimumWidth(60)
+            self.etypeComboBox8.setCurrentIndex(aw.qmc.specialeventstype[7])
             self.line8b.setMaximumWidth(50)
             self.line8 = QLineEdit(time8 + u" " + aw.qmc.specialeventsStrings[7])
         if ntlines > 8 and nslines > 8:
             time9 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[8]]))
             self.line9b = QLineEdit(time9)
             self.line9b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox9 = QComboBox()
+            self.etypeComboBox9.addItems(aw.qmc.etypes)
+            self.etypeComboBox9.setMaximumWidth(60)
+            self.etypeComboBox9.setMinimumWidth(60)
+            self.etypeComboBox9.setCurrentIndex(aw.qmc.specialeventstype[8])
             self.line9b.setMaximumWidth(50)
             self.line9 = QLineEdit(time9 + u" " + aw.qmc.specialeventsStrings[8])
         if ntlines > 9 and nslines > 9:
             time10 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[9]]))
             self.line10b = QLineEdit(time10)
             self.line10b.setValidator(QRegExpValidator(regextime,self))
+            self.etypeComboBox10 = QComboBox()
+            self.etypeComboBox10.addItems(aw.qmc.etypes)
+            self.etypeComboBox10.setMaximumWidth(60)
+            self.etypeComboBox10.setMinimumWidth(60)
+            self.etypeComboBox10.setCurrentIndex(aw.qmc.specialeventstype[9])
             self.line10b.setMaximumWidth(50)
             self.line10 = QLineEdit(time10 + u" " + aw.qmc.specialeventsStrings[9])
 
@@ -4408,55 +4386,62 @@ class editGraphDlg(QDialog):
         if ntlines:
             eventsLayout.addWidget(numberlabel1,1,0)
             eventsLayout.addWidget(self.line1b,1,1)
-            eventsLayout.addWidget(self.line1,1,2)
+            eventsLayout.addWidget(self.etypeComboBox1,1,2)
+            eventsLayout.addWidget(self.line1,1,3)
         if ntlines > 1:
             eventsLayout.addWidget(numberlabel2,2,0)
             eventsLayout.addWidget(self.line2b,2,1)
-            eventsLayout.addWidget(self.line2,2,2)
+            eventsLayout.addWidget(self.etypeComboBox2,2,2)
+            eventsLayout.addWidget(self.line2,2,3)
         if ntlines > 2:
             eventsLayout.addWidget(numberlabel3,3,0)
             eventsLayout.addWidget(self.line3b,3,1)
-            eventsLayout.addWidget(self.line3,3,2)
+            eventsLayout.addWidget(self.etypeComboBox3,3,2)
+            eventsLayout.addWidget(self.line3,3,3)
         if ntlines >3:
             eventsLayout.addWidget(numberlabel4,4,0)
             eventsLayout.addWidget(self.line4b,4,1)
-            eventsLayout.addWidget(self.line4,4,2)
+            eventsLayout.addWidget(self.etypeComboBox4,4,2)
+            eventsLayout.addWidget(self.line4,4,3)
         if ntlines >4:
             eventsLayout.addWidget(numberlabel5,5,0)
             eventsLayout.addWidget(self.line5b,5,1)
-            eventsLayout.addWidget(self.line5,5,2)
+            eventsLayout.addWidget(self.etypeComboBox5,5,2)
+            eventsLayout.addWidget(self.line5,5,3)
         if ntlines >5:
             eventsLayout.addWidget(numberlabel6,6,0)
             eventsLayout.addWidget(self.line6b,6,1)
-            eventsLayout.addWidget(self.line6,6,2)
+            eventsLayout.addWidget(self.etypeComboBox6,6,2)
+            eventsLayout.addWidget(self.line6,6,3)
         if ntlines >6:
             eventsLayout.addWidget(numberlabel7,7,0)
             eventsLayout.addWidget(self.line7b,7,1)
-            eventsLayout.addWidget(self.line7,7,2)
+            eventsLayout.addWidget(self.etypeComboBox7,7,2)
+            eventsLayout.addWidget(self.line7,7,3)
         if ntlines >7:
             eventsLayout.addWidget(numberlabel8,8,0)
             eventsLayout.addWidget(self.line8b,8,1)
-            eventsLayout.addWidget(self.line8,8,2)
+            eventsLayout.addWidget(self.etypeComboBox8,8,2)
+            eventsLayout.addWidget(self.line8,8,3)
         if ntlines >8:
             eventsLayout.addWidget(numberlabel9,9,0)
             eventsLayout.addWidget(self.line9b,9,1)
-            eventsLayout.addWidget(self.line9,9,2)
+            eventsLayout.addWidget(self.etypeComboBox9,9,2)
+            eventsLayout.addWidget(self.line9,9,3)
         if ntlines >9:
             eventsLayout.addWidget(numberlabel10,10,0)
             eventsLayout.addWidget(self.line10b,10,1)
-            eventsLayout.addWidget(self.line10,10,2)
+            eventsLayout.addWidget(self.etypeComboBox10,10,2)
+            eventsLayout.addWidget(self.line10,10,3)
 
-        
         neweventButton = QPushButton("Add")
         neweventButton.setFocusPolicy(Qt.NoFocus)
-        #neweventButton.setMaximumSize(70, 30)
         neweventButton.setMaximumSize(neweventButton.sizeHint())
         neweventButton.setMinimumSize(neweventButton.minimumSizeHint())
         self.connect(neweventButton,SIGNAL("clicked()"),self.addevent)
 
         deleventButton = QPushButton("Delete")
         deleventButton.setFocusPolicy(Qt.NoFocus)
-        #deleventButton.setMaximumSize(70, 30)
         deleventButton.setMaximumSize(deleventButton.sizeHint())
         deleventButton.setMinimumSize(deleventButton.minimumSizeHint())
         self.connect(deleventButton,SIGNAL("clicked()"),self.delevent)
@@ -4688,33 +4673,43 @@ class editGraphDlg(QDialog):
             if ntlines > 0:
                 aw.qmc.specialevents[0] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line1b.text()))))
                 aw.qmc.specialeventsStrings[0] = unicode(self.line1.text())
+                aw.qmc.specialeventstype[0] = self.etypeComboBox1.currentIndex()
             if ntlines > 1:
                 aw.qmc.specialevents[1] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line2b.text()))))
                 aw.qmc.specialeventsStrings[1] = unicode(self.line2.text())
+                aw.qmc.specialeventstype[1] = self.etypeComboBox2.currentIndex()
             if ntlines > 2:
                 aw.qmc.specialevents[2] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line3b.text()))))
                 aw.qmc.specialeventsStrings[2] = unicode(self.line3.text())
+                aw.qmc.specialeventstype[2] = self.etypeComboBox3.currentIndex()
             if ntlines > 3:
                 aw.qmc.specialevents[3] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line4b.text()))))
                 aw.qmc.specialeventsStrings[3] = unicode(self.line4.text())
+                aw.qmc.specialeventstype[3] = self.etypeComboBox4.currentIndex()
             if ntlines > 4:
                 aw.qmc.specialevents[4] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line5b.text()))))
                 aw.qmc.specialeventsStrings[4] = unicode(self.line5.text())
+                aw.qmc.specialeventstype[4] = self.etypeComboBox5.currentIndex() 
             if ntlines > 5:
                 aw.qmc.specialevents[5] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line6b.text()))))
                 aw.qmc.specialeventsStrings[5] = unicode(self.line6.text())
+                aw.qmc.specialeventstype[5] = self.etypeComboBox6.currentIndex() 
             if ntlines > 6:
                 aw.qmc.specialevents[6] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line7b.text()))))
                 aw.qmc.specialeventsStrings[6] = unicode(self.line7.text())
+                aw.qmc.specialeventstype[6] = self.etypeComboBox7.currentIndex() 
             if ntlines > 7:
                 aw.qmc.specialevents[7] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line8b.text()))))
                 aw.qmc.specialeventsStrings[7] = unicode(self.line8.text())
+                aw.qmc.specialeventstype[7] = self.etypeComboBox8.currentIndex() 
             if ntlines > 8:
                 aw.qmc.specialevents[8] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line9b.text()))))
                 aw.qmc.specialeventsStrings[8] = unicode(self.line9.text())
+                aw.qmc.specialeventstype[8] = self.etypeComboBox9.currentIndex() 
             if ntlines > 9:
                 aw.qmc.specialevents[9] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line10b.text()))))
                 aw.qmc.specialeventsStrings[9] = unicode(self.line10.text())
+                aw.qmc.specialeventstype[9] = self.etypeComboBox10.currentIndex() 
 
         # Update Title
         aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
@@ -6065,7 +6060,7 @@ class serialport(object):
                 s2 = binascii.hexlify(r[10]+ r[11])
 
                 #we convert the strings to integers. Divide by 10.0 (decimal position)
-                return self.filterDropOuts(int(s1,16)/10, int(s2,16)/10.)
+                return self.filterDropOuts(int(s1,16)/10., int(s2,16)/10.)
             else:
                 aw.messagelabel.setText(u"No RX data from HH806AUtemperature()")
                 aw.qmc.errorlog.append(u"No RX data from HH806AUtemperature() ")
