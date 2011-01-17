@@ -4810,16 +4810,18 @@ class editGraphDlg(QDialog):
                 #compare sorroundings to find smallest
                 check1 =  abs(aw.qmc.timex[index] - seconds)   
                 check2 =  abs(aw.qmc.timex[index-1] - seconds) 
-                check3 =  abs(aw.qmc.timex[index+1] - seconds) 
+                if len(aw.qmc.timex) > index+1:
+                    check3 =  abs(aw.qmc.timex[index+1] - seconds) 
                 #find smallest of three
 
                 if check1 < check2 and check1 < check3:
                     return aw.qmc.timex[index]
                 elif check2 < check1 and check2 < check3:
                     return aw.qmc.timex[index-1]
-                elif check3 < check2 and check3 < check1:
+                elif check3 < check2 and check3 < check1 and len(aw.qmc.timex) > index+1:
                     return aw.qmc.timex[index + 1]
-                
+                else:
+                    return aw.qmc.timex[index]
             
     # adds a new event to the Dlg
     def addevent(self):
