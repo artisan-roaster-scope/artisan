@@ -941,16 +941,16 @@ class tgraphcanvas(FigureCanvas):
             
             self.writestatistics()
             
-            #write events
-            Nevents = len(self.specialevents)
-            step = 30
-            for i in range(Nevents):
-                firstletter = self.etypes[self.specialeventstype[i]][0]                
-                secondletter = self.eventsvalues[self.specialeventsvalue[i]]
-                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                                 xytext=(self.timex[int(self.specialevents[i])]-5,step),alpha=0.9,
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='<-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
-                
+        #write events
+        Nevents = len(self.specialevents)
+        step = 30
+        for i in range(Nevents):
+            firstletter = self.etypes[self.specialeventstype[i]][0]                
+            secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                             xytext=(self.timex[int(self.specialevents[i])]-5,step),alpha=0.9,
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='<-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+            
                 
         #update X label names and colors        
         self.xaxistosm()
@@ -1629,8 +1629,10 @@ class tgraphcanvas(FigureCanvas):
                 aw.messagelabel.setText(message)            
                 firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
                 secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
-                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp2[i]), xytext=(self.timex[i]-15,self.temp2[i]+ 40),alpha=0.9,
+                step = 30
+                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp2[i]), xytext=(self.timex[i]-15,step),alpha=0.9,
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+
             else:
                 aw.messagelabel.setText("No more than 10 events are allowed")
         else:
@@ -4710,8 +4712,6 @@ class editGraphDlg(QDialog):
                 aw.qmc.specialeventstype[0] = self.etypeComboBox1.currentIndex()
                 aw.qmc.specialeventsvalue[0] = self.valueComboBox1.currentIndex()
                 
-                
-
             if ntlines > 1:
                 aw.qmc.specialevents[1] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line2b.text()))))
                 aw.qmc.specialeventsStrings[1] = unicode(self.line2.text())
