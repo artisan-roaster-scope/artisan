@@ -17,7 +17,7 @@ from setuptools import setup
 
 
 # current version of Artisan
-VERSION = '0.3.0'
+VERSION = '0.3.2'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
@@ -36,7 +36,7 @@ OPTIONS = {
     'semi_standalone': False,
     'site_packages': True,
     'packages':['matplotlib'],
-    'optimize':  0,
+    'optimize':  2,
     'iconfile': 'artisan.icns',
     'includes': ['sip',
                  'serial',
