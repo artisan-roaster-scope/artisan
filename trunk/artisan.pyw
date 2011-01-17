@@ -116,7 +116,7 @@ from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainW
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient)
-from PyQt4.QtCore import (QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
+from PyQt4.QtCore import (Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList)
 
 
@@ -199,7 +199,7 @@ class tgraphcanvas(FigureCanvas):
         self.setParent(parent)
         # we define the widget as expandable
         FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)
-        
+
         # the rate of chage of temperature
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
@@ -271,7 +271,9 @@ class tgraphcanvas(FigureCanvas):
         #stores indexes (for ComboBox) in etypes above for each event. Max 10 events
         self.specialeventstype = [0,0,0,0,0,0,0,0,0,0] 
         #stores text descriptions for each event. Max 10 events
-        self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
+        self.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s"]        
+        self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
+        self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0]
 
         # set limits for X and Y axes. Default is in Farenheit units
         self.ylimit = 750
@@ -439,7 +441,6 @@ class tgraphcanvas(FigureCanvas):
             aw.lcd2.display(t1)                               # MET
             aw.lcd3.display(t2)                               # BT
             aw.lcd4.display(self.approx(self.rateofchange1*60))       # rate of change MET (degress per minute)
-            print self.approx(self.rateofchange2*60)
             aw.lcd5.display(self.approx(self.rateofchange2*60))       # rate of change BT (degrees per minute)
 
             self.fig.canvas.draw()
@@ -490,9 +491,9 @@ class tgraphcanvas(FigureCanvas):
         ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
         #plot proyections
         self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
-                         linestyle = '-.', linewidth= 8, alpha = .3, label="ET Proj")
+                         linestyle = '-.', linewidth= 8, alpha = .3)
         self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"],
-                         linestyle = '-.', linewidth= 8, alpha = .3, label="BT Proj")
+                         linestyle = '-.', linewidth= 8, alpha = .3)
         
         #erase every three trigger events to make it look like a radar
         l,p = divmod(self.ProjCounter,3)
@@ -724,6 +725,7 @@ class tgraphcanvas(FigureCanvas):
         self.weight = [0,0,u"g"]
         self.specialevents = []
         self.specialeventstype = [0,0,0,0,0,0,0,0,0,0]
+        self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0]
         self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.roastdate = QDate.currentDate()        
 
@@ -762,8 +764,8 @@ class tgraphcanvas(FigureCanvas):
         self.ax.add_patch(rect3)
 
         ##### ET,BT curves
-        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label="ET")
-        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label="BT")
+        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2)
+        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2)
 
         #check BACKGROUND flag
         if self.background:
@@ -779,9 +781,9 @@ class tgraphcanvas(FigureCanvas):
                 
             #draw background
             self.l_back1, = self.ax.plot(self.timeB, self.backgroundET,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label="ET Back")
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha)
             self.l_back2, = self.ax.plot(self.timeB, self.backgroundBT,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label="BT Back")
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha)
 
             #check backgroundDetails flag
             if self.backgroundDetails:
@@ -857,9 +859,9 @@ class tgraphcanvas(FigureCanvas):
 
         ##### DeltaET,DeltaBT curves
         if self.DeltaETflag:
-            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label="DeltaET")
+            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2)
         if self.DeltaBTflag:
-            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label="DeltaBT")
+            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2)
         
         handles = [self.l_temp1,self.l_temp2]
         labels = [u"ET",u"BT"]
@@ -887,7 +889,7 @@ class tgraphcanvas(FigureCanvas):
             
         #Add 1Cs markers
         if self.varC[0]:
-            st1 = u"1CS " + unicode(self.stringfromseconds(self.varC[0]-self.startend[0]))
+            st1 = u"FCs " + unicode(self.stringfromseconds(self.varC[0]-self.startend[0]))
             #anotate temperature
             self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
                                 self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
@@ -896,7 +898,7 @@ class tgraphcanvas(FigureCanvas):
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
         #Add 1Ce markers
         if self.varC[2]:
-            st1 = u"1CE " + unicode(self.stringfromseconds(self.varC[2]-self.startend[0]))
+            st1 = u"FCe " + unicode(self.stringfromseconds(self.varC[2]-self.startend[0]))
             #anotate temperature
             self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
                                 self.varC[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
@@ -908,14 +910,14 @@ class tgraphcanvas(FigureCanvas):
 
         #Add 2Cs markers
         if self.varC[4]:
-            st1 = u"2CS " + unicode(self.stringfromseconds(self.varC[4]-self.startend[0]))
+            st1 = u"SCs " + unicode(self.stringfromseconds(self.varC[4]-self.startend[0]))
             self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
                                 self.varC[5]+90),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)      
             self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-110),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
         #Add 2Ce markers
         if self.varC[6]:
-            st1 =  u"2CE " + unicode(self.stringfromseconds(self.varC[6]-self.startend[0]))
+            st1 =  u"SCe " + unicode(self.stringfromseconds(self.varC[6]-self.startend[0]))
             #anotate temperature
             self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
                                 self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
@@ -941,11 +943,13 @@ class tgraphcanvas(FigureCanvas):
             
             #write events
             Nevents = len(self.specialevents)
+            step = 30
             for i in range(Nevents):
-                firstletter = self.etypes[self.specialeventstype[i]][0]
-                self.ax.annotate(str(i+1)+ firstletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                                 xytext=(self.timex[int(self.specialevents[i])]-15,self.temp2[int(self.specialevents[i])]+ 40),alpha=0.8,
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=12)
+                firstletter = self.etypes[self.specialeventstype[i]][0]                
+                secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                                 xytext=(self.timex[int(self.specialevents[i])]-5,step),alpha=0.9,
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='<-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
                 
                 
         #update X label names and colors        
@@ -1616,14 +1620,21 @@ class tgraphcanvas(FigureCanvas):
     def EventRecord(self):
         i = len(self.timex)-1
         if i > 0:
-            self.specialevents.append(i)
-            Nevents = len(self.specialevents)
-            temp = unicode(self.temp2[i])
-            time = self.stringfromseconds(self.timex[i])
-            message = u"Event number "+ unicode(Nevents) + u"recorded at " + unicode(Nevents) +u" BT = " + temp + u" Time = " + time
-            aw.messagelabel.setText(message)
-            self.ax.text(self.timex[i],self.temp2[i],Nevents,color=self.palette["text"])
-
+            if len(self.specialevents)< 11:
+                self.specialevents.append(i)
+                temp = unicode(self.temp2[i])
+                time = self.stringfromseconds(self.timex[i])
+                Nevents = len(self.specialevents)
+                message = u"Event number "+ unicode(Nevents) + u" recorded at " + unicode(Nevents) +u" BT = " + temp + u" Time = " + time
+                aw.messagelabel.setText(message)            
+                firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
+                secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
+                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp2[i]), xytext=(self.timex[i]-15,self.temp2[i]+ 40),alpha=0.9,
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+            else:
+                aw.messagelabel.setText("No more than 10 events are allowed")
+        else:
+            aw.messagelabel.setText("No profile found")
 
     def movebackground(self,direction,step):
         lt = len(self.timeB)
@@ -1837,6 +1848,8 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText(unicode(e))
             self.errorlog.append(u"Exception error in drawinterp() " + unicode(e))
             return        
+
+
                 
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem
@@ -1862,20 +1875,11 @@ class VMToolbar(NavigationToolbar):
 ########################################################################################
             
 class ApplicationWindow(QMainWindow):
-    
     def __init__(self, parent = None):
-        self.MaxRecentFiles = 10
-        self.recentFileActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         # set window title
-        self.windowTitle = u"Artisan " + str(__version__)
-        self.setWindowTitle(self.windowTitle)
-        
-        for i in range(self.MaxRecentFiles):
-            self.recentFileActs.append(
-                    QAction(self, visible=False,
-                            triggered=self.openRecentFile))        
+        self.setWindowTitle(u"Artisan " + str(__version__))
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month. file-open/save will point to profilepath
         self.profilepath = u""
@@ -1944,50 +1948,51 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         self.button_1.setMaximumSize(90, 50)
         self.button_1.setMinimumHeight(50)
-        self.button_1.setToolTip("<font color=red size=2><b>" + "Press here to Start monitoring" + "</font></b>")
+        self.button_1.setToolTip("Starts recording")
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
 
         self.button_2 = QPushButton("OFF")
         self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
         self.button_2.setMaximumSize(90, 50)
         self.button_2.setMinimumHeight(50)
-        self.button_2.setToolTip("<font color=red size=2><b>" + "Press here to Stop monitoring" + "</font></b>")
+        #self.button_2.setToolTip("<font color=red size=2><b>" + "Press here to Stop monitoring" + "</font></b>")
+        self.button_2.setToolTip("Stops recording")
         self.connect(self.button_2, SIGNAL("clicked()"), self.qmc.OffMonitor)
 
         #create 1C START, 1C END, 2C START and 2C END buttons
-        self.button_3 = QPushButton("1C START")
+        self.button_3 = QPushButton("FC START")
         self.button_3.setStyleSheet("QPushButton { background-color: orange }")
         self.button_3.setMaximumSize(90, 50)
         self.button_3.setMinimumHeight(50)
-        self.button_3.setToolTip("Press here to mark begining of 1C crack")
+        self.button_3.setToolTip("Marks the begining of First Crack (FC)")
         self.connect(self.button_3, SIGNAL("clicked()"), self.qmc.mark1Cstart)
 
-        self.button_4 = QPushButton("1C END")
+        self.button_4 = QPushButton("FC END")
         self.button_4.setStyleSheet("QPushButton { background-color: orange }")
         self.button_4.setMaximumSize(90, 50)
         self.button_4.setMinimumHeight(50)
-        self.button_4.setToolTip("Press here to mark the end of 1C")
+        self.button_4.setToolTip("Marks the end of First Crack (FC)")
         self.connect(self.button_4, SIGNAL("clicked()"), self.qmc.mark1Cend)
 
-        self.button_5 = QPushButton("2C START")
+        self.button_5 = QPushButton("SC START")
         self.button_5.setStyleSheet("QPushButton { background-color: orange }")
         self.button_5.setMaximumSize(90, 50)
         self.button_5.setMinimumHeight(50)
-        self.button_5.setToolTip("Press here to mark the begining of 2C")
+        self.button_5.setToolTip("Marks the begining of Second Crack (SC)")
         self.connect(self.button_5, SIGNAL("clicked()"), self.qmc.mark2Cstart)
 
-        self.button_6 = QPushButton("2C END")
+        self.button_6 = QPushButton("SC END")
         self.button_6.setStyleSheet("QPushButton { background-color: orange }")
         self.button_6.setMaximumSize(90, 50)
         self.button_6.setMinimumHeight(50)
-        self.button_6.setToolTip("Press here to mark the end of 2C")
+        self.button_6.setToolTip("Marks the end of Second Crack (SC)")
         self.connect(self.button_6, SIGNAL("clicked()"), self.qmc.mark2Cend)
 
         #create RESET button
         self.button_7 = QPushButton("RESET")
         self.button_7.setStyleSheet("QPushButton { background-color: white }")
         self.button_7.setMaximumSize(90, 45)
-        self.button_7.setToolTip("<font color=red size=2><b>" + "Reset graphs and time" + "</font></b>")
+        self.button_7.setToolTip("Resets Graph and Time")
         self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset_and_redraw)
 
         #create CHARGE button
@@ -1995,7 +2000,7 @@ class ApplicationWindow(QMainWindow):
         self.button_8.setStyleSheet("QPushButton { background-color: #f07800 }")
         self.button_8.setMaximumSize(90, 50)
         self.button_8.setMinimumHeight(50)
-        self.button_8.setToolTip("<font color=red size=2><b>" + "Press here to mark the begining of the roast" + "</font></b>")
+        self.button_8.setToolTip("Marks the begining of the roast (beans in)")
         self.connect(self.button_8, SIGNAL("clicked()"), self.qmc.markCharge)
 
         #create DROP button
@@ -2003,7 +2008,7 @@ class ApplicationWindow(QMainWindow):
         self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
         self.button_9.setMaximumSize(90, 50)
         self.button_9.setMinimumHeight(50)
-        self.button_9.setToolTip("<font color=red size=2><b>" + "Press here to Stop monitoring" + "</font></b>")
+        self.button_9.setToolTip("Marks the end of the roast (drop beans)")
         self.connect(self.button_9, SIGNAL("clicked()"), self.qmc.markDrop)
 
         #create PID control button
@@ -2012,11 +2017,12 @@ class ApplicationWindow(QMainWindow):
         self.button_10.setMaximumSize(90, 45)
         self.connect(self.button_10, SIGNAL("clicked()"), self.PIDcontrol)        
 
-        #create Event record button
+        #create EVENT record button
         self.button_11 = QPushButton("EVENT")
         self.button_11.setStyleSheet("QPushButton { background-color: yellow}")
         self.button_11.setMaximumSize(90, 50)
         self.button_11.setMinimumHeight(50)
+        self.button_11.setToolTip("Marks an Event")
         self.connect(self.button_11, SIGNAL("clicked()"), self.qmc.EventRecord) 
 
         #create PID+5 button
@@ -2024,42 +2030,55 @@ class ApplicationWindow(QMainWindow):
         self.button_12.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_12.setMaximumSize(90, 50)
         self.button_12.setMinimumHeight(50)
+        self.button_12.setToolTip("Increases the current SV value by 5")
+
 
         #create PID+10 button
         self.button_13 = QPushButton("SV +10")
         self.button_13.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_13.setMaximumSize(90, 50)
         self.button_13.setMinimumHeight(50)
+        self.button_13.setToolTip("Increases the current SV value by 10")
+
 
         #create PID+20 button
         self.button_14 = QPushButton("SV +20")
         self.button_14.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_14.setMaximumSize(90, 50)
         self.button_14.setMinimumHeight(50)
+        self.button_14.setToolTip("Increases the current SV value by 20")
+
 
         #create PID-20 button
         self.button_15 = QPushButton("SV -20")
         self.button_15.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_15.setMaximumSize(90, 50)
         self.button_15.setMinimumHeight(50)
+        self.button_15.setToolTip("Decreases the current SV value by 20")
+
 
         #create PID-10 button
         self.button_16 = QPushButton("SV -10")
         self.button_16.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_16.setMaximumSize(90, 50)
         self.button_16.setMinimumHeight(50)
+        self.button_16.setToolTip("Decreases the current SV value by 10")
+
 
         #create PID-5 button
         self.button_17 = QPushButton("SV -5")
         self.button_17.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_17.setMaximumSize(90, 50)
         self.button_17.setMinimumHeight(50)
+        self.button_17.setToolTip("Decreases the current SV value by 5")
+
         
         #create HUD button
         self.button_18 = QPushButton("HUD")
         self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
         self.button_18.setMaximumSize(90, 45)
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
+        self.button_18.setToolTip("Turns ON/OFF the HUD")
 
         #connect PID sv easy buttons
         self.connect(self.button_12, SIGNAL("clicked()"),lambda x=5: self.pid.adjustsv(x))
@@ -2078,17 +2097,6 @@ class ApplicationWindow(QMainWindow):
         naviLayout.addWidget(self.button_18,1)
         naviLayout.addWidget(self.button_7,2)
         
-        #only leave operational the control button if the device is Fuji PID
-        #the SV buttons are activated from the PID control panel 
-        if self.qmc.device > 0:
-            self.button_10.setVisible(False)        
-        self.button_12.setVisible(False)
-        self.button_13.setVisible(False)
-        self.button_14.setVisible(False)
-        self.button_15.setVisible(False)
-        self.button_16.setVisible(False)
-        self.button_17.setVisible(False)
-        
         #create LCD displays
         #RIGHT COLUMN
         self.lcd1 = QLCDNumber() # time
@@ -2105,6 +2113,21 @@ class ApplicationWindow(QMainWindow):
         self.lcd5.setStyleSheet("QLCDNumber { background-color: black }")
         self.lcd6.setStyleSheet("QLCDNumber { background-color: black }")
         
+        self.lcd1.setMaximumSize(90, 45)
+        self.lcd2.setMaximumSize(90, 45)
+        self.lcd3.setMaximumSize(90, 45)
+        self.lcd4.setMaximumSize(90, 45)
+        self.lcd5.setMaximumSize(90, 45)
+        self.lcd6.setMaximumSize(90, 45)
+
+        self.lcd1.setToolTip("Timer")
+        self.lcd2.setToolTip("ET Temperature")
+        self.lcd3.setToolTip("BT Temperature")
+        self.lcd4.setToolTip("ET/time (degrees/min)")
+        self.lcd5.setToolTip("BT/time (degrees/min)")
+        self.lcd6.setToolTip("Value of SV in PID")
+
+
         #create labels for LCDs
         #time
         self.label1 = QLabel()
@@ -2127,12 +2150,26 @@ class ApplicationWindow(QMainWindow):
         #label5.setStyleSheet("background-color:'#CCCCCC';")
         label5.setText( "<font color='black'><b>DeltaBT<\b></font>")
         # pid sv
-        label6 = QLabel()
+        self.label6 = QLabel()
         #label6.setStyleSheet("background-color:'#CCCCCC';")
-        label6.setText( "<font color='black'><b>PID SV<\b></font>")
+        self.label6.setText( "<font color='black'><b>PID SV<\b></font>")
+
+        #only leave operational the control button if the device is Fuji PID
+        #the SV buttons are activated from the PID control panel 
+        if self.qmc.device > 0:
+            self.button_10.setVisible(False)
+            self.label6.setVisible(False)
+            self.lcd6.setVisible(False)
+            
+        self.button_12.setVisible(False)
+        self.button_13.setVisible(False)
+        self.button_14.setVisible(False)
+        self.button_15.setVisible(False)
+        self.button_16.setVisible(False)
+        self.button_17.setVisible(False)
 
         #place control buttons + LCDs inside vertical button layout manager      
-        LCDlayout.addWidget(label6)
+        LCDlayout.addWidget(self.label6)
         LCDlayout.addWidget(self.lcd6)
         LCDlayout.addWidget(label2)
         LCDlayout.addWidget(self.lcd2)
@@ -2193,15 +2230,11 @@ class ApplicationWindow(QMainWindow):
             self.helpMenu = self.menuBar().addMenu("&Help")
             
         #FILE menu
-        fileLoadAction = QAction("Open...",self)
+        fileLoadAction = QAction("Open Profile...",self)
         fileLoadAction.setShortcut(QKeySequence.Open)
         self.connect(fileLoadAction,SIGNAL("triggered()"),self.fileLoad)
         self.fileMenu.addAction(fileLoadAction)
         
-        self.openRecentMenu = self.fileMenu.addMenu("Open Recent")
-        for i in range(self.MaxRecentFiles):
-            self.openRecentMenu.addAction(self.recentFileActs[i])
-        self.updateRecentFileActions()
 
         importMenu = self.fileMenu.addMenu("Import Readings")
 
@@ -2360,65 +2393,17 @@ class ApplicationWindow(QMainWindow):
         self.main_widget.setFocus()
 
         # set the central widget of MainWindow to main_widget
-        self.setCentralWidget(self.main_widget) 
-                
-    def strippedName(self, fullFileName):
-        return QFileInfo(fullFileName).fileName()
-          
-    def setCurrentFile(self, fileName):
-        self.curFile = fileName
-        if self.curFile:
-            self.setWindowTitle(("%s - " + self.windowTitle) % self.strippedName(self.curFile))
-        else:
-            self.setWindowTitle("Recent Files")
+        self.setCentralWidget(self.main_widget)   
 
-        settings = QSettings()
-        files = settings.value('recentFileList').toStringList()
 
-        try:
-            files.removeAll(fileName)
-        except ValueError:
-            pass
-
-        files.insert(0, fileName)
-        del files[self.MaxRecentFiles:]
-
-        settings.setValue('recentFileList', files)
-
-        for widget in QApplication.topLevelWidgets():
-            if isinstance(widget, ApplicationWindow):
-                widget.updateRecentFileActions()
-
-    def updateRecentFileActions(self):
-        settings = QSettings()
-        files = settings.value('recentFileList').toStringList()
-        numRecentFiles = min(len(files), self.MaxRecentFiles)
-
-        for i in range(numRecentFiles):
-            text = "&%s" % self.strippedName(files[i])
-            self.recentFileActs[i].setText(text)
-            self.recentFileActs[i].setData(files[i])
-            self.recentFileActs[i].setVisible(True)
-
-        for j in range(numRecentFiles, self.MaxRecentFiles):
-            self.recentFileActs[j].setVisible(False)
-                
-    def openRecentFile(self):
-        action = self.sender()
-        if action:
-            self.loadFile(action.data().toString())
-                        
-    def fileLoad(self):
-        fileName = QFileDialog.getOpenFileName(self,"Open",self.profilepath,"*.txt")
-        if fileName:
-            self.loadFile(fileName)
-            
     #loads stored profiles. Called from file menu        
-    def loadFile(self,filename):
+    def fileLoad(self):
         f = None
         old_mode = self.qmc.mode
 
         try:        
+            filename = unicode(QFileDialog.getOpenFileName(self,"Load Profile",self.profilepath,"*.txt"))
+            
             f = QFile(filename)
             if not f.open(QIODevice.ReadOnly):
                 raise IOError, unicode(f.errorString())            
@@ -2630,8 +2615,7 @@ class ApplicationWindow(QMainWindow):
             message =  unicode(filename) + u" loaded successfully"
             self.messagelabel.setText(message)
             
-            #self.editgraph()
-            self.setCurrentFile(filename)
+            self.editgraph()
 
         except IOError,e:
             self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
@@ -2875,6 +2859,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialevents = profile["specialevents"]
         if "specialeventstype" in profile:
             self.qmc.specialeventstype = profile["specialeventstype"]
+        if "specialeventsvalue" in profile:
+            self.qmc.specialeventsvalue = profile["specialeventsvalue"]
         if "specialeventsStrings" in profile:
             self.qmc.specialeventsStrings = profile["specialeventsStrings"]
         if "roastingnotes" in profile:
@@ -2926,6 +2912,7 @@ class ApplicationWindow(QMainWindow):
         profile["roastdate"] = unicode(self.qmc.roastdate.toString())
         profile["specialevents"] = self.qmc.specialevents
         profile["specialeventstype"] = self.qmc.specialeventstype
+        profile["specialeventsvalue"] = self.qmc.specialeventsvalue
         profile["specialeventsStrings"] = self.qmc.specialeventsStrings
         profile["roastingnotes"] = self.qmc.roastingnotes
         profile["cuppingnotes"] = self.qmc.cuppingnotes
@@ -2950,7 +2937,6 @@ class ApplicationWindow(QMainWindow):
         try:         
             filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))            
             self.serialize(filename,self.getProfile())
-            self.setCurrentFile(filename)
         except IOError,e:
             self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
@@ -4251,113 +4237,151 @@ class editGraphDlg(QDialog):
             time1 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[0]]))
             self.line1b = QLineEdit(time1)
             self.line1b.setValidator(QRegExpValidator(regextime,self))
+            self.line1b.setMaximumWidth(38)
             self.etypeComboBox1 = QComboBox()
             self.etypeComboBox1.addItems(aw.qmc.etypes)
             self.etypeComboBox1.setMaximumWidth(60)
-            self.etypeComboBox1.setMinimumWidth(60)
             self.etypeComboBox1.setCurrentIndex(aw.qmc.specialeventstype[0])
-            self.line1b.setMaximumWidth(50)
+            self.valueComboBox1 = QComboBox()
+            self.valueComboBox1.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox1.setMaximumWidth(35)
+            self.valueComboBox1.setCurrentIndex(aw.qmc.specialeventsvalue[0])
             self.line1 = QLineEdit(aw.qmc.specialeventsStrings[0])
             
         if ntlines > 1 and nslines > 1:
             time2 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[1]]))
             self.line2b = QLineEdit(time2)
             self.line2b.setValidator(QRegExpValidator(regextime,self))
+            self.line2b.setMaximumWidth(38)
             self.etypeComboBox2 = QComboBox()
             self.etypeComboBox2.addItems(aw.qmc.etypes)
             self.etypeComboBox2.setMaximumWidth(60)
-            self.etypeComboBox2.setMinimumWidth(60)
             self.etypeComboBox2.setCurrentIndex(aw.qmc.specialeventstype[1])
-            self.line2b.setMaximumWidth(50)
+            self.valueComboBox2 = QComboBox()
+            self.valueComboBox2.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox2.setMaximumWidth(35)
+            self.valueComboBox2.setCurrentIndex(aw.qmc.specialeventsvalue[1])
             self.line2 = QLineEdit(aw.qmc.specialeventsStrings[1])
+            
         if ntlines > 2 and nslines > 2:
             time3 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[2]]))
             self.line3b = QLineEdit(time3)
             self.line3b.setValidator(QRegExpValidator(regextime,self))
+            self.line3b.setMaximumWidth(38)
             self.etypeComboBox3 = QComboBox()
             self.etypeComboBox3.addItems(aw.qmc.etypes)
             self.etypeComboBox3.setMaximumWidth(60)
-            self.etypeComboBox3.setMinimumWidth(60)
             self.etypeComboBox3.setCurrentIndex(aw.qmc.specialeventstype[2])
-            self.line3b.setMaximumWidth(50)
+            self.valueComboBox3 = QComboBox()
+            self.valueComboBox3.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox3.setMaximumWidth(35)
+            self.valueComboBox3.setCurrentIndex(aw.qmc.specialeventsvalue[2])
             self.line3 = QLineEdit(aw.qmc.specialeventsStrings[2])
+            
         if ntlines > 3 and nslines > 3:
             time4 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[3]]))
             self.line4b = QLineEdit(time4)
             self.line4b.setValidator(QRegExpValidator(regextime,self))
+            self.line4b.setMaximumWidth(38)            
             self.etypeComboBox4 = QComboBox()
             self.etypeComboBox4.addItems(aw.qmc.etypes)
             self.etypeComboBox4.setMaximumWidth(60)
-            self.etypeComboBox4.setMinimumWidth(60)
             self.etypeComboBox4.setCurrentIndex(aw.qmc.specialeventstype[3])
-            self.line4b.setMaximumWidth(50)
+            self.valueComboBox4 = QComboBox()
+            self.valueComboBox4.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox4.setMaximumWidth(35)
+            self.valueComboBox4.setCurrentIndex(aw.qmc.specialeventsvalue[3])
             self.line4 = QLineEdit(aw.qmc.specialeventsStrings[3])
+            
         if ntlines > 4 and nslines > 4:
             time5 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[4]]))
             self.line5b = QLineEdit(time5)
             self.line5b.setValidator(QRegExpValidator(regextime,self))
+            self.line5b.setMaximumWidth(38)
             self.etypeComboBox5 = QComboBox()
             self.etypeComboBox5.addItems(aw.qmc.etypes)
             self.etypeComboBox5.setMaximumWidth(60)
-            self.etypeComboBox5.setMinimumWidth(60)
             self.etypeComboBox5.setCurrentIndex(aw.qmc.specialeventstype[4])
-            self.line5b.setMaximumWidth(50)
+            self.valueComboBox5 = QComboBox()
+            self.valueComboBox5.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox5.setMaximumWidth(35)
+            self.valueComboBox5.setCurrentIndex(aw.qmc.specialeventsvalue[4])
             self.line5 = QLineEdit(aw.qmc.specialeventsStrings[4])
+            
         if ntlines > 5 and nslines > 5:
             time6 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[5]]))
             self.line6b = QLineEdit(time6)
             self.line6b.setValidator(QRegExpValidator(regextime,self))
+            self.line6b.setMaximumWidth(38)
             self.etypeComboBox6 = QComboBox()
             self.etypeComboBox6.addItems(aw.qmc.etypes)
             self.etypeComboBox6.setMaximumWidth(60)
-            self.etypeComboBox6.setMinimumWidth(60)
-            self.etypeComboBox6.setCurrentIndex(aw.qmc.specialeventstype[5])
-            self.line6b.setMaximumWidth(50)
-            self.line6 = QLineEdit(time6 + u" " + aw.qmc.specialeventsStrings[5])
+            self.etypeComboBox6.setCurrentIndex(aw.qmc.specialeventstype[5])       
+            self.valueComboBox6 = QComboBox()
+            self.valueComboBox6.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox6.setMaximumWidth(35)
+            self.valueComboBox6.setCurrentIndex(aw.qmc.specialeventsvalue[5])            
+            self.line6 = QLineEdit(aw.qmc.specialeventsStrings[5])
+            
         if ntlines > 6 and nslines > 6:
             time7 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[6]]))
             self.line7b = QLineEdit(time7)
             self.line7b.setValidator(QRegExpValidator(regextime,self))
+            self.line7b.setMaximumWidth(38)
             self.etypeComboBox7 = QComboBox()
             self.etypeComboBox7.addItems(aw.qmc.etypes)
             self.etypeComboBox7.setMaximumWidth(60)
-            self.etypeComboBox7.setMinimumWidth(60)
             self.etypeComboBox7.setCurrentIndex(aw.qmc.specialeventstype[6])
-            self.line7b.setMaximumWidth(50)
-            self.line7 = QLineEdit(time6 + u" " + aw.qmc.specialeventsStrings[6])
+            self.valueComboBox7 = QComboBox()
+            self.valueComboBox7.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox7.setMaximumWidth(35)
+            self.valueComboBox7.setCurrentIndex(aw.qmc.specialeventsvalue[6])
+            self.line7 = QLineEdit(aw.qmc.specialeventsStrings[6])
+            
         if ntlines > 7 and nslines > 7:
             time8 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[7]]))
             self.line8b = QLineEdit(time8)
             self.line8b.setValidator(QRegExpValidator(regextime,self))
+            self.line8b.setMaximumWidth(38)
             self.etypeComboBox8 = QComboBox()
             self.etypeComboBox8.addItems(aw.qmc.etypes)
             self.etypeComboBox8.setMaximumWidth(60)
-            self.etypeComboBox8.setMinimumWidth(60)
             self.etypeComboBox8.setCurrentIndex(aw.qmc.specialeventstype[7])
-            self.line8b.setMaximumWidth(50)
-            self.line8 = QLineEdit(time8 + u" " + aw.qmc.specialeventsStrings[7])
+            self.valueComboBox8 = QComboBox()
+            self.valueComboBox8.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox8.setMaximumWidth(35)
+            self.valueComboBox8.setCurrentIndex(aw.qmc.specialeventsvalue[7])
+            self.line8 = QLineEdit(aw.qmc.specialeventsStrings[7])
+            
         if ntlines > 8 and nslines > 8:
             time9 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[8]]))
             self.line9b = QLineEdit(time9)
             self.line9b.setValidator(QRegExpValidator(regextime,self))
+            self.line9b.setMaximumWidth(38)
             self.etypeComboBox9 = QComboBox()
             self.etypeComboBox9.addItems(aw.qmc.etypes)
             self.etypeComboBox9.setMaximumWidth(60)
-            self.etypeComboBox9.setMinimumWidth(60)
             self.etypeComboBox9.setCurrentIndex(aw.qmc.specialeventstype[8])
-            self.line9b.setMaximumWidth(50)
-            self.line9 = QLineEdit(time9 + u" " + aw.qmc.specialeventsStrings[8])
+            self.valueComboBox9 = QComboBox()
+            self.valueComboBox9.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox9.setMaximumWidth(35)
+            self.valueComboBox9.setCurrentIndex(aw.qmc.specialeventsvalue[8])
+            self.line9 = QLineEdit(aw.qmc.specialeventsStrings[8])
+            
         if ntlines > 9 and nslines > 9:
             time10 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[9]]))
             self.line10b = QLineEdit(time10)
             self.line10b.setValidator(QRegExpValidator(regextime,self))
+            self.line10b.setMaximumWidth(38)
             self.etypeComboBox10 = QComboBox()
             self.etypeComboBox10.addItems(aw.qmc.etypes)
             self.etypeComboBox10.setMaximumWidth(60)
-            self.etypeComboBox10.setMinimumWidth(60)
             self.etypeComboBox10.setCurrentIndex(aw.qmc.specialeventstype[9])
-            self.line10b.setMaximumWidth(50)
-            self.line10 = QLineEdit(time10 + u" " + aw.qmc.specialeventsStrings[9])
+            self.valueComboBox10 = QComboBox()
+            self.valueComboBox10.addItems(aw.qmc.eventsvalues)
+            self.valueComboBox10.setMaximumWidth(35)
+            self.valueComboBox10.setCurrentIndex(aw.qmc.specialeventsvalue[9])
+            self.line10 = QLineEdit(aw.qmc.specialeventsStrings[9])
 
         numberlabel1 = QLabel("Event 1")
         numberlabel2 = QLabel("Event 2")
@@ -4387,52 +4411,62 @@ class editGraphDlg(QDialog):
             eventsLayout.addWidget(numberlabel1,1,0)
             eventsLayout.addWidget(self.line1b,1,1)
             eventsLayout.addWidget(self.etypeComboBox1,1,2)
-            eventsLayout.addWidget(self.line1,1,3)
+            eventsLayout.addWidget(self.valueComboBox1,1,3)
+            eventsLayout.addWidget(self.line1,1,4)
         if ntlines > 1:
             eventsLayout.addWidget(numberlabel2,2,0)
             eventsLayout.addWidget(self.line2b,2,1)
             eventsLayout.addWidget(self.etypeComboBox2,2,2)
-            eventsLayout.addWidget(self.line2,2,3)
+            eventsLayout.addWidget(self.valueComboBox2,2,3)
+            eventsLayout.addWidget(self.line2,2,4)
         if ntlines > 2:
             eventsLayout.addWidget(numberlabel3,3,0)
             eventsLayout.addWidget(self.line3b,3,1)
             eventsLayout.addWidget(self.etypeComboBox3,3,2)
-            eventsLayout.addWidget(self.line3,3,3)
+            eventsLayout.addWidget(self.valueComboBox3,3,3)
+            eventsLayout.addWidget(self.line3,3,4)
         if ntlines >3:
             eventsLayout.addWidget(numberlabel4,4,0)
             eventsLayout.addWidget(self.line4b,4,1)
             eventsLayout.addWidget(self.etypeComboBox4,4,2)
-            eventsLayout.addWidget(self.line4,4,3)
+            eventsLayout.addWidget(self.valueComboBox4,4,3)
+            eventsLayout.addWidget(self.line4,4,4)
         if ntlines >4:
             eventsLayout.addWidget(numberlabel5,5,0)
             eventsLayout.addWidget(self.line5b,5,1)
             eventsLayout.addWidget(self.etypeComboBox5,5,2)
-            eventsLayout.addWidget(self.line5,5,3)
+            eventsLayout.addWidget(self.valueComboBox5,5,3)
+            eventsLayout.addWidget(self.line5,5,4)
         if ntlines >5:
             eventsLayout.addWidget(numberlabel6,6,0)
             eventsLayout.addWidget(self.line6b,6,1)
             eventsLayout.addWidget(self.etypeComboBox6,6,2)
-            eventsLayout.addWidget(self.line6,6,3)
+            eventsLayout.addWidget(self.valueComboBox6,6,3)
+            eventsLayout.addWidget(self.line6,6,4)
         if ntlines >6:
             eventsLayout.addWidget(numberlabel7,7,0)
             eventsLayout.addWidget(self.line7b,7,1)
             eventsLayout.addWidget(self.etypeComboBox7,7,2)
-            eventsLayout.addWidget(self.line7,7,3)
+            eventsLayout.addWidget(self.valueComboBox7,7,3)
+            eventsLayout.addWidget(self.line7,7,4)
         if ntlines >7:
             eventsLayout.addWidget(numberlabel8,8,0)
             eventsLayout.addWidget(self.line8b,8,1)
             eventsLayout.addWidget(self.etypeComboBox8,8,2)
-            eventsLayout.addWidget(self.line8,8,3)
+            eventsLayout.addWidget(self.valueComboBox8,8,3)
+            eventsLayout.addWidget(self.line8,8,4)
         if ntlines >8:
             eventsLayout.addWidget(numberlabel9,9,0)
             eventsLayout.addWidget(self.line9b,9,1)
             eventsLayout.addWidget(self.etypeComboBox9,9,2)
-            eventsLayout.addWidget(self.line9,9,3)
+            eventsLayout.addWidget(self.valueComboBox9,9,3)
+            eventsLayout.addWidget(self.line9,9,4)
         if ntlines >9:
             eventsLayout.addWidget(numberlabel10,10,0)
             eventsLayout.addWidget(self.line10b,10,1)
             eventsLayout.addWidget(self.etypeComboBox10,10,2)
-            eventsLayout.addWidget(self.line10,10,3)
+            eventsLayout.addWidget(self.valueComboBox10,10,3)
+            eventsLayout.addWidget(self.line10,10,4)
 
         neweventButton = QPushButton("Add")
         neweventButton.setFocusPolicy(Qt.NoFocus)
@@ -4674,42 +4708,64 @@ class editGraphDlg(QDialog):
                 aw.qmc.specialevents[0] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line1b.text()))))
                 aw.qmc.specialeventsStrings[0] = unicode(self.line1.text())
                 aw.qmc.specialeventstype[0] = self.etypeComboBox1.currentIndex()
+                aw.qmc.specialeventsvalue[0] = self.valueComboBox1.currentIndex()
+                
+                
+
             if ntlines > 1:
                 aw.qmc.specialevents[1] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line2b.text()))))
                 aw.qmc.specialeventsStrings[1] = unicode(self.line2.text())
                 aw.qmc.specialeventstype[1] = self.etypeComboBox2.currentIndex()
+                aw.qmc.specialeventsvalue[1] = self.valueComboBox2.currentIndex()
+
             if ntlines > 2:
                 aw.qmc.specialevents[2] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line3b.text()))))
                 aw.qmc.specialeventsStrings[2] = unicode(self.line3.text())
                 aw.qmc.specialeventstype[2] = self.etypeComboBox3.currentIndex()
+                aw.qmc.specialeventsvalue[2] = self.valueComboBox3.currentIndex()
+            
             if ntlines > 3:
                 aw.qmc.specialevents[3] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line4b.text()))))
                 aw.qmc.specialeventsStrings[3] = unicode(self.line4.text())
                 aw.qmc.specialeventstype[3] = self.etypeComboBox4.currentIndex()
+                aw.qmc.specialeventsvalue[3] = self.valueComboBox4.currentIndex()
+
             if ntlines > 4:
                 aw.qmc.specialevents[4] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line5b.text()))))
                 aw.qmc.specialeventsStrings[4] = unicode(self.line5.text())
-                aw.qmc.specialeventstype[4] = self.etypeComboBox5.currentIndex() 
+                aw.qmc.specialeventstype[4] = self.etypeComboBox5.currentIndex()
+                aw.qmc.specialeventsvalue[4] = self.valueComboBox5.currentIndex()
+
             if ntlines > 5:
                 aw.qmc.specialevents[5] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line6b.text()))))
                 aw.qmc.specialeventsStrings[5] = unicode(self.line6.text())
-                aw.qmc.specialeventstype[5] = self.etypeComboBox6.currentIndex() 
+                aw.qmc.specialeventstype[5] = self.etypeComboBox6.currentIndex()
+                aw.qmc.specialeventsvalue[5] = self.valueComboBox6.currentIndex()
+
             if ntlines > 6:
                 aw.qmc.specialevents[6] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line7b.text()))))
                 aw.qmc.specialeventsStrings[6] = unicode(self.line7.text())
-                aw.qmc.specialeventstype[6] = self.etypeComboBox7.currentIndex() 
+                aw.qmc.specialeventstype[6] = self.etypeComboBox7.currentIndex()
+                aw.qmc.specialeventsvalue[6] = self.valueComboBox7.currentIndex()
+
             if ntlines > 7:
                 aw.qmc.specialevents[7] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line8b.text()))))
                 aw.qmc.specialeventsStrings[7] = unicode(self.line8.text())
-                aw.qmc.specialeventstype[7] = self.etypeComboBox8.currentIndex() 
+                aw.qmc.specialeventstype[7] = self.etypeComboBox8.currentIndex()
+                aw.qmc.specialeventsvalue[7] = self.valueComboBox8.currentIndex()
+
             if ntlines > 8:
                 aw.qmc.specialevents[8] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line9b.text()))))
                 aw.qmc.specialeventsStrings[8] = unicode(self.line9.text())
-                aw.qmc.specialeventstype[8] = self.etypeComboBox9.currentIndex() 
+                aw.qmc.specialeventstype[8] = self.etypeComboBox9.currentIndex()
+                aw.qmc.specialeventsvalue[8] = self.valueComboBox9.currentIndex()
+
             if ntlines > 9:
                 aw.qmc.specialevents[9] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line10b.text()))))
                 aw.qmc.specialeventsStrings[9] = unicode(self.line10.text())
-                aw.qmc.specialeventstype[9] = self.etypeComboBox10.currentIndex() 
+                aw.qmc.specialeventstype[9] = self.etypeComboBox10.currentIndex()
+                aw.qmc.specialeventsvalue[9] = self.valueComboBox10.currentIndex()
+
 
         # Update Title
         aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
@@ -4778,12 +4834,16 @@ class editGraphDlg(QDialog):
     # adds a new event to the Dlg
     def addevent(self):
         self.accept()                       #saves edited events or notes before adding new event
-        if len(aw.qmc.timex) > 1:
+        if len(aw.qmc.timex) > 1 and len(aw.qmc.specialevents) < 10:
             aw.qmc.specialevents.append(0)
             self.close()
             aw.editgraph()
         else:
-            aw.messagelabel.setText(u"Events need time and data")
+            if len(aw.qmc.timex) < 1:
+                message = u"Events need time and data"
+            if len(aw.qmc.specialevents) == 10:
+                message = u"Max 10 Events allowed"
+            aw.messagelabel.setText(message)
 
     # pops an event from the Dlg
     def delevent(self):
@@ -6752,6 +6812,8 @@ class DeviceAssignmentDLG(QDialog):
             " ; PID to read BT set to " + str2 + " " + str(aw.ser.readBTpid[1])
             
             aw.button_10.setVisible(True)
+            aw.label6.setVisible(True)
+            aw.lcd6.setVisible(True)
             
         if self.nonpidButton.isChecked():
             meter = str(self.devicetypeComboBox.currentText())
@@ -6923,6 +6985,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.button_15.setVisible(False)
             aw.button_16.setVisible(False)
             aw.button_17.setVisible(False)
+            aw.label6.setVisible(False)
+            aw.lcd6.setVisible(False)
                         
         aw.messagelabel.setText(message)
             
