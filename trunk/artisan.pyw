@@ -3014,7 +3014,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.sensitivity = settings.value("Sensitivity",self.qmc.sensitivity).toInt()[0]
             settings.endGroup()
             settings.beginGroup("HUD")
-            self.qmc.projectCheck = settings.value("Projection",self.qmc.projectFlag).toBool()
+            self.qmc.projectFlag = settings.value("Projection",self.qmc.projectFlag).toInt()[0]
             self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
