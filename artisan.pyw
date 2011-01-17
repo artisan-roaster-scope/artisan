@@ -486,20 +486,20 @@ class tgraphcanvas(FigureCanvas):
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
-        #calculate the temperature endpoint at endofx acording to the latest rate of change
-        BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)
-        ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
-        #plot proyections
-        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
-                         linestyle = '-.', linewidth= 8, alpha = .3)
-        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"],
-                         linestyle = '-.', linewidth= 8, alpha = .3)
-        
         #erase every three trigger events to make it look like a radar
         l,p = divmod(self.ProjCounter,3)
         if p == 0:
             self.resetlines()
         self.ProjCounter += 1
+        #calculate the temperature endpoint at endofx acording to the latest rate of change
+        BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)
+        ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
+        #plot projections
+        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
+                         linestyle = '-.', linewidth= 8, alpha = .3)
+        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"],
+                         linestyle = '-.', linewidth= 8, alpha = .3)
+    
 
     def getTargetTime(self):
         
@@ -4152,18 +4152,8 @@ class HUDDlg(QDialog):
             aw.HUDfunction = 0
         elif mode == u"thermal":
             aw.HUDfunction = 1
-
-        if self.projectCheck.isChecked():
-            aw.qmc.projectFlag = True
-        else:
-            aw.qmc.projectFlag = False
-            aw.qmc.resetlines()
-            
-        aw.qmc.ETtarget = int(unicode(self.ETlineEdit.text()))
-        aw.qmc.BTtarget = int(unicode(self.BTlineEdit.text()))
         string = u"[ET target = " + unicode(self.ETlineEdit.text()) + u"] [BT target = " + unicode(self.BTlineEdit.text()) + u"]"
         aw.messagelabel.setText(string)
-        #self.close()
         self.accept()
 
     def closeEvent(self, event):    
