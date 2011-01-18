@@ -1045,15 +1045,12 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
-        self.ylimit = 0
+        self.ylimit_min = 0
         self.ylimit = 750
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
             self.phases[i] = self.approx(self.fromCtoF(self.phases[i]))          
         self.ax.set_ylabel("F",size=16,color = self.palette["ylabel"]) #Write "F" on Y axis
-        self.statisticsheight = 650
-        self.statisticsupper = 655
-        self.statisticslower = 617
         self.mode = u"F"
         if aw: # during initialization aw is still None
             aw.FahrenheitAction.setDisabled(True)
@@ -1071,9 +1068,6 @@ class tgraphcanvas(FigureCanvas):
         for i in range(4):
             self.phases[i] = self.approx(self.fromFtoC(self.phases[i]))
         self.ax.set_ylabel("C",size=16,color = self.palette["ylabel"]) #Write "C" on Y axis
-        self.statisticsheight = 341
-        self.statisticsupper = 346
-        self.statisticslower = 325
         self.mode = u"C"
         if aw: # during initialization aw is still None
             aw.CelsiusAction.setDisabled(True)
@@ -1533,20 +1527,28 @@ class tgraphcanvas(FigureCanvas):
             #finish time string
             st3 = self.stringfromseconds(finishphasetime)
 
+            #calculate the positions for the statistics elements
+            ydist = self.ylimit - self.ylimit_min
+            statisticsbarheight = ydist/80
+            statisticsheight = self.ylimit - (0.13 * ydist)
+            statisticsupper = statisticsheight + statisticsbarheight
+            statisticslower = statisticsheight - statisticsbarheight * 3
+            
             if self.statisticsflags[1]:
+                
                 #Draw finish phase rectangle
                 #chech to see if end of 1C exists. If so, use half between start of 1C and end of 1C. Otherwise use only the start of 1C
-                rect = patches.Rectangle( (self.varC[0], self.statisticsheight), width = finishphasetime, height = 5,
+                rect = patches.Rectangle( (self.varC[0], statisticsheight), width = finishphasetime, height = statisticsbarheight,
                                             color = self.palette["rect3"],alpha=0.5)
                 self.ax.add_patch(rect)
                 
                 # Draw mid phase rectangle
-                rect = patches.Rectangle( (self.startend[0]+dryphasetime, self.statisticsheight), width = midphasetime, height = 5,
+                rect = patches.Rectangle( (self.startend[0]+dryphasetime, statisticsheight), width = midphasetime, height = statisticsbarheight,
                                           color = self.palette["rect2"],alpha=0.5)
                 self.ax.add_patch(rect)
 
                 # Draw dry phase rectangle
-                rect = patches.Rectangle( (self.startend[0], self.statisticsheight), width = dryphasetime, height = 5,
+                rect = patches.Rectangle( (self.startend[0], statisticsheight), width = dryphasetime, height = statisticsbarheight,
                                           color = self.palette["rect1"],alpha=0.5)
                 self.ax.add_patch(rect)
 
@@ -1561,14 +1563,13 @@ class tgraphcanvas(FigureCanvas):
                 LP = self.temp2[TP_index]
 
             if self.statisticsflags[0]:            
-                self.ax.text(self.startend[0]+ dryphasetime/3,self.statisticsupper,st1 + u" "+ unicode(int(dryphaseP))+u"%",color=self.palette["text"])
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime/3,self.statisticsupper,st2+ " " + unicode(int(midphaseP))+u"%",color=self.palette["text"])
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/3,self.statisticsupper,st3 + u" " + unicode(int(finishphaseP))+ u"%",color=self.palette["text"])
+                self.ax.text(self.startend[0]+ dryphasetime/3,statisticsupper,st1 + u" "+ unicode(int(dryphaseP))+u"%",color=self.palette["text"])
+                self.ax.text(self.startend[0]+ dryphasetime+midphasetime/3,statisticsupper,st2+ " " + unicode(int(midphaseP))+u"%",color=self.palette["text"])
+                self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/3,statisticsupper,st3 + u" " + unicode(int(finishphaseP))+ u"%",color=self.palette["text"])
 
             if self.statisticsflags[2]:
                 (st1,st2,st3) = aw.defect_estimation()
 
-                    
                 rates_of_changes = aw.RoR(TP_index,dryEndIndex)
 
                 st1 += u"  (%.1f deg/min)"%rates_of_changes[0]
@@ -1576,9 +1577,9 @@ class tgraphcanvas(FigureCanvas):
                 st3 += u"  (%.1f deg/min)"%rates_of_changes[2]
         
                 #Write flavor estimation
-                self.ax.text(self.startend[0],self.statisticslower,st1,color=self.palette["text"],fontsize=11)
-                self.ax.text(self.startend[0]+ dryphasetime,self.statisticslower,st2,color=self.palette["text"],fontsize=11)
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime,self.statisticslower,st3,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0],statisticslower,st1,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0]+ dryphasetime,statisticslower,st2,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0]+ dryphasetime+midphasetime,statisticslower,st3,color=self.palette["text"],fontsize=11)
 
             if self.statisticsflags[3]:          
                 #calculate AREA under BT and ET
