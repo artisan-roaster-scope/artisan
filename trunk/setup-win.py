@@ -35,15 +35,13 @@ EXCLUDES = ['_tkagg',
 setup(
     name ="Artisan",
     author = "YOU",
-    windows=[{"script" : "E:\\Artisan\\artisan\\trunk\\artisan.pyw"}],
+    windows=[{"script" : "C:\\SVN\\artisan\\trunk\\artisan.pyw"}],
     data_files = mpl.get_py2exe_datafiles(),
-    zipfile = None,
+    zipfile = "lib\library.zip",
     options={"py2exe" :{
-                        "packages": ['matplotlib','pytz'],
+                        "packages": ['matplotlib','pytz',],
                         "compressed": True,
                         "unbuffered": True,
-                        "optimize":1,
-                        "bundle_files": 1,
                         "dll_excludes":[
                             'tcl84.dll','tk84.dll','libgdk-win32-2.0-0.dll',
                             'libgdk_pixbuf-2.0-0.dll','libgobject-2.0-0.dll'],
