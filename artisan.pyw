@@ -209,6 +209,7 @@ class tgraphcanvas(FigureCanvas):
         self.flagclock = False
         
         self.title = u"Roaster Scope"
+        self.ambientTemp = 0.
 
         #list to store the time of each reading. Most IMPORTANT variable.
         self.timex = []
@@ -221,6 +222,8 @@ class tgraphcanvas(FigureCanvas):
         #1C start time [0],1C start Temp [1],1C end time [2],1C end temp [3],2C start time [4], 2C start Temp [5],
         #2C end time [6], 2C end temp [7]
         self.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
+        #dryend time, dryend BTtemp
+        self.dryend = [0.,0.]
         #variable to mark the begining and end of the roast [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
         self.startend = [0.,0.,0.,0.]
 
@@ -229,7 +232,8 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundDetails = False
         self.backgroundpath = ""
         self.backgroundET,self.backgroundBT,self.timeB = [],[],[]
-        self.startendB,self.varCB = [0.,0.,0.,0.],[0.,0.,0.,0.,0.,0.,0.,0.]
+        self.startendB,self.varCB,self.dryendB = [0.,0.,0.,0.],[0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.]
+        self.dryend = [0.,0.]
         self.backgroundalpha = 0.3
         self.backgroundwidth = 2
         self.backgroundmetcolor = self.palette["met"]
@@ -719,6 +723,7 @@ class tgraphcanvas(FigureCanvas):
         self.sensitivity = 100.0 # was 20.0
         self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
         self.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
+        self.dryend = [0.,0.]
         self.startend = [0.,0.,0.,0.]
         self.specialevents=[]
         self.endofx = 60
@@ -737,7 +742,8 @@ class tgraphcanvas(FigureCanvas):
         aw.button_6.setDisabled(False)
         aw.button_7.setDisabled(False)
         aw.button_8.setDisabled(False)
-        aw.button_9.setDisabled(False)        
+        aw.button_9.setDisabled(False)
+        aw.button_19.setDisabled(False)        
         aw.button_1.setFlat(False)
         aw.button_2.setFlat(False)
         aw.button_3.setFlat(False)
@@ -747,6 +753,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_7.setFlat(False)
         aw.button_8.setFlat(False)
         aw.button_9.setFlat(False)
+        aw.button_19.setFlat(False)        
         
         self.title = u"Roaster Scope"
         self.roastertype = u""
@@ -763,7 +770,8 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0]
         self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.roastdate = QDate.currentDate()        
-
+        self.ambientTemp = 0.
+        
         #aw.settingsLoad()
         
         #restart() clock 
@@ -830,7 +838,17 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.annotate(st1, xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]+5,self.startendB[1]-100),fontsize=10,
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
                                 alpha=self.backgroundalpha)
-                
+
+                if self.dryendB[0]:
+                    st1 = unicode(self.stringfromseconds(self.dryendB[0]-self.startend[0]))
+                    self.ax.annotate(u"%.1f"%(self.dryendB[1]), xy=(self.dryendB[0], self.dryendB[1]),xytext=(self.dryendB[0]-5,self.dryendB[1]+50),fontsize=10,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
+                                     alpha=self.backgroundalpha)
+                    self.ax.annotate(st1, xy=(self.dryendB[0], self.dryendB[1]),xytext=(self.dryendB[0],self.dryendB[1]-50),fontsize=10,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
+                                     alpha=self.backgroundalpha)
+                    
+                    
                 if self.varCB[0]:
                     st1 = unicode(self.stringfromseconds(self.varCB[0]-self.startend[0]))
                     self.ax.annotate(u"%.1f"%(self.varCB[1]), xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0]-5,self.varCB[1]+50),fontsize=10,
@@ -921,7 +939,15 @@ class tgraphcanvas(FigureCanvas):
             #anotate time
             self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
                                 self.startend[1]-100),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
-            
+        #Add Dry End markers
+        if self.dryend[0]:
+            st1 = u"DE " + unicode(self.stringfromseconds(self.dryend[0]-self.startend[0]))
+            #anotate temperature
+            self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0]-5,
+                                self.dryend[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+            #anotate time
+            self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-50),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)            
         #Add 1Cs markers
         if self.varC[0]:
             st1 = u"FCs " + unicode(self.stringfromseconds(self.varC[0]-self.startend[0]))
@@ -1381,6 +1407,45 @@ class tgraphcanvas(FigureCanvas):
             
         aw.messagelabel.setText(message)
 
+    def markDryEnd(self):
+        if self.flagon:
+            # record Dry end only if Charge mark has been done
+            if self.startend[0]:
+                self.dryend[0] = self.timeclock.elapsed()/1000.
+                self.dryend[1] = self.temp2[-1]
+        
+                #calculate time elapsed since charge time
+                st1 = u"Dry end " + self.stringfromseconds(self.dryend[0] - self.startend[0])
+                #anotate temperature
+                self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0]-5,
+                                self.dryend[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-50),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+
+                aw.button_19.setDisabled(True)
+                aw.button_19.setFlat(True)
+                
+                message = u"DRY END recorded at " + st1 + u" BT = " + unicode(self.dryend[1]) + self.mode
+                
+                #move phase[1] (end of Dry Phase)
+                A = QLabel()
+                reply = QMessageBox.question(A,u"Phase change",
+                                         u"Change Dry End Phase?",
+                                         QMessageBox.Yes|QMessageBox.Cancel)
+                if reply == QMessageBox.Yes:
+                    self.phases[1] = self.dryend[1]                
+                    self.redraw()
+             
+
+            else:
+                message = u"Charge mark is missing. Do that first"
+        else:
+            message = u"Scope is OFF"
+
+        #set message at bottom
+        aw.messagelabel.setText(message)
+        
     #redord 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
         if self.flagon:
@@ -2125,6 +2190,14 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
         self.button_18.setToolTip("Turns ON/OFF the HUD")
 
+        #create DRY button
+        self.button_19 = QPushButton("DRY END")
+        self.button_19.setStyleSheet("QPushButton { background-color: orange }")
+        self.button_19.setMaximumSize(90, 50)
+        self.button_19.setMinimumHeight(50)
+        self.button_19.setToolTip("Marks the begining of First Crack (FC)")
+        self.connect(self.button_19, SIGNAL("clicked()"), self.qmc.markDryEnd)
+ 
         #connect PID sv easy buttons
         self.connect(self.button_12, SIGNAL("clicked()"),lambda x=5: self.pid.adjustsv(x))
         self.connect(self.button_13, SIGNAL("clicked()"),lambda x=10: self.pid.adjustsv(x))
@@ -2229,6 +2302,7 @@ class ApplicationWindow(QMainWindow):
         #place RECORDING buttons inside the horizontal button layout manager
         buttonHHbl.addWidget(self.button_1)
         buttonHHbl.addWidget(self.button_8)
+        buttonHHbl.addWidget(self.button_19)
         buttonHHbl.addWidget(self.button_3)
         buttonHHbl.addWidget(self.button_4)
         buttonHHbl.addWidget(self.button_5)
@@ -2753,6 +2827,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundBT = profile["temp2"]
                 self.qmc.startendB = profile["startend"]
                 self.qmc.varCB = profile["cracks"]
+                if "dryend" in profile:
+                    self.qmc.dryendB = profile["dryend"]                
             else:      
                 #variables to read on the text file are initialized as empty lists
                 self.qmc.backgroundET,self.qmc.backgroundBT,self.qmc.timeB = [],[],[]
@@ -2994,7 +3070,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.DeltaETflag = profile["DeltaET"]
         if "DeltaBT" in profile:
             self.qmc.DeltaBTflag = profile["DeltaBT"]
-
+        if "ambientTemp" in profile:
+            self.qmc.ambientTemp = profile["ambientTemp"]
+        if "dryend" in profile:
+            self.qmc.dryend = profile["dryend"]            
     #used by filesave()
     def getProfile(self):
         profile = {}
@@ -3027,8 +3106,8 @@ class ApplicationWindow(QMainWindow):
         profile["statisticsconditions"] = self.qmc.statisticsconditions
         profile["DeltaET"] = self.qmc.DeltaETflag
         profile["DeltaBT"] = self.qmc.DeltaBTflag
-
-        
+        profile["ambientTemp"] = self.qmc.ambientTemp
+        profile["dryend"] = self.qmc.dryend        
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -4294,7 +4373,14 @@ class editGraphDlg(QDialog):
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
         chargelabel.setBuddy(self.chargeedit)
-        
+
+        drylabel  = QLabel("<b>DRY END</b>")
+        drylabel.setStyleSheet("background-color:'orange';")
+        self.dryedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.dryend[0])))
+        self.dryedit.setValidator(QRegExpValidator(regextime,self))
+        self.dryedit.setMaximumWidth(50)
+        drylabel.setBuddy(self.dryedit)
+ 
         Cstartlabel = QLabel("<b>1C START</b>")
         Cstartlabel.setStyleSheet("background-color:'orange';")
         self.Cstartedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.varC[0])))
@@ -4622,7 +4708,7 @@ class editGraphDlg(QDialog):
         weightoutlabel = QLabel(" out")
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
-        self.weightinedit = QLineEdit(inw)
+        self.weightinedit = QLineEdit(inw) 
         
         self.weightinedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightinedit))
         self.weightinedit.setMinimumWidth(50)
@@ -4648,7 +4734,14 @@ class editGraphDlg(QDialog):
         self.unitsComboBox.setMinimumWidth(60)
         self.unitsComboBox.addItems(["g","Kg"])
 
-
+        #Ambient temperature (uses display mode as unit (F or C)
+        ambientlabel = QLabel("<b>Room Temperature </b>")
+        ambientunitslabel = QLabel("(" + aw.qmc.mode + ")")
+        self.ambientedit = QLineEdit( )
+        self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
+        self.ambientedit.setMaximumWidth(50)
+        self.ambientedit.setValidator(QDoubleValidator(0., 200., 1, self.ambientedit))
+  
         # NOTES
         roastertypelabel = QLabel()
         roastertypelabel.setText("<b>Roaster<\b>")
@@ -4675,9 +4768,7 @@ class editGraphDlg(QDialog):
         saveButton.setMaximumSize(saveButton.sizeHint())
         saveButton.setMinimumSize(saveButton.minimumSizeHint())
         
-        # why this restriction (anyhow tested in accept())? can't I add the beans name before roasting/recording..
-        #if len(aw.qmc.timex) < 1:
-        #    saveButton.setDisabled(True)
+ 
         
         #Cancel Button
         cancelButton = QPushButton("Cancel")
@@ -4691,17 +4782,19 @@ class editGraphDlg(QDialog):
 
         timeLayout = QGridLayout()
         timeLayout.addWidget(chargelabel,0,0)
-        timeLayout.addWidget(Cstartlabel,0,1)
-        timeLayout.addWidget(Cendlabel,0,2)
-        timeLayout.addWidget(CCstartlabel,0,3)
-        timeLayout.addWidget(CCendlabel,0,4)
-        timeLayout.addWidget(droplabel,0,5)
+        timeLayout.addWidget(drylabel,0,1)
+        timeLayout.addWidget(Cstartlabel,0,2)
+        timeLayout.addWidget(Cendlabel,0,3)
+        timeLayout.addWidget(CCstartlabel,0,4)
+        timeLayout.addWidget(CCendlabel,0,5)
+        timeLayout.addWidget(droplabel,0,6)
         timeLayout.addWidget(self.chargeedit,1,0)
-        timeLayout.addWidget(self.Cstartedit,1,1)
-        timeLayout.addWidget(self.Cendedit,1,2)
-        timeLayout.addWidget(self.CCstartedit,1,3)
-        timeLayout.addWidget(self.CCendedit,1,4)
-        timeLayout.addWidget(self.dropedit,1,5)
+        timeLayout.addWidget(self.dryedit,1,1)
+        timeLayout.addWidget(self.Cstartedit,1,2)
+        timeLayout.addWidget(self.Cendedit,1,3)
+        timeLayout.addWidget(self.CCstartedit,1,4)
+        timeLayout.addWidget(self.CCendedit,1,5)
+        timeLayout.addWidget(self.dropedit,1,6)
 
         eventbuttonLayout = QHBoxLayout()
         eventbuttonLayout.addStretch()  
@@ -4738,7 +4831,12 @@ class editGraphDlg(QDialog):
         weightLayout.addSpacing(10)
         weightLayout.addWidget(self.roastdegreelabel)  
         weightLayout.addStretch()  
-        
+
+        ambientLayout = QHBoxLayout()
+        ambientLayout.addWidget(ambientlabel,0,Qt.AlignLeft)
+        ambientLayout.addWidget(self.ambientedit,1,Qt.AlignLeft)
+        ambientLayout.addWidget( ambientunitslabel,2,Qt.AlignLeft)
+  	
         anotationLayout = QVBoxLayout()
         anotationLayout.addWidget(roastinglabel)
         anotationLayout.addWidget(self.roastingeditor)
@@ -4766,6 +4864,7 @@ class editGraphDlg(QDialog):
         totalLayout.addWidget(eventsGroupLayout)
         totalLayout.addLayout(textLayout)
         totalLayout.addLayout(weightLayout)
+        totalLayout.addLayout(ambientLayout)
         totalLayout.addLayout(anotationLayout)
         totalLayout.addStretch()  
         totalLayout.addLayout(okLayout)
@@ -4801,6 +4900,7 @@ class editGraphDlg(QDialog):
             #varC = 1C start time [0],1C start Temp [1],1C end time [2],1C end temp [3],2C start time [4], 2C start Temp [5],2C end time [6], 2C end temp [7]
             #startend = [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
             aw.qmc.startend[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))   #CHARGE   time
+            aw.qmc.dryend[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.dryedit.text())))        #DRY END time
             aw.qmc.varC[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))       #1C START time
             aw.qmc.varC[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))         #1C END   time
             aw.qmc.varC[4] = self.choice(aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))      #2C START time
@@ -4896,6 +4996,10 @@ class editGraphDlg(QDialog):
             pass
         aw.qmc.weight[2] = unicode(self.unitsComboBox.currentText())
 
+
+    	#update ambient temperature
+        aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
+         
         #update notes
         aw.qmc.roastertype = unicode(self.roaster.text())
         aw.qmc.operator = unicode(self.operator.text())
@@ -5893,6 +5997,7 @@ class backgroundDLG(QDialog):
         
         aw.qmc.backgroundET, aw.qmc.backgroundBT, aw.qmc.timeB = [],[],[]
         aw.qmc.startendB, aw.qmc.varCB = [0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.,0.,0.]
+        aw.qmc.dryendB = [0.,0.]
         aw.qmc.background = False
         aw.qmc.backgroundDetails = False
         aw.qmc.backmoveflag = 1
