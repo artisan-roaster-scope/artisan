@@ -61,8 +61,8 @@ __version__ = u"0.3.2"
 #  Example, add to Path ;C:\MINgw\bin     (; is important)
 
 #   QT GRAPHIC INTERFACE
-# 2) http://ftp3.ie.freebsd.org/pub/trolltech/pub/qt/source/qt-win-opensource-4.6.0-mingw.exe
-# add to Path environment variable the bin directory of Qt. Example ;C:\Qt\4.6.0\bin
+# 2) http://ftp3.ie.freebsd.org/pub/trolltech/pub/qt/source/qt-win-opensource-4.7.1-mingw.exe
+# add to Path environment variable the bin directory of Qt. Example ;C:\Qt\4.7.1\bin
 
 #   JAVA TO SUPPORT PYSERIAL LIBRARY
 # 3) Java JDK or JRE:  http://java.sun.com/javase/downloads/index.jsp
@@ -75,12 +75,11 @@ __version__ = u"0.3.2"
 
 #   EXTRA PYTHON LIBRARIES NEEDED (install after installing python 2.6.6)
 # 6) pyserial for python 2.6: http://sourceforge.net/projects/pyserial/files/pyserial/2.5/pyserial-2.5-rc1.win32.exe/download
-#    NOTE: at the present time, numpy 1.5 is incompatible with py2exe. Instead, use numpy 1.3 if compiling for Win executable
-# 7) http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0-win32-superpack-python2.6.exe/download 
-# 8) http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-0.99.1/
-# 9) pyqt4 for python 2.6: http://pyqwt.sourceforge.net/support/PyQt-Py2.6-gpl-4.5.4-1.exe
-
-
+# 7) http://sourceforge.net/projects/numpy/files/NumPy/1.5.1/numpy-1.5.1-win32-superpack-python2.6.exe/download
+# 8) http://sourceforge.net/projects/scipy/files/scipy/0.9.0rc1/scipy-0.9.0rc1-win32-superpack-python2.6.exe/download
+# 9) http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.0.1/matplotlib-1.0.1.win32-py2.6.exe/download
+# 10) pyqt4 for python 2.6: http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-Py2.6-x64-gpl-4.8.3-1.exe
+ 
 #########################   POLICIES  ###########################################################################
 # 1  STRINGS
 #
@@ -524,13 +523,13 @@ class tgraphcanvas(FigureCanvas):
             den = self.temp1[-1] - self.temp2[-1]  #denominator ETn - BTn 
             if den > 0: # if ETn > BTn
                 #get x points
-                xpoints = range(self.timex[-1],self.endofx + 120, self.delay/1000.)  #do two minutes after endofx (+ 120 seconds)
+                xpoints = list(numpy.arange (self.timex[-1],self.endofx + 120, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds)
                 #get y points
-                ypoints = [self.temp2[-1]]                      # start initializing with last BT
-                K =  self.projectionconstant*self.rateofchange2/den      # multiplier
-                for i in range(len(xpoints)-1):                 # create new points from previous points 
-                    DeltaT = K*(self.temp1[-1]- ypoints[-1])    # DeltaT = K*(ET - BT)
-                    ypoints.append(ypoints[-1]+ DeltaT)         # add DeltaT to the next ypoint                        
+                ypoints = [self.temp2[-1]]                              	    # start initializing with last BT
+                K =  self.projectionconstant*self.rateofchange2/den                 # multiplier
+                for i in range(len(xpoints)-1):                                     # create new points from previous points 
+                    DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
+                    ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint                        
                     
                 #plot line
                 self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], self.temp1[-1]],color =  self.palette["met"],
