@@ -6485,8 +6485,8 @@ class serialport(object):
             serCENTER.close()
             
             if len(r) == 45:
-                T1 = int(binascii.hexlify(r[7] + r[8]),16)
-                T2 = int(binascii.hexlify(r[9] + r[10]),16)
+                T1 = int(binascii.hexlify(r[7] + r[8]),16)/10.
+                T2 = int(binascii.hexlify(r[9] + r[10]),16)/10.
                 
                 #Display initial message to check T1 and T2 connectivity
                 if not self.CENTER309flag:
@@ -6502,7 +6502,7 @@ class serialport(object):
                         self.CENTER309flag = 1
                         
                 
-                return T1/10.,T2/10.
+                return T1,T2
             
             else:
                 nbytes = len(r)
