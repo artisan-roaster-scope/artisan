@@ -3113,6 +3113,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("HUD")
             self.qmc.projectFlag = settings.value("Projection",self.qmc.projectFlag).toInt()[0]
+            self.qmc.projectionmode = settings.value("ProjectionMode",self.qmc.projectionmode).toInt()[0]
             self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
@@ -3186,6 +3187,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("HUD")
             settings.setValue("Projection",self.qmc.projectFlag)
+            settings.setValue("ProjectionMode",self.qmc.projectionmode)
             settings.setValue("ETtarget",self.qmc.ETtarget)
             settings.setValue("BTtarget",self.qmc.BTtarget)
             settings.setValue("Mode",self.HUDfunction)
