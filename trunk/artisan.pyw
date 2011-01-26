@@ -259,6 +259,13 @@ class tgraphcanvas(FigureCanvas):
         self.projectFlag = False
         self.DeltaETflag = False
         self.DeltaBTflag = False
+        # projection variables of change of rate
+        self.HUDflag = 0
+        self.ProjCounter = 1
+        self.ETtarget = 350
+        self.BTtarget = 250
+        self.projectionconstant = 1
+        self.projectionmode = 0     # 0 = linear; 1 = newton
         
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight = [0,0,u"g"]
@@ -267,7 +274,7 @@ class tgraphcanvas(FigureCanvas):
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event
         self.specialevents = []
         #Combobox text items in editGraphDlg
-        self.etypes = ["None","Power","Dumper","Fan"]
+        self.etypes = ["None","Power","Damper","Fan"]
         #stores indexes (for ComboBox) in etypes above for each event. Max 10 events
         self.specialeventstype = [0,0,0,0,0,0,0,0,0,0] 
         #stores text descriptions for each event. Max 10 events
@@ -486,21 +493,50 @@ class tgraphcanvas(FigureCanvas):
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
-        #erase every three trigger events to make it look like a radar
-        l,p = divmod(self.ProjCounter,3)
-        if p == 0:
-            self.resetlines()
-        self.ProjCounter += 1
-        #calculate the temperature endpoint at endofx acording to the latest rate of change
-        BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)
-        ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
-        #plot projections
-        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
-                         linestyle = '-.', linewidth= 8, alpha = .3, label="ProjectET")
-        self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"],
-                         linestyle = '-.', linewidth= 8, alpha = .3, label="ProjectBT")
-    
+##        #erase every three trigger events to make it look like a radar
+##        l,p = divmod(self.ProjCounter,3)
+##        if p == 0:
+##            self.resetlines()
+##        self.ProjCounter += 1
+        self.resetlines()
 
+        if self.projectionmode == 0:
+            #calculate the temperature endpoint at endofx acording to the latest rate of change
+            BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)
+            ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
+            #plot projections
+            self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
+                             linestyle = '-.', linewidth= 8, alpha = .3)
+            self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"],
+                             linestyle = '-.', linewidth= 8, alpha = .3)
+            
+        elif self.projectionmode == 1:
+            # Under Test. Newton's Law of Cooling
+            # This comes from the formula of heating (with ET) a cool (colder) object (BT).
+            # The difference equation (discrete with n elements) is: DeltaT = T(n+1) - T(n) = K*(ET - BT)
+            # The formula is a natural decay towards ET. The closer BT to ET, the smaller the change in DeltaT
+            # projectionconstant is a multiplier factor. It depends on
+            # 1 Damper or fan. Heating by convection is _faster_ than heat by conduction,
+            # 2 Mass of beans. The heavier the mass, the _slower_ the heating of BT
+            # 3 Gas or electric power: gas heats BT _faster_ because of hoter air.
+            # Every roaster will have a different constantN.
+
+            den = self.temp1[-1] - self.temp2[-1]  #denominator ETn - BTn 
+            if den > 0: # if ETn > BTn
+                #get x points
+                xpoints = range(self.timex[-1],self.endofx + 120, self.delay/1000.)  #do two minutes after endofx (+ 120 seconds)
+                #get y points
+                ypoints = [self.temp2[-1]]                      # start initializing with last BT
+                K =  self.projectionconstant*self.rateofchange2/den      # multiplier
+                for i in range(len(xpoints)-1):                 # create new points from previous points 
+                    DeltaT = K*(self.temp1[-1]- ypoints[-1])    # DeltaT = K*(ET - BT)
+                    ypoints.append(ypoints[-1]+ DeltaT)         # add DeltaT to the next ypoint                        
+                    
+                #plot line
+                self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], self.temp1[-1]],color =  self.palette["met"],
+                             linestyle = '-.', linewidth= 3, alpha = .5)
+                self.ax.plot(xpoints, ypoints, color =  self.palette["bt"],linestyle = '-.', linewidth= 3, alpha = .5)                  
+                        
     def getTargetTime(self):
         
         if self.rateofchange1 > 0:
@@ -3995,14 +4031,20 @@ class HUDDlg(QDialog):
             self.DeltaET.setChecked(False)
 
         #delta BT   
-        self.DeltaBT = QCheckBox("DeltaBT")
+        self.DeltaBT = QCheckBox("DeltaBT")        
         if aw.qmc.DeltaBTflag == True:
             self.DeltaBT.setChecked(True)
         else:
             self.DeltaBT.setChecked(False)
 
         #show projection
-        self.projectCheck = QCheckBox("ET/BT Projection")
+        self.projectCheck = QCheckBox("Projection")
+        projectionmodeLabel = QLabel("Mode")
+        self.projectionmodeComboBox = QComboBox()
+        self.projectionmodeComboBox.addItems(["linear","newton"])
+        self.projectionmodeComboBox.setCurrentIndex(aw.qmc.projectionmode)
+        self.connect(self.projectionmodeComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.projectionmodeComboBox.currentIndex() :self.changeProjectionMode(i))
+
         if aw.qmc.projectFlag == True:
             self.projectCheck.setChecked(True)
         else:
@@ -4049,6 +4091,7 @@ class HUDDlg(QDialog):
         
         rorLayout = QGridLayout()
         rorLayout.addWidget(self.projectCheck,0,0)
+        rorLayout.addWidget(self.projectionmodeComboBox,0,1)
         rorLayout.addWidget(self.DeltaET,1,0)
         rorLayout.addWidget(self.DeltaBT,1,1)
         
@@ -4093,8 +4136,8 @@ class HUDDlg(QDialog):
         self.interpComboBox.addItems([u"linear", u"cubic","nearest"])
         
         """
-         'linear' : linear interpolation, same as the default
-         'cubic' : 3rd order spline interpolation
+         'linear'  : linear interpolation, same as the default
+         'cubic'   : 3rd order spline interpolation
          'nearest' : take the y value of the nearest point
         """
 
@@ -4190,7 +4233,10 @@ class HUDDlg(QDialog):
     def changeSensitivity(self,i):
         aw.qmc.sensitivity = self.sensitivityString2Int(self.sensitivityValues[i])
         aw.qmc.redraw()         
-         
+
+    def changeProjectionMode(self,i):
+        aw.qmc.projectionmode = i
+                  
     def sensitivityString2Int(self,s):
         return int(s) * 20
         
