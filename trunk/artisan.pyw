@@ -1751,10 +1751,10 @@ class tgraphcanvas(FigureCanvas):
             Xpoints = []
             Ypoints = []
             if origin == 0:
-                #start points
+                #start point from begining of time
                 Xpoints.append(self.timex[0])
                 Ypoints.append(self.temp2[0])
-                #drop
+                #input beans (CHARGE)
                 Xpoints.append(self.startend[0])
                 Ypoints.append(self.startend[1])
 
@@ -1800,7 +1800,7 @@ class tgraphcanvas(FigureCanvas):
     def univariateinfo(self):
         try:
             
-            Xpoints,Ypoints = self.findpoints(1)  #from lowest point
+            Xpoints,Ypoints = self.findpoints(1)  #from lowest point to avoid many coeficients
             
             equ = inter.UnivariateSpline(Xpoints, Ypoints)
             coeffs = equ.get_coeffs().tolist()
@@ -6473,6 +6473,7 @@ class serialport(object):
         ##                                        If T3 thermocouple connected alone, then r[43]  = \x0B = 11
         ##                                        If T4 thermocouple connected alone, then r[43]  = \x07 = 7
         ##                                        Note: Print r[43] if you want to find other connect-combinations
+        ##                                        THIS ONLY WORKS WHEN T < 200. If T >= 200 r[43] changes
                 
         serCENTER = None
         try:
@@ -6484,48 +6485,23 @@ class serialport(object):
             serCENTER.close()
             
             if len(r) == 45:
+                T1 = int(binascii.hexlify(r[7] + r[8]),16)
+                T2 = int(binascii.hexlify(r[9] + r[10]),16)
                 
-                #check r[43]: Only allow T1 & T2 when two thermocouples are connected
-                #Allow to plot when any other single thermocouple is connected
-
-                Tcheck = int(binascii.hexlify(r[43]),16)
-                if Tcheck != 12:
-                    if Tcheck == 14:
-                        if not self.CENTER309flag:
-                            aw.messagelabel.setText(u"CENTER 309 connected: T1")
+                #Display initial message to check T1 and T2 connectivity
+                if not self.CENTER309flag:
+                    Tcheck = int(binascii.hexlify(r[43]),16)
+                    if Tcheck != 12:
+                        if T1 < 200 and T2 < 200:
+                            aw.messagelabel.setText(u"Please connect T1 & T2")
+                        else:
+                            #don't display any message
                             self.CENTER309flag = 1
-                        T1 = int(binascii.hexlify(r[7] + r[8]),16)
-                        T2 = 0.
-                    elif Tcheck == 13:
-                        if not self.CENTER309flag:
-                            aw.messagelabel.setText(u"CENTER 309 connected: T2")
-                            self.CENTER309flag = 1
-                        T1 = 0.
-                        T2 = int(binascii.hexlify(r[9] + r[10]),16)
-                    elif Tcheck == 11:
-                        if not self.CENTER309flag:
-                            aw.messagelabel.setText(u"CENTER 309 connected: T3")
-                            self.CENTER309flag = 1
-                        T1 = 0.
-                        T2 = int(binascii.hexlify(r[11] + r[12]),16)
-                    elif Tcheck == 7:
-                        if not self.CENTER309flag:
-                            aw.messagelabel.setText(u"CENTER 309 connected: T4")
-                            self.CENTER309flag = 1
-                        T1 = 0.
-                        T2 = int(binascii.hexlify(r[13] + r[14]),16)
-                    else:
-                        aw.messagelabel.setText(u"Connections allowed: T1&T2, or T1, or T2, or T3, or T4")
-                        T1 = 0.
-                        T2 = 0.
-                else:
-                    if not self.CENTER309flag:
-                        aw.messagelabel.setText(u"CENTER 309 connected: T1 & T2")
+                    elif Tcheck ==12 and T1 < 200 and T2 < 200:
+                        aw.messagelabel.setText(u"T1 & T2 connected")
                         self.CENTER309flag = 1
                         
-                    T1 = int(binascii.hexlify(r[7] + r[8]),16)
-                    T2 = int(binascii.hexlify(r[9] + r[10]),16)
-                    
+                
                 return T1/10.,T2/10.
             
             else:
@@ -6537,7 +6513,7 @@ class serialport(object):
                 if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
                     return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
                 else:
-                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+                    return -1.,-1.                                    #return something out of scope to avoid function error (expects two values)
         
         
         except serial.SerialException, e:
