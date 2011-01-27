@@ -6882,24 +6882,26 @@ class DeviceAssignmentDLG(QDialog):
         self.nonpidButton = QRadioButton("Device")
         self.pidButton = QRadioButton("PID")
 
+        devices = ["Omega HH806AU",
+                   "Omega HH506RA",
+                   "CENTER 309",
+                   "CENTER 306",
+                   "CENTER 305",
+                   "CENTER 304",
+                   "CENTER 303",
+                   "CENTER 302",
+                   "CENTER 301",
+                   "CENTER 300",
+                   "VOLTCRAFT K204",
+                   "VOLTCRAFT K202",
+                   "VOLTCRAFT 300K",
+                   "VOLTCRAFT 302KJ",
+                   "EXTECH 421509",
+                   "Omega HH802U"
+                   ]
+        sorted_devices = sorted(devices)
         self.devicetypeComboBox = QComboBox()
-        self.devicetypeComboBox.addItems(["Omega HH806AU",
-                                          "Omega HH506RA",
-                                          "CENTER 309",
-                                          "CENTER 306",
-                                          "CENTER 305",
-                                          "CENTER 304",
-                                          "CENTER 303",
-                                          "CENTER 302",
-                                          "CENTER 301",
-                                          "CENTER 300",
-                                          "VOLTCRAFT K204",
-                                          "VOLTCRAFT K202",
-                                          "VOLTCRAFT 300K",
-                                          "VOLTCRAFT 302KJ",
-                                          "EXTECH 421509",
-                                          "Omega HH802U"
-                                          ])
+        self.devicetypeComboBox.addItems(sorted_devices)
         
         controllabel =QLabel("Control ET")                            
         self.controlpidtypeComboBox = QComboBox()
@@ -6922,7 +6924,12 @@ class DeviceAssignmentDLG(QDialog):
             
         else:
             self.nonpidButton.setChecked(True)
-            self.devicetypeComboBox.setCurrentIndex(aw.qmc.device - 1)            
+            selected_device_index = 0
+            try:
+                selected_device_index = sorted_devices.index(devices[aw.qmc.device - 1])            
+            except Exception:
+                pass
+            self.devicetypeComboBox.setCurrentIndex(selected_device_index)           
                 
         if aw.ser.controlETpid[0] == 0 :       # control is PXG4
             self.controlpidtypeComboBox.setCurrentIndex(0)
