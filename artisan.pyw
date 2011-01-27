@@ -233,7 +233,6 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundpath = ""
         self.backgroundET,self.backgroundBT,self.timeB = [],[],[]
         self.startendB,self.varCB,self.dryendB = [0.,0.,0.,0.],[0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.]
-        self.dryend = [0.,0.]
         self.backgroundalpha = 0.3
         self.backgroundwidth = 2
         self.backgroundmetcolor = self.palette["met"]
@@ -4213,10 +4212,12 @@ class HUDDlg(QDialog):
         self.interpComboBox = QComboBox()
         self.interpComboBox.setMaximumWidth(100)
         self.interpComboBox.setMinimumWidth(55)
-        self.interpComboBox.addItems([u"linear", u"cubic","nearest"])
+        self.interpComboBox.addItems([u"linear", u"cubic",u"nearest"])
+        self.connect(self.interpComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.interpComboBox.currentIndex() :self.changeInterpolationMode(i))
+
         
         """
-         'linear'  : linear interpolation, same as the default
+         'linear'  : linear interpolation
          'cubic'   : 3rd order spline interpolation
          'nearest' : take the y value of the nearest point
         """
@@ -4275,9 +4276,10 @@ class HUDDlg(QDialog):
             #check for finished roast
             if aw.qmc.startend[2]:
                 aw.qmc.univariate()
+                print "OK"
             else:
                 self.status.showMessage("Need to load a finished profile first",5000)
-                self.interpCheck.setChecked(False)               
+                self.univarCheck.setChecked(False)               
         else:
             aw.qmc.resetlines()
             aw.qmc.redraw()                
@@ -4316,7 +4318,12 @@ class HUDDlg(QDialog):
 
     def changeProjectionMode(self,i):
         aw.qmc.projectionmode = i
-                  
+
+    def changeInterpolationMode(self,i):
+        aw.qmc.resetlines()
+        aw.qmc.redraw()
+        self.interpolation(i)
+
     def sensitivityString2Int(self,s):
         return int(s) * 20
         
