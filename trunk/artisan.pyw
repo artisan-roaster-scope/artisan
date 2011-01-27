@@ -6828,6 +6828,7 @@ class comportDlg(QDialog):
         elif platf == 'Linux':
             maxnum=9
             for prefix, description, klass in ( 
+                ("/dev/ttyS", "Standard serial port", "serial"), 
                 ("/dev/cua", "Standard serial port", "serial"), 
                 ("/dev/ttyUSB", "USB to serial convertor", "serial"),
                 ("/dev/usb/ttyUSB", "USB to serial convertor", "serial"), 
