@@ -3371,6 +3371,10 @@ th {
 <td>$TP</td>
 </tr>
 <tr>
+<th>DRY:</th>
+<td>$DRY</td>
+</tr>
+<tr>
 <th>FCs:</th>
 <td>$FCs</td>
 </tr>
@@ -3444,6 +3448,16 @@ $cupping_notes
             TP_temp = aw.qmc.temp2[TP_index]
         dryEndIndex = self.findDryEnd(TP_index)
         rates_of_changes = aw.RoR(TP_index,dryEndIndex)
+        
+        if aw.qmc.dryend[0]:
+            #manual dryend available
+            DRY_time = aw.qmc.dryend[0]
+            DRY_temp = aw.qmc.dryend[1]
+            print DRY_temp
+        else:
+            #we use the dryEndIndex respecting the dry phase
+            DRY_time = aw.qmc.timex[dryEndIndex]
+            DRY_temp = aw.qmc.temp2[dryEndIndex]        
         evaluations = aw.defect_estimation()        
         #print graph
         self.qmc.redraw()   
@@ -3487,6 +3501,7 @@ $cupping_notes
             cup=str(self.cuppingSum()),
             charge="BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode,
             TP=self.event2html(TP_time,TP_temp),
+            DRY=self.event2html(DRY_time,DRY_temp),
             FCs=self.event2html(self.qmc.varC[0],self.qmc.varC[1]),
             FCe=self.event2html(self.qmc.varC[2],self.qmc.varC[3]),
             SCs=self.event2html(self.qmc.varC[4],self.qmc.varC[5]),
@@ -4742,7 +4757,7 @@ class editGraphDlg(QDialog):
         self.unitsComboBox.addItems(["g","Kg"])
 
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>Room Temperature </b>")
+        ambientlabel = QLabel("<b>Temperature </b>")
         ambientunitslabel = QLabel("(" + aw.qmc.mode + ")")
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
@@ -4840,9 +4855,10 @@ class editGraphDlg(QDialog):
         weightLayout.addStretch()  
 
         ambientLayout = QHBoxLayout()
-        ambientLayout.addWidget(ambientlabel,0,Qt.AlignLeft)
-        ambientLayout.addWidget(self.ambientedit,1,Qt.AlignLeft)
-        ambientLayout.addWidget( ambientunitslabel,2,Qt.AlignLeft)
+        ambientLayout.addWidget(ambientlabel)
+        ambientLayout.addWidget(self.ambientedit)
+        ambientLayout.addWidget(ambientunitslabel)
+        ambientLayout.addStretch()
   	
         anotationLayout = QVBoxLayout()
         anotationLayout.addWidget(roastinglabel)
@@ -4915,6 +4931,7 @@ class editGraphDlg(QDialog):
             aw.qmc.startend[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.dropedit.text())))     #DROP     time
             #find corresponding temperatures
             aw.qmc.startend[1] = aw.BTfromseconds(aw.qmc.startend[0])                             #CHARGE   temperature
+            aw.qmc.dryend[1] = aw.BTfromseconds(aw.qmc.dryend[0])                                 #DRY END temperature
             aw.qmc.varC[1] = aw.BTfromseconds(aw.qmc.varC[0])                                     #1C START temperature
             aw.qmc.varC[3] = aw.BTfromseconds(aw.qmc.varC[2])                                     #1C END   temperature
             aw.qmc.varC[5] = aw.BTfromseconds(aw.qmc.varC[4])                                     #2C START temperature
