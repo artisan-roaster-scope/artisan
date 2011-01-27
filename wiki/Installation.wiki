@@ -40,7 +40,7 @@ _NOTE: for now a binary is only provided for OS X 10.6 Snow Leopard_
 
 =Device Configuration=
 
-Once artisan is up, chose your device in the Conf/device menu. From version 0.2.0 on, the following devices are supported:
+Once artisan is up, chose your device using the menu <Conf> and select the <Device> submenu. From version 0.2.0 on, the following devices are supported:
 
   ** Fuji PXR PID (with RS485 mod bus protocol purchase option)
   ** Fuji PXG PID (with RS485 mod bus protocol purchase option)
