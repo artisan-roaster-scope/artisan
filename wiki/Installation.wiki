@@ -63,5 +63,5 @@ You can test to see if you have the correct comm port by clicking the green butt
 
 Report problems here:
 
-    http://groups.google.com/group/artisan-coffee-roasting
+[https://lists.mokelbu.de/listinfo/artisan-user]
     
