@@ -157,6 +157,8 @@ class tgraphcanvas(FigureCanvas):
 
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases = [200,300,390,450]
+        #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
+        self.phasesbuttonflag = 1 #0 no change; 1 make the DRY and FC buttons change the phases during roast automatically
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area
         self.statisticsflags = [1,1,1,1]
@@ -187,7 +189,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.VOLTCRAFT300K,
                                    self.VOLTCRAFT302KJ,
                                    self.EXTECH421509,
-                                   self.HH802U
+                                   self.HH802U,
+                                   self.HH309
                                    ]
         
         self.fig = Figure(facecolor=u'lightgrey')
@@ -495,11 +498,7 @@ class tgraphcanvas(FigureCanvas):
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
-##        #erase every three trigger events to make it look like a radar
-##        l,p = divmod(self.ProjCounter,3)
-##        if p == 0:
-##            self.resetlines()
-##        self.ProjCounter += 1
+
         self.resetlines()
 
         if self.projectionmode == 0:
@@ -534,11 +533,13 @@ class tgraphcanvas(FigureCanvas):
                     DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
                     ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint                        
                     
-                #plot line
+                #plot ET level (straight line) and BT curve
                 self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], self.temp1[-1]],color =  self.palette["met"],
                              linestyle = '-.', linewidth= 3, alpha = .5)
                 self.ax.plot(xpoints, ypoints, color =  self.palette["bt"],linestyle = '-.', linewidth= 3, alpha = .5)                  
-                        
+
+    # this function is called from the HUD DLg and reports the linear time (straight line) it would take to reach a temperature target
+    # acording to the current rate of change
     def getTargetTime(self):
         
         if self.rateofchange1 > 0:
@@ -585,6 +586,13 @@ class tgraphcanvas(FigureCanvas):
          tx = self.timeclock.elapsed()/1000.
 
          return tx,t2,t1
+
+    def HH309(self):
+
+         t2,t1 = aw.ser.CENTER309temperature()
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1   
 
     def CENTER309(self):
 
@@ -1427,16 +1435,10 @@ class tgraphcanvas(FigureCanvas):
                 
                 message = u"DRY END recorded at " + st1 + u" BT = " + unicode(self.dryend[1]) + self.mode
                 
-                #move phase[1] (end of Dry Phase)
-                A = QLabel()
-                reply = QMessageBox.question(A,u"Phase change",
-                                         u"Change Dry End Phase?",
-                                         QMessageBox.Yes|QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
-                    self.phases[1] = self.dryend[1]                
+                if aw.qmc.phasesbuttonflag:     
+                    self.phases[1] = self.approx(self.dryend[1])
                     self.redraw()
-             
-
+      
             else:
                 message = u"Charge mark is missing. Do that first"
         else:
@@ -1467,7 +1469,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_3.setFlat(True)
                 
                 message = u"1C START recorded at " + st1 + u" BT = " + unicode(self.varC[1]) + self.mode
-            
+
+                if aw.qmc.phasesbuttonflag:     
+                    self.phases[2] = self.approx(self.varC[1])
+                    self.redraw()
+
             else:
                 message = u"Charge mark is missing. Do that first"
         else:
@@ -3147,6 +3153,9 @@ class ApplicationWindow(QMainWindow):
             #restore phases
             if settings.contains("Phases"):
                 self.qmc.phases = map(lambda x:x.toInt()[0],settings.value("Phases").toList())
+            if settings.contains("phasesbuttonflag"):
+                self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]
+
             #restore statistics
             if settings.contains("Statistics"):
                 self.qmc.statisticsflags = map(lambda x:x.toInt()[0],settings.value("Statistics").toList())
@@ -3196,7 +3205,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
             settings.endGroup()
-            
+
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
             self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
@@ -3232,6 +3241,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup();
             #save phases
             settings.setValue("Phases",self.qmc.phases)
+            #save phasesbuttonflag
+            settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
             #save delay
@@ -3776,8 +3787,8 @@ $cupping_notes
     def setcommport(self):
         dialog = comportDlg(self)
         if dialog.exec_():
-            self.ser.comport = unicode(dialog.comportEdit.currentText())                #str changes QString to a python string
-            self.ser.baudrate = int(dialog.baudrateComboBox.currentText())          #int changes QString to int
+            self.ser.comport = unicode(dialog.comportEdit.currentText())                #unicode() changes QString to a python string
+            self.ser.baudrate = int(dialog.baudrateComboBox.currentText())              #int changes QString to int
             self.ser.bytesize = int(dialog.bytesizeComboBox.currentText())
             self.ser.stopbits = int(dialog.stopbitsComboBox.currentText())
             self.ser.parity = unicode(dialog.parityComboBox.currentText())
@@ -5467,7 +5478,12 @@ class phasesGraphDlg(QDialog):
         self.startfinish.setValue(aw.qmc.phases[2])
         self.endfinish.setValue(aw.qmc.phases[3])
 
-
+        self.pushbuttonflag = QCheckBox("Let [DRY END] and [FC START] adjust phases")
+        if aw.qmc.phasesbuttonflag:
+            self.pushbuttonflag.setChecked(True)
+        else:
+            self.pushbuttonflag.setChecked(False)
+            
         okButton = QPushButton("OK")  
         cancelButton = QPushButton("Cancel")
         setDefaultButton = QPushButton("Defaults")
@@ -5489,7 +5505,7 @@ class phasesGraphDlg(QDialog):
         phaseLayout.addWidget(finishLabel,2,0,Qt.AlignRight)
         phaseLayout.addWidget(self.startfinish,2,1)
         phaseLayout.addWidget(self.endfinish,2,2)
-        
+
         boxedPhaseLayout = QHBoxLayout()
         boxedPhaseLayout.addStretch()
         boxedPhaseLayout.addLayout(phaseLayout)
@@ -5503,6 +5519,7 @@ class phasesGraphDlg(QDialog):
                              
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(boxedPhaseLayout)
+        mainLayout.addWidget(self.pushbuttonflag)
         mainLayout.addStretch()
         mainLayout.addLayout(buttonsLayout)
 
@@ -5514,6 +5531,11 @@ class phasesGraphDlg(QDialog):
         aw.qmc.phases[2] = self.endmid.value()
         aw.qmc.phases[3] = self.endfinish.value()
         
+        if self.pushbuttonflag.isChecked():
+            aw.qmc.phasesbuttonflag = 1
+        else:
+            aw.qmc.phasesbuttonflag = 0
+            
         aw.qmc.redraw()
         self.close()
 
@@ -6897,7 +6919,8 @@ class DeviceAssignmentDLG(QDialog):
                    "VOLTCRAFT 300K",
                    "VOLTCRAFT 302KJ",
                    "EXTECH 421509",
-                   "Omega HH802U"
+                   "Omega HH802U",
+                   "Omega HH309"
                    ]
         sorted_devices = sorted(devices)
         self.devicetypeComboBox = QComboBox()
@@ -7202,6 +7225,16 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = "Device set to " + meter + ", which is equivalent to Omega HH806AU. Now, chose serial port"
+
+            elif meter == "Omega HH309":
+                aw.qmc.device = 17
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to " + meter + ". Now, chose serial port"
 
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
