@@ -5515,6 +5515,11 @@ class phasesGraphDlg(QDialog):
         boxedPhaseLayout.addStretch()
         boxedPhaseLayout.addLayout(phaseLayout)
         boxedPhaseLayout.addStretch()
+
+        boxedPhaseFlagLayout = QHBoxLayout()
+        boxedPhaseFlagLayout.addStretch()
+        boxedPhaseFlagLayout.addWidget(self.pushbuttonflag)
+        boxedPhaseFlagLayout.addStretch()
                 
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(setDefaultButton)
@@ -5524,7 +5529,7 @@ class phasesGraphDlg(QDialog):
                              
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(boxedPhaseLayout)
-        mainLayout.addWidget(self.pushbuttonflag)
+        mainLayout.addLayout(boxedPhaseFlagLayout)
         mainLayout.addStretch()
         mainLayout.addLayout(buttonsLayout)
 
