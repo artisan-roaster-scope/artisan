@@ -4774,7 +4774,7 @@ class editGraphDlg(QDialog):
 
         #Ambient temperature (uses display mode as unit (F or C)
         ambientlabel = QLabel("<b>Temperature </b>")
-        ambientunitslabel = QLabel("(" + aw.qmc.mode + ")")
+        ambientunitslabel = QLabel(aw.qmc.mode)
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
         self.ambientedit.setMaximumWidth(50)
@@ -5483,7 +5483,7 @@ class phasesGraphDlg(QDialog):
         self.startfinish.setValue(aw.qmc.phases[2])
         self.endfinish.setValue(aw.qmc.phases[3])
 
-        self.pushbuttonflag = QCheckBox("Let [DRY END] and [FC START] adjust phases")
+        self.pushbuttonflag = QCheckBox("Adjusted by events")
         if aw.qmc.phasesbuttonflag:
             self.pushbuttonflag.setChecked(True)
         else:
