@@ -3452,6 +3452,9 @@ $cupping_notes
         beans = cgi.escape(self.qmc.beans)
         if len(beans) > 43:
             beans = beans[:41] + "&hellip;"
+        charge = "--"
+        if self.qmc.startend[0] > 0.:
+            charge = "BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode,            
         TP_index = self.findTP()
         TP_time = TP_temp = None
         if TP_index > 0 and len(aw.qmc.timex) > 0:
@@ -3464,11 +3467,13 @@ $cupping_notes
             #manual dryend available
             DRY_time = aw.qmc.dryend[0]
             DRY_temp = aw.qmc.dryend[1]
-            print DRY_temp
         else:
             #we use the dryEndIndex respecting the dry phase
-            DRY_time = aw.qmc.timex[dryEndIndex]
-            DRY_temp = aw.qmc.temp2[dryEndIndex]        
+            if dryEndIndex < len(aw.qmc.timex):
+                DRY_time = aw.qmc.timex[dryEndIndex]
+                DRY_temp = aw.qmc.temp2[dryEndIndex]        
+            else:
+                DRY_time = DRY_temp = 0
         evaluations = aw.defect_estimation()        
         #print graph
         self.qmc.redraw()   
@@ -3510,7 +3515,7 @@ $cupping_notes
             roaster=cgi.escape(self.qmc.roastertype),
             operator=cgi.escape(self.qmc.operator),
             cup=str(self.cuppingSum()),
-            charge="BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode,
+            charge=charge,
             TP=self.event2html(TP_time,TP_temp),
             DRY=self.event2html(DRY_time,DRY_temp),
             FCs=self.event2html(self.qmc.varC[0],self.qmc.varC[1]),
