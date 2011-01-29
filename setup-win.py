@@ -35,7 +35,7 @@ EXCLUDES = ['_tkagg',
 setup(
     name ="Artisan",
     author = "YOU",
-    windows=[{"script" : "C:\\SVN\\artisan\\trunk\\artisan.pyw"}],
+    windows=[{"script" : "C:\\SVN\\artisan\\trunk\\artisan.py"}],
     data_files = mpl.get_py2exe_datafiles(),
     zipfile = "lib\library.zip",
     options={"py2exe" :{
