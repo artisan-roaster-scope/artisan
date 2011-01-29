@@ -5575,7 +5575,7 @@ class phasesGraphDlg(QDialog):
         self.setWindowTitle("Roast Phases")
         self.setModal(True)
         
-        self.phases = aw.qmc.phases
+        self.phases = copy(aw.qmc.phases)
 
         dryLabel = QLabel("Dry")
         midLabel = QLabel("Mid")
@@ -5726,7 +5726,7 @@ class phasesGraphDlg(QDialog):
         self.close()
         
     def cancel(self):
-        aw.qmc.phases = self.phases
+        aw.qmc.phases = list(self.phases)
         aw.qmc.redraw()
         self.savePhasesSettings()
         self.close()
