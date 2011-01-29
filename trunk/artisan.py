@@ -762,6 +762,7 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.roastdate = QDate.currentDate()        
         self.ambientTemp = 0.
+        self.curFile = None
         
         #aw.settingsLoad()
         
@@ -2008,6 +2009,7 @@ class VMToolbar(NavigationToolbar):
             
 class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
+        self.curFile = None
         self.MaxRecentFiles = 10
         self.recentFileActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
@@ -2430,11 +2432,20 @@ class ApplicationWindow(QMainWindow):
         
         self.fileMenu.addSeparator()  
 
-        fileSaveAction = QAction("Save Profile...",self)
+        fileSaveAction = QAction("Save",self)
         fileSaveAction.setShortcut(QKeySequence.Save)
-        self.connect(fileSaveAction,SIGNAL("triggered()"),self.fileSave)
+        self.connect(fileSaveAction,SIGNAL("triggered()"),lambda b=0:self.fileSave(self.curFile))
         self.fileMenu.addAction(fileSaveAction)    
-
+        
+        fileSaveAsAction = QAction("Save As...",self)
+        self.connect(fileSaveAsAction,SIGNAL("triggered()"),lambda b=0:self.fileSave(None))
+        self.fileMenu.addAction(fileSaveAsAction)  
+        
+        self.fileMenu.addSeparator()    
+        
+        fileExportAction = QAction("Export...",self)
+        self.connect(fileExportAction,SIGNAL("triggered()"),self.fileExport)
+        self.fileMenu.addAction(fileExportAction)  
 
         
         self.fileMenu.addSeparator()    
@@ -2596,25 +2607,20 @@ class ApplicationWindow(QMainWindow):
         self.curFile = fileName
         if self.curFile:
             self.setWindowTitle(("%s - " + self.windowTitle) % self.strippedName(self.curFile))
+            settings = QSettings()
+            files = settings.value('recentFileList').toStringList()
+            try:
+                files.removeAll(fileName)
+            except ValueError:
+                pass
+            files.insert(0, fileName)
+            del files[self.MaxRecentFiles:]
+            settings.setValue('recentFileList', files)
+            for widget in QApplication.topLevelWidgets():
+                if isinstance(widget, ApplicationWindow):
+                    widget.updateRecentFileActions()
         else:
-            self.setWindowTitle("Recent Files")
- 
-        settings = QSettings()
-        files = settings.value('recentFileList').toStringList()
- 
-        try:
-            files.removeAll(fileName)
-        except ValueError:
-            pass
- 
-        files.insert(0, fileName)
-        del files[self.MaxRecentFiles:]
- 
-        settings.setValue('recentFileList', files)
- 
-        for widget in QApplication.topLevelWidgets():
-            if isinstance(widget, ApplicationWindow):
-                widget.updateRecentFileActions()
+            self.setWindowTitle(self.windowTitle)
  
     def updateRecentFileActions(self):
         settings = QSettings()
@@ -3053,6 +3059,55 @@ class ApplicationWindow(QMainWindow):
             if f:
                 f.close()
                 
+    #Write readings to csv file
+    def exportCSV(self,filename):
+        f = open(filename, 'w+')
+        f.write("Time1\tTime2\tBT\tET\tEvent\n")
+        CHARGE = self.qmc.startend[0]
+        TP_index = self.findTP()
+        TP = 0.
+        if TP_index and TP_index < len(self.qmc.timex):
+            TP = self.qmc.timex[TP_index]
+        dryEndIndex = self.findDryEnd(TP_index)
+        if aw.qmc.dryend[0]:
+            #manual dryend available
+            DRYe = self.qmc.dryend[0]
+        else:
+            #we use the dryEndIndex respecting the dry phase
+            if dryEndIndex < len(aw.qmc.timex):
+                DRYe = self.qmc.timex[dryEndIndex]
+            else:
+                DRYe = 0.
+        FCs = self.qmc.varC[0]
+        FCe = self.qmc.varC[2]
+        SCs = self.qmc.varC[4]
+        SCe = self.qmc.varC[6]
+        DROP = self.qmc.startend[2]
+        events = [     
+            [CHARGE,"Charge"],
+            [TP,"TP"],      
+            [DRYe,"Dry End"], 
+            [FCs,"FCs"],
+            [FCe,"FCe"],
+            [SCs,"SCs"],
+            [SCe,"SCe"],
+            [DROP, "Drop"],
+            ]
+        for i in range(len(self.qmc.timex)):
+            f.write(self.qmc.stringfromseconds(self.qmc.timex[i]) + "\t")
+            if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
+                f.write(self.qmc.stringfromseconds(self.qmc.timex[i] - CHARGE))
+                f.write("\t")
+            else:
+                f.write("\t")
+            f.write(str(self.qmc.temp2[i]) + "\t")
+            f.write(str(self.qmc.temp1[i]) + "\t")
+            for e in range(len(events)):
+                if round(self.qmc.timex[i]) == round(events[e][0]):
+                    f.write(events[e][1])
+                    break
+            f.write("\n")
+        f.close()
                 
     #Write object to file
     def serialize(self,filename,obj):
@@ -3145,6 +3200,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ambientTemp = profile["ambientTemp"]
         if "dryend" in profile:
             self.qmc.dryend = profile["dryend"]            
+            
     #used by filesave()
     def getProfile(self):
         profile = {}
@@ -3182,14 +3238,33 @@ class ApplicationWindow(QMainWindow):
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
-    def fileSave(self):
+    def fileSave(self,fname):
         try:         
-            filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))            
-            self.serialize(filename,self.getProfile())
-            self.setCurrentFile(filename)
+            filename = fname
+            if not filename:
+                filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))  
+            if filename:
+                self.serialize(filename,self.getProfile())
+                self.setCurrentFile(filename)
+                self.messagelabel.setText(u"Profile saved")
+            else:
+                self.messagelabel.setText(u"Cancelled")
         except IOError,e:
-            self.messagelabel.setText(u"Error in filesave() " + unicode(e) + u" ")
-            aw.qmc.errorlog.append(u"Error in filesave() " + unicode(e))
+            self.messagelabel.setText(u"Error on save: " + unicode(e))
+            aw.qmc.errorlog.append(u"Error on save: " + unicode(e))
+            return
+            
+    def fileExport(self):
+        try:         
+            filename = unicode(QFileDialog.getSaveFileName(self,"Export CSV",self.profilepath,"*.csv"))  
+            if filename:
+                self.exportCSV(filename)
+                self.messagelabel.setText(u"Readings exported")
+            else:
+                self.messagelabel.setText(u"Cancelled")
+        except IOError,e:
+            self.messagelabel.setText(u"Error on export: " + unicode(e))
+            aw.qmc.errorlog.append(u"Error on export: " + unicode(e))
             return
 
 
@@ -4040,7 +4115,7 @@ $cupping_notes
             if w != 0:        
                 image = image.scaledToWidth(w,transformationmode)
         
-            filename = unicode(QFileDialog.getSaveFileName(self,"Save Image for web","","*.png"))
+            filename = unicode(QFileDialog.getSaveFileName(self,"Save Image for Web","","*.png"))
             if filename:
                 if u".png" not in filename:
                     filename += u".png"
