@@ -145,7 +145,7 @@ class tgraphcanvas(FigureCanvas):
                         "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'brown'}
         
         self.flavordefaultlabels = [u'Acidity',u'After Taste',u'Clean Cup',u'Head',u'Fragance',u'Sweetness',u'Aroma',u'Balance',u'Body']
-        self.flavorlabels = self.flavordefaultlabels
+        self.flavorlabels = list(self.flavordefaultlabels)
         
 
         #F = Fahrenheit; C = Celsius
@@ -156,7 +156,9 @@ class tgraphcanvas(FigureCanvas):
         self.delay = 5000
 
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
-        self.phases = [200,300,390,450]
+        self.phases_fahrenheit_defaults = [200,300,390,450]
+        self.phases_celsius_defaults = [95,150,200,230]
+        self.phases = list(self.phases_fahrenheit_defaults)
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
         self.phasesbuttonflag = 1 #0 no change; 1 make the DRY and FC buttons change the phases during roast automatically
 
@@ -248,7 +250,6 @@ class tgraphcanvas(FigureCanvas):
 
         # projection variables of change of rate
         self.HUDflag = 0
-        self.ProjCounter = 1
         self.ETtarget = 350
         self.BTtarget = 250
 
@@ -266,7 +267,6 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaBTflag = False
         # projection variables of change of rate
         self.HUDflag = 0
-        self.ProjCounter = 1
         self.ETtarget = 350
         self.BTtarget = 250
         self.projectionconstant = 1
@@ -700,7 +700,6 @@ class tgraphcanvas(FigureCanvas):
     def reset(self):
         if self.HUDflag:
             self.toggleHUD()
-        self.ProjCounter = 1
 
             
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
@@ -764,7 +763,7 @@ class tgraphcanvas(FigureCanvas):
         self.ambientTemp = 0.
         self.curFile = None
         
-        #aw.settingsLoad()
+        aw.settingsLoad()
         
         #restart() clock 
         self.timeclock.restart()
@@ -3380,8 +3379,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("controlETpid",self.ser.controlETpid)
             settings.setValue("readBTpid",self.ser.readBTpid)
             settings.endGroup();
-            #save phases
-            settings.setValue("Phases",self.qmc.phases)
+            #save of phases is done in the phases dialog
             #save phasesbuttonflag
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
             #save statistics
@@ -5093,7 +5091,14 @@ class editGraphDlg(QDialog):
             aw.qmc.varC[3] = aw.BTfromseconds(aw.qmc.varC[2])                                     #1C END   temperature
             aw.qmc.varC[5] = aw.BTfromseconds(aw.qmc.varC[4])                                     #2C START temperature
             aw.qmc.varC[7] = aw.BTfromseconds(aw.qmc.varC[6])                                     #2C END   temperature
-            aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2])                                                        
+            aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2]) 
+            
+            if aw.qmc.phasesbuttonflag:   
+                # adjust phases by DryEnd and FCs events
+                if aw.qmc.dryend[1] > 0.:
+                    aw.qmc.phases[1] = self.approx(aw.qmc.dryend[1])  
+                if aw.qmc.varC[1] > 0.:
+                    aw.qmc.phases[2] = self.approx(aw.qmc.varC[1])                                                   
 
             #update events             
             ntlines = len(aw.qmc.specialevents)         #number of events found            
@@ -5569,6 +5574,8 @@ class phasesGraphDlg(QDialog):
 
         self.setWindowTitle("Roast Phases")
         self.setModal(True)
+        
+        self.phases = aw.qmc.phases
 
         dryLabel = QLabel("Dry")
         midLabel = QLabel("Mid")
@@ -5580,6 +5587,8 @@ class phasesGraphDlg(QDialog):
         self.endmid = QSpinBox()
         self.startfinish = QSpinBox()
         self.endfinish = QSpinBox()
+                
+        self.events2phases()
         
         if aw.qmc.mode == u"F":
              self.startdry.setSuffix(" F")
@@ -5616,19 +5625,14 @@ class phasesGraphDlg(QDialog):
         self.connect(self.endmid,SIGNAL("valueChanged(int)"),self.startfinish.setValue)
         self.connect(self.startfinish,SIGNAL("valueChanged(int)"),self.endmid.setValue)  
 
-
-        self.startdry.setValue(aw.qmc.phases[0])
-        self.enddry.setValue(aw.qmc.phases[1])
-        self.startmid.setValue(aw.qmc.phases[1])
-        self.endmid.setValue(aw.qmc.phases[2])
-        self.startfinish.setValue(aw.qmc.phases[2])
-        self.endfinish.setValue(aw.qmc.phases[3])
+        self.getphases()
 
         self.pushbuttonflag = QCheckBox("Adjusted by events")
         if aw.qmc.phasesbuttonflag:
             self.pushbuttonflag.setChecked(True)
         else:
             self.pushbuttonflag.setChecked(False)
+        self.connect(self.pushbuttonflag,SIGNAL("stateChanged(int)"),self.pushbuttonflagChanged)  
             
         okButton = QPushButton("OK")  
         cancelButton = QPushButton("Cancel")
@@ -5637,7 +5641,7 @@ class phasesGraphDlg(QDialog):
         cancelButton.setFocusPolicy(Qt.NoFocus)
         setDefaultButton.setFocusPolicy(Qt.NoFocus)
         
-        self.connect(cancelButton,SIGNAL("clicked()"),self.close)
+        self.connect(cancelButton,SIGNAL("clicked()"),self.cancel)
         self.connect(okButton,SIGNAL("clicked()"),self.updatephases)
         self.connect(setDefaultButton,SIGNAL("clicked()"),self.setdefault)
                                      
@@ -5675,31 +5679,73 @@ class phasesGraphDlg(QDialog):
         mainLayout.addLayout(buttonsLayout)
 
         self.setLayout(mainLayout)
+        aw.qmc.redraw()
+        
+    def savePhasesSettings(self):
+        if not aw.qmc.phasesbuttonflag:
+            settings = QSettings()
+            #save phases
+            settings.setValue("Phases",aw.qmc.phases)
+        
+    def events2phases(self):
+        if aw.qmc.phasesbuttonflag:
+            # adjust phases by DryEnd and FCs events
+            if aw.qmc.dryend[1] > 0.:
+                aw.qmc.phases[1] = aw.qmc.approx(aw.qmc.dryend[1])  
+                self.enddry.setDisabled(True)
+                self.startmid.setDisabled(True)
+            if aw.qmc.varC[1] > 0.:
+                aw.qmc.phases[2] = aw.qmc.approx(aw.qmc.varC[1])
+                self.endmid.setDisabled(True)
+                self.startfinish.setDisabled(True)
 
+    def pushbuttonflagChanged(self,i):
+        if i:
+            aw.qmc.phasesbuttonflag = 1
+            self.events2phases()
+            self.getphases()
+            aw.qmc.redraw()
+        else:
+            aw.qmc.phasesbuttonflag = 0
+            self.enddry.setEnabled(True)
+            self.startmid.setEnabled(True)
+            self.endmid.setEnabled(True)
+            self.startfinish.setEnabled(True)
+        
     def updatephases(self):
         aw.qmc.phases[0] = self.startdry.value()
         aw.qmc.phases[1] = self.enddry.value()
         aw.qmc.phases[2] = self.endmid.value()
         aw.qmc.phases[3] = self.endfinish.value()
-        
         if self.pushbuttonflag.isChecked():
             aw.qmc.phasesbuttonflag = 1
         else:
             aw.qmc.phasesbuttonflag = 0
-            
         aw.qmc.redraw()
+        self.savePhasesSettings()
         self.close()
+        
+    def cancel(self):
+        aw.qmc.phases = self.phases
+        aw.qmc.redraw()
+        self.savePhasesSettings()
+        self.close()
+        
+    def getphases(self):
+        self.startdry.setValue(aw.qmc.phases[0])
+        self.enddry.setValue(aw.qmc.phases[1])
+        self.endmid.setValue(aw.qmc.phases[2])
+        self.endfinish.setValue(aw.qmc.phases[3])
 
     def setdefault(self):
         if aw.qmc.mode == u"F":
-            aw.qmc.phases = [200,300,390,450]
-            aw.messagelabel.setText(u"Phases changed to F default: [200,300,390,450]")
-
+            aw.qmc.phases = list(aw.qmc.phases_fahrenheit_defaults)
         elif aw.qmc.mode == u"C":
-            aw.qmc.phases = [95,150,200,230]
-            aw.messagelabel.setText(u"Phases changed to C default: [95,150,200,230]")
+            aw.qmc.phases = list(aw.qmc.phases_celsius_defaults)
+        self.events2phases()
+        self.getphases()
+        aw.messagelabel.setText(u"Phases changed to " + aw.qmc.mode + " default: " + unicode(aw.qmc.phases))
         aw.qmc.redraw()
-        self.close()
 
 ############################################################################        
 #####################   FLAVOR STAR PROPERTIES DIALOG   ####################
@@ -5924,7 +5970,7 @@ class flavorDlg(QDialog):
         aw.qmc.flavorchart()
 
     def defaultlabels(self):
-        aw.qmc.flavorlabels = aw.qmc.flavordefaultlabels
+        aw.qmc.flavorlabels = list(aw.qmc.flavordefaultlabels)
         self.line0edit.setText(aw.qmc.flavorlabels[0])    
         self.line1edit.setText(aw.qmc.flavorlabels[1])
         self.line2edit.setText(aw.qmc.flavorlabels[2])
