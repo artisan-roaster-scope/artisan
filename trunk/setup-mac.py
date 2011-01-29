@@ -21,7 +21,7 @@ LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
 
-APP = ['artisan.pyw']
+APP = ['artisan.py']
 
 DATA_FILES = [
     "index.html",
