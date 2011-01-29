@@ -2305,17 +2305,19 @@ class ApplicationWindow(QMainWindow):
         self.etypes = ["N","P","D","F"]
         self.eventlabel = QLabel()
         self.eventlabel.setStyleSheet("background-color:'yellow';")
+       	#self.eventlabel.setMinimumWidth(40)
        	self.eventlabel.setMaximumWidth(40)
         self.etypeComboBox = QComboBox()
         self.etypeComboBox.addItems(self.etypes)
-        self.etypeComboBox.setMaximumWidth(33)
+        self.etypeComboBox.setMaximumWidth(47)
         self.valueComboBox = QComboBox()
         self.valueComboBox.addItems(self.qmc.eventsvalues)
-        self.valueComboBox.setMaximumWidth(33)
+        self.valueComboBox.setMaximumWidth(47)
         
         #create EVENT mini button
         self.buttonminiEvent = QPushButton("OK")
-        self.buttonminiEvent.setMaximumSize(33,30)
+        self.buttonminiEvent.setMaximumSize(35,20)
+        self.buttonminiEvent.setMinimumSize(35,20)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
         self.buttonminiEvent.setToolTip("Records event type")
         
@@ -2326,8 +2328,8 @@ class ApplicationWindow(QMainWindow):
         
         EventsLayout = QGridLayout()
         EventsLayout.addWidget(self.etypeComboBox,0,0)
-        EventsLayout.addWidget(self.valueComboBox,0,1)        
-        EventsLayout.addWidget(self.eventlabel,1,0)
+        EventsLayout.addWidget(self.eventlabel,0,1, Qt.AlignLeft)        
+        EventsLayout.addWidget(self.valueComboBox,1,0)
         EventsLayout.addWidget(self.buttonminiEvent,1,1)
 
     	
@@ -2578,7 +2580,6 @@ class ApplicationWindow(QMainWindow):
         self.setCentralWidget(self.main_widget)   
 
     def miniEventRecord(self):
-        print self.etypeComboBox.currentIndex()
         lenevents = len(self.qmc.specialevents)
         self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
         self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
@@ -4366,13 +4367,13 @@ class HUDDlg(QDialog):
         if aw.qmc.startend[2]:
             aw.qmc.univariateinfo()
         else:
-            self.status.showMessage("Need to load a finished profile first",5000)            
+            self.status.showMessage("Need to load a finished profile first",5000)     
+                   
     def univar(self,i):
         if self.univarCheck.isChecked():
             #check for finished roast
             if aw.qmc.startend[2]:
                 aw.qmc.univariate()
-                print "OK"
             else:
                 self.status.showMessage("Need to load a finished profile first",5000)
                 self.univarCheck.setChecked(False)               
