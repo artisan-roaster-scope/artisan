@@ -326,22 +326,6 @@ class tgraphcanvas(FigureCanvas):
         #Create x axis labels in minutes:seconds instead of seconds
         self.xaxistosm()
 
-        # make a blended transformation to help identify MOISTURE control phase
-        trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
-        rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1] - self.phases[0]),
-                                  transform=trans, color=self.palette["rect1"],alpha=0.3)
-        self.ax.add_patch(rect1)
-
-        # make a blended transformation to help identify ROAST phase
-        rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2] - self.phases[1]),
-                                  transform=trans, color=self.palette["rect2"],alpha=0.3)
-        self.ax.add_patch(rect2)
-
-        # make a blended transformation to help identify FINISH phase. other color #885500
-        rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
-                                  transform=trans, color=self.palette["rect3"],alpha=0.3)
-        self.ax.add_patch(rect3)
-        
         self.delta1, self.delta2 = [],[]
 
         # generates first "empty" plot of temperature and deltaT
@@ -813,6 +797,21 @@ class tgraphcanvas(FigureCanvas):
                                   transform=trans, color=self.palette["rect3"],alpha=0.3)
         self.ax.add_patch(rect3)
 
+        # make blended transformations to help identify EVENT types
+        if self.mode == "C":
+            step = 5
+        else:
+            step = 10
+        jump = 20
+        for i in range(len(self.etypes)):
+            rectEvent = patches.Rectangle((0,jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
+            self.ax.add_patch(rectEvent)
+            if self.mode == "C":
+                jump += 10
+            else:
+                jump += 20
+
+
         ##### ET,BT curves
         self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label="ET")
         self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label="BT")
@@ -942,37 +941,37 @@ class tgraphcanvas(FigureCanvas):
         if self.startend[0]:
             #anotate temperature
             self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
-                                self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
             self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
-                                self.startend[1]-100),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                self.startend[1]-100),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
         #Add Dry End markers
         if self.dryend[0]:
             st1 = u"DE " + unicode(self.stringfromseconds(self.dryend[0]-self.startend[0]))
             #anotate temperature
             self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0]-5,
-                                self.dryend[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                self.dryend[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
             self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)            
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
         #Add 1Cs markers
         if self.varC[0]:
             st1 = u"FCs " + unicode(self.stringfromseconds(self.varC[0]-self.startend[0]))
             #anotate temperature
             self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
-                                self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
             self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
         #Add 1Ce markers
         if self.varC[2]:
             st1 = u"FCe " + unicode(self.stringfromseconds(self.varC[2]-self.startend[0]))
             #anotate temperature
             self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
-                                self.varC[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                self.varC[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
             self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-80),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #add a water mark
             self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
 
@@ -980,43 +979,45 @@ class tgraphcanvas(FigureCanvas):
         if self.varC[4]:
             st1 = u"SCs " + unicode(self.stringfromseconds(self.varC[4]-self.startend[0]))
             self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
-                                self.varC[5]+90),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)      
+                                self.varC[5]+90),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
             self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-110),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
         #Add 2Ce markers
         if self.varC[6]:
             st1 =  u"SCe " + unicode(self.stringfromseconds(self.varC[6]-self.startend[0]))
             #anotate temperature
             self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
-                                self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
             self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-40),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #do water mark
             self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
-            #make vertical line in the MIDDLE of 2Cs and 2Ce
-            middle = (self.varC[4]+self.varC[6])/2
-            self.ax.axvline(x=middle, ymin=0, ymax=1,color=self.palette["Cline"])
+
         #Add DROP markers
         if self.startend[2]:
             st1 = u"END " + unicode(self.stringfromseconds(self.startend[2]-self.startend[0]))
             #anotate temperature
             self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
-                                self.startend[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                self.startend[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
             self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-80),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             
             self.writestatistics()
             
         #write events
         Nevents = len(self.specialevents)
-        step = 30
+        if self.mode == "F":
+            row = {"N":80,"P":60,"D":40,"F":20}
+        else:
+            row = {"N":50,"P":40,"D":30,"F":20}
         for i in range(Nevents):
             firstletter = self.etypes[self.specialeventstype[i]][0]                
             secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+            
             self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                             xytext=(self.timex[int(self.specialevents[i])]-5,step),alpha=0.9,
+                             xytext=(self.timex[int(self.specialevents[i])]-5,row[firstletter]),alpha=1.,
                              color=self.palette["text"],arrowprops=dict(arrowstyle='<-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
             
                 
@@ -1723,26 +1724,49 @@ class tgraphcanvas(FigureCanvas):
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
-    def EventRecord(self):
+    def EventRecord(self):      
         i = len(self.timex)-1
         if i > 0:
-            if len(self.specialevents)< 11:
+            Nevents = len(self.specialevents)
+            #Nevents is zero when recording first event. Therefore check up to 10 (max allowed).
+            if Nevents < 10:
                 self.specialevents.append(i)
                 temp = unicode(self.temp2[i])
                 time = self.stringfromseconds(self.timex[i])
-                Nevents = len(self.specialevents)
-                message = u"Event number "+ unicode(Nevents) + u" recorded at " + unicode(Nevents) +u" BT = " + temp + u" Time = " + time
-                aw.messagelabel.setText(message)            
+                message = u"Event number "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
+                aw.messagelabel.setText(message)
+
+                if self.mode == "F":
+                    row = {"N":80,"P":60,"D":40,"F":20}
+                else:
+                    row = {"N":50,"P":40,"D":30,"F":20}
+          
                 firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
                 secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
-                step = 30
-                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp2[i]), xytext=(self.timex[i]-15,step),alpha=0.9,
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp2[i]),
+                                 xytext=(self.timex[i],row[firstletter]),alpha=0.9,
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='-',
+                                color=self.palette["text"],alpha=0.4),fontsize=8, backgroundcolor='yellow')
+
+            	#activate mini recorder
+                string = "E #" + unicode(Nevents+1) 
+                aw.eventlabel.setText(QString(string))
+                aw.etypeComboBox.setVisible(True)
+                aw.valueComboBox.setVisible(True)
+                aw.eventlabel.setVisible(True)
+                aw.buttonminiEvent.setVisible(True)                
 
             else:
                 aw.messagelabel.setText("No more than 10 events are allowed")
+                aw.etypeComboBox.setVisible(False)
+                aw.valueComboBox.setVisible(False)
+                aw.eventlabel.setVisible(False)
+                aw.buttonminiEvent.setVisible(False)                
         else:
             aw.messagelabel.setText("No profile found")
+
+
+
 
     def movebackground(self,direction,step):
         lt = len(self.timeB)
@@ -2276,7 +2300,37 @@ class ApplicationWindow(QMainWindow):
         self.label6 = QLabel()
         #label6.setStyleSheet("background-color:'#CCCCCC';")
         self.label6.setText( "<font color='black'><b>PID SV<\b></font>")
+        
+        #create EVENT mini logger
+        self.etypes = ["N","P","D","F"]
+        self.eventlabel = QLabel()
+        self.eventlabel.setStyleSheet("background-color:'yellow';")
+       	self.eventlabel.setMaximumWidth(40)
+        self.etypeComboBox = QComboBox()
+        self.etypeComboBox.addItems(self.etypes)
+        self.etypeComboBox.setMaximumWidth(33)
+        self.valueComboBox = QComboBox()
+        self.valueComboBox.addItems(self.qmc.eventsvalues)
+        self.valueComboBox.setMaximumWidth(33)
+        
+        #create EVENT mini button
+        self.buttonminiEvent = QPushButton("OK")
+        self.buttonminiEvent.setMaximumSize(33,30)
+        self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
+        self.buttonminiEvent.setToolTip("Records event type")
+        
+        self.etypeComboBox.setVisible(False)
+        self.valueComboBox.setVisible(False)
+        self.eventlabel.setVisible(False)
+        self.buttonminiEvent.setVisible(False)
+        
+        EventsLayout = QGridLayout()
+        EventsLayout.addWidget(self.etypeComboBox,0,0)
+        EventsLayout.addWidget(self.valueComboBox,0,1)        
+        EventsLayout.addWidget(self.eventlabel,1,0)
+        EventsLayout.addWidget(self.buttonminiEvent,1,1)
 
+    	
         #only leave operational the control button if the device is Fuji PID
         #the SV buttons are activated from the PID control panel 
         if self.qmc.device > 0:
@@ -2339,7 +2393,7 @@ class ApplicationWindow(QMainWindow):
         gl.addLayout(midLayout,2,0)         #GRAPHS
         gl.addLayout(LCDlayout,2,1)         #place LCD manager inside grid box layout manager
         gl.addLayout(buttonHHbl,4,0)        #place buttonlayout manager inside grid box layout manager
-
+        gl.addLayout(EventsLayout,4,1)
         ###############  create MENUS 
         
         if platf == u'Darwin':
@@ -2523,6 +2577,17 @@ class ApplicationWindow(QMainWindow):
         # set the central widget of MainWindow to main_widget
         self.setCentralWidget(self.main_widget)   
 
+    def miniEventRecord(self):
+        print self.etypeComboBox.currentIndex()
+        lenevents = len(self.qmc.specialevents)
+        self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
+        self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
+        self.qmc.redraw()
+        self.etypeComboBox.setVisible(False)
+        self.valueComboBox.setVisible(False)
+        self.eventlabel.setVisible(False)
+        self.buttonminiEvent.setVisible(False)
+        
     def strippedName(self, fullFileName):
         return QFileInfo(fullFileName).fileName()
 
