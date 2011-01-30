@@ -2295,11 +2295,17 @@ class ApplicationWindow(QMainWindow):
         #label6.setStyleSheet("background-color:'#CCCCCC';")
         self.label6.setText( "<font color='black'><b>PID SV<\b></font>")
         
-        #create EVENT mini logger
+        #convenience EVENT mini editor; Edits last recorded event without opening roast editor Dlg.
         self.etypes = ["N","P","D","F"]
         self.eventlabel = QLabel()
+        Nevents = len(self.qmc.specialevents)
+        if Nevents:
+            string = "E #" + unicode(Nevents+1) 
+            self.eventlabel.setText(QString(string))
+        else:
+            self.eventlabel.setText("E #0")
+            
         self.eventlabel.setStyleSheet("background-color:'yellow';")
-        #self.eventlabel.setMinimumWidth(40)
         self.eventlabel.setMaximumWidth(40)
         self.etypeComboBox = QComboBox()
         self.etypeComboBox.addItems(self.etypes)
@@ -2307,13 +2313,13 @@ class ApplicationWindow(QMainWindow):
         self.valueComboBox = QComboBox()
         self.valueComboBox.addItems(self.qmc.eventsvalues)
         self.valueComboBox.setMaximumWidth(47)
-        
+
         #create EVENT mini button
         self.buttonminiEvent = QPushButton("OK")
         self.buttonminiEvent.setMaximumSize(35,20)
         self.buttonminiEvent.setMinimumSize(35,20)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
-        self.buttonminiEvent.setToolTip("Records event type")
+        self.buttonminiEvent.setToolTip("Edits the last recorded event")
 
         if self.minieventsflag:
 
@@ -5591,7 +5597,7 @@ class EventsDlg(QDialog):
             self.eventsbuttonflag.setChecked(False)
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)  
         
-        self.minieventsflag = QCheckBox("Events mini logger")
+        self.minieventsflag = QCheckBox("Last event mini editor")
         if aw.minieventsflag:
             self.minieventsflag.setChecked(True)
         else:
