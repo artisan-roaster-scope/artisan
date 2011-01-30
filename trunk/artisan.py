@@ -757,9 +757,11 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventstype = [0,0,0,0,0,0,0,0,0,0]
         self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0]
         self.specialeventsStrings = [u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
+        aw.eventlabel.setText("E #0")
         self.roastdate = QDate.currentDate()        
         self.ambientTemp = 0.
         self.curFile = None
+        
         
         #aw.settingsLoad()
         
@@ -795,7 +797,7 @@ class tgraphcanvas(FigureCanvas):
                                   transform=trans, color=self.palette["rect3"],alpha=0.3)
         self.ax.add_patch(rect3)
 
-    	if self.eventsGraphflag:
+        if self.eventsGraphflag:
             # make blended transformations to help identify EVENT types
             if self.mode == "C":
                 step = 5
@@ -1017,7 +1019,7 @@ class tgraphcanvas(FigureCanvas):
             
             self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
                              xytext=(self.timex[int(self.specialevents[i])]-5,row[firstletter]),alpha=1.,
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
             
                 
         #update X label names and colors        
@@ -2591,7 +2593,7 @@ class ApplicationWindow(QMainWindow):
         self.helpMenu.addAction(errorAction)
         
         # activate event button
-    	if self.eventsbuttonflag:
+        if self.eventsbuttonflag:
             self.button_11.setVisible(True)
         else:
             self.button_11.setVisible(False)
@@ -5618,17 +5620,17 @@ class EventsDlg(QDialog):
             self.minieventsflag.setChecked(False)
         self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)  
         
-        self.eventsGraphflag = QCheckBox("Events graph bars")
+        self.eventsGraphflag = QCheckBox("Events location bars")
         if aw.qmc.eventsGraphflag:
             self.eventsGraphflag.setChecked(True)
         else:
             self.eventsGraphflag.setChecked(False)
         self.connect(self.eventsGraphflag,SIGNAL("stateChanged(int)"),self.eventsGraphflagChanged)  
 
-    	EventsLayout = QVBoxLayout()
-    	EventsLayout.addWidget(self.eventsbuttonflag,0)
-    	EventsLayout.addWidget(self.minieventsflag,1)
-    	EventsLayout.addWidget(self.eventsGraphflag,2)
+        EventsLayout = QVBoxLayout()
+        EventsLayout.addWidget(self.eventsbuttonflag,0)
+        EventsLayout.addWidget(self.minieventsflag,1)
+        EventsLayout.addWidget(self.eventsGraphflag,2)
 
         self.setLayout(EventsLayout)
         
