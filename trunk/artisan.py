@@ -109,7 +109,6 @@ import numpy
 
 
 
-
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
@@ -286,7 +285,8 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s"]        
         self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0]
-
+        self.eventsGraphflag = 1
+        
         # set limits for X and Y axes. Default is in Farenheit units
         self.ylimit = 750
         self.ylimit_min = 0
@@ -321,7 +321,6 @@ class tgraphcanvas(FigureCanvas):
 
         for label in self.ax.xaxis.get_ticklabels():
             label.set_color(self.palette["xlabel"])            
-
         
         #Create x axis labels in minutes:seconds instead of seconds
         self.xaxistosm()
@@ -436,8 +435,8 @@ class tgraphcanvas(FigureCanvas):
                 
             aw.lcd2.display(t1)                               # MET
             aw.lcd3.display(t2)                               # BT
-            aw.lcd4.display(self.approx(self.rateofchange1*60))       # rate of change MET (degress per minute)
-            aw.lcd5.display(self.approx(self.rateofchange2*60))       # rate of change BT (degrees per minute)
+            aw.lcd4.display(int(round(self.rateofchange1*60)))       # rate of change MET (degress per minute)
+            aw.lcd5.display(int(round(self.rateofchange2*60)))       # rate of change BT (degrees per minute)
 
             self.fig.canvas.draw()
             
@@ -701,7 +700,6 @@ class tgraphcanvas(FigureCanvas):
         if self.HUDflag:
             self.toggleHUD()
 
-            
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')  
 
@@ -797,19 +795,20 @@ class tgraphcanvas(FigureCanvas):
                                   transform=trans, color=self.palette["rect3"],alpha=0.3)
         self.ax.add_patch(rect3)
 
-        # make blended transformations to help identify EVENT types
-        if self.mode == "C":
-            step = 5
-        else:
-            step = 10
-        jump = 20
-        for i in range(len(self.etypes)):
-            rectEvent = patches.Rectangle((0,jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
-            self.ax.add_patch(rectEvent)
+    	if self.eventsGraphflag:
+            # make blended transformations to help identify EVENT types
             if self.mode == "C":
-                jump += 10
+                step = 5
             else:
-                jump += 20
+                step = 10
+            jump = 20
+            for i in range(len(self.etypes)):
+                rectEvent = patches.Rectangle((0,jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
+                self.ax.add_patch(rectEvent)
+                if self.mode == "C":
+                    jump += 10
+                else:
+                    jump += 20
 
 
         ##### ET,BT curves
@@ -1016,9 +1015,9 @@ class tgraphcanvas(FigureCanvas):
             firstletter = self.etypes[self.specialeventstype[i]][0]                
             secondletter = self.eventsvalues[self.specialeventsvalue[i]]
             
-            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
                              xytext=(self.timex[int(self.specialevents[i])]-5,row[firstletter]),alpha=1.,
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='<-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
             
                 
         #update X label names and colors        
@@ -1097,15 +1096,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             st2 = unicode(int(mins))
         return st2
-
-    #find better approximation than int() alone
-    def approx(self,number):
-        integer, deci = divmod(number,1)
-        if deci >= .5:
-            return int(number) + 1
-        else:
-            return int(number)
-        
+       
     def fromFtoC(self,Ffloat):
         return (Ffloat-32.0)*(5.0/9.0)
 
@@ -1118,7 +1109,7 @@ class tgraphcanvas(FigureCanvas):
         self.ylimit = 750
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
-            self.phases[i] = self.approx(self.fromCtoF(self.phases[i]))          
+            self.phases[i] = int(round(self.fromCtoF(self.phases[i])))          
         self.ax.set_ylabel("F",size=16,color = self.palette["ylabel"]) #Write "F" on Y axis
         self.mode = u"F"
         if aw: # during initialization aw is still None
@@ -1135,7 +1126,7 @@ class tgraphcanvas(FigureCanvas):
         self.ylimit = 400
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
-            self.phases[i] = self.approx(self.fromFtoC(self.phases[i]))
+            self.phases[i] = int(round(self.fromFtoC(self.phases[i])))
         self.ax.set_ylabel("C",size=16,color = self.palette["ylabel"]) #Write "C" on Y axis
         self.mode = u"C"
         if aw: # during initialization aw is still None
@@ -1437,7 +1428,7 @@ class tgraphcanvas(FigureCanvas):
                 message = u"DRY END recorded at " + st1 + u" BT = " + unicode(self.dryend[1]) + self.mode
                 
                 if aw.qmc.phasesbuttonflag:     
-                    self.phases[1] = self.approx(self.dryend[1])
+                    self.phases[1] = int(round(self.dryend[1]))
                     self.redraw()
       
             else:
@@ -1472,7 +1463,7 @@ class tgraphcanvas(FigureCanvas):
                 message = u"1C START recorded at " + st1 + u" BT = " + unicode(self.varC[1]) + self.mode
 
                 if aw.qmc.phasesbuttonflag:     
-                    self.phases[2] = self.approx(self.varC[1])
+                    self.phases[2] = int(round(self.varC[1]))
                     self.redraw()
 
             else:
@@ -1743,19 +1734,16 @@ class tgraphcanvas(FigureCanvas):
           
                 firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
                 secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
-                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp2[i]),
+                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp1[i]),
                                  xytext=(self.timex[i],row[firstletter]),alpha=0.9,
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',
                                 color=self.palette["text"],alpha=0.4),fontsize=8, backgroundcolor='yellow')
 
             	#activate mini recorder
-                string = "E #" + unicode(Nevents+1) 
-                aw.eventlabel.setText(QString(string))
-                aw.etypeComboBox.setVisible(True)
-                aw.valueComboBox.setVisible(True)
-                aw.eventlabel.setVisible(True)
-                aw.buttonminiEvent.setVisible(True)                
-
+                if aw.minieventsflag:
+                    string = "E #" + unicode(Nevents+1) 
+                    aw.eventlabel.setText(QString(string))
+               
             else:
                 aw.messagelabel.setText("No more than 10 events are allowed")
                 aw.etypeComboBox.setVisible(False)
@@ -2068,9 +2056,11 @@ class ApplicationWindow(QMainWindow):
         self.stack.addWidget(self.qmc)
         self.stack.addWidget(self.HUD)        
         #self.stack.addWidget(self.profDesign)
-
-        self.stack.setCurrentIndex(0)
         
+        #events config
+        self.eventsbuttonflag = 1
+        self.minieventsflag = 1
+       
         #create a serial port object
         self.ser = serialport()
         # create a PID object
@@ -2164,8 +2154,11 @@ class ApplicationWindow(QMainWindow):
         self.button_11.setMinimumHeight(50)
         self.button_11.setToolTip("Marks an Event")
         self.connect(self.button_11, SIGNAL("clicked()"), self.qmc.EventRecord) 
-
-        #create PID+5 button
+    	if self.eventsbuttonflag:
+            self.button_11.setVisible(True)
+        else:
+            self.button_11.setVisible(False)
+    	#create PID+5 button
         self.button_12 = QPushButton("SV +5")
         self.button_12.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_12.setMaximumSize(90, 50)
@@ -2306,8 +2299,8 @@ class ApplicationWindow(QMainWindow):
         self.etypes = ["N","P","D","F"]
         self.eventlabel = QLabel()
         self.eventlabel.setStyleSheet("background-color:'yellow';")
-       	#self.eventlabel.setMinimumWidth(40)
-       	self.eventlabel.setMaximumWidth(40)
+        #self.eventlabel.setMinimumWidth(40)
+        self.eventlabel.setMaximumWidth(40)
         self.etypeComboBox = QComboBox()
         self.etypeComboBox.addItems(self.etypes)
         self.etypeComboBox.setMaximumWidth(47)
@@ -2321,11 +2314,18 @@ class ApplicationWindow(QMainWindow):
         self.buttonminiEvent.setMinimumSize(35,20)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
         self.buttonminiEvent.setToolTip("Records event type")
-        
-        self.etypeComboBox.setVisible(False)
-        self.valueComboBox.setVisible(False)
-        self.eventlabel.setVisible(False)
-        self.buttonminiEvent.setVisible(False)
+
+        if self.minieventsflag:
+
+            self.etypeComboBox.setVisible(True)
+            self.valueComboBox.setVisible(True)
+            self.eventlabel.setVisible(True)
+            self.buttonminiEvent.setVisible(True)
+        else:
+            self.etypeComboBox.setVisible(False)
+            self.valueComboBox.setVisible(False)
+            self.eventlabel.setVisible(False)
+            self.buttonminiEvent.setVisible(False)
         
         EventsLayout = QGridLayout()
         EventsLayout.addWidget(self.etypeComboBox,0,0)
@@ -2556,6 +2556,10 @@ class ApplicationWindow(QMainWindow):
         phasesGraphAction = QAction("Phases...",self)
         self.connect(phasesGraphAction,SIGNAL("triggered()"),self.editphases)
         self.ConfMenu.addAction(phasesGraphAction)
+        
+        eventsAction = QAction("Events...",self)
+        self.connect(eventsAction,SIGNAL("triggered()"),self.eventsconf)
+        self.ConfMenu.addAction(eventsAction)        
        
         StatisticsAction = QAction("Statistics...",self)
         self.connect(StatisticsAction,SIGNAL("triggered()"),self.showstatistics)
@@ -2594,10 +2598,6 @@ class ApplicationWindow(QMainWindow):
         self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
         self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
         self.qmc.redraw()
-        self.etypeComboBox.setVisible(False)
-        self.valueComboBox.setVisible(False)
-        self.eventlabel.setVisible(False)
-        self.buttonminiEvent.setVisible(False)
         
     def strippedName(self, fullFileName):
         return QFileInfo(fullFileName).fileName()
@@ -3102,7 +3102,7 @@ class ApplicationWindow(QMainWindow):
             f.write(str(self.qmc.temp2[i]) + "\t")
             f.write(str(self.qmc.temp1[i]) + "\t")
             for e in range(len(events)):
-                if round(self.qmc.timex[i]) == round(events[e][0]):
+                if int(round(self.qmc.timex[i])) == int(round(events[e][0])):
                     f.write(events[e][1])
                     break
             f.write("\n")
@@ -3295,6 +3295,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phases = map(lambda x:x.toInt()[0],settings.value("Phases").toList())
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]
+            #restore Events settings
+            self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
+            self.minieventsflag = settings.value("minieventsflag",int(self.minieventsflag)).toInt()[0]
+            self.qmc.eventsGraphflag = settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)).toInt()[0]
 
             #restore statistics
             if settings.contains("Statistics"):
@@ -3384,6 +3388,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
+            #save Events settings
+            settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
+            settings.setValue("minieventsflag",self.minieventsflag)
+            settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
             #save delay
             settings.setValue("Delay",self.qmc.delay)
             #save colors
@@ -3978,6 +3986,10 @@ $cupping_notes
 
     def editphases(self):
         dialog = phasesGraphDlg(self)
+        dialog.show()
+        
+    def eventsconf(self):
+        dialog = EventsDlg(self)
         dialog.show()
         
     # takes the weight of the green and roasted coffee as floats and
@@ -4599,7 +4611,7 @@ class editGraphDlg(QDialog):
 
         #Dynamic content of events depending on number of events found    
         if ntlines > 0 and nslines > 0:
-            time1 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[0]]))
+            time1 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[0]])))
             self.line1b = QLineEdit(time1)
             self.line1b.setValidator(QRegExpValidator(regextime,self))
             self.line1b.setMaximumWidth(50)
@@ -4615,7 +4627,7 @@ class editGraphDlg(QDialog):
             self.line1.setMinimumWidth(200)
             
         if ntlines > 1 and nslines > 1:
-            time2 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[1]]))
+            time2 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[1]])))
             self.line2b = QLineEdit(time2)
             self.line2b.setValidator(QRegExpValidator(regextime,self))
             self.line2b.setMaximumWidth(50)
@@ -4631,7 +4643,7 @@ class editGraphDlg(QDialog):
             self.line2.setMinimumWidth(200)
             
         if ntlines > 2 and nslines > 2:
-            time3 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[2]]))
+            time3 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[2]])))
             self.line3b = QLineEdit(time3)
             self.line3b.setValidator(QRegExpValidator(regextime,self))
             self.line3b.setMaximumWidth(50)
@@ -4647,7 +4659,7 @@ class editGraphDlg(QDialog):
             self.line3.setMinimumWidth(200)
             
         if ntlines > 3 and nslines > 3:
-            time4 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[3]]))
+            time4 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[3]])))
             self.line4b = QLineEdit(time4)
             self.line4b.setValidator(QRegExpValidator(regextime,self))
             self.line4b.setMaximumWidth(50)            
@@ -4663,7 +4675,7 @@ class editGraphDlg(QDialog):
             self.line4.setMinimumWidth(200)
             
         if ntlines > 4 and nslines > 4:
-            time5 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[4]]))
+            time5 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[4]])))
             self.line5b = QLineEdit(time5)
             self.line5b.setValidator(QRegExpValidator(regextime,self))
             self.line5b.setMaximumWidth(50)
@@ -4679,7 +4691,7 @@ class editGraphDlg(QDialog):
             self.line5.setMinimumWidth(200)
             
         if ntlines > 5 and nslines > 5:
-            time6 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[5]]))
+            time6 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[5]])))
             self.line6b = QLineEdit(time6)
             self.line6b.setValidator(QRegExpValidator(regextime,self))
             self.line6b.setMaximumWidth(50)
@@ -4695,7 +4707,7 @@ class editGraphDlg(QDialog):
             self.line6.setMinimumWidth(200)
             
         if ntlines > 6 and nslines > 6:
-            time7 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[6]]))
+            time7 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[6]])))
             self.line7b = QLineEdit(time7)
             self.line7b.setValidator(QRegExpValidator(regextime,self))
             self.line7b.setMaximumWidth(50)
@@ -4711,7 +4723,7 @@ class editGraphDlg(QDialog):
             self.line7.setMinimumWidth(200)
             
         if ntlines > 7 and nslines > 7:
-            time8 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[7]]))
+            time8 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[7]])))
             self.line8b = QLineEdit(time8)
             self.line8b.setValidator(QRegExpValidator(regextime,self))
             self.line8b.setMaximumWidth(50)
@@ -4727,7 +4739,7 @@ class editGraphDlg(QDialog):
             self.line8.setMinimumWidth(200)
             
         if ntlines > 8 and nslines > 8:
-            time9 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[8]]))
+            time9 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[8]])))
             self.line9b = QLineEdit(time9)
             self.line9b.setValidator(QRegExpValidator(regextime,self))
             self.line9b.setMaximumWidth(50)
@@ -4743,7 +4755,7 @@ class editGraphDlg(QDialog):
             self.line9.setMinimumWidth(200)
             
         if ntlines > 9 and nslines > 9:
-            time10 = aw.qmc.stringfromseconds(self.approx(aw.qmc.timex[aw.qmc.specialevents[9]]))
+            time10 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[9]])))
             self.line10b = QLineEdit(time10)
             self.line10b.setValidator(QRegExpValidator(regextime,self))
             self.line10b.setMaximumWidth(50)
@@ -5048,16 +5060,8 @@ class editGraphDlg(QDialog):
         totalLayout.addLayout(okLayout)
 
         self.setLayout(totalLayout)
-
-    #find better approximation than int() alone
-    def approx(self,number):
-        integer, deci = divmod(number,1)
-        if deci >= .5:
-            return int(number) + 1
-        else:
-            return int(number)
-        
-    
+      
+   
     def percent(self):
         if float(self.weightoutedit.text()) != 0.0:
             percent = aw.weight_loss(float(self.weightinedit.text()),float(self.weightoutedit.text()))
@@ -5096,9 +5100,9 @@ class editGraphDlg(QDialog):
             if aw.qmc.phasesbuttonflag:   
                 # adjust phases by DryEnd and FCs events
                 if aw.qmc.dryend[1] > 0.:
-                    aw.qmc.phases[1] = self.approx(aw.qmc.dryend[1])  
+                    aw.qmc.phases[1] = int(round(aw.qmc.dryend[1]))  
                 if aw.qmc.varC[1] > 0.:
-                    aw.qmc.phases[2] = self.approx(aw.qmc.varC[1])                                                   
+                    aw.qmc.phases[2] = int(round(aw.qmc.varC[1]))                                                   
 
             #update events             
             ntlines = len(aw.qmc.specialevents)         #number of events found            
@@ -5563,7 +5567,79 @@ class calculatorDlg(QDialog):
            inx = outx*convtable[self.outComboBox.currentIndex()][self.inComboBox.currentIndex()]
            self.inEdit.setText(u"%.2f"%inx)
                    
+##########################################################################
+#####################  EVENTS DLG  CONF       ############################
+##########################################################################
+        
+class EventsDlg(QDialog):
+    def __init__(self, parent = None):
+        super(EventsDlg,self).__init__(parent)
 
+        self.setWindowTitle("Events config")
+        self.setModal(True)
+
+        self.eventsbuttonflag = QCheckBox("Events Button")
+        if aw.eventsbuttonflag:
+            self.eventsbuttonflag.setChecked(True)
+        else:
+            self.eventsbuttonflag.setChecked(False)
+        self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)  
+        
+        self.minieventsflag = QCheckBox("Events mini logger")
+        if aw.minieventsflag:
+            self.minieventsflag.setChecked(True)
+        else:
+            self.minieventsflag.setChecked(False)
+        self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)  
+        
+        self.eventsGraphflag = QCheckBox("Events graph bars")
+        if aw.qmc.eventsGraphflag:
+            self.eventsGraphflag.setChecked(True)
+        else:
+            self.eventsGraphflag.setChecked(False)
+        self.connect(self.eventsGraphflag,SIGNAL("stateChanged(int)"),self.eventsGraphflagChanged)  
+
+    	EventsLayout = QVBoxLayout()
+    	EventsLayout.addWidget(self.eventsbuttonflag,0)
+    	EventsLayout.addWidget(self.minieventsflag,1)
+    	EventsLayout.addWidget(self.eventsGraphflag,2)
+
+        self.setLayout(EventsLayout)
+        
+    def eventsbuttonflagChanged(self):
+        if self.eventsbuttonflag.isChecked():
+            aw.button_11.setVisible(True)
+            aw.eventsbuttonflag = 1
+        else:
+            aw.button_11.setVisible(False)            
+            aw.eventsbuttonflag = 0
+            self.minieventsflag.setChecked(False)
+            self.eventsGraphflag.setChecked(False)
+            
+    def minieventsflagChanged(self):
+        if self.minieventsflag.isChecked():
+            aw.etypeComboBox.setVisible(True)
+            aw.valueComboBox.setVisible(True)
+            aw.eventlabel.setVisible(True)
+            aw.buttonminiEvent.setVisible(True)
+            aw.minieventsflag = 1
+        else:
+            aw.etypeComboBox.setVisible(False)
+            aw.valueComboBox.setVisible(False)
+            aw.eventlabel.setVisible(False)
+            aw.buttonminiEvent.setVisible(False)            
+            aw.minieventsflag = 0
+            
+    def eventsGraphflagChanged(self):
+        if self.eventsGraphflag.isChecked():
+            aw.qmc.eventsGraphflag = 1
+            aw.qmc.redraw()
+        else:
+            aw.qmc.eventsGraphflag = 0
+            aw.qmc.redraw()            
+          
+        
+        
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
 ##########################################################################
@@ -5575,8 +5651,9 @@ class phasesGraphDlg(QDialog):
         self.setWindowTitle("Roast Phases")
         self.setModal(True)
         
-        self.phases = copy(aw.qmc.phases)
-
+        #self.phases = copy(aw.qmc.phases)
+    	self.phases = aw.qmc.phases
+    	
         dryLabel = QLabel("Dry")
         midLabel = QLabel("Mid")
         finishLabel = QLabel("Finish")
@@ -5671,7 +5748,7 @@ class phasesGraphDlg(QDialog):
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(cancelButton)
         buttonsLayout.addWidget(okButton)
-                             
+
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(boxedPhaseLayout)
         mainLayout.addLayout(boxedPhaseFlagLayout)
@@ -5691,11 +5768,11 @@ class phasesGraphDlg(QDialog):
         if aw.qmc.phasesbuttonflag:
             # adjust phases by DryEnd and FCs events
             if aw.qmc.dryend[1] > 0.:
-                aw.qmc.phases[1] = aw.qmc.approx(aw.qmc.dryend[1])  
+                aw.qmc.phases[1] = int(round(aw.qmc.dryend[1]))  
                 self.enddry.setDisabled(True)
                 self.startmid.setDisabled(True)
             if aw.qmc.varC[1] > 0.:
-                aw.qmc.phases[2] = aw.qmc.approx(aw.qmc.varC[1])
+                aw.qmc.phases[2] = int(round(aw.qmc.varC[1]))
                 self.endmid.setDisabled(True)
                 self.startfinish.setDisabled(True)
 
