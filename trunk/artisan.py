@@ -3376,6 +3376,7 @@ class ApplicationWindow(QMainWindow):
             #save window geometry
             settings.setValue("Geometry",QVariant(self.saveGeometry()))
             #save mode
+            previous_mode = unicode(settings.value("Mode",self.qmc.mode).toString())
             settings.setValue("Mode",self.qmc.mode)
             #save device
             settings.beginGroup("Device");
@@ -3384,6 +3385,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("readBTpid",self.ser.readBTpid)
             settings.endGroup();
             #save of phases is done in the phases dialog
+            #only if mode was changed (and therefore the phases values have been converted)
+            #we update the defaults here
+            if previous_mode != self.qmc.mode:
+                #save phases
+                settings.setValue("Phases",aw.qmc.phases)            
             #save phasesbuttonflag
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
             #save statistics
@@ -5575,7 +5581,7 @@ class EventsDlg(QDialog):
     def __init__(self, parent = None):
         super(EventsDlg,self).__init__(parent)
 
-        self.setWindowTitle("Events config")
+        self.setWindowTitle("Events")
         self.setModal(True)
 
         self.eventsbuttonflag = QCheckBox("Events Button")
