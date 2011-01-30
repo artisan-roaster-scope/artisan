@@ -2599,6 +2599,7 @@ class ApplicationWindow(QMainWindow):
         # set the central widget of MainWindow to main_widget
         self.setCentralWidget(self.main_widget)   
 
+    # edit last entry in mini Event editor
     def miniEventRecord(self):
         lenevents = len(self.qmc.specialevents)
         self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
@@ -2814,6 +2815,7 @@ class ApplicationWindow(QMainWindow):
                             self.qmc.specialeventsStrings[i] = unicode(stream.readLine().trimmed())               
                 else:
                     stream.readLine() #read blank line
+            
                 #Read roasting notes tag
                 line = stream.readLine().trimmed()                   
                 if not line.startsWith(u"[[ROASTING-NOTES]]"):
@@ -2868,10 +2870,19 @@ class ApplicationWindow(QMainWindow):
             message =  unicode(filename) + u" loaded successfully"
             self.messagelabel.setText(message)
             
-            #do we realy need to show the Roast Properties dialog on each open?
-            #self.editgraph()
             self.setCurrentFile(filename)
 
+            #adds label in mini Events editor
+            Nevents = len(self.qmc.specialevents)
+            if Nevents:
+                string = "E #" + unicode(Nevents) 
+                self.eventlabel.setText(QString(string))
+                self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[Nevents-1]) 
+                self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[Nevents-1]) 
+                
+            else:
+                self.eventlabel.setText("E #0")
+                
         except IOError,e:
             self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Unable to open file " + unicode(e))
