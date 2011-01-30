@@ -761,7 +761,7 @@ class tgraphcanvas(FigureCanvas):
         self.ambientTemp = 0.
         self.curFile = None
         
-        aw.settingsLoad()
+        #aw.settingsLoad()
         
         #restart() clock 
         self.timeclock.restart()
@@ -2154,10 +2154,7 @@ class ApplicationWindow(QMainWindow):
         self.button_11.setMinimumHeight(50)
         self.button_11.setToolTip("Marks an Event")
         self.connect(self.button_11, SIGNAL("clicked()"), self.qmc.EventRecord) 
-    	if self.eventsbuttonflag:
-            self.button_11.setVisible(True)
-        else:
-            self.button_11.setVisible(False)
+        
     	#create PID+5 button
         self.button_12 = QPushButton("SV +5")
         self.button_12.setStyleSheet("QPushButton { background-color: #ffaaff}")
@@ -2592,6 +2589,12 @@ class ApplicationWindow(QMainWindow):
         errorAction = QAction("Errors",self)
         self.connect(errorAction,SIGNAL("triggered()"),self.viewErrorLog)
         self.helpMenu.addAction(errorAction)
+        
+        # activate event button
+    	if self.eventsbuttonflag:
+            self.button_11.setVisible(True)
+        else:
+            self.button_11.setVisible(False)
 
         # set the focus on the main widget
         self.main_widget.setFocus()
