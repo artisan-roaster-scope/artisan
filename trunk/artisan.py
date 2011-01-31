@@ -3629,7 +3629,7 @@ $cupping_notes
             beans = beans[:41] + "&hellip;"
         charge = "--"
         if self.qmc.startend[0] > 0.:
-            charge = "BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode,            
+            charge = "BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode
         TP_index = self.findTP()
         TP_time = TP_temp = None
         if TP_index > 0 and len(aw.qmc.timex) > 0:
