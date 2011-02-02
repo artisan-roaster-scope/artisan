@@ -5127,9 +5127,9 @@ class editGraphDlg(QDialog):
             
             if aw.qmc.phasesbuttonflag:   
                 # adjust phases by DryEnd and FCs events
-                if aw.qmc.dryend[1] > 0.:
+                if aw.qmc.dryend[0]:
                     aw.qmc.phases[1] = int(round(aw.qmc.dryend[1]))  
-                if aw.qmc.varC[1] > 0.:
+                if aw.qmc.varC[0]:
                     aw.qmc.phases[2] = int(round(aw.qmc.varC[1]))                                                   
 
             #update events             
@@ -5794,11 +5794,11 @@ class phasesGraphDlg(QDialog):
     def events2phases(self):
         if aw.qmc.phasesbuttonflag:
             # adjust phases by DryEnd and FCs events
-            if aw.qmc.dryend[1] > 0.:
+            if aw.qmc.dryend[0]:
                 aw.qmc.phases[1] = int(round(aw.qmc.dryend[1]))  
                 self.enddry.setDisabled(True)
                 self.startmid.setDisabled(True)
-            if aw.qmc.varC[1] > 0.:
+            if aw.qmc.varC[0]:
                 aw.qmc.phases[2] = int(round(aw.qmc.varC[1]))
                 self.endmid.setDisabled(True)
                 self.startfinish.setDisabled(True)
