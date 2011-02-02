@@ -297,6 +297,9 @@ class tgraphcanvas(FigureCanvas):
         self.statisticsheight = 650
         self.statisticsupper = 655
         self.statisticslower = 617
+
+        #used to place correct height of text in push buttons markers and avoid text over text
+        self.ystep = 45
         
         self.ax.set_xlim(self.startofx, self.endofx)
         self.ax.set_ylim(self.ylimit_min,self.ylimit)
@@ -761,7 +764,7 @@ class tgraphcanvas(FigureCanvas):
         self.roastdate = QDate.currentDate()        
         self.ambientTemp = 0.
         self.curFile = None
-        
+        self.ystep = 45
         
         #aw.settingsLoad()
         
@@ -941,68 +944,88 @@ class tgraphcanvas(FigureCanvas):
         #Add markers for CHARGE
         if self.startend[0]:
             #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
-                                self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0], self.startend[1]+self.ystep),
+                               color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
-                                self.startend[1]-100),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-        #Add Dry End markers
+            self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+        #Add Dry End markers            
         if self.dryend[0]:
+            self.ystep = self.findtextgap(self.startend[1],self.dryend[1])
             st1 = u"DE " + unicode(self.stringfromseconds(self.dryend[0]-self.startend[0]))
             #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0]-5,
-                                self.dryend[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0], self.dryend[1] + self.ystep), 
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
+            self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1] - self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
         #Add 1Cs markers
         if self.varC[0]:
+            if self.dryend[0]:
+                self.ystep = self.findtextgap(self.dryend[1],self.varC[1])
+            else:
+                self.ystep = self.findtextgap(self.startend[1],self.varC[1])
             st1 = u"FCs " + unicode(self.stringfromseconds(self.varC[0]-self.startend[0]))
             #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
-                                self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]+self.ystep), 
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-50),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1] - self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
         #Add 1Ce markers
         if self.varC[2]:
+            self.ystep = self.findtextgap(self.varC[1],self.varC[3])
             st1 = u"FCe " + unicode(self.stringfromseconds(self.varC[2]-self.startend[0]))
             #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
-                                self.varC[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]+ self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-80),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #add a water mark
             self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
 
         #Add 2Cs markers
         if self.varC[4]:
+            if self.varC[3]:
+                self.ystep = self.findtextgap(self.varC[3],self.varC[5])
+            else:
+                self.ystep = self.findtextgap(self.varC[1],self.varC[5])
             st1 = u"SCs " + unicode(self.stringfromseconds(self.varC[4]-self.startend[0]))
-            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
-                                self.varC[5]+90),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
-            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-110),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]+self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
+            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-self.ystep),
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
         #Add 2Ce markers
         if self.varC[6]:
+            self.ystep = self.findtextgap(self.varC[5],self.varC[7])
             st1 =  u"SCe " + unicode(self.stringfromseconds(self.varC[6]-self.startend[0]))
             #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
-                                self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]+self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-40),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #do water mark
             self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
 
         #Add DROP markers
         if self.startend[2]:
+            if self.varC[7]:
+                self.ystep = self.findtextgap(self.varC[7],self.startend[3])
+            elif self.varC[5]:
+                self.ystep = self.findtextgap(self.varC[5],self.startend[3])
+            elif self.varC[3]:
+                self.ystep = self.findtextgap(self.varC[3],self.startend[3])
+            else:
+                ystep = self.findtextgap(self.varC[1],self.startend[3])
+                
             st1 = u"END " + unicode(self.stringfromseconds(self.startend[2]-self.startend[0]))
             #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
-                                self.startend[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]+self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-80),
+            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-self.ystep),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             
             self.writestatistics()
@@ -1032,6 +1055,20 @@ class tgraphcanvas(FigureCanvas):
         #ready to plot    
         self.fig.canvas.draw()     
 
+    #used to find best height of text in graph to avoid writting over previous text
+    #oldpoint height, newpoint height, previous arrow step
+    def findtextgap(self,height1,height2):
+        if self.mode == "F":
+            init = 50
+            gap = 30
+        else:
+            init = 40
+            gap = 20
+        for i in range(init,90):
+            if abs((height1 + self.ystep) - (height2+i)) > gap and abs((height1-self.ystep) - (height2-i)) > gap:
+                break
+    	return i 
+               
     # used to put time in LCD timer. input int, output string
     def stringfromseconds(self, seconds):
         mins, secs = divmod(seconds,60)
@@ -1388,11 +1425,11 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.add_patch(rect)
 
                 #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-                self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]-5,
-                                self.startend[1]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]+ self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
                 #anotate time
-                self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0]+5,
-                                self.startend[1]-50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
                 message = u"Roast time starts now. 00:00 BT = " + unicode(self.startend[1]) + self.mode
 
@@ -1418,10 +1455,11 @@ class tgraphcanvas(FigureCanvas):
                 #calculate time elapsed since charge time
                 st1 = u"Dry end " + self.stringfromseconds(self.dryend[0] - self.startend[0])
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0]-5,
-                                self.dryend[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                self.ystep = self.findtextgap(self.startend[1],self.dryend[1])
+                self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]+self.ystep), 
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-50),
+                self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-self.ystep),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
                 aw.button_19.setDisabled(True)
@@ -1453,10 +1491,14 @@ class tgraphcanvas(FigureCanvas):
                 #calculate time elapsed since charge time
                 st1 = u"1CS " + self.stringfromseconds(self.varC[0]-self.startend[0])
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0]-5,
-                                self.varC[1]+50), color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                if self.dryend[0]:
+                    self.ystep = self.findtextgap(self.dryend[1],self.varC[1])
+                else:
+                    self.ystep = self.findtextgap(self.startend[1],self.varC[1])                
+                self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1] + self.ystep), 
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-50),
+                self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-self.ystep),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
                 aw.button_3.setDisabled(True)
@@ -1487,10 +1529,11 @@ class tgraphcanvas(FigureCanvas):
                 #calculate time elapsed since charge time
                 st1 = u"1CE " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2]-5,
-                                self.varC[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                self.ystep = self.findtextgap(self.varC[1],self.varC[3])
+                self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]+self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-80),
+                self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
                 self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -1512,11 +1555,15 @@ class tgraphcanvas(FigureCanvas):
             self.varC[4] = self.timeclock.elapsed()/1000.
             self.varC[5] = self.temp2[-1]
             
-            st1 = u"2CS " + self.stringfromseconds(self.varC[4]-self.startend[0]) 
-            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,
-                                self.varC[5]+90),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)      
-            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-110),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+            st1 = u"2CS " + self.stringfromseconds(self.varC[4]-self.startend[0])
+            if self.varC[3]:
+                self.ystep = self.findtextgap(self.varC[3],self.varC[5])
+            else:
+                self.ystep = self.findtextgap(self.varC[1],self.varC[5])            
+            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,self.varC[5]+self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)      
+            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-self.ystep),
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
             aw.button_5.setDisabled(True)
             aw.button_5.setFlat(True)
@@ -1538,10 +1585,11 @@ class tgraphcanvas(FigureCanvas):
                     
                 st1 =  u"2CE " + self.stringfromseconds(self.varC[6]-self.startend[0])
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,
-                                self.varC[7]+50),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                self.ystep = self.findtextgap(self.varC[5],self.varC[7])
+                self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,self.varC[7]+self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-40),
+                self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-self.ystep),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
 
 
@@ -1567,10 +1615,19 @@ class tgraphcanvas(FigureCanvas):
             
             st1 = u"END " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
             #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,
-                                self.startend[3]+70),color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+            if self.varC[7]:
+                self.ystep = self.findtextgap(self.varC[7],self.startend[3])
+            elif self.varC[5]:
+                self.ystep = self.findtextgap(self.varC[5],self.startend[3])
+            elif self.varC[3]:
+                self.ystep = self.findtextgap(self.varC[3],self.startend[3])
+            else:
+                self.ystep = self.findtextgap(self.varC[1],self.startend[3])
+                            
+            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,self.startend[3]+self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             #anotate time
-            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-80),
+            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-self.ystep),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
             
             self.writestatistics()
