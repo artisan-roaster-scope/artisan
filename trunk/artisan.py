@@ -1067,7 +1067,7 @@ class tgraphcanvas(FigureCanvas):
         for i in range(init,90):
             if abs((height1 + self.ystep) - (height2+i)) > gap and abs((height1-self.ystep) - (height2-i)) > gap:
                 break
-    	return i 
+        return i 
                
     # used to put time in LCD timer. input int, output string
     def stringfromseconds(self, seconds):
@@ -1938,6 +1938,7 @@ class tgraphcanvas(FigureCanvas):
 
 
         return Xpoints,Ypoints
+    
     def univariateinfo(self):
         try:
             
@@ -2124,7 +2125,7 @@ class ApplicationWindow(QMainWindow):
         self.ser = serialport()
         # create a PID object
         self.pid = FujiPID()
-        
+
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID. 
         self.settingsLoad()        
@@ -2471,7 +2472,7 @@ class ApplicationWindow(QMainWindow):
             self.GraphMenu = self.menuBar().addMenu("&Roast")
             self.ConfMenu = self.menuBar().addMenu("&Conf")
             self.helpMenu = self.menuBar().addMenu("&Help")
-            
+
         #FILE menu
         fileLoadAction = QAction("Open...",self)
         fileLoadAction.setShortcut(QKeySequence.Open)
@@ -2540,7 +2541,6 @@ class ApplicationWindow(QMainWindow):
         self.connect(htmlAction,SIGNAL("triggered()"),self.htmlReport)
         htmlAction.setShortcut("Ctrl+R")
         self.fileMenu.addAction(htmlAction)
-
         
         self.fileMenu.addSeparator()
         
@@ -2633,9 +2633,8 @@ class ApplicationWindow(QMainWindow):
 
         hudAction = QAction("Extras...",self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
-        self.ConfMenu.addAction(hudAction)  
-        
-        
+        self.ConfMenu.addAction(hudAction)
+
         # HELP menu
         helpAboutAction = QAction("About",self)
         self.connect(helpAboutAction,SIGNAL("triggered()"),self.helpAbout)
@@ -2644,6 +2643,10 @@ class ApplicationWindow(QMainWindow):
         helpDocumentationAction = QAction("Documentation",self)
         self.connect(helpDocumentationAction,SIGNAL("triggered()"),self.helpHelp)
         self.helpMenu.addAction(helpDocumentationAction)        
+
+        KshortCAction = QAction("Show Keybord Shortcuts",self)
+        self.connect(KshortCAction,SIGNAL("triggered()"),self.viewKshortcuts)
+        self.helpMenu.addAction(KshortCAction)
 
         errorAction = QAction("Errors",self)
         self.connect(errorAction,SIGNAL("triggered()"),self.viewErrorLog)
@@ -2661,6 +2664,51 @@ class ApplicationWindow(QMainWindow):
         # set the central widget of MainWindow to main_widget
         self.setCentralWidget(self.main_widget)   
 
+
+    def keyPressEvent(self,event):
+        key = int(event.key())
+        #use this to find the integer value of a key
+        #print key
+        if key == 90:           #Z [ON]
+            self.qmc.OnMonitor()
+        elif key == 88:     #X [CHARGE]     
+            self.qmc.markCharge()
+        elif key == 67:     #C [DRY END]    
+            self.qmc.markDryEnd()
+        elif key == 86:     #V [FC START]
+            self.qmc.mark1Cstart()            
+        elif key == 66:     #B [FC END]
+            self.qmc.mark1Cend()
+        elif key == 78:     #N [SC START]
+            self.qmc.mark2Cstart()
+        elif key == 77:     #M [SC END]
+            self.qmc.mark2Cend()
+        elif key == 44:     #, [DROP]
+            self.qmc.markDrop()
+        elif key == 46:     #. [OFF]
+            self.qmc.OffMonitor()
+        elif key == 47:     #/ [EVENT]
+            self.qmc.EventRecord()
+        elif key == 80:     #P [RESET]
+            self.qmc.reset_and_redraw()
+        elif key == 32:     #SPACE
+            pass #future sequestial logger
+              
+    def viewKshortcuts(self):
+        string = "ON = [Z]<br><br>"
+        string += "CHARGE = [X]<br><br>"
+        string += "DRYEND = [C]<br><br>"
+        string += "FC START = [V]<br><br>"
+        string += "FC END = [B]<br><br>"
+        string += "SC START = [N]<br><br>"
+        string += "SC END = [M]<br><br>"
+        string += "DROP = [,]<br><br>"
+        string += "OFF = [.] <br><br>"
+        string += "EVENT = [/]<br><br>"
+        string += "RESET = [P]<br><br>"
+       
+        QMessageBox.information(self,u"Roast Keyboard Shortcuts",string)
+            
     # edit last entry in mini Event editor
     def miniEventRecord(self):
         lenevents = len(self.qmc.specialevents)
@@ -3277,7 +3325,8 @@ class ApplicationWindow(QMainWindow):
         if "ambientTemp" in profile:
             self.qmc.ambientTemp = profile["ambientTemp"]
         if "dryend" in profile:
-            self.qmc.dryend = profile["dryend"]            
+            self.qmc.dryend = profile["dryend"]
+          
             
     #used by filesave()
     def getProfile(self):
@@ -3312,7 +3361,7 @@ class ApplicationWindow(QMainWindow):
         profile["DeltaET"] = self.qmc.DeltaETflag
         profile["DeltaBT"] = self.qmc.DeltaBTflag
         profile["ambientTemp"] = self.qmc.ambientTemp
-        profile["dryend"] = self.qmc.dryend        
+        profile["dryend"] = self.qmc.dryend
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -3378,8 +3427,7 @@ class ApplicationWindow(QMainWindow):
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
             self.minieventsflag = settings.value("minieventsflag",int(self.minieventsflag)).toInt()[0]
             self.qmc.eventsGraphflag = settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)).toInt()[0]
-
-            #restore statistics
+    	    #restore statistics
             if settings.contains("Statistics"):
                 self.qmc.statisticsflags = map(lambda x:x.toInt()[0],settings.value("Statistics").toList())
             #restore delay
