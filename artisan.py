@@ -106,7 +106,8 @@ import string
 import cgi
 import codecs
 import numpy
-
+import pyaudio
+import array
 
 
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
@@ -115,7 +116,7 @@ from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainW
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient)
 from PyQt4.QtCore import (QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent)
 
 
 from matplotlib.figure import Figure
@@ -454,7 +455,7 @@ class tgraphcanvas(FigureCanvas):
         if self.HUDflag:
             self.viewProjection()
             self.HUDflag = False
-            aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+            aw.button_18.setStyleSheet("QPushButton { background-color: #61ffff }")
             aw.stack.setCurrentIndex(0)
             self.resetlines()
             aw.messagelabel.setText(u"HUD OFF")
@@ -471,7 +472,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.stack.setCurrentIndex(1)
                 aw.messagelabel.setText(u"HUD ON")
             else:
-                aw.messagelabel.setText(u"Need some data for HUD to work")                
+                aw.messagelabel.setText(u"Need some data for HUD to work")
+        aw.soundpop()        
 
     def resetlines(self):
         count = 2 #ET + BT
@@ -700,8 +702,6 @@ class tgraphcanvas(FigureCanvas):
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
-        if self.HUDflag:
-            self.toggleHUD()
 
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')  
@@ -772,7 +772,8 @@ class tgraphcanvas(FigureCanvas):
         self.timeclock.restart()
         
         self.redraw()
-
+        aw.soundpop()
+        
     #Redraws data   
     def redraw(self):
         self.fig.clf()   #wipe out figure
@@ -1403,14 +1404,14 @@ class tgraphcanvas(FigureCanvas):
         aw.messagelabel.setText(u"Scope recording...")     
         aw.button_1.setDisabled(True)                     #button ON
         aw.button_1.setStyleSheet("QPushButton { background-color: #88ff18}")
-        
+        aw.soundpop()        
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
         self.flagon = False
         aw.messagelabel.setText(u"Scope stopped")
         aw.button_1.setDisabled(False)
         aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
-        
+        aw.soundpop()        
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
         if self.flagon:
@@ -1444,7 +1445,7 @@ class tgraphcanvas(FigureCanvas):
             message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)
-
+        aw.soundpop()
     def markDryEnd(self):
         if self.flagon:
             # record Dry end only if Charge mark has been done
@@ -1478,7 +1479,7 @@ class tgraphcanvas(FigureCanvas):
 
         #set message at bottom
         aw.messagelabel.setText(message)
-        
+        aw.soundpop()        
     #redord 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
         if self.flagon:
@@ -1517,7 +1518,7 @@ class tgraphcanvas(FigureCanvas):
 
         #set message at bottom
         aw.messagelabel.setText(message)
-
+        aw.soundpop()
     #record 1C end markers of BT. called from button_4 of application window
     def mark1Cend(self):
         if self.flagon:
@@ -1548,7 +1549,7 @@ class tgraphcanvas(FigureCanvas):
             message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)
-        
+        aw.soundpop()        
     #record 2C start markers of BT. Called from button_5 of application window
     def mark2Cstart(self):
         if self.flagon:
@@ -1573,7 +1574,7 @@ class tgraphcanvas(FigureCanvas):
             message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)
-        
+        aw.soundpop()        
     #record 2C end markers of BT. Called from button_6  of application window
     def mark2Cend(self):
         if self.flagon:
@@ -1605,7 +1606,7 @@ class tgraphcanvas(FigureCanvas):
             message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)            
-
+        aw.soundpop()
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
         if self.flagon:
@@ -1644,7 +1645,7 @@ class tgraphcanvas(FigureCanvas):
             message = u"Scope is OFF"
             
         aw.messagelabel.setText(message)
-
+        aw.soundpop()
     # Writes information about the finished profile in the graph
     def writestatistics(self):
         TP_index = aw.findTP()
@@ -1811,9 +1812,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.buttonminiEvent.setVisible(False)                
         else:
             aw.messagelabel.setText("No profile found")
-
-
-
+        aw.soundpop()
 
     def movebackground(self,direction,step):
         lt = len(self.timeB)
@@ -2126,6 +2125,8 @@ class ApplicationWindow(QMainWindow):
         # create a PID object
         self.pid = FujiPID()
 
+        self.soundflag = 0
+
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID. 
         self.settingsLoad()        
@@ -2135,6 +2136,7 @@ class ApplicationWindow(QMainWindow):
         
         #create START STOP buttons        
         self.button_1 = QPushButton("ON")
+        self.button_1.setFocusPolicy(Qt.NoFocus)
         self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         self.button_1.setMaximumSize(90, 50)
         self.button_1.setMinimumHeight(50)
@@ -2142,6 +2144,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
 
         self.button_2 = QPushButton("OFF")
+        self.button_2.setFocusPolicy(Qt.NoFocus)
         self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
         self.button_2.setMaximumSize(90, 50)
         self.button_2.setMinimumHeight(50)
@@ -2151,6 +2154,7 @@ class ApplicationWindow(QMainWindow):
 
         #create 1C START, 1C END, 2C START and 2C END buttons
         self.button_3 = QPushButton("FC START")
+        self.button_3.setFocusPolicy(Qt.NoFocus)
         self.button_3.setStyleSheet("QPushButton { background-color: orange }")
         self.button_3.setMaximumSize(90, 50)
         self.button_3.setMinimumHeight(50)
@@ -2158,6 +2162,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_3, SIGNAL("clicked()"), self.qmc.mark1Cstart)
 
         self.button_4 = QPushButton("FC END")
+        self.button_4.setFocusPolicy(Qt.NoFocus)
         self.button_4.setStyleSheet("QPushButton { background-color: orange }")
         self.button_4.setMaximumSize(90, 50)
         self.button_4.setMinimumHeight(50)
@@ -2165,6 +2170,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_4, SIGNAL("clicked()"), self.qmc.mark1Cend)
 
         self.button_5 = QPushButton("SC START")
+        self.button_5.setFocusPolicy(Qt.NoFocus)
         self.button_5.setStyleSheet("QPushButton { background-color: orange }")
         self.button_5.setMaximumSize(90, 50)
         self.button_5.setMinimumHeight(50)
@@ -2172,6 +2178,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.button_5, SIGNAL("clicked()"), self.qmc.mark2Cstart)
 
         self.button_6 = QPushButton("SC END")
+        self.button_6.setFocusPolicy(Qt.NoFocus)
         self.button_6.setStyleSheet("QPushButton { background-color: orange }")
         self.button_6.setMaximumSize(90, 50)
         self.button_6.setMinimumHeight(50)
@@ -2180,6 +2187,7 @@ class ApplicationWindow(QMainWindow):
 
         #create RESET button
         self.button_7 = QPushButton("RESET")
+        self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet("QPushButton { background-color: white }")
         self.button_7.setMaximumSize(90, 45)
         self.button_7.setToolTip("Resets Graph and Time")
@@ -2187,6 +2195,7 @@ class ApplicationWindow(QMainWindow):
 
         #create CHARGE button
         self.button_8 = QPushButton("CHARGE")
+        self.button_8.setFocusPolicy(Qt.NoFocus)
         self.button_8.setStyleSheet("QPushButton { background-color: #f07800 }")
         self.button_8.setMaximumSize(90, 50)
         self.button_8.setMinimumHeight(50)
@@ -2195,6 +2204,7 @@ class ApplicationWindow(QMainWindow):
 
         #create DROP button
         self.button_9 = QPushButton("DROP")
+        self.button_9.setFocusPolicy(Qt.NoFocus)
         self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
         self.button_9.setMaximumSize(90, 50)
         self.button_9.setMinimumHeight(50)
@@ -2203,12 +2213,14 @@ class ApplicationWindow(QMainWindow):
 
         #create PID control button
         self.button_10 = QPushButton("PID")
+        self.button_10.setFocusPolicy(Qt.NoFocus)
         self.button_10.setStyleSheet("QPushButton { background-color: '#92C3FF'}")
         self.button_10.setMaximumSize(90, 45)
         self.connect(self.button_10, SIGNAL("clicked()"), self.PIDcontrol)        
 
         #create EVENT record button
         self.button_11 = QPushButton("EVENT")
+        self.button_11.setFocusPolicy(Qt.NoFocus)
         self.button_11.setStyleSheet("QPushButton { background-color: yellow}")
         self.button_11.setMaximumSize(90, 50)
         self.button_11.setMinimumHeight(50)
@@ -2217,6 +2229,7 @@ class ApplicationWindow(QMainWindow):
         
     	#create PID+5 button
         self.button_12 = QPushButton("SV +5")
+        self.button_12.setFocusPolicy(Qt.NoFocus)
         self.button_12.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_12.setMaximumSize(90, 50)
         self.button_12.setMinimumHeight(50)
@@ -2225,6 +2238,7 @@ class ApplicationWindow(QMainWindow):
 
         #create PID+10 button
         self.button_13 = QPushButton("SV +10")
+        self.button_13.setFocusPolicy(Qt.NoFocus)
         self.button_13.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_13.setMaximumSize(90, 50)
         self.button_13.setMinimumHeight(50)
@@ -2233,6 +2247,7 @@ class ApplicationWindow(QMainWindow):
 
         #create PID+20 button
         self.button_14 = QPushButton("SV +20")
+        self.button_14.setFocusPolicy(Qt.NoFocus)
         self.button_14.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_14.setMaximumSize(90, 50)
         self.button_14.setMinimumHeight(50)
@@ -2241,6 +2256,7 @@ class ApplicationWindow(QMainWindow):
 
         #create PID-20 button
         self.button_15 = QPushButton("SV -20")
+        self.button_15.setFocusPolicy(Qt.NoFocus)
         self.button_15.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_15.setMaximumSize(90, 50)
         self.button_15.setMinimumHeight(50)
@@ -2249,6 +2265,7 @@ class ApplicationWindow(QMainWindow):
 
         #create PID-10 button
         self.button_16 = QPushButton("SV -10")
+        self.button_16.setFocusPolicy(Qt.NoFocus)
         self.button_16.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_16.setMaximumSize(90, 50)
         self.button_16.setMinimumHeight(50)
@@ -2257,14 +2274,15 @@ class ApplicationWindow(QMainWindow):
 
         #create PID-5 button
         self.button_17 = QPushButton("SV -5")
+        self.button_17.setFocusPolicy(Qt.NoFocus)
         self.button_17.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_17.setMaximumSize(90, 50)
         self.button_17.setMinimumHeight(50)
         self.button_17.setToolTip("Decreases the current SV value by 5")
-
         
         #create HUD button
         self.button_18 = QPushButton("HUD")
+        self.button_18.setFocusPolicy(Qt.NoFocus)
         self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
         self.button_18.setMaximumSize(90, 45)
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
@@ -2272,6 +2290,7 @@ class ApplicationWindow(QMainWindow):
 
         #create DRY button
         self.button_19 = QPushButton("DRY END")
+        self.button_19.setFocusPolicy(Qt.NoFocus)
         self.button_19.setStyleSheet("QPushButton { background-color: orange }")
         self.button_19.setMaximumSize(90, 50)
         self.button_19.setMinimumHeight(50)
@@ -2365,14 +2384,17 @@ class ApplicationWindow(QMainWindow):
         self.eventlabel.setStyleSheet("background-color:'yellow';")
         self.eventlabel.setMaximumWidth(40)
         self.etypeComboBox = QComboBox()
+        self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.etypeComboBox.addItems(self.etypes)
         self.etypeComboBox.setMaximumWidth(47)
         self.valueComboBox = QComboBox()
+        self.valueComboBox.setFocusPolicy(Qt.NoFocus)
         self.valueComboBox.addItems(self.qmc.eventsvalues)
         self.valueComboBox.setMaximumWidth(47)
 
         #create EVENT mini button
         self.buttonminiEvent = QPushButton("OK")
+        self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
         self.buttonminiEvent.setMaximumSize(35,20)
         self.buttonminiEvent.setMinimumSize(35,20)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
@@ -2634,6 +2656,10 @@ class ApplicationWindow(QMainWindow):
         hudAction = QAction("Extras...",self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.ConfMenu.addAction(hudAction)
+        
+        soundAction = QAction("Sound...",self)
+        self.connect(soundAction,SIGNAL("triggered()"),self.soundset)
+        self.ConfMenu.addAction(soundAction)
 
         # HELP menu
         helpAboutAction = QAction("About",self)
@@ -2664,49 +2690,249 @@ class ApplicationWindow(QMainWindow):
         # set the central widget of MainWindow to main_widget
         self.setCentralWidget(self.main_widget)   
 
+        #list of functions to chose from (using left-right keyboard arrow)
+        self.keyboardmove  = [self.qmc.OnMonitor,self.qmc.markCharge,self.qmc.markDryEnd,self.qmc.mark1Cstart,self.qmc.mark1Cend,
+                             self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.OffMonitor,self.qmc.EventRecord,
+                             self.qmc.reset_and_redraw,self.qmc.toggleHUD,self.PIDcontrol]
+        #current function above
+        self.keyboardmoveindex = 0
+        #state flag for above. It is initialized by pressing SPACE or left-right arrows
+        self.keyboardmoveflag = 0
 
+    #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):
         key = int(event.key())
-        #use this to find the integer value of a key
+        #uncomment next line to find the integer value of a key
         #print key
-        if key == 90:           #Z [ON]
-            self.qmc.OnMonitor()
-        elif key == 88:     #X [CHARGE]     
-            self.qmc.markCharge()
-        elif key == 67:     #C [DRY END]    
-            self.qmc.markDryEnd()
-        elif key == 86:     #V [FC START]
-            self.qmc.mark1Cstart()            
-        elif key == 66:     #B [FC END]
-            self.qmc.mark1Cend()
-        elif key == 78:     #N [SC START]
-            self.qmc.mark2Cstart()
-        elif key == 77:     #M [SC END]
-            self.qmc.mark2Cend()
-        elif key == 44:     #, [DROP]
-            self.qmc.markDrop()
-        elif key == 46:     #. [OFF]
-            self.qmc.OffMonitor()
-        elif key == 47:     #/ [EVENT]
-            self.qmc.EventRecord()
-        elif key == 80:     #P [RESET]
-            self.qmc.reset_and_redraw()
-        elif key == 32:     #SPACE
-            pass #future sequestial logger
-              
+        #keyboard move keys
+        if key == 32:                       #SPACE TURN ON/OFF KEYBOARD MOVES
+            self.moveKbutton("space")
+        elif key == 16777234:               #LEFT ARROW MOVES CURRENT BUTTON
+            self.moveKbutton("left")
+        elif key == 16777236:               #RIGHT ARROW MOVES CURRENT BUTTON
+            self.moveKbutton("right")
+        elif key == 16777235:               #UP ARROW & DOWN ARROW CHOSE CURRENT BUTTON
+            self.moveKbutton("up")
+        elif key == 16777237:               #DOWN ARROW & UP ARROW CHOSE CURRENT BUTTON
+            self.moveKbutton("down")            
+        elif key == 83:                     #letter S
+            self.automaticsave()
+        else:
+            QWidget.keyPressEvent(self, event)
+
+    def moveKbutton(self,command):
+        #space toggles ON/OFF keyboard    
+        if command =="space":
+            if self.keyboardmoveflag == 0:
+                #turn on
+                self.keyboardmoveflag = 1
+                self.keyboardmoveindex = 0
+                self.messagelabel.setText("Keyboard moves turned ON")
+                self.button_1.setStyleSheet("QPushButton { background-color: purple }")
+            elif self.keyboardmoveflag == 1:
+                # turn off 
+                self.keyboardmoveflag = 0
+                # clear all
+                self.messagelabel.setText("Keyboard moves turned OFF")
+                if self.qmc.flagon:    
+                    self.button_1.setStyleSheet("QPushButton { background-color: #88ff18 }")
+                else:
+                    self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")                 
+                self.button_8.setStyleSheet("QPushButton { background-color: #f07800 }")
+                self.button_19.setStyleSheet("QPushButton { background-color: orange }")
+                self.button_3.setStyleSheet("QPushButton { background-color: orange }")
+                self.button_4.setStyleSheet("QPushButton { background-color: orange }")
+                self.button_5.setStyleSheet("QPushButton { background-color: orange }")
+                self.button_6.setStyleSheet("QPushButton { background-color: orange }")
+                self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
+                self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
+                self.button_11.setStyleSheet("QPushButton { background-color: yellow }")
+                self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
+                if self.qmc.HUDflag:
+                    self.button_18.setStyleSheet("QPushButton { background-color: #61ffff }")
+                else:    
+                    self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+
+        #if moves on              
+        if self.keyboardmoveflag:       
+            #presses current button
+            if command == "up" or command == "down":
+                self.keyboardmove[self.keyboardmoveindex]()
+                
+            #command left-right: moves button          
+            else:
+                # self.button_1 = ON, self.button_8 = CHARGE, self.button_19 = DRYEND, self.button_3 = FC START, self.button_4 = FC END,
+                # self.button_5 = SC START, self.button_6 = SC END, self.button_9 = DROP, self.button_2 = OFF, self.button_11 = EVENT,
+                # self.button_7 = RESET, self.button_18 = HUD
+                
+                #Check current index (location)
+                #location in button ON
+                if self.keyboardmoveindex == 0:
+                    if command == "right":
+                        self.button_8.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 1                        
+                        if self.qmc.flagon:    
+                            self.button_1.setStyleSheet("QPushButton { background-color: #88ff18 }")
+                        else:
+                            self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")                        
+                    elif command == "left":
+                        self.messagelabel.setText("Keys reached limit")
+
+                #location in button CHARGE
+                elif self.keyboardmoveindex == 1:
+                    if command == "right":
+                        self.button_19.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 2
+                    elif command == "left":
+                        self.button_1.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 0
+                    self.button_8.setStyleSheet("QPushButton { background-color: #f07800 }")
+                    
+                #location in button DRY END    
+                elif self.keyboardmoveindex == 2:
+                    if command == "right":
+                        self.button_3.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 3
+                    elif command == "left":
+                        self.button_8.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 1
+                    self.button_19.setStyleSheet("QPushButton { background-color: orange }")
+                    
+                #location in button FC START    
+                elif self.keyboardmoveindex == 3:
+                    if command == "right":
+                        self.button_4.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 4
+                    elif command == "left":
+                        self.button_19.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 2
+                    self.button_3.setStyleSheet("QPushButton { background-color: orange }")
+                   
+                #location in button FC END        
+                elif self.keyboardmoveindex == 4:    
+                    if command == "right":
+                        self.button_5.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 5
+                    elif command == "left":
+                        self.button_3.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 3
+                    self.button_4.setStyleSheet("QPushButton { background-color: orange }")
+                        
+                #location in button SC START        
+                elif self.keyboardmoveindex == 5:
+                    if command == "right":
+                        self.button_6.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 6
+                    elif command == "left":
+                        self.button_4.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 4
+                    self.button_5.setStyleSheet("QPushButton { background-color: orange }")
+                       
+                #location in button SC END    
+                elif self.keyboardmoveindex == 6:
+                    if command == "right":
+                        self.button_9.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 7
+                    elif command == "left":
+                        self.button_5.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 5
+                    self.button_6.setStyleSheet("QPushButton { background-color: orange }")
+                        
+                #location in button DROP    
+                elif self.keyboardmoveindex == 7:
+                    if command == "right":
+                        self.button_2.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 8
+                    elif command == "left":
+                        self.button_6.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 6
+                    self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
+                        
+                #location in button OFF    
+                elif self.keyboardmoveindex == 8:
+                    if command == "right":
+                        if self.eventsbuttonflag:
+                            self.button_11.setStyleSheet("QPushButton { background-color: purple }")
+                            self.keyboardmoveindex = 9
+                        else:
+                            self.button_7.setStyleSheet("QPushButton { background-color: purple }")
+                            self.keyboardmoveindex = 10   
+                    elif command == "left":
+                        self.button_9.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 7
+                    self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
+                    
+                #location in button EVENT    
+                elif self.keyboardmoveindex == 9:
+                    if command == "right":
+                        if self.eventsbuttonflag:
+                            self.button_7.setStyleSheet("QPushButton { background-color: purple }")
+                            self.button_11.setStyleSheet("QPushButton { background-color: yellow }")
+                            self.keyboardmoveindex = 10
+                        if not self.eventsbuttonflag:
+                            self.button_11.setStyleSheet("QPushButton { background-color: purple }")
+                            self.button_2.setStyleSheet("QPushButton { background-color: yellow }")
+                            self.keyboardmoveindex = 9                            
+                    if command == "left":
+                        self.button_2.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_11.setStyleSheet("QPushButton { background-color: yellow }")
+                        self.keyboardmoveindex = 8
+                #location in button RESET    
+                elif self.keyboardmoveindex == 10:
+                    if command == "left":
+                        self.button_18.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
+                        self.keyboardmoveindex = 11
+                    if command == "right":
+                        if self.eventsbuttonflag:
+                            self.button_11.setStyleSheet("QPushButton { background-color: purple }")
+                            self.keyboardmoveindex = 9
+                            self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")                  
+                        if not self.eventsbuttonflag:
+                            self.button_2.setStyleSheet("QPushButton { background-color: purple }")
+                            self.keyboardmoveindex = 8
+                            self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
+                    self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
+                #location in button HUD    
+                elif self.keyboardmoveindex == 11:   
+                    if command == "left":
+                        self.messagelabel.setText("Keys reached limit")
+                    elif command == "right":
+                        self.button_7.setStyleSheet("QPushButton { background-color: purple }")
+                        self.keyboardmoveindex = 10 
+                        if self.qmc.HUDflag:
+                            self.button_18.setStyleSheet("QPushButton { background-color: #61ffff }")
+                        else:    
+                            self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+
+    #sound feedback when pressing a push button
+    def soundpop(self):
+        if self.soundflag:
+            p = pyaudio.PyAudio()
+            stream = p.open(rate=44100, channels=1, format=pyaudio.paFloat32, output=True)
+            stream.write(array.array('f',(.25 * math.sin(i / 10.) for i in range(44100))))
+            stream.close()
+            p.terminate()
+
+    def soundset(self):
+        if self.soundflag == 0:
+            self.soundflag = 1
+            self.messagelabel.setText("Sound turned ON")
+            self.soundpop()
+        else:
+            self.soundflag = 0
+            self.messagelabel.setText("Sound turn OFF")
+            
+    #future automatation of filename when saving a file through keyboard shortcut  
+    def automaticsave(self):
+        pass
+    
     def viewKshortcuts(self):
-        string = "ON = [Z]<br><br>"
-        string += "CHARGE = [X]<br><br>"
-        string += "DRYEND = [C]<br><br>"
-        string += "FC START = [V]<br><br>"
-        string += "FC END = [B]<br><br>"
-        string += "SC START = [N]<br><br>"
-        string += "SC END = [M]<br><br>"
-        string += "DROP = [,]<br><br>"
-        string += "OFF = [.] <br><br>"
-        string += "EVENT = [/]<br><br>"
-        string += "RESET = [P]<br><br>"
-       
+        string = "<b>[SPACE]</b> = Turns ON/OFF keyboard function<br><br>"
+        string += "<b>[UP] [DOWN]</b> = Chose current button<br><br>"
+        string += "<b>[LEFT]</b> = Move to the left<br><br>"
+        string += "<b>[RIGHT]</b> = Move to the right<br><br>"
+        
         QMessageBox.information(self,u"Roast Keyboard Shortcuts",string)
             
     # edit last entry in mini Event editor
@@ -3423,6 +3649,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phases = map(lambda x:x.toInt()[0],settings.value("Phases").toList())
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]
+            if settings.contains("sound"):    
+                self.soundflag = settings.value("sound",self.soundflag).toInt()[0]    
             #restore Events settings
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
             self.minieventsflag = settings.value("minieventsflag",int(self.minieventsflag)).toInt()[0]
@@ -3531,6 +3759,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Colors",self.qmc.palette)
             #save flavors
             settings.setValue("Flavors",self.qmc.flavorlabels)
+            #soundflag
+            settings.setValue("sound",self.soundflag)
             #save serial port
             settings.beginGroup("SerialPort");
             settings.setValue("comport",self.ser.comport)
@@ -5358,12 +5588,14 @@ class editGraphDlg(QDialog):
                 check1 =  abs(aw.qmc.timex[index] - seconds)   
                 check2 =  abs(aw.qmc.timex[index-1] - seconds) 
                 if len(aw.qmc.timex) > index+1:
-                    check3 =  abs(aw.qmc.timex[index+1] - seconds) 
+                    check3 =  abs(aw.qmc.timex[index+1] - seconds)
+                else:
+                    check3 = abs(aw.qmc.timex[index] - seconds)
                 #find smallest of three
 
                 if check1 < check2 and check1 < check3:
                     return aw.qmc.timex[index]
-                elif check2 < check1 and check2 < check3:
+                elif check2 < check1 and check2 <= check3:
                     return aw.qmc.timex[index-1]
                 elif check3 < check2 and check3 < check1 and len(aw.qmc.timex) > index+1:
                     return aw.qmc.timex[index + 1]
