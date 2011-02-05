@@ -2703,26 +2703,24 @@ class ApplicationWindow(QMainWindow):
     def keyPressEvent(self,event):
         key = int(event.key())
         #uncomment next line to find the integer value of a key
-        #print key
+        # print key
         #keyboard move keys
-        if key == 32:                       #SPACE TURN ON/OFF KEYBOARD MOVES
+        if key == 32:                       #SELECTS ACTIVE BUTTON
             self.moveKbutton("space")
-        elif key == 16777234:               #LEFT ARROW MOVES CURRENT BUTTON
+        if key == 16777220:                 #TURN ON/OFF KEYBOARD MOVES
+            self.moveKbutton("enter")            
+        elif key == 16777234:               #MOVES CURRENT BUTTON LEFT
             self.moveKbutton("left")
-        elif key == 16777236:               #RIGHT ARROW MOVES CURRENT BUTTON
-            self.moveKbutton("right")
-        elif key == 16777235:               #UP ARROW & DOWN ARROW CHOSE CURRENT BUTTON
-            self.moveKbutton("up")
-        elif key == 16777237:               #DOWN ARROW & UP ARROW CHOSE CURRENT BUTTON
-            self.moveKbutton("down")            
-        elif key == 83:                     #letter S
+        elif key == 16777236:               #MOVES CURRENT BUTTON RIGHT
+            self.moveKbutton("right")          
+        elif key == 83:                     #letter S (future automatic save)
             self.automaticsave()
         else:
             QWidget.keyPressEvent(self, event)
 
     def moveKbutton(self,command):
         #space toggles ON/OFF keyboard    
-        if command =="space":
+        if command =="enter":
             if self.keyboardmoveflag == 0:
                 #turn on
                 self.keyboardmoveflag = 1
@@ -2755,10 +2753,17 @@ class ApplicationWindow(QMainWindow):
 
         #if moves on              
         if self.keyboardmoveflag:       
-            #presses current button
-            if command == "up" or command == "down":
+            #presses currently selected button
+            if command == "space":
                 self.keyboardmove[self.keyboardmoveindex]()
-                
+                #if RESET preset go back to ON     
+                if self.keyboardmoveindex == 10:
+                    self.keyboardmoveindex = 0
+                    self.button_1.setStyleSheet("QPushButton { background-color: purple }")
+                    self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
+                elif self.keyboardmoveindex < 10:
+                    self.moveKbutton("right")
+                    
             #command left-right: moves button          
             else:
                 # self.button_1 = ON, self.button_8 = CHARGE, self.button_19 = DRYEND, self.button_3 = FC START, self.button_4 = FC END,
@@ -2887,11 +2892,9 @@ class ApplicationWindow(QMainWindow):
                         if self.eventsbuttonflag:
                             self.button_11.setStyleSheet("QPushButton { background-color: purple }")
                             self.keyboardmoveindex = 9
-                            self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")                  
                         if not self.eventsbuttonflag:
                             self.button_2.setStyleSheet("QPushButton { background-color: purple }")
                             self.keyboardmoveindex = 8
-                            self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
                     self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
                 #location in button HUD    
                 elif self.keyboardmoveindex == 11:   
