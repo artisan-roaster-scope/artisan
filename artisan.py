@@ -1427,12 +1427,12 @@ class tgraphcanvas(FigureCanvas):
 
                 #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
                 self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]+ self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                self.ax.annotate(u"Start 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
-                message = u"Roast time starts now. 00:00 BT = " + unicode(self.startend[1]) + self.mode
+                message = u"Roast time starts now 00:00 BT = " + unicode(self.startend[1]) + self.mode
 
                 aw.label1.setStyleSheet("background-color:'#FF9966';")
                 aw.label1.setText( "<font color='black'><b>Roast time<\b></font>")
@@ -1454,19 +1454,19 @@ class tgraphcanvas(FigureCanvas):
                 self.dryend[1] = self.temp2[-1]
         
                 #calculate time elapsed since charge time
-                st1 = u"Dry end " + self.stringfromseconds(self.dryend[0] - self.startend[0])
+                st1 = u"DE " + self.stringfromseconds(self.dryend[0] - self.startend[0])
                 #anotate temperature
                 self.ystep = self.findtextgap(self.startend[1],self.dryend[1])
                 self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]+self.ystep), 
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
                 aw.button_19.setDisabled(True)
                 aw.button_19.setFlat(True)
                 
-                message = u"DRY END recorded at " + st1 + u" BT = " + unicode(self.dryend[1]) + self.mode
+                message = u"[DRY END] recorded at " + st1 + u" BT = " + unicode(self.dryend[1]) + self.mode
                 
                 if aw.qmc.phasesbuttonflag:     
                     self.phases[1] = int(round(self.dryend[1]))
@@ -1490,22 +1490,22 @@ class tgraphcanvas(FigureCanvas):
                 self.varC[1] = self.temp2[-1]
                 
                 #calculate time elapsed since charge time
-                st1 = u"1CS " + self.stringfromseconds(self.varC[0]-self.startend[0])
+                st1 = u"FCs " + self.stringfromseconds(self.varC[0]-self.startend[0])
                 #anotate temperature
                 if self.dryend[0]:
                     self.ystep = self.findtextgap(self.dryend[1],self.varC[1])
                 else:
                     self.ystep = self.findtextgap(self.startend[1],self.varC[1])                
                 self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1] + self.ystep), 
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
                 aw.button_3.setDisabled(True)
                 aw.button_3.setFlat(True)
                 
-                message = u"1C START recorded at " + st1 + u" BT = " + unicode(self.varC[1]) + self.mode
+                message = u"[FC START] recorded at " + st1 + u" BT = " + unicode(self.varC[1]) + self.mode
 
                 if aw.qmc.phasesbuttonflag:     
                     self.phases[2] = int(round(self.varC[1]))
@@ -1528,21 +1528,21 @@ class tgraphcanvas(FigureCanvas):
                 self.varC[3] = self.temp2[-1]
                 
                 #calculate time elapsed since charge time
-                st1 = u"1CE " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
+                st1 = u"FCe " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
                 #anotate temperature
                 self.ystep = self.findtextgap(self.varC[1],self.varC[3])
                 self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]+self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
                 self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
 
                 aw.button_4.setDisabled(True)
                 aw.button_4.setFlat(True)
 
-                message = u"1C END recorded at " + st1 + " BT = " + unicode(self.varC[3]) + self.mode
+                message = u"[FC END] recorded at " + st1 + " BT = " + unicode(self.varC[3]) + self.mode
             else:
                 message = u"1Cs mark missing. Do that first"
         else:
@@ -1556,20 +1556,21 @@ class tgraphcanvas(FigureCanvas):
             self.varC[4] = self.timeclock.elapsed()/1000.
             self.varC[5] = self.temp2[-1]
             
-            st1 = u"2CS " + self.stringfromseconds(self.varC[4]-self.startend[0])
+            st1 = u"SCs " + self.stringfromseconds(self.varC[4]-self.startend[0])
             if self.varC[3]:
                 self.ystep = self.findtextgap(self.varC[3],self.varC[5])
             else:
                 self.ystep = self.findtextgap(self.varC[1],self.varC[5])            
-            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4]-5,self.varC[5]+self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)      
+            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]+self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+             
             self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-self.ystep),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
             aw.button_5.setDisabled(True)
             aw.button_5.setFlat(True)
 
-            message = u"2C START recorded at " + st1 + " BT = " + unicode(self.varC[5]) + self.mode
+            message = u"[SC START] recorded at " + st1 + " BT = " + unicode(self.varC[5]) + self.mode
         else:
             message = u"Scope is OFF"
             
@@ -1584,14 +1585,14 @@ class tgraphcanvas(FigureCanvas):
                 self.varC[6] = self.timeclock.elapsed()/1000. 
                 self.varC[7] = self.temp2[-1]
                     
-                st1 =  u"2CE " + self.stringfromseconds(self.varC[6]-self.startend[0])
+                st1 =  u"SCe " + self.stringfromseconds(self.varC[6]-self.startend[0])
                 #anotate temperature
                 self.ystep = self.findtextgap(self.varC[5],self.varC[7])
-                self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6]-5,self.varC[7]+self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]+self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
 
                 self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -1599,9 +1600,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_6.setDisabled(True)
                 aw.button_6.setFlat(True)
 
-                message = u"2C END recorded at " + st1 + " BT = " + unicode(self.varC[7]) + self.mode
+                message = u"[SC END] recorded at " + st1 + " BT = " + unicode(self.varC[7]) + self.mode
             else:
-                message = u"2Cs mark missing. Do that first"
+                message = u"SCs mark missing. Do that first"
         else:
             message = u"Scope is OFF"
             
@@ -1614,7 +1615,7 @@ class tgraphcanvas(FigureCanvas):
             self.startend[2] = self.timeclock.elapsed()/1000.
             self.startend[3] = self.temp2[-1]
             
-            st1 = u"END " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
+            st1 = u"End " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
             #anotate temperature
             if self.varC[7]:
                 self.ystep = self.findtextgap(self.varC[7],self.startend[3])
@@ -1625,11 +1626,11 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.ystep = self.findtextgap(self.varC[1],self.startend[3])
                             
-            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2]-5,self.startend[3]+self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]+self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
             self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=0.8)
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             
             self.writestatistics()
             
@@ -1639,7 +1640,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_9.setDisabled(True)
             aw.button_9.setFlat(True)
             
-            message = u"Roast ENDED at " + st1 + " BT = " + unicode(self.startend[-1]) + self.mode
+            message = u"Roast ended at " + st1 + " BT = " + unicode(self.startend[-1]) + self.mode
 
         else:
             message = u"Scope is OFF"
@@ -2699,7 +2700,7 @@ class ApplicationWindow(QMainWindow):
     def keyPressEvent(self,event):
         key = int(event.key())
         #uncomment next line to find the integer value of a key
-        # print key
+        #print key
         #keyboard move keys
         if key == 32:                       #SELECTS ACTIVE BUTTON
             self.moveKbutton("space")
@@ -2749,15 +2750,21 @@ class ApplicationWindow(QMainWindow):
 
         #if moves on              
         if self.keyboardmoveflag:       
-            #presses currently selected button
             if command == "space":
-                self.keyboardmove[self.keyboardmoveindex]()
-                #if RESET preset go back to ON     
+                self.keyboardmove[self.keyboardmoveindex]()   #apply button command
+                #behaviour rules
+                #if RESET is pressed jump to ON     
                 if self.keyboardmoveindex == 10:
                     self.keyboardmoveindex = 0
                     self.button_1.setStyleSheet("QPushButton { background-color: purple }")
                     self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
-                elif self.keyboardmoveindex < 10:
+                #if OFF is pressed jump to RESET (jump over EVENT if needed)   
+                elif self.keyboardmoveindex == 8:
+                    self.keyboardmoveindex = 10
+                    self.button_7.setStyleSheet("QPushButton { background-color: purple }")
+                    self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
+                #if less than OFF jump forward to the right once automatically    
+                elif self.keyboardmoveindex < 9:
                     self.moveKbutton("right")
                     
             #command left-right: moves button          
@@ -2776,9 +2783,13 @@ class ApplicationWindow(QMainWindow):
                             self.button_1.setStyleSheet("QPushButton { background-color: #88ff18 }")
                         else:
                             self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")                        
-                    elif command == "left":
-                        self.messagelabel.setText("Keys reached limit")
-
+                    elif command == "left": #jump to HUD (close circle)
+                        self.keyboardmoveindex = 11
+                        self.button_18.setStyleSheet("QPushButton { background-color: purple }")
+                        if self.qmc.flagon:    
+                            self.button_1.setStyleSheet("QPushButton { background-color: #88ff18 }")
+                        else:
+                            self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")                        
                 #location in button CHARGE
                 elif self.keyboardmoveindex == 1:
                     if command == "right":
@@ -2895,7 +2906,12 @@ class ApplicationWindow(QMainWindow):
                 #location in button HUD    
                 elif self.keyboardmoveindex == 11:   
                     if command == "left":
-                        self.messagelabel.setText("Keys reached limit")
+                        self.keyboardmoveindex = 0
+                        if self.qmc.HUDflag:
+                            self.button_18.setStyleSheet("QPushButton { background-color: #61ffff }")
+                        else:    
+                            self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+                        self.button_1.setStyleSheet("QPushButton { background-color: purple }")
                     elif command == "right":
                         self.button_7.setStyleSheet("QPushButton { background-color: purple }")
                         self.keyboardmoveindex = 10 
@@ -2918,8 +2934,8 @@ class ApplicationWindow(QMainWindow):
         pass
     
     def viewKshortcuts(self):
-        string = "<b>[SPACE]</b> = Turns ON/OFF keyboard function<br><br>"
-        string += "<b>[UP] [DOWN]</b> = Chose current button<br><br>"
+        string = "<b>[ENTER]</b> = Turns ON/OFF keys<br><br>"
+        string += "<b>[SPACE]</b> = Choses current button<br><br>"  
         string += "<b>[LEFT]</b> = Move to the left<br><br>"
         string += "<b>[RIGHT]</b> = Move to the right<br><br>"
         
@@ -3812,7 +3828,7 @@ class ApplicationWindow(QMainWindow):
                 painter.drawPixmap(0,0,image)
             else:
                 painter.drawImage(0, 0, image)
-
+ 
     def htmlReport(self):
         HTML_REPORT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -4525,7 +4541,7 @@ $cupping_notes
         font = QFont('Utopia', 14, -1)
         p.setFont(font)
         #Draw begins
-        p.begin(self)
+        #p.begin(self)
         p.setOpacity(0.2)
         p.setBrush(QBrush(QColor("grey")))
         p.drawRect(0,                       #p(x,)
@@ -4550,7 +4566,6 @@ $cupping_notes
         p.drawRect(10,10, Wwidth-20, Wheight-20)
     
         p.end()
-        
         self.HUD.setPixmap(img)
         
     def showHUDthermal(self): 
@@ -4559,7 +4574,7 @@ $cupping_notes
         Wwidth= aw.qmc.size().width()
         Wheight = aw.qmc.size().height()
         #Draw begins
-        p.begin(self)
+        #p.begin(self)
         #darken image
         p.setOpacity(0.05)
         p.fillRect(0,0, aw.qmc.size().width(), aw.qmc.size().height(),QColor("blue"))
