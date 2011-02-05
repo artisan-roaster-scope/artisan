@@ -2656,10 +2656,6 @@ class ApplicationWindow(QMainWindow):
         hudAction = QAction("Extras...",self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.ConfMenu.addAction(hudAction)
-        
-        soundAction = QAction("Sound...",self)
-        self.connect(soundAction,SIGNAL("triggered()"),self.soundset)
-        self.ConfMenu.addAction(soundAction)
 
         # HELP menu
         helpAboutAction = QAction("About",self)
@@ -2916,15 +2912,6 @@ class ApplicationWindow(QMainWindow):
             stream.write(array.array('f',(.25 * math.sin(i / 10.) for i in range(44100))))
             stream.close()
             p.terminate()
-
-    def soundset(self):
-        if self.soundflag == 0:
-            self.soundflag = 1
-            self.messagelabel.setText("Sound turned ON")
-            self.soundpop()
-        else:
-            self.soundflag = 0
-            self.messagelabel.setText("Sound turn OFF")
             
     #future automatation of filename when saving a file through keyboard shortcut  
     def automaticsave(self):
@@ -3651,9 +3638,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Phases"):
                 self.qmc.phases = map(lambda x:x.toInt()[0],settings.value("Phases").toList())
             if settings.contains("phasesbuttonflag"):
-                self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]
-            if settings.contains("sound"):    
-                self.soundflag = settings.value("sound",self.soundflag).toInt()[0]    
+                self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0] 
             #restore Events settings
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
             self.minieventsflag = settings.value("minieventsflag",int(self.minieventsflag)).toInt()[0]
@@ -3706,6 +3691,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
+            settings.endGroup()
+            settings.beginGroup("Sound")
+            self.soundflag = settings.value("Beep",self.soundflag).toInt()[0]
             settings.endGroup()
 
             #need to update timer delay (otherwise it uses default 5 seconds)
@@ -3762,8 +3750,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Colors",self.qmc.palette)
             #save flavors
             settings.setValue("Flavors",self.qmc.flavorlabels)
-            #soundflag
-            settings.setValue("sound",self.soundflag)
             #save serial port
             settings.beginGroup("SerialPort");
             settings.setValue("comport",self.ser.comport)
@@ -3793,6 +3779,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETtarget",self.qmc.ETtarget)
             settings.setValue("BTtarget",self.qmc.BTtarget)
             settings.setValue("Mode",self.HUDfunction)
+            settings.endGroup()
+            settings.beginGroup("Sound")
+            settings.setValue("Beep",self.soundflag)
             settings.endGroup()
             
         except Exception,e:
@@ -4740,22 +4729,16 @@ class HUDDlg(QDialog):
         
         hudGroupLayout = QGroupBox("HUD")
         hudGroupLayout.setLayout(hudLayout)
-        
-        buttonsLayout = QHBoxLayout()
-        buttonsLayout.addStretch()
-        buttonsLayout.addWidget(cancelButton)
-        buttonsLayout.addWidget(okButton)
                                 
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(rorGroupLayout)
         tab1Layout.addWidget(hudGroupLayout)
-        tab1Layout.addStretch()
-        tab1Layout.addLayout(buttonsLayout)
+        
 
 
         ##### TAB 2
         self.interpCheck = QCheckBox("Interpolation")
-        self.connect(self.interpCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.interpolation(i)) #toggle
+        self.connect(self.interpCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.interpolation(i)) #toggle 
         
         self.interpComboBox = QComboBox()
         self.interpComboBox.setMaximumWidth(100)
@@ -4783,7 +4766,7 @@ class HUDDlg(QDialog):
         interLayout.addWidget(self.interpCheck,0)
         interLayout.addWidget(self.interpComboBox,0)
 
-        interGroupLayout = QGroupBox("Interp.")
+        interGroupLayout = QGroupBox("Interpolate")
         interGroupLayout.setLayout(interLayout)
 
         uniLayout = QHBoxLayout()
@@ -4794,7 +4777,18 @@ class HUDDlg(QDialog):
         univarGroupLayout.setLayout(uniLayout)
 
         tab2Layout.addWidget(interGroupLayout)
-        tab2Layout.addWidget(univarGroupLayout)        
+        tab2Layout.addWidget(univarGroupLayout)  
+        
+        ##### TAB 3
+        self.soundCheck = QCheckBox("Beep")
+        self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
+        if aw.soundflag:
+            self.soundCheck.setChecked(True)
+        else:
+            self.soundCheck.setChecked(False)
+        
+        tab3Layout = QHBoxLayout()
+        tab3Layout.addWidget(self.soundCheck)       
 
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
@@ -4806,12 +4800,24 @@ class HUDDlg(QDialog):
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         TabWidget.addTab(C2Widget,"Math")
+        
+        C3Widget = QWidget()
+        C3Widget.setLayout(tab3Layout)
+        TabWidget.addTab(C3Widget,"Sound")
 
 
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(cancelButton)
+        buttonsLayout.addWidget(okButton)
+        
         #incorporate layouts
         Slayout = QVBoxLayout()
         Slayout.addWidget(self.status,0)
-        Slayout.addWidget(TabWidget,1)
+        Slayout.addWidget(TabWidget,1)        
+        Slayout.addStretch()
+        Slayout.addLayout(buttonsLayout)
+        
         self.setLayout(Slayout)
 
     def showunivarinfo(self):
@@ -4845,6 +4851,15 @@ class HUDDlg(QDialog):
         else:
             aw.qmc.resetlines()
             aw.qmc.redraw()
+            
+    def soundset(self,i):
+        if aw.soundflag == 0:
+            aw.soundflag = 1
+            aw.messagelabel.setText("Sound turned ON")
+            aw.soundpop()
+        else:
+            aw.soundflag = 0
+            aw.messagelabel.setText("Sound turn OFF")
             
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
