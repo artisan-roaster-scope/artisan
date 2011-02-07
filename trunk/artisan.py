@@ -7509,8 +7509,8 @@ class nonedevDlg(QDialog):
         self.setWindowTitle("Temperature")
 
         if aw.qmc.timex:
-            etval = str(int(aw.qmc.temp2[-1]))
-            btval = str(int(aw.qmc.temp1[-1])) 
+            etval = str(int(aw.qmc.temp1[-1]))
+            btval = str(int(aw.qmc.temp2[-1])) 
         else:
             etval = "0"
             btval = "0"
