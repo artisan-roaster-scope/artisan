@@ -192,7 +192,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.VOLTCRAFT302KJ,
                                    self.EXTECH421509,
                                    self.HH802U,
-                                   self.HH309
+                                   self.HH309,
+                                   self.NONE
                                    ]
         
         self.fig = Figure(facecolor=u'lightgrey')
@@ -329,6 +330,9 @@ class tgraphcanvas(FigureCanvas):
         #Create x axis labels in minutes:seconds instead of seconds
         self.xaxistosm()
 
+        #counts the number of lines in the plot
+        self.linecount = 2
+
         self.delta1, self.delta2 = [],[]
 
         # generates first "empty" plot of temperature and deltaT
@@ -376,86 +380,116 @@ class tgraphcanvas(FigureCanvas):
     #event handler from startTimer()
     def timerEvent(self, evt):
         if self.flagon:
-            #read time, ET (t2) and BT (t1) TEMPERATURE
-            tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
-            
-            #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
-            #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
-            if len(self.timex) > 2 and t1 == self.temp2[-1] and t2 == self.temp1[-1]:
-                #let's better swap the readings (also they are just repeating the previous ones)
-                self.temp2.append(t1)
-                self.temp1.append(t2)
-            else:
-                #the readings seem to be "in order"
-                self.temp2.append(t2)
-                self.temp1.append(t1)
-
-            self.timex.append(tx)
-
-            #we need a minimum of two readings to calculate rate of change
-            if len(self.timex) > 2:
-                timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
-                #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
-                self.rateofchange1 = (self.temp1[-1] - self.temp1[-2]) / timed  #delta ET (degress / second)
-                self.rateofchange2 = (self.temp2[-1] - self.temp2[-2]) / timed  #delta  BT (degress / second)
-                rateofchange1plot = 100 + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 100
-                rateofchange2plot = 50 + self.sensitivity*self.rateofchange2    #lift to plot on the grpah at Temp  = 50
-            else:
-                self.rateofchange1 = 100.
-                self.rateofchange2 = 50.
-                rateofchange1plot = 0
-                rateofchange2plot = 0
-            # append new data to the rateofchange
-            self.delta1.append(rateofchange1plot)
-            self.delta2.append(rateofchange2plot)
-                        
-            # update lines data using the lists with new data
-            self.l_temp1.set_data(self.timex, self.temp1)
-            self.l_temp2.set_data(self.timex, self.temp2)
-
-            if self.DeltaETflag:
-                self.l_delta1.set_data(self.timex, self.delta1)
-            if self.DeltaBTflag:
-                self.l_delta2.set_data(self.timex, self.delta2)
-
-            #readjust xlimit of plot if needed
-            if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds  
-                self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
-                self.ax.set_xlim(self.startofx,self.endofx)
-                self.xaxistosm()
-
-            #update LCDs
-            if self.flagclock:
-                ts = tx - self.startend[0]
-                st2 = self.stringfromseconds(ts)
-                timelcd = QString(st2)
-                aw.lcd1.display(timelcd)
-
-            else:
-                ts = tx
-                st2 = self.stringfromseconds(ts)
-                timelcd = QString(st2)
-                aw.lcd1.display(timelcd)                
+            #if using a thermocouple device
+            if self.device != 18:
+                #read time, ET (t2) and BT (t1) TEMPERATURE
+                tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
                 
-            aw.lcd2.display(t1)                               # MET
-            aw.lcd3.display(t2)                               # BT
-            aw.lcd4.display(int(round(self.rateofchange1*60)))       # rate of change MET (degress per minute)
-            aw.lcd5.display(int(round(self.rateofchange2*60)))       # rate of change BT (degrees per minute)
+                #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
+                #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
+                if len(self.timex) > 2 and t1 == self.temp2[-1] and t2 == self.temp1[-1]:
+                    #let's better swap the readings (also they are just repeating the previous ones)
+                    self.temp2.append(t1)
+                    self.temp1.append(t2)
+                else:
+                    #the readings seem to be "in order"
+                    self.temp2.append(t2)
+                    self.temp1.append(t1)
 
-            self.fig.canvas.draw()
-            
-            if self.projectFlag:
-                self.viewProjection()
-            if self.HUDflag:
-                aw.showHUD[aw.HUDfunction]()
+                self.timex.append(tx)
 
+                #we need a minimum of two readings to calculate rate of change
+                if len(self.timex) > 2:
+                    timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
+                    #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
+                    self.rateofchange1 = (self.temp1[-1] - self.temp1[-2]) / timed  #delta ET (degress / second)
+                    self.rateofchange2 = (self.temp2[-1] - self.temp2[-2]) / timed  #delta  BT (degress / second)
+                    rateofchange1plot = 100 + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 100
+                    rateofchange2plot = 50 + self.sensitivity*self.rateofchange2    #lift to plot on the grpah at Temp  = 50
+                else:
+                    self.rateofchange1 = 100.
+                    self.rateofchange2 = 50.
+                    rateofchange1plot = 0
+                    rateofchange2plot = 0
+                # append new data to the rateofchange
+                self.delta1.append(rateofchange1plot)
+                self.delta2.append(rateofchange2plot)
+                            
+                # update lines data using the lists with new data
+                self.l_temp1.set_data(self.timex, self.temp1)
+                self.l_temp2.set_data(self.timex, self.temp2)
+
+                if self.DeltaETflag:
+                    self.l_delta1.set_data(self.timex, self.delta1)
+                if self.DeltaBTflag:
+                    self.l_delta2.set_data(self.timex, self.delta2)
+
+                #readjust xlimit of plot if needed
+                if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds  
+                    self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
+                    self.ax.set_xlim(self.startofx,self.endofx)
+                    self.xaxistosm()
+
+                #update LCDs
+                if self.flagclock:
+                    ts = tx - self.startend[0]
+                    st2 = self.stringfromseconds(ts)
+                    timelcd = QString(st2)
+                    aw.lcd1.display(timelcd)
+
+                else:
+                    ts = tx
+                    st2 = self.stringfromseconds(ts)
+                    timelcd = QString(st2)
+                    aw.lcd1.display(timelcd)                
+                    
+                aw.lcd2.display(t1)                               # MET
+                aw.lcd3.display(t2)                               # BT
+                aw.lcd4.display(int(round(self.rateofchange1*60)))       # rate of change MET (degress per minute)
+                aw.lcd5.display(int(round(self.rateofchange2*60)))       # rate of change BT (degrees per minute)
+
+                self.fig.canvas.draw()
+                
+                if self.projectFlag:
+                    self.viewProjection()
+                if self.HUDflag:
+                    aw.showHUD[aw.HUDfunction]()
+                    
+            #############    if using DEVICE 18 (no device). Manual mode
+                    
+            else:
+                tx = self.timeclock.elapsed()/1000.
+                
+                #update LCDs
+                if self.flagclock:
+                    ts = tx - self.startend[0]
+                    st2 = self.stringfromseconds(ts)
+                    timelcd = QString(st2)
+                    aw.lcd1.display(timelcd)
+
+                else:
+                    ts = tx
+                    st2 = self.stringfromseconds(ts)
+                    timelcd = QString(st2)
+                    aw.lcd1.display(timelcd)
+                    
+                #readjust xlimit of plot if needed
+                if  tx > (self.endofx - 45):            # if difference is smaller than 30 seconds  
+                    self.endofx = int(tx + 180)         # increase x limit by 3 minutes
+                    self.ax.set_xlim(self.startofx,self.endofx)
+                    self.xaxistosm()
+                    
+                self.resetlines()
+                self.ax.plot([tx,tx], [0,self.ylimit],color ='black',linestyle = '-.', linewidth= 2, alpha = .7)
+                
+                self.fig.canvas.draw()
 
     def toggleHUD(self):
         #OFF
         if self.HUDflag:
             self.viewProjection()
             self.HUDflag = False
-            aw.button_18.setStyleSheet("QPushButton { background-color: #61ffff }")
+            aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.stack.setCurrentIndex(0)
             self.resetlines()
             aw.messagelabel.setText(u"HUD OFF")
@@ -476,13 +510,12 @@ class tgraphcanvas(FigureCanvas):
         aw.soundpop()        
 
     def resetlines(self):
-        count = 2 #ET + BT
         if self.DeltaETflag:
-            count += 1
+            self.linecount += 1
         if self.DeltaBTflag:
-            count += 1
+            self.linecount += 1
 
-        self.ax.lines = self.ax.lines[0:count]
+        self.ax.lines = self.ax.lines[0:self.linecount]
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
@@ -674,6 +707,12 @@ class tgraphcanvas(FigureCanvas):
 
         return tx,t2,t1
 
+    def NONE(self):
+        tx = self.timeclock.elapsed()/1000.        
+        t2,t1 = aw.ser.NONE()
+        
+        return tx,t2,t1
+    
     #creates X axis labels ticks in mm:ss acording to the endofx limit
     def xaxistosm(self):
         #aligns the 00:00 with the start of the roast if it exists    
@@ -702,7 +741,9 @@ class tgraphcanvas(FigureCanvas):
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
-
+        if self.HUDflag:
+            self.toggleHUD()
+            
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')  
 
@@ -1199,6 +1240,7 @@ class tgraphcanvas(FigureCanvas):
                             self.delta1[i] = self.fromCtoF(self.delta1[i])  #Delta ET
                             self.delta2[i] = self.fromCtoF(self.delta2[i])  #Delta BT
                             
+                        self.dryend[1] =   self.fromCtoF(self.dryend[1])    
                         self.varC[1] =   self.fromCtoF(self.varC[1])        #1C start temp
                         self.varC[3] =   self.fromCtoF(self.varC[3])        #1C end temp
                         self.varC[5] =   self.fromCtoF(self.varC[5])        #2C start temp
@@ -1210,8 +1252,9 @@ class tgraphcanvas(FigureCanvas):
                         if backgroundlength > 0:
                             for i in range(backgroundlength):
                                 self.backgroundET[i] = self.fromCtoF(self.backgroundET[i])
-                                self.backgroundBT[i] = self.fromCtoF(self.backgroundBT[i])                           
+                                self.backgroundBT[i] = self.fromCtoF(self.backgroundBT[i])
                                 
+                            self.dryendB[1] =   self.fromCtoF(self.dryend[1])    
                             self.varCB[1] =   self.fromCtoF(self.varCB[1])       #1C start temp B
                             self.varCB[3] =   self.fromCtoF(self.varCB[3])       #1C end temp B
                             self.varCB[5] =   self.fromCtoF(self.varCB[5])       #2C start temp B
@@ -1246,6 +1289,7 @@ class tgraphcanvas(FigureCanvas):
                             self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
                             self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
                             
+                        self.dryend[1] =   self.fromFtoC(self.dryend[1])    
                         self.varC[1] =   self.fromFtoC(self.varC[1])        #1C start temp
                         self.varC[3] =   self.fromFtoC(self.varC[3])        #1C end temp
                         self.varC[5] =   self.fromFtoC(self.varC[5])        #2C start temp
@@ -1257,8 +1301,9 @@ class tgraphcanvas(FigureCanvas):
                         if backgroundlength > 0:
                             for i in range(backgroundlength):
                                 self.backgroundET[i] = self.fromFtoC(self.backgroundET[i]) #ET B
-                                self.backgroundBT[i] = self.fromFtoC(self.backgroundBT[i]) #BT B                          
+                                self.backgroundBT[i] = self.fromFtoC(self.backgroundBT[i]) #BT B
                                 
+                            self.dryendB[1] =   self.fromFtoC(self.dryendB[1])    
                             self.varCB[1] =   self.fromFtoC(self.varCB[1])       #1C start temp B
                             self.varCB[3] =   self.fromFtoC(self.varCB[3])       #1C end temp B
                             self.varCB[5] =   self.fromFtoC(self.varCB[5])       #2C start temp B
@@ -1411,36 +1456,52 @@ class tgraphcanvas(FigureCanvas):
         aw.messagelabel.setText(u"Scope stopped")
         aw.button_1.setDisabled(False)
         aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
-        aw.soundpop()        
+        aw.soundpop()
+        if self.device == 18:        
+            self.drawinterp("cubic")            
+
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
         if self.flagon:
-            if len(self.timex) >= 3:
-                
-                self.flagclock = True
-                self.startend[0] = self.timeclock.elapsed()/1000.
-                self.startend[1] = self.temp2[-1]
-
-                # put a white marker on graph
-                rect = patches.Rectangle( (self.startend[0]-1,0), width=.1, height=self.temp2[-1], color = self.palette["text"])
-                self.ax.add_patch(rect)
-
-                #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-                self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]+ self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(u"Start 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-
-                message = u"Roast time starts now 00:00 BT = " + unicode(self.startend[1]) + self.mode
-
-                aw.label1.setStyleSheet("background-color:'#FF9966';")
-                aw.label1.setText( "<font color='black'><b>Roast time<\b></font>")
-
-                aw.button_8.setDisabled(True)
-                aw.button_8.setFlat(True)
+            if self.device != 18:
+                if len(self.timex) >= 3:
+                    self.flagclock = True
+                    self.startend[0] = self.timeclock.elapsed()/1000.
+                    self.startend[1] = self.temp2[-1]
+                else:
+                    message = u"Not enough variables collected yet. Try again in a few seconds"
+            #device 18  = manual mode        
             else:
-                message = u"Not enough variables collected yet. Try again in a few seconds"
+                tx = self.timeclock.elapsed()/1000.
+                et,bt = aw.ser.NONE()
+                self.startend[0] = tx
+                self.startend[1] = bt
+                self.drawmanual(et,bt,tx)
+                if et != -1 and bt != -1:
+                    # put initial BT marker on graph
+                    rect = patches.Rectangle( (self.startend[0],0), width=.1, height=self.temp2[-1], color = self.palette["bt"])
+                    self.ax.add_patch(rect)
+                    if et >  bt:
+                        #put ET marker on graph
+                        rect = patches.Rectangle( (self.startend[0],bt), width=.1, height=et-bt, color = self.palette["met"])
+                        self.ax.add_patch(rect)
+                else:
+                    return
+            #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
+            self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]+ self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            #anotate time
+            self.ax.annotate(u"Start 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+            message = u"Roast time starts now 00:00 BT = " + unicode(self.startend[1]) + self.mode
+
+            aw.label1.setStyleSheet("background-color:'#FF9966';")
+            aw.label1.setText( "<font color='black'><b>Roast time<\b></font>")
+
+            aw.button_8.setDisabled(True)
+            aw.button_8.setFlat(True)
+                    
         else:
             message = u"Scope is OFF"
             
@@ -1450,9 +1511,19 @@ class tgraphcanvas(FigureCanvas):
         if self.flagon:
             # record Dry end only if Charge mark has been done
             if self.startend[0]:
-                self.dryend[0] = self.timeclock.elapsed()/1000.
-                self.dryend[1] = self.temp2[-1]
-        
+                if self.device != 18:
+                    self.dryend[0] = self.timeclock.elapsed()/1000.
+                    self.dryend[1] = self.temp2[-1]
+                else:
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.dryend[0] = tx
+                        self.dryend[1] = bt
+                        self.drawmanual(et,bt,tx)                               
+                    else:
+                        return
+                    
                 #calculate time elapsed since charge time
                 st1 = u"DE " + self.stringfromseconds(self.dryend[0] - self.startend[0])
                 #anotate temperature
@@ -1485,10 +1556,18 @@ class tgraphcanvas(FigureCanvas):
         if self.flagon:
             # record 1Cs only if Charge mark has been done
             if self.startend[0]:
-                
-                self.varC[0] = self.timeclock.elapsed()/1000.
-                self.varC[1] = self.temp2[-1]
-                
+                if self.device != 18:                
+                    self.varC[0] = self.timeclock.elapsed()/1000.
+                    self.varC[1] = self.temp2[-1]
+                else:
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.varC[0] = tx
+                        self.varC[1] = bt
+                        self.drawmanual(et,bt,tx)                               
+                    else:
+                        return
                 #calculate time elapsed since charge time
                 st1 = u"FCs " + self.stringfromseconds(self.varC[0]-self.startend[0])
                 #anotate temperature
@@ -1524,9 +1603,18 @@ class tgraphcanvas(FigureCanvas):
         if self.flagon:
             # record only if 1Cs has been saved
             if self.varC[0]:
-                self.varC[2] = self.timeclock.elapsed()/1000.
-                self.varC[3] = self.temp2[-1]
-                
+                if self.device != 18:
+                    self.varC[2] = self.timeclock.elapsed()/1000.
+                    self.varC[3] = self.temp2[-1]
+                else:
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.varC[2] = tx
+                        self.varC[3] = bt
+                        self.drawmanual(et,bt,tx)                           
+                    else:
+                        return                    
                 #calculate time elapsed since charge time
                 st1 = u"FCe " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
                 #anotate temperature
@@ -1553,9 +1641,18 @@ class tgraphcanvas(FigureCanvas):
     #record 2C start markers of BT. Called from button_5 of application window
     def mark2Cstart(self):
         if self.flagon:
-            self.varC[4] = self.timeclock.elapsed()/1000.
-            self.varC[5] = self.temp2[-1]
-            
+            if self.device != 18:
+                self.varC[4] = self.timeclock.elapsed()/1000.
+                self.varC[5] = self.temp2[-1]
+            else:
+                tx = self.timeclock.elapsed()/1000.
+                et,bt = aw.ser.NONE()
+                if et != -1 and bt != -1:
+                    self.varC[4] = tx
+                    self.varC[5] = bt
+                    self.drawmanual(et,bt,tx)                           
+                else:
+                    return              
             st1 = u"SCs " + self.stringfromseconds(self.varC[4]-self.startend[0])
             if self.varC[3]:
                 self.ystep = self.findtextgap(self.varC[3],self.varC[5])
@@ -1581,10 +1678,18 @@ class tgraphcanvas(FigureCanvas):
         if self.flagon:
             # record only if 1Cs has been saved
             if self.varC[4]:
-                
-                self.varC[6] = self.timeclock.elapsed()/1000. 
-                self.varC[7] = self.temp2[-1]
-                    
+                if self.device != 18:                
+                    self.varC[6] = self.timeclock.elapsed()/1000. 
+                    self.varC[7] = self.temp2[-1]
+                else:
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.varC[6] = tx
+                        self.varC[7] = bt
+                        self.drawmanual(et,bt,tx)                           
+                    else:
+                        return
                 st1 =  u"SCe " + self.stringfromseconds(self.varC[6]-self.startend[0])
                 #anotate temperature
                 self.ystep = self.findtextgap(self.varC[5],self.varC[7])
@@ -1611,10 +1716,25 @@ class tgraphcanvas(FigureCanvas):
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
         if self.flagon:
-        
-            self.startend[2] = self.timeclock.elapsed()/1000.
-            self.startend[3] = self.temp2[-1]
-            
+            if self.device != 18:        
+                self.startend[2] = self.timeclock.elapsed()/1000.
+                self.startend[3] = self.temp2[-1]
+            else:
+                tx = self.timeclock.elapsed()/1000.
+                et,bt = aw.ser.NONE()
+                if et != -1 and bt != -1:
+                    self.startend[2] = tx
+                    self.startend[3] = bt
+                    self.drawmanual(et,bt,tx)
+                    # put final BT marker on graph
+                    rect = patches.Rectangle( (self.startend[2],0), width=.1, height=bt, color = self.palette["bt"])
+                    self.ax.add_patch(rect)
+                    if et >  bt:
+                        #put ET marker on graph
+                        rect = patches.Rectangle( (self.startend[2],bt), width=.1, height=et-bt, color = self.palette["met"])
+                        self.ax.add_patch(rect)
+                else:
+                    return             
             st1 = u"End " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
             #anotate temperature
             if self.varC[7]:
@@ -1776,10 +1896,24 @@ class tgraphcanvas(FigureCanvas):
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
-    def EventRecord(self):      
+    def EventRecord(self):
+        Nevents = len(self.specialevents)
+        #if in manual mode record last point
+        if self.device == 18:
+            if self.startend[0]:
+                if Nevents < 10:
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.temp1.append(et)
+                        self.temp2.append(bt)
+                        self.timex.append(tx)
+                        self.l_temp1.set_data(self.timex, self.temp1)
+                        self.l_temp2.set_data(self.timex, self.temp2)
+                        self.fig.canvas.draw()
+                    
         i = len(self.timex)-1
         if i > 0:
-            Nevents = len(self.specialevents)
             #Nevents is zero when recording first event. Therefore check up to 10 (max allowed).
             if Nevents < 10:
                 self.specialevents.append(i)
@@ -1813,8 +1947,21 @@ class tgraphcanvas(FigureCanvas):
                 aw.buttonminiEvent.setVisible(False)                
         else:
             aw.messagelabel.setText("No profile found")
+                    
         aw.soundpop()
 
+    #called from markdryen(), markcharge(), mark1Cstart(), etc
+    def drawmanual(self,et,bt,tx):
+        self.temp1.append(et)
+        self.temp2.append(bt)
+        self.timex.append(tx)
+        self.l_temp1.set_data(self.timex, self.temp1)
+        self.l_temp2.set_data(self.timex, self.temp2)
+        self.fig.canvas.draw()
+        if et >  bt and et > 10:
+            self.ax.annotate(u"%.1f"%(et), xy=(tx, et),xytext=(tx,et + 30),
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+        
     def movebackground(self,direction,step):
         lt = len(self.timeB)
         le = len(self.backgroundET)
@@ -1886,32 +2033,36 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText(u"unable to move background")
             return
 
-    def findpoints(self,origin):
+    def findpoints(self):
         
         if self.startend[0]:
             Xpoints = []
             Ypoints = []
-            if origin == 0:
-                #start point from begining of time
-                Xpoints.append(self.timex[0])
-                Ypoints.append(self.temp2[0])
-                #input beans (CHARGE)
-                Xpoints.append(self.startend[0])
-                Ypoints.append(self.startend[1])
-
-            LPind = aw.findTP()
-            DE = aw.findDryEnd()
-            if LPind < DE:
-                Xpoints.append(self.timex[LPind])
-                Ypoints.append(self.temp2[LPind])
-                Xpoints.append(self.timex[DE])
-                Ypoints.append(self.temp2[DE])
-            else:
-                Xpoints.append(self.timex[DE])
-                Ypoints.append(self.temp2[DE])                
-                Xpoints.append(self.timex[LPind])
-                Ypoints.append(self.temp2[LPind])
-
+            
+            #start point from begining of time
+            Xpoints.append(self.timex[0])
+            Ypoints.append(self.temp2[0])
+            #input beans (CHARGE)
+            Xpoints.append(self.startend[0])
+            Ypoints.append(self.startend[1])
+                        
+##            LPind = aw.findTP()    
+##            DE = aw.findDryEnd()
+##
+##            if LPind < DE:
+##                Xpoints.append(self.timex[LPind])
+##                Ypoints.append(self.temp2[LPind])
+##                Xpoints.append(self.timex[DE])
+##                Ypoints.append(self.temp2[DE])
+##            else:
+##                Xpoints.append(self.timex[DE])
+##                Ypoints.append(self.temp2[DE])                
+##                Xpoints.append(self.timex[LPind])
+##                Ypoints.append(self.temp2[LPind])
+                
+            if self.dryend[0]:
+                Xpoints.append(self.dryend[0])
+                Ypoints.append(self.dryend[1])
             if self.varC[0]:
                 Xpoints.append(self.varC[0])
                 Ypoints.append(self.varC[1])
@@ -1942,7 +2093,7 @@ class tgraphcanvas(FigureCanvas):
     def univariateinfo(self):
         try:
             
-            Xpoints,Ypoints = self.findpoints(1)  #from lowest point to avoid many coeficients
+            Xpoints,Ypoints = self.findpoints()  #from lowest point to avoid many coeficients
             
             equ = inter.UnivariateSpline(Xpoints, Ypoints)
             coeffs = equ.get_coeffs().tolist()
@@ -1974,18 +2125,17 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError,e:
             aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"value error in drawinterp() " + unicode(e))
+            self.errorlog.append(u"value error in univariateinfo() " + unicode(e))
             return
 
         except Exception,e:
             aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"Exception error in drawinterp() " + unicode(e))
+            self.errorlog.append(u"Exception error in univariateinfo() " + unicode(e))
             return  
-            
-
+         
     def univariate(self):
         try:           
-            Xpoints,Ypoints = self.findpoints(1)  #from lowest point
+            Xpoints,Ypoints = self.findpoints()  #from lowest point
             
             func = inter.UnivariateSpline(Xpoints, Ypoints)
             
@@ -2011,7 +2161,7 @@ class tgraphcanvas(FigureCanvas):
     def drawinterp(self,mode):
         try:
             
-            Xpoints,Ypoints = self.findpoints(0) #from 0 origin
+            Xpoints,Ypoints = self.findpoints() #from 0 origin
             func = inter.interp1d(Xpoints, Ypoints, kind=mode)
             newY = func(self.timex)          
             self.ax.plot(self.timex, newY, color="black", linestyle = '-.', linewidth=3)            
@@ -2657,6 +2807,10 @@ class ApplicationWindow(QMainWindow):
         hudAction = QAction("Extras...",self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.ConfMenu.addAction(hudAction)
+        
+        soundAction = QAction("Sound...",self)
+        self.connect(soundAction,SIGNAL("triggered()"),self.soundset)
+        self.ConfMenu.addAction(soundAction)
 
         # HELP menu
         helpAboutAction = QAction("About",self)
@@ -2716,7 +2870,7 @@ class ApplicationWindow(QMainWindow):
             QWidget.keyPressEvent(self, event)
 
     def moveKbutton(self,command):
-        #space toggles ON/OFF keyboard    
+        #"Enter" toggles ON/OFF keyboard    
         if command =="enter":
             if self.keyboardmoveflag == 0:
                 #turn on
@@ -2752,7 +2906,7 @@ class ApplicationWindow(QMainWindow):
         if self.keyboardmoveflag:       
             if command == "space":
                 self.keyboardmove[self.keyboardmoveindex]()   #apply button command
-                #behaviour rules
+                #behaviour rules after pressing a button
                 #if RESET is pressed jump to ON     
                 if self.keyboardmoveindex == 10:
                     self.keyboardmoveindex = 0
@@ -2928,6 +3082,15 @@ class ApplicationWindow(QMainWindow):
             stream.write(array.array('f',(.25 * math.sin(i / 10.) for i in range(44100))))
             stream.close()
             p.terminate()
+
+    def soundset(self):
+        if self.soundflag == 0:
+            self.soundflag = 1
+            self.messagelabel.setText("Sound turned ON")
+            self.soundpop()
+        else:
+            self.soundflag = 0
+            self.messagelabel.setText("Sound turn OFF")
             
     #future automatation of filename when saving a file through keyboard shortcut  
     def automaticsave(self):
@@ -3654,7 +3817,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Phases"):
                 self.qmc.phases = map(lambda x:x.toInt()[0],settings.value("Phases").toList())
             if settings.contains("phasesbuttonflag"):
-                self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0] 
+                self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]
+            if settings.contains("sound"):    
+                self.soundflag = settings.value("sound",self.soundflag).toInt()[0]    
             #restore Events settings
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
             self.minieventsflag = settings.value("minieventsflag",int(self.minieventsflag)).toInt()[0]
@@ -3707,9 +3872,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
-            settings.endGroup()
-            settings.beginGroup("Sound")
-            self.soundflag = settings.value("Beep",self.soundflag).toInt()[0]
             settings.endGroup()
 
             #need to update timer delay (otherwise it uses default 5 seconds)
@@ -3766,6 +3928,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Colors",self.qmc.palette)
             #save flavors
             settings.setValue("Flavors",self.qmc.flavorlabels)
+            #soundflag
+            settings.setValue("sound",self.soundflag)
             #save serial port
             settings.beginGroup("SerialPort");
             settings.setValue("comport",self.ser.comport)
@@ -3795,9 +3959,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETtarget",self.qmc.ETtarget)
             settings.setValue("BTtarget",self.qmc.BTtarget)
             settings.setValue("Mode",self.HUDfunction)
-            settings.endGroup()
-            settings.beginGroup("Sound")
-            settings.setValue("Beep",self.soundflag)
             settings.endGroup()
             
         except Exception,e:
@@ -4513,7 +4674,7 @@ $cupping_notes
             aw.qmc.errorlog.append(u"Error in resize() " + unicode(e))
             return
 
-    #displays Dialog for the setting the HUD
+    #displays Dialog for the setting of the HUD
     def hudset(self):
         hudDl = HUDDlg(self)
         hudDl.show()
@@ -4744,16 +4905,22 @@ class HUDDlg(QDialog):
         
         hudGroupLayout = QGroupBox("HUD")
         hudGroupLayout.setLayout(hudLayout)
+        
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(cancelButton)
+        buttonsLayout.addWidget(okButton)
                                 
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(rorGroupLayout)
         tab1Layout.addWidget(hudGroupLayout)
-        
+        tab1Layout.addStretch()
+        tab1Layout.addLayout(buttonsLayout)
 
 
         ##### TAB 2
         self.interpCheck = QCheckBox("Interpolation")
-        self.connect(self.interpCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.interpolation(i)) #toggle 
+        self.connect(self.interpCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.interpolation(i)) #toggle
         
         self.interpComboBox = QComboBox()
         self.interpComboBox.setMaximumWidth(100)
@@ -4781,7 +4948,7 @@ class HUDDlg(QDialog):
         interLayout.addWidget(self.interpCheck,0)
         interLayout.addWidget(self.interpComboBox,0)
 
-        interGroupLayout = QGroupBox("Interpolate")
+        interGroupLayout = QGroupBox("Interp.")
         interGroupLayout.setLayout(interLayout)
 
         uniLayout = QHBoxLayout()
@@ -4792,18 +4959,7 @@ class HUDDlg(QDialog):
         univarGroupLayout.setLayout(uniLayout)
 
         tab2Layout.addWidget(interGroupLayout)
-        tab2Layout.addWidget(univarGroupLayout)  
-        
-        ##### TAB 3
-        self.soundCheck = QCheckBox("Beep")
-        self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
-        if aw.soundflag:
-            self.soundCheck.setChecked(True)
-        else:
-            self.soundCheck.setChecked(False)
-        
-        tab3Layout = QHBoxLayout()
-        tab3Layout.addWidget(self.soundCheck)       
+        tab2Layout.addWidget(univarGroupLayout)        
 
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
@@ -4815,24 +4971,12 @@ class HUDDlg(QDialog):
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         TabWidget.addTab(C2Widget,"Math")
-        
-        C3Widget = QWidget()
-        C3Widget.setLayout(tab3Layout)
-        TabWidget.addTab(C3Widget,"Sound")
 
 
-        buttonsLayout = QHBoxLayout()
-        buttonsLayout.addStretch()
-        buttonsLayout.addWidget(cancelButton)
-        buttonsLayout.addWidget(okButton)
-        
         #incorporate layouts
         Slayout = QVBoxLayout()
         Slayout.addWidget(self.status,0)
-        Slayout.addWidget(TabWidget,1)        
-        Slayout.addStretch()
-        Slayout.addLayout(buttonsLayout)
-        
+        Slayout.addWidget(TabWidget,1)
         self.setLayout(Slayout)
 
     def showunivarinfo(self):
@@ -4866,15 +5010,6 @@ class HUDDlg(QDialog):
         else:
             aw.qmc.resetlines()
             aw.qmc.redraw()
-            
-    def soundset(self,i):
-        if aw.soundflag == 0:
-            aw.soundflag = 1
-            aw.messagelabel.setText("Sound turned ON")
-            aw.soundpop()
-        else:
-            aw.soundflag = 0
-            aw.messagelabel.setText("Sound turn OFF")
             
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
@@ -7207,7 +7342,20 @@ class serialport(object):
         finally:
             if serCENTER:
                 serCENTER.close()
-
+                
+       
+    def NONE(self):
+        #stop trigger (not time) to give time to answer
+        aw.qmc.flagon = 0        
+        dialogx = nonedevDlg( )
+        if dialogx.exec_():
+            ET = int(dialogx.etEdit.text())
+            BT = int(dialogx.btEdit.text())
+            aw.qmc.flagon = 1
+            return ET,BT
+        else:
+            aw.qmc.flagon = 1
+            return -1,-1
                 
     def CENTER303temperature(self):
         serCENTER = None
@@ -7349,7 +7497,46 @@ class serialport(object):
             if serCENTER:
                 serCENTER.close()
 
+#########################################################################
+#############  NONE DEVICE DIALOG #######################################                                   
+#########################################################################
 
+#inputs temperature            
+class nonedevDlg(QDialog):
+    def __init__(self, parent = None):
+        super(nonedevDlg,self).__init__(parent)
+       
+        self.setWindowTitle("Temperature")
+
+        if aw.qmc.timex:
+            etval = str(int(aw.qmc.temp2[-1]))
+            btval = str(int(aw.qmc.temp1[-1])) 
+        else:
+            etval = "0"
+            btval = "0"
+        
+        etlabel = QLabel("ET")
+        self.etEdit = QLineEdit(etval)
+        btlabel = QLabel("BT")
+        self.btEdit = QLineEdit(btval)
+        self.etEdit.setValidator(QIntValidator(0, 1000, self.etEdit))
+        self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
+        
+        okButton = QPushButton("&OK")
+        cancelButton = QPushButton("Cancel")
+
+        self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
+        self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+        
+        grid = QGridLayout()
+        grid.addWidget(etlabel,0,0)
+        grid.addWidget(self.etEdit,0,1)
+        grid.addWidget(btlabel,1,0)
+        grid.addWidget(self.btEdit,1,1)
+        grid.addWidget(okButton,2,0)
+        grid.addWidget(cancelButton,2,1)        
+
+        self.setLayout(grid)
 
 #########################################################################
 #############  SERIAL PORT DIALOG #######################################                                   
@@ -7591,7 +7778,8 @@ class DeviceAssignmentDLG(QDialog):
                    "VOLTCRAFT 302KJ",
                    "EXTECH 421509",
                    "Omega HH802U",
-                   "Omega HH309"
+                   "Omega HH309",
+                   "NONE"
                    ]
         sorted_devices = sorted(devices)
         self.devicetypeComboBox = QComboBox()
@@ -7906,7 +8094,11 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = "Device set to " + meter + ". Now, chose serial port"
-
+                
+            elif meter == "NONE":
+                aw.qmc.device = 18
+                message = "Device set to " + meter 
+                
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
             aw.button_13.setVisible(False)
