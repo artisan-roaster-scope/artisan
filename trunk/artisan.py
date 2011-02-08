@@ -213,7 +213,8 @@ class tgraphcanvas(FigureCanvas):
         #read and plot on/off flag
         self.flagon = False
         self.flagclock = False
-        
+        #log flag that tells to log ET when using device 18 (manual mode)
+        self.manuallogETflag = 0
         self.title = u"Roaster Scope"
         self.ambientTemp = 0.
 
@@ -480,7 +481,7 @@ class tgraphcanvas(FigureCanvas):
                     self.xaxistosm()
                     
                 self.resetlines()
-                self.ax.plot([tx,tx], [0,self.ylimit],color ='black',linestyle = '-.', linewidth= 2, alpha = .7)
+                self.ax.plot([tx,tx], [0,self.ylimit],color ='blue',linestyle = '-', linewidth= 1, alpha = .7)
                 
                 self.fig.canvas.draw()
 
@@ -681,7 +682,7 @@ class tgraphcanvas(FigureCanvas):
 
     def VOLTCRAFTK202(self):
         
-         t2,t1 = aw.ser.CENTER306temperature()
+         t2,t1 = aw.ser.ENTER306temperature()
          tx = self.timeclock.elapsed()/1000.
          
          return tx,t2,t1
@@ -1254,7 +1255,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.backgroundET[i] = self.fromCtoF(self.backgroundET[i])
                                 self.backgroundBT[i] = self.fromCtoF(self.backgroundBT[i])
                                 
-                            self.dryendB[1] =   self.fromCtoF(self.dryend[1])    
+                            self.dryendB[1] =   self.fromCtoF(self.dryendB[1])    
                             self.varCB[1] =   self.fromCtoF(self.varCB[1])       #1C start temp B
                             self.varCB[3] =   self.fromCtoF(self.varCB[3])       #1C end temp B
                             self.varCB[5] =   self.fromCtoF(self.varCB[5])       #2C start temp B
@@ -1477,6 +1478,7 @@ class tgraphcanvas(FigureCanvas):
                 self.startend[0] = tx
                 self.startend[1] = bt
                 self.drawmanual(et,bt,tx)
+
                 if et != -1 and bt != -1:
                     # put initial BT marker on graph
                     rect = patches.Rectangle( (self.startend[0],0), width=.1, height=self.temp2[-1], color = self.palette["bt"])
@@ -1520,7 +1522,9 @@ class tgraphcanvas(FigureCanvas):
                     if et != -1 and bt != -1:
                         self.dryend[0] = tx
                         self.dryend[1] = bt
-                        self.drawmanual(et,bt,tx)                               
+                        self.drawmanual(et,bt,tx)
+                        #delete initial charge marks
+                        self.redraw()
                     else:
                         return
                     
@@ -1727,11 +1731,11 @@ class tgraphcanvas(FigureCanvas):
                     self.startend[3] = bt
                     self.drawmanual(et,bt,tx)
                     # put final BT marker on graph
-                    rect = patches.Rectangle( (self.startend[2],0), width=.1, height=bt, color = self.palette["bt"])
+                    rect = patches.Rectangle( (self.startend[2],0), width=.05, height=bt, color = self.palette["bt"])
                     self.ax.add_patch(rect)
                     if et >  bt:
                         #put ET marker on graph
-                        rect = patches.Rectangle( (self.startend[2],bt), width=.1, height=et-bt, color = self.palette["met"])
+                        rect = patches.Rectangle( (self.startend[2],bt), width=.05, height=et-bt, color = self.palette["met"])
                         self.ax.add_patch(rect)
                 else:
                     return             
@@ -1904,14 +1908,8 @@ class tgraphcanvas(FigureCanvas):
                 if Nevents < 10:
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.temp1.append(et)
-                        self.temp2.append(bt)
-                        self.timex.append(tx)
-                        self.l_temp1.set_data(self.timex, self.temp1)
-                        self.l_temp2.set_data(self.timex, self.temp2)
-                        self.fig.canvas.draw()
-                    
+                    self.drawmanual(et,bt,tx)
+        #index number            
         i = len(self.timex)-1
         if i > 0:
             #Nevents is zero when recording first event. Therefore check up to 10 (max allowed).
@@ -1934,7 +1932,7 @@ class tgraphcanvas(FigureCanvas):
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',
                                 color=self.palette["text"],alpha=0.4),fontsize=8, backgroundcolor='yellow')
 
-            	#activate mini recorder
+            	#write label in mini recorder
                 if aw.minieventsflag:
                     string = "E #" + unicode(Nevents+1) 
                     aw.eventlabel.setText(QString(string))
@@ -1953,11 +1951,12 @@ class tgraphcanvas(FigureCanvas):
     #called from markdryen(), markcharge(), mark1Cstart(), etc
     def drawmanual(self,et,bt,tx):
         self.temp1.append(et)
+        self.l_temp1.set_data(self.timex, self.temp1)
         self.temp2.append(bt)
         self.timex.append(tx)
-        self.l_temp1.set_data(self.timex, self.temp1)
         self.l_temp2.set_data(self.timex, self.temp2)
         self.fig.canvas.draw()
+        #write et when above bt
         if et >  bt and et > 10:
             self.ax.annotate(u"%.1f"%(et), xy=(tx, et),xytext=(tx,et + 30),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -2807,10 +2806,6 @@ class ApplicationWindow(QMainWindow):
         hudAction = QAction("Extras...",self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.ConfMenu.addAction(hudAction)
-        
-        soundAction = QAction("Sound...",self)
-        self.connect(soundAction,SIGNAL("triggered()"),self.soundset)
-        self.ConfMenu.addAction(soundAction)
 
         # HELP menu
         helpAboutAction = QAction("About",self)
@@ -3082,15 +3077,6 @@ class ApplicationWindow(QMainWindow):
             stream.write(array.array('f',(.25 * math.sin(i / 10.) for i in range(44100))))
             stream.close()
             p.terminate()
-
-    def soundset(self):
-        if self.soundflag == 0:
-            self.soundflag = 1
-            self.messagelabel.setText("Sound turned ON")
-            self.soundpop()
-        else:
-            self.soundflag = 0
-            self.messagelabel.setText("Sound turn OFF")
             
     #future automatation of filename when saving a file through keyboard shortcut  
     def automaticsave(self):
@@ -3817,9 +3803,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Phases"):
                 self.qmc.phases = map(lambda x:x.toInt()[0],settings.value("Phases").toList())
             if settings.contains("phasesbuttonflag"):
-                self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]
-            if settings.contains("sound"):    
-                self.soundflag = settings.value("sound",self.soundflag).toInt()[0]    
+                self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]   
             #restore Events settings
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
             self.minieventsflag = settings.value("minieventsflag",int(self.minieventsflag)).toInt()[0]
@@ -3873,7 +3857,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
             settings.endGroup()
-
+            settings.beginGroup("Sound")
+            self.soundflag = settings.value("Beep",self.soundflag).toInt()[0]
+            settings.endGroup()
+            
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
             self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
@@ -3959,6 +3946,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETtarget",self.qmc.ETtarget)
             settings.setValue("BTtarget",self.qmc.BTtarget)
             settings.setValue("Mode",self.HUDfunction)
+            settings.endGroup()
+            settings.beginGroup("Sound")
+            settings.setValue("Beep",self.soundflag)
             settings.endGroup()
             
         except Exception,e:
@@ -4904,18 +4894,11 @@ class HUDDlg(QDialog):
         rorGroupLayout.setLayout(curvesLayout)
         
         hudGroupLayout = QGroupBox("HUD")
-        hudGroupLayout.setLayout(hudLayout)
-        
-        buttonsLayout = QHBoxLayout()
-        buttonsLayout.addStretch()
-        buttonsLayout.addWidget(cancelButton)
-        buttonsLayout.addWidget(okButton)
-                                
+        hudGroupLayout.setLayout(hudLayout)       
+                               
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(rorGroupLayout)
         tab1Layout.addWidget(hudGroupLayout)
-        tab1Layout.addStretch()
-        tab1Layout.addLayout(buttonsLayout)
 
 
         ##### TAB 2
@@ -4948,7 +4931,7 @@ class HUDDlg(QDialog):
         interLayout.addWidget(self.interpCheck,0)
         interLayout.addWidget(self.interpComboBox,0)
 
-        interGroupLayout = QGroupBox("Interp.")
+        interGroupLayout = QGroupBox("Interpolate")
         interGroupLayout.setLayout(interLayout)
 
         uniLayout = QHBoxLayout()
@@ -4959,7 +4942,18 @@ class HUDDlg(QDialog):
         univarGroupLayout.setLayout(uniLayout)
 
         tab2Layout.addWidget(interGroupLayout)
-        tab2Layout.addWidget(univarGroupLayout)        
+        tab2Layout.addWidget(univarGroupLayout)
+
+        ##### TAB 3
+        self.soundCheck = QCheckBox("Beep")
+        if aw.soundflag:
+            self.soundCheck.setChecked(True)
+        else:
+            self.soundCheck.setChecked(False)    
+        self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
+        tab3Layout = QHBoxLayout()
+        tab3Layout.addWidget(self.soundCheck)
+        
 
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
@@ -4972,11 +4966,22 @@ class HUDDlg(QDialog):
         C2Widget.setLayout(tab2Layout)
         TabWidget.addTab(C2Widget,"Math")
 
+        C3Widget = QWidget()
+        C3Widget.setLayout(tab3Layout)
+        TabWidget.addTab(C3Widget,"Sound")
+
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(cancelButton)
+        buttonsLayout.addWidget(okButton)
 
         #incorporate layouts
         Slayout = QVBoxLayout()
         Slayout.addWidget(self.status,0)
         Slayout.addWidget(TabWidget,1)
+        Slayout.addStretch()
+        Slayout.addLayout(buttonsLayout)
+        
         self.setLayout(Slayout)
 
     def showunivarinfo(self):
@@ -5010,6 +5015,16 @@ class HUDDlg(QDialog):
         else:
             aw.qmc.resetlines()
             aw.qmc.redraw()
+
+    def soundset(self,i):
+        if aw.soundflag == 0:
+            aw.soundflag = 1
+            aw.messagelabel.setText("Sound turned ON")
+            aw.soundpop()
+        else:
+            aw.soundflag = 0
+            aw.messagelabel.setText("Sound turn OFF")
+
             
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
@@ -7346,15 +7361,14 @@ class serialport(object):
        
     def NONE(self):
         #stop trigger (not time) to give time to answer
-        aw.qmc.flagon = 0        
         dialogx = nonedevDlg( )
         if dialogx.exec_():
             ET = int(dialogx.etEdit.text())
             BT = int(dialogx.btEdit.text())
-            aw.qmc.flagon = 1
+            aw.lcd2.display(ET)                               # MET
+            aw.lcd3.display(BT)
             return ET,BT
         else:
-            aw.qmc.flagon = 1
             return -1,-1
                 
     def CENTER303temperature(self):
@@ -7506,31 +7520,44 @@ class nonedevDlg(QDialog):
     def __init__(self, parent = None):
         super(nonedevDlg,self).__init__(parent)
        
-        self.setWindowTitle("Temperature")
+        self.setWindowTitle("Manual Temperature Logger")
 
-        if aw.qmc.timex:
-            etval = str(int(aw.qmc.temp1[-1]))
+        if len(aw.qmc.timex):
+            if aw.qmc.manuallogETflag:
+                etval = str(int(aw.qmc.temp1[-1]))
+            else:
+                etval = "1"
             btval = str(int(aw.qmc.temp2[-1])) 
         else:
-            etval = "0"
-            btval = "0"
+            etval = "1"
+            btval = "1"
         
-        etlabel = QLabel("ET")
         self.etEdit = QLineEdit(etval)
         btlabel = QLabel("BT")
         self.btEdit = QLineEdit(btval)
         self.etEdit.setValidator(QIntValidator(0, 1000, self.etEdit))
         self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
-        
-        okButton = QPushButton("&OK")
+
+        self.ETbox = QCheckBox("ET")
+        if aw.qmc.manuallogETflag == True:
+            self.ETbox.setChecked(True)
+            
+        else:
+            self.ETbox.setChecked(False)
+            self.etEdit.setVisible(False)            
+           
+        self.connect(self.ETbox,SIGNAL("stateChanged(int)"),self.changemanuallogETflag)
+
+        okButton = QPushButton("OK")
         cancelButton = QPushButton("Cancel")
 
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         
         grid = QGridLayout()
-        grid.addWidget(etlabel,0,0)
+        grid.addWidget(self.ETbox,0,0)
         grid.addWidget(self.etEdit,0,1)
+        
         grid.addWidget(btlabel,1,0)
         grid.addWidget(self.btEdit,1,1)
         grid.addWidget(okButton,2,0)
@@ -7538,6 +7565,15 @@ class nonedevDlg(QDialog):
 
         self.setLayout(grid)
 
+    def changemanuallogETflag(self):
+        if self.ETbox.isChecked():
+            aw.qmc.manuallogETflag = 1
+            self.etEdit.setVisible(True)
+        else:
+            aw.qmc.manuallogETflag = 0
+            self.etEdit.setVisible(False)
+        
+                
 #########################################################################
 #############  SERIAL PORT DIALOG #######################################                                   
 #########################################################################
@@ -8097,7 +8133,12 @@ class DeviceAssignmentDLG(QDialog):
                 
             elif meter == "NONE":
                 aw.qmc.device = 18
-                message = "Device set to " + meter 
+                message = "Device set to " + meter
+                st = ""
+                if aw.qmc.delay != 1:
+                    aw.qmc.delay = 1
+                    st += ". Sampling rate changed to 1 second"
+                message = "Device set to " + meter + st
                 
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
