@@ -7215,7 +7215,11 @@ class serialport(object):
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.HH806AUtemperature(): " + unicode(e))
             aw.qmc.errorlog.append(u"ser.HH806AUtemperature(): " + unicode(e) )
-            return -1,-1
+            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            else:
+                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+
         finally:
             if serHH:
                 serHH.close()
@@ -7247,8 +7251,7 @@ class serialport(object):
             
             else:
                 aw.messagelabel.setText(u"No RX data from HH506RAtemperature()")
-                aw.qmc.errorlog.append(u"No RX data from HH506RAtemperature()")
-                
+                aw.qmc.errorlog.append(u"No RX data from HH506RAtemperature()")                
                 if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
                     return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
                 else:
@@ -7257,8 +7260,11 @@ class serialport(object):
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.HH506RAtemperature(): " + unicode(e))
             aw.qmc.errorlog.append(u"ser.HH506RAtemperature(): " + unicode(e) )
-            return -1,-1
-        
+            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            else:
+                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+       
         finally:
             if serHH:
                 serHH.close()
@@ -7347,12 +7353,14 @@ class serialport(object):
                 else:
                     return -1,-1                                    #return something out of scope to avoid function error (expects two values)
 
-            
-        
+                 
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.CENTER306temperature()" + unicode(e))
             aw.qmc.errorlog.append(u"ser.CENTER306temperature()" + unicode(e) )
-            return -1,-1
+            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            else:
+                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             
         finally:
             if serCENTER:
@@ -7420,8 +7428,7 @@ class serialport(object):
                 nbytes = len(r)
                 message = u"%i bytes received but 8 needed"%nbytes
                 aw.messagelabel.setText(message)
-                aw.qmc.errorlog.append(message)
-                
+                aw.qmc.errorlog.append(message)                
                 if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
                     return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
                 else:
@@ -7430,8 +7437,11 @@ class serialport(object):
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.CENTER303temperature()" + unicode(e))
             aw.qmc.errorlog.append(u"ser.CENTER303temperature()" + unicode(e) )
-            return -1,-1
-            
+            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            else:
+                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+        
         finally:
             if serCENTER:
                 serCENTER.close()
@@ -7494,8 +7504,7 @@ class serialport(object):
                 nbytes = len(r)
                 message = u"%i bytes from CENTER309 but 45 needed"%nbytes
                 aw.messagelabel.setText(message)
-                aw.qmc.errorlog.append(message)
-                
+                aw.qmc.errorlog.append(message)                
                 if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
                     return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
                 else:
@@ -7505,7 +7514,10 @@ class serialport(object):
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.CENTER309temperature()" + unicode(e))
             aw.qmc.errorlog.append(u"ser.CENTER309temperature()" + unicode(e) )
-            return -1,-1
+            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            else:
+                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             
         finally:
             if serCENTER:
