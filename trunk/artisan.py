@@ -1466,7 +1466,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         aw.soundpop()
         if self.device == 18:        
-            self.drawinterp("cubic")            
+            self.createFromManual()           
 
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
@@ -2047,24 +2047,26 @@ class tgraphcanvas(FigureCanvas):
             #input beans (CHARGE)
             Xpoints.append(self.startend[0])
             Ypoints.append(self.startend[1])
-                        
-##            LPind = aw.findTP()    
-##            DE = aw.findDryEnd()
-##
-##            if LPind < DE:
-##                Xpoints.append(self.timex[LPind])
-##                Ypoints.append(self.temp2[LPind])
-##                Xpoints.append(self.timex[DE])
-##                Ypoints.append(self.temp2[DE])
-##            else:
-##                Xpoints.append(self.timex[DE])
-##                Ypoints.append(self.temp2[DE])                
-##                Xpoints.append(self.timex[LPind])
-##                Ypoints.append(self.temp2[LPind])
+
+            #find indexes of lowest point and dryend            
+            LPind = aw.findTP()
+            DE = aw.findDryEnd()
+
+            if LPind < DE:
+                Xpoints.append(self.timex[LPind])
+                Ypoints.append(self.temp2[LPind])
+                Xpoints.append(self.timex[DE])
+                Ypoints.append(self.temp2[DE])
+            else:
+                Xpoints.append(self.timex[DE])
+                Ypoints.append(self.temp2[DE])                
+                Xpoints.append(self.timex[LPind])
+                Ypoints.append(self.temp2[LPind])
                 
-            if self.dryend[0]:
+            if self.dryend[1] > self.timex[DE] and self.dryend[1] > self.timex[LPind]:
                 Xpoints.append(self.dryend[0])
                 Ypoints.append(self.dryend[1])
+                
             if self.varC[0]:
                 Xpoints.append(self.varC[0])
                 Ypoints.append(self.varC[1])
@@ -2134,7 +2136,77 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText(unicode(e))
             self.errorlog.append(u"Exception error in univariateinfo() " + unicode(e))
             return  
-         
+
+    #interpoltaes profile (creates new data). Call when using device 18 (manual) at [OFF]
+    def createFromManual(self):
+        try:
+            #check to see if there is an ET curve
+            etflag = 0
+            if self.temp1[-1] > 3:
+                etflag = 1
+                
+            #create BT function
+            func = inter.UnivariateSpline(self.timex,self.temp2)
+
+            #create ET function
+            if etflag:
+                func2 = inter.UnivariateSpline(self.timex,self.temp1)
+
+            #create longer list of time values
+            time = numpy.arange(self.timex[0],self.timex[-1],1)
+            #convert all time values to temperature
+            btvals = func(time).tolist()
+
+            if etflag:
+                etvals = func2(time).tolist()
+
+            #plot to verify
+            self.ax.plot(time, btvals, color=self.palette["bt"], linestyle = '-.', linewidth=2)
+            if etflag:
+                self.ax.plot(time, etvals, color=self.palette["met"], linestyle = '-.', linewidth=2)
+                
+            self.fig.canvas.draw()
+            
+            if etflag:
+                question = "Interpolate ET and BT?"
+            else:    
+                question = "Interpolate BT?"
+                
+            reply = QMessageBox.question(self,u"Convert BT?",question,
+                                QMessageBox.Yes|QMessageBox.Cancel)
+
+            if reply == QMessageBox.Yes:
+                #find new indexes for events
+                for i in range(len(self.specialevents)):
+                    for p in range(len(time)):
+                        if time[p] > self.timex[self.specialevents[i]]:
+                            self.specialevents[i] = p
+                            break
+                    
+                self.temp2 = btvals
+                self.timex = time
+                if etflag:
+                    self.temp1 = etvals
+                else:    
+                    #make et same dimension as bt and time
+                    self.temp1 = []
+                    for i in range(len(time)):
+                        self.temp1.append(0.)
+                    #self.temp1 = numpy.zeros(len(time)).tolist()
+    
+            self.redraw()
+       
+        except ValueError,e:
+            aw.messagelabel.setText(unicode(e))
+            self.errorlog.append(u"value error in createFromManual() " + unicode(e))
+            return
+
+        except Exception,e:
+            aw.messagelabel.setText(unicode(e))
+            self.errorlog.append(u"Exception error in createFromManual() " + unicode(e))
+            return  
+                                    
+            
     def univariate(self):
         try:           
             Xpoints,Ypoints = self.findpoints()  #from lowest point
@@ -2152,12 +2224,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError,e:
             aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"value error in drawinterp() " + unicode(e))
+            self.errorlog.append(u"value error in univariate() " + unicode(e))
             return
 
         except Exception,e:
             aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"Exception error in drawinterp() " + unicode(e))
+            self.errorlog.append(u"Exception error in univariate() " + unicode(e))
             return  
             
     def drawinterp(self,mode):
@@ -4912,9 +4984,10 @@ class HUDDlg(QDialog):
         self.interpComboBox.setMaximumWidth(100)
         self.interpComboBox.setMinimumWidth(55)
         self.interpComboBox.addItems([u"linear", u"cubic",u"nearest"])
+        self.interpComboBox.setToolTip("linear: linear interpolation\ncubic: 3rd order spline interpolation\nnearest: y value of the nearest point")
         self.connect(self.interpComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.interpComboBox.currentIndex() :self.changeInterpolationMode(i))
 
-        
+       
         """
          'linear'  : linear interpolation
          'cubic'   : 3rd order spline interpolation
@@ -4930,10 +5003,10 @@ class HUDDlg(QDialog):
         self.connect(univarButton,SIGNAL("clicked()"),self.showunivarinfo)
         
         tab2Layout = QVBoxLayout()
-        interLayout = QHBoxLayout()
-        interLayout.addWidget(self.interpCheck,0)
-        interLayout.addWidget(self.interpComboBox,0)
-
+        interLayout = QGridLayout()
+        interLayout.addWidget(self.interpCheck,0,0)
+        interLayout.addWidget(self.interpComboBox,0,1)
+        
         interGroupLayout = QGroupBox("Interpolate")
         interGroupLayout.setLayout(interLayout)
 
@@ -4986,6 +5059,9 @@ class HUDDlg(QDialog):
         Slayout.addLayout(buttonsLayout)
         
         self.setLayout(Slayout)
+        
+    def saveinterp(self):
+        pass
 
     def showunivarinfo(self):
         if aw.qmc.startend[2]:
@@ -8778,6 +8854,7 @@ class PXRpidDlgControl(QDialog):
                 aw.pid.PXR["sv0"][0] = float(self.svedit.text())
                 aw.lcd6.display(aw.pid.PXR["sv0"][0])
                 self.status.showMessage(message,5000)
+                aw.lcd6.display(unicode(self.svedit.text()))
             else:
                 mssg = u"setsv(): unable to set sv"
                 self.status.showMessage(mssg,5000)
@@ -8790,7 +8867,7 @@ class PXRpidDlgControl(QDialog):
         if temp != -1:
             aw.pid.PXR["sv0"][0] =  temp
             aw.lcd6.display(aw.pid.PXR["sv0"][0])
-            self.readsvedit.setText(unicode(aw.pid.PXR["sv0"][0]))
+            self.readsvedit.setText(unicode(aw.pid.PXR["sv0"][0]))           
         else:
             self.status.showMessage(u"Unable to read SV",5000)
 
@@ -9742,7 +9819,7 @@ class PXG4pidDlgControl(QDialog):
                         aw.pid.PXG4["selectsv"][0] = svn
                         key = u"sv" + unicode(svn)
                         message = u"SV" + unicode(svn) + u" set to " + unicode(aw.pid.PXG4[key][0])
-                        aw.lcd6.display(aw.pid.PXG4[key][0])
+                        aw.lcd6.display(unicode(aw.pid.PXG4[key][0]))
                         self.status.showMessage(message, 5000)
                     else:
                         self.status.showMessage(u"Problem setting SV",5000)
@@ -9864,38 +9941,44 @@ class PXG4pidDlgControl(QDialog):
                  message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv1edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(1)
+                 aw.lcd6.display(unicode(self.sv1edit.text()))
             elif i == 2:
                  aw.pid.PXG4[svkey][0] = float(self.sv2edit.text())
                  message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv2edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(2)
+                 aw.lcd6.display(unicode(self.sv2edit.text()))
             elif i == 3:
                  aw.pid.PXG4[svkey][0] = float(self.sv3edit.text())
                  message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv3edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(3)
+                 aw.lcd6.display(unicode(self.sv3edit.text()))
             elif i == 4:
                  aw.pid.PXG4[svkey][0] = float(self.sv4edit.text())
                  message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv4edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(4)
+                 aw.lcd6.display(unicode(self.sv4edit.text()))
             elif i == 5:
                  aw.pid.PXG4[svkey][0] = float(self.sv5edit.text())
                  message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv5edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(5)
+                 aw.lcd6.display(unicode(self.sv5edit.text()))
             elif i == 6:
                  aw.pid.PXG4[svkey][0] = float(self.sv6edit.text())
                  message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv6edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(6)
+                 aw.lcd6.display(unicode(self.sv6edit.text()))
             elif i == 7:
                  aw.pid.PXG4[svkey][0] = float(self.sv7edit.text())
                  message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv7edit.text())
                  self.status.showMessage(message,5000)
                  self.setNsv(7)
+                 aw.lcd6.display(unicode(self.sv7edit.text()))
 
-            #call 
         else:
             mssg = u"setsv(): Unable to set SV "
             self.status.showMessage(mssg,5000)
