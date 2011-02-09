@@ -36,7 +36,7 @@
 # version 00031: FINISHED PXG4 control Dlg and enhanced background options
 # END OF ALPHA.  BEGINNING BETA TESTING 
 
-__version__ = u"0.3.2"
+__version__ = u"0.3.3"
 
 
 # ABOUT
@@ -1082,10 +1082,15 @@ class tgraphcanvas(FigureCanvas):
         for i in range(Nevents):
             firstletter = self.etypes[self.specialeventstype[i]][0]                
             secondletter = self.eventsvalues[self.specialeventsvalue[i]]
-            
-            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
-                             xytext=(self.timex[int(self.specialevents[i])]-5,row[firstletter]),alpha=1.,
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+            if self.temp1[i] >= self.temp2[i]:
+                height = self.temp1[int(self.specialevents[i])]
+                armcolor = color=self.palette["met"]
+            else:
+                height =self.temp2[int(self.specialevents[i])]
+                armcolor=self.palette["bt"]
+            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], height),
+                             xytext=(self.timex[int(self.specialevents[i])] ,row[firstletter]),alpha=1.,
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=armcolor,alpha=0.4),fontsize=8,backgroundcolor='yellow')
             
                 
         #update X label names and colors        
@@ -1238,9 +1243,10 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(profilelength):
                             self.temp1[i] = self.fromCtoF(self.temp1[i])    #ET
                             self.temp2[i] = self.fromCtoF(self.temp2[i])    #BT
-                            self.delta1[i] = self.fromCtoF(self.delta1[i])  #Delta ET
-                            self.delta2[i] = self.fromCtoF(self.delta2[i])  #Delta BT
-                            
+                            if self.device != 18:
+                                self.delta1[i] = self.fromCtoF(self.delta1[i])  #Delta ET
+                                self.delta2[i] = self.fromCtoF(self.delta2[i])  #Delta BT
+                                
                         self.dryend[1] =   self.fromCtoF(self.dryend[1])    
                         self.varC[1] =   self.fromCtoF(self.varC[1])        #1C start temp
                         self.varC[3] =   self.fromCtoF(self.varC[3])        #1C end temp
@@ -1287,8 +1293,9 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(profilelength):
                             self.temp1[i] = self.fromFtoC(self.temp1[i])    #ET
                             self.temp2[i] = self.fromFtoC(self.temp2[i])    #BT
-                            self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
-                            self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
+                            if self.device != 18:
+                                self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
+                                self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
                             
                         self.dryend[1] =   self.fromFtoC(self.dryend[1])    
                         self.varC[1] =   self.fromFtoC(self.varC[1])        #1C start temp
@@ -1435,7 +1442,7 @@ class tgraphcanvas(FigureCanvas):
             self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
 
             #needs matplotlib 1.0.0+
-            self.ax1.fill_between(angles,0,self.flavors, facecolor='blue', alpha=0.1, interpolate=True)
+            self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
                
             self.ax1.plot(angles,self.flavors)
             self.fig.canvas.draw()
@@ -1478,17 +1485,10 @@ class tgraphcanvas(FigureCanvas):
                 self.startend[0] = tx
                 self.startend[1] = bt
                 self.drawmanual(et,bt,tx)
+                # put initial marker on graph
+                rect = patches.Rectangle( (self.startend[0],0), width=.01, height=self.ylimit, color = self.palette["text"])
+                self.ax.add_patch(rect)
 
-                if et != -1 and bt != -1:
-                    # put initial BT marker on graph
-                    rect = patches.Rectangle( (self.startend[0],0), width=.1, height=self.temp2[-1], color = self.palette["bt"])
-                    self.ax.add_patch(rect)
-                    if et >  bt:
-                        #put ET marker on graph
-                        rect = patches.Rectangle( (self.startend[0],bt), width=.1, height=et-bt, color = self.palette["met"])
-                        self.ax.add_patch(rect)
-                else:
-                    return
             #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
             self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]+ self.ystep),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -1500,7 +1500,7 @@ class tgraphcanvas(FigureCanvas):
 
             aw.label1.setStyleSheet("background-color:'#FF9966';")
             aw.label1.setText( "<font color='black'><b>Roast time<\b></font>")
-
+  
             aw.button_8.setDisabled(True)
             aw.button_8.setFlat(True)
                     
@@ -1523,8 +1523,6 @@ class tgraphcanvas(FigureCanvas):
                         self.dryend[0] = tx
                         self.dryend[1] = bt
                         self.drawmanual(et,bt,tx)
-                        #delete initial charge marks
-                        self.redraw()
                     else:
                         return
                     
@@ -1545,8 +1543,7 @@ class tgraphcanvas(FigureCanvas):
                 
                 if aw.qmc.phasesbuttonflag:     
                     self.phases[1] = int(round(self.dryend[1]))
-                    self.redraw()
-      
+                    self.redraw()     
             else:
                 message = u"Charge mark is missing. Do that first"
         else:
@@ -1731,7 +1728,7 @@ class tgraphcanvas(FigureCanvas):
                     self.startend[3] = bt
                     self.drawmanual(et,bt,tx)
                     # put final BT marker on graph
-                    rect = patches.Rectangle( (self.startend[2],0), width=.05, height=bt, color = self.palette["bt"])
+                    rect = patches.Rectangle( (self.startend[2],0), width=.01, height=self.ylimit, color = self.palette["text"])
                     self.ax.add_patch(rect)
                     if et >  bt:
                         #put ET marker on graph
@@ -1884,7 +1881,7 @@ class tgraphcanvas(FigureCanvas):
                 deltaAcc = int(AccMET) - int(AccBT)
                         
                 lowestBT = u"%.1f"%LP
-                timeLP = unicode(self.stringfromseconds(self.timex[k] - self.startend[0]))
+                #timeLP = unicode(self.stringfromseconds(self.timex[k] - self.startend[0]))
                 time = self.stringfromseconds(self.startend[2]-self.startend[0])
                 #end temperature 
                 
@@ -1927,10 +1924,16 @@ class tgraphcanvas(FigureCanvas):
           
                 firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
                 secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
-                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp1[i]),
+                if self.temp1[i] >= self.temp2[i]:
+                    height = self.temp1[i]
+                    armcolor = color=self.palette["met"]
+                else:
+                    height = self.temp2[i]
+                    armcolor = color=self.palette["bt"]                    
+                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], height),
                                  xytext=(self.timex[i],row[firstletter]),alpha=0.9,
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',
-                                color=self.palette["text"],alpha=0.4),fontsize=8, backgroundcolor='yellow')
+                                color=armcolor,alpha=0.4),fontsize=8, backgroundcolor='yellow')
 
             	#write label in mini recorder
                 if aw.minieventsflag:
@@ -7538,11 +7541,11 @@ class nonedevDlg(QDialog):
             if aw.qmc.manuallogETflag:
                 etval = str(int(aw.qmc.temp1[-1]))
             else:
-                etval = "1"
+                etval = "0"
             btval = str(int(aw.qmc.temp2[-1])) 
         else:
-            etval = "1"
-            btval = "1"
+            etval = "0"
+            btval = "0"
         
         self.etEdit = QLineEdit(etval)
         btlabel = QLabel("BT")
