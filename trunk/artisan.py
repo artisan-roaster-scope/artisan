@@ -116,7 +116,7 @@ from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainW
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient)
 from PyQt4.QtCore import (QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime)
 
 
 from matplotlib.figure import Figure
@@ -301,6 +301,11 @@ class tgraphcanvas(FigureCanvas):
         self.statisticsupper = 655
         self.statisticslower = 617
 
+        # autosave
+        self.autosaveflag = 0
+        self.autosaveprefix = u"edit-text"
+    	self.autosavepath = u""
+    	
         #used to place correct height of text in push buttons markers and avoid text over text
         self.ystep = 45
         
@@ -1104,7 +1109,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.draw()     
 
     #used to find best height of text in graph to avoid writting over previous text
-    #oldpoint height, newpoint height, previous arrow step
+    #oldpoint height, newpoint height, previous arrow step (self.ystep)
     def findtextgap(self,height1,height2):
         if self.mode == "F":
             init = 50
@@ -1468,6 +1473,7 @@ class tgraphcanvas(FigureCanvas):
         if self.device == 18:        
             self.createFromManual()           
 
+   
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
         if self.flagon:
@@ -2188,11 +2194,7 @@ class tgraphcanvas(FigureCanvas):
                 if etflag:
                     self.temp1 = etvals
                 else:    
-                    #make et same dimension as bt and time
-                    self.temp1 = []
-                    for i in range(len(time)):
-                        self.temp1.append(0.)
-                    #self.temp1 = numpy.zeros(len(time)).tolist()
+                    self.temp1 = numpy.zeros(len(time)).tolist()
     
             self.redraw()
        
@@ -2878,6 +2880,10 @@ class ApplicationWindow(QMainWindow):
         self.connect(WindowconfigAction,SIGNAL("triggered()"),self.Windowconfig)
         self.ConfMenu.addAction(WindowconfigAction) 
 
+        autosaveAction = QAction("Autosave...",self)
+        self.connect(autosaveAction,SIGNAL("triggered()"),self.autosaveconf)
+        self.ConfMenu.addAction(autosaveAction) 
+
         hudAction = QAction("Extras...",self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.ConfMenu.addAction(hudAction)
@@ -3153,10 +3159,23 @@ class ApplicationWindow(QMainWindow):
             stream.close()
             p.terminate()
             
-    #future automatation of filename when saving a file through keyboard shortcut  
+    #automatation of filename when saving a file through keyboard shortcut  
     def automaticsave(self):
-        pass
-    
+        try:        
+            filename = self.qmc.autosaveprefix + "-"
+            filename += unicode(QDateTime.currentDateTime().toString(QString("yyMMMdddhhmm")))
+            filename += u".txt"
+            oldDir = unicode(QDir.current())
+            newdir = QDir.setCurrent(self.qmc.autosavepath)
+            self.serialize(QString(filename),self.getProfile())
+            QDir.setCurrent(oldDir)
+            self.messagelabel.setText(u"Profile " + filename + " saved in: " + self.qmc.autosavepath)
+
+        except IOError,e:
+            self.messagelabel.setText(u"Error on save: " + unicode(e))
+            aw.qmc.errorlog.append(u"Error on save: " + unicode(e))
+            
+           
     def viewKshortcuts(self):
         string = "<b>[ENTER]</b> = Turns ON/OFF keys<br><br>"
         string += "<b>[SPACE]</b> = Choses current button<br><br>"  
@@ -3825,10 +3844,12 @@ class ApplicationWindow(QMainWindow):
         try:         
             filename = fname
             if not filename:
-                filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))  
+                 filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))  
             if filename:
+                #write
                 self.serialize(filename,self.getProfile())
                 self.setCurrentFile(filename)
+                self.profilepath = unicode(QDir().filePath(filename))
                 self.messagelabel.setText(u"Profile saved")
             else:
                 self.messagelabel.setText(u"Cancelled")
@@ -3935,6 +3956,12 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Sound")
             self.soundflag = settings.value("Beep",self.soundflag).toInt()[0]
             settings.endGroup()
+            #saves max-min temp limits of graph
+            settings.beginGroup("ylimits")
+            self.qmc.ylimit = settings.value("ymax",self.qmc.ylimit).toInt()[0]
+            self.qmc.ylimit_min = settings.value("ymin",self.qmc.ylimit_min).toInt()[0]
+            
+            settings.endGroup()
             
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
@@ -4024,6 +4051,10 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("Sound")
             settings.setValue("Beep",self.soundflag)
+            settings.endGroup()
+            settings.beginGroup("ylimits")
+            settings.setValue("ymax",self.qmc.ylimit)
+            settings.setValue("ymin",self.qmc.ylimit_min)
             settings.endGroup()
             
         except Exception,e:
@@ -4564,6 +4595,10 @@ $cupping_notes
     def Windowconfig(self):
         dialog = WindowsDlg(self)
         dialog.show()
+        
+    def autosaveconf(self):
+        dialog = autosaveDlg(self)
+        dialog.show()        
 
     def calculator(self):
         dialog = calculatorDlg(self)
@@ -4710,7 +4745,8 @@ $cupping_notes
         monthpath = QString(u"profiles/" + unicode(date.year()) + u"/" + unicode(date.month()))
         if not currentdir.exists(monthpath):
             monthdir = currentdir.mkdir(monthpath)
-        self.profilepath = monthpath
+        if  self.profilepath == u"":   
+            self.profilepath = monthpath
 
     #resizes and saves graph to a new width w 
     def resize(self,w,transformationmode):
@@ -5915,6 +5951,63 @@ class errorDlg(QDialog):
         self.setLayout(layout)
 
 
+
+##########################################################################
+#####################  AUTOSAVE DLG  #####################################
+##########################################################################
+        
+class autosaveDlg(QDialog):
+    def __init__(self, parent = None):
+        super(autosaveDlg,self).__init__(parent)
+        self.setWindowTitle("Keyboard Autosave")
+        
+        self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
+        self.autocheckbox = QCheckBox("Autosave")
+        
+        if aw.qmc.autosaveflag:
+            self.autocheckbox.setChecked(True)
+        else:
+            self.autocheckbox.setChecked(False)
+
+        okButton = QPushButton("OK")  
+        cancelButton = QPushButton("Cancel")
+        cancelButton.setFocusPolicy(Qt.NoFocus)
+
+        pathButton = QPushButton("Path")
+        self.pathEdit = QLineEdit(unicode(aw.qmc.autosavepath))
+        
+        self.connect(cancelButton,SIGNAL("clicked()"),self.close)        
+        self.connect(okButton,SIGNAL("clicked()"),self.autoChanged)  
+        self.connect(pathButton,SIGNAL("clicked()"),self.getpath)  
+
+        autolayout = QGridLayout()
+        autolayout.addWidget(self.autocheckbox,0,0)
+        autolayout.addWidget(self.prefixEdit,0,1)
+        autolayout.addWidget(pathButton,1,0)
+        autolayout.addWidget(self.pathEdit,1,1)
+        
+        autolayout.addWidget(cancelButton,2,0)
+        autolayout.addWidget(okButton,2,1)
+        
+        self.setLayout(autolayout)
+
+    def getpath(self):
+        filename = unicode(QFileDialog.getExistingDirectory(self,"AutoSave Path",aw.profilepath))         
+        self.pathEdit.setText(filename)
+        
+    def autoChanged(self):
+        if self.autocheckbox.isChecked(): 
+            aw.qmc.autosaveflag = 1
+            aw.qmc.autosaveprefix = self.prefixEdit.text()
+            message = "Autosave ON. Prefix: " + self.prefixEdit.text()
+            aw.messagelabel.setText(message)
+            aw.qmc.autosavepath = unicode(self.pathEdit.text())
+        else:
+            aw.qmc.autosaveflag = 0
+            message = "Autosave OFF"
+            aw.messagelabel.setText(message)            
+        self.close()
+        
 ##########################################################################
 #####################  WINDOW PROPERTIES DLG  ############################
 ##########################################################################
@@ -5948,9 +6041,11 @@ class WindowsDlg(QDialog):
         okButton = QPushButton("OK")  
         cancelButton = QPushButton("Cancel")
         cancelButton.setFocusPolicy(Qt.NoFocus)
-
+        resetybutton = QPushButton("Get Defaults")
+        
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatewindow)
+        self.connect(resetybutton,SIGNAL("clicked()"),self.resety)
         
         xlayout = QGridLayout()
         xlayout.addWidget(xlimitLabel_min,0,0)
@@ -5963,6 +6058,7 @@ class WindowsDlg(QDialog):
         ylayout.addWidget(self.ylimitEdit_min,0,1)
         ylayout.addWidget(ylimitLabel,1,0)
         ylayout.addWidget(self.ylimitEdit,1,1)
+        ylayout.addWidget(resetybutton,2,1)
         
         xGroupLayout = QGroupBox("Time")
         xGroupLayout.setLayout(xlayout)
@@ -5985,13 +6081,21 @@ class WindowsDlg(QDialog):
     def updatewindow(self):
         aw.qmc.ylimit = int(self.ylimitEdit.text())
         aw.qmc.ylimit_min = int(self.ylimitEdit_min.text())
-        aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))     
+        aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit))     
         aw.qmc.startofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit_min.text())) 
         aw.qmc.redraw()
         string = u"[ylimit = (" + unicode(self.ylimitEdit_min.text()) + u"," + unicode(self.ylimitEdit.text()) + u")] [xlimit = " + unicode(self.xlimitEdit.text()) + u"," + unicode(self.xlimitEdit_min.text()) + u")]"
         aw.messagelabel.setText(string)
 
         self.close()
+        
+    def resety(self):
+        if aw.qmc.mode == u"F":
+            self.ylimitEdit.setText(u"750")
+            self.ylimitEdit_min.setText(u"0")
+        else:
+            self.ylimitEdit.setText(u"400")
+            self.ylimitEdit_min.setText(u"0")
 
 ##########################################################################
 #####################  ROAST CALCULATOR DLG   ############################
