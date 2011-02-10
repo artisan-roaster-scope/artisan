@@ -3161,15 +3161,23 @@ class ApplicationWindow(QMainWindow):
             
     #automatation of filename when saving a file through keyboard shortcut  
     def automaticsave(self):
-        try:        
-            filename = self.qmc.autosaveprefix + "-"
-            filename += unicode(QDateTime.currentDateTime().toString(QString("yyMMMdddhhmm")))
-            filename += u".txt"
-            oldDir = unicode(QDir.current())
-            newdir = QDir.setCurrent(self.qmc.autosavepath)
-            self.serialize(QString(filename),self.getProfile())
-            QDir.setCurrent(oldDir)
-            self.messagelabel.setText(u"Profile " + filename + " saved in: " + self.qmc.autosavepath)
+        try:
+            if self.qmc.autosavepath and self.qmc.autosaveflag:
+                filename = self.qmc.autosaveprefix + "-"
+                filename += unicode(QDateTime.currentDateTime().toString(QString("yyMMMdddhhmm")))
+                filename += u".txt"
+                oldDir = unicode(QDir.current())           
+                newdir = QDir.setCurrent(self.qmc.autosavepath)
+                #write
+                self.serialize(QString(filename),self.getProfile())
+                #restore dirs
+                QDir.setCurrent(oldDir)
+                self.messagelabel.setText(u"Profile " + filename + " saved in: " + self.qmc.autosavepath)
+            else:
+                self.messagelabel.setText("Empty path or box unchecked in Autosave")
+                dialog = autosaveDlg(self)
+                dialog.show()                
+                
 
         except IOError,e:
             self.messagelabel.setText(u"Error on save: " + unicode(e))
