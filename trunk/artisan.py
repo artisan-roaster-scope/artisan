@@ -334,9 +334,6 @@ class tgraphcanvas(FigureCanvas):
         #Create x axis labels in minutes:seconds instead of seconds
         self.xaxistosm()
 
-        #counts the number of lines in the plot
-        self.linecount = 2
-
         self.delta1, self.delta2 = [],[]
 
         # generates first "empty" plot of temperature and deltaT
@@ -514,12 +511,13 @@ class tgraphcanvas(FigureCanvas):
         aw.soundpop()        
 
     def resetlines(self):
+        linecount = 2
         if self.DeltaETflag:
-            self.linecount += 1
+            linecount += 1
         if self.DeltaBTflag:
-            self.linecount += 1
+            linecount += 1
 
-        self.ax.lines = self.ax.lines[0:self.linecount]
+        self.ax.lines = self.ax.lines[0:linecount]
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
@@ -7314,6 +7312,7 @@ class serialport(object):
         
     def openport(self):
         try:
+            print "OK"
             #reset previous settings
             self.SP.close()
             #provision port 
@@ -7329,13 +7328,13 @@ class serialport(object):
         except serial.SerialException,e:
             aw.messagelabel.setText(u"Unable to open serial port" + unicode(e))
             aw.qmc.errorlog.append(u"Unable to open serial port " + unicode(e))
-            
-    def closeEvent(self):
-        try:        
-           if self.SP.isOpen(): 
-               self.SP.close()
-        except serial.SerialException,e:
-            pass
+##            
+##    def closeEvent(self):
+##        try:        
+##           if self.SP.isOpen(): 
+##               self.SP.close()
+##        except serial.SerialException,e:
+##            pass
         
     # function used by Fuji PIDs
     def sendFUJIcommand(self,binstring,nbytes):
