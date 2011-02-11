@@ -7312,7 +7312,6 @@ class serialport(object):
         
     def openport(self):
         try:
-            print "OK"
             #reset previous settings
             self.SP.close()
             #provision port 
@@ -7328,13 +7327,13 @@ class serialport(object):
         except serial.SerialException,e:
             aw.messagelabel.setText(u"Unable to open serial port" + unicode(e))
             aw.qmc.errorlog.append(u"Unable to open serial port " + unicode(e))
-##            
-##    def closeEvent(self):
-##        try:        
-##           if self.SP.isOpen(): 
-##               self.SP.close()
-##        except serial.SerialException,e:
-##            pass
+            
+    def closeEvent(self):
+        try:        
+           if self.SP.isOpen(): 
+               self.SP.close()
+        except serial.SerialException,e:
+            pass
         
     # function used by Fuji PIDs
     def sendFUJIcommand(self,binstring,nbytes):
