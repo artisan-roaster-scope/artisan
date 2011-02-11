@@ -106,7 +106,6 @@ import string
 import cgi
 import codecs
 import numpy
-import pyaudio
 import array
 
 
@@ -3153,6 +3152,11 @@ class ApplicationWindow(QMainWindow):
     #sound feedback when pressing a push button
     def soundpop(self):
         if self.soundflag:
+            try:
+                import pyaudio
+            except ImportError:
+                return False
+
             p = pyaudio.PyAudio()
             stream = p.open(rate=44100, channels=1, format=pyaudio.paFloat32, output=True)
             stream.write(array.array('f',(.25 * math.sin(i / 10.) for i in range(44100))))
