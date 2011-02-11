@@ -117,7 +117,6 @@ from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainW
 from PyQt4.QtCore import (QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime)
 
-
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
 import matplotlib.patches as patches
@@ -303,8 +302,8 @@ class tgraphcanvas(FigureCanvas):
         # autosave
         self.autosaveflag = 0
         self.autosaveprefix = u"edit-text"
-    	self.autosavepath = u""
-    	
+        self.autosavepath = u""
+        
         #used to place correct height of text in push buttons markers and avoid text over text
         self.ystep = 45
         
@@ -686,7 +685,7 @@ class tgraphcanvas(FigureCanvas):
 
     def VOLTCRAFTK202(self):
         
-         t2,t1 = aw.ser.ENTER306temperature()
+         t2,t1 = aw.ser.CENTER306temperature()
          tx = self.timeclock.elapsed()/1000.
          
          return tx,t2,t1
@@ -2198,12 +2197,12 @@ class tgraphcanvas(FigureCanvas):
             self.redraw()
        
         except ValueError,e:
-            aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"value error in createFromManual() " + unicode(e))
+            aw.messagelabel.setText("Unable to interpolate: " + unicode(e))
+            self.errorlog.append(u"Exception error in createFromManual() " + unicode(e))
             return
 
         except Exception,e:
-            aw.messagelabel.setText(unicode(e))
+            aw.messagelabel.setText("Unable to interpolate: " + unicode(e))
             self.errorlog.append(u"Exception error in createFromManual() " + unicode(e))
             return  
                                     
@@ -3163,11 +3162,11 @@ class ApplicationWindow(QMainWindow):
             stream.close()
             p.terminate()
             
-    #automatation of filename when saving a file through keyboard shortcut  
+    #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting. 
     def automaticsave(self):
         try:
             if self.qmc.autosavepath and self.qmc.autosaveflag:
-                filename = self.qmc.autosaveprefix + "-"
+                filename = self.qmc.autosaveprefix + u"-"
                 filename += unicode(QDateTime.currentDateTime().toString(QString("yyMMMdddhhmm")))
                 filename += u".txt"
                 oldDir = unicode(QDir.current())           
@@ -3177,15 +3176,17 @@ class ApplicationWindow(QMainWindow):
                 #restore dirs
                 QDir.setCurrent(oldDir)
                 self.messagelabel.setText(u"Profile " + filename + " saved in: " + self.qmc.autosavepath)
+##                #reset graph
+##                self.qmc.reset()
+##                #turn ON
+##                self.qmc.OnMonitor()
             else:
                 self.messagelabel.setText("Empty path or box unchecked in Autosave")
-                dialog = autosaveDlg(self)
-                dialog.show()                
-                
+                self.autosaveconf()               
 
         except IOError,e:
-            self.messagelabel.setText(u"Error on save: " + unicode(e))
-            aw.qmc.errorlog.append(u"Error on save: " + unicode(e))
+            self.messagelabel.setText(u"Error on autosave: " + unicode(e))
+            aw.qmc.errorlog.append(u"Error on autosave: " + unicode(e))
             
            
     def viewKshortcuts(self):
@@ -3193,6 +3194,7 @@ class ApplicationWindow(QMainWindow):
         string += "<b>[SPACE]</b> = Choses current button<br><br>"  
         string += "<b>[LEFT]</b> = Move to the left<br><br>"
         string += "<b>[RIGHT]</b> = Move to the right<br><br>"
+        string += "<b>[s]</b> = Autosave<br><br>"
         
         QMessageBox.information(self,u"Roast Keyboard Shortcuts",string)
             
@@ -5971,7 +5973,7 @@ class errorDlg(QDialog):
 class autosaveDlg(QDialog):
     def __init__(self, parent = None):
         super(autosaveDlg,self).__init__(parent)
-        self.setWindowTitle("Keyboard Autosave")
+        self.setWindowTitle("Keyboard Autosave Accelerator")
         
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.autocheckbox = QCheckBox("Autosave")
@@ -7289,7 +7291,7 @@ class serialport(object):
     """ this class handles the communications with all the devices"""
     
     def __init__(self):
-        #default initial settings. They are changed by settingsload() at initiation of program
+        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = "COM4"
         self.baudrate = 9600
         self.bytesize = 8
@@ -7307,58 +7309,84 @@ class serialport(object):
         #initial message flag for CENTER 309 meter
         self.CENTER309flag = 0
 
-
+        #serial port
+        self.SP  = serial.Serial()
+        
+    def openport(self):
+        try:
+            #reset previous settings
+            self.SP.close()
+            #provision port 
+            self.SP.setPort(self.comport)
+            self.SP.setBaudrate(self.baudrate)
+            self.SP.setByteSize(self.bytesize)
+            self.SP.setParity(self.parity)
+            self.SP.setStopbits(self.stopbits)
+            self.SP.setTimeout(self.timeout)
+            #open port
+            self.SP.open()        
+               
+        except serial.SerialException,e:
+            aw.messagelabel.setText(u"Unable to open serial port" + unicode(e))
+            aw.qmc.errorlog.append(u"Unable to open serial port " + unicode(e))
+            
+    def closeEvent(self):
+        try:        
+           if self.SP.isOpen(): 
+               self.SP.close()
+        except serial.SerialException,e:
+            pass
+        
     # function used by Fuji PIDs
     def sendFUJIcommand(self,binstring,nbytes):
-        serTX = None
         try:
-            serTX = serial.Serial(self.comport,baudrate = self.baudrate, bytesize = self.bytesize,
-                                parity = self.parity, stopbits = self.stopbits, timeout=self.timeout)
-            serTX.write(binstring)
-            r = serTX.read(nbytes)
-            serTX.close()
-            lenstring = len(r)
-            if lenstring:
-                # CHECK FOR RECEIVED ERROR CODES
-                if ord(r[1]) == 128:
-                        if ord(r[2]) == 1:
-                             errorcode = u" F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. "
-                             aw.messagelabel.setText(u"sendFUJIcommand(): ERROR 1 Illegal Function in unit %i" %ord(command[0]))
-                             aw.qmc.errorlog.append(errorcode)
-                        if ord(r[2]) == 2:
-                             errorcode = u"F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n \
-                                         number cannot be used by the specified function code."
-                             aw.messagelabel.setText(u"sendFUJIcommand() ERROR 2 Illegal Address for unit %i"%(ord(command[0])))
-                             aw.qmc.errorlog.append(errorcode)
-                        if ord(r[2]) == 3:
-                             errorcode = u"F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n \
-                                          coil numbers or resistor numbers."
-                             aw.messagelabel.setText(u"sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i"%(ord(command[0])))
-                             aw.qmc.errorlog.append(errorcode)
-                else:
-                    #Check crc16
-                    crcRx =  int(binascii.hexlify(r[-1]+r[-2]),16)
-                    crcCal1 = aw.pid.fujiCrc16(r[:-2]) 
-                    if crcCal1 == crcRx:  
-                        return r           #OK. Return r after it has been checked for errors
+            if not self.SP.isOpen():
+                self.openport()                    
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write(binstring)
+                r = self.SP.read(nbytes)
+                #serTX.close()
+                lenstring = len(r)
+                if lenstring:
+                    # CHECK FOR RECEIVED ERROR CODES
+                    if ord(r[1]) == 128:
+                            if ord(r[2]) == 1:
+                                 errorcode = u" F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. "
+                                 aw.messagelabel.setText(u"sendFUJIcommand(): ERROR 1 Illegal Function in unit %i" %ord(command[0]))
+                                 aw.qmc.errorlog.append(errorcode)
+                            if ord(r[2]) == 2:
+                                 errorcode = u"F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n \
+                                             number cannot be used by the specified function code."
+                                 aw.messagelabel.setText(u"sendFUJIcommand() ERROR 2 Illegal Address for unit %i"%(ord(command[0])))
+                                 aw.qmc.errorlog.append(errorcode)
+                            if ord(r[2]) == 3:
+                                 errorcode = u"F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n \
+                                              coil numbers or resistor numbers."
+                                 aw.messagelabel.setText(u"sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i"%(ord(command[0])))
+                                 aw.qmc.errorlog.append(errorcode)
                     else:
-                        aw.messagelabel.setText(u"Crc16 data corruption ERROR. TX does not match RX. Check wiring")
-                        aw.qmc.errorlog.append(u"Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
-                        return u"0"
+                        #Check crc16
+                        crcRx =  int(binascii.hexlify(r[-1]+r[-2]),16)
+                        crcCal1 = aw.pid.fujiCrc16(r[:-2]) 
+                        if crcCal1 == crcRx:  
+                            return r           #OK. Return r after it has been checked for errors
+                        else:
+                            aw.messagelabel.setText(u"Crc16 data corruption ERROR. TX does not match RX. Check wiring")
+                            aw.qmc.errorlog.append(u"Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
+                            return u"0"
 
+                else:
+                    aw.messagelabel.setText(u"No RX data received")
+                    return u"0"
             else:
-                aw.messagelabel.setText(u"No RX data received")
-                return u"0"                  #return "0" if something went wrong
-
-
+                return u"0"                                    
+                
         except serial.SerialException,e:
             aw.messagelabel.setText(u"ser.sendFUJIcommand(): Error in serial port" + unicode(e))
             aw.qmc.errorlog.append(u"ser.sendFUJIcommand): Error in serial port " + unicode(e))
             return u"0"
-        
-        finally:
-            if serTX:
-                serTX.close()
 
     # predicate that returns true if the given temperature reading is out of range
     def outOfRange(self,t):
@@ -7383,41 +7411,48 @@ class serialport(object):
 
      #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
-        serHH = None
         try:
-            serHH = serial.Serial(self.comport, baudrate=self.baudrate, bytesize = self.bytesize, parity=self.parity,
-                                stopbits = self.stopbits, timeout = self.timeout)
-            
-            command = "#0A0000NA2\r\n" 
-            serHH.write(command)
-            r = serHH.read(14) 
-            serHH.close()
+            if not self.SP.isOpen():
+                self.openport()
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                command = "#0A0000NA2\r\n" 
+                self.SP.write(command)
+                r = self.SP.read(14) 
 
-            if len(r) == 14:
-                #convert to binary to hex string
-                s1 = binascii.hexlify(r[5] + r[6])
-                s2 = binascii.hexlify(r[10]+ r[11])
+                if len(r) == 14:
+                    #convert to binary to hex string
+                    s1 = binascii.hexlify(r[5] + r[6])
+                    s2 = binascii.hexlify(r[10]+ r[11])
 
-                #we convert the strings to integers. Divide by 10.0 (decimal position)
-                return self.filterDropOuts(int(s1,16)/10., int(s2,16)/10.)
-            else:
-                aw.messagelabel.setText(u"No RX data from HH806AUtemperature()")
-                aw.qmc.errorlog.append(u"No RX data from HH806AUtemperature() ")
-                if len(aw.qmc.timex) > 2:
-                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]
+                    #we convert the strings to integers. Divide by 10.0 (decimal position)
+                    return self.filterDropOuts(int(s1,16)/10., int(s2,16)/10.)
                 else:
-                    return -1,-1
+                    nbytes = len(r)
+                    message = u"%i bytes received but 14 needed"%nbytes
+                    aw.messagelabel.setText(message)
+                    aw.qmc.errorlog.append(message) 
+                    if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
+                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+                    else:
+                        return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+
+            else:
+                if len(aw.qmc.timex) > 2:                           
+                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]        
+                else:
+                    return -1,-1                                    
+                                   
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.HH806AUtemperature(): " + unicode(e))
             aw.qmc.errorlog.append(u"ser.HH806AUtemperature(): " + unicode(e) )
-            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+                return -1,-1                                    
 
-        finally:
-            if serHH:
-                serHH.close()
         
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
@@ -7430,137 +7465,142 @@ class serialport(object):
                 aw.qmc.errorlog.append(u"unable to get id from HH506RA device")
                 return -1,-1
            
-        serHH = None
         try:
-            serHH = serial.Serial(self.comport, baudrate=self.baudrate, bytesize = self.bytesize, parity= self.parity,
-                                  stopbits = self.stopbits, timeout = self.timeout)
-            
-            command = "#" + self.HH506RAid + "N\r\n"
-            serHH.write(command)
-            r = serHH.read(14)
-            serHH.close()
+            if not self.SP.isOpen():
+                self.openport()                    
+               
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                command = "#" + self.HH506RAid + "N\r\n"
+                self.SP.write(command)
+                r = self.SP.read(14)
 
-            if len(r) == 14: 
-                #we convert the hex strings to integers. Divide by 10.0 (decimal position)
-                return self.filterDropOuts(int(r[1:5],16)/10., int(r[7:11],16)/10.)
-            
-            else:
-                aw.messagelabel.setText(u"No RX data from HH506RAtemperature()")
-                aw.qmc.errorlog.append(u"No RX data from HH506RAtemperature()")                
-                if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+                if len(r) == 14: 
+                    #we convert the hex strings to integers. Divide by 10.0 (decimal position)
+                    return self.filterDropOuts(int(r[1:5],16)/10., int(r[7:11],16)/10.)
+                
                 else:
-                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
-        
+                    nbytes = len(r)
+                    message = u"%i bytes received but 14 needed"%nbytes
+                    aw.messagelabel.setText(message)
+                    aw.qmc.errorlog.append(message)                
+                    if len(aw.qmc.timex) > 2:                           
+                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+                    else:
+                        return -1,-1 
+            else:
+                if len(aw.qmc.timex) > 2:                           
+                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+                else:
+                    return -1,-1 
+                
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.HH506RAtemperature(): " + unicode(e))
             aw.qmc.errorlog.append(u"ser.HH506RAtemperature(): " + unicode(e) )
-            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
-       
-        finally:
-            if serHH:
-                serHH.close()
-
+                return -1,-1 
             
     #reads once the id of the HH506RA meter and stores it in the serial variable self.HH506RAid. Marko Luther.
-    def HH506RAGetID(self):
-        serHH = None
+    def HH506RAGetID(self):   
         try:
-            serHH = serial.Serial(self.comport, baudrate=self.baudrate, bytesize = self.bytesize, parity=self.parity,
-                                stopbits=self.stopbits, timeout=self.timeout)                
-            sync = None
-            while sync != "Err\r\n":
-                serHH.write("\r\n")
-                sync = serHH.read(5)
-                time.sleep(1)
+            if not self.SP.isOpen():
+                self.openport()                    
                 
-            serHH.write("%000R")
-            ID = serHH.read(5)
-            if len(ID) == 5:
-                self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
-            serHH.close()
-        
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                sync = None
+                while sync != "Err\r\n":
+                    self.SP.write("\r\n")
+                    sync = serHH.read(5)
+                    time.sleep(1)
+                    
+                self.SP.write("%000R")
+                ID = serHH.read(5)
+                if len(ID) == 5:
+                    self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
+                else:
+                    nbytes = len(ID)
+                    message = u"%i bytes received but 5 needed"%nbytes
+                    aw.messagelabel.setText(message)
+                    aw.qmc.errorlog.append(message)
+                    
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.HH506RAGetID()" + unicode(e))
             aw.qmc.errorlog.append(u"ser.HH506RAGetID()" + unicode(e) )
-            
-        finally:
-            if serHH:
-                serHH.close()        
-
 
     def CENTER306temperature(self):
-        serCENTER = None
         try:
-            serCENTER = serial.Serial(self.comport, baudrate=self.baudrate, bytesize = self.bytesize, parity=self.parity,
-                                    stopbits=self.stopbits, timeout=self.timeout)
-            command = "\x41"                 
-            serCENTER.write(command)
-            r = serCENTER.read(10)                                  #NOTE: different
-            serCENTER.close()
-            
-            if len(r) == 10:
+            if not self.SP.isOpen():
+                self.openport()                    
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                command = "\x41"                 
+                self.SP.write(command)
+                r = self.SP.read(10)                                  #NOTE: different
+                
+                if len(r) == 10:
 
-                #DECIMAL POINT
-                #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
-                #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
-                #if bit 5 of byte 3 = 1 then T2 = ####
-                #if bit 5 of byte 3 = 0 then T2 = ###.#
-                
-                #extract bit 2, and bit 5 of BYTE 3
-                b3bin = bin(ord(r[2]))[2:]          #bits string order "[7][6][5][4][3][2][1][0]"
-                bit2 = b3bin[5]
-                bit5 = b3bin[2]
-                
-                #extract T1
-                B34 = binascii.hexlify(r[3]+r[4])
-                if B34[0].isdigit():
-                    T1 = float(B34)
-                else:
-                    T1 = float(B34[1:])
+                    #DECIMAL POINT
+                    #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
+                    #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
+                    #if bit 5 of byte 3 = 1 then T2 = ####
+                    #if bit 5 of byte 3 = 0 then T2 = ###.#
                     
-                #extract T2
-                B78 = binascii.hexlify(r[7]+r[8])
-                if B78[0].isdigit():
-                    T2 = float(B78)
-                else:
-                    T2 = float(B78[1:])
+                    #extract bit 2, and bit 5 of BYTE 3
+                    b3bin = bin(ord(r[2]))[2:]          #bits string order "[7][6][5][4][3][2][1][0]"
+                    bit2 = b3bin[5]
+                    bit5 = b3bin[2]
+                    
+                    #extract T1
+                    B34 = binascii.hexlify(r[3]+r[4])
+                    if B34[0].isdigit():
+                        T1 = float(B34)
+                    else:
+                        T1 = float(B34[1:])
+                        
+                    #extract T2
+                    B78 = binascii.hexlify(r[7]+r[8])
+                    if B78[0].isdigit():
+                        T2 = float(B78)
+                    else:
+                        T2 = float(B78[1:])
 
-                #check decimal point
-                if bit2 == "0":
-                    T1 /= 10.
-                if bit5 == "0":
-                    T2 /= 10.
+                    #check decimal point
+                    if bit2 == "0":
+                        T1 /= 10.
+                    if bit5 == "0":
+                        T2 /= 10.
 
-                return T1,T2
+                    return T1,T2
                 
+                else:
+                    nbytes = len(r)
+                    message = u"%i bytes received but 10 needed"%nbytes
+                    aw.messagelabel.setText(message)
+                    aw.qmc.errorlog.append(message)                     
+                    if len(aw.qmc.timex) > 2:                           
+                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+                    else:
+                        return -1,-1 
             else:
-                nbytes = len(r)
-                message = u"%i bytes received but 10 needed"%nbytes
-                aw.messagelabel.setText(message)
-                aw.qmc.errorlog.append(message)
-                
-                if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+                if len(aw.qmc.timex) > 2:                           
+                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                 else:
-                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
-
-                 
+                    return -1,-1 
+                     
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.CENTER306temperature()" + unicode(e))
             aw.qmc.errorlog.append(u"ser.CENTER306temperature()" + unicode(e) )
-            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
-            
-        finally:
-            if serCENTER:
-                serCENTER.close()
-                
+                return -1,-1 
        
     def NONE(self):
         #stop trigger (not time) to give time to answer
@@ -7572,74 +7612,77 @@ class serialport(object):
             aw.lcd3.display(BT)
             return ET,BT
         else:
-            return -1,-1
+            self.returnprevious()
                 
     def CENTER303temperature(self):
-        serCENTER = None
         try:
-            serCENTER = serial.Serial(self.comport, baudrate=self.baudrate, bytesize = self.bytesize, parity=self.parity,
-                                    stopbits=self.stopbits, timeout=self.timeout)
-            command = "\x41"                 
-            serCENTER.write(command)
-            r = serCENTER.read(8)                                   #NOTE: different
-            serCENTER.close()
-            
-            if len(r) == 8:
+            if not self.SP.isOpen():
+                self.openport()                    
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                command = "\x41"                 
+                self.SP.write(command)
+                r = self.SP.read(8)                                   #NOTE: different
+                
+                if len(r) == 8:
 
-                #DECIMAL POINT
-                #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
-                #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
-                #if bit 5 of byte 3 = 1 then T2 = ####
-                #if bit 5 of byte 3 = 0 then T2 = ###.#
-                
-                #extract bit 2, and bit 5 of BYTE 3
-                b3bin = bin(ord(r[2]))[2:]              #bit"[7][6][5][4][3][2][1][0]"
-                bit2 = b3bin[5]
-                bit5 = b3bin[2]
-                
-                #extract T1
-                B34 = binascii.hexlify(r[3]+r[4])
-                if B34[0].isdigit():
-                    T1 = float(B34)
-                else:
-                    T1 = float(B34[1:])
+                    #DECIMAL POINT
+                    #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
+                    #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
+                    #if bit 5 of byte 3 = 1 then T2 = ####
+                    #if bit 5 of byte 3 = 0 then T2 = ###.#
                     
-                #extract T2
-                B56 = binascii.hexlify(r[5]+r[6])
-                if B56[0].isdigit():
-                    T2 = float(B56)
+                    #extract bit 2, and bit 5 of BYTE 3
+                    b3bin = bin(ord(r[2]))[2:]              #bit"[7][6][5][4][3][2][1][0]"
+                    bit2 = b3bin[5]
+                    bit5 = b3bin[2]
+                    
+                    #extract T1
+                    B34 = binascii.hexlify(r[3]+r[4])
+                    if B34[0].isdigit():
+                        T1 = float(B34)
+                    else:
+                        T1 = float(B34[1:])
+                        
+                    #extract T2
+                    B56 = binascii.hexlify(r[5]+r[6])
+                    if B56[0].isdigit():
+                        T2 = float(B56)
+                    else:
+                        T2 = float(B56[1:])
+
+                    #check decimal point
+                    if bit2 == "0":
+                        T1 /= 10.
+                    if bit5 == "0":
+                        T2 /= 10.
+
+                    return T1,T2
+
                 else:
-                    T2 = float(B56[1:])
-
-                #check decimal point
-                if bit2 == "0":
-                    T1 /= 10.
-                if bit5 == "0":
-                    T2 /= 10.
-
-                return T1,T2
-
+                    nbytes = len(r)
+                    message = u"%i bytes received but 8 needed"%nbytes
+                    aw.messagelabel.setText(message)
+                    aw.qmc.errorlog.append(message)                
+                    if len(aw.qmc.timex) > 2:                           
+                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+                    else:
+                        return -1,-1 
             else:
-                nbytes = len(r)
-                message = u"%i bytes received but 8 needed"%nbytes
-                aw.messagelabel.setText(message)
-                aw.qmc.errorlog.append(message)                
-                if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+                if len(aw.qmc.timex) > 2:                           
+                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                 else:
-                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
-        
+                    return -1,-1 
+            
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.CENTER303temperature()" + unicode(e))
             aw.qmc.errorlog.append(u"ser.CENTER303temperature()" + unicode(e) )
-            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
-        
-        finally:
-            if serCENTER:
-                serCENTER.close()
+                return -1,-1 
                 
     def CENTER309temperature(self):  
         ##    command = "\x4B" returns 4 bytes . Model number.
@@ -7664,59 +7707,60 @@ class serialport(object):
         ##                                        If T3 thermocouple connected alone, then r[43]  = \x0B = 11
         ##                                        If T4 thermocouple connected alone, then r[43]  = \x07 = 7
         ##                                        Note: Print r[43] if you want to find other connect-combinations
-        ##                                        THIS ONLY WORKS WHEN T < 200. If T >= 200 r[43] changes
+        ##                                        THIS ONLY WORKS WHEN TEMPERATURE < 200. If T >= 200 r[43] changes
                 
-        serCENTER = None
         try:
-            serCENTER = serial.Serial(self.comport, baudrate=self.baudrate, bytesize = self.bytesize, parity=self.parity,
-                                    stopbits=self.stopbits, timeout=self.timeout)
-            command = "\x41"                 
-            serCENTER.write(command)
-            r = serCENTER.read(45)
-            serCENTER.close()
-            
-            if len(r) == 45:
-                T1 = int(binascii.hexlify(r[7] + r[8]),16)/10.
-                T2 = int(binascii.hexlify(r[9] + r[10]),16)/10.
+            if not self.SP.isOpen():
+                self.openport()                    
                 
-                #Display initial message to check T1 and T2 connectivity
-                if not self.CENTER309flag:
-                    Tcheck = int(binascii.hexlify(r[43]),16)
-                    if Tcheck != 12:
-                        if T1 < 200 and T2 < 200:
-                            aw.messagelabel.setText(u"Please connect T1 & T2")
-                        else:
-                            #don't display any message
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                command = "\x41"                 
+                self.SP.write(command)
+                r = self.SP.read(45)
+                
+                if len(r) == 45:
+                    T1 = int(binascii.hexlify(r[7] + r[8]),16)/10.
+                    T2 = int(binascii.hexlify(r[9] + r[10]),16)/10.
+                    
+                    #Display initial message to check T1 and T2 connectivity
+                    if not self.CENTER309flag:
+                        Tcheck = int(binascii.hexlify(r[43]),16)
+                        if Tcheck != 12:
+                            if T1 < 200 and T2 < 200:
+                                aw.messagelabel.setText(u"Please connect T1 & T2")
+                            else:
+                                #don't display any message
+                                self.CENTER309flag = 1
+                        elif Tcheck ==12 and T1 < 200 and T2 < 200:
+                            aw.messagelabel.setText(u"T1 & T2 connected")
                             self.CENTER309flag = 1
-                    elif Tcheck ==12 and T1 < 200 and T2 < 200:
-                        aw.messagelabel.setText(u"T1 & T2 connected")
-                        self.CENTER309flag = 1
-                        
+                                               
+                    return T1,T2
                 
-                return T1,T2
-            
-            else:
-                nbytes = len(r)
-                message = u"%i bytes from CENTER309 but 45 needed"%nbytes
-                aw.messagelabel.setText(message)
-                aw.qmc.errorlog.append(message)                
-                if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
                 else:
-                    return -1.,-1.                                    #return something out of scope to avoid function error (expects two values)
-        
-        
+                    nbytes = len(r)
+                    message = u"%i bytes from CENTER309 but 45 needed"%nbytes
+                    aw.messagelabel.setText(message)
+                    aw.qmc.errorlog.append(message)                
+                    if len(aw.qmc.timex) > 2:                           
+                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+                    else:
+                        return -1,-1 
+            else:
+                    if len(aw.qmc.timex) > 2:                           
+                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+                    else:
+                        return -1,-1 
+            
         except serial.SerialException, e:
             aw.messagelabel.setText(u"ser.CENTER309temperature()" + unicode(e))
             aw.qmc.errorlog.append(u"ser.CENTER309temperature()" + unicode(e) )
-            if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1                                    #return something out of scope to avoid function error (expects two values)
-            
-        finally:
-            if serCENTER:
-                serCENTER.close()
+                return -1,-1 
 
 #########################################################################
 #############  NONE DEVICE DIALOG #######################################                                   
