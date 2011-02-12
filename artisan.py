@@ -580,13 +580,14 @@ class tgraphcanvas(FigureCanvas):
 
     #finds time, ET and BT when using Fuji PID
     def fujitemperature(self):
-        # get the temperature for BT. RS485 unit ID (2)
-        t2 = aw.pid.gettemperature(2)/10.
-        #get time of each temperature reading in seconds from start; .elapsed() returns miliseconds
-        tx = self.timeclock.elapsed()/1000.
         # get the temperature for MET. RS485 unit ID (1)
         t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
-                
+        #get time of each temperature reading in seconds from start; .elapsed() returns miliseconds
+        tx = self.timeclock.elapsed()/1000.         
+        # get the temperature for BT. RS485 unit ID (2)
+        t2 = aw.pid.gettemperature(2)/10.
+
+               
         return tx,t2,t1
 
     def HH506RA(self):
@@ -7346,6 +7347,7 @@ class serialport(object):
                 self.SP.write(binstring)
                 r = self.SP.read(nbytes)
                 #serTX.close()
+                time.sleep(.035)                     #this gurantees a minimum of 35 miliseconds between readings (for Fujis)
                 lenstring = len(r)
                 if lenstring:
                     # CHECK FOR RECEIVED ERROR CODES
