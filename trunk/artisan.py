@@ -5983,10 +5983,13 @@ class errorDlg(QDialog):
 class autosaveDlg(QDialog):
     def __init__(self, parent = None):
         super(autosaveDlg,self).__init__(parent)
-        self.setWindowTitle("Keyboard Autosave Accelerator")
+        self.setWindowTitle("Keyboard Autosave [s]")
         
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
-        self.autocheckbox = QCheckBox("Autosave")
+        self.prefixEdit.setToolTip("Automatic generated name = This text + date + time")
+        
+        self.autocheckbox = QCheckBox("Autosave [s]")
+        self.autocheckbox.setToolTip("ON/OFF of automatic saving when pressing keyboard letter [s]")
         
         if aw.qmc.autosaveflag:
             self.autocheckbox.setChecked(True)
@@ -5997,9 +6000,10 @@ class autosaveDlg(QDialog):
         cancelButton = QPushButton("Cancel")
         cancelButton.setFocusPolicy(Qt.NoFocus)
 
-        pathButton = QPushButton("Path")
+        pathButton = QPushButton("Path")        
         pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(unicode(aw.qmc.autosavepath))
+        self.pathEdit.setToolTip("Sets the directory to store batch profiles when using the letter [s]")
         
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)        
         self.connect(okButton,SIGNAL("clicked()"),self.autoChanged)  
