@@ -2313,7 +2313,7 @@ class ApplicationWindow(QMainWindow):
         self.main_widget = QWidget(self)
         #set a minimum size (main window can be bigger but never smaller)
         self.main_widget.setMinimumWidth(811)
-        self.main_widget.setMinimumHeight(670)
+        #self.main_widget.setMinimumHeight(670)
 
         # create MASTER grid layout manager to place all widgets
         gl = QGridLayout(self.main_widget)
@@ -2540,12 +2540,18 @@ class ApplicationWindow(QMainWindow):
         
         #create LCD displays
         #RIGHT COLUMN
-        self.lcd1 = QLCDNumber() # time
-        self.lcd2 = QLCDNumber() # Temperature MET
-        self.lcd3 = QLCDNumber() # Temperature BT
-        self.lcd4 = QLCDNumber() # rate of change MET
-        self.lcd5 = QLCDNumber() # rate of change BT
-        self.lcd6 = QLCDNumber() # pid sv
+        self.lcd1 = QLCDNumber() # time      
+        self.lcd1.setMinimumHeight(45)
+        self.lcd2 = QLCDNumber() # Temperature MET        
+        self.lcd2.setMinimumHeight(45)
+        self.lcd3 = QLCDNumber() # Temperature BT    
+        self.lcd3.setMinimumHeight(45)
+        self.lcd4 = QLCDNumber() # rate of change MET    
+        self.lcd4.setMinimumHeight(45)
+        self.lcd5 = QLCDNumber() # rate of change BT    
+        self.lcd5.setMinimumHeight(45)
+        self.lcd6 = QLCDNumber() # pid sv    
+        self.lcd6.setMinimumHeight(45)
         
         self.lcd1.setStyleSheet("QLCDNumber { background-color: black }")
         self.lcd2.setStyleSheet("QLCDNumber { background-color: black }")
@@ -2657,17 +2663,22 @@ class ApplicationWindow(QMainWindow):
         self.button_16.setVisible(False)
         self.button_17.setVisible(False)
 
-        #place control buttons + LCDs inside vertical button layout manager      
+        #place control buttons + LCDs inside vertical button layout manager           
         LCDlayout.addWidget(self.label6)
         LCDlayout.addWidget(self.lcd6)
+        LCDlayout.addStretch()   
         LCDlayout.addWidget(label2)
         LCDlayout.addWidget(self.lcd2)
+        LCDlayout.addStretch()   
         LCDlayout.addWidget(label3)
         LCDlayout.addWidget(self.lcd3)
+        LCDlayout.addStretch()   
         LCDlayout.addWidget(label4)
         LCDlayout.addWidget(self.lcd4)
+        LCDlayout.addStretch()   
         LCDlayout.addWidget(label5)
         LCDlayout.addWidget(self.lcd5)
+        LCDlayout.addStretch()   
 
         
         #place RECORDING buttons inside the horizontal button layout manager
@@ -5987,22 +5998,30 @@ class autosaveDlg(QDialog):
         cancelButton.setFocusPolicy(Qt.NoFocus)
 
         pathButton = QPushButton("Path")
+        pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(unicode(aw.qmc.autosavepath))
         
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)        
         self.connect(okButton,SIGNAL("clicked()"),self.autoChanged)  
         self.connect(pathButton,SIGNAL("clicked()"),self.getpath)  
 
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()  
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
+        
         autolayout = QGridLayout()
         autolayout.addWidget(self.autocheckbox,0,0)
         autolayout.addWidget(self.prefixEdit,0,1)
         autolayout.addWidget(pathButton,1,0)
         autolayout.addWidget(self.pathEdit,1,1)
         
-        autolayout.addWidget(cancelButton,2,0)
-        autolayout.addWidget(okButton,2,1)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(autolayout)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonLayout)
         
-        self.setLayout(autolayout)
+        self.setLayout(mainLayout)
 
     def getpath(self):
         filename = unicode(QFileDialog.getExistingDirectory(self,"AutoSave Path",aw.profilepath))         
