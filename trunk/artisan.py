@@ -386,6 +386,8 @@ class tgraphcanvas(FigureCanvas):
             if self.device != 18:
                 #read time, ET (t2) and BT (t1) TEMPERATURE
                 tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
+                #test for a possible change
+                t1,t2 = self.filterDropOuts(t1,t2)
                 
                 #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
                 #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
@@ -815,7 +817,8 @@ class tgraphcanvas(FigureCanvas):
         
         #restart() clock 
         self.timeclock.restart()
-        
+    	#restart comm port 
+        aw.ser.openport()
         self.redraw()
         aw.soundpop()
         
@@ -2253,6 +2256,30 @@ class tgraphcanvas(FigureCanvas):
             self.errorlog.append(u"Exception error in drawinterp() " + unicode(e))
             return        
 
+#####################################################################################
+        
+    # predicate that returns true if the given temperature reading is out of range
+    def outOfRange(self,t):
+        if self.mode == "C":
+            return t < 1. or t > 500.
+        else:
+            return t < 1. or t > 800.
+        
+    # return -1 for probes not connected with output outside of range: -25 to 700 or 
+    # the previous values if available
+    def filterDropOuts(self,t1,t2):
+        if self.outOfRange(t1):
+            if len(self.timex) > 2:
+                t1 = self.temp1[-1]
+            else:
+                t1 = -1
+        if self.outOfRange(t2):
+            if len(self.timex) > 2:
+                t2 = self.temp2[-1]
+            else:
+                t2 = -1
+                
+        return t1,t2
 
                 
 #######################################################################################
@@ -7432,27 +7459,6 @@ class serialport(object):
             aw.qmc.errorlog.append(u"ser.sendFUJIcommand): Error in serial port " + unicode(e))
             return u"0"
 
-    # predicate that returns true if the given temperature reading is out of range
-    def outOfRange(self,t):
-        return t < -25 or t > 500
-        
-    # return -1 for probes not connected with output outside of range: -25 to 700 or 
-    # the previous values if available
-    def filterDropOuts(self,t1,t2):
-        r1 = t1
-        r2 = t2
-        if self.outOfRange(t1):
-            if len(aw.qmc.timex) > 2:
-                r1 = aw.qmc.temp1[-1]
-            else:
-                r1 = -1
-        if self.outOfRange(t2):
-            if len(aw.qmc.timex) > 2:
-                r2 = aw.qmc.temp2[-1]
-            else:
-                r2 = -1
-        return r1,r2
-
      #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
         try:
@@ -7472,7 +7478,7 @@ class serialport(object):
                     s2 = binascii.hexlify(r[10]+ r[11])
 
                     #we convert the strings to integers. Divide by 10.0 (decimal position)
-                    return self.filterDropOuts(int(s1,16)/10., int(s2,16)/10.)
+                    return int(s1,16)/10., int(s2,16)/10.
                 else:
                     nbytes = len(r)
                     message = u"%i bytes received but 14 needed"%nbytes
@@ -7522,8 +7528,7 @@ class serialport(object):
 
                 if len(r) == 14: 
                     #we convert the hex strings to integers. Divide by 10.0 (decimal position)
-                    return self.filterDropOuts(int(r[1:5],16)/10., int(r[7:11],16)/10.)
-                
+                    return int(r[1:5],16)/10., int(r[7:11],16)/10.                
                 else:
                     nbytes = len(r)
                     message = u"%i bytes received but 14 needed"%nbytes
