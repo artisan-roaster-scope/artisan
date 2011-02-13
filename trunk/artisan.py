@@ -4496,7 +4496,7 @@ $cupping_notes
         sd = 1000
         nsd = 1000
         index = 0
-        for i in range(len(aw.qmc.timex)):
+        for i in range(len(aw.qmc.timex) -1, -1, -1):
              nsd = abs(aw.qmc.temp2[i]- aw.qmc.phases[1])
              if nsd < sd:
                  sd = nsd
