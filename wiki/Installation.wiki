@@ -40,6 +40,20 @@ _NOTE: for now a binary is only provided for OS X 10.6 Snow Leopard_
 
 =Installation Linux=
 
+The Linux package is compatible with Ubuntu Linux 10.10, aka the Maverick Meerkat, and Debian Linux 5.0 "Lenny" as well as 6.0 "Squeeze". For now, we simply offer a .deb Debian package that you have to install manually (see below). For future releases, we plan to have a repository so that you can "`apt-get install artisan`" and get updates automagically.
+
+Help on getting Artisan packaged for RPM-based distributions would be appreciated.
+
+==Installation in Ubuntu==
+In your web browser, simply download the .deb-File from the [http://code.google.com/p/artisan/downloads/list download page]. This will start the Ubuntu Software-Center that guides you through the rest of the installation. It will also download all dependencies during the process, like `python-qt4`, `python-matplotlib` and others.
+
+There is no menu entry yet, this will follow in the next version. You can start artisan by simply typing "`artisan`" into a terminal window.
+
+==Installation in Debian==
+Download the .deb from the [http://code.google.com/p/artisan/downloads/list download page]. Become root (either with "`su -`", followed by entering your root-password, or if you have sudo configured with "`sudo -i`") and install the package with "`dpkg -i artisan_VERSION_all.deb`". dpkg will possibly complain about missing dependencies and decline to configure the package. With "`apt-get -f install`" you can automatically install all missing dependencies and dpkg will be happy.
+
+There is no menu entry yet, this will follow in the next version. You can start artisan by simply typing "`artisan`" into a terminal window.
+
 =Device Configuration=
 
 Once artisan is up, chose your device using the menu *Conf* and then select the *Device* submenu. From version 0.2.0 on, the following devices are supported:
