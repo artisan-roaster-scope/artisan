@@ -761,8 +761,6 @@ class tgraphcanvas(FigureCanvas):
         self.dryend = [0.,0.]
         self.startend = [0.,0.,0.,0.]
         self.specialevents=[]
-        self.endofx = 60
-        self.startofx = 0
         aw.lcd1.display(0.0)
         aw.lcd2.display(0.0)
         aw.lcd3.display(0.0)
@@ -3981,10 +3979,11 @@ class ApplicationWindow(QMainWindow):
             self.soundflag = settings.value("Beep",self.soundflag).toInt()[0]
             settings.endGroup()
             #saves max-min temp limits of graph
-            settings.beginGroup("ylimits")
+            settings.beginGroup("Axis")
+            self.qmc.startofx = settings.value("xmin",self.qmc.startofx).toInt()[0]
+            self.qmc.endofx = settings.value("xmax",self.qmc.endofx).toInt()[0]            
+            self.qmc.ylimit_min = settings.value("ymin",self.qmc.ylimit_min).toInt()[0]            
             self.qmc.ylimit = settings.value("ymax",self.qmc.ylimit).toInt()[0]
-            self.qmc.ylimit_min = settings.value("ymin",self.qmc.ylimit_min).toInt()[0]
-            
             settings.endGroup()
             
             #need to update timer delay (otherwise it uses default 5 seconds)
@@ -4076,7 +4075,9 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Sound")
             settings.setValue("Beep",self.soundflag)
             settings.endGroup()
-            settings.beginGroup("ylimits")
+            settings.beginGroup("Axis")
+            settings.setValue("xmin",self.qmc.startofx)
+            settings.setValue("xmax",self.qmc.endofx)
             settings.setValue("ymax",self.qmc.ylimit)
             settings.setValue("ymin",self.qmc.ylimit_min)
             settings.endGroup()
@@ -6077,11 +6078,12 @@ class WindowsDlg(QDialog):
         okButton = QPushButton("OK")  
         cancelButton = QPushButton("Cancel")
         cancelButton.setFocusPolicy(Qt.NoFocus)
-        resetybutton = QPushButton("Get Defaults")
+        resetButton = QPushButton("Defaults")
+        resetButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatewindow)
-        self.connect(resetybutton,SIGNAL("clicked()"),self.resety)
+        self.connect(resetButton,SIGNAL("clicked()"),self.reset)
         
         xlayout = QGridLayout()
         xlayout.addWidget(xlimitLabel_min,0,0)
@@ -6094,7 +6096,6 @@ class WindowsDlg(QDialog):
         ylayout.addWidget(self.ylimitEdit_min,0,1)
         ylayout.addWidget(ylimitLabel,1,0)
         ylayout.addWidget(self.ylimitEdit,1,1)
-        ylayout.addWidget(resetybutton,2,1)
         
         xGroupLayout = QGroupBox("Time")
         xGroupLayout.setLayout(xlayout)
@@ -6102,6 +6103,7 @@ class WindowsDlg(QDialog):
         yGroupLayout.setLayout(ylayout)
                 
         buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(resetButton)
         buttonLayout.addStretch()  
         buttonLayout.addWidget(cancelButton)
         buttonLayout.addWidget(okButton)
@@ -6125,7 +6127,9 @@ class WindowsDlg(QDialog):
 
         self.close()
         
-    def resety(self):
+    def reset(self):
+        self.xlimitEdit.setText(u"60")
+        self.xlimitEdit_min.setText(u"0")
         if aw.qmc.mode == u"F":
             self.ylimitEdit.setText(u"750")
             self.ylimitEdit_min.setText(u"0")
