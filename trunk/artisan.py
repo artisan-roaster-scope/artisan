@@ -3986,6 +3986,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ylimit_min = settings.value("ymin",self.qmc.ylimit_min).toInt()[0]            
             self.qmc.ylimit = settings.value("ymax",self.qmc.ylimit).toInt()[0]
             settings.endGroup()
+            settings.beginGroup("RoastProperties")
+            self.qmc.operator = settings.value("operator",self.qmc.operator).toString()
+            self.qmc.roastertype = settings.value("roastertype",self.qmc.roastertype).toString()
+            settings.endGroup()
             
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
@@ -4081,6 +4085,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("xmax",self.qmc.endofx)
             settings.setValue("ymax",self.qmc.ylimit)
             settings.setValue("ymin",self.qmc.ylimit_min)
+            settings.endGroup()
+            settings.beginGroup("RoastProperties")
+            settings.setValue("operator",self.qmc.operator)
+            settings.setValue("roastertype",self.qmc.roastertype)
             settings.endGroup()
             
         except Exception,e:
