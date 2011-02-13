@@ -4016,6 +4016,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ylimit = settings.value("ymax",self.qmc.ylimit).toInt()[0]
             self.qmc.keeptimeflag = settings.value("keepTimeLimit",self.qmc.keeptimeflag).toInt()[0]
             settings.endGroup()
+            settings.beginGroup("RoastProperties")
+            self.qmc.operator = settings.value("operator",self.qmc.operator).toString()
+            self.qmc.roastertype = settings.value("roastertype",self.qmc.roastertype).toString()
+            settings.endGroup()
             
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
@@ -4112,6 +4116,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ymax",self.qmc.ylimit)
             settings.setValue("ymin",self.qmc.ylimit_min)
             settings.setValue("keepTimeLimit",self.qmc.keeptimeflag)
+            settings.endGroup()
+            settings.beginGroup("RoastProperties")
+            settings.setValue("operator",self.qmc.operator)
+            settings.setValue("roastertype",self.qmc.roastertype)
             settings.endGroup()
             
         except Exception,e:
@@ -7564,11 +7572,11 @@ class serialport(object):
                 sync = None
                 while sync != "Err\r\n":
                     self.SP.write("\r\n")
-                    sync = serHH.read(5)
+                    sync = self.SP.read(5)
                     time.sleep(1)
                     
                 self.SP.write("%000R")
-                ID = serHH.read(5)
+                ID = self.SP.read(5)
                 if len(ID) == 5:
                     self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
                 else:
