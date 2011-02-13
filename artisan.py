@@ -7543,11 +7543,11 @@ class serialport(object):
                 sync = None
                 while sync != "Err\r\n":
                     self.SP.write("\r\n")
-                    sync = serHH.read(5)
+                    sync = self.SP.read(5)
                     time.sleep(1)
                     
                 self.SP.write("%000R")
-                ID = serHH.read(5)
+                ID = self.SP.read(5)
                 if len(ID) == 5:
                     self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
                 else:
