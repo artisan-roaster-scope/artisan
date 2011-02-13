@@ -7418,7 +7418,7 @@ class serialport(object):
 
     # predicate that returns true if the given temperature reading is out of range
     def outOfRange(self,t):
-        return t < -25 or t > 700
+        return t < -25 or t > 500
         
     # return -1 for probes not connected with output outside of range: -25 to 700 or 
     # the previous values if available
