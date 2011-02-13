@@ -38,6 +38,8 @@ _NOTE: for now a binary is only provided for OS X 10.6 Snow Leopard_
   ## Double click the disk image which appears on your desktop
   ## Drag the `artisan` application icon to your `Applications` directory.
 
+=Installation Linux=
+
 =Device Configuration=
 
 Once artisan is up, chose your device using the menu *Conf* and then select the *Device* submenu. From version 0.2.0 on, the following devices are supported:
