@@ -761,6 +761,7 @@ class tgraphcanvas(FigureCanvas):
         self.dryend = [0.,0.]
         self.startend = [0.,0.,0.,0.]
         self.specialevents=[]
+        #self.endofx = 60
         aw.lcd1.display(0.0)
         aw.lcd2.display(0.0)
         aw.lcd3.display(0.0)
@@ -6122,14 +6123,14 @@ class WindowsDlg(QDialog):
         aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))     
         aw.qmc.startofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit_min.text())) 
         aw.qmc.redraw()
-        string = u"ylimit = (" + unicode(self.ylimitEdit_min.text()) + u"," + unicode(self.ylimitEdit.text()) + u") xlimit = " + unicode(self.xlimitEdit_min.text()) + u"," + unicode(self.xlimitEdit.text())+ u")"
+        string = u"ylimit = (" + unicode(self.ylimitEdit_min.text()) + u"," + unicode(self.ylimitEdit.text()) + u") xlimit = (" + unicode(self.xlimitEdit_min.text()) + u"," + unicode(self.xlimitEdit.text())+ u")"
         aw.messagelabel.setText(string)
 
         self.close()
         
     def reset(self):
-        self.xlimitEdit.setText(u"60")
-        self.xlimitEdit_min.setText(u"0")
+        self.xlimitEdit.setText(aw.qmc.stringfromseconds(60))
+        self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(0))
         if aw.qmc.mode == u"F":
             self.ylimitEdit.setText(u"750")
             self.ylimitEdit_min.setText(u"0")
@@ -7639,8 +7640,11 @@ class serialport(object):
             aw.lcd3.display(BT)
             return ET,BT
         else:
-            self.returnprevious()
-                
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+            else:
+                return -1,-1
+            
     def CENTER303temperature(self):
         try:
             if not self.SP.isOpen():
@@ -8004,7 +8008,10 @@ class comportDlg(QDialog):
             if not timeout:
                 raise timeoutError
             #add more checks here
-            
+
+            #activate port:
+            aw.ser.openport()
+                        
         except comportError,e:
             aw.qmc.errorlog.append(u"Invalid serial Comm entry " + unicode(e))
             self.messagelabel.setText(u"Invalid Comm entry")
@@ -8068,8 +8075,8 @@ class comportDlg(QDialog):
                                 
         self.comportEdit.clear()              
         self.comportEdit.addItems(available)
-        if len(available) > 1:
-            self.comportEdit.setCurrentIndex(1)
+        if len(available):
+            self.comportEdit.setCurrentIndex(len(available)-1)
 
 
 #################################################################################            
