@@ -8429,8 +8429,8 @@ class DeviceAssignmentDLG(QDialog):
                 aw.qmc.device = 18
                 message = "Device set to " + meter
                 st = ""
-                if aw.qmc.delay != 1:
-                    aw.qmc.delay = 1
+                if aw.qmc.delay != 1000:
+                    aw.qmc.delay = 1000
                     st += ". Sampling rate changed to 1 second"
                 message = "Device set to " + meter + st
                 
