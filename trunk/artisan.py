@@ -818,7 +818,7 @@ class tgraphcanvas(FigureCanvas):
         #restart() clock 
         self.timeclock.restart()
     	#restart comm port 
-        aw.ser.openport()
+        #aw.ser.openport()
         self.redraw()
         aw.soundpop()
         
