@@ -6117,10 +6117,10 @@ class WindowsDlg(QDialog):
     def updatewindow(self):
         aw.qmc.ylimit = int(self.ylimitEdit.text())
         aw.qmc.ylimit_min = int(self.ylimitEdit_min.text())
-        aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit))     
+        aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))     
         aw.qmc.startofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit_min.text())) 
         aw.qmc.redraw()
-        string = u"[ylimit = (" + unicode(self.ylimitEdit_min.text()) + u"," + unicode(self.ylimitEdit.text()) + u")] [xlimit = " + unicode(self.xlimitEdit.text()) + u"," + unicode(self.xlimitEdit_min.text()) + u")]"
+        string = u"ylimit = (" + unicode(self.ylimitEdit_min.text()) + u"," + unicode(self.ylimitEdit.text()) + u") xlimit = " + unicode(self.xlimitEdit_min.text()) + u"," + unicode(self.xlimitEdit.text())+ u")"
         aw.messagelabel.setText(string)
 
         self.close()
