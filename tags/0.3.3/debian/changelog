@@ -1,3 +1,12 @@
+artisan (0.3.3-2) maverick; urgency=low
+
+  * Rebuild with some last-minute fixes:
+   - comments out a line in qmc.reset() that affects device NONE
+   - revised
+   - moves filterdropouts() from ser to qmc.
+
+ -- lukas <lukas@larosa.fritz.box>  Mon, 14 Feb 2011 00:47:11 +0100
+
 artisan (0.3.3-1) maverick; urgency=low
 
   * New Upstream release (0.3.3). Upstream changes:
