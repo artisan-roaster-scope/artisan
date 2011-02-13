@@ -293,6 +293,7 @@ class tgraphcanvas(FigureCanvas):
         self.ylimit_min = 0
         self.endofx = 60
         self.startofx = 0
+        self.keeptimeflag = 1
         
         #height of statistics bar
         self.statisticsheight = 650
@@ -761,7 +762,8 @@ class tgraphcanvas(FigureCanvas):
         self.dryend = [0.,0.]
         self.startend = [0.,0.,0.,0.]
         self.specialevents=[]
-        #self.endofx = 60
+        if not self.keeptimeflag:
+            self.endofx = 60
         aw.lcd1.display(0.0)
         aw.lcd2.display(0.0)
         aw.lcd3.display(0.0)
@@ -3985,10 +3987,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.endofx = settings.value("xmax",self.qmc.endofx).toInt()[0]            
             self.qmc.ylimit_min = settings.value("ymin",self.qmc.ylimit_min).toInt()[0]            
             self.qmc.ylimit = settings.value("ymax",self.qmc.ylimit).toInt()[0]
-            settings.endGroup()
-            settings.beginGroup("RoastProperties")
-            self.qmc.operator = settings.value("operator",self.qmc.operator).toString()
-            self.qmc.roastertype = settings.value("roastertype",self.qmc.roastertype).toString()
+            self.qmc.keeptimeflag = settings.value("keepTimeLimit",self.qmc.keeptimeflag).toInt()[0]
             settings.endGroup()
             
             #need to update timer delay (otherwise it uses default 5 seconds)
@@ -4085,10 +4084,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("xmax",self.qmc.endofx)
             settings.setValue("ymax",self.qmc.ylimit)
             settings.setValue("ymin",self.qmc.ylimit_min)
-            settings.endGroup()
-            settings.beginGroup("RoastProperties")
-            settings.setValue("operator",self.qmc.operator)
-            settings.setValue("roastertype",self.qmc.roastertype)
+            settings.setValue("keepTimeLimit",self.qmc.keeptimeflag)
             settings.endGroup()
             
         except Exception,e:
@@ -6084,6 +6080,13 @@ class WindowsDlg(QDialog):
         self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx))
         self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx))
 
+
+        self.timeflag = QCheckBox("Keep Max time after RESET")
+        if aw.qmc.keeptimeflag:
+            self.timeflag.setChecked(True)
+        else:
+            self.timeflag.setChecked(False)
+
         okButton = QPushButton("OK")  
         cancelButton = QPushButton("Cancel")
         cancelButton.setFocusPolicy(Qt.NoFocus)
@@ -6099,6 +6102,7 @@ class WindowsDlg(QDialog):
         xlayout.addWidget(self.xlimitEdit_min,0,1)
         xlayout.addWidget(xlimitLabel,1,0)
         xlayout.addWidget(self.xlimitEdit,1,1)
+        xlayout.addWidget(self.timeflag,2,1)
         
         ylayout = QGridLayout()
         ylayout.addWidget(ylimitLabel_min,0,0)
@@ -6129,7 +6133,11 @@ class WindowsDlg(QDialog):
         aw.qmc.ylimit = int(self.ylimitEdit.text())
         aw.qmc.ylimit_min = int(self.ylimitEdit_min.text())
         aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))     
-        aw.qmc.startofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit_min.text())) 
+        aw.qmc.startofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit_min.text()))
+        if self.timeflag.isChecked():
+            aw.qmc.keeptimeflag = 1
+        else:
+            aw.qmc.keeptimeflag = 0
         aw.qmc.redraw()
         string = u"ylimit = (" + unicode(self.ylimitEdit_min.text()) + u"," + unicode(self.ylimitEdit.text()) + u") xlimit = (" + unicode(self.xlimitEdit_min.text()) + u"," + unicode(self.xlimitEdit.text())+ u")"
         aw.messagelabel.setText(string)
@@ -7426,7 +7434,7 @@ class serialport(object):
 
     # predicate that returns true if the given temperature reading is out of range
     def outOfRange(self,t):
-        return t < -25 or t > 500
+        return t < -25 or t > 700
         
     # return -1 for probes not connected with output outside of range: -25 to 700 or 
     # the previous values if available
@@ -7551,11 +7559,11 @@ class serialport(object):
                 sync = None
                 while sync != "Err\r\n":
                     self.SP.write("\r\n")
-                    sync = self.SP.read(5)
+                    sync = serHH.read(5)
                     time.sleep(1)
                     
                 self.SP.write("%000R")
-                ID = self.SP.read(5)
+                ID = serHH.read(5)
                 if len(ID) == 5:
                     self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
                 else:
