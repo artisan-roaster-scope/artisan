@@ -7828,9 +7828,15 @@ class nonedevDlg(QDialog):
 
         okButton = QPushButton("OK")
         cancelButton = QPushButton("Cancel")
+        cancelButton.setFocusPolicy(Qt.NoFocus)
 
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+        
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()  
+        buttonLayout.addWidget(cancelButton)
+        buttonLayout.addWidget(okButton)
         
         grid = QGridLayout()
         grid.addWidget(self.ETbox,0,0)
@@ -7838,10 +7844,13 @@ class nonedevDlg(QDialog):
         
         grid.addWidget(btlabel,1,0)
         grid.addWidget(self.btEdit,1,1)
-        grid.addWidget(okButton,2,0)
-        grid.addWidget(cancelButton,2,1)        
 
-        self.setLayout(grid)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(grid)
+        mainLayout.addStretch()  
+        mainLayout.addLayout(buttonLayout)
+        
+        self.setLayout(mainLayout)
 
     def changemanuallogETflag(self):
         if self.ETbox.isChecked():
