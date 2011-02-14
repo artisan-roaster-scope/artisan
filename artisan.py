@@ -2160,7 +2160,7 @@ class tgraphcanvas(FigureCanvas):
                 func2 = inter.UnivariateSpline(self.timex,self.temp1)
 
             #create longer list of time values
-            time = numpy.arange(self.timex[0],self.timex[-1],1)
+            time = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
             #convert all time values to temperature
             btvals = func(time).tolist()
 
