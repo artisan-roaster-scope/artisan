@@ -107,6 +107,7 @@ import cgi
 import codecs
 import numpy
 import array
+import codecs
 
 
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
@@ -1778,9 +1779,17 @@ class tgraphcanvas(FigureCanvas):
     # Writes information about the finished profile in the graph
     def writestatistics(self):
         TP_index = aw.findTP()
-        #find when dry phase ends 
-        dryEndIndex = aw.findDryEnd(TP_index)
-        BTdrycross = self.temp2[dryEndIndex]    
+        if aw.qmc.dryend[0] and aw.qmc.phasesbuttonflag:
+            #manual dryend available
+            dryEndTime = aw.qmc.dryend[0]
+            BTdrycross = aw.qmc.dryend[1]
+            dryEndIndex = aw.time2index(dryEndTime)
+        else:
+            #find when dry phase ends 
+            dryEndIndex = aw.findDryEnd(TP_index)
+            dryEndTime = self.timex[dryEndIndex]
+            BTdrycross = self.temp2[dryEndIndex]  
+                  
         
         #self.varC [1C starttime[0],1C startTemp[1],  1C endtime[2],1C endtemp[3],  2C starttime[4], 2C startTemp[5],  2C endtime[6], 2C endtemp[7]]
         #self.startend [starttime[0], starttempBT[1], endtime[2],endtempBT[3]]      
@@ -1790,14 +1799,14 @@ class tgraphcanvas(FigureCanvas):
             #if 1Ce use middle point of 1Cs and 1Ce            
             if self.varC[2]:
                 
-                dryphasetime = int(self.timex[dryEndIndex] - self.startend[0])
-                midphasetime = int(self.varC[0] - self.timex[dryEndIndex])
+                dryphasetime = int(dryEndTime - self.startend[0])
+                midphasetime = int(self.varC[0] - dryEndTime)
                 finishphasetime = int(self.startend[2]- self.varC[0])
                                    
             else: #very light roast)
                 #use 1Cs (start of 1C) as 1C
-                dryphasetime = int(self.timex[dryEndIndex] - self.startend[0])
-                midphasetime = int(self.varC[0] - self.timex[dryEndIndex])     
+                dryphasetime = int(dryEndTime - self.startend[0])
+                midphasetime = int(self.varC[0] - dryEndTime)     
                 finishphasetime = int(self.startend[2] - self.varC[0])
                 
             self.statisticstimes[1] = dryphasetime
@@ -3764,7 +3773,7 @@ class ApplicationWindow(QMainWindow):
                 
     #Write object to file
     def serialize(self,filename,obj):
-        f = open(filename, 'w+')
+        f = codecs.open(filename, 'w+', encoding='utf-8')
         f.write(repr(obj))
         f.close()
     
@@ -3773,7 +3782,7 @@ class ApplicationWindow(QMainWindow):
         obj = None
         if os.path.exists(filename):
             if (os.path.exists(filename)):
-                f = open(filename, 'r')
+                f = codecs.open(filename, 'r', encoding='utf-8')
                 obj=eval(f.read())
                 f.close()
         return obj
@@ -3862,7 +3871,7 @@ class ApplicationWindow(QMainWindow):
         profile["startend"] = self.qmc.startend
         profile["cracks"] = self.qmc.varC
         profile["flavors"] = self.qmc.flavors
-        profile["flavorlabels"] = [str(fl) for fl in self.qmc.flavorlabels]
+        profile["flavorlabels"] = [unicode(fl) for fl in self.qmc.flavorlabels]
         profile["title"] = self.qmc.title
         profile["beans"] = self.qmc.beans
         profile["weight"] = self.qmc.weight
@@ -4454,11 +4463,11 @@ $cupping_notes
             return 0.0
         
     # converts times (values of timex) to indices in aw.qmc.temp1 and aw.qmc.temp2
-##    def time2index(self,time):
-##        for i in range(len(aw.qmc.timex)):
-##            if aw.qmc.timex[i] == time:
-##                return i
-##        return -1
+    def time2index(self,time):
+        for i in range(len(aw.qmc.timex)):
+            if aw.qmc.timex[i] == time:
+                return i
+        return -1
         
     #returns the index of the lowest point in BT; return -1 if no such value found
     def findTP(self):
