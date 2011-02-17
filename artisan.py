@@ -197,7 +197,6 @@ class tgraphcanvas(FigureCanvas):
         
         self.fig = Figure(facecolor=u'lightgrey')
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
-        #ML:
         self.fig.subplots_adjust(
             # all values in percent
             top=0.93, # the top of the subplots of the figure (default: 0.9)
@@ -2772,7 +2771,6 @@ class ApplicationWindow(QMainWindow):
         gl.addLayout(buttonHHbl,4,0)        #place buttonlayout manager inside grid box layout manager
         gl.addLayout(EventsLayout,4,1)
         
-        #ML:
         gl.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom (defaults to 12)
         gl.setHorizontalSpacing(0) # default: 9
         gl.setVerticalSpacing(0) # default: 9
