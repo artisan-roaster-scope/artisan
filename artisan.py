@@ -5190,15 +5190,15 @@ class HUDDlg(QDialog):
             self.soundCheck.setChecked(False)    
         self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
 
-        okButton = QPushButton("Test Mike" )  
+        mikeButton = QPushButton("Test Mike" )  
             
-        self.connect(okButton,SIGNAL("clicked()"),self.showsound)
+        self.connect(mikeButton,SIGNAL("clicked()"),self.showsound)
 
         self.showsoundflag = 0
         
         tab3Layout = QHBoxLayout()
         tab3Layout.addWidget(self.soundCheck)
-        tab3Layout.addWidget(okButton)
+        tab3Layout.addWidget(mikeButton)
 
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
@@ -5217,6 +5217,8 @@ class HUDDlg(QDialog):
         
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
+        buttonsLayout.addWidget(cancelButton)
+        buttonsLayout.addWidget(okButton)
 
 
         #incorporate layouts
