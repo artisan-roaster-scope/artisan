@@ -108,7 +108,8 @@ import codecs
 import numpy
 import array
 import codecs
-
+import struct
+from scipy import fft
 
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
@@ -2386,13 +2387,15 @@ class ApplicationWindow(QMainWindow):
         #this holds the index of the HUD functions above
         self.HUDfunction = 0
 
+        self.sound = soundcrack(QWidget)
         #self.profDesign = profiledesigner(QWidget)
         
         self.stack = QStackedWidget()
         self.stack.addWidget(self.qmc)
-        self.stack.addWidget(self.HUD)        
+        self.stack.addWidget(self.HUD)
+        self.stack.addWidget(self.sound)
         #self.stack.addWidget(self.profDesign)
-        
+        self.stack.setCurrentIndex(0)
         #events config
         self.eventsbuttonflag = 1
         self.minieventsflag = 1
@@ -3007,7 +3010,7 @@ class ApplicationWindow(QMainWindow):
         elif key == 16777236:               #MOVES CURRENT BUTTON RIGHT
             self.moveKbutton("right")          
         elif key == 83:                     #letter S (future automatic save)
-            self.automaticsave()
+            self.automaticsave()          
         else:
             QWidget.keyPressEvent(self, event)
 
@@ -5186,9 +5189,16 @@ class HUDDlg(QDialog):
         else:
             self.soundCheck.setChecked(False)    
         self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
+
+        okButton = QPushButton("Test Mike" )  
+            
+        self.connect(okButton,SIGNAL("clicked()"),self.showsound)
+
+        self.showsoundflag = 0
+        
         tab3Layout = QHBoxLayout()
         tab3Layout.addWidget(self.soundCheck)
-        
+        tab3Layout.addWidget(okButton)
 
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
@@ -5204,11 +5214,10 @@ class HUDDlg(QDialog):
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
         TabWidget.addTab(C3Widget,"Sound")
-
+        
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
-        buttonsLayout.addWidget(cancelButton)
-        buttonsLayout.addWidget(okButton)
+
 
         #incorporate layouts
         Slayout = QVBoxLayout()
@@ -5218,7 +5227,20 @@ class HUDDlg(QDialog):
         Slayout.addLayout(buttonsLayout)
         
         self.setLayout(Slayout)
+            
+    def showsound(self):
+        aw.messagelabel.setText("Testing Mike...")
+        aw.stack.setCurrentIndex(2)
+        aw.sound.opensound()
+        for i in range(80):
+            msg = str(80-i)
+            self.status.showMessage(msg,500)
+            aw.sound.blitsound()
+        aw.stack.setCurrentIndex(0)
+        aw.sound.closesound()
+        aw.messagelabel.setText("")
         
+             
     def saveinterp(self):
         pass
 
@@ -5322,7 +5344,8 @@ class HUDDlg(QDialog):
         self.accept()
         aw.qmc.resetlines()
         aw.qmc.redraw()        
-           
+        aw.stack.setCurrentIndex(0)
+        
 ########################################################################################            
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
 ########################################################################################        
@@ -9397,11 +9420,105 @@ class PXRpidDlgControl(QDialog):
             mssg = u"setpid(): There was a problem setting " + var 
             self.status.showMessage(mssg,5000)        
             aw.qmc.errorlog.append(mssg)
+            
+# UNDER WORK 
+#######################################################################################
+#################### COFFEE CRACK  DETECTOR PROJECT ###################################
+#######################################################################################
 
+class soundcrack(FigureCanvas):
+    def __init__(self,parent):
+        
+        self.fig = Figure(facecolor=u'lightgrey')
+        FigureCanvas.__init__(self, self.fig)
+
+        self.ax = self.fig.add_subplot(111, axisbg="black")
+        self.ax.grid(True,linewidth=2,color="green")
+        
+        self.ax.set_xlim(0,5500)
+        self.ax.set_ylim(-1,1)
+        #make first empty plot of frequency
+        self.Freqline, = self.ax.plot([], [], animated=True, lw=1,color = "green")
+        #make first empty plot of rms amplitude     
+        self.Ampline, = self.ax.plot([], [], animated=True, lw=2,color = "orange")
+        self.N_SAMPLES = 1024
+        self.SAMPLING_RATE = 11025
+        self.amplitudeThreshold = .6
+        self.fig.canvas.draw()
+        self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
+        self.ampsensitivity = 10
+                         
+        self.freqs = numpy.fft.fftfreq(self.N_SAMPLES,1./self.SAMPLING_RATE)[:self.N_SAMPLES/2] #X axis
+        
+        self.stream = None
+        self.pa = None
+        self.ON = 0
+
+    def reset(self):
+        self.fig.clf()   #wipe out figure
+        self.ax = self.fig.add_subplot(111, axisbg="black")
+        self.ax.grid(True,linewidth=2,color="green")
+        self.ax.set_xlim(0,5500)
+        self.ax.set_ylim(-1,1)
+        self.fig.canvas.draw()
+        self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
+                                 
+    def crackdetedted(self):
+        pass
+
+    #updates animated display
+    def blitsound(self):   
+        if self.ON:
+            self.fig.canvas.restore_region(self.background)
+            F,amplitude = self.getsound()
+            amplitude *= self.ampsensitivity
+            self.Freqline.set_data(self.freqs,F)
+            self.Ampline.set_data([0,5500],[amplitude,amplitude])
+            self.ax.draw_artist(self.Freqline)
+            self.ax.draw_artist(self.Ampline)       
+            self.fig.canvas.blit(self.ax.bbox)
+
+    def opensound(self):
+        try:
+            import pyaudio
+        except ImportError:
+            return False
+        self.reset()
+        self.ON = 1    
+        self.pa = pyaudio.PyAudio()
+        self.stream = self.pa.open(format=pyaudio.paInt16, channels=1, rate=self.SAMPLING_RATE,
+                     input=True, frames_per_buffer=self.N_SAMPLES)
+
+    def closesound(self):
+        self.ON = 0
+        self.stream.close()
+        self.pa.terminate()
+        
+    def getsound(self):
+
+        #F[m] = m*SAMPLING_RATE/N_SAMPLES   (List with magnitudes of frequencies) Y axis
+        
+        block = self.stream.read(self.N_SAMPLES)        
+        
+        count = len(block)/2
+        formatS = "%dh"%(count)    
+        audio_data  = struct.unpack( formatS, block )
+
+        sum_squares = 0
+        naudio = []
+        for sample in audio_data:
+            n = sample /32768.            
+            naudio.append(n)            
+            sum_squares += n*n
+
+        F = fft(naudio)[:self.N_SAMPLES/2]  
+        amplitude =  math.sqrt( sum_squares / count )    #rms
+        
+        return F,amplitude  
 
 # UNDER WORK 
 #######################################################################################
-#################### PROFILE DESIGNER   ###############################################
+#################### PROFILE DESIGNER  PROJECT ########################################
 #######################################################################################
 
 class profiledesigner(FigureCanvas):
@@ -9443,11 +9560,6 @@ class profiledesigner(FigureCanvas):
         self.ax.plot([20,60],[300, 200],color =  "blue")
         self.ax.plot([60,180],[200, 300],color =  "blue")
         self.ax.plot([180,360],[300, 400],color =  "blue")
-        self.ax.plot([360,500],[400, 450],color =  "blue")
-       
-        
-        #ready to plot
-        self.ax.set_ylim(aw.qmc.ylimit_min,aw.qmc.ylimit)
 
         self.fig.canvas.draw() 
 
