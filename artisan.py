@@ -197,6 +197,13 @@ class tgraphcanvas(FigureCanvas):
         
         self.fig = Figure(facecolor=u'lightgrey')
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
+        #ML:
+        self.fig.subplots_adjust(
+            # all values in percent
+            top=0.93, # the top of the subplots of the figure (default: 0.9)
+            bottom=0.1, # the bottom of the subplots of the figure (default: 0.1)
+            left=0.068, # the left side of the subplots of the figure (default: 0.125)
+            right=.95) # the right side of the subplots of the figure (default: 0.9
         FigureCanvas.__init__(self, self.fig)
 
         # set the parent widget
@@ -1876,7 +1883,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.text(self.startend[0]+ dryphasetime,statisticslower,st2,color=self.palette["text"],fontsize=11)
                 self.ax.text(self.startend[0]+ dryphasetime+midphasetime,statisticslower,st3,color=self.palette["text"],fontsize=11)
 
-            if self.statisticsflags[3]:          
+            if self.statisticsflags[3]:
                 #calculate AREA under BT and ET
                 AccBT = 0.0
                 AccMET = 0.0
@@ -1905,11 +1912,21 @@ class tgraphcanvas(FigureCanvas):
                             u"] [ETarea - BTarea = " + unicode(deltaAcc) + u"] [Time = " +time +u"]")
                             
                 #text metrics 
-                if self.mode == u"C":
-                    dist = -47
-                else:
-                    dist = -90
-                self.ax.text(-100,dist, strline,color = self.palette["text"],fontsize=11)
+                #if self.mode == u"C":
+                #    dist = -47
+                #    dist = -100
+                #else:
+                #    dist = -90
+                #self.ax.text(-100,dist, strline,color = self.palette["text"],fontsize=11)
+                
+                #alternative
+                #factor = (aw.qmc.ylimit - aw.qmc.ylimit_min) / 10.8
+                #self.ax.text(0,aw.qmc.ylimit_min - factor, strline,color = self.palette["text"],fontsize=11)
+                
+                # even better: use xlabel
+                self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
+            else:
+                self.ax.set_xlabel(u'Time',size=16,color = self.palette["xlabel"])
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
@@ -2351,7 +2368,7 @@ class ApplicationWindow(QMainWindow):
         #set a minimum size (main window can be bigger but never smaller)
         self.main_widget.setMinimumWidth(811)
         #self.main_widget.setMinimumHeight(670)
-
+        
         # create MASTER grid layout manager to place all widgets
         gl = QGridLayout(self.main_widget)
                 
@@ -2745,7 +2762,7 @@ class ApplicationWindow(QMainWindow):
         midLayout.addLayout(controlLayout,0)
         midLayout.addWidget(self.stack,1)
         
-
+        
         #pack all into the grid MASTER LAYOUT manager (widget,row,column)
         gl.addLayout(naviLayout,0,0)               #Navigation Tool bar
         gl.addWidget(self.lcd1,0,1)         #timer LCD
@@ -2754,6 +2771,12 @@ class ApplicationWindow(QMainWindow):
         gl.addLayout(LCDlayout,2,1)         #place LCD manager inside grid box layout manager
         gl.addLayout(buttonHHbl,4,0)        #place buttonlayout manager inside grid box layout manager
         gl.addLayout(EventsLayout,4,1)
+        
+        #ML:
+        gl.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom (defaults to 12)
+        gl.setHorizontalSpacing(0) # default: 9
+        gl.setVerticalSpacing(0) # default: 9
+        
         ###############  create MENUS 
         
         if platf == u'Darwin':
@@ -3253,7 +3276,10 @@ class ApplicationWindow(QMainWindow):
         self.qmc.redraw()
         
     def strippedName(self, fullFileName):
-        return QFileInfo(fullFileName).fileName()
+        return unicode(QFileInfo(fullFileName).fileName())
+        
+    def strippedDir(self, fullFileName):
+        return unicode(QFileInfo(fullFileName).dir().dirName())
 
     def setCurrentFile(self, fileName):
         self.curFile = fileName
@@ -3277,10 +3303,15 @@ class ApplicationWindow(QMainWindow):
     def updateRecentFileActions(self):
         settings = QSettings()
         files = settings.value('recentFileList').toStringList()
+        strippedNames = map(self.strippedName,files)
         numRecentFiles = min(len(files), self.MaxRecentFiles)
  
         for i in range(numRecentFiles):
-            text = "&%s" % self.strippedName(files[i])
+            strippedName = self.strippedName(files[i])
+            if strippedNames.count(strippedName) > 1:
+                text = "&%s (%s)" % (strippedName, self.strippedDir(files[i]))
+            else:
+                text = "&%s" % strippedName
             self.recentFileActs[i].setText(text)
             self.recentFileActs[i].setData(files[i])
             self.recentFileActs[i].setVisible(True)
@@ -3293,8 +3324,29 @@ class ApplicationWindow(QMainWindow):
         if action:
             self.loadFile(action.data().toString())
  
+    #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
+    #reads and sets the actual directory
+    def ArtisanOpenFileDialog(self,msg="Open",ext="*.txt",path=None):
+        if path == None:
+            path = self.profilepath
+        return unicode(QFileDialog.getOpenFileName(self,msg,path,ext))
+ 
+    #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
+    #reads and sets the actual directory
+    def ArtisanSaveFileDialog(self,msg="Save",ext="*.txt",path=None):
+        if path == None:
+            path = self.profilepath
+        return unicode(QFileDialog.getSaveFileName(self,msg,path,ext))
+ 
+    #the central ExistingDirectoryDialog function that should always be called. Besides triggering the file dialog it
+    #reads and sets the actual directory
+    def ArtisanExistingDirectoryDialog(self,msg="Select Directory",path=None):
+        if path == None:
+            path = self.profilepath
+        return unicode(QFileDialog.getExistingDirectory(self,msg,path))
+ 
     def fileLoad(self):
-        fileName = QFileDialog.getOpenFileName(self,"Open",self.profilepath,"*.txt")
+        fileName = self.ArtisanOpenFileDialog()
         if fileName:
             self.loadFile(fileName)
  
@@ -3304,18 +3356,18 @@ class ApplicationWindow(QMainWindow):
         old_mode = self.qmc.mode
 
         try:       
-            f = QFile(filename)
+            f = QFile(unicode(filename))
             if not f.open(QIODevice.ReadOnly):
-                raise IOError, unicode(f.errorString())            
+                raise IOError, unicode(f.errorString())    
             stream = QTextStream(f)
             
             self.qmc.reset()
 
             firstChar = stream.read(1)
-            if firstChar == "{":            
-                f.close()
-                self.setProfile(self.deserialize(filename))
-            else:
+            if firstChar == "{":    
+                f.close()       
+                self.setProfile(self.deserialize(filename)) 
+            else:      
     
                 #Read first line. STARTEND tag
                 line = firstChar + stream.readLine().trimmed()
@@ -3541,7 +3593,7 @@ class ApplicationWindow(QMainWindow):
 
         except Exception,e:
             self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"error in fileload() " + unicode(e))
+            self.qmc.errorlog.append(unicode(e))
             return
         
         finally:
@@ -3552,7 +3604,7 @@ class ApplicationWindow(QMainWindow):
     # Loads background profile
     def loadbackground(self,filename):
         try:        
-            f = QFile(filename)
+            f = QFile(unicode(filename))
             if not f.open(QIODevice.ReadOnly):
                 raise IOError, unicode(f.errorString())
             stream = QTextStream(f)
@@ -3773,18 +3825,17 @@ class ApplicationWindow(QMainWindow):
                 
     #Write object to file
     def serialize(self,filename,obj):
-        f = codecs.open(filename, 'w+', encoding='utf-8')
+        f = codecs.open(unicode(filename), 'w+', encoding='utf-8')
         f.write(repr(obj))
         f.close()
     
     #Read object from file 
     def deserialize(self,filename):
         obj = None
-        if os.path.exists(filename):
-            if (os.path.exists(filename)):
-                f = codecs.open(filename, 'r', encoding='utf-8')
-                obj=eval(f.read())
-                f.close()
+        if os.path.exists(unicode(filename)):
+            f = codecs.open(unicode(filename), 'r', encoding='utf-8')
+            obj=eval(f.read())
+            f.close()
         return obj
 
     #used by fileLoad()
@@ -3905,7 +3956,7 @@ class ApplicationWindow(QMainWindow):
         try:         
             filename = fname
             if not filename:
-                 filename = unicode(QFileDialog.getSaveFileName(self,"Save Profile",self.profilepath,"*.txt"))  
+                 filename = self.ArtisanSaveFileDialog(msg="Save Profile") 
             if filename:
                 #write
                 self.serialize(filename,self.getProfile())
@@ -3921,7 +3972,7 @@ class ApplicationWindow(QMainWindow):
             
     def fileExport(self):
         try:         
-            filename = unicode(QFileDialog.getSaveFileName(self,"Export CSV",self.profilepath,"*.csv"))  
+            filename = aw.ArtisanSaveFileDialog(msg="Export CSV",ext="*.csv")
             if filename:
                 self.exportCSV(filename)
                 self.messagelabel.setText(u"Readings exported")
@@ -4386,7 +4437,7 @@ $cupping_notes
             for i in range(len(html)):
                 f.write(html[i])
             f.close()
-            QDesktopServices.openUrl(QUrl("file:///" + QDir().current().absolutePath() + "/Artisanreport.html", QUrl.TolerantMode))            
+            QDesktopServices.openUrl(QUrl(u"file:///" + unicode(QDir().current().absolutePath()) + u"/Artisanreport.html", QUrl.TolerantMode))            
         except IOError,e:
             self.messagelabel.setText("Error in htmlReport() " + str(e) + " ")
             aw.qmc.errorlog.append("Error in htmlReport() " + str(e))
@@ -4624,7 +4675,7 @@ $cupping_notes
                 creditsto))
 
     def helpHelp(self):
-        QDesktopServices.openUrl(QUrl("file:///" + self.applicationDirectory + "/index.html", QUrl.TolerantMode))
+        QDesktopServices.openUrl(QUrl(u"file:///" + unicode(self.applicationDirectory) + u"/index.html", QUrl.TolerantMode))
 
     def calibratedelay(self):
         calSpinBox = QSpinBox()
@@ -4727,7 +4778,7 @@ $cupping_notes
     def importHH506RA(self):
         try:
             filename = u""
-            filename = QFileDialog.getOpenFileName(self,u"Load Profile for a HH506RA")
+            filename = aw.ArtisanOpenFileDialog(msg=u"Load Profile for a HH506RA",ext=None)
             if  filename == "":
                 return
             self.qmc.reset()
@@ -4832,7 +4883,7 @@ $cupping_notes
             if w != 0:        
                 image = image.scaledToWidth(w,transformationmode)
         
-            filename = unicode(QFileDialog.getSaveFileName(self,"Save Image for Web","","*.png"))
+            filename = aw.ArtisanSaveFileDialog(msg="Save Image for Web",ext="*.png")
             if filename:
                 if u".png" not in filename:
                     filename += u".png"
@@ -6078,7 +6129,7 @@ class autosaveDlg(QDialog):
         self.setLayout(mainLayout)
 
     def getpath(self):
-        filename = unicode(QFileDialog.getExistingDirectory(self,"AutoSave Path",aw.profilepath))         
+        filename = aw.ArtisanExistingDirectoryDialog(msg="AutoSave Path")
         self.pathEdit.setText(filename)
         
     def autoChanged(self):
@@ -7201,7 +7252,7 @@ class backgroundDLG(QDialog):
         
 
     def selectpath(self):
-        filename = unicode(QFileDialog.getOpenFileName(self,"Load Profile",aw.profilepath,"*.txt"))
+        filename = aw.ArtisanOpenFileDialog()
         self.pathedit.setText(filename)
         self.filename = filename
 
