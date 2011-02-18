@@ -110,6 +110,7 @@ import array
 import codecs
 import struct
 from scipy import fft
+from scipy import interpolate as inter
 
 from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
@@ -127,7 +128,6 @@ import matplotlib.font_manager as font_manager
 import matplotlib.path as mpath
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
-from scipy  import interpolate as inter
 
 platf = unicode(platform.system())
 
@@ -193,7 +193,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.EXTECH421509,
                                    self.HH802U,
                                    self.HH309,
-                                   self.NONE
+                                   self.NONE,
+                                   self.ARDUINOTC4
                                    ]
         
         self.fig = Figure(facecolor=u'lightgrey')
@@ -589,15 +590,16 @@ class tgraphcanvas(FigureCanvas):
         return ETreachTime, BTreachTime
 
 
-    #finds time, ET and BT when using Fuji PID
+    #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD.
     def fujitemperature(self):
-        # get the temperature for MET. RS485 unit ID (1)
+        # get the temperature for ET. RS485 unit ID (1)
         t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
         #get time of each temperature reading in seconds from start; .elapsed() returns miliseconds
         tx = self.timeclock.elapsed()/1000.         
         # get the temperature for BT. RS485 unit ID (2)
         t2 = aw.pid.gettemperature(2)/10.
-
+        #read and update SV LCD
+        aw.pid.readcurrentsv()
                
         return tx,t2,t1
 
@@ -726,6 +728,10 @@ class tgraphcanvas(FigureCanvas):
         t2,t1 = aw.ser.NONE()
         
         return tx,t2,t1
+
+    def ARDUINOTC4(self):
+        t2,t1 = aw.ser.ARDUINOTC4temperature()
+        tx = self.timeclock.elapsed()/1000.
     
     #creates X axis labels ticks in mm:ss acording to the endofx limit
     def xaxistosm(self):
@@ -825,8 +831,10 @@ class tgraphcanvas(FigureCanvas):
         
         #restart() clock 
         self.timeclock.restart()
-    	#restart comm port 
-        #aw.ser.openport()
+    	#restart comm port if not in manual mode
+        if self.device != 18:
+            aw.ser.openport()
+            
         self.redraw()
         aw.soundpop()
         
@@ -861,17 +869,18 @@ class tgraphcanvas(FigureCanvas):
             # make blended transformations to help identify EVENT types
             if self.mode == "C":
                 step = 5
+                start = 20
             else:
                 step = 10
+                start = 60
             jump = 20
             for i in range(len(self.etypes)):
-                rectEvent = patches.Rectangle((0,jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
+                rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
                 self.ax.add_patch(rectEvent)
                 if self.mode == "C":
-                    jump += 10
+                    jump -= 10
                 else:
-                    jump += 20
-
+                    jump -= 20
 
         ##### ET,BT curves
         self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label="ET")
@@ -1089,23 +1098,49 @@ class tgraphcanvas(FigureCanvas):
             
         #write events
         Nevents = len(self.specialevents)
-        if self.mode == "F":
-            row = {"N":80,"P":60,"D":40,"F":20}
-        else:
-            row = {"N":50,"P":40,"D":30,"F":20}
-        for i in range(Nevents):
-            firstletter = self.etypes[self.specialeventstype[i]][0]                
-            secondletter = self.eventsvalues[self.specialeventsvalue[i]]
-            if self.temp1[i] >= self.temp2[i]:
-                height = self.temp1[int(self.specialevents[i])]
-                armcolor = color=self.palette["met"]
+        if self.eventsGraphflag:
+            #two modes of drawing events. Check self.ylimit_min to see if there is enough room
+            if self.mode == "F":
+                lim = self.phases[0]-80
             else:
-                height =self.temp2[int(self.specialevents[i])]
-                armcolor=self.palette["bt"]
-            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], height),
-                             xytext=(self.timex[int(self.specialevents[i])] ,row[firstletter]),alpha=1.,
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=armcolor,alpha=0.4),fontsize=8,backgroundcolor='yellow')
-            
+                lim = self.phases[0]-40
+                
+            if self.ylimit_min < lim:
+                if self.mode == "F":
+                    row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
+                else:
+                    row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
+                for i in range(Nevents):
+                    firstletter = self.etypes[self.specialeventstype[i]][0]                
+                    secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                    if self.temp1[i] >= self.temp2[i]:
+                        height = self.temp1[int(self.specialevents[i])]
+                        armcolor = color=self.palette["met"]
+                    else:
+                        height =self.temp2[int(self.specialevents[i])]
+                        armcolor=self.palette["bt"]
+                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], height),
+                                     xytext=(self.timex[int(self.specialevents[i])] -5,row[firstletter]),alpha=1.,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=armcolor,alpha=0.4),fontsize=8,backgroundcolor='yellow')
+
+            else:
+                #revert to old mode since all bars cannnot be shown
+                for i in range(Nevents):
+                    firstletter = self.etypes[self.specialeventstype[i]][0]                
+                    secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                                     xytext=(self.timex[int(self.specialevents[i])]-5,self.temp2[int(self.specialevents[i])]+20),alpha=0.9,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                         
+        #if not self.eventsGraphflag revert to old mode    
+        else:
+            for i in range(Nevents):
+                firstletter = self.etypes[self.specialeventstype[i]][0]                
+                secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
+                                 xytext=(self.timex[int(self.specialevents[i])]-5,self.temp1[int(self.specialevents[i])]+20),alpha=0.9,
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+     
                 
         #update X label names and colors        
         self.xaxistosm()
@@ -1497,13 +1532,15 @@ class tgraphcanvas(FigureCanvas):
             else:
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
-                self.startend[0] = tx
-                self.startend[1] = bt
-                self.drawmanual(et,bt,tx)
-                # put initial marker on graph
-                rect = patches.Rectangle( (self.startend[0],0), width=.01, height=self.ylimit, color = self.palette["text"])
-                self.ax.add_patch(rect)
-
+                if bt != 1 and et != -1:  #cancel 
+                    self.startend[0] = tx
+                    self.startend[1] = bt
+                    self.drawmanual(et,bt,tx)
+                    # put initial marker on graph
+                    rect = patches.Rectangle( (self.startend[0],0), width=.01, height=self.ylimit, color = self.palette["text"])
+                    self.ax.add_patch(rect)
+                else:
+                    return
             #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
             self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]+ self.ystep),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -1938,7 +1975,10 @@ class tgraphcanvas(FigureCanvas):
                 if Nevents < 10:
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
-                    self.drawmanual(et,bt,tx)
+                    if bt != 1 and et != -1:  #cancel 
+                        self.drawmanual(et,bt,tx)
+                    else:
+                        return
         #index number            
         i = len(self.timex)-1
         if i > 0:
@@ -1950,29 +1990,56 @@ class tgraphcanvas(FigureCanvas):
                 message = u"Event number "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
                 aw.messagelabel.setText(message)
 
-                if self.mode == "F":
-                    row = {"N":80,"P":60,"D":40,"F":20}
-                else:
-                    row = {"N":50,"P":40,"D":30,"F":20}
-          
-                firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
-                secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
-                if self.temp1[i] >= self.temp2[i]:
-                    height = self.temp1[i]
-                    armcolor = color=self.palette["met"]
-                else:
-                    height = self.temp2[i]
-                    armcolor = color=self.palette["bt"]                    
-                self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], height),
-                                 xytext=(self.timex[i],row[firstletter]),alpha=0.9,
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='-',
-                                color=armcolor,alpha=0.4),fontsize=8, backgroundcolor='yellow')
+                if self.eventsGraphflag:
+                    #two modes of drawing events. Check self.ylimit_min to see if there is enough room
+                    if self.mode == "F":
+                        lim = self.phases[0]-80
+                    else:
+                        lim = self.phases[0]-40
+                        
+                    if self.ylimit_min < lim:
+                        if self.mode == "F":
+                            row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
+                        else:
+                            row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
+                          
+                        firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
+                        secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
+                        if self.temp1[i] >= self.temp2[i]:
+                            height = self.temp1[i]
+                            armcolor = color=self.palette["met"]
+                        else:
+                            height = self.temp2[i]
+                            armcolor = color=self.palette["bt"]                    
+                        self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], height),
+                                         xytext=(self.timex[i]-5,row[firstletter]),alpha=0.9,
+                                        color=self.palette["text"],arrowprops=dict(arrowstyle='-',
+                                        color=armcolor,alpha=0.4),fontsize=8, backgroundcolor='yellow')
+                    #second mode (old mode)   
+                    else:
 
-            	#write label in mini recorder
+                        firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]                
+                        secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
+                        self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp1[i]),
+                                         xytext=(self.timex[i]-5,self.temp1[i]+20),alpha=0.9,
+                                        color=self.palette["text"],arrowprops=dict(arrowstyle='-',
+                                        color=self.palette["met"],alpha=0.4),fontsize=8, backgroundcolor='yellow')     
+    
+                #second mode (old mode)   
+                else:
+
+                    firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]                
+                    secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
+                    self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp2[i]),
+                                     xytext=(self.timex[i]-5,self.temp2[i]+20),alpha=0.9,
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',
+                                    color=self.palette["met"],alpha=0.4),fontsize=8, backgroundcolor='yellow')     
+
+                #write label in mini recorder
                 if aw.minieventsflag:
                     string = "E #" + unicode(Nevents+1) 
                     aw.eventlabel.setText(QString(string))
-               
+           
             else:
                 aw.messagelabel.setText("No more than 10 events are allowed")
                 aw.etypeComboBox.setVisible(False)
@@ -1981,7 +2048,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.buttonminiEvent.setVisible(False)                
         else:
             aw.messagelabel.setText("No profile found")
-                    
+            
         aw.soundpop()
 
     #called from markdryen(), markcharge(), mark1Cstart(), etc
@@ -7460,6 +7527,11 @@ class serialport(object):
         self.stopbits = 1
         self.timeout=1
 
+        #serial port
+        self.SP  = serial.Serial()
+
+        ##### SPECIAL METER FLAGS ########
+
         #stores the id of the meter HH506RA as a string
         self.HH506RAid = "X"
 
@@ -7470,13 +7542,15 @@ class serialport(object):
         #initial message flag for CENTER 309 meter
         self.CENTER309flag = 0
 
-        #serial port
-        self.SP  = serial.Serial()
+        #initial ambient temperature flag for ARDUINOTC4 meter
+        self.arduinoAmbFlag = 0
+
         
     def openport(self):
         try:
             #reset previous settings
             self.SP.close()
+            self.arduinoAmbFlag = 0
             #provision port 
             self.SP.setPort(self.comport)
             self.SP.setBaudrate(self.baudrate)
@@ -7509,7 +7583,7 @@ class serialport(object):
                 self.SP.write(binstring)
                 r = self.SP.read(nbytes)
                 #serTX.close()
-                time.sleep(.035)                     #this gurantees a minimum of 35 miliseconds between readings (for Fujis)
+                time.sleep(0.035)                     #this gurantees a minimum of 35 miliseconds between readings (for all Fujis)
                 lenstring = len(r)
                 if lenstring:
                     # CHECK FOR RECEIVED ERROR CODES
@@ -7752,10 +7826,7 @@ class serialport(object):
             aw.lcd3.display(BT)
             return ET,BT
         else:
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-            else:
-                return -1,-1
+            return -1,-1
             
     def CENTER303temperature(self):
         try:
@@ -7905,6 +7976,34 @@ class serialport(object):
             else:
                 return -1,-1 
 
+
+    def ARDUINOTC4temperature(self):
+        try:
+            if not self.SP.isOpen():
+                self.openport()                    
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+
+                command = "READ\n"                
+                self.SP.write(command)
+                t0, t1, t2 = self.SP.readline().rsplit(',')  #t0 = ambient; t1 = ET; t2 = BT
+                if not self.arduinoAmbFlag:
+                    aw.qmc.ambientTemp = float(t0)
+                    self.arduinoAmbFlag = 1
+                
+                return float(t1), float(t2)
+
+
+        except serial.SerialException, e:
+            aw.messagelabel.setText(u"ser.CENTER309temperature()" + unicode(e))
+            aw.qmc.errorlog.append(u"ser.CENTER309temperature()" + unicode(e) )
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+            else:
+                return -1,-1 
+        
 #########################################################################
 #############  NONE DEVICE DIALOG #######################################                                   
 #########################################################################
@@ -7975,6 +8074,7 @@ class nonedevDlg(QDialog):
         else:
             aw.qmc.manuallogETflag = 0
             self.etEdit.setVisible(False)
+
         
                 
 #########################################################################
@@ -7997,13 +8097,15 @@ class comportDlg(QDialog):
         baudratelabel = QLabel("Baud Rate")
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
-        self.baudrateComboBox.addItems(["2400","9600","19200"])
+        self.baudrateComboBox.addItems(["2400","9600","19200","57600"])
         if aw.ser.baudrate == 2400:
             self.baudrateComboBox.setCurrentIndex(0)
         elif aw.ser.baudrate == 9600:
             self.baudrateComboBox.setCurrentIndex(1)     
         elif aw.ser.baudrate == 19200:
             self.baudrateComboBox.setCurrentIndex(2)
+        elif aw.ser.baudrate == 57600:
+            self.baudrateComboBox.setCurrentIndex(3)
         else:
             pass
                    
@@ -8221,7 +8323,8 @@ class DeviceAssignmentDLG(QDialog):
                    "EXTECH 421509",
                    "Omega HH802U",
                    "Omega HH309",
-                   "NONE"
+                   "NONE",
+                   "ArduinoTC4"
                    ]
         sorted_devices = sorted(devices)
         self.devicetypeComboBox = QComboBox()
@@ -8545,6 +8648,16 @@ class DeviceAssignmentDLG(QDialog):
                     aw.qmc.delay = 1000
                     st += ". Sampling rate changed to 1 second"
                 message = "Device set to " + meter + st
+
+            elif meter == "ArduinoTC4":
+                aw.qmc.device = 19
+                aw.ser.comport = "/dev/ttyACM0"
+                aw.ser.baudrate = 57600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = "Device set to " + meter + ". Now, check Serial Port settings"
                 
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
@@ -8557,7 +8670,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.lcd6.setVisible(False)
                         
         aw.messagelabel.setText(message)
-            
+        if meter != "NONE":
+            aw.setcommport()    
         self.close()
 
 ############################################################
@@ -8893,6 +9007,7 @@ class PXRpidDlgControl(QDialog):
         labelpattern = QLabel("Ramp/Soak Pattern")
         self.patternComboBox =  QComboBox()
         self.patternComboBox.addItems(["1-4","5-8","1-8"])
+        self.patternComboBox.setCurrentIndex(aw.pid.PXR["rampsoakpattern"][0])
 
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
@@ -9345,7 +9460,6 @@ class PXRpidDlgControl(QDialog):
             msg = u"Reading Ramp/Soak #" + unicode(i+1)
             self.status.showMessage(msg,500)
             k = self.getsegment(i+1)
-            time.sleep(0.035)
             if k == -1:
                 mssg = u"getallsegments(): problem reading R/S "
                 self.status.showMessage(mssg,5000)
@@ -9432,6 +9546,7 @@ class soundcrack(FigureCanvas):
     def __init__(self,parent):
         
         self.fig = Figure(facecolor=u'lightgrey')
+        
         FigureCanvas.__init__(self, self.fig)
 
         self.ax = self.fig.add_subplot(111, axisbg="black")
@@ -9439,8 +9554,9 @@ class soundcrack(FigureCanvas):
         
         self.ax.set_xlim(0,5500)
         self.ax.set_ylim(-1,1)
+
         #make first empty plot of frequency
-        self.Freqline, = self.ax.plot([], [], animated=True, lw=1,color = "green")
+        self.Freqline, = self.ax.plot([], [], animated=True, lw=1,color = "#78E800")
         #make first empty plot of rms amplitude     
         self.Ampline, = self.ax.plot([], [], animated=True, lw=2,color = "orange")
         self.N_SAMPLES = 1024
@@ -9509,7 +9625,7 @@ class soundcrack(FigureCanvas):
         sum_squares = 0
         naudio = []
         for sample in audio_data:
-            n = sample /32768.            
+            n = sample /32768.            #normalize        
             naudio.append(n)            
             sum_squares += n*n
 
@@ -9669,11 +9785,10 @@ class PXG4pidDlgControl(QDialog):
         self.label_rs14.setMargin(10)
         self.label_rs15.setMargin(10)
         self.label_rs16.setMargin(10)
-
-
         
         self.patternComboBox =  QComboBox()
         self.patternComboBox.addItems(["1-4","5-8","1-8","9-12","13-16","9-16","1-16"])
+        self.patternComboBox.setCurrentIndex(aw.pid.PXG4["rampsoakpattern"][0])
         
         self.paintlabels()
 
@@ -10090,7 +10205,7 @@ class PXG4pidDlgControl(QDialog):
         self.setLayout(layout)
 
     def paintlabels(self):
-        #read values of variables to place in buttons
+        #read values of computer variables (not the actual pid values) to place in buttons
         str1 = u"1 [T " + unicode(aw.pid.PXG4["segment1sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment1ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment1soak"][0])+u"]"
         str2 = u"2 [T " + unicode(aw.pid.PXG4["segment2sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment2ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment2soak"][0])+u"]"
         str3 = u"3 [T " + unicode(aw.pid.PXG4["segment3sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment3ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment3soak"][0])+u"]"
@@ -10438,9 +10553,7 @@ class PXG4pidDlgControl(QDialog):
         commandd = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[dkey][1],newDvalue)
 
         p = aw.ser.sendFUJIcommand(commandp,8)
-        time.sleep(0.035)
         i = aw.ser.sendFUJIcommand(commandi,8)
-        time.sleep(0.035)
         d = aw.ser.sendFUJIcommand(commandd,8)
         
         #verify it went ok
@@ -10520,10 +10633,8 @@ class PXG4pidDlgControl(QDialog):
             self.status.showMessage(msg,1000)
             commandp = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[pkey][1],1)
             p = aw.pid.readoneword(commandp)/10.
-            time.sleep(0.035)                    #need minimum time of 0.03 seconds before sending another message
             commandi = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[ikey][1],1)
             i = aw.pid.readoneword(commandi)/10.
-            time.sleep(0.035)
             commandd = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[dkey][1],1)
             d = aw.pid.readoneword(commandd)/10.
             
@@ -10892,16 +11003,17 @@ class PXG4pidDlgControl(QDialog):
 ##########################  FUJI PID CLASS DEFINITION  ############################
 ###################################################################################
         
-# This class can work for either one Fuji PXR3 or one Fuji PXG4
+# This class can work for either one Fuji PXR or one Fuji PXG. It is used for the controlling PID only.
 # NOTE: There is only one controlling PID. The second pid is only used for reading BT and therefore,
-# there is no need to create a second PID object since the second pid all it does is read temperature (always same command).
-# All is needed for the second pid is its unit id number stored in aw.qmc.device[]. The command to read T is the same for PXR and PXG
+# there is no need to create a second PID object since the second pid all it does is read temperature (always use the same command).
+# All is needed for the second pid is its unit id number stored in aw.qmc.device[].
+# The command to read T is the always the same for PXR and PXG but with the unit ID changed.
 
 class FujiPID(object):
     def __init__(self):
         
-                   #Use a python dictionary data container for the parameters of each channel
-                   #refer to Fuji PID instruction manual for more information about the parameters and channels
+        #refer to Fuji PID instruction manual for more information about the parameters and channels
+
         
         #"KEY": [VALUE,MEMORY ADDRESS]
         self.PXG4={
@@ -10927,7 +11039,7 @@ class FujiPID(object):
                   #differential time d0 (0.0 to 999.9 sec)
                   "d": [600,41008],
 
-                   ############ CH3 These are 7 storage locations
+                   ############ CH3 These are 7 pid storage locations
                   "sv1": [300.0,41241], "p1": [5,41242], "i1": [240,41243], "d1": [60,41244],
                   "sv2": [350.0,41251], "p2": [5,41252], "i2": [240,41253], "d2": [60,41254],
                   "sv3": [400.0,41261], "p3": [5,41262], "i3": [240,41263], "d3": [60,41264],
@@ -10939,15 +11051,15 @@ class FujiPID(object):
                   
                   ############# CH4      Creates a pattern of temperatures (profiles) using ramp soak combination
                   #sv stands for Set Value (desired temperature value)
-                  #the time to reach sv is called ramp (minutes)
-                  #the time to hold the temperature at sv is called soak (minutes)
+                  #the time to reach sv is called ramp 
+                  #the time to hold the temperature at sv is called soak 
                   "timeunits": [1,41562],  #0=hh.MM (hour:min)  1=MM.SS (min:sec)
-                  # Dry roast phase. selects 3 or 4 minutes
+                  # Example. Dry roast phase. selects 3 or 4 minutes
                   "segment1sv": [270.0,41581],"segment1ramp": [3,41582],"segment1soak": [0,41583],
                   "segment2sv": [300.0,41584],"segment2ramp": [3,41585],"segment2soak": [0,41586],
                   "segment3sv": [350.0,41587],"segment3ramp": [3,41588],"segment3soak": [0,41589],
                   "segment4sv": [400.0,41590],"segment4ramp": [3,41591],"segment4soak": [0,41591],
-                  # Phase to 1C. selects 6 or 8 mins
+                  # Example. Phase to 1C. selects 6 or 8 mins
                   "segment5sv": [530.0,41593],"segment5ramp": [5,41594],"segment5soak": [0,41595],
                   "segment6sv": [530.0,41596],"segment6ramp": [8,41597],"segment6soak": [0,41598],
                   "segment7sv": [540.0,41599],"segment7ramp": [5,41600],"segment7soak": [0,41601],
@@ -10956,13 +11068,13 @@ class FujiPID(object):
                   "segment10sv": [550.0,41608],"segment10ramp": [8,41609],"segment10soak": [0,41610],
                   "segment11sv": [560.0,41611],"segment11ramp": [5,41612],"segment11soak": [0,41613],
                   "segment12sv": [560.0,41614],"segment12ramp": [8,41615],"segment12soak": [0,41616],
-                  # finish phase. selects 3 mins for regular coffee or 5 mins for espresso
+                  # Eaxample. Finish phase. selects 3 mins for regular coffee or 5 mins for espresso
                   "segment13sv": [570.0,41617],"segment13ramp": [3,41618],"segment13soak": [0,41619],
                   "segment14sv": [570.0,41620],"segment14ramp": [5,41621],"segment14soak": [0,41622],
                   "segment15sv": [580.0,41623],"segment15ramp": [3,41624],"segment15soak": [0,41625],
                   "segment16sv": [580.0,41626],"segment16ramp": [5,41627],"segment16soak": [0,41628],
-                  # "rampsoakmode" 0-15 = 1-16 IMPORTANT: Factory setting is 3 (bad). Set it up to number 0 or it will
-                  # sit on stanby (SV blinks) at the end till rampsoakmode changes. 
+                  # "rampsoakmode" 0-15 = 1-16 IMPORTANT: Factory setting is 3 (BAD). Set it up to number 0 or it will
+                  # sit on stanby (SV blinks) at the end till rampsoakmode changes. It will appear as if the PID broke (unresponsive)
                   "rampsoakmode":[0,41081],
                   "rampsoakpattern": [6,41561],  #ramp soak activation pattern 0=(1-4) 1=(5-8) 2=(1-8) 3=(9-12) 4=(13-16) 5=(9-16) 6=(1-16)
                   
