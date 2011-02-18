@@ -1105,7 +1105,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 lim = self.phases[0]-40
                 
-            if self.ylimit_min < lim:
+            if self.ylimit_min <= lim:
                 if self.mode == "F":
                     row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
                 else:
@@ -2953,19 +2953,19 @@ class ApplicationWindow(QMainWindow):
         
         temperatureMenu = self.GraphMenu.addMenu("Temperature")
         
-        self.ConvertToFahrenheitAction = QAction("Convert to Fahrenheit",self)
+        self.ConvertToFahrenheitAction = QAction("Convert profile to Fahrenheit",self)
         self.connect(self.ConvertToFahrenheitAction,SIGNAL("triggered()"),lambda t="F":self.qmc.convertTemperature(t))
         temperatureMenu.addAction(self.ConvertToFahrenheitAction)
 
-        self.ConvertToCelsiusAction = QAction("Convert to Celsius",self)
+        self.ConvertToCelsiusAction = QAction("Convert profile to Celsius",self)
         self.connect(self.ConvertToCelsiusAction,SIGNAL("triggered()"),lambda t="C":self.qmc.convertTemperature(t))
         temperatureMenu.addAction(self.ConvertToCelsiusAction)
 
-        self.FahrenheitAction = QAction("Fahrenheit Mode",self)
+        self.FahrenheitAction = QAction("Set display to Fahrenheit Mode",self)
         self.connect(self.FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
         temperatureMenu.addAction(self.FahrenheitAction)
 
-        self.CelsiusAction = QAction("Celsius Mode",self)
+        self.CelsiusAction = QAction("Set display to Celsius Mode",self)
         self.connect(self.CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusMode)
         temperatureMenu.addAction(self.CelsiusAction)
         
@@ -6606,6 +6606,15 @@ class EventsDlg(QDialog):
     def eventsGraphflagChanged(self):
         if self.eventsGraphflag.isChecked():
             aw.qmc.eventsGraphflag = 1
+            #check limits and adjust bottom part if needed
+            if aw.qmc.mode == "F":
+                lim = aw.qmc.phases[0]-80
+            else:
+                lim = aw.qmc.phases[0]-40
+                
+            if   aw.qmc.ylimit_min > lim:
+                aw.qmc.ylimit_min = lim
+                
             aw.qmc.redraw()
         else:
             aw.qmc.eventsGraphflag = 0
