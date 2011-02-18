@@ -1098,49 +1098,47 @@ class tgraphcanvas(FigureCanvas):
             
         #write events
         Nevents = len(self.specialevents)
-        if self.eventsGraphflag:
-            #two modes of drawing events. Check self.ylimit_min to see if there is enough room
+        if self.mode == "F":
+            lim = self.phases[0]-80
+        else:
+            lim = self.phases[0]-40
+            
+        #two modes of drawing events. Check eventsGraphflag and self.ylimit_min to see if there is enough room            
+        if self.eventsGraphflag and self.ylimit_min <= lim:
+            
             if self.mode == "F":
-                lim = self.phases[0]-80
+                row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
             else:
-                lim = self.phases[0]-40
+                row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
                 
-            if self.ylimit_min <= lim:
-                if self.mode == "F":
-                    row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
-                else:
-                    row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
-                for i in range(Nevents):
-                    firstletter = self.etypes[self.specialeventstype[i]][0]                
-                    secondletter = self.eventsvalues[self.specialeventsvalue[i]]
-                    if self.temp1[i] >= self.temp2[i]:
-                        height = self.temp1[int(self.specialevents[i])]
-                        armcolor = color=self.palette["met"]
-                    else:
-                        height =self.temp2[int(self.specialevents[i])]
-                        armcolor=self.palette["bt"]
-                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], height),
+            for i in range(Nevents):
+                firstletter = self.etypes[self.specialeventstype[i]][0]                
+                secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                #some times ET is not drawn (ET = 0) when using device NONE
+                if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
+                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
                                      xytext=(self.timex[int(self.specialevents[i])] -5,row[firstletter]),alpha=1.,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=armcolor,alpha=0.4),fontsize=8,backgroundcolor='yellow')
-
-            else:
-                #revert to old mode since all bars cannnot be shown
-                for i in range(Nevents):
-                    firstletter = self.etypes[self.specialeventstype[i]][0]                
-                    secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')                    
+                else:
                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                                     xytext=(self.timex[int(self.specialevents[i])]-5,self.temp2[int(self.specialevents[i])]+20),alpha=0.9,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
-                         
-        #if not self.eventsGraphflag revert to old mode    
+                                 xytext=(self.timex[int(self.specialevents[i])] -5,row[firstletter]),alpha=1.,
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                        
+        # revert to old mode    
         else:
             for i in range(Nevents):
                 firstletter = self.etypes[self.specialeventstype[i]][0]                
                 secondletter = self.eventsvalues[self.specialeventsvalue[i]]
-                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
-                                 xytext=(self.timex[int(self.specialevents[i])]-5,self.temp1[int(self.specialevents[i])]+20),alpha=0.9,
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
-     
+                #some times ET is not drawn (ET = 0) when using device NONE
+                if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
+                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
+                                     xytext=(self.timex[int(self.specialevents[i])]-5,self.temp1[int(self.specialevents[i])]+20),alpha=0.9,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                else:
+                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                                     xytext=(self.timex[int(self.specialevents[i])]-5,self.temp2[int(self.specialevents[i])]+20),alpha=0.9,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                    
                 
         #update X label names and colors        
         self.xaxistosm()
@@ -1989,52 +1987,48 @@ class tgraphcanvas(FigureCanvas):
                 time = self.stringfromseconds(self.timex[i])
                 message = u"Event number "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
                 aw.messagelabel.setText(message)
+                #two modes of drawing events. Check self.ylimit_min to see if there is enough room
+                if self.mode == "F":
+                    lim = self.phases[0]-80
+                else:
+                    lim = self.phases[0]-40
+                if self.eventsGraphflag and self.ylimit_min <= lim:
 
-                if self.eventsGraphflag:
-                    #two modes of drawing events. Check self.ylimit_min to see if there is enough room
                     if self.mode == "F":
-                        lim = self.phases[0]-80
+                        row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
                     else:
-                        lim = self.phases[0]-40
+                        row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
+                      
+                    firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
+                    secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
+                    if self.temp1[i] >= self.temp2[i]:
+                        height = self.temp1[i]
+                        armcolor = color=self.palette["met"]
+                    else:
+                        height = self.temp2[i]
+                        armcolor = color=self.palette["bt"]
                         
-                    if self.ylimit_min < lim:
-                        if self.mode == "F":
-                            row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
-                        else:
-                            row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
-                          
-                        firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
-                        secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
-                        if self.temp1[i] >= self.temp2[i]:
-                            height = self.temp1[i]
-                            armcolor = color=self.palette["met"]
-                        else:
-                            height = self.temp2[i]
-                            armcolor = color=self.palette["bt"]                    
-                        self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], height),
-                                         xytext=(self.timex[i]-5,row[firstletter]),alpha=0.9,
-                                        color=self.palette["text"],arrowprops=dict(arrowstyle='-',
-                                        color=armcolor,alpha=0.4),fontsize=8, backgroundcolor='yellow')
-                    #second mode (old mode)   
-                    else:
-
-                        firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]                
-                        secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
-                        self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp1[i]),
-                                         xytext=(self.timex[i]-5,self.temp1[i]+20),alpha=0.9,
-                                        color=self.palette["text"],arrowprops=dict(arrowstyle='-',
-                                        color=self.palette["met"],alpha=0.4),fontsize=8, backgroundcolor='yellow')     
-    
+                    self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], height),
+                                     xytext=(self.timex[i]-5,row[firstletter]),alpha=0.9,
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',
+                                    color=armcolor,alpha=0.4),fontsize=8, backgroundcolor='yellow')
+      
                 #second mode (old mode)   
                 else:
-
                     firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]                
                     secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
-                    self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp2[i]),
-                                     xytext=(self.timex[i]-5,self.temp2[i]+20),alpha=0.9,
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',
-                                    color=self.palette["met"],alpha=0.4),fontsize=8, backgroundcolor='yellow')     
+                    if self.temp1[i] > self.temp2[i]:
+                        self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp1[i]),
+                                        xytext=(self.timex[i]-5,self.temp1[i]+20),alpha=0.9,
+                                        color=self.palette["text"],arrowprops=dict(arrowstyle='-',
+                                        color=self.palette["met"],alpha=0.4),fontsize=8, backgroundcolor='yellow')     
 
+                    else:
+                        self.ax.annotate(firstletter+secondletter, xy=(self.timex[i], self.temp2[i]),
+                                        xytext=(self.timex[i]-5,self.temp2[i]+20),alpha=0.9,
+                                        color=self.palette["text"],arrowprops=dict(arrowstyle='-',
+                                        color=self.palette["bt"],alpha=0.4),fontsize=8, backgroundcolor='yellow')
+                        
                 #write label in mini recorder
                 if aw.minieventsflag:
                     string = "E #" + unicode(Nevents+1) 
