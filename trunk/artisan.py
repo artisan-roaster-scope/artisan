@@ -1990,15 +1990,13 @@ class tgraphcanvas(FigureCanvas):
                 #two modes of drawing events. Check self.ylimit_min to see if there is enough room
                 if self.mode == "F":
                     lim = self.phases[0]-80
+                    row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
                 else:
                     lim = self.phases[0]-40
-                if self.eventsGraphflag and self.ylimit_min <= lim:
+                    row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
 
-                    if self.mode == "F":
-                        row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
-                    else:
-                        row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
-                      
+                if self.eventsGraphflag and self.ylimit_min <= lim:
+                    
                     firstletter = self.etypes[self.specialeventstype[Nevents-1]][0]
                     secondletter = self.eventsvalues[self.specialeventsvalue[Nevents-1]]
                     if self.temp1[i] >= self.temp2[i]:
@@ -8225,8 +8223,9 @@ class comportDlg(QDialog):
             if not timeout:
                 raise timeoutError
             #add more checks here
-
-            #activate port:
+            
+            aw.messagelabel.setText(u"Serial Settings: " + comport + ", " + baudrate + ", " + bytesize + ", " + parity + ", " + stopbits + ", " + timeout)
+            #activate port and test:
             aw.ser.openport()
                         
         except comportError,e:
