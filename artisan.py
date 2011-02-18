@@ -8224,9 +8224,7 @@ class comportDlg(QDialog):
                 raise timeoutError
             #add more checks here
             
-            aw.messagelabel.setText(u"Serial Settings: " + comport + ", " + baudrate + ", " + bytesize + ", " + parity + ", " + stopbits + ", " + timeout)
-            #activate port and test:
-            aw.ser.openport()
+            aw.messagelabel.setText(u"Serial Port Settings: " + comport + ", " + baudrate + ", " + bytesize + ", " + parity + ", " + stopbits + ", " + timeout)
                         
         except comportError,e:
             aw.qmc.errorlog.append(u"Invalid serial Comm entry " + unicode(e))
@@ -8660,7 +8658,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = "Device set to " + meter + ". Now, check Serial Port settings"
-                
+            
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
             aw.button_13.setVisible(False)
@@ -8672,8 +8670,13 @@ class DeviceAssignmentDLG(QDialog):
             aw.lcd6.setVisible(False)
                         
         aw.messagelabel.setText(message)
-        if meter != "NONE":
-            aw.setcommport()    
+        
+        if self.nonpidButton.isChecked():
+            if meter != "NONE":
+                aw.setcommport()
+        else:
+            aw.setcommport()
+
         self.close()
 
 ############################################################
