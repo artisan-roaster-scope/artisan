@@ -1130,7 +1130,7 @@ class tgraphcanvas(FigureCanvas):
             for p in range(4):    
                 if len(netypes[p]) > 1:
                     for i in range(len(netypes[p])-1):
-                         #draw
+                         #draw differentiating color bars between events
                          rect = patches.Rectangle( (netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step,color = colors[i%2],alpha=0.5)
                          self.ax.add_patch(rect)
                          
@@ -1163,6 +1163,14 @@ class tgraphcanvas(FigureCanvas):
                                      xytext=(self.timex[int(self.specialevents[i])],self.temp2[int(self.specialevents[i])]+20),alpha=0.9,
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
 
+        #set minieditor info for last event found
+        if aw != None: #avoids error because aw is None during  app start (it does not exists yet)
+            #write label in mini recorder
+            string = "E #" + unicode(Nevents) 
+            aw.eventlabel.setText(QString(string))
+            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+            aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+            
 
         #update X label names and colors        
         self.xaxistosm()
@@ -2622,7 +2630,7 @@ class ApplicationWindow(QMainWindow):
         self.button_19.setStyleSheet("QPushButton { background-color: orange }")
         self.button_19.setMaximumSize(90, 50)
         self.button_19.setMinimumHeight(50)
-        self.button_19.setToolTip("Marks the begining of First Crack (FC)")
+        self.button_19.setToolTip("Marks the end of the Dry phase (DRYEND)")
         self.connect(self.button_19, SIGNAL("clicked()"), self.qmc.markDryEnd)
  
         #connect PID sv easy buttons
@@ -2708,6 +2716,7 @@ class ApplicationWindow(QMainWindow):
         #convenience EVENT mini editor; Edits last recorded event without opening roast editor Dlg.
         self.etypes = ["N","P","D","F"]
         self.eventlabel = QLabel()
+        self.eventlabel.setToolTip("Number of last event found")
         Nevents = len(self.qmc.specialevents)
         if Nevents:
             string = "E #" + unicode(Nevents+1) 
@@ -2718,10 +2727,12 @@ class ApplicationWindow(QMainWindow):
         self.eventlabel.setStyleSheet("background-color:'yellow';")
         self.eventlabel.setMaximumWidth(40)
         self.etypeComboBox = QComboBox()
+        self.etypeComboBox.setToolTip("Type of last event")
         self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.etypeComboBox.addItems(self.etypes)
         self.etypeComboBox.setMaximumWidth(47)
         self.valueComboBox = QComboBox()
+        self.valueComboBox.setToolTip("Value of last event")
         self.valueComboBox.setFocusPolicy(Qt.NoFocus)
         self.valueComboBox.addItems(self.qmc.eventsvalues)
         self.valueComboBox.setMaximumWidth(47)
@@ -3618,17 +3629,6 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(message)
             
             self.setCurrentFile(filename)
-
-            #adds label in mini Events editor
-            Nevents = len(self.qmc.specialevents)
-            if Nevents:
-                string = "E #" + unicode(Nevents) 
-                self.eventlabel.setText(QString(string))
-                self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[Nevents-1]) 
-                self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[Nevents-1]) 
-                
-            else:
-                self.eventlabel.setText("E #0")
                 
         except IOError,e:
             self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
@@ -11188,14 +11188,14 @@ class FujiPID(object):
             else:
                 return -1
 
-        #or if control pid is fuji PXR3
+        #or if control pid is fuji PXR
         elif aw.ser.controlETpid[0] == 1:
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
-            val = float(self.readoneword(command)/10.)
+            val = float(self.readoneword(command))/10.
             if val != -0.1:
-                self.PXR["sv"][0] =  val
-                aw.lcd6.display(aw.pid.PXR["sv"][0])
-                return aw.pid.PXR["sv"][0]
+                self.PXR["sv0"][0] =  val
+                aw.lcd6.display(aw.pid.PXR["sv0"][0])
+                return aw.pid.PXR["sv0"][0]
             else:
                 return -1
             
@@ -11232,7 +11232,7 @@ class FujiPID(object):
                     message = u" SV changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
                     aw.messagelabel.setText(message)
                     aw.lcd6.display(newsv/10.)
-                    self.PXR["sv"][0] = newsv
+                    self.PXR["sv0"][0] = newsv
                 else:
                     aw.messagelabel.setText(u"Unable to set sv")
         else:
