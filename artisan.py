@@ -285,7 +285,7 @@ class tgraphcanvas(FigureCanvas):
         self.weight = [0,0,u"g"]
         
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
-        # use self.temp2[self.specialevents[x]] to get the BT temperature of an event
+        # use self.temp2[self.specialevents[x]] to get the BT temperature of an event. Use self.timex[self.specialevents[x]] to get its time
         self.specialevents = []
         #Combobox text items in editGraphDlg
         self.etypes = ["None","Power","Damper","Fan"]
@@ -881,6 +881,7 @@ class tgraphcanvas(FigureCanvas):
                     jump -= 10
                 else:
                     jump -= 20
+                    
 
         ##### ET,BT curves
         self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label="ET")
@@ -1110,7 +1111,30 @@ class tgraphcanvas(FigureCanvas):
                 row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
             else:
                 row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
-                
+
+            #draw lines of color between events of the same type to help identify areas of events
+            #count and collect their times for each type 
+            netypes=[[],[],[],[]]
+            for i in range(Nevents):
+                if self.specialeventstype[i] == 0:
+                    netypes[0].append(self.timex[self.specialevents[i]])
+                elif self.specialeventstype[i] == 1:
+                    netypes[1].append(self.timex[self.specialevents[i]])
+                elif self.specialeventstype[i] == 2:
+                    netypes[2].append(self.timex[self.specialevents[i]])
+                elif self.specialeventstype[i] == 3:
+                    netypes[3].append(self.timex[self.specialevents[i]])
+                    
+            letters = "NPDF"
+            colors = [self.palette["rect2"],self.palette["rect3"]]
+            for p in range(4):    
+                if len(netypes[p]) > 1:
+                    for i in range(len(netypes[p])-1):
+                         #draw
+                         self.ax.plot([netypes[p][i],netypes[p][i+1]], [row[letters[p]],row[letters[p]]],color = colors[i%2],
+                                      linestyle = '-', linewidth= 4, alpha = .6)
+                         
+            # annotate events
             for i in range(Nevents):
                 firstletter = self.etypes[self.specialeventstype[i]][0]                
                 secondletter = self.eventsvalues[self.specialeventsvalue[i]]
@@ -1124,7 +1148,7 @@ class tgraphcanvas(FigureCanvas):
                                  xytext=(self.timex[int(self.specialevents[i])] -5,row[firstletter]),alpha=1.,
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
                         
-        # revert to old mode    
+        # revert to old style mode    
         else:
             for i in range(Nevents):
                 firstletter = self.etypes[self.specialeventstype[i]][0]                
@@ -1302,6 +1326,8 @@ class tgraphcanvas(FigureCanvas):
                         self.startend[1] = self.fromCtoF(self.startend[1])  #CHARGE temp
                         self.startend[3] = self.fromCtoF(self.startend[3])  #DROP temp
 
+                        self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
+
                         backgroundlength = len(self.timeB)
                         if backgroundlength > 0:
                             for i in range(backgroundlength):
@@ -1351,6 +1377,8 @@ class tgraphcanvas(FigureCanvas):
                         self.varC[7] =   self.fromFtoC(self.varC[7])        #2C end temp
                         self.startend[1] = self.fromFtoC(self.startend[1])  #CHARGE temp
                         self.startend[3] = self.fromFtoC(self.startend[3])  #DROP temp
+
+                        self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
                         
                         backgroundlength = len(self.timeB)
                         if backgroundlength > 0:
@@ -5438,28 +5466,28 @@ class editGraphDlg(QDialog):
         self.dryedit.setMaximumWidth(50)
         drylabel.setBuddy(self.dryedit)
  
-        Cstartlabel = QLabel("<b>1C START</b>")
+        Cstartlabel = QLabel("<b>FC START</b>")
         Cstartlabel.setStyleSheet("background-color:'orange';")
         self.Cstartedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.varC[0])))
         self.Cstartedit.setValidator(QRegExpValidator(regextime,self))
         self.Cstartedit.setMaximumWidth(50)
         Cstartlabel.setBuddy(self.Cstartedit)
         
-        Cendlabel = QLabel("<b>1C END</b>")
+        Cendlabel = QLabel("<b>FC END</b>")
         Cendlabel.setStyleSheet("background-color:'orange';")
         self.Cendedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.varC[2])))
         self.Cendedit.setValidator(QRegExpValidator(regextime,self))
         self.Cendedit.setMaximumWidth(50)
         Cendlabel.setBuddy(self.Cendedit)
    
-        CCstartlabel = QLabel("<b>2C START</b>")
+        CCstartlabel = QLabel("<b>SC START</b>")
         CCstartlabel.setStyleSheet("background-color:'orange';")
         self.CCstartedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.varC[4])))
         self.CCstartedit.setValidator(QRegExpValidator(regextime,self))
         self.CCstartedit.setMaximumWidth(50)
         CCstartlabel.setBuddy(self.CCstartedit)
 
-        CCendlabel = QLabel("<b>2C END</b>")
+        CCendlabel = QLabel("<b>SC END</b>")
         CCendlabel.setStyleSheet("background-color:'orange';")
         self.CCendedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.varC[6])))
         self.CCendedit.setValidator(QRegExpValidator(regextime,self))
