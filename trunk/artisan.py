@@ -116,7 +116,7 @@ from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainW
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
-                         QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient)
+                         QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,QStyleFactory)
 from PyQt4.QtCore import (QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime)
 
@@ -5240,8 +5240,7 @@ class HUDDlg(QDialog):
             self.soundCheck.setChecked(False)    
         self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
 
-        mikeButton = QPushButton("Test Mike" )  
-            
+        mikeButton = QPushButton("Test Mike" )             
         self.connect(mikeButton,SIGNAL("clicked()"),self.showsound)
 
         self.showsoundflag = 0
@@ -5249,6 +5248,17 @@ class HUDDlg(QDialog):
         tab3Layout = QHBoxLayout()
         tab3Layout.addWidget(self.soundCheck)
         tab3Layout.addWidget(mikeButton)
+
+    	#tab4
+        self.styleComboBox = QComboBox()
+        available = map(QString, QStyleFactory.keys())
+        self.styleComboBox.addItems(available)
+        styleButton = QPushButton("Set style" )
+        styleButton.setMaximumWidth(90)
+        self.connect(styleButton,SIGNAL("clicked()"),self.setappearance)        
+        tab4Layout = QVBoxLayout()
+        tab4Layout.addWidget(self.styleComboBox)    	
+        tab4Layout.addWidget(styleButton)    	
 
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
@@ -5264,6 +5274,10 @@ class HUDDlg(QDialog):
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
         TabWidget.addTab(C3Widget,"Sound")
+
+        C4Widget = QWidget()
+        C4Widget.setLayout(tab4Layout)
+        TabWidget.addTab(C4Widget,"Style")
         
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
@@ -5279,7 +5293,10 @@ class HUDDlg(QDialog):
         Slayout.addLayout(buttonsLayout)
         
         self.setLayout(Slayout)
-            
+        
+    def setappearance(self):        
+        app.setStyle(self.styleComboBox.currentText())
+        
     def showsound(self):
         aw.messagelabel.setText("Testing Mike...")
         aw.stack.setCurrentIndex(2)
