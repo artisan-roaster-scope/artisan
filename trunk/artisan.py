@@ -3967,23 +3967,23 @@ class ApplicationWindow(QMainWindow):
     #used by filesave()
     def getProfile(self):
         profile = {}
-        profile["mode"] = self.qmc.mode
+        profile["mode"] = unicode(self.qmc.mode)
         profile["startend"] = self.qmc.startend
         profile["cracks"] = self.qmc.varC
         profile["flavors"] = self.qmc.flavors
         profile["flavorlabels"] = [unicode(fl) for fl in self.qmc.flavorlabels]
-        profile["title"] = self.qmc.title
-        profile["beans"] = self.qmc.beans
+        profile["title"] = unicode(self.qmc.title)
+        profile["beans"] = unicode(self.qmc.beans)
         profile["weight"] = self.qmc.weight
-        profile["roastertype"] = self.qmc.roastertype
-        profile["operator"] = self.qmc.operator
+        profile["roastertype"] = unicode(self.qmc.roastertype)
+        profile["operator"] = unicode(self.qmc.operator)
         profile["roastdate"] = unicode(self.qmc.roastdate.toString())
         profile["specialevents"] = self.qmc.specialevents
         profile["specialeventstype"] = self.qmc.specialeventstype
         profile["specialeventsvalue"] = self.qmc.specialeventsvalue
         profile["specialeventsStrings"] = self.qmc.specialeventsStrings
-        profile["roastingnotes"] = self.qmc.roastingnotes
-        profile["cuppingnotes"] = self.qmc.cuppingnotes
+        profile["roastingnotes"] = unicode(self.qmc.roastingnotes)
+        profile["cuppingnotes"] = unicode(self.qmc.cuppingnotes)
         profile["timex"] = self.qmc.timex
         profile["temp1"] = self.qmc.temp1
         profile["temp2"] = self.qmc.temp2
@@ -4057,7 +4057,6 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("readBTpid"):
                 self.ser.readBTpid = map(lambda x:x.toInt()[0],settings.value("readBTpid").toList())
             settings.endGroup()
-            
             #restore phases
             if settings.contains("Phases"):
                 self.qmc.phases = map(lambda x:x.toInt()[0],settings.value("Phases").toList())
@@ -4072,7 +4071,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.statisticsflags = map(lambda x:x.toInt()[0],settings.value("Statistics").toList())
             #restore delay
             self.qmc.delay = settings.value("Delay",int(self.qmc.delay)).toInt()[0]
-            
             #restore colors
             for (k, v) in settings.value("Colors").toMap().items():
                 self.qmc.palette[unicode(k)] = unicode(v.toString())
@@ -4088,7 +4086,6 @@ class ApplicationWindow(QMainWindow):
             self.ser.parity = unicode(settings.value("parity",self.ser.parity).toString())
             self.ser.timeout = settings.value("timeout",self.ser.timeout).toInt()[0]
             settings.endGroup();
-
             #restore pid settings
             settings.beginGroup("PXR");
             for key in self.pid.PXR.keys():
@@ -4128,10 +4125,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.keeptimeflag = settings.value("keepTimeLimit",self.qmc.keeptimeflag).toInt()[0]
             settings.endGroup()
             settings.beginGroup("RoastProperties")
-            self.qmc.operator = settings.value("operator",self.qmc.operator).toString()
-            self.qmc.roastertype = settings.value("roastertype",self.qmc.roastertype).toString()
+            self.qmc.operator = unicode(settings.value("operator",self.qmc.operator).toString())
+            self.qmc.roastertype = unicode(settings.value("roastertype",self.qmc.roastertype).toString())
             settings.endGroup()
-            
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
             self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
