@@ -732,6 +732,8 @@ class tgraphcanvas(FigureCanvas):
     def ARDUINOTC4(self):
         t2,t1 = aw.ser.ARDUINOTC4temperature()
         tx = self.timeclock.elapsed()/1000.
+
+	return tx,t2,t1
     
     #creates X axis labels ticks in mm:ss acording to the endofx limit
     def xaxistosm(self):
@@ -7986,6 +7988,7 @@ class serialport(object):
         try:
             if not self.SP.isOpen():
                 self.openport()                    
+                time.sleep(2)
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
