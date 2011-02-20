@@ -1056,7 +1056,7 @@ class tgraphcanvas(FigureCanvas):
 
         #Add 2Cs markers
         if self.varC[4]:
-            if self.varC[3]:
+            if self.varC[2]:
                 self.ystep = self.findtextgap(self.varC[3],self.varC[5])
             else:
                 self.ystep = self.findtextgap(self.varC[1],self.varC[5])
@@ -1080,11 +1080,11 @@ class tgraphcanvas(FigureCanvas):
 
         #Add DROP markers
         if self.startend[2]:
-            if self.varC[7]:
+            if self.varC[6]:
                 self.ystep = self.findtextgap(self.varC[7],self.startend[3])
-            elif self.varC[5]:
+            elif self.varC[4]:
                 self.ystep = self.findtextgap(self.varC[5],self.startend[3])
-            elif self.varC[3]:
+            elif self.varC[2]:
                 self.ystep = self.findtextgap(self.varC[3],self.startend[3])
             else:
                 ystep = self.findtextgap(self.varC[1],self.startend[3])
@@ -1743,7 +1743,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     return              
             st1 = u"SCs " + self.stringfromseconds(self.varC[4]-self.startend[0])
-            if self.varC[3]:
+            if self.varC[2]:
                 self.ystep = self.findtextgap(self.varC[3],self.varC[5])
             else:
                 self.ystep = self.findtextgap(self.varC[1],self.varC[5])            
@@ -1826,11 +1826,11 @@ class tgraphcanvas(FigureCanvas):
                     return             
             st1 = u"End " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
             #anotate temperature
-            if self.varC[7]:
+            if self.varC[6]:
                 self.ystep = self.findtextgap(self.varC[7],self.startend[3])
-            elif self.varC[5]:
+            elif self.varC[4]:
                 self.ystep = self.findtextgap(self.varC[5],self.startend[3])
-            elif self.varC[3]:
+            elif self.varC[2]:
                 self.ystep = self.findtextgap(self.varC[3],self.startend[3])
             else:
                 self.ystep = self.findtextgap(self.varC[1],self.startend[3])
@@ -2244,7 +2244,7 @@ class tgraphcanvas(FigureCanvas):
                 func2 = inter.UnivariateSpline(self.timex,self.temp1)
 
             #create longer list of time values
-            time = list(numpy.arange(self.timex[0],self.timex[-1],1).tolist())
+            time = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
             #convert all time values to temperature
             btvals = func(time).tolist()
 
