@@ -16,7 +16,7 @@ import sys, os
 from setuptools import setup
 
 # current version of Artisan
-VERSION = '0.3.3'
+VERSION = '0.3.4'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
@@ -82,6 +82,12 @@ for root, dirs, files in os.walk('./dist'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
             
+os.system(r'cp README.txt dist')
+os.system(r'cp LICENSE.txt dist')
 os.chdir('./dist')
-os.system(r'macdeployqt Artisan.app -dmg -verbose=0')
+#os.system(r'macdeployqt Artisan.app -dmg -verbose=0')
+os.system(r'macdeployqt Artisan.app -verbose=0')
+os.chdir('..')
+os.system(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"')
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
+
