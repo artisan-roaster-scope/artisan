@@ -6041,9 +6041,6 @@ class editGraphDlg(QDialog):
         allEventsLayout.addLayout(eventsLayout)
         allEventsLayout.addLayout(eventbuttonLayout)
         
-        eventsGroupLayout = QGroupBox("Events")
-        eventsGroupLayout.setLayout(allEventsLayout)
-        
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(textLayout)
         tab1Layout.addLayout(weightLayout)
@@ -6053,31 +6050,32 @@ class editGraphDlg(QDialog):
         tab1Layout.addStretch()  
 
         tab2Layout = QVBoxLayout()
-        tab2Layout.addWidget(eventsGroupLayout)
+        tab2Layout.addLayout(allEventsLayout)
         tab2Layout.addStretch()  
 
         
         #  TABS LAYOUT
-        TabWidget = QTabWidget()
+        self.TabWidget = QTabWidget()
         
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,"General")
+        self.TabWidget.addTab(C1Widget,"General")
         
-        C2Widget = QWidget()
-        C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,"Events")
+        self.C2Widget = QWidget()
+        self.C2Widget.setLayout(tab2Layout)
+        self.TabWidget.addTab(self.C2Widget,"Events")
 
         C3Widget = QWidget()
         C3Widget.setLayout(anotationLayout)
-        TabWidget.addTab(C3Widget,"Notes")
+        self.TabWidget.addTab(C3Widget,"Notes")
 
         totalLayout = QVBoxLayout()
-        totalLayout.addWidget(TabWidget)
+        totalLayout.addWidget(self.TabWidget)
         totalLayout.addStretch()  
         totalLayout.addLayout(okLayout)
 
-        self.setLayout(totalLayout)
+        self.setLayout(totalLayout)    
+        aw.editgraph_dialog = self    
       
    
     def percent(self):
@@ -6287,6 +6285,7 @@ class editGraphDlg(QDialog):
             aw.qmc.specialevents.append(0)
             self.close()
             aw.editgraph()
+            aw.editgraph_dialog.TabWidget.setCurrentWidget(aw.editgraph_dialog.C2Widget)
         else:
             if len(aw.qmc.timex) < 1:
                 message = u"Events need time and data"
@@ -6297,9 +6296,10 @@ class editGraphDlg(QDialog):
     # pops an event from the Dlg
     def delevent(self):
         if len(aw.qmc.specialevents) > 0:
-             aw.qmc.specialevents.pop()
-             self.close()
-             aw.editgraph()
+            aw.qmc.specialevents.pop()
+            self.close()
+            aw.editgraph()
+            aw.editgraph_dialog.TabWidget.setCurrentWidget(aw.editgraph_dialog.C2Widget)
 
 
 
