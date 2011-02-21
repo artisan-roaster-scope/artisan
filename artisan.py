@@ -188,6 +188,8 @@ class tgraphcanvas(FigureCanvas):
         self.manuallogETflag = 0
         self.title = u"Roaster Scope"
         self.ambientTemp = 0.
+        #relative humidity percentage [0], corresponding temperature [1], temperature unit [2]
+        self.bag_humidity = [0.,0.,"C"]
 
         #list to store the time of each reading. Most IMPORTANT variable.
         self.timex = []
@@ -247,6 +249,8 @@ class tgraphcanvas(FigureCanvas):
         
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight = [0,0,u"g"]
+        #[0]volume in, [1]volume out, [2]units (string)
+        self.volume = [0,0,u"l"]
         
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event. Use self.timex[self.specialevents[x]] to get its time
@@ -786,6 +790,7 @@ class tgraphcanvas(FigureCanvas):
         self.projectFlag = False
         self.errorlog = []
         self.weight = [0,0,u"g"]
+        self.volume = [0,0,u"l"]
         self.specialevents = []
         self.specialeventstype = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] 
         self.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s",
@@ -952,6 +957,11 @@ class tgraphcanvas(FigureCanvas):
             timed = self.timex[i+1] - self.timex[i]
             d1 = self.sensitivity*((self.temp1[i+1] - self.temp1[i]) / timed) + 100
             d2 = self.sensitivity*((self.temp2[i+1] - self.temp2[i]) / timed) + 50
+            #smooth DeltaBT/DeltaET
+            #if len(self.delta1) > 2:
+            #   d1 = (d1 + d1 + d1 + self.delta1[-1] + self.delta1[-1] + self.delta1[-1] + self.delta1[-2] + self.delta1[-2] + self.delta1[-3]) / 9.0
+            #if len(self.delta2) > 2:
+            #   d2 = (d2 + d2 + d2 + self.delta2[-1] + self.delta2[-1] + self.delta2[-1] + self.delta2[-2] + self.delta2[-2] + self.delta2[-3]) / 9.0
             self.delta1.append(d1)
             self.delta2.append(d2)
         #this is needed because DeltaBT and DeltaET need 2 values of timex (difference) but they also need same dimension in order to plot
@@ -2226,6 +2236,7 @@ class tgraphcanvas(FigureCanvas):
             self.ax.plot(time, btvals, color=self.palette["bt"], linestyle = '-.', linewidth=2)
             if etflag:
                 self.ax.plot(time, etvals, color=self.palette["met"], linestyle = '-.', linewidth=2)
+            self.fig.canvas.draw()
             
             if etflag:
                 question = "Interpolate ET and BT?"
@@ -3602,16 +3613,25 @@ class ApplicationWindow(QMainWindow):
             self.setCurrentFile(filename)
                 
         except IOError,e:
+            #print e
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Unable to open file " + unicode(e))
             return
 
         except ValueError,e:
+            #print e
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             self.messagelabel.setText(unicode(e))
             self.qmc.errorlog.append(u"value error in fileload() " + unicode(e))
             return
 
         except Exception,e:
+            #print e
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             self.messagelabel.setText(unicode(e))
             self.qmc.errorlog.append(unicode(e))
             return
@@ -3862,7 +3882,7 @@ class ApplicationWindow(QMainWindow):
     def setProfile(self,profile):
         old_mode = self.qmc.mode
         if "mode" in profile:
-            self.qmc.mode = profile["mode"]
+            self.qmc.mode = unicode(profile["mode"])
         #convert modes only if needed comparing the new uploaded mode to the old one.
         #otherwise it would incorrectly convert the uploaded phases
         if self.qmc.mode == u"F" and old_mode == "C":
@@ -3870,23 +3890,25 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.mode == u"C" and old_mode == "F":
             self.qmc.celsiusMode()
         if "startend" in profile:
-            self.qmc.startend = profile["startend"]        
+            self.qmc.startend = [float(fl) for fl in profile["startend"]]       
         if "cracks" in profile:
-            self.qmc.varC = profile["cracks"]
+            self.qmc.varC = [float(fl) for fl in profile["cracks"]]
         if "flavors" in profile:
-            self.qmc.flavors = profile["flavors"]
+            self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
         if "flavorlabels" in profile:
             self.qmc.flavorlabels = QStringList(profile["flavorlabels"])
         if "title" in profile:
-            self.qmc.title = profile["title"]
+            self.qmc.title = unicode(profile["title"])
         if "beans" in profile:
-            self.qmc.beans = profile["beans"]
+            self.qmc.beans = unicode(profile["beans"])
         if "weight" in profile:
             self.qmc.weight = profile["weight"]
+        if "volume" in profile:
+            self.qmc.volume = profile["volume"]
         if "roastertype" in profile:
-            self.qmc.roastertype = profile["roastertype"]
+            self.qmc.roastertype = unicode(profile["roastertype"])
         if "operator" in profile:
-            self.qmc.operator = profile["operator"]
+            self.qmc.operator = unicode(profile["operator"])
         if "roastdate" in profile:
             self.qmc.roastdate = QDate.fromString(profile["roastdate"])
         if "specialevents" in profile:
@@ -3905,9 +3927,9 @@ class ApplicationWindow(QMainWindow):
             for i in range(len(specialeventsStrings)):
                 self.qmc.specialeventsStrings[i] = specialeventsStrings[i]
         if "roastingnotes" in profile:
-            self.qmc.roastingnotes = profile["roastingnotes"]
+            self.qmc.roastingnotes = unicode(profile["roastingnotes"])
         if "cuppingnotes" in profile:
-            self.qmc.cuppingnotes = profile["cuppingnotes"]
+            self.qmc.cuppingnotes = unicode(profile["cuppingnotes"])
         if "timex" in profile:
             self.qmc.timex = profile["timex"]
         if "temp1" in profile:
@@ -3917,13 +3939,13 @@ class ApplicationWindow(QMainWindow):
         if "phases" in profile:
             self.qmc.phases = profile["phases"]
         if "ymin" in profile:
-            self.qmc.ylimit_min = profile["ymin"]
+            self.qmc.ylimit_min = int(profile["ymin"])
         if "ymax" in profile:
-            self.qmc.ylimit = profile["ymax"]
+            self.qmc.ylimit = int(profile["ymax"])
         if "xmin" in profile:
-            self.qmc.startofx = profile["xmin"]
+            self.qmc.startofx = int(profile["xmin"])
         if "xmax" in profile:
-            self.qmc.endofx = profile["xmax"]   
+            self.qmc.endofx = int(profile["xmax"])
         else:
             #Set the xlimits
             if self.qmc.timex:
@@ -3933,16 +3955,18 @@ class ApplicationWindow(QMainWindow):
         if "statisticsconditions" in profile:
             self.qmc.statisticsconditions = profile["statisticsconditions"]
         if "DeltaET" in profile:
-            self.qmc.DeltaETflag = profile["DeltaET"]
+            self.qmc.DeltaETflag = bool(profile["DeltaET"])
         if "DeltaBT" in profile:
-            self.qmc.DeltaBTflag = profile["DeltaBT"]
+            self.qmc.DeltaBTflag = bool(profile["DeltaBT"])
         if "ambientTemp" in profile:
             self.qmc.ambientTemp = profile["ambientTemp"]
         if "dryend" in profile:
             self.qmc.dryend = profile["dryend"]
-          
+        if "bag_humidity" in profile:
+            self.qmc.bag_humidity = profile["bag_humidity"]          
             
     #used by filesave()
+    #wrap values in unicode(.) if and only if those are of type string
     def getProfile(self):
         profile = {}
         profile["mode"] = self.qmc.mode
@@ -3950,18 +3974,19 @@ class ApplicationWindow(QMainWindow):
         profile["cracks"] = self.qmc.varC
         profile["flavors"] = self.qmc.flavors
         profile["flavorlabels"] = [unicode(fl) for fl in self.qmc.flavorlabels]
-        profile["title"] = self.qmc.title
-        profile["beans"] = self.qmc.beans
+        profile["title"] = unicode(self.qmc.title)
+        profile["beans"] = unicode(self.qmc.beans)
         profile["weight"] = self.qmc.weight
-        profile["roastertype"] = self.qmc.roastertype
-        profile["operator"] = self.qmc.operator
+        profile["volume"] = self.qmc.volume
+        profile["roastertype"] = unicode(self.qmc.roastertype)
+        profile["operator"] = unicode(self.qmc.operator)
         profile["roastdate"] = unicode(self.qmc.roastdate.toString())
         profile["specialevents"] = self.qmc.specialevents
         profile["specialeventstype"] = self.qmc.specialeventstype
         profile["specialeventsvalue"] = self.qmc.specialeventsvalue
-        profile["specialeventsStrings"] = self.qmc.specialeventsStrings
-        profile["roastingnotes"] = self.qmc.roastingnotes
-        profile["cuppingnotes"] = self.qmc.cuppingnotes
+        profile["specialeventsStrings"] = [unicode(ses) for ses in self.qmc.specialeventsStrings] 
+        profile["roastingnotes"] = unicode(self.qmc.roastingnotes)
+        profile["cuppingnotes"] = unicode(self.qmc.cuppingnotes)
         profile["timex"] = self.qmc.timex
         profile["temp1"] = self.qmc.temp1
         profile["temp2"] = self.qmc.temp2
@@ -3976,6 +4001,7 @@ class ApplicationWindow(QMainWindow):
         profile["DeltaBT"] = self.qmc.DeltaBTflag
         profile["ambientTemp"] = self.qmc.ambientTemp
         profile["dryend"] = self.qmc.dryend
+        profile["bag_humidity"] = self.qmc.bag_humidity
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -4284,6 +4310,10 @@ th {
 <td>$degree</td>
 </tr>
 <tr>
+<th>Volume:</th>
+<td>$volume</td>
+</tr>
+<tr>
 <th>Roaster:</th>
 <td>$roaster</td>
 </tr>
@@ -4430,6 +4460,7 @@ $cupping_notes
             flavor_image = "artisan-flavor.png"
             image.save(flavor_image)
         weight_loss = aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1])
+        volume_gain = aw.weight_loss(self.qmc.volume[1],self.qmc.volume[0])
         #return screen to GRAPH profile mode
         self.qmc.redraw()
         html = string.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -4438,6 +4469,7 @@ $cupping_notes
             beans=beans,
             weight=unicode(self.qmc.weight[0]) + self.qmc.weight[2] + " (" + "%.1f"%weight_loss + "%)",
             degree=aw.roast_degree(weight_loss),
+            volume=unicode(self.qmc.volume[0]) + self.qmc.volume[2] + " (" + "%.1f"%volume_gain + "%)",
             roaster=cgi.escape(self.qmc.roastertype),
             operator=cgi.escape(self.qmc.operator),
             cup=str(self.cuppingSum()),
@@ -4542,16 +4574,36 @@ $cupping_notes
     # converts times (values of timex) to indices in aw.qmc.temp1 and aw.qmc.temp2
     def time2index(self,time):
         for i in range(len(aw.qmc.timex)):
-            if aw.qmc.timex[i] == time:
+            if aw.qmc.timex[i] > time:
                 return i
         return -1
         
     #returns the index of the lowest point in BT; return -1 if no such value found
-    def findTP(self):
+    def findTP(self):  
         
         TP  = 1000
         idx = 0
-        for i in range(len(aw.qmc.timex) - 1, 0, -1):
+        start = 0
+        end = len(aw.qmc.timex)
+        # try to consider only indices until the roast end and not beyond
+        EOR_index = end
+        if aw.qmc.startend[2] > 0.:
+            EOR_index = self.time2index(aw.qmc.startend[2])
+        if EOR_index > start and EOR_index < end:
+            end = EOR_index
+        # try to consider only indices until FCs and not beyond
+        FCs_index = end
+        if aw.qmc.varC[0] > 0.:
+            FCs_index = self.time2index(aw.qmc.varC[0])
+        if FCs_index > start and FCs_index < end:
+            end = FCs_index
+        # try to consider only indices from start of roast on and not before
+        SOR_index = start
+        if aw.qmc.startend[0] > 0.:
+            SOR_index = self.time2index(aw.qmc.startend[0]) 
+        if SOR_index > start and SOR_index < end:
+            start = SOR_index
+        for i in range(end - 1, start -1, -1):
             if aw.qmc.temp2[i] < TP:
                 TP = aw.qmc.temp2[i]
                 idx = i
@@ -4601,13 +4653,40 @@ $cupping_notes
         sd = 1000
         nsd = 1000
         index = 0
-        for i in range(len(aw.qmc.timex) -1, -1, -1):
+        start = 0
+        end = len(aw.qmc.timex)
+        # try to consider only indices until the roast end and not beyond
+        EOR_index = end
+        if aw.qmc.startend[2] > 0.:
+            EOR_index = self.time2index(aw.qmc.startend[2])
+        if EOR_index > start and EOR_index < end:
+            end = EOR_index
+        # try to consider only indices until FCs and not beyond
+        FCs_index = end
+        if aw.qmc.varC[0] > 0.:
+            FCs_index = self.time2index(aw.qmc.varC[0])
+        if FCs_index > start and FCs_index < end:
+            end = FCs_index
+        # try to consider only indices from start of roast on and not before
+        SOR_index = start
+        if aw.qmc.startend[0] > 0.:
+            SOR_index = self.time2index(aw.qmc.startend[0]) 
+        if SOR_index > start and SOR_index < end:
+            start = SOR_index
+        # try to consider only indices from TP of roast on and not before
+        TP = TP_index
+        # if TP not yet computed, let's try to compute it
+        if TP == None:
+            TP = self.findTP()
+        if TP > start and TP < end:
+            start = TP
+        for i in range(end -1, start -1, -1):
              nsd = abs(aw.qmc.temp2[i]- aw.qmc.phases[1])
              if nsd < sd:
                  sd = nsd
                  index = i
         return index
-     
+      
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
     def RoR(self,TP_index,dryEndIndex):
         dryphasetime = aw.qmc.statisticstimes[1]
@@ -5168,6 +5247,7 @@ class HUDDlg(QDialog):
         self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
 
         mikeButton = QPushButton("Test Mike" )             
+        mikeButton.setFocusPolicy(Qt.NoFocus)        
         self.connect(mikeButton,SIGNAL("clicked()"),self.showsound)
 
         self.showsoundflag = 0
@@ -5181,6 +5261,7 @@ class HUDDlg(QDialog):
         available = map(QString, QStyleFactory.keys())
         self.styleComboBox.addItems(available)
         styleButton = QPushButton("Set style" )
+        styleButton.setFocusPolicy(Qt.NoFocus)   
         styleButton.setMaximumWidth(90)
         self.connect(styleButton,SIGNAL("clicked()"),self.setappearance)        
         tab4Layout = QVBoxLayout()
@@ -5898,8 +5979,6 @@ class editGraphDlg(QDialog):
         events1Layout.addWidget(self.valueComboBox10,10,3)
         events1Layout.addWidget(self.line10,10,4)
 
-
-
         events2Layout = QGridLayout()
 
         events2Layout.addWidget(self.numberlabel11,1,0)
@@ -6008,7 +6087,11 @@ class editGraphDlg(QDialog):
 
         #Beans
         beanslabel = QLabel("<b>Beans</b>")
-        self.beansedit = QLineEdit(aw.qmc.beans)
+        #self.beansedit = QLineEdit(aw.qmc.beans)
+        self.beansedit = QTextEdit()
+        self.beansedit.setMaximumHeight(100)
+
+        self.beansedit.setPlainText(QString(aw.qmc.beans))
 
         #roaster
         self.roaster = QLineEdit(aw.qmc.roastertype)
@@ -6041,15 +6124,74 @@ class editGraphDlg(QDialog):
         self.percent()
         self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.percent)
         self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.percent)
+        
 
 
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
         self.unitsComboBox.addItems(["g","Kg"])
+        if aw.qmc.weight[2] == "g":
+            self.unitsComboBox.setCurrentIndex(0)
+        else:
+            self.unitsComboBox.setCurrentIndex(1)
+        
+        #volume
+        volumelabel = QLabel("<b>Volume</b> ")
+        volumeinlabel = QLabel(" in")
+        volumeoutlabel = QLabel(" out")
+        inv = str(aw.qmc.volume[0])
+        outv = str(aw.qmc.volume[1])
+        self.volumeinedit = QLineEdit(inv) 
+        
+        self.volumeinedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeinedit))
+        self.volumeinedit.setMinimumWidth(50)
+        self.volumeinedit.setMaximumWidth(50)
+        self.volumeoutedit = QLineEdit(outv)
+        self.volumeoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeoutedit))
+        self.volumeoutedit.setMinimumWidth(50)
+        self.volumeoutedit.setMaximumWidth(50)
+        self.volumepercentlabel = QLabel(" %")
+        self.volumepercentlabel.setMinimumWidth(45)
+        self.volumepercentlabel.setMaximumWidth(45)
+
+        self.volume_percent()
+        self.connect(self.volumeoutedit,SIGNAL("editingFinished()"),self.volume_percent)
+        self.connect(self.volumeinedit,SIGNAL("editingFinished()"),self.volume_percent)
+        
+        self.volumeUnitsComboBox = QComboBox()
+        self.volumeUnitsComboBox.setMaximumWidth(60)
+        self.volumeUnitsComboBox.setMinimumWidth(60)
+        self.volumeUnitsComboBox.addItems(["ml","l"])        
+        if aw.qmc.volume[2] == "ml":
+            self.volumeUnitsComboBox.setCurrentIndex(0)
+        else:
+            self.volumeUnitsComboBox.setCurrentIndex(1)
+
+        #bag humidity
+        bag_humidity_label = QLabel("<b>Bag Humidity </b>")
+        bag_humidity_unit_label = QLabel("%")
+        self.humidity_edit = QLineEdit()
+        self.humidity_edit.setText(unicode(aw.qmc.bag_humidity[0]))
+        self.humidity_edit.setMaximumWidth(50)
+        self.humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.humidity_edit))
+        bag_humidity_at_label = QLabel("at")
+        self.bag_temp_edit = QLineEdit( )
+        self.bag_temp_edit.setText(unicode(aw.qmc.bag_humidity[1]))
+        self.bag_temp_edit.setMaximumWidth(50)
+        self.bag_temp_edit.setValidator(QDoubleValidator(0., 200., 1, self.bag_temp_edit))
+        self.bag_humiditity_tempUnitsComboBox = QComboBox()
+        self.bag_humiditity_tempUnitsComboBox.setMaximumWidth(60)
+        self.bag_humiditity_tempUnitsComboBox.setMinimumWidth(60)
+        self.bag_humiditity_tempUnitsComboBox.addItems(["C","F"])
+        if aw.qmc.bag_humidity[2] == "C":
+            self.bag_humiditity_tempUnitsComboBox.setCurrentIndex(0)
+        else:
+            self.bag_humiditity_tempUnitsComboBox.setCurrentIndex(1)
+        
 
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>Ambient T</b>")
+        ambientlabel = QLabel("<b>Ambient Temperature</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
@@ -6148,6 +6290,34 @@ class editGraphDlg(QDialog):
         weightLayout.addWidget(self.roastdegreelabel)  
         weightLayout.addStretch()  
 
+        volumeLayout = QHBoxLayout()
+        volumeLayout.setSpacing(0)
+        volumeLayout.addWidget(volumelabel)
+        volumeLayout.addSpacing(14)
+        volumeLayout.addWidget(self.volumeUnitsComboBox)
+        volumeLayout.addSpacing(15)
+        volumeLayout.addWidget(self.volumeinedit)
+        volumeLayout.addSpacing(1)
+        volumeLayout.addWidget(volumeinlabel)
+        volumeLayout.addSpacing(15)
+        volumeLayout.addWidget(self.volumeoutedit)
+        volumeLayout.addSpacing(1)
+        volumeLayout.addWidget(volumeoutlabel)
+        volumeLayout.addSpacing(15)
+        volumeLayout.addWidget(self.volumepercentlabel)  
+        volumeLayout.addStretch()  
+
+        humidityLayout = QHBoxLayout()
+        humidityLayout.addWidget(bag_humidity_label)
+        humidityLayout.addWidget(self.humidity_edit)
+        humidityLayout.addWidget(bag_humidity_unit_label)
+        humidityLayout.addSpacing(15)
+        humidityLayout.addWidget(bag_humidity_at_label)
+        humidityLayout.addSpacing(15)
+        humidityLayout.addWidget(self.bag_temp_edit)
+        humidityLayout.addWidget(self.bag_humiditity_tempUnitsComboBox)
+        humidityLayout.addStretch()
+        
         ambientLayout = QHBoxLayout()
         ambientLayout.addWidget(ambientlabel)
         ambientLayout.addWidget(self.ambientedit)
@@ -6180,6 +6350,8 @@ class editGraphDlg(QDialog):
         tab1Layout.addWidget(timeGroupLayout)
         tab1Layout.addLayout(textLayout)
         tab1Layout.addLayout(weightLayout)
+        tab1Layout.addLayout(volumeLayout)
+        tab1Layout.addLayout(humidityLayout)
         tab1Layout.addLayout(ambientLayout)
         tab1Layout.addStretch()  
 
@@ -6202,7 +6374,7 @@ class editGraphDlg(QDialog):
         
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        self.TabWidget.addTab(C1Widget,"Roast")
+        self.TabWidget.addTab(C1Widget,"General")
         
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
@@ -6238,6 +6410,14 @@ class editGraphDlg(QDialog):
         if percent > 0.:
             roastdegreestring = aw.roast_degree(percent)
         self.roastdegreelabel.setText(QString(roastdegreestring))
+        
+    def volume_percent(self):
+        if float(self.volumeoutedit.text()) != 0.0:
+            percent = aw.weight_loss(float(self.volumeoutedit.text()),float(self.volumeinedit.text()))
+        else:
+            percent = 0.
+        percentstring =  "%.1f" %(percent) + "%"
+        self.volumepercentlabel.setText(QString(percentstring))    #volume percent gain
         
                 
     def accept(self):
@@ -6395,7 +6575,7 @@ class editGraphDlg(QDialog):
         aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
         aw.qmc.title = unicode(self.titleedit.text())
         # Update beans
-        aw.qmc.beans = unicode(self.beansedit.text())
+        aw.qmc.beans = unicode(self.beansedit.toPlainText())
         #update roaster
         aw.qmc.roaster = unicode(self.roaster.text())
 
@@ -6409,7 +6589,22 @@ class editGraphDlg(QDialog):
         else:
             pass
         aw.qmc.weight[2] = unicode(self.unitsComboBox.currentText())
+        
+        #update volume
+        if unicode(self.volumeinedit.text()).isdigit():
+            aw.qmc.volume[0] = int(self.volumeinedit.text())
+        else:
+            pass
+        if unicode(self.volumeoutedit.text()).isdigit():
+            aw.qmc.volume[1] = int(self.volumeoutedit.text())
+        else:
+            pass
+        aw.qmc.volume[2] = unicode(self.unitsComboBox.currentText())
 
+        #update humidity
+        aw.qmc.bag_humidity[0] = float(self.humidity_edit.text())
+        aw.qmc.bag_humidity[1] = float(self.bag_temp_edit.text())
+        aw.qmc.bag_humidity[2] = unicode(self.bag_humiditity_tempUnitsComboBox.currentText())
 
     	#update ambient temperature
         aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
@@ -6717,12 +6912,13 @@ class editGraphDlg(QDialog):
     # adds a new event to the Dlg
     def addevent(self):
         nevents = len(aw.qmc.specialevents)
-        #self.accept()                       #saves edited events or notes before adding new event
+        #self.accept()
         if len(aw.qmc.timex) > 1 and nevents < 20:
             aw.qmc.specialevents.append(0)
             self.paintevents()
             aw.qmc.redraw()
             message = u"Event #" + str(nevents) + " added"
+            nevents = len(aw.qmc.specialevents)
             if nevents <= 10:
                 self.delevent1Button.setDisabled(False)
                 self.newevent1Button.setDisabled(False)
@@ -6740,7 +6936,7 @@ class editGraphDlg(QDialog):
         else:
             if len(aw.qmc.timex) < 1:
                 message = u"Events need time and data"
-            if len(aw.qmc.specialevents) == 10:
+            if len(aw.qmc.specialevents) == 20:
                 message = u"Max 20 Events allowed"
             aw.messagelabel.setText(message)
 
@@ -6750,6 +6946,20 @@ class editGraphDlg(QDialog):
              aw.qmc.specialevents.pop()
              self.paintevents()
              aw.qmc.redraw()
+             nevents = len(aw.qmc.specialevents)
+             message = u"Event #" + str(nevents+1) + " deleted"             
+             if nevents <= 10:
+                self.delevent1Button.setDisabled(False)
+                self.newevent1Button.setDisabled(False)
+                self.delevent2Button.setDisabled(True)
+                self.newevent2Button.setDisabled(True)
+                self.TabWidget.setCurrentIndex(2)
+             else:
+                self.delevent2Button.setDisabled(False)
+                self.newevent2Button.setDisabled(False)            
+                self.delevent1Button.setDisabled(True)
+                self.newevent1Button.setDisabled(True)
+                self.TabWidget.setCurrentIndex(3)             
         else:
             aw.messagelabel.setText("Zero events")
 
@@ -9911,7 +10121,7 @@ class PXRpidDlgControl(QDialog):
             if r == command:
                 message = u" SV successfully set to " + self.svedit.text()
                 aw.pid.PXR["sv0"][0] = float(self.svedit.text())
-                aw.lcd6.display(QString("%.1f"%aw.pid.PXR["sv0"][0]))
+                aw.lcd6.display(aw.pid.PXR["sv0"][0])
                 self.status.showMessage(message,5000)
                 #aw.lcd6.display(unicode(self.svedit.text()))
             else:
