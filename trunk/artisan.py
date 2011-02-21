@@ -5964,37 +5964,37 @@ class editGraphDlg(QDialog):
             
         self.paintevents()            
             
-        newevent1Button = QPushButton("Add")
-        newevent1Button.setFocusPolicy(Qt.NoFocus)
-        newevent1Button.setMaximumSize(newevent1Button.sizeHint())
-        newevent1Button.setMinimumSize(newevent1Button.minimumSizeHint())
-        self.connect(newevent1Button,SIGNAL("clicked()"),self.addevent)
+        self.newevent1Button = QPushButton("Add")
+        self.newevent1Button.setFocusPolicy(Qt.NoFocus)
+        self.newevent1Button.setMaximumSize(self.newevent1Button.sizeHint())
+        self.newevent1Button.setMinimumSize(self.newevent1Button.minimumSizeHint())
+        self.connect(self.newevent1Button,SIGNAL("clicked()"),self.addevent)
 
-        delevent1Button = QPushButton("Delete")
-        delevent1Button.setFocusPolicy(Qt.NoFocus)
-        delevent1Button.setMaximumSize(delevent1Button.sizeHint())
-        delevent1Button.setMinimumSize(delevent1Button.minimumSizeHint())
-        self.connect(delevent1Button,SIGNAL("clicked()"),self.delevent)
+        self.delevent1Button = QPushButton("Delete")
+        self.delevent1Button.setFocusPolicy(Qt.NoFocus)
+        self.delevent1Button.setMaximumSize(self.delevent1Button.sizeHint())
+        self.delevent1Button.setMinimumSize(self.delevent1Button.minimumSizeHint())
+        self.connect(self.delevent1Button,SIGNAL("clicked()"),self.delevent)
 
-        newevent2Button = QPushButton("Add")
-        newevent2Button.setFocusPolicy(Qt.NoFocus)
-        newevent2Button.setMaximumSize(newevent2Button.sizeHint())
-        newevent2Button.setMinimumSize(newevent2Button.minimumSizeHint())
-        self.connect(newevent2Button,SIGNAL("clicked()"),self.addevent)
+        self.newevent2Button = QPushButton("Add")
+        self.newevent2Button.setFocusPolicy(Qt.NoFocus)
+        self.newevent2Button.setMaximumSize(self.newevent2Button.sizeHint())
+        self.newevent2Button.setMinimumSize(self.newevent2Button.minimumSizeHint())
+        self.connect(self.newevent2Button,SIGNAL("clicked()"),self.addevent)
 
-        delevent2Button = QPushButton("Delete")
-        delevent2Button.setFocusPolicy(Qt.NoFocus)
-        delevent2Button.setMaximumSize(delevent2Button.sizeHint())
-        delevent2Button.setMinimumSize(delevent2Button.minimumSizeHint())
-        self.connect(delevent2Button,SIGNAL("clicked()"),self.delevent)
+        self.delevent2Button = QPushButton("Delete")
+        self.delevent2Button.setFocusPolicy(Qt.NoFocus)
+        self.delevent2Button.setMaximumSize(self.delevent2Button.sizeHint())
+        self.delevent2Button.setMinimumSize(self.delevent2Button.minimumSizeHint())
+        self.connect(self.delevent2Button,SIGNAL("clicked()"),self.delevent)
 
         lene = len(aw.qmc.timex)
         if lene > 1 and lene <= 10:
-            delevent1Button.setDisabled(True)
-            newevent1Button.setDisabled(True)
+            self.delevent1Button.setDisabled(True)
+            self.newevent1Button.setDisabled(True)
         if lene > 10 and lene <= 20:
-            delevent2Button.setDisabled(True)
-            newevent2Button.setDisabled(True)            
+            self.delevent2Button.setDisabled(True)
+            self.newevent2Button.setDisabled(True)            
             
         #TITLE
         titlelabel = QLabel("<b>Title</b>")
@@ -6109,13 +6109,13 @@ class editGraphDlg(QDialog):
 
         event1buttonLayout = QHBoxLayout()
         event1buttonLayout.addStretch()  
-        event1buttonLayout.addWidget(delevent1Button)
-        event1buttonLayout.addWidget(newevent1Button)
+        event1buttonLayout.addWidget(self.delevent1Button)
+        event1buttonLayout.addWidget(self.newevent1Button)
 
         event2buttonLayout = QHBoxLayout()
         event2buttonLayout.addStretch()  
-        event2buttonLayout.addWidget(delevent2Button)
-        event2buttonLayout.addWidget(newevent2Button)
+        event2buttonLayout.addWidget(self.delevent2Button)
+        event2buttonLayout.addWidget(self.newevent2Button)
         
         textLayout = QGridLayout()
         textLayout.addWidget(datelabel1,0,0)
@@ -6723,6 +6723,20 @@ class editGraphDlg(QDialog):
             self.paintevents()
             aw.qmc.redraw()
             message = u"Event #" + str(nevents) + " added"
+            if nevents <= 10:
+                self.delevent1Button.setDisabled(False)
+                self.newevent1Button.setDisabled(False)
+                self.delevent2Button.setDisabled(True)
+                self.newevent2Button.setDisabled(True)
+                self.TabWidget.setCurrentIndex(2)
+        
+            else:
+                self.delevent2Button.setDisabled(False)
+                self.newevent2Button.setDisabled(False)            
+                self.delevent1Button.setDisabled(True)
+                self.newevent1Button.setDisabled(True)
+                self.TabWidget.setCurrentIndex(3)
+
         else:
             if len(aw.qmc.timex) < 1:
                 message = u"Events need time and data"
