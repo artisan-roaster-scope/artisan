@@ -982,6 +982,11 @@ class tgraphcanvas(FigureCanvas):
             timed = self.timex[i+1] - self.timex[i]
             d1 = self.sensitivity*((self.temp1[i+1] - self.temp1[i]) / timed) + 100
             d2 = self.sensitivity*((self.temp2[i+1] - self.temp2[i]) / timed) + 50
+            #smooth DeltaBT/DeltaET
+            #if len(self.delta1) > 2:
+            #   d1 = (d1 + d1 + d1 + self.delta1[-1] + self.delta1[-1] + self.delta1[-1] + self.delta1[-2] + self.delta1[-2] + self.delta1[-3]) / 9.0
+            #if len(self.delta2) > 2:
+            #   d2 = (d2 + d2 + d2 + self.delta2[-1] + self.delta2[-1] + self.delta2[-1] + self.delta2[-2] + self.delta2[-2] + self.delta2[-3]) / 9.0
             self.delta1.append(d1)
             self.delta2.append(d2)
         #this is needed because DeltaBT and DeltaET need 2 values of timex (difference) but they also need same dimension in order to plot
@@ -3631,18 +3636,27 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(message)
             
             self.setCurrentFile(filename)
-                
+              
         except IOError,e:
+            #print e
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Unable to open file " + unicode(e))
             return
 
         except ValueError,e:
+            #print e
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             self.messagelabel.setText(unicode(e))
             self.qmc.errorlog.append(u"value error in fileload() " + unicode(e))
             return
 
         except Exception,e:
+            #print e
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             self.messagelabel.setText(unicode(e))
             self.qmc.errorlog.append(unicode(e))
             return
@@ -3893,7 +3907,7 @@ class ApplicationWindow(QMainWindow):
     def setProfile(self,profile):
         old_mode = self.qmc.mode
         if "mode" in profile:
-            self.qmc.mode = profile["mode"]
+            self.qmc.mode = unicode(profile["mode"])
         #convert modes only if needed comparing the new uploaded mode to the old one.
         #otherwise it would incorrectly convert the uploaded phases
         if self.qmc.mode == u"F" and old_mode == "C":
@@ -3901,23 +3915,23 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.mode == u"C" and old_mode == "F":
             self.qmc.celsiusMode()
         if "startend" in profile:
-            self.qmc.startend = profile["startend"]        
+            self.qmc.startend = [float(fl) for fl in profile["startend"]]       
         if "cracks" in profile:
-            self.qmc.varC = profile["cracks"]
+            self.qmc.varC = [float(fl) for fl in profile["cracks"]]
         if "flavors" in profile:
-            self.qmc.flavors = profile["flavors"]
+            self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
         if "flavorlabels" in profile:
             self.qmc.flavorlabels = QStringList(profile["flavorlabels"])
         if "title" in profile:
-            self.qmc.title = profile["title"]
+            self.qmc.title = unicode(profile["title"])
         if "beans" in profile:
-            self.qmc.beans = profile["beans"]
+            self.qmc.beans = unicode(profile["beans"])
         if "weight" in profile:
             self.qmc.weight = profile["weight"]
         if "roastertype" in profile:
-            self.qmc.roastertype = profile["roastertype"]
+            self.qmc.roastertype = unicode(profile["roastertype"])
         if "operator" in profile:
-            self.qmc.operator = profile["operator"]
+            self.qmc.operator = unicode(profile["operator"])
         if "roastdate" in profile:
             self.qmc.roastdate = QDate.fromString(profile["roastdate"])
         if "specialevents" in profile:
@@ -3927,11 +3941,11 @@ class ApplicationWindow(QMainWindow):
         if "specialeventsvalue" in profile:
             self.qmc.specialeventsvalue = profile["specialeventsvalue"]
         if "specialeventsStrings" in profile:
-            self.qmc.specialeventsStrings = profile["specialeventsStrings"]
+            self.qmc.specialeventsStrings = [unicode(s) for s in profile["specialeventsStrings"]]
         if "roastingnotes" in profile:
-            self.qmc.roastingnotes = profile["roastingnotes"]
+            self.qmc.roastingnotes = unicode(profile["roastingnotes"])
         if "cuppingnotes" in profile:
-            self.qmc.cuppingnotes = profile["cuppingnotes"]
+            self.qmc.cuppingnotes = unicode(profile["cuppingnotes"])
         if "timex" in profile:
             self.qmc.timex = profile["timex"]
         if "temp1" in profile:
@@ -3941,13 +3955,13 @@ class ApplicationWindow(QMainWindow):
         if "phases" in profile:
             self.qmc.phases = profile["phases"]
         if "ymin" in profile:
-            self.qmc.ylimit_min = profile["ymin"]
+            self.qmc.ylimit_min = int(profile["ymin"])
         if "ymax" in profile:
-            self.qmc.ylimit = profile["ymax"]
+            self.qmc.ylimit = int(profile["ymax"])
         if "xmin" in profile:
-            self.qmc.startofx = profile["xmin"]
+            self.qmc.startofx = int(profile["xmin"])
         if "xmax" in profile:
-            self.qmc.endofx = profile["xmax"]   
+            self.qmc.endofx = int(profile["xmax"])
         else:
             #Set the xlimits
             if self.qmc.timex:
@@ -3957,9 +3971,9 @@ class ApplicationWindow(QMainWindow):
         if "statisticsconditions" in profile:
             self.qmc.statisticsconditions = profile["statisticsconditions"]
         if "DeltaET" in profile:
-            self.qmc.DeltaETflag = profile["DeltaET"]
+            self.qmc.DeltaETflag = bool(profile["DeltaET"])
         if "DeltaBT" in profile:
-            self.qmc.DeltaBTflag = profile["DeltaBT"]
+            self.qmc.DeltaBTflag = bool(profile["DeltaBT"])
         if "ambientTemp" in profile:
             self.qmc.ambientTemp = profile["ambientTemp"]
         if "dryend" in profile:
@@ -3967,39 +3981,40 @@ class ApplicationWindow(QMainWindow):
           
             
     #used by filesave()
+    #wrap values in unicode(.) if and only if those are of type string
     def getProfile(self):
         profile = {}
-        profile["mode"] = unicode(self.qmc.mode)
-        profile["startend"] = unicode(self.qmc.startend)
-        profile["cracks"] = unicode(self.qmc.varC)
+        profile["mode"] = self.qmc.mode
+        profile["startend"] = self.qmc.startend
+        profile["cracks"] = self.qmc.varC
         profile["flavors"] = unicode(self.qmc.flavors)
         profile["flavorlabels"] = [unicode(fl) for fl in self.qmc.flavorlabels]
         profile["title"] = unicode(self.qmc.title)
         profile["beans"] = unicode(self.qmc.beans)
-        profile["weight"] = unicode(self.qmc.weight)
+        profile["weight"] = self.qmc.weight
         profile["roastertype"] = unicode(self.qmc.roastertype)
         profile["operator"] = unicode(self.qmc.operator)
         profile["roastdate"] = unicode(self.qmc.roastdate.toString())
-        profile["specialevents"] = unicode(self.qmc.specialevents)
-        profile["specialeventstype"] = unicode(self.qmc.specialeventstype)
-        profile["specialeventsvalue"] = unicode(self.qmc.specialeventsvalue)
-        profile["specialeventsStrings"] = unicode(self.qmc.specialeventsStrings)
+        profile["specialevents"] = self.qmc.specialevents
+        profile["specialeventstype"] = self.qmc.specialeventstype
+        profile["specialeventsvalue"] = self.qmc.specialeventsvalue
+        profile["specialeventsStrings"] = [unicode(ses) for ses in self.qmc.specialeventsStrings] 
         profile["roastingnotes"] = unicode(self.qmc.roastingnotes)
         profile["cuppingnotes"] = unicode(self.qmc.cuppingnotes)
-        profile["timex"] = unicode(self.qmc.timex)
-        profile["temp1"] = unicode(self.qmc.temp1)
-        profile["temp2"] = unicode(self.qmc.temp2)
-        profile["phases"] = unicode(self.qmc.phases)        
-        profile["ymin"] = unicode(self.qmc.ylimit_min)
-        profile["ymax"] = unicode(self.qmc.ylimit)
-        profile["xmin"] = unicode(self.qmc.startofx)
-        profile["xmax"] = unicode(self.qmc.endofx)        
-        profile["statisticsflags"] = unicode(self.qmc.statisticsflags)
-        profile["statisticsconditions"] = unicode(self.qmc.statisticsconditions)
-        profile["DeltaET"] = unicode(self.qmc.DeltaETflag)
-        profile["DeltaBT"] = unicode(self.qmc.DeltaBTflag)
-        profile["ambientTemp"] = unicode(self.qmc.ambientTemp)
-        profile["dryend"] = unicode(self.qmc.dryend)
+        profile["timex"] = self.qmc.timex
+        profile["temp1"] = self.qmc.temp1
+        profile["temp2"] = self.qmc.temp2
+        profile["phases"] = self.qmc.phases
+        profile["ymin"] = self.qmc.ylimit_min
+        profile["ymax"] = self.qmc.ylimit
+        profile["xmin"] = self.qmc.startofx
+        profile["xmax"] = self.qmc.endofx
+        profile["statisticsflags"] = self.qmc.statisticsflags
+        profile["statisticsconditions"] = self.qmc.statisticsconditions
+        profile["DeltaET"] = self.qmc.DeltaETflag
+        profile["DeltaBT"] = self.qmc.DeltaBTflag
+        profile["ambientTemp"] = self.qmc.ambientTemp
+        profile["dryend"] = self.qmc.dryend
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -4565,32 +4580,35 @@ $cupping_notes
     # converts times (values of timex) to indices in aw.qmc.temp1 and aw.qmc.temp2
     def time2index(self,time):
         for i in range(len(aw.qmc.timex)):
-            if aw.qmc.timex[i] == time:
+            if aw.qmc.timex[i] > time:
                 return i
         return -1
         
     #returns the index of the lowest point in BT; return -1 if no such value found
-    def findTP(self):
-##        end = len(aw.qmc.temp2) - 1
-##        # try to consider only indices until the roast end and not beyond
-##        if aw.qmc.startend[2] > 0.:                                         #if endtime > 0.
-##            end = self.time2index(aw.qmc.startend[2])
-##            
-##        if end > 0:
-##            TP = aw.qmc.temp2[0]
-##            idx = -1
-##        
-##            for i in range(end, 0, -1):
-##                if aw.qmc.temp2[i] < TP:
-##                    TP = aw.qmc.temp2[i]
-##                    idx = i
-##            return idx
-##        else:
-##            return -1
-        
+    def findTP(self):  
         TP  = 1000
         idx = 0
-        for i in range(len(aw.qmc.timex) - 1, 0, -1):
+        start = 0
+        end = len(aw.qmc.timex)
+        # try to consider only indices until the roast end and not beyond
+        EOR_index = end
+        if aw.qmc.startend[2] > 0.:
+            EOR_index = self.time2index(aw.qmc.startend[2])
+        if EOR_index > start and EOR_index < end:
+            end = EOR_index
+        # try to consider only indices until FCs and not beyond
+        FCs_index = end
+        if aw.qmc.varC[0] > 0.:
+            FCs_index = self.time2index(aw.qmc.varC[0])
+        if FCs_index > start and FCs_index < end:
+            end = FCs_index
+        # try to consider only indices from start of roast on and not before
+        SOR_index = start
+        if aw.qmc.startend[0] > 0.:
+            SOR_index = self.time2index(aw.qmc.startend[0]) 
+        if SOR_index > start and SOR_index < end:
+            start = SOR_index
+        for i in range(end - 1, start -1, -1):
             if aw.qmc.temp2[i] < TP:
                 TP = aw.qmc.temp2[i]
                 idx = i
@@ -4632,51 +4650,45 @@ $cupping_notes
             st3 = LongFinishPhase
         return (st1,st2,st3)
     
-    #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
-    #if given, starts at TP_index and looks forward, otherwise it looks backwards from end of roast (EoR)
-
     #find index with smallest abs() difference between aw.qmc.phases[1] and BT (temp2)
     def findDryEnd(self,TP_index=None):
         sd = 1000
         nsd = 1000
         index = 0
-        for i in range(len(aw.qmc.timex) -1, -1, -1):
+        start = 0
+        end = len(aw.qmc.timex)
+        # try to consider only indices until the roast end and not beyond
+        EOR_index = end
+        if aw.qmc.startend[2] > 0.:
+            EOR_index = self.time2index(aw.qmc.startend[2])
+        if EOR_index > start and EOR_index < end:
+            end = EOR_index
+        # try to consider only indices until FCs and not beyond
+        FCs_index = end
+        if aw.qmc.varC[0] > 0.:
+            FCs_index = self.time2index(aw.qmc.varC[0])
+        if FCs_index > start and FCs_index < end:
+            end = FCs_index
+        # try to consider only indices from start of roast on and not before
+        SOR_index = start
+        if aw.qmc.startend[0] > 0.:
+            SOR_index = self.time2index(aw.qmc.startend[0]) 
+        if SOR_index > start and SOR_index < end:
+            start = SOR_index
+        # try to consider only indices from TP of roast on and not before
+        TP = TP_index
+        # if TP not yet computed, let's try to compute it
+        if TP == None:
+            TP = self.findTP()
+        if TP > start and TP < end:
+            start = TP
+        for i in range(end -1, start -1, -1):
              nsd = abs(aw.qmc.temp2[i]- aw.qmc.phases[1])
              if nsd < sd:
                  sd = nsd
                  index = i
         return index
-##
-##        
-##        idx = -1
-##        end = len(aw.qmc.temp2)
-##        # try to consider only indices until the roast end and not beyond
-##        if aw.qmc.startend[2] > 0.:
-##            end = self.time2index(aw.qmc.startend[2])            
-##        TP = TP_index
-##        # if TP not yet computed, let's try to compute it
-##        if not TP:
-##            TP = self.findTP()
-##            if TP < 0:
-##                TP = None
-##        if TP:
-##          for i in range(TP,end):
-##              #count from TP forward (low temps towards high temps)
-##              if aw.qmc.temp2[i] > aw.qmc.phases[1]:
-##                  idx = i
-##                  break
-##          return idx                
-##        else:
-##          for i in range(end):
-##              #count from the back [-i] (high temps towards low temps)
-##              if aw.qmc.temp2[-i] < aw.qmc.phases[1] and i > 0:
-##                  idx = i
-##                  break
-##          if idx < 0:
-##              return idx
-##          else:
-##              return len(aw.qmc.temp2) - idx
-##        
+      
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
     def RoR(self,TP_index,dryEndIndex):
         dryphasetime = aw.qmc.statisticstimes[1]
