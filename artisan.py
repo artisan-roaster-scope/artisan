@@ -283,6 +283,9 @@ class tgraphcanvas(FigureCanvas):
         
         #[0]weight in, [1]weight out, [2]units (string)
         self.weight = [0,0,u"g"]
+
+        #[0]volume in, [1]volume out, [2]units (string)
+        self.volume = [0,0,u"l"]
         
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event. Use self.timex[self.specialevents[x]] to get its time
@@ -819,6 +822,7 @@ class tgraphcanvas(FigureCanvas):
         self.projectFlag = False
         self.errorlog = []
         self.weight = [0,0,u"g"]
+        self.volume = [0,0,u"l"]
         self.specialevents = []
         self.specialeventstype = [0,0,0,0,0,0,0,0,0,0]
         self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0]
@@ -3928,6 +3932,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.beans = unicode(profile["beans"])
         if "weight" in profile:
             self.qmc.weight = profile["weight"]
+        if "volume" in profile:
+            self.qmc.volume = profile["volume"]
         if "roastertype" in profile:
             self.qmc.roastertype = unicode(profile["roastertype"])
         if "operator" in profile:
@@ -3987,11 +3993,12 @@ class ApplicationWindow(QMainWindow):
         profile["mode"] = self.qmc.mode
         profile["startend"] = self.qmc.startend
         profile["cracks"] = self.qmc.varC
-        profile["flavors"] = unicode(self.qmc.flavors)
+        profile["flavors"] = self.qmc.flavors
         profile["flavorlabels"] = [unicode(fl) for fl in self.qmc.flavorlabels]
         profile["title"] = unicode(self.qmc.title)
         profile["beans"] = unicode(self.qmc.beans)
         profile["weight"] = self.qmc.weight
+        profile["volume"] = self.qmc.volume
         profile["roastertype"] = unicode(self.qmc.roastertype)
         profile["operator"] = unicode(self.qmc.operator)
         profile["roastdate"] = unicode(self.qmc.roastdate.toString())
@@ -5250,7 +5257,8 @@ class HUDDlg(QDialog):
             self.soundCheck.setChecked(False)    
         self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
 
-        mikeButton = QPushButton("Test Mike" )             
+        mikeButton = QPushButton("Test Mike" )        
+        mikeButton.setFocusPolicy(Qt.NoFocus)        
         self.connect(mikeButton,SIGNAL("clicked()"),self.showsound)
 
         self.showsoundflag = 0
@@ -5264,6 +5272,7 @@ class HUDDlg(QDialog):
         available = map(QString, QStyleFactory.keys())
         self.styleComboBox.addItems(available)
         styleButton = QPushButton("Set style" )
+        styleButton.setFocusPolicy(Qt.NoFocus)   
         styleButton.setMaximumWidth(90)
         self.connect(styleButton,SIGNAL("clicked()"),self.setappearance)        
         tab4Layout = QVBoxLayout()
@@ -5769,7 +5778,9 @@ class editGraphDlg(QDialog):
 
         #Beans
         beanslabel = QLabel("<b>Beans</b>")
-        self.beansedit = QLineEdit(aw.qmc.beans)
+        #self.beansedit = QLineEdit(aw.qmc.beans)
+        self.beansedit = QTextEdit()
+        self.beansedit.setPlainText(QString(aw.qmc.beans))
 
         #roaster
         self.roaster = QLineEdit(aw.qmc.roastertype)
@@ -5802,12 +5813,42 @@ class editGraphDlg(QDialog):
         self.percent()
         self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.percent)
         self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.percent)
-
+        
 
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
         self.unitsComboBox.addItems(["g","Kg"])
+        
+        #volume
+        volumelabel = QLabel("<b>Volume</b> ")
+        volumeinlabel = QLabel(" in")
+        volumeoutlabel = QLabel(" out")
+        inv = str(aw.qmc.volume[0])
+        outv = str(aw.qmc.volume[1])
+        self.volumeinedit = QLineEdit(inv) 
+        
+        self.volumeinedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeinedit))
+        self.volumeinedit.setMinimumWidth(50)
+        self.volumeinedit.setMaximumWidth(50)
+        self.volumeoutedit = QLineEdit(outv)
+        self.volumeoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeoutedit))
+        self.volumeoutedit.setMinimumWidth(50)
+        self.volumeoutedit.setMaximumWidth(50)
+        self.volumepercentlabel = QLabel(" %")
+        self.volumepercentlabel.setMinimumWidth(45)
+        self.volumepercentlabel.setMaximumWidth(45)
+
+        self.volume_percent()
+        self.connect(self.volumeoutedit,SIGNAL("editingFinished()"),self.volume_percent)
+        self.connect(self.volumeinedit,SIGNAL("editingFinished()"),self.volume_percent)
+        
+        
+        self.volumeUnitsComboBox = QComboBox()
+        self.volumeUnitsComboBox.setMaximumWidth(60)
+        self.volumeUnitsComboBox.setMinimumWidth(60)
+        self.volumeUnitsComboBox.addItems(["ml","l"])
+
 
         #Ambient temperature (uses display mode as unit (F or C)
         ambientlabel = QLabel("<b>Temperature </b>")
@@ -5907,6 +5948,23 @@ class editGraphDlg(QDialog):
         weightLayout.addWidget(self.roastdegreelabel)  
         weightLayout.addStretch()  
 
+        volumeLayout = QHBoxLayout()
+        volumeLayout.setSpacing(0)
+        volumeLayout.addWidget(volumelabel)
+        volumeLayout.addSpacing(14)
+        volumeLayout.addWidget(self.volumeUnitsComboBox)
+        volumeLayout.addSpacing(15)
+        volumeLayout.addWidget(self.volumeinedit)
+        volumeLayout.addSpacing(1)
+        volumeLayout.addWidget(volumeinlabel)
+        volumeLayout.addSpacing(15)
+        volumeLayout.addWidget(self.volumeoutedit)
+        volumeLayout.addSpacing(1)
+        volumeLayout.addWidget(volumeoutlabel)
+        volumeLayout.addSpacing(15)
+        volumeLayout.addWidget(self.volumepercentlabel)  
+        volumeLayout.addStretch()  
+
         ambientLayout = QHBoxLayout()
         ambientLayout.addWidget(ambientlabel)
         ambientLayout.addWidget(self.ambientedit)
@@ -5935,13 +5993,36 @@ class editGraphDlg(QDialog):
         
         eventsGroupLayout = QGroupBox("Events")
         eventsGroupLayout.setLayout(allEventsLayout)
+        
+        tab1Layout = QVBoxLayout()
+        tab1Layout.addLayout(textLayout)
+        tab1Layout.addLayout(weightLayout)
+        tab1Layout.addLayout(volumeLayout)
+        tab1Layout.addLayout(ambientLayout)
+        tab1Layout.addStretch()  
+
+        tab2Layout = QVBoxLayout()
+        tab2Layout.addWidget(eventsGroupLayout)
+        tab2Layout.addStretch()  
+
+        
+        #  TABS LAYOUT
+        TabWidget = QTabWidget()
+        
+        C1Widget = QWidget()
+        C1Widget.setLayout(tab1Layout)
+        TabWidget.addTab(C1Widget,"General")
+        
+        C2Widget = QWidget()
+        C2Widget.setLayout(tab2Layout)
+        TabWidget.addTab(C2Widget,"Events")
+
+        C3Widget = QWidget()
+        C3Widget.setLayout(anotationLayout)
+        TabWidget.addTab(C3Widget,"Notes")
 
         totalLayout = QVBoxLayout()
-        totalLayout.addWidget(eventsGroupLayout)
-        totalLayout.addLayout(textLayout)
-        totalLayout.addLayout(weightLayout)
-        totalLayout.addLayout(ambientLayout)
-        totalLayout.addLayout(anotationLayout)
+        totalLayout.addWidget(TabWidget)
         totalLayout.addStretch()  
         totalLayout.addLayout(okLayout)
 
@@ -5959,6 +6040,14 @@ class editGraphDlg(QDialog):
         if percent > 0.:
             roastdegreestring = aw.roast_degree(percent)
         self.roastdegreelabel.setText(QString(roastdegreestring))
+        
+    def volume_percent(self):
+        if float(self.volumeoutedit.text()) != 0.0:
+            percent = aw.weight_loss(float(self.volumeoutedit.text()),float(self.volumeinedit.text()))
+        else:
+            percent = 0.
+        percentstring =  "%.1f" %(percent) + "%"
+        self.volumepercentlabel.setText(QString(percentstring))    #volume percent gain
         
                 
     def accept(self):
@@ -6057,7 +6146,7 @@ class editGraphDlg(QDialog):
         aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
         aw.qmc.title = unicode(self.titleedit.text())
         # Update beans
-        aw.qmc.beans = unicode(self.beansedit.text())
+        aw.qmc.beans = unicode(self.beansedit.toPlainText())
         #update roaster
         aw.qmc.roaster = unicode(self.roaster.text())
 
@@ -6071,6 +6160,17 @@ class editGraphDlg(QDialog):
         else:
             pass
         aw.qmc.weight[2] = unicode(self.unitsComboBox.currentText())
+        
+        #update volume
+        if unicode(self.volumeinedit.text()).isdigit():
+            aw.qmc.volume[0] = int(self.volumeinedit.text())
+        else:
+            pass
+        if unicode(self.volumeoutedit.text()).isdigit():
+            aw.qmc.volume[1] = int(self.volumeoutedit.text())
+        else:
+            pass
+        aw.qmc.volume[2] = unicode(self.volumeUnitsComboBox.currentText())
 
 
     	#update ambient temperature
