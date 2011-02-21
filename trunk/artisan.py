@@ -224,6 +224,9 @@ class tgraphcanvas(FigureCanvas):
         self.manuallogETflag = 0
         self.title = u"Roaster Scope"
         self.ambientTemp = 0.
+        
+        #relative humidity percentage [0], corresponding temperature [1], temperature unit [2]
+        self.bag_humidity = [0.,0.,"C"]
 
         #list to store the time of each reading. Most IMPORTANT variable.
         self.timex = []
@@ -3984,7 +3987,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ambientTemp = profile["ambientTemp"]
         if "dryend" in profile:
             self.qmc.dryend = profile["dryend"]
-          
+        if "bag_humidity" in profile:
+            self.qmc.bag_humidity = profile["bag_humidity"]          
             
     #used by filesave()
     #wrap values in unicode(.) if and only if those are of type string
@@ -4022,6 +4026,7 @@ class ApplicationWindow(QMainWindow):
         profile["DeltaBT"] = self.qmc.DeltaBTflag
         profile["ambientTemp"] = self.qmc.ambientTemp
         profile["dryend"] = self.qmc.dryend
+        profile["bag_humidity"] = self.qmc.bag_humidity
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -4329,6 +4334,10 @@ th {
 <td>$degree</td>
 </tr>
 <tr>
+<th>Volume:</th>
+<td>$volume</td>
+</tr>
+<tr>
 <th>Roaster:</th>
 <td>$roaster</td>
 </tr>
@@ -4475,6 +4484,7 @@ $cupping_notes
             flavor_image = "artisan-flavor.png"
             image.save(flavor_image)
         weight_loss = aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1])
+        volume_gain = aw.weight_loss(self.qmc.volume[1],self.qmc.volume[0])
         #return screen to GRAPH profile mode
         self.qmc.redraw()
         html = string.Template(HTML_REPORT_TEMPLATE).safe_substitute(
@@ -4483,6 +4493,7 @@ $cupping_notes
             beans=beans,
             weight=unicode(self.qmc.weight[0]) + self.qmc.weight[2] + " (" + "%.1f"%weight_loss + "%)",
             degree=aw.roast_degree(weight_loss),
+            volume=unicode(self.qmc.volume[0]) + self.qmc.volume[2] + " (" + "%.1f"%volume_gain + "%)",
             roaster=cgi.escape(self.qmc.roastertype),
             operator=cgi.escape(self.qmc.operator),
             cup=str(self.cuppingSum()),
@@ -5818,7 +5829,11 @@ class editGraphDlg(QDialog):
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
-        self.unitsComboBox.addItems(["g","Kg"])
+        self.unitsComboBox.addItems(["g","Kg"])  
+        if aw.qmc.weight[2] == "g":
+            self.unitsComboBox.setCurrentIndex(0)
+        else:
+            self.unitsComboBox.setCurrentIndex(1)
         
         #volume
         volumelabel = QLabel("<b>Volume</b> ")
@@ -5843,15 +5858,39 @@ class editGraphDlg(QDialog):
         self.connect(self.volumeoutedit,SIGNAL("editingFinished()"),self.volume_percent)
         self.connect(self.volumeinedit,SIGNAL("editingFinished()"),self.volume_percent)
         
-        
         self.volumeUnitsComboBox = QComboBox()
         self.volumeUnitsComboBox.setMaximumWidth(60)
         self.volumeUnitsComboBox.setMinimumWidth(60)
-        self.volumeUnitsComboBox.addItems(["ml","l"])
+        self.volumeUnitsComboBox.addItems(["ml","l"])        
+        if aw.qmc.volume[2] == "ml":
+            self.volumeUnitsComboBox.setCurrentIndex(0)
+        else:
+            self.volumeUnitsComboBox.setCurrentIndex(1)
 
+        #bag humidity
+        bag_humidity_label = QLabel("<b>Bag Humidity </b>")
+        bag_humidity_unit_label = QLabel("%")
+        self.humidity_edit = QLineEdit()
+        self.humidity_edit.setText(unicode(aw.qmc.bag_humidity[0]))
+        self.humidity_edit.setMaximumWidth(50)
+        self.humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.humidity_edit))
+        bag_humidity_at_label = QLabel("at")
+        self.bag_temp_edit = QLineEdit( )
+        self.bag_temp_edit.setText(unicode(aw.qmc.bag_humidity[1]))
+        self.bag_temp_edit.setMaximumWidth(50)
+        self.bag_temp_edit.setValidator(QDoubleValidator(0., 200., 1, self.bag_temp_edit))
+        self.bag_humiditity_tempUnitsComboBox = QComboBox()
+        self.bag_humiditity_tempUnitsComboBox.setMaximumWidth(60)
+        self.bag_humiditity_tempUnitsComboBox.setMinimumWidth(60)
+        self.bag_humiditity_tempUnitsComboBox.addItems(["C","F"])
+        if aw.qmc.bag_humidity[2] == "C":
+            self.bag_humiditity_tempUnitsComboBox.setCurrentIndex(0)
+        else:
+            self.bag_humiditity_tempUnitsComboBox.setCurrentIndex(1)
+        
 
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>Temperature </b>")
+        ambientlabel = QLabel("<b>Ambient Temperature</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
@@ -5965,6 +6004,17 @@ class editGraphDlg(QDialog):
         volumeLayout.addWidget(self.volumepercentlabel)  
         volumeLayout.addStretch()  
 
+        humidityLayout = QHBoxLayout()
+        humidityLayout.addWidget(bag_humidity_label)
+        humidityLayout.addWidget(self.humidity_edit)
+        humidityLayout.addWidget(bag_humidity_unit_label)
+        humidityLayout.addSpacing(15)
+        humidityLayout.addWidget(bag_humidity_at_label)
+        humidityLayout.addSpacing(15)
+        humidityLayout.addWidget(self.bag_temp_edit)
+        humidityLayout.addWidget(self.bag_humiditity_tempUnitsComboBox)
+        humidityLayout.addStretch()
+        
         ambientLayout = QHBoxLayout()
         ambientLayout.addWidget(ambientlabel)
         ambientLayout.addWidget(self.ambientedit)
@@ -5998,6 +6048,7 @@ class editGraphDlg(QDialog):
         tab1Layout.addLayout(textLayout)
         tab1Layout.addLayout(weightLayout)
         tab1Layout.addLayout(volumeLayout)
+        tab1Layout.addLayout(humidityLayout)
         tab1Layout.addLayout(ambientLayout)
         tab1Layout.addStretch()  
 
@@ -6170,8 +6221,12 @@ class editGraphDlg(QDialog):
             aw.qmc.volume[1] = int(self.volumeoutedit.text())
         else:
             pass
-        aw.qmc.volume[2] = unicode(self.volumeUnitsComboBox.currentText())
+        aw.qmc.volume[2] = unicode(self.unitsComboBox.currentText())
 
+        #update humidity
+        aw.qmc.bag_humidity[0] = float(self.humidity_edit.text())
+        aw.qmc.bag_humidity[1] = float(self.bag_temp_edit.text())
+        aw.qmc.bag_humidity[2] = unicode(self.bag_humiditity_tempUnitsComboBox.currentText())
 
     	#update ambient temperature
         aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
