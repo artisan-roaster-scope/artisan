@@ -90,6 +90,7 @@ import matplotlib.patches as patches
 import matplotlib.transforms as transforms
 import matplotlib.font_manager as font_manager
 import matplotlib.path as mpath
+import matplotlib.ticker as ticker
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 
@@ -706,27 +707,38 @@ class tgraphcanvas(FigureCanvas):
 
         return tx,t2,t1
     
+    def minsec(self,sec):
+        minutes = sec // 60
+        sec = sec - minutes * 60
+        return '%d:%02d' % (minutes, sec)
+        
+    def xaxistosm(self):    
+        formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - int(self.startend[0]), 60))
+        locator = ticker.IndexLocator(60, int(self.startend[0]))
+        self.ax.xaxis.set_major_formatter(formatter)
+        self.ax.xaxis.set_major_locator(locator)
+        
     #creates X axis labels ticks in mm:ss acording to the endofx limit
-    def xaxistosm(self):
-        #aligns the 00:00 with the start of the roast if it exists    
-        if int(self.startend[0]):
-            LLL = int(self.endofx/60)
-            newlocs = [self.startend[0]]
-            for i in range(LLL):    
-                newlocs.append(newlocs[-1]+60)              
-            self.ax.xaxis.set_ticks(newlocs)
-
-        #rename xaxis ticks in mins:secs
-        locs = self.ax.get_xticks()
-        labels = []
-        for i in range(len(locs)):
-                stringlabel = unicode(self.minutesfromseconds(locs[i]-int(self.startend[0])))
-                labels.append(stringlabel)              
-        self.ax.set_xticklabels(labels,color=self.palette["xlabel"],horizontalalignment='center')
-
-        #update label colors
-        for label in self.ax.xaxis.get_ticklabels():
-            label.set_color(self.palette["xlabel"])  
+#    def xaxistosm(self):
+#        #aligns the 00:00 with the start of the roast if it exists    
+#        if int(self.startend[0]):
+#            LLL = int(self.endofx/60)
+#            newlocs = [self.startend[0]]
+#            for i in range(LLL):    
+#                newlocs.append(newlocs[-1]+60)              
+#            self.ax.xaxis.set_ticks(newlocs)
+#
+#        #rename xaxis ticks in mins:secs
+#        locs = self.ax.get_xticks()
+#        labels = []
+#        for i in range(len(locs)):
+#                stringlabel = unicode(self.minutesfromseconds(locs[i]-int(self.startend[0])))
+#                labels.append(stringlabel)              
+#        self.ax.set_xticklabels(labels,color=self.palette["xlabel"],horizontalalignment='center')
+#
+#        #update label colors
+#        for label in self.ax.xaxis.get_ticklabels():
+#            label.set_color(self.palette["xlabel"])  
         
     def reset_and_redraw(self):
         self.reset()
