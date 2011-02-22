@@ -6412,9 +6412,8 @@ class editGraphDlg(QDialog):
         #totallayout.addLayout(buttonsLayout)
                
         self.setLayout(totallayout)
-        if lene <= 10:
-    	    C4Widget.setVisible(False)
-    	
+
+   	
     def percent(self):
         if float(self.weightoutedit.text()) != 0.0:
             percent = aw.weight_loss(float(self.weightinedit.text()),float(self.weightoutedit.text()))
@@ -6565,7 +6564,7 @@ class editGraphDlg(QDialog):
                 aw.qmc.specialeventsvalue[14] = self.valueComboBox15.currentIndex()
 
             if ntlines > 15:
-                aw.qmc.specialevents[15] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line116b.text()))))
+                aw.qmc.specialevents[15] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line16b.text()))))
                 aw.qmc.specialeventsStrings[15] = unicode(self.line16.text())
                 aw.qmc.specialeventstype[15] = self.etypeComboBox16.currentIndex()
                 aw.qmc.specialeventsvalue[15] = self.valueComboBox16.currentIndex()
