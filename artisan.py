@@ -263,8 +263,7 @@ class tgraphcanvas(FigureCanvas):
         #stores text descriptions for each event. Max 10 events
         self.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s",
                                      u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]        
-        self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10",
-                              u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]
+        self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.eventsGraphflag = 1
         
@@ -809,10 +808,10 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventstype = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] 
         self.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s",
                                      u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]        
-        self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10",
-                              u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]
+        self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        aw.eventlabel.setText("E #0")
+        aw.eventlabel.setText(" Event #0")
+        aw.lineEvent.setText("")
         self.ambientTemp = 0.
         self.curFile = None
         self.ystep = 45
@@ -1129,43 +1128,52 @@ class tgraphcanvas(FigureCanvas):
                          rect = patches.Rectangle( (netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step,color = colors[i%2],alpha=0.5)
                          self.ax.add_patch(rect)
                          
-            # annotate events
+            # annotate event
             for i in range(Nevents):
-                firstletter = self.etypes[self.specialeventstype[i]][0]                
+                firstletter = self.etypes[self.specialeventstype[i]][0]
                 secondletter = self.eventsvalues[self.specialeventsvalue[i]]
                 #some times ET is not drawn (ET = 0) when using device NONE
                 if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
                                      xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')                    
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
                 else:
                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
                                  xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
                         
         # revert to old style mode    
         else:
             for i in range(Nevents):
                 firstletter = self.etypes[self.specialeventstype[i]][0]                
                 secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                if self.mode == "F":
+                    height = 50
+                else:
+                    height = 20
                 #some times ET is not drawn (ET = 0) when using device NONE
                 if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
-                                     xytext=(self.timex[int(self.specialevents[i])],self.temp1[int(self.specialevents[i])]+20),alpha=0.9,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                                     xytext=(self.timex[int(self.specialevents[i])],self.temp1[int(self.specialevents[i])]+height),alpha=0.9,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
                 else:
                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                                     xytext=(self.timex[int(self.specialevents[i])],self.temp2[int(self.specialevents[i])]+20),alpha=0.9,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4),fontsize=8,backgroundcolor='yellow')
+                                     xytext=(self.timex[int(self.specialevents[i])],self.temp2[int(self.specialevents[i])]+height),alpha=0.9,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
         #set minieditor info for last event found
         if aw != None: #avoids error because aw is None during  app start (it does not exists yet)
             #write label in mini recorder
-            string = "E #" + unicode(Nevents) 
+            string = " Event #" + unicode(Nevents) 
             aw.eventlabel.setText(QString(string))
             aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
             aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-            
+            if Nevents:
+                aw.lineEvent.setText(self.specialeventsStrings[Nevents-1])
+            else:
+                aw.lineEvent.setText("")
+
+
 
         #update X label names and colors        
         self.xaxistosm()
@@ -2001,7 +2009,7 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.set_xlabel(u'Time',size=16,color = self.palette["xlabel"])
 
     #Marks location in graph of special events. For example change a fan setting.
-    #Uses the position of the time index (variable self.timex) as location in time
+    #Uses the position of the time index (variable self.timex) as location in time           
     def EventRecord(self):
         Nevents = len(self.specialevents)
         #if in manual mode record last point
@@ -2011,31 +2019,34 @@ class tgraphcanvas(FigureCanvas):
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if bt != 1 and et != -1:  #cancel 
-                        self.drawmanual(et,bt,tx)
+                        self.drawmanual(et,bt,tx)                        
                     else:
                         return
         #index number            
         i = len(self.timex)-1
         if i > 0:
-            #Nevents is zero when recording first event. Therefore check up to 10 (max allowed).
-            if Nevents < 10:
+            #Nevents is zero when recording first event. Therefore check up to 20 (max allowed).
+            if Nevents < 20:
                 self.specialevents.append(i)
                 temp = unicode(self.temp2[i])
                 time = self.stringfromseconds(self.timex[i])
                 message = u"Event number "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
                 aw.messagelabel.setText(message)
-                self.redraw()
-                #write label in mini recorder
+                #write label in mini recorder if flag checked
                 if aw.minieventsflag:
                     string = "E #" + unicode(Nevents+1) 
                     aw.eventlabel.setText(QString(string))
-           
+                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                    aw.lineEvent.setText(self.specialeventsStrings[Nevents-1])
+                self.redraw()
             else:
-                aw.messagelabel.setText("No more than 10 events are allowed")
+                aw.messagelabel.setText("No more than 20 events are allowed")
                 aw.etypeComboBox.setVisible(False)
                 aw.valueComboBox.setVisible(False)
                 aw.eventlabel.setVisible(False)
-                aw.buttonminiEvent.setVisible(False)                
+                aw.buttonminiEvent.setVisible(False)
+                aw.lineEvent.setVisible(False)
         else:
             aw.messagelabel.setText("No profile found")
             
@@ -2459,7 +2470,7 @@ class ApplicationWindow(QMainWindow):
         self.stack.setCurrentIndex(0)
         #events config
         self.eventsbuttonflag = 1
-        self.minieventsflag = 1
+        self.minieventsflag = 1   #minieditor flag
        
         #create a serial port object
         self.ser = serialport()
@@ -2728,54 +2739,63 @@ class ApplicationWindow(QMainWindow):
         #convenience EVENT mini editor; Edits last recorded event without opening roast editor Dlg.
         self.etypes = ["N","P","D","F"]
         self.eventlabel = QLabel()
+        self.eventlabel.setIndent(5)
+        self.eventlabel.setMinimumWidth(70)
         self.eventlabel.setToolTip("Number of last event found")
         Nevents = len(self.qmc.specialevents)
+        self.lineEvent = QLineEdit()
+        self.eventlabel.setToolTip("Last event description editor")
+        self.lineEvent.setFocusPolicy(Qt.ClickFocus)
+        self.lineEvent.setMinimumWidth(200)
         if Nevents:
-            string = "E #" + unicode(Nevents+1) 
+            string = " Event #" + unicode(Nevents+1) 
             self.eventlabel.setText(QString(string))
+            self.lineEvent.setText(self.qmc.specialeventsStrings[Nevents-1])
         else:
-            self.eventlabel.setText("E #0")
+            self.eventlabel.setText(" Event #0")
             
         self.eventlabel.setStyleSheet("background-color:'yellow';")
-        self.eventlabel.setMaximumWidth(40)
+        self.eventlabel.setMaximumWidth(60)
         self.etypeComboBox = QComboBox()
         self.etypeComboBox.setToolTip("Type of last event")
         self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.etypeComboBox.addItems(self.etypes)
-        self.etypeComboBox.setMaximumWidth(47)
+        self.etypeComboBox.setMaximumWidth(50)
         self.valueComboBox = QComboBox()
         self.valueComboBox.setToolTip("Value of last event")
         self.valueComboBox.setFocusPolicy(Qt.NoFocus)
         self.valueComboBox.addItems(self.qmc.eventsvalues)
-        self.valueComboBox.setMaximumWidth(47)
+        self.valueComboBox.setMaximumWidth(50)
 
         #create EVENT mini button
-        self.buttonminiEvent = QPushButton("OK")
+        self.buttonminiEvent = QPushButton("Save")
         self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
-        self.buttonminiEvent.setMaximumSize(35,20)
+        self.buttonminiEvent.setMaximumSize(55,20)
         self.buttonminiEvent.setMinimumSize(35,20)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
         self.buttonminiEvent.setToolTip("Edits the last recorded event")
 
+        
         if self.minieventsflag:
-
+            self.lineEvent.setVisible(True)
             self.etypeComboBox.setVisible(True)
             self.valueComboBox.setVisible(True)
             self.eventlabel.setVisible(True)
             self.buttonminiEvent.setVisible(True)
         else:
+            self.lineEvent.setVisible(False)
             self.etypeComboBox.setVisible(False)
             self.valueComboBox.setVisible(False)
             self.eventlabel.setVisible(False)
             self.buttonminiEvent.setVisible(False)
         
-        EventsLayout = QGridLayout()
-        EventsLayout.addWidget(self.etypeComboBox,0,0)
-        EventsLayout.addWidget(self.eventlabel,0,1, Qt.AlignLeft)        
-        EventsLayout.addWidget(self.valueComboBox,1,0)
-        EventsLayout.addWidget(self.buttonminiEvent,1,1)
+        EventsLayout = QHBoxLayout()
+        EventsLayout.addWidget(self.eventlabel,0)
+        EventsLayout.addWidget(self.lineEvent,1)        
+        EventsLayout.addWidget(self.etypeComboBox,2)
+        EventsLayout.addWidget(self.valueComboBox,3)
+        EventsLayout.addWidget(self.buttonminiEvent,4)
 
-    	
         #only leave operational the control button if the device is Fuji PID
         #the SV buttons are activated from the PID control panel 
         if self.qmc.device > 0:
@@ -2843,7 +2863,7 @@ class ApplicationWindow(QMainWindow):
         gl.addLayout(midLayout,2,0)         #GRAPHS
         gl.addLayout(LCDlayout,2,1)         #place LCD manager inside grid box layout manager
         gl.addLayout(buttonHHbl,4,0)        #place buttonlayout manager inside grid box layout manager
-        gl.addLayout(EventsLayout,4,1)
+        gl.addLayout(EventsLayout,5,0)
         
         gl.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom (defaults to 12)
         gl.setHorizontalSpacing(0) # default: 9
@@ -3088,6 +3108,9 @@ class ApplicationWindow(QMainWindow):
     def moveKbutton(self,command):
         #"Enter" toggles ON/OFF keyboard    
         if command =="enter":
+            if self.lineEvent.hasFocus():
+                self.lineEvent.clearFocus()
+                return
             if self.keyboardmoveflag == 0:
                 #turn on
                 self.keyboardmoveflag = 1
@@ -3343,9 +3366,21 @@ class ApplicationWindow(QMainWindow):
     # edit last entry in mini Event editor
     def miniEventRecord(self):
         lenevents = len(self.qmc.specialevents)
-        self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
-        self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
-        self.qmc.redraw()
+        if lenevents:
+            self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
+            self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
+            self.qmc.specialeventsStrings[lenevents-1] = unicode(self.lineEvent.text())
+            self.lineEvent.clearFocus()
+            self.qmc.redraw()
+
+            string = ""
+            if len(self.qmc.specialeventsStrings[lenevents-1]) > 5:
+                string += self.qmc.specialeventsStrings[lenevents-1][0:5]
+                string += "..."
+            message = u"Changes to Event #" + str(lenevents) + ":  " + string +  u" have been saved"
+            self.messagelabel.setText(message)
+        else:
+            self.messagelabel.setText("Zero events found")
         
     def strippedName(self, fullFileName):
         return unicode(QFileInfo(fullFileName).fileName())
@@ -4124,9 +4159,12 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]   
             #restore Events settings
+            settings.beginGroup("events");
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
             self.minieventsflag = settings.value("minieventsflag",int(self.minieventsflag)).toInt()[0]
             self.qmc.eventsGraphflag = settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)).toInt()[0]
+            settings.endGroup()
+            
     	    #restore statistics
             if settings.contains("Statistics"):
                 self.qmc.statisticsflags = map(lambda x:x.toInt()[0],settings.value("Statistics").toList())
@@ -4236,9 +4274,11 @@ class ApplicationWindow(QMainWindow):
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
             #save Events settings
+            settings.beginGroup("events");
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
             settings.setValue("minieventsflag",self.minieventsflag)
             settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
+            settings.endGroup();            
             #save delay
             settings.setValue("Delay",self.qmc.delay)
             #save colors
@@ -6272,12 +6312,12 @@ class editGraphDlg(QDialog):
 
         roastinglabel = QLabel("<b>Roasting Notes<\b>")
         self.roastingeditor = QTextEdit()
-        #self.roastingeditor.setMaximumHeight(100)
+        self.roastingeditor.setMaximumHeight(150)
         self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
 
         cupinglabel = QLabel("<b>Cuping Notes<\b>")
         self.cupingeditor =  QTextEdit()
-        #self.cupingeditor.setMaximumHeight(100)
+        self.cupingeditor.setMaximumHeight(150)
         self.cupingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
         
 
@@ -6688,7 +6728,7 @@ class editGraphDlg(QDialog):
         aw.qmc.roastingnotes = unicode(self.roastingeditor.toPlainText())
         aw.qmc.cuppingnotes = unicode(self.cupingeditor.toPlainText())
            
-        aw.messagelabel.setText(u"Graph properties updated (but profile not saved to disk)")            
+        aw.messagelabel.setText(u"Roast properties updated but profile not saved to disk")            
         aw.qmc.redraw()
         self.close()
 
@@ -7013,10 +7053,10 @@ class editGraphDlg(QDialog):
             aw.qmc.specialevents.append(0)
             self.paintevents()
             aw.qmc.redraw()
-            message = u"Event #" + str(nevents) + " added"
+            message = u" Event #" + str(nevents) + " added"
             nevents = len(aw.qmc.specialevents)
             if nevents <= 10:
-                if lene == 0:
+                if nevents == 0:
                     self.delevent1Button.setDisabled(True)
                 else:
                     self.delevent1Button.setDisabled(False)
@@ -7046,7 +7086,7 @@ class editGraphDlg(QDialog):
              self.paintevents()
              aw.qmc.redraw()
              nevents = len(aw.qmc.specialevents)
-             message = u"Event #" + str(nevents+1) + " deleted"             
+             message = u" Event #" + str(nevents+1) + " deleted"             
              if nevents <= 10:
                 if lene == 0:
                     self.delevent1Button.setDisabled(True)
@@ -7466,10 +7506,12 @@ class calculatorDlg(QDialog):
            outx = float(unicode(self.outEdit.text()))
            inx = outx*convtable[self.outComboBox.currentIndex()][self.inComboBox.currentIndex()]
            self.inEdit.setText(u"%.2f"%inx)
-                   
+
+
 ##########################################################################
-#####################  EVENTS DLG  CONF       ############################
+#####################  EVENTS CONFIGURATION DLG     ######################
 ##########################################################################
+#accessed through menu conf
         
 class EventsDlg(QDialog):
     def __init__(self, parent = None):
@@ -7486,11 +7528,12 @@ class EventsDlg(QDialog):
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)  
         
         self.minieventsflag = QCheckBox("Last event mini editor")
+        self.minieventsflag.setToolTip("Allows to enter a short description of the last event")
         if aw.minieventsflag:
             self.minieventsflag.setChecked(True)
         else:
             self.minieventsflag.setChecked(False)
-        self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)  
+        self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)
         
         self.eventsGraphflag = QCheckBox("Events location bars")
         if aw.qmc.eventsGraphflag:
@@ -7501,8 +7544,8 @@ class EventsDlg(QDialog):
 
         EventsLayout = QVBoxLayout()
         EventsLayout.addWidget(self.eventsbuttonflag,0)
-        EventsLayout.addWidget(self.minieventsflag,1)
-        EventsLayout.addWidget(self.eventsGraphflag,2)
+        EventsLayout.addWidget(self.minieventsflag,2)
+        EventsLayout.addWidget(self.eventsGraphflag,3)
 
         self.setLayout(EventsLayout)
         
@@ -7514,7 +7557,6 @@ class EventsDlg(QDialog):
             aw.button_11.setVisible(False)            
             aw.eventsbuttonflag = 0
             self.minieventsflag.setChecked(False)
-            self.eventsGraphflag.setChecked(False)
             
     def minieventsflagChanged(self):
         if self.minieventsflag.isChecked():
@@ -7522,14 +7564,16 @@ class EventsDlg(QDialog):
             aw.valueComboBox.setVisible(True)
             aw.eventlabel.setVisible(True)
             aw.buttonminiEvent.setVisible(True)
+            aw.lineEvent.setVisible(True)
             aw.minieventsflag = 1
         else:
+            aw.lineEvent.setVisible(False)
             aw.etypeComboBox.setVisible(False)
             aw.valueComboBox.setVisible(False)
             aw.eventlabel.setVisible(False)
             aw.buttonminiEvent.setVisible(False)            
             aw.minieventsflag = 0
-            
+
     def eventsGraphflagChanged(self):
         if self.eventsGraphflag.isChecked():
             aw.qmc.eventsGraphflag = 1
@@ -10655,7 +10699,7 @@ class PXG4pidDlgControl(QDialog):
         super(PXG4pidDlgControl,self).__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         
-        self.setWindowTitle("Fuji PXG4 PID control")
+        self.setWindowTitle("Fuji PXG PID Control")
 
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
