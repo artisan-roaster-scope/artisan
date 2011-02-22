@@ -714,7 +714,7 @@ class tgraphcanvas(FigureCanvas):
         
     def xaxistosm(self):    
         formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - int(self.startend[0]), 60))
-        locator = ticker.IndexLocator(60, int(self.startend[0]))
+        locator = ticker.IndexLocator(120, int(self.startend[0]))
         self.ax.xaxis.set_major_formatter(formatter)
         self.ax.xaxis.set_major_locator(locator)
         
