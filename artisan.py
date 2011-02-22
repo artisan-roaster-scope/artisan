@@ -3396,41 +3396,52 @@ class ApplicationWindow(QMainWindow):
         if action:
             self.loadFile(action.data().toString())
  
+    def getDefaultPath(self):
+        userprofilepath_dir = QDir()
+        userprofilepath_dir.setPath(self.userprofilepath)
+        userprofilepath_elements = userprofilepath_dir.absolutePath().split("/") # directories as QStrings
+        profilepath_dir = QDir()
+        profilepath_dir.setPath(self.profilepath)
+        profilepath_elements = profilepath_dir.absolutePath().split("/")
+        #compare profilepath with userprofilepath (modulo the last two segments which are month/year respectively)
+        if len(userprofilepath_elements) == len(profilepath_elements) and len(userprofilepath_elements) > 1 and reduce(lambda x,y: x and y, map(lambda x : x[0] == x[1], zip(userprofilepath_elements[:-2],profilepath_elements[:-2]))):
+            return self.profilepath
+        else:
+            return self.userprofilepath
+            
+    def setDefaultPath(self,file):
+        if file:
+            filepath_dir = QDir()
+            filepath_dir.setPath(file)
+            filepath_elements = filepath_dir.absolutePath().split("/")[:-1] # directories as QStrings (without the filename)
+            self.userprofilepath = unicode(reduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
+                
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanOpenFileDialog(self,msg="Open",ext="*.txt",path=None):
-        if path == None:    
-            userprofilepath_dir = QDir()
-            userprofilepath_dir.setPath(self.userprofilepath)
-            userprofilepath_elements = userprofilepath_dir.absolutePath().split("/") # directories as QStrings
-            profilepath_dir = QDir()
-            profilepath_dir.setPath(self.profilepath)
-            profilepath_elements = profilepath_dir.absolutePath().split("/")
-            #compare profilepath with userprofilepath (modulo the last two segments which are month/year respectively)
-            if len(userprofilepath_elements) == len(profilepath_elements) and len(userprofilepath_elements) > 1 and reduce(lambda x,y: x and y, map(lambda x : x[0] == x[1], zip(userprofilepath_elements[:-2],profilepath_elements[:-2]))):
-                path = self.profilepath
-            else:
-                path = self.userprofilepath
+        if path == None:   
+            path = self.getDefaultPath() 
         file = unicode(QFileDialog.getOpenFileName(self,msg,path,ext))
-        filepath_dir = QDir()
-        filepath_dir.setPath(file)
-        filepath_elements = filepath_dir.absolutePath().split("/")[:-1] # directories as QStrings (without the filename)
-        self.userprofilepath = unicode(reduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
+        self.setDefaultPath(file)
         return unicode(file)
  
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanSaveFileDialog(self,msg="Save",ext="*.txt",path=None):
         if path == None:
-            path = self.profilepath
-        return unicode(QFileDialog.getSaveFileName(self,msg,path,ext))
+            path = self.getDefaultPath() 
+        file = unicode(QFileDialog.getSaveFileName(self,msg,path,ext))
+        self.setDefaultPath(file)
+        return file
  
     #the central ExistingDirectoryDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanExistingDirectoryDialog(self,msg="Select Directory",path=None):
         if path == None:
-            path = self.profilepath
-        return unicode(QFileDialog.getExistingDirectory(self,msg,path))
+            path = self.getDefaultPath() 
+        file = unicode(QFileDialog.getExistingDirectory(self,msg,path))
+        self.setDefaultPath(file)
+        return file
  
     def fileLoad(self):
         fileName = self.ArtisanOpenFileDialog()
