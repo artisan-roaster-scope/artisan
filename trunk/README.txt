@@ -1,4 +1,4 @@
-readme.txt
+﻿readme.txt
 
 Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
 
@@ -88,7 +88,7 @@ LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
 
-- Python 2.7.x released under the PSF licence http://www.python.org/psf/
+- Python 2.7.x 2.6.X released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
 - QT 4.7.x under the Qt GNU GPL v. 3.0 licence
   http://qt.nokia.com/
@@ -116,6 +116,8 @@ v0.3.4 (??)
 - improved Fuji PXR/PXG support
 - support for file paths with accent characters
 - improved main layout that uses space better
+- main window layout improvements
+- improved events visualization and capacity
 - statistic characteristic line as y-label to ensure visibility if axis limits are changed
 - duplicate recent file names show containing directory
 
@@ -127,7 +129,6 @@ v0.3.3 (13.02.2011)
 - added NONE device
 - added keyboard shortcuts for events and sound feedback
 - initial Linux binary release
-- main window layout improvements
 - added axis settings to application preferences
 
 v0.3.2 (31.01.2011)
