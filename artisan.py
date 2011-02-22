@@ -8542,8 +8542,8 @@ class serialport(object):
             self.SP.open()        
                
         except serial.SerialException,e:
-            aw.messagelabel.setText(u"Unable to open serial port" + unicode(e))
-            aw.qmc.errorlog.append(u"Unable to open serial port " + unicode(e))
+            aw.messagelabel.setText(u"Unable to open serial port" )
+            aw.qmc.errorlog.append(u"Unable to open serial port ")
             
     def closeEvent(self):
         try:        
@@ -8600,8 +8600,8 @@ class serialport(object):
                 return u"0"                                    
                 
         except serial.SerialException,e:
-            aw.messagelabel.setText(u"ser.sendFUJIcommand(): Error in serial port" + unicode(e))
-            aw.qmc.errorlog.append(u"ser.sendFUJIcommand): Error in serial port " + unicode(e))
+            aw.messagelabel.setText(u"ser.sendFUJIcommand(): Error in serial port" )
+            aw.qmc.errorlog.append(u"ser.sendFUJIcommand): Error in serial port " )
             return u"0"
 
      #t2 and t1 from Omega HH806 or HH802 meter 
@@ -8641,8 +8641,8 @@ class serialport(object):
                     return -1,-1                                    
                                    
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.HH806AUtemperature(): " + unicode(e))
-            aw.qmc.errorlog.append(u"ser.HH806AUtemperature(): " + unicode(e) )
+            aw.messagelabel.setText(u"ser.HH806AUtemperature(): " )
+            aw.qmc.errorlog.append(u"ser.HH806AUtemperature(): ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8690,8 +8690,8 @@ class serialport(object):
                     return -1,-1 
                 
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.HH506RAtemperature(): " + unicode(e))
-            aw.qmc.errorlog.append(u"ser.HH506RAtemperature(): " + unicode(e) )
+            aw.messagelabel.setText(u"ser.HH506RAtemperature(): " )
+            aw.qmc.errorlog.append(u"ser.HH506RAtemperature(): ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8723,8 +8723,8 @@ class serialport(object):
                     aw.qmc.errorlog.append(message)
                     
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.HH506RAGetID()" + unicode(e))
-            aw.qmc.errorlog.append(u"ser.HH506RAGetID()" + unicode(e) )
+            aw.messagelabel.setText(u"ser.HH506RAGetID()" )
+            aw.qmc.errorlog.append(u"ser.HH506RAGetID()"  )
 
     def CENTER306temperature(self):
         try:
@@ -8789,8 +8789,8 @@ class serialport(object):
                     return -1,-1 
                      
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.CENTER306temperature()" + unicode(e))
-            aw.qmc.errorlog.append(u"ser.CENTER306temperature()" + unicode(e) )
+            aw.messagelabel.setText(u"ser.CENTER306temperature()" )
+            aw.qmc.errorlog.append(u"ser.CENTER306temperature()" )
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8871,8 +8871,8 @@ class serialport(object):
                     return -1,-1 
             
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.CENTER303temperature()" + unicode(e))
-            aw.qmc.errorlog.append(u"ser.CENTER303temperature()" + unicode(e) )
+            aw.messagelabel.setText(u"ser.CENTER303temperature()" )
+            aw.qmc.errorlog.append(u"ser.CENTER303temperature()" )
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8949,8 +8949,8 @@ class serialport(object):
                         return -1,-1 
             
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.CENTER309temperature()" + unicode(e))
-            aw.qmc.errorlog.append(u"ser.CENTER309temperature()" + unicode(e) )
+            aw.messagelabel.setText(u"ser.CENTER309temperature() ")
+            aw.qmc.errorlog.append(u"ser.CENTER309temperature() ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8978,8 +8978,8 @@ class serialport(object):
 
 
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.CENTER309temperature()" + unicode(e))
-            aw.qmc.errorlog.append(u"ser.CENTER309temperature()" + unicode(e) )
+            aw.messagelabel.setText(u"ser.CENTER309temperature() " )
+            aw.qmc.errorlog.append(u"ser.CENTER309temperature() " )
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
