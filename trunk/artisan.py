@@ -704,7 +704,7 @@ class tgraphcanvas(FigureCanvas):
         t2,t1 = aw.ser.ARDUINOTC4temperature()
         tx = self.timeclock.elapsed()/1000.
 
-	return tx,t2,t1
+        return tx,t2,t1
     
     #creates X axis labels ticks in mm:ss acording to the endofx limit
     def xaxistosm(self):
@@ -1855,6 +1855,10 @@ class tgraphcanvas(FigureCanvas):
         #self.startend [starttime[0], starttempBT[1], endtime[2],endtempBT[3]]      
         if self.startend[2]:
             totaltime = int(self.startend[2]-self.startend[0])
+            if totaltime == 0:
+                aw.messagelabel.setText("Statistics cancelled: need complete profile [CHARGE] + [DROP]")
+                return
+                        
             self.statisticstimes[0] = totaltime
             #if 1Ce use middle point of 1Cs and 1Ce            
             if self.varC[2]:
@@ -1907,7 +1911,7 @@ class tgraphcanvas(FigureCanvas):
                                           color = self.palette["rect1"],alpha=0.5)
                 self.ax.add_patch(rect)
 
-
+            
             dryphaseP = dryphasetime*100/totaltime
             midphaseP = midphasetime*100/totaltime
             finishphaseP = finishphasetime*100/totaltime
@@ -2450,7 +2454,8 @@ class ApplicationWindow(QMainWindow):
         self.settingsLoad()        
         
         #create a Label object to display program status information
-        self.messagelabel = QLabel()
+        self.messagelabel = QLabel() 
+        self.messagelabel.setIndent(10)
         
         #create START STOP buttons        
         self.button_1 = QPushButton("ON")
@@ -2674,26 +2679,32 @@ class ApplicationWindow(QMainWindow):
         self.label1 = QLabel()
         #self.label1.setStyleSheet("background-color:'#CCCCCC';")
         self.label1.setText( "<font color='black'><b>Time<\b></font>")
+        self.label1.setIndent(5)
         #MET
         label2 = QLabel()
         #label2.setStyleSheet("background-color:'#CCCCCC';")
         label2.setText( "<font color='black'><b>ET<\b></font>")
+        label2.setIndent(5)
         #BT
         label3 = QLabel()
         #label3.setStyleSheet("background-color:'#CCCCCC';")
         label3.setText( "<font color='black'><b>BT<\b></font>")
+        label3.setIndent(5)
         #DELTA MET
         label4 = QLabel()
         #label4.setStyleSheet("background-color:'#CCCCCC';")
         label4.setText( "<font color='black'><b>DeltaET<\b></font>")
+        label4.setIndent(5)
         # DELTA BT
         label5 = QLabel()
         #label5.setStyleSheet("background-color:'#CCCCCC';")
         label5.setText( "<font color='black'><b>DeltaBT<\b></font>")
+        label5.setIndent(5)
         # pid sv
         self.label6 = QLabel()
         #label6.setStyleSheet("background-color:'#CCCCCC';")
         self.label6.setText( "<font color='black'><b>PID SV<\b></font>")
+        self.label6.setIndent(5)
         
         #convenience EVENT mini editor; Edits last recorded event without opening roast editor Dlg.
         self.etypes = ["N","P","D","F"]
@@ -6067,13 +6078,17 @@ class editGraphDlg(QDialog):
         self.delevent2Button.setMinimumSize(self.delevent2Button.minimumSizeHint())
         self.connect(self.delevent2Button,SIGNAL("clicked()"),self.delevent)
 
-        lene = len(aw.qmc.timex)
-        if lene > 1 and lene <= 10:
+        lene = len(aw.qmc.specialevents)
+        if lene <= 10:
+            self.delevent1Button.setDisabled(False)
+            self.newevent1Button.setDisabled(False)
+            self.delevent2Button.setDisabled(True)
+            self.newevent2Button.setDisabled(True)
+        else:
+            self.delevent2Button.setDisabled(False)
+            self.newevent2Button.setDisabled(False)            
             self.delevent1Button.setDisabled(True)
             self.newevent1Button.setDisabled(True)
-        if lene > 10 and lene <= 20:
-            self.delevent2Button.setDisabled(True)
-            self.newevent2Button.setDisabled(True)            
             
         #TITLE
         titlelabel = QLabel("<b>Title</b>")
@@ -6169,7 +6184,7 @@ class editGraphDlg(QDialog):
             self.volumeUnitsComboBox.setCurrentIndex(1)
 
         #bag humidity
-        bag_humidity_label = QLabel("<b>Bag Humidity </b>")
+        bag_humidity_label = QLabel("<b>Storage Humidity </b>")
         bag_humidity_unit_label = QLabel("%")
         self.humidity_edit = QLineEdit()
         self.humidity_edit.setText(unicode(aw.qmc.bag_humidity[0]))
@@ -6191,7 +6206,7 @@ class editGraphDlg(QDialog):
         
 
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>Ambient Temperature</b>")
+        ambientlabel = QLabel("<b>Ambient T</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
@@ -6397,8 +6412,9 @@ class editGraphDlg(QDialog):
         #totallayout.addLayout(buttonsLayout)
                
         self.setLayout(totallayout)
-      
-   
+        if lene <= 10:
+    	    C4Widget.setVisible(False)
+    	
     def percent(self):
         if float(self.weightoutedit.text()) != 0.0:
             percent = aw.weight_loss(float(self.weightinedit.text()),float(self.weightoutedit.text()))
@@ -6426,22 +6442,29 @@ class editGraphDlg(QDialog):
             # update graph time variables
             #varC = 1C start time [0],1C start Temp [1],1C end time [2],1C end temp [3],2C start time [4], 2C start Temp [5],2C end time [6], 2C end temp [7]
             #startend = [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
-            aw.qmc.startend[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))   #CHARGE   time
-            aw.qmc.dryend[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.dryedit.text())))        #DRY END time
-            aw.qmc.varC[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))       #1C START time
-            aw.qmc.varC[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))         #1C END   time
-            aw.qmc.varC[4] = self.choice(aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))      #2C START time
-            aw.qmc.varC[6] = self.choice(aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))        #2C END   time
-            aw.qmc.startend[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.dropedit.text())))     #DROP     time
-            #find corresponding temperatures
-            aw.qmc.startend[1] = aw.BTfromseconds(aw.qmc.startend[0])                             #CHARGE   temperature
-            aw.qmc.dryend[1] = aw.BTfromseconds(aw.qmc.dryend[0])                                 #DRY END temperature
-            aw.qmc.varC[1] = aw.BTfromseconds(aw.qmc.varC[0])                                     #1C START temperature
-            aw.qmc.varC[3] = aw.BTfromseconds(aw.qmc.varC[2])                                     #1C END   temperature
-            aw.qmc.varC[5] = aw.BTfromseconds(aw.qmc.varC[4])                                     #2C START temperature
-            aw.qmc.varC[7] = aw.BTfromseconds(aw.qmc.varC[6])                                     #2C END   temperature
-            aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2]) 
-            
+            #check it does not updates the graph with zero times
+            if aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0:
+                aw.qmc.startend[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))   #CHARGE   time
+                aw.qmc.startend[1] = aw.BTfromseconds(aw.qmc.startend[0])                                   #CHARGE   temperature
+            if aw.qmc.stringtoseconds(unicode(self.dryedit.text())) > 0:
+                aw.qmc.dryend[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.dryedit.text())))        #DRY END time
+                aw.qmc.dryend[1] = aw.BTfromseconds(aw.qmc.dryend[0])                                       #DRY END temperature
+            if aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())) > 0: 
+                aw.qmc.varC[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))       #1C START time
+                aw.qmc.varC[1] = aw.BTfromseconds(aw.qmc.varC[0])                                           #1C START temperature            
+            if aw.qmc.stringtoseconds(unicode(self.Cendedit.text())) > 0:    
+                aw.qmc.varC[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))         #1C END   time
+                aw.qmc.varC[3] = aw.BTfromseconds(aw.qmc.varC[2])                                           #1C END   temperature
+            if aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())) > 0:    
+                aw.qmc.varC[4] = self.choice(aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))      #2C START time
+                aw.qmc.varC[5] = aw.BTfromseconds(aw.qmc.varC[4])                                           #2C START temperature
+            if aw.qmc.stringtoseconds(unicode(self.CCendedit.text())) > 0:
+                aw.qmc.varC[6] = self.choice(aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))        #2C END   time
+                aw.qmc.varC[7] = aw.BTfromseconds(aw.qmc.varC[6])                                           #2C END   temperature                
+            if aw.qmc.stringtoseconds(unicode(self.dropedit.text())) > 0:
+                aw.qmc.startend[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.dropedit.text())))     #DROP     time
+                aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2]) 
+
             if aw.qmc.phasesbuttonflag:   
                 # adjust phases by DryEnd and FCs events
                 if aw.qmc.dryend[0]:
@@ -6877,7 +6900,10 @@ class editGraphDlg(QDialog):
     #interpolation would cause plotting dimension problems because several graphs depend on the dimension of aw.qmc.timex
     def choice(self,seconds):
         if seconds == 0:
-            return 0
+            if aw.qmc.startend[0]:
+                return aw.qmc.startend[0]
+            else:
+                return aw.qmc.timex[0]
         else:
             if len(aw.qmc.timex):                           #check that time is not empty just in case
                 if aw.qmc.timex[-1] < seconds:
