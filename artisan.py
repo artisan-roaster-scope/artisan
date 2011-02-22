@@ -6105,7 +6105,10 @@ class editGraphDlg(QDialog):
 
         lene = len(aw.qmc.specialevents)
         if lene <= 10:
-            self.delevent1Button.setDisabled(False)
+            if lene == 0:
+                self.delevent1Button.setDisabled(True)
+            else:
+                self.delevent1Button.setDisabled(False)
             self.newevent1Button.setDisabled(False)
             self.delevent2Button.setDisabled(True)
             self.newevent2Button.setDisabled(True)
@@ -6990,7 +6993,10 @@ class editGraphDlg(QDialog):
             message = u"Event #" + str(nevents) + " added"
             nevents = len(aw.qmc.specialevents)
             if nevents <= 10:
-                self.delevent1Button.setDisabled(False)
+                if lene == 0:
+                    self.delevent1Button.setDisabled(True)
+                else:
+                    self.delevent1Button.setDisabled(False)
                 self.newevent1Button.setDisabled(False)
                 self.delevent2Button.setDisabled(True)
                 self.newevent2Button.setDisabled(True)
@@ -7019,7 +7025,10 @@ class editGraphDlg(QDialog):
              nevents = len(aw.qmc.specialevents)
              message = u"Event #" + str(nevents+1) + " deleted"             
              if nevents <= 10:
-                self.delevent1Button.setDisabled(False)
+                if lene == 0:
+                    self.delevent1Button.setDisabled(True)
+                else:
+                    self.delevent1Button.setDisabled(False)
                 self.newevent1Button.setDisabled(False)
                 self.delevent2Button.setDisabled(True)
                 self.newevent2Button.setDisabled(True)
