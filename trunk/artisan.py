@@ -189,7 +189,7 @@ class tgraphcanvas(FigureCanvas):
         self.title = u"Roaster Scope"
         self.ambientTemp = 0.
         #relative humidity percentage [0], corresponding temperature [1], temperature unit [2]
-        self.bag_humidity = [0.,0.,"C"]
+        self.bag_humidity = [0.,0.]
 
         #list to store the time of each reading. Most IMPORTANT variable.
         self.timex = []
@@ -781,13 +781,15 @@ class tgraphcanvas(FigureCanvas):
         aw.button_19.setFlat(False)        
         
         self.title = u"Roaster Scope"
-        self.roastertype = u""
-        self.operator = u""
+        #the following should be taken from the users settings or at least not cleared such
+        #that users don't have to reenter those
+        #self.roastertype = u""
+        #self.operator = u""
+        #self.projectFlag = False
         self.roastingnotes = u""
         self.cuppingnotes = u""
         self.roastdate = QDate.currentDate()
         self.beans = u""
-        self.projectFlag = False
         self.errorlog = []
         self.weight = [0,0,u"g"]
         self.volume = [0,0,u"l"]
@@ -799,7 +801,6 @@ class tgraphcanvas(FigureCanvas):
                               u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]
         self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         aw.eventlabel.setText("E #0")
-        self.roastdate = QDate.currentDate()        
         self.ambientTemp = 0.
         self.curFile = None
         self.ystep = 45
@@ -1317,6 +1318,7 @@ class tgraphcanvas(FigureCanvas):
                         self.startend[3] = self.fromCtoF(self.startend[3])  #DROP temp
 
                         self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
+                        self.bag_humidity[1] = self.fromCtoF(self.bag_humidity[1]) #bag humidity temperature
 
                         backgroundlength = len(self.timeB)
                         if backgroundlength > 0:
@@ -1369,6 +1371,7 @@ class tgraphcanvas(FigureCanvas):
                         self.startend[3] = self.fromFtoC(self.startend[3])  #DROP temp
 
                         self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
+                        self.bag_humidity[1] = self.fromFtoC(self.bag_humidity[1])  #bag humidity temperature                        
                         
                         backgroundlength = len(self.timeB)
                         if backgroundlength > 0:
@@ -6052,7 +6055,7 @@ class editGraphDlg(QDialog):
         events2Layout.addWidget(self.valueComboBox20,10,3)
         events2Layout.addWidget(self.line20,10,4)
             
-        self.paintevents()            
+        self.paintevents(disable_only=True)            
             
         self.newevent1Button = QPushButton("Add")
         self.newevent1Button.setFocusPolicy(Qt.NoFocus)
@@ -6185,6 +6188,7 @@ class editGraphDlg(QDialog):
 
         #bag humidity
         bag_humidity_label = QLabel("<b>Storage Humidity </b>")
+        bag_humidity_unitslabel = QLabel(aw.qmc.mode)
         bag_humidity_unit_label = QLabel("%")
         self.humidity_edit = QLineEdit()
         self.humidity_edit.setText(unicode(aw.qmc.bag_humidity[0]))
@@ -6198,20 +6202,18 @@ class editGraphDlg(QDialog):
         self.bag_humiditity_tempUnitsComboBox = QComboBox()
         self.bag_humiditity_tempUnitsComboBox.setMaximumWidth(60)
         self.bag_humiditity_tempUnitsComboBox.setMinimumWidth(60)
-        self.bag_humiditity_tempUnitsComboBox.addItems(["C","F"])
-        if aw.qmc.bag_humidity[2] == "C":
-            self.bag_humiditity_tempUnitsComboBox.setCurrentIndex(0)
-        else:
-            self.bag_humiditity_tempUnitsComboBox.setCurrentIndex(1)
         
 
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>Ambient T</b>")
+        ambientlabel = QLabel("<b>Ambient Temperature</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
         self.ambientedit.setMaximumWidth(50)
-        self.ambientedit.setValidator(QDoubleValidator(0., 200., 1, self.ambientedit))
+        self.ambientedit.setValidator(QDoubleValidator(0., 200., 1, self.ambientedit))        
+        self.ambientedit_tempUnitsComboBox = QComboBox()
+        self.ambientedit_tempUnitsComboBox.setMaximumWidth(60)
+        self.ambientedit_tempUnitsComboBox.setMinimumWidth(60)
   
         # NOTES
         roastertypelabel = QLabel()
@@ -6222,12 +6224,12 @@ class editGraphDlg(QDialog):
 
         roastinglabel = QLabel("<b>Roasting Notes<\b>")
         self.roastingeditor = QTextEdit()
-        self.roastingeditor.setMaximumHeight(100)
+        #self.roastingeditor.setMaximumHeight(100)
         self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
 
         cupinglabel = QLabel("<b>Cuping Notes<\b>")
         self.cupingeditor =  QTextEdit()
-        self.cupingeditor.setMaximumHeight(100)
+        #self.cupingeditor.setMaximumHeight(100)
         self.cupingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
         
 
@@ -6330,7 +6332,7 @@ class editGraphDlg(QDialog):
         humidityLayout.addWidget(bag_humidity_at_label)
         humidityLayout.addSpacing(15)
         humidityLayout.addWidget(self.bag_temp_edit)
-        humidityLayout.addWidget(self.bag_humiditity_tempUnitsComboBox)
+        humidityLayout.addWidget(bag_humidity_unitslabel)
         humidityLayout.addStretch()
         
         ambientLayout = QHBoxLayout()
@@ -6378,11 +6380,13 @@ class editGraphDlg(QDialog):
         tab3Layout = QVBoxLayout()
         tab3Layout.addLayout(events1Layout)
         tab3Layout.addLayout(event1buttonLayout)
+        tab3Layout.addStretch()  
         
         #tab 4
         tab4Layout = QVBoxLayout()
         tab4Layout.addLayout(events2Layout)
         tab4Layout.addLayout(event2buttonLayout)
+        tab4Layout.addStretch()  
         
         #tabwidget
         self.TabWidget = QTabWidget()
@@ -6626,7 +6630,6 @@ class editGraphDlg(QDialog):
         #update humidity
         aw.qmc.bag_humidity[0] = float(self.humidity_edit.text())
         aw.qmc.bag_humidity[1] = float(self.bag_temp_edit.text())
-        aw.qmc.bag_humidity[2] = unicode(self.bag_humiditity_tempUnitsComboBox.currentText())
 
     	#update ambient temperature
         aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
@@ -6641,14 +6644,15 @@ class editGraphDlg(QDialog):
         aw.qmc.redraw()
         self.close()
 
-    def paintevents(self):
+    def paintevents(self,disable_only=False):
         ntlines = len(aw.qmc.specialevents)
         if ntlines > 0:
-            self.numberlabel1.setVisible(True)
-            self.line1b.setVisible(True)
-            self.line1.setVisible(True)
-            self.etypeComboBox1.setVisible(True)
-            self.valueComboBox1.setVisible(True)
+            if not disable_only:
+                self.numberlabel1.setVisible(True)
+                self.line1b.setVisible(True)
+                self.line1.setVisible(True)
+                self.etypeComboBox1.setVisible(True)
+                self.valueComboBox1.setVisible(True)
         else:
             self.numberlabel1.setVisible(False)
             self.line1b.setVisible(False)
@@ -6656,11 +6660,12 @@ class editGraphDlg(QDialog):
             self.etypeComboBox1.setVisible(False)
             self.valueComboBox1.setVisible(False)            
         if ntlines > 1:
-            self.numberlabel2.setVisible(True)
-            self.line2b.setVisible(True)
-            self.line2.setVisible(True)
-            self.etypeComboBox2.setVisible(True)
-            self.valueComboBox2.setVisible(True)
+            if not disable_only:
+                self.numberlabel2.setVisible(True)
+                self.line2b.setVisible(True)
+                self.line2.setVisible(True)
+                self.etypeComboBox2.setVisible(True)
+                self.valueComboBox2.setVisible(True)
         else:
             self.numberlabel2.setVisible(False)
             self.line2b.setVisible(False)
@@ -6668,11 +6673,12 @@ class editGraphDlg(QDialog):
             self.etypeComboBox2.setVisible(False)
             self.valueComboBox2.setVisible(False)            
         if ntlines > 2:
-            self.numberlabel3.setVisible(True)
-            self.line3b.setVisible(True)
-            self.line3.setVisible(True)
-            self.etypeComboBox3.setVisible(True)
-            self.valueComboBox3.setVisible(True)
+            if not disable_only:
+                self.numberlabel3.setVisible(True)
+                self.line3b.setVisible(True)
+                self.line3.setVisible(True)
+                self.etypeComboBox3.setVisible(True)
+                self.valueComboBox3.setVisible(True)
         else:
             self.numberlabel3.setVisible(False)
             self.line3b.setVisible(False)
@@ -6680,11 +6686,12 @@ class editGraphDlg(QDialog):
             self.etypeComboBox3.setVisible(False)
             self.valueComboBox3.setVisible(False)
         if ntlines >3:
-            self.numberlabel4.setVisible(True)
-            self.line4b.setVisible(True)
-            self.line4.setVisible(True)
-            self.etypeComboBox4.setVisible(True)
-            self.valueComboBox4.setVisible(True)
+            if not disable_only:
+                self.numberlabel4.setVisible(True)
+                self.line4b.setVisible(True)
+                self.line4.setVisible(True)
+                self.etypeComboBox4.setVisible(True)
+                self.valueComboBox4.setVisible(True)
         else:
             self.numberlabel4.setVisible(False)
             self.line4b.setVisible(False)
@@ -6692,11 +6699,12 @@ class editGraphDlg(QDialog):
             self.etypeComboBox4.setVisible(False)
             self.valueComboBox4.setVisible(False)            
         if ntlines >4:
-            self.numberlabel5.setVisible(True)
-            self.line5b.setVisible(True)
-            self.line5.setVisible(True)
-            self.etypeComboBox5.setVisible(True)
-            self.valueComboBox5.setVisible(True)
+            if not disable_only:
+                self.numberlabel5.setVisible(True)
+                self.line5b.setVisible(True)
+                self.line5.setVisible(True)
+                self.etypeComboBox5.setVisible(True)
+                self.valueComboBox5.setVisible(True)
         else:
             self.numberlabel5.setVisible(False)
             self.line5b.setVisible(False)
@@ -6704,11 +6712,12 @@ class editGraphDlg(QDialog):
             self.etypeComboBox5.setVisible(False)
             self.valueComboBox5.setVisible(False)            
         if ntlines >5:
-            self.numberlabel6.setVisible(True)
-            self.line6b.setVisible(True)
-            self.line6.setVisible(True)
-            self.etypeComboBox6.setVisible(True)
-            self.valueComboBox6.setVisible(True)
+            if not disable_only:
+                self.numberlabel6.setVisible(True)
+                self.line6b.setVisible(True)
+                self.line6.setVisible(True)
+                self.etypeComboBox6.setVisible(True)
+                self.valueComboBox6.setVisible(True)
         else:
             self.numberlabel6.setVisible(False)
             self.line6b.setVisible(False)
@@ -6716,11 +6725,12 @@ class editGraphDlg(QDialog):
             self.etypeComboBox6.setVisible(False)
             self.valueComboBox6.setVisible(False)            
         if ntlines >6:
-            self.numberlabel7.setVisible(True)
-            self.line7b.setVisible(True)
-            self.line7.setVisible(True)
-            self.etypeComboBox7.setVisible(True)
-            self.valueComboBox7.setVisible(True)
+            if not disable_only:
+                self.numberlabel7.setVisible(True)
+                self.line7b.setVisible(True)
+                self.line7.setVisible(True)
+                self.etypeComboBox7.setVisible(True)
+                self.valueComboBox7.setVisible(True)
         else:
             self.numberlabel7.setVisible(False)
             self.line7b.setVisible(False)
@@ -6728,11 +6738,12 @@ class editGraphDlg(QDialog):
             self.etypeComboBox7.setVisible(False)
             self.valueComboBox7.setVisible(False)            
         if ntlines >7:
-            self.numberlabel8.setVisible(True)
-            self.line8b.setVisible(True)
-            self.line8.setVisible(True)
-            self.etypeComboBox8.setVisible(True)
-            self.valueComboBox8.setVisible(True)
+            if not disable_only:
+                self.numberlabel8.setVisible(True)
+                self.line8b.setVisible(True)
+                self.line8.setVisible(True)
+                self.etypeComboBox8.setVisible(True)
+                self.valueComboBox8.setVisible(True)
         else:
             self.numberlabel8.setVisible(False)
             self.line8b.setVisible(False)
@@ -6740,11 +6751,12 @@ class editGraphDlg(QDialog):
             self.etypeComboBox8.setVisible(False)
             self.valueComboBox8.setVisible(False)            
         if ntlines >8:
-            self.numberlabel9.setVisible(True)
-            self.line9b.setVisible(True)
-            self.line9.setVisible(True)
-            self.etypeComboBox9.setVisible(True)
-            self.valueComboBox9.setVisible(True)
+            if not disable_only:
+                self.numberlabel9.setVisible(True)
+                self.line9b.setVisible(True)
+                self.line9.setVisible(True)
+                self.etypeComboBox9.setVisible(True)
+                self.valueComboBox9.setVisible(True)
         else:
             self.numberlabel9.setVisible(False)
             self.line9b.setVisible(False)
@@ -6752,11 +6764,12 @@ class editGraphDlg(QDialog):
             self.etypeComboBox9.setVisible(False)
             self.valueComboBox9.setVisible(False)            
         if ntlines >9:
-            self.numberlabel10.setVisible(True)
-            self.line10b.setVisible(True)
-            self.line10.setVisible(True)
-            self.etypeComboBox10.setVisible(True)
-            self.valueComboBox10.setVisible(True)
+            if not disable_only:
+                self.numberlabel10.setVisible(True)
+                self.line10b.setVisible(True)
+                self.line10.setVisible(True)
+                self.etypeComboBox10.setVisible(True)
+                self.valueComboBox10.setVisible(True)
         else:
             self.numberlabel10.setVisible(False)
             self.line10b.setVisible(False)
@@ -6765,11 +6778,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox10.setVisible(False)
             
         if ntlines >10:
-            self.numberlabel11.setVisible(True)
-            self.line11b.setVisible(True)
-            self.line11.setVisible(True)
-            self.etypeComboBox11.setVisible(True)
-            self.valueComboBox11.setVisible(True)
+            if not disable_only:
+                self.numberlabel11.setVisible(True)
+                self.line11b.setVisible(True)
+                self.line11.setVisible(True)
+                self.etypeComboBox11.setVisible(True)
+                self.valueComboBox11.setVisible(True)
         else:
             self.numberlabel11.setVisible(False)
             self.line11b.setVisible(False)
@@ -6778,11 +6792,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox11.setVisible(False)            
 
         if ntlines >11:
-            self.numberlabel12.setVisible(True)
-            self.line12b.setVisible(True)
-            self.line12.setVisible(True)
-            self.etypeComboBox12.setVisible(True)
-            self.valueComboBox12.setVisible(True)
+            if not disable_only:
+                self.numberlabel12.setVisible(True)
+                self.line12b.setVisible(True)
+                self.line12.setVisible(True)
+                self.etypeComboBox12.setVisible(True)
+                self.valueComboBox12.setVisible(True)
         else:
             self.numberlabel12.setVisible(False)
             self.line12b.setVisible(False)
@@ -6791,11 +6806,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox12.setVisible(False)            
 
         if ntlines >12:
-            self.numberlabel13.setVisible(True)
-            self.line13b.setVisible(True)
-            self.line13.setVisible(True)
-            self.etypeComboBox13.setVisible(True)
-            self.valueComboBox13.setVisible(True)
+            if not disable_only:
+                self.numberlabel13.setVisible(True)
+                self.line13b.setVisible(True)
+                self.line13.setVisible(True)
+                self.etypeComboBox13.setVisible(True)
+                self.valueComboBox13.setVisible(True)
         else:
             self.numberlabel13.setVisible(False)
             self.line13b.setVisible(False)
@@ -6804,11 +6820,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox13.setVisible(False)            
 
         if ntlines >13:
-            self.numberlabel14.setVisible(True)
-            self.line14b.setVisible(True)
-            self.line14.setVisible(True)
-            self.etypeComboBox14.setVisible(True)
-            self.valueComboBox14.setVisible(True)
+            if not disable_only:
+                self.numberlabel14.setVisible(True)
+                self.line14b.setVisible(True)
+                self.line14.setVisible(True)
+                self.etypeComboBox14.setVisible(True)
+                self.valueComboBox14.setVisible(True)
         else:
             self.numberlabel14.setVisible(False)
             self.line14b.setVisible(False)
@@ -6817,11 +6834,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox14.setVisible(False)            
 
         if ntlines >14:
-            self.numberlabel15.setVisible(True)
-            self.line15b.setVisible(True)
-            self.line15.setVisible(True)
-            self.etypeComboBox15.setVisible(True)
-            self.valueComboBox15.setVisible(True)
+            if not disable_only:
+                self.numberlabel15.setVisible(True)
+                self.line15b.setVisible(True)
+                self.line15.setVisible(True)
+                self.etypeComboBox15.setVisible(True)
+                self.valueComboBox15.setVisible(True)
         else:
             self.numberlabel15.setVisible(False)
             self.line15b.setVisible(False)
@@ -6830,11 +6848,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox15.setVisible(False)            
 
         if ntlines >15:
-            self.numberlabel16.setVisible(True)
-            self.line16b.setVisible(True)
-            self.line16.setVisible(True)
-            self.etypeComboBox16.setVisible(True)
-            self.valueComboBox16.setVisible(True)
+            if not disable_only:
+                self.numberlabel16.setVisible(True)
+                self.line16b.setVisible(True)
+                self.line16.setVisible(True)
+                self.etypeComboBox16.setVisible(True)
+                self.valueComboBox16.setVisible(True)
         else:
             self.numberlabel16.setVisible(False)
             self.line16b.setVisible(False)
@@ -6843,11 +6862,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox16.setVisible(False)            
 
         if ntlines >16:
-            self.numberlabel17.setVisible(True)
-            self.line17b.setVisible(True)
-            self.line17.setVisible(True)
-            self.etypeComboBox17.setVisible(True)
-            self.valueComboBox17.setVisible(True)
+            if not disable_only:
+                self.numberlabel17.setVisible(True)
+                self.line17b.setVisible(True)
+                self.line17.setVisible(True)
+                self.etypeComboBox17.setVisible(True)
+                self.valueComboBox17.setVisible(True)
         else:
             self.numberlabel17.setVisible(False)
             self.line17b.setVisible(False)
@@ -6856,11 +6876,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox17.setVisible(False)            
 
         if ntlines >17:
-            self.numberlabel18.setVisible(True)
-            self.line18b.setVisible(True)
-            self.line18.setVisible(True)
-            self.etypeComboBox18.setVisible(True)
-            self.valueComboBox18.setVisible(True)
+            if not disable_only:
+                self.numberlabel18.setVisible(True)
+                self.line18b.setVisible(True)
+                self.line18.setVisible(True)
+                self.etypeComboBox18.setVisible(True)
+                self.valueComboBox18.setVisible(True)
         else:
             self.numberlabel18.setVisible(False)
             self.line18b.setVisible(False)
@@ -6869,11 +6890,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox18.setVisible(False)            
 
         if ntlines >18:
-            self.numberlabel19.setVisible(True)
-            self.line19b.setVisible(True)
-            self.line19.setVisible(True)
-            self.etypeComboBox19.setVisible(True)
-            self.valueComboBox19.setVisible(True)
+            if not disable_only:
+                self.numberlabel19.setVisible(True)
+                self.line19b.setVisible(True)
+                self.line19.setVisible(True)
+                self.etypeComboBox19.setVisible(True)
+                self.valueComboBox19.setVisible(True)
         else:
             self.numberlabel19.setVisible(False)
             self.line19b.setVisible(False)
@@ -6882,11 +6904,12 @@ class editGraphDlg(QDialog):
             self.valueComboBox19.setVisible(False)            
 
         if ntlines >19:
-            self.numberlabel20.setVisible(True)
-            self.line20b.setVisible(True)
-            self.line20.setVisible(True)
-            self.etypeComboBox20.setVisible(True)
-            self.valueComboBox20.setVisible(True)
+            if not disable_only:
+                self.numberlabel20.setVisible(True)
+                self.line20b.setVisible(True)
+                self.line20.setVisible(True)
+                self.etypeComboBox20.setVisible(True)
+                self.valueComboBox20.setVisible(True)
         else:
             self.numberlabel20.setVisible(False)
             self.line20b.setVisible(False)
