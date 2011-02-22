@@ -2406,6 +2406,10 @@ class ApplicationWindow(QMainWindow):
         #checks executable directory. dirstruct() checks or creates: /profile/year/month directory to store profiles
         self.dirstruct()
         
+        
+        #defaults the users profile path to the standard profilepath (incl. month/year subdirectories)
+        self.userprofilepath = self.profilepath
+        
         self.printer = QPrinter()
         self.printer.setPageSize(QPrinter.Letter)
         
@@ -3383,9 +3387,24 @@ class ApplicationWindow(QMainWindow):
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanOpenFileDialog(self,msg="Open",ext="*.txt",path=None):
-        if path == None:
-            path = self.profilepath
-        return unicode(QFileDialog.getOpenFileName(self,msg,path,ext))
+        if path == None:    
+            userprofilepath_dir = QDir()
+            userprofilepath_dir.setPath(self.userprofilepath)
+            userprofilepath_elements = userprofilepath_dir.absolutePath().split("/") # directories as QStrings
+            profilepath_dir = QDir()
+            profilepath_dir.setPath(self.profilepath)
+            profilepath_elements = profilepath_dir.absolutePath().split("/")
+            #compare profilepath with userprofilepath (modulo the last two segments which are month/year respectively)
+            if len(userprofilepath_elements) == len(profilepath_elements) and len(userprofilepath_elements) > 1 and reduce(lambda x,y: x and y, map(lambda x : x[0] == x[1], zip(userprofilepath_elements[:-2],profilepath_elements[:-2]))):
+                path = self.profilepath
+            else:
+                path = self.userprofilepath
+        file = unicode(QFileDialog.getOpenFileName(self,msg,path,ext))
+        filepath_dir = QDir()
+        filepath_dir.setPath(file)
+        filepath_elements = filepath_dir.absolutePath().split("/")[:-1] # directories as QStrings (without the filename)
+        self.userprofilepath = unicode(reduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
+        return unicode(file)
  
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
@@ -3977,11 +3996,12 @@ class ApplicationWindow(QMainWindow):
         if "dryend" in profile:
             self.qmc.dryend = profile["dryend"]
         if "bag_humidity" in profile:
-            self.qmc.bag_humidity = profile["bag_humidity"]          
+            self.qmc.bag_humidity = profile["bag_humidity"]   
             
     #used by filesave()
     #wrap values in unicode(.) if and only if those are of type string
     def getProfile(self):
+        print "getProfile"
         profile = {}
         profile["mode"] = self.qmc.mode
         profile["startend"] = self.qmc.startend
@@ -4147,6 +4167,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.operator = unicode(settings.value("operator",self.qmc.operator).toString())
             self.qmc.roastertype = unicode(settings.value("roastertype",self.qmc.roastertype).toString())
             settings.endGroup()
+            self.userprofilepath = unicode(settings.value("profilepath",self.userprofilepath).toString())
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
             self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
@@ -4247,6 +4268,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("operator",self.qmc.operator)
             settings.setValue("roastertype",self.qmc.roastertype)
             settings.endGroup()
+            settings.setValue("profilepath",self.userprofilepath)
             
         except Exception,e:
             self.qmc.errorlog.append("Error saving settings " + str(e))   
