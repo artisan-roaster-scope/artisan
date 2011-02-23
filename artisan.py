@@ -705,15 +705,10 @@ class tgraphcanvas(FigureCanvas):
         tx = self.timeclock.elapsed()/1000.
 
         return tx,t2,t1
-    
-    def minsec(self,sec):
-        minutes = sec // 60
-        sec = sec - minutes * 60
-        return '%d:%02d' % (minutes, sec)
         
-    def xaxistosm(self):    
-        formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - int(self.startend[0]), 60))
-        locator = ticker.IndexLocator(120, int(self.startend[0]))
+    def xaxistosm(self):   
+        formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - round(self.startend[0]), 60))
+        locator = ticker.IndexLocator(120, round(self.startend[0]))
         self.ax.xaxis.set_major_formatter(formatter)
         self.ax.xaxis.set_major_locator(locator)
         
@@ -2776,19 +2771,6 @@ class ApplicationWindow(QMainWindow):
         self.buttonminiEvent.setToolTip("Edits the last recorded event")
 
         
-        if self.minieventsflag:
-            self.lineEvent.setVisible(True)
-            self.etypeComboBox.setVisible(True)
-            self.valueComboBox.setVisible(True)
-            self.eventlabel.setVisible(True)
-            self.buttonminiEvent.setVisible(True)
-        else:
-            self.lineEvent.setVisible(False)
-            self.etypeComboBox.setVisible(False)
-            self.valueComboBox.setVisible(False)
-            self.eventlabel.setVisible(False)
-            self.buttonminiEvent.setVisible(False)
-        
         EventsLayout = QHBoxLayout()
         EventsLayout.addWidget(self.eventlabel,0)
         EventsLayout.addWidget(self.lineEvent,1)        
@@ -3076,6 +3058,20 @@ class ApplicationWindow(QMainWindow):
 
         # set the central widget of MainWindow to main_widget
         self.setCentralWidget(self.main_widget)   
+        
+        # set visibility of mini event line
+        if self.minieventsflag:
+            self.lineEvent.setVisible(True)
+            self.etypeComboBox.setVisible(True)
+            self.valueComboBox.setVisible(True)
+            self.eventlabel.setVisible(True)
+            self.buttonminiEvent.setVisible(True)
+        else:
+            self.lineEvent.setVisible(False)
+            self.etypeComboBox.setVisible(False)
+            self.valueComboBox.setVisible(False)
+            self.eventlabel.setVisible(False)
+            self.buttonminiEvent.setVisible(False)
 
         #list of functions to chose from (using left-right keyboard arrow)
         self.keyboardmove  = [self.qmc.OnMonitor,self.qmc.markCharge,self.qmc.markDryEnd,self.qmc.mark1Cstart,self.qmc.mark1Cend,
@@ -6312,12 +6308,10 @@ class editGraphDlg(QDialog):
 
         roastinglabel = QLabel("<b>Roasting Notes<\b>")
         self.roastingeditor = QTextEdit()
-        self.roastingeditor.setMaximumHeight(150)
         self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
 
         cupinglabel = QLabel("<b>Cuping Notes<\b>")
         self.cupingeditor =  QTextEdit()
-        self.cupingeditor.setMaximumHeight(150)
         self.cupingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
         
 
