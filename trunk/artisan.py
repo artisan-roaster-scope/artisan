@@ -159,7 +159,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.HH802U,
                                    self.HH309,
                                    self.NONE,
-                                   self.ARDUINOTC4
+                                   self.ARDUINOTC4,
+                                   self.TEVA18B
                                    ]
         
         self.fig = Figure(facecolor=u'lightgrey')
@@ -180,6 +181,7 @@ class tgraphcanvas(FigureCanvas):
         # the rate of chage of temperature
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
+        
         # multiplication factor to increment sensitivity of rateofchange
         self.sensitivity = 100.0 # was 20.0
         #read and plot on/off flag
@@ -241,6 +243,8 @@ class tgraphcanvas(FigureCanvas):
         self.projectFlag = False
         self.DeltaETflag = False
         self.DeltaBTflag = False
+        self.deltafilter = True
+
         # projection variables of change of rate
         self.HUDflag = 0
         self.ETtarget = 350
@@ -357,7 +361,6 @@ class tgraphcanvas(FigureCanvas):
         # event occurs. Reimplement this function to get timer events. If multiple timers are running, the QTimerEvent.timerId()
         # can be used to find out which timer was activated.
 
-
     #event handler from startTimer()
     def timerEvent(self, evt):
         if self.flagon:
@@ -365,8 +368,6 @@ class tgraphcanvas(FigureCanvas):
             if self.device != 18:
                 #read time, ET (t2) and BT (t1) TEMPERATURE
                 tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
-                #test for a possible change
-                t1,t2 = self.filterDropOuts(t1,t2)
                 
                 #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
                 #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
@@ -426,10 +427,10 @@ class tgraphcanvas(FigureCanvas):
                     timelcd = QString(st2)
                     aw.lcd1.display(timelcd)                
                     
-                aw.lcd2.display(QString("%.1f"%t1))               # MET use a string format to the always show one decimal point
-                aw.lcd3.display(QString("%.1f"%t2))               # BT use a string format to the always show one decimal point
-                aw.lcd4.display(int(self.rateofchange1*60))       # rate of change MET (degress per minute)
-                aw.lcd5.display(int(self.rateofchange2*60))       # rate of change BT (degrees per minute)
+                aw.lcd2.display(t1)                               # MET
+                aw.lcd3.display(t2)                               # BT
+                aw.lcd4.display(int(round(self.rateofchange1*60)))       # rate of change MET (degress per minute)
+                aw.lcd5.display(int(round(self.rateofchange2*60)))       # rate of change BT (degrees per minute)
 
                 self.fig.canvas.draw()
                 
@@ -705,6 +706,12 @@ class tgraphcanvas(FigureCanvas):
         tx = self.timeclock.elapsed()/1000.
 
         return tx,t2,t1
+
+    def TEVA18B(self):
+        t2,t1 = aw.ser.TEVA18Btemperature()
+        tx = self.timeclock.elapsed()/1000.
+
+        return tx,t2,t1        
         
     def xaxistosm(self):   
         formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - round(self.startend[0]), 60))
@@ -958,23 +965,37 @@ class tgraphcanvas(FigureCanvas):
 
             
         #populate delta BT (self.delta2) and delta MET (self.delta1)
-        self.delta1,self.delta2,d1,d2=[],[],[],[]
+        d1,d2,d3,d4=[],[],[],[]
         for i in range(len(self.timex)-1):
             #print i, self.qmc.temp1[i+1], self.qmc.temp1[i]
             timed = self.timex[i+1] - self.timex[i]
-            d1 = self.sensitivity*((self.temp1[i+1] - self.temp1[i]) / timed) + 100
-            d2 = self.sensitivity*((self.temp2[i+1] - self.temp2[i]) / timed) + 50
-            #smooth DeltaBT/DeltaET
-            #if len(self.delta1) > 2:
-            #   d1 = (d1 + d1 + d1 + self.delta1[-1] + self.delta1[-1] + self.delta1[-1] + self.delta1[-2] + self.delta1[-2] + self.delta1[-3]) / 9.0
-            #if len(self.delta2) > 2:
-            #   d2 = (d2 + d2 + d2 + self.delta2[-1] + self.delta2[-1] + self.delta2[-1] + self.delta2[-2] + self.delta2[-2] + self.delta2[-3]) / 9.0
-            self.delta1.append(d1)
-            self.delta2.append(d2)
+
+            delta1 = 100+ self.sensitivity*((self.temp1[i+1] - self.temp1[i]) / timed) 
+            delta2 = 50 + self.sensitivity*((self.temp2[i+1] - self.temp2[i]) / timed)
+            
+            d1.append(delta1)
+            d2.append(delta2)
+            
+            if self.deltafilter:
+                if i > 4:
+                    #smooth DeltaBT/DeltaET by using FIR filter of 5 pads (use only current and past input values. Don't use outputs
+                    d3.append((d1[-1]+ d1[-2] + d1[-3]+ d1[-4]+ d1[-5])/5.)
+                    d4.append((d2[-1]+ d2[-2] + d2[-3]+ d2[-4]+ d2[-5])/5.)
+                else:
+                    d3.append(delta1) 
+                    d4.append(delta2)                     
+            
+        if self.deltafilter:
+            self.delta1 = d3
+            self.delta2 = d4
+        else:
+            self.delta1 = d1
+            self.delta2 = d2
+            
         #this is needed because DeltaBT and DeltaET need 2 values of timex (difference) but they also need same dimension in order to plot
         if len(self.timex) > len(self.delta1):
-            self.delta1.append(d1)
-            self.delta2.append(d2)
+            self.delta1.append(delta1)
+            self.delta2.append(delta2)
 
         ##### DeltaET,DeltaBT curves
         if self.DeltaETflag:
@@ -2763,12 +2784,12 @@ class ApplicationWindow(QMainWindow):
         self.valueComboBox.setMaximumWidth(50)
 
         #create EVENT mini button
-        self.buttonminiEvent = QPushButton("Save")
+        self.buttonminiEvent = QPushButton("Update")
         self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
         self.buttonminiEvent.setMaximumSize(55,20)
         self.buttonminiEvent.setMinimumSize(35,20)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
-        self.buttonminiEvent.setToolTip("Edits the last recorded event")
+        self.buttonminiEvent.setToolTip("Updates the last recorded event")
 
         
         EventsLayout = QHBoxLayout()
@@ -3373,7 +3394,7 @@ class ApplicationWindow(QMainWindow):
             if len(self.qmc.specialeventsStrings[lenevents-1]) > 5:
                 string += self.qmc.specialeventsStrings[lenevents-1][0:5]
                 string += "..."
-            message = u"Changes to Event #" + str(lenevents) + ":  " + string +  u" have been saved"
+            message = u"Event #" + str(lenevents) + ":  " + string +  u" has been updated"
             self.messagelabel.setText(message)
         else:
             self.messagelabel.setText("Zero events found")
@@ -4200,6 +4221,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoC")
             self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
+            self.qmc.deltafilter = settings.value("deltafilter",self.qmc.deltafilter).toBool()
             self.qmc.sensitivity = settings.value("Sensitivity",self.qmc.sensitivity).toInt()[0]
             settings.endGroup()
             settings.beginGroup("HUD")
@@ -4305,6 +4327,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaET",self.qmc.DeltaETflag)
             settings.setValue("DeltaBT",self.qmc.DeltaBTflag)
             settings.setValue("Sensitivity",self.qmc.sensitivity)
+            settings.setValue("deltafilter",self.qmc.deltafilter)
             settings.endGroup()
             settings.beginGroup("HUD")
             settings.setValue("Projection",self.qmc.projectFlag)
@@ -5207,6 +5230,15 @@ class HUDDlg(QDialog):
         else:
             self.DeltaBT.setChecked(False)
 
+        #delta Filter  
+        self.DeltaFilter = QCheckBox("Filter")        
+        if aw.qmc.deltafilter == True:
+            self.DeltaFilter.setChecked(True)
+        else:
+            self.DeltaFilter.setChecked(False)
+        self.connect(self.DeltaFilter ,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaFilter(i))         #toggle
+
+
         #show projection
         self.projectCheck = QCheckBox("Projection")
         projectionmodeLabel = QLabel("Mode")
@@ -5272,6 +5304,7 @@ class HUDDlg(QDialog):
         sensitivityLayout = QHBoxLayout()
         sensitivityLayout.addWidget(self.sensitivitylabel)
         sensitivityLayout.addWidget(self.sensitivityComboBox)
+        sensitivityLayout.addWidget(self.DeltaFilter)
         sensitivityLayout.addStretch()
         
         curvesLayout = QVBoxLayout()
@@ -5460,6 +5493,10 @@ class HUDDlg(QDialog):
             
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
+        aw.qmc.redraw()
+
+    def changeDeltaFilter(self,i):
+        aw.qmc.deltafilter = not aw.qmc.deltafilter
         aw.qmc.redraw()
         
     def changeDeltaBT(self,i):
@@ -7522,7 +7559,7 @@ class EventsDlg(QDialog):
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)  
         
         self.minieventsflag = QCheckBox("Last event mini editor")
-        self.minieventsflag.setToolTip("Allows to enter a short description of the last event")
+        self.minieventsflag.setToolTip("Allows to enter a description of the last event")
         if aw.minieventsflag:
             self.minieventsflag.setChecked(True)
         else:
@@ -8536,8 +8573,8 @@ class serialport(object):
             self.SP.open()        
                
         except serial.SerialException,e:
-            aw.messagelabel.setText(u"Unable to open serial port" )
-            aw.qmc.errorlog.append(u"Unable to open serial port ")
+            aw.messagelabel.setText("Unable to open serial port: SerialException" )
+            aw.qmc.errorlog.append("Unable to open serial port: SerialException ")
             
     def closeEvent(self):
         try:        
@@ -8563,18 +8600,18 @@ class serialport(object):
                     # CHECK FOR RECEIVED ERROR CODES
                     if ord(r[1]) == 128:
                             if ord(r[2]) == 1:
-                                 errorcode = u" F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. "
-                                 aw.messagelabel.setText(u"sendFUJIcommand(): ERROR 1 Illegal Function in unit %i" %ord(command[0]))
+                                 errorcode = " F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. "
+                                 aw.messagelabel.setText("sendFUJIcommand(): ERROR 1 Illegal Function in unit %i " %ord(command[0]))
                                  aw.qmc.errorlog.append(errorcode)
                             if ord(r[2]) == 2:
-                                 errorcode = u"F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n \
-                                             number cannot be used by the specified function code."
-                                 aw.messagelabel.setText(u"sendFUJIcommand() ERROR 2 Illegal Address for unit %i"%(ord(command[0])))
+                                 errorcode = "F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n \
+                                             number cannot be used by the specified function code. "
+                                 aw.messagelabel.setText("sendFUJIcommand() ERROR 2 Illegal Address for unit %i "%(ord(command[0])))
                                  aw.qmc.errorlog.append(errorcode)
                             if ord(r[2]) == 3:
-                                 errorcode = u"F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n \
+                                 errorcode = "F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n \
                                               coil numbers or resistor numbers."
-                                 aw.messagelabel.setText(u"sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i"%(ord(command[0])))
+                                 aw.messagelabel.setText("sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i "%(ord(command[0])))
                                  aw.qmc.errorlog.append(errorcode)
                     else:
                         #Check crc16
@@ -8583,9 +8620,9 @@ class serialport(object):
                         if crcCal1 == crcRx:  
                             return r           #OK. Return r after it has been checked for errors
                         else:
-                            aw.messagelabel.setText(u"Crc16 data corruption ERROR. TX does not match RX. Check wiring")
-                            aw.qmc.errorlog.append(u"Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
-                            return u"0"
+                            aw.messagelabel.setText("Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
+                            aw.qmc.errorlog.append("Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
+                            return "0"
 
                 else:
                     aw.messagelabel.setText(u"No RX data received")
@@ -8594,9 +8631,9 @@ class serialport(object):
                 return u"0"                                    
                 
         except serial.SerialException,e:
-            aw.messagelabel.setText(u"ser.sendFUJIcommand(): Error in serial port" )
-            aw.qmc.errorlog.append(u"ser.sendFUJIcommand): Error in serial port " )
-            return u"0"
+            aw.messagelabel.setText("ser.sendFUJIcommand(): SerialException " )
+            aw.qmc.errorlog.append("ser.sendFUJIcommand): SerialException ")
+            return "0"
 
      #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
@@ -8635,8 +8672,8 @@ class serialport(object):
                     return -1,-1                                    
                                    
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.HH806AUtemperature(): " )
-            aw.qmc.errorlog.append(u"ser.HH806AUtemperature(): ")
+            aw.messagelabel.setText("ser.HH806AUtemperature(): SerialException ")
+            aw.qmc.errorlog.append("ser.HH806AUtemperature(): SerialException ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8650,8 +8687,8 @@ class serialport(object):
         if self.HH506RAid == "X":                                         
             self.HH506RAGetID()                       # obtain new id one time; self.HH506RAid should not be "X" any more
             if self.HH506RAid == "X":                 # if self.HH506RAGetID() went wrong and self.HH506RAid is still "X" 
-                aw.messagelabel.setText(u"unable to get id from HH506RA device")
-                aw.qmc.errorlog.append(u"unable to get id from HH506RA device")
+                aw.messagelabel.setText("unable to get id from HH506RA device ")
+                aw.qmc.errorlog.append("unable to get id from HH506RA device ")
                 return -1,-1
            
         try:
@@ -8670,7 +8707,7 @@ class serialport(object):
                     return int(r[1:5],16)/10., int(r[7:11],16)/10.                
                 else:
                     nbytes = len(r)
-                    message = u"%i bytes received but 14 needed"%nbytes
+                    message = "%i bytes received but 14 needed"%nbytes
                     aw.messagelabel.setText(message)
                     aw.qmc.errorlog.append(message)                
                     if len(aw.qmc.timex) > 2:                           
@@ -8684,8 +8721,8 @@ class serialport(object):
                     return -1,-1 
                 
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.HH506RAtemperature(): " )
-            aw.qmc.errorlog.append(u"ser.HH506RAtemperature(): ")
+            aw.messagelabel.setText("ser.HH506RAtemperature(): " + e)
+            aw.qmc.errorlog.append("ser.HH506RAtemperature(): " + e)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8712,13 +8749,13 @@ class serialport(object):
                     self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
                 else:
                     nbytes = len(ID)
-                    message = u"%i bytes received but 5 needed"%nbytes
+                    message = "%i bytes received but 5 needed"%nbytes
                     aw.messagelabel.setText(message)
                     aw.qmc.errorlog.append(message)
                     
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.HH506RAGetID()" )
-            aw.qmc.errorlog.append(u"ser.HH506RAGetID()"  )
+            aw.messagelabel.setText("ser.HH506RAGetID() SerialException ")
+            aw.qmc.errorlog.append("ser.HH506RAGetID() SerialException " )
 
     def CENTER306temperature(self):
         try:
@@ -8769,7 +8806,7 @@ class serialport(object):
                 
                 else:
                     nbytes = len(r)
-                    message = u"%i bytes received but 10 needed"%nbytes
+                    message = "%i bytes received but 10 needed "%nbytes
                     aw.messagelabel.setText(message)
                     aw.qmc.errorlog.append(message)                     
                     if len(aw.qmc.timex) > 2:                           
@@ -8783,8 +8820,8 @@ class serialport(object):
                     return -1,-1 
                      
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.CENTER306temperature()" )
-            aw.qmc.errorlog.append(u"ser.CENTER306temperature()" )
+            aw.messagelabel.setText("ser.CENTER306temperature() SerialException")
+            aw.qmc.errorlog.append("ser.CENTER306temperature() SerialException")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8851,7 +8888,7 @@ class serialport(object):
 
                 else:
                     nbytes = len(r)
-                    message = u"%i bytes received but 8 needed"%nbytes
+                    message = "%i bytes received but 8 needed "%nbytes
                     aw.messagelabel.setText(message)
                     aw.qmc.errorlog.append(message)                
                     if len(aw.qmc.timex) > 2:                           
@@ -8865,8 +8902,8 @@ class serialport(object):
                     return -1,-1 
             
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.CENTER303temperature()" )
-            aw.qmc.errorlog.append(u"ser.CENTER303temperature()" )
+            aw.messagelabel.setText("ser.CENTER303temperature() SerialException ")
+            aw.qmc.errorlog.append("ser.CENTER303temperature() SerialException ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8917,19 +8954,19 @@ class serialport(object):
                         Tcheck = int(binascii.hexlify(r[43]),16)
                         if Tcheck != 12:
                             if T1 < 200 and T2 < 200:
-                                aw.messagelabel.setText(u"Please connect T1 & T2")
+                                aw.messagelabel.setText("Please connect T1 & T2")
                             else:
                                 #don't display any message
                                 self.CENTER309flag = 1
                         elif Tcheck ==12 and T1 < 200 and T2 < 200:
-                            aw.messagelabel.setText(u"T1 & T2 connected")
+                            aw.messagelabel.setText("T1 & T2 connected")
                             self.CENTER309flag = 1
                                                
                     return T1,T2
                 
                 else:
                     nbytes = len(r)
-                    message = u"%i bytes from CENTER309 but 45 needed"%nbytes
+                    message = "%i bytes from CENTER309 but 45 needed"%nbytes
                     aw.messagelabel.setText(message)
                     aw.qmc.errorlog.append(message)                
                     if len(aw.qmc.timex) > 2:                           
@@ -8943,8 +8980,8 @@ class serialport(object):
                         return -1,-1 
             
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.CENTER309temperature() ")
-            aw.qmc.errorlog.append(u"ser.CENTER309temperature() ")
+            aw.messagelabel.setText("ser.CENTER309temperature() SerialException ")
+            aw.qmc.errorlog.append("ser.CENTER309temperature() SerialException ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8972,13 +9009,228 @@ class serialport(object):
 
 
         except serial.SerialException, e:
-            aw.messagelabel.setText(u"ser.CENTER309temperature() " )
-            aw.qmc.errorlog.append(u"ser.CENTER309temperature() " )
+            aw.messagelabel.setText("ser.ARDUINOTC4temperature() SerialException ")
+            aw.qmc.errorlog.append("ser.ARDUINOTC4temperature() SerialException ")
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+            else:
+                return -1,-1 
+
+    def TEVA18Bconvert(self, seg):
+        if seg == 0x7D:
+            return 0
+        elif seg == 0x05:
+            return 1
+        elif seg == 0x5B:
+            return 2
+        elif seg == 0x1F:
+            return 3
+        elif seg == 0x27:
+            return 4
+        elif seg == 0x3E:
+            return 5
+        elif seg == 0x7E:
+            return 6
+        elif seg == 0x15:
+            return 7
+        elif seg == 0x7F:
+            return 8
+        elif seg == 0x3F:
+            return 9
+        else:
+            return -1
+
+    def TEVA18Btemperature(self):
+        try:
+            if not self.SP.isOpen():
+                self.openport()                    
+                time.sleep(2)
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+
+                r = self.SP.read(14)
+
+                if len(r) != 14:
+                    raise ValueError
+
+                s200 = binascii.hexlify(r[0])
+                s201 = binascii.hexlify(r[1])
+                s202 = binascii.hexlify(r[2])
+                s203 = binascii.hexlify(r[3])
+                s204 = binascii.hexlify(r[4])
+                s205 = binascii.hexlify(r[5])
+                s206 = binascii.hexlify(r[6])
+                s207 = binascii.hexlify(r[7])
+                s208 = binascii.hexlify(r[8])
+                s209 = binascii.hexlify(r[9])
+                s210 = binascii.hexlify(r[10])
+                s211 = binascii.hexlify(r[11])
+                s212 = binascii.hexlify(r[12])
+                s213 = binascii.hexlify(r[13])
+           
+                t200 = int(s200,16)
+                t201 = int(s201,16)
+                t202 = int(s202,16)
+                t203 = int(s203,16)
+                t204 = int(s204,16)
+                t205 = int(s205,16)
+                t206 = int(s206,16)
+                t207 = int(s207,16)
+                t208 = int(s208,16)
+                t209 = int(s209,16)
+                t210 = int(s210,16)
+                t211 = int(s211,16)
+                t212 = int(s212,16)
+                t213 = int(s213,16)
+
+         #       print str(((t200 & 0xf0) >> 4)) + " = " + str((t200 & 0x0f))
+         #       print str(((t201 & 0xf0) >> 4)) + " = " + str((t201 & 0x0f))
+         #       print str(((t202 & 0xf0) >> 4)) + " = " + str((t202 & 0x0f))
+         #       print str(((t203 & 0xf0) >> 4)) + " = " + str((t203 & 0x0f))
+         #       print str(((t204 & 0xf0) >> 4)) + " = " + str((t204 & 0x0f))
+         #       print str(((t205 & 0xf0) >> 4)) + " = " + str((t205 & 0x0f))
+         #       print str(((t206 & 0xf0) >> 4)) + " = " + str((t206 & 0x0f))
+         #       print str(((t207 & 0xf0) >> 4)) + " = " + str((t207 & 0x0f))
+         #       print str(((t208 & 0xf0) >> 4)) + " = " + str((t208 & 0x0f))
+         #       print str(((t209 & 0xf0) >> 4)) + " = " + str((t209 & 0x0f))
+         #       print str(((t210 & 0xf0) >> 4)) + " = " + str((t210 & 0x0f))
+         #       print str(((t211 & 0xf0) >> 4)) + " = " + str((t211 & 0x0f))
+         #       print str(((t212 & 0xf0) >> 4)) + " = " + str((t212 & 0x0f))
+         #       print str(((t213 & 0xf0) >> 4)) + " = " + str((t213 & 0x0f))
+
+                # is meter in temp mode?
+                # first check byte order
+                if(((t213 & 0xf0) >> 4) != 14):
+                    #ERROR
+                    raise ValueError
+
+                elif(((t213 & 0x0f) & 0x02) != 2 ):
+                    #ERROR
+                    # device seems not to be in temp mode
+                    # print "No TempMode ...."
+                    raise ValueError
+                
+                # convert
+                bNegative = 0
+                iDivisor = 0
+
+                # first lets check the byte order
+                # seg1 bytes
+                if (((t201 & 0xf0) >> 4) == 2) and (((t202 & 0xf0) >> 4 ) == 3):
+                    seg1 = ((t201 & 0x0f) << 4) + (t202 & 0x0f)
+                else:
+                     raise ValueError
+
+                # seg2 bytes
+                if (((t203 & 0xf0) >> 4) == 4) and (((t204 & 0xf0) >> 4 ) == 5):
+                    seg2 = ((t203 & 0x0f) << 4) + (t204 & 0x0f)
+                else:
+                     raise ValueError
+
+                
+                # seg3 bytes
+                if (((t205 & 0xf0) >> 4) == 6) and (((t206 & 0xf0) >> 4 ) == 7):
+                    seg3 = ((t205 & 0x0f) << 4) + (t206 & 0x0f)
+                else:
+                     raise ValueError
+
+                
+                # seg4 bytes
+                if (((t207 & 0xf0) >> 4) == 8) and (((t208 & 0xf0) >> 4 ) == 9):
+                    seg4 = ((t207 & 0x0f) << 4) + (t208 & 0x0f)
+                else:
+                     raise ValueError
+
+                
+        #        print ('Seg1: {0:x}'.format(seg1))
+        #        print ('Seg2: {0:x}'.format(seg2))
+        #        print ('Seg3: {0:x}'.format(seg3))
+        #        print ('Seg4: {0:x}'.format(seg4))
+
+                # is negative?
+                if (seg1 & 0x80):
+                    bNegative = 1
+                    seg1 = seg1 & ~0x80
+                # check divisor
+                if (seg2 & 0x80):
+                    iDivisor = 1000.
+                    seg2 = seg2 & ~0x80
+                elif (seg3 & 0x80):
+                    iDivisor = 100.
+                    seg3 = seg3 & ~0x80        
+                elif (seg4 & 0x80):
+                    iDivisor = 10.
+                    seg4 = seg4 & ~0x80
+                    
+                iValue = 0
+                fReturn = 0
+                
+                i = self.TEVA18Bconvert(seg1)
+                if ( i < 0 ):
+                     raise ValueError
+
+                iValue = i * 1000
+
+                i = self.TEVA18Bconvert(seg2)
+                if ( i < 0 ):
+                     raise ValueError
+
+                
+                iValue = iValue + (i * 100)
+                i = self.TEVA18Bconvert(seg3)
+                
+                if ( i < 0 ):
+                     raise ValueError
+
+                iValue = iValue + (i * 10)
+                i = self.TEVA18Bconvert(seg4)
+                
+                if ( i < 0 ):
+                     raise ValueError
+                
+                iValue = iValue + i
+
+        #       print ('Val: {0:d}'.format(iValue))
+
+                # what about the divisor?
+                if( iDivisor > 0 ):
+                    fReturn = iValue / iDivisor
+                # is value negative?
+                if( fReturn ):
+                    if( bNegative ):
+                        fReturn = fReturn * (-1)
+
+        #      print ('Return: {0:f}'.format(fReturn))
+
+
+                if fReturn <= -2000:
+                     raise ValueError
+                
+                #Since the meter reads only one temperature, send 0 as ET and fReturn as BT
+                if fReturn:
+                    return 0.,fReturn    #  **** RETURN T HERE  ******
+                else:
+                    raise ValueError
+
+        except ValueError:
+            aw.messagelabel.setText("ser.TEVA18Btemperature() ValueError ")
+            aw.qmc.errorlog.append("ser.TEVA18Btemperature() ValueError ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1 
         
+        except serial.SerialException:
+            aw.messagelabel.setText("ser.TEVA18Btemperature() SerialException ")
+            aw.qmc.errorlog.append("ser.TEVA18Btemperature() SerialException ")
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
+            else:
+                return -1,-1 
+
+
+            
 #########################################################################
 #############  NONE DEVICE DIALOG #######################################                                   
 #########################################################################
@@ -9298,7 +9550,8 @@ class DeviceAssignmentDLG(QDialog):
                    "Omega HH802U",
                    "Omega HH309",
                    "NONE",
-                   "ArduinoTC4"
+                   "ArduinoTC4",
+                   "TE VA18B"
                    ]
         sorted_devices = sorted(devices)
         self.devicetypeComboBox = QComboBox()
@@ -9613,7 +9866,8 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = "Device set to " + meter + ". Now, chose serial port"
-                
+
+            #special device manual mode. No serial settings.    
             elif meter == "NONE":
                 aw.qmc.device = 18
                 message = "Device set to " + meter
@@ -9632,6 +9886,17 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = "Device set to " + meter + ". Now, check Serial Port settings"
+                
+            elif meter == "TE VA18B":
+                aw.qmc.device = 20
+                aw.ser.comport = "COM7"
+                aw.ser.baudrate = 2400
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=2
+                message = "Device set to " + meter + ". Now, check Serial Port settings"
+                
             
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
