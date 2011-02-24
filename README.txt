@@ -113,6 +113,7 @@ VERSION HISTORY
 
 v0.3.4 (??)
 - adds ArduinoTC4 device support
+- adds TE VA18b device support
 - improved Fuji PXR/PXG support
 - support for file paths with accent characters
 - main window layout improvements
@@ -120,6 +121,8 @@ v0.3.4 (??)
 - improved roasting properties dialog
 - statistic characteristic line as y-label to ensure visibility if axis limits are changed
 - duplicate recent file names show containing directory
+- remembers user selected profile path
+- added DeltaET/DeltaBT filter to make those delta more useful
 - bug fixes
 
 v0.3.3 (13.02.2011)
