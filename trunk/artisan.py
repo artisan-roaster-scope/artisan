@@ -1191,12 +1191,13 @@ class tgraphcanvas(FigureCanvas):
                                      xytext=(self.timex[int(self.specialevents[i])],self.temp2[int(self.specialevents[i])]+height),alpha=0.9,
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
-        #set minieditor info for last event found
-        if aw != None: #avoids error because aw is None during  app start (it does not exists yet)
-            #write label in mini recorder
+        #if recorder on        
+        if self.flagon:             
+            #update to last event
             aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
             aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
             aw.eNumberSpinBox.setValue(Nevents)
+            
 
         #update X label names and colors        
         self.xaxistosm()
@@ -1895,8 +1896,8 @@ class tgraphcanvas(FigureCanvas):
             ydist = self.ylimit - self.ylimit_min
             statisticsbarheight = ydist/80
             statisticsheight = self.ylimit - (0.13 * ydist)
-            statisticsupper = statisticsheight + statisticsbarheight + 2
-            statisticslower = statisticsheight - statisticsbarheight - ydist / 50.
+            statisticsupper = statisticsheight + statisticsbarheight
+            statisticslower = statisticsheight - statisticsbarheight * 3
             
             if self.statisticsflags[1]:
                 
@@ -1941,9 +1942,9 @@ class tgraphcanvas(FigureCanvas):
                 st3 += u"  (%.1f deg/min)"%rates_of_changes[2]
         
                 #Write flavor estimation
-                self.ax.text(self.startend[0]+ dryphasetime/2-len(st1)*8/2,statisticslower,st1,color=self.palette["text"],fontsize=11)
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime/2-len(st2)*8/2,statisticslower,st2,color=self.palette["text"],fontsize=11)
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/2-len(st3)*8/2,statisticslower,st3,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0],statisticslower,st1,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0]+ dryphasetime,statisticslower,st2,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0]+ dryphasetime+midphasetime,statisticslower,st3,color=self.palette["text"],fontsize=11)
 
             if self.statisticsflags[3]:
                 #calculate AREA under BT and ET
@@ -2012,7 +2013,7 @@ class tgraphcanvas(FigureCanvas):
                 self.specialevents.append(i)
                 temp = unicode(self.temp2[i])
                 time = self.stringfromseconds(self.timex[i])
-                message = u"Event number "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
+                message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
                 aw.messagelabel.setText(message)
                 #write label in mini recorder if flag checked
                 if aw.minieventsflag:
@@ -2719,10 +2720,9 @@ class ApplicationWindow(QMainWindow):
         self.label6.setIndent(5)
         
         #convenience EVENT mini editor; Edits last recorded event without opening roast editor Dlg.
-        self.etypes = ["N","P","D","F"]
-        self.eventlabel = QLabel("Event Number ")
+        self.etypes = ["None","Power","Damper","Fan"]
+        self.eventlabel = QLabel("Event # ")
         self.eventlabel.setIndent(5)
-        self.eventlabel.setMinimumWidth(80)
         self.eNumberSpinBox = QSpinBox()
         self.eNumberSpinBox.setToolTip("Number of events found")
         self.eNumberSpinBox.setRange(0,20)
@@ -2734,15 +2734,13 @@ class ApplicationWindow(QMainWindow):
         self.lineEvent.setMinimumWidth(200)
             
         self.eventlabel.setStyleSheet("background-color:'yellow';")
-        self.eventlabel.setMaximumWidth(60)
-        self.eventlabel.setMinimumHeight(20)
+
         self.etypeComboBox = QComboBox()
-        self.etypeComboBox.setToolTip("Type of last event")
+        self.etypeComboBox.setToolTip("Type of event")
         self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.etypeComboBox.addItems(self.etypes)
-        self.etypeComboBox.setMaximumWidth(50)
         self.valueComboBox = QComboBox()
-        self.valueComboBox.setToolTip("Value of last event")
+        self.valueComboBox.setToolTip("Value of event")
         self.valueComboBox.setFocusPolicy(Qt.NoFocus)
         self.valueComboBox.addItems(self.qmc.eventsvalues)
         self.valueComboBox.setMaximumWidth(50)
@@ -4720,25 +4718,12 @@ $cupping_notes
                 idx = i
         return idx
         
-    def defect_estimation_phase(self,phase_length,lower_limit,upper_limit,short_taste,optimal_taste,long_taste):
-        result = optimal_taste
-        third_of_optimal_phase = (upper_limit - lower_limit) / 3.0
-        if phase_length < lower_limit:
-            result = short_taste
-        elif phase_length > upper_limit:
-            result = long_taste
-        elif phase_length < lower_limit + third_of_optimal_phase:
-            result = short_taste + '/' + result
-        elif phase_length > upper_limit - third_of_optimal_phase:
-            result += '/' + long_taste
-        return result
     
     #Flavor defect estimation chart for each leg. Thanks to Jim Schulman 
     def defect_estimation(self):    
         dryphasetime = aw.qmc.statisticstimes[1]
         midphasetime = aw.qmc.statisticstimes[2]
         finishphasetime = aw.qmc.statisticstimes[3]
-        PerfectPhase = "OK"
         ShortDryingPhase = "Grassy"
         LongDryingPhase = "Leathery"
         ShortTo1CPhase = "Toasty"
@@ -4748,14 +4733,25 @@ $cupping_notes
         st1 = st2 = st3 = 'OK'
         #CHECK CONDITIONS                
         #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
-        st1 = self.defect_estimation_phase(dryphasetime,aw.qmc.statisticsconditions[0],aw.qmc.statisticsconditions[1],ShortDryingPhase,PerfectPhase,LongDryingPhase)
+        if dryphasetime < aw.qmc.statisticsconditions[0]:
+            st1 = ShortDryingPhase
+        #if dry phase time > 6 mins or more than 40% of the total time
+        elif dryphasetime > aw.qmc.statisticsconditions[1]:
+            st1 = LongDryingPhase
 
         #if mid phase time < 5 minutes
-        st2 = self.defect_estimation_phase(midphasetime,aw.qmc.statisticsconditions[2],aw.qmc.statisticsconditions[3],ShortTo1CPhase,PerfectPhase,LongTo1CPhase)
+        if midphasetime < aw.qmc.statisticsconditions[2]:
+            st2 = ShortTo1CPhase
+        #if mid phase time > 10 minutes
+        elif midphasetime > aw.qmc.statisticsconditions[3]:
+            st2 = LongTo1CPhase
 
         #if finish phase is less than 3 mins
-        st2 = self.defect_estimation_phase(midphasetime,aw.qmc.statisticsconditions[4],aw.qmc.statisticsconditions[5],ShortFinishPhase,PerfectPhase,LongFinishPhase)
-        
+        if finishphasetime < aw.qmc.statisticsconditions[4]:
+            st3 = ShortFinishPhase
+        #if finish phase is over 6 minutes
+        elif finishphasetime > aw.qmc.statisticsconditions[5]:
+            st3 = LongFinishPhase
         return (st1,st2,st3)
     
     #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
@@ -7552,7 +7548,7 @@ class EventsDlg(QDialog):
             self.eventsbuttonflag.setChecked(False)
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)  
         
-        self.minieventsflag = QCheckBox("Last event mini editor")
+        self.minieventsflag = QCheckBox("Event mini editor")
         self.minieventsflag.setToolTip("Allows to enter a description of the last event")
         if aw.minieventsflag:
             self.minieventsflag.setChecked(True)
