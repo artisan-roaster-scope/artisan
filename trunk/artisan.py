@@ -823,8 +823,8 @@ class tgraphcanvas(FigureCanvas):
         #restart() clock 
         self.timeclock.restart()
     	#restart comm port if not in manual mode
-        if self.device != 18:
-            aw.ser.openport()
+        #if self.device != 18:
+        #    aw.ser.openport()
             
         self.redraw()
         aw.soundpop()
