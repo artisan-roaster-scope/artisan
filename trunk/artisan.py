@@ -2772,6 +2772,7 @@ class ApplicationWindow(QMainWindow):
             
         self.eventlabel.setStyleSheet("background-color:'yellow';")
         self.eventlabel.setMaximumWidth(60)
+        self.eventlabel.setMinimumHeight(20)
         self.etypeComboBox = QComboBox()
         self.etypeComboBox.setToolTip("Type of last event")
         self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
@@ -2786,18 +2787,20 @@ class ApplicationWindow(QMainWindow):
         #create EVENT mini button
         self.buttonminiEvent = QPushButton("Update")
         self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
-        self.buttonminiEvent.setMaximumSize(55,20)
-        self.buttonminiEvent.setMinimumSize(35,20)
+        #self.buttonminiEvent.setMaximumSize(55,20)
+        #self.buttonminiEvent.setMinimumSize(35,20)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
         self.buttonminiEvent.setToolTip("Updates the last recorded event")
 
         
         EventsLayout = QHBoxLayout()
-        EventsLayout.addWidget(self.eventlabel,0)
-        EventsLayout.addWidget(self.lineEvent,1)        
-        EventsLayout.addWidget(self.etypeComboBox,2)
-        EventsLayout.addWidget(self.valueComboBox,3)
-        EventsLayout.addWidget(self.buttonminiEvent,4)
+        EventsLayout.addWidget(self.eventlabel)
+        EventsLayout.addWidget(self.lineEvent)  
+        EventsLayout.addSpacing(5)      
+        EventsLayout.addWidget(self.etypeComboBox)
+        EventsLayout.addWidget(self.valueComboBox)
+        EventsLayout.addSpacing(5)      
+        EventsLayout.addWidget(self.buttonminiEvent)
 
         #only leave operational the control button if the device is Fuji PID
         #the SV buttons are activated from the PID control panel 
@@ -4066,6 +4069,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.DeltaETflag = bool(profile["DeltaET"])
         if "DeltaBT" in profile:
             self.qmc.DeltaBTflag = bool(profile["DeltaBT"])
+        if "DeltaFilter" in profile:
+            self.qmc.deltafilter = bool(profile["DeltaFilter"])
         if "ambientTemp" in profile:
             self.qmc.ambientTemp = profile["ambientTemp"]
         if "dryend" in profile:
@@ -4076,7 +4081,6 @@ class ApplicationWindow(QMainWindow):
     #used by filesave()
     #wrap values in unicode(.) if and only if those are of type string
     def getProfile(self):
-        print "getProfile"
         profile = {}
         profile["mode"] = self.qmc.mode
         profile["startend"] = self.qmc.startend
@@ -4108,6 +4112,7 @@ class ApplicationWindow(QMainWindow):
         profile["statisticsconditions"] = self.qmc.statisticsconditions
         profile["DeltaET"] = self.qmc.DeltaETflag
         profile["DeltaBT"] = self.qmc.DeltaBTflag
+        profile["DeltaFilter"] = self.qmc.deltafilter
         profile["ambientTemp"] = self.qmc.ambientTemp
         profile["dryend"] = self.qmc.dryend
         profile["bag_humidity"] = self.qmc.bag_humidity
