@@ -243,7 +243,7 @@ class tgraphcanvas(FigureCanvas):
         self.projectFlag = False
         self.DeltaETflag = False
         self.DeltaBTflag = False
-        self.deltafilter = True
+        self.deltafilter = 5
 
         # projection variables of change of rate
         self.HUDflag = 0
@@ -258,20 +258,22 @@ class tgraphcanvas(FigureCanvas):
         self.volume = [0,0,u"l"]
         
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
-        # use self.temp2[self.specialevents[x]] to get the BT temperature of an event. Use self.timex[self.specialevents[x]] to get its time
+        # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
         self.specialevents = []
-        #Combobox text items in editGraphDlg
+        #Combobox text items in editGraphDlg for types of events
         self.etypes = ["None","Power","Damper","Fan"]
-        #stores indexes (for ComboBox) in etypes above for each event. Max 20 events
+        #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc. Max 20 events
         self.specialeventstype = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        #stores text descriptions for each event. Max 10 events
+        #stores text string descriptions for each event. Max 20 events
         self.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s",
-                                     u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]        
+                                     u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]
+        #stores the numeric value for each event
         self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        #flag that makes the events location bars (horizontal bars) appear on the plot. flag read on redraw()
         self.eventsGraphflag = 1
         
-        # set limits for X and Y axes. Default is in Farenheit units
+        # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 750
         self.ylimit_min = 0
         self.endofx = 60
@@ -288,7 +290,7 @@ class tgraphcanvas(FigureCanvas):
         self.autosaveprefix = u"edit-text"
         self.autosavepath = u""
         
-        #used to place correct height of text in push buttons markers and avoid text over text
+        #used to place correct height of text to avoid placing text over text (annotations)
         self.ystep = 45
         
         self.ax.set_xlim(self.startofx, self.endofx)
@@ -318,9 +320,7 @@ class tgraphcanvas(FigureCanvas):
         #Create x axis labels in minutes:seconds instead of seconds
         self.xaxistosm()
 
-        self.delta1, self.delta2 = [],[]
-
-        # generates first "empty" plot of temperature and deltaT
+        # generates first "empty" plot (lists are empty) of temperature and deltaT
         self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label="ET")
         self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label="BT")
         self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label="DeltaET")
@@ -364,11 +364,14 @@ class tgraphcanvas(FigureCanvas):
     #event handler from startTimer()
     def timerEvent(self, evt):
         if self.flagon:
-            #if using a thermocouple device
+            #if using a meter (thermocouple device)
             if self.device != 18:
                 #read time, ET (t2) and BT (t1) TEMPERATURE
                 tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
-                
+
+                # test for a possible change
+                t1,t2 = self.filterDropOuts(t1,t2)
+
                 #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
                 #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
                 if len(self.timex) > 2 and t1 == self.temp2[-1] and t2 == self.temp1[-1]:
@@ -440,7 +443,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.showHUD[aw.HUDfunction]()
                     
             #############    if using DEVICE 18 (no device). Manual mode
-                    
+            # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
             else:
                 tx = self.timeclock.elapsed()/1000.
                 
@@ -812,8 +815,10 @@ class tgraphcanvas(FigureCanvas):
                                      u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]        
         self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
         self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        aw.eventlabel.setText(" Event #0")
-        aw.lineEvent.setText("")
+    	aw.eNumberSpinBox.setValue(0)
+        aw.lineEvent.setText("")      
+        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[0])
+        aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[0])    
         self.ambientTemp = 0.
         self.curFile = None
         self.ystep = 45
@@ -977,10 +982,16 @@ class tgraphcanvas(FigureCanvas):
             d2.append(delta2)
             
             if self.deltafilter:
-                if i > 4:
-                    #smooth DeltaBT/DeltaET by using FIR filter of 5 pads (use only current and past input values. Don't use outputs
-                    d3.append((d1[-1]+ d1[-2] + d1[-3]+ d1[-4]+ d1[-5])/5.)
-                    d4.append((d2[-1]+ d2[-2] + d2[-3]+ d2[-4]+ d2[-5])/5.)
+                if i > (self.deltafilter-1):
+                    #smooth DeltaBT/DeltaET by using FIR filter of X pads.
+                    #d1 and d2 are inputs, while d3 and d4 are outputs  
+                    #Use only current and past input values. Don't feed parts of outputs d3 d4 to filter
+                    a1,a2 = 0,0
+                    for k in range(self.deltafilter):
+                        a1 += d1[-(k+1)]
+                        a2 += d2[-(k+1)]
+                    d3.append(a1/self.deltafilter)
+                    d4.append(a2/self.deltafilter)
                 else:
                     d3.append(delta1) 
                     d4.append(delta2)                     
@@ -1114,7 +1125,10 @@ class tgraphcanvas(FigureCanvas):
         else:
             lim = self.phases[0]-40
             
-        #two modes of drawing events. Check eventsGraphflag and self.ylimit_min to see if there is enough room            
+        #two modes of drawing events. The first mode aligns the events annotations to a bar height so that they can be visually identified by type. 
+        # the second mode places the events without height order.
+        
+        #Check eventsGraphflag and self.ylimit_min to see if there is enough height room           
         if self.eventsGraphflag and self.ylimit_min <= lim:
             
             if self.mode == "F":
@@ -1122,8 +1136,8 @@ class tgraphcanvas(FigureCanvas):
             else:
                 row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
 
-            #draw lines of color between events of the same type to help identify areas of events
-            #count and collect their times for each type 
+            #draw lines of color between events of the same type to help identify areas of events.
+            #count (length of the list) and collect their times for each different type. Each type will have a different plot height 
             netypes=[[],[],[],[]]
             for i in range(Nevents):
                 if self.specialeventstype[i] == 0:
@@ -1135,13 +1149,13 @@ class tgraphcanvas(FigureCanvas):
                 elif self.specialeventstype[i] == 3:
                     netypes[3].append(self.timex[self.specialevents[i]])
                     
-            letters = "NPDF"
-            colors = [self.palette["rect2"],self.palette["rect3"]]
-            for p in range(4):    
+            letters = "NPDF"   #fisrt letter for each type (None, Power, Damper, Fan)
+            colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
+            for p in range(len(letters)):    
                 if len(netypes[p]) > 1:
                     for i in range(len(netypes[p])-1):
-                         #draw differentiating color bars between events
-                         rect = patches.Rectangle( (netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step,color = colors[i%2],alpha=0.5)
+                         #draw differentiating color bars between events and place then in a different height acording with type
+                         rect = patches.Rectangle( (netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step, color = colors[i%2],alpha=0.5)
                          self.ax.add_patch(rect)
                          
             # annotate event
@@ -1158,7 +1172,7 @@ class tgraphcanvas(FigureCanvas):
                                  xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
                         
-        # revert to old style mode    
+        # Second mode: old style mode (just attached the events to the graph without ordering height by type)   
         else:
             for i in range(Nevents):
                 firstletter = self.etypes[self.specialeventstype[i]][0]                
@@ -1180,16 +1194,9 @@ class tgraphcanvas(FigureCanvas):
         #set minieditor info for last event found
         if aw != None: #avoids error because aw is None during  app start (it does not exists yet)
             #write label in mini recorder
-            string = " Event #" + unicode(Nevents) 
-            aw.eventlabel.setText(QString(string))
             aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
             aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-            if Nevents:
-                aw.lineEvent.setText(self.specialeventsStrings[Nevents-1])
-            else:
-                aw.lineEvent.setText("")
-
-
+            aw.eNumberSpinBox.setValue(Nevents)
 
         #update X label names and colors        
         self.xaxistosm()
@@ -1201,8 +1208,8 @@ class tgraphcanvas(FigureCanvas):
         #ready to plot    
         self.fig.canvas.draw()     
 
-    #used to find best height of text in graph to avoid writting over previous text
-    #oldpoint height, newpoint height, previous arrow step (self.ystep)
+    #used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
+    #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep
     def findtextgap(self,height1,height2):
         if self.mode == "F":
             init = 50
@@ -1215,72 +1222,30 @@ class tgraphcanvas(FigureCanvas):
                 break
         return i 
                
-    # used to put time in LCD timer. input int, output string
+    # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
     def stringfromseconds(self, seconds):
-        mins, secs = divmod(seconds,60)
-        if secs < 10:
-            st2 = unicode(int(mins)) + u":" + u"0" + unicode(int(secs))
-        else:
-            st2 = unicode(int(mins))+ u":" + unicode(int(secs))
-        if mins < 10:
-            st2 =u"0" + st2
-        return st2
+        return "%d:%02d"% divmod(seconds, 60)
 
-    #Converts a string into seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
-    #acepted formats: "00:00:00","00:00","0:00"
+    #Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
+    #acepted formats: "00:00","0:00"
     def stringtoseconds(self, string):
-        try:
-            seconds = 0
-            length = len(string)
-            if length > 8:
-                raise ValueError, u"Invalid time format, too long."                
-            
-            if length > 0 and string[-1].isdigit():
-                seconds += int(string[-1])
-                
-            if length > 1 and string[-2].isdigit():
-                if int(string[-2]) > 5:
-                    raise ValueError,u"Invalid seconds xx:59 max"
-                seconds += 10*int(string[-2])
-
-            if length > 2 and string[-3] != ":":
-                raise ValueError, u"invalid time format mm:ss (: separator missing)"
-            
-            if length > 3 and string[-4].isdigit():            
-                seconds += 60*int(string[-4])
-                
-            if length > 4 and string[-5].isdigit():
-                if int(string[-5]) > 5:
-                    raise ValueError,u"Invalid minutes 59:xx max"                
-                seconds += 600*int(string[-5])
-
-            if length > 5 and string[-6] != ":":
-                raise ValueError, u"invalid time format hh:mm:ss (: separator missing)"
-                
-            if length > 6 and string[-7].isdigit():
-                seconds += 3600*int(string[-7])
-                
-            if length > 7 and string[-8].isdigit():
-                seconds += 36000*int(string[-8])
+        timeparts = string.split(":")
+        if len(timeparts) != 2:
+            aw.messagelabel.setText("Time format error encountered")
+            return -1
+        else:
+            seconds = int(timeparts[1])
+            seconds += int(timeparts[0])*60
             return seconds
 
-        except ValueError,e:
-            aw.messagelabel.setText(unicode(e))
-            aw.qmc.errorlog.append(u"stringfromseconds(): input error " + unicode(e))
-            return -1          
-
-
-    # used to create minutes labels in the X axis. input int, output string
+    # used to create minutes labels in the X axis.
     def minutesfromseconds(self, seconds):
-        mins, secs = divmod(seconds,60)
         if not int(self.startend[0]):
-            if secs < 10:
-                st2 = str(int(mins)) + ":" + "0" + str(int(secs))
-            else:
-                st2 = str(int(mins))+ ":" + str(int(secs))
+            return "%d:%02d"% divmod(seconds, 60)
         else:
-            st2 = unicode(int(mins))
-        return st2
+            mins, secs = divmod(seconds,60)
+            return str(mins)
+        
        
     def fromFtoC(self,Ffloat):
         return (Ffloat-32.0)*(5.0/9.0)
@@ -1616,6 +1581,7 @@ class tgraphcanvas(FigureCanvas):
             
         aw.messagelabel.setText(message)
         aw.soundpop()
+        
     def markDryEnd(self):
         if self.flagon:
             # record Dry end only if Charge mark has been done
@@ -2050,14 +2016,14 @@ class tgraphcanvas(FigureCanvas):
                 aw.messagelabel.setText(message)
                 #write label in mini recorder if flag checked
                 if aw.minieventsflag:
-                    string = "E #" + unicode(Nevents+1) 
-                    aw.eventlabel.setText(QString(string))
+                    aw.eNumberSpinBox.setValue(Nevents+1)
                     aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
                     aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                    aw.lineEvent.setText(self.specialeventsStrings[Nevents-1])
+                    aw.lineEvent.setText(self.specialeventsStrings[Nevents])
                 self.redraw()
             else:
                 aw.messagelabel.setText("No more than 20 events are allowed")
+                aw.eNumberSpinBox.setVisible(False)
                 aw.etypeComboBox.setVisible(False)
                 aw.valueComboBox.setVisible(False)
                 aw.eventlabel.setVisible(False)
@@ -2309,9 +2275,9 @@ class tgraphcanvas(FigureCanvas):
     
             self.redraw()
        
-        except ValueError,e:
-            aw.messagelabel.setText("Unable to interpolate: " + unicode(e))
-            self.errorlog.append(u"Exception error in createFromManual() " + unicode(e))
+        except ValueError:
+            aw.messagelabel.setText("Unable to interpolate: ")
+            self.errorlog.append(u"Exception error in createFromManual() ")
             return
 
         except Exception,e:
@@ -2322,7 +2288,7 @@ class tgraphcanvas(FigureCanvas):
             
     def univariate(self):
         try:           
-            Xpoints,Ypoints = self.findpoints()  #from lowest point
+            Xpoints,Ypoints = self.findpoints()  
             
             func = inter.UnivariateSpline(Xpoints, Ypoints)
             
@@ -2335,14 +2301,14 @@ class tgraphcanvas(FigureCanvas):
             
             self.fig.canvas.draw()
 
-        except ValueError,e:
-            aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"value error in univariate() " + unicode(e))
+        except ValueError:
+            aw.messagelabel.setText(u"value error in univariate() ")
+            self.errorlog.append(u"value error in univariate() " )
             return
 
-        except Exception,e:
-            aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"Exception error in univariate() " + unicode(e))
+        except Exception:
+            aw.messagelabel.setText(u"Exception error in univariate() ")
+            self.errorlog.append(u"Exception error in univariate() ")
             return  
             
     def drawinterp(self,mode):
@@ -2754,21 +2720,18 @@ class ApplicationWindow(QMainWindow):
         
         #convenience EVENT mini editor; Edits last recorded event without opening roast editor Dlg.
         self.etypes = ["N","P","D","F"]
-        self.eventlabel = QLabel()
+        self.eventlabel = QLabel("Event Number ")
         self.eventlabel.setIndent(5)
-        self.eventlabel.setMinimumWidth(70)
-        self.eventlabel.setToolTip("Number of last event found")
+        self.eventlabel.setMinimumWidth(80)
+        self.eNumberSpinBox = QSpinBox()
+        self.eNumberSpinBox.setToolTip("Number of events found")
+        self.eNumberSpinBox.setRange(0,20)
+        self.connect(self.eNumberSpinBox, SIGNAL("valueChanged(int)"),self.changeEventNumber)
+        self.eNumberSpinBox.setMaximumWidth(40)
         Nevents = len(self.qmc.specialevents)
         self.lineEvent = QLineEdit()
-        self.eventlabel.setToolTip("Last event description editor")
         self.lineEvent.setFocusPolicy(Qt.ClickFocus)
         self.lineEvent.setMinimumWidth(200)
-        if Nevents:
-            string = " Event #" + unicode(Nevents+1) 
-            self.eventlabel.setText(QString(string))
-            self.lineEvent.setText(self.qmc.specialeventsStrings[Nevents-1])
-        else:
-            self.eventlabel.setText(" Event #0")
             
         self.eventlabel.setStyleSheet("background-color:'yellow';")
         self.eventlabel.setMaximumWidth(60)
@@ -2784,6 +2747,12 @@ class ApplicationWindow(QMainWindow):
         self.valueComboBox.addItems(self.qmc.eventsvalues)
         self.valueComboBox.setMaximumWidth(50)
 
+        if Nevents:
+            self.eNumberSpinBox.setCurrentIndex(Nevents)
+            self.lineEvent.setText(self.qmc.specialeventsStrings[Nevents-1])
+            self.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+            self.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+            
         #create EVENT mini button
         self.buttonminiEvent = QPushButton("Update")
         self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
@@ -2795,6 +2764,7 @@ class ApplicationWindow(QMainWindow):
         
         EventsLayout = QHBoxLayout()
         EventsLayout.addWidget(self.eventlabel)
+        EventsLayout.addWidget(self.eNumberSpinBox)
         EventsLayout.addWidget(self.lineEvent)  
         EventsLayout.addSpacing(5)      
         EventsLayout.addWidget(self.etypeComboBox)
@@ -3130,6 +3100,7 @@ class ApplicationWindow(QMainWindow):
         if command =="enter":
             if self.lineEvent.hasFocus():
                 self.lineEvent.clearFocus()
+                self.eNumberSpinBox.clearFocus()
                 return
             if self.keyboardmoveflag == 0:
                 #turn on
@@ -3382,15 +3353,34 @@ class ApplicationWindow(QMainWindow):
         string += "<b>[s]</b> = Autosave<br><br>"
         
         QMessageBox.information(self,u"Roast Keyboard Shortcuts",string)
-            
+
+    def changeEventNumber(self):
+       #check 
+       lenevents = len(self.qmc.specialevents)
+       currentevent = self.eNumberSpinBox.value()
+       if currentevent == 0:
+           self.lineEvent.setText("")
+           self.valueComboBox.setCurrentIndex(0)
+           self.etypeComboBox.setCurrentIndex(0)
+           return
+       if currentevent > lenevents:
+           self.eNumberSpinBox.setValue(lenevents)
+           return
+       else:
+           self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
+           self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[currentevent-1])
+           self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
+
     # edit last entry in mini Event editor
     def miniEventRecord(self):
-        lenevents = len(self.qmc.specialevents)
+        lenevents = self.eNumberSpinBox.value()
         if lenevents:
             self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
             self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
             self.qmc.specialeventsStrings[lenevents-1] = unicode(self.lineEvent.text())
             self.lineEvent.clearFocus()
+            self.eNumberSpinBox.clearFocus()
+
             self.qmc.redraw()
 
             string = ""
@@ -3399,8 +3389,6 @@ class ApplicationWindow(QMainWindow):
                 string += "..."
             message = u"Event #" + str(lenevents) + ":  " + string +  u" has been updated"
             self.messagelabel.setText(message)
-        else:
-            self.messagelabel.setText("Zero events found")
         
     def strippedName(self, fullFileName):
         return unicode(QFileInfo(fullFileName).fileName())
@@ -4226,7 +4214,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoC")
             self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
-            self.qmc.deltafilter = settings.value("deltafilter",self.qmc.deltafilter).toBool()
+            self.qmc.deltafilter = settings.value("deltafilter",self.qmc.deltafilter).toInt()[0]
             self.qmc.sensitivity = settings.value("Sensitivity",self.qmc.sensitivity).toInt()[0]
             settings.endGroup()
             settings.beginGroup("HUD")
@@ -5236,16 +5224,14 @@ class HUDDlg(QDialog):
             self.DeltaBT.setChecked(True)
         else:
             self.DeltaBT.setChecked(False)
-
-        #delta Filter  
-        self.DeltaFilter = QCheckBox("Filter")        
-        if aw.qmc.deltafilter == True:
-            self.DeltaFilter.setChecked(True)
-        else:
-            self.DeltaFilter.setChecked(False)
-        self.connect(self.DeltaFilter ,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaFilter(i))         #toggle
-
-
+            
+    	filterlabel = QLabel("Filter")
+        #DeltaFilter holds the number of pads in filter  
+        self.DeltaFilter = QSpinBox()
+        self.DeltaFilter.setRange(0,20)
+        self.DeltaFilter.setValue(aw.qmc.deltafilter)
+        self.connect(self.DeltaFilter ,SIGNAL("valueChanged(int)"),lambda i=0:self.changeDeltaFilter(i)) 
+    	
         #show projection
         self.projectCheck = QCheckBox("Projection")
         projectionmodeLabel = QLabel("Mode")
@@ -5264,7 +5250,7 @@ class HUDDlg(QDialog):
         self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.changeProjection(i)) #toggle
             
         self.sensitivityValues = map(str,range(10,0,-1))
-        self.sensitivitylabel  = QLabel("Delta Sensitivity")                          
+        self.sensitivitylabel  = QLabel("Sensitivity")                          
         self.sensitivityComboBox = QComboBox()
         self.sensitivityComboBox.addItems(self.sensitivityValues)
         try:
@@ -5311,6 +5297,7 @@ class HUDDlg(QDialog):
         sensitivityLayout = QHBoxLayout()
         sensitivityLayout.addWidget(self.sensitivitylabel)
         sensitivityLayout.addWidget(self.sensitivityComboBox)
+        sensitivityLayout.addWidget(filterlabel)
         sensitivityLayout.addWidget(self.DeltaFilter)
         sensitivityLayout.addStretch()
         
@@ -5503,7 +5490,7 @@ class HUDDlg(QDialog):
         aw.qmc.redraw()
 
     def changeDeltaFilter(self,i):
-        aw.qmc.deltafilter = not aw.qmc.deltafilter
+        aw.qmc.deltafilter = self.DeltaFilter.value()
         aw.qmc.redraw()
         
     def changeDeltaBT(self,i):
@@ -7603,13 +7590,15 @@ class EventsDlg(QDialog):
             aw.eventlabel.setVisible(True)
             aw.buttonminiEvent.setVisible(True)
             aw.lineEvent.setVisible(True)
+            aw.eNumberSpinBox.setVisible(True)
             aw.minieventsflag = 1
         else:
             aw.lineEvent.setVisible(False)
             aw.etypeComboBox.setVisible(False)
             aw.valueComboBox.setVisible(False)
             aw.eventlabel.setVisible(False)
-            aw.buttonminiEvent.setVisible(False)            
+            aw.buttonminiEvent.setVisible(False)
+            aw.eNumberSpinBox.setVisible(False)
             aw.minieventsflag = 0
 
     def eventsGraphflagChanged(self):
