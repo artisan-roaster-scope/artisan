@@ -1896,8 +1896,8 @@ class tgraphcanvas(FigureCanvas):
             ydist = self.ylimit - self.ylimit_min
             statisticsbarheight = ydist/80
             statisticsheight = self.ylimit - (0.13 * ydist)
-            statisticsupper = statisticsheight + statisticsbarheight
-            statisticslower = statisticsheight - statisticsbarheight * 3
+            statisticsupper = statisticsheight + statisticsbarheight + 2
+            statisticslower = statisticsheight - statisticsbarheight - ydist / 50.
             
             if self.statisticsflags[1]:
                 
@@ -1942,9 +1942,9 @@ class tgraphcanvas(FigureCanvas):
                 st3 += u"  (%.1f deg/min)"%rates_of_changes[2]
         
                 #Write flavor estimation
-                self.ax.text(self.startend[0],statisticslower,st1,color=self.palette["text"],fontsize=11)
-                self.ax.text(self.startend[0]+ dryphasetime,statisticslower,st2,color=self.palette["text"],fontsize=11)
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime,statisticslower,st3,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0]+ dryphasetime/2-len(st1)*8/2,statisticslower,st1,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0]+ dryphasetime+midphasetime/2-len(st2)*8/2,statisticslower,st2,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/2-len(st3)*8/2,statisticslower,st3,color=self.palette["text"],fontsize=11)
 
             if self.statisticsflags[3]:
                 #calculate AREA under BT and ET
@@ -4063,7 +4063,7 @@ class ApplicationWindow(QMainWindow):
         if "DeltaBT" in profile:
             self.qmc.DeltaBTflag = bool(profile["DeltaBT"])
         if "DeltaFilter" in profile:
-            self.qmc.deltafilter = bool(profile["DeltaFilter"])
+            self.qmc.deltafilter = int(profile["DeltaFilter"])
         if "ambientTemp" in profile:
             self.qmc.ambientTemp = profile["ambientTemp"]
         if "dryend" in profile:
@@ -4726,11 +4726,25 @@ $cupping_notes
         return idx
         
     
+    def defect_estimation_phase(self,phase_length,lower_limit,upper_limit,short_taste,optimal_taste,long_taste):
+        result = optimal_taste
+        third_of_optimal_phase = (upper_limit - lower_limit) / 3.0
+        if phase_length < lower_limit:
+            result = short_taste
+        elif phase_length > upper_limit:
+            result = long_taste
+        elif phase_length < lower_limit + third_of_optimal_phase:
+            result = short_taste + '/' + result
+        elif phase_length > upper_limit - third_of_optimal_phase:
+            result += '/' + long_taste
+        return result
+    
     #Flavor defect estimation chart for each leg. Thanks to Jim Schulman 
     def defect_estimation(self):    
         dryphasetime = aw.qmc.statisticstimes[1]
         midphasetime = aw.qmc.statisticstimes[2]
         finishphasetime = aw.qmc.statisticstimes[3]
+        PerfectPhase = "OK"
         ShortDryingPhase = "Grassy"
         LongDryingPhase = "Leathery"
         ShortTo1CPhase = "Toasty"
@@ -4740,25 +4754,14 @@ $cupping_notes
         st1 = st2 = st3 = 'OK'
         #CHECK CONDITIONS                
         #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
-        if dryphasetime < aw.qmc.statisticsconditions[0]:
-            st1 = ShortDryingPhase
-        #if dry phase time > 6 mins or more than 40% of the total time
-        elif dryphasetime > aw.qmc.statisticsconditions[1]:
-            st1 = LongDryingPhase
+        st1 = self.defect_estimation_phase(dryphasetime,aw.qmc.statisticsconditions[0],aw.qmc.statisticsconditions[1],ShortDryingPhase,PerfectPhase,LongDryingPhase)
 
         #if mid phase time < 5 minutes
-        if midphasetime < aw.qmc.statisticsconditions[2]:
-            st2 = ShortTo1CPhase
-        #if mid phase time > 10 minutes
-        elif midphasetime > aw.qmc.statisticsconditions[3]:
-            st2 = LongTo1CPhase
+        st2 = self.defect_estimation_phase(midphasetime,aw.qmc.statisticsconditions[2],aw.qmc.statisticsconditions[3],ShortTo1CPhase,PerfectPhase,LongTo1CPhase)
 
         #if finish phase is less than 3 mins
-        if finishphasetime < aw.qmc.statisticsconditions[4]:
-            st3 = ShortFinishPhase
-        #if finish phase is over 6 minutes
-        elif finishphasetime > aw.qmc.statisticsconditions[5]:
-            st3 = LongFinishPhase
+        st2 = self.defect_estimation_phase(midphasetime,aw.qmc.statisticsconditions[4],aw.qmc.statisticsconditions[5],ShortFinishPhase,PerfectPhase,LongFinishPhase)
+        
         return (st1,st2,st3)
     
     #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
@@ -4933,7 +4936,8 @@ $cupping_notes
         return 100. * ((float(green) - float(roasted)) / float(green))
 
 
-    # from RoastMagazin (corrected by substracting 1% based on experience)
+    # from RoastMagazine (corrected by substracting 1% based on experience)
+    # http://www.roastmagazine.com/resources/Roasting101_Articles/Roast_SeptOct05_LightRoasting.pdf
     def roast_degree(self,percent):
         if percent < 13.5:
             return ""
