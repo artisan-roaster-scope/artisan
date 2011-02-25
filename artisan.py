@@ -3048,18 +3048,7 @@ class ApplicationWindow(QMainWindow):
         self.setCentralWidget(self.main_widget)   
         
         # set visibility of mini event line
-        if self.minieventsflag:
-            self.lineEvent.setVisible(True)
-            self.etypeComboBox.setVisible(True)
-            self.valueComboBox.setVisible(True)
-            self.eventlabel.setVisible(True)
-            self.buttonminiEvent.setVisible(True)
-        else:
-            self.lineEvent.setVisible(False)
-            self.etypeComboBox.setVisible(False)
-            self.valueComboBox.setVisible(False)
-            self.eventlabel.setVisible(False)
-            self.buttonminiEvent.setVisible(False)
+        self.update_minieventline_visibility()
 
         #list of functions to chose from (using left-right keyboard arrow)
         self.keyboardmove  = [self.qmc.OnMonitor,self.qmc.markCharge,self.qmc.markDryEnd,self.qmc.mark1Cstart,self.qmc.mark1Cend,
@@ -3069,6 +3058,22 @@ class ApplicationWindow(QMainWindow):
         self.keyboardmoveindex = 0
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
+        
+    def update_minieventline_visibility(self):
+        if self.minieventsflag:
+            self.etypeComboBox.setVisible(True)
+            self.valueComboBox.setVisible(True)
+            self.eventlabel.setVisible(True)
+            self.buttonminiEvent.setVisible(True)
+            self.lineEvent.setVisible(True)
+            self.eNumberSpinBox.setVisible(True)
+        else:
+            self.lineEvent.setVisible(False)
+            self.etypeComboBox.setVisible(False)
+            self.valueComboBox.setVisible(False)
+            self.eventlabel.setVisible(False)
+            self.buttonminiEvent.setVisible(False)
+            self.eNumberSpinBox.setVisible(False)
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):    
@@ -7592,21 +7597,10 @@ class EventsDlg(QDialog):
             
     def minieventsflagChanged(self):
         if self.minieventsflag.isChecked():
-            aw.etypeComboBox.setVisible(True)
-            aw.valueComboBox.setVisible(True)
-            aw.eventlabel.setVisible(True)
-            aw.buttonminiEvent.setVisible(True)
-            aw.lineEvent.setVisible(True)
-            aw.eNumberSpinBox.setVisible(True)
             aw.minieventsflag = 1
         else:
-            aw.lineEvent.setVisible(False)
-            aw.etypeComboBox.setVisible(False)
-            aw.valueComboBox.setVisible(False)
-            aw.eventlabel.setVisible(False)
-            aw.buttonminiEvent.setVisible(False)
-            aw.eNumberSpinBox.setVisible(False)
             aw.minieventsflag = 0
+        aw.update_minieventline_visibility()
 
     def eventsGraphflagChanged(self):
         if self.eventsGraphflag.isChecked():
