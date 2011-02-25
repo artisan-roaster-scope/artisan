@@ -3665,7 +3665,7 @@ class ApplicationWindow(QMainWindow):
                         break
                     self.qmc.roastingnotes += unicode(line) + u"\n"
     
-                #Read cuping notes
+                #Read cupping notes
                 while not stream.atEnd():
                     line = stream.readLine().trimmed()                  
                     if line.startsWith(u"[[DATA]]"):
@@ -3868,7 +3868,7 @@ class ApplicationWindow(QMainWindow):
                     line = stream.readLine().trimmed()                   
                     if line.startsWith(u"[[CUPPING-NOTES]]"):
                         break
-                #Read cuping notes
+                #Read cupping notes
                 while not stream.atEnd():
                     line = stream.readLine().trimmed()                   
                     if line.startsWith(u"[[DATA]]"):
@@ -6337,9 +6337,9 @@ class editGraphDlg(QDialog):
         self.roastingeditor = QTextEdit()
         self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
 
-        cupinglabel = QLabel("<b>Cuping Notes<\b>")
-        self.cupingeditor =  QTextEdit()
-        self.cupingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
+        cuppinglabel = QLabel("<b>Cupping Notes<\b>")
+        self.cuppingeditor =  QTextEdit()
+        self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
         
 
         # Save button
@@ -6453,8 +6453,8 @@ class editGraphDlg(QDialog):
         anotationLayout = QVBoxLayout()
         anotationLayout.addWidget(roastinglabel)
         anotationLayout.addWidget(self.roastingeditor)
-        anotationLayout.addWidget(cupinglabel)
-        anotationLayout.addWidget(self.cupingeditor)
+        anotationLayout.addWidget(cuppinglabel)
+        anotationLayout.addWidget(self.cuppingeditor)
 
         okLayout = QHBoxLayout()
         okLayout.addStretch()
@@ -6747,7 +6747,7 @@ class editGraphDlg(QDialog):
         aw.qmc.roastertype = unicode(self.roaster.text())
         aw.qmc.operator = unicode(self.operator.text())
         aw.qmc.roastingnotes = unicode(self.roastingeditor.toPlainText())
-        aw.qmc.cuppingnotes = unicode(self.cupingeditor.toPlainText())
+        aw.qmc.cuppingnotes = unicode(self.cuppingeditor.toPlainText())
            
         aw.messagelabel.setText(u"Roast properties updated but profile not saved to disk")            
         aw.qmc.redraw()
