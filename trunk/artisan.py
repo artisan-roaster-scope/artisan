@@ -2719,54 +2719,50 @@ class ApplicationWindow(QMainWindow):
         self.label6.setText( "<font color='black'><b>PID SV<\b></font>")
         self.label6.setIndent(5)
         
-        #convenience EVENT mini editor; Edits last recorded event without opening roast editor Dlg.
+        #convenience EVENT mini editor; View&Edits events without opening roast properties Dlg.
         self.etypes = ["None","Power","Damper","Fan"]
-        self.eventlabel = QLabel("Event # ")
+        self.eventlabel = QLabel("Event #<b>0 </b>")
         self.eventlabel.setIndent(5)
         self.eNumberSpinBox = QSpinBox()
+        
+        self.eNumberSpinBox.setFocusPolicy(Qt.TabFocus)
         self.eNumberSpinBox.setToolTip("Number of events found")
         self.eNumberSpinBox.setRange(0,20)
         self.connect(self.eNumberSpinBox, SIGNAL("valueChanged(int)"),self.changeEventNumber)
         self.eNumberSpinBox.setMaximumWidth(40)
         Nevents = len(self.qmc.specialevents)
         self.lineEvent = QLineEdit()
-        self.lineEvent.setFocusPolicy(Qt.ClickFocus)
+        self.lineEvent.setFocusPolicy(Qt.TabFocus)
         self.lineEvent.setMinimumWidth(200)
             
         self.eventlabel.setStyleSheet("background-color:'yellow';")
 
         self.etypeComboBox = QComboBox()
         self.etypeComboBox.setToolTip("Type of event")
-        self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
+        self.etypeComboBox.setFocusPolicy(Qt.TabFocus)
         self.etypeComboBox.addItems(self.etypes)
         self.valueComboBox = QComboBox()
         self.valueComboBox.setToolTip("Value of event")
-        self.valueComboBox.setFocusPolicy(Qt.NoFocus)
+        self.valueComboBox.setFocusPolicy(Qt.TabFocus)
         self.valueComboBox.addItems(self.qmc.eventsvalues)
         self.valueComboBox.setMaximumWidth(50)
 
-        if Nevents:
-            self.eNumberSpinBox.setCurrentIndex(Nevents)
-            self.lineEvent.setText(self.qmc.specialeventsStrings[Nevents-1])
-            self.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-            self.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-            
         #create EVENT mini button
         self.buttonminiEvent = QPushButton("Update")
         self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
-        #self.buttonminiEvent.setMaximumSize(55,20)
-        #self.buttonminiEvent.setMinimumSize(35,20)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
-        self.buttonminiEvent.setToolTip("Updates the last recorded event")
-
+        self.buttonminiEvent.setToolTip("Updates the event")
         
         EventsLayout = QHBoxLayout()
         EventsLayout.addWidget(self.eventlabel)
-        EventsLayout.addWidget(self.eNumberSpinBox)
+        EventsLayout.addSpacing(5) 
         EventsLayout.addWidget(self.lineEvent)  
         EventsLayout.addSpacing(5)      
         EventsLayout.addWidget(self.etypeComboBox)
+        EventsLayout.addSpacing(5)
         EventsLayout.addWidget(self.valueComboBox)
+        EventsLayout.addSpacing(5)
+        EventsLayout.addWidget(self.eNumberSpinBox)        
         EventsLayout.addSpacing(5)      
         EventsLayout.addWidget(self.buttonminiEvent)
 
@@ -3096,17 +3092,31 @@ class ApplicationWindow(QMainWindow):
     def moveKbutton(self,command):
         #"Enter" toggles ON/OFF keyboard    
         if command =="enter":
-            if self.lineEvent.hasFocus():
-                self.lineEvent.clearFocus()
-                self.eNumberSpinBox.clearFocus()
-                return
             if self.keyboardmoveflag == 0:
+                #if minievent editor on, take it out of focus
+                if self.minieventsflag:
+                    self.eNumberSpinBox.clearFocus()
+                    self.lineEvent.clearFocus()
+                    self.etypeComboBox.clearFocus()
+                    self.valueComboBox.clearFocus()
+                    self.eNumberSpinBox.setFocusPolicy(Qt.NoFocus)
+                    self.lineEvent.setFocusPolicy(Qt.NoFocus)
+                    self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
+                    self.valueComboBox.setFocusPolicy(Qt.NoFocus)
+                    
                 #turn on
                 self.keyboardmoveflag = 1
                 self.keyboardmoveindex = 0
                 self.messagelabel.setText("Keyboard moves turned ON")
                 self.button_1.setStyleSheet("QPushButton { background-color: purple }")
+                
             elif self.keyboardmoveflag == 1:
+                if self.minieventsflag:
+                    self.eNumberSpinBox.setFocusPolicy(Qt.TabFocus)
+                    self.lineEvent.setFocusPolicy(Qt.TabFocus)
+                    self.etypeComboBox.setFocusPolicy(Qt.TabFocus)
+                    self.valueComboBox.setFocusPolicy(Qt.TabFocus)
+                    
                 # turn off 
                 self.keyboardmoveflag = 0
                 # clear all
@@ -3356,7 +3366,8 @@ class ApplicationWindow(QMainWindow):
        #check 
        lenevents = len(self.qmc.specialevents)
        currentevent = self.eNumberSpinBox.value()
-       if currentevent == 0:
+       self.eventlabel.setText("Event #<b>%i </b>"%currentevent)
+       if currentevent == 0: 
            self.lineEvent.setText("")
            self.valueComboBox.setCurrentIndex(0)
            self.etypeComboBox.setCurrentIndex(0)
