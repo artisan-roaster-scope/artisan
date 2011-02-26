@@ -734,10 +734,10 @@ class tgraphcanvas(FigureCanvas):
     def reset(self):
         #prevents deleting accidentally a finished roast
         if self.safesaveflag== True:
-            string = "Do you want to reset (delete all data)?\nDELETE?"
-            reply = QMessageBox.warning(self,u"Delete unsaved profile?",string,
-                                QMessageBox.Yes|QMessageBox.Cancel|QMessageBox.Save)
-            if reply == QMessageBox.Yes:
+            string = "Do you want to save the profile?"
+            reply = QMessageBox.warning(self,u"Profile unsaved",string,
+                                QMessageBox.Reset |QMessageBox.Save|QMessageBox.Cancel)
+            if reply == QMessageBox.Reset :
                 self.safesaveflag == False
             elif reply == QMessageBox.Cancel:            
                 aw.messagelabel.setText("Reset has been cancelled")
