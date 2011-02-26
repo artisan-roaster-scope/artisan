@@ -3356,7 +3356,7 @@ class ApplicationWindow(QMainWindow):
        lenevents = len(self.qmc.specialevents)
        currentevent = self.eNumberSpinBox.value()
        self.eventlabel.setText("Event #<b>%i </b>"%currentevent)
-       if currentevent == 0: 
+       if currentevent == 0:
            self.lineEvent.setText("")
            self.valueComboBox.setCurrentIndex(0)
            self.etypeComboBox.setCurrentIndex(0)
@@ -3368,6 +3368,17 @@ class ApplicationWindow(QMainWindow):
            self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
            self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[currentevent-1])
            self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
+           etimeindex = self.qmc.specialevents[currentevent-1]
+           #plot little dot 
+           self.qmc.resetlines() #clear old
+           #plot highest ET or BT (sometimes only BT is plot (et is zero))
+           if self.qmc.temp1[etimeindex] > self.qmc.temp2[etimeindex]:
+               self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["met"])
+           else:
+               self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp2[etimeindex], "o", color = self.qmc.palette["bt"])
+               
+           self.qmc.fig.canvas.draw()
+
 
     # edit last entry in mini Event editor
     def miniEventRecord(self):
