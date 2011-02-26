@@ -210,6 +210,9 @@ class tgraphcanvas(FigureCanvas):
         #variable to mark the begining and end of the roast [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
         self.startend = [0.,0.,0.,0.]
 
+        #prevents accidentally deleting a finished profile. Activated at [DROP]
+        self.safesaveflag = False
+
         #background profile
         self.background = False
         self.backgroundDetails = False
@@ -714,42 +717,32 @@ class tgraphcanvas(FigureCanvas):
         t2,t1 = aw.ser.TEVA18Btemperature()
         tx = self.timeclock.elapsed()/1000.
 
-        return tx,t2,t1        
-        
+        return tx,t2,t1
+    
+    #creates X axis labels ticks in mm:ss instead of seconds     
     def xaxistosm(self):   
         formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - round(self.startend[0]), 60))
         locator = ticker.IndexLocator(120, round(self.startend[0]))
         self.ax.xaxis.set_major_formatter(formatter)
         self.ax.xaxis.set_major_locator(locator)
-        
-    #creates X axis labels ticks in mm:ss acording to the endofx limit
-#    def xaxistosm(self):
-#        #aligns the 00:00 with the start of the roast if it exists    
-#        if int(self.startend[0]):
-#            LLL = int(self.endofx/60)
-#            newlocs = [self.startend[0]]
-#            for i in range(LLL):    
-#                newlocs.append(newlocs[-1]+60)              
-#            self.ax.xaxis.set_ticks(newlocs)
-#
-#        #rename xaxis ticks in mins:secs
-#        locs = self.ax.get_xticks()
-#        labels = []
-#        for i in range(len(locs)):
-#                stringlabel = unicode(self.minutesfromseconds(locs[i]-int(self.startend[0])))
-#                labels.append(stringlabel)              
-#        self.ax.set_xticklabels(labels,color=self.palette["xlabel"],horizontalalignment='center')
-#
-#        #update label colors
-#        for label in self.ax.xaxis.get_ticklabels():
-#            label.set_color(self.palette["xlabel"])  
-        
+       
     def reset_and_redraw(self):
         self.reset()
         self.redraw()
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
+        #prevents deleting accidentally a finished roast
+        if self.safesaveflag== True:
+            string = "Found an unsaved profile but you are trying to erase it.\nProfile data will be lost.\nContinue (erase it)?"
+            reply = QMessageBox.warning(self,u"Trying to erase an unsaved profile",string,
+                                QMessageBox.Yes|QMessageBox.Cancel)
+            if reply == QMessageBox.Yes:
+                self.safesaveflag == False
+            elif reply == QMessageBox.Cancel:            
+                aw.messagelabel.setText("Reset has been cancelled")
+                return
+            
         if self.HUDflag:
             self.toggleHUD()
             
@@ -1238,16 +1231,7 @@ class tgraphcanvas(FigureCanvas):
             seconds = int(timeparts[1])
             seconds += int(timeparts[0])*60
             return seconds
-
-    # used to create minutes labels in the X axis.
-    def minutesfromseconds(self, seconds):
-        if not int(self.startend[0]):
-            return "%d:%02d"% divmod(seconds, 60)
-        else:
-            mins, secs = divmod(seconds,60)
-            return str(mins)
-        
-       
+   
     def fromFtoC(self,Ffloat):
         return (Ffloat-32.0)*(5.0/9.0)
 
@@ -1836,7 +1820,10 @@ class tgraphcanvas(FigureCanvas):
             aw.button_9.setFlat(True)
             
             message = u"Roast ended at " + st1 + " BT = " + unicode(self.startend[-1]) + self.mode
-
+            
+            #prevents accidentally deleting a finished roast
+            self.safesaveflag = True
+            
         else:
             message = u"Scope is OFF"
             
@@ -2465,7 +2452,7 @@ class ApplicationWindow(QMainWindow):
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID. 
         self.settingsLoad()        
-        
+       
         #create a Label object to display program status information
         self.messagelabel = QLabel() 
         self.messagelabel.setIndent(10)
@@ -3332,7 +3319,7 @@ class ApplicationWindow(QMainWindow):
         try:
             if self.qmc.autosavepath and self.qmc.autosaveflag:
                 filename = self.qmc.autosaveprefix + u"-"
-                filename += unicode(QDateTime.currentDateTime().toString(QString("yyMMMdddhhmm")))
+                filename += unicode(QDateTime.currentDateTime().toString(QString("yy-MMM-ddd-hhmm")))
                 filename += u".txt"
                 oldDir = unicode(QDir.current())           
                 newdir = QDir.setCurrent(self.qmc.autosavepath)
@@ -3341,6 +3328,7 @@ class ApplicationWindow(QMainWindow):
                 #restore dirs
                 QDir.setCurrent(oldDir)
                 self.messagelabel.setText(u"Profile " + filename + " saved in: " + self.qmc.autosavepath)
+                self.qmc.safesaveflag = False
 ##                #reset graph
 ##                self.qmc.reset()
 ##                #turn ON
@@ -3505,13 +3493,12 @@ class ApplicationWindow(QMainWindow):
     def loadFile(self,filename):
         f = None
         old_mode = self.qmc.mode
-
+        
         try:       
             f = QFile(unicode(filename))
             if not f.open(QIODevice.ReadOnly):
                 raise IOError, unicode(f.errorString())    
             stream = QTextStream(f)
-            
             self.qmc.reset()
 
             firstChar = stream.read(1)
@@ -4128,6 +4115,8 @@ class ApplicationWindow(QMainWindow):
                 self.setCurrentFile(filename)
                 self.profilepath = unicode(QDir().filePath(filename))
                 self.messagelabel.setText(u"Profile saved")
+
+                self.qmc.safesaveflag = False
             else:
                 self.messagelabel.setText(u"Cancelled")
         except IOError,e:
@@ -7125,7 +7114,7 @@ class editGraphDlg(QDialog):
              nevents = len(aw.qmc.specialevents)
              message = u" Event #" + str(nevents+1) + " deleted"             
              if nevents <= 10:
-                if lene == 0:
+                if nevents == 0:
                     self.delevent1Button.setDisabled(True)
                 else:
                     self.delevent1Button.setDisabled(False)
@@ -10924,27 +10913,11 @@ class profiledesigner(FigureCanvas):
 
     #creates X axis labels ticks in mm:ss acording to the endofx limit
     def xaxistosm(self):
-        #aligns the 00:00 with the start of the roast if it exists    
-        LLL = int(1200/60)
-        newlocs = [0]
-        for i in range(LLL):    
-            newlocs.append(newlocs[-1]+60)              
-        self.ax.xaxis.set_ticks(newlocs)
-
-        #rename xaxis ticks in mins:secs
-        locs = self.ax.get_xticks()
-        labels = []
-        for i in range(len(locs)):
-                stringlabel = unicode(aw.qmc.minutesfromseconds(locs[i]))
-                part1 = stringlabel.split(":")[0]
-                labels.append(part1)              
-        self.ax.set_xticklabels(labels,color=aw.qmc.palette["xlabel"],horizontalalignment='center')
-
-        #update label colors
-        for label in self.ax.xaxis.get_ticklabels():
-            label.set_color(aw.qmc.palette["xlabel"])
-                
-                
+        formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - round(self.startend[0]), 60))
+        locator = ticker.IndexLocator(120, round(self.startend[0]))
+        self.ax.xaxis.set_major_formatter(formatter)
+        self.ax.xaxis.set_major_locator(locator)
+    
         
 ############################################################################
 ######################## FUJI PXG4 PID CONTROL DIALOG ######################
