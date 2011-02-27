@@ -123,6 +123,7 @@ v0.3.4 (??)
 - duplicate recent file names show containing directory
 - remembers user selected profile path
 - added DeltaET/DeltaBT filter to make those delta more useful
+- adds volume and bean probe density
 - bug fixes
 
 v0.3.3 (13.02.2011)
