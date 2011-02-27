@@ -3329,7 +3329,7 @@ class ApplicationWindow(QMainWindow):
         try:
             if self.qmc.autosavepath and self.qmc.autosaveflag:
                 filename = self.qmc.autosaveprefix + u"-"
-                filename += unicode(QDateTime.currentDateTime().toString(QString("yy-MMM-ddd-hhmm")))
+                filename += unicode(QDateTime.currentDateTime().toString(QString("dd-MM-yy_hhmm")))
                 filename += u".txt"
                 oldDir = unicode(QDir.current())           
                 newdir = QDir.setCurrent(self.qmc.autosavepath)
@@ -4313,7 +4313,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.operator = unicode(settings.value("operator",self.qmc.operator).toString())
             self.qmc.roastertype = unicode(settings.value("roastertype",self.qmc.roastertype).toString())
             self.qmc.density[2] = settings.value("densitySampleVolume",self.qmc.density[2]).toInt()[0]
-            self.qmc.density[3] = settings.value("densitySampleVolumeUnit",self.qmc.density[3]).toString()
+            self.qmc.density[3] = unicode(settings.value("densitySampleVolumeUnit",self.qmc.density[3]).toString())
             settings.endGroup()
             self.userprofilepath = unicode(settings.value("profilepath",self.userprofilepath).toString())
             #need to update timer delay (otherwise it uses default 5 seconds)
