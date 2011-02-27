@@ -259,6 +259,8 @@ class tgraphcanvas(FigureCanvas):
         self.weight = [0,0,u"g"]
         #[0]volume in, [1]volume out, [2]units (string)
         self.volume = [0,0,u"l"]
+        #[0]probe weight, [1]weight unit, [2]probe volume, [3]volume unit
+        self.density = [0,u"g",0,u"l"]
         
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
@@ -4000,46 +4002,79 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.mode == u"C" and old_mode == "F":
             self.qmc.celsiusMode()
         if "startend" in profile:
-            self.qmc.startend = [float(fl) for fl in profile["startend"]]       
+            self.qmc.startend = [float(fl) for fl in profile["startend"]]  
+        else:
+            self.qmc.startend = [0.,0.,0.,0.]     
         if "cracks" in profile:
             self.qmc.varC = [float(fl) for fl in profile["cracks"]]
+        else:
+            self.qmc.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
         if "flavors" in profile:
             self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
         if "flavorlabels" in profile:
             self.qmc.flavorlabels = QStringList(profile["flavorlabels"])
         if "title" in profile:
             self.qmc.title = unicode(profile["title"])
+        else:            
+            self.qmc.title = u"Roaster Scope"
         if "beans" in profile:
             self.qmc.beans = unicode(profile["beans"])
+        else:
+            self.qmc.beans = u""
         if "weight" in profile:
             self.qmc.weight = profile["weight"]
+        else:
+            self.qmc.weight = [0,0,u"g"]
         if "volume" in profile:
             self.qmc.volume = profile["volume"]
+        else:
+            self.qmc.volume = [0,0,u"l"]
+        if "density" in profile:
+            self.qmc.density = profile["density"]
+        else:
+            self.qmc.density = [0,u"g",0,u"l"]
         if "roastertype" in profile:
             self.qmc.roastertype = unicode(profile["roastertype"])
+        else:
+            self.qmc.roastertype = u""
         if "operator" in profile:
             self.qmc.operator = unicode(profile["operator"])
+        else:
+            self.qmc.operator = u""
         if "roastdate" in profile:
             self.qmc.roastdate = QDate.fromString(profile["roastdate"])
         if "specialevents" in profile:
             self.qmc.specialevents = profile["specialevents"]
             #the new length of especial events is now 20 instead of 10
+        else:
+            self.qmc.specialevents = []
         if "specialeventstype" in profile:
             specialeventstype = profile["specialeventstype"]
             for i in range(len(specialeventstype)):
                 self.qmc.specialeventstype[i] = specialeventstype[i]
+        else:  
+            self.qmc.specialeventstype = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         if "specialeventsvalue" in profile:
             specialeventsvalue = profile["specialeventsvalue"]
             for i in range(len(specialeventsvalue)):
-                self.qmc.specialeventsvalue[i] = specialeventsvalue[i]               
+                self.qmc.specialeventsvalue[i] = specialeventsvalue[i]     
+        else:
+            self.qmc.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]          
         if "specialeventsStrings" in profile:
             specialeventsStrings = profile["specialeventsStrings"]
             for i in range(len(specialeventsStrings)):
                 self.qmc.specialeventsStrings[i] = specialeventsStrings[i]
+        else:
+            self.qmc.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s",
+                                     u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]
         if "roastingnotes" in profile:
             self.qmc.roastingnotes = unicode(profile["roastingnotes"])
+        else:
+            self.qmc.roastingnotes = u""
         if "cuppingnotes" in profile:
             self.qmc.cuppingnotes = unicode(profile["cuppingnotes"])
+        else:
+            self.qmc.cuppingnotes = u""
         if "timex" in profile:
             self.qmc.timex = profile["timex"]
         if "temp1" in profile:
@@ -4074,8 +4109,13 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ambientTemp = profile["ambientTemp"]
         if "dryend" in profile:
             self.qmc.dryend = profile["dryend"]
+        else:
+            self.qmc.dryend = [0.,0.]
         if "bag_humidity" in profile:
             self.qmc.bag_humidity = profile["bag_humidity"]   
+        else:
+            self.qmc.bag_humidity = [0.,0.]
+            
             
     #used by filesave()
     #wrap values in unicode(.) if and only if those are of type string
@@ -4090,6 +4130,7 @@ class ApplicationWindow(QMainWindow):
         profile["beans"] = unicode(self.qmc.beans)
         profile["weight"] = self.qmc.weight
         profile["volume"] = self.qmc.volume
+        profile["density"] = self.qmc.density
         profile["roastertype"] = unicode(self.qmc.roastertype)
         profile["operator"] = unicode(self.qmc.operator)
         profile["roastdate"] = unicode(self.qmc.roastdate.toString())
@@ -4127,7 +4168,6 @@ class ApplicationWindow(QMainWindow):
                 #write
                 self.serialize(filename,self.getProfile())
                 self.setCurrentFile(filename)
-                self.profilepath = unicode(QDir().filePath(filename))
                 self.messagelabel.setText(u"Profile saved")
 
                 self.qmc.safesaveflag = False
@@ -4251,6 +4291,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoastProperties")
             self.qmc.operator = unicode(settings.value("operator",self.qmc.operator).toString())
             self.qmc.roastertype = unicode(settings.value("roastertype",self.qmc.roastertype).toString())
+            self.qmc.density[2] = settings.value("densitySampleVolume",self.qmc.density[2]).toInt()[0]
+            self.qmc.density[3] = settings.value("densitySampleVolumeUnit",self.qmc.density[3]).toString()
             settings.endGroup()
             self.userprofilepath = unicode(settings.value("profilepath",self.userprofilepath).toString())
             #need to update timer delay (otherwise it uses default 5 seconds)
@@ -4355,6 +4397,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoastProperties")
             settings.setValue("operator",self.qmc.operator)
             settings.setValue("roastertype",self.qmc.roastertype)
+            settings.setValue("densitySampleVolume",self.qmc.density[2])
+            settings.setValue("densitySampleVolumeUnit",self.qmc.density[3])
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
             
@@ -6273,8 +6317,6 @@ class editGraphDlg(QDialog):
         self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.percent)
         self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.percent)
         
-
-
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
@@ -6315,6 +6357,47 @@ class editGraphDlg(QDialog):
             self.volumeUnitsComboBox.setCurrentIndex(0)
         else:
             self.volumeUnitsComboBox.setCurrentIndex(1)
+                        
+        self.calculateddensitylabel = QLabel("")
+        self.calculated_density()
+        self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.calculated_density)
+        self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.calculated_density)
+        self.connect(self.volumeoutedit,SIGNAL("editingFinished()"),self.calculated_density)
+        self.connect(self.volumeinedit,SIGNAL("editingFinished()"),self.calculated_density)
+
+        #density
+        bean_density_label = QLabel("<b>Density </b>")
+        self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
+        self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_weight_edit))
+        self.bean_density_weight_edit.setMinimumWidth(50)
+        self.bean_density_weight_edit.setMaximumWidth(50)
+        self.bean_density_weightUnitsComboBox = QComboBox()
+        self.bean_density_weightUnitsComboBox.setMaximumWidth(60)
+        self.bean_density_weightUnitsComboBox.setMinimumWidth(60)
+        self.bean_density_weightUnitsComboBox.addItems(["g","Kg"])        
+        if aw.qmc.density[1] == "g":
+            self.bean_density_weightUnitsComboBox.setCurrentIndex(0)
+        else:
+            self.bean_density_weightUnitsComboBox.setCurrentIndex(1)
+        bean_density_per_label = QLabel("per")
+        self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
+        self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
+        self.bean_density_volume_edit.setMinimumWidth(50)
+        self.bean_density_volume_edit.setMaximumWidth(50)
+        self.bean_density_volumeUnitsComboBox = QComboBox()
+        self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
+        self.bean_density_volumeUnitsComboBox.setMinimumWidth(60)
+        self.bean_density_volumeUnitsComboBox.addItems(["ml","l"])        
+        if aw.qmc.density[3] == "ml":
+            self.bean_density_volumeUnitsComboBox.setCurrentIndex(0)
+        else:
+            self.bean_density_volumeUnitsComboBox.setCurrentIndex(1)
+
+        self.standarddensitylabel = QLabel("")
+        self.standard_density()
+        self.connect(self.bean_density_volume_edit,SIGNAL("editingFinished()"),self.standard_density)
+        self.connect(self.bean_density_weight_edit,SIGNAL("editingFinished()"),self.standard_density)
+
 
         #bag humidity
         bag_humidity_label = QLabel("<b>Storage Humidity </b>")
@@ -6452,6 +6535,23 @@ class editGraphDlg(QDialog):
         volumeLayout.addWidget(self.volumepercentlabel)  
         volumeLayout.addStretch()  
 
+        densityLayout = QHBoxLayout()
+        densityLayout.setSpacing(0)
+        densityLayout.addWidget(bean_density_label)
+        densityLayout.addSpacing(13)
+        densityLayout.addWidget(self.bean_density_weightUnitsComboBox)
+        densityLayout.addSpacing(15)
+        densityLayout.addWidget(self.bean_density_weight_edit)
+        densityLayout.addSpacing(15)
+        densityLayout.addWidget(bean_density_per_label)
+        densityLayout.addSpacing(15)
+        densityLayout.addWidget(self.bean_density_volumeUnitsComboBox)
+        densityLayout.addSpacing(15)
+        densityLayout.addWidget(self.bean_density_volume_edit)
+        densityLayout.addSpacing(20)
+        densityLayout.addWidget(self.standarddensitylabel)
+        densityLayout.addStretch()  
+        
         humidityLayout = QHBoxLayout()
         humidityLayout.addWidget(bag_humidity_label)
         humidityLayout.addWidget(self.humidity_edit)
@@ -6475,7 +6575,8 @@ class editGraphDlg(QDialog):
         anotationLayout.addWidget(cuppinglabel)
         anotationLayout.addWidget(self.cuppingeditor)
 
-        okLayout = QHBoxLayout()
+        okLayout = QHBoxLayout()        
+        okLayout.addWidget(self.calculateddensitylabel)
         okLayout.addStretch()
         okLayout.addWidget(cancelButton,0)
         okLayout.addWidget(saveButton,1)
@@ -6496,6 +6597,7 @@ class editGraphDlg(QDialog):
         tab1Layout.addLayout(textLayout)
         tab1Layout.addLayout(weightLayout)
         tab1Layout.addLayout(volumeLayout)
+        tab1Layout.addLayout(densityLayout)
         tab1Layout.addLayout(humidityLayout)
         tab1Layout.addLayout(ambientLayout)
         tab1Layout.addStretch()  
@@ -6565,6 +6667,34 @@ class editGraphDlg(QDialog):
             percent = 0.
         percentstring =  "%.1f" %(percent) + "%"
         self.volumepercentlabel.setText(QString(percentstring))    #volume percent gain
+        
+    def calculated_density(self):
+        volumein = float(self.volumeinedit.text())
+        volumeout = float(self.volumeoutedit.text())
+        weightin = float(self.weightinedit.text())
+        weightout = float(self.weightoutedit.text())
+        if volumein != 0.0 and volumeout and weightin != 0.0 and weightout != 0.0:
+            if self.volumeUnitsComboBox.currentText() == "ml" :
+                volumein = volumein / 1000.0
+                volumeout = volumeout / 1000.0      
+            if self.unitsComboBox.currentText() != "g" :
+                weightin = weightin * 1000.0
+                weightout = weightout * 1000.0
+            self.calculateddensitylabel.setText(QString(u"Density in: %d" % (weightin / volumein) + u" g/l   =>   Density out: %d" % (weightout / volumeout) + u" g/l"))
+        else:
+            self.calculateddensitylabel.setText("")
+        
+    def standard_density(self):
+        volume = float(self.bean_density_volume_edit.text())
+        weight = float(self.bean_density_weight_edit.text())
+        if volume != 0.0 and weight != 0.0:
+            if self.bean_density_volumeUnitsComboBox.currentText() == "ml" :
+                volume = volume / 1000.0
+            if self.bean_density_weightUnitsComboBox.currentText() != "g" :
+                weight = weight * 1000.0
+            self.standarddensitylabel.setText(QString(u"(%d" % (weight / volume) + u" g/l)"))
+        else:
+            self.standarddensitylabel.setText("")
         
                 
     def accept(self):
@@ -6753,7 +6883,19 @@ class editGraphDlg(QDialog):
             aw.qmc.volume[1] = int(self.volumeoutedit.text())
         else:
             pass
-        aw.qmc.volume[2] = unicode(self.unitsComboBox.currentText())
+        aw.qmc.volume[2] = unicode(self.volumeUnitsComboBox.currentText())
+
+        #update density
+        if unicode(self.bean_density_weight_edit.text()).isdigit():
+            aw.qmc.density[0] = int(self.bean_density_weight_edit.text())
+        else:
+            pass
+        aw.qmc.density[1] = unicode(self.bean_density_weightUnitsComboBox.currentText())
+        if unicode(self.bean_density_volume_edit.text()).isdigit():
+            aw.qmc.density[2] = int(self.bean_density_volume_edit.text())
+        else:
+            pass
+        aw.qmc.density[3] = unicode(self.bean_density_volumeUnitsComboBox.currentText())
 
         #update humidity
         aw.qmc.bag_humidity[0] = float(self.humidity_edit.text())
