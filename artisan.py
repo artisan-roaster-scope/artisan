@@ -2845,6 +2845,11 @@ class ApplicationWindow(QMainWindow):
             self.helpMenu = self.menuBar().addMenu("&Help")
 
         #FILE menu
+        newRoastAction = QAction("New",self)
+        newRoastAction.setShortcut(QKeySequence.New)
+        self.connect(newRoastAction,SIGNAL("triggered()"),self.newRoast)
+        self.fileMenu.addAction(newRoastAction)
+        
         fileLoadAction = QAction("Open...",self)
         fileLoadAction.setShortcut(QKeySequence.Open)
         self.connect(fileLoadAction,SIGNAL("triggered()"),self.fileLoad)
@@ -3499,6 +3504,22 @@ class ApplicationWindow(QMainWindow):
         file = unicode(QFileDialog.getExistingDirectory(self,msg,path))
         self.setDefaultPath(file)
         return file
+        
+    def newRoast(self):
+        #stop current roast (if any)
+        if self.qmc.flagon:
+            #mark drop if not yet done
+            if self.qmc.startend[2] != 0.0:
+                self.qmc.markDrop()
+            #invoke "OFF"
+            self.qmc.OffMonitor
+        #store, reset and redraw
+        if self.qmc.autosavepath and self.qmc.autosaveflag:
+            #if autosave mode active we just save automatic
+            self.automaticsave()
+        self.qmc.reset_and_redraw()
+        #start new roast
+        self.qmc.OnMonitor()
  
     def fileLoad(self):
         fileName = self.ArtisanOpenFileDialog()
