@@ -3358,7 +3358,7 @@ class ApplicationWindow(QMainWindow):
         string += "<b>[LEFT]</b> = Move to the left<br><br>"
         string += "<b>[RIGHT]</b> = Move to the right<br><br>"
         string += "<b>[s]</b> = Autosave<br><br>"
-        
+        string += "<b>[CRTL N]</b> = Autosave + Reset + ON<br><br>"
         QMessageBox.information(self,u"Roast Keyboard Shortcuts",string)
 
     def changeEventNumber(self):
@@ -3509,7 +3509,7 @@ class ApplicationWindow(QMainWindow):
         #stop current roast (if any)
         if self.qmc.flagon:
             #mark drop if not yet done
-            if self.qmc.startend[2] != 0.0:
+            if self.qmc.startend[2] == 0.0:
                 self.qmc.markDrop()
             #invoke "OFF"
             self.qmc.OffMonitor
@@ -3517,10 +3517,15 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.autosavepath and self.qmc.autosaveflag:
             #if autosave mode active we just save automatic
             self.automaticsave()
+        else:
+            self.messagelabel.setText("Empty path or box unchecked in Autosave")
+            self.autosaveconf()
+            return
         self.qmc.reset_and_redraw()
         #start new roast
         self.qmc.OnMonitor()
- 
+        self.messagelabel.setText("Roast has been saved. New roast has started")
+
     def fileLoad(self):
         fileName = self.ArtisanOpenFileDialog()
         if fileName:
