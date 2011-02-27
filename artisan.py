@@ -3339,6 +3339,8 @@ class ApplicationWindow(QMainWindow):
                 QDir.setCurrent(oldDir)
                 self.messagelabel.setText(u"Profile " + filename + " saved in: " + self.qmc.autosavepath)
                 self.qmc.safesaveflag = False
+
+                return filename
 ##                #reset graph
 ##                self.qmc.reset()
 ##                #turn ON
@@ -3508,6 +3510,9 @@ class ApplicationWindow(QMainWindow):
     def newRoast(self):
         #stop current roast (if any)
         if self.qmc.flagon:
+            if self.qmc.startend[0] == 0.0:
+                self.messagelabel.setText("No profile found")
+                return
             #mark drop if not yet done
             if self.qmc.startend[2] == 0.0:
                 self.qmc.markDrop()
@@ -3516,7 +3521,7 @@ class ApplicationWindow(QMainWindow):
         #store, reset and redraw
         if self.qmc.autosavepath and self.qmc.autosaveflag:
             #if autosave mode active we just save automatic
-            self.automaticsave()
+            filename = self.automaticsave()
         else:
             self.messagelabel.setText("Empty path or box unchecked in Autosave")
             self.autosaveconf()
@@ -3524,7 +3529,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.reset_and_redraw()
         #start new roast
         self.qmc.OnMonitor()
-        self.messagelabel.setText("Roast has been saved. New roast has started")
+        self.messagelabel.setText(filename + " has been saved. New roast has started")
 
     def fileLoad(self):
         fileName = self.ArtisanOpenFileDialog()
