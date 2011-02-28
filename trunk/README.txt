@@ -20,12 +20,13 @@ FEATURES
 
 o runs on Mac OS X 10.5/10.6, Windows, and Linux
 o ET/BT logging and PID control supporting the following devices
- - ArduinoTC4
  - Fuji PXR/PXG 4 & 5 PID
  - Omega HH309, HH506RA, HH802U, HH806AU
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
  - VOLTCRAFT K202, K204, 300K, 302KJ
  - EXTECH 421509
+ - ArduinoTC4
+ - TE VA18B
 o Fahrenheit and Celsius display and conversion
 o manual logging of extra events (FCs,FCe,..)
 o large buttons supporting touch panels
@@ -111,7 +112,10 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
-v0.3.4 (??)
+v0.3.5 (??)
+- improved CSV import/export
+
+v0.3.4 (28.02.2011)
 - adds ArduinoTC4 device support
 - adds TE VA18b device support
 - improved Fuji PXR/PXG support
@@ -122,8 +126,9 @@ v0.3.4 (??)
 - statistic characteristic line as y-label to ensure visibility if axis limits are changed
 - duplicate recent file names show containing directory
 - remembers user selected profile path
-- added DeltaET/DeltaBT filter to make those delta more useful
+- added DeltaET/DeltaBT filter to make those delta curves more useful
 - adds volume and bean probe density
+- adds new command to start/restart roasts
 - bug fixes
 
 v0.3.3 (13.02.2011)

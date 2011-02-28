@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.3.4"
+__version__ = u"0.3.5"
 
 
 # ABOUT
@@ -970,29 +970,30 @@ class tgraphcanvas(FigureCanvas):
         #populate delta BT (self.delta2) and delta MET (self.delta1)
         d1,d2,d3,d4=[],[],[],[]
         for i in range(len(self.timex)-1):
-            #print i, self.qmc.temp1[i+1], self.qmc.temp1[i]
+            #print i, self.temp1[i+1], self.temp1[i]
             timed = self.timex[i+1] - self.timex[i]
-
-            delta1 = 100+ self.sensitivity*((self.temp1[i+1] - self.temp1[i]) / timed) 
-            delta2 = 50 + self.sensitivity*((self.temp2[i+1] - self.temp2[i]) / timed)
             
-            d1.append(delta1)
-            d2.append(delta2)
-            
-            if self.deltafilter:
-                if i > (self.deltafilter-1):
-                    #smooth DeltaBT/DeltaET by using FIR filter of X pads.
-                    #d1 and d2 are inputs, while d3 and d4 are outputs  
-                    #Use only current and past input values. Don't feed parts of outputs d3 d4 to filter
-                    a1,a2 = 0,0
-                    for k in range(self.deltafilter):
-                        a1 += d1[-(k+1)]
-                        a2 += d2[-(k+1)]
-                    d3.append(a1/self.deltafilter)
-                    d4.append(a2/self.deltafilter)
-                else:
-                    d3.append(delta1) 
-                    d4.append(delta2)                     
+            if timed != 0:
+                delta1 = 100+ self.sensitivity*((self.temp1[i+1] - self.temp1[i]) / timed) 
+                delta2 = 50 + self.sensitivity*((self.temp2[i+1] - self.temp2[i]) / timed)
+                
+                d1.append(delta1)
+                d2.append(delta2)
+                
+                if self.deltafilter:
+                    if i > (self.deltafilter-1):
+                        #smooth DeltaBT/DeltaET by using FIR filter of X pads.
+                        #d1 and d2 are inputs, while d3 and d4 are outputs  
+                        #Use only current and past input values. Don't feed parts of outputs d3 d4 to filter
+                        a1,a2 = 0,0
+                        for k in range(self.deltafilter):
+                            a1 += d1[-(k+1)]
+                            a2 += d2[-(k+1)]
+                        d3.append(a1/self.deltafilter)
+                        d4.append(a2/self.deltafilter)
+                    else:
+                        d3.append(delta1) 
+                        d4.append(delta2)                     
             
         if self.deltafilter:
             self.delta1 = d3
@@ -2862,9 +2863,20 @@ class ApplicationWindow(QMainWindow):
 
         importMenu = self.fileMenu.addMenu("Import Readings")
 
+
+        fileImportAction = QAction("Artisan...",self)
+        self.connect(fileImportAction,SIGNAL("triggered()"),self.fileImport)
+        importMenu.addAction(fileImportAction)  
+        
         importHH506RAAction = QAction("HH506RA...",self)
         self.connect(importHH506RAAction,SIGNAL("triggered()"),self.importHH506RA)
         importMenu.addAction(importHH506RAAction)
+
+        importK202Action = QAction("K202...",self)
+        self.connect(importK202Action,SIGNAL("triggered()"),self.importK202)
+        importMenu.addAction(importK202Action)
+        
+        
 
         self.fileMenu.addMenu(importMenu)    
         
@@ -3956,10 +3968,85 @@ class ApplicationWindow(QMainWindow):
             if f:
                 f.close()
                 
-    #Write readings to csv file
+    def eventtime2string(self,time):
+        if time == 0.0:
+            return ""
+        else:
+            return "%02d:%02d"% divmod(time,60)
+            
+    #read Artisan CSV    
+    def importCSV(self,filename):
+        import csv
+        csvFile = file(filename,"rb")
+        data = csv.reader(csvFile,delimiter='\t')
+        #read file header
+        header = data.next()
+        self.qmc.roastdate = QDate.fromString(header[0].split('Date:')[1],"dd'.'MM'.'yyyy")
+        unit = header[1].split('Unit:')[1]
+        #set temperature mode
+        if unit == u"F" and self.qmc.mode == u"C":
+            self.qmc.fahrenheitMode()
+        if unit == u"C" and self.qmc.mode == u"F":
+            self.qmc.celsiusMode()                        
+        zero_t = 0
+        #read column headers
+        fields = data.next() 
+        #read data
+        last_time = None
+        for row in data:
+            items = zip(fields, row)
+            item = {}
+            for (name, value) in items:
+                item[name] = value.strip()
+            #add one measurement
+            time = float(self.qmc.stringtoseconds(item['Time1']))
+            if not last_time or last_time < time:
+                self.qmc.timex.append(time)
+                self.qmc.temp1.append(float(item['ET']))
+                self.qmc.temp2.append(float(item['BT']))
+            last_time = time
+        csvFile.close()
+        #swap temperature curves if needed such that BT is the lower and ET the upper one
+        if len(self.qmc.temp2) > 0 and len(self.qmc.temp1) > 0 and (reduce (lambda x,y:x + y, self.qmc.temp2)) > reduce (lambda x,y:x + y, self.qmc.temp1):
+            tmp = self.qmc.temp1
+            self.qmc.temp1 = self.qmc.temp2
+            self.qmc.temp2 = tmp                
+        #set events
+        CHARGE = aw.qmc.stringtoseconds(header[2].split('CHARGE:')[1])
+        if CHARGE > 0:
+            aw.qmc.startend[0] = CHARGE
+            aw.qmc.startend[1] = aw.BTfromseconds(aw.qmc.startend[0])
+        DRYe = aw.qmc.stringtoseconds(header[4].split('DRYe:')[1])
+        if DRYe > 0:
+            aw.qmc.dryend[0] = DRYe
+            aw.qmc.dryend[1] = aw.BTfromseconds(aw.qmc.dryend[0])
+        FCs = aw.qmc.stringtoseconds(header[5].split('FCs:')[1])
+        if FCs > 0: 
+            aw.qmc.varC[0] = FCs
+            aw.qmc.varC[1] = aw.BTfromseconds(aw.qmc.varC[0])  
+        FCe = aw.qmc.stringtoseconds(header[6].split('FCe:')[1])        
+        if FCe > 0:    
+            aw.qmc.varC[2] = FCe
+            aw.qmc.varC[3] = aw.BTfromseconds(aw.qmc.varC[2])
+        SCs = aw.qmc.stringtoseconds(header[7].split('SCs:')[1])
+        if SCs > 0:    
+            aw.qmc.varC[4] = SCs
+            aw.qmc.varC[5] = aw.BTfromseconds(aw.qmc.varC[4])
+        SCe = aw.qmc.stringtoseconds(header[8].split('SCe:')[1])
+        if SCe> 0:
+            aw.qmc.varC[6] = SCe
+            aw.qmc.varC[7] = aw.BTfromseconds(aw.qmc.varC[6])   
+        DROP = aw.qmc.stringtoseconds(header[9].split('DROP:')[1])           
+        if DROP > 0:
+            aw.qmc.startend[2] = DROP
+            aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2]) 
+        self.qmc.endofx = self.qmc.timex[-1]
+        self.messagelabel.setText(u"HH506RA file loaded successfully")
+        self.qmc.redraw()
+
+            
+    #Write readings to Artisan csv file
     def exportCSV(self,filename):
-        f = open(filename, 'w+')
-        f.write("Time1\tTime2\tBT\tET\tEvent\n")
         CHARGE = self.qmc.startend[0]
         TP_index = self.findTP()
         TP = 0.
@@ -3981,30 +4068,49 @@ class ApplicationWindow(QMainWindow):
         SCe = self.qmc.varC[6]
         DROP = self.qmc.startend[2]
         events = [     
-            [CHARGE,"Charge"],
-            [TP,"TP"],      
-            [DRYe,"Dry End"], 
-            [FCs,"FCs"],
-            [FCe,"FCe"],
-            [SCs,"SCs"],
-            [SCe,"SCe"],
-            [DROP, "Drop"],
+            [CHARGE,"Charge",False],
+            [TP,"TP",False],      
+            [DRYe,"Dry End",False], 
+            [FCs,"FCs",False],
+            [FCe,"FCe",False],
+            [SCs,"SCs",False],
+            [SCe,"SCe",False],
+            [DROP, "Drop",False],
             ]
+            
+        import csv
+        csvFile= file(filename, "wb")
+        writer= csv.writer(csvFile,delimiter='\t')
+        writer.writerow([
+            "Date:" + self.qmc.roastdate.toString("dd'.'MM'.'yyyy"),
+            "Unit:" + self.qmc.mode,
+            "CHARGE:" + self.eventtime2string(CHARGE),
+            "TP:" + self.eventtime2string(TP),
+            "DRYe:" + self.eventtime2string(DRYe),
+            "FCs:" + self.eventtime2string(FCs),
+            "FCe:" + self.eventtime2string(FCe),
+            "SCs:" + self.eventtime2string(SCs),
+            "SCe:" + self.eventtime2string(SCe),
+            "DROP:" + self.eventtime2string(DROP)])
+        writer.writerow(['Time1','Time2','BT','ET','Event'])
+
+        last_time = None
         for i in range(len(self.qmc.timex)):
-            f.write(self.qmc.stringfromseconds(self.qmc.timex[i]) + "\t")
             if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
-                f.write(self.qmc.stringfromseconds(self.qmc.timex[i] - CHARGE))
-                f.write("\t")
+                time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
             else:
-                f.write("\t")
-            f.write(str(self.qmc.temp2[i]) + "\t")
-            f.write(str(self.qmc.temp1[i]) + "\t")
+                time2 = "" 
+            event = ""               
             for e in range(len(events)):
-                if int(round(self.qmc.timex[i])) == int(round(events[e][0])):
-                    f.write(events[e][1])
+                if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
+                    event = events[e][1]
+                    events[e][2] = True
                     break
-            f.write("\n")
-        f.close()
+            time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
+            if not last_time or last_time != time1:
+                writer.writerow([time1,time2,self.qmc.temp2[i],self.qmc.temp1[i],event])
+            last_time = time1
+        csvFile.close()
                 
     #Write object to file
     def serialize(self,filename,obj):
@@ -4220,6 +4326,19 @@ class ApplicationWindow(QMainWindow):
         except IOError,e:
             self.messagelabel.setText(u"Error on export: " + unicode(e))
             aw.qmc.errorlog.append(u"Error on export: " + unicode(e))
+            return
+            
+    def fileImport(self):
+        try:         
+            filename = aw.ArtisanOpenFileDialog(msg="Import CSV",ext="*.csv")
+            if filename:
+                self.importCSV(filename)
+                self.messagelabel.setText(u"Readings imported")
+            else:
+                self.messagelabel.setText(u"Cancelled")
+        except IOError,e:
+            self.messagelabel.setText(u"Error on import: " + unicode(e))
+            aw.qmc.errorlog.append(u"Error on import: " + unicode(e))
             return
 
 
@@ -5037,10 +5156,9 @@ $cupping_notes
         else:
             return "French"
             
-    def importHH506RA(self):
+    def importK202(self):
         try:
-            filename = u""
-            filename = aw.ArtisanOpenFileDialog(msg=u"Load Profile for a HH506RA",ext=None)
+            filename = aw.ArtisanOpenFileDialog(msg=u"Load Profile for a K202",ext="")
             if  filename == "":
                 return
             self.qmc.reset()
@@ -5048,48 +5166,109 @@ $cupping_notes
             if not f.open(QIODevice.ReadOnly):
                 raise IOError, unicode(f.errorString())
                 return
-            stream = QTextStream(f)
+            import csv
+            csvFile = file(filename,"rb")
+            csvReader = csv.DictReader(csvFile,["Date","Time","T1","T1unit","T2","T2unit"],delimiter='\t')            
+            zero_t = None
+            roastdate = None
+            unit = None
+            for item in csvReader:
+                try:
+                    #set date
+                    if not roastdate:
+                        roastdate = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                        self.qmc.roastdate = roastdate
+                    #set zero
+                    if not zero_t:
+                        date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                        zero = QDateTime()
+                        zero.setDate(date)
+                        zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                        zero_t = zero.toTime_t()
+                    #set temperature mode
+                    if not unit:
+                        unit = item['T1unit']
+                        if unit == u"F" and self.qmc.mode == u"C":
+                            self.qmc.fahrenheitMode()
+                        if unit == u"C" and self.qmc.mode == u"F":
+                            self.qmc.celsiusMode()
+                    #add one measurement
+                    dt = QDateTime()
+                    dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
+                    dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                    self.qmc.timex.append(float(dt.toTime_t() - zero_t))
+                    self.qmc.temp1.append(float(item['T1'].replace(',','.')))
+                    self.qmc.temp2.append(float(item['T2'].replace(',','.')))
+                except ValueError:
+                    pass
+            csvFile.close()
+            #swap temperature curves if needed such that BT is the lower and ET the upper one
+            if (reduce (lambda x,y:x + y, self.qmc.temp2)) > reduce (lambda x,y:x + y, self.qmc.temp1):
+                tmp = self.qmc.temp1
+                self.qmc.temp1 = self.qmc.temp2
+                self.qmc.temp2 = tmp
+            self.qmc.endofx = self.qmc.timex[-1]
+            self.messagelabel.setText(u"K202 file loaded successfully")
+            self.qmc.redraw()
+ 
+        except IOError,e:
+            self.messagelabel.setText(unicode(e))
+            self.qmc.errorlog.append(u"file error in importK202(): " + unicode(e))
+            return            
 
-            #variables to read on the text file are initialized as empty lists
-            self.qmc.timex, self.qmc.temp1, self.qmc.temp2 = [],[],[]
+        except ValueError,e:
+            self.messagelabel.setText(unicode(e))
+            self.qmc.errorlog.append(u"value error in importK202(): " + unicode(e))
+            return
 
-            #Read first line
-            lino = 0
-            line = stream.readLine().trimmed()
-            regex = QRegExp(r"\s")
-            parts = line.split(regex)
-            if parts.count() != 3:
-                raise ValueError, u"invalid header values"
-            else:
-                self.qmc.title = unicode(parts[0])
-            line = stream.readLine().trimmed()
-            line = stream.readLine().trimmed()
-
-            parts = line.split(regex, QString.SkipEmptyParts)
-            if parts[2] == u"F":
-                self.qmc.fahrenheitMode()
-            if parts[2] == u"C":
-                self.qmc.celsiusMode()
-
-            value = float(self.qmc.stringtoseconds(str(parts[8])))
-            zero = value - self.qmc.startend[0]
-
-            self.qmc.timex.append(float(self.qmc.stringtoseconds(str(parts[8]))-zero))
-            self.qmc.temp1.append(float(parts[1])- self.qmc.startend[0])
-            self.qmc.temp2.append(float(parts[4])- self.qmc.startend[0])
-
-            #Read DATA values till the end of the file
-            while not stream.atEnd():
-                line = stream.readLine().trimmed()                   
-                parts = line.split(regex, QString.SkipEmptyParts)
-                if parts.count() != 9:
-                    raise ValueError, u"invalid data values"
-                newtime = float(self.qmc.stringtoseconds(unicode(parts[8])))-zero
-                self.qmc.timex.append(newtime)
-                self.qmc.temp1.append(float(parts[1]))
-                self.qmc.temp2.append(float(parts[4]))
             
-            f.close()
+    def importHH506RA(self):
+        try:
+            filename = aw.ArtisanOpenFileDialog(msg=u"Load Profile for a HH506RA",ext="")
+            if  filename == "":
+                return
+            self.qmc.reset()
+            f = QFile(filename)
+            if not f.open(QIODevice.ReadOnly):
+                raise IOError, unicode(f.errorString())
+                return
+                
+            import csv
+            csvFile = file(filename,"rb")
+            data = csv.reader(csvFile,delimiter='\t')
+            #read file header
+            header = data.next()
+            zero = QDateTime()
+            date = QDate.fromString(header[0].split('Date:')[1],"yyyy'/'MM'/'dd")
+            self.qmc.roastdate = date
+            zero.setDate(date)
+            zero.setTime(QTime.fromString(header[1].split('Time:')[1],"hh':'mm':'ss"))
+            zero_t = zero.toTime_t()
+            #read column headers
+            fields = data.next() 
+            unit = None
+            #read data
+            for row in data:
+                items = zip(fields, row)
+                item = {}
+                for (name, value) in items:
+                    item[name] = value.strip()
+                #set temperature mode
+                if not unit:
+                    unit = item['Unit']
+                    if unit == u"F" and self.qmc.mode == u"C":
+                        self.qmc.fahrenheitMode()
+                    if unit == u"C" and self.qmc.mode == u"F":
+                        self.qmc.celsiusMode()
+                #add one measurement
+                dt = QDateTime()
+                dt.setDate(QDate.fromString(item['Date'],"yyyy'/'MM'/'dd"))
+                dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                self.qmc.timex.append(float(dt.toTime_t() - zero_t))
+                self.qmc.temp1.append(float(item['T1']))
+                self.qmc.temp2.append(float(item['T2']))
+            csvFile.close()
+            #swap temperature curves if needed such that BT is the lower and ET the upper one
             if (reduce (lambda x,y:x + y, self.qmc.temp2)) > reduce (lambda x,y:x + y, self.qmc.temp1):
                 tmp = self.qmc.temp1
                 self.qmc.temp1 = self.qmc.temp2
@@ -5097,7 +5276,7 @@ $cupping_notes
             self.qmc.endofx = self.qmc.timex[-1]
             self.messagelabel.setText(u"HH506RA file loaded successfully")
             self.qmc.redraw()
-
+ 
         except IOError,e:
             self.messagelabel.setText(unicode(e))
             self.qmc.errorlog.append(u"file error in importHH506RA(): " + unicode(e))
@@ -5629,7 +5808,9 @@ class HUDDlg(QDialog):
             aw.HUDfunction = 0
         elif mode == u"thermal":
             aw.HUDfunction = 1
-        string = u"[ET target = " + unicode(self.ETlineEdit.text()) + u"] [BT target = " + unicode(self.BTlineEdit.text()) + u"]"
+        aw.qmc.ETtarget = int(self.ETlineEdit.text())
+        aw.qmc.BTtarget = int(self.BTlineEdit.text())
+        string = u"[ET target = " + unicode(aw.qmc.ETtarget) + u"] [BT target = " + unicode(aw.qmc.BTtarget) + u"]"        
         aw.messagelabel.setText(string)
         self.accept()
 
