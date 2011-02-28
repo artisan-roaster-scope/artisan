@@ -4956,13 +4956,22 @@ $cupping_notes
         st1 = st2 = st3 = 'OK'
         #CHECK CONDITIONS                
         #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
+        #  => ShortDryingPhase
+        #if dry phase time > 6 mins or more than 40% of the total time
+        #  => LongDryingPhase
         st1 = self.defect_estimation_phase(dryphasetime,aw.qmc.statisticsconditions[0],aw.qmc.statisticsconditions[1],ShortDryingPhase,PerfectPhase,LongDryingPhase)
 
         #if mid phase time < 5 minutes
+        #  => ShortTo1CPhase        
+        #if mid phase time > 10 minutes
+        #  => LongTo1CPhase
         st2 = self.defect_estimation_phase(midphasetime,aw.qmc.statisticsconditions[2],aw.qmc.statisticsconditions[3],ShortTo1CPhase,PerfectPhase,LongTo1CPhase)
 
         #if finish phase is less than 3 mins
-        st3 = self.defect_estimation_phase(midphasetime,aw.qmc.statisticsconditions[4],aw.qmc.statisticsconditions[5],ShortFinishPhase,PerfectPhase,LongFinishPhase)
+        #  => ShortFinishPhase
+        #if finish phase is over 6 minutes
+        #  => LongFinishPhase
+        st3 = self.defect_estimation_phase(finishphasetime,aw.qmc.statisticsconditions[4],aw.qmc.statisticsconditions[5],ShortFinishPhase,PerfectPhase,LongFinishPhase)
         
         return (st1,st2,st3)
     
