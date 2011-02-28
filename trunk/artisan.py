@@ -4962,7 +4962,7 @@ $cupping_notes
         st2 = self.defect_estimation_phase(midphasetime,aw.qmc.statisticsconditions[2],aw.qmc.statisticsconditions[3],ShortTo1CPhase,PerfectPhase,LongTo1CPhase)
 
         #if finish phase is less than 3 mins
-        st2 = self.defect_estimation_phase(midphasetime,aw.qmc.statisticsconditions[4],aw.qmc.statisticsconditions[5],ShortFinishPhase,PerfectPhase,LongFinishPhase)
+        st3 = self.defect_estimation_phase(midphasetime,aw.qmc.statisticsconditions[4],aw.qmc.statisticsconditions[5],ShortFinishPhase,PerfectPhase,LongFinishPhase)
         
         return (st1,st2,st3)
     
