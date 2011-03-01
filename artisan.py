@@ -1224,7 +1224,7 @@ class tgraphcanvas(FigureCanvas):
                
     # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
     def stringfromseconds(self, seconds):
-        return "%d:%02d"% divmod(seconds, 60)
+        return "%02d:%02d"% divmod(seconds, 60)
 
     #Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
     #acepted formats: "00:00","0:00"
@@ -2723,7 +2723,6 @@ class ApplicationWindow(QMainWindow):
         self.eNumberSpinBox.setRange(0,20)
         self.connect(self.eNumberSpinBox, SIGNAL("valueChanged(int)"),self.changeEventNumber)
         self.eNumberSpinBox.setMaximumWidth(40)
-        Nevents = len(self.qmc.specialevents)
         self.lineEvent = QLineEdit()
         self.lineEvent.setFocusPolicy(Qt.ClickFocus)
         self.lineEvent.setMinimumWidth(200)
@@ -2734,12 +2733,19 @@ class ApplicationWindow(QMainWindow):
         self.etypeComboBox.setToolTip("Type of event")
         self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.etypeComboBox.addItems(self.etypes)
+        
         self.valueComboBox = QComboBox()
         self.valueComboBox.setToolTip("Value of event")
         self.valueComboBox.setFocusPolicy(Qt.NoFocus)
         self.valueComboBox.addItems(self.qmc.eventsvalues)
         self.valueComboBox.setMaximumWidth(50)
 
+        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
+        self.etimeline = QLineEdit()
+        self.etimeline.setValidator(QRegExpValidator(regextime,self))
+        self.etimeline.setFocusPolicy(Qt.ClickFocus)
+        self.etimeline.setMaximumWidth(50)
+        
         #create EVENT mini button
         self.buttonminiEvent = QPushButton("Update")
         self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
@@ -2748,9 +2754,11 @@ class ApplicationWindow(QMainWindow):
         
         EventsLayout = QHBoxLayout()
         EventsLayout.addWidget(self.eventlabel)
-        EventsLayout.addSpacing(5) 
+        EventsLayout.addSpacing(5)
+        EventsLayout.addWidget(self.etimeline)
+        EventsLayout.addSpacing(5)
         EventsLayout.addWidget(self.lineEvent)  
-        EventsLayout.addSpacing(5)      
+        EventsLayout.addSpacing(5)
         EventsLayout.addWidget(self.etypeComboBox)
         EventsLayout.addSpacing(5)
         EventsLayout.addWidget(self.valueComboBox)
@@ -3076,6 +3084,7 @@ class ApplicationWindow(QMainWindow):
             self.buttonminiEvent.setVisible(True)
             self.lineEvent.setVisible(True)
             self.eNumberSpinBox.setVisible(True)
+            self.etimeline.setVisible(True)
         else:
             self.lineEvent.setVisible(False)
             self.etypeComboBox.setVisible(False)
@@ -3083,6 +3092,7 @@ class ApplicationWindow(QMainWindow):
             self.eventlabel.setVisible(False)
             self.buttonminiEvent.setVisible(False)
             self.eNumberSpinBox.setVisible(False)
+            self.etimeline.setVisible(False)
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):    
@@ -3111,10 +3121,12 @@ class ApplicationWindow(QMainWindow):
         if self.minieventsflag:
             self.eNumberSpinBox.releaseKeyboard()
             self.lineEvent.releaseKeyboard()
+            self.etimeline.releaseKeyboard()
             self.etypeComboBox.releaseKeyboard()
             self.valueComboBox.releaseKeyboard()
             self.lineEvent.clearFocus()            
             self.valueComboBox.clearFocus()
+            self.etimeline.clearFocus()
 
     def moveKbutton(self,command):
         #"Enter" toggles ON/OFF keyboard    
@@ -3384,12 +3396,15 @@ class ApplicationWindow(QMainWindow):
            self.lineEvent.setText("")
            self.valueComboBox.setCurrentIndex(0)
            self.etypeComboBox.setCurrentIndex(0)
+           self.etimeline.setText("")
            return
        if currentevent > lenevents:
            self.eNumberSpinBox.setValue(lenevents)
            return
        else:
            self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
+           time = self.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[currentevent-1]])))
+           self.etimeline.setText(time)
            self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[currentevent-1])
            self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
            etimeindex = self.qmc.specialevents[currentevent-1]
@@ -3404,15 +3419,18 @@ class ApplicationWindow(QMainWindow):
            self.qmc.fig.canvas.draw()
 
 
-    # edit last entry in mini Event editor
+    # update entry in mini Event editor
     def miniEventRecord(self):
         lenevents = self.eNumberSpinBox.value()
         if lenevents:
             self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
             self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
             self.qmc.specialeventsStrings[lenevents-1] = unicode(self.lineEvent.text())
+            self.qmc.specialevents[lenevents-1] = self.qmc.timex.index(self.choice(self.qmc.stringtoseconds(unicode(self.etimeline.text()))))
+
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
+            self.etimeline.clearFocus()                        
 
             self.qmc.redraw()
 
@@ -4580,6 +4598,47 @@ class ApplicationWindow(QMainWindow):
                 painter.drawPixmap(0,0,image)
             else:
                 painter.drawImage(0, 0, image)
+
+    #selects the closest match from the available data in timex for a given number of seconds.
+    #this helps ploting an event in a recorded spot of the graph, so that we don't need to interpolate.
+    #interpolation would cause plotting dimension problems because several graphs depend on the dimension of aw.qmc.timex
+    def choice(self,seconds):
+        if seconds == 0:
+            if self.qmc.startend[0]:
+                return self.qmc.startend[0]
+            else:
+                return self.qmc.timex[0]
+        else:
+            if len(self.qmc.timex):                           #check that time is not empty just in case
+                if self.qmc.timex[-1] < seconds:
+                    self.messagelabel.setText(u"Time out of reach")
+                    return self.qmc.timex[-1]
+
+                #find where given seconds crosses aw.qmc.timex
+                sd = 1000
+                for i in range(len(self.qmc.timex)):                    
+                    if abs(self.qmc.timex[i] - seconds) < sd:
+                        sd = abs(self.qmc.timex[i] - seconds)
+                        index = i
+                        
+                #compare sorroundings to find smallest
+                check1 =  abs(self.qmc.timex[index] - seconds)   
+                check2 =  abs(self.qmc.timex[index-1] - seconds) 
+                if len(self.qmc.timex) > index+1:
+                    check3 =  abs(self.qmc.timex[index+1] - seconds)
+                else:
+                    check3 = abs(self.qmc.timex[index] - seconds)
+                #find smallest of three
+
+                if check1 < check2 and check1 < check3:
+                    return self.qmc.timex[index]
+                elif check2 < check1 and check2 <= check3:
+                    return self.qmc.timex[index-1]
+                elif check3 < check2 and check3 < check1 and len(aw.qmc.timex) > index+1:
+                    return self.qmc.timex[index + 1]
+                else:
+                    return self.qmc.timex[index]
+
  
     def htmlReport(self):
         HTML_REPORT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
@@ -6926,25 +6985,25 @@ class editGraphDlg(QDialog):
             #startend = [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
             #check it does not updates the graph with zero times
             if aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0:
-                aw.qmc.startend[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))   #CHARGE   time
+                aw.qmc.startend[0] = aw.choice(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))   #CHARGE   time
                 aw.qmc.startend[1] = aw.BTfromseconds(aw.qmc.startend[0])                                   #CHARGE   temperature
             if aw.qmc.stringtoseconds(unicode(self.dryedit.text())) > 0:
-                aw.qmc.dryend[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.dryedit.text())))        #DRY END time
+                aw.qmc.dryend[0] = aw.choice(aw.qmc.stringtoseconds(unicode(self.dryedit.text())))        #DRY END time
                 aw.qmc.dryend[1] = aw.BTfromseconds(aw.qmc.dryend[0])                                       #DRY END temperature
             if aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())) > 0: 
-                aw.qmc.varC[0] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))       #1C START time
+                aw.qmc.varC[0] = aw.choice(aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))       #1C START time
                 aw.qmc.varC[1] = aw.BTfromseconds(aw.qmc.varC[0])                                           #1C START temperature            
             if aw.qmc.stringtoseconds(unicode(self.Cendedit.text())) > 0:    
-                aw.qmc.varC[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))         #1C END   time
+                aw.qmc.varC[2] = aw.choice(aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))         #1C END   time
                 aw.qmc.varC[3] = aw.BTfromseconds(aw.qmc.varC[2])                                           #1C END   temperature
             if aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())) > 0:    
-                aw.qmc.varC[4] = self.choice(aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))      #2C START time
+                aw.qmc.varC[4] = aw.choice(aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))      #2C START time
                 aw.qmc.varC[5] = aw.BTfromseconds(aw.qmc.varC[4])                                           #2C START temperature
             if aw.qmc.stringtoseconds(unicode(self.CCendedit.text())) > 0:
-                aw.qmc.varC[6] = self.choice(aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))        #2C END   time
+                aw.qmc.varC[6] = aw.choice(aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))        #2C END   time
                 aw.qmc.varC[7] = aw.BTfromseconds(aw.qmc.varC[6])                                           #2C END   temperature                
             if aw.qmc.stringtoseconds(unicode(self.dropedit.text())) > 0:
-                aw.qmc.startend[2] = self.choice(aw.qmc.stringtoseconds(unicode(self.dropedit.text())))     #DROP     time
+                aw.qmc.startend[2] = aw.choice(aw.qmc.stringtoseconds(unicode(self.dropedit.text())))     #DROP     time
                 aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2]) 
 
             if aw.qmc.phasesbuttonflag:   
@@ -6957,121 +7016,121 @@ class editGraphDlg(QDialog):
             #update events             
             ntlines = len(aw.qmc.specialevents)         #number of events found            
             if ntlines > 0:
-                aw.qmc.specialevents[0] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line1b.text()))))
+                aw.qmc.specialevents[0] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line1b.text()))))
                 aw.qmc.specialeventsStrings[0] = unicode(self.line1.text())
                 aw.qmc.specialeventstype[0] = self.etypeComboBox1.currentIndex()
                 aw.qmc.specialeventsvalue[0] = self.valueComboBox1.currentIndex()
                 
             if ntlines > 1:
-                aw.qmc.specialevents[1] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line2b.text()))))
+                aw.qmc.specialevents[1] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line2b.text()))))
                 aw.qmc.specialeventsStrings[1] = unicode(self.line2.text())
                 aw.qmc.specialeventstype[1] = self.etypeComboBox2.currentIndex()
                 aw.qmc.specialeventsvalue[1] = self.valueComboBox2.currentIndex()
 
             if ntlines > 2:
-                aw.qmc.specialevents[2] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line3b.text()))))
+                aw.qmc.specialevents[2] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line3b.text()))))
                 aw.qmc.specialeventsStrings[2] = unicode(self.line3.text())
                 aw.qmc.specialeventstype[2] = self.etypeComboBox3.currentIndex()
                 aw.qmc.specialeventsvalue[2] = self.valueComboBox3.currentIndex()
             
             if ntlines > 3:
-                aw.qmc.specialevents[3] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line4b.text()))))
+                aw.qmc.specialevents[3] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line4b.text()))))
                 aw.qmc.specialeventsStrings[3] = unicode(self.line4.text())
                 aw.qmc.specialeventstype[3] = self.etypeComboBox4.currentIndex()
                 aw.qmc.specialeventsvalue[3] = self.valueComboBox4.currentIndex()
 
             if ntlines > 4:
-                aw.qmc.specialevents[4] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line5b.text()))))
+                aw.qmc.specialevents[4] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line5b.text()))))
                 aw.qmc.specialeventsStrings[4] = unicode(self.line5.text())
                 aw.qmc.specialeventstype[4] = self.etypeComboBox5.currentIndex()
                 aw.qmc.specialeventsvalue[4] = self.valueComboBox5.currentIndex()
 
             if ntlines > 5:
-                aw.qmc.specialevents[5] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line6b.text()))))
+                aw.qmc.specialevents[5] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line6b.text()))))
                 aw.qmc.specialeventsStrings[5] = unicode(self.line6.text())
                 aw.qmc.specialeventstype[5] = self.etypeComboBox6.currentIndex()
                 aw.qmc.specialeventsvalue[5] = self.valueComboBox6.currentIndex()
 
             if ntlines > 6:
-                aw.qmc.specialevents[6] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line7b.text()))))
+                aw.qmc.specialevents[6] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line7b.text()))))
                 aw.qmc.specialeventsStrings[6] = unicode(self.line7.text())
                 aw.qmc.specialeventstype[6] = self.etypeComboBox7.currentIndex()
                 aw.qmc.specialeventsvalue[6] = self.valueComboBox7.currentIndex()
 
             if ntlines > 7:
-                aw.qmc.specialevents[7] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line8b.text()))))
+                aw.qmc.specialevents[7] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line8b.text()))))
                 aw.qmc.specialeventsStrings[7] = unicode(self.line8.text())
                 aw.qmc.specialeventstype[7] = self.etypeComboBox8.currentIndex()
                 aw.qmc.specialeventsvalue[7] = self.valueComboBox8.currentIndex()
 
             if ntlines > 8:
-                aw.qmc.specialevents[8] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line9b.text()))))
+                aw.qmc.specialevents[8] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line9b.text()))))
                 aw.qmc.specialeventsStrings[8] = unicode(self.line9.text())
                 aw.qmc.specialeventstype[8] = self.etypeComboBox9.currentIndex()
                 aw.qmc.specialeventsvalue[8] = self.valueComboBox9.currentIndex()
 
             if ntlines > 9:
-                aw.qmc.specialevents[9] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line10b.text()))))
+                aw.qmc.specialevents[9] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line10b.text()))))
                 aw.qmc.specialeventsStrings[9] = unicode(self.line10.text())
                 aw.qmc.specialeventstype[9] = self.etypeComboBox10.currentIndex()
                 aw.qmc.specialeventsvalue[9] = self.valueComboBox10.currentIndex()
 
             if ntlines > 10:
-                aw.qmc.specialevents[10] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line11b.text()))))
+                aw.qmc.specialevents[10] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line11b.text()))))
                 aw.qmc.specialeventsStrings[10] = unicode(self.line11.text())
                 aw.qmc.specialeventstype[10] = self.etypeComboBox11.currentIndex()
                 aw.qmc.specialeventsvalue[10] = self.valueComboBox11.currentIndex()
 
             if ntlines > 11:
-                aw.qmc.specialevents[11] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line12b.text()))))
+                aw.qmc.specialevents[11] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line12b.text()))))
                 aw.qmc.specialeventsStrings[11] = unicode(self.line12.text())
                 aw.qmc.specialeventstype[11] = self.etypeComboBox12.currentIndex()
                 aw.qmc.specialeventsvalue[11] = self.valueComboBox12.currentIndex()
 
             if ntlines > 12:
-                aw.qmc.specialevents[12] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line13b.text()))))
+                aw.qmc.specialevents[12] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line13b.text()))))
                 aw.qmc.specialeventsStrings[12] = unicode(self.line13.text())
                 aw.qmc.specialeventstype[12] = self.etypeComboBox13.currentIndex()
                 aw.qmc.specialeventsvalue[12] = self.valueComboBox13.currentIndex()
 
             if ntlines > 13:
-                aw.qmc.specialevents[13] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line14b.text()))))
+                aw.qmc.specialevents[13] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line14b.text()))))
                 aw.qmc.specialeventsStrings[13] = unicode(self.line14.text())
                 aw.qmc.specialeventstype[13] = self.etypeComboBox14.currentIndex()
                 aw.qmc.specialeventsvalue[13] = self.valueComboBox14.currentIndex()
 
             if ntlines > 14:
-                aw.qmc.specialevents[14] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line15b.text()))))
+                aw.qmc.specialevents[14] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line15b.text()))))
                 aw.qmc.specialeventsStrings[14] = unicode(self.line15.text())
                 aw.qmc.specialeventstype[14] = self.etypeComboBox15.currentIndex()
                 aw.qmc.specialeventsvalue[14] = self.valueComboBox15.currentIndex()
 
             if ntlines > 15:
-                aw.qmc.specialevents[15] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line16b.text()))))
+                aw.qmc.specialevents[15] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line16b.text()))))
                 aw.qmc.specialeventsStrings[15] = unicode(self.line16.text())
                 aw.qmc.specialeventstype[15] = self.etypeComboBox16.currentIndex()
                 aw.qmc.specialeventsvalue[15] = self.valueComboBox16.currentIndex()
 
             if ntlines > 16:
-                aw.qmc.specialevents[16] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line17b.text()))))
+                aw.qmc.specialevents[16] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line17b.text()))))
                 aw.qmc.specialeventsStrings[16] = unicode(self.line17.text())
                 aw.qmc.specialeventstype[16] = self.etypeComboBox17.currentIndex()
                 aw.qmc.specialeventsvalue[16] = self.valueComboBox17.currentIndex()
 
             if ntlines > 17:
-                aw.qmc.specialevents[17] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line18b.text()))))
+                aw.qmc.specialevents[17] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line18b.text()))))
                 aw.qmc.specialeventsStrings[17] = unicode(self.line18.text())
                 aw.qmc.specialeventstype[17] = self.etypeComboBox18.currentIndex()
                 aw.qmc.specialeventsvalue[17] = self.valueComboBox18.currentIndex()
 
             if ntlines > 18:
-                aw.qmc.specialevents[18] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line19b.text()))))
+                aw.qmc.specialevents[18] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line19b.text()))))
                 aw.qmc.specialeventsStrings[18] = unicode(self.line19.text())
                 aw.qmc.specialeventstype[18] = self.etypeComboBox19.currentIndex()
                 aw.qmc.specialeventsvalue[18] = self.valueComboBox19.currentIndex()
 
             if ntlines > 19:
-                aw.qmc.specialevents[19] = aw.qmc.timex.index(self.choice(aw.qmc.stringtoseconds(unicode(self.line20b.text()))))
+                aw.qmc.specialevents[19] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line20b.text()))))
                 aw.qmc.specialeventsStrings[19] = unicode(self.line20.text())
                 aw.qmc.specialeventstype[19] = self.etypeComboBox12.currentIndex()
                 aw.qmc.specialeventsvalue[19] = self.valueComboBox20.currentIndex()
@@ -7408,45 +7467,6 @@ class editGraphDlg(QDialog):
             self.etypeComboBox20.setVisible(False)
             self.valueComboBox20.setVisible(False)            
 
-    #selects the closest match from the available data in timex for a given number of seconds.
-    #this helps ploting an event in a recorded spot of the graph, so that we don't need to interpolate.
-    #interpolation would cause plotting dimension problems because several graphs depend on the dimension of aw.qmc.timex
-    def choice(self,seconds):
-        if seconds == 0:
-            if aw.qmc.startend[0]:
-                return aw.qmc.startend[0]
-            else:
-                return aw.qmc.timex[0]
-        else:
-            if len(aw.qmc.timex):                           #check that time is not empty just in case
-                if aw.qmc.timex[-1] < seconds:
-                    aw.messagelabel.setText(u"Time out of reach")
-                    return aw.qmc.timex[-1]
-
-                #find where given seconds crosses aw.qmc.timex
-                sd = 1000
-                for i in range(len(aw.qmc.timex)):                    
-                    if abs(aw.qmc.timex[i] - seconds) < sd:
-                        sd = abs(aw.qmc.timex[i] - seconds)
-                        index = i
-                        
-                #compare sorroundings to find smallest
-                check1 =  abs(aw.qmc.timex[index] - seconds)   
-                check2 =  abs(aw.qmc.timex[index-1] - seconds) 
-                if len(aw.qmc.timex) > index+1:
-                    check3 =  abs(aw.qmc.timex[index+1] - seconds)
-                else:
-                    check3 = abs(aw.qmc.timex[index] - seconds)
-                #find smallest of three
-
-                if check1 < check2 and check1 < check3:
-                    return aw.qmc.timex[index]
-                elif check2 < check1 and check2 <= check3:
-                    return aw.qmc.timex[index-1]
-                elif check3 < check2 and check3 < check1 and len(aw.qmc.timex) > index+1:
-                    return aw.qmc.timex[index + 1]
-                else:
-                    return aw.qmc.timex[index]
             
     # adds a new event to the Dlg
     def addevent(self):
@@ -7820,18 +7840,24 @@ class calculatorDlg(QDialog):
                 # first find the index i where seconds crosses timex
                 if aw.qmc.timex[i] > seconds:
                     break
-            choice1 = aw.qmc.timex[i]   # after or equal
+            choice1 = aw.qmc.timex[i]   # equal
             choice2 = aw.qmc.timex[i-1] # before
+            choice3 = aw.qmc.timex[i+1] # after
 
-            if (choice1-seconds) < (choice2-seconds):  #return closest INDEX 
+            if abs(choice1-seconds) < abs(choice2-seconds) < abs(choice3-seconds):  #return closest INDEX 
                 return i
-            else:
+            elif abs(choice2-seconds) < abs(choice1-seconds) < abs(choice3-seconds):
                 return i-1
+            else:
+                return i+1
 
 
     #calculate rate of change        
     def calculateRC(self):
         if len(aw.qmc.timex)>2:
+            if not len(self.startEdit.text()) or not len(self.endEdit.text()):
+                #empty field
+                return
             starttime = aw.qmc.stringtoseconds(unicode(self.startEdit.text()))
             endtime = aw.qmc.stringtoseconds(unicode(self.endEdit.text()))
 
