@@ -81,7 +81,7 @@ from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainW
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,QStyleFactory)
-from PyQt4.QtCore import (QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
+from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime)
 
 from matplotlib.figure import Figure
@@ -97,6 +97,37 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as Naviga
 platf = unicode(platform.system())
 
 
+#######################################################################################
+#################### Main Application  ################################################
+#######################################################################################
+
+app = QApplication(sys.argv)
+app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
+app.setOrganizationDomain("questm3.groups.google.com")                  #needed by QSettings() to store windows geometry in operating system 
+if platf == 'Windows':
+    app.setWindowIcon(QIcon("artisan.png"))
+#Localization support
+locale = QLocale.system().name()
+qtTranslator = QTranslator()
+#load Qt default translations from QLibrary
+if qtTranslator.load("qt_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)): 
+    app.installTranslator(qtTranslator)
+#find Qt default translations in Mac binary
+elif qtTranslator.load("qt_" + locale, QApplication.applicationDirPath() + "/../translations"):
+    app.installTranslator(qtTranslator)
+#load Artisan translations
+appTranslator = QTranslator()
+#find application translations in source folder
+if appTranslator.load("artisan_" + locale, "translations"): 
+    app.installTranslator(appTranslator)
+#find application translations in Mac binary
+elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() + "/../translations"):
+    app.installTranslator(appTranslator)
+    
+#Constants with translations have to be loaded after the translations
+from const import UIconst
+    
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
 #######################################################################################
@@ -2842,35 +2873,29 @@ class ApplicationWindow(QMainWindow):
         
         ###############  create MENUS 
         
-        if platf == u'Darwin':
-            self.fileMenu = self.menuBar().addMenu("File")
-            self.GraphMenu = self.menuBar().addMenu("Roast")
-            self.ConfMenu = self.menuBar().addMenu("Conf")
-            self.helpMenu = self.menuBar().addMenu("Help")
-        else:
-            self.fileMenu = self.menuBar().addMenu("&File")
-            self.GraphMenu = self.menuBar().addMenu("&Roast")
-            self.ConfMenu = self.menuBar().addMenu("&Conf")
-            self.helpMenu = self.menuBar().addMenu("&Help")
+        self.fileMenu = self.menuBar().addMenu(UIconst.FILE_MENU)
+        self.GraphMenu = self.menuBar().addMenu(UIconst.ROAST_MENU)
+        self.ConfMenu = self.menuBar().addMenu(UIconst.CONF_MENU)
+        self.helpMenu = self.menuBar().addMenu(UIconst.HELP_MENU)
 
         #FILE menu
-        newRoastAction = QAction("New",self)
+        newRoastAction = QAction(UIconst.FILE_MENU_NEW,self)
+        
         newRoastAction.setShortcut(QKeySequence.New)
         self.connect(newRoastAction,SIGNAL("triggered()"),self.newRoast)
         self.fileMenu.addAction(newRoastAction)
         
-        fileLoadAction = QAction("Open...",self)
+        fileLoadAction = QAction(UIconst.FILE_MENU_OPEN,self)
         fileLoadAction.setShortcut(QKeySequence.Open)
         self.connect(fileLoadAction,SIGNAL("triggered()"),self.fileLoad)
         self.fileMenu.addAction(fileLoadAction)
         
-        self.openRecentMenu = self.fileMenu.addMenu("Open Recent")
+        self.openRecentMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_OPENRECENT)
         for i in range(self.MaxRecentFiles):
             self.openRecentMenu.addAction(self.recentFileActs[i])
         self.updateRecentFileActions()
 
-        importMenu = self.fileMenu.addMenu("Import Readings")
-
+        importMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_IMPORT)
 
         fileImportAction = QAction("Artisan...",self)
         self.connect(fileImportAction,SIGNAL("triggered()"),self.fileImport)
@@ -2884,31 +2909,29 @@ class ApplicationWindow(QMainWindow):
         self.connect(importK202Action,SIGNAL("triggered()"),self.importK202)
         importMenu.addAction(importK202Action)
         
-        
-
         self.fileMenu.addMenu(importMenu)    
         
         self.fileMenu.addSeparator()  
 
-        fileSaveAction = QAction("Save",self)
+        fileSaveAction = QAction(UIconst.FILE_MENU_SAVE,self)
         fileSaveAction.setShortcut(QKeySequence.Save)
         self.connect(fileSaveAction,SIGNAL("triggered()"),lambda b=0:self.fileSave(self.curFile))
         self.fileMenu.addAction(fileSaveAction)    
         
-        fileSaveAsAction = QAction("Save As...",self)
+        fileSaveAsAction = QAction(UIconst.FILE_MENU_SAVEAS,self)
         self.connect(fileSaveAsAction,SIGNAL("triggered()"),lambda b=0:self.fileSave(None))
         self.fileMenu.addAction(fileSaveAsAction)  
         
         self.fileMenu.addSeparator()    
         
-        fileExportAction = QAction("Export...",self)
+        fileExportAction = QAction(UIconst.FILE_MENU_EXPORT,self)
         self.connect(fileExportAction,SIGNAL("triggered()"),self.fileExport)
         self.fileMenu.addAction(fileExportAction)  
 
         
         self.fileMenu.addSeparator()    
 
-        saveGraphMenu = self.fileMenu.addMenu("Save Graph Image")
+        saveGraphMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_SAVEGRAPH)
 
         fullsizeAction = QAction("Full Size...",self)
         self.connect(fullsizeAction,SIGNAL("triggered()"),lambda x=0,y=1:self.resize(x,y))
@@ -2933,36 +2956,34 @@ class ApplicationWindow(QMainWindow):
         self.connect(CoffeeGeekActionHigh,SIGNAL("triggered()"),lambda x=500,y=1:self.resize(x,y))
         saveGraphMenuCG.addAction(CoffeeGeekActionHigh)
 
-        htmlAction = QAction("Create HTML Report",self)
+        htmlAction = QAction(UIconst.FILE_MENU_HTMLREPORT,self)
         self.connect(htmlAction,SIGNAL("triggered()"),self.htmlReport)
         htmlAction.setShortcut("Ctrl+R")
         self.fileMenu.addAction(htmlAction)
         
         self.fileMenu.addSeparator()
         
-        printAction = QAction("Print Graph...",self)
+        printAction = QAction(UIconst.FILE_MENU_PRINT,self)
         printAction.setShortcut(QKeySequence.Print)
         self.connect(printAction,SIGNAL("triggered()"),self.filePrint)
         self.fileMenu.addAction(printAction)
-   
-
 
         # ROAST menu
-        editGraphAction = QAction("Roast Properties...",self)
+        editGraphAction = QAction(UIconst.ROAST_MENU_PROPERTIES,self)
         self.connect(editGraphAction ,SIGNAL("triggered()"),self.editgraph)
         self.GraphMenu.addAction(editGraphAction)
 
-        backgroundAction = QAction("Profile Background...",self)
+        backgroundAction = QAction(UIconst.ROAST_MENU_BACKGROUND,self)
         self.connect(backgroundAction,SIGNAL("triggered()"),self.background)
         self.GraphMenu.addAction(backgroundAction)  
 
-        flavorAction = QAction("Cup Profile...",self)
+        flavorAction = QAction(UIconst.ROAST_MENU_CUPPROFILE,self)
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
         self.GraphMenu.addAction(flavorAction)
         
         self.GraphMenu.addSeparator()
         
-        temperatureMenu = self.GraphMenu.addMenu("Temperature")
+        temperatureMenu = self.GraphMenu.addMenu(UIconst.ROAST_MENU_TEMPERATURE)
         
         self.ConvertToFahrenheitAction = QAction("Convert profile to Fahrenheit",self)
         self.connect(self.ConvertToFahrenheitAction,SIGNAL("triggered()"),lambda t="F":self.qmc.convertTemperature(t))
@@ -2989,66 +3010,66 @@ class ApplicationWindow(QMainWindow):
 
         self.GraphMenu.addSeparator()
 
-        calculatorAction = QAction("Calculator",self)
+        calculatorAction = QAction(UIconst.ROAST_MENU_CALCULATOR,self)
         self.connect(calculatorAction,SIGNAL("triggered()"),self.calculator)
         self.GraphMenu.addAction(calculatorAction)   
 
 
         # CONFIGURATION menu
-        deviceAction = QAction("Device...", self)
+        deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
         self.connect(deviceAction,SIGNAL("triggered()"),self.deviceassigment)
         self.ConfMenu.addAction(deviceAction) 
         
-        commportAction = QAction("Serial Port...",self)
+        commportAction = QAction(UIconst.CONF_MENU_SERIALPORT,self)
         self.connect(commportAction,SIGNAL("triggered()"),self.setcommport)
         self.ConfMenu.addAction(commportAction)
 
-        calibrateDelayAction = QAction("Sampling Interval...",self)
+        calibrateDelayAction = QAction(UIconst.CONF_MENU_SAMPLING,self)
         self.connect(calibrateDelayAction,SIGNAL("triggered()"),self.calibratedelay)
         self.ConfMenu.addAction(calibrateDelayAction)
         
-        colorsAction = QAction("Colors...",self)
+        colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
         self.connect(colorsAction,SIGNAL("triggered()"),lambda x=3:self.qmc.changeGColor(x))
         self.ConfMenu.addAction(colorsAction)
 
-        phasesGraphAction = QAction("Phases...",self)
+        phasesGraphAction = QAction(UIconst.CONF_MENU_PHASES,self)
         self.connect(phasesGraphAction,SIGNAL("triggered()"),self.editphases)
         self.ConfMenu.addAction(phasesGraphAction)
         
-        eventsAction = QAction("Events...",self)
+        eventsAction = QAction(UIconst.CONF_MENU_EVENTS,self)
         self.connect(eventsAction,SIGNAL("triggered()"),self.eventsconf)
         self.ConfMenu.addAction(eventsAction)        
        
-        StatisticsAction = QAction("Statistics...",self)
+        StatisticsAction = QAction(UIconst.CONF_MENU_STATISTICS,self)
         self.connect(StatisticsAction,SIGNAL("triggered()"),self.showstatistics)
         self.ConfMenu.addAction(StatisticsAction)     
 
-        WindowconfigAction = QAction("Axis...",self)
+        WindowconfigAction = QAction(UIconst.CONF_MENU_AXES,self)
         self.connect(WindowconfigAction,SIGNAL("triggered()"),self.Windowconfig)
         self.ConfMenu.addAction(WindowconfigAction) 
 
-        autosaveAction = QAction("Autosave...",self)
+        autosaveAction = QAction(UIconst.CONF_MENU_AUTOSAVE,self)
         self.connect(autosaveAction,SIGNAL("triggered()"),self.autosaveconf)
         self.ConfMenu.addAction(autosaveAction) 
 
-        hudAction = QAction("Extras...",self)
+        hudAction = QAction(UIconst.CONF_MENU_EXTRAS,self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.ConfMenu.addAction(hudAction)
 
         # HELP menu
-        helpAboutAction = QAction("About",self)
+        helpAboutAction = QAction(UIconst.HELP_MENU_ABOUT,self)
         self.connect(helpAboutAction,SIGNAL("triggered()"),self.helpAbout)
         self.helpMenu.addAction(helpAboutAction)
 
-        helpDocumentationAction = QAction("Documentation",self)
+        helpDocumentationAction = QAction(UIconst.HELP_MENU_DOCUMENTATION,self)
         self.connect(helpDocumentationAction,SIGNAL("triggered()"),self.helpHelp)
         self.helpMenu.addAction(helpDocumentationAction)        
 
-        KshortCAction = QAction("Show Keybord Shortcuts",self)
+        KshortCAction = QAction(UIconst.HELP_MENU_KEYBOARDSHORTCUTS,self)
         self.connect(KshortCAction,SIGNAL("triggered()"),self.viewKshortcuts)
         self.helpMenu.addAction(KshortCAction)
 
-        errorAction = QAction("Errors",self)
+        errorAction = QAction(UIconst.HELP_MENU_ERRORS,self)
         self.connect(errorAction,SIGNAL("triggered()"),self.viewErrorLog)
         self.helpMenu.addAction(errorAction)
         
@@ -7144,37 +7165,19 @@ class editGraphDlg(QDialog):
         aw.qmc.roaster = unicode(self.roaster.text())
 
         #update weight
-        if unicode(self.weightinedit.text()).isdigit():
-            aw.qmc.weight[0] = int(self.weightinedit.text())
-        else:
-            pass
-        if unicode(self.weightoutedit.text()).isdigit():
-            aw.qmc.weight[1] = int(self.weightoutedit.text())
-        else:
-            pass
+        aw.qmc.weight[0] = float(self.weightinedit.text())
+        aw.qmc.weight[1] = float(self.weightoutedit.text())
         aw.qmc.weight[2] = unicode(self.unitsComboBox.currentText())
         
         #update volume
-        if unicode(self.volumeinedit.text()).isdigit():
-            aw.qmc.volume[0] = int(self.volumeinedit.text())
-        else:
-            pass
-        if unicode(self.volumeoutedit.text()).isdigit():
-            aw.qmc.volume[1] = int(self.volumeoutedit.text())
-        else:
-            pass
+        aw.qmc.volume[0] = float(self.volumeinedit.text())
+        aw.qmc.volume[1] = float(self.volumeoutedit.text())
         aw.qmc.volume[2] = unicode(self.volumeUnitsComboBox.currentText())
 
         #update density
-        if unicode(self.bean_density_weight_edit.text()).isdigit():
-            aw.qmc.density[0] = int(self.bean_density_weight_edit.text())
-        else:
-            pass
+        aw.qmc.density[0] = float(self.bean_density_weight_edit.text())
         aw.qmc.density[1] = unicode(self.bean_density_weightUnitsComboBox.currentText())
-        if unicode(self.bean_density_volume_edit.text()).isdigit():
-            aw.qmc.density[2] = int(self.bean_density_volume_edit.text())
-        else:
-            pass
+        aw.qmc.density[2] = float(self.bean_density_volume_edit.text())
         aw.qmc.density[3] = unicode(self.bean_density_volumeUnitsComboBox.currentText())
 
         #update humidity
@@ -12956,12 +12959,6 @@ class FujiPID(object):
 ###########################################################################################################################################
 ###########################################################################################################################################
 
-app = QApplication(sys.argv)
-app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationDomain("questm3.groups.google.com")                  #needed by QSettings() to store windows geometry in operating system 
-if platf == 'Windows':
-    app.setWindowIcon(QIcon("artisan.png"))
 aw = None # this is to ensure that the variable aw is already defined during application initialization
 aw = ApplicationWindow()
 aw.show()
