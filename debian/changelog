@@ -1,3 +1,9 @@
+artisan (0.3.4-1) maverick; urgency=low
+
+  * new upstream release
+
+ -- lukas <lukas@einfachkaffee.de>  Mon, 28 Feb 2011 23:30:51 +0100
+
 artisan (0.3.3-2) maverick; urgency=low
 
   * Rebuild with some last-minute fixes:
