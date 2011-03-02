@@ -1,6 +1,21 @@
 artisan (0.3.4-1) maverick; urgency=low
 
-  * new upstream release
+  * New upstream release. Upstream changes:
+    - adds ArduinoTC4 device support
+    - adds TE VA18b device support
+    - improved Fuji PXR/PXG support
+    - support for file paths with accent characters
+    - main window layout improvements
+    - improved events visualization and capacity
+    - improved roasting properties dialog
+    - statistic characteristic line as y-label to ensure visibility if
+      axis limits are changed
+    - duplicate recent file names show containing directory
+    - remembers user selected profile path
+    - added DeltaET/DeltaBT filter to make those delta curves more useful
+    - adds volume and bean probe density
+    - adds new command to start/restart roasts
+    - bug fixes
 
  -- lukas <lukas@einfachkaffee.de>  Mon, 28 Feb 2011 23:30:51 +0100
 
