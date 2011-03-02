@@ -7911,15 +7911,7 @@ class calculatorDlg(QDialog):
             self.startEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Aevent-1]]-aw.qmc.startend[0]))        
             self.endEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Bevent-1]]-aw.qmc.startend[0]))
             self.calculateRC()
-            #plot visual line 
-            aw.qmc.resetlines()
-            indexA = aw.qmc.specialevents[Aevent-1]
-            indexB = aw.qmc.specialevents[Bevent-1]
-            aw.qmc.ax.plot(aw.qmc.timex[indexA], aw.qmc.temp2[indexA], "o", color = aw.qmc.palette["text"])
-            aw.qmc.ax.plot(aw.qmc.timex[indexB], aw.qmc.temp2[indexB], "o", color = aw.qmc.palette["text"])
-            aw.qmc.ax.plot([aw.qmc.timex[indexA],aw.qmc.timex[indexB]],[aw.qmc.temp2[indexA],aw.qmc.temp2[indexB]],
-                            linewidth=1, color = aw.qmc.palette["text"],linestyle="-.")
-            aw.qmc.fig.canvas.draw()
+
     
     #calculate rate of change        
     def calculateRC(self):
@@ -7942,7 +7934,8 @@ class calculatorDlg(QDialog):
 
             startindex = self.choice(starttime + aw.qmc.startend[0])
             endindex = self.choice(endtime + aw.qmc.startend[0])
-
+            
+            
             #delta
             deltatime = aw.qmc.timex[endindex] -  aw.qmc.timex[startindex]
             deltatemperature = aw.qmc.temp2[endindex] - aw.qmc.temp2[startindex]
@@ -7958,6 +7951,15 @@ class calculatorDlg(QDialog):
             
             self.result1.setText(string1)        
             self.result2.setText(string2)
+
+            #plot visual line 
+            aw.qmc.resetlines()
+            aw.qmc.ax.plot(aw.qmc.timex[startindex], aw.qmc.temp2[startindex], "o", color = aw.qmc.palette["text"])
+            aw.qmc.ax.plot(aw.qmc.timex[endindex], aw.qmc.temp2[endindex], "o", color = aw.qmc.palette["text"])
+            aw.qmc.ax.plot([aw.qmc.timex[startindex],aw.qmc.timex[endindex]],[aw.qmc.temp2[startindex],aw.qmc.temp2[endindex]],
+                            linewidth=1, color = aw.qmc.palette["text"],linestyle="-.")
+            aw.qmc.fig.canvas.draw()
+            
         else:
             self.result1.setText("No profile found")  
             self.result2.setText("")
