@@ -9,6 +9,7 @@ o matplotlib 1.0.1
 o scipy 0.9.0rc1
 o elixir 0.7.1 (for Green)
 o pyaudio
+o py2app 0.5.3
 
 
 --- 32bit Leopard & Snow Leopard Carbon Setup:
@@ -161,29 +162,10 @@ fetch modulegraph 0.8.2 from repository:
 # python setup.py build
 # python setup.py install
 
-9) py2app (0.5.3 from Repository)
+9) py2app (0.5.3 from Dist)
 
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386"
-export FFLAGS="-m32"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386"
-export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
+# sudo easy_install -U py2app
 
-fetch source from repository
-# hg clone https://bitbucket.org/ronaldoussoren/py2app
-# cd py2app
-
-add the following lines on the head of the setup.py file
-# vi setup.py
-from distutils import sysconfig
-their_parse_makefile = sysconfig.parse_makefile
-def my_parse_makefile(filename, g):
-    their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.5'
-sysconfig.parse_makefile = my_parse_makefile
-
-# python setup.py build
-# python setup.py install
 
 
 10) scipy-0.8.0

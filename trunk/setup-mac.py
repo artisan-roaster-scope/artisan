@@ -27,7 +27,13 @@ DATA_FILES = [
     "index.html",
     "LICENSE.txt",
     ("../PlugIns/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib'])
+    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
+    ("../translations", [QTDIR + r'/translations/qt_de.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_es.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_fr.qm']),
+    ("../translations", [r"translations/artisan_de.qm"]),
+    ("../translations", [r"translations/artisan_es.qm"]),
+    ("../translations", [r"translations/artisan_fr.qm"]),
   ]
   
 OPTIONS = {
