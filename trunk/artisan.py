@@ -104,7 +104,7 @@ platf = unicode(platform.system())
 app = QApplication(sys.argv)
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationDomain("questm3.groups.google.com")                  #needed by QSettings() to store windows geometry in operating system 
+app.setOrganizationDomain("http://code.google.com/p/artisan")           #needed by QSettings() to store windows geometry in operating system 
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
 #Localization support
@@ -7758,6 +7758,20 @@ class calculatorDlg(QDialog):
         self.connect(self.startEdit,SIGNAL("editingFinished()"),self.calculateRC)
         self.connect(self.endEdit,SIGNAL("editingFinished()"),self.calculateRC)
 
+        nevents = len(aw.qmc.specialevents)
+        events_found = ["Event #0"]
+        for i in range(nevents):
+            events_found.append("Event #" + str(i+1))
+            
+        self.eventAComboBox = QComboBox()
+        self.eventAComboBox.addItems(events_found)
+        self.connect(self.eventAComboBox,SIGNAL("currentIndexChanged(int)"),self.calcEventRC)
+
+        self.eventBComboBox = QComboBox()
+        self.eventBComboBox.addItems(events_found)
+        self.connect(self.eventBComboBox,SIGNAL("currentIndexChanged(int)"),self.calcEventRC)
+
+
         #TEMPERATURE CONVERSION
         flabel = QLabel("Fahrenheit")
         clabel = QLabel("Celsius")
@@ -7769,21 +7783,40 @@ class calculatorDlg(QDialog):
         self.connect(self.ceEdit,SIGNAL("editingFinished()"),lambda x="CtoF":self.convertTemp(x))
 
         #WEIGHT CONVERSION
-        self.inComboBox = QComboBox()
-        self.inComboBox.addItems(["g","Kg","lb"])
-        self.inComboBox.setMaximumWidth(50)
-        self.outComboBox = QComboBox()
-        self.outComboBox.setMaximumWidth(50)
-        self.outComboBox.addItems(["g","Kg","lb"])
-        self.outComboBox.setCurrentIndex(2)
-        self.inEdit = QLineEdit()
-        self.outEdit = QLineEdit()
-        self.inEdit.setMaximumWidth(60)
-        self.outEdit.setMaximumWidth(60)
-        self.inEdit.setValidator(QDoubleValidator(0., 99999., 2, self.inEdit))
-        self.outEdit.setValidator(QDoubleValidator(0., 99999., 2, self.outEdit))
-        self.connect(self.inEdit,SIGNAL("editingFinished()"),lambda x="ItoO":self.convertWeight(x))
-        self.connect(self.outEdit,SIGNAL("editingFinished()"),lambda x="OtoI":self.convertWeight(x))
+        self.WinComboBox = QComboBox()
+        weightunits = ["g","Kg","lb"]
+        self.WinComboBox.addItems(weightunits)
+        self.WinComboBox.setMaximumWidth(50)
+        self.WoutComboBox = QComboBox()
+        self.WoutComboBox.setMaximumWidth(50)
+        self.WoutComboBox.addItems(weightunits)
+        self.WoutComboBox.setCurrentIndex(2)
+        self.WinEdit = QLineEdit()
+        self.WoutEdit = QLineEdit()
+        self.WinEdit.setMaximumWidth(60)
+        self.WoutEdit.setMaximumWidth(60)
+        self.WinEdit.setValidator(QDoubleValidator(0., 99999., 2, self.WinEdit))
+        self.WoutEdit.setValidator(QDoubleValidator(0., 99999., 2, self.WoutEdit))
+        self.connect(self.WinEdit,SIGNAL("editingFinished()"),lambda x="ItoO":self.convertWeight(x))
+        self.connect(self.WoutEdit,SIGNAL("editingFinished()"),lambda x="OtoI":self.convertWeight(x))
+
+        #VOLUME CONVERSION
+        self.VinComboBox = QComboBox()
+        volumeunits = ["liter","gallon","quart","pint","cup"]
+        self.VinComboBox.addItems(volumeunits )
+        self.VinComboBox.setMaximumWidth(50)
+        self.VoutComboBox = QComboBox()
+        self.VoutComboBox.setMaximumWidth(50)
+        self.VoutComboBox.addItems(volumeunits )
+        self.VoutComboBox.setCurrentIndex(4)
+        self.VinEdit = QLineEdit()
+        self.VoutEdit = QLineEdit()
+        self.VinEdit.setMaximumWidth(60)
+        self.VoutEdit.setMaximumWidth(60)
+        self.VinEdit.setValidator(QDoubleValidator(0., 99999., 2, self.VinEdit))
+        self.VoutEdit.setValidator(QDoubleValidator(0., 99999., 2, self.VoutEdit))
+        self.connect(self.VinEdit,SIGNAL("editingFinished()"),lambda x="ItoO":self.convertVolume(x))
+        self.connect(self.VoutEdit,SIGNAL("editingFinished()"),lambda x="OtoI":self.convertVolume(x))
         
         #LAYOUTS
         #Rate of chage
@@ -7792,11 +7825,15 @@ class calculatorDlg(QDialog):
         calrcLayout.addWidget(endlabel,0,1)
         calrcLayout.addWidget(self.startEdit,1,0)
         calrcLayout.addWidget(self.endEdit,1,1)
+        calrcLayout.addWidget(self.eventAComboBox ,2,0)
+        calrcLayout.addWidget(self.eventBComboBox ,2,1)
+        
         
         rclayout = QVBoxLayout()
         rclayout.addWidget(self.result1,0)
         rclayout.addWidget(self.result2,1)
         rclayout.addLayout(calrcLayout,2)
+
 
         #temperature conversion
         tempLayout = QGridLayout()        
@@ -7807,10 +7844,18 @@ class calculatorDlg(QDialog):
 
         #weight conversions
         weightLayout = QHBoxLayout()
-        weightLayout.addWidget(self.inComboBox,0)
-        weightLayout.addWidget(self.inEdit,1)
-        weightLayout.addWidget(self.outEdit,2)
-        weightLayout.addWidget(self.outComboBox,3)
+        weightLayout.addWidget(self.WinComboBox,0)
+        weightLayout.addWidget(self.WinEdit,1)
+        weightLayout.addWidget(self.WoutEdit,2)
+        weightLayout.addWidget(self.WoutComboBox,3)
+
+        #volume conversions
+        volumeLayout = QHBoxLayout()
+        volumeLayout.addWidget(self.VinComboBox,0)
+        volumeLayout.addWidget(self.VinEdit,1)
+        volumeLayout.addWidget(self.VoutEdit,2)
+        volumeLayout.addWidget(self.VoutComboBox,3)
+
 
         RoCGroup = QGroupBox("Rate of Change")
         RoCGroup.setLayout(rclayout)
@@ -7821,12 +7866,16 @@ class calculatorDlg(QDialog):
         weightConvGroup = QGroupBox("Weight Conversion")
         weightConvGroup.setLayout(weightLayout)
 
+        volumeConvGroup = QGroupBox("Volume Conversion")
+        volumeConvGroup.setLayout(volumeLayout)
+
         #main
         mainlayout = QVBoxLayout()
         mainlayout.setSpacing(10)
         mainlayout.addWidget(RoCGroup)
         mainlayout.addWidget(tempConvGroup)
         mainlayout.addWidget(weightConvGroup)
+        mainlayout.addWidget(volumeConvGroup)
         mainlayout.addStretch()  
         
         self.setLayout(mainlayout)
@@ -7854,7 +7903,24 @@ class calculatorDlg(QDialog):
             else:
                 return i+1
 
-
+    def calcEventRC(self):
+        nevents = len(aw.qmc.specialevents)
+        Aevent = int(self.eventAComboBox.currentIndex())
+        Bevent = int(self.eventBComboBox.currentIndex())
+        if Aevent <= nevents and Bevent <= nevents and Aevent and Bevent:      
+            self.startEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Aevent-1]]-aw.qmc.startend[0]))        
+            self.endEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Bevent-1]]-aw.qmc.startend[0]))
+            self.calculateRC()
+            #plot visual line 
+            aw.qmc.resetlines()
+            indexA = aw.qmc.specialevents[Aevent-1]
+            indexB = aw.qmc.specialevents[Bevent-1]
+            aw.qmc.ax.plot(aw.qmc.timex[indexA], aw.qmc.temp2[indexA], "o", color = aw.qmc.palette["text"])
+            aw.qmc.ax.plot(aw.qmc.timex[indexB], aw.qmc.temp2[indexB], "o", color = aw.qmc.palette["text"])
+            aw.qmc.ax.plot([aw.qmc.timex[indexA],aw.qmc.timex[indexB]],[aw.qmc.temp2[indexA],aw.qmc.temp2[indexB]],
+                            linewidth=1, color = aw.qmc.palette["text"],linestyle="-.")
+            aw.qmc.fig.canvas.draw()
+    
     #calculate rate of change        
     def calculateRC(self):
         if len(aw.qmc.timex)>2:
@@ -7870,39 +7936,25 @@ class calculatorDlg(QDialog):
                 return
 
             if  endtime > aw.qmc.timex[-1] or endtime < starttime:
-                self.result1.setText("time profile error")
+                self.result1.setText("Error: End time smaller than Start time")
                 self.result2.setText("")
                 return
 
-            #if profile has a CHARGE time (time is referenced to charge time)
-            if aw.qmc.startend[0]:
-                starttime += aw.qmc.startend[0]
-                endtime += aw.qmc.startend[0]
-                startindex = self.choice(starttime)
-                endindex = self.choice(endtime)
-                
-            #if profile does not have a CHARGE time (time is absolute time)   
-            else:
-                startindex = self.choice(starttime)
-                endindex = self.choice(endtime)
+            startindex = self.choice(starttime + aw.qmc.startend[0])
+            endindex = self.choice(endtime + aw.qmc.startend[0])
 
             #delta
-            deltatime = float(aw.qmc.timex[endindex] -  aw.qmc.timex[startindex])
-            deltatemperature = float(aw.qmc.temp2[endindex] - aw.qmc.temp2[startindex])
+            deltatime = aw.qmc.timex[endindex] -  aw.qmc.timex[startindex]
+            deltatemperature = aw.qmc.temp2[endindex] - aw.qmc.temp2[startindex]
             if deltatime == 0:
                 deltaseconds = 0
             else:
                 deltaseconds = deltatemperature/deltatime
             deltaminutes = deltaseconds*60.
-            
-            if aw.qmc.startend[0]:
-                string1 = ( u"Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]-aw.qmc.startend[0]) +
-                            u" to " + aw.qmc.stringfromseconds(aw.qmc.timex[endindex]-aw.qmc.startend[0] ))
-            else:
-                string1 = (u"Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]) + u" to " +
-                           aw.qmc.stringfromseconds(aw.qmc.timex[endindex]))
-                
-            string2 = u"deg/sec = " + u"%.2f"%(deltaseconds) + u"    deg/min = " + u"%.2f"%(deltaminutes)
+        
+            string1 = ( u"Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- aw.qmc.startend[0]) +
+                        u" to " + aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- aw.qmc.startend[0]))
+            string2 = u"deg/sec = " + u"%.2f"%(deltaseconds) + u"    deg/min = <b>" + u"%.2f<\b>"%(deltaminutes)
             
             self.result1.setText(string1)        
             self.result2.setText(string2)
@@ -7926,20 +7978,42 @@ class calculatorDlg(QDialog):
         convtable = [
                         [1.,           0.001,      0.00220462262     ],    # g
                         [1000,         1.,         2.205             ],    # Kg
-                        [453.591999,   0.45359237, 1.                ]     #lb
+                        [453.591999,   0.45359237, 1.                ]     # lb
                     ]
         
         if x == "ItoO":
-           inx = float(unicode(self.inEdit.text()))
-           outx = inx*convtable[self.inComboBox.currentIndex()][self.outComboBox.currentIndex()]
-           self.outEdit.setText(u"%.2f"%outx)
+           inx = float(unicode(self.WinEdit.text()))
+           outx = inx*convtable[self.WinComboBox.currentIndex()][self.WoutComboBox.currentIndex()]
+           self.WoutEdit.setText(u"%.2f"%outx)
             
         elif x == "OtoI":
-           outx = float(unicode(self.outEdit.text()))
-           inx = outx*convtable[self.outComboBox.currentIndex()][self.inComboBox.currentIndex()]
-           self.inEdit.setText(u"%.2f"%inx)
+           outx = float(unicode(self.WoutEdit.text()))
+           inx = outx*convtable[self.WoutComboBox.currentIndex()][self.WinComboBox.currentIndex()]
+           self.WinEdit.setText(u"%.2f"%inx)
 
-
+    def convertVolume(self,x):
+                        #liter          gal             qt              pt              cup
+        convtable = [
+                        [1.,            0.26417205,     1.05668821,     2.11337643,     4.22675284 ],    # liter
+                        [3.78541181,    1.,             4.,             8.,             16         ],    # gallon
+                        [0.94635294,    0.25,           1.,             2.,             4.         ],    # quart
+                        [0.47317647,    0.125,          0.5,            1.,             2.         ],    # pint
+                        [0.23658823,    0.0625,         0.25,           0.5,            1.         ]     # cup
+                    ]
+        
+        if x == "ItoO":
+           inx = float(unicode(self.VinEdit.text()))
+           outx = inx*convtable[self.VinComboBox.currentIndex()][self.VoutComboBox.currentIndex()]
+           self.VoutEdit.setText(u"%.2f"%outx)
+            
+        elif x == "OtoI":
+           outx = float(unicode(self.VoutEdit.text()))
+           inx = outx*convtable[self.VoutComboBox.currentIndex()][self.VinComboBox.currentIndex()]
+           self.VinEdit.setText(u"%.2f"%inx)
+           
+    def closeEvent(self, event):    
+        aw.qmc.redraw()        
+                         
 ##########################################################################
 #####################  EVENTS CONFIGURATION DLG     ######################
 ##########################################################################
