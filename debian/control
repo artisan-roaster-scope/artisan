@@ -1,5 +1,5 @@
 Source: artisan
-Section: unknown
+Section: science
 Priority: extra
 Maintainer: Lukas Kolbe <lukas@einfachkaffee.de>
 Build-Depends: debhelper (>= 7.0.50~), python-support, python (>=2.6)
