@@ -6,5 +6,6 @@ export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2
 pylupdate4 artisan.pro
 lrelease -verbose artisan.pro
 
+# distribution
 rm -rf build dist
 python setup-mac.py py2app

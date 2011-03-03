@@ -114,6 +114,8 @@ VERSION HISTORY
 
 v0.3.5 (??)
 - improved CSV import/export
+- adds localization support
+- 
 
 v0.3.4 (28.02.2011)
 - adds ArduinoTC4 device support
