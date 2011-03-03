@@ -80,7 +80,8 @@ from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainW
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
-                         QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,QStyleFactory)
+                         QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
+                         QStyleFactory,QTableWidget,QTableWidgetItem)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime)
 
@@ -196,6 +197,8 @@ class tgraphcanvas(FigureCanvas):
         
         self.fig = Figure(facecolor=u'lightgrey')
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
+        #legend location
+        self.legendloc = 2
         self.fig.subplots_adjust(
             # all values in percent
             top=0.93, # the top of the subplots of the figure (default: 0.9)
@@ -365,7 +368,7 @@ class tgraphcanvas(FigureCanvas):
         # add legend to plot.
         handles = [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2]
         labels = [u"ET",u"BT",u"DeltaET",u"DeltaBT"]
-        self.ax.legend(handles,labels,loc=2,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+        self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
         # draw of the Figure
         self.fig.canvas.draw()
@@ -1057,7 +1060,7 @@ class tgraphcanvas(FigureCanvas):
             labels.append(u"DeltaBT")
                     
         #write legend
-        self.ax.legend(handles,labels,loc=2,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+        self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
     
         #Add markers for CHARGE
         if self.startend[0]:
@@ -2032,28 +2035,31 @@ class tgraphcanvas(FigureCanvas):
         #index number            
         i = len(self.timex)-1
         if i > 0:
-            #Nevents is zero when recording first event. Therefore check up to 20 (max allowed).
-            if Nevents < 20:
-                self.specialevents.append(i)
-                temp = unicode(self.temp2[i])
-                time = self.stringfromseconds(self.timex[i])
-                message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
-                aw.messagelabel.setText(message)
-                #write label in mini recorder if flag checked
-                if aw.minieventsflag:
-                    aw.eNumberSpinBox.setValue(Nevents+1)
-                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                    aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                self.redraw()
+            if self.startend[0]:
+                #Nevents is zero when recording first event. Therefore check up to 20 (max allowed).
+                if Nevents < 20:
+                    self.specialevents.append(i)
+                    temp = unicode(self.temp2[i])
+                    time = self.stringfromseconds(self.timex[i])
+                    message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
+                    aw.messagelabel.setText(message)
+                    #write label in mini recorder if flag checked
+                    if aw.minieventsflag:
+                        aw.eNumberSpinBox.setValue(Nevents+1)
+                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                        aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                        aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+                    self.redraw()
+                else:
+                    aw.messagelabel.setText("No more than 20 events are allowed")
+                    aw.eNumberSpinBox.setVisible(False)
+                    aw.etypeComboBox.setVisible(False)
+                    aw.valueComboBox.setVisible(False)
+                    aw.eventlabel.setVisible(False)
+                    aw.buttonminiEvent.setVisible(False)
+                    aw.lineEvent.setVisible(False)
             else:
-                aw.messagelabel.setText("No more than 20 events are allowed")
-                aw.eNumberSpinBox.setVisible(False)
-                aw.etypeComboBox.setVisible(False)
-                aw.valueComboBox.setVisible(False)
-                aw.eventlabel.setVisible(False)
-                aw.buttonminiEvent.setVisible(False)
-                aw.lineEvent.setVisible(False)
+               aw.messagelabel.setText("Events are only allowed after [CHARGE]")     
         else:
             aw.messagelabel.setText("No profile found")
             
@@ -2750,6 +2756,7 @@ class ApplicationWindow(QMainWindow):
         self.eNumberSpinBox = QSpinBox()
         
         self.eNumberSpinBox.setFocusPolicy(Qt.NoFocus)
+        self.eNumberSpinBox.setAlignment(Qt.AlignCenter)
         self.eNumberSpinBox.setToolTip("Number of events found")
         self.eNumberSpinBox.setRange(0,20)
         self.connect(self.eNumberSpinBox, SIGNAL("valueChanged(int)"),self.changeEventNumber)
@@ -3433,7 +3440,12 @@ class ApplicationWindow(QMainWindow):
            return
        else:
            self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
-           time = self.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[currentevent-1]])))
+           #time from origin in seconds
+           absolutetime = int(round(aw.qmc.timex[aw.qmc.specialevents[currentevent-1]]))
+           #time from [START]. When saving in minieventrecord(), we will need to convert to absoluet time
+           relativetime = absolutetime - self.qmc.startend[0]
+           #display relative time
+           time = self.qmc.stringfromseconds(relativetime)
            self.etimeline.setText(time)
            self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[currentevent-1])
            self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
@@ -3456,7 +3468,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
             self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
             self.qmc.specialeventsStrings[lenevents-1] = unicode(self.lineEvent.text())
-            self.qmc.specialevents[lenevents-1] = self.qmc.timex.index(self.choice(self.qmc.stringtoseconds(unicode(self.etimeline.text()))))
+            #relative time
+            relativetime = self.qmc.stringtoseconds(unicode(self.etimeline.text()))
+            absolutetime = relativetime + self.qmc.startend[0]
+            self.qmc.specialevents[lenevents-1] = self.qmc.timex.index(self.choice(absolutetime))
 
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
@@ -4485,6 +4500,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ylimit_min = settings.value("ymin",self.qmc.ylimit_min).toInt()[0]            
             self.qmc.ylimit = settings.value("ymax",self.qmc.ylimit).toInt()[0]
             self.qmc.keeptimeflag = settings.value("keepTimeLimit",self.qmc.keeptimeflag).toInt()[0]
+            self.qmc.legendloc = settings.value("legendloc",self.qmc.legendloc).toInt()[0]
             settings.endGroup()
             settings.beginGroup("RoastProperties")
             self.qmc.operator = unicode(settings.value("operator",self.qmc.operator).toString())
@@ -4591,6 +4607,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ymax",self.qmc.ylimit)
             settings.setValue("ymin",self.qmc.ylimit_min)
             settings.setValue("keepTimeLimit",self.qmc.keeptimeflag)
+            settings.setValue("legendloc",self.qmc.legendloc )
             settings.endGroup()
             settings.beginGroup("RoastProperties")
             settings.setValue("operator",self.qmc.operator)
@@ -5984,13 +6001,21 @@ class editGraphDlg(QDialog):
         self.dropedit.setMaximumWidth(50)
         droplabel.setBuddy(self.dropedit)
         
-        # EVENTS 
+        # EVENTS
+        ###################################################################
+        #new smaller/smarter table UNDER WORK for holding infinite events
+        self.eventtable = QTableWidget()
+        self.updateEventTable()
+        ###################################################################
+            
+            
+        
         ntlines = len(aw.qmc.specialevents)         #number of events found
         nslines = len(aw.qmc.specialeventsStrings)  #number of descriptions for each event
 
         self.line1b = QLineEdit()
         if ntlines > 0 and nslines > 0:
-            time1 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[0]])))
+            time1 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[0]]-aw.qmc.startend[0])))
             self.line1b.setText(time1)
         else:
             self.line1b.setText("00:00")
@@ -6009,7 +6034,7 @@ class editGraphDlg(QDialog):
             
         self.line2b = QLineEdit()
         if ntlines > 1 and nslines > 1:
-            time2 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[1]])))
+            time2 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[1]]-aw.qmc.startend[0])))
             self.line2b.setText(time2)
         else:
             self.line2b.setText("00:00")
@@ -6028,7 +6053,7 @@ class editGraphDlg(QDialog):
             
         self.line3b = QLineEdit()
         if ntlines > 2 :
-            time3 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[2]])))
+            time3 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[2]]-aw.qmc.startend[0])))
             self.line3b.setText(time3)
         else:
             self.line3b.setText("00:00")            
@@ -6047,7 +6072,7 @@ class editGraphDlg(QDialog):
         
         self.line4b = QLineEdit()
         if ntlines > 3 and nslines > 3:
-            time4 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[3]])))
+            time4 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[3]]-aw.qmc.startend[0])))
             self.line4b.setText(time4)
         else:
             self.line4b.setText("00:00")            
@@ -6066,7 +6091,7 @@ class editGraphDlg(QDialog):
     
         self.line5b = QLineEdit()
         if ntlines > 4 and nslines > 4:
-            time5 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[4]])))
+            time5 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[4]]-aw.qmc.startend[0])))
             self.line5b.setText(time5)
         else:
             self.line5b.setText("00:00")            
@@ -6085,7 +6110,7 @@ class editGraphDlg(QDialog):
         
         self.line6b = QLineEdit()
         if ntlines > 5 and nslines > 5:
-            time6 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[5]])))
+            time6 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[5]]-aw.qmc.startend[0])))
             self.line6b.setText(time6)
         else:
             self.line6b.setText("00:00")            
@@ -6104,7 +6129,7 @@ class editGraphDlg(QDialog):
         
         self.line7b = QLineEdit()
         if ntlines > 6 and nslines > 6:
-            time7 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[6]])))
+            time7 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[6]]-aw.qmc.startend[0])))
             self.line7b.setText(time7)
         else:
             self.line7b.setText("00:00") 
@@ -6123,7 +6148,7 @@ class editGraphDlg(QDialog):
             
         self.line8b = QLineEdit()
         if ntlines > 7 and nslines > 7:
-           time8 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[7]])))
+           time8 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[7]]-aw.qmc.startend[0])))
            self.line8b.setText(time8)
         else:
             self.line8b.setText("00:00") 
@@ -6142,7 +6167,7 @@ class editGraphDlg(QDialog):
             
         self.line9b = QLineEdit()
         if ntlines > 8 and nslines > 8:
-            time9 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[8]])))
+            time9 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[8]]-aw.qmc.startend[0])))
             self.line9b.setText(time9)
         else:
             self.line9b.setText("00:00")
@@ -6161,7 +6186,7 @@ class editGraphDlg(QDialog):
             
         self.line10b = QLineEdit()
         if ntlines > 9 and nslines > 9:
-            time10 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[9]])))
+            time10 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[9]]-aw.qmc.startend[0])))
             self.line10b.setText(time10)
         else:
             self.line10b.setText("00:00") 
@@ -6180,7 +6205,7 @@ class editGraphDlg(QDialog):
 
         self.line11b = QLineEdit()
         if ntlines > 10 and nslines > 10:
-            time11 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[10]])))
+            time11 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[10]]-aw.qmc.startend[0])))
             self.line11b.setText(time11)
         else:
             self.line11b.setText("00:00") 
@@ -6199,7 +6224,7 @@ class editGraphDlg(QDialog):
 
         self.line12b = QLineEdit()
         if ntlines > 11 and nslines > 11:
-            time12 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[11]])))
+            time12 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[11]]-aw.qmc.startend[0])))
             self.line12b.setText(time12)
         else:
             self.line12b.setText("00:00") 
@@ -6218,7 +6243,7 @@ class editGraphDlg(QDialog):
 
         self.line13b = QLineEdit()
         if ntlines > 12 and nslines > 12:
-            time13 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[12]])))
+            time13 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[12]]-aw.qmc.startend[0])))
             self.line13b.setText(time13)
         else:
             self.line13b.setText("00:00") 
@@ -6237,7 +6262,7 @@ class editGraphDlg(QDialog):
 
         self.line14b = QLineEdit()
         if ntlines > 13 and nslines > 13:
-            time14 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[13]])))
+            time14 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[13]]-aw.qmc.startend[0])))
             self.line14b.setText(time14)
         else:
             self.line14b.setText("00:00") 
@@ -6256,7 +6281,7 @@ class editGraphDlg(QDialog):
 
         self.line15b = QLineEdit()
         if ntlines > 14 and nslines > 14:
-            time15 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[14]])))
+            time15 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[14]]-aw.qmc.startend[0])))
             self.line15b.setText(time15)
         else:
             self.line15b.setText("00:00") 
@@ -6275,7 +6300,7 @@ class editGraphDlg(QDialog):
         
         self.line16b = QLineEdit()
         if ntlines > 15 and nslines > 15:
-            time16 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[15]])))
+            time16 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[15]]-aw.qmc.startend[0])))
             self.line16b.setText(time16)
         else:
             self.line16b.setText("00:00") 
@@ -6294,7 +6319,7 @@ class editGraphDlg(QDialog):
 
         self.line17b = QLineEdit()
         if ntlines > 16 and nslines > 16:
-            time17 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[16]])))
+            time17 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[16]]-aw.qmc.startend[0])))
             self.line17b.setText(time17)
         else:
             self.line17b.setText("00:00") 
@@ -6313,7 +6338,7 @@ class editGraphDlg(QDialog):
 
         self.line18b = QLineEdit()
         if ntlines > 17 and nslines > 17:
-            time18 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[17]])))
+            time18 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[17]]-aw.qmc.startend[0])))
             self.line18b.setText(time18)
         else:
             self.line18b.setText("00:00") 
@@ -6332,7 +6357,7 @@ class editGraphDlg(QDialog):
 
         self.line19b = QLineEdit()
         if ntlines > 18 and nslines > 18:
-            time19 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[18]])))
+            time19 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[18]]-aw.qmc.startend[0])))
             self.line19b.setText(time19)
         else:
             self.line19b.setText("00:00") 
@@ -6351,7 +6376,7 @@ class editGraphDlg(QDialog):
 
         self.line20b = QLineEdit()
         if ntlines > 19 and nslines > 19:
-            time20 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[19]])))
+            time20 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[19]]-aw.qmc.startend[0])))
             self.line20b.setText(time20)
         else:
             self.line20b.setText("00:00") 
@@ -6898,7 +6923,7 @@ class editGraphDlg(QDialog):
         allEventsLayout = QVBoxLayout()
         allEventsLayout.addLayout(timeLayoutBox)
         
-        timeGroupLayout = QGroupBox("Times")
+        timeGroupLayout = QGroupBox("Absolute Times")
         timeGroupLayout.setLayout(allEventsLayout)
 
         #tab 1
@@ -6927,6 +6952,11 @@ class editGraphDlg(QDialog):
         tab4Layout.addLayout(events2Layout)
         tab4Layout.addLayout(event2buttonLayout)
         tab4Layout.addStretch()  
+
+        #temporary
+        tab5Layout = QVBoxLayout()
+        tab5Layout.addWidget(self.eventtable)
+        
         
         #tabwidget
         self.TabWidget = QTabWidget()
@@ -6946,6 +6976,10 @@ class editGraphDlg(QDialog):
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
         self.TabWidget.addTab(C4Widget,"Events 11-20")
+
+        C5Widget = QWidget()
+        C5Widget.setLayout(tab5Layout)
+        self.TabWidget.addTab(C5Widget,"Testing new format")
         
         #incorporate layouts
         totallayout = QVBoxLayout()
@@ -6957,6 +6991,38 @@ class editGraphDlg(QDialog):
                
         self.setLayout(totallayout)
 
+
+    def updateEventTable(self):
+        self.eventtable.clear()
+        nevents = len(aw.qmc.specialevents)        
+        self.eventtable.setRowCount(nevents)
+        self.eventtable.setColumnCount(4)
+        self.eventtable.setHorizontalHeaderLabels(["Time","Description","Type","Value"])
+        self.eventtable.setAlternatingRowColors(True)
+        self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
+        #self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
+        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
+        #populate table
+        for i in range(nevents):
+            #create widgets
+            typeComboBox = QComboBox()
+            typeComboBox.addItems(aw.qmc.etypes)
+            typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
+            valueComboBox = QComboBox()
+            valueComboBox.addItems(aw.qmc.eventsvalues)
+            valueComboBox.setCurrentIndex(aw.qmc.specialeventsvalue[i])
+            lineb = QLineEdit()
+            time = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.startend[0])))
+            lineb.setText(time)
+            lineb.setValidator(QRegExpValidator(regextime,self))
+            line = QLineEdit(aw.qmc.specialeventsStrings[0])
+
+            #add widgets
+            self.eventtable.setCellWidget(i,0,lineb)
+            self.eventtable.setCellWidget(i,1,line)
+            self.eventtable.setCellWidget(i,2,typeComboBox)
+            self.eventtable.setCellWidget(i,3,valueComboBox)
    	
     def percent(self):
         if float(self.weightoutedit.text()) != 0.0:
@@ -7046,121 +7112,121 @@ class editGraphDlg(QDialog):
             #update events             
             ntlines = len(aw.qmc.specialevents)         #number of events found            
             if ntlines > 0:
-                aw.qmc.specialevents[0] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line1b.text()))))
+                aw.qmc.specialevents[0] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line1b.text()))))
                 aw.qmc.specialeventsStrings[0] = unicode(self.line1.text())
                 aw.qmc.specialeventstype[0] = self.etypeComboBox1.currentIndex()
                 aw.qmc.specialeventsvalue[0] = self.valueComboBox1.currentIndex()
                 
             if ntlines > 1:
-                aw.qmc.specialevents[1] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line2b.text()))))
+                aw.qmc.specialevents[1] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line2b.text()))))
                 aw.qmc.specialeventsStrings[1] = unicode(self.line2.text())
                 aw.qmc.specialeventstype[1] = self.etypeComboBox2.currentIndex()
                 aw.qmc.specialeventsvalue[1] = self.valueComboBox2.currentIndex()
 
             if ntlines > 2:
-                aw.qmc.specialevents[2] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line3b.text()))))
+                aw.qmc.specialevents[2] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line3b.text()))))
                 aw.qmc.specialeventsStrings[2] = unicode(self.line3.text())
                 aw.qmc.specialeventstype[2] = self.etypeComboBox3.currentIndex()
                 aw.qmc.specialeventsvalue[2] = self.valueComboBox3.currentIndex()
             
             if ntlines > 3:
-                aw.qmc.specialevents[3] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line4b.text()))))
+                aw.qmc.specialevents[3] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line4b.text()))))
                 aw.qmc.specialeventsStrings[3] = unicode(self.line4.text())
                 aw.qmc.specialeventstype[3] = self.etypeComboBox4.currentIndex()
                 aw.qmc.specialeventsvalue[3] = self.valueComboBox4.currentIndex()
 
             if ntlines > 4:
-                aw.qmc.specialevents[4] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line5b.text()))))
+                aw.qmc.specialevents[4] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line5b.text()))))
                 aw.qmc.specialeventsStrings[4] = unicode(self.line5.text())
                 aw.qmc.specialeventstype[4] = self.etypeComboBox5.currentIndex()
                 aw.qmc.specialeventsvalue[4] = self.valueComboBox5.currentIndex()
 
             if ntlines > 5:
-                aw.qmc.specialevents[5] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line6b.text()))))
+                aw.qmc.specialevents[5] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line6b.text()))))
                 aw.qmc.specialeventsStrings[5] = unicode(self.line6.text())
                 aw.qmc.specialeventstype[5] = self.etypeComboBox6.currentIndex()
                 aw.qmc.specialeventsvalue[5] = self.valueComboBox6.currentIndex()
 
             if ntlines > 6:
-                aw.qmc.specialevents[6] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line7b.text()))))
+                aw.qmc.specialevents[6] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line7b.text()))))
                 aw.qmc.specialeventsStrings[6] = unicode(self.line7.text())
                 aw.qmc.specialeventstype[6] = self.etypeComboBox7.currentIndex()
                 aw.qmc.specialeventsvalue[6] = self.valueComboBox7.currentIndex()
 
             if ntlines > 7:
-                aw.qmc.specialevents[7] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line8b.text()))))
+                aw.qmc.specialevents[7] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line8b.text()))))
                 aw.qmc.specialeventsStrings[7] = unicode(self.line8.text())
                 aw.qmc.specialeventstype[7] = self.etypeComboBox8.currentIndex()
                 aw.qmc.specialeventsvalue[7] = self.valueComboBox8.currentIndex()
 
             if ntlines > 8:
-                aw.qmc.specialevents[8] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line9b.text()))))
+                aw.qmc.specialevents[8] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line9b.text()))))
                 aw.qmc.specialeventsStrings[8] = unicode(self.line9.text())
                 aw.qmc.specialeventstype[8] = self.etypeComboBox9.currentIndex()
                 aw.qmc.specialeventsvalue[8] = self.valueComboBox9.currentIndex()
 
             if ntlines > 9:
-                aw.qmc.specialevents[9] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line10b.text()))))
+                aw.qmc.specialevents[9] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line10b.text()))))
                 aw.qmc.specialeventsStrings[9] = unicode(self.line10.text())
                 aw.qmc.specialeventstype[9] = self.etypeComboBox10.currentIndex()
                 aw.qmc.specialeventsvalue[9] = self.valueComboBox10.currentIndex()
 
             if ntlines > 10:
-                aw.qmc.specialevents[10] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line11b.text()))))
+                aw.qmc.specialevents[10] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line11b.text()))))
                 aw.qmc.specialeventsStrings[10] = unicode(self.line11.text())
                 aw.qmc.specialeventstype[10] = self.etypeComboBox11.currentIndex()
                 aw.qmc.specialeventsvalue[10] = self.valueComboBox11.currentIndex()
 
             if ntlines > 11:
-                aw.qmc.specialevents[11] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line12b.text()))))
+                aw.qmc.specialevents[11] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line12b.text()))))
                 aw.qmc.specialeventsStrings[11] = unicode(self.line12.text())
                 aw.qmc.specialeventstype[11] = self.etypeComboBox12.currentIndex()
                 aw.qmc.specialeventsvalue[11] = self.valueComboBox12.currentIndex()
 
             if ntlines > 12:
-                aw.qmc.specialevents[12] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line13b.text()))))
+                aw.qmc.specialevents[12] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line13b.text()))))
                 aw.qmc.specialeventsStrings[12] = unicode(self.line13.text())
                 aw.qmc.specialeventstype[12] = self.etypeComboBox13.currentIndex()
                 aw.qmc.specialeventsvalue[12] = self.valueComboBox13.currentIndex()
 
             if ntlines > 13:
-                aw.qmc.specialevents[13] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line14b.text()))))
+                aw.qmc.specialevents[13] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line14b.text()))))
                 aw.qmc.specialeventsStrings[13] = unicode(self.line14.text())
                 aw.qmc.specialeventstype[13] = self.etypeComboBox14.currentIndex()
                 aw.qmc.specialeventsvalue[13] = self.valueComboBox14.currentIndex()
 
             if ntlines > 14:
-                aw.qmc.specialevents[14] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line15b.text()))))
+                aw.qmc.specialevents[14] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line15b.text()))))
                 aw.qmc.specialeventsStrings[14] = unicode(self.line15.text())
                 aw.qmc.specialeventstype[14] = self.etypeComboBox15.currentIndex()
                 aw.qmc.specialeventsvalue[14] = self.valueComboBox15.currentIndex()
 
             if ntlines > 15:
-                aw.qmc.specialevents[15] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line16b.text()))))
+                aw.qmc.specialevents[15] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line16b.text()))))
                 aw.qmc.specialeventsStrings[15] = unicode(self.line16.text())
                 aw.qmc.specialeventstype[15] = self.etypeComboBox16.currentIndex()
                 aw.qmc.specialeventsvalue[15] = self.valueComboBox16.currentIndex()
 
             if ntlines > 16:
-                aw.qmc.specialevents[16] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line17b.text()))))
+                aw.qmc.specialevents[16] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line17b.text()))))
                 aw.qmc.specialeventsStrings[16] = unicode(self.line17.text())
                 aw.qmc.specialeventstype[16] = self.etypeComboBox17.currentIndex()
                 aw.qmc.specialeventsvalue[16] = self.valueComboBox17.currentIndex()
 
             if ntlines > 17:
-                aw.qmc.specialevents[17] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line18b.text()))))
+                aw.qmc.specialevents[17] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line18b.text()))))
                 aw.qmc.specialeventsStrings[17] = unicode(self.line18.text())
                 aw.qmc.specialeventstype[17] = self.etypeComboBox18.currentIndex()
                 aw.qmc.specialeventsvalue[17] = self.valueComboBox18.currentIndex()
 
             if ntlines > 18:
-                aw.qmc.specialevents[18] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line19b.text()))))
+                aw.qmc.specialevents[18] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line19b.text()))))
                 aw.qmc.specialeventsStrings[18] = unicode(self.line19.text())
                 aw.qmc.specialeventstype[18] = self.etypeComboBox19.currentIndex()
                 aw.qmc.specialeventsvalue[18] = self.valueComboBox19.currentIndex()
 
             if ntlines > 19:
-                aw.qmc.specialevents[19] = aw.qmc.timex.index(aw.choice(aw.qmc.stringtoseconds(unicode(self.line20b.text()))))
+                aw.qmc.specialevents[19] = aw.qmc.timex.index(aw.choice(round(aw.qmc.dryend[0])+aw.qmc.stringtoseconds(unicode(self.line20b.text()))))
                 aw.qmc.specialeventsStrings[19] = unicode(self.line20.text())
                 aw.qmc.specialeventstype[19] = self.etypeComboBox12.currentIndex()
                 aw.qmc.specialeventsvalue[19] = self.valueComboBox20.currentIndex()
@@ -7667,6 +7733,12 @@ class WindowsDlg(QDialog):
         self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx))
         self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx))
 
+        self.legendComboBox = QComboBox()
+        legendlocs = ["upper right","upper left","lower left","lower right","right",
+                      "center left","center right", "lower center","upper center","center"]
+        self.legendComboBox.addItems(legendlocs)
+        self.legendComboBox.setCurrentIndex(aw.qmc.legendloc-1)
+        self.connect(self.legendComboBox,SIGNAL("currentIndexChanged(int)"),self.changelegendloc)
 
         self.timeflag = QCheckBox("Keep Max time after RESET")
         if aw.qmc.keeptimeflag:
@@ -7696,12 +7768,19 @@ class WindowsDlg(QDialog):
         ylayout.addWidget(self.ylimitEdit_min,0,1)
         ylayout.addWidget(ylimitLabel,1,0)
         ylayout.addWidget(self.ylimitEdit,1,1)
+
+        legentlayout = QHBoxLayout()
+        legentlayout.addWidget(self.legendComboBox)
+                                     
         
         xGroupLayout = QGroupBox("Time")
         xGroupLayout.setLayout(xlayout)
         yGroupLayout = QGroupBox("Temperature")
         yGroupLayout.setLayout(ylayout)
-                
+                                     
+        legendLayout = QGroupBox("Legend Location")
+        legendLayout.setLayout(legentlayout)                                     
+                                     
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(resetButton)
         buttonLayout.addStretch()  
@@ -7711,10 +7790,16 @@ class WindowsDlg(QDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(xGroupLayout)
         mainLayout.addWidget(yGroupLayout)
+        mainLayout.addWidget(legendLayout)
+                                     
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         
         self.setLayout(mainLayout)
+
+    def changelegendloc(self):
+        aw.qmc.legendloc = self.legendComboBox.currentIndex() + 1
+        aw.qmc.redraw()
 
     def updatewindow(self):
         aw.qmc.ylimit = int(self.ylimitEdit.text())
@@ -8164,7 +8249,7 @@ class phasesGraphDlg(QDialog):
 
         self.getphases()
 
-        self.pushbuttonflag = QCheckBox("Adjusted by events")
+        self.pushbuttonflag = QCheckBox("Auto Adjusted")
         if aw.qmc.phasesbuttonflag:
             self.pushbuttonflag.setChecked(True)
         else:
