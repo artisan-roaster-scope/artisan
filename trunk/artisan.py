@@ -2939,6 +2939,7 @@ class ApplicationWindow(QMainWindow):
 
         saveGraphMenuHB = saveGraphMenu.addMenu("Home-Barista.com")
         saveGraphMenuCG = saveGraphMenu.addMenu("CoffeeGeek.com")
+        saveGraphMenuPC = saveGraphMenu.addMenu("PlanetCafe.fr")
 
         HomeBaristaActionLow = QAction("Low Quality...",self)
         self.connect(HomeBaristaActionLow,SIGNAL("triggered()"),lambda x=700,y=0:self.resize(x,y))
@@ -2955,6 +2956,14 @@ class ApplicationWindow(QMainWindow):
         CoffeeGeekActionHigh = QAction("High Quality...",self)
         self.connect(CoffeeGeekActionHigh,SIGNAL("triggered()"),lambda x=500,y=1:self.resize(x,y))
         saveGraphMenuCG.addAction(CoffeeGeekActionHigh)
+
+        PlanetCafeActionLow = QAction("Low Quality...",self)
+        self.connect(PlanetCafeActionLow,SIGNAL("triggered()"),lambda x=600,y=0:self.resize(x,y))
+        saveGraphMenuPC.addAction(PlanetCafeActionLow)
+
+        PlanetCafeActionHigh = QAction("High Quality...",self)
+        self.connect(PlanetCafeActionHigh,SIGNAL("triggered()"),lambda x=600,y=1:self.resize(x,y))
+        saveGraphMenuPC.addAction(PlanetCafeActionHigh)
 
         htmlAction = QAction(UIconst.FILE_MENU_HTMLREPORT,self)
         self.connect(htmlAction,SIGNAL("triggered()"),self.htmlReport)
