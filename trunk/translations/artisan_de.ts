@@ -133,12 +133,12 @@
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="69"/>
+        <location filename="const/UIconst.py" line="70"/>
         <source>Documentation</source>
         <translation>Dokumentation</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="70"/>
+        <location filename="const/UIconst.py" line="71"/>
         <source>Keybord Shortcuts</source>
         <translation>Tastaturkürzel</translation>
     </message>
@@ -163,7 +163,7 @@
         <translation type="obsolete">Über</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="71"/>
+        <location filename="const/UIconst.py" line="72"/>
         <source>Errors</source>
         <translation>Fehlermeldungen</translation>
     </message>

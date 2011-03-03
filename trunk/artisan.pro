@@ -18,6 +18,7 @@ SOURCES = \
     
 TRANSLATIONS = \
 	translations/artisan_de.ts \
-	translations/artisan_fr.ts \
 	translations/artisan_es.ts \
-	translations/artisan_it.ts
+	translations/artisan_fr.ts \
+	translations/artisan_it.ts \
+	translations/artisan_se.ts

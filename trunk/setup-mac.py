@@ -34,6 +34,7 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_de.qm"]),
     ("../translations", [r"translations/artisan_es.qm"]),
     ("../translations", [r"translations/artisan_fr.qm"]),
+    ("../translations", [r"translations/artisan_it.qm"]),
   ]
   
 OPTIONS = {
@@ -94,6 +95,7 @@ os.chdir('./dist')
 #os.system(r'macdeployqt Artisan.app -dmg -verbose=0')
 os.system(r'macdeployqt Artisan.app -verbose=0')
 os.chdir('..')
+os.system(r"rm artisan-mac-" + VERSION + r".dmg")
 os.system(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"')
 # otool -L dist/Artisan.app/Contents/MacOS/Artisan
 

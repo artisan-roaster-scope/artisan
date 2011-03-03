@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0" language="es">
 <context>
     <name>Menu</name>
     <message>
@@ -128,12 +129,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="69"/>
+        <location filename="const/UIconst.py" line="70"/>
         <source>Documentation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="70"/>
+        <location filename="const/UIconst.py" line="71"/>
         <source>Keybord Shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
@@ -158,7 +159,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="71"/>
+        <location filename="const/UIconst.py" line="72"/>
         <source>Errors</source>
         <translation type="unfinished"></translation>
     </message>
