@@ -31,10 +31,12 @@ DATA_FILES = [
     ("../translations", [QTDIR + r'/translations/qt_de.qm']),
     ("../translations", [QTDIR + r'/translations/qt_es.qm']),
     ("../translations", [QTDIR + r'/translations/qt_fr.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_sv.qm']),
     ("../translations", [r"translations/artisan_de.qm"]),
     ("../translations", [r"translations/artisan_es.qm"]),
     ("../translations", [r"translations/artisan_fr.qm"]),
     ("../translations", [r"translations/artisan_it.qm"]),
+    ("../translations", [r"translations/artisan_sv.qm"]),
   ]
   
 OPTIONS = {

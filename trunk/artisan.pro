@@ -21,4 +21,4 @@ TRANSLATIONS = \
 	translations/artisan_es.ts \
 	translations/artisan_fr.ts \
 	translations/artisan_it.ts \
-	translations/artisan_se.ts
+	translations/artisan_sv.ts
