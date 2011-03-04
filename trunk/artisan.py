@@ -110,6 +110,7 @@ if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
 #Localization support
 locale = QLocale.system().name()
+locale = "es"
 qtTranslator = QTranslator()
 #load Qt default translations from QLibrary
 if qtTranslator.load("qt_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)): 
@@ -302,13 +303,12 @@ class tgraphcanvas(FigureCanvas):
         #Combobox text items in editGraphDlg for types of events
         self.etypes = ["None","Power","Damper","Fan"]
         #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc. Max 20 events
-        self.specialeventstype = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.specialeventstype = []
         #stores text string descriptions for each event. Max 20 events
-        self.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s",
-                                     u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]
+        self.specialeventsStrings = []
         #stores the numeric value for each event
         self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
-        self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.specialeventsvalue = []
         #flag that makes the events location bars (horizontal bars) appear on the plot. flag read on redraw()
         self.eventsGraphflag = 1
         
@@ -842,27 +842,20 @@ class tgraphcanvas(FigureCanvas):
         self.weight = [0,0,u"g"]
         self.volume = [0,0,u"l"]
         self.specialevents = []
-        self.specialeventstype = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] 
-        self.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s",
-                                     u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]        
-        self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
-        self.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.specialeventstype = [] 
+        self.specialeventsStrings = []        
+        self.specialeventsvalue = []
         aw.eNumberSpinBox.setValue(0)
         aw.lineEvent.setText("")      
-        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[0])
-        aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[0])    
+        aw.etypeComboBox.setCurrentIndex(0)
+        aw.valueComboBox.setCurrentIndex(0)    
         self.ambientTemp = 0.
         self.curFile = None
         self.ystep = 45
         
-        #aw.settingsLoad()
-        
-        #restart() clock 
+        #aw.settingsLoad()        
         self.timeclock.restart()
-    	#restart comm port if not in manual mode
-        #if self.device != 18:
-        #    aw.ser.openport()
-            
+
         self.redraw()
         aw.soundpop()
         
@@ -1258,8 +1251,13 @@ class tgraphcanvas(FigureCanvas):
                
     # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
     def stringfromseconds(self, seconds):
-        return "%02d:%02d"% divmod(seconds, 60)
-
+        if seconds >= 0:
+            return "%02d:%02d"% divmod(seconds, 60)
+        else:
+            #usually the startend[0] is alreday taken away in seconds before calling stringfromseconds()
+            negtime = abs(seconds)
+            return "-%02d:%02d"% divmod(negtime, 60)
+        
     #Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
     #acepted formats: "00:00","0:00"
     def stringtoseconds(self, string):
@@ -2037,27 +2035,23 @@ class tgraphcanvas(FigureCanvas):
         if i > 0:
             if self.startend[0]:
                 #Nevents is zero when recording first event. Therefore check up to 20 (max allowed).
-                if Nevents < 20:
-                    self.specialevents.append(i)
-                    temp = unicode(self.temp2[i])
-                    time = self.stringfromseconds(self.timex[i])
-                    message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
-                    aw.messagelabel.setText(message)
-                    #write label in mini recorder if flag checked
-                    if aw.minieventsflag:
-                        aw.eNumberSpinBox.setValue(Nevents+1)
-                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                        aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                        aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                    self.redraw()
-                else:
-                    aw.messagelabel.setText("No more than 20 events are allowed")
-                    aw.eNumberSpinBox.setVisible(False)
-                    aw.etypeComboBox.setVisible(False)
-                    aw.valueComboBox.setVisible(False)
-                    aw.eventlabel.setVisible(False)
-                    aw.buttonminiEvent.setVisible(False)
-                    aw.lineEvent.setVisible(False)
+                self.specialevents.append(i)
+                self.specialeventstype.append(0)                #range 0-3
+                self.specialeventsStrings.append(str(Nevents+1))
+                self.specialeventsvalue.append(0)               #range 0-9
+                
+                temp = unicode(self.temp2[i])
+                time = self.stringfromseconds(self.timex[i])
+                message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
+                aw.messagelabel.setText(message)
+                #write label in mini recorder if flag checked
+                if aw.minieventsflag:
+                    aw.eNumberSpinBox.setValue(Nevents+1)
+                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                    aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+                self.redraw()
+
             else:
                aw.messagelabel.setText("Events are only allowed after [CHARGE]")     
         else:
@@ -4258,24 +4252,17 @@ class ApplicationWindow(QMainWindow):
         else:
             self.qmc.specialevents = []
         if "specialeventstype" in profile:
-            specialeventstype = profile["specialeventstype"]
-            for i in range(len(specialeventstype)):
-                self.qmc.specialeventstype[i] = specialeventstype[i]
+            self.qmc.specialeventstype = profile["specialeventstype"]
         else:  
-            self.qmc.specialeventstype = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            self.qmc.specialeventstype = []
         if "specialeventsvalue" in profile:
-            specialeventsvalue = profile["specialeventsvalue"]
-            for i in range(len(specialeventsvalue)):
-                self.qmc.specialeventsvalue[i] = specialeventsvalue[i]     
+            self.qmc.specialeventsvalue = profile["specialeventsvalue"]
         else:
-            self.qmc.specialeventsvalue = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]          
+            self.qmc.specialeventsvalue = []          
         if "specialeventsStrings" in profile:
-            specialeventsStrings = profile["specialeventsStrings"]
-            for i in range(len(specialeventsStrings)):
-                self.qmc.specialeventsStrings[i] = specialeventsStrings[i]
+            self.qmc.specialeventsStrings = profile["specialeventsStrings"]
         else:
-            self.qmc.specialeventsStrings = [u"1s",u"2s",u"3s",u"4s",u"5s",u"6s",u"7s",u"8s",u"9s",u"10s",
-                                     u"11",u"12",u"13",u"14",u"15",u"16",u"17",u"18",u"19",u"20"]
+            self.qmc.specialeventsStrings = []
         if "roastingnotes" in profile:
             self.qmc.roastingnotes = unicode(profile["roastingnotes"])
         else:
@@ -6011,606 +5998,27 @@ class editGraphDlg(QDialog):
         droplabel.setBuddy(self.dropedit)
         
         # EVENTS
-        ###################################################################
-        #new smaller/smarter table UNDER WORK for holding infinite events
+        #table for showing events
         self.eventtable = QTableWidget()
-        self.updateEventTable()
-        ###################################################################
-            
-            
+        self.createEventTable()
         
-        ntlines = len(aw.qmc.specialevents)         #number of events found
-        nslines = len(aw.qmc.specialeventsStrings)  #number of descriptions for each event
+        self.neweventTableButton = QPushButton("Add")
+        self.neweventTableButton.setFocusPolicy(Qt.NoFocus)
+        self.neweventTableButton.setMaximumSize(self.neweventTableButton.sizeHint())
+        self.neweventTableButton.setMinimumSize(self.neweventTableButton.minimumSizeHint())
+        self.connect(self.neweventTableButton,SIGNAL("clicked()"),self.addEventTable)
 
-        self.line1b = QLineEdit()
-        if ntlines > 0 and nslines > 0:
-            time1 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[0]]-aw.qmc.startend[0])))
-            self.line1b.setText(time1)
-        else:
-            self.line1b.setText("00:00")
-        self.line1b.setValidator(QRegExpValidator(regextime,self))
-        self.line1b.setMaximumWidth(50)
-        self.etypeComboBox1 = QComboBox()
-        self.etypeComboBox1.addItems(aw.qmc.etypes)
-        self.etypeComboBox1.setMaximumWidth(85)
-        self.etypeComboBox1.setCurrentIndex(aw.qmc.specialeventstype[0])
-        self.valueComboBox1 = QComboBox()
-        self.valueComboBox1.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox1.setMaximumWidth(60)
-        self.valueComboBox1.setCurrentIndex(aw.qmc.specialeventsvalue[0])
-        self.line1 = QLineEdit(aw.qmc.specialeventsStrings[0])
-        self.line1.setMinimumWidth(200)
-            
-        self.line2b = QLineEdit()
-        if ntlines > 1 and nslines > 1:
-            time2 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[1]]-aw.qmc.startend[0])))
-            self.line2b.setText(time2)
-        else:
-            self.line2b.setText("00:00")
-        self.line2b.setValidator(QRegExpValidator(regextime,self))
-        self.line2b.setMaximumWidth(50)
-        self.etypeComboBox2 = QComboBox()
-        self.etypeComboBox2.addItems(aw.qmc.etypes)
-        self.etypeComboBox2.setMaximumWidth(85)
-        self.etypeComboBox2.setCurrentIndex(aw.qmc.specialeventstype[1])
-        self.valueComboBox2 = QComboBox()
-        self.valueComboBox2.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox2.setMaximumWidth(60)
-        self.valueComboBox2.setCurrentIndex(aw.qmc.specialeventsvalue[1])
-        self.line2 = QLineEdit(aw.qmc.specialeventsStrings[1])
-        self.line2.setMinimumWidth(200)
-            
-        self.line3b = QLineEdit()
-        if ntlines > 2 :
-            time3 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[2]]-aw.qmc.startend[0])))
-            self.line3b.setText(time3)
-        else:
-            self.line3b.setText("00:00")            
-        self.line3b.setValidator(QRegExpValidator(regextime,self))
-        self.line3b.setMaximumWidth(50)
-        self.etypeComboBox3 = QComboBox()
-        self.etypeComboBox3.addItems(aw.qmc.etypes)
-        self.etypeComboBox3.setMaximumWidth(85)
-        self.etypeComboBox3.setCurrentIndex(aw.qmc.specialeventstype[2])
-        self.valueComboBox3 = QComboBox()
-        self.valueComboBox3.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox3.setMaximumWidth(60)
-        self.valueComboBox3.setCurrentIndex(aw.qmc.specialeventsvalue[2])
-        self.line3 = QLineEdit(aw.qmc.specialeventsStrings[2])            
-        self.line3.setMinimumWidth(200)
-        
-        self.line4b = QLineEdit()
-        if ntlines > 3 and nslines > 3:
-            time4 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[3]]-aw.qmc.startend[0])))
-            self.line4b.setText(time4)
-        else:
-            self.line4b.setText("00:00")            
-        self.line4b.setValidator(QRegExpValidator(regextime,self))
-        self.line4b.setMaximumWidth(50)            
-        self.etypeComboBox4 = QComboBox()
-        self.etypeComboBox4.addItems(aw.qmc.etypes)
-        self.etypeComboBox4.setMaximumWidth(85)
-        self.etypeComboBox4.setCurrentIndex(aw.qmc.specialeventstype[3])
-        self.valueComboBox4 = QComboBox()
-        self.valueComboBox4.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox4.setMaximumWidth(60)
-        self.valueComboBox4.setCurrentIndex(aw.qmc.specialeventsvalue[3])
-        self.line4 = QLineEdit(aw.qmc.specialeventsStrings[3])
-        self.line4.setMinimumWidth(200)
-    
-        self.line5b = QLineEdit()
-        if ntlines > 4 and nslines > 4:
-            time5 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[4]]-aw.qmc.startend[0])))
-            self.line5b.setText(time5)
-        else:
-            self.line5b.setText("00:00")            
-        self.line5b.setValidator(QRegExpValidator(regextime,self))
-        self.line5b.setMaximumWidth(50)
-        self.etypeComboBox5 = QComboBox()
-        self.etypeComboBox5.addItems(aw.qmc.etypes)
-        self.etypeComboBox5.setMaximumWidth(85)
-        self.etypeComboBox5.setCurrentIndex(aw.qmc.specialeventstype[4])
-        self.valueComboBox5 = QComboBox()
-        self.valueComboBox5.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox5.setMaximumWidth(60)
-        self.valueComboBox5.setCurrentIndex(aw.qmc.specialeventsvalue[4])
-        self.line5 = QLineEdit(aw.qmc.specialeventsStrings[4])
-        self.line5.setMinimumWidth(200)
-        
-        self.line6b = QLineEdit()
-        if ntlines > 5 and nslines > 5:
-            time6 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[5]]-aw.qmc.startend[0])))
-            self.line6b.setText(time6)
-        else:
-            self.line6b.setText("00:00")            
-        self.line6b.setValidator(QRegExpValidator(regextime,self))
-        self.line6b.setMaximumWidth(50)
-        self.etypeComboBox6 = QComboBox()
-        self.etypeComboBox6.addItems(aw.qmc.etypes)
-        self.etypeComboBox6.setMaximumWidth(85)
-        self.etypeComboBox6.setCurrentIndex(aw.qmc.specialeventstype[5])       
-        self.valueComboBox6 = QComboBox()
-        self.valueComboBox6.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox6.setMaximumWidth(60)
-        self.valueComboBox6.setCurrentIndex(aw.qmc.specialeventsvalue[5])            
-        self.line6 = QLineEdit(aw.qmc.specialeventsStrings[5])
-        self.line6.setMinimumWidth(200)
-        
-        self.line7b = QLineEdit()
-        if ntlines > 6 and nslines > 6:
-            time7 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[6]]-aw.qmc.startend[0])))
-            self.line7b.setText(time7)
-        else:
-            self.line7b.setText("00:00") 
-        self.line7b.setValidator(QRegExpValidator(regextime,self))
-        self.line7b.setMaximumWidth(50)
-        self.etypeComboBox7 = QComboBox()
-        self.etypeComboBox7.addItems(aw.qmc.etypes)
-        self.etypeComboBox7.setMaximumWidth(85)
-        self.etypeComboBox7.setCurrentIndex(aw.qmc.specialeventstype[6])
-        self.valueComboBox7 = QComboBox()
-        self.valueComboBox7.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox7.setMaximumWidth(60)
-        self.valueComboBox7.setCurrentIndex(aw.qmc.specialeventsvalue[6])
-        self.line7 = QLineEdit(aw.qmc.specialeventsStrings[6])
-        self.line7.setMinimumWidth(200)
-            
-        self.line8b = QLineEdit()
-        if ntlines > 7 and nslines > 7:
-           time8 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[7]]-aw.qmc.startend[0])))
-           self.line8b.setText(time8)
-        else:
-            self.line8b.setText("00:00") 
-        self.line8b.setValidator(QRegExpValidator(regextime,self))
-        self.line8b.setMaximumWidth(50)
-        self.etypeComboBox8 = QComboBox()
-        self.etypeComboBox8.addItems(aw.qmc.etypes)
-        self.etypeComboBox8.setMaximumWidth(85)
-        self.etypeComboBox8.setCurrentIndex(aw.qmc.specialeventstype[7])
-        self.valueComboBox8 = QComboBox()
-        self.valueComboBox8.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox8.setMaximumWidth(60)
-        self.valueComboBox8.setCurrentIndex(aw.qmc.specialeventsvalue[7])
-        self.line8 = QLineEdit(aw.qmc.specialeventsStrings[7])
-        self.line8.setMinimumWidth(200)
-            
-        self.line9b = QLineEdit()
-        if ntlines > 8 and nslines > 8:
-            time9 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[8]]-aw.qmc.startend[0])))
-            self.line9b.setText(time9)
-        else:
-            self.line9b.setText("00:00")
-        self.line9b.setValidator(QRegExpValidator(regextime,self))
-        self.line9b.setMaximumWidth(50)
-        self.etypeComboBox9 = QComboBox()
-        self.etypeComboBox9.addItems(aw.qmc.etypes)
-        self.etypeComboBox9.setMaximumWidth(85)
-        self.etypeComboBox9.setCurrentIndex(aw.qmc.specialeventstype[8])
-        self.valueComboBox9 = QComboBox()
-        self.valueComboBox9.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox9.setMaximumWidth(60)
-        self.valueComboBox9.setCurrentIndex(aw.qmc.specialeventsvalue[8])
-        self.line9 = QLineEdit(aw.qmc.specialeventsStrings[8])
-        self.line9.setMinimumWidth(200)
-            
-        self.line10b = QLineEdit()
-        if ntlines > 9 and nslines > 9:
-            time10 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[9]]-aw.qmc.startend[0])))
-            self.line10b.setText(time10)
-        else:
-            self.line10b.setText("00:00") 
-        self.line10b.setValidator(QRegExpValidator(regextime,self))
-        self.line10b.setMaximumWidth(50)
-        self.etypeComboBox10 = QComboBox()
-        self.etypeComboBox10.addItems(aw.qmc.etypes)
-        self.etypeComboBox10.setMaximumWidth(85)
-        self.etypeComboBox10.setCurrentIndex(aw.qmc.specialeventstype[9])
-        self.valueComboBox10 = QComboBox()
-        self.valueComboBox10.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox10.setMaximumWidth(60)
-        self.valueComboBox10.setCurrentIndex(aw.qmc.specialeventsvalue[9])
-        self.line10 = QLineEdit(aw.qmc.specialeventsStrings[9])
-        self.line10.setMinimumWidth(200)
-
-        self.line11b = QLineEdit()
-        if ntlines > 10 and nslines > 10:
-            time11 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[10]]-aw.qmc.startend[0])))
-            self.line11b.setText(time11)
-        else:
-            self.line11b.setText("00:00") 
-        self.line11b.setValidator(QRegExpValidator(regextime,self))
-        self.line11b.setMaximumWidth(50)
-        self.etypeComboBox11 = QComboBox()
-        self.etypeComboBox11.addItems(aw.qmc.etypes)
-        self.etypeComboBox11.setMaximumWidth(85)
-        self.etypeComboBox11.setCurrentIndex(aw.qmc.specialeventstype[10])
-        self.valueComboBox11 = QComboBox()
-        self.valueComboBox11.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox11.setMaximumWidth(60)
-        self.valueComboBox11.setCurrentIndex(aw.qmc.specialeventsvalue[10])
-        self.line11 = QLineEdit(aw.qmc.specialeventsStrings[10])
-        self.line11.setMinimumWidth(200)
-
-        self.line12b = QLineEdit()
-        if ntlines > 11 and nslines > 11:
-            time12 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[11]]-aw.qmc.startend[0])))
-            self.line12b.setText(time12)
-        else:
-            self.line12b.setText("00:00") 
-        self.line12b.setValidator(QRegExpValidator(regextime,self))
-        self.line12b.setMaximumWidth(50)
-        self.etypeComboBox12 = QComboBox()
-        self.etypeComboBox12.addItems(aw.qmc.etypes)
-        self.etypeComboBox12.setMaximumWidth(85)
-        self.etypeComboBox12.setCurrentIndex(aw.qmc.specialeventstype[11])
-        self.valueComboBox12 = QComboBox()
-        self.valueComboBox12.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox12.setMaximumWidth(60)
-        self.valueComboBox12.setCurrentIndex(aw.qmc.specialeventsvalue[11])
-        self.line12 = QLineEdit(aw.qmc.specialeventsStrings[11])
-        self.line12.setMinimumWidth(200)
-
-        self.line13b = QLineEdit()
-        if ntlines > 12 and nslines > 12:
-            time13 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[12]]-aw.qmc.startend[0])))
-            self.line13b.setText(time13)
-        else:
-            self.line13b.setText("00:00") 
-        self.line13b.setValidator(QRegExpValidator(regextime,self))
-        self.line13b.setMaximumWidth(50)
-        self.etypeComboBox13 = QComboBox()
-        self.etypeComboBox13.addItems(aw.qmc.etypes)
-        self.etypeComboBox13.setMaximumWidth(85)
-        self.etypeComboBox13.setCurrentIndex(aw.qmc.specialeventstype[12])
-        self.valueComboBox13 = QComboBox()
-        self.valueComboBox13.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox13.setMaximumWidth(60)
-        self.valueComboBox13.setCurrentIndex(aw.qmc.specialeventsvalue[12])
-        self.line13 = QLineEdit(aw.qmc.specialeventsStrings[12])
-        self.line13.setMinimumWidth(200)
-
-        self.line14b = QLineEdit()
-        if ntlines > 13 and nslines > 13:
-            time14 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[13]]-aw.qmc.startend[0])))
-            self.line14b.setText(time14)
-        else:
-            self.line14b.setText("00:00") 
-        self.line14b.setValidator(QRegExpValidator(regextime,self))
-        self.line14b.setMaximumWidth(50)
-        self.etypeComboBox14 = QComboBox()
-        self.etypeComboBox14.addItems(aw.qmc.etypes)
-        self.etypeComboBox14.setMaximumWidth(85)
-        self.etypeComboBox14.setCurrentIndex(aw.qmc.specialeventstype[13])
-        self.valueComboBox14 = QComboBox()
-        self.valueComboBox14.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox14.setMaximumWidth(60)
-        self.valueComboBox14.setCurrentIndex(aw.qmc.specialeventsvalue[13])
-        self.line14 = QLineEdit(aw.qmc.specialeventsStrings[13])
-        self.line14.setMinimumWidth(200)
-
-        self.line15b = QLineEdit()
-        if ntlines > 14 and nslines > 14:
-            time15 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[14]]-aw.qmc.startend[0])))
-            self.line15b.setText(time15)
-        else:
-            self.line15b.setText("00:00") 
-        self.line15b.setValidator(QRegExpValidator(regextime,self))
-        self.line15b.setMaximumWidth(50)
-        self.etypeComboBox15 = QComboBox()
-        self.etypeComboBox15.addItems(aw.qmc.etypes)
-        self.etypeComboBox15.setMaximumWidth(85)
-        self.etypeComboBox15.setCurrentIndex(aw.qmc.specialeventstype[14])
-        self.valueComboBox15 = QComboBox()
-        self.valueComboBox15.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox15.setMaximumWidth(60)
-        self.valueComboBox15.setCurrentIndex(aw.qmc.specialeventsvalue[14])
-        self.line15 = QLineEdit(aw.qmc.specialeventsStrings[14])
-        self.line15.setMinimumWidth(200)
-        
-        self.line16b = QLineEdit()
-        if ntlines > 15 and nslines > 15:
-            time16 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[15]]-aw.qmc.startend[0])))
-            self.line16b.setText(time16)
-        else:
-            self.line16b.setText("00:00") 
-        self.line16b.setValidator(QRegExpValidator(regextime,self))
-        self.line16b.setMaximumWidth(50)
-        self.etypeComboBox16 = QComboBox()
-        self.etypeComboBox16.addItems(aw.qmc.etypes)
-        self.etypeComboBox16.setMaximumWidth(85)
-        self.etypeComboBox16.setCurrentIndex(aw.qmc.specialeventstype[15])
-        self.valueComboBox16 = QComboBox()
-        self.valueComboBox16.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox16.setMaximumWidth(60)
-        self.valueComboBox16.setCurrentIndex(aw.qmc.specialeventsvalue[15])
-        self.line16 = QLineEdit(aw.qmc.specialeventsStrings[15])
-        self.line16.setMinimumWidth(200)
-
-        self.line17b = QLineEdit()
-        if ntlines > 16 and nslines > 16:
-            time17 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[16]]-aw.qmc.startend[0])))
-            self.line17b.setText(time17)
-        else:
-            self.line17b.setText("00:00") 
-        self.line17b.setValidator(QRegExpValidator(regextime,self))
-        self.line17b.setMaximumWidth(50)
-        self.etypeComboBox17 = QComboBox()
-        self.etypeComboBox17.addItems(aw.qmc.etypes)
-        self.etypeComboBox17.setMaximumWidth(85)
-        self.etypeComboBox17.setCurrentIndex(aw.qmc.specialeventstype[16])
-        self.valueComboBox17 = QComboBox()
-        self.valueComboBox17.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox17.setMaximumWidth(60)
-        self.valueComboBox17.setCurrentIndex(aw.qmc.specialeventsvalue[16])
-        self.line17 = QLineEdit(aw.qmc.specialeventsStrings[16])
-        self.line17.setMinimumWidth(200)
-
-        self.line18b = QLineEdit()
-        if ntlines > 17 and nslines > 17:
-            time18 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[17]]-aw.qmc.startend[0])))
-            self.line18b.setText(time18)
-        else:
-            self.line18b.setText("00:00") 
-        self.line18b.setValidator(QRegExpValidator(regextime,self))
-        self.line18b.setMaximumWidth(50)
-        self.etypeComboBox18 = QComboBox()
-        self.etypeComboBox18.addItems(aw.qmc.etypes)
-        self.etypeComboBox18.setMaximumWidth(85)
-        self.etypeComboBox18.setCurrentIndex(aw.qmc.specialeventstype[17])
-        self.valueComboBox18 = QComboBox()
-        self.valueComboBox18.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox18.setMaximumWidth(60)
-        self.valueComboBox18.setCurrentIndex(aw.qmc.specialeventsvalue[17])
-        self.line18 = QLineEdit(aw.qmc.specialeventsStrings[17])
-        self.line18.setMinimumWidth(200)
-
-        self.line19b = QLineEdit()
-        if ntlines > 18 and nslines > 18:
-            time19 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[18]]-aw.qmc.startend[0])))
-            self.line19b.setText(time19)
-        else:
-            self.line19b.setText("00:00") 
-        self.line19b.setValidator(QRegExpValidator(regextime,self))
-        self.line19b.setMaximumWidth(50)
-        self.etypeComboBox19 = QComboBox()
-        self.etypeComboBox19.addItems(aw.qmc.etypes)
-        self.etypeComboBox19.setMaximumWidth(85)
-        self.etypeComboBox19.setCurrentIndex(aw.qmc.specialeventstype[18])
-        self.valueComboBox19 = QComboBox()
-        self.valueComboBox19.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox19.setMaximumWidth(60)
-        self.valueComboBox19.setCurrentIndex(aw.qmc.specialeventsvalue[18])
-        self.line19 = QLineEdit(aw.qmc.specialeventsStrings[18])
-        self.line19.setMinimumWidth(200)  
-
-        self.line20b = QLineEdit()
-        if ntlines > 19 and nslines > 19:
-            time20 = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[19]]-aw.qmc.startend[0])))
-            self.line20b.setText(time20)
-        else:
-            self.line20b.setText("00:00") 
-        self.line20b.setValidator(QRegExpValidator(regextime,self))
-        self.line20b.setMaximumWidth(50)
-        self.etypeComboBox20 = QComboBox()
-        self.etypeComboBox20.addItems(aw.qmc.etypes)
-        self.etypeComboBox20.setMaximumWidth(85)
-        self.etypeComboBox20.setCurrentIndex(aw.qmc.specialeventstype[19])
-        self.valueComboBox20 = QComboBox()
-        self.valueComboBox20.addItems(aw.qmc.eventsvalues)
-        self.valueComboBox20.setMaximumWidth(60)
-        self.valueComboBox20.setCurrentIndex(aw.qmc.specialeventsvalue[19])
-        self.line20 = QLineEdit(aw.qmc.specialeventsStrings[19])
-        self.line20.setMinimumWidth(200)  
-        
-        
-        self.numberlabel1 = QLabel("Event 1")
-        self.numberlabel2 = QLabel("Event 2")
-        self.numberlabel3 = QLabel("Event 3")
-        self.numberlabel4 = QLabel("Event 4")
-        self.numberlabel5 = QLabel("Event 5")
-        self.numberlabel6 = QLabel("Event 6")
-        self.numberlabel7 = QLabel("Event 7")
-        self.numberlabel8 = QLabel("Event 8")
-        self.numberlabel9 = QLabel("Event 9")
-        self.numberlabel10 = QLabel("Event 10")
-        self.numberlabel11 = QLabel("Event 11")
-        self.numberlabel12 = QLabel("Event 12")
-        self.numberlabel13 = QLabel("Event 13")
-        self.numberlabel14 = QLabel("Event 14")
-        self.numberlabel15 = QLabel("Event 15")
-        self.numberlabel16 = QLabel("Event 16")
-        self.numberlabel17 = QLabel("Event 17")
-        self.numberlabel18 = QLabel("Event 18")
-        self.numberlabel19 = QLabel("Event 19")
-        self.numberlabel20 = QLabel("Event 20")
-        
-        self.numberlabel1.setStyleSheet("background-color:'yellow';")
-        self.numberlabel2.setStyleSheet("background-color:'yellow';")
-        self.numberlabel3.setStyleSheet("background-color:'yellow';")
-        self.numberlabel4.setStyleSheet("background-color:'yellow';")
-        self.numberlabel5.setStyleSheet("background-color:'yellow';")
-        self.numberlabel6.setStyleSheet("background-color:'yellow';")
-        self.numberlabel7.setStyleSheet("background-color:'yellow';")
-        self.numberlabel8.setStyleSheet("background-color:'yellow';")
-        self.numberlabel9.setStyleSheet("background-color:'yellow';")
-        self.numberlabel10.setStyleSheet("background-color:'yellow';")
-        self.numberlabel11.setStyleSheet("background-color:'yellow';")
-        self.numberlabel12.setStyleSheet("background-color:'yellow';")
-        self.numberlabel13.setStyleSheet("background-color:'yellow';")
-        self.numberlabel14.setStyleSheet("background-color:'yellow';")
-        self.numberlabel15.setStyleSheet("background-color:'yellow';")
-        self.numberlabel16.setStyleSheet("background-color:'yellow';")
-        self.numberlabel17.setStyleSheet("background-color:'yellow';")
-        self.numberlabel18.setStyleSheet("background-color:'yellow';")
-        self.numberlabel19.setStyleSheet("background-color:'yellow';")
-        self.numberlabel20.setStyleSheet("background-color:'yellow';")
+        self.deleventTableButton = QPushButton("Delete")
+        self.deleventTableButton.setFocusPolicy(Qt.NoFocus)
+        self.deleventTableButton.setMaximumSize(self.deleventTableButton.sizeHint())
+        self.deleventTableButton.setMinimumSize(self.deleventTableButton.minimumSizeHint())
+        self.connect(self.deleventTableButton,SIGNAL("clicked()"),self.deleteEventTable)
         
 
-        events1Layout = QGridLayout()
-
-        events1Layout.addWidget(self.numberlabel1,1,0)
-        events1Layout.addWidget(self.line1b,1,1)
-        events1Layout.addWidget(self.etypeComboBox1,1,2)
-        events1Layout.addWidget(self.valueComboBox1,1,3)
-        events1Layout.addWidget(self.line1,1,4)
-
-        events1Layout.addWidget(self.numberlabel2,2,0)
-        events1Layout.addWidget(self.line2b,2,1)
-        events1Layout.addWidget(self.etypeComboBox2,2,2)
-        events1Layout.addWidget(self.valueComboBox2,2,3)
-        events1Layout.addWidget(self.line2,2,4)
-
-        events1Layout.addWidget(self.numberlabel3,3,0)
-        events1Layout.addWidget(self.line3b,3,1)
-        events1Layout.addWidget(self.etypeComboBox3,3,2)
-        events1Layout.addWidget(self.valueComboBox3,3,3)
-        events1Layout.addWidget(self.line3,3,4)
-
-        events1Layout.addWidget(self.numberlabel4,4,0)
-        events1Layout.addWidget(self.line4b,4,1)
-        events1Layout.addWidget(self.etypeComboBox4,4,2)
-        events1Layout.addWidget(self.valueComboBox4,4,3)
-        events1Layout.addWidget(self.line4,4,4)
-        
-        events1Layout.addWidget(self.numberlabel5,5,0)
-        events1Layout.addWidget(self.line5b,5,1)
-        events1Layout.addWidget(self.etypeComboBox5,5,2)
-        events1Layout.addWidget(self.valueComboBox5,5,3)
-        events1Layout.addWidget(self.line5,5,4)
-        
-        events1Layout.addWidget(self.numberlabel6,6,0)
-        events1Layout.addWidget(self.line6b,6,1)
-        events1Layout.addWidget(self.etypeComboBox6,6,2)
-        events1Layout.addWidget(self.valueComboBox6,6,3)
-        events1Layout.addWidget(self.line6,6,4)
-
-        events1Layout.addWidget(self.numberlabel7,7,0)
-        events1Layout.addWidget(self.line7b,7,1)
-        events1Layout.addWidget(self.etypeComboBox7,7,2)
-        events1Layout.addWidget(self.valueComboBox7,7,3)
-        events1Layout.addWidget(self.line7,7,4)
-
-        events1Layout.addWidget(self.numberlabel8,8,0)
-        events1Layout.addWidget(self.line8b,8,1)
-        events1Layout.addWidget(self.etypeComboBox8,8,2)
-        events1Layout.addWidget(self.valueComboBox8,8,3)
-        events1Layout.addWidget(self.line8,8,4)
-
-        events1Layout.addWidget(self.numberlabel9,9,0)
-        events1Layout.addWidget(self.line9b,9,1)
-        events1Layout.addWidget(self.etypeComboBox9,9,2)
-        events1Layout.addWidget(self.valueComboBox9,9,3)
-        events1Layout.addWidget(self.line9,9,4)
-
-        events1Layout.addWidget(self.numberlabel10,10,0)
-        events1Layout.addWidget(self.line10b,10,1)
-        events1Layout.addWidget(self.etypeComboBox10,10,2)
-        events1Layout.addWidget(self.valueComboBox10,10,3)
-        events1Layout.addWidget(self.line10,10,4)
-
-        events2Layout = QGridLayout()
-
-        events2Layout.addWidget(self.numberlabel11,1,0)
-        events2Layout.addWidget(self.line11b,1,1)
-        events2Layout.addWidget(self.etypeComboBox11,1,2)
-        events2Layout.addWidget(self.valueComboBox11,1,3)
-        events2Layout.addWidget(self.line11,1,4)
-
-        events2Layout.addWidget(self.numberlabel12,2,0)
-        events2Layout.addWidget(self.line12b,2,1)
-        events2Layout.addWidget(self.etypeComboBox12,2,2)
-        events2Layout.addWidget(self.valueComboBox12,2,3)
-        events2Layout.addWidget(self.line12,2,4)
-
-        events2Layout.addWidget(self.numberlabel13,3,0)
-        events2Layout.addWidget(self.line13b,3,1)
-        events2Layout.addWidget(self.etypeComboBox13,3,2)
-        events2Layout.addWidget(self.valueComboBox13,3,3)
-        events2Layout.addWidget(self.line13,3,4)
-
-        events2Layout.addWidget(self.numberlabel14,4,0)
-        events2Layout.addWidget(self.line14b,4,1)
-        events2Layout.addWidget(self.etypeComboBox14,4,2)
-        events2Layout.addWidget(self.valueComboBox14,4,3)
-        events2Layout.addWidget(self.line14,4,4)
-        
-        events2Layout.addWidget(self.numberlabel15,5,0)
-        events2Layout.addWidget(self.line15b,5,1)
-        events2Layout.addWidget(self.etypeComboBox15,5,2)
-        events2Layout.addWidget(self.valueComboBox15,5,3)
-        events2Layout.addWidget(self.line15,5,4)
-
-        events2Layout.addWidget(self.numberlabel16,6,0)
-        events2Layout.addWidget(self.line16b,6,1)
-        events2Layout.addWidget(self.etypeComboBox16,6,2)
-        events2Layout.addWidget(self.valueComboBox16,6,3)
-        events2Layout.addWidget(self.line16,6,4)
-
-        events2Layout.addWidget(self.numberlabel17,7,0)
-        events2Layout.addWidget(self.line17b,7,1)
-        events2Layout.addWidget(self.etypeComboBox17,7,2)
-        events2Layout.addWidget(self.valueComboBox17,7,3)
-        events2Layout.addWidget(self.line17,7,4)
-
-        events2Layout.addWidget(self.numberlabel18,8,0)
-        events2Layout.addWidget(self.line18b,8,1)
-        events2Layout.addWidget(self.etypeComboBox18,8,2)
-        events2Layout.addWidget(self.valueComboBox18,8,3)
-        events2Layout.addWidget(self.line18,8,4)
-
-        events2Layout.addWidget(self.numberlabel19,9,0)
-        events2Layout.addWidget(self.line19b,9,1)
-        events2Layout.addWidget(self.etypeComboBox19,9,2)
-        events2Layout.addWidget(self.valueComboBox19,9,3)
-        events2Layout.addWidget(self.line19,9,4)
-        
-        events2Layout.addWidget(self.numberlabel20,10,0)
-        events2Layout.addWidget(self.line20b,10,1)
-        events2Layout.addWidget(self.etypeComboBox20,10,2)
-        events2Layout.addWidget(self.valueComboBox20,10,3)
-        events2Layout.addWidget(self.line20,10,4)
-            
-        self.paintevents(disable_only=True)            
-            
-        self.newevent1Button = QPushButton("Add")
-        self.newevent1Button.setFocusPolicy(Qt.NoFocus)
-        self.newevent1Button.setMaximumSize(self.newevent1Button.sizeHint())
-        self.newevent1Button.setMinimumSize(self.newevent1Button.minimumSizeHint())
-        self.connect(self.newevent1Button,SIGNAL("clicked()"),self.addevent)
-
-        self.delevent1Button = QPushButton("Delete")
-        self.delevent1Button.setFocusPolicy(Qt.NoFocus)
-        self.delevent1Button.setMaximumSize(self.delevent1Button.sizeHint())
-        self.delevent1Button.setMinimumSize(self.delevent1Button.minimumSizeHint())
-        self.connect(self.delevent1Button,SIGNAL("clicked()"),self.delevent)
-
-        self.newevent2Button = QPushButton("Add")
-        self.newevent2Button.setFocusPolicy(Qt.NoFocus)
-        self.newevent2Button.setMaximumSize(self.newevent2Button.sizeHint())
-        self.newevent2Button.setMinimumSize(self.newevent2Button.minimumSizeHint())
-        self.connect(self.newevent2Button,SIGNAL("clicked()"),self.addevent)
-
-        self.delevent2Button = QPushButton("Delete")
-        self.delevent2Button.setFocusPolicy(Qt.NoFocus)
-        self.delevent2Button.setMaximumSize(self.delevent2Button.sizeHint())
-        self.delevent2Button.setMinimumSize(self.delevent2Button.minimumSizeHint())
-        self.connect(self.delevent2Button,SIGNAL("clicked()"),self.delevent)
-
-        lene = len(aw.qmc.specialevents)
-        if lene <= 10:
-            if lene == 0:
-                self.delevent1Button.setDisabled(True)
-            else:
-                self.delevent1Button.setDisabled(False)
-            self.newevent1Button.setDisabled(False)
-            self.delevent2Button.setDisabled(True)
-            self.newevent2Button.setDisabled(True)
-        else:
-            self.delevent2Button.setDisabled(False)
-            self.newevent2Button.setDisabled(False)            
-            self.delevent1Button.setDisabled(True)
-            self.newevent1Button.setDisabled(True)
-            
+        #DATA Table
+        self.datatable = QTableWidget()
+        self.createDataTable()        
+           
         #TITLE
         titlelabel = QLabel("<b>Title</b>")
         self.titleedit = QLineEdit(aw.qmc.title)
@@ -6623,7 +6031,6 @@ class editGraphDlg(QDialog):
 
         #Beans
         beanslabel = QLabel("<b>Beans</b>")
-        #self.beansedit = QLineEdit(aw.qmc.beans)
         self.beansedit = QTextEdit()
         self.beansedit.setMaximumHeight(100)
 
@@ -6820,16 +6227,6 @@ class editGraphDlg(QDialog):
         timeLayout.addWidget(self.CCstartedit,1,4)
         timeLayout.addWidget(self.CCendedit,1,5)
         timeLayout.addWidget(self.dropedit,1,6)
-
-        event1buttonLayout = QHBoxLayout()
-        event1buttonLayout.addStretch()  
-        event1buttonLayout.addWidget(self.delevent1Button)
-        event1buttonLayout.addWidget(self.newevent1Button)
-
-        event2buttonLayout = QHBoxLayout()
-        event2buttonLayout.addStretch()  
-        event2buttonLayout.addWidget(self.delevent2Button)
-        event2buttonLayout.addWidget(self.newevent2Button)
         
         textLayout = QGridLayout()
         textLayout.addWidget(datelabel1,0,0)
@@ -6929,11 +6326,16 @@ class editGraphDlg(QDialog):
         timeLayoutBox.addLayout(timeLayout)
         timeLayoutBox.addStretch()
         
-        allEventsLayout = QVBoxLayout()
-        allEventsLayout.addLayout(timeLayoutBox)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(timeLayoutBox)
         
         timeGroupLayout = QGroupBox("Absolute Times")
-        timeGroupLayout.setLayout(allEventsLayout)
+        timeGroupLayout.setLayout(mainLayout)
+
+        eventbuttonLayout = QHBoxLayout()
+        eventbuttonLayout.addStretch()  
+        eventbuttonLayout.addWidget(self.deleventTableButton)
+        eventbuttonLayout.addWidget(self.neweventTableButton)
 
         #tab 1
         tab1Layout = QVBoxLayout()
@@ -6949,23 +6351,15 @@ class editGraphDlg(QDialog):
         #tab 2
         tab2Layout = QVBoxLayout()
         tab2Layout.addLayout(anotationLayout)
-
-        #tab 3
+ 
+        #tab3 events
         tab3Layout = QVBoxLayout()
-        tab3Layout.addLayout(events1Layout)
-        tab3Layout.addLayout(event1buttonLayout)
-        tab3Layout.addStretch()  
-        
-        #tab 4
-        tab4Layout = QVBoxLayout()
-        tab4Layout.addLayout(events2Layout)
-        tab4Layout.addLayout(event2buttonLayout)
-        tab4Layout.addStretch()  
+        tab3Layout.addWidget(self.eventtable)
+        tab3Layout.addLayout(eventbuttonLayout)
 
-        #temporary
-        tab5Layout = QVBoxLayout()
-        tab5Layout.addWidget(self.eventtable)
-        
+        #tab 4 data
+        tab4Layout = QVBoxLayout()
+        tab4Layout.addWidget(self.datatable)        
         
         #tabwidget
         self.TabWidget = QTabWidget()
@@ -6980,15 +6374,11 @@ class editGraphDlg(QDialog):
 
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        self.TabWidget.addTab(C3Widget,"Events 1-10")
+        self.TabWidget.addTab(C3Widget,"Events")
 
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        self.TabWidget.addTab(C4Widget,"Events 11-20")
-
-        C5Widget = QWidget()
-        C5Widget.setLayout(tab5Layout)
-        self.TabWidget.addTab(C5Widget,"Testing new format")
+        self.TabWidget.addTab(C4Widget,"Data")
         
         #incorporate layouts
         totallayout = QVBoxLayout()
@@ -7001,17 +6391,98 @@ class editGraphDlg(QDialog):
         self.setLayout(totallayout)
 
 
-    def updateEventTable(self):
+    def createDataTable(self):
+        self.datatable.clear()
+        ndata = len(aw.qmc.timex)
+        self.datatable.setRowCount(ndata)
+        self.datatable.setColumnCount(6)
+        self.datatable.setHorizontalHeaderLabels(["Abs Time","Rel Time","ET","BT","DeltaBT (d/m)","DEltaET (d/m)"])
+        self.datatable.setAlternatingRowColors(True)
+        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+        self.datatable.setShowGrid(True)
+        specE = []
+        #convert timex of speacial events to integers for easy match find
+        for i in range(len(aw.qmc.specialevents)):
+            specE.append(int(round(aw.qmc.timex[aw.qmc.specialevents[i]])))
+        
+        for i in range(ndata):
+            Atime = QTableWidgetItem("%.03f"%aw.qmc.timex[i])
+            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.startend[0]))))
+            ET = QTableWidgetItem("%.02f"%aw.qmc.temp1[i])
+            BT = QTableWidgetItem("%.02f"%aw.qmc.temp2[i])
+            if i:
+                deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp1[i]-aw.qmc.temp1[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
+                deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp2[i]-aw.qmc.temp2[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
+            else:
+                deltaET = QTableWidgetItem("00:00")
+                deltaBT = QTableWidgetItem("00:00")
+            #identify by color and add notation
+            t= int(round(aw.qmc.timex[i]))
+            if t == int(round(aw.qmc.startend[0])):
+                Rtime.setBackgroundColor(QColor('#f07800'))
+                text = Rtime.text()
+                text += " START"
+                Rtime.setText(text)
+            elif t == int(round(aw.qmc.dryend[0])):
+                Rtime.setBackgroundColor(QColor('orange'))
+                text = Rtime.text()
+                text += " DRY END"
+                Rtime.setText(text)
+            elif t == int(round(aw.qmc.varC[0])):
+                Rtime.setBackgroundColor(QColor('orange'))
+                text = Rtime.text()
+                text += " FC START"
+                Rtime.setText(text)
+            elif t == int(round(aw.qmc.varC[2])):
+                Rtime.setBackgroundColor(QColor('orange'))
+                text = Rtime.text()
+                text += " FC END"
+                Rtime.setText(text)
+            elif t == int(round(aw.qmc.varC[4])):
+                Rtime.setBackgroundColor(QColor('orange'))
+                text = Rtime.text()
+                text += " SC START"
+                Rtime.setText(text)
+            elif t == int(round(aw.qmc.varC[6])):
+                Rtime.setBackgroundColor(QColor('orange'))
+                text = Rtime.text()
+                text += " SC END"
+                Rtime.setText(text)
+            elif t in specE:
+                Rtime.setBackgroundColor(QColor('yellow'))
+                text = Rtime.text()
+                text += " EVENT #"
+                index = specE.index(t)
+                text += str(index+1)
+                text += " " + aw.qmc.etypes[aw.qmc.specialeventstype[index]][0]
+                text += str(aw.qmc.specialeventsvalue[index]-1)
+                Rtime.setText(text)
+            elif t == int(round(aw.qmc.startend[2])):
+                Rtime.setBackgroundColor(QColor('#f07800'))
+                text = Rtime.text()
+                text += " END"
+                Rtime.setText(text)
+                
+            self.datatable.setItem(i,0,Atime) 
+            self.datatable.setItem(i,1,Rtime)
+            self.datatable.setItem(i,2,ET)
+            self.datatable.setItem(i,3,BT)
+            self.datatable.setItem(i,4,deltaBT)
+            self.datatable.setItem(i,5,deltaET)
+            
+    def createEventTable(self):
         self.eventtable.clear()
         nevents = len(aw.qmc.specialevents)        
         self.eventtable.setRowCount(nevents)
         self.eventtable.setColumnCount(4)
         self.eventtable.setHorizontalHeaderLabels(["Time","Description","Type","Value"])
-        self.eventtable.setAlternatingRowColors(True)
         self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
-        #self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
+        self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
+        self.eventtable.setShowGrid(True) 
         #populate table
         for i in range(nevents):
             #create widgets
@@ -7021,18 +6492,58 @@ class editGraphDlg(QDialog):
             valueComboBox = QComboBox()
             valueComboBox.addItems(aw.qmc.eventsvalues)
             valueComboBox.setCurrentIndex(aw.qmc.specialeventsvalue[i])
-            lineb = QLineEdit()
-            time = aw.qmc.stringfromseconds(int(round(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.startend[0])))
-            lineb.setText(time)
-            lineb.setValidator(QRegExpValidator(regextime,self))
-            line = QLineEdit(aw.qmc.specialeventsStrings[0])
+            timeline = QLineEdit()
+            time = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.startend[0]))
+            timeline.setText(time)
+            timeline.setValidator(QRegExpValidator(regextime,self))
+            stringline = QLineEdit(aw.qmc.specialeventsStrings[i])
 
-            #add widgets
-            self.eventtable.setCellWidget(i,0,lineb)
-            self.eventtable.setCellWidget(i,1,line)
+            #add widgets to the table
+            self.eventtable.setCellWidget(i,0,timeline)
+            self.eventtable.setCellWidget(i,1,stringline)
             self.eventtable.setCellWidget(i,2,typeComboBox)
             self.eventtable.setCellWidget(i,3,valueComboBox)
-   	
+
+    def saveEventTable(self):
+        nevents  = self.eventtable.rowCount() 
+        for i in range(nevents):
+            time = self.eventtable.cellWidget(i,0)  
+            aw.qmc.specialevents[i] = aw.qmc.timex.index(aw.choice(int(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(time.text()))))
+            description = self.eventtable.cellWidget(i,1)
+            aw.qmc.specialeventsStrings[i] = unicode(description.text())
+            etype = self.eventtable.cellWidget(i,2)
+            aw.qmc.specialeventstype[i] = etype.currentIndex()
+            evalue = self.eventtable.cellWidget(i,3)            
+            aw.qmc.specialeventsvalue[i] = evalue.currentIndex()
+
+    def addEventTable(self):
+        if len(aw.qmc.timex) and aw.qmc.startend[0]:
+            aw.qmc.specialevents.append(len(aw.qmc.timex)-1)   #qmc.specialevents holds indexes in qmx.timex. Initialize event index
+            aw.qmc.specialeventstype.append(0)
+            aw.qmc.specialeventsStrings.append(str(len(aw.qmc.specialevents)))
+            aw.qmc.specialeventsvalue.append(0)
+            self.createEventTable()
+            aw.qmc.redraw()
+            message = u" Event #" + str(len(aw.qmc.specialevents)) + " added"
+            aw.messagelabel.setText(message)
+        else:
+            message = u" No profile found"
+            aw.messagelabel.setText(message)            
+            
+    def deleteEventTable(self):
+        if len(aw.qmc.specialevents):
+             aw.qmc.specialevents.pop()
+             aw.qmc.specialeventstype.pop()
+             aw.qmc.specialeventsStrings.pop()
+             aw.qmc.specialeventsvalue.pop()
+             self.createEventTable()
+             aw.qmc.redraw()
+             message = u" Event #" + str(len(aw.qmc.specialevents)+1) + " deleted"  
+             aw.messagelabel.setText(message)
+        else:
+             message = u"No events found"  
+             aw.messagelabel.setText(message)            
+             
     def percent(self):
         if float(self.weightoutedit.text()) != 0.0:
             percent = aw.weight_loss(float(self.weightinedit.text()),float(self.weightoutedit.text()))
@@ -7118,127 +6629,7 @@ class editGraphDlg(QDialog):
                 if aw.qmc.varC[0]:
                     aw.qmc.phases[2] = int(round(aw.qmc.varC[1]))                                                   
 
-            #update events             
-            ntlines = len(aw.qmc.specialevents)         #number of events found            
-            if ntlines > 0:
-                aw.qmc.specialevents[0] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line1b.text()))))
-                aw.qmc.specialeventsStrings[0] = unicode(self.line1.text())
-                aw.qmc.specialeventstype[0] = self.etypeComboBox1.currentIndex()
-                aw.qmc.specialeventsvalue[0] = self.valueComboBox1.currentIndex()
-                
-            if ntlines > 1:
-                aw.qmc.specialevents[1] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line2b.text()))))
-                aw.qmc.specialeventsStrings[1] = unicode(self.line2.text())
-                aw.qmc.specialeventstype[1] = self.etypeComboBox2.currentIndex()
-                aw.qmc.specialeventsvalue[1] = self.valueComboBox2.currentIndex()
-
-            if ntlines > 2:
-                aw.qmc.specialevents[2] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line3b.text()))))
-                aw.qmc.specialeventsStrings[2] = unicode(self.line3.text())
-                aw.qmc.specialeventstype[2] = self.etypeComboBox3.currentIndex()
-                aw.qmc.specialeventsvalue[2] = self.valueComboBox3.currentIndex()
-            
-            if ntlines > 3:
-                aw.qmc.specialevents[3] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line4b.text()))))
-                aw.qmc.specialeventsStrings[3] = unicode(self.line4.text())
-                aw.qmc.specialeventstype[3] = self.etypeComboBox4.currentIndex()
-                aw.qmc.specialeventsvalue[3] = self.valueComboBox4.currentIndex()
-
-            if ntlines > 4:
-                aw.qmc.specialevents[4] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line5b.text()))))
-                aw.qmc.specialeventsStrings[4] = unicode(self.line5.text())
-                aw.qmc.specialeventstype[4] = self.etypeComboBox5.currentIndex()
-                aw.qmc.specialeventsvalue[4] = self.valueComboBox5.currentIndex()
-
-            if ntlines > 5:
-                aw.qmc.specialevents[5] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line6b.text()))))
-                aw.qmc.specialeventsStrings[5] = unicode(self.line6.text())
-                aw.qmc.specialeventstype[5] = self.etypeComboBox6.currentIndex()
-                aw.qmc.specialeventsvalue[5] = self.valueComboBox6.currentIndex()
-
-            if ntlines > 6:
-                aw.qmc.specialevents[6] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line7b.text()))))
-                aw.qmc.specialeventsStrings[6] = unicode(self.line7.text())
-                aw.qmc.specialeventstype[6] = self.etypeComboBox7.currentIndex()
-                aw.qmc.specialeventsvalue[6] = self.valueComboBox7.currentIndex()
-
-            if ntlines > 7:
-                aw.qmc.specialevents[7] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line8b.text()))))
-                aw.qmc.specialeventsStrings[7] = unicode(self.line8.text())
-                aw.qmc.specialeventstype[7] = self.etypeComboBox8.currentIndex()
-                aw.qmc.specialeventsvalue[7] = self.valueComboBox8.currentIndex()
-
-            if ntlines > 8:
-                aw.qmc.specialevents[8] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line9b.text()))))
-                aw.qmc.specialeventsStrings[8] = unicode(self.line9.text())
-                aw.qmc.specialeventstype[8] = self.etypeComboBox9.currentIndex()
-                aw.qmc.specialeventsvalue[8] = self.valueComboBox9.currentIndex()
-
-            if ntlines > 9:
-                aw.qmc.specialevents[9] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line10b.text()))))
-                aw.qmc.specialeventsStrings[9] = unicode(self.line10.text())
-                aw.qmc.specialeventstype[9] = self.etypeComboBox10.currentIndex()
-                aw.qmc.specialeventsvalue[9] = self.valueComboBox10.currentIndex()
-
-            if ntlines > 10:
-                aw.qmc.specialevents[10] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line11b.text()))))
-                aw.qmc.specialeventsStrings[10] = unicode(self.line11.text())
-                aw.qmc.specialeventstype[10] = self.etypeComboBox11.currentIndex()
-                aw.qmc.specialeventsvalue[10] = self.valueComboBox11.currentIndex()
-
-            if ntlines > 11:
-                aw.qmc.specialevents[11] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line12b.text()))))
-                aw.qmc.specialeventsStrings[11] = unicode(self.line12.text())
-                aw.qmc.specialeventstype[11] = self.etypeComboBox12.currentIndex()
-                aw.qmc.specialeventsvalue[11] = self.valueComboBox12.currentIndex()
-
-            if ntlines > 12:
-                aw.qmc.specialevents[12] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line13b.text()))))
-                aw.qmc.specialeventsStrings[12] = unicode(self.line13.text())
-                aw.qmc.specialeventstype[12] = self.etypeComboBox13.currentIndex()
-                aw.qmc.specialeventsvalue[12] = self.valueComboBox13.currentIndex()
-
-            if ntlines > 13:
-                aw.qmc.specialevents[13] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line14b.text()))))
-                aw.qmc.specialeventsStrings[13] = unicode(self.line14.text())
-                aw.qmc.specialeventstype[13] = self.etypeComboBox14.currentIndex()
-                aw.qmc.specialeventsvalue[13] = self.valueComboBox14.currentIndex()
-
-            if ntlines > 14:
-                aw.qmc.specialevents[14] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line15b.text()))))
-                aw.qmc.specialeventsStrings[14] = unicode(self.line15.text())
-                aw.qmc.specialeventstype[14] = self.etypeComboBox15.currentIndex()
-                aw.qmc.specialeventsvalue[14] = self.valueComboBox15.currentIndex()
-
-            if ntlines > 15:
-                aw.qmc.specialevents[15] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line16b.text()))))
-                aw.qmc.specialeventsStrings[15] = unicode(self.line16.text())
-                aw.qmc.specialeventstype[15] = self.etypeComboBox16.currentIndex()
-                aw.qmc.specialeventsvalue[15] = self.valueComboBox16.currentIndex()
-
-            if ntlines > 16:
-                aw.qmc.specialevents[16] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line17b.text()))))
-                aw.qmc.specialeventsStrings[16] = unicode(self.line17.text())
-                aw.qmc.specialeventstype[16] = self.etypeComboBox17.currentIndex()
-                aw.qmc.specialeventsvalue[16] = self.valueComboBox17.currentIndex()
-
-            if ntlines > 17:
-                aw.qmc.specialevents[17] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line18b.text()))))
-                aw.qmc.specialeventsStrings[17] = unicode(self.line18.text())
-                aw.qmc.specialeventstype[17] = self.etypeComboBox18.currentIndex()
-                aw.qmc.specialeventsvalue[17] = self.valueComboBox18.currentIndex()
-
-            if ntlines > 18:
-                aw.qmc.specialevents[18] = aw.qmc.timex.index(aw.choice(round(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(self.line19b.text()))))
-                aw.qmc.specialeventsStrings[18] = unicode(self.line19.text())
-                aw.qmc.specialeventstype[18] = self.etypeComboBox19.currentIndex()
-                aw.qmc.specialeventsvalue[18] = self.valueComboBox19.currentIndex()
-
-            if ntlines > 19:
-                aw.qmc.specialevents[19] = aw.qmc.timex.index(aw.choice(round(aw.qmc.dryend[0])+aw.qmc.stringtoseconds(unicode(self.line20b.text()))))
-                aw.qmc.specialeventsStrings[19] = unicode(self.line20.text())
-                aw.qmc.specialeventstype[19] = self.etypeComboBox12.currentIndex()
-                aw.qmc.specialeventsvalue[19] = self.valueComboBox20.currentIndex()
+            self.saveEventTable()
 
         # Update Title
         aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
@@ -7280,341 +6671,7 @@ class editGraphDlg(QDialog):
         aw.messagelabel.setText(u"Roast properties updated but profile not saved to disk")            
         aw.qmc.redraw()
         self.close()
-
-    def paintevents(self,disable_only=False):
-        ntlines = len(aw.qmc.specialevents)
-        if ntlines > 0:
-            if not disable_only:
-                self.numberlabel1.setVisible(True)
-                self.line1b.setVisible(True)
-                self.line1.setVisible(True)
-                self.etypeComboBox1.setVisible(True)
-                self.valueComboBox1.setVisible(True)
-        else:
-            self.numberlabel1.setVisible(False)
-            self.line1b.setVisible(False)
-            self.line1.setVisible(False)
-            self.etypeComboBox1.setVisible(False)
-            self.valueComboBox1.setVisible(False)            
-        if ntlines > 1:
-            if not disable_only:
-                self.numberlabel2.setVisible(True)
-                self.line2b.setVisible(True)
-                self.line2.setVisible(True)
-                self.etypeComboBox2.setVisible(True)
-                self.valueComboBox2.setVisible(True)
-        else:
-            self.numberlabel2.setVisible(False)
-            self.line2b.setVisible(False)
-            self.line2.setVisible(False)
-            self.etypeComboBox2.setVisible(False)
-            self.valueComboBox2.setVisible(False)            
-        if ntlines > 2:
-            if not disable_only:
-                self.numberlabel3.setVisible(True)
-                self.line3b.setVisible(True)
-                self.line3.setVisible(True)
-                self.etypeComboBox3.setVisible(True)
-                self.valueComboBox3.setVisible(True)
-        else:
-            self.numberlabel3.setVisible(False)
-            self.line3b.setVisible(False)
-            self.line3.setVisible(False)
-            self.etypeComboBox3.setVisible(False)
-            self.valueComboBox3.setVisible(False)
-        if ntlines >3:
-            if not disable_only:
-                self.numberlabel4.setVisible(True)
-                self.line4b.setVisible(True)
-                self.line4.setVisible(True)
-                self.etypeComboBox4.setVisible(True)
-                self.valueComboBox4.setVisible(True)
-        else:
-            self.numberlabel4.setVisible(False)
-            self.line4b.setVisible(False)
-            self.line4.setVisible(False)
-            self.etypeComboBox4.setVisible(False)
-            self.valueComboBox4.setVisible(False)            
-        if ntlines >4:
-            if not disable_only:
-                self.numberlabel5.setVisible(True)
-                self.line5b.setVisible(True)
-                self.line5.setVisible(True)
-                self.etypeComboBox5.setVisible(True)
-                self.valueComboBox5.setVisible(True)
-        else:
-            self.numberlabel5.setVisible(False)
-            self.line5b.setVisible(False)
-            self.line5.setVisible(False)
-            self.etypeComboBox5.setVisible(False)
-            self.valueComboBox5.setVisible(False)            
-        if ntlines >5:
-            if not disable_only:
-                self.numberlabel6.setVisible(True)
-                self.line6b.setVisible(True)
-                self.line6.setVisible(True)
-                self.etypeComboBox6.setVisible(True)
-                self.valueComboBox6.setVisible(True)
-        else:
-            self.numberlabel6.setVisible(False)
-            self.line6b.setVisible(False)
-            self.line6.setVisible(False)
-            self.etypeComboBox6.setVisible(False)
-            self.valueComboBox6.setVisible(False)            
-        if ntlines >6:
-            if not disable_only:
-                self.numberlabel7.setVisible(True)
-                self.line7b.setVisible(True)
-                self.line7.setVisible(True)
-                self.etypeComboBox7.setVisible(True)
-                self.valueComboBox7.setVisible(True)
-        else:
-            self.numberlabel7.setVisible(False)
-            self.line7b.setVisible(False)
-            self.line7.setVisible(False)
-            self.etypeComboBox7.setVisible(False)
-            self.valueComboBox7.setVisible(False)            
-        if ntlines >7:
-            if not disable_only:
-                self.numberlabel8.setVisible(True)
-                self.line8b.setVisible(True)
-                self.line8.setVisible(True)
-                self.etypeComboBox8.setVisible(True)
-                self.valueComboBox8.setVisible(True)
-        else:
-            self.numberlabel8.setVisible(False)
-            self.line8b.setVisible(False)
-            self.line8.setVisible(False)
-            self.etypeComboBox8.setVisible(False)
-            self.valueComboBox8.setVisible(False)            
-        if ntlines >8:
-            if not disable_only:
-                self.numberlabel9.setVisible(True)
-                self.line9b.setVisible(True)
-                self.line9.setVisible(True)
-                self.etypeComboBox9.setVisible(True)
-                self.valueComboBox9.setVisible(True)
-        else:
-            self.numberlabel9.setVisible(False)
-            self.line9b.setVisible(False)
-            self.line9.setVisible(False)
-            self.etypeComboBox9.setVisible(False)
-            self.valueComboBox9.setVisible(False)            
-        if ntlines >9:
-            if not disable_only:
-                self.numberlabel10.setVisible(True)
-                self.line10b.setVisible(True)
-                self.line10.setVisible(True)
-                self.etypeComboBox10.setVisible(True)
-                self.valueComboBox10.setVisible(True)
-        else:
-            self.numberlabel10.setVisible(False)
-            self.line10b.setVisible(False)
-            self.line10.setVisible(False)
-            self.etypeComboBox10.setVisible(False)
-            self.valueComboBox10.setVisible(False)
-            
-        if ntlines >10:
-            if not disable_only:
-                self.numberlabel11.setVisible(True)
-                self.line11b.setVisible(True)
-                self.line11.setVisible(True)
-                self.etypeComboBox11.setVisible(True)
-                self.valueComboBox11.setVisible(True)
-        else:
-            self.numberlabel11.setVisible(False)
-            self.line11b.setVisible(False)
-            self.line11.setVisible(False)
-            self.etypeComboBox11.setVisible(False)
-            self.valueComboBox11.setVisible(False)            
-
-        if ntlines >11:
-            if not disable_only:
-                self.numberlabel12.setVisible(True)
-                self.line12b.setVisible(True)
-                self.line12.setVisible(True)
-                self.etypeComboBox12.setVisible(True)
-                self.valueComboBox12.setVisible(True)
-        else:
-            self.numberlabel12.setVisible(False)
-            self.line12b.setVisible(False)
-            self.line12.setVisible(False)
-            self.etypeComboBox12.setVisible(False)
-            self.valueComboBox12.setVisible(False)            
-
-        if ntlines >12:
-            if not disable_only:
-                self.numberlabel13.setVisible(True)
-                self.line13b.setVisible(True)
-                self.line13.setVisible(True)
-                self.etypeComboBox13.setVisible(True)
-                self.valueComboBox13.setVisible(True)
-        else:
-            self.numberlabel13.setVisible(False)
-            self.line13b.setVisible(False)
-            self.line13.setVisible(False)
-            self.etypeComboBox13.setVisible(False)
-            self.valueComboBox13.setVisible(False)            
-
-        if ntlines >13:
-            if not disable_only:
-                self.numberlabel14.setVisible(True)
-                self.line14b.setVisible(True)
-                self.line14.setVisible(True)
-                self.etypeComboBox14.setVisible(True)
-                self.valueComboBox14.setVisible(True)
-        else:
-            self.numberlabel14.setVisible(False)
-            self.line14b.setVisible(False)
-            self.line14.setVisible(False)
-            self.etypeComboBox14.setVisible(False)
-            self.valueComboBox14.setVisible(False)            
-
-        if ntlines >14:
-            if not disable_only:
-                self.numberlabel15.setVisible(True)
-                self.line15b.setVisible(True)
-                self.line15.setVisible(True)
-                self.etypeComboBox15.setVisible(True)
-                self.valueComboBox15.setVisible(True)
-        else:
-            self.numberlabel15.setVisible(False)
-            self.line15b.setVisible(False)
-            self.line15.setVisible(False)
-            self.etypeComboBox15.setVisible(False)
-            self.valueComboBox15.setVisible(False)            
-
-        if ntlines >15:
-            if not disable_only:
-                self.numberlabel16.setVisible(True)
-                self.line16b.setVisible(True)
-                self.line16.setVisible(True)
-                self.etypeComboBox16.setVisible(True)
-                self.valueComboBox16.setVisible(True)
-        else:
-            self.numberlabel16.setVisible(False)
-            self.line16b.setVisible(False)
-            self.line16.setVisible(False)
-            self.etypeComboBox16.setVisible(False)
-            self.valueComboBox16.setVisible(False)            
-
-        if ntlines >16:
-            if not disable_only:
-                self.numberlabel17.setVisible(True)
-                self.line17b.setVisible(True)
-                self.line17.setVisible(True)
-                self.etypeComboBox17.setVisible(True)
-                self.valueComboBox17.setVisible(True)
-        else:
-            self.numberlabel17.setVisible(False)
-            self.line17b.setVisible(False)
-            self.line17.setVisible(False)
-            self.etypeComboBox17.setVisible(False)
-            self.valueComboBox17.setVisible(False)            
-
-        if ntlines >17:
-            if not disable_only:
-                self.numberlabel18.setVisible(True)
-                self.line18b.setVisible(True)
-                self.line18.setVisible(True)
-                self.etypeComboBox18.setVisible(True)
-                self.valueComboBox18.setVisible(True)
-        else:
-            self.numberlabel18.setVisible(False)
-            self.line18b.setVisible(False)
-            self.line18.setVisible(False)
-            self.etypeComboBox18.setVisible(False)
-            self.valueComboBox18.setVisible(False)            
-
-        if ntlines >18:
-            if not disable_only:
-                self.numberlabel19.setVisible(True)
-                self.line19b.setVisible(True)
-                self.line19.setVisible(True)
-                self.etypeComboBox19.setVisible(True)
-                self.valueComboBox19.setVisible(True)
-        else:
-            self.numberlabel19.setVisible(False)
-            self.line19b.setVisible(False)
-            self.line19.setVisible(False)
-            self.etypeComboBox19.setVisible(False)
-            self.valueComboBox19.setVisible(False)            
-
-        if ntlines >19:
-            if not disable_only:
-                self.numberlabel20.setVisible(True)
-                self.line20b.setVisible(True)
-                self.line20.setVisible(True)
-                self.etypeComboBox20.setVisible(True)
-                self.valueComboBox20.setVisible(True)
-        else:
-            self.numberlabel20.setVisible(False)
-            self.line20b.setVisible(False)
-            self.line20.setVisible(False)
-            self.etypeComboBox20.setVisible(False)
-            self.valueComboBox20.setVisible(False)            
-
-            
-    # adds a new event to the Dlg
-    def addevent(self):
-        nevents = len(aw.qmc.specialevents)
-        #self.accept()
-        if len(aw.qmc.timex) > 1 and nevents < 20:
-            aw.qmc.specialevents.append(0)
-            self.paintevents()
-            aw.qmc.redraw()
-            message = u" Event #" + str(nevents) + " added"
-            nevents = len(aw.qmc.specialevents)
-            if nevents <= 10:
-                if nevents == 0:
-                    self.delevent1Button.setDisabled(True)
-                else:
-                    self.delevent1Button.setDisabled(False)
-                self.newevent1Button.setDisabled(False)
-                self.delevent2Button.setDisabled(True)
-                self.newevent2Button.setDisabled(True)
-                self.TabWidget.setCurrentIndex(2)
         
-            else:
-                self.delevent2Button.setDisabled(False)
-                self.newevent2Button.setDisabled(False)            
-                self.delevent1Button.setDisabled(True)
-                self.newevent1Button.setDisabled(True)
-                self.TabWidget.setCurrentIndex(3)
-
-        else:
-            if len(aw.qmc.timex) < 1:
-                message = u"Events need time and data"
-            if len(aw.qmc.specialevents) == 20:
-                message = u"Max 20 Events allowed"
-            aw.messagelabel.setText(message)
-
-    # pops an event from the Dlg
-    def delevent(self):
-        if len(aw.qmc.specialevents) > 0:
-             aw.qmc.specialevents.pop()
-             self.paintevents()
-             aw.qmc.redraw()
-             nevents = len(aw.qmc.specialevents)
-             message = u" Event #" + str(nevents+1) + " deleted"             
-             if nevents <= 10:
-                if nevents == 0:
-                    self.delevent1Button.setDisabled(True)
-                else:
-                    self.delevent1Button.setDisabled(False)
-                self.newevent1Button.setDisabled(False)
-                self.delevent2Button.setDisabled(True)
-                self.newevent2Button.setDisabled(True)
-                self.TabWidget.setCurrentIndex(2)
-             else:
-                self.delevent2Button.setDisabled(False)
-                self.newevent2Button.setDisabled(False)            
-                self.delevent1Button.setDisabled(True)
-                self.newevent1Button.setDisabled(True)
-                self.TabWidget.setCurrentIndex(3)             
-        else:
-            aw.messagelabel.setText("Zero events")
-
 ##########################################################################
 #####################  VIEW ERROR LOG DLG  ###############################
 ##########################################################################
