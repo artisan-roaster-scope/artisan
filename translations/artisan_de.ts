@@ -20,7 +20,7 @@
     <message>
         <location filename="const/UIconst.py" line="30"/>
         <source>Open Recent</source>
-        <translation>Benutzte Documente</translation>
+        <translation>Benutzte Dokumente</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="31"/>
@@ -35,7 +35,7 @@
     <message>
         <location filename="const/UIconst.py" line="33"/>
         <source>Save As...</source>
-        <translation>Sichern unter...</translation>
+        <translation>Sichern Unter...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="34"/>
@@ -95,7 +95,7 @@
     <message>
         <location filename="const/UIconst.py" line="55"/>
         <source>Sampling Interval...</source>
-        <translation>Abtastintervall</translation>
+        <translation>Abtastintervall...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="56"/>
@@ -110,7 +110,7 @@
     <message>
         <location filename="const/UIconst.py" line="58"/>
         <source>Events...</source>
-        <translation>Ereignisse</translation>
+        <translation>Ereignisse...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="59"/>
@@ -138,11 +138,6 @@
         <translation>Dokumentation</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="71"/>
-        <source>Keybord Shortcuts</source>
-        <translation>Tastaturkürzel</translation>
-    </message>
-    <message>
         <location filename="const/UIconst.py" line="35"/>
         <source>Save Graph</source>
         <translation>Graph speichern</translation>
@@ -166,6 +161,11 @@
         <location filename="const/UIconst.py" line="72"/>
         <source>Errors</source>
         <translation>Fehlermeldungen</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="71"/>
+        <source>Keyboard Shortcuts</source>
+        <translation>Tastaturkürzel</translation>
     </message>
 </context>
 </TS>

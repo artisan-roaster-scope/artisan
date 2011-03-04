@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en_US">
+<!DOCTYPE TS><TS version="1.1" language="es">
 <context>
     <name>Menu</name>
     <message>
@@ -31,7 +30,7 @@
     <message>
         <location filename="const/UIconst.py" line="33"/>
         <source>Save As...</source>
-        <translation>Guardar como...</translation>
+        <translation>Guardar Como...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="34"/>
@@ -86,7 +85,7 @@
     <message>
         <location filename="const/UIconst.py" line="54"/>
         <source>Serial Port...</source>
-        <translation>Puerto serial...</translation>
+        <translation>Puerto Serial...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="55"/>
@@ -116,7 +115,7 @@
     <message>
         <location filename="const/UIconst.py" line="61"/>
         <source>Autosave...</source>
-        <translation>Auto grabar...</translation>
+        <translation>Auto Grabar...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="62"/>
@@ -132,11 +131,6 @@
         <location filename="const/UIconst.py" line="70"/>
         <source>Documentation</source>
         <translation>Documentacion</translation>
-    </message>
-    <message>
-        <location filename="const/UIconst.py" line="71"/>
-        <source>Keybord Shortcuts</source>
-        <translation>Atajo teclado</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="25"/>
@@ -162,6 +156,11 @@
         <location filename="const/UIconst.py" line="72"/>
         <source>Errors</source>
         <translation>Errores</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="71"/>
+        <source>Keyboard Shortcuts</source>
+        <translation>Atajo Teclado</translation>
     </message>
 </context>
 </TS>
