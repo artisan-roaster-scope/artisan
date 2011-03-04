@@ -1,167 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es">
+<TS version="2.0" language="es" sourcelanguage="en_US">
 <context>
     <name>Menu</name>
     <message>
         <location filename="const/UIconst.py" line="28"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuevo</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="29"/>
         <source>Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="30"/>
         <source>Open Recent</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir Reciente</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="31"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="32"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="33"/>
         <source>Save As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar como...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="34"/>
         <source>Export...</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="36"/>
         <source>HTML Report</source>
-        <translation type="unfinished"></translation>
+        <translation>Informe HTML</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="37"/>
         <source>Print...</source>
-        <translation type="unfinished"></translation>
+        <translation>Imprimir...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="40"/>
         <source>Roast</source>
-        <translation type="unfinished"></translation>
+        <translation>Tostadura</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="43"/>
         <source>Properties...</source>
-        <translation type="unfinished"></translation>
+        <translation>Propiedades...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="44"/>
         <source>Background...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fondo...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="45"/>
         <source>Cup Profile...</source>
-        <translation type="unfinished"></translation>
+        <translation>Catacion...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="46"/>
         <source>Temperature</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatura</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="47"/>
         <source>Calculator</source>
-        <translation type="unfinished"></translation>
+        <translation>Calculadora</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="53"/>
         <source>Device...</source>
-        <translation type="unfinished"></translation>
+        <translation>Dispositivo...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="54"/>
         <source>Serial Port...</source>
-        <translation type="unfinished"></translation>
+        <translation>Puerto serial...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="55"/>
         <source>Sampling Interval...</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalo Tiempo...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="56"/>
         <source>Colors...</source>
-        <translation type="unfinished"></translation>
+        <translation>Colores...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="57"/>
         <source>Phases...</source>
-        <translation type="unfinished"></translation>
+        <translation>Etapas...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="58"/>
         <source>Events...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eventos...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="59"/>
         <source>Statistics...</source>
-        <translation type="unfinished"></translation>
+        <translation>Estadisticas...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="61"/>
         <source>Autosave...</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto grabar...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="62"/>
         <source>Extras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Extras...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="65"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Ayuda</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="70"/>
         <source>Documentation</source>
-        <translation type="unfinished"></translation>
+        <translation>Documentacion</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="71"/>
         <source>Keybord Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Atajo teclado</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="25"/>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="35"/>
         <source>Save Graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar Grafico</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="50"/>
         <source>Config</source>
-        <translation type="unfinished"></translation>
+        <translation>Config</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="60"/>
         <source>Axes...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ejes...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="72"/>
         <source>Errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Errores</translation>
     </message>
 </context>
 </TS>
