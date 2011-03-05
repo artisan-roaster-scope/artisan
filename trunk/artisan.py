@@ -110,7 +110,7 @@ if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
 #Localization support
 locale = QLocale.system().name()
-locale = "es"
+#locale = "es"
 qtTranslator = QTranslator()
 #load Qt default translations from QLibrary
 if qtTranslator.load("qt_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)): 
@@ -2034,9 +2034,8 @@ class tgraphcanvas(FigureCanvas):
         i = len(self.timex)-1
         if i > 0:
             if self.startend[0]:
-                #Nevents is zero when recording first event. Therefore check up to 20 (max allowed).
                 self.specialevents.append(i)
-                self.specialeventstype.append(0)                #range 0-3
+                self.specialeventstype.append(0)                #range 0-4
                 self.specialeventsStrings.append(str(Nevents+1))
                 self.specialeventsvalue.append(0)               #range 0-9
                 
@@ -2051,7 +2050,6 @@ class tgraphcanvas(FigureCanvas):
                     aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
                     aw.lineEvent.setText(self.specialeventsStrings[Nevents])
                 self.redraw()
-
             else:
                aw.messagelabel.setText("Events are only allowed after [CHARGE]")     
         else:
@@ -2091,6 +2089,9 @@ class tgraphcanvas(FigureCanvas):
                    self.varCB[5] += step
                 if self.varCB[7]:
                    self.varCB[7] += step
+                if self.dryendB[1]:
+                   self.dryendB[1] += step
+                   
                 self.startendB[1] += step
                 self.startendB[3] += step
                 
@@ -2106,6 +2107,9 @@ class tgraphcanvas(FigureCanvas):
                    self.varCB[4] -= step
                 if self.varCB[6]:
                    self.varCB[6] -= step
+                if self.dryendB[0]:
+                   self.dryendB[0] -= step
+                   
                 self.startendB[0] -= step
                 self.startendB[2] -= step
                 
@@ -2121,6 +2125,9 @@ class tgraphcanvas(FigureCanvas):
                    self.varCB[4] += step
                 if self.varCB[6]:
                    self.varCB[6] += step
+                if self.dryendB[0]:
+                   self.dryendB[0] += step
+                   
                 self.startendB[0] += step
                 self.startendB[2] += step
                     
@@ -2136,7 +2143,10 @@ class tgraphcanvas(FigureCanvas):
                 if self.varCB[5]:
                    self.varCB[5] -= step
                 if self.varCB[7]:
-                   self.varCB[7] -= step  
+                   self.varCB[7] -= step
+                if self.dryendB[1]:
+                   self.dryendB[1] -= step
+                   
                 self.startendB[1] -= step
                 self.startendB[3] -= step    
         else:
