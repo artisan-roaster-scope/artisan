@@ -105,7 +105,7 @@ platf = unicode(platform.system())
 app = QApplication(sys.argv)
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
-app.setOrganizationDomain("http://code.google.com/p/artisan")           #needed by QSettings() to store windows geometry in operating system 
+app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system 
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
 #Localization support
@@ -6061,12 +6061,12 @@ class editGraphDlg(QDialog):
         self.weightinedit = QLineEdit(inw) 
         
         self.weightinedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightinedit))
-        self.weightinedit.setMinimumWidth(50)
-        self.weightinedit.setMaximumWidth(50)
+        self.weightinedit.setMinimumWidth(55)
+        self.weightinedit.setMaximumWidth(55)
         self.weightoutedit = QLineEdit(outw)
         self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
-        self.weightoutedit.setMinimumWidth(50)
-        self.weightoutedit.setMaximumWidth(50)
+        self.weightoutedit.setMinimumWidth(55)
+        self.weightoutedit.setMaximumWidth(55)
         self.weightpercentlabel = QLabel(" %")
         self.weightpercentlabel.setMinimumWidth(45)
         self.weightpercentlabel.setMaximumWidth(45)
@@ -6096,12 +6096,12 @@ class editGraphDlg(QDialog):
         self.volumeinedit = QLineEdit(inv) 
         
         self.volumeinedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeinedit))
-        self.volumeinedit.setMinimumWidth(50)
-        self.volumeinedit.setMaximumWidth(50)
+        self.volumeinedit.setMinimumWidth(55)
+        self.volumeinedit.setMaximumWidth(55)
         self.volumeoutedit = QLineEdit(outv)
         self.volumeoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeoutedit))
-        self.volumeoutedit.setMinimumWidth(50)
-        self.volumeoutedit.setMaximumWidth(50)
+        self.volumeoutedit.setMinimumWidth(55)
+        self.volumeoutedit.setMaximumWidth(55)
         self.volumepercentlabel = QLabel(" %")
         self.volumepercentlabel.setMinimumWidth(45)
         self.volumepercentlabel.setMaximumWidth(45)
@@ -6120,18 +6120,19 @@ class editGraphDlg(QDialog):
             self.volumeUnitsComboBox.setCurrentIndex(1)
                         
         self.calculateddensitylabel = QLabel("")
-        self.calculated_density()
         self.connect(self.weightoutedit,SIGNAL("editingFinished()"),self.calculated_density)
         self.connect(self.weightinedit,SIGNAL("editingFinished()"),self.calculated_density)
         self.connect(self.volumeoutedit,SIGNAL("editingFinished()"),self.calculated_density)
         self.connect(self.volumeinedit,SIGNAL("editingFinished()"),self.calculated_density)
+        self.connect(self.volumeUnitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
+        self.connect(self.unitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
 
         #density
         bean_density_label = QLabel("<b>Density </b>")
         self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
         self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_weight_edit))
-        self.bean_density_weight_edit.setMinimumWidth(50)
-        self.bean_density_weight_edit.setMaximumWidth(50)
+        self.bean_density_weight_edit.setMinimumWidth(55)
+        self.bean_density_weight_edit.setMaximumWidth(55)
         self.bean_density_weightUnitsComboBox = QComboBox()
         self.bean_density_weightUnitsComboBox.setMaximumWidth(60)
         self.bean_density_weightUnitsComboBox.setMinimumWidth(60)
@@ -6143,8 +6144,8 @@ class editGraphDlg(QDialog):
         bean_density_per_label = QLabel("per")
         self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
         self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
-        self.bean_density_volume_edit.setMinimumWidth(50)
-        self.bean_density_volume_edit.setMaximumWidth(50)
+        self.bean_density_volume_edit.setMinimumWidth(55)
+        self.bean_density_volume_edit.setMaximumWidth(55)
         self.bean_density_volumeUnitsComboBox = QComboBox()
         self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
         self.bean_density_volumeUnitsComboBox.setMinimumWidth(60)
@@ -6327,7 +6328,6 @@ class editGraphDlg(QDialog):
         anotationLayout.addWidget(self.cuppingeditor)
 
         okLayout = QHBoxLayout()        
-        okLayout.addWidget(self.calculateddensitylabel)
         okLayout.addStretch()
         okLayout.addWidget(cancelButton,0)
         okLayout.addWidget(saveButton,1)
@@ -6348,15 +6348,22 @@ class editGraphDlg(QDialog):
         eventbuttonLayout.addWidget(self.neweventTableButton)
 
         #tab 1
+        self.tab1aLayout = QVBoxLayout()
+        self.tab1aLayout.addWidget(timeGroupLayout)
+        self.tab1aLayout.addLayout(textLayout)
+        self.tab1aLayout.addLayout(weightLayout)
+        self.tab1aLayout.addLayout(volumeLayout)
+        self.tab1aLayout.addLayout(densityLayout)
+        tab1bLayout = QVBoxLayout()
+        tab1bLayout.addLayout(humidityLayout)
+        tab1bLayout.addLayout(ambientLayout)
+        tab1bLayout.addStretch()  
         tab1Layout = QVBoxLayout()
-        tab1Layout.addWidget(timeGroupLayout)
-        tab1Layout.addLayout(textLayout)
-        tab1Layout.addLayout(weightLayout)
-        tab1Layout.addLayout(volumeLayout)
-        tab1Layout.addLayout(densityLayout)
-        tab1Layout.addLayout(humidityLayout)
-        tab1Layout.addLayout(ambientLayout)
-        tab1Layout.addStretch()  
+        tab1Layout.addLayout(self.tab1aLayout)
+        tab1Layout.addLayout(tab1bLayout)
+        
+        self.calculated_density()
+
 
         #tab 2
         tab2Layout = QVBoxLayout()
@@ -6586,9 +6593,17 @@ class editGraphDlg(QDialog):
             if self.unitsComboBox.currentText() != "g" :
                 weightin = weightin * 1000.0
                 weightout = weightout * 1000.0
-            self.calculateddensitylabel.setText(QString(u"Density in: %d" % (weightin / volumein) + u" g/l   =>   Density out: %d" % (weightout / volumeout) + u" g/l"))
+            din = (weightin / volumein) 
+            dout = (weightout / volumeout)
+            if din > 1 and dout > 1:
+                self.calculateddensitylabel.setText(QString(u"                 Density in: %d" % din + u" g/l   =>   Density out: %d" % dout + u" g/l"))                
+                self.tab1aLayout.addWidget(self.calculateddensitylabel)
+            else:
+                self.calculateddensitylabel.setText("")
+                self.tab1aLayout.removeWidget(self.calculateddensitylabel)
         else:
             self.calculateddensitylabel.setText("")
+            self.tab1aLayout.removeWidget(self.calculateddensitylabel)
         
     def standard_density(self):
         volume = float(self.bean_density_volume_edit.text())
