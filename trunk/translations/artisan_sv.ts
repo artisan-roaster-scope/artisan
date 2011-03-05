@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="sv">
+<!DOCTYPE TS>
+<TS version="2.0" language="sv">
 <context>
     <name>Menu</name>
     <message>
@@ -20,7 +21,7 @@
     <message>
         <location filename="const/UIconst.py" line="30"/>
         <source>Open Recent</source>
-        <translation>Öppna Senaste</translation>
+        <translation>Öppna senaste</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="31"/>
@@ -35,7 +36,7 @@
     <message>
         <location filename="const/UIconst.py" line="33"/>
         <source>Save As...</source>
-        <translation>Spara Som...</translation>
+        <translation>Spara som...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="34"/>
@@ -45,7 +46,7 @@
     <message>
         <location filename="const/UIconst.py" line="35"/>
         <source>Save Graph</source>
-        <translation>Spara Graf</translation>
+        <translation>Spara graf</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="36"/>
@@ -55,7 +56,7 @@
     <message>
         <location filename="const/UIconst.py" line="37"/>
         <source>Print...</source>
-        <translation>Skriv Ut...</translation>
+        <translation>Skriv ut...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="40"/>
@@ -135,7 +136,7 @@
     <message>
         <location filename="const/UIconst.py" line="61"/>
         <source>Autosave...</source>
-        <translation>Spara Automatiskt...</translation>
+        <translation>Spara automatiskt...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="62"/>
