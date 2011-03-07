@@ -2037,9 +2037,18 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.ax.set_xlabel(u'Time',size=16,color = self.palette["xlabel"])
 
+
+    def restorebutton_11(self):
+        aw.button_11.setDisabled(False)
+        aw.button_11.setFlat(False)        
+
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time           
     def EventRecord(self):
+        aw.button_11.setFlat(True)
+        aw.button_11.setDisabled(True)
+        QTimer.singleShot(2000, self.restorebutton_11)
+        
         Nevents = len(self.specialevents)
         #if in manual mode record last point
         if self.device == 18:
@@ -2061,8 +2070,8 @@ class tgraphcanvas(FigureCanvas):
                 self.specialeventsvalue.append(0)               
                 
                 temp = unicode(self.temp2[i])
-                time = self.stringfromseconds(self.timex[i])
-                message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + time
+                timed = self.stringfromseconds(self.timex[i])
+                message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
                 aw.messagelabel.setText(message)
                 #write label in mini recorder if flag checked
                 if aw.minieventsflag:
@@ -2077,6 +2086,7 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText("No profile found")
             
         aw.soundpop()
+
 
     #called from markdryen(), markcharge(), mark1Cstart(), etc
     def drawmanual(self,et,bt,tx):
