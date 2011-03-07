@@ -1,7 +1,7 @@
 
 Current Versions
 o Python 2.7.1
-o QT 4.7.1
+o QT 4.7.2
 o Numpy 1.5.1
 o SIP 4.12.1
 o PyQt 4.8.3
@@ -26,11 +26,11 @@ http://www.python.org/ftp/python/2.6.6/python-2.6.6-macosx10.3.dmg
 set default to 32bit:
 # defaults write com.apple.versioner.python Prefer-32-Bit -bool yes
 
-1) Install QT
+1) Install QT ("Framework Only" without the debug libs and not the "SDK/Complete Component Environment")
 
 download and install:
 
-http://get.qt.nokia.com/qt/source/qt-mac-carbon-opensource-4.7.1.dmg (Carbon)
+http://get.qt.nokia.com/qt/source/qt-mac-carbon-opensource-4.7.2.dmg (Carbon)
 
 2) Install pyserial for Python 2.6
 
