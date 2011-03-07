@@ -2417,13 +2417,14 @@ class tgraphcanvas(FigureCanvas):
         if len(self.timex):                           #check that time is not empty just in case
             if self.timex[-1] < seconds:
                 return self.timex[-1]
+
+            if seconds < self.timex[0]:
+                return self.timex[0]
             
             for i in range(len(self.timex)):
                 # first find the index i where seconds crosses timex
                 if self.timex[i] > seconds:
                     break
-                else:
-                    return -1
                 
             choice1 = abs(self.timex[i] - seconds)   
             choice2 = abs(self.timex[i-1] - seconds) 
