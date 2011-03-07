@@ -244,6 +244,11 @@ class tgraphcanvas(FigureCanvas):
         self.dryend = [0.,0.]
         #variable to mark the begining and end of the roast [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
         self.startend = [0.,0.,0.,0.]
+        
+        #indexes for buttons START[0],Dryend[1],FCs[2],FCe[3],SCs[4],SCe[5], and DROP[6]
+        #Example: Use as self.timex[self.timeindex[1]] to get the time of DryeEnd
+        #Example: Use self.temp2[self.timeindex[4]] to get the BT temperature of SCs 
+        self.timeindex = [0,0,0,0,0,0,0] #they are all ints
 
         #prevents accidentally deleting a finished profile. Activated at [DROP]
         self.safesaveflag = False
@@ -798,6 +803,7 @@ class tgraphcanvas(FigureCanvas):
         self.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
         self.dryend = [0.,0.]
         self.startend = [0.,0.,0.,0.]
+        self.timeindex = [0,0,0,0,0,0,0]
         self.specialevents=[]
         if not self.keeptimeflag:
             self.endofx = 60
@@ -1569,6 +1575,7 @@ class tgraphcanvas(FigureCanvas):
                     self.flagclock = True
                     self.startend[0] = self.timeclock.elapsed()/1000.
                     self.startend[1] = self.temp2[-1]
+                    self.timeindex[0] = len(self.timex)-1
                 else:
                     message = u"Not enough variables collected yet. Try again in a few seconds"
             #device 18  = manual mode        
@@ -1578,6 +1585,8 @@ class tgraphcanvas(FigureCanvas):
                 if bt != 1 and et != -1:  #cancel 
                     self.startend[0] = tx
                     self.startend[1] = bt
+                    self.timeindex[0] = len(self.timex)-1
+
                     self.drawmanual(et,bt,tx)
                     # put initial marker on graph
                     rect = patches.Rectangle( (self.startend[0],0), width=.01, height=self.ylimit, color = self.palette["text"])
@@ -1612,12 +1621,15 @@ class tgraphcanvas(FigureCanvas):
                 if self.device != 18:
                     self.dryend[0] = self.timeclock.elapsed()/1000.
                     self.dryend[1] = self.temp2[-1]
+                    self.timeindex[1] = len(self.timex)-1
+
                 else:
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
                         self.dryend[0] = tx
                         self.dryend[1] = bt
+                        self.timeindex[1] = len(self.timex)-1
                         self.drawmanual(et,bt,tx)
                     else:
                         return
@@ -1656,12 +1668,14 @@ class tgraphcanvas(FigureCanvas):
                 if self.device != 18:                
                     self.varC[0] = self.timeclock.elapsed()/1000.
                     self.varC[1] = self.temp2[-1]
+                    self.timeindex[2] = len(self.timex)-1
                 else:
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
                         self.varC[0] = tx
                         self.varC[1] = bt
+                        self.timeindex[2] = len(self.timex)-1
                         self.drawmanual(et,bt,tx)                               
                     else:
                         return
@@ -1703,12 +1717,14 @@ class tgraphcanvas(FigureCanvas):
                 if self.device != 18:
                     self.varC[2] = self.timeclock.elapsed()/1000.
                     self.varC[3] = self.temp2[-1]
+                    self.timeindex[3] = len(self.timex)-1
                 else:
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
                         self.varC[2] = tx
                         self.varC[3] = bt
+                        self.timeindex[3] = len(self.timex)-1
                         self.drawmanual(et,bt,tx)                           
                     else:
                         return                    
@@ -1741,12 +1757,14 @@ class tgraphcanvas(FigureCanvas):
             if self.device != 18:
                 self.varC[4] = self.timeclock.elapsed()/1000.
                 self.varC[5] = self.temp2[-1]
+                self.timeindex[4] = len(self.timex)-1
             else:
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
                 if et != -1 and bt != -1:
                     self.varC[4] = tx
                     self.varC[5] = bt
+                    self.timeindex[4] = len(self.timex)-1
                     self.drawmanual(et,bt,tx)                           
                 else:
                     return              
@@ -1778,12 +1796,14 @@ class tgraphcanvas(FigureCanvas):
                 if self.device != 18:                
                     self.varC[6] = self.timeclock.elapsed()/1000. 
                     self.varC[7] = self.temp2[-1]
+                    self.timeindex[5] = len(self.timex)-1
                 else:
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
                         self.varC[6] = tx
                         self.varC[7] = bt
+                        self.timeindex[5] = len(self.timex)-1
                         self.drawmanual(et,bt,tx)                           
                     else:
                         return
@@ -1816,12 +1836,14 @@ class tgraphcanvas(FigureCanvas):
             if self.device != 18:        
                 self.startend[2] = self.timeclock.elapsed()/1000.
                 self.startend[3] = self.temp2[-1]
+                self.timeindex[6] = len(self.timex)-1
             else:
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
                 if et != -1 and bt != -1:
                     self.startend[2] = tx
                     self.startend[3] = bt
+                    self.timeindex[6] = len(self.timex)-1
                     self.drawmanual(et,bt,tx)
                     # put final BT marker on graph
                     rect = patches.Rectangle( (self.startend[2],0), width=.01, height=self.ylimit, color = self.palette["text"])
@@ -1861,7 +1883,6 @@ class tgraphcanvas(FigureCanvas):
             
             #prevents accidentally deleting a finished roast
             self.safesaveflag = True
-            
         else:
             message = u"Scope is OFF"
             
@@ -1874,7 +1895,7 @@ class tgraphcanvas(FigureCanvas):
             #manual dryend available
             dryEndTime = aw.qmc.dryend[0]
             BTdrycross = aw.qmc.dryend[1]
-            dryEndIndex = aw.time2index(dryEndTime)
+            dryEndIndex = aw.qmc.time2index(dryEndTime)
         else:
             #find when dry phase ends 
             dryEndIndex = aw.findDryEnd(TP_index)
@@ -2035,9 +2056,9 @@ class tgraphcanvas(FigureCanvas):
         if i > 0:
             if self.startend[0]:
                 self.specialevents.append(i)
-                self.specialeventstype.append(0)                #range 0-4
+                self.specialeventstype.append(0)            
                 self.specialeventsStrings.append(str(Nevents+1))
-                self.specialeventsvalue.append(0)               #range 0-9
+                self.specialeventsvalue.append(0)               
                 
                 temp = unicode(self.temp2[i])
                 time = self.stringfromseconds(self.timex[i])
@@ -2367,8 +2388,6 @@ class tgraphcanvas(FigureCanvas):
             self.errorlog.append(u"Exception error in drawinterp() " + unicode(e))
             return        
 
-#####################################################################################
-        
     # predicate that returns true if the given temperature reading is out of range
     def outOfRange(self,t):
         if self.mode == "C":
@@ -2392,7 +2411,41 @@ class tgraphcanvas(FigureCanvas):
                 
         return t1,t2
 
+    #selects closest time INDEX in self.timex from a given input seconds
+    def time2index(self,seconds):
+        #find where given seconds crosses aw.qmc.timex
+        if len(self.timex):                           #check that time is not empty just in case
+            if self.timex[-1] < seconds:
+                return self.timex[-1]
+            
+            for i in range(len(self.timex)):
+                # first find the index i where seconds crosses timex
+                if self.timex[i] > seconds:
+                    break
+                else:
+                    return -1
                 
+            choice1 = abs(self.timex[i] - seconds)   
+            choice2 = abs(self.timex[i-1] - seconds) 
+            choice3 = abs(self.timex[i+1] - seconds) 
+
+            if choice1 < choice2 < choice3:  #return closest (smallest) index
+                return i
+            elif choice2 < choice1 < choice3:
+                return i-1
+            else:
+                return i+1
+
+    #updates list self.timeindex when found an _old_ profile without self.timeindex
+    def timeindexupdate(self):
+        #          START            DRYEND          FCs             FCe         SCs         SCe         DROP
+        times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
+        for i in range(7):               
+            if times[i]:
+                self.timeindex[i] = self.time2index(times[i])
+            else:
+                self.timeindex[i] = 0
+                                  
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem
 #####   with py2exe and svg
@@ -3484,7 +3537,7 @@ class ApplicationWindow(QMainWindow):
             #relative time
             relativetime = self.qmc.stringtoseconds(unicode(self.etimeline.text()))
             absolutetime = relativetime + self.qmc.startend[0]
-            self.qmc.specialevents[lenevents-1] = self.qmc.timex.index(self.choice(absolutetime))
+            self.qmc.specialevents[lenevents-1] = self.qmc.time2index(absolutetime)
 
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
@@ -3641,194 +3694,7 @@ class ApplicationWindow(QMainWindow):
                 f.close()       
                 self.setProfile(self.deserialize(filename)) 
             else:      
-    
-                #Read first line. STARTEND tag
-                line = firstChar + stream.readLine().trimmed()
-                if not line.startsWith(u"[[MODE]]"):
-                    raise ValueError, u" Invalid Artisan file format: MODE tag missing"
-                line = stream.readLine().trimmed()
-                self.qmc.mode = unicode(line)        
-    
-                line = stream.readLine()
-                if not line.startsWith(u"[[STARTEND]]"):
-                    raise ValueError, u" Invalid Artisan file format: STARTEND tag missing"
-
-                #Read second line with the STARTEND values
-                line = stream.readLine().trimmed()
-                parts = line.split(u"    ")
-                if parts.count() != 4:
-                    raise ValueError, u"invalid STARTEND values"
-                else:
-                    self.qmc.startend = []
-                    for i in range(4):
-                        self.qmc.startend.append(float(parts[i]))
-
-                #Read third line. CRACKS tag
-                line = stream.readLine().trimmed()                    
-                if not line.startsWith(u"[[CRACKS]]"):
-                    raise ValueError, u" Invalid Artisan file format: CRACKS tag missing"
-    
-                #Read fourth line with CRACKS values
-                line = stream.readLine().trimmed() 
-                parts = line.split(u"    ")
-                if parts.count() != 8:
-                    raise ValueError, u"invalid CRACK values"
-                else:
-                    self.qmc.varC = []
-                    for i in range(8):
-                        self.qmc.varC.append(float(parts[i]))
-
-                #Read fith line. FLAVORS tag
-                line = stream.readLine().trimmed()                    
-                if not line.startsWith(u"[[FLAVORS]]"):
-                    raise ValueError, u" Invalid Artisan file format: FLAVORS tag missing"
-    
-                #Read six line with FLAVOR values
-                line = stream.readLine().trimmed()
-                parts = line.split(u"    ")
-                if parts.count() != 10:
-                    raise ValueError, u"invalid FLAVOR values"
-                else:
-                    self.qmc.flavors = []
-                    for i in range(10):
-                        self.qmc.flavors.append(float(parts[i]))
-                #add 10th flavor to close the circle gap when drawing STAR graph
-                self.qmc.flavors.append(self.qmc.flavors[0])
-                
-                #Read FLAVORS-LABEL tag
-                line = stream.readLine().trimmed()
-                if not line.startsWith(u"[[FLAVOR-LABELS]]"):
-                    raise ValueError, u"FLAVOR LABELS tag missing"
-                #Read FLAVOR-LABEL values
-                line = stream.readLine().trimmed()
-                parts = line.split(u";;;")
-                if parts.count() != 9:
-                    raise ValueError, u"Incorrect N flavors found"           
-                for i in range(9):
-                    self.qmc.flavorlabels[i] = unicode(parts[i])
-    
-                #read next line TITLE tag
-                line = stream.readLine().trimmed()                   
-                if not line.startsWith(u"[[TITLE]]"):
-                    raise ValueError, u" Invalid Artisan file format: TITLE tag missing"
-    
-                #Read next line beans type
-                line = stream.readLine().trimmed()
-                self.qmc.title = unicode(line)            
-    
-                #read next line BEANS tag
-                line = stream.readLine().trimmed()                   
-                if not line.startsWith(u"[[BEANS]]"):
-                    raise ValueError, u" Invalid Artisan file format: BEANS tag missing"
-    
-                #Read next line beans type
-                line = stream.readLine().trimmed()
-                self.qmc.beans = unicode(line)           
-    
-                #read next line WEIGHT tag
-                line = stream.readLine().trimmed()
-                if not line.startsWith(u"[[WEIGHT]]"):
-                    raise ValueError, u" Invalid Artisan file format: WEIGHT tag missing"
-    
-                #Read Weight
-                line = stream.readLine().trimmed()
-                parts = line.split(u"    ")
-                if parts.count() != 3:
-                    raise ValueError, u"Weight needs three values"
-                else:
-                    self.qmc.weight[0] = int(parts[0])
-                    self.qmc.weight[1] = int(parts[1])
-                    self.qmc.weight[2] = unicode(parts[2])
-                    
-                #read next line ROASTER-TYPE tag
-                line = stream.readLine().trimmed()                  
-                if not line.startsWith(u"[[ROASTER-TYPE]]"):
-                    raise ValueError, u" Invalid Artisan file format: ROASTER-TYPE tag missing"
-    
-                #Read next line roaster type
-                line = stream.readLine().trimmed()
-                self.qmc.roastertype = unicode(line)
-                
-                #read next line OPERATOR tag
-                line = stream.readLine().trimmed()                   
-                if line.startsWith(u"[[OPERATOR]]"):
-                    #Read next line roaster type
-                    line = stream.readLine().trimmed()
-                    self.qmc.operator = unicode(line)
-                    line = stream.readLine().trimmed() 
-                    
-                #Read date tag
-                if not line.startsWith(u"[[DATE]]"):
-                    raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
-                #Read date
-                line = stream.readLine().trimmed()
-                self.qmc.roastdate = QDate.fromString(line)
-    
-                #Read event tag
-                line = stream.readLine().trimmed()                   
-                if not line.startsWith(u"[[EVENTS]]"):
-                    raise ValueError, u" Invalid Artisan file format: DATE tag missing"
-                
-                #Read events contents
-                line = stream.readLine().trimmed()
-                parts = line.split(u"    ")
-                eventn = parts.count()              #number of events
-                if unicode(parts[0]).isdigit():
-                    self.qmc.specialevents = []
-                    for i in range(eventn):
-                        self.qmc.specialevents.append(int(parts[i]))
-                    #read events data
-                line = stream.readLine().trimmed()
-                if not line.startsWith(u"[[EVENTS-DATA]]"):
-                    raise ValueError, u" Invalid Artisan file format: DATA tag missing"
-                if len(self.qmc.specialevents):
-                    for i in range(len(self.qmc.specialevents)):
-                            self.qmc.specialeventsStrings[i] = unicode(stream.readLine().trimmed())               
-                else:
-                    stream.readLine() #read blank line
-            
-                #Read roasting notes tag
-                line = stream.readLine().trimmed()                   
-                if not line.startsWith(u"[[ROASTING-NOTES]]"):
-                    raise ValueError, u" Invalid Artisan file format: ROASTING-NOTES tag missing"            
-    
-                #Read Roasting notes
-                while not stream.atEnd():
-                    line = stream.readLine().trimmed()                   
-                    if line.startsWith(u"[[CUPPING-NOTES]]"):
-                        break
-                    self.qmc.roastingnotes += unicode(line) + u"\n"
-    
-                #Read cupping notes
-                while not stream.atEnd():
-                    line = stream.readLine().trimmed()                  
-                    if line.startsWith(u"[[DATA]]"):
-                        break
-                    self.qmc.cuppingnotes += unicode(line) + u"\n"
-                    
-                #Read DATA values till the end of the file
-                while not stream.atEnd():
-                    line = stream.readLine().trimmed()
-                    parts = line.split(u"    ")
-                    if parts.count() != 3:
-                        raise ValueError, u"invalid DATA values"
-                    else:
-                        self.qmc.timex.append(float(parts[0]))
-                        self.qmc.temp1.append(float(parts[1]))
-                        self.qmc.temp2.append(float(parts[2]))
-    
-                #CLOSE FILE
-                f.close()
-                #convert modes only if needed comparing the new uploaded mode to the old one.
-                #otherwise it would incorrectly convert the uploaded phases
-                if self.qmc.mode == u"F" and old_mode == "C":
-                    self.qmc.fahrenheitMode()
-                if self.qmc.mode == u"C" and old_mode == "F":
-                    self.qmc.celsiusMode()
-                    
-                #Set the xlimits
-                if self.qmc.timex:
-                    self.qmc.endofx = self.qmc.timex[-1] + 40
+                self.messagelabel.setText(u"Invalid artisan format")
 
             aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
 
@@ -3892,137 +3758,9 @@ class ApplicationWindow(QMainWindow):
                 if "dryend" in profile:
                     self.qmc.dryendB = profile["dryend"]                
             else:      
-                #variables to read on the text file are initialized as empty lists
-                self.qmc.backgroundET,self.qmc.backgroundBT,self.qmc.timeB = [],[],[]
-                self.qmc.startendB,self.qmc.varCB = [],[]
-                #Read first line. STARTEND tag
-                line = firstChar + stream.readLine().trimmed()
-                if not line.startsWith(u"[[MODE]]"):
-                    raise ValueError, u" Invalid Artisan file format: MODE tag missing"
-                line = stream.readLine()       
-                line = stream.readLine()
-                if not line.startsWith(u"[[STARTEND]]"):
-                    raise ValueError, u" Invalid Artisan file format: STARTEND tag missing"
-                #Read second line with the STARTEND values
-                line = stream.readLine().trimmed()
-                parts = line.split(u"    ")
-                if parts.count() != 4:
-                    raise ValueError, u"invalid STARTEND values"
-                else:
-                    for i in range(4):
-                        self.qmc.startendB.append(float(parts[i]))
-                        
-                #Read third line. CRACKS tag
-                line = stream.readLine().trimmed()                    
-                if not line.startsWith(u"[[CRACKS]]"):
-                    raise ValueError, u" Invalid Artisan file format: CRACKS tag missing"
-                #Read fourth line with CRACKS values
-                line = stream.readLine().trimmed() 
-                parts = line.split(u"    ")
-                if parts.count() != 8:
-                    raise ValueError, u"invalid CRACK values"
-                else:
-                    for i in range(8):
-                        self.qmc.varCB.append(float(parts[i]))
-    
-                #Read fith line. FLAVORS tag
-                line = stream.readLine().trimmed()                    
-                if not line.startsWith(u"[[FLAVORS]]"):
-                    raise ValueError, u" Invalid Artisan file format: FLAVORS tag missing"
-                #Read six line with FLAVOR values
-                line = stream.readLine().trimmed() 
-                #pass
-                #Read FLAVORS-LABEL tag
-                line = stream.readLine().trimmed()
-                if not line.startsWith(u"[[FLAVOR-LABELS]]"):
-                    raise ValueError, u"FLAVOR LABELS tag missing"
-                #Read FLAVOR-LABEL values
-                line = stream.readLine().trimmed()
-                #read next line TITLE tag
-                line = stream.readLine().trimmed()                   
-                if not line.startsWith(u"[[TITLE]]"):
-                    raise ValueError, u" Invalid Artisan file format: TITLE tag missing"
-                #Read next line beans type
-                line = stream.readLine()
-                #read next line BEANS tag
-                line = stream.readLine().trimmed()                  
-                if not line.startsWith(u"[[BEANS]]"):
-                    raise ValueError, u" Invalid Artisan file format: BEANS tag missing"
-                #Read next line beans type
-                line = stream.readLine().trimmed()
-                #read next line WEIGHT tag
-                line = stream.readLine().trimmed()                  
-                if not line.startsWith(u"[[WEIGHT]]"):
-                    raise ValueError, u" Invalid Artisan file format: WEIGHT tag missing"
-                #Read next weight
-                line = stream.readLine().trimmed()            
-                #read next line ROASTER-TYPE tag
-                line = stream.readLine().trimmed()                   
-                if not line.startsWith(u"[[ROASTER-TYPE]]"):
-                    raise ValueError, u" Invalid Artisan file format: ROASTER-TYPE tag missing"
-                line = stream.readLine().trimmed()                   
-                #read next line OPERATOR tag
-                line = stream.readLine().trimmed()                   
-                if not line.startsWith(u"[[OPERATOR]]"):
-                    raise ValueError, u" Invalid Artisan file format: OPERATOR tag missing"
-                line = stream.readLine().trimmed()                   
-                #Read data tag
-                line = stream.readLine().trimmed()                   
-                if not line.startsWith(u"[[DATE]]"):
-                    raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
-                #Read date
-                line = stream.readLine()
-                #Read event tag
-                line = stream.readLine().trimmed()                   
-                if not line.startsWith(u"[[EVENTS]]"):
-                    raise ValueError, u" Invalid Artisan file format: DATE tag missing"            
-                #Read events contents
-                line = stream.readLine().trimmed()
-    
-                parts = line.split(u"    ")
-                specialevents = parts.count()              #number of events
-    
-                #read events data
-                line = stream.readLine().trimmed()
-                if not line.startsWith(u"[[EVENTS-DATA]]"):
-                    raise ValueError, u" Invalid Artisan file format: DATA tag missing"
-                
-                if specialevents:
-                    for i in range(specialevents):
-                        stream.readLine()                             
-                else:
-                    stream.readLine() #read a blank line
-                    
-                #Read roasting notes tag
-                line = stream.readLine().trimmed()
-                if not line.startsWith(u"[[ROASTING-NOTES]]"):
-                    raise ValueError, u" Invalid Artisan file format: ROASTING-NOTES tag missing"            
-                #Read Roasting notes
-                while not stream.atEnd():
-                    line = stream.readLine().trimmed()                   
-                    if line.startsWith(u"[[CUPPING-NOTES]]"):
-                        break
-                #Read cupping notes
-                while not stream.atEnd():
-                    line = stream.readLine().trimmed()                   
-                    if line.startsWith(u"[[DATA]]"):
-                        break
-                    
-                #Read DATA values till the end of the file
-                while not stream.atEnd():
-                    line = stream.readLine().trimmed()
-                    parts = line.split(u"    ")
-                    if parts.count() != 3:
-                        raise ValueError, u"invalid DATA values"
-                    else:
-                        self.qmc.timeB.append(float(parts[0]))
-                        self.qmc.backgroundET.append(float(parts[1]))
-                        self.qmc.backgroundBT.append(float(parts[2]))
-                #CLOSE FILE
-                f.close()
+                self.messagelabel.setText(u"Invalid artisan format")
 
             message =  u"Background " + unicode(filename) + u" loaded successfully "+unicode(self.qmc.stringfromseconds(self.qmc.startendB[2]))
-
             self.messagelabel.setText(message)
 
         except IOError,e:
@@ -4258,7 +3996,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.roastdate = QDate.fromString(profile["roastdate"])
         if "specialevents" in profile:
             self.qmc.specialevents = profile["specialevents"]
-            #the new length of especial events is now 20 instead of 10
         else:
             self.qmc.specialevents = []
         if "specialeventstype" in profile:
@@ -4321,6 +4058,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.bag_humidity = profile["bag_humidity"]   
         else:
             self.qmc.bag_humidity = [0.,0.]
+        if "timeindex" in profile:
+            self.qmc.timeindex = profile["timeindex"]
+        else:
+            self.qmc.timeindexupdate()
             
             
     #used by filesave()
@@ -4330,6 +4071,7 @@ class ApplicationWindow(QMainWindow):
         profile["mode"] = self.qmc.mode
         profile["startend"] = self.qmc.startend
         profile["cracks"] = self.qmc.varC
+        profile["timeindex"] = self.qmc.timeindex
         profile["flavors"] = self.qmc.flavors
         profile["flavorlabels"] = [unicode(fl) for fl in self.qmc.flavorlabels]
         profile["title"] = unicode(self.qmc.title)
@@ -4651,46 +4393,6 @@ class ApplicationWindow(QMainWindow):
                 painter.drawPixmap(0,0,image)
             else:
                 painter.drawImage(0, 0, image)
-
-    #selects the closest match from the available data in timex for a given number of seconds.
-    #this helps ploting an event in a recorded spot of the graph, so that we don't need to interpolate.
-    #interpolation would cause plotting dimension problems because several graphs depend on the dimension of aw.qmc.timex
-    def choice(self,seconds):
-        if seconds == 0:
-            if self.qmc.startend[0]:
-                return self.qmc.startend[0]
-            else:
-                return self.qmc.timex[0]
-        else:
-            if len(self.qmc.timex):                           #check that time is not empty just in case
-                if self.qmc.timex[-1] < seconds:
-                    self.messagelabel.setText(u"Time out of reach")
-                    return self.qmc.timex[-1]
-
-                #find where given seconds crosses aw.qmc.timex
-                sd = 1000
-                for i in range(len(self.qmc.timex)):                    
-                    if abs(self.qmc.timex[i] - seconds) < sd:
-                        sd = abs(self.qmc.timex[i] - seconds)
-                        index = i
-                        
-                #compare sorroundings to find smallest
-                check1 =  abs(self.qmc.timex[index] - seconds)   
-                check2 =  abs(self.qmc.timex[index-1] - seconds) 
-                if len(self.qmc.timex) > index+1:
-                    check3 =  abs(self.qmc.timex[index+1] - seconds)
-                else:
-                    check3 = abs(self.qmc.timex[index] - seconds)
-                #find smallest of three
-
-                if check1 < check2 and check1 < check3:
-                    return self.qmc.timex[index]
-                elif check2 < check1 and check2 <= check3:
-                    return self.qmc.timex[index-1]
-                elif check3 < check2 and check3 < check1 and len(aw.qmc.timex) > index+1:
-                    return self.qmc.timex[index + 1]
-                else:
-                    return self.qmc.timex[index]
 
  
     def htmlReport(self):
@@ -6419,11 +6121,7 @@ class editGraphDlg(QDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SingleSelection)
         self.datatable.setShowGrid(True)
-        specE = []
-        #convert timex of speacial events to integers for easy match find
-        for i in range(len(aw.qmc.specialevents)):
-            specE.append(int(round(aw.qmc.timex[aw.qmc.specialevents[i]])))
-        
+
         for i in range(ndata):
             Atime = QTableWidgetItem("%.03f"%aw.qmc.timex[i])
             Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.startend[0]))))
@@ -6435,52 +6133,52 @@ class editGraphDlg(QDialog):
             else:
                 deltaET = QTableWidgetItem("00:00")
                 deltaBT = QTableWidgetItem("00:00")
-            #identify by color and add notation
-            t= int(round(aw.qmc.timex[i]))
-            if t == int(round(aw.qmc.startend[0])):
-                Rtime.setBackgroundColor(QColor('#f07800'))
-                text = Rtime.text()
-                text += " START"
-                Rtime.setText(text)
-            elif t == int(round(aw.qmc.dryend[0])):
-                Rtime.setBackgroundColor(QColor('orange'))
-                text = Rtime.text()
-                text += " DRY END"
-                Rtime.setText(text)
-            elif t == int(round(aw.qmc.varC[0])):
-                Rtime.setBackgroundColor(QColor('orange'))
-                text = Rtime.text()
-                text += " FC START"
-                Rtime.setText(text)
-            elif t == int(round(aw.qmc.varC[2])):
-                Rtime.setBackgroundColor(QColor('orange'))
-                text = Rtime.text()
-                text += " FC END"
-                Rtime.setText(text)
-            elif t == int(round(aw.qmc.varC[4])):
-                Rtime.setBackgroundColor(QColor('orange'))
-                text = Rtime.text()
-                text += " SC START"
-                Rtime.setText(text)
-            elif t == int(round(aw.qmc.varC[6])):
-                Rtime.setBackgroundColor(QColor('orange'))
-                text = Rtime.text()
-                text += " SC END"
-                Rtime.setText(text)
-            elif t in specE:
-                Rtime.setBackgroundColor(QColor('yellow'))
-                text = Rtime.text()
-                text += " EVENT #"
-                index = specE.index(t)
-                text += str(index+1)
-                text += " " + aw.qmc.etypes[aw.qmc.specialeventstype[index]][0]
-                text += str(aw.qmc.specialeventsvalue[index]-1)
-                Rtime.setText(text)
-            elif t == int(round(aw.qmc.startend[2])):
-                Rtime.setBackgroundColor(QColor('#f07800'))
-                text = Rtime.text()
-                text += " END"
-                Rtime.setText(text)
+            if i:                
+                    #identify by color and add notation
+                if i == aw.qmc.timeindex[0]:
+                    Rtime.setBackgroundColor(QColor('#f07800'))
+                    text = Rtime.text()
+                    text += " START"
+                    Rtime.setText(text)
+                elif i == aw.qmc.timeindex[1]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " DRY END"
+                    Rtime.setText(text)
+                elif i == aw.qmc.timeindex[2]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " FC START"
+                    Rtime.setText(text)
+                elif i == aw.qmc.timeindex[3]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " FC END"
+                    Rtime.setText(text)
+                elif i == aw.qmc.timeindex[4]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " SC START"
+                    Rtime.setText(text)
+                elif i == aw.qmc.timeindex[5]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " SC END"
+                    Rtime.setText(text)
+                elif i == aw.qmc.timeindex[6]:
+                    Rtime.setBackgroundColor(QColor('#f07800'))
+                    text = Rtime.text()
+                    text += " END"
+                    Rtime.setText(text)
+                elif i in aw.qmc.specialevents:
+                    Rtime.setBackgroundColor(QColor('yellow'))
+                    text = Rtime.text()
+                    text += " EVENT #"
+                    index = aw.qmc.specialevents.index(i)
+                    text += str(index+1)
+                    text += " " + aw.qmc.etypes[aw.qmc.specialeventstype[index]][0]
+                    text += str(aw.qmc.specialeventsvalue[index]-1)
+                    Rtime.setText(text)
                 
             self.datatable.setItem(i,0,Atime) 
             self.datatable.setItem(i,1,Rtime)
@@ -6525,7 +6223,7 @@ class editGraphDlg(QDialog):
         nevents  = self.eventtable.rowCount() 
         for i in range(nevents):
             time = self.eventtable.cellWidget(i,0)  
-            aw.qmc.specialevents[i] = aw.qmc.timex.index(aw.choice(int(aw.qmc.startend[0])+ aw.qmc.stringtoseconds(unicode(time.text()))))
+            aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(time.text())))
             description = self.eventtable.cellWidget(i,1)
             aw.qmc.specialeventsStrings[i] = unicode(description.text())
             etype = self.eventtable.cellWidget(i,2)
@@ -6626,26 +6324,39 @@ class editGraphDlg(QDialog):
             #startend = [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
             #check it does not updates the graph with zero times
             if aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0:
-                aw.qmc.startend[0] = aw.choice(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))   #CHARGE   time
-                aw.qmc.startend[1] = aw.BTfromseconds(aw.qmc.startend[0])                                   #CHARGE   temperature
+                startindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
+                aw.qmc.startend[0] = aw.qmc.timex[startindex]                                             #CHARGE   time
+                aw.qmc.startend[1] = aw.qmc.temp2[startindex]                                             #CHARGE   bt temperature
+                aw.qmc.timeindex[0] = startindex
             if aw.qmc.stringtoseconds(unicode(self.dryedit.text())) > 0:
-                aw.qmc.dryend[0] = aw.choice(aw.qmc.stringtoseconds(unicode(self.dryedit.text())))        #DRY END time
-                aw.qmc.dryend[1] = aw.BTfromseconds(aw.qmc.dryend[0])                                       #DRY END temperature
-            if aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())) > 0: 
-                aw.qmc.varC[0] = aw.choice(aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))       #1C START time
-                aw.qmc.varC[1] = aw.BTfromseconds(aw.qmc.varC[0])                                           #1C START temperature            
-            if aw.qmc.stringtoseconds(unicode(self.Cendedit.text())) > 0:    
-                aw.qmc.varC[2] = aw.choice(aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))         #1C END   time
-                aw.qmc.varC[3] = aw.BTfromseconds(aw.qmc.varC[2])                                           #1C END   temperature
-            if aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())) > 0:    
-                aw.qmc.varC[4] = aw.choice(aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))      #2C START time
-                aw.qmc.varC[5] = aw.BTfromseconds(aw.qmc.varC[4])                                           #2C START temperature
+                dryindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.dryedit.text())))
+                aw.qmc.dryend[0] = aw.qmc.timex[dryindex]                                                  #DRY END time
+                aw.qmc.dryend[1] = aw.qmc.temp2[dryindex]                                                  #DRY END bt temperature
+                aw.qmc.timeindex[1] = dryindex
+            if aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())) > 0:
+                fcsindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))
+                aw.qmc.varC[0] = aw.qmc.timex[fcsindex]                                                    #1C START time
+                aw.qmc.varC[1] = aw.qmc.temp2[fcsindex]                                                   #1C START bt temperature
+                aw.qmc.timeindex[2] = fcsindex
+            if aw.qmc.stringtoseconds(unicode(self.Cendedit.text())) > 0:
+                fceindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))
+                aw.qmc.varC[2] = aw.qmc.timex[fceindex]                                                   #1C END   time
+                aw.qmc.varC[3] = aw.qmc.temp2[fceindex]                                                   #1C END   bt temperature
+                aw.qmc.timeindex[3] = fceindex 
+            if aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())) > 0:
+                scsindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))
+                aw.qmc.varC[4] = aw.qmc.timex[scsindex]                                                    #2C START time
+                aw.qmc.varC[5] = aw.qmc.temp2[scsindex]                                                    #2C START bt temperature
+                aw.qmc.timeindex[4] = scsindex 
             if aw.qmc.stringtoseconds(unicode(self.CCendedit.text())) > 0:
-                aw.qmc.varC[6] = aw.choice(aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))        #2C END   time
-                aw.qmc.varC[7] = aw.BTfromseconds(aw.qmc.varC[6])                                           #2C END   temperature                
+                sceindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))
+                aw.qmc.varC[6] = aw.qmc.timex[sceindex]                                                    #2C END   time
+                aw.qmc.varC[7] = aw.qmc.temp2[sceindex]                                                    #2C END   bt temperature
+                aw.qmc.timeindex[5] = sceindex
             if aw.qmc.stringtoseconds(unicode(self.dropedit.text())) > 0:
-                aw.qmc.startend[2] = aw.choice(aw.qmc.stringtoseconds(unicode(self.dropedit.text())))     #DROP     time
-                aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2]) 
+                dropindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.dropedit.text())))
+                aw.qmc.startend[2] = aw.qmc.timex[dropindex]                                                #DROP     time
+                aw.qmc.startend[3] = aw.qmc.temp2[dropindex]                                                #DROP bt temp
 
             if aw.qmc.phasesbuttonflag:   
                 # adjust phases by DryEnd and FCs events
@@ -7065,29 +6776,6 @@ class calculatorDlg(QDialog):
         
         self.setLayout(mainlayout)
 
-    #selects closest time INDEX in aw.qmc.timex from secons
-    #used by calculate()
-    def choice(self,seconds):        
-        #find where given seconds crosses aw.qmc.timex
-        if len(aw.qmc.timex):                           #check that time is not empty just in case
-            if aw.qmc.timex[-1] < seconds:
-                return aw.qmc.timex[-1]
-            
-            for i in range(len(aw.qmc.timex)):
-                # first find the index i where seconds crosses timex
-                if aw.qmc.timex[i] > seconds:
-                    break
-            choice1 = aw.qmc.timex[i]   # equal
-            choice2 = aw.qmc.timex[i-1] # before
-            choice3 = aw.qmc.timex[i+1] # after
-
-            if abs(choice1-seconds) < abs(choice2-seconds) < abs(choice3-seconds):  #return closest INDEX 
-                return i
-            elif abs(choice2-seconds) < abs(choice1-seconds) < abs(choice3-seconds):
-                return i-1
-            else:
-                return i+1
-
     def calcEventRC(self):
         nevents = len(aw.qmc.specialevents)
         Aevent = int(self.eventAComboBox.currentIndex())
@@ -7117,8 +6805,8 @@ class calculatorDlg(QDialog):
                 self.result2.setText("")
                 return
 
-            startindex = self.choice(starttime + aw.qmc.startend[0])
-            endindex = self.choice(endtime + aw.qmc.startend[0])
+            startindex = aw.qmc.time2index(starttime + aw.qmc.startend[0])
+            endindex = aw.qmc.time2index(endtime + aw.qmc.startend[0])
             
             
             #delta
