@@ -492,7 +492,7 @@ class tgraphcanvas(FigureCanvas):
                     self.viewProjection()
                 if self.HUDflag:
                     aw.showHUD[aw.HUDfunction]()
-                if self.background:
+                if self.background and self.backgroundReproduce:
                     self.detectbackgroundevent()
                     
             #############    if using DEVICE 18 (no device). Manual mode
@@ -555,10 +555,12 @@ class tgraphcanvas(FigureCanvas):
 
     def resetlines(self):
         linecount = 2         #ET + BT
-        if self.DeltaETflag:
+        if self.DeltaETflag:  #delta ET
             linecount += 1
-        if self.DeltaBTflag:
+        if self.DeltaBTflag: #delta BT
             linecount += 1
+        if self.background:
+            linecount += 2   #background ET + background BT = 2
             
         self.ax.lines = self.ax.lines[0:linecount]
 
@@ -568,8 +570,8 @@ class tgraphcanvas(FigureCanvas):
             for i in range(len(self.backgroundEvents)):
                 timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)                 
                 if  timed > 0 and timed < self.detectBackgroundEventTime:
-                    message = "> EVENT #" + str(i+2) +" [" + self.etypes[self.backgroundEtypes[i]] + "] [" + self.eventsvalues[self.backgroundEvalues[i]] + "]"
-                    message +=  " in " + self.stringfromseconds(timed) + " : " + self.backgroundEStrings[i]
+                    message = "> next EVENT [" + self.etypes[self.backgroundEtypes[i]] + "]:  " + self.eventsvalues[self.backgroundEvalues[i]]
+                    message +=  " in " + self.stringfromseconds(timed) + " (" + self.backgroundEStrings[i] + ")"
                     #rotate colors to get attention
                     if timed%2:
                         aw.messagelabel.setStyleSheet("background-color:'transparent';")
