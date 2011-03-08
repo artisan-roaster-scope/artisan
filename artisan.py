@@ -256,16 +256,23 @@ class tgraphcanvas(FigureCanvas):
         #background profile
         self.background = False
         self.backgroundDetails = False
+        self.backgroundeventsflag = False
         self.backgroundpath = ""
         self.backgroundET,self.backgroundBT,self.timeB = [],[],[]
         self.startendB,self.varCB,self.dryendB = [0.,0.,0.,0.],[0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.]
+        self.backgroundEvents = [] #indexes of background events
+        self.backgroundEtypes = []
+        self.backgroundEvalues = []
+        self.backgroundEStrings = []
         self.backgroundalpha = 0.3
         self.backgroundwidth = 2
         self.backgroundmetcolor = self.palette["met"]
         self.backgroundbtcolor = self.palette["bt"]
         self.backgroundstyle = "-"
         self.backmoveflag = 1
-
+        self.detectBackgroundEventTime = 20 #seconds
+    	self.backgroundReproduce = False
+    	
         #Initial flavor parameters. 
         self.flavors = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5]
 
@@ -485,6 +492,8 @@ class tgraphcanvas(FigureCanvas):
                     self.viewProjection()
                 if self.HUDflag:
                     aw.showHUD[aw.HUDfunction]()
+                if self.background:
+                    self.detectbackgroundevent()
                     
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
@@ -514,6 +523,9 @@ class tgraphcanvas(FigureCanvas):
                 #plot a vertical time line
                 self.ax.plot([tx,tx], [0,self.ylimit],color ='blue',linestyle = '-', linewidth= 1, alpha = .7)
                 
+                if self.background and self.backgroundReproduce:
+                    self.detectbackgroundevent()
+                
                 self.fig.canvas.draw()
 
     def toggleHUD(self):
@@ -542,13 +554,37 @@ class tgraphcanvas(FigureCanvas):
         aw.soundpop()        
 
     def resetlines(self):
-        linecount = 2
+        linecount = 2         #ET + BT
         if self.DeltaETflag:
             linecount += 1
         if self.DeltaBTflag:
             linecount += 1
-
+            
         self.ax.lines = self.ax.lines[0:linecount]
+
+    def detectbackgroundevent(self):
+        if len(self.timex):
+            #find time distances
+            for i in range(len(self.backgroundEvents)):
+                timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)                 
+                if  timed > 0 and timed < self.detectBackgroundEventTime:
+                    message = "> EVENT #" + str(i+2) +" [" + self.etypes[self.backgroundEtypes[i]] + "] [" + self.eventsvalues[self.backgroundEvalues[i]] + "]"
+                    message +=  " in " + self.stringfromseconds(timed) + " : " + self.backgroundEStrings[i]
+                    #rotate colors to get attention
+                    if timed%2:
+                        aw.messagelabel.setStyleSheet("background-color:'transparent';")
+                    else:
+                        aw.messagelabel.setStyleSheet("background-color:'yellow';")
+                        
+                    aw.messagelabel.setText(message)
+                    break
+                #delete message
+                else:
+                    text = str(aw.messagelabel.text())
+                    if len(text):
+                        if text[0] == ">":
+                           aw.messagelabel.setText("")
+                           aw.messagelabel.setStyleSheet("background-color:'transparent';")
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
@@ -932,6 +968,23 @@ class tgraphcanvas(FigureCanvas):
             self.l_back2, = self.ax.plot(self.timeB, self.backgroundBT,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
                                          linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label="BackgroundBT")
 
+            #check backgroundevents flag	
+            if self.backgroundeventsflag:
+                if self.mode == "F":
+                    height = 50
+                else:
+                    height = 20
+                for p in range(len(self.backgroundEvents)):
+                    st1 = unicode(self.etypes[self.backgroundEtypes[p]][0] + self.eventsvalues[self.backgroundEvalues[p]])                   
+                    if self.backgroundET[self.backgroundEvents[p]] > self.backgroundBT[self.backgroundEvents[p]]:
+                        temp = self.backgroundET[self.backgroundEvents[p]]
+                    else:
+                        temp = self.backgroundBT[self.backgroundEvents[p]]
+                    self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),
+                                        xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
+                                        fontsize=10,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
+                                        alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)                        
+
             #check backgroundDetails flag
             if self.backgroundDetails:
                 st1 = unicode(self.stringfromseconds(self.startendB[0]-self.startend[0]))
@@ -1002,6 +1055,7 @@ class tgraphcanvas(FigureCanvas):
             
         #populate delta BT (self.delta2) and delta MET (self.delta1)
         d1,d2,d3,d4=[],[],[],[]
+        delta1, delta2 = 0,0
         for i in range(len(self.timex)-1):
             #print i, self.temp1[i+1], self.temp1[i]
             timed = self.timex[i+1] - self.timex[i]
@@ -1215,19 +1269,22 @@ class tgraphcanvas(FigureCanvas):
                     height = 20
                 #some times ET is not drawn (ET = 0) when using device NONE
                 if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
-                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
-                                     xytext=(self.timex[int(self.specialevents[i])],self.temp1[int(self.specialevents[i])]+height),alpha=0.9,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                    temp = self.temp1[int(self.specialevents[i])]
                 else:
-                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                                     xytext=(self.timex[int(self.specialevents[i])],self.temp2[int(self.specialevents[i])]+height),alpha=0.9,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                    temp = self.temp2[int(self.specialevents[i])]
+                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                 xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
         #if recorder on        
         if self.flagon:             
             #update to last event
-            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-            aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+            if Nevents:
+                aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+            else:
+                aw.etypeComboBox.setCurrentIndex(0)
+                aw.valueComboBox.setCurrentIndex(0)
             aw.eNumberSpinBox.setValue(Nevents)
             
 
@@ -2425,20 +2482,27 @@ class tgraphcanvas(FigureCanvas):
     def time2index(self,seconds):
         #find where given seconds crosses aw.qmc.timex
         if len(self.timex):                           #check that time is not empty just in case
+            #if input seconds longer than available time return last index
             if self.timex[-1] < seconds:
-                return self.timex[-1]
+                return len(self.timex)-1
 
+            #if given input seconds smaller than first time, return first time	
             if seconds < self.timex[0]:
-                return self.timex[0]
+                return 0
             
             for i in range(len(self.timex)):
                 # first find the index i where seconds crosses timex
                 if self.timex[i] > seconds:
                     break
                 
-            choice1 = abs(self.timex[i] - seconds)   
-            choice2 = abs(self.timex[i-1] - seconds) 
-            choice3 = abs(self.timex[i+1] - seconds) 
+            choice1 = abs(self.timex[i] - seconds)
+            
+            choice2 = abs(self.timex[i-1] - seconds)
+            #check to see if i is at the end (i+1) would cause list out of range
+            if len(self.timex) < i:
+                choice3 = abs(self.timex[i+1] - seconds)
+            else:
+                choice3 = 1999
 
             if choice1 < choice2 < choice3:  #return closest (smallest) index
                 return i
@@ -2565,7 +2629,7 @@ class ApplicationWindow(QMainWindow):
         self.settingsLoad()        
        
         #create a Label object to display program status information
-        self.messagelabel = QLabel() 
+        self.messagelabel = QLabel()
         self.messagelabel.setIndent(10)
         
         #create START STOP buttons        
@@ -3502,7 +3566,7 @@ class ApplicationWindow(QMainWindow):
         QMessageBox.information(self,u"Roast Keyboard Shortcuts",string)
 
     def changeEventNumber(self):
-       #check 
+       #check
        lenevents = len(self.qmc.specialevents)
        currentevent = self.eNumberSpinBox.value()
        self.eventlabel.setText("Event #<b>%i </b>"%currentevent)
@@ -3511,6 +3575,8 @@ class ApplicationWindow(QMainWindow):
            self.valueComboBox.setCurrentIndex(0)
            self.etypeComboBox.setCurrentIndex(0)
            self.etimeline.setText("")
+           self.qmc.resetlines()
+           self.qmc.fig.canvas.draw()
            return
        if currentevent > lenevents:
            self.eNumberSpinBox.setValue(lenevents)
@@ -3530,10 +3596,11 @@ class ApplicationWindow(QMainWindow):
            #plot little dot 
            self.qmc.resetlines() #clear old
            #plot highest ET or BT (sometimes only BT is plot (et is zero))
-           if self.qmc.temp1[etimeindex] > self.qmc.temp2[etimeindex]:
-               self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["met"])
-           else:
-               self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp2[etimeindex], "o", color = self.qmc.palette["bt"])
+           if currentevent:
+               if self.qmc.temp1[etimeindex] > self.qmc.temp2[etimeindex]:
+                   self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["met"])
+               else:
+                   self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp2[etimeindex], "o", color = self.qmc.palette["bt"])
                
            self.qmc.fig.canvas.draw()
 
@@ -3555,6 +3622,15 @@ class ApplicationWindow(QMainWindow):
             self.etimeline.clearFocus()                        
 
             self.qmc.redraw()
+            
+            #plot highest ET or BT (sometimes only BT is plot (et is zero))
+            etimeindex = self.qmc.specialevents[lenevents-1]
+            if self.qmc.temp1[etimeindex] > self.qmc.temp2[etimeindex]:
+                self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["met"])
+            else:
+                self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp2[etimeindex], "o", color = self.qmc.palette["bt"])
+               
+            self.qmc.fig.canvas.draw()
 
             string = ""
             if len(self.qmc.specialeventsStrings[lenevents-1]) > 5:
@@ -3766,6 +3842,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundBT = profile["temp2"]
                 self.qmc.startendB = profile["startend"]
                 self.qmc.varCB = profile["cracks"]
+                self.qmc.backgroundEvents = profile["specialevents"]
+                self.qmc.backgroundEtypes = profile["specialeventstype"]
+                self.qmc.backgroundEvalues = profile["specialeventsvalue"]
+                self.qmc.backgroundEStrings = profile["specialeventsStrings"]
                 if "dryend" in profile:
                     self.qmc.dryendB = profile["dryend"]                
             else:      
@@ -7415,12 +7495,14 @@ class backgroundDLG(QDialog):
         super(backgroundDLG,self).__init__(parent)
         self.setWindowTitle("Profile Background")
 
+    	#TAB 1
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
         self.filename = u""
         
         self.backgroundCheck = QCheckBox("Show")
         self.backgroundDetails = QCheckBox("Text")
+        self.backgroundeventsflag = QCheckBox("Events")
         
         if aw.qmc.background:
             self.backgroundCheck.setChecked(True)
@@ -7435,6 +7517,12 @@ class backgroundDLG(QDialog):
             self.backgroundDetails.setChecked(True)
         else:
             self.backgroundDetails.setChecked(False)
+
+        if aw.qmc.backgroundeventsflag:
+            self.backgroundeventsflag.setChecked(True)
+        else:
+            self.backgroundeventsflag.setChecked(False)
+            
 
         loadButton = QPushButton("Load")
         loadButton.setFocusPolicy(Qt.NoFocus)
@@ -7512,6 +7600,7 @@ class backgroundDLG(QDialog):
 
         self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundDetails, SIGNAL("clicked()"),self.readChecks)
+        self.connect(self.backgroundeventsflag, SIGNAL("clicked()"),self.readChecks)
         self.connect(delButton, SIGNAL("clicked()"),self.delete)
         self.connect(self.upButton, SIGNAL("clicked()"), lambda m= "up": self.move(m))
         self.connect(self.downButton, SIGNAL("clicked()"), lambda m="down": self.move(m))
@@ -7523,7 +7612,29 @@ class backgroundDLG(QDialog):
         self.connect(self.metcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color= "", curve = "met": self.adjustcolor(color,curve))
         self.connect(self.styleComboBox, SIGNAL("currentIndexChanged(QString)"),self.adjuststyle)
         
+    	#TAB 2
+        self.backgroundReproduce = QCheckBox("Reproduce Aid Mode")    
+        if aw.qmc.backgroundReproduce:
+            self.backgroundReproduce.setChecked(True)
+        else:
+            self.backgroundReproduce.setChecked(False)    	
 
+        etimelabel =QLabel("Text warning time (seconds)")
+        self.etimeSpinBox = QSpinBox()
+        self.etimeSpinBox.setRange(1,60)
+        self.etimeSpinBox.setValue(aw.qmc.detectBackgroundEventTime)
+
+        setEventButton =QPushButton("Set")
+        setEventButton.setFocusPolicy(Qt.NoFocus)
+
+        close2Button = QPushButton("Close")
+        close2Button.setFocusPolicy(Qt.NoFocus)
+
+        self.connect(setEventButton, SIGNAL("clicked()"),self.setreproduce)
+        self.connect(close2Button, SIGNAL("clicked()"),self, SLOT("reject()"))
+
+
+        #LAYOUT MANAGERS
         movelayout = QGridLayout()
         movelayout.addWidget(self.upButton,0,1)
         movelayout.addWidget(self.leftButton,1,0)
@@ -7531,28 +7642,31 @@ class backgroundDLG(QDialog):
         movelayout.addWidget(self.rightButton,1,2)
         movelayout.addWidget(self.downButton,2,1)
 
+        checkslayout = QHBoxLayout()
+        checkslayout.addWidget(self.backgroundCheck)
+        checkslayout.addWidget(self.backgroundDetails)
+        checkslayout.addWidget(self.backgroundeventsflag)
+        
+        
         layout = QGridLayout()
         layout.addWidget(selectButton,0,0)
         layout.addWidget(self.pathedit,0,1)
         layout.addWidget(loadButton,1,0)
         layout.addWidget(delButton,1,1)
-        layout.addWidget(self.backgroundCheck,2,0)
-        layout.addWidget(self.backgroundDetails,2,1)
-        layout.addWidget(widthlabel,3,0)
-        layout.addWidget(self.widthSpinBox,3,1)
-        layout.addWidget(intensitylabel,4,0)
-        layout.addWidget(self.intensitySpinBox,4,1)
-        layout.addWidget(metcolorlabel,5,0)
-        layout.addWidget(self.metcolorComboBox,5,1)
-        layout.addWidget(btcolorlabel,6,0)
-        layout.addWidget(self.btcolorComboBox,6,1)
-        layout.addWidget(stylelabel,7,0)
-        layout.addWidget(self.styleComboBox,7,1)
+        layout.addWidget(widthlabel,2,0)
+        layout.addWidget(self.widthSpinBox,2,1)
+        layout.addWidget(intensitylabel,3,0)
+        layout.addWidget(self.intensitySpinBox,3,1)
+        layout.addWidget(metcolorlabel,4,0)
+        layout.addWidget(self.metcolorComboBox,4,1)
+        layout.addWidget(btcolorlabel,5,0)
+        layout.addWidget(self.btcolorComboBox,5,1)
+        layout.addWidget(stylelabel,6,0)
+        layout.addWidget(self.styleComboBox,6,1)
         
         upperlayout = QVBoxLayout()
-        upperlayout.addWidget(self.status)
         upperlayout.addLayout(movelayout)
-        upperlayout.addSpacing(30)
+        upperlayout.addLayout(checkslayout)         
         upperlayout.addLayout(layout) 
         
         layoutBoxed = QHBoxLayout()
@@ -7564,12 +7678,51 @@ class backgroundDLG(QDialog):
         cancelButtonBoxed.addWidget(alignButton)
         cancelButtonBoxed.addWidget(cancelButton)
         
-        mainlayout = QVBoxLayout()
-        mainlayout.addLayout(layoutBoxed)  
-        mainlayout.addStretch()
-        mainlayout.addLayout(cancelButtonBoxed)
+        tab1layout = QVBoxLayout()
+        tab1layout.addLayout(layoutBoxed)  
+        tab1layout.addStretch()
+        tab1layout.addLayout(cancelButtonBoxed)
+
+        tab2layout = QGridLayout()
+        tab2layout.addWidget(self.backgroundReproduce,0,0)
+        tab2layout.addWidget(etimelabel,1,0)
+        tab2layout.addWidget(self.etimeSpinBox,1,1)
+        tab2layout.addWidget(setEventButton,2,0)
+        tab2layout.addWidget(close2Button,2,1)
+
+        #tab layout
+        TabWidget = QTabWidget()
         
-        self.setLayout(mainlayout)
+        C1Widget = QWidget()
+        C1Widget.setLayout(tab1layout)
+        TabWidget.addTab(C1Widget,"Config")
+        
+        C2Widget = QWidget()
+        C2Widget.setLayout(tab2layout)
+        TabWidget.addTab(C2Widget,"Reproduce")
+        	       
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(self.status)
+        mainLayout.addWidget(TabWidget)
+
+        self.setLayout(mainLayout)
+
+    def setreproduce(self):
+        if aw.qmc.background:
+            aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
+            
+            msg = "Reproduction set "
+            if self.backgroundReproduce.isChecked():
+                aw.qmc.backgroundReproduce = True
+                msg += "ON at " + str(aw.qmc.detectBackgroundEventTime) + " secs" 
+            else:
+                aw.qmc.backgroundReproduce = False
+                msg += "OFF"
+                aw.messagelabel.setStyleSheet("background-color:'transparent';")
+                
+            self.status.showMessage(msg,5000)
+        else:
+            self.status.showMessage("No profile background found",5000)
 
     def timealign(self):
         btime = aw.qmc.startendB[0]
@@ -7649,12 +7802,16 @@ class backgroundDLG(QDialog):
         self.pathedit.setText(u"")
         self.backgroundDetails.setChecked(False)
         self.backgroundCheck.setChecked(False)
+        self.backgroundeventsflag.setChecked(False)
         
         aw.qmc.backgroundET, aw.qmc.backgroundBT, aw.qmc.timeB = [],[],[]
         aw.qmc.startendB, aw.qmc.varCB = [0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.,0.,0.]
+        aw.qmc.backgroundEvents, aw.qmc.backgroundEtypes = [],[]
+        aw.qmc.backgroundEvalues, aw.qmc.backgroundEStrings = [],[]
         aw.qmc.dryendB = [0.,0.]
         aw.qmc.background = False
         aw.qmc.backgroundDetails = False
+        aw.qmc.backgroundeventsflag = False
         aw.qmc.backmoveflag = 1
         aw.qmc.redraw()
         
@@ -7699,6 +7856,11 @@ class backgroundDLG(QDialog):
             aw.qmc.backgroundDetails = True
         else:
             aw.qmc.backgroundDetails = False
+
+        if self.backgroundeventsflag.isChecked():
+            aw.qmc.backgroundeventsflag = True
+        else:
+            aw.qmc.backgroundeventsflag = False            
             
         aw.qmc.redraw()
         self.status.showMessage("Ready",5000)   
@@ -7718,6 +7880,7 @@ class backgroundDLG(QDialog):
         aw.loadbackground(unicode(self.pathedit.text()))
         self.backgroundCheck.setChecked(True)
         self.backgroundDetails.setChecked(True)
+        self.backgroundeventsflag.setChecked(True)
         self.readChecks()
 
 
