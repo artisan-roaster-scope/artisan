@@ -271,8 +271,8 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundstyle = "-"
         self.backmoveflag = 1
         self.detectBackgroundEventTime = 20 #seconds
-    	self.backgroundReproduce = False
-    	
+        self.backgroundReproduce = False
+    
         #Initial flavor parameters. 
         self.flavors = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5]
 
@@ -850,7 +850,7 @@ class tgraphcanvas(FigureCanvas):
         aw.lcd3.display(0.0)
         aw.lcd4.display(0)
         aw.lcd5.display(0)
-        aw.messagelabel.setText(u"Scope has been resetted")
+        aw.messagelabel.setText(u"Scope has been reset")
         aw.button_1.setDisabled(False)
         aw.button_2.setDisabled(False)        
         aw.button_3.setDisabled(False)
@@ -2240,7 +2240,7 @@ class tgraphcanvas(FigureCanvas):
                 self.startendB[1] -= step
                 self.startendB[3] -= step    
         else:
-            aw.messagelabel.setText(u"unable to move background")
+            aw.messagelabel.setText(u"Unable to move background")
             return
 
     def findpoints(self):
@@ -2337,7 +2337,7 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError,e:
             aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"value error in univariateinfo() " + unicode(e))
+            self.errorlog.append(u"Value error in univariateinfo() " + unicode(e))
             return
 
         except Exception,e:
@@ -3554,8 +3554,8 @@ class ApplicationWindow(QMainWindow):
                 self.autosaveconf()               
 
         except IOError,e:
-            self.messagelabel.setText(u"Error on autosave: " + unicode(e))
-            aw.qmc.errorlog.append(u"Error on autosave: " + unicode(e))
+            self.messagelabel.setText(u"Error on Autosave: " + unicode(e))
+            aw.qmc.errorlog.append(u"Error on Autosave: " + unicode(e))
             
            
     def viewKshortcuts(self):
@@ -3802,7 +3802,7 @@ class ApplicationWindow(QMainWindow):
             #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
+            self.messagelabel.setText(u"Error in fileload() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Unable to open file " + unicode(e))
             return
 
@@ -3857,18 +3857,18 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(message)
 
         except IOError,e:
-            self.messagelabel.setText(u"error in fileload() " + unicode(e) + u" ")
+            self.messagelabel.setText(u"Error in fileload() " + unicode(e) + u" ")
             aw.qmc.errorlog.append(u"Unable to open file " + unicode(e) )
             return
 
         except ValueError,e:
             self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"value error in fileload() " + unicode(e))
+            self.qmc.errorlog.append(u"Value error in fileload() " + unicode(e))
             return
 
         except Exception,e:
             self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"error in fileload() " + unicode(e))
+            self.qmc.errorlog.append(u"Error in fileload() " + unicode(e))
             return
         
         finally:
@@ -8204,8 +8204,8 @@ class serialport(object):
         if self.HH506RAid == "X":                                         
             self.HH506RAGetID()                       # obtain new id one time; self.HH506RAid should not be "X" any more
             if self.HH506RAid == "X":                 # if self.HH506RAGetID() went wrong and self.HH506RAid is still "X" 
-                aw.messagelabel.setText("unable to get id from HH506RA device ")
-                aw.qmc.errorlog.append("unable to get id from HH506RA device ")
+                aw.messagelabel.setText("Unable to get id from HH506RA device ")
+                aw.qmc.errorlog.append("Unable to get id from HH506RA device ")
                 return -1,-1
            
         try:
