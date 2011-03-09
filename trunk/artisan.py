@@ -140,7 +140,7 @@ class tgraphcanvas(FigureCanvas):
         #default palette of colors
         self.palette = {"background":u'white',"grid":u'green',"ylabel":u'black',"xlabel":u'black',"title":u'black',"rect1":u'green',
                         "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
-                        "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'brown'}
+                        "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'blue'}
         
         self.flavordefaultlabels = [u'Acidity',u'After Taste',u'Clean Cup',u'Head',u'Fragance',u'Sweetness',u'Aroma',u'Balance',u'Body']
         self.flavorlabels = list(self.flavordefaultlabels)
@@ -270,9 +270,12 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundbtcolor = self.palette["bt"]
         self.backgroundstyle = "-"
         self.backmoveflag = 1
-        self.detectBackgroundEventTime = 20 #seconds
-        self.backgroundReproduce = False
-    
+        self.detectBackgroundEventTime = 20 #seconds    	
+    	self.backgroundReproduce = False
+    	self.backgroundtimeindex = [0,0,0,0,0,0,0]
+        self.Betypes = [u"None",u"Power",u"Damper",u"Fan"]
+
+    	
         #Initial flavor parameters. 
         self.flavors = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5]
 
@@ -312,8 +315,10 @@ class tgraphcanvas(FigureCanvas):
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
         self.specialevents = []
-        #Combobox text items in editGraphDlg for types of events
-        self.etypes = ["None","Power","Damper","Fan"]
+        #Combobox text event types. They can be modified in eventsDlg()
+        self.etypes = [u"None",u"Power",u"Damper",u"Fan"]
+        #default etype settings to restore 
+        self.etypesdefault = [u"None",u"Power",u"Damper",u"Fan"]
         #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc. Max 20 events
         self.specialeventstype = []
         #stores text string descriptions for each event. Max 20 events
@@ -493,7 +498,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.HUDflag:
                     aw.showHUD[aw.HUDfunction]()
                 if self.background and self.backgroundReproduce:
-                    self.detectbackgroundevent()
+                    self.playbackevent()
                     
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
@@ -514,17 +519,17 @@ class tgraphcanvas(FigureCanvas):
                     aw.lcd1.display(timelcd)
                     
                 #readjust xlimit of plot if needed
-                if  tx > (self.endofx - 45):            # if difference is smaller than 30 seconds  
-                    self.endofx = int(tx + 180)         # increase x limit by 3 minutes
+                if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
+                    self.endofx = int(tx + 180)         # increase x limit by 3 minutes (180)
                     self.ax.set_xlim(self.startofx,self.endofx)
                     self.xaxistosm()
                     
                 self.resetlines()
                 #plot a vertical time line
-                self.ax.plot([tx,tx], [0,self.ylimit],color ='blue',linestyle = '-', linewidth= 1, alpha = .7)
+                self.ax.plot([tx,tx], [0,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
                 
                 if self.background and self.backgroundReproduce:
-                    self.detectbackgroundevent()
+                    self.playbackevent()
                 
                 self.fig.canvas.draw()
 
@@ -564,14 +569,15 @@ class tgraphcanvas(FigureCanvas):
             
         self.ax.lines = self.ax.lines[0:linecount]
 
-    def detectbackgroundevent(self):
+    def playbackevent(self):
         if len(self.timex):
             #find time distances
             for i in range(len(self.backgroundEvents)):
                 timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)                 
                 if  timed > 0 and timed < self.detectBackgroundEventTime:
-                    message = "> next EVENT [" + self.etypes[self.backgroundEtypes[i]] + "]:  " + self.eventsvalues[self.backgroundEvalues[i]]
-                    message +=  " in " + self.stringfromseconds(timed) + " (" + self.backgroundEStrings[i] + ")"
+                    #write message
+                    message = "> " +  self.stringfromseconds(timed) + " [" + self.etypes[self.backgroundEtypes[i]] + "] [" + self.eventsvalues[self.backgroundEvalues[i]] + "] : "
+                    message += self.backgroundEStrings[i]
                     #rotate colors to get attention
                     if timed%2:
                         aw.messagelabel.setStyleSheet("background-color:'transparent';")
@@ -977,7 +983,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     height = 20
                 for p in range(len(self.backgroundEvents)):
-                    st1 = unicode(self.etypes[self.backgroundEtypes[p]][0] + self.eventsvalues[self.backgroundEvalues[p]])                   
+                    st1 = unicode(self.Betypes[self.backgroundEtypes[p]][0] + self.eventsvalues[self.backgroundEvalues[p]])                   
                     if self.backgroundET[self.backgroundEvents[p]] > self.backgroundBT[self.backgroundEvents[p]]:
                         temp = self.backgroundET[self.backgroundEvents[p]]
                     else:
@@ -1218,13 +1224,17 @@ class tgraphcanvas(FigureCanvas):
         
         #Check eventsGraphflag and self.ylimit_min to see if there is enough height room           
         if self.eventsGraphflag and self.ylimit_min <= lim:
-            
-            if self.mode == "F":
-                row = {"N":self.phases[0]-20,"P":self.phases[0]-40,"D":self.phases[0]-60,"F":self.phases[0]-80}
-            else:
-                row = {"N":self.phases[0]-10,"P":self.phases[0]-20,"D":self.phases[0]-30,"F":self.phases[0]-40}
+            char1 = self.etypes[0][0]
+            char2 = self.etypes[1][0]
+            char3 = self.etypes[2][0]
+            char4 = self.etypes[3][0]
 
-            #draw lines of color between events of the same type to help identify areas of events.
+            if self.mode == "F":
+                row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+            else:
+                row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+
+            #draw lines of 7053color between events of the same type to help identify areas of events.
             #count (length of the list) and collect their times for each different type. Each type will have a different plot height 
             netypes=[[],[],[],[]]
             for i in range(Nevents):
@@ -1237,7 +1247,7 @@ class tgraphcanvas(FigureCanvas):
                 elif self.specialeventstype[i] == 3:
                     netypes[3].append(self.timex[self.specialevents[i]])
                     
-            letters = "NPDF"   #fisrt letter for each type (None, Power, Damper, Fan)
+            letters = self.etypes[0][0]+self.etypes[1][0]+self.etypes[2][0]+self.etypes[3][0]   #"NPDF" fisrt letter for each type (None, Power, Damper, Fan)
             colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
             for p in range(len(letters)):    
                 if len(netypes[p]) > 1:
@@ -1495,7 +1505,7 @@ class tgraphcanvas(FigureCanvas):
         #COLOR (option 1) Default
         palette1 = {"background":u'white',"grid":u'green',"ylabel":u'black',"xlabel":u'black',"title":u'black',"rect1":u'green',
                         "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
-                        "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'brown'}
+                        "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'blue'}
 
         #BLACK & WHITE (option 2) best for printing
         palette2 = {"background":u'white',"grid":u'grey',"ylabel":u'black',"xlabel":u'black',"title":u'black',"rect1":u'lightgrey',
@@ -2112,13 +2122,12 @@ class tgraphcanvas(FigureCanvas):
         #if in manual mode record last point
         if self.device == 18:
             if self.startend[0]:
-                if Nevents < 10:
-                    tx = self.timeclock.elapsed()/1000.
-                    et,bt = aw.ser.NONE()
-                    if bt != 1 and et != -1:  #cancel 
-                        self.drawmanual(et,bt,tx)                        
-                    else:
-                        return
+                tx = self.timeclock.elapsed()/1000.
+                et,bt = aw.ser.NONE()
+                if bt != 1 and et != -1:  #cancel 
+                    self.drawmanual(et,bt,tx)                        
+                else:
+                    return
         #index number            
         i = len(self.timex)-1
         if i > 0:
@@ -2146,7 +2155,19 @@ class tgraphcanvas(FigureCanvas):
             
         aw.soundpop()
 
-
+    #UNDER WORK. called from devices capable of controlling roaster to record control changes in order to reproduce a profile later
+    #device type is a string like "FUJIPXG". Command is a string.
+    def DeviceEventRecord(self,devicetype,command):
+        #number of events
+        Nevents = len(self.specialevents)
+        #index number            
+        i = len(self.timex)-1        
+        if i > 0:
+            self.specialevents.append(i)                                     # store absolute time index
+            self.specialeventstype.append(0)                                 # set type (to the first in the list)          
+            self.specialeventsStrings.append(devicetype + "::" + command)    # store the command in the string (not a binary string)   
+            self.specialeventsvalue.append(0)                                # empty 
+            
     #called from markdryen(), markcharge(), mark1Cstart(), etc
     def drawmanual(self,et,bt,tx):
         self.temp1.append(et)
@@ -2513,7 +2534,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 return i+1
 
-    #updates list self.timeindex when found an _old_ profile without self.timeindex
+    #updates list self.timeindex when found an _old_ profile without self.timeindex (new version)
     def timeindexupdate(self):
         #          START            DRYEND          FCs             FCe         SCs         SCe         DROP
         times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
@@ -2522,7 +2543,18 @@ class tgraphcanvas(FigureCanvas):
                 self.timeindex[i] = self.time2index(times[i])
             else:
                 self.timeindex[i] = 0
-                                  
+
+
+    #updates list self.backgroundtimeindex when found an _old_ profile without self.timeindex 
+    def timebackgroundindexupdate(self):
+        #          STARTB            DRYENDB          FCsB       FCeB         SCsB         SCeB               DROPB
+        times = [self.startendB[0],self.dryendB[0],self.varCB[0],self.varCB[2],self.varCB[4],self.varCB[6],self.startendB[2]]
+        for i in range(7):               
+            if times[i]:
+                self.backgroundtimeindex[i] = self.time2index(times[i])
+            else:
+                self.backgroundtimeindex[i] = 0
+                
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem
 #####   with py2exe and svg
@@ -3848,6 +3880,14 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEtypes = profile["specialeventstype"]
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
                 self.qmc.backgroundEStrings = profile["specialeventsStrings"]
+                if "etypes" in profile:
+                    self.qmc.Betypes = profile["etypes"]
+                
+                if "timeindex" in profile:
+                    self.qmc.backgroundtimeindex = profile["timeindex"]
+                else:
+                    self.qmc.timebackgroundindexupdate()
+                    
                 if "dryend" in profile:
                     self.qmc.dryendB = profile["dryend"]                
             else:      
@@ -4103,6 +4143,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventsStrings = profile["specialeventsStrings"]
         else:
             self.qmc.specialeventsStrings = []
+        if "etypes" in profile:
+            self.qmc.etypes = profile["etypes"]
+            
         if "roastingnotes" in profile:
             self.qmc.roastingnotes = unicode(profile["roastingnotes"])
         else:
@@ -4178,7 +4221,8 @@ class ApplicationWindow(QMainWindow):
         profile["specialevents"] = self.qmc.specialevents
         profile["specialeventstype"] = self.qmc.specialeventstype
         profile["specialeventsvalue"] = self.qmc.specialeventsvalue
-        profile["specialeventsStrings"] = [unicode(ses) for ses in self.qmc.specialeventsStrings] 
+        profile["specialeventsStrings"] = [unicode(ses) for ses in self.qmc.specialeventsStrings]
+        profile["etypes"] = [unicode(et) for et in self.qmc.etypes]
         profile["roastingnotes"] = unicode(self.qmc.roastingnotes)
         profile["cuppingnotes"] = unicode(self.qmc.cuppingnotes)
         profile["timex"] = self.qmc.timex
@@ -4280,6 +4324,8 @@ class ApplicationWindow(QMainWindow):
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
             self.minieventsflag = settings.value("minieventsflag",int(self.minieventsflag)).toInt()[0]
             self.qmc.eventsGraphflag = settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)).toInt()[0]
+            if settings.contains("etypes"):
+                self.qmc.etypes = settings.value("etypes",self.qmc.etypes).toStringList()
             settings.endGroup()
             
     	    #restore statistics
@@ -4399,6 +4445,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
             settings.setValue("minieventsflag",self.minieventsflag)
             settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
+            settings.setValue("etypes",self.qmc.etypes)
             settings.endGroup();            
             #save delay
             settings.setValue("Delay",self.qmc.delay)
@@ -5744,7 +5791,8 @@ class editGraphDlg(QDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
 
-        self.setModal(True)
+        #commented out because it could be used now to compare data with background tables
+        #self.setModal(True)
 
         self.setWindowTitle(u"Roast Properties")
 
@@ -7009,18 +7057,60 @@ class EventsDlg(QDialog):
             self.minieventsflag.setChecked(False)
         self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)
         
-        self.eventsGraphflag = QCheckBox("Events location bars")
+        self.eventsGraphflag = QCheckBox("Events type bars")
         if aw.qmc.eventsGraphflag:
             self.eventsGraphflag.setChecked(True)
         else:
             self.eventsGraphflag.setChecked(False)
-        self.connect(self.eventsGraphflag,SIGNAL("stateChanged(int)"),self.eventsGraphflagChanged)  
+        self.connect(self.eventsGraphflag,SIGNAL("stateChanged(int)"),self.eventsGraphflagChanged)
+
+        typelabel1 = QLabel("1")
+        typelabel2 = QLabel("2")
+        typelabel3 = QLabel("3")
+        typelabel4 = QLabel("4")
+        
+        self.etype0 = QLineEdit(aw.qmc.etypes[0])
+        self.etype1 = QLineEdit(aw.qmc.etypes[1])
+        self.etype2 = QLineEdit(aw.qmc.etypes[2])
+        self.etype3 = QLineEdit(aw.qmc.etypes[3])
+
+        okButton = QPushButton("OK")  
+        closeButton = QPushButton("Close")
+        defaultButton = QPushButton("Defaults")
+        okButton.setFocusPolicy(Qt.NoFocus)
+        closeButton.setFocusPolicy(Qt.NoFocus)
+        defaultButton.setFocusPolicy(Qt.NoFocus)
+        
+        self.connect(closeButton,SIGNAL("clicked()"),self, SLOT("reject()"))
+        self.connect(okButton,SIGNAL("clicked()"),self.updatetypes)
+        self.connect(defaultButton,SIGNAL("clicked()"),self.settypedefault)
+
+        #layouts
+        typelayout  = QGridLayout()
+        typelayout.addWidget(typelabel1,0,0)
+        typelayout.addWidget(typelabel2,0,1)
+        typelayout.addWidget(self.etype0,1,0)
+        typelayout.addWidget(self.etype1,1,1)
+        typelayout.addWidget(typelabel3,2,0)
+        typelayout.addWidget(typelabel4,2,1)
+        typelayout.addWidget(self.etype2,3,0)
+        typelayout.addWidget(self.etype3,3,1)
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(defaultButton,0)
+        buttonLayout.addWidget(okButton,1)
+        buttonLayout.addWidget(closeButton,2)
+
+        TypeGroupLayout = QGroupBox("Event Types")
+        TypeGroupLayout.setLayout(typelayout)
 
         EventsLayout = QVBoxLayout()
         EventsLayout.addWidget(self.eventsbuttonflag,0)
-        EventsLayout.addWidget(self.minieventsflag,2)
-        EventsLayout.addWidget(self.eventsGraphflag,3)
-
+        EventsLayout.addWidget(self.minieventsflag,1)
+        EventsLayout.addWidget(self.eventsGraphflag,2)
+        EventsLayout.addWidget(TypeGroupLayout,3)
+        EventsLayout.addLayout(buttonLayout,4)
+        
         self.setLayout(EventsLayout)
         
     def eventsbuttonflagChanged(self):
@@ -7056,7 +7146,25 @@ class EventsDlg(QDialog):
             aw.qmc.eventsGraphflag = 0
             aw.qmc.redraw()            
           
-        
+    def updatetypes(self):
+        if len(unicode(self.etype0.text())) and len(unicode(self.etype1.text())) and len(unicode(self.etype2.text())) and len(unicode(self.etype3.text())):
+            aw.qmc.etypes[0] = unicode(self.etype0.text())
+            aw.qmc.etypes[1] = unicode(self.etype1.text())
+            aw.qmc.etypes[2] = unicode(self.etype2.text())
+            aw.qmc.etypes[3] = unicode(self.etype3.text())
+            aw.qmc.redraw()
+            aw.messagelabel.setText(u"Event types saved")        
+            self.close()
+        else:
+            aw.messagelabel.setText(u"Found empty event type box")        
+            
+
+    def settypedefault(self):
+        aw.qmc.etypes = aw.qmc.etypesdefault
+        self.etype0.setText(aw.qmc.etypesdefault[0])
+        self.etype1.setText(aw.qmc.etypesdefault[1])
+        self.etype2.setText(aw.qmc.etypesdefault[2])
+        self.etype3.setText(aw.qmc.etypesdefault[3])
         
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
@@ -7613,29 +7721,29 @@ class backgroundDLG(QDialog):
         self.connect(self.btcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color="", curve = "bt": self.adjustcolor(color,curve))
         self.connect(self.metcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color= "", curve = "met": self.adjustcolor(color,curve))
         self.connect(self.styleComboBox, SIGNAL("currentIndexChanged(QString)"),self.adjuststyle)
+
+        #TAB 2 EVENTS
+        #table for showing events
+        self.eventtable = QTableWidget()
+
+        #TAB 3 DATA
+        #table for showing data
+        self.datatable = QTableWidget()
         
-    	#TAB 2
-        self.backgroundReproduce = QCheckBox("Reproduce Aid Mode")    
+    	#TAB 4
+        self.backgroundReproduce = QCheckBox("Playback Aid Mode")    
         if aw.qmc.backgroundReproduce:
             self.backgroundReproduce.setChecked(True)
         else:
             self.backgroundReproduce.setChecked(False)    	
+        self.connect(self.backgroundReproduce, SIGNAL("stateChanged(int)"),self.setreproduce)
 
         etimelabel =QLabel("Text warning time (seconds)")
         self.etimeSpinBox = QSpinBox()
         self.etimeSpinBox.setRange(1,60)
         self.etimeSpinBox.setValue(aw.qmc.detectBackgroundEventTime)
-
-        setEventButton =QPushButton("Set")
-        setEventButton.setFocusPolicy(Qt.NoFocus)
-
-        close2Button = QPushButton("Close")
-        close2Button.setFocusPolicy(Qt.NoFocus)
-
-        self.connect(setEventButton, SIGNAL("clicked()"),self.setreproduce)
-        self.connect(close2Button, SIGNAL("clicked()"),self, SLOT("reject()"))
-
-
+        self.connect(self.etimeSpinBox, SIGNAL("valueChanged(int)"),self.setreproduce)
+        
         #LAYOUT MANAGERS
         movelayout = QGridLayout()
         movelayout.addWidget(self.upButton,0,1)
@@ -7685,24 +7793,36 @@ class backgroundDLG(QDialog):
         tab1layout.addStretch()
         tab1layout.addLayout(cancelButtonBoxed)
 
-        tab2layout = QGridLayout()
-        tab2layout.addWidget(self.backgroundReproduce,0,0)
-        tab2layout.addWidget(etimelabel,1,0)
-        tab2layout.addWidget(self.etimeSpinBox,1,1)
-        tab2layout.addWidget(setEventButton,2,0)
-        tab2layout.addWidget(close2Button,2,1)
+        tab2layout = QVBoxLayout()
+        tab2layout.addWidget(self.eventtable)
 
+        tab3layout = QVBoxLayout()
+        tab3layout.addWidget(self.datatable)
+        
+        tab4layout = QGridLayout()
+        tab4layout.addWidget(self.backgroundReproduce,0,0)
+        tab4layout.addWidget(etimelabel,1,0)
+        tab4layout.addWidget(self.etimeSpinBox,1,1)
+       
         #tab layout
         TabWidget = QTabWidget()
         
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
         TabWidget.addTab(C1Widget,"Config")
-        
+
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        TabWidget.addTab(C2Widget,"Reproduce")
-        	       
+        TabWidget.addTab(C2Widget,"Events")
+
+        C3Widget = QWidget()
+        C3Widget.setLayout(tab3layout)
+        TabWidget.addTab(C3Widget,"Data")
+
+        C4Widget = QWidget()
+        C4Widget.setLayout(tab4layout)
+        TabWidget.addTab(C4Widget,"Playback")
+        
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.status)
         mainLayout.addWidget(TabWidget)
@@ -7810,6 +7930,9 @@ class backgroundDLG(QDialog):
         aw.qmc.startendB, aw.qmc.varCB = [0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.,0.,0.]
         aw.qmc.backgroundEvents, aw.qmc.backgroundEtypes = [],[]
         aw.qmc.backgroundEvalues, aw.qmc.backgroundEStrings = [],[]
+        aw.qmc.backgroundtimeindex = [0,0,0,0,0,0,0]
+        self.eventtable.clear()
+        self.datatable.clear()
         aw.qmc.dryendB = [0.,0.]
         aw.qmc.background = False
         aw.qmc.backgroundDetails = False
@@ -7884,7 +8007,110 @@ class backgroundDLG(QDialog):
         self.backgroundDetails.setChecked(True)
         self.backgroundeventsflag.setChecked(True)
         self.readChecks()
+        self.createEventTable()
+        self.createDataTable()
 
+    def createEventTable(self):
+        self.eventtable.clear()
+        ndata = len(aw.qmc.backgroundEvents)
+        self.eventtable.setRowCount(ndata)
+        self.eventtable.setColumnCount(4)
+        self.eventtable.setHorizontalHeaderLabels(["Time","Description","Type","Value"])
+        self.eventtable.setAlternatingRowColors(True)
+        self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
+        self.eventtable.setShowGrid(True)
+
+        for i in range(ndata):
+            time = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-aw.qmc.startendB[0])))
+            description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
+            etype = QTableWidgetItem(aw.qmc.Betypes[aw.qmc.backgroundEtypes[i]])
+            evalue = QTableWidgetItem(aw.qmc.eventsvalues[aw.qmc.backgroundEvalues[i]])
+
+            #add widgets to the table
+            self.eventtable.setItem(i,0,time)
+            self.eventtable.setItem(i,1,description)
+            self.eventtable.setItem(i,2,etype)
+            self.eventtable.setItem(i,3,evalue)            
+
+
+    def createDataTable(self):
+        self.datatable.clear()
+        ndata = len(aw.qmc.timeB)
+        self.datatable.setRowCount(ndata)
+        self.datatable.setColumnCount(6)
+        self.datatable.setHorizontalHeaderLabels(["Abs Time","Rel Time","ET","BT","DeltaBT (d/m)","DEltaET (d/m)"])
+        self.datatable.setAlternatingRowColors(True)
+        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+        self.datatable.setShowGrid(True)
+
+        for i in range(ndata):
+            Atime = QTableWidgetItem("%.03f"%aw.qmc.timeB[i])
+            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-aw.qmc.startendB[0]))))
+            ET = QTableWidgetItem("%.02f"%aw.qmc.backgroundET[i])
+            BT = QTableWidgetItem("%.02f"%aw.qmc.backgroundBT[i])
+            if i:
+                deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.backgroundET[i]-aw.qmc.backgroundET[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
+                deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.backgroundBT[i]-aw.qmc.backgroundBT[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
+            else:
+                deltaET = QTableWidgetItem("00:00")
+                deltaBT = QTableWidgetItem("00:00")
+            if i:                
+                    #identify by color and add notation
+                if i == aw.qmc.backgroundtimeindex[0]:
+                    Rtime.setBackgroundColor(QColor('#f07800'))
+                    text = Rtime.text()
+                    text += " START"
+                    Rtime.setText(text)
+                elif i == aw.qmc.backgroundtimeindex[1]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " DRY END"
+                    Rtime.setText(text)
+                elif i == aw.qmc.backgroundtimeindex[2]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " FC START"
+                    Rtime.setText(text)
+                elif i == aw.qmc.backgroundtimeindex[3]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " FC END"
+                    Rtime.setText(text)
+                elif i == aw.qmc.backgroundtimeindex[4]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " SC START"
+                    Rtime.setText(text)
+                elif i == aw.qmc.backgroundtimeindex[5]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = Rtime.text()
+                    text += " SC END"
+                    Rtime.setText(text)
+                elif i == aw.qmc.backgroundtimeindex[6]:
+                    Rtime.setBackgroundColor(QColor('#f07800'))
+                    text = Rtime.text()
+                    text += " END"
+                    Rtime.setText(text)
+                elif i in aw.qmc.backgroundEvents:
+                    Rtime.setBackgroundColor(QColor('yellow'))
+                    text = Rtime.text()
+                    text += " EVENT #"
+                    index = aw.qmc.backgroundEvents.index(i)
+                    text += str(index+1)
+                    text += " " + aw.qmc.Betypes[aw.qmc.backgroundEtypes[index]][0]
+                    text += str(aw.qmc.backgroundEvalues[index]-1)
+                    Rtime.setText(text)
+                
+            self.datatable.setItem(i,0,Atime) 
+            self.datatable.setItem(i,1,Rtime)
+            self.datatable.setItem(i,2,ET)
+            self.datatable.setItem(i,3,BT)
+            self.datatable.setItem(i,4,deltaBT)
+            self.datatable.setItem(i,5,deltaET)
 
 #############################################################################
 ################  Statistics DIALOG ########################
