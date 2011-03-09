@@ -2223,6 +2223,8 @@ class tgraphcanvas(FigureCanvas):
                    
                 self.startendB[0] -= step
                 self.startendB[2] -= step
+
+                self.timebackgroundindexupdate()                
                 
             elif direction == u"right":
                 for i in range(lt):
@@ -2241,7 +2243,9 @@ class tgraphcanvas(FigureCanvas):
                    
                 self.startendB[0] += step
                 self.startendB[2] += step
-                    
+
+                self.timebackgroundindexupdate()
+                
             elif direction == u"down":
                 for i in range(lt):
                     self.backgroundET[i] -= step
@@ -7963,6 +7967,8 @@ class backgroundDLG(QDialog):
 
          step = self.speedSpinBox.value()
          aw.qmc.movebackground(m,step)
+         self.createEventTable()
+         self.createDataTable()
          
          aw.qmc.redraw()
          #activate button
