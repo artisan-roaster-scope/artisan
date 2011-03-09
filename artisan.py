@@ -2657,7 +2657,6 @@ class ApplicationWindow(QMainWindow):
         self.pid = FujiPID()
 
         self.soundflag = 0
-
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID. 
         self.settingsLoad()        
@@ -2916,7 +2915,6 @@ class ApplicationWindow(QMainWindow):
         self.label6.setIndent(5)
         
         #convenience EVENT mini editor; View&Edits events without opening roast properties Dlg.
-        self.etypes = ["None","Power","Damper","Fan"]
         self.eventlabel = QLabel("Event #<b>0 </b>")
         self.eventlabel.setIndent(5)
         self.eNumberSpinBox = QSpinBox()
@@ -2936,7 +2934,7 @@ class ApplicationWindow(QMainWindow):
         self.etypeComboBox = QComboBox()
         self.etypeComboBox.setToolTip("Type of event")
         self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
-        self.etypeComboBox.addItems(self.etypes)
+        self.etypeComboBox.addItems(self.qmc.etypes)
         
         self.valueComboBox = QComboBox()
         self.valueComboBox.setToolTip("Value of event")
@@ -3822,6 +3820,10 @@ class ApplicationWindow(QMainWindow):
             #change Title
             self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"], fontweight='bold')
 
+            #update etypes combo box
+            self.etypeComboBox.clear()
+            self.etypeComboBox.addItems(self.qmc.etypes)
+            
             #Plot everything
             self.qmc.redraw()
             
@@ -7152,6 +7154,11 @@ class EventsDlg(QDialog):
             aw.qmc.etypes[1] = unicode(self.etype1.text())
             aw.qmc.etypes[2] = unicode(self.etype2.text())
             aw.qmc.etypes[3] = unicode(self.etype3.text())
+
+            #update mini editor
+            aw.etypeComboBox.clear()
+            aw.etypeComboBox.addItems(aw.qmc.etypes)
+        
             aw.qmc.redraw()
             aw.messagelabel.setText(u"Event types saved")        
             self.close()
