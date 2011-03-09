@@ -7736,10 +7736,12 @@ class backgroundDLG(QDialog):
         #TAB 2 EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
-
+        self.createEventTable()
+        
         #TAB 3 DATA
         #table for showing data
         self.datatable = QTableWidget()
+        self.createDataTable()
         
     	#TAB 4
         self.backgroundReproduce = QCheckBox("Playback Aid Mode")    
@@ -7844,7 +7846,7 @@ class backgroundDLG(QDialog):
         if aw.qmc.background:
             aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
             
-            msg = "Reproduction set "
+            msg = "Playback Aid set "
             if self.backgroundReproduce.isChecked():
                 aw.qmc.backgroundReproduce = True
                 msg += "ON at " + str(aw.qmc.detectBackgroundEventTime) + " secs" 
@@ -8026,104 +8028,106 @@ class backgroundDLG(QDialog):
     def createEventTable(self):
         self.eventtable.clear()
         ndata = len(aw.qmc.backgroundEvents)
-        self.eventtable.setRowCount(ndata)
-        self.eventtable.setColumnCount(4)
-        self.eventtable.setHorizontalHeaderLabels(["Time","Description","Type","Value"])
-        self.eventtable.setAlternatingRowColors(True)
-        self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
-        self.eventtable.setShowGrid(True)
+        if ndata:
+            self.eventtable.setRowCount(ndata)
+            self.eventtable.setColumnCount(4)
+            self.eventtable.setHorizontalHeaderLabels(["Time","Description","Type","Value"])
+            self.eventtable.setAlternatingRowColors(True)
+            self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
+            self.eventtable.setShowGrid(True)
 
-        for i in range(ndata):
-            time = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-aw.qmc.startendB[0])))
-            description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
-            etype = QTableWidgetItem(aw.qmc.Betypes[aw.qmc.backgroundEtypes[i]])
-            evalue = QTableWidgetItem(aw.qmc.eventsvalues[aw.qmc.backgroundEvalues[i]])
+            for i in range(ndata):
+                time = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-aw.qmc.startendB[0])))
+                description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
+                etype = QTableWidgetItem(aw.qmc.Betypes[aw.qmc.backgroundEtypes[i]])
+                evalue = QTableWidgetItem(aw.qmc.eventsvalues[aw.qmc.backgroundEvalues[i]])
 
-            #add widgets to the table
-            self.eventtable.setItem(i,0,time)
-            self.eventtable.setItem(i,1,description)
-            self.eventtable.setItem(i,2,etype)
-            self.eventtable.setItem(i,3,evalue)            
+                #add widgets to the table
+                self.eventtable.setItem(i,0,time)
+                self.eventtable.setItem(i,1,description)
+                self.eventtable.setItem(i,2,etype)
+                self.eventtable.setItem(i,3,evalue)            
 
 
     def createDataTable(self):
         self.datatable.clear()
         ndata = len(aw.qmc.timeB)
-        self.datatable.setRowCount(ndata)
-        self.datatable.setColumnCount(6)
-        self.datatable.setHorizontalHeaderLabels(["Abs Time","Rel Time","ET","BT","DeltaBT (d/m)","DEltaET (d/m)"])
-        self.datatable.setAlternatingRowColors(True)
-        self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.datatable.setSelectionMode(QTableWidget.SingleSelection)
-        self.datatable.setShowGrid(True)
+        if ndata:    
+            self.datatable.setRowCount(ndata)
+            self.datatable.setColumnCount(6)
+            self.datatable.setHorizontalHeaderLabels(["Abs Time","Rel Time","ET","BT","DeltaBT (d/m)","DEltaET (d/m)"])
+            self.datatable.setAlternatingRowColors(True)
+            self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.datatable.setSelectionMode(QTableWidget.SingleSelection)
+            self.datatable.setShowGrid(True)
 
-        for i in range(ndata):
-            Atime = QTableWidgetItem("%.03f"%aw.qmc.timeB[i])
-            Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-aw.qmc.startendB[0]))))
-            ET = QTableWidgetItem("%.02f"%aw.qmc.backgroundET[i])
-            BT = QTableWidgetItem("%.02f"%aw.qmc.backgroundBT[i])
-            if i:
-                deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.backgroundET[i]-aw.qmc.backgroundET[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
-                deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.backgroundBT[i]-aw.qmc.backgroundBT[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
-            else:
-                deltaET = QTableWidgetItem("00:00")
-                deltaBT = QTableWidgetItem("00:00")
-            if i:                
-                    #identify by color and add notation
-                if i == aw.qmc.backgroundtimeindex[0]:
-                    Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = Rtime.text()
-                    text += " START"
-                    Rtime.setText(text)
-                elif i == aw.qmc.backgroundtimeindex[1]:
-                    Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " DRY END"
-                    Rtime.setText(text)
-                elif i == aw.qmc.backgroundtimeindex[2]:
-                    Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " FC START"
-                    Rtime.setText(text)
-                elif i == aw.qmc.backgroundtimeindex[3]:
-                    Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " FC END"
-                    Rtime.setText(text)
-                elif i == aw.qmc.backgroundtimeindex[4]:
-                    Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " SC START"
-                    Rtime.setText(text)
-                elif i == aw.qmc.backgroundtimeindex[5]:
-                    Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " SC END"
-                    Rtime.setText(text)
-                elif i == aw.qmc.backgroundtimeindex[6]:
-                    Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = Rtime.text()
-                    text += " END"
-                    Rtime.setText(text)
-                elif i in aw.qmc.backgroundEvents:
-                    Rtime.setBackgroundColor(QColor('yellow'))
-                    text = Rtime.text()
-                    text += " EVENT #"
-                    index = aw.qmc.backgroundEvents.index(i)
-                    text += str(index+1)
-                    text += " " + aw.qmc.Betypes[aw.qmc.backgroundEtypes[index]][0]
-                    text += str(aw.qmc.backgroundEvalues[index]-1)
-                    Rtime.setText(text)
-                
-            self.datatable.setItem(i,0,Atime) 
-            self.datatable.setItem(i,1,Rtime)
-            self.datatable.setItem(i,2,ET)
-            self.datatable.setItem(i,3,BT)
-            self.datatable.setItem(i,4,deltaBT)
-            self.datatable.setItem(i,5,deltaET)
+            for i in range(ndata):
+                Atime = QTableWidgetItem("%.03f"%aw.qmc.timeB[i])
+                Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-aw.qmc.startendB[0]))))
+                ET = QTableWidgetItem("%.02f"%aw.qmc.backgroundET[i])
+                BT = QTableWidgetItem("%.02f"%aw.qmc.backgroundBT[i])
+                if i:
+                    deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.backgroundET[i]-aw.qmc.backgroundET[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
+                    deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.backgroundBT[i]-aw.qmc.backgroundBT[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
+                else:
+                    deltaET = QTableWidgetItem("00:00")
+                    deltaBT = QTableWidgetItem("00:00")
+                if i:                
+                        #identify by color and add notation
+                    if i == aw.qmc.backgroundtimeindex[0]:
+                        Rtime.setBackgroundColor(QColor('#f07800'))
+                        text = Rtime.text()
+                        text += " START"
+                        Rtime.setText(text)
+                    elif i == aw.qmc.backgroundtimeindex[1]:
+                        Rtime.setBackgroundColor(QColor('orange'))
+                        text = Rtime.text()
+                        text += " DRY END"
+                        Rtime.setText(text)
+                    elif i == aw.qmc.backgroundtimeindex[2]:
+                        Rtime.setBackgroundColor(QColor('orange'))
+                        text = Rtime.text()
+                        text += " FC START"
+                        Rtime.setText(text)
+                    elif i == aw.qmc.backgroundtimeindex[3]:
+                        Rtime.setBackgroundColor(QColor('orange'))
+                        text = Rtime.text()
+                        text += " FC END"
+                        Rtime.setText(text)
+                    elif i == aw.qmc.backgroundtimeindex[4]:
+                        Rtime.setBackgroundColor(QColor('orange'))
+                        text = Rtime.text()
+                        text += " SC START"
+                        Rtime.setText(text)
+                    elif i == aw.qmc.backgroundtimeindex[5]:
+                        Rtime.setBackgroundColor(QColor('orange'))
+                        text = Rtime.text()
+                        text += " SC END"
+                        Rtime.setText(text)
+                    elif i == aw.qmc.backgroundtimeindex[6]:
+                        Rtime.setBackgroundColor(QColor('#f07800'))
+                        text = Rtime.text()
+                        text += " END"
+                        Rtime.setText(text)
+                    elif i in aw.qmc.backgroundEvents:
+                        Rtime.setBackgroundColor(QColor('yellow'))
+                        text = Rtime.text()
+                        text += " EVENT #"
+                        index = aw.qmc.backgroundEvents.index(i)
+                        text += str(index+1)
+                        text += " " + aw.qmc.Betypes[aw.qmc.backgroundEtypes[index]][0]
+                        text += str(aw.qmc.backgroundEvalues[index]-1)
+                        Rtime.setText(text)
+                    
+                self.datatable.setItem(i,0,Atime) 
+                self.datatable.setItem(i,1,Rtime)
+                self.datatable.setItem(i,2,ET)
+                self.datatable.setItem(i,3,BT)
+                self.datatable.setItem(i,4,deltaBT)
+                self.datatable.setItem(i,5,deltaET)
 
 #############################################################################
 ################  Statistics DIALOG ########################
