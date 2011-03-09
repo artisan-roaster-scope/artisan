@@ -271,8 +271,8 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundstyle = "-"
         self.backmoveflag = 1
         self.detectBackgroundEventTime = 20 #seconds    	
-    	self.backgroundReproduce = False
-    	self.backgroundtimeindex = [0,0,0,0,0,0,0]
+        self.backgroundReproduce = False
+        self.backgroundtimeindex = [0,0,0,0,0,0,0]
         self.Betypes = [u"None",u"Power",u"Damper",u"Fan"]
 
     	
@@ -8747,7 +8747,6 @@ class serialport(object):
             else:
                 return -1,-1 
 
-
     def ARDUINOTC4temperature(self):
         try:
             if not self.SP.isOpen():
@@ -8758,15 +8757,15 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
 
-                command = "READ\n"                
+                command = "R" + aw.qmc.mode + "2000"  #Read command, unit, arguments
                 self.SP.write(command)
+                                
                 t0, t1, t2 = self.SP.readline().rsplit(',')  #t0 = ambient; t1 = ET; t2 = BT
                 if not self.arduinoAmbFlag:
                     aw.qmc.ambientTemp = float(t0)
                     self.arduinoAmbFlag = 1
                 
                 return float(t1), float(t2)
-
 
         except serial.SerialException, e:
             aw.messagelabel.setText("ser.ARDUINOTC4temperature() SerialException ")
