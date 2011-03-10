@@ -319,14 +319,15 @@ class tgraphcanvas(FigureCanvas):
         self.etypes = [u"None",u"Power",u"Damper",u"Fan"]
         #default etype settings to restore 
         self.etypesdefault = [u"None",u"Power",u"Damper",u"Fan"]
-        #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc. Max 20 events
+        #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc. 
         self.specialeventstype = []
-        #stores text string descriptions for each event. Max 20 events
+        #stores text string descriptions for each event. 
         self.specialeventsStrings = []
-        #stores the numeric value for each event
+        #event values are from 0-10
         self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
+        #stores the value for each event
         self.specialeventsvalue = []
-        #flag that makes the events location bars (horizontal bars) appear on the plot. flag read on redraw()
+        #flag that makes the events location type bars (horizontal bars) appear on the plot. flag read on redraw()
         self.eventsGraphflag = 1
         
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
@@ -575,9 +576,9 @@ class tgraphcanvas(FigureCanvas):
             for i in range(len(self.backgroundEvents)):
                 timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)                 
                 if  timed > 0 and timed < self.detectBackgroundEventTime:
-                    #write message
-                    message = "> " +  self.stringfromseconds(timed) + " [" + self.etypes[self.backgroundEtypes[i]] + "] [" + self.eventsvalues[self.backgroundEvalues[i]] + "] : "
-                    message += self.backgroundEStrings[i]
+                    #write text message
+                    message = "> " +  self.stringfromseconds(timed) + " [" + self.etypes[self.backgroundEtypes[i]] 
+                    message += "] [" + self.eventsvalues[self.backgroundEvalues[i]] + "] : " + self.backgroundEStrings[i]
                     #rotate colors to get attention
                     if timed%2:
                         aw.messagelabel.setStyleSheet("background-color:'transparent';")
@@ -586,6 +587,17 @@ class tgraphcanvas(FigureCanvas):
                         
                     aw.messagelabel.setText(message)
                     break
+                
+                elif timed == 0:
+                    #devices that support automatic roaster control
+                    #Fuji PID
+                    if self.device == 0:
+                        #format of the input string Command: COMMAND::VALUE1::VALUE2::VALUE3::ETC        
+                        if "::" in self.backgroundEStrings[i]:   
+                            aw.pid.replay(self.backgroundEStrings[i])
+                    #future Arduino
+                    #if self.device == 19:
+                        
                 #delete message
                 else:
                     text = str(aw.messagelabel.text())
@@ -1234,8 +1246,8 @@ class tgraphcanvas(FigureCanvas):
             else:
                 row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
 
-            #draw lines of 7053color between events of the same type to help identify areas of events.
-            #count (length of the list) and collect their times for each different type. Each type will have a different plot height 
+            #draw lines of color between events of the same type to help identify areas of events.
+            #count (as length of the list) and collect their times for each different type. Each type will have a different plot height 
             netypes=[[],[],[],[]]
             for i in range(Nevents):
                 if self.specialeventstype[i] == 0:
@@ -1310,8 +1322,8 @@ class tgraphcanvas(FigureCanvas):
         #ready to plot    
         self.fig.canvas.draw()     
 
-    #used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
-    #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep
+    #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
+    #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep (changes value in self.redraw())
     def findtextgap(self,height1,height2):
         if self.mode == "F":
             init = 50
@@ -2106,7 +2118,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.ax.set_xlabel(u'Time',size=16,color = self.palette["xlabel"])
 
-
+    #used in EventRecord()
     def restorebutton_11(self):
         aw.button_11.setDisabled(False)
         aw.button_11.setFlat(False)        
@@ -2114,6 +2126,7 @@ class tgraphcanvas(FigureCanvas):
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time           
     def EventRecord(self):
+        #[EVENT] push button feedback
         aw.button_11.setFlat(True)
         aw.button_11.setDisabled(True)
         QTimer.singleShot(2000, self.restorebutton_11)
@@ -2128,7 +2141,7 @@ class tgraphcanvas(FigureCanvas):
                     self.drawmanual(et,bt,tx)                        
                 else:
                     return
-        #index number            
+        #i = index number of the event (current length of the time list)           
         i = len(self.timex)-1
         if i > 0:
             if self.startend[0]:
@@ -2155,8 +2168,8 @@ class tgraphcanvas(FigureCanvas):
             
         aw.soundpop()
 
-    #UNDER WORK. called from devices capable of controlling roaster to record control changes in order to reproduce a profile later
-    #device type is a string like "FUJIPXG". Command is a string.
+    #called from controlling devices when roasting to record steps (commands) and produce a profile later
+    #device type is a string like "FUJIPXG", "FUJIPXR", or "ARDUINO4". Command is a text string.
     def DeviceEventRecord(self,devicetype,command):
         #number of events
         Nevents = len(self.specialevents)
@@ -2164,11 +2177,11 @@ class tgraphcanvas(FigureCanvas):
         i = len(self.timex)-1        
         if i > 0:
             self.specialevents.append(i)                                     # store absolute time index
-            self.specialeventstype.append(0)                                 # set type (to the first in the list)          
-            self.specialeventsStrings.append(devicetype + "::" + command)    # store the command in the string (not a binary string)   
+            self.specialeventstype.append(0)                                 # set type (to the first index 0)          
+            self.specialeventsStrings.append(devicetype + "::" + command)    # store the command in the string section of events (not a binary string)   
             self.specialeventsvalue.append(0)                                # empty 
             
-    #called from markdryen(), markcharge(), mark1Cstart(), etc
+    #called from markdryen(), markcharge(), mark1Cstart(), etc when using device 18 (manual mode)
     def drawmanual(self,et,bt,tx):
         self.temp1.append(et)
         self.l_temp1.set_data(self.timex, self.temp1)
@@ -2268,8 +2281,9 @@ class tgraphcanvas(FigureCanvas):
             aw.messagelabel.setText(u"Unable to move background")
             return
 
+    #points are used to draw interpolation
     def findpoints(self):
-        
+    
         if self.startend[0]:
             Xpoints = []
             Ypoints = []
@@ -2326,7 +2340,8 @@ class tgraphcanvas(FigureCanvas):
 
 
         return Xpoints,Ypoints
-    
+
+    #collects info about the univariate interpolation
     def univariateinfo(self):
         try:
             
@@ -2361,22 +2376,21 @@ class tgraphcanvas(FigureCanvas):
     ##       given points.
 
         except ValueError,e:
-            aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"Value error in univariateinfo() " + unicode(e))
+            self.adderror(u"Value Error: univariateinfo() " + unicode(e) + " ")
             return
 
         except Exception,e:
-            aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"Exception error in univariateinfo() " + unicode(e))
+            self.adderror(u"Exception Error: univariateinfo() " + unicode(e) + " ")
             return  
 
-    #interpoltaes profile (creates new data). Call when using device 18 (manual) at [OFF]
+    #interpolates profile (creates new data). Call when using device 18 (manual) at [OFF]
     def createFromManual(self):
         try:
             #check to see if there is an ET curve
             etflag = 0
-            if self.temp1[-1] > 3:
-                etflag = 1
+            if len(self.temp1):
+                if self.temp1[-1] > 3:
+                    etflag = 1
                 
             #create BT function
             func = inter.UnivariateSpline(self.timex,self.temp2)
@@ -2426,16 +2440,14 @@ class tgraphcanvas(FigureCanvas):
             self.redraw()
        
         except ValueError:
-            aw.messagelabel.setText("Unable to interpolate: ")
-            self.errorlog.append(u"Exception error in createFromManual() ")
+            self.adderror(u"Value Error: createFromManual() ")
             return
 
         except Exception,e:
-            aw.messagelabel.setText("Unable to interpolate: " + unicode(e))
-            self.errorlog.append(u"Exception error in createFromManual() " + unicode(e))
+            self.adderror(u"Exception: createFromManual() " + unicode(e) + " ")
             return  
                                     
-            
+    #interpolation type        
     def univariate(self):
         try:           
             Xpoints,Ypoints = self.findpoints()  
@@ -2452,13 +2464,11 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
 
         except ValueError:
-            aw.messagelabel.setText(u"value error in univariate() ")
-            self.errorlog.append(u"value error in univariate() " )
+            self.adderror(u"value Error: univariate() " )
             return
 
         except Exception:
-            aw.messagelabel.setText(u"Exception error in univariate() ")
-            self.errorlog.append(u"Exception error in univariate() ")
+            self.adderror(u"Exception: univariate() ")
             return  
             
     def drawinterp(self,mode):
@@ -2473,13 +2483,11 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
 
         except ValueError,e:
-            aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"value error in drawinterp() " + unicode(e))
+            self.adderror(u"value error in drawinterp() " + unicode(e) + " ")
             return
 
         except Exception,e:
-            aw.messagelabel.setText(unicode(e))
-            self.errorlog.append(u"Exception error in drawinterp() " + unicode(e))
+            self.adderror(u"Exception: drawinterp() " + unicode(e) + " ")
             return        
 
     # predicate that returns true if the given temperature reading is out of range
@@ -2513,7 +2521,7 @@ class tgraphcanvas(FigureCanvas):
             if self.timex[-1] < seconds:
                 return len(self.timex)-1
 
-            #if given input seconds smaller than first time, return first time	
+            #if given input seconds smaller than first time return first index
             if seconds < self.timex[0]:
                 return 0
             
@@ -2521,17 +2529,18 @@ class tgraphcanvas(FigureCanvas):
                 # first find the index i where seconds crosses timex
                 if self.timex[i] > seconds:
                     break
-                
+
+            #look around    
             choice1 = abs(self.timex[i] - seconds)
-            
             choice2 = abs(self.timex[i-1] - seconds)
-            #check to see if i is at the end (i+1) would cause list out of range
+            #for choice3 (i+1) first check to see if i is at the end, (i+1) would cause list out of range
             if len(self.timex) < i:
                 choice3 = abs(self.timex[i+1] - seconds)
             else:
-                choice3 = 1999
+                choice3 = 99999
 
-            if choice1 < choice2 < choice3:  #return closest (smallest) index
+            #return closest (smallest) index
+            if choice1 < choice2 < choice3:  
                 return i
             elif choice2 < choice1 < choice3:
                 return i-1
@@ -2558,6 +2567,20 @@ class tgraphcanvas(FigureCanvas):
                 self.backgroundtimeindex[i] = self.time2index(times[i])
             else:
                 self.backgroundtimeindex[i] = 0
+
+    def restore_message_label(self):
+        aw.messagelabel.setStyleSheet("background-color:'transparent';")
+
+    #adds errors
+    def adderror(self,error):
+        aw.messagelabel.setStyleSheet("background-color:'red';")
+        self.errorlog.append(error)
+        if len(error) > 150:
+            Lerror = error[0:150] + "..."
+            aw.messagelabel.setText(Lerror)
+        else:
+            aw.messagelabel.setText(error)
+        QTimer.singleShot(500, self.restore_message_label)  #set a time less than 1 second to restore color
                 
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem
@@ -3588,10 +3611,8 @@ class ApplicationWindow(QMainWindow):
                 self.autosaveconf()               
 
         except IOError,e:
-            self.messagelabel.setText(u"Error on Autosave: " + unicode(e))
-            aw.qmc.errorlog.append(u"Error on Autosave: " + unicode(e))
-            
-           
+            self.qmc.adderror(u"IO Error: automaticsave() " + unicode(e) + " ")
+          
     def viewKshortcuts(self):
         string = "<b>[ENTER]</b> = Turns ON/OFF keys<br><br>"
         string += "<b>[SPACE]</b> = Choses current button<br><br>"  
@@ -3840,24 +3861,21 @@ class ApplicationWindow(QMainWindow):
             #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.messagelabel.setText(u"Error in fileload() " + unicode(e) + u" ")
-            aw.qmc.errorlog.append(u"Unable to open file " + unicode(e))
+            self.qmc.adderror(u"IO Error: fileload() " + unicode(e) + u" ")
             return
 
         except ValueError,e:
             #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"value error in fileload() " + unicode(e))
+            self.qmc.adderror(u"Value Error: fileload() " + unicode(e) + " ")
             return
 
         except Exception,e:
             #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(unicode(e))
+            self.qmc.adderror(u"Exception Error: fileload() " + unicode(e) + " ")
             return
         
         finally:
@@ -3903,18 +3921,15 @@ class ApplicationWindow(QMainWindow):
             self.messagelabel.setText(message)
 
         except IOError,e:
-            self.messagelabel.setText(u"Error in fileload() " + unicode(e) + u" ")
-            aw.qmc.errorlog.append(u"Unable to open file " + unicode(e) )
+            self.qmc.adderror(u"IO Error: loadbackground() " + unicode(e) + u" ")
             return
 
         except ValueError,e:
-            self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"Value error in fileload() " + unicode(e))
+            self.qmc.adderror(u"Value Error: loadbackground() " + unicode(e) + u" ")
             return
 
         except Exception,e:
-            self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"Error in fileload() " + unicode(e))
+            self.qmc.adderror(u"Exception Error: loadbackground() " + unicode(e) + u" ")
             return
         
         finally:
@@ -4265,8 +4280,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.messagelabel.setText(u"Cancelled")
         except IOError,e:
-            self.messagelabel.setText(u"Error on save: " + unicode(e))
-            aw.qmc.errorlog.append(u"Error on save: " + unicode(e))
+            self.qmc.adderror(u"IO Error on filesave(): " + unicode(e) + " ")
             return
             
     def fileExport(self):
@@ -4278,8 +4292,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.messagelabel.setText(u"Cancelled")
         except IOError,e:
-            self.messagelabel.setText(u"Error on export: " + unicode(e))
-            aw.qmc.errorlog.append(u"Error on export: " + unicode(e))
+            self.qmc.adderror(u"IO Error on fileExport(): " + unicode(e) + " ")
             return
             
     def fileImport(self):
@@ -4291,8 +4304,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.messagelabel.setText(u"Cancelled")
         except IOError,e:
-            self.messagelabel.setText(u"Error on import: " + unicode(e))
-            aw.qmc.errorlog.append(u"Error on import: " + unicode(e))
+            self.qmc.adderror(u"IO Error on fileImport(): " + unicode(e) + " ")            
             return
 
 
@@ -4409,9 +4421,8 @@ class ApplicationWindow(QMainWindow):
             #update display
             self.qmc.redraw()
 
-
         except Exception,e:
-            self.qmc.errorlog.append(u"Error loading settings " + unicode(e))         
+            self.qmc.adderror(u"Exception: settingsLoad() " + unicode(e) + " ")
             return                            
 
 
@@ -4512,8 +4523,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("profilepath",self.userprofilepath)
             
         except Exception,e:
-            self.qmc.errorlog.append("Error saving settings " + str(e))   
-            
+            self.qmc.adderror(u"Exception: closeEvent() " + str(e) + " ")            
 
     def filePrint(self):
 
@@ -4775,8 +4785,7 @@ $cupping_notes
             f.close()
             QDesktopServices.openUrl(QUrl(u"file:///" + unicode(QDir().current().absolutePath()) + u"/Artisanreport.html", QUrl.TolerantMode))            
         except IOError,e:
-            self.messagelabel.setText("Error in htmlReport() " + str(e) + " ")
-            aw.qmc.errorlog.append("Error in htmlReport() " + str(e))
+            self.qmc.adderror("IO Error: htmlReport() " + str(e) + " ")
             return
         finally:
             if f:
@@ -5181,13 +5190,11 @@ $cupping_notes
             self.qmc.redraw()
  
         except IOError,e:
-            self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"file error in importK202(): " + unicode(e))
+            self.qmc.adderror(u"IO Error: importK202(): " + unicode(e) + " ")
             return            
 
         except ValueError,e:
-            self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"value error in importK202(): " + unicode(e))
+            self.qmc.adderror(u"Value Error: importK202(): " + unicode(e) + " ")
             return
 
             
@@ -5247,13 +5254,11 @@ $cupping_notes
             self.qmc.redraw()
  
         except IOError,e:
-            self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"file error in importHH506RA(): " + unicode(e))
+            self.qmc.adderror("IO Error: importHH506RA(): " + unicode(e) + " ")
             return            
 
         except ValueError,e:
-            self.messagelabel.setText(unicode(e))
-            self.qmc.errorlog.append(u"value error in importHH506RA(): " + unicode(e))
+            self.qmc.adderror("Value Error: importHH506RA(): " + unicode(e) + " ")
             return
 
 
@@ -5306,8 +5311,7 @@ $cupping_notes
             self.messagelabel.setText(filename + u" (" + unicode(x) + u"x" + unicode(y) + u") saved")
 
         except IOError,e:
-            self.messagelabel.setText(u"Error in resize() " + unicode(e) + u" ")
-            aw.qmc.errorlog.append(u"Error in resize() " + unicode(e))
+            self.qmc.adderror(u"IO Error: resize() " + unicode(e) + u" ")
             return
 
     #displays Dialog for the setting of the HUD
@@ -7857,7 +7861,9 @@ class backgroundDLG(QDialog):
                 
             self.status.showMessage(msg,5000)
         else:
+            self.backgroundReproduce.setChecked(False)
             self.status.showMessage("No profile background found",5000)
+
 
     def timealign(self):
         btime = aw.qmc.startendB[0]
@@ -8333,8 +8339,7 @@ class serialport(object):
             self.SP.open()        
                
         except serial.SerialException,e:
-            aw.messagelabel.setText("Unable to open serial port: SerialException" )
-            aw.qmc.errorlog.append("Unable to open serial port: SerialException ")
+            aw.qmc.adderror("Serial Exception: Unable to open serial port ")
             
     def closeEvent(self):
         try:        
@@ -8361,18 +8366,18 @@ class serialport(object):
                     if ord(r[1]) == 128:
                             if ord(r[2]) == 1:
                                  errorcode = " F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. "
-                                 aw.messagelabel.setText("sendFUJIcommand(): ERROR 1 Illegal Function in unit %i " %ord(command[0]))
-                                 aw.qmc.errorlog.append(errorcode)
+                                 errorcode += "SendFUJIcommand(): ERROR 1 Illegal Function in unit %i " %ord(command[0])
+                                 aw.qmc.adderror(errorcode)
                             if ord(r[2]) == 2:
                                  errorcode = "F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n \
                                              number cannot be used by the specified function code. "
-                                 aw.messagelabel.setText("sendFUJIcommand() ERROR 2 Illegal Address for unit %i "%(ord(command[0])))
-                                 aw.qmc.errorlog.append(errorcode)
+                                 errorcode += "SendFUJIcommand() ERROR 2 Illegal Address for unit %i "%(ord(command[0]))
+                                 aw.qmc.adderror(errorcode)
                             if ord(r[2]) == 3:
                                  errorcode = "F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n \
                                               coil numbers or resistor numbers."
-                                 aw.messagelabel.setText("sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i "%(ord(command[0])))
-                                 aw.qmc.errorlog.append(errorcode)
+                                 errorcode += "sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i "%(ord(command[0]))
+                                 aw.qmc.adderror(errorcode)
                     else:
                         #Check crc16
                         crcRx =  int(binascii.hexlify(r[-1]+r[-2]),16)
@@ -8380,19 +8385,16 @@ class serialport(object):
                         if crcCal1 == crcRx:  
                             return r           #OK. Return r after it has been checked for errors
                         else:
-                            aw.messagelabel.setText("Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
-                            aw.qmc.errorlog.append("Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
+                            aw.qmc.adderror("Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
                             return "0"
-
                 else:
-                    aw.messagelabel.setText(u"No RX data received")
+                    aw.qmc.adderror(u"No RX data received ")
                     return u"0"
             else:
                 return u"0"                                    
                 
         except serial.SerialException,e:
-            aw.messagelabel.setText("ser.sendFUJIcommand(): SerialException " )
-            aw.qmc.errorlog.append("ser.sendFUJIcommand): SerialException ")
+            aw.qmc.adderror("SerialException: ser.sendFUJIcommand() ")
             return "0"
 
      #t2 and t1 from Omega HH806 or HH802 meter 
@@ -8417,9 +8419,7 @@ class serialport(object):
                     return int(s1,16)/10., int(s2,16)/10.
                 else:
                     nbytes = len(r)
-                    message = u"%i bytes received but 14 needed"%nbytes
-                    aw.messagelabel.setText(message)
-                    aw.qmc.errorlog.append(message) 
+                    aw.qmc.adderror(u"HH806AUtemperature(): %i bytes received but 14 needed"%nbytes)
                     if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
                     else:
@@ -8432,8 +8432,7 @@ class serialport(object):
                     return -1,-1                                    
                                    
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.HH806AUtemperature(): SerialException ")
-            aw.qmc.errorlog.append("ser.HH806AUtemperature(): SerialException ")
+            aw.qmc.adderror(u"Serial Exception: ser.HH806AUtemperature() ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8446,9 +8445,8 @@ class serialport(object):
         #if initial id "X" has not changed then get a new one;
         if self.HH506RAid == "X":                                         
             self.HH506RAGetID()                       # obtain new id one time; self.HH506RAid should not be "X" any more
-            if self.HH506RAid == "X":                 # if self.HH506RAGetID() went wrong and self.HH506RAid is still "X" 
-                aw.messagelabel.setText("Unable to get id from HH506RA device ")
-                aw.qmc.errorlog.append("Unable to get id from HH506RA device ")
+            if self.HH506RAid == "X":                 # if self.HH506RAGetID() went wrong and self.HH506RAid is still "X"
+                aw.qmc.adderror(u"HH506RAtemperature(): Unable to get id from HH506RA device ")
                 return -1,-1
            
         try:
@@ -8467,9 +8465,7 @@ class serialport(object):
                     return int(r[1:5],16)/10., int(r[7:11],16)/10.                
                 else:
                     nbytes = len(r)
-                    message = "%i bytes received but 14 needed"%nbytes
-                    aw.messagelabel.setText(message)
-                    aw.qmc.errorlog.append(message)                
+                    aw.qmc.adderror("HH506RAtemperature(): %i bytes received but 14 needed"%nbytes)               
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -8481,8 +8477,7 @@ class serialport(object):
                     return -1,-1 
                 
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.HH506RAtemperature(): " + e)
-            aw.qmc.errorlog.append("ser.HH506RAtemperature(): " + e)
+            aw.qmc.adderror("Serial Exception: ser.HH506RAtemperature() ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8509,13 +8504,10 @@ class serialport(object):
                     self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
                 else:
                     nbytes = len(ID)
-                    message = "%i bytes received but 5 needed"%nbytes
-                    aw.messagelabel.setText(message)
-                    aw.qmc.errorlog.append(message)
+                    aw.qmc.adderror("HH506RAGetID: %i bytes received but 5 needed"%nbytes)
                     
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.HH506RAGetID() SerialException ")
-            aw.qmc.errorlog.append("ser.HH506RAGetID() SerialException " )
+            aw.qmc.adderror("Serial Exception: ser.HH506RAGetID()")
 
     def CENTER306temperature(self):
         try:
@@ -8566,9 +8558,8 @@ class serialport(object):
                 
                 else:
                     nbytes = len(r)
-                    message = "%i bytes received but 10 needed "%nbytes
-                    aw.messagelabel.setText(message)
-                    aw.qmc.errorlog.append(message)                     
+                    aw.qmc.adderror("CENTER306temperature(): %i bytes received but 10 needed "%nbytes)
+                   
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -8580,8 +8571,7 @@ class serialport(object):
                     return -1,-1 
                      
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.CENTER306temperature() SerialException")
-            aw.qmc.errorlog.append("ser.CENTER306temperature() SerialException")
+            aw.qmc.adderror("Serial Exception: ser.CENTER306temperature() ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8648,9 +8638,7 @@ class serialport(object):
 
                 else:
                     nbytes = len(r)
-                    message = "%i bytes received but 8 needed "%nbytes
-                    aw.messagelabel.setText(message)
-                    aw.qmc.errorlog.append(message)                
+                    aw.qmc.adderror("CENTER303temperature(): %i bytes received but 8 needed "%nbytes)                
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -8662,8 +8650,7 @@ class serialport(object):
                     return -1,-1 
             
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.CENTER303temperature() SerialException ")
-            aw.qmc.errorlog.append("ser.CENTER303temperature() SerialException ")
+            aw.qmc.adderror("Serial Exception: ser.CENTER303temperature()")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8726,9 +8713,7 @@ class serialport(object):
                 
                 else:
                     nbytes = len(r)
-                    message = "%i bytes from CENTER309 but 45 needed"%nbytes
-                    aw.messagelabel.setText(message)
-                    aw.qmc.errorlog.append(message)                
+                    aw.qmc.adderror("ser.CENTER309(): %i bytes received but 45 needed "%nbytes)                
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -8740,8 +8725,7 @@ class serialport(object):
                         return -1,-1 
             
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.CENTER309temperature() SerialException ")
-            aw.qmc.errorlog.append("ser.CENTER309temperature() SerialException ")
+            aw.qmc.adderror("Serial Exception: ser.CENTER309temperature() ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8768,8 +8752,7 @@ class serialport(object):
                 return float(t1), float(t2)
 
         except serial.SerialException, e:
-            aw.messagelabel.setText("ser.ARDUINOTC4temperature() SerialException ")
-            aw.qmc.errorlog.append("ser.ARDUINOTC4temperature() SerialException ")
+            aw.qmc.adderror("Serial Exception: ser.ARDUINOTC4temperature() ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -8973,16 +8956,14 @@ class serialport(object):
                     raise ValueError
 
         except ValueError:
-            aw.messagelabel.setText("ser.TEVA18Btemperature() ValueError ")
-            aw.qmc.errorlog.append("ser.TEVA18Btemperature() ValueError ")
+            aw.qmc.adderror("Value Error: ser.TEVA18Btemperature() ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1 
         
         except serial.SerialException:
-            aw.messagelabel.setText("ser.TEVA18Btemperature() SerialException ")
-            aw.qmc.errorlog.append("ser.TEVA18Btemperature() SerialException ")
+            aw.qmc.adderror("Serial Exception: ser.TEVA18Btemperature() ")
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -9212,15 +9193,13 @@ class comportDlg(QDialog):
             aw.messagelabel.setText(u"Serial Port Settings: " + comport + ", " + baudrate + ", " + bytesize + ", " + parity + ", " + stopbits + ", " + timeout)
                         
         except comportError,e:
-            aw.qmc.errorlog.append(u"Invalid serial Comm entry " + unicode(e))
-            self.messagelabel.setText(u"Invalid Comm entry")
+            aw.qmc.adderror(u"Comport Error: Invalid Comm entry ")
             self.comportEdit.selectAll()
             self.comportEdit.setFocus()           
             return
 
         except timeoutError,e:
-            aw.qmc.errorlog.append(u"Invalid serial Timeout entry" + unicode(e))
-            self.messagelabel.setText(u"Invalid Timeout entry")
+            aw.qmc.adderror(u"Timeout Error: Invalid Timeout entry ")
             self.timeoutEdit.selectAll()
             self.timeoutEdit.setFocus()           
             return
@@ -9238,7 +9217,7 @@ class comportDlg(QDialog):
                     available.append(s.portstr)
                     s.close()  
                 except serial.SerialException,e:
-                    aw.qmc.errorlog.append(u"Exception during port scan:" + unicode(e)) 
+                    aw.qmc.adderror(u"Serial Exception: scanforport() ") 
                 
         elif platf == 'Darwin':
             #scans serial ports in Mac computer
@@ -10256,7 +10235,7 @@ class PXRpidDlgControl(QDialog):
         else:
             mssg = u"setONOFFautotune() problem "
             self.status.showMessage(mssg,5000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(u"setONOFFautotune(): bad response")
         
     def setONOFFstandby(self,flag):
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
@@ -10273,9 +10252,9 @@ class PXRpidDlgControl(QDialog):
                 message = u"PID ON"      #put pid in standby 0 (pid off)
                 aw.pid.PXR["runstandby"][0] = 0
         else:
-            mssg = u"setONOFFstandby() problem "
+            mssg = u"setONOFFstandby(): problem "
             self.status.showMessage(mssg,5000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
 
     def setsv(self):
         if self.svedit.text() != "":
@@ -10285,13 +10264,14 @@ class PXRpidDlgControl(QDialog):
             if r == command:
                 message = u" SV successfully set to " + self.svedit.text()
                 aw.pid.PXR["sv0"][0] = float(self.svedit.text())
-                aw.lcd6.display(aw.pid.PXR["sv0"][0])
                 self.status.showMessage(message,5000)
-                #aw.lcd6.display(unicode(self.svedit.text()))
+                #record command as an Event 
+                strcommand = u"SETSV::"+ unicode("%.1f"%(newSVvalue/10.))
+                aw.qmc.DeviceEventRecord("FUJI",strcommand)
             else:
                 mssg = u"setsv(): unable to set sv"
                 self.status.showMessage(mssg,5000)
-                aw.qmc.errorlog.append(mssg)                
+                aw.qmc.adderror(mssg)                
         else:
             self.status.showMessage(u"Empty SV box",5000)
 
@@ -10407,9 +10387,9 @@ class PXRpidDlgControl(QDialog):
                 else:
                     self.status.showMessage(u"RampSoak could not be turned ON", 5000)
             else:
-                mssg = u"setONOFFrampsoak() problem "
+                mssg = u"setONOFFrampsoak(): problem "
                 self.status.showMessage(mssg,5000)
-                aw.qmc.errorlog.append(mssg)
+                aw.qmc.adderror(mssg)
                   
         #set ramp soak OFF       
         elif flag == 0:
@@ -10420,9 +10400,9 @@ class PXRpidDlgControl(QDialog):
                 self.status.showMessage(u"RS successfully turned OFF", 5000)
                 aw.pid.PXR["rampsoak"][0] = flag
             else:
-                mssg = u"Ramp Soak could not be set OFF"
+                mssg = u"setONOFFrampsoak(): Ramp Soak could not be set OFF"
                 self.status.showMessage(mssg,5000)
-                aw.qmc.errorlog.append(mssg)
+                aw.qmc.adderror(mssg)
 
     def getsegment(self, idn):
         svkey = u"segment" + unicode(idn) + u"sv"
@@ -10431,7 +10411,7 @@ class PXRpidDlgControl(QDialog):
         if sv == -1:
             mssg = u"getsegment(): problem reading sv "
             self.status.showMessage(mssg,5000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
             return -1
         aw.pid.PXR[svkey][0] = sv/10.              #divide by 10 because the decimal point is not sent by the PID
 
@@ -10441,7 +10421,7 @@ class PXRpidDlgControl(QDialog):
         if ramp == -1:
             mssg = u"getsegment(): problem reading ramp "
             self.status.showMessage(mssg,5000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
             return -1
         aw.pid.PXR[rampkey][0] = ramp/10.
         
@@ -10451,7 +10431,7 @@ class PXRpidDlgControl(QDialog):
         if soak == -1:
             mssg = u"getsegment(): problem reading soak "
             self.status.showMessage(mssg,5000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
             return -1
             return -1
         aw.pid.PXR[soakkey][0] = soak/10.
@@ -10466,7 +10446,7 @@ class PXRpidDlgControl(QDialog):
             if k == -1:
                 mssg = u"getallsegments(): problem reading R/S "
                 self.status.showMessage(mssg,5000)
-                aw.qmc.errorlog.append(mssg)
+                aw.qmc.adderror(mssg)
                 return
             self.paintlabels()
             
@@ -10538,7 +10518,7 @@ class PXRpidDlgControl(QDialog):
         else:
             mssg = u"setpid(): There was a problem setting " + var 
             self.status.showMessage(mssg,5000)        
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
             
 # UNDER WORK 
 #######################################################################################
@@ -11353,7 +11333,7 @@ class PXG4pidDlgControl(QDialog):
         else:
             mssg = u"setNsv(): bad response"
             self.status.showMessage(mssg,1000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
 
         
     #selects an sv   
@@ -11382,7 +11362,7 @@ class PXG4pidDlgControl(QDialog):
                     else:
                         mssg = u"setNpid(): bad confirmation" 
                         self.status.showMessage(mssg,1000)
-                        aw.qmc.errorlog.append(mssg)
+                        aw.qmc.adderror(mssg)
                         
                 elif reply == QMessageBox.Cancel:
                     self.status.showMessage(u"Cancelled pid change",5000)
@@ -11408,7 +11388,7 @@ class PXG4pidDlgControl(QDialog):
         else:
             mssg = u"setNpid(): Unable to set pid " + unicode(N) + u" "
             self.status.showMessage(mssg,1000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
 
     #writes new value on sv(i)
     def setsv(self,i):
@@ -11485,10 +11465,14 @@ class PXG4pidDlgControl(QDialog):
                  self.setNsv(7)
                  aw.lcd6.display(unicode(self.sv7edit.text()))
 
+            #record command as an Event 
+            strcommand = u"SETSV::" + + unicode("%.1f"%(newSVvalue/10.))
+            aw.qmc.DeviceEventRecord("FUJI",strcommand)
+
         else:
             mssg = u"setsv(): Unable to set SV "
             self.status.showMessage(mssg,5000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
 
     #writes new values for p - i - d
     def setpid(self,k):
@@ -11607,7 +11591,7 @@ class PXG4pidDlgControl(QDialog):
             ld = len(d)
             mssg = u"pid command failed. Bad data at pid" + unicode(k) + u" (8,8,8): (" + unicode(lp)+ u"," + unicode(li)+u"," + unicode(ld) + u") "
             self.status.showMessage(mssg,5000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
 
 
     def getallpid(self):
@@ -11675,7 +11659,7 @@ class PXG4pidDlgControl(QDialog):
             else:
                 mssg = u"getallpid(): Unable to read pid values "
                 self.status.showMessage(mssg,5000)
-                aw.qmc.errorlog.append(mssg)
+                aw.qmc.adderror(mssg)
                 return
                 
         #read current pidN
@@ -11704,7 +11688,7 @@ class PXG4pidDlgControl(QDialog):
         else:
             mssg = u"getallpid(): Unable to read current sv "
             self.status.showMessage(mssg,5000)
-            aw.qmc.errorlog.append(mssg)
+            aw.qmc.adderror(mssg)
             
     def getallsv(self):
         for i in reversed(range(1,8)):
@@ -12190,6 +12174,42 @@ class FujiPID(object):
             else:
                 return -1
             
+    #sets a new sv value on PXG             
+    def setPXGsv(self,value):
+        #send command to the current sv (1-7)
+        svkey = u"sv"+ unicode(aw.pid.PXG4["selectsv"][0]) #current sv
+        command = self.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[svkey][1],int(value*10))
+        r = aw.ser.sendFUJIcommand(command,8)
+        #check response
+        if len(r) == 8:
+            message = u"PXG sv#%i set to %.1f"%(aw.pid.PXG4["selectsv"][0],float(value))
+            aw.messagelabel.setText(message)
+            aw.pid.PXG4[svkey][0] = value
+            #record command as an Event 
+            strcommand = u"SETSV::" + unicode("%.1f"%float(value))
+            aw.qmc.DeviceEventRecord("FUJI",strcommand)
+        else:
+            aw.qmc.adderror(u"setPXGsv(): bad response from PID")
+            return -1        
+
+    #sets a new sv value on PXR 
+    def setPXRsv(self,value):
+        command = self.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["sv0"][1],int(value*10))
+        r = aw.ser.sendFUJIcommand(command,8)
+        #check response
+        if len(r) == 8:
+            message = u"PXR sv set to %.1f"%value
+            aw.pid.PXR["sv0"][0] = value
+            aw.messagelabel.setText(message)
+            #record command as an Event 
+            strcommand = u"SETSV::" + unicode("%.1f"%float(value))
+            aw.qmc.DeviceEventRecord("FUJI",strcommand)
+        else:
+            aw.qmc.adderror(u"setPXRsv(): bad response from PID")
+            return -1          
+
+
+    #used to set up or down SV by diff degrees from current sv setting      
     def adjustsv(self,diff):
         currentsv = self.readcurrentsv()
         if currentsv != -1:
@@ -12203,14 +12223,18 @@ class FujiPID(object):
                 if N != -1:
                     self.PXG4["selectsv"][0] = N
                     svkey = u"sv" + unicode(N)
+                    
                     command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],newsv)
                     r = aw.ser.sendFUJIcommand(command,8)
                     if len(r) == 8:
                         message = u"SV" + unicode(N) + u" changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
                         aw.messagelabel.setText(message)
-                        aw.lcd6.display(newsv/10.)
                         self.PXG4[svkey][0] = newsv
                         
+                        #record command as an Event to replay (not binary as it needs to be stored in a text file)
+                        strcommand = u"SETSV::" + unicode("%.1f"%(newsv/10.))
+                        aw.qmc.DeviceEventRecord("FUJI",strcommand)
+                            
                     else:
                         msg = u"Unable to set sv" + unicode(N)
                         aw.messagelabel.setText(msg)       
@@ -12222,12 +12246,32 @@ class FujiPID(object):
                 if len(r) == 8:
                     message = u" SV changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
                     aw.messagelabel.setText(message)
-                    aw.lcd6.display(newsv/10.)
                     self.PXR["sv0"][0] = newsv
+
+                    #record command as an Event to replay (not binary as it needs to be stored in a text file)
+                    strcommand = u"SETSV::" + unicode("%.1f"%(newsv/10.))
+                    aw.qmc.DeviceEventRecord("FUJI",strcommand)
                 else:
                     aw.messagelabel.setText(u"Unable to set sv")
         else:
             aw.messagelabel.setText(u"Unable to set new sv")
+
+
+    #format of the input string Command: COMMAND::VALUE1::VALUE2::VALUE3::ETC        
+    def replay(self,CommandString):
+        parts = CommandString.split("::")
+        command = parts[0]
+        values = parts[1:]
+        
+        if aw.ser.controlETpid[0] == 0: #Fuji PXG           
+            if command == "SETSV":
+                self.setPXGsv(float(values[0]))
+            #add more commands here
+                
+        elif aw.ser.controlETpid[0] == 1: #Fuji PXR
+            if command == "SETSV":
+                self.setPXRsv(float(values[0]))
+            #add more commands here
 
     def dec2HexRaw(self,decimal):
         # This method converts a decimal to a raw string appropiate for Fuji serial TX
@@ -12291,8 +12335,7 @@ class FujiPID(object):
         else:
             #bad number of RX bytes 
             errorcode = u"pid.readoneword(): %i RX bytes received (7 needed) for unit ID=%i" %(len(r),ord(command[0]))
-            aw.messagelabel.setText(errorcode)
-            aw.qmc.errorlog.append(errorcode)            
+            aw.qmc.adderror(errorcode)            
             return -1
 
     #FUJICRC16 function calculates the CRC16 of the data. It expects a binary string as input and returns and int
