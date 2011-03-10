@@ -2178,7 +2178,16 @@ class tgraphcanvas(FigureCanvas):
             self.specialevents.append(i)                                     # store absolute time index
             self.specialeventstype.append(0)                                 # set type (to the first index 0)          
             self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
-            self.specialeventsvalue.append(0)                                # empty 
+            self.specialeventsvalue.append(0)                                # empty
+            message = u"Computer Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
+            aw.messagelabel.setText(message)
+            #write label in mini recorder if flag checked
+            if aw.minieventsflag:
+                aw.eNumberSpinBox.setValue(Nevents+1)
+                aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+            self.redraw()
             
     #called from markdryen(), markcharge(), mark1Cstart(), etc when using device 18 (manual mode)
     def drawmanual(self,et,bt,tx):
