@@ -2169,8 +2169,7 @@ class tgraphcanvas(FigureCanvas):
         aw.soundpop()
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
-    #device type is a string like "FUJIPXG", "FUJIPXR", or "ARDUINO4". Command is a text string.
-    def DeviceEventRecord(self,devicetype,command):
+    def DeviceEventRecord(self,command):
         #number of events
         Nevents = len(self.specialevents)
         #index number            
@@ -2178,7 +2177,7 @@ class tgraphcanvas(FigureCanvas):
         if i > 0:
             self.specialevents.append(i)                                     # store absolute time index
             self.specialeventstype.append(0)                                 # set type (to the first index 0)          
-            self.specialeventsStrings.append(devicetype + "::" + command)    # store the command in the string section of events (not a binary string)   
+            self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
             self.specialeventsvalue.append(0)                                # empty 
             
     #called from markdryen(), markcharge(), mark1Cstart(), etc when using device 18 (manual mode)
@@ -10267,7 +10266,7 @@ class PXRpidDlgControl(QDialog):
                 self.status.showMessage(message,5000)
                 #record command as an Event 
                 strcommand = u"SETSV::"+ unicode("%.1f"%(newSVvalue/10.))
-                aw.qmc.DeviceEventRecord("FUJI",strcommand)
+                aw.qmc.DeviceEventRecord(strcommand)
             else:
                 mssg = u"setsv(): unable to set sv"
                 self.status.showMessage(mssg,5000)
@@ -11467,7 +11466,7 @@ class PXG4pidDlgControl(QDialog):
 
             #record command as an Event 
             strcommand = u"SETSV::" + + unicode("%.1f"%(newSVvalue/10.))
-            aw.qmc.DeviceEventRecord("FUJI",strcommand)
+            aw.qmc.DeviceEventRecord(strcommand)
 
         else:
             mssg = u"setsv(): Unable to set SV "
@@ -12187,7 +12186,7 @@ class FujiPID(object):
             aw.pid.PXG4[svkey][0] = value
             #record command as an Event 
             strcommand = u"SETSV::" + unicode("%.1f"%float(value))
-            aw.qmc.DeviceEventRecord("FUJI",strcommand)
+            aw.qmc.DeviceEventRecord(strcommand)
         else:
             aw.qmc.adderror(u"setPXGsv(): bad response from PID")
             return -1        
@@ -12203,7 +12202,7 @@ class FujiPID(object):
             aw.messagelabel.setText(message)
             #record command as an Event 
             strcommand = u"SETSV::" + unicode("%.1f"%float(value))
-            aw.qmc.DeviceEventRecord("FUJI",strcommand)
+            aw.qmc.DeviceEventRecord(strcommand)
         else:
             aw.qmc.adderror(u"setPXRsv(): bad response from PID")
             return -1          
@@ -12233,7 +12232,7 @@ class FujiPID(object):
                         
                         #record command as an Event to replay (not binary as it needs to be stored in a text file)
                         strcommand = u"SETSV::" + unicode("%.1f"%(newsv/10.))
-                        aw.qmc.DeviceEventRecord("FUJI",strcommand)
+                        aw.qmc.DeviceEventRecord(strcommand)
                             
                     else:
                         msg = u"Unable to set sv" + unicode(N)
@@ -12250,7 +12249,7 @@ class FujiPID(object):
 
                     #record command as an Event to replay (not binary as it needs to be stored in a text file)
                     strcommand = u"SETSV::" + unicode("%.1f"%(newsv/10.))
-                    aw.qmc.DeviceEventRecord("FUJI",strcommand)
+                    aw.qmc.DeviceEventRecord(strcommand)
                 else:
                     aw.messagelabel.setText(u"Unable to set sv")
         else:
