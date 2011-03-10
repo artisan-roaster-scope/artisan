@@ -6943,7 +6943,7 @@ class calculatorDlg(QDialog):
             endtime = aw.qmc.stringtoseconds(unicode(self.endEdit.text()))
 
             if starttime == -1 or endtime == -1:
-                self.result1.setText("time sintax error. Time not valid")
+                self.result1.setText("Time syntax error. Time not valid")
                 self.result2.setText("")
                 return
 
