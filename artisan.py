@@ -10079,6 +10079,11 @@ class PXRpidDlgControl(QDialog):
         self.connect(button_d, SIGNAL("clicked()"), lambda var=u"d": self.setpid(var))
         self.connect(tab3cancelbutton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(button_readpid, SIGNAL("clicked()"), self.getpid)
+
+        #TAB4
+        #table for setting segments
+        self.segmenttable = QTableWidget()
+        self.createsegmenttable()
         
         #create layouts
         tab1layout = QVBoxLayout()
@@ -10141,7 +10146,8 @@ class PXRpidDlgControl(QDialog):
         tab3layout.addWidget(button_readpid,4,1)
         tab3layout.addWidget(tab3cancelbutton,4,2)
         
-
+        tab4layout = QVBoxLayout()
+        tab4layout.addWidget(self.segmenttable)  
         ###################################        
 
         TabWidget = QTabWidget()
@@ -10157,7 +10163,10 @@ class PXRpidDlgControl(QDialog):
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
         TabWidget.addTab(C3Widget,"pid")
-        
+
+        C4Widget = QWidget()
+        C4Widget.setLayout(tab4layout)
+        TabWidget.addTab(C4Widget,"Set RS")        
 
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -10527,7 +10536,39 @@ class PXRpidDlgControl(QDialog):
             mssg = u"setpid(): There was a problem setting " + var 
             self.status.showMessage(mssg,5000)        
             aw.qmc.adderror(mssg)
+
+    def createsegmenttable(self):
+        self.segmenttable.setRowCount(8)
+        self.segmenttable.setColumnCount(4)
+        self.segmenttable.setHorizontalHeaderLabels(["SV","Ramp (mins)","Soak (mins)",""])
+        self.segmenttable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
+        self.segmenttable.setShowGrid(True)
             
+        #populate table
+        for i in range(8):
+            #create widgets
+            svkey = u"segment" + unicode(i+1) + u"sv"
+            rampkey = u"segment" + unicode(i+1) + u"ramp"
+            soakkey = u"segment" + unicode(i+1) + u"soak"
+            
+            svedit = QLineEdit(unicode(aw.pid.PXR[svkey][0]))
+            svedit.setValidator(QDoubleValidator(0., 999., 1, svedit))
+            rampedit = QLineEdit(unicode(aw.pid.PXR[rampkey][0]))
+            rampedit.setValidator(QIntValidator(0,20,rampedit))
+            soakedit  = QLineEdit(unicode(aw.pid.PXR[soakkey][0]))
+            soakedit.setValidator(QIntValidator(0,20,soakedit))
+            setButton = QPushButton("Set")
+            self.connect(setButton,SIGNAL("clicked()"),lambda idn =i+1, sv=float(svedit.text()),ramp=int(rampedit.text()),
+                         soak=int(soakedit.text()):aw.pid.setsegment(idn,sv,ramp,soak))
+            #add widgets to the table
+            self.segmenttable.setCellWidget(i,0,svedit)
+            self.segmenttable.setCellWidget(i,1,rampedit)
+            self.segmenttable.setCellWidget(i,2,soakedit)
+            self.segmenttable.setCellWidget(i,3,setButton)
+
+
 # UNDER WORK 
 #######################################################################################
 #################### COFFEE CRACK  DETECTOR PROJECT ###################################
@@ -11053,7 +11094,12 @@ class PXG4pidDlgControl(QDialog):
         self.connect(cancel3button, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(autotuneONbutton, SIGNAL("clicked()"), lambda flag=1: self.setONOFFautotune(flag))
         self.connect(autotuneOFFbutton, SIGNAL("clicked()"), lambda flag=0: self.setONOFFautotune(flag))
-        
+
+        #TAB4
+        #table for setting segments
+        self.segmenttable = QTableWidget()
+        self.createsegmenttable()
+       
         # LAYOUTS        
         tab1Layout = QGridLayout() #TAB1
         tab1Layout.setSpacing(10)
@@ -11157,6 +11203,8 @@ class PXG4pidDlgControl(QDialog):
         tab3Layoutbutton.addWidget(pidreadallbutton,1,0)
         tab3Layoutbutton.addWidget(cancel3button,1,1)
 
+        tab4layout = QVBoxLayout()
+        tab4layout.addWidget(self.segmenttable)
         
         ############################
         TabWidget = QTabWidget()
@@ -11173,6 +11221,10 @@ class PXG4pidDlgControl(QDialog):
         C3Widget.setLayout(tab3MasterLayout)
         TabWidget.addTab(C3Widget,"PID")
 
+        C4Widget = QWidget()
+        C4Widget.setLayout(tab4layout)
+        TabWidget.addTab(C4Widget,"Set RS")
+        
         #incorporate layouts
         layout = QVBoxLayout()
         layout.addWidget(self.status,0)
@@ -11978,6 +12030,37 @@ class PXG4pidDlgControl(QDialog):
             else:
                 self.status.showMessage(u"UNABLE to set Autotune",5000) 
 
+    def createsegmenttable(self):
+        self.segmenttable.setRowCount(16)
+        self.segmenttable.setColumnCount(4)
+        self.segmenttable.setHorizontalHeaderLabels(["SV","Ramp (mins)","Soak (mins)",""])
+        self.segmenttable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
+        self.segmenttable.setShowGrid(True)
+            
+        #populate table
+        for i in range(16):
+            #create widgets
+            svkey = u"segment" + unicode(i+1) + u"sv"
+            rampkey = u"segment" + unicode(i+1) + u"ramp"
+            soakkey = u"segment" + unicode(i+1) + u"soak"
+            
+            svedit = QLineEdit(unicode(aw.pid.PXG4[svkey][0]))
+            svedit.setValidator(QDoubleValidator(0., 999., 1, svedit))
+            rampedit = QLineEdit(unicode(aw.pid.PXG4[rampkey][0]))
+            rampedit.setValidator(QIntValidator(0,20,rampedit))
+            soakedit  = QLineEdit(unicode(aw.pid.PXG4[soakkey][0]))
+            soakedit.setValidator(QIntValidator(0,20,soakedit))
+            setButton = QPushButton("Set")
+            self.connect(setButton,SIGNAL("clicked()"),lambda idn =i+1, sv=float(svedit.text()),ramp=int(rampedit.text()),
+                         soak=int(soakedit.text()):aw.pid.setsegment(idn,sv,ramp,soak))
+            #add widgets to the table
+            self.segmenttable.setCellWidget(i,0,svedit)
+            self.segmenttable.setCellWidget(i,1,rampedit)
+            self.segmenttable.setCellWidget(i,2,soakedit)
+            self.segmenttable.setCellWidget(i,3,setButton)
+
 ###################################################################################
 ##########################  FUJI PID CLASS DEFINITION  ############################
 ###################################################################################
@@ -12118,11 +12201,10 @@ class FujiPID(object):
                     "pv?":[0,31001],
                     #current sv on display (during ramp soak it changes)
                     "sv?":[0,31002],
-                    #rampsoak current running position (0-17)
+                    #rampsoak current running position (1-8)
                     "segment?":[0,31009]
                     }
-                    
-                    
+                        
                       
     ##TX/RX FUNCTIONS
     #This function reads read-only memory (with 3xxxx memory we need function=4)
@@ -12164,57 +12246,136 @@ class FujiPID(object):
         #if control pid is fuji PXG4
         if aw.ser.controlETpid[0] == 0:        
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["sv?"][1],1)
-            val = float(self.readoneword(command)/10.)
+            val = self.readoneword(command)/10.
             if val != -0.1:
-                aw.lcd6.display(val)
+                return val
+            else:
+                return -1
+ 
+        #or if control pid is fuji PXR
+        elif aw.ser.controlETpid[0] == 1:
+            command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
+            val = self.readoneword(command)/10.
+            if val != -0.1:
                 return val
             else:
                 return -1
 
-        #or if control pid is fuji PXR
-        elif aw.ser.controlETpid[0] == 1:
-            command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
-            val = float(self.readoneword(command))/10.
-            if val != -0.1:
-                self.PXR["sv0"][0] =  val
-                aw.lcd6.display(aw.pid.PXR["sv0"][0])
-                return aw.pid.PXR["sv0"][0]
-            else:
-                return -1
+    #idn = id number, sv = float set value, ramp = ramp value, soak = soak value
+    def setsegment(self,idn,sv,ramp,soak):
+        #if PXG
+        if aw.ser.controlETpid[0] == 0:
+            if idn < 1 or idn > 16:
+                aw.qmc.adderror(u"Segment number requested is out of range (1-16)")
+                return
+            svkey = u"segment" + unicode(idn) + u"sv"
+            svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(sv*10))
+            r1 = aw.ser.sendFUJIcommand(svcommand,8)
             
-    #sets a new sv value on PXG             
-    def setPXGsv(self,value):
-        #send command to the current sv (1-7)
-        svkey = u"sv"+ unicode(aw.pid.PXG4["selectsv"][0]) #current sv
-        command = self.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[svkey][1],int(value*10))
-        r = aw.ser.sendFUJIcommand(command,8)
-        #check response
-        if len(r) == 8:
-            message = u"PXG sv#%i set to %.1f"%(aw.pid.PXG4["selectsv"][0],float(value))
-            aw.messagelabel.setText(message)
-            aw.pid.PXG4[svkey][0] = value
-            #record command as an Event 
-            strcommand = u"SETSV::" + unicode("%.1f"%float(value))
-            aw.qmc.DeviceEventRecord(strcommand)
+            rampkey = u"segment" + unicode(idn) + u"ramp"
+            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[rampkey][1],ramp)
+            r2 = aw.ser.sendFUJIcommand(rampcommand,8)
+             
+            soakkey = u"segment" + unicode(idn) + u"soak"
+            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[soakkey][1],soak)
+            r3 = aw.ser.sendFUJIcommand(soakcommand,8)
+        #if PXR
+        if aw.ser.controlETpid[0] == 1:
+            if idn < 1 or idn > 8:
+                aw.qmc.adderror(u"Segment number requested is out of range (1-8)")
+                return
+            svkey = u"segment" + unicode(idn) + u"sv"
+            svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[svkey][1],int(sv*10))
+            r1 = aw.ser.sendFUJIcommand(svcommand,8)
+            
+            rampkey = u"segment" + unicode(idn) + u"ramp"
+            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[rampkey][1],ramp)
+            r2 = aw.ser.sendFUJIcommand(rampcommand,8)
+             
+            soakkey = u"segment" + unicode(idn) + u"soak"
+            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[soakkey][1],soak)
+            r3 = aw.ser.sendFUJIcommand(soakcommand,8)
+        
+        #check if OK
+        if len(r1)==8 and len(r2)==8 and len(r3)==8:
+            if aw.ser.controlETpid[0] == 0:
+                self.PXG4[svkey][0] = sv
+                self.PXG4[rampkey][0] = ramp
+                self.PXG4[soakkey][0] = soak
+            if aw.ser.controlETpid[0] == 1:
+                self.PXR[svkey][0] = sv
+                self.PXR[rampkey][0] = ramp
+                self.PXR[soakkey][0] = soak
         else:
-            aw.qmc.adderror(u"setPXGsv(): bad response from PID")
-            return -1        
+            aw.qmc.adderror(u"Segment values could not be writen into PID")
 
-    #sets a new sv value on PXR 
-    def setPXRsv(self,value):
-        command = self.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["sv0"][1],int(value*10))
+
+    #turns ON turns OFF current ramp soak mode
+    #flag =0 OFF, flag = 1 ON, flag = 2 hold
+    #A ramp soak pattern defines a whole profile. They have a minimum of 4 segments.       
+    def setrampsoak(self,flag):
+        #Fuji PXG 
+        if aw.ser.controlETpid[0] == 0:         
+            command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4["rampsoak"][1],flag)
+        #Fuji PXR    
+        elif aw.ser.controlETpid[0] == 1:
+            command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["rampsoak"][1],flag)
+            
         r = aw.ser.sendFUJIcommand(command,8)
-        #check response
-        if len(r) == 8:
-            message = u"PXR sv set to %.1f"%value
-            aw.pid.PXR["sv0"][0] = value
-            aw.messagelabel.setText(message)
+        #if OK
+        if r == command:
+            if flag == 1:
+                aw.messagelabel.setText(u"RS ON and running...")
+            elif flag == 0:
+                aw.messagelabel.setText(u"RS OFF")
+            else:
+                aw.messagelabel.setText(u"RS on HOLD")                
             #record command as an Event 
-            strcommand = u"SETSV::" + unicode("%.1f"%float(value))
+            strcommand = u"SETRS::" + unicode(flag)
             aw.qmc.DeviceEventRecord(strcommand)
+            #save value
+            if aw.ser.controlETpid[0] == 0:
+                self.PXG4["rampsoak"][0] = flag
+            elif aw.ser.controlETpid[0] == 1:
+                self.PXR["rampsoak"][0] = flag
         else:
-            aw.qmc.adderror(u"setPXRsv(): bad response from PID")
-            return -1          
+            aw.qmc.adderror(u"RampSoak could not be changed")
+
+           
+    #sets a new sv value              
+    def setsv(self,value):
+        #Fuji PXG 
+        if aw.ser.controlETpid[0] == 0: 
+            #send command to the current sv (1-7)
+            svkey = u"sv"+ unicode(aw.pid.PXG4["selectsv"][0]) #current sv
+            command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(value*10))
+            r = aw.ser.sendFUJIcommand(command,8)
+            #check response
+            if r == command:
+                message = u"PXG sv#%i set to %.1f"%(self.PXG4["selectsv"][0],float(value))
+                aw.messagelabel.setText(message)
+                self.PXG4[svkey][0] = value
+                #record command as an Event 
+                strcommand = u"SETSV::" + unicode("%.1f"%float(value))
+                aw.qmc.DeviceEventRecord(strcommand)
+            else:
+                aw.qmc.adderror(u"setPXGsv(): bad response from PID")
+                return -1
+        #Fuji PXR    
+        elif aw.ser.controlETpid[0] == 1:  
+            command = self.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["sv0"][1],int(value*10))
+            r = aw.ser.sendFUJIcommand(command,8)
+            #check response
+            if r == command:
+                message = u"PXR sv set to %.1f"%value
+                aw.pid.PXR["sv0"][0] = value
+                aw.messagelabel.setText(message)
+                #record command as an Event 
+                strcommand = u"SETSV::" + unicode("%.1f"%float(value))
+                aw.qmc.DeviceEventRecord(strcommand)
+            else:
+                aw.qmc.adderror(u"setPXRsv(): bad response from PID")
+                return -1
 
 
     #used to set up or down SV by diff degrees from current sv setting      
@@ -12223,7 +12384,7 @@ class FujiPID(object):
         if currentsv != -1:
             newsv = int((currentsv + diff)*10.)          #multiply by 10 because we use a decimal point          
 
-            #   if control pid is fuji PXG4
+            #   if control pid is fuji PXG
             if aw.ser.controlETpid[0] == 0:
                 # read the current svN (1-7) being used
                 command = aw.pid.message2send(aw.ser.controlETpid[1],3,self.PXG4["selectsv"][1],1)
@@ -12247,7 +12408,7 @@ class FujiPID(object):
                         msg = u"Unable to set sv" + unicode(N)
                         aw.messagelabel.setText(msg)       
 
-            #   or if control pid is fuji PXR3
+            #   or if control pid is fuji PXR
             elif aw.ser.controlETpid[0] == 1:
                 command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
                 r = aw.ser.sendFUJIcommand(command,8)
@@ -12270,16 +12431,11 @@ class FujiPID(object):
         parts = CommandString.split("::")
         command = parts[0]
         values = parts[1:]
-        
-        if aw.ser.controlETpid[0] == 0: #Fuji PXG           
-            if command == "SETSV":
-                self.setPXGsv(float(values[0]))
+                 
+        if command == "SETSV":
+            self.setsv(float(values[0]))
             #add more commands here
-                
-        elif aw.ser.controlETpid[0] == 1: #Fuji PXR
-            if command == "SETSV":
-                self.setPXRsv(float(values[0]))
-            #add more commands here
+
 
     def dec2HexRaw(self,decimal):
         # This method converts a decimal to a raw string appropiate for Fuji serial TX
