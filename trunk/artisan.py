@@ -1273,7 +1273,7 @@ class tgraphcanvas(FigureCanvas):
                 firstletter = self.etypes[self.specialeventstype[i]][0]
                 secondletter = self.eventsvalues[self.specialeventsvalue[i]]
                 #some times ET is not drawn (ET = 0) when using device NONE
-                if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
+                if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:
                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
                                      xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
@@ -2179,6 +2179,8 @@ class tgraphcanvas(FigureCanvas):
             self.specialeventstype.append(0)                                 # set type (to the first index 0)          
             self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
             self.specialeventsvalue.append(0)                                # empty
+            temp = unicode(self.temp2[i])
+            timed = self.stringfromseconds(self.timex[i])
             message = u"Computer Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
             aw.messagelabel.setText(message)
             #write label in mini recorder if flag checked
@@ -10394,7 +10396,6 @@ class PXRpidDlgControl(QDialog):
                     if len(r) == 8:
                         self.status.showMessage(u"Pattern has been changed. Wait 5 secs.", 500)
                         aw.pid.PXR["rampsoakpattern"][0] = selectedmode
-                        time.sleep(5) #wait 5 seconds to set eeprom memory
                     else:
                         self.status.showMessage(u"Pattern could not be changed", 5000)
                         return
@@ -10403,9 +10404,30 @@ class PXRpidDlgControl(QDialog):
                 command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["rampsoak"][1],flag)
                 r = aw.ser.sendFUJIcommand(command,8)
                 if r == command:
-                    self.status.showMessage(u"RS ON and running...", 5000)
+                    #record command as an Event if flag = 1
+                    if flag == 1:
+                        self.status.showMessage(u"RS ON and running...", 5000)
+                        #ramp soak pattern. 0=executes 1 to 4; 1=executes 5 to 8; 2=executes 1 to 8
+                        pattern =[[1,4],[5,8],[1,8]]
+                        start = pattern[aw.pid.PXR["rampsoakpattern"][0]][0]
+                        end = pattern[aw.pid.PXR["rampsoakpattern"][0]][1]+1
+                        strcommand = u"SETRS"
+                        result = u""
+                        for i in range(start,end):
+                            svkey = u"segment"+str(i)+"sv"
+                            rampkey = u"segment"+str(i)+"ramp"
+                            soakkey = u"segment"+str(i)+"soak"
+                            strcommand += u"::" + unicode(aw.pid.PXR[svkey][0]) + u"::" + unicode(aw.pid.PXR[rampkey][0]) + u"::" + unicode(aw.pid.PXR[soakkey][0])+u"::"
+                            result += strcommand
+                            strcommand = u"SETRS"
+                        result = result.strip(u"::")
+                        aw.qmc.DeviceEventRecord(result)
+                    elif fag == 0:
+                        self.status.showMessage(u"RS turned OFF", 5000)
+                    elif fag == 2:
+                        self.status.showMessage(u"RS on HOLD mode", 5000)
                 else:
-                    self.status.showMessage(u"RampSoak could not be turned ON", 5000)
+                    self.status.showMessage(u"RampSoak could not be changed", 5000)
             else:
                 mssg = u"setONOFFrampsoak(): problem "
                 self.status.showMessage(mssg,5000)
@@ -10564,12 +10586,38 @@ class PXRpidDlgControl(QDialog):
             soakedit.setValidator(QIntValidator(0,20,soakedit))
             setButton = QPushButton("Set")
             self.connect(setButton,SIGNAL("clicked()"),lambda idn =i+1, sv=float(svedit.text()),ramp=int(rampedit.text()),
-                         soak=int(soakedit.text()):aw.pid.setsegment(idn,sv,ramp,soak))
+                         soak=int(soakedit.text()):self.setsegment(idn,sv,ramp,soak))
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
             self.segmenttable.setCellWidget(i,1,rampedit)
             self.segmenttable.setCellWidget(i,2,soakedit)
             self.segmenttable.setCellWidget(i,3,setButton)
+
+
+    #idn = id number, sv = float set value, ramp = ramp value, soak = soak value
+    def setsegment(self,idn,sv,ramp,soak):
+
+        svkey = u"segment" + unicode(idn) + u"sv"
+        svcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR[svkey][1],int(sv*10))
+        r1 = aw.ser.sendFUJIcommand(svcommand,8)
+        
+        rampkey = u"segment" + unicode(idn) + u"ramp"
+        rampcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR[rampkey][1],ramp)
+        r2 = aw.ser.sendFUJIcommand(rampcommand,8)
+         
+        soakkey = u"segment" + unicode(idn) + u"soak"
+        soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR[soakkey][1],soak)
+        r3 = aw.ser.sendFUJIcommand(soakcommand,8)
+    
+        #check if OK
+        if r1==svcommand and r2==rampcommand and r3==soakcommand:
+            aw.pid.PXR[svkey][0] = sv
+            aw.pid.PXR[rampkey][0] = ramp
+            aw.pid.PXR[soakkey][0] = soak
+            self.paintlabels()
+        
+        else:
+            aw.qmc.adderror(u"Segment values could not be writen into PID")
 
 
 # UNDER WORK 
@@ -11529,7 +11577,7 @@ class PXG4pidDlgControl(QDialog):
                  aw.lcd6.display(unicode(self.sv7edit.text()))
 
             #record command as an Event 
-            strcommand = u"SETSV::" + + unicode("%.1f"%(newSVvalue/10.))
+            strcommand = u"SETSV::" + unicode("%.1f"%(newSVvalue/10.))
             aw.qmc.DeviceEventRecord(strcommand)
 
         else:
@@ -11902,18 +11950,37 @@ class PXG4pidDlgControl(QDialog):
                 if len(r) == 8:
                     self.status.showMessage(u"Pattern has been changed. Wait 5 secs.", 500)
                     aw.pid.PXG4["rampsoakpattern"][0] = selectedmode
-                    time.sleep(5) #wait 5 seconds to set eeprom memory
                 else:
                     self.status.showMessage(u"Pattern could not be changed", 5000)
                     return
             #combobox mode matches pid mode
-            #set ramp soak mode ON
+            #set ramp soak mode ON/OFF
             command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4["rampsoak"][1],flag)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                self.status.showMessage(u"RS ON and running...", 5000)
+                #record command as an Event if flag = 1
+                if flag == 1:
+                    self.status.showMessage(u"RS ON and running...", 5000)
+                    pattern =[[1,4],[5,8],[1,8],[9,12],[13,16],[9,16],[1,16]]
+                    start = pattern[aw.pid.PXG4["rampsoakpattern"][0]][0]
+                    end = pattern[aw.pid.PXG4["rampsoakpattern"][0]][1]+1
+                    strcommand = u"SETRS"
+                    result = u""
+                    for i in range(start,end):
+                        svkey = u"segment"+str(i)+"sv"
+                        rampkey = u"segment"+str(i)+"ramp"
+                        soakkey = u"segment"+str(i)+"soak"
+                        strcommand += u"::" + unicode(aw.pid.PXG4[svkey][0]) + u"::" + unicode(aw.pid.PXG4[rampkey][0]) + u"::" + unicode(aw.pid.PXG4[soakkey][0])+u"::"
+                        result += strcommand
+                        strcommand = u"SETRS"
+                    result = result.strip(u"::")
+                    aw.qmc.DeviceEventRecord(result)
+                elif fag == 0:
+                    self.status.showMessage(u"RS turned OFF", 5000)
+                elif fag == 2:
+                    self.status.showMessage(u"RS on HOLD mode", 5000)
             else:
-                self.status.showMessage(u"RampSoak could not be turned ON", 5000)
+                self.status.showMessage(u"RampSoak could not be changed", 5000)
                 
         #set ramp soak OFF       
         elif flag == 0:
@@ -12057,12 +12124,37 @@ class PXG4pidDlgControl(QDialog):
             soakedit.setValidator(QIntValidator(0,20,soakedit))
             setButton = QPushButton("Set")
             self.connect(setButton,SIGNAL("clicked()"),lambda idn =i+1, sv=float(svedit.text()),ramp=int(rampedit.text()),
-                         soak=int(soakedit.text()):aw.pid.setsegment(idn,sv,ramp,soak))
+                         soak=int(soakedit.text()):self.setsegment(idn,sv,ramp,soak))
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
             self.segmenttable.setCellWidget(i,1,rampedit)
             self.segmenttable.setCellWidget(i,2,soakedit)
             self.segmenttable.setCellWidget(i,3,setButton)
+
+    #idn = id number, sv = float set value, ramp = ramp value, soak = soak value
+    def setsegment(self,idn,sv,ramp,soak):
+
+        svkey = u"segment" + unicode(idn) + u"sv"
+        svcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[svkey][1],int(sv*10))
+        r1 = aw.ser.sendFUJIcommand(svcommand,8)
+        
+        rampkey = u"segment" + unicode(idn) + u"ramp"
+        rampcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[rampkey][1],ramp)
+        r2 = aw.ser.sendFUJIcommand(rampcommand,8)
+         
+        soakkey = u"segment" + unicode(idn) + u"soak"
+        soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[soakkey][1],soak)
+        r3 = aw.ser.sendFUJIcommand(soakcommand,8)
+      
+        #check if OK
+        if r1==svcommand and r2==rampcommand and r3==soakcommand:
+            aw.pid.PXG4[svkey][0] = sv
+            aw.pid.PXG4[rampkey][0] = ramp
+            aw.pid.PXG4[soakkey][0] = soak
+            self.paintlabels()
+        else:
+            aw.qmc.adderror(u"Segment values could not be writen into PID")
+
 
 ###################################################################################
 ##########################  FUJI PID CLASS DEFINITION  ############################
@@ -12264,55 +12356,6 @@ class FujiPID(object):
             else:
                 return -1
 
-    #idn = id number, sv = float set value, ramp = ramp value, soak = soak value
-    def setsegment(self,idn,sv,ramp,soak):
-        #if PXG
-        if aw.ser.controlETpid[0] == 0:
-            if idn < 1 or idn > 16:
-                aw.qmc.adderror(u"Segment number requested is out of range (1-16)")
-                return
-            svkey = u"segment" + unicode(idn) + u"sv"
-            svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(sv*10))
-            r1 = aw.ser.sendFUJIcommand(svcommand,8)
-            
-            rampkey = u"segment" + unicode(idn) + u"ramp"
-            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[rampkey][1],ramp)
-            r2 = aw.ser.sendFUJIcommand(rampcommand,8)
-             
-            soakkey = u"segment" + unicode(idn) + u"soak"
-            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[soakkey][1],soak)
-            r3 = aw.ser.sendFUJIcommand(soakcommand,8)
-        #if PXR
-        if aw.ser.controlETpid[0] == 1:
-            if idn < 1 or idn > 8:
-                aw.qmc.adderror(u"Segment number requested is out of range (1-8)")
-                return
-            svkey = u"segment" + unicode(idn) + u"sv"
-            svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[svkey][1],int(sv*10))
-            r1 = aw.ser.sendFUJIcommand(svcommand,8)
-            
-            rampkey = u"segment" + unicode(idn) + u"ramp"
-            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[rampkey][1],ramp)
-            r2 = aw.ser.sendFUJIcommand(rampcommand,8)
-             
-            soakkey = u"segment" + unicode(idn) + u"soak"
-            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[soakkey][1],soak)
-            r3 = aw.ser.sendFUJIcommand(soakcommand,8)
-        
-        #check if OK
-        if len(r1)==8 and len(r2)==8 and len(r3)==8:
-            if aw.ser.controlETpid[0] == 0:
-                self.PXG4[svkey][0] = sv
-                self.PXG4[rampkey][0] = ramp
-                self.PXG4[soakkey][0] = soak
-            if aw.ser.controlETpid[0] == 1:
-                self.PXR[svkey][0] = sv
-                self.PXR[rampkey][0] = ramp
-                self.PXR[soakkey][0] = soak
-        else:
-            aw.qmc.adderror(u"Segment values could not be writen into PID")
-
-
     #turns ON turns OFF current ramp soak mode
     #flag =0 OFF, flag = 1 ON, flag = 2 hold
     #A ramp soak pattern defines a whole profile. They have a minimum of 4 segments.       
@@ -12332,15 +12375,7 @@ class FujiPID(object):
             elif flag == 0:
                 aw.messagelabel.setText(u"RS OFF")
             else:
-                aw.messagelabel.setText(u"RS on HOLD")                
-            #record command as an Event 
-            strcommand = u"SETRS::" + unicode(flag)
-            aw.qmc.DeviceEventRecord(strcommand)
-            #save value
-            if aw.ser.controlETpid[0] == 0:
-                self.PXG4["rampsoak"][0] = flag
-            elif aw.ser.controlETpid[0] == 1:
-                self.PXR["rampsoak"][0] = flag
+                aw.messagelabel.setText(u"RS on HOLD")
         else:
             aw.qmc.adderror(u"RampSoak could not be changed")
 
