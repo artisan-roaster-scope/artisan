@@ -3810,20 +3810,23 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.startend[2] == 0.0:
                 self.qmc.markDrop()
             #invoke "OFF"
-            self.qmc.OffMonitor
-        #store, reset and redraw
-        if self.qmc.autosavepath and self.qmc.autosaveflag:
-            #if autosave mode active we just save automatic
-            filename = self.automaticsave()
+            self.qmc.OffMonitor()
+            
+            #store, reset and redraw
+            if self.qmc.autosavepath and self.qmc.autosaveflag:
+                #if autosave mode active we just save automatic
+                filename = self.automaticsave()
+            else:
+                self.messagelabel.setText("Empty path or box unchecked in Autosave")
+                self.autosaveconf()
+                return
+            self.qmc.reset_and_redraw()
+            #start new roast
+            self.qmc.OnMonitor()
+            self.messagelabel.setText(filename + " has been saved. New roast has started")
         else:
-            self.messagelabel.setText("Empty path or box unchecked in Autosave")
-            self.autosaveconf()
-            return
-        self.qmc.reset_and_redraw()
-        #start new roast
-        self.qmc.OnMonitor()
-        self.messagelabel.setText(filename + " has been saved. New roast has started")
-
+            self.qmc.OnMonitor()
+            
     def fileLoad(self):
         fileName = self.ArtisanOpenFileDialog()
         if fileName:
