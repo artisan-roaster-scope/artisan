@@ -3888,7 +3888,7 @@ class ApplicationWindow(QMainWindow):
             #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.qmc.adderror(u"Exception Error: fileload() " + unicode(e) + " ")
+            self.qmc.adderror(u"Exception Error: loadFile() " + unicode(e) + " ")
             return
         
         finally:
@@ -4208,16 +4208,16 @@ class ApplicationWindow(QMainWindow):
             #Set the xlimits
             if self.qmc.timex:
                 self.qmc.endofx = self.qmc.timex[-1] + 40         
-        if "statisticsflags" in profile:
-            self.qmc.statisticsflags = profile["statisticsflags"]
-        if "statisticsconditions" in profile:
-            self.qmc.statisticsconditions = profile["statisticsconditions"]
-        if "DeltaET" in profile:
-            self.qmc.DeltaETflag = bool(profile["DeltaET"])
-        if "DeltaBT" in profile:
-            self.qmc.DeltaBTflag = bool(profile["DeltaBT"])
-        if "DeltaFilter" in profile:
-            self.qmc.deltafilter = int(profile["DeltaFilter"])
+##        if "statisticsflags" in profile:
+##            self.qmc.statisticsflags = profile["statisticsflags"]
+##        if "statisticsconditions" in profile:
+##            self.qmc.statisticsconditions = profile["statisticsconditions"]
+##        if "DeltaET" in profile:
+##            self.qmc.DeltaETflag = bool(profile["DeltaET"])
+##        if "DeltaBT" in profile:
+##            self.qmc.DeltaBTflag = bool(profile["DeltaBT"])
+##        if "DeltaFilter" in profile:
+##            self.qmc.deltafilter = int(profile["DeltaFilter"])
         if "ambientTemp" in profile:
             self.qmc.ambientTemp = profile["ambientTemp"]
         if "dryend" in profile:
@@ -4267,11 +4267,11 @@ class ApplicationWindow(QMainWindow):
         profile["ymax"] = self.qmc.ylimit
         profile["xmin"] = self.qmc.startofx
         profile["xmax"] = self.qmc.endofx       
-        profile["statisticsflags"] = self.qmc.statisticsflags
-        profile["statisticsconditions"] = self.qmc.statisticsconditions
-        profile["DeltaET"] = self.qmc.DeltaETflag
-        profile["DeltaBT"] = self.qmc.DeltaBTflag
-        profile["DeltaFilter"] = self.qmc.deltafilter
+##        profile["statisticsflags"] = self.qmc.statisticsflags
+##        profile["statisticsconditions"] = self.qmc.statisticsconditions
+##        profile["DeltaET"] = self.qmc.DeltaETflag
+##        profile["DeltaBT"] = self.qmc.DeltaBTflag
+##        profile["DeltaFilter"] = self.qmc.deltafilter
         profile["ambientTemp"] = self.qmc.ambientTemp
         profile["dryend"] = self.qmc.dryend
         profile["bag_humidity"] = self.qmc.bag_humidity
@@ -8185,14 +8185,18 @@ class StatisticsDLG(QDialog):
         minf = QLabel("Min")
         maxf = QLabel("Max")
 
-        if aw.qmc.statisticsflags[0]:
-            self.time.setChecked(True)
-        if aw.qmc.statisticsflags[1]:
-            self.bar.setChecked(True)
-        if aw.qmc.statisticsflags[2]:
-            self.flavor.setChecked(True)
-        if aw.qmc.statisticsflags[3]:
-            self.area.setChecked(True)
+        #temp fix for possible bug aw.qmc.statisticsflags=[] > empty list out of range
+        if aw.qmc.statisticsflags:
+            if aw.qmc.statisticsflags[0]:
+                self.time.setChecked(True)
+            if aw.qmc.statisticsflags[1]:
+                self.bar.setChecked(True)
+            if aw.qmc.statisticsflags[2]:
+                self.flavor.setChecked(True)
+            if aw.qmc.statisticsflags[3]:
+                self.area.setChecked(True)
+        else:
+            aw.qmc.statisticsflags = [1,1,1,1]
             
         self.connect(self.time,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,0)) 
         self.connect(self.bar,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,1)) 
