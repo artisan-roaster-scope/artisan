@@ -595,6 +595,8 @@ class tgraphcanvas(FigureCanvas):
                         #format of the input string Command: COMMAND::VALUE1::VALUE2::VALUE3::ETC        
                         if "::" in self.backgroundEStrings[i]:   
                             aw.pid.replay(self.backgroundEStrings[i])
+                            time.sleep(.5)  #avoid possible close times (rounding off) 
+                            
                     #future Arduino
                     #if self.device == 19:
                         
@@ -12476,9 +12478,94 @@ class FujiPID(object):
                  
         if command == "SETSV":
             self.setsv(float(values[0]))
-            #add more commands here
+            return
+        elif command == "SETRS":
+            self.replaysetrs(CommandString)
+            return
 
+    #example of command string with four segments (minimum for Fuji PIDs)
+    # SETRS::270.0::3::0::SETRS::300.0::3::0::SETRS::350.0::3::0::SETRS::400.0::3::0
+    def replaysetrs(self,CommandString):
+        parts =CommandString.split("SETRS")
+        if parts[0] == "":
+            parts = parts[1:]          #remove first empty [""] list
+        if parts[-1] == "":
+            parts = parts[:-1]          #remove last empty [""] list
+        n = len(parts)
+        rs = []
+        changeflag = 0
+        for i in range(n):
+            rs.append(parts[i].split("::"))
+            if rs[i][0] == "":          #remove first empty ""
+                rs[i] = rs[i][1:]
+            if rs[i][-1] == "":          #remove last empty ""
+                rs[i] = rs[i][:-1]
+            
+            if len(rs[i]) == 3:
+                svkey = "segment" + str(i+1) + "sv"
+                rampkey = "segment" + str(i+1) + "ramp"
+                soakkey = "segment" + str(i+1) + "soak"
+                if aw.ser.controlETpid[0] == 0:             #PXG4
+                    if n < 4 or n > 16:
+                        aw.qmc.adderror("pid replaysetrs(): PXG4 invalid pid segment count: %i"%n)
+                        return
+                    if self.PXG4[svkey][0] != float(rs[i][0]):
+                        self.PXG4[svkey][0] = float(rs[i][0])
+                        changeflag = 1
+                    if self.PXG4[rampkey][0] != int(rs[i][1]):
+                        self.PXG4[rampkey][0] = int(rs[i][1])
+                        changeflag = 1
+                    if self.PXG4[soakkey][0] != int(rs[i][2]):
+                        self.PXG4[soakkey][0] = int(rs[i][2])
+                        changeflag = 1
+                    if changeflag:
+                        self.setsegment((i+1), self.PXG4[svkey][0], self.PXG4[rampkey][0] ,self.PXG4[soakkey][0])
+                        changeflag = 0
+                elif aw.ser.controlETpid[0] == 1:           #PXR
+                    if n < 4 or n > 8:
+                        aw.qmc.adderror("pid replaysetrs(): PXR invalid segment count: %i"%n)
+                        return
+                    if self.PXR[svkey][0] != float(rs[i][0]):
+                        self.PXR[svkey][0] = float(rs[i][0])
+                        changeflag = 1
+                    if self.PXR[rampkey][0] != int(rs[i][1]):
+                        self.PXR[rampkey][0] = int(rs[i][1])
+                        changeflag = 1
+                    if self.PXR[soakkey][0] != int(rs[i][2]):
+                        self.PXR[soakkey][0] = int(rs[i][2])
+                        changeflag = 1
+                    if changeflag:
+                        self.setsegment((i+1), self.PXR[svkey][0], self.PXR[rampkey][0] ,self.PXR[soakkey][0])
+                        changeflag = 0
+            else:
+                aw.qmc.adderror("replaysetrs() Error: Need three SETRS values (float,int,int)")
+        #start ramp soak ON
+        self.setrampsoak(1)
+        
+    #idn = id number, sv = float set value, ramp = ramp value, soak = soak value
+    def setsegment(self,idn,sv,ramp,soak):
 
+        svkey = u"segment" + unicode(idn) + u"sv"
+        rampkey = u"segment" + unicode(idn) + u"ramp"
+        soakkey = u"segment" + unicode(idn) + u"soak"
+        
+        if aw.ser.controlETpid[0] == 0:
+            svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(sv*10))
+            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[rampkey][1],ramp)
+            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[soakkey][1],soak)
+        elif  aw.ser.controlETpid[0] == 1:
+            svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[svkey][1],int(sv*10))
+            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[rampkey][1],ramp)
+            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[soakkey][1],soak)
+            
+        r1 = self.sendFUJIcommand(svcommand,8)
+        r2 = self.sendFUJIcommand(rampcommand,8)
+        r3 = self.sendFUJIcommand(soakcommand,8)
+      
+        #check if OK
+        if r1!=svcommand or r2!=rampcommand or r3!=soakcommand:
+            aw.qmc.adderror(u"pid: Segment values could not be writen into PID")
+            
     def dec2HexRaw(self,decimal):
         # This method converts a decimal to a raw string appropiate for Fuji serial TX
         # Used to compose serial messages
