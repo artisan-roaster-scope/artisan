@@ -70,6 +70,7 @@ HELP_MENU_ABOUT = "About" #QApplication.translate("Menu", "About", None, QApplic
 HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None, QApplication.UnicodeUTF8)
 HELP_MENU_KEYBOARDSHORTCUTS = QApplication.translate("Menu", "Keyboard Shortcuts", None, QApplication.UnicodeUTF8)
 HELP_MENU_ERRORS = QApplication.translate("Menu", "Errors", None, QApplication.UnicodeUTF8)
+HELP_MENU_MESSAGES = QApplication.translate("Menu", "Messages", None, QApplication.UnicodeUTF8)
 
 
     
