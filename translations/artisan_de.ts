@@ -167,5 +167,10 @@
         <source>Keyboard Shortcuts</source>
         <translation>Tastaturkürzel</translation>
     </message>
+    <message>
+        <location filename="const/UIconst.py" line="73"/>
+        <source>Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
