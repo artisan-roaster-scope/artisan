@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="es">
+<!DOCTYPE TS>
+<TS version="2.0" language="es">
 <context>
     <name>Menu</name>
     <message>
@@ -161,6 +162,11 @@
         <location filename="const/UIconst.py" line="71"/>
         <source>Keyboard Shortcuts</source>
         <translation>Atajo de Teclado</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="73"/>
+        <source>Messages</source>
+        <translation>Mensajes</translation>
     </message>
 </context>
 </TS>
