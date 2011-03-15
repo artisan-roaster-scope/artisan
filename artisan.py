@@ -542,7 +542,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.stack.setCurrentIndex(0)
             self.resetlines()
-            aw.messagelabel.setText(u"HUD OFF")
+            aw.sendmessage(u"HUD OFF")
             
         #ON
         else:
@@ -554,9 +554,9 @@ class tgraphcanvas(FigureCanvas):
                 self.HUDflag = True
                 aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
                 aw.stack.setCurrentIndex(1)
-                aw.messagelabel.setText(u"HUD ON")
+                aw.sendmessage(u"HUD ON")
             else:
-                aw.messagelabel.setText(u"Need some data for HUD to work")
+                aw.sendmessage(u"Need some data for HUD to work")
         aw.soundpop()        
 
     def resetlines(self):
@@ -585,7 +585,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         aw.messagelabel.setStyleSheet("background-color:'yellow';")
                         
-                    aw.messagelabel.setText(message)
+                    aw.sendmessage(message)
                     break
                 
                 elif timed == 0:
@@ -605,7 +605,7 @@ class tgraphcanvas(FigureCanvas):
                     text = str(aw.messagelabel.text())
                     if len(text):
                         if text[0] == ">":
-                           aw.messagelabel.setText("")
+                           aw.sendmessage("")
                            aw.messagelabel.setStyleSheet("background-color:'transparent';")
 
     #make a projection of change of rate of BT on the graph
@@ -839,7 +839,7 @@ class tgraphcanvas(FigureCanvas):
             if reply == QMessageBox.Reset :
                 self.safesaveflag == False
             elif reply == QMessageBox.Cancel:            
-                aw.messagelabel.setText("Reset has been cancelled")
+                aw.sendmessage("Reset has been cancelled")
                 return
             elif reply == QMessageBox.Save:
                 aw.fileSave(None)
@@ -870,7 +870,7 @@ class tgraphcanvas(FigureCanvas):
         aw.lcd3.display(0.0)
         aw.lcd4.display(0)
         aw.lcd5.display(0)
-        aw.messagelabel.setText(u"Scope has been reset")
+        aw.sendmessage(u"Scope has been reset")
         aw.button_1.setDisabled(False)
         aw.button_2.setDisabled(False)        
         aw.button_3.setDisabled(False)
@@ -1352,7 +1352,7 @@ class tgraphcanvas(FigureCanvas):
     def stringtoseconds(self, string):
         timeparts = string.split(":")
         if len(timeparts) != 2:
-            aw.messagelabel.setText("Time format error encountered")
+            aw.sendmessage("Time format error encountered")
             return -1
         else:
             seconds = int(timeparts[1])
@@ -1448,12 +1448,12 @@ class tgraphcanvas(FigureCanvas):
                             self.startendB[3] = self.fromCtoF(self.startendB[3]) #DROP temp B
 
                         self.fahrenheitMode()
-                        aw.messagelabel.setText(u"Profile changed to Fahrenheit")
+                        aw.sendmessage(u"Profile changed to Fahrenheit")
 
                     else:
                         QMessageBox.information(self,u"Convert Profile Temperature",
                                                 u"Unable to comply. You already are in Fahrenheit")
-                        aw.messagelabel.setText(u"Profile not changed")
+                        aw.sendmessage(u"Profile not changed")
                         return
 
             elif t == u"C":
@@ -1502,11 +1502,11 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         QMessageBox.information(self,u"Convert Profile Temperature",
                                                 u"Unable to comply. You already are in Celsius")
-                        aw.messagelabel.setText(u"Profile not changed")
+                        aw.sendmessage(u"Profile not changed")
                         return
 
                     self.celsiusMode()
-                    aw.messagelabel.setText(u"Profile changed to Celsius")
+                    aw.sendmessage(u"Profile changed to Celsius")
                     
             self.redraw()
 
@@ -1528,12 +1528,12 @@ class tgraphcanvas(FigureCanvas):
         
         #load selected dictionary
         if color == 1:
-            aw.messagelabel.setText("Colors set to defaults")
+            aw.sendmessage("Colors set to defaults")
             for key in palette1.keys():
                 self.palette[key] = palette1[key]
             
         if color == 2:
-            aw.messagelabel.setText("Colors set to grey")
+            aw.sendmessage("Colors set to grey")
             for key in palette1.keys():
                 self.palette[key] = palette2[key]
                 
@@ -1635,14 +1635,14 @@ class tgraphcanvas(FigureCanvas):
         if not len(self.timex):
             self.timeclock.start()        
         self.flagon = True
-        aw.messagelabel.setText(u"Scope recording...")     
+        aw.sendmessage(u"Scope recording...")     
         aw.button_1.setDisabled(True)                     #button ON
         aw.button_1.setStyleSheet("QPushButton { background-color: #88ff18}")
         aw.soundpop()        
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
         self.flagon = False
-        aw.messagelabel.setText(u"Scope stopped")
+        aw.sendmessage(u"Scope stopped")
         aw.button_1.setDisabled(False)
         aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         aw.soundpop()
@@ -1694,7 +1694,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             message = u"Scope is OFF"
             
-        aw.messagelabel.setText(message)
+        aw.sendmessage(message)
         aw.soundpop()
         
     def markDryEnd(self):
@@ -1741,7 +1741,7 @@ class tgraphcanvas(FigureCanvas):
             message = u"Scope is OFF"
 
         #set message at bottom
-        aw.messagelabel.setText(message)
+        aw.sendmessage(message)
         aw.soundpop()        
     #redord 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
@@ -1790,7 +1790,7 @@ class tgraphcanvas(FigureCanvas):
             message = u"Scope is OFF"
 
         #set message at bottom
-        aw.messagelabel.setText(message)
+        aw.sendmessage(message)
         aw.soundpop()
     #record 1C end markers of BT. called from button_4 of application window
     def mark1Cend(self):
@@ -1832,7 +1832,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             message = u"Scope is OFF"
             
-        aw.messagelabel.setText(message)
+        aw.sendmessage(message)
         aw.soundpop()        
     #record 2C start markers of BT. Called from button_5 of application window
     def mark2Cstart(self):
@@ -1869,7 +1869,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             message = u"Scope is OFF"
             
-        aw.messagelabel.setText(message)
+        aw.sendmessage(message)
         aw.soundpop()        
     #record 2C end markers of BT. Called from button_6  of application window
     def mark2Cend(self):
@@ -1911,7 +1911,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             message = u"Scope is OFF"
             
-        aw.messagelabel.setText(message)            
+        aw.sendmessage(message)            
         aw.soundpop()
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
@@ -1969,7 +1969,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             message = u"Scope is OFF"
             
-        aw.messagelabel.setText(message)
+        aw.sendmessage(message)
         aw.soundpop()
     # Writes information about the finished profile in the graph
     def writestatistics(self):
@@ -1991,7 +1991,7 @@ class tgraphcanvas(FigureCanvas):
         if self.startend[2]:
             totaltime = int(self.startend[2]-self.startend[0])
             if totaltime == 0:
-                aw.messagelabel.setText("Statistics cancelled: need complete profile [CHARGE] + [DROP]")
+                aw.sendmessage("Statistics cancelled: need complete profile [CHARGE] + [DROP]")
                 return
                         
             self.statisticstimes[0] = totaltime
@@ -2155,7 +2155,7 @@ class tgraphcanvas(FigureCanvas):
                 temp = unicode(self.temp2[i])
                 timed = self.stringfromseconds(self.timex[i])
                 message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
-                aw.messagelabel.setText(message)
+                aw.sendmessage(message)
                 #write label in mini recorder if flag checked
                 if aw.minieventsflag:
                     aw.eNumberSpinBox.setValue(Nevents+1)
@@ -2164,9 +2164,9 @@ class tgraphcanvas(FigureCanvas):
                     aw.lineEvent.setText(self.specialeventsStrings[Nevents])
                 self.redraw()
             else:
-               aw.messagelabel.setText("Events are only allowed after [CHARGE]")     
+               aw.sendmessage("Events are only allowed after [CHARGE]")     
         else:
-            aw.messagelabel.setText("No profile found")
+            aw.sendmessage("No profile found")
             
         aw.soundpop()
 
@@ -2184,7 +2184,7 @@ class tgraphcanvas(FigureCanvas):
             temp = unicode(self.temp2[i])
             timed = self.stringfromseconds(self.timex[i])
             message = u"Computer Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
-            aw.messagelabel.setText(message)
+            aw.sendmessage(message)
             #write label in mini recorder if flag checked
             if aw.minieventsflag:
                 aw.eNumberSpinBox.setValue(Nevents+1)
@@ -2290,7 +2290,7 @@ class tgraphcanvas(FigureCanvas):
                 self.startendB[1] -= step
                 self.startendB[3] -= step    
         else:
-            aw.messagelabel.setText(u"Unable to move background")
+            aw.sendmessage(u"Unable to move background")
             return
 
     #points are used to draw interpolation
@@ -2348,7 +2348,7 @@ class tgraphcanvas(FigureCanvas):
             Ypoints.append(self.temp2[-1])
 
         else:
-            aw.messagelabel.setText(u"No finished profile found")
+            aw.sendmessage(u"No finished profile found")
 
 
         return Xpoints,Ypoints
@@ -2586,13 +2586,14 @@ class tgraphcanvas(FigureCanvas):
     #adds errors
     def adderror(self,error):
         aw.messagelabel.setStyleSheet("background-color:'red';")
-        self.errorlog.append(error)
-        if len(error) > 150:
-            Lerror = error[0:150] + "..."
-            aw.messagelabel.setText(Lerror)
-        else:
-            aw.messagelabel.setText(error)
-        QTimer.singleShot(500, self.restore_message_label)  #set a time less than 1 second to restore color
+        time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+        #keep a max of 500 errors
+        if self.errorlog > 499:
+            self.errorlog = self.errorlog[1:]
+        self.errorlog.append(time + " " + error)
+        aw.sendmessage(error)
+
+        QTimer.singleShot(600, self.restore_message_label)  #set a time less than 1 second to restore color
                 
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem
@@ -2886,7 +2887,7 @@ class ApplicationWindow(QMainWindow):
         
         #create LCD displays
         #RIGHT COLUMN
-        self.lcd1 = QLCDNumber() # time      
+        self.lcd1 = QLCDNumber() # time
         self.lcd1.setMinimumHeight(45)
         self.lcd2 = QLCDNumber() # Temperature MET        
         self.lcd2.setMinimumHeight(45)
@@ -2952,7 +2953,9 @@ class ApplicationWindow(QMainWindow):
         #label6.setStyleSheet("background-color:'#CCCCCC';")
         self.label6.setText( "<font color='black'><b>PID SV<\b></font>")
         self.label6.setIndent(5)
-        
+
+    	self.messagehist = []
+
         #convenience EVENT mini editor; View&Edits events without opening roast properties Dlg.
         self.eventlabel = QLabel("Event #<b>0 </b>")
         self.eventlabel.setIndent(5)
@@ -3300,6 +3303,10 @@ class ApplicationWindow(QMainWindow):
         errorAction = QAction(UIconst.HELP_MENU_ERRORS,self)
         self.connect(errorAction,SIGNAL("triggered()"),self.viewErrorLog)
         self.helpMenu.addAction(errorAction)
+
+        messageAction = QAction(UIconst.HELP_MENU_MESSAGES,self)
+        self.connect(messageAction,SIGNAL("triggered()"),self.viewMessageLog)
+        self.helpMenu.addAction(messageAction)
         
         # activate event button
         if self.eventsbuttonflag:
@@ -3324,7 +3331,16 @@ class ApplicationWindow(QMainWindow):
         self.keyboardmoveindex = 0
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
-        
+
+    def sendmessage(self,message):
+        #keep a max of 100 messages
+        if len(self.messagehist) > 99:
+            self.messagehist = self.messagehist[1:]
+        time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz ")))    #zzz = miliseconds
+        self.messagehist.append(time + message)
+        self.messagelabel.setText(message)
+
+    
     def update_minieventline_visibility(self):
         if self.minieventsflag:
             self.etypeComboBox.setVisible(True)
@@ -3384,14 +3400,14 @@ class ApplicationWindow(QMainWindow):
                 #turn on
                 self.keyboardmoveflag = 1
                 self.keyboardmoveindex = 0
-                self.messagelabel.setText("Keyboard moves turned ON")
+                self.sendmessage("Keyboard moves turned ON")
                 self.button_1.setStyleSheet("QPushButton { background-color: purple }")
                 
             elif self.keyboardmoveflag == 1:                  
                 # turn off 
                 self.keyboardmoveflag = 0
                 # clear all
-                self.messagelabel.setText("Keyboard moves turned OFF")
+                self.sendmessage("Keyboard moves turned OFF")
                 if self.qmc.flagon:    
                     self.button_1.setStyleSheet("QPushButton { background-color: #88ff18 }")
                 else:
@@ -3610,7 +3626,7 @@ class ApplicationWindow(QMainWindow):
                 self.serialize(QString(filename),self.getProfile())
                 #restore dirs
                 QDir.setCurrent(oldDir)
-                self.messagelabel.setText(u"Profile " + filename + " saved in: " + self.qmc.autosavepath)
+                self.sendmessage(u"Profile " + filename + " saved in: " + self.qmc.autosavepath)
                 self.qmc.safesaveflag = False
 
                 return filename
@@ -3619,7 +3635,7 @@ class ApplicationWindow(QMainWindow):
 ##                #turn ON
 ##                self.qmc.OnMonitor()
             else:
-                self.messagelabel.setText("Empty path or box unchecked in Autosave")
+                self.sendmessage("Empty path or box unchecked in Autosave")
                 self.autosaveconf()               
 
         except IOError,e:
@@ -3706,7 +3722,7 @@ class ApplicationWindow(QMainWindow):
                 string += self.qmc.specialeventsStrings[lenevents-1][0:5]
                 string += "..."
             message = u"Event #" + str(lenevents) + ":  " + string +  u" has been updated"
-            self.messagelabel.setText(message)
+            self.sendmessage(message)
         
     def strippedName(self, fullFileName):
         return unicode(QFileInfo(fullFileName).fileName())
@@ -3808,7 +3824,7 @@ class ApplicationWindow(QMainWindow):
         #stop current roast (if any)
         if self.qmc.flagon:
             if self.qmc.startend[0] == 0.0:
-                self.messagelabel.setText("No profile found")
+                self.sendmessage("No profile found")
                 return
             #mark drop if not yet done
             if self.qmc.startend[2] == 0.0:
@@ -3821,13 +3837,13 @@ class ApplicationWindow(QMainWindow):
                 #if autosave mode active we just save automatic
                 filename = self.automaticsave()
             else:
-                self.messagelabel.setText("Empty path or box unchecked in Autosave")
+                self.sendmessage("Empty path or box unchecked in Autosave")
                 self.autosaveconf()
                 return
             self.qmc.reset_and_redraw()
             #start new roast
             self.qmc.OnMonitor()
-            self.messagelabel.setText(filename + " has been saved. New roast has started")
+            self.sendmessage(filename + " has been saved. New roast has started")
         else:
             self.qmc.OnMonitor()
             
@@ -3853,7 +3869,7 @@ class ApplicationWindow(QMainWindow):
                 f.close()       
                 self.setProfile(self.deserialize(filename)) 
             else:      
-                self.messagelabel.setText(u"Invalid artisan format")
+                self.sendmessage(u"Invalid artisan format")
 
             aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
 
@@ -3868,7 +3884,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.redraw()
             
             message =  unicode(filename) + u" loaded successfully"
-            self.messagelabel.setText(message)
+            self.sendmessage(message)
             
             self.setCurrentFile(filename)
                 
@@ -3930,10 +3946,10 @@ class ApplicationWindow(QMainWindow):
                 if "dryend" in profile:
                     self.qmc.dryendB = profile["dryend"]                
             else:      
-                self.messagelabel.setText(u"Invalid artisan format")
+                self.sendmessage(u"Invalid artisan format")
 
             message =  u"Background " + unicode(filename) + u" loaded successfully "+unicode(self.qmc.stringfromseconds(self.qmc.startendB[2]))
-            self.messagelabel.setText(message)
+            self.sendmessage(message)
 
         except IOError,e:
             self.qmc.adderror(u"IO Error: loadbackground() " + unicode(e) + u" ")
@@ -4024,7 +4040,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.startend[2] = DROP
             aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2]) 
         self.qmc.endofx = self.qmc.timex[-1]
-        self.messagelabel.setText(u"HH506RA file loaded successfully")
+        self.sendmessage(u"HH506RA file loaded successfully")
         self.qmc.redraw()
 
             
@@ -4289,11 +4305,11 @@ class ApplicationWindow(QMainWindow):
                 #write
                 self.serialize(filename,self.getProfile())
                 self.setCurrentFile(filename)
-                self.messagelabel.setText(u"Profile saved")
+                self.sendmessage(u"Profile saved")
 
                 self.qmc.safesaveflag = False
             else:
-                self.messagelabel.setText(u"Cancelled")
+                self.sendmessage(u"Cancelled")
         except IOError,e:
             self.qmc.adderror(u"IO Error on filesave(): " + unicode(e) + " ")
             return
@@ -4303,9 +4319,9 @@ class ApplicationWindow(QMainWindow):
             filename = aw.ArtisanSaveFileDialog(msg="Export CSV",ext="*.csv")
             if filename:
                 self.exportCSV(filename)
-                self.messagelabel.setText(u"Readings exported")
+                self.sendmessage(u"Readings exported")
             else:
-                self.messagelabel.setText(u"Cancelled")
+                self.sendmessage(u"Cancelled")
         except IOError,e:
             self.qmc.adderror(u"IO Error on fileExport(): " + unicode(e) + " ")
             return
@@ -4315,9 +4331,9 @@ class ApplicationWindow(QMainWindow):
             filename = aw.ArtisanOpenFileDialog(msg="Import CSV",ext="*.csv")
             if filename:
                 self.importCSV(filename)
-                self.messagelabel.setText(u"Readings imported")
+                self.sendmessage(u"Readings imported")
             else:
-                self.messagelabel.setText(u"Cancelled")
+                self.sendmessage(u"Cancelled")
         except IOError,e:
             self.qmc.adderror(u"IO Error on fileImport(): " + unicode(e) + " ")            
             return
@@ -5022,7 +5038,11 @@ $cupping_notes
         
     def viewErrorLog(self):
         error = errorDlg(self)
-        error.show()      
+        error.show()
+
+    def viewMessageLog(self):
+        message = messageDlg(self)
+        message.show()        
         
     def helpAbout(self):
         creditsto = "<br>Rafael Cobo <br> Marko Luther"
@@ -5201,7 +5221,7 @@ $cupping_notes
                 self.qmc.temp1 = self.qmc.temp2
                 self.qmc.temp2 = tmp
             self.qmc.endofx = self.qmc.timex[-1]
-            self.messagelabel.setText(u"K202 file loaded successfully")
+            self.sendmessage(u"K202 file loaded successfully")
             self.qmc.redraw()
  
         except IOError,e:
@@ -5265,7 +5285,7 @@ $cupping_notes
                 self.qmc.temp1 = self.qmc.temp2
                 self.qmc.temp2 = tmp
             self.qmc.endofx = self.qmc.timex[-1]
-            self.messagelabel.setText(u"HH506RA file loaded successfully")
+            self.sendmessage(u"HH506RA file loaded successfully")
             self.qmc.redraw()
  
         except IOError,e:
@@ -5323,7 +5343,7 @@ $cupping_notes
             x = image.width()
             y = image.height()
             
-            self.messagelabel.setText(filename + u" (" + unicode(x) + u"x" + unicode(y) + u") saved")
+            self.sendmessage(filename + u" (" + unicode(x) + u"x" + unicode(y) + u") saved")
 
         except IOError,e:
             self.qmc.adderror(u"IO Error: resize() " + unicode(e) + u" ")
@@ -5685,7 +5705,7 @@ class HUDDlg(QDialog):
         app.setStyle(self.styleComboBox.currentText())
         
     def showsound(self):
-        aw.messagelabel.setText("Testing Mike...")
+        aw.sendmessage("Testing Mike...")
         aw.stack.setCurrentIndex(2)
         aw.sound.opensound()
         for i in range(80):
@@ -5694,7 +5714,7 @@ class HUDDlg(QDialog):
             aw.sound.blitsound()
         aw.stack.setCurrentIndex(0)
         aw.sound.closesound()
-        aw.messagelabel.setText("")
+        aw.sendmessage("")
         
              
     def saveinterp(self):
@@ -5735,11 +5755,11 @@ class HUDDlg(QDialog):
     def soundset(self,i):
         if aw.soundflag == 0:
             aw.soundflag = 1
-            aw.messagelabel.setText("Sound turned ON")
+            aw.sendmessage("Sound turned ON")
             aw.soundpop()
         else:
             aw.soundflag = 0
-            aw.messagelabel.setText("Sound turn OFF")
+            aw.sendmessage("Sound turn OFF")
 
             
     def changeDeltaET(self,i):
@@ -5799,7 +5819,7 @@ class HUDDlg(QDialog):
         aw.qmc.ETtarget = int(self.ETlineEdit.text())
         aw.qmc.BTtarget = int(self.BTlineEdit.text())
         string = u"[ET target = " + unicode(aw.qmc.ETtarget) + u"] [BT target = " + unicode(aw.qmc.BTtarget) + u"]"        
-        aw.messagelabel.setText(string)
+        aw.sendmessage(string)
         self.accept()
 
     def closeEvent(self, event):    
@@ -6406,10 +6426,10 @@ class editGraphDlg(QDialog):
             self.createEventTable()
             aw.qmc.redraw()
             message = u" Event #" + str(len(aw.qmc.specialevents)) + " added"
-            aw.messagelabel.setText(message)
+            aw.sendmessage(message)
         else:
             message = u" No profile found"
-            aw.messagelabel.setText(message)            
+            aw.sendmessage(message)            
             
     def deleteEventTable(self):
         if len(aw.qmc.specialevents):
@@ -6420,10 +6440,10 @@ class editGraphDlg(QDialog):
              self.createEventTable()
              aw.qmc.redraw()
              message = u" Event #" + str(len(aw.qmc.specialevents)+1) + " deleted"  
-             aw.messagelabel.setText(message)
+             aw.sendmessage(message)
         else:
              message = u"No events found"  
-             aw.messagelabel.setText(message)            
+             aw.sendmessage(message)            
              
     def percent(self):
         if float(self.weightoutedit.text()) != 0.0:
@@ -6570,7 +6590,7 @@ class editGraphDlg(QDialog):
         aw.qmc.roastingnotes = unicode(self.roastingeditor.toPlainText())
         aw.qmc.cuppingnotes = unicode(self.cuppingeditor.toPlainText())
            
-        aw.messagelabel.setText(u"Roast properties updated but profile not saved to disk")            
+        aw.sendmessage(u"Roast properties updated but profile not saved to disk")            
         aw.qmc.redraw()
         self.close()
         
@@ -6586,7 +6606,7 @@ class errorDlg(QDialog):
         #convert list of errors to an html string
         htmlerr = ""
         for i in range(len(aw.qmc.errorlog)):
-            htmlerr += "<b>" + str(i+1) + "</b> <i>" + aw.qmc.errorlog[i] + "</i><br><br>"
+            htmlerr += "<b>" + str(len(aw.qmc.errorlog)-i) + "</b> <i>" + aw.qmc.errorlog[-i-1] + "</i><br><br>"
 
         enumber = len(aw.qmc.errorlog)
         labelstr =  "Number of errors found <b>" + unicode(enumber) +"</b>"
@@ -6600,6 +6620,34 @@ class errorDlg(QDialog):
         layout.addWidget(errorEdit,1)
                                
         self.setLayout(layout)
+
+##########################################################################
+#####################  MESSAGE HISTORY DLG  ##############################
+##########################################################################
+        
+class messageDlg(QDialog):
+    def __init__(self, parent = None):
+        super(messageDlg,self).__init__(parent)
+        self.setWindowTitle("Message History")
+
+        #convert list of messages to an html string
+        htmlmessage = ""
+        for i in range(len(aw.messagehist)):
+            htmlmessage += "<b>" + str(len(aw.messagehist)-i) + "</b> <i>" + aw.messagehist[-i-1] + "</i><br><br>"
+
+        linenumber = len(aw.messagehist)
+        labelstr =  "Last stacked messages"
+        mlabel = QLabel(labelstr)
+        messageEdit = QTextEdit()
+        messageEdit.setHtml(htmlmessage)
+        messageEdit.setReadOnly(True)
+
+        layout = QVBoxLayout()
+        layout.addWidget(mlabel,0)
+        layout.addWidget(messageEdit,1)
+                               
+        self.setLayout(layout)
+
 
 
 
@@ -6663,12 +6711,12 @@ class autosaveDlg(QDialog):
             aw.qmc.autosaveflag = 1
             aw.qmc.autosaveprefix = self.prefixEdit.text()
             message = "Autosave ON. Prefix: " + self.prefixEdit.text()
-            aw.messagelabel.setText(message)
+            aw.sendmessage(message)
             aw.qmc.autosavepath = unicode(self.pathEdit.text())
         else:
             aw.qmc.autosaveflag = 0
             message = "Autosave OFF"
-            aw.messagelabel.setText(message)            
+            aw.sendmessage(message)            
         self.close()
         
 ##########################################################################
@@ -6780,7 +6828,7 @@ class WindowsDlg(QDialog):
             aw.qmc.keeptimeflag = 0
         aw.qmc.redraw()
         string = u"ylimit = (" + unicode(self.ylimitEdit_min.text()) + u"," + unicode(self.ylimitEdit.text()) + u") xlimit = (" + unicode(self.xlimitEdit_min.text()) + u"," + unicode(self.xlimitEdit.text())+ u")"
-        aw.messagelabel.setText(string)
+        aw.sendmessage(string)
 
         self.close()
         
@@ -7183,10 +7231,10 @@ class EventsDlg(QDialog):
             aw.etypeComboBox.addItems(aw.qmc.etypes)
         
             aw.qmc.redraw()
-            aw.messagelabel.setText(u"Event types saved")        
+            aw.sendmessage(u"Event types saved")        
             self.close()
         else:
-            aw.messagelabel.setText(u"Found empty event type box")        
+            aw.sendmessage(u"Found empty event type box")        
             
 
     def settypedefault(self):
@@ -7376,7 +7424,7 @@ class phasesGraphDlg(QDialog):
             aw.qmc.phases = list(aw.qmc.phases_celsius_defaults)
         self.events2phases()
         self.getphases()
-        aw.messagelabel.setText(u"Phases changed to " + aw.qmc.mode + " default: " + unicode(aw.qmc.phases))
+        aw.sendmessage(u"Phases changed to " + aw.qmc.mode + " default: " + unicode(aw.qmc.phases))
         aw.qmc.redraw()
 
 ############################################################################        
@@ -8720,12 +8768,12 @@ class serialport(object):
                         Tcheck = int(binascii.hexlify(r[43]),16)
                         if Tcheck != 12:
                             if T1 < 200 and T2 < 200:
-                                aw.messagelabel.setText("Please connect T1 & T2")
+                                aw.sendmessage("Please connect T1 & T2")
                             else:
                                 #don't display any message
                                 self.CENTER309flag = 1
                         elif Tcheck ==12 and T1 < 200 and T2 < 200:
-                            aw.messagelabel.setText("T1 & T2 connected")
+                            aw.sendmessage("T1 & T2 connected")
                             self.CENTER309flag = 1
                                                
                     return T1,T2
@@ -9209,7 +9257,7 @@ class comportDlg(QDialog):
                 raise timeoutError
             #add more checks here
             
-            aw.messagelabel.setText(u"Serial Port Settings: " + comport + ", " + baudrate + ", " + bytesize + ", " + parity + ", " + stopbits + ", " + timeout)
+            aw.sendmessage(u"Serial Port Settings: " + comport + ", " + baudrate + ", " + bytesize + ", " + parity + ", " + stopbits + ", " + timeout)
                         
         except comportError,e:
             aw.qmc.adderror(u"Comport Error: Invalid Comm entry ")
@@ -9236,7 +9284,7 @@ class comportDlg(QDialog):
                     available.append(s.portstr)
                     s.close()  
                 except serial.SerialException,e:
-                    aw.qmc.adderror(u"Serial Exception: scanforport() ") 
+                    pass
                 
         elif platf == 'Darwin':
             #scans serial ports in Mac computer
@@ -9268,7 +9316,7 @@ class comportDlg(QDialog):
                     except Exception, e:
                         pass
         else:
-            self.messagelabel.setText("Port scan on this platform not yet supported")
+            self.sendmessage("Port scan on this platform not yet supported")
                                 
         self.comportEdit.clear()              
         self.comportEdit.addItems(available)
@@ -9665,7 +9713,7 @@ class DeviceAssignmentDLG(QDialog):
             aw.label6.setVisible(False)
             aw.lcd6.setVisible(False)
                         
-        aw.messagelabel.setText(message)
+        aw.sendmessage(message)
         
         if self.nonpidButton.isChecked():
             if meter != "NONE":
@@ -9974,7 +10022,7 @@ class graphColorDlg(QDialog):
             var.setPalette(QPalette(colorf))
             var.setAutoFillBackground(True)            
             aw.qmc.fig.canvas.redraw()
-            aw.messagelabel.setText("Color of " + title + " set to " + str(aw.qmc.palette[color]))
+            aw.sendmessage("Color of " + title + " set to " + str(aw.qmc.palette[color]))
 
 
 
@@ -12014,11 +12062,11 @@ class PXG4pidDlgControl(QDialog):
 
             else:
                 message = u"Pattern did not changed"
-            aw.messagelabel.setText(message)
+            aw.sendmessage(message)
         elif onoff == 1:
-            aw.messagelabel.setText(u"Ramp/Soak was found ON! Turn it off before changing the pattern")
+            aw.sendmessage(u"Ramp/Soak was found ON! Turn it off before changing the pattern")
         elif onoff == 2:
-            aw.messagelabel.setText(u"Ramp/Soak was found in Hold! Turn it off before changing the pattern")
+            aw.sendmessage(u"Ramp/Soak was found in Hold! Turn it off before changing the pattern")
           
 
     def setONOFFstandby(self,flag):
@@ -12377,11 +12425,11 @@ class FujiPID(object):
         #if OK
         if r == command:
             if flag == 1:
-                aw.messagelabel.setText(u"RS ON and running...")
+                aw.sendmessage(u"RS ON and running...")
             elif flag == 0:
-                aw.messagelabel.setText(u"RS OFF")
+                aw.sendmessage(u"RS OFF")
             else:
-                aw.messagelabel.setText(u"RS on HOLD")
+                aw.sendmessage(u"RS on HOLD")
         else:
             aw.qmc.adderror(u"RampSoak could not be changed")
 
@@ -12397,7 +12445,7 @@ class FujiPID(object):
             #check response
             if r == command:
                 message = u"PXG sv#%i set to %.1f"%(self.PXG4["selectsv"][0],float(value))
-                aw.messagelabel.setText(message)
+                aw.sendmessage(message)
                 self.PXG4[svkey][0] = value
                 #record command as an Event 
                 strcommand = u"SETSV::" + unicode("%.1f"%float(value))
@@ -12413,7 +12461,7 @@ class FujiPID(object):
             if r == command:
                 message = u"PXR sv set to %.1f"%value
                 aw.pid.PXR["sv0"][0] = value
-                aw.messagelabel.setText(message)
+                aw.sendmessage(message)
                 #record command as an Event 
                 strcommand = u"SETSV::" + unicode("%.1f"%float(value))
                 aw.qmc.DeviceEventRecord(strcommand)
@@ -12441,7 +12489,7 @@ class FujiPID(object):
                     r = aw.ser.sendFUJIcommand(command,8)
                     if len(r) == 8:
                         message = u"SV" + unicode(N) + u" changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
-                        aw.messagelabel.setText(message)
+                        aw.sendmessage(message)
                         self.PXG4[svkey][0] = newsv
                         
                         #record command as an Event to replay (not binary as it needs to be stored in a text file)
@@ -12450,7 +12498,7 @@ class FujiPID(object):
                             
                     else:
                         msg = u"Unable to set sv" + unicode(N)
-                        aw.messagelabel.setText(msg)       
+                        aw.sendmessage(msg)       
 
             #   or if control pid is fuji PXR
             elif aw.ser.controlETpid[0] == 1:
@@ -12458,16 +12506,16 @@ class FujiPID(object):
                 r = aw.ser.sendFUJIcommand(command,8)
                 if len(r) == 8:
                     message = u" SV changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
-                    aw.messagelabel.setText(message)
+                    aw.sendmessage(message)
                     self.PXR["sv0"][0] = newsv
 
                     #record command as an Event to replay (not binary as it needs to be stored in a text file)
                     strcommand = u"SETSV::" + unicode("%.1f"%(newsv/10.))
                     aw.qmc.DeviceEventRecord(strcommand)
                 else:
-                    aw.messagelabel.setText(u"Unable to set sv")
+                    aw.sendmessage(u"Unable to set sv")
         else:
-            aw.messagelabel.setText(u"Unable to set new sv")
+            aw.sendmessage(u"Unable to set new sv")
 
 
     #format of the input string Command: COMMAND::VALUE1::VALUE2::VALUE3::ETC        
@@ -12486,19 +12534,29 @@ class FujiPID(object):
     #example of command string with four segments (minimum for Fuji PIDs)
     # SETRS::270.0::3::0::SETRS::300.0::3::0::SETRS::350.0::3::0::SETRS::400.0::3::0
     def replaysetrs(self,CommandString):
-        parts =CommandString.split("SETRS")
-        if parts[0] == "":
-            parts = parts[1:]          #remove first empty [""] list
-        if parts[-1] == "":
-            parts = parts[:-1]          #remove last empty [""] list
-        n = len(parts)
+        segments =CommandString.split("SETRS")
+        if segments[0] == "":
+            segments = segments[1:]          #remove first empty [""] list [[""],[etc]]
+        if segments[-1] == "":
+            segments = segments[:-1]          #remove last empty [""] list [[etc][""]]
+        n = len(segments)
+        
+        #if parts is < 4, make it compatible with Fuji PID (4 segments needed)
+        if n < 4:            
+            for i in range(4-n):
+                #last temperature
+                lasttemp = segments[-1].split("::")[1]
+                #create a string with 4 segments ("SETRS" alredy removed) 
+                string = "::" + lasttemp + u"::0::0"   #add zero ramp time and zero soak time
+                segments.append(string)
+                
         rs = []
         changeflag = 0
         for i in range(n):
-            rs.append(parts[i].split("::"))
-            if rs[i][0] == "":          #remove first empty ""
+            rs.append(segments[i].split("::"))
+            if rs[i][0] == "":          #remove first empty u"" [u"",u"300.5",u"3",u"0",u""] if one found
                 rs[i] = rs[i][1:]
-            if rs[i][-1] == "":          #remove last empty ""
+            if rs[i][-1] == "":          #remove last empty u"" [u"300.5",u"3",u"0",u""] if one found
                 rs[i] = rs[i][:-1]
             
             if len(rs[i]) == 3:
@@ -12506,8 +12564,8 @@ class FujiPID(object):
                 rampkey = "segment" + str(i+1) + "ramp"
                 soakkey = "segment" + str(i+1) + "soak"
                 if aw.ser.controlETpid[0] == 0:             #PXG4
-                    if n < 4 or n > 16:
-                        aw.qmc.adderror("pid replaysetrs(): PXG4 invalid pid segment count: %i"%n)
+                    if not n%4 or n > 16:
+                        aw.qmc.adderror("PXG4 replaysetrs() Error: Invalid segment count: %i"%n)
                         return
                     if self.PXG4[svkey][0] != float(rs[i][0]):
                         self.PXG4[svkey][0] = float(rs[i][0])
@@ -12522,8 +12580,8 @@ class FujiPID(object):
                         self.setsegment((i+1), self.PXG4[svkey][0], self.PXG4[rampkey][0] ,self.PXG4[soakkey][0])
                         changeflag = 0
                 elif aw.ser.controlETpid[0] == 1:           #PXR
-                    if n < 4 or n > 8:
-                        aw.qmc.adderror("pid replaysetrs(): PXR invalid segment count: %i"%n)
+                    if not n%4 or n > 8:
+                        aw.qmc.adderror("PXR replaysetrs() Error: Invalid segment count: %i"%n)
                         return
                     if self.PXR[svkey][0] != float(rs[i][0]):
                         self.PXR[svkey][0] = float(rs[i][0])
@@ -12539,6 +12597,7 @@ class FujiPID(object):
                         changeflag = 0
             else:
                 aw.qmc.adderror("replaysetrs() Error: Need three SETRS values (float,int,int)")
+                return
         #start ramp soak ON
         self.setrampsoak(1)
         
