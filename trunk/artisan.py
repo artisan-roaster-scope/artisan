@@ -196,7 +196,7 @@ class tgraphcanvas(FigureCanvas):
                                    self.TEVA18B
                                    ]
         
-        self.fig = Figure(facecolor=u'lightgrey')
+        self.fig = Figure()
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
         #legend location
         self.legendloc = 2
@@ -571,6 +571,7 @@ class tgraphcanvas(FigureCanvas):
         self.ax.lines = self.ax.lines[0:linecount]
 
     def playbackevent(self):
+        #needed when using device NONE
         if len(self.timex):
             #find time distances
             for i in range(len(self.backgroundEvents)):
@@ -582,6 +583,7 @@ class tgraphcanvas(FigureCanvas):
                     #rotate colors to get attention
                     if timed%2:
                         aw.messagelabel.setStyleSheet("background-color:'transparent';")
+                        
                     else:
                         aw.messagelabel.setStyleSheet("background-color:'yellow';")
                         
@@ -589,16 +591,42 @@ class tgraphcanvas(FigureCanvas):
                     break
                 
                 elif timed == 0:
-                    #devices that support automatic roaster control
-                    #Fuji PID
+                    #for devices that support automatic roaster control
+                    #if Fuji PID
                     if self.device == 0:
-                        #format of the input string Command: COMMAND::VALUE1::VALUE2::VALUE3::ETC        
+
+                        # COMMAND SET STRINGS
+                        # SETSV::VALUE1  (adjust the SV PID to the float VALUE1)
+                        # SETRS::VALUE1::VALUE2::VALUE3  (VALUE1 = target SV. VALUE2 = time to reach VALUE 1 (ramp) in minutes. VALUE3 = hold (soak) time in minutes)
+
+                        # IMPORTANT: VALUES are for controlling ET only (not BT). The PID should control ET not BT. The PID should be connected to ET only.
+                        # Therefore, these values don't reflect a BT defined profile. They define an ET profile.
+                        # They reflect the changes in ET, which indirectly define BT after some time lag
+                        
+                        # There are two ways to record a roast. One is by changing Set Values (SV) during the roast,
+                        # the other is by using ramp/soaks segments (RS). 
+                        # Examples:
+                        
+                        # SETSV::560.3           sets an SV value of 560.3F in the PID at the time of the recorded background event
+                        
+                        # SETRS::440.2::2::0     starts Ramp Soak mode so that it reaches 440.2F in 2 minutes and holds (soaks) 440.2F for zero minutes
+                        
+                        # SETRS::300.0::2::3::SETRS::540.0::6::0::SETRS::560.0::4::0::SETRS::560::0::0   
+                        #       this command has 4 comsecutive commands inside (4 segments)
+                        #       1 SETRS::300.0::2::3 reach 300.0F in 2 minutes and hold it for 3 minutes (ie. total dry phase time = 5 minutes)
+                        #       2 SETRS::540.0::6::0 then reach 540.0F in 6 minutes and hold it there 0 minutes (ie. total mid phase time = 6 minutes )
+                        #       3 SETRS::560.0::4::0 then reach 560.0F in 4 minutes and hold it there 0 minutes (ie. total finish phase time = 4 minutes)
+                        #       4 SETRS::560::0::0 then do nothing (because ramp time and soak time are both 0)
+                        #       END ramp soak mode
+                        
+                        
                         if "::" in self.backgroundEStrings[i]:   
                             aw.pid.replay(self.backgroundEStrings[i])
                             time.sleep(.5)  #avoid possible close times (rounding off) 
                             
                     #future Arduino
                     #if self.device == 19:
+
                         
                 #delete message
                 else:
@@ -1684,10 +1712,7 @@ class tgraphcanvas(FigureCanvas):
                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
             message = u"Roast time starts now 00:00 BT = " + unicode(self.startend[1]) + self.mode
-
-            aw.label1.setStyleSheet("background-color:'#FF9966';")
-            aw.label1.setText( "<font color='black'><b>Roast time<\b></font>")
-  
+ 
             aw.button_8.setDisabled(True)
             aw.button_8.setFlat(True)
                     
@@ -1955,9 +1980,6 @@ class tgraphcanvas(FigureCanvas):
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             
             self.writestatistics()
-            
-            aw.label1.setStyleSheet("background-color:'#66FF66';")
-            aw.label1.setText( "<font color='black'><b>Monitor time<\b></font>")
             
             aw.button_9.setDisabled(True)
             aw.button_9.setFlat(True)
@@ -2697,6 +2719,10 @@ class ApplicationWindow(QMainWindow):
         self.pid = FujiPID()
 
         self.soundflag = 0
+
+        #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv 
+        self.lcdpalette = { "timer":u'black',"met":'black',"bt":'black',"deltamet":'black',"deltabt":'black',"sv":'black'}
+
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID. 
         self.settingsLoad()        
@@ -2899,14 +2925,14 @@ class ApplicationWindow(QMainWindow):
         self.lcd5.setMinimumHeight(45)
         self.lcd6 = QLCDNumber() # pid sv    
         self.lcd6.setMinimumHeight(45)
-        
-        self.lcd1.setStyleSheet("QLCDNumber { background-color: black }")
-        self.lcd2.setStyleSheet("QLCDNumber { background-color: black }")
-        self.lcd3.setStyleSheet("QLCDNumber { background-color: black }")
-        self.lcd4.setStyleSheet("QLCDNumber { background-color: black }")
-        self.lcd5.setStyleSheet("QLCDNumber { background-color: black }")
-        self.lcd6.setStyleSheet("QLCDNumber { background-color: black }")
-        
+
+        self.lcd1.setStyleSheet("QLCDNumber { background-color: %s}"%self.lcdpalette["timer"])
+        self.lcd2.setStyleSheet("QLCDNumber { background-color: %s}"%self.lcdpalette["met"])
+        self.lcd3.setStyleSheet("QLCDNumber { background-color: %s}"%self.lcdpalette["bt"])
+        self.lcd4.setStyleSheet("QLCDNumber { background-color: %s}"%self.lcdpalette["deltamet"])
+        self.lcd5.setStyleSheet("QLCDNumber { background-color: %s}"%self.lcdpalette["deltabt"])
+        self.lcd6.setStyleSheet("QLCDNumber { background-color: %s}"%self.lcdpalette["sv"])
+      
         self.lcd1.setMaximumSize(90, 45)
         self.lcd2.setMaximumSize(90, 45)
         self.lcd3.setMaximumSize(90, 45)
@@ -2921,36 +2947,29 @@ class ApplicationWindow(QMainWindow):
         self.lcd5.setToolTip("BT/time (degrees/min)")
         self.lcd6.setToolTip("Value of SV in PID")
 
-
-        #create labels for LCDs
-        #time
-        self.label1 = QLabel()
-        #self.label1.setStyleSheet("background-color:'#CCCCCC';")
-        self.label1.setText( "<font color='black'><b>Time<\b></font>")
-        self.label1.setIndent(5)
         #MET
         label2 = QLabel()
-        #label2.setStyleSheet("background-color:'#CCCCCC';")
         label2.setText( "<font color='black'><b>ET<\b></font>")
+        label2.setAlignment(Qt.AlignRight)
         label2.setIndent(5)
         #BT
         label3 = QLabel()
-        #label3.setStyleSheet("background-color:'#CCCCCC';")
+        label3.setAlignment(Qt.AlignRight)
         label3.setText( "<font color='black'><b>BT<\b></font>")
         label3.setIndent(5)
         #DELTA MET
         label4 = QLabel()
-        #label4.setStyleSheet("background-color:'#CCCCCC';")
+        label4.setAlignment(Qt.AlignRight)
         label4.setText( "<font color='black'><b>DeltaET<\b></font>")
         label4.setIndent(5)
         # DELTA BT
         label5 = QLabel()
-        #label5.setStyleSheet("background-color:'#CCCCCC';")
+        label5.setAlignment(Qt.AlignRight)       
         label5.setText( "<font color='black'><b>DeltaBT<\b></font>")
         label5.setIndent(5)
         # pid sv
         self.label6 = QLabel()
-        #label6.setStyleSheet("background-color:'#CCCCCC';")
+        self.label6.setAlignment(Qt.AlignRight)
         self.label6.setText( "<font color='black'><b>PID SV<\b></font>")
         self.label6.setIndent(5)
 
@@ -4386,7 +4405,11 @@ class ApplicationWindow(QMainWindow):
             #restore colors
             for (k, v) in settings.value("Colors").toMap().items():
                 self.qmc.palette[unicode(k)] = unicode(v.toString())
-            
+                
+            if settings.contains("LCDColors"):
+                for (k, v) in settings.value("LCDColors").toMap().items():
+                    self.lcdpalette[unicode(k)] = unicode(v.toString())
+
             #restore flavors
             self.qmc.flavorlabels = settings.value("Flavors",self.qmc.flavorlabels).toStringList()
             #restore serial port     
@@ -4499,6 +4522,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Delay",self.qmc.delay)
             #save colors
             settings.setValue("Colors",self.qmc.palette)
+            settings.setValue("LCDColors",self.lcdpalette)
             #save flavors
             settings.setValue("Flavors",self.qmc.flavorlabels)
             #soundflag
@@ -5045,11 +5069,13 @@ $cupping_notes
         message.show()        
         
     def helpAbout(self):
-        creditsto = "<br>Rafael Cobo <br> Marko Luther"
+        coredevelopers = "<br>Rafael Cobo <br> Marko Luther <br> Sebastien Delgrande"
+        contributors = "<br>Lukas Kolbe, linux binary<br>Rich Helms, documentation<br>Markus Wagner, TEVA18B support"
+        contributors += "<br>Martin Kral, Swedish localization<br>Bluequijote, Spanish localization<br>Marcio Carneiro, Arduino/TC4"
         box = QMessageBox()
         #create a html QString
         box.about(self,
-                "Platform",
+                "About",
                 """<b>Version:</b> {0} 
                 <p>
                 <b>Python:</b> [ {1} ]
@@ -5058,17 +5084,21 @@ $cupping_notes
                 <b>OS:</b/>[ {4} ]
                 </p>
                 <p>
-                <b>Credits:</b> {5}
+                <b>Core developers:</b> {5}
+                </p>
+                <p>
+                <b>Contributors:</b> {6}
                 </p>""".format(
                 __version__,
                 platform.python_version(),
                 QT_VERSION_STR,
                 PYQT_VERSION_STR,
                 platf,
-                creditsto))
-
+                coredevelopers,
+                contributors))
+                
     def helpHelp(self):
-        QDesktopServices.openUrl(QUrl(u"file:///" + unicode(self.applicationDirectory) + u"/index.html", QUrl.TolerantMode))
+        QDesktopServices.openUrl(QUrl(u"http://coffeetroupe.com/artisandocs/", QUrl.TolerantMode))
 
     def calibratedelay(self):
         calSpinBox = QSpinBox()
@@ -6912,7 +6942,7 @@ class calculatorDlg(QDialog):
 
         #VOLUME CONVERSION
         self.VinComboBox = QComboBox()
-        volumeunits = ["liter","gallon","quart","pint","cup"]
+        volumeunits = ["liter","gallon","quart","pint","cup","cm^3"]
         self.VinComboBox.addItems(volumeunits )
         self.VinComboBox.setMaximumWidth(50)
         self.VoutComboBox = QComboBox()
@@ -7081,24 +7111,25 @@ class calculatorDlg(QDialog):
            self.WinEdit.setText(u"%.2f"%inx)
 
     def convertVolume(self,x):
-                        #liter          gal             qt              pt              cup
+                        #liter          gal             qt              pt              cup             cm^3
         convtable = [
-                        [1.,            0.26417205,     1.05668821,     2.11337643,     4.22675284 ],    # liter
-                        [3.78541181,    1.,             4.,             8.,             16         ],    # gallon
-                        [0.94635294,    0.25,           1.,             2.,             4.         ],    # quart
-                        [0.47317647,    0.125,          0.5,            1.,             2.         ],    # pint
-                        [0.23658823,    0.0625,         0.25,           0.5,            1.         ]     # cup
+                        [1.,            0.26417205,     1.05668821,     2.11337643,     4.22675284,     1000.                ],    # liter
+                        [3.78541181,    1.,             4.,             8.,             16,             3785.4117884         ],    # gallon
+                        [0.94635294,    0.25,           1.,             2.,             4.,             946.352946           ],    # quart
+                        [0.47317647,    0.125,          0.5,            1.,             2.,             473.176473           ],    # pint
+                        [0.23658823,    0.0625,         0.25,           0.5,            1.,             236.5882365          ],    # cup
+                        [0.001,         2.6417205e-4,   1.05668821e-3,  2.11337641e-3,  4.2267528e-3,   1.                   ]     # cm^3          
                     ]
         
         if x == "ItoO":
            inx = float(unicode(self.VinEdit.text()))
            outx = inx*convtable[self.VinComboBox.currentIndex()][self.VoutComboBox.currentIndex()]
-           self.VoutEdit.setText(u"%.2f"%outx)
+           self.VoutEdit.setText(u"%.3f"%outx)
             
         elif x == "OtoI":
            outx = float(unicode(self.VoutEdit.text()))
            inx = outx*convtable[self.VoutComboBox.currentIndex()][self.VinComboBox.currentIndex()]
-           self.VinEdit.setText(u"%.2f"%inx)
+           self.VinEdit.setText(u"%.3f"%inx)
            
     def closeEvent(self, event):    
         aw.qmc.redraw()        
@@ -9733,6 +9764,7 @@ class graphColorDlg(QDialog):
         self.setWindowTitle("Colors")
         frameStyle = QFrame.Sunken | QFrame.Panel
 
+        #TAB1
         self.backgroundLabel = QLabel(aw.qmc.palette["background"])
         self.backgroundLabel.setPalette(QPalette(QColor(aw.qmc.palette["background"])))
         self.backgroundLabel.setAutoFillBackground(True)
@@ -9885,6 +9917,65 @@ class graphColorDlg(QDialog):
         greyButton.setFocusPolicy(Qt.NoFocus)
         self.connect(greyButton, SIGNAL("clicked()"),lambda x=2:self.recolor(x))             
 
+        #TAB 2
+        lcd1label = QLabel("Timer")
+        lcd2label = QLabel("ET")
+        lcd3label = QLabel("BT")
+        lcd4label = QLabel("Delta ET")
+        lcd5label = QLabel("Dleta BT")
+        lcd6label = QLabel("SV")
+
+        lcdcolors = ["grey","darkGrey","slateGrey","lightGray","black","white","transparent"]
+        self.lcd1colorComboBox =  QComboBox()
+        self.lcd1colorComboBox.addItems(lcdcolors)
+
+        self.lcd2colorComboBox =  QComboBox()
+        self.lcd2colorComboBox.addItems(lcdcolors)
+    
+        self.lcd3colorComboBox =  QComboBox()
+        self.lcd3colorComboBox.addItems(lcdcolors)
+    
+        self.lcd4colorComboBox =  QComboBox()
+        self.lcd4colorComboBox.addItems(lcdcolors)
+    
+        self.lcd5colorComboBox =  QComboBox()
+        self.lcd5colorComboBox.addItems(lcdcolors)
+    
+        self.lcd6colorComboBox =  QComboBox()
+        self.lcd6colorComboBox.addItems(lcdcolors)
+
+        lcd1setButton = QPushButton("Set")
+        self.connect(lcd1setButton, SIGNAL("clicked()"),lambda x=1:self.paintlcds(x))
+        lcd2setButton = QPushButton("Set")
+        self.connect(lcd2setButton, SIGNAL("clicked()"),lambda x=2:self.paintlcds(x))   
+        lcd3setButton = QPushButton("Set")
+        self.connect(lcd3setButton, SIGNAL("clicked()"),lambda x=3:self.paintlcds(x))   
+        lcd4setButton = QPushButton("Set")
+        self.connect(lcd4setButton, SIGNAL("clicked()"),lambda x=4:self.paintlcds(x))   
+        lcd5setButton = QPushButton("Set")
+        self.connect(lcd5setButton, SIGNAL("clicked()"),lambda x=5:self.paintlcds(x))   
+        lcd6setButton = QPushButton("Set")
+        self.connect(lcd6setButton, SIGNAL("clicked()"),lambda x=6:self.paintlcds(x))   
+
+
+        lcd1customButton = QPushButton("Custom")
+        self.connect(lcd1customButton, SIGNAL("clicked()"),lambda x=1:self.custompaintlcds(x))
+        lcd2customButton = QPushButton("Custom")
+        self.connect(lcd2customButton, SIGNAL("clicked()"),lambda x=2:self.custompaintlcds(x))   
+        lcd3customButton = QPushButton("Custom")
+        self.connect(lcd3customButton, SIGNAL("clicked()"),lambda x=3:self.custompaintlcds(x))   
+        lcd4customButton = QPushButton("Custom")
+        self.connect(lcd4customButton, SIGNAL("clicked()"),lambda x=4:self.custompaintlcds(x))   
+        lcd5customButton = QPushButton("Custom")
+        self.connect(lcd5customButton, SIGNAL("clicked()"),lambda x=5:self.custompaintlcds(x))   
+        lcd6customButton = QPushButton("Custom")
+        self.connect(lcd6customButton, SIGNAL("clicked()"),lambda x=6:self.custompaintlcds(x))   
+
+        closeButton = QPushButton("Close")
+        self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+        
+        #LAYOUTS
+        #tab1 layout
         grid = QGridLayout()
         
         grid.setColumnStretch(1,10)
@@ -9953,13 +10044,101 @@ class graphColorDlg(QDialog):
         okLayout.addStretch()
         okLayout.addWidget(okButton)
 
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(grid)
-        mainLayout.addLayout(okLayout)
+        graphLayout = QVBoxLayout()
+        graphLayout.addLayout(grid)
+        graphLayout.addLayout(okLayout)
 
+        #tab 2
+        lcdlayout = QGridLayout()
+        lcdlayout.addWidget(lcd1label,0,0) 
+        lcdlayout.addWidget(self.lcd1colorComboBox,0,1)
+        lcdlayout.addWidget(lcd1setButton,0,2)
+        lcdlayout.addWidget(lcd1customButton,0,3)
+        lcdlayout.addWidget(lcd2label,1,0) 
+        lcdlayout.addWidget(self.lcd2colorComboBox,1,1)
+        lcdlayout.addWidget(lcd2setButton,1,2)
+        lcdlayout.addWidget(lcd2customButton,1,3)
+        lcdlayout.addWidget(lcd3label,2,0) 
+        lcdlayout.addWidget(self.lcd3colorComboBox,2,1)
+        lcdlayout.addWidget(lcd3setButton,2,2)        
+        lcdlayout.addWidget(lcd3customButton,2,3)
+        lcdlayout.addWidget(lcd4label,3,0) 
+        lcdlayout.addWidget(self.lcd4colorComboBox,3,1)
+        lcdlayout.addWidget(lcd4setButton,3,2)
+        lcdlayout.addWidget(lcd4customButton,3,3)
+        lcdlayout.addWidget(lcd5label,4,0) 
+        lcdlayout.addWidget(self.lcd5colorComboBox,4,1)
+        lcdlayout.addWidget(lcd5setButton,4,2)
+        lcdlayout.addWidget(lcd5customButton,4,3)
+        lcdlayout.addWidget(lcd6label,5,0) 
+        lcdlayout.addWidget(self.lcd6colorComboBox,5,1)
+        lcdlayout.addWidget(lcd6setButton,5,2)
+        lcdlayout.addWidget(lcd6customButton,5,3)
+        lcdlayout.addWidget(closeButton,6,3)
 
-        self.setLayout(mainLayout)
+        ###################################        
+
+        TabWidget = QTabWidget()
         
+        C1Widget = QWidget()
+        C1Widget.setLayout(graphLayout)
+        TabWidget.addTab(C1Widget,"Graph")
+        
+        C2Widget = QWidget()
+        C2Widget.setLayout(lcdlayout)
+        TabWidget.addTab(C2Widget,"LCDs")      
+
+        #incorporate layouts
+        Mlayout = QVBoxLayout()
+        Mlayout.addWidget(TabWidget,1)
+        self.setLayout(Mlayout)
+
+    def custompaintlcds(self,lcdnumber):
+        if lcdnumber ==1:
+            color = unicode((QColorDialog.getColor(QColor(aw.lcdpalette["timer"]),self)).name())
+            aw.lcd1.setStyleSheet("QLCDNumber { background-color: %s}"%color)
+            aw.lcdpalette["timer"] = color
+        if lcdnumber ==2:
+            color = unicode((QColorDialog.getColor(QColor(aw.lcdpalette["met"]),self)).name())
+            aw.lcd2.setStyleSheet("QLCDNumber { background-color: %s}"%color)
+            aw.lcdpalette["met"]= color
+        if lcdnumber ==3:
+            color = unicode((QColorDialog.getColor(QColor(aw.lcdpalette["bt"]),self)).name())
+            aw.lcd3.setStyleSheet("QLCDNumber { background-color: %s}"%color)
+            aw.lcdpalette["bt"]= color
+        if lcdnumber ==4:
+            color = unicode((QColorDialog.getColor(QColor(aw.lcdpalette["deltamet"]),self)).name())
+            aw.lcd4.setStyleSheet("QLCDNumber { background-color: %s}"%color)
+            aw.lcdpalette["deltamet"]= color
+        if lcdnumber ==5:
+            color = unicode((QColorDialog.getColor(QColor(aw.lcdpalette["deltabt"]),self)).name())
+            aw.lcd5.setStyleSheet("QLCDNumber { background-color: %s}"%color)
+            aw.lcdpalette["deltabt"]= color
+        if lcdnumber ==6:
+            color = unicode((QColorDialog.getColor(QColor(aw.lcdpalette["sv"]),self)).name())
+            aw.lcd6.setStyleSheet("QLCDNumber { background-color: %s}"%color)
+            aw.lcdpalette["sv"]= color
+            
+    def paintlcds(self,x):
+        if x ==1 :      
+            aw.lcdpalette["timer"] = self.lcd1colorComboBox.currentText()
+            aw.lcd1.setStyleSheet("QLCDNumber { background-color: %s}"%aw.lcdpalette["timer"])
+        elif x == 2:
+            aw.lcdpalette["met"] = self.lcd2colorComboBox.currentText()
+            aw.lcd2.setStyleSheet("QLCDNumber { background-color: %s}"%aw.lcdpalette["met"])
+        elif x ==3:
+            aw.lcdpalette["bt"] = self.lcd3colorComboBox.currentText()
+            aw.lcd3.setStyleSheet("QLCDNumber { background-color: %s}"%aw.lcdpalette["bt"])
+        elif  x == 4:    
+            aw.lcdpalette["deltamet"] = self.lcd4colorComboBox.currentText()
+            aw.lcd4.setStyleSheet("QLCDNumber { background-color: %s}"%aw.lcdpalette["deltamet"])
+        elif x == 5:
+            aw.lcdpalette["deltabt"] = self.lcd5colorComboBox.currentText()
+            aw.lcd5.setStyleSheet("QLCDNumber { background-color: %s}"%aw.lcdpalette["deltabt"])
+        elif x == 6:
+            aw.lcdpalette["sv"] = self.lcd6colorComboBox.currentText()
+            aw.lcd6.setStyleSheet("QLCDNumber { background-color: %s}"%aw.lcdpalette["sv"])
+
         
     # adds a new event to the Dlg
     def recolor(self, x):
@@ -10042,13 +10221,13 @@ class PXRpidDlgControl(QDialog):
         #create Ramp Soak control button colums
 
         self.labelrs1 = QLabel()
-        self.labelrs1.setMargin(10)
+        self.labelrs1.setMargin(5)
         self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
         self.labelrs1.setText( "<font color='white'><b>Ramp/Soak<br>(1-4)<\b></font>")
         self.labelrs1.setMaximumSize(90, 62)
 
         self.labelrs2 = QLabel()
-        self.labelrs2.setMargin(10)
+        self.labelrs2.setMargin(5)
         self.labelrs2.setStyleSheet("background-color:'#CCCCCC';")
         self.labelrs2.setText( "<font color='white'><b>Ramp/Soak<br>(5-8)<\b></font>")
         self.labelrs2.setMaximumSize(90, 62)
@@ -10843,14 +11022,14 @@ class PXG4pidDlgControl(QDialog):
 
         #*************    TAB 1 WIDGETS
         labelrs1 = QLabel()
-        labelrs1.setMargin(10)
+        labelrs1.setMargin(5)
         labelrs1.setStyleSheet("background-color:'#CCCCCC';")
         labelrs1.setText( "<font color='white'><b>RampSoak<br>(1-7)<\b></font>")
         #labelrs1.setMaximumSize(90, 42)
         #labelrs1.setMinimumHeight(50)
 
         labelrs2 = QLabel()
-        labelrs2.setMargin(10)
+        labelrs2.setMargin(5)
         labelrs2.setStyleSheet("background-color:'#CCCCCC';")
         labelrs2.setText( "<font color='white'><b>RampSoak<br>(8-16)<\b></font>")
         #labelrs2.setMaximumSize(90, 42)
@@ -10889,24 +11068,7 @@ class PXG4pidDlgControl(QDialog):
         self.label_rs14.setMinimumWidth(170)
         self.label_rs15.setMinimumWidth(170)
         self.label_rs16.setMinimumWidth(170)
-
-        self.label_rs1.setMargin(10)
-        self.label_rs2.setMargin(10)
-        self.label_rs3.setMargin(10)
-        self.label_rs4.setMargin(10)
-        self.label_rs5.setMargin(10)
-        self.label_rs6.setMargin(10)
-        self.label_rs7.setMargin(10)
-        self.label_rs8.setMargin(10)
-        self.label_rs9.setMargin(10)
-        self.label_rs10.setMargin(10)
-        self.label_rs11.setMargin(10)
-        self.label_rs12.setMargin(10)
-        self.label_rs13.setMargin(10)
-        self.label_rs14.setMargin(10)
-        self.label_rs15.setMargin(10)
-        self.label_rs16.setMargin(10)
-        
+       
         self.patternComboBox =  QComboBox()
         self.patternComboBox.addItems(["1-4","5-8","1-8","9-12","13-16","9-16","1-16"])
         self.patternComboBox.setCurrentIndex(aw.pid.PXG4["rampsoakpattern"][0])
