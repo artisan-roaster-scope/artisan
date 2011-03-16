@@ -110,7 +110,7 @@ if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
 #Localization support
 locale = QLocale.system().name()
-#locale = "es"
+#locale = "fr"
 qtTranslator = QTranslator()
 #load Qt default translations from QLibrary
 if qtTranslator.load("qt_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)): 
@@ -542,7 +542,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.stack.setCurrentIndex(0)
             self.resetlines()
-            aw.sendmessage(u"HUD OFF")
+            aw.sendmessage(QApplication.translate("Message Area","HUD OFF", None, QApplication.UnicodeUTF8))
             
         #ON
         else:
@@ -554,9 +554,9 @@ class tgraphcanvas(FigureCanvas):
                 self.HUDflag = True
                 aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
                 aw.stack.setCurrentIndex(1)
-                aw.sendmessage(u"HUD ON")
+                aw.sendmessage(QApplication.translate("Message Area","HUD ON", None, QApplication.UnicodeUTF8))
             else:
-                aw.sendmessage(u"Need some data for HUD to work")
+                aw.sendmessage(QApplication.translate("Message Area","Need some data for HUD to work", None, QApplication.UnicodeUTF8))
         aw.soundpop()        
 
     def resetlines(self):
@@ -833,13 +833,13 @@ class tgraphcanvas(FigureCanvas):
     def reset(self):
         #prevents deleting accidentally a finished roast
         if self.safesaveflag== True:
-            string = "Do you want to save the profile?"
-            reply = QMessageBox.warning(self,u"Profile unsaved",string,
+            string = QApplication.translate("Message Box","Do you want to save the profile?", None, QApplication.UnicodeUTF8)
+            reply = QMessageBox.warning(self,QApplication.translate("Form Caption","Profile unsaved", None, QApplication.UnicodeUTF8),string,
                                 QMessageBox.Reset |QMessageBox.Save|QMessageBox.Cancel)
             if reply == QMessageBox.Reset :
                 self.safesaveflag == False
             elif reply == QMessageBox.Cancel:            
-                aw.sendmessage("Reset has been cancelled")
+                aw.sendmessage(QApplication.translate("Message Area","Reset has been cancelled",None, QApplication.UnicodeUTF8))
                 return
             elif reply == QMessageBox.Save:
                 aw.fileSave(None)
@@ -870,7 +870,7 @@ class tgraphcanvas(FigureCanvas):
         aw.lcd3.display(0.0)
         aw.lcd4.display(0)
         aw.lcd5.display(0)
-        aw.sendmessage(u"Scope has been reset")
+        aw.sendmessage(QApplication.translate("Message Area","Scope has been reset",None, QApplication.UnicodeUTF8))
         aw.button_1.setDisabled(False)
         aw.button_2.setDisabled(False)        
         aw.button_3.setDisabled(False)
@@ -1123,16 +1123,16 @@ class tgraphcanvas(FigureCanvas):
             self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label="DeltaBT")
         
         handles = [self.l_temp1,self.l_temp2]
-        labels = [u"ET",u"BT"]
+        labels = [QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8),QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)]
 
         #add Rate of Change if flags are True
         if  self.DeltaETflag:
             handles.append(self.l_delta1)
-            labels.append(u"DeltaET")
+            labels.append(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8))
             
         if  self.DeltaBTflag:
             handles.append(self.l_delta2)
-            labels.append(u"DeltaBT")
+            labels.append(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8))
                     
         #write legend
         self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
@@ -2706,12 +2706,12 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel.setIndent(10)
         
         #create START STOP buttons        
-        self.button_1 = QPushButton("ON")
+        self.button_1 = QPushButton(QApplication.translate("Scope Button", "ON", None, QApplication.UnicodeUTF8))
         self.button_1.setFocusPolicy(Qt.NoFocus)
         self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         self.button_1.setMaximumSize(90, 50)
         self.button_1.setMinimumHeight(50)
-        self.button_1.setToolTip("Starts recording")
+        self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
 
         self.button_2 = QPushButton("OFF")
@@ -2954,7 +2954,7 @@ class ApplicationWindow(QMainWindow):
         self.label6.setText( "<font color='black'><b>PID SV<\b></font>")
         self.label6.setIndent(5)
 
-    	self.messagehist = []
+        self.messagehist = []
 
         #convenience EVENT mini editor; View&Edits events without opening roast properties Dlg.
         self.eventlabel = QLabel("Event #<b>0 </b>")
@@ -9122,13 +9122,13 @@ class comportDlg(QDialog):
               
         self.setModal(True)
 
-        comportlabel =QLabel("Comm Port")
+        comportlabel =QLabel(QApplication.translate("Form Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.comportEdit = QComboBox()
         self.comportEdit.addItems([aw.ser.comport])
         self.comportEdit.setEditable(True)
         comportlabel.setBuddy(self.comportEdit)
         
-        baudratelabel = QLabel("Baud Rate")
+        baudratelabel = QLabel(QApplication.translate("Form Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
         self.baudrateComboBox.addItems(["2400","9600","19200","57600"])
