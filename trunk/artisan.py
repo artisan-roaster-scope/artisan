@@ -1376,16 +1376,21 @@ class tgraphcanvas(FigureCanvas):
             return "-%02d:%02d"% divmod(negtime, 60)
         
     #Converts a string into a seconds integer. Use for example to interpret times from Roaster Properties Dlg inputs
-    #acepted formats: "00:00","0:00"
+    #acepted formats: "00:00","-00:00"
     def stringtoseconds(self, string):
         timeparts = string.split(":")
         if len(timeparts) != 2:
             aw.sendmessage("Time format error encountered")
             return -1
         else:
-            seconds = int(timeparts[1])
-            seconds += int(timeparts[0])*60
-            return seconds
+            if timeparts[0][0] != "-":  #if number is positive
+                seconds = int(timeparts[1])
+                seconds += int(timeparts[0])*60
+                return seconds
+            else:
+                seconds = int(timeparts[0])*60
+                seconds -= int(timeparts[1])
+                return seconds    #return negative number            
    
     def fromFtoC(self,Ffloat):
         return (Ffloat-32.0)*(5.0/9.0)
@@ -1693,12 +1698,12 @@ class tgraphcanvas(FigureCanvas):
             else:
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
-                if bt != 1 and et != -1:  #cancel 
+                if bt != 1 and et != -1:  #cancel
+                    self.drawmanual(et,bt,tx)
                     self.startend[0] = tx
                     self.startend[1] = bt
                     self.timeindex[0] = len(self.timex)-1
 
-                    self.drawmanual(et,bt,tx)
                     # put initial marker on graph
                     rect = patches.Rectangle( (self.startend[0],0), width=.01, height=self.ylimit, color = self.palette["text"])
                     self.ax.add_patch(rect)
@@ -1735,10 +1740,10 @@ class tgraphcanvas(FigureCanvas):
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)
                         self.dryend[0] = tx
                         self.dryend[1] = bt
                         self.timeindex[1] = len(self.timex)-1
-                        self.drawmanual(et,bt,tx)
                     else:
                         return
                     
@@ -1781,10 +1786,10 @@ class tgraphcanvas(FigureCanvas):
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)                               
                         self.varC[0] = tx
                         self.varC[1] = bt
                         self.timeindex[2] = len(self.timex)-1
-                        self.drawmanual(et,bt,tx)                               
                     else:
                         return
                 #calculate time elapsed since charge time
@@ -1830,10 +1835,10 @@ class tgraphcanvas(FigureCanvas):
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)                           
                         self.varC[2] = tx
                         self.varC[3] = bt
                         self.timeindex[3] = len(self.timex)-1
-                        self.drawmanual(et,bt,tx)                           
                     else:
                         return                    
                 #calculate time elapsed since charge time
@@ -1870,10 +1875,10 @@ class tgraphcanvas(FigureCanvas):
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
                 if et != -1 and bt != -1:
+                    self.drawmanual(et,bt,tx)                           
                     self.varC[4] = tx
                     self.varC[5] = bt
                     self.timeindex[4] = len(self.timex)-1
-                    self.drawmanual(et,bt,tx)                           
                 else:
                     return              
             st1 = u"SCs " + self.stringfromseconds(self.varC[4]-self.startend[0])
@@ -1909,10 +1914,10 @@ class tgraphcanvas(FigureCanvas):
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)                           
                         self.varC[6] = tx
                         self.varC[7] = bt
                         self.timeindex[5] = len(self.timex)-1
-                        self.drawmanual(et,bt,tx)                           
                     else:
                         return
                 st1 =  u"SCe " + self.stringfromseconds(self.varC[6]-self.startend[0])
@@ -1949,10 +1954,10 @@ class tgraphcanvas(FigureCanvas):
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
                 if et != -1 and bt != -1:
+                    self.drawmanual(et,bt,tx)
                     self.startend[2] = tx
                     self.startend[3] = bt
                     self.timeindex[6] = len(self.timex)-1
-                    self.drawmanual(et,bt,tx)
                     # put final BT marker on graph
                     rect = patches.Rectangle( (self.startend[2],0), width=.01, height=self.ylimit, color = self.palette["text"])
                     self.ax.add_patch(rect)
@@ -2156,39 +2161,34 @@ class tgraphcanvas(FigureCanvas):
         QTimer.singleShot(2000, self.restorebutton_11)
         
         Nevents = len(self.specialevents)
-        #if in manual mode record last point
+        #if in manual mode record first the last point in self.timex[]
         if self.device == 18:
-            if self.startend[0]:
-                tx = self.timeclock.elapsed()/1000.
-                et,bt = aw.ser.NONE()
-                if bt != 1 and et != -1:  #cancel 
-                    self.drawmanual(et,bt,tx)                        
-                else:
-                    return
+            tx = self.timeclock.elapsed()/1000.
+            et,bt = aw.ser.NONE()
+            if bt != 1 and et != -1:              
+                self.drawmanual(et,bt,tx)                        
+            else:
+                return
         #i = index number of the event (current length of the time list)           
         i = len(self.timex)-1
-        if i > 0:
-            if self.startend[0]:
-                self.specialevents.append(i)
-                self.specialeventstype.append(0)            
-                self.specialeventsStrings.append(str(Nevents+1))
-                self.specialeventsvalue.append(0)               
-                
-                temp = unicode(self.temp2[i])
-                timed = self.stringfromseconds(self.timex[i])
-                message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
-                aw.sendmessage(message)
-                #write label in mini recorder if flag checked
-                if aw.minieventsflag:
-                    aw.eNumberSpinBox.setValue(Nevents+1)
-                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                    aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                self.redraw()
-            else:
-               aw.sendmessage("Events are only allowed after [CHARGE]")     
-        else:
-            aw.sendmessage("No profile found")
+
+        self.specialevents.append(i)
+        self.specialeventstype.append(0)            
+        self.specialeventsStrings.append(str(Nevents+1))
+        self.specialeventsvalue.append(0)               
+        
+        temp = unicode(self.temp2[i])
+        timed = self.stringfromseconds(self.timex[i])
+        message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
+        aw.sendmessage(message)
+        #write label in mini recorder if flag checked
+        if aw.minieventsflag:
+            aw.eNumberSpinBox.setValue(Nevents+1)
+            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+            aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+        self.redraw()     
+
             
         aw.soundpop()
 
@@ -2198,22 +2198,22 @@ class tgraphcanvas(FigureCanvas):
         Nevents = len(self.specialevents)
         #index number            
         i = len(self.timex)-1        
-        if i > 0:
-            self.specialevents.append(i)                                     # store absolute time index
-            self.specialeventstype.append(0)                                 # set type (to the first index 0)          
-            self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
-            self.specialeventsvalue.append(0)                                # empty
-            temp = unicode(self.temp2[i])
-            timed = self.stringfromseconds(self.timex[i])
-            message = u"Computer Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
-            aw.sendmessage(message)
-            #write label in mini recorder if flag checked
-            if aw.minieventsflag:
-                aw.eNumberSpinBox.setValue(Nevents+1)
-                aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-            self.redraw()
+
+        self.specialevents.append(i)                                     # store absolute time index
+        self.specialeventstype.append(0)                                 # set type (to the first index 0)          
+        self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
+        self.specialeventsvalue.append(0)                                # empty
+        temp = unicode(self.temp2[i])
+        timed = self.stringfromseconds(self.timex[i])
+        message = u"Computer Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
+        aw.sendmessage(message)
+        #write label in mini recorder if flag checked
+        if aw.minieventsflag:
+            aw.eNumberSpinBox.setValue(Nevents+1)
+            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+            aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+        self.redraw()
             
     #called from markdryen(), markcharge(), mark1Cstart(), etc when using device 18 (manual mode)
     def drawmanual(self,et,bt,tx):
@@ -2380,7 +2380,6 @@ class tgraphcanvas(FigureCanvas):
         try:
             
             Xpoints,Ypoints = self.findpoints()  #from lowest point to avoid many coeficients
-            
             equ = inter.UnivariateSpline(Xpoints, Ypoints)
             coeffs = equ.get_coeffs().tolist()
             knots = equ.get_knots().tolist()
@@ -2426,9 +2425,21 @@ class tgraphcanvas(FigureCanvas):
                 if self.temp1[-1] > 3:
                     etflag = 1
                 
-            #create BT function
-            func = inter.UnivariateSpline(self.timex,self.temp2)
-
+            #for device NONE we need to check the number of points given because the length of points must be larger than the spline degree k
+            #NOTE: k must always be <= 5
+            if len(self.timex) > 2:        
+                splinedegree = 3
+                if self.device == 18:
+                    npoints = len(self.timex)
+                    if npoints < 5:
+                        splinedegree = npoints -1
+                        
+                #create BT function        
+                func = inter.UnivariateSpline(self.timex,self.temp2, k = splinedegree )
+            else:
+                #no need to interpolate (only 2 points or less)
+                return
+            
             #create ET function
             if etflag:
                 func2 = inter.UnivariateSpline(self.timex,self.temp1)
@@ -2470,7 +2481,8 @@ class tgraphcanvas(FigureCanvas):
                     self.temp1 = etvals
                 else:    
                     self.temp1 = numpy.zeros(len(time)).tolist()
-    
+
+            self.timeindexupdate()
             self.redraw()
        
         except ValueError:
@@ -2547,12 +2559,12 @@ class tgraphcanvas(FigureCanvas):
                 
         return t1,t2
 
-    #selects closest time INDEX in self.timex from a given input seconds
+    #selects closest time INDEX in self.timex from a given input float seconds
     def time2index(self,seconds):
         #find where given seconds crosses aw.qmc.timex
         if len(self.timex):                           #check that time is not empty just in case
             #if input seconds longer than available time return last index
-            if self.timex[-1] < seconds:
+            if  seconds > self.timex[-1]:
                 return len(self.timex)-1
 
             #if given input seconds smaller than first time return first index
@@ -2567,19 +2579,13 @@ class tgraphcanvas(FigureCanvas):
             #look around    
             choice1 = abs(self.timex[i] - seconds)
             choice2 = abs(self.timex[i-1] - seconds)
-            #for choice3 (i+1) first check to see if i is at the end, (i+1) would cause list out of range
-            if len(self.timex) < i:
-                choice3 = abs(self.timex[i+1] - seconds)
-            else:
-                choice3 = 99999
 
             #return closest (smallest) index
-            if choice1 < choice2 < choice3:  
+            if choice1 < choice2:  
                 return i
-            elif choice2 < choice1 < choice3:
+            elif choice2 < choice1:
                 return i-1
-            else:
-                return i+1
+
 
     #updates list self.timeindex when found an _old_ profile without self.timeindex (new version)
     def timeindexupdate(self):
@@ -3003,7 +3009,7 @@ class ApplicationWindow(QMainWindow):
         self.valueComboBox.addItems(self.qmc.eventsvalues)
         self.valueComboBox.setMaximumWidth(50)
 
-        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
+        regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
         self.etimeline = QLineEdit()
         self.etimeline.setValidator(QRegExpValidator(regextime,self))
         self.etimeline.setFocusPolicy(Qt.ClickFocus)
@@ -3687,12 +3693,7 @@ class ApplicationWindow(QMainWindow):
            return
        else:
            self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
-           #time from origin in seconds
-           absolutetime = int(round(aw.qmc.timex[aw.qmc.specialevents[currentevent-1]]))
-           #time from [START]. When saving in minieventrecord(), we will need to convert to absoluet time
-           relativetime = absolutetime - self.qmc.startend[0]
-           #display relative time
-           time = self.qmc.stringfromseconds(relativetime)
+           time = self.qmc.stringfromseconds(int(self.qmc.timex[aw.qmc.specialevents[currentevent-1]]-aw.qmc.startend[0]))
            self.etimeline.setText(time)
            self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[currentevent-1])
            self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
@@ -5878,49 +5879,81 @@ class editGraphDlg(QDialog):
         chargelabel  = QLabel("<b>CHARGE</b>")
         chargelabel.setStyleSheet("background-color:'#f07800';")
 
-        self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.startend[0])))
+        self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
+        self.chargeeditcopy = aw.qmc.stringfromseconds(0)
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
         chargelabel.setBuddy(self.chargeedit)
 
         drylabel  = QLabel("<b>DRY END</b>")
         drylabel.setStyleSheet("background-color:'orange';")
-        self.dryedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.dryend[0])))
+        
+        if aw.qmc.dryend[0]:
+            t2 = int(aw.qmc.dryend[0]-aw.qmc.startend[0])
+        else:
+            t2 = 0
+        self.dryedit = QLineEdit(aw.qmc.stringfromseconds(t2))
+        self.dryeditcopy = aw.qmc.stringfromseconds(t2)
         self.dryedit.setValidator(QRegExpValidator(regextime,self))
         self.dryedit.setMaximumWidth(50)
         drylabel.setBuddy(self.dryedit)
  
         Cstartlabel = QLabel("<b>FC START</b>")
         Cstartlabel.setStyleSheet("background-color:'orange';")
-        self.Cstartedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.varC[0])))
+        if aw.qmc.varC[0]:
+            t3 = int(aw.qmc.varC[0]-aw.qmc.startend[0])
+        else:
+            t3 = 0
+        self.Cstartedit = QLineEdit(aw.qmc.stringfromseconds(t3))
+        self.Cstarteditcopy = aw.qmc.stringfromseconds(t3)
         self.Cstartedit.setValidator(QRegExpValidator(regextime,self))
         self.Cstartedit.setMaximumWidth(50)
         Cstartlabel.setBuddy(self.Cstartedit)
         
         Cendlabel = QLabel("<b>FC END</b>")
         Cendlabel.setStyleSheet("background-color:'orange';")
-        self.Cendedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.varC[2])))
+        if aw.qmc.varC[2]:
+            t4 = int(aw.qmc.varC[2]-aw.qmc.startend[0])
+        else:
+            t4 = 0
+        self.Cendedit = QLineEdit(aw.qmc.stringfromseconds(t4))
+        self.Cendeditcopy = aw.qmc.stringfromseconds(t4)
         self.Cendedit.setValidator(QRegExpValidator(regextime,self))
         self.Cendedit.setMaximumWidth(50)
         Cendlabel.setBuddy(self.Cendedit)
    
         CCstartlabel = QLabel("<b>SC START</b>")
         CCstartlabel.setStyleSheet("background-color:'orange';")
-        self.CCstartedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.varC[4])))
+        if aw.qmc.varC[4]:
+            t5 = int(aw.qmc.varC[4]-aw.qmc.startend[0])
+        else:
+            t5 = 0
+        self.CCstartedit = QLineEdit(aw.qmc.stringfromseconds(t5))
+        self.CCstarteditcopy = aw.qmc.stringfromseconds(t5)
         self.CCstartedit.setValidator(QRegExpValidator(regextime,self))
         self.CCstartedit.setMaximumWidth(50)
         CCstartlabel.setBuddy(self.CCstartedit)
 
         CCendlabel = QLabel("<b>SC END</b>")
         CCendlabel.setStyleSheet("background-color:'orange';")
-        self.CCendedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.varC[6])))
+        if aw.qmc.varC[6]:
+            t6 = int(aw.qmc.varC[6]-aw.qmc.startend[0])
+        else:
+            t6 = 0
+        self.CCendedit = QLineEdit(aw.qmc.stringfromseconds(t6))
+        self.CCendeditcopy = aw.qmc.stringfromseconds(t6)
         self.CCendedit.setValidator(QRegExpValidator(regextime,self))
         self.CCendedit.setMaximumWidth(50)
         CCendlabel.setBuddy(self.CCendedit)
         
         droplabel = QLabel("<b>DROP</b>")
         droplabel.setStyleSheet("background-color:'#f07800';")
-        self.dropedit = QLineEdit(aw.qmc.stringfromseconds(int(aw.qmc.startend[2])))
+        if aw.qmc.startend[2]:
+            t7 = int(aw.qmc.startend[2]-aw.qmc.startend[0])
+        else:
+            t7 = 0
+        self.dropedit = QLineEdit(aw.qmc.stringfromseconds(t7))
+        self.dropeditcopy = aw.qmc.stringfromseconds(t7)
         self.dropedit.setValidator(QRegExpValidator(regextime,self))
         self.dropedit.setMaximumWidth(50)
         droplabel.setBuddy(self.dropedit)
@@ -5928,8 +5961,9 @@ class editGraphDlg(QDialog):
         # EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
+        self.eventtablecopy = []
         self.createEventTable()
-        
+
         self.neweventTableButton = QPushButton("Add")
         self.neweventTableButton.setFocusPolicy(Qt.NoFocus)
         self.neweventTableButton.setMaximumSize(self.neweventTableButton.sizeHint())
@@ -6257,7 +6291,7 @@ class editGraphDlg(QDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(timeLayoutBox)
         
-        timeGroupLayout = QGroupBox("Absolute Times")
+        timeGroupLayout = QGroupBox("Times")
         timeGroupLayout.setLayout(mainLayout)
 
         eventbuttonLayout = QHBoxLayout()
@@ -6337,13 +6371,12 @@ class editGraphDlg(QDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SingleSelection)
         self.datatable.setShowGrid(True)
-
         for i in range(ndata):
             Atime = QTableWidgetItem("%.03f"%aw.qmc.timex[i])
             Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.startend[0]))))
             ET = QTableWidgetItem("%.02f"%aw.qmc.temp1[i])
             BT = QTableWidgetItem("%.02f"%aw.qmc.temp2[i])
-            if i:
+            if i > 1 and (aw.qmc.timex[i]-aw.qmc.timex[i-1]):
                 deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp1[i]-aw.qmc.temp1[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
                 deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp2[i]-aw.qmc.temp2[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
             else:
@@ -6386,7 +6419,8 @@ class editGraphDlg(QDialog):
                     text = Rtime.text()
                     text += " END"
                     Rtime.setText(text)
-                elif i in aw.qmc.specialevents:
+                    
+            if i in aw.qmc.specialevents:
                     Rtime.setBackgroundColor(QColor('yellow'))
                     text = Rtime.text()
                     text += " EVENT #"
@@ -6412,7 +6446,7 @@ class editGraphDlg(QDialog):
         self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
-        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
+        regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
         self.eventtable.setShowGrid(True) 
         #populate table
         for i in range(nevents):
@@ -6425,6 +6459,7 @@ class editGraphDlg(QDialog):
             valueComboBox.setCurrentIndex(aw.qmc.specialeventsvalue[i])
             timeline = QLineEdit()
             time = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.startend[0]))
+            self.eventtablecopy.append(unicode(time)) 
             timeline.setText(time)
             timeline.setValidator(QRegExpValidator(regextime,self))
             stringline = QLineEdit(aw.qmc.specialeventsStrings[i])
@@ -6438,8 +6473,9 @@ class editGraphDlg(QDialog):
     def saveEventTable(self):
         nevents  = self.eventtable.rowCount() 
         for i in range(nevents):
-            time = self.eventtable.cellWidget(i,0)  
-            aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(time.text())))
+            time = self.eventtable.cellWidget(i,0)
+            if self.eventtablecopy[i] !=  unicode(time.text()):
+                aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(time.text())))                
             description = self.eventtable.cellWidget(i,1)
             aw.qmc.specialeventsStrings[i] = unicode(description.text())
             etype = self.eventtable.cellWidget(i,2)
@@ -6448,7 +6484,7 @@ class editGraphDlg(QDialog):
             aw.qmc.specialeventsvalue[i] = evalue.currentIndex()
 
     def addEventTable(self):
-        if len(aw.qmc.timex) and aw.qmc.startend[0]:
+        if len(aw.qmc.timex):
             aw.qmc.specialevents.append(len(aw.qmc.timex)-1)   #qmc.specialevents holds indexes in qmx.timex. Initialize event index
             aw.qmc.specialeventstype.append(0)
             aw.qmc.specialeventsStrings.append(str(len(aw.qmc.specialevents)))
@@ -6539,40 +6575,48 @@ class editGraphDlg(QDialog):
             #varC = 1C start time [0],1C start Temp [1],1C end time [2],1C end temp [3],2C start time [4], 2C start Temp [5],2C end time [6], 2C end temp [7]
             #startend = [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
             #check it does not updates the graph with zero times
-            if aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0:
-                startindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
-                aw.qmc.startend[0] = aw.qmc.timex[startindex]                                             #CHARGE   time
-                aw.qmc.startend[1] = aw.qmc.temp2[startindex]                                             #CHARGE   bt temperature
-                aw.qmc.timeindex[0] = startindex
-            if aw.qmc.stringtoseconds(unicode(self.dryedit.text())) > 0:
-                dryindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.dryedit.text())))
-                aw.qmc.dryend[0] = aw.qmc.timex[dryindex]                                                  #DRY END time
-                aw.qmc.dryend[1] = aw.qmc.temp2[dryindex]                                                  #DRY END bt temperature
-                aw.qmc.timeindex[1] = dryindex
-            if aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())) > 0:
-                fcsindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))
-                aw.qmc.varC[0] = aw.qmc.timex[fcsindex]                                                    #1C START time
-                aw.qmc.varC[1] = aw.qmc.temp2[fcsindex]                                                   #1C START bt temperature
-                aw.qmc.timeindex[2] = fcsindex
-            if aw.qmc.stringtoseconds(unicode(self.Cendedit.text())) > 0:
-                fceindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))
-                aw.qmc.varC[2] = aw.qmc.timex[fceindex]                                                   #1C END   time
-                aw.qmc.varC[3] = aw.qmc.temp2[fceindex]                                                   #1C END   bt temperature
-                aw.qmc.timeindex[3] = fceindex 
-            if aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())) > 0:
-                scsindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))
-                aw.qmc.varC[4] = aw.qmc.timex[scsindex]                                                    #2C START time
-                aw.qmc.varC[5] = aw.qmc.temp2[scsindex]                                                    #2C START bt temperature
-                aw.qmc.timeindex[4] = scsindex 
-            if aw.qmc.stringtoseconds(unicode(self.CCendedit.text())) > 0:
-                sceindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))
-                aw.qmc.varC[6] = aw.qmc.timex[sceindex]                                                    #2C END   time
-                aw.qmc.varC[7] = aw.qmc.temp2[sceindex]                                                    #2C END   bt temperature
-                aw.qmc.timeindex[5] = sceindex
-            if aw.qmc.stringtoseconds(unicode(self.dropedit.text())) > 0:
-                dropindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.dropedit.text())))
-                aw.qmc.startend[2] = aw.qmc.timex[dropindex]                                                #DROP     time
-                aw.qmc.startend[3] = aw.qmc.temp2[dropindex]                                                #DROP bt temp
+            if self.chargeeditcopy != unicode(self.chargeedit.text()):
+                if aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0:
+                    startindex = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
+                    aw.qmc.startend[0] = aw.qmc.timex[startindex]                                             #CHARGE   time
+                    aw.qmc.startend[1] = aw.qmc.temp2[startindex]                                             #CHARGE   bt temperature
+                    aw.qmc.timeindex[0] = startindex
+            if self.dryeditcopy != unicode(self.dryedit.text()):
+                if aw.qmc.stringtoseconds(unicode(self.dryedit.text())) > 0:
+                    dryindex = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(self.dryedit.text())))
+                    aw.qmc.dryend[0] = aw.qmc.timex[dryindex]                                                  #DRY END time
+                    aw.qmc.dryend[1] = aw.qmc.temp2[dryindex]                                                  #DRY END bt temperature
+                    aw.qmc.timeindex[1] = dryindex
+            if self.Cstarteditcopy != unicode(self.Cstartedit.text()):
+                if aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())) > 0:
+                    fcsindex = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))
+                    aw.qmc.varC[0] = aw.qmc.timex[fcsindex]                                                    #1C START time
+                    aw.qmc.varC[1] = aw.qmc.temp2[fcsindex]                                                   #1C START bt temperature
+                    aw.qmc.timeindex[2] = fcsindex
+            if self.Cendeditcopy != unicode(self.Cendedit.text()):
+                if aw.qmc.stringtoseconds(unicode(self.Cendedit.text())) > 0:
+                    fceindex = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))
+                    aw.qmc.varC[2] = aw.qmc.timex[fceindex]                                                   #1C END   time
+                    aw.qmc.varC[3] = aw.qmc.temp2[fceindex]                                                   #1C END   bt temperature
+                    aw.qmc.timeindex[3] = fceindex
+            if self.CCstarteditcopy != unicode(self.CCstartedit.text()):
+                if aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())) > 0:
+                    scsindex = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))
+                    aw.qmc.varC[4] = aw.qmc.timex[scsindex]                                                    #2C START time
+                    aw.qmc.varC[5] = aw.qmc.temp2[scsindex]                                                    #2C START bt temperature
+                    aw.qmc.timeindex[4] = scsindex
+            if self.CCendeditcopy != unicode(self.CCendedit.text()):        
+                if aw.qmc.stringtoseconds(unicode(self.CCendedit.text())) > 0:
+                    sceindex = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))
+                    aw.qmc.varC[6] = aw.qmc.timex[sceindex]                                                    #2C END   time
+                    aw.qmc.varC[7] = aw.qmc.temp2[sceindex]                                                    #2C END   bt temperature
+                    aw.qmc.timeindex[5] = sceindex
+            if self.dropeditcopy != unicode(self.dropedit.text()):
+                if aw.qmc.stringtoseconds(unicode(self.dropedit.text())) > 0:
+                    dropindex = aw.qmc.time2index(aw.qmc.startend[0]+ aw.qmc.stringtoseconds(unicode(self.dropedit.text())))
+                    aw.qmc.startend[2] = aw.qmc.timex[dropindex]                                                #DROP     time
+                    aw.qmc.startend[3] = aw.qmc.temp2[dropindex]                                                #DROP bt temp
+                    aw.qmc.timeindex[6] = dropindex
 
             if aw.qmc.phasesbuttonflag:   
                 # adjust phases by DryEnd and FCs events
@@ -6581,7 +6625,9 @@ class editGraphDlg(QDialog):
                 if aw.qmc.varC[0]:
                     aw.qmc.phases[2] = int(round(aw.qmc.varC[1]))                                                   
 
+            
             self.saveEventTable()
+
 
         # Update Title
         aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
@@ -8676,7 +8722,6 @@ class serialport(object):
                 return -1,-1 
        
     def NONE(self):
-        #stop trigger (not time) to give time to answer
         dialogx = nonedevDlg( )
         if dialogx.exec_():
             ET = int(dialogx.etEdit.text())
