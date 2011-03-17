@@ -3717,10 +3717,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
             self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
             self.qmc.specialeventsStrings[lenevents-1] = unicode(self.lineEvent.text())
-            #relative time
-            relativetime = self.qmc.stringtoseconds(unicode(self.etimeline.text()))
-            absolutetime = relativetime + self.qmc.startend[0]
-            self.qmc.specialevents[lenevents-1] = self.qmc.time2index(absolutetime)
+            self.qmc.specialevents[lenevents-1] = self.qmc.time2index(self.qmc.startend[0]+ self.qmc.stringtoseconds(unicode(self.etimeline.text())))
 
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
@@ -5872,7 +5869,7 @@ class editGraphDlg(QDialog):
 
         self.setWindowTitle(u"Roast Properties")
 
-        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
+        regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
         regexweight = QRegExp(r"^[0-9]{1,3}[.0-9]{1,2}$")
 
         #MARKERS
