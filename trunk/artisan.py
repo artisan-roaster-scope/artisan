@@ -9980,92 +9980,90 @@ class graphColorDlg(QDialog):
         lcd5label = QLabel("Dleta BT")
         lcd6label = QLabel("SV")
 
-        lcdcolors = ["grey","darkGrey","slateGrey","lightGray","black","white","transparent"]
+        lcdcolors = ["","grey","darkGrey","slateGrey","lightGray","black","white","transparent"]
         self.lcd1colorComboBox =  QComboBox()
         self.lcd1colorComboBox.addItems(lcdcolors)
+        self.connect(self.lcd1colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd1colorComboBox.currentText(),flag = 2,x=1:self.paintlcds(text,flag,x))
 
         self.lcd2colorComboBox =  QComboBox()
         self.lcd2colorComboBox.addItems(lcdcolors)
+        self.connect(self.lcd2colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd2colorComboBox.currentText(),flag = 2,x=2:self.paintlcds(text,flag,x))
     
         self.lcd3colorComboBox =  QComboBox()
         self.lcd3colorComboBox.addItems(lcdcolors)
+        self.connect(self.lcd3colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd3colorComboBox.currentText(),flag = 2,x=3:self.paintlcds(text,flag,x))
     
         self.lcd4colorComboBox =  QComboBox()
         self.lcd4colorComboBox.addItems(lcdcolors)
+        self.connect(self.lcd4colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd4colorComboBox.currentText(),flag = 2,x=4:self.paintlcds(text,flag,x))
     
         self.lcd5colorComboBox =  QComboBox()
         self.lcd5colorComboBox.addItems(lcdcolors)
+        self.connect(self.lcd5colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd5colorComboBox.currentText(),flag = 2,x=5:self.paintlcds(text,flag,x))
     
         self.lcd6colorComboBox =  QComboBox()
         self.lcd6colorComboBox.addItems(lcdcolors)
-
-        lcd1setButton = QPushButton("Set")
-        self.connect(lcd1setButton, SIGNAL("clicked()"),lambda flag = 2,x=1:self.paintlcds(flag,x))
-        lcd2setButton = QPushButton("Set")
-        self.connect(lcd2setButton, SIGNAL("clicked()"),lambda flag = 2,x=2:self.paintlcds(flag,x))   
-        lcd3setButton = QPushButton("Set")
-        self.connect(lcd3setButton, SIGNAL("clicked()"),lambda flag = 2,x=3:self.paintlcds(flag,x))   
-        lcd4setButton = QPushButton("Set")
-        self.connect(lcd4setButton, SIGNAL("clicked()"),lambda flag = 2,x=4:self.paintlcds(flag,x))   
-        lcd5setButton = QPushButton("Set")
-        self.connect(lcd5setButton, SIGNAL("clicked()"),lambda flag = 2,x=5:self.paintlcds(flag,x))   
-        lcd6setButton = QPushButton("Set")
-        self.connect(lcd6setButton, SIGNAL("clicked()"),lambda flag = 2,x=6:self.paintlcds(flag,x))   
-
+        self.connect(self.lcd6colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text =self.lcd6colorComboBox.currentText(),flag = 2,x=6:self.paintlcds(text,flag,x))
 
         lcd1backButton = QPushButton("Background")
-        self.connect(lcd1backButton, SIGNAL("clicked()"),lambda flag=0,x=1:self.paintlcds(flag,x))
+        self.connect(lcd1backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=1:self.paintlcds(text,flag,x))
         lcd2backButton = QPushButton("Background")
-        self.connect(lcd2backButton, SIGNAL("clicked()"),lambda flag=0,x=2:self.paintlcds(flag,x))   
+        self.connect(lcd2backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=2:self.paintlcds(text,flag,x))   
         lcd3backButton = QPushButton("Background")
-        self.connect(lcd3backButton, SIGNAL("clicked()"),lambda flag=0,x=3:self.paintlcds(flag,x))   
+        self.connect(lcd3backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=3:self.paintlcds(text,flag,x))   
         lcd4backButton = QPushButton("Background")
-        self.connect(lcd4backButton, SIGNAL("clicked()"),lambda flag=0,x=4:self.kpaintlcds(flag,x))   
+        self.connect(lcd4backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=4:self.kpaintlcds(text,flag,x))   
         lcd5backButton = QPushButton("Background")
-        self.connect(lcd5backButton, SIGNAL("clicked()"),lambda flag=0,x=5:self.paintlcds(flag,x))   
+        self.connect(lcd5backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=5:self.paintlcds(text,flag,x))   
         lcd6backButton = QPushButton("Background")
-        self.connect(lcd6backButton, SIGNAL("clicked()"),lambda flag=0,x=6:self.paintlcds(flag,x))   
+        self.connect(lcd6backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=6:self.paintlcds(text,flag,x))   
 
         lcd1LEDButton = QPushButton("LED")
-        self.connect(lcd1LEDButton, SIGNAL("clicked()"),lambda flag=1,x=1:self.paintlcds(flag,x))
+        self.connect(lcd1LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=1:self.paintlcds(text,flag,x))
         lcd2LEDButton = QPushButton("LED")
-        self.connect(lcd2LEDButton, SIGNAL("clicked()"),lambda flag=1,x=2:self.paintlcds(flag,x))   
+        self.connect(lcd2LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=2:self.paintlcds(text,flag,x))   
         lcd3LEDButton = QPushButton("LED")
-        self.connect(lcd3LEDButton, SIGNAL("clicked()"),lambda flag=1,x=3:self.paintlcds(flag,x))   
+        self.connect(lcd3LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=3:self.paintlcds(text,flag,x))   
         lcd4LEDButton = QPushButton("LED")
-        self.connect(lcd4LEDButton, SIGNAL("clicked()"),lambda flag=1,x=4:self.paintlcds(flag,x))   
+        self.connect(lcd4LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=4:self.paintlcds(text,flag,x))   
         lcd5LEDButton = QPushButton("LED")
-        self.connect(lcd5LEDButton, SIGNAL("clicked()"),lambda flag=1,x=5:self.paintlcds(flag,x))   
+        self.connect(lcd5LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=5:self.paintlcds(text,flag,x))   
         lcd6LEDButton = QPushButton("LED")
-        self.connect(lcd6LEDButton, SIGNAL("clicked()"),lambda flag=1,x=6:self.paintlcds(flag,x))   
+        self.connect(lcd6LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=6:self.paintlcds(text,flag,x))   
 
         self.lcd1spinbox = QSpinBox()
-        self.lcd1spinbox.setSingleStep(15) 
+        self.lcd1spinbox.setSingleStep(10) 
         self.lcd1spinbox.setMaximum(359)
+        self.lcd1spinbox.setWrapping(True)
         self.connect(self.lcd1spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd1spinbox.value(),lcd=1:self.setLED(val,lcd))
         
         self.lcd2spinbox = QSpinBox()
-        self.lcd2spinbox.setSingleStep(15) 
+        self.lcd2spinbox.setSingleStep(10)
+        self.lcd2spinbox.setWrapping(True)
         self.lcd2spinbox.setMaximum(359)
         self.connect(self.lcd2spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd2spinbox.value(),lcd=2:self.setLED(val,lcd))
         
         self.lcd3spinbox = QSpinBox()
-        self.lcd3spinbox.setSingleStep(15) 
+        self.lcd3spinbox.setSingleStep(10)
+        self.lcd3spinbox.setWrapping(True)
         self.lcd3spinbox.setMaximum(359)
         self.connect(self.lcd3spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd3spinbox.value(),lcd=3:self.setLED(val,lcd))
 
         self.lcd4spinbox = QSpinBox()
-        self.lcd4spinbox.setSingleStep(15) 
+        self.lcd4spinbox.setSingleStep(10)
+        self.lcd4spinbox.setWrapping(True)
         self.lcd4spinbox.setMaximum(359)
         self.connect(self.lcd4spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd4spinbox.value(),lcd=4:self.setLED(val,lcd))
 
         self.lcd5spinbox = QSpinBox()
-        self.lcd5spinbox.setSingleStep(15) 
+        self.lcd5spinbox.setSingleStep(10)
+        self.lcd1spinbox.setWrapping(True)
         self.lcd5spinbox.setMaximum(359)
         self.connect(self.lcd5spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd5spinbox.value(),lcd=5:self.setLED(val,lcd))
 
         self.lcd6spinbox = QSpinBox()
-        self.lcd6spinbox.setSingleStep(15) 
+        self.lcd6spinbox.setSingleStep(10)
+        self.lcd1spinbox.setWrapping(True)
         self.lcd6spinbox.setMaximum(359)
         self.connect(self.lcd6spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd6spinbox.value(),lcd=6:self.setLED(val,lcd))
 
@@ -10128,46 +10126,40 @@ class graphColorDlg(QDialog):
         lcdlayout = QVBoxLayout()
         
         lcd1layout = QHBoxLayout()
-        lcd1layout.addWidget(self.lcd1colorComboBox,0)
-        lcd1layout.addWidget(lcd1setButton,1)
-        lcd1layout.addWidget(lcd1backButton,2)
-        lcd1layout.addWidget(lcd1LEDButton,3)
-        lcd1layout.addWidget(self.lcd1spinbox,4)
+        lcd1layout.addWidget(lcd1backButton,0)
+        lcd1layout.addWidget(self.lcd1colorComboBox,1)
+        lcd1layout.addWidget(lcd1LEDButton,2)
+        lcd1layout.addWidget(self.lcd1spinbox,3)
         
         lcd2layout = QHBoxLayout()        
-        lcd2layout.addWidget(self.lcd2colorComboBox,0)
-        lcd2layout.addWidget(lcd2setButton,1)
-        lcd2layout.addWidget(lcd2backButton,2)
-        lcd2layout.addWidget(lcd2LEDButton,3)
-        lcd2layout.addWidget(self.lcd2spinbox,4)
+        lcd2layout.addWidget(lcd2backButton,0)
+        lcd2layout.addWidget(self.lcd2colorComboBox,1)
+        lcd2layout.addWidget(lcd2LEDButton,2)
+        lcd2layout.addWidget(self.lcd2spinbox,3)
 
         lcd3layout = QHBoxLayout()
-        lcd3layout.addWidget(self.lcd3colorComboBox,0)
-        lcd3layout.addWidget(lcd3setButton,1)        
-        lcd3layout.addWidget(lcd3backButton,2)
-        lcd3layout.addWidget(lcd3LEDButton,3)
-        lcd3layout.addWidget(self.lcd3spinbox,4)
+        lcd3layout.addWidget(lcd3backButton,0)
+        lcd3layout.addWidget(self.lcd3colorComboBox,1)
+        lcd3layout.addWidget(lcd3LEDButton,2)
+        lcd3layout.addWidget(self.lcd3spinbox,3)
 
         lcd4layout = QHBoxLayout()
-        lcd4layout.addWidget(self.lcd4colorComboBox,0)
-        lcd4layout.addWidget(lcd4setButton,1)
-        lcd4layout.addWidget(lcd4backButton,2)
-        lcd4layout.addWidget(lcd4LEDButton,3)
-        lcd4layout.addWidget(self.lcd4spinbox,4)
+        lcd4layout.addWidget(lcd4backButton,0)
+        lcd4layout.addWidget(self.lcd4colorComboBox,1)
+        lcd4layout.addWidget(lcd4LEDButton,2)
+        lcd4layout.addWidget(self.lcd4spinbox,3)
 
         lcd5layout = QHBoxLayout()
-        lcd5layout.addWidget(self.lcd5colorComboBox,0)
-        lcd5layout.addWidget(lcd5setButton,1)
-        lcd5layout.addWidget(lcd5backButton,2)
-        lcd5layout.addWidget(lcd5LEDButton,3)
-        lcd5layout.addWidget(self.lcd5spinbox,4)
+        lcd5layout.addWidget(lcd5backButton,0)
+        lcd5layout.addWidget(self.lcd5colorComboBox,1)
+        lcd5layout.addWidget(lcd5LEDButton,2)
+        lcd5layout.addWidget(self.lcd5spinbox,3)
 
         lcd6layout = QHBoxLayout()
-        lcd6layout.addWidget(self.lcd6colorComboBox,0)
-        lcd6layout.addWidget(lcd6setButton,1)
-        lcd6layout.addWidget(lcd6backButton,2)
-        lcd6layout.addWidget(lcd6LEDButton,3)
-        lcd6layout.addWidget(self.lcd6spinbox,4)
+        lcd6layout.addWidget(lcd6backButton,0)
+        lcd6layout.addWidget(self.lcd6colorComboBox,1)
+        lcd6layout.addWidget(lcd6LEDButton,2)
+        lcd6layout.addWidget(self.lcd6spinbox,3)
 
         LCD1GroupLayout = QGroupBox("Timer LCD")
         LCD1GroupLayout.setLayout(lcd1layout)
@@ -10270,14 +10262,14 @@ class graphColorDlg(QDialog):
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             
             
-    def paintlcds(self,flag,lcdnumber):
+    def paintlcds(self,text,flag,lcdnumber):
         if lcdnumber ==1:
             if flag == 0:
                 aw.lcdpaletteB["timer"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["timer"]),self)).name())
             elif flag == 1:
                 aw.lcdpaletteF["timer"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["timer"]),self)).name())
-            elif flag == 2:
-                aw.lcdpaletteB["timer"] = unicode(self.lcd1colorComboBox.currentText())
+            elif flag == 2 and text:
+                aw.lcdpaletteB["timer"] = unicode(text)
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             
         if lcdnumber ==2:
@@ -10285,7 +10277,7 @@ class graphColorDlg(QDialog):
                 aw.lcdpaletteB["met"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["met"]),self)).name())
             elif flag == 1:
                 aw.lcdpaletteF["met"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["met"]),self)).name())
-            elif flag == 2:
+            elif flag == 2 and text:
                 aw.lcdpaletteB["met"] = unicode(self.lcd2colorComboBox.currentText())
             aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["met"],aw.lcdpaletteB["met"]))
             
@@ -10294,8 +10286,8 @@ class graphColorDlg(QDialog):
                 aw.lcdpaletteB["bt"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["bt"]),self)).name())
             elif flag == 1:
                 aw.lcdpaletteF["bt"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["bt"]),self)).name())
-            elif flag == 2:
-                aw.lcdpaletteB["bt"] = unicode(self.lcd3colorComboBox.currentText())
+            elif flag == 2 and text:
+                aw.lcdpaletteB["bt"] = unicode(text)
             aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
             
         if lcdnumber ==4:
@@ -10303,24 +10295,24 @@ class graphColorDlg(QDialog):
                 aw.lcdpaletteB["deltamet"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["deltamet"]),self)).name())
             elif flag == 1:
                 aw.lcdpaletteF["deltamet"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["deltamet"]),self)).name())
-            elif flag == 2:
-                aw.lcdpaletteB["deltamet"] = unicode(self.lcd4colorComboBox.currentText())
+            elif flag == 2 and text:
+                aw.lcdpaletteB["deltamet"] = unicode(text)
             aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltamet"],aw.lcdpaletteB["deltamet"]))
         if lcdnumber ==5:
             if flag == 0:
                 aw.lcdpaletteB["deltabt"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["deltabt"]),self)).name())
             elif flag == 1:
                 aw.lcdpaletteF["deltabt"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["deltabt"]),self)).name())
-            elif flag == 2:
-                aw.lcdpaletteB["deltabt"] = unicode(self.lcd5colorComboBox.currentText())
+            elif flag == 2 and text:
+                aw.lcdpaletteB["deltabt"] = unicode(text)
             aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))            
         if lcdnumber ==6:
             if flag == 0:
                 aw.lcdpaletteB["sv"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["sv"]),self)).name())
             elif flag == 1:
                 aw.lcdpaletteF["sv"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["sv"]),self)).name())
-            elif flag == 2:
-                aw.lcdpaletteB["sv"] = unicode(self.lcd6colorComboBox.currentText())
+            elif flag == 2 and text:
+                aw.lcdpaletteB["sv"] = unicode(text)
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))            
             
         
