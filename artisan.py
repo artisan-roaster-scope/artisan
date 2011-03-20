@@ -378,10 +378,10 @@ class tgraphcanvas(FigureCanvas):
         self.xaxistosm()
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
-        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label="ET")
-        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label="BT")
-        self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label="DeltaET")
-        self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label="DeltaBT")
+        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8))
+        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))
+        self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label=QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8))
+        self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8))
 
         # add legend to plot.
         handles = [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2]
@@ -997,8 +997,8 @@ class tgraphcanvas(FigureCanvas):
                     
 
         ##### ET,BT curves
-        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label="ET")
-        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label="BT")
+        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8))
+        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))
 
         #check BACKGROUND flag
         if self.background:
@@ -1146,12 +1146,12 @@ class tgraphcanvas(FigureCanvas):
 
         ##### DeltaET,DeltaBT curves
         if self.DeltaETflag:
-            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label="DeltaET")
+            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label=QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8))
         if self.DeltaBTflag:
-            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label="DeltaBT")
+            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8))
         
         handles = [self.l_temp1,self.l_temp2]
-        labels = [QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8),QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)]
+        labels = [QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)]
 
         #add Rate of Change if flags are True
         if  self.DeltaETflag:
@@ -3374,7 +3374,7 @@ class ApplicationWindow(QMainWindow):
         self.keyboardmoveindex = 0
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
-
+            
     def sendmessage(self,message):
         #keep a max of 100 messages
         if len(self.messagehist) > 99:
