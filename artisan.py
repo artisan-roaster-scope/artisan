@@ -1759,17 +1759,15 @@ class tgraphcanvas(FigureCanvas):
 
                 aw.button_19.setDisabled(True)
                 aw.button_19.setFlat(True)
-
-                #Parameterized Translation [Bookmark]
-                message = u"[DRY END] recorded at " + st1 + u" BT = " + unicode(self.dryend[1]) + self.mode
+                message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.dryend[1]) + self.mode)
                 
                 if aw.qmc.phasesbuttonflag:     
                     self.phases[1] = int(round(self.dryend[1]))
                     self.redraw()     
             else:
-                message = aw.sendmessage(QApplication.translate("Message Area","Charge mark is missing. Do that first", None, QApplication.UnicodeUTF8))
+                message = QApplication.translate("Message Area","Charge mark is missing. Do that first", None, QApplication.UnicodeUTF8)
         else:
-            message = aw.sendmessage(QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8))
+            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
 
         #set message at bottom
         aw.sendmessage(message)
@@ -1808,19 +1806,16 @@ class tgraphcanvas(FigureCanvas):
 
                 aw.button_3.setDisabled(True)
                 aw.button_3.setFlat(True)
-
-                
-                #Parameterized Translation [Bookmark]
-                message = u"[FC START] recorded at " + st1 + u" BT = " + unicode(self.varC[1]) + self.mode
+                message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[1]) + self.mode)
 
                 if aw.qmc.phasesbuttonflag:     
                     self.phases[2] = int(round(self.varC[1]))
                     self.redraw()
 
             else:
-                message = aw.sendmessage(QApplication.translate("Message Area","Charge mark is missing. Do that first", None, QApplication.UnicodeUTF8))
+                message = QApplication.translate("Message Area","Charge mark is missing. Do that first", None, QApplication.UnicodeUTF8)
         else:
-            message = aw.sendmessage(QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8))
+            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
 
         #set message at bottom
         aw.sendmessage(message)
@@ -1859,12 +1854,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_4.setDisabled(True)
                 aw.button_4.setFlat(True)
 
-                #Parameterized Translation [Bookmark]
-                message = u"[FC END] recorded at " + st1 + " BT = " + unicode(self.varC[3]) + self.mode
+                message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[3]) + self.mode)
             else:
-                message = aw.sendmessage(QApplication.translate("Message Area","1Cs mark missing. Do that first", None, QApplication.UnicodeUTF8))
+                message = QApplication.translate("Message Area","1Cs mark missing. Do that first", None, QApplication.UnicodeUTF8)
         else:
-            message = aw.sendmessage(QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8))
+            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
             
         aw.sendmessage(message)
         aw.soundpop()        
@@ -1898,11 +1892,10 @@ class tgraphcanvas(FigureCanvas):
 
             aw.button_5.setDisabled(True)
             aw.button_5.setFlat(True)
-            
-            #Parameterized Translation [Bookmark]
-            message = u"[SC START] recorded at " + st1 + " BT = " + unicode(self.varC[5]) + self.mode
+
+            message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[5]) + self.mode)
         else:
-            message = aw.sendmessage(QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8))
+            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
             
         aw.sendmessage(message)
         aw.soundpop()        
@@ -1940,12 +1933,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_6.setDisabled(True)
                 aw.button_6.setFlat(True)
 
-                #Parameterized Translation [Bookmark]
-                message = u"[SC END] recorded at " + st1 + " BT = " + unicode(self.varC[7]) + self.mode
+                message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[7]) + self.mode)
             else:
-                message = aw.sendmessage(QApplication.translate("Message Area","SCs mark missing. Do that first", None, QApplication.UnicodeUTF8))
+                message = QApplication.translate("Message Area","SCs mark missing. Do that first", None, QApplication.UnicodeUTF8)
         else:
-            message = aw.sendmessage(QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8))
+            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
             
         aw.sendmessage(message)            
         aw.soundpop()
@@ -1995,13 +1987,12 @@ class tgraphcanvas(FigureCanvas):
             aw.button_9.setDisabled(True)
             aw.button_9.setFlat(True)
             
-            #Parameterized Translation [Bookmark]
-            message = u"Roast ended at " + st1 + " BT = " + unicode(self.startend[-1]) + self.mode
+            message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.startend[-1]) + self.mode)
             
             #prevents accidentally deleting a finished roast
             self.safesaveflag = True
         else:
-            message = aw.sendmessage(QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8))
+            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
             
         aw.sendmessage(message)
         aw.soundpop()
@@ -2187,8 +2178,7 @@ class tgraphcanvas(FigureCanvas):
         temp = unicode(self.temp2[i])
         timed = self.stringfromseconds(self.timex[i])
 
-        #Parameterized Translation [Bookmark]
-        message = u"Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
+        message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
         aw.sendmessage(message)
         #write label in mini recorder if flag checked
         if aw.minieventsflag:
@@ -2214,8 +2204,7 @@ class tgraphcanvas(FigureCanvas):
         temp = unicode(self.temp2[i])
         timed = self.stringfromseconds(self.timex[i])
 
-        #Parameterized Translation [Bookmark]
-        message = u"Computer Event # "+ unicode(Nevents+1) + u" recorded at BT = " + temp + u" Time = " + timed
+        message = QApplication.translate("Message Area","Computer Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
         aw.sendmessage(message)
         #write label in mini recorder if flag checked
         if aw.minieventsflag:
@@ -3670,8 +3659,7 @@ class ApplicationWindow(QMainWindow):
                 #restore dirs
                 QDir.setCurrent(oldDir)
 
-                #Parameterized Translation [Bookmark]
-                self.sendmessage(u"Profile " + filename + " saved in: " + self.qmc.autosavepath)
+                self.sendmessage(QApplication.translate("Message Area","Profile %1 saved in: %2", None, QApplication.UnicodeUTF8).arg(filename).arg(self.qmc.autosavepath))
                 self.qmc.safesaveflag = False
 
                 return filename
@@ -3759,8 +3747,7 @@ class ApplicationWindow(QMainWindow):
                 string += self.qmc.specialeventsStrings[lenevents-1][0:5]
                 string += "..."
 
-            #Parameterized Translation [Bookmark]   
-            message = u"Event #" + str(lenevents) + ":  " + string +  u" has been updated"
+            message = QApplication.translate("Message Area","Event #%1:  %2 has been updated", None, QApplication.UnicodeUTF8).arg(str(lenevents)).arg(string)
             self.sendmessage(message)
         
     def strippedName(self, fullFileName):
@@ -3883,8 +3870,7 @@ class ApplicationWindow(QMainWindow):
             #start new roast
             self.qmc.OnMonitor()
 
-            #Parameterized Translation [Bookmark]
-            self.sendmessage(filename + " has been saved. New roast has started")
+            self.sendmessage(QApplication.translate("Message Area","%1 has been saved. New roast has started", None, QApplication.UnicodeUTF8).arg(filename))
         else:
             self.qmc.OnMonitor()
             
@@ -3924,8 +3910,7 @@ class ApplicationWindow(QMainWindow):
             #Plot everything
             self.qmc.redraw()
 
-            #Parameterized Translation [Bookmark]
-            message =  unicode(filename) + u" loaded successfully"
+            message =  QApplication.translate("Message Area","%1  loaded successfully", None, QApplication.UnicodeUTF8).arg(unicode(filename))
             self.sendmessage(message)
             
             self.setCurrentFile(filename)
@@ -5400,8 +5385,7 @@ $cupping_notes
             x = image.width()
             y = image.height()
 
-            #Parameterized Translation [Bookmark]
-            self.sendmessage(filename + u" (" + unicode(x) + u"x" + unicode(y) + u") saved")
+            self.sendmessage(QApplication.translate("Message Area","%1  (%2x) saved", None, QApplication.UnicodeUTF8).arg(unicode(filename)).arg(unicode(x)).arg(unicode(y)))
 
         except IOError,e:
             self.qmc.adderror(u"IO Error: resize() " + unicode(e) + u" ")
@@ -5877,8 +5861,7 @@ class HUDDlg(QDialog):
         aw.qmc.ETtarget = int(self.ETlineEdit.text())
         aw.qmc.BTtarget = int(self.BTlineEdit.text())
 
-        #Parameterized Translation [Bookmark]        
-        string = u"[ET target = " + unicode(aw.qmc.ETtarget) + u"] [BT target = " + unicode(aw.qmc.BTtarget) + u"]"        
+        string = QApplication.translate("Message Area","[ET target = %1] [BT target =   (%2]", None, QApplication.UnicodeUTF8).arg(unicode(aw.qmc.ETtarget)).arg(unicode(aw.qmc.BTtarget))
         aw.sendmessage(string)
         self.accept()
 
@@ -6521,8 +6504,7 @@ class editGraphDlg(QDialog):
             self.createEventTable()
             aw.qmc.redraw()
 
-            #Parameterized Translation [Bookmark]
-            message = u"Event #" + str(len(aw.qmc.specialevents)) + " added"
+            message = QApplication.translate("Message Area","Event #%1 added", None, QApplication.UnicodeUTF8).arg(str(len(aw.qmc.specialevents))) 
             aw.sendmessage(message)
         else:
             message = QApplication.translate("Message Area","No profile found", None, QApplication.UnicodeUTF8)
@@ -6537,8 +6519,7 @@ class editGraphDlg(QDialog):
              self.createEventTable()
              aw.qmc.redraw()
              
-             #Parameterized Translation [Bookmark]
-             message = u" Event #" + str(len(aw.qmc.specialevents)+1) + " deleted"  
+             message = uQApplication.translate("Message Area"," Event #%1 deleted", None, QApplication.UnicodeUTF8).arg(str(len(aw.qmc.specialevents)+1))
              aw.sendmessage(message)
         else:
              message = QApplication.translate("Message Area","No events found", None, QApplication.UnicodeUTF8)  
@@ -6820,8 +6801,7 @@ class autosaveDlg(QDialog):
             aw.qmc.autosaveflag = 1
             aw.qmc.autosaveprefix = self.prefixEdit.text()
 
-            #Parameterized Translation [Bookmark]
-            message = "Autosave ON. Prefix: " + self.prefixEdit.text()
+            message = QApplication.translate("Message Area","Autosave ON. Prefix: %1").arg(self.prefixEdit.text())
             aw.sendmessage(message)
             aw.qmc.autosavepath = unicode(self.pathEdit.text())
         else:
@@ -6939,8 +6919,7 @@ class WindowsDlg(QDialog):
             aw.qmc.keeptimeflag = 0
         aw.qmc.redraw()
         
-        #Parameterized Translation [Bookmark]
-        string = u"ylimit = (" + unicode(self.ylimitEdit_min.text()) + u"," + unicode(self.ylimitEdit.text()) + u") xlimit = (" + unicode(self.xlimitEdit_min.text()) + u"," + unicode(self.xlimitEdit.text())+ u")"
+        string = QApplication.translate("Message Area","ylimit = (%1,%2) xlimit = (%3,%4)",None, QApplication.UnicodeUTF8).arg(unicode(self.ylimitEdit_min.text())).arg(unicode(self.ylimitEdit.text())).arg(unicode(self.xlimitEdit_min.text())).arg(unicode(self.xlimitEdit.text()))                                        
         aw.sendmessage(string)
 
         self.close()
@@ -7539,8 +7518,7 @@ class phasesGraphDlg(QDialog):
         self.events2phases()
         self.getphases()
 
-        #Parameterized Translation [Bookmark]
-        aw.sendmessage(u"Phases changed to " + aw.qmc.mode + " default: " + unicode(aw.qmc.phases))
+        aw.sendmessage(QApplication.translate("Message Area","Phases changed to %1 default: %2)",None, QApplication.UnicodeUTF8).arg(aw.qmc.mode).arg(unicode(aw.qmc.phases)))
         aw.qmc.redraw()
 
 ############################################################################        
@@ -9372,8 +9350,7 @@ class comportDlg(QDialog):
                 raise timeoutError
             #add more checks here
 
-            #Parameterized Translation [Bookmark]
-            aw.sendmessage(u"Serial Port Settings: " + comport + ", " + baudrate + ", " + bytesize + ", " + parity + ", " + stopbits + ", " + timeout)
+            aw.sendmessage(QApplication.translate("Message Area","Serial Port Settings: %1, %2, %3, %4, %5, %6", None, QApplication.UnicodeUTF8).arg(comport).arg(baudrate).arg(bytesize).arg(parity).arg(stopbits).arg(timeout))
                         
         except comportError,e:
             aw.qmc.adderror(u"Comport Error: Invalid Comm entry ")
@@ -9606,9 +9583,8 @@ class DeviceAssignmentDLG(QDialog):
             self.stopbits = 1
             self.timeout=1
 
-            #Parameterized Translation [Bookmark]
-            message = "PID to control ET set to " + str1 + " " + str(aw.ser.controlETpid[1]) + \
-            " ; PID to read BT set to " + str2 + " " + str(aw.ser.readBTpid[1])
+            message = QApplication.translate("Message Area","PID to control ET set to %1 %2" + \
+                                             " ; PID to read BT set to %3 %4", None, QApplication.UnicodeUTF8).arg(str1).arg(str(aw.ser.controlETpid[1])).arg(str2).arg(str(aw.ser.readBTpid[1]))
             
             aw.button_10.setVisible(True)
             aw.label6.setVisible(True)
@@ -9625,8 +9601,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'E'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                #Parameterized Translation [Bookmark]                
-                message = "Device set to " + meter + ". Now, chose serial port"
+                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "Omega HH506RA":
                 aw.qmc.device = 2
@@ -9636,8 +9611,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'E'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                #Parameterized Translation [Bookmark]                
-                message = "Device set to " + meter + ". Now, chose serial port"
+                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 
             elif meter == "CENTER 309":
                 aw.qmc.device = 3
@@ -9647,8 +9621,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                #Parameterized Translation [Bookmark]              
-                message = "Device set to " + meter + ". Now, chose serial port"
+                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "CENTER 306":
                 aw.qmc.device = 4
@@ -9658,8 +9631,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1                
-                #Parameterized Translation [Bookmark]
-                message = "Device set to " + meter + ". Now, chose serial port"
+                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "CENTER 305":
                 aw.qmc.device = 5
@@ -9779,8 +9751,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'E'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                #Parameterized Translation [Bookmark]
-                message = "Device set to " + meter + ", which is equivalent to Omega HH806AU. Now, chose serial port"
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "Omega HH309":
                 aw.qmc.device = 17
@@ -9790,19 +9761,17 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                #Parameterized Translation [Bookmark]
-                message = "Device set to " + meter + ". Now, chose serial port"
+                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             #special device manual mode. No serial settings.    
             elif meter == "NONE":
                 aw.qmc.device = 18
-                message = "Device set to " + meter
+                message = QApplication.translate("Message Area","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 st = ""
                 if aw.qmc.delay != 1000:
                     aw.qmc.delay = 1000
                     st += ". Sampling rate changed to 1 second"
-                #Parameterized Translation [Bookmark]
-                message = "Device set to " + meter + st
+                message = QApplication.translate("Message Area","Device set to %1%2", None, QApplication.UnicodeUTF8).arg(meter).arg(st)
 
             elif meter == "ArduinoTC4":
                 aw.qmc.device = 19
@@ -9812,8 +9781,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                #Parameterized Translation [Bookmark]
-                message = "Device set to " + meter + ". Now, check Serial Port settings"
+                message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 
             elif meter == "TE VA18B":
                 aw.qmc.device = 20
@@ -9823,10 +9791,8 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=2
-                #Parameterized Translation [Bookmark]
-                message = "Device set to " + meter + ". Now, check Serial Port settings"
+                message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 
-            
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
             aw.button_13.setVisible(False)
@@ -10415,11 +10381,8 @@ class graphColorDlg(QDialog):
             var.setPalette(QPalette(colorf))
             var.setAutoFillBackground(True)            
             aw.qmc.fig.canvas.redraw()
-            #Parameterized Translation [Bookmark]
-            aw.sendmessage("Color of " + title + " set to " + str(aw.qmc.palette[color]))
+            aw.sendmessage(QApplication.translate("Message Area","Color of %1 set to %2", None, QApplication.UnicodeUTF8).arg(title).arg(str(aw.qmc.palette[color])))
 
-
-            
 
 #########################################################################
 ######################## FUJI PXR CONTROL DIALOG  #######################
@@ -12434,9 +12397,7 @@ class PXG4pidDlgControl(QDialog):
             #check response from pid and update message on main window
             if r == command:
                 patterns = ["1-4","5-8","1-8","9-12","13-16","9-16","1-16"]
-                #Parameterized Translation [Bookmark]
-                message = u"Pattern changed to " + patterns[aw.pid.PXG4CH4["rampsoakpattern"][0]]
-
+                message = QApplication.translate("Message Area","Pattern changed to %1", None, QApplication.UnicodeUTF8).arg(patterns[aw.pid.PXG4CH4["rampsoakpattern"][0]])
             else:
                 message = QApplication.translate("Message Area","Pattern did not changed", None, QApplication.UnicodeUTF8)
             aw.sendmessage(message)
@@ -12820,8 +12781,9 @@ class FujiPID(object):
             r = aw.ser.sendFUJIcommand(command,8)
             #check response
             if r == command:
-            #Parameterized Translation [Bookmark]
-                message = u"PXG sv#%i set to %.1f"%(self.PXG4["selectsv"][0],float(value))
+                           
+                # [Not sure the following will translate or even format properly... Need testing!]
+                message = QApplication.translate("Message Area","PXG sv#%1 set to %2",None, QApplication.UnicodeUTF8).arg(self.PXG4["selectsv"][0]).arg("%.1f" % float(value))
                 aw.sendmessage(message)
                 self.PXG4[svkey][0] = value
                 #record command as an Event 
@@ -12836,8 +12798,8 @@ class FujiPID(object):
             r = aw.ser.sendFUJIcommand(command,8)
             #check response
             if r == command:
-                #Parameterized Translation [Bookmark]                
-                message = u"PXR sv set to %.1f"%value
+                # [Not sure the following will translate or even format properly... Need testing!]           
+                message = QApplication.translate("Message Area","PXR sv set to %1",None, QApplication.UnicodeUTF8).arg("%.1f" % float(value))
                 aw.pid.PXR["sv0"][0] = value
                 aw.sendmessage(message)
                 #record command as an Event 
@@ -12866,8 +12828,7 @@ class FujiPID(object):
                     command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],newsv)
                     r = aw.ser.sendFUJIcommand(command,8)
                     if len(r) == 8:
-                        #Parameterized Translation [Bookmark]
-                        message = u"SV" + unicode(N) + u" changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
+                        message = QApplication.translate("Message Area","SV%1 changed from %2 to %3)",None, QApplication.UnicodeUTF8).arg(unicode(N)).arg(unicode(currentsv)).arg(unicode(newsv/10.))
                         aw.sendmessage(message)
                         self.PXG4[svkey][0] = newsv
                         
@@ -12876,8 +12837,7 @@ class FujiPID(object):
                         aw.qmc.DeviceEventRecord(strcommand)
                             
                     else:
-                        #Parameterized Translation [Bookmark]                        
-                        msg = u"Unable to set sv" + unicode(N)
+                        msg = QApplication.translate("Message Area","Unable to set sv%1",None, QApplication.UnicodeUTF8).arg(unicode(N))
                         aw.sendmessage(msg)       
 
             #   or if control pid is fuji PXR
@@ -12885,8 +12845,8 @@ class FujiPID(object):
                 command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
                 r = aw.ser.sendFUJIcommand(command,8)
                 if len(r) == 8:
-                    #Parameterized Translation [Bookmark]                    
                     message = u" SV changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
+                    message = QApplication.translate("Message Area"," SV changed from %1 to %2)",None, QApplication.UnicodeUTF8).arg(unicode(currentsv)).arg(unicode(newsv/10.))                           
                     aw.sendmessage(message)
                     self.PXR["sv0"][0] = newsv
 
