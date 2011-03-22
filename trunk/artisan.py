@@ -224,7 +224,7 @@ class tgraphcanvas(FigureCanvas):
         self.flagclock = False
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
-        self.title = u"Roaster Scope"
+        self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
         self.ambientTemp = 0.
         #relative humidity percentage [0], corresponding temperature [1], temperature unit [2]
         self.bag_humidity = [0.,0.]
@@ -385,7 +385,7 @@ class tgraphcanvas(FigureCanvas):
 
         # add legend to plot.
         handles = [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2]
-        labels = [u"ET",u"BT",u"DeltaET",u"DeltaBT"]
+        labels = [QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)]
         self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
         # draw of the Figure
@@ -1014,9 +1014,9 @@ class tgraphcanvas(FigureCanvas):
                 
             #draw background
             self.l_back1, = self.ax.plot(self.timeB, self.backgroundET,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label="BackgroundET")
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=QApplication.translate("Scope Label", "BackgroundET", None, QApplication.UnicodeUTF8))
             self.l_back2, = self.ax.plot(self.timeB, self.backgroundBT,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label="BackgroundBT")
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=QApplication.translate("Scope Label", "BackgroundBT", None, QApplication.UnicodeUTF8))
 
             #check backgroundevents flag	
             if self.backgroundeventsflag:
@@ -2123,10 +2123,9 @@ class tgraphcanvas(FigureCanvas):
                 lowestBT = u"%.1f"%LP
                 #timeLP = unicode(self.stringfromseconds(self.timex[k] - self.startend[0]))
                 time = self.stringfromseconds(self.startend[2]-self.startend[0])
-                #end temperature 
-                
-                strline = (u"[BT = " + lowestBT + self.mode + u" - " + u"%.1f"%self.startend[3] + self.mode +
-                            u"] [ETarea - BTarea = " + unicode(deltaAcc) + u"] [Time = " +time +u"]")
+                #end temperature
+
+                QApplication.translate("Scope Label", "[BT = %1 - %2] [ETarea - BTarea = %3] [Time = %4]", None, QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.startend[3] + self.mode).arg(unicode(deltaAcc)).arg(time)                              
                             
                 #text metrics 
                 #if self.mode == u"C":
