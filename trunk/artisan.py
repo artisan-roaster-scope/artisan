@@ -587,7 +587,6 @@ class tgraphcanvas(FigureCanvas):
                     if self.temp1[-1] > self.alarmtemperature[i]:
                         self.setalarm(i)
                 elif self.alarmsource[i] == 1:                      #check BT
-                    print self.alarmtemperature[i],self.temp1[-1]
                     if self.temp2[-1] > self.alarmtemperature[i]:
                         self.setalarm(i)
 
