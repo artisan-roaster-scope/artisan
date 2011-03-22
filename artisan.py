@@ -329,6 +329,14 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventsvalue = []
         #flag that makes the events location type bars (horizontal bars) appear on the plot. flag read on redraw()
         self.eventsGraphflag = 1
+
+        #Temperature Alarms lists. Data is writen in  alarmDlg 
+        self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
+        self.alarmflag = []    # 0 = OFF; 1 = ON flags 
+        self.alarmsource = []   # 0 = ET , 1= BT
+        self.alarmtemperature = []  # set temperature number (example 500)
+        self.alarmaction = []       # 0 = open a window; 1 = call program with a filepath equal to alarmstring
+        self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
         
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 750
@@ -500,6 +508,8 @@ class tgraphcanvas(FigureCanvas):
                     aw.showHUD[aw.HUDfunction]()
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
+
+                self.checkalams()
                     
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
@@ -570,6 +580,30 @@ class tgraphcanvas(FigureCanvas):
             
         self.ax.lines = self.ax.lines[0:linecount]
 
+    def checkalarms(self):
+        for i in range(len(self.alarmflag)):
+            if self.alarmflag[i] and self.timeindex[self.alarmtime[i]]:    
+                if self.alarmsource[i] == 0:                        #check ET
+                    if self.alarmtemperature[i] > self.temp2[-1]:
+                        self.setalarm(i)
+                elif self.alarmsource[i] == 1:                      #check BT
+                    if self.alarmtemperature[i] > self.temp1[-1]:
+                        self.setalarm(i)
+
+    def setalarm(self,alarmnumber):
+        if self.alarmaction[alarmnumber] == 0:
+            self.alarmflag[alarmnumber] = 0    #turn off flag as it has been read
+            QMessageBox.information(self,u"Alarm notice",self.alarmstrings[alarmnumber])
+        elif self.alarmaction[alarmnumber] == 1:
+            self.alarmflag[alarmnumber] = 0
+            try:
+                #self.alarmstrings[alarmnumber] = "filepath"
+                os.startfile(unicode(self.alarmstrings[alarmnumber]))
+                aw.sendmessage("Alarm is calling: %s"%unicode(self.alarmstrings[alarmnumber]))
+            except Exception,e:
+                self.adderror(u"Exception Error: setalarm() " + unicode(e) + " ")
+                return  
+
     def playbackevent(self):
         #needed when using device NONE
         if len(self.timex):
@@ -583,7 +617,6 @@ class tgraphcanvas(FigureCanvas):
                     #rotate colors to get attention
                     if timed%2:
                         aw.messagelabel.setStyleSheet("background-color:'transparent';")
-                        
                     else:
                         aw.messagelabel.setStyleSheet("background-color:'yellow';")
                         
@@ -3314,6 +3347,10 @@ class ApplicationWindow(QMainWindow):
         self.connect(autosaveAction,SIGNAL("triggered()"),self.autosaveconf)
         self.ConfMenu.addAction(autosaveAction) 
 
+        alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
+        self.connect(alarmAction,SIGNAL("triggered()"),self.alarmconfig)
+        self.ConfMenu.addAction(alarmAction) 
+
         hudAction = QAction(UIconst.CONF_MENU_EXTRAS,self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.ConfMenu.addAction(hudAction)
@@ -4382,7 +4419,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.celsiusMode()
 
             #restore device
-            settings.beginGroup("Device");
+            settings.beginGroup("Device")
             self.qmc.device = settings.value("id",self.qmc.device).toInt()[0]
             if settings.contains("controlETpid"):
                 self.ser.controlETpid = map(lambda x:x.toInt()[0],settings.value("controlETpid").toList())
@@ -4395,7 +4432,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]   
             #restore Events settings
-            settings.beginGroup("events");
+            settings.beginGroup("events")
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
             self.minieventsflag = settings.value("minieventsflag",int(self.minieventsflag)).toInt()[0]
             self.qmc.eventsGraphflag = settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)).toInt()[0]
@@ -4423,23 +4460,34 @@ class ApplicationWindow(QMainWindow):
             #restore flavors
             self.qmc.flavorlabels = settings.value("Flavors",self.qmc.flavorlabels).toStringList()
             #restore serial port     
-            settings.beginGroup("SerialPort");
+            settings.beginGroup("SerialPort")
             self.ser.comport = unicode(settings.value("comport",self.ser.comport).toString())
             self.ser.baudrate = settings.value("baudrate",int(self.ser.baudrate)).toInt()[0]
             self.ser.bytesize = settings.value("bytesize",self.ser.bytesize).toInt()[0]       
             self.ser.stopbits = settings.value("stopbits",self.ser.stopbits).toInt()[0]
             self.ser.parity = unicode(settings.value("parity",self.ser.parity).toString())
             self.ser.timeout = settings.value("timeout",self.ser.timeout).toInt()[0]
-            settings.endGroup();
+            settings.endGroup()
+            #restore alarms
+            settings.beginGroup("Alarms")
+            if settings.contains("alarmtime"):
+                self.qmc.alarmtime = map(lambda x:x.toInt()[0],settings.value("alarmtime").toList())                                                    
+                self.qmc.alarmflag = map(lambda x:x.toInt()[0],settings.value("alarmflag").toList())
+                self.qmc.alarmsource = map(lambda x:x.toInt()[0],settings.value("alarmsource").toList())
+                self.qmc.alarmtemperature = map(lambda x:x.toInt()[0],settings.value("alarmtemperature").toList())
+                self.qmc.alarmaction = map(lambda x:x.toInt()[0],settings.value("alarmaction").toList())
+                self.qmc.alarmstrings = list(settings.value("alarmstrings",self.qmc.alarmstrings).toStringList())
+            settings.endGroup()
+
             #restore pid settings
-            settings.beginGroup("PXR");
+            settings.beginGroup("PXR")
             for key in self.pid.PXR.keys():
                 if type(self.pid.PXR[key][0]) == type(float()):
                     self.pid.PXR[key][0] = settings.value(key,self.pid.PXR[key]).toDouble()[0]
                 elif type(self.pid.PXR[key][0]) == type(int()):
                     self.pid.PXR[key][0] = settings.value(key,self.pid.PXR[key]).toInt()[0]
             settings.endGroup()
-            settings.beginGroup("PXG4");
+            settings.beginGroup("PXG4")
             for key in self.pid.PXG4.keys():
                 if type(self.pid.PXG4[key][0]) == type(float()):
                     self.pid.PXG4[key][0] = settings.value(key,self.pid.PXG4[key][0]).toDouble()[0]
@@ -4506,11 +4554,11 @@ class ApplicationWindow(QMainWindow):
             previous_mode = unicode(settings.value("Mode",self.qmc.mode).toString())
             settings.setValue("Mode",self.qmc.mode)
             #save device
-            settings.beginGroup("Device");
+            settings.beginGroup("Device")
             settings.setValue("id",self.qmc.device)
             settings.setValue("controlETpid",self.ser.controlETpid)
             settings.setValue("readBTpid",self.ser.readBTpid)
-            settings.endGroup();
+            settings.endGroup()
             #save of phases is done in the phases dialog
             #only if mode was changed (and therefore the phases values have been converted)
             #we update the defaults here
@@ -4522,12 +4570,12 @@ class ApplicationWindow(QMainWindow):
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
             #save Events settings
-            settings.beginGroup("events");
+            settings.beginGroup("events")
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
             settings.setValue("minieventsflag",self.minieventsflag)
             settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
             settings.setValue("etypes",self.qmc.etypes)
-            settings.endGroup();            
+            settings.endGroup()            
             #save delay
             settings.setValue("Delay",self.qmc.delay)
             #save colors
@@ -4539,20 +4587,20 @@ class ApplicationWindow(QMainWindow):
             #soundflag
             settings.setValue("sound",self.soundflag)
             #save serial port
-            settings.beginGroup("SerialPort");
+            settings.beginGroup("SerialPort")
             settings.setValue("comport",self.ser.comport)
             settings.setValue("baudrate",self.ser.baudrate)
             settings.setValue("bytesize",self.ser.bytesize)
             settings.setValue("stopbits",self.ser.stopbits)
             settings.setValue("parity",self.ser.parity)
             settings.setValue("timeout",self.ser.timeout)            
-            settings.endGroup();
+            settings.endGroup()
             #save pid settings (only key and value[0])
-            settings.beginGroup("PXR");
+            settings.beginGroup("PXR")
             for key in self.pid.PXR.keys():
                 settings.setValue(key,self.pid.PXR[key][0])
             settings.endGroup()
-            settings.beginGroup("PXG4");
+            settings.beginGroup("PXG4")
             for key in self.pid.PXG4.keys():            
                 settings.setValue(key,self.pid.PXG4[key][0])
             settings.endGroup()
@@ -4585,6 +4633,15 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("roastertype",self.qmc.roastertype)
             settings.setValue("densitySampleVolume",self.qmc.density[2])
             settings.setValue("densitySampleVolumeUnit",self.qmc.density[3])
+            settings.endGroup()
+            #save alarms
+            settings.beginGroup("Alarms")
+            settings.setValue("alarmtime",self.qmc.alarmtime)                                                                
+            settings.setValue("alarmflag",self.qmc.alarmflag)            
+            settings.setValue("alarmsource",self.qmc.alarmsource)
+            settings.setValue("alarmtemperature",self.qmc.alarmtemperature)
+            settings.setValue("alarmaction",self.qmc.alarmaction)
+            settings.setValue("alarmstrings",self.qmc.alarmstrings)
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
             
@@ -5182,6 +5239,13 @@ $cupping_notes
     def eventsconf(self):
         dialog = EventsDlg(self)
         dialog.show()
+        
+    def alarmconfig(self):
+        if self.qmc.device != 18:
+            dialog = AlarmDlg(self)
+            dialog.show()
+        else:
+            QMessageBox.information(self,u"Alarm Config","Alarms are not available for device None")
         
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loos in percentage as float
@@ -6518,7 +6582,7 @@ class editGraphDlg(QDialog):
              self.createEventTable()
              aw.qmc.redraw()
              
-             message = uQApplication.translate("Message Area"," Event #%1 deleted", None, QApplication.UnicodeUTF8).arg(str(len(aw.qmc.specialevents)+1))
+             message = QApplication.translate("Message Area"," Event #%1 deleted", None, QApplication.UnicodeUTF8).arg(str(len(aw.qmc.specialevents)+1))
              aw.sendmessage(message)
         else:
              message = QApplication.translate("Message Area","No events found", None, QApplication.UnicodeUTF8)  
@@ -9640,7 +9704,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 
             elif meter == "CENTER 304":
                 aw.qmc.device = 6
@@ -9650,7 +9714,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Device set to CENTER 304, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "CENTER 303":
                 aw.qmc.device = 7
@@ -9660,7 +9724,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Device set to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "CENTER 302":
                 aw.qmc.device = 8
@@ -9670,7 +9734,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Device set to CENTER 302, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 
             elif meter == "CENTER 301":
                 aw.qmc.device = 9
@@ -9680,7 +9744,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Device set to CENTER 301, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "CENTER 300":
                 aw.qmc.device = 10
@@ -9690,7 +9754,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Device set to CENTER 300, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 
             elif meter == "VOLTCRAFT K204":
                 aw.qmc.device = 11
@@ -9700,7 +9764,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Device set to VOLTCRAFT K204, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "VOLTCRAFT K202":
                 aw.qmc.device = 12
@@ -9710,7 +9774,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Device set to VOLTCRAFT K202, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "VOLTCRAFT 300K":
                 aw.qmc.device = 13
@@ -9720,7 +9784,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Device set to VOLTCRAFT 300K, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "VOLTCRAFT 302KJ":
                 aw.qmc.device = 14
@@ -9730,7 +9794,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to VOLTCRAFT 302KJ, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
             elif meter == "EXTECH 421509":
                 aw.qmc.device = 15
@@ -9740,7 +9804,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'E'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to EXTECH 421509, which is equivalent to Omega HH506RA. Now, chose serial port", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH506RA. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                                 
             elif meter == "Omega HH802U":
                 aw.qmc.device = 16
@@ -10382,6 +10446,154 @@ class graphColorDlg(QDialog):
             aw.qmc.fig.canvas.redraw()
             aw.sendmessage(QApplication.translate("Message Area","Color of %1 set to %2", None, QApplication.UnicodeUTF8).arg(title).arg(str(aw.qmc.palette[color])))
 
+
+############################################################
+#######################  ALARM DIALOG  #####################
+############################################################
+
+class AlarmDlg(QDialog):
+    def __init__(self, parent = None):
+        super(AlarmDlg,self).__init__(parent)
+        self.setWindowTitle("Alarms")
+
+        #table for alarms
+        self.alarmtable = QTableWidget()
+        self.createalarmtable()        
+
+        allonButton = QPushButton("Set All ON")
+        self.connect(allonButton,  SIGNAL("clicked()"), lambda flag=1: self.alarmson(flag))
+
+        alloffButton = QPushButton("Set All OFF")
+        self.connect(alloffButton, SIGNAL("clicked()"), lambda flag=0: self.alarmson(flag))
+
+        addButton = QPushButton("Add")
+        self.connect(addButton, SIGNAL("clicked()"),self.addalarm)
+
+        deleteButton = QPushButton("Delete")
+        self.connect(deleteButton, SIGNAL("clicked()"),self.deletealarm)
+
+        saveButton = QPushButton("Save Changes")
+        self.connect(saveButton, SIGNAL("clicked()"),self.savealarms)
+
+        closeButton = QPushButton("Close")
+        self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+
+        tablelayout = QVBoxLayout()
+        buttonlayout = QHBoxLayout()
+        mainlayout = QVBoxLayout()
+
+        tablelayout.addWidget(self.alarmtable)
+        buttonlayout.addWidget(alloffButton)        
+        buttonlayout.addWidget(allonButton)
+        buttonlayout.addWidget(deleteButton)
+        buttonlayout.addWidget(addButton)
+        buttonlayout.addWidget(saveButton)
+        buttonlayout.addWidget(closeButton)
+
+        mainlayout.addLayout(tablelayout)
+        mainlayout.addLayout(buttonlayout)
+
+        self.setLayout(mainlayout)
+
+    def alarmson(self,flag):
+        for i in range(len(aw.qmc.alarmflag)):
+            if flag == 1:
+                aw.qmc.alarmflag[i] = 1
+            else:
+                aw.qmc.alarmflag[i] = 0
+        self.createalarmtable()
+
+    def addalarm(self):
+        self.savealarms()
+        aw.qmc.alarmtime.append(1)
+        aw.qmc.alarmflag.append(1)
+        aw.qmc.alarmsource.append(1)
+        aw.qmc.alarmtemperature.append(500)
+        aw.qmc.alarmaction.append(0)
+        aw.qmc.alarmstrings.append("Enter description")
+
+        self.createalarmtable()
+        
+    def deletealarm(self):
+        nalarms = len(aw.qmc.alarmflag)
+        if nalarms:
+            aw.qmc.alarmtime.pop()                                                                
+            aw.qmc.alarmflag.pop()            
+            aw.qmc.alarmsource.pop()
+            aw.qmc.alarmtemperature.pop()
+            aw.qmc.alarmaction.pop()
+            aw.qmc.alarmstrings.pop()
+            self.createalarmtable()
+        if not len(aw.qmc.alarmflag):
+            if self.alarmtable.rowCount():
+                self.alarmtable.setRowCount(0)
+       
+    def savealarms(self):
+        nalarms = self.alarmtable.rowCount()
+        for i in range(nalarms):
+            time =  self.alarmtable.cellWidget(i,0)
+            aw.qmc.alarmtime[i] = int(unicode(time.currentIndex()))                                       
+            flag = self.alarmtable.cellWidget(i,1)
+            aw.qmc.alarmflag[i] = int(unicode(flag.currentIndex()))
+            atype = self.alarmtable.cellWidget(i,2)
+            aw.qmc.alarmsource[i] = int(unicode(atype.currentIndex()))
+            temp = self.alarmtable.cellWidget(i,3)
+            aw.qmc.alarmtemperature[i] = int(unicode(temp.text()))
+            action = self.alarmtable.cellWidget(i,4)
+            aw.qmc.alarmaction[i] = int(unicode(action.currentIndex()))
+            description = self.alarmtable.cellWidget(i,5)
+            aw.qmc.alarmstrings[i] = unicode(description.text())
+               
+    def createalarmtable(self):
+        self.alarmtable.clear()
+        nalarms = len(aw.qmc.alarmtemperature)
+        if nalarms:    
+            self.alarmtable.setRowCount(nalarms)
+            self.alarmtable.setColumnCount(6)
+            self.alarmtable.setHorizontalHeaderLabels(["From","Status","Source","Temperature","Action","Description"])
+            self.alarmtable.setAlternatingRowColors(True)
+            self.alarmtable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.alarmtable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.alarmtable.setSelectionMode(QTableWidget.SingleSelection)
+            self.alarmtable.setShowGrid(True)
+
+            #populate table
+            for i in range(nalarms):
+                #Effective time from
+                timeComboBox = QComboBox()
+                timeComboBox.addItems(["CHARGE","DRY END","FC START","FC END","SC START","DROP"])
+                timeComboBox.setCurrentIndex(aw.qmc.alarmtime[i])
+                                            
+                #flag
+                flagComboBox = QComboBox()
+                flagComboBox.addItems(["OFF","ON"])
+                flagComboBox.setCurrentIndex(aw.qmc.alarmflag[i])
+
+                #type
+                typeComboBox = QComboBox()
+                typeComboBox.addItems(["ET","BT"])
+                typeComboBox.setCurrentIndex(aw.qmc.alarmsource[i])
+
+                #temperature
+                tempedit = QLineEdit(unicode(aw.qmc.alarmtemperature[i]))
+                tempedit.setValidator(QIntValidator(0, 1000,tempedit))
+
+                #action
+                actionComboBox = QComboBox()
+                actionComboBox.addItems(["Pop up window","Call program"])
+                actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i])
+                    
+                #text description
+                descriptionedit = QLineEdit(unicode(aw.qmc.alarmstrings[i]))
+
+                #add widgets to the table
+                self.alarmtable.setCellWidget(i,0,timeComboBox)                
+                self.alarmtable.setCellWidget(i,1,flagComboBox)
+                self.alarmtable.setCellWidget(i,2,typeComboBox)
+                self.alarmtable.setCellWidget(i,3,tempedit)
+                self.alarmtable.setCellWidget(i,4,actionComboBox)                
+                self.alarmtable.setCellWidget(i,5,descriptionedit)
+            
 
 #########################################################################
 ######################## FUJI PXR CONTROL DIALOG  #######################
