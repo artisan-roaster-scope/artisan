@@ -59,6 +59,7 @@ CONF_MENU_EVENTS = QApplication.translate("Menu", "Events...", None, QApplicatio
 CONF_MENU_STATISTICS = QApplication.translate("Menu", "Statistics...", None, QApplication.UnicodeUTF8)
 CONF_MENU_AXES = QApplication.translate("Menu", "Axes...", None, QApplication.UnicodeUTF8)
 CONF_MENU_AUTOSAVE = QApplication.translate("Menu", "Autosave...", None, QApplication.UnicodeUTF8)
+CONF_MENU_ALARMS = QApplication.translate("Menu", "Alarms...", None, QApplication.UnicodeUTF8)
 CONF_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None, QApplication.UnicodeUTF8)
 
 #Help menu items
