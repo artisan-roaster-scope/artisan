@@ -509,7 +509,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
 
-                self.checkalams()
+                self.checkalarms()
                     
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
@@ -584,10 +584,11 @@ class tgraphcanvas(FigureCanvas):
         for i in range(len(self.alarmflag)):
             if self.alarmflag[i] and self.timeindex[self.alarmtime[i]]:    
                 if self.alarmsource[i] == 0:                        #check ET
-                    if self.alarmtemperature[i] > self.temp2[-1]:
+                    if self.temp1[-1] > self.alarmtemperature[i]:
                         self.setalarm(i)
                 elif self.alarmsource[i] == 1:                      #check BT
-                    if self.alarmtemperature[i] > self.temp1[-1]:
+                    print self.alarmtemperature[i],self.temp1[-1]
+                    if self.temp2[-1] > self.alarmtemperature[i]:
                         self.setalarm(i)
 
     def setalarm(self,alarmnumber):
