@@ -426,6 +426,16 @@ class tgraphcanvas(FigureCanvas):
         # event occurs. Reimplement this function to get timer events. If multiple timers are running, the QTimerEvent.timerId()
         # can be used to find out which timer was activated.
 
+
+        #Designer variables
+        self.desinerflag = False
+        self.mousepress = None
+        self.indexpoint = 0
+        self.cidpress = 0
+        self.cidrelease = 0
+        self.cidmotion = 0
+        self.workingline = 2  #selects ET or BT
+        
     #event handler from startTimer()
     def timerEvent(self, evt):
         if self.flagon:
@@ -630,7 +640,7 @@ class tgraphcanvas(FigureCanvas):
 
                         # COMMAND SET STRINGS
                         # SETSV::VALUE1  (adjust the SV PID to the float VALUE1)
-                        # SETRS::VALUE1::VALUE2::VALUE3  (VALUE1 = target SV. VALUE2 = time to reach VALUE 1 (ramp) in minutes. VALUE3 = hold (soak) time in minutes)
+                        # SETRS::VALUE1::VALUE2::VALUE3  (VALUE1 = target SV. float VALUE2 = time to reach int VALUE 1 (ramp) in minutes. int VALUE3 = hold (soak) time in minutes)
 
                         # IMPORTANT: VALUES are for controlling ET only (not BT). The PID should control ET not BT. The PID should be connected to ET only.
                         # Therefore, these values don't reflect a BT defined profile. They define an ET profile.
@@ -983,7 +993,11 @@ class tgraphcanvas(FigureCanvas):
 
         self.redraw()
         aw.soundpop()
-        
+
+        if self.desinerflag:
+            self.disconnect_designer()
+            self.desinerflag = False
+            
     #Redraws data   
     def redraw(self):
         self.fig.clf()   #wipe out figure
@@ -1624,75 +1638,75 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["Cline"] = unicode(dialog.ClineLabel.text())
 
         #update screen with new colors
-        self.fig.canvas.redraw()
-            
+        self.fig.canvas.redraw()        
+        
     #draws a polar star graph to score cupping. It does not delete any profile data.            
     def flavorchart(self):
-            pi = math.pi
-            self.fig.clf()
-            #create a new name ax1 instead of ax
-            self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg='white')
-            g_angle = range(10,360,40) 
-            self.ax1.set_thetagrids(g_angle)
-            self.ax1.set_rmax(1.)
-            self.ax1.set_autoscale_on(False)
-            self.ax1.grid(True,linewidth=2,color='grey')
-            
-            #delete degrees ticks to anotate flavor characteristics 
-            for tick in self.ax1.xaxis.get_major_ticks():
-                tick.label1On = False
+        pi = math.pi
+        self.fig.clf()
+        #create a new name ax1 instead of ax
+        self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg='white')
+        g_angle = range(10,360,40) 
+        self.ax1.set_thetagrids(g_angle)
+        self.ax1.set_rmax(1.)
+        self.ax1.set_autoscale_on(False)
+        self.ax1.grid(True,linewidth=2,color='grey')
+        
+        #delete degrees ticks to anotate flavor characteristics 
+        for tick in self.ax1.xaxis.get_major_ticks():
+            tick.label1On = False
 
-            #rename yaxis 
-            locs = self.ax1.get_yticks()
-            labels = []
-            for i in range(len(locs)):
-                    stringlabel = str(int(locs[i]*10))
-                    labels.append(stringlabel)              
-            self.ax1.set_yticklabels(labels,color=self.palette["xlabel"])
-                        
-            angles = [pi/2.]
-            for i in range(9): angles.append(angles[-1] + 2.*pi/9.)
-            
+        #rename yaxis 
+        locs = self.ax1.get_yticks()
+        labels = []
+        for i in range(len(locs)):
+                stringlabel = str(int(locs[i]*10))
+                labels.append(stringlabel)              
+        self.ax1.set_yticklabels(labels,color=self.palette["xlabel"])
+                    
+        angles = [pi/2.]
+        for i in range(9): angles.append(angles[-1] + 2.*pi/9.)
+        
 
-            #anotate labels
-            self.ax1.annotate(self.flavorlabels[0] + u" - " + unicode(int(self.flavors[0]*10)),xy =(angles[0],.9),
-                              xytext=(angles[0],1.1),horizontalalignment='left',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[1]+ u" - " + unicode(int(self.flavors[1]*10)),xy=(angles[1],.9),
-                              xytext=(angles[1],1.1),horizontalalignment='right',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[2]+ u" - " + unicode(int(self.flavors[2]*10)),xy=(angles[2],.9),
-                              xytext=(angles[2],1.1),horizontalalignment='right',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[3]+ u" - " + unicode(int(self.flavors[3]*10)),xy=(angles[3],.9),
-                              xytext=(angles[3],1.1),horizontalalignment='right',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[4]+ u" - " + unicode(int(self.flavors[4]*10)),
-                              xy=(angles[4],.9),xytext=(angles[4],1.1),horizontalalignment='right',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[5]+ u" - " + unicode(int(self.flavors[5]*10)),xy=(angles[5],.9),
-                              xytext=(angles[5],1.1),horizontalalignment='left',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[6]+ u" - " + unicode(int(self.flavors[6]*10)),xy=(angles[6],.9),
-                              xytext=(angles[6],1.1),horizontalalignment='left',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[7]+ u" - " + unicode(int(self.flavors[7]*10)),xy=(angles[7],.9),
-                              xytext=(angles[7],1.1),horizontalalignment='left',verticalalignment='bottom')
-            self.ax1.annotate(self.flavorlabels[8]+ u" - " + unicode(int(self.flavors[8]*10)),xy=(angles[8],.9),
-                              xytext=(angles[8],1.1),horizontalalignment='left',verticalalignment='bottom')
+        #anotate labels
+        self.ax1.annotate(self.flavorlabels[0] + u" - " + unicode(int(self.flavors[0]*10)),xy =(angles[0],.9),
+                          xytext=(angles[0],1.1),horizontalalignment='left',verticalalignment='bottom')
+        self.ax1.annotate(self.flavorlabels[1]+ u" - " + unicode(int(self.flavors[1]*10)),xy=(angles[1],.9),
+                          xytext=(angles[1],1.1),horizontalalignment='right',verticalalignment='bottom')
+        self.ax1.annotate(self.flavorlabels[2]+ u" - " + unicode(int(self.flavors[2]*10)),xy=(angles[2],.9),
+                          xytext=(angles[2],1.1),horizontalalignment='right',verticalalignment='bottom')
+        self.ax1.annotate(self.flavorlabels[3]+ u" - " + unicode(int(self.flavors[3]*10)),xy=(angles[3],.9),
+                          xytext=(angles[3],1.1),horizontalalignment='right',verticalalignment='bottom')
+        self.ax1.annotate(self.flavorlabels[4]+ u" - " + unicode(int(self.flavors[4]*10)),
+                          xy=(angles[4],.9),xytext=(angles[4],1.1),horizontalalignment='right',verticalalignment='bottom')
+        self.ax1.annotate(self.flavorlabels[5]+ u" - " + unicode(int(self.flavors[5]*10)),xy=(angles[5],.9),
+                          xytext=(angles[5],1.1),horizontalalignment='left',verticalalignment='bottom')
+        self.ax1.annotate(self.flavorlabels[6]+ u" - " + unicode(int(self.flavors[6]*10)),xy=(angles[6],.9),
+                          xytext=(angles[6],1.1),horizontalalignment='left',verticalalignment='bottom')
+        self.ax1.annotate(self.flavorlabels[7]+ u" - " + unicode(int(self.flavors[7]*10)),xy=(angles[7],.9),
+                          xytext=(angles[7],1.1),horizontalalignment='left',verticalalignment='bottom')
+        self.ax1.annotate(self.flavorlabels[8]+ u" - " + unicode(int(self.flavors[8]*10)),xy=(angles[8],.9),
+                          xytext=(angles[8],1.1),horizontalalignment='left',verticalalignment='bottom')
 
-            #Needs same dimension in order to plot. To close circle we may need one more element. 
-            if len(angles) < len(self.flavors):
-                angles.append(angles[-1])  
+        #Needs same dimension in order to plot. To close circle we may need one more element. 
+        if len(angles) < len(self.flavors):
+            angles.append(angles[-1])  
 
-            score = 0.
-            for i in range(9):
-                score += self.flavors[i]
-            score /= 9.
-            score *= 100.
-            
-            txt = u"%.2f" %score
+        score = 0.
+        for i in range(9):
+            score += self.flavors[i]
+        score /= 9.
+        score *= 100.
+        
+        txt = u"%.2f" %score
 
-            self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
+        self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
 
-            #needs matplotlib 1.0.0+
-            self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
-               
-            self.ax1.plot(angles,self.flavors)
-            self.fig.canvas.draw()
+        #needs matplotlib 1.0.0+
+        self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
+           
+        self.ax1.plot(angles,self.flavors)
+        self.fig.canvas.draw()
             
 
     #Turns ON flag self.flagon to read and plot. Called from push button_1. 
@@ -1707,14 +1721,20 @@ class tgraphcanvas(FigureCanvas):
         aw.soundpop()        
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
+        
+        if self.desinerflag:
+           self.convert_designer() 
+           return
+        
         self.flagon = False
         aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
         aw.button_1.setDisabled(False)
         aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         aw.soundpop()
+        
         if self.device == 18:        
             self.createFromManual()           
-
+        
    
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
@@ -1763,42 +1783,40 @@ class tgraphcanvas(FigureCanvas):
     def markDryEnd(self):
         if self.flagon:
             # record Dry end only if Charge mark has been done
-            if self.startend[0]:
-                if self.device != 18:
-                    self.dryend[0] = self.timeclock.elapsed()/1000.
-                    self.dryend[1] = self.temp2[-1]
-                    self.timeindex[1] = len(self.timex)-1
+            
+            if self.device != 18:
+                self.dryend[0] = self.timeclock.elapsed()/1000.
+                self.dryend[1] = self.temp2[-1]
+                self.timeindex[1] = len(self.timex)-1
 
-                else:
-                    tx = self.timeclock.elapsed()/1000.
-                    et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)
-                        self.dryend[0] = tx
-                        self.dryend[1] = bt
-                        self.timeindex[1] = len(self.timex)-1
-                    else:
-                        return
-                    
-                #calculate time elapsed since charge time
-                st1 = u"DE " + self.stringfromseconds(self.dryend[0] - self.startend[0])
-                #anotate temperature
-                self.ystep = self.findtextgap(self.startend[1],self.dryend[1])
-                self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]+self.ystep), 
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-
-                aw.button_19.setDisabled(True)
-                aw.button_19.setFlat(True)
-                message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.dryend[1]) + self.mode)
-                
-                if aw.qmc.phasesbuttonflag:     
-                    self.phases[1] = int(round(self.dryend[1]))
-                    self.redraw()     
             else:
-                message = QApplication.translate("Message Area","Charge mark is missing. Do that first", None, QApplication.UnicodeUTF8)
+                tx = self.timeclock.elapsed()/1000.
+                et,bt = aw.ser.NONE()
+                if et != -1 and bt != -1:
+                    self.drawmanual(et,bt,tx)
+                    self.dryend[0] = tx
+                    self.dryend[1] = bt
+                    self.timeindex[1] = len(self.timex)-1
+                else:
+                    return
+                
+            #calculate time elapsed since charge time
+            st1 = u"DE " + self.stringfromseconds(self.dryend[0] - self.startend[0])
+            #anotate temperature
+            self.ystep = self.findtextgap(self.startend[1],self.dryend[1])
+            self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]+self.ystep), 
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            #anotate time
+            self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-self.ystep),
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+            aw.button_19.setDisabled(True)
+            aw.button_19.setFlat(True)
+            message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.dryend[1]) + self.mode)
+            
+            if aw.qmc.phasesbuttonflag:     
+                self.phases[1] = int(round(self.dryend[1]))
+                self.redraw()     
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
 
@@ -1809,44 +1827,40 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cstart(self):
         if self.flagon:
             # record 1Cs only if Charge mark has been done
-            if self.startend[0]:
-                if self.device != 18:                
-                    self.varC[0] = self.timeclock.elapsed()/1000.
-                    self.varC[1] = self.temp2[-1]
+            if self.device != 18:                
+                self.varC[0] = self.timeclock.elapsed()/1000.
+                self.varC[1] = self.temp2[-1]
+                self.timeindex[2] = len(self.timex)-1
+            else:
+                tx = self.timeclock.elapsed()/1000.
+                et,bt = aw.ser.NONE()
+                if et != -1 and bt != -1:
+                    self.drawmanual(et,bt,tx)                               
+                    self.varC[0] = tx
+                    self.varC[1] = bt
                     self.timeindex[2] = len(self.timex)-1
                 else:
-                    tx = self.timeclock.elapsed()/1000.
-                    et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)                               
-                        self.varC[0] = tx
-                        self.varC[1] = bt
-                        self.timeindex[2] = len(self.timex)-1
-                    else:
-                        return
-                #calculate time elapsed since charge time
-                st1 = u"FCs " + self.stringfromseconds(self.varC[0]-self.startend[0])
-                #anotate temperature
-                if self.dryend[0]:
-                    self.ystep = self.findtextgap(self.dryend[1],self.varC[1])
-                else:
-                    self.ystep = self.findtextgap(self.startend[1],self.varC[1])                
-                self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1] + self.ystep), 
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-
-                aw.button_3.setDisabled(True)
-                aw.button_3.setFlat(True)
-                message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[1]) + self.mode)
-
-                if aw.qmc.phasesbuttonflag:     
-                    self.phases[2] = int(round(self.varC[1]))
-                    self.redraw()
-
+                    return
+            #calculate time elapsed since charge time
+            st1 = u"FCs " + self.stringfromseconds(self.varC[0]-self.startend[0])
+            #anotate temperature
+            if self.dryend[0]:
+                self.ystep = self.findtextgap(self.dryend[1],self.varC[1])
             else:
-                message = QApplication.translate("Message Area","Charge mark is missing. Do that first", None, QApplication.UnicodeUTF8)
+                self.ystep = self.findtextgap(self.startend[1],self.varC[1])                
+            self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1] + self.ystep), 
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            #anotate time
+            self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-self.ystep),
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+            aw.button_3.setDisabled(True)
+            aw.button_3.setFlat(True)
+            message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[1]) + self.mode)
+
+            if aw.qmc.phasesbuttonflag:     
+                self.phases[2] = int(round(self.varC[1]))
+                self.redraw()
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
 
@@ -2158,7 +2172,8 @@ class tgraphcanvas(FigureCanvas):
                 time = self.stringfromseconds(self.startend[2]-self.startend[0])
                 #end temperature
 
-                QApplication.translate("Scope Label", "[BT = %1 - %2] [ETarea - BTarea = %3] [Time = %4]", None, QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.startend[3] + self.mode).arg(unicode(deltaAcc)).arg(time)                              
+                strline = QApplication.translate("Scope Label", "[BT = %1 - %2] [ETarea - BTarea = %3] [Time = %4]", None,
+                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.startend[3] + self.mode).arg(unicode(deltaAcc)).arg(time)                              
                             
                 #text metrics 
                 #if self.mode == u"C":
@@ -2652,6 +2667,98 @@ class tgraphcanvas(FigureCanvas):
         aw.sendmessage(error)
 
         QTimer.singleShot(600, self.restore_message_label)  #set a time less than 1 second to restore color
+
+    ####################  PROFILE DESIGNER   ###################################################################################
+
+    def designer(self):
+        if len(self.timex):
+            reply = QMessageBox.question(self,u"Unsave data found","Continue will delete all previous data.\nContinue?",
+                                QMessageBox.Yes|QMessageBox.Cancel)
+            if reply == QMessageBox.Cancel:
+                return 
+
+        #check x limits
+        if self.endofx < 960:
+            self.endofx = 960
+            self.redraw()
+
+        #create mouse events            
+        self.cidpress = self.fig.canvas.mpl_connect('pick_event', self.on_press)
+        self.cidrelease = self.fig.canvas.mpl_connect('button_release_event', self.on_release)
+        self.cidmotion = self.fig.canvas.mpl_connect('motion_notify_event', self.on_motion)
+        
+        self.mousepress = None
+        self.reset()
+        aw.sendmessage("Press [OFF] when done")
+        self.timex = [50,300,540,660,800]
+        if self.mode == "C":
+            self.temp1 = [290,290,290,290,290]
+            self.temp2 = [200,150,200,220,240]   #CHARGE, DRY END, FCs, SCs, DROP
+        else:
+            self.temp1 = [500,500,500,500,500]
+            self.temp2 = [380,300,390,410,420]
+
+        self.ax.plot(self.timex,self.temp2,color=self.palette["bt"])
+        self.ax.plot(self.timex,self.temp2, "ro",picker=5)
+        self.ax.plot(self.timex,self.temp1,color=self.palette["met"])
+        self.ax.plot(self.timex,self.temp1,"bo",picker=5)
+        self.fig.canvas.draw()
+
+    def on_press(self,event):
+        self.indexpoint = event.ind
+        self.mousepress = True
+        
+        line = event.artist
+        #identify which line is being edited
+        ydata = line.get_ydata()
+        if ydata[0] == self.temp1[0]:  
+            self.workingline = 1
+        else:
+            self.workingline = 2
+        
+    def on_release(self,event):
+        self.mousepress = False
+        pass
+
+    def on_motion(self,event):
+        if not self.mousepress:
+            return
+        else:
+            self.timex[self.indexpoint] = event.xdata
+            if self.workingline == 1:
+                self.temp1[self.indexpoint] = event.ydata
+            else:
+                self.temp2[self.indexpoint] = event.ydata
+            self.ax.lines = []
+            self.ax.plot(self.timex,self.temp2,color=self.palette["bt"])
+            self.ax.plot(self.timex,self.temp2, "ro",picker=5)
+            self.ax.plot(self.timex,self.temp1,color=self.palette["met"])
+            self.ax.plot(self.timex,self.temp1,"bo",picker=5)            
+            self.fig.canvas.draw()
+
+    def convert_designer(self):
+        self.startend[0] = self.timex[0]
+        self.startend[1] = self.temp2[0]
+        self.dryend[0] = self.timex[1]
+        self.dryend[1] = self.temp2[1]
+        self.varC[0] = self.timex[2]
+        self.varC[1] = self.temp2[2]
+        self.varC[4] = self.timex[3]
+        self.varC[5] = self.temp2[3]
+        self.startend[2] = self.timex[4]
+        self.startend[3] = self.temp2[4]
+        
+        self.createFromManual()        
+        self.timebackgroundindexupdate()
+        self.disconnect_designer()
+        self.redraw()
+        
+    def disconnect_designer(self):
+        self.desinerflag = False
+        self.fig.canvas.mpl_disconnect(self.cidpress)
+        self.fig.canvas.mpl_disconnect(self.cidrelease)
+        self.fig.canvas.mpl_disconnect(self.cidmotion)
+
                 
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem
@@ -2737,13 +2844,11 @@ class ApplicationWindow(QMainWindow):
         self.HUDfunction = 0
 
         self.sound = soundcrack(QWidget)
-        #self.profDesign = profiledesigner(QWidget)
         
         self.stack = QStackedWidget()
         self.stack.addWidget(self.qmc)
         self.stack.addWidget(self.HUD)
         self.stack.addWidget(self.sound)
-        #self.stack.addWidget(self.profDesign)
         self.stack.setCurrentIndex(0)
         #events config
         self.eventsbuttonflag = 1
@@ -3275,6 +3380,12 @@ class ApplicationWindow(QMainWindow):
         flavorAction = QAction(UIconst.ROAST_MENU_CUPPROFILE,self)
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
         self.GraphMenu.addAction(flavorAction)
+        
+        self.GraphMenu.addSeparator()
+
+        designerAction = QAction("Designer",self)
+        self.connect(designerAction ,SIGNAL("triggered()"),self.startdesigner)
+        self.GraphMenu.addAction(designerAction)
         
         self.GraphMenu.addSeparator()
         
@@ -5227,6 +5338,10 @@ $cupping_notes
     def flavorchart(self):
         dialog = flavorDlg(self)
         dialog.show()
+
+    def startdesigner(self):
+        self.qmc.designer()
+        self.qmc.desinerflag = True
         
     def editgraph(self):
         dialog = editGraphDlg(self)
@@ -10981,12 +11096,6 @@ class PXRpidDlgControl(QDialog):
         string += u"\nUse the Parameter Loader Software by Fuji if you need to\n\n"
         string += u"\n\n\nContinue?" 
  
-        reply = QMessageBox.question(self,u"Ramp Soak start-end mode",string,
-                            QMessageBox.Yes|QMessageBox.Cancel)
-        if reply == QMessageBox.Cancel:
-            return 0
-        elif reply == QMessageBox.Yes:
-            return 1  
 
     def setONOFFrampsoak(self,flag):         
         #flag =0 OFF, flag = 1 ON, flag = 2 hold
@@ -11338,60 +11447,7 @@ class soundcrack(FigureCanvas):
         
         return F,amplitude  
 
-# UNDER WORK 
-#######################################################################################
-#################### PROFILE DESIGNER  PROJECT ########################################
-#######################################################################################
 
-class profiledesigner(FigureCanvas):
-    def __init__(self,parent):
-        self.fig = Figure(facecolor=u'lightgrey')
-        FigureCanvas.__init__(self, self.fig)
-
-        self.ax = self.fig.add_subplot(111, axisbg= aw.qmc.palette["background"])
-
-
-        #Set axes same as in __init__
-        self.ax.set_xlim(0, 1200)               #(0-20 mins)
-            
-        self.ax.grid(True,linewidth=2,color=aw.qmc.palette["grid"])
-        self.ax.set_ylabel(aw.qmc.mode,size=16,color =aw.qmc.palette["ylabel"])
-        self.ax.set_xlabel('Time',size=16,color = aw.qmc.palette["xlabel"])
-        self.ax.set_title("Profile Designer",size=20,color=aw.qmc.palette["title"],fontweight='bold')
-        for tick in self.ax.yaxis.get_major_ticks():
-            tick.label2On = True
-            
-        #draw water marks for dry phase region, mid phase region, and finish phase region
-        trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
-        rect1 = patches.Rectangle((0,aw.qmc.phases[0]), width=1, height=(aw.qmc.phases[1]-aw.qmc.phases[0]),
-                                  transform=trans, color=aw.qmc.palette["rect1"],alpha=0.3)
-        self.ax.add_patch(rect1)
-        rect2 = patches.Rectangle((0,aw.qmc.phases[1]), width=1, height=(aw.qmc.phases[2]-aw.qmc.phases[1]),
-                                  transform=trans, color=aw.qmc.palette["rect2"],alpha=0.3)
-        self.ax.add_patch(rect2)
-        rect3 = patches.Rectangle((0,aw.qmc.phases[2]), width=1, height=(aw.qmc.phases[3] - aw.qmc.phases[2]),
-                                  transform=trans, color=aw.qmc.palette["rect3"],alpha=0.3)
-        self.ax.add_patch(rect3)
-
-        #update Y label colors
-        for label in self.ax.yaxis.get_ticklabels():
-            label.set_color(aw.qmc.palette["ylabel"])
-
-        self.xaxistosm()
-
-        self.ax.plot([20,60],[300, 200],color =  "blue")
-        self.ax.plot([60,180],[200, 300],color =  "blue")
-        self.ax.plot([180,360],[300, 400],color =  "blue")
-
-        self.fig.canvas.draw() 
-
-    #creates X axis labels ticks in mm:ss acording to the endofx limit
-    def xaxistosm(self):
-        formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - round(self.startend[0]), 60))
-        locator = ticker.IndexLocator(120, round(self.startend[0]))
-        self.ax.xaxis.set_major_formatter(formatter)
-        self.ax.xaxis.set_major_locator(locator)
-    
         
 ############################################################################
 ######################## FUJI PXG4 PID CONTROL DIALOG ######################
