@@ -2512,7 +2512,9 @@ class tgraphcanvas(FigureCanvas):
             reply = QMessageBox.question(self,u"Convert BT?",question,
                                 QMessageBox.Yes|QMessageBox.Cancel)
 
-            if reply == QMessageBox.Yes:
+            if reply == QMessageBox.Cancel:
+                return 0
+            elif reply == QMessageBox.Yes:
                 #find new indexes for events
                 for i in range(len(self.specialevents)):
                     for p in range(len(time)):
@@ -2529,6 +2531,8 @@ class tgraphcanvas(FigureCanvas):
 
             self.timeindexupdate()
             self.redraw()
+
+            return 1
        
         except ValueError:
             self.adderror(u"Value Error: createFromManual() ")
@@ -2748,8 +2752,11 @@ class tgraphcanvas(FigureCanvas):
         self.startend[2] = self.timex[4]
         self.startend[3] = self.temp2[4]
         
-        self.createFromManual()        
-        self.timebackgroundindexupdate()
+        answer = self.createFromManual()
+        if answer:
+            aw.sendmessage("New profile created")
+        else:
+            return
         self.disconnect_designer()
         self.redraw()
         
