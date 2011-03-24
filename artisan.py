@@ -440,7 +440,7 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventscopy = []
         self.specialeventsStringscopy = []
         self.specialeventsvaluecopy = []
-        self.specialeventstype = []
+        self.specialeventstypecopy = []
         
     #event handler from startTimer()
     def timerEvent(self, evt):
@@ -2826,7 +2826,7 @@ class tgraphcanvas(FigureCanvas):
         self.disconnect_designer()
         
         #check events
-        if len(self.eventtimecopy):
+        if len(self.specialeventscopy):
             for i in range(len(self.eventtimecopy)):
                 self.specialevents.append(self.time2index(self.eventtimecopy[i]))
             self.specialeventsStrings = self.specialeventsStringscopy
@@ -9492,7 +9492,7 @@ class designerconfigDlg(QDialog):
         else:
             aw.qmc.designerconfig[id] = 1
             
-    	if not len(aw.qmc.eventtimecopy):
+    	if not len(aw.qmc.specialeventscopy):
             aw.qmc.designerinit()
         else:
             #unfinished
