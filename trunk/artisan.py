@@ -8618,7 +8618,11 @@ class StatisticsDLG(QDialog):
 
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
 
-        
+        self.time = QCheckBox("Time")
+        self.bar = QCheckBox("Bar")
+        self.flavor = QCheckBox("Evaluation")
+        self.area = QCheckBox("Characteristics")
+                
         self.mindryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))        
         self.maxdryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[1]))        
         self.minmidedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[2]))        
