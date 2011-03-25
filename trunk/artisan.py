@@ -2752,11 +2752,11 @@ class tgraphcanvas(FigureCanvas):
 
     #CONTEXT MENU  = Right click
     def on_press(self,event):
-        self.currentx = event.xdata 
-        self.currenty = event.ydata
         if event.inaxes==None: return
         if event.button != 3: return   #select right click only
-
+        self.currentx = event.xdata 
+        self.currenty = event.ydata
+        
         menu = QMenu(self)
         configAction = QAction("Designer Config...",self)
         self.connect(configAction,SIGNAL("triggered()"),self.desconfig)
@@ -2780,7 +2780,7 @@ class tgraphcanvas(FigureCanvas):
         line = event.artist
         #identify which line is being edited
         ydata = line.get_ydata()
-        if ydata[0] == self.temp1[0]:  
+        if ydata[1] == self.temp1[1]:  
             self.workingline = 1
         else:
             self.workingline = 2
@@ -2821,14 +2821,15 @@ class tgraphcanvas(FigureCanvas):
         if len(self.timex) > 2: 
             time,t1,t2 = [self.timex[1]],[self.temp1[1]],[self.temp2[1]]  #get first data point (INIT point)
         else:
-            self.adderror("Unable to import profile in to Designer") 
+            self.reset()
+            self.adderror("Unable to import profile in to Designer")
         for i in range(len(self.timeindex)):
             if self.timeindex[i]:
                 self.designerconfig[i+1] = 1
                 time.append(self.timex[self.timeindex[i]])
                 t1.append(self.temp1[self.timeindex[i]])
                 t2.append(self.temp2[self.timeindex[i]])
-        
+                
         self.reset()        
         self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]
         self.redrawdesigner()
@@ -2885,6 +2886,7 @@ class tgraphcanvas(FigureCanvas):
                 temp1copy.pop(i)
                 temp2copy.pop(i)
                 
+
         count = 0        
         if self.designerconfig[0]:
             count += 1
@@ -2896,6 +2898,8 @@ class tgraphcanvas(FigureCanvas):
             count += 1
         else:
             self.designertimeindex[1] = 0
+            self.startend[0] = 0
+            self.startend[1] = 0
         if self.designerconfig[2]:
             self.dryend[0] = timexcopy[count]
             self.dryend[1] = temp2copy[count]
@@ -2903,6 +2907,8 @@ class tgraphcanvas(FigureCanvas):
             count += 1
         else:
             self.designertimeindex[2] = 0
+            self.dryend[0] = 0
+            self.dryend[1] = 0
         if self.designerconfig[3]:
             self.varC[0] = timexcopy[count]
             self.varC[1] = temp2copy[count]
@@ -2910,6 +2916,8 @@ class tgraphcanvas(FigureCanvas):
             count += 1
         else:
             self.designertimeindex[3] = 0
+            self.varC[0] = 0
+            self.varC[1] = 0
         if self.designerconfig[4]:
             self.varC[2] = timexcopy[count]
             self.varC[3] = temp2copy[count]
@@ -2917,6 +2925,8 @@ class tgraphcanvas(FigureCanvas):
             count += 1
         else:
             self.designertimeindex[4] = 0
+            self.varC[2] = 0
+            self.varC[3] = 3
         if self.designerconfig[5]:
             self.varC[4] = timexcopy[count]
             self.varC[5] = temp2copy[count]
@@ -2924,6 +2934,8 @@ class tgraphcanvas(FigureCanvas):
             count += 1
         else:
             self.designertimeindex[5] = 0
+            self.varC[4] = 0
+            self.varC[5] = 0
         if self.designerconfig[6]:
             self.varC[6] = timexcopy[count]
             self.varC[7] = temp2copy[count]
@@ -2931,37 +2943,17 @@ class tgraphcanvas(FigureCanvas):
             count += 1
         else:
             self.designertimeindex[6] = 0
+            self.varC[6] = 0
+            self.varC[7] = 0
         if self.designerconfig[7]:
             self.startend[2] = timexcopy[count]
             self.startend[3] = temp2copy[count]
             self.designertimeindex[7] = self.time2index(self.startend[2])
         else:
             self.designertimeindex[7] = 0
+            self.startend[2] = 0
+            self.startend[3] = 0
         self.xaxistosm()
-
-    def reviewDmarks(self):
-        if not self.designerconfig[1]:
-           self.startend[0] = 0
-           self.startend[1] = 0
-        if not self.designerconfig[2]:
-           self.dryend[0] = 0
-           self.dryend[1] = 0
-        if not self.designerconfig[3]:
-           self.varC[0] = 0
-           self.varC[1] = 0
-        if not self.designerconfig[4]:
-           self.varC[2] = 0
-           self.varC[3] = 0
-        if not self.designerconfig[5]:
-           self.varC[4] = 0
-           self.varC[5] = 0
-        if not self.designerconfig[6]:
-           self.varC[6] = 0
-           self.varC[7] = 0
-        if not self.designerconfig[7]:
-           self.startend[2] = 0
-           self.startend[3] = 0
-                       
 
     #activates mouse events	
     def connect_designer(self):
@@ -2983,7 +2975,10 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.mpl_disconnect(self.rightclickcid)
 
         self.setCursor(Qt.ArrowCursor)
-      
+
+        #erase working dirs
+        self.newpointindex = []
+              
     #launches designer config Window    
     def desconfig(self):
         dialog = designerconfigDlg(self)
@@ -9594,17 +9589,18 @@ class designerconfigDlg(QDialog):
         for i in range(len(oldconfig)):
             if oldconfig[i] != aw.qmc.designerconfig[i]:
                 if not aw.qmc.designerconfig[id]:
+                    #erase point
                     aw.qmc.timex.pop(aw.qmc.designertimeindex[i])
                     aw.qmc.temp1.pop(aw.qmc.designertimeindex[i])
                     aw.qmc.temp2.pop(aw.qmc.designertimeindex[i])
                     break
                 else:
+                    #add a point
                     aw.qmc.timex.insert(aw.qmc.designertimeindex[i-1]+1,aw.qmc.designertimeinit[i])
                     aw.qmc.temp1.insert(aw.qmc.designertimeindex[i-1]+1,aw.qmc.designertemp1init[i])
                     aw.qmc.temp2.insert(aw.qmc.designertimeindex[i-1]+1,aw.qmc.designertemp2init[i])
                     break
         aw.qmc.setDmarks()
-        #aw.qmc.timeindexupdate()
         aw.qmc.redrawdesigner()        
         
     def loadconfigflags(self):
