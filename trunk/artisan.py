@@ -437,11 +437,18 @@ class tgraphcanvas(FigureCanvas):
         self.rightclickcid = 0
         self.workingline = 2  #selects ET or BT
         self.designerconfig = [1,1,1,1,1,1,1,1] #flags for INIT,CHARGE,DRYEND,FCs,FCe,SCs,SCe,DROP
-        self.specialeventscopy = []
+        self.eventtimecopy = []
         self.specialeventsStringscopy = []
         self.specialeventsvaluecopy = []
         self.specialeventstypecopy = []
-        
+        self.currentx = 0               #used to add point when right click
+        self.currenty = 0               #used to add point when right click
+        self.newpointindex = []
+        self.designertimeinit = [0,50,300,540,560,660,700,800]
+        self.designertemp1init = []
+        self.designertemp2init = []
+        self.designertimeindex = [0,0,0,0,0,0,0,0]
+
     #event handler from startTimer()
     def timerEvent(self, evt):
         if self.flagon:
@@ -2695,6 +2702,16 @@ class tgraphcanvas(FigureCanvas):
         self.connect_designer()
         self.reset()
         self.designerinit()
+
+    def setdesignerinitvars(self):
+        if self.mode == u"C":
+                                      #ini,CH, DE, Fcs,Fce,Scs,Sce,Drop  
+            self.designertemp1init = [290, 290,290,290,290,290,290,290]
+            self.designertemp2init = [200,200,150,200,210,220,225,240]   #INIT,CHARGE,DRY END,FCs, FCe,SCs,SCe,DROP
+        elif self.mode == u"F":
+            self.designertemp1init = [500,500,500,500,500,500,500,500]
+            self.designertemp2init = [380,380,300,390,395,410,412,420]
+        
         
     #used to start designer from scracth (not from a loaded profile)	
     def designerinit(self):
@@ -2703,31 +2720,29 @@ class tgraphcanvas(FigureCanvas):
             self.endofx = 960
             self.redraw()
 
+        self.setdesignerinitvars()
+        
         aw.sendmessage("Press [OFF] when done")
         
         self.timex,self.temp1,self.temp2 = [],[],[]
-        
-        time = [0,50,300,540,560,660,700,800]
-        if self.mode == "C":
-            t1 = [290,290,290,290,290,290,290,290]
-            t2 = [200,200,150,200,210,220,225,240]   #INIT,CHARGE, DRY END, FCs, FCe,SCs,SCe,DROP
-        else:
-            t1 = [500,500,500,500,500,500,500,500]
-            t2 = [380,380,300,390,395,410,412,420]
-            
+                    
         for i in range(len(self.designerconfig)):
             if self.designerconfig[i]:
-                self.temp1.append(t1[i])
-                self.temp2.append(t2[i])
-                self.timex.append(time[i])
-                
+                self.temp1.append(self.designertemp1init[i])
+                self.temp2.append(self.designertemp2init[i])
+                self.timex.append(self.designertimeinit[i])
+
+
         self.setDmarks()
-        #initial plot
+        self.timeindexupdate()        
         self.redrawdesigner()
 
     #redraws designer()	
     def redrawdesigner(self):
-        self.ax.lines = []
+        if self.background:
+            self.ax.lines = self.ax.lines[0:4]
+        else:
+            self.ax.lines = []
         self.ax.plot(self.timex,self.temp2,color=self.palette["bt"])
         self.ax.plot(self.timex,self.temp2, "ro",picker=10)             #picker = 10 means 10 points tolerance
         self.ax.plot(self.timex,self.temp1,color=self.palette["met"])
@@ -2737,13 +2752,19 @@ class tgraphcanvas(FigureCanvas):
 
     #CONTEXT MENU  = Right click
     def on_press(self,event):
+        self.currentx = event.xdata 
+        self.currenty = event.ydata
         if event.inaxes==None: return
         if event.button != 3: return   #select right click only
-        
+
         menu = QMenu(self)
-        configAction = QAction("Launch Designer Config...",self)
+        configAction = QAction("Designer Config...",self)
         self.connect(configAction,SIGNAL("triggered()"),self.desconfig)
         menu.addAction(configAction)
+
+        addpointAction = QAction("Add point",self)
+        self.connect(addpointAction,SIGNAL("triggered()"),self.addpoint)
+        menu.addAction(addpointAction)        
         
         convertAction = QAction("Convert",self)
         self.connect(convertAction,SIGNAL("triggered()"),self.convert_designer)
@@ -2771,33 +2792,30 @@ class tgraphcanvas(FigureCanvas):
 
     #handler for moving point
     def on_motion(self,event):
-        if not self.mousepress:
-            return
+        if not self.mousepress: return
         else:
             self.timex[self.indexpoint] = event.xdata
             if self.workingline == 1:
                 self.temp1[self.indexpoint] = event.ydata
             else:
                 self.temp2[self.indexpoint] = event.ydata
+
+            #check for possible CHARGE time moving    
             self.setDmarks()
+
             #redraw
-            self.ax.lines = []
-            self.ax.plot(self.timex,self.temp2,color=self.palette["bt"])
-            self.ax.plot(self.timex,self.temp2, "ro",picker=5)
-            self.ax.plot(self.timex,self.temp1,color=self.palette["met"])
-            self.ax.plot(self.timex,self.temp1,"bo",picker=5)            
-            self.fig.canvas.draw()
+            self.redrawdesigner()
 
     #loads main points from a profile so that they can be edited
     def initfromprofile(self):
         #save events. They will be deleted on qmc.reset()
+        self.specialeventsStringscopy = self.specialeventsStrings[:]
+        self.specialeventsvaluecopy = self.specialeventsvalue[:]
+        self.specialeventstypecopy = self.specialeventstype[:]
         self.eventtimecopy = []
-        self.specialeventsStringscopy = self.specialeventsStrings
-        self.specialeventsvaluecopy = self.specialeventsvalue
-        self.specialeventstypecopy = self.specialeventstype 
         for i in range(len(self.specialevents)):
             self.eventtimecopy.append(self.timex[self.specialevents[i]])
-                              
+            
         #load designer flags
         self.designerconfig = [1,0,0,0,0,0,0,0]
         if len(self.timex) > 2: 
@@ -2810,11 +2828,30 @@ class tgraphcanvas(FigureCanvas):
                 time.append(self.timex[self.timeindex[i]])
                 t1.append(self.temp1[self.timeindex[i]])
                 t2.append(self.temp2[self.timeindex[i]])
-
+        
         self.reset()        
-        self.timex,self.temp1,self.temp2 = time,t1,t2
+        self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]
         self.redrawdesigner()
-                                 
+
+    def addpoint(self):
+        #current x, and y is obtained when doing right click in mouse: on_press()
+        #find index
+        for i in range(len(self.timex)):
+            if self.timex[i] > self.currentx:
+                break
+        
+        self.timex.insert(i,self.currentx)
+        self.temp2.insert(i,self.currenty)
+        self.temp1.insert(i,self.temp1[i])
+        self.newpointindex.append(i)
+        self.redrawdesigner()
+
+##    #removes point at time X
+##    def removepoint(self,time):
+##        
+##    
+
+                                
     #converts from a designer profile to a normal profile	        
     def convert_designer(self):
         self.setDmarks()
@@ -2826,48 +2863,105 @@ class tgraphcanvas(FigureCanvas):
         self.disconnect_designer()
         
         #check events
-        if len(self.specialeventscopy):
+        if len(self.eventtimecopy):
             for i in range(len(self.eventtimecopy)):
                 self.specialevents.append(self.time2index(self.eventtimecopy[i]))
-            self.specialeventsStrings = self.specialeventsStringscopy
-            self.specialeventsvalue = self.specialeventsvaluecopy
-            self.specialeventstype = self.specialeventstypecopy
+            self.specialeventsStrings = self.specialeventsStringscopy[:]
+            self.specialeventsvalue = self.specialeventsvaluecopy[:]
+            self.specialeventstype = self.specialeventstypecopy[:]
+           
         self.redraw()
 
     #obtains landmarks from timex,temp by reading designer config flags	
     def setDmarks(self):
-        count = 0
+        timexcopy = self.timex[:]       #NOTE: we need python to do a deep copy, not a shallow copy, therefore the [:]
+        temp1copy = self.temp1[:]
+        temp2copy = self.temp2[:]
+        
+        #make a barebone copy without any extra points
+        for i in range(len(self.timex)):
+            if i in self.newpointindex:
+                timexcopy.pop(i)
+                temp1copy.pop(i)
+                temp2copy.pop(i)
+                
+        count = 0        
         if self.designerconfig[0]:
             count += 1
+            self.designertimeindex[0] = 0
         if self.designerconfig[1]:
-            self.startend[0] = self.timex[count]
-            self.startend[1] = self.temp2[count]
+            self.startend[0] = timexcopy[count]
+            self.startend[1] = temp2copy[count]
+            self.designertimeindex[1] = self.time2index(self.startend[0])
             count += 1
+        else:
+            self.designertimeindex[1] = 0
         if self.designerconfig[2]:
-            self.dryend[0] = self.timex[count]
-            self.dryend[1] = self.temp2[count]
+            self.dryend[0] = timexcopy[count]
+            self.dryend[1] = temp2copy[count]
+            self.designertimeindex[2] = self.time2index(self.dryend[0])
             count += 1
+        else:
+            self.designertimeindex[2] = 0
         if self.designerconfig[3]:
-            self.varC[0] = self.timex[count]
-            self.varC[1] = self.temp2[count]
+            self.varC[0] = timexcopy[count]
+            self.varC[1] = temp2copy[count]
+            self.designertimeindex[3] = self.time2index(self.varC[0])
             count += 1
+        else:
+            self.designertimeindex[3] = 0
         if self.designerconfig[4]:
-            self.varC[2] = self.timex[count]
-            self.varC[3] = self.temp2[count]
+            self.varC[2] = timexcopy[count]
+            self.varC[3] = temp2copy[count]
+            self.designertimeindex[4] = self.time2index(self.varC[2])
             count += 1
+        else:
+            self.designertimeindex[4] = 0
         if self.designerconfig[5]:
-            self.varC[4] = self.timex[count]
-            self.varC[5] = self.temp2[count]
+            self.varC[4] = timexcopy[count]
+            self.varC[5] = temp2copy[count]
+            self.designertimeindex[5] = self.time2index(self.varC[4])
             count += 1
+        else:
+            self.designertimeindex[5] = 0
         if self.designerconfig[6]:
-            self.varC[6] = self.timex[count]
-            self.varC[7] = self.temp2[count]
+            self.varC[6] = timexcopy[count]
+            self.varC[7] = temp2copy[count]
+            self.designertimeindex[6] = self.time2index(self.varC[6])
             count += 1
+        else:
+            self.designertimeindex[6] = 0
         if self.designerconfig[7]:
-            self.startend[2] = self.timex[count]
-            self.startend[3] = self.temp2[count]
-            
-    	self.xaxistosm()
+            self.startend[2] = timexcopy[count]
+            self.startend[3] = temp2copy[count]
+            self.designertimeindex[7] = self.time2index(self.startend[2])
+        else:
+            self.designertimeindex[7] = 0
+        self.xaxistosm()
+
+    def reviewDmarks(self):
+        if not self.designerconfig[1]:
+           self.startend[0] = 0
+           self.startend[1] = 0
+        if not self.designerconfig[2]:
+           self.dryend[0] = 0
+           self.dryend[1] = 0
+        if not self.designerconfig[3]:
+           self.varC[0] = 0
+           self.varC[1] = 0
+        if not self.designerconfig[4]:
+           self.varC[2] = 0
+           self.varC[3] = 0
+        if not self.designerconfig[5]:
+           self.varC[4] = 0
+           self.varC[5] = 0
+        if not self.designerconfig[6]:
+           self.varC[6] = 0
+           self.varC[7] = 0
+        if not self.designerconfig[7]:
+           self.startend[2] = 0
+           self.startend[3] = 0
+                       
 
     #activates mouse events	
     def connect_designer(self):
@@ -2889,7 +2983,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.mpl_disconnect(self.rightclickcid)
 
         self.setCursor(Qt.ArrowCursor)
-
+      
     #launches designer config Window    
     def desconfig(self):
         dialog = designerconfigDlg(self)
@@ -9491,19 +9585,27 @@ class designerconfigDlg(QDialog):
         self.setLayout(mainLayout)        
 
     def changeflags(self,x,id):
+        oldconfig = aw.qmc.designerconfig[:]
+        #change config
         if aw.qmc.designerconfig[id]:
-            aw.qmc.designerconfig[id] = 0
+            aw.qmc.designerconfig[id] = 0               
         else:
             aw.qmc.designerconfig[id] = 1
-            
-    	if not len(aw.qmc.specialeventscopy):
-            aw.qmc.designerinit()
-        else:
-            #unfinished
-            pass
-##            aw.qmc.setDmarks()
-##            aw.qmc.redrawdesigner()
-            
+        for i in range(len(oldconfig)):
+            if oldconfig[i] != aw.qmc.designerconfig[i]:
+                if not aw.qmc.designerconfig[id]:
+                    aw.qmc.timex.pop(aw.qmc.designertimeindex[i])
+                    aw.qmc.temp1.pop(aw.qmc.designertimeindex[i])
+                    aw.qmc.temp2.pop(aw.qmc.designertimeindex[i])
+                    break
+                else:
+                    aw.qmc.timex.insert(aw.qmc.designertimeindex[i-1]+1,aw.qmc.designertimeinit[i])
+                    aw.qmc.temp1.insert(aw.qmc.designertimeindex[i-1]+1,aw.qmc.designertemp1init[i])
+                    aw.qmc.temp2.insert(aw.qmc.designertimeindex[i-1]+1,aw.qmc.designertemp2init[i])
+                    break
+        aw.qmc.setDmarks()
+        #aw.qmc.timeindexupdate()
+        aw.qmc.redrawdesigner()        
         
     def loadconfigflags(self):
         if aw.qmc.designerconfig[0]:
