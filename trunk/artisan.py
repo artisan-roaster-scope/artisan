@@ -2982,13 +2982,11 @@ class tgraphcanvas(FigureCanvas):
             if reply == QMessageBox.Cancel:
                 return 
             elif reply == QMessageBox.Yes:
-                print "before", self.newpointindex
                 self.newpointindex.remove(index)
                 #update index
                 for i in range(len(self.newpointindex)):
                     if i > index:
                         self.newpointindex[i] -= 1
-                print "after", self.newpointindex
                 self.timex.pop(index)        
                 self.temp1.pop(index)
                 self.temp2.pop(index)    
