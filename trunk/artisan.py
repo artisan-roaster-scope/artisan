@@ -1023,6 +1023,7 @@ class tgraphcanvas(FigureCanvas):
         self.newpointindex = []
         self.designertemp1init = []
         self.designertemp2init = []
+        self.newpointindex = []
         self.designertimeinit = [50,300,540,560,660,700,800]
         if self.mode == u"C":
                                       #CH, DE, Fcs,Fce,Scs,Sce,Drop  
@@ -2770,7 +2771,7 @@ class tgraphcanvas(FigureCanvas):
             self.eventtimecopy.append(self.timex[self.specialevents[i]])
             
         #load designer flags
-        self.designerconfig = [0,0,0,0,0,0,0]  #init to zero except first point
+        self.designerconfig = [0,0,0,0,0,0,0]  #init to zero 
         time,t1,t2 = [],[],[]                               #temp lists
         for i in range(len(self.timeindex)):
             if self.timeindex[i]:                           #match from timeindex
@@ -2899,27 +2900,63 @@ class tgraphcanvas(FigureCanvas):
 
     def addpoint(self):
         #current x, and y is obtained when doing right click in mouse: on_press()
-        #find index
-        for i in range(len(self.timex)):
-            if self.timex[i] > self.currentx:
-                break
-            
-        #find closest line
-        d1 = abs(self.temp1[i] - self.currenty)
-        d2 = abs(self.temp2[i] - self.currenty)
-
-        self.timex.insert(i,self.currentx)        
-        if d2 < d1:
-            self.temp2.insert(i,self.currenty)
-            self.temp1.insert(i,self.temp1[i])
-        else:
-            self.temp2.insert(i,self.temp2[i])
-            self.temp1.insert(i,self.currenty)            
-        self.newpointindex.append(i)
         
+        if self.timex[-1] < self.currentx:       #if point is beyond max timex
+            #find closest line
+            d1 = abs(self.temp1[-1] - self.currenty)
+            d2 = abs(self.temp2[-1] - self.currenty)
+            if d2 < d1:
+                self.temp2.append(self.currenty)
+                self.temp1.append(self.temp1[-1])
+            else:
+                self.temp2.append(self.temp2[-1])
+                self.temp1.append(self.currenty) 
+            self.timex.append(self.currentx)
+            self.newpointindex.sort()
+            self.newpointindex.append(len(self.timex)-1) #no need to update newpointindex
+
+        elif self.timex[0] > self.currentx:         #if point is bellow min timex
+            #find closest line
+            d1 = abs(self.temp1[0] - self.currenty)
+            d2 = abs(self.temp2[0] - self.currenty)
+            if d2 < d1:
+                self.temp2.insert(0,self.currenty)
+                self.temp1.insert(0,self.temp1[0])
+            else:
+                self.temp2.insert(0,self.temp2[0])
+                self.temp1.insert(0,self.currenty) 
+            self.timex.insert(0,self.currentx)
+            self.newpointindex.sort()
+            self.newpointindex.insert(0,0)
+            #update newpoints list
+            for u in range(1,len(self.newpointindex)):
+                self.newpointindex[u] += 1
+                
+        else:                                           #mid range
+            #find index
+            for i in range(len(self.timex)):
+                if self.timex[i] > self.currentx:  
+                    break
+            #find closest line
+            d1 = abs(self.temp1[i] - self.currenty)
+            d2 = abs(self.temp2[i] - self.currenty)
+            self.timex.insert(i,self.currentx)        
+            if d2 < d1:
+                self.temp2.insert(i,self.currenty)
+                self.temp1.insert(i,self.temp1[i])
+            else:
+                self.temp2.insert(i,self.temp2[i])
+                self.temp1.insert(i,self.currenty)
+            self.newpointindex.append(i)
+            #update newpoints list
+            self.newpointindex.sort()
+            start = self.newpointindex.index(i)
+            for x in range(len(self.newpointindex)):
+                if x > start:
+                    self.newpointindex[x] += 1
+                    
         self.setDmarks()
         self.redrawdesigner()
-
 
     #removes point
     def removepoint(self):
@@ -2945,7 +2982,13 @@ class tgraphcanvas(FigureCanvas):
             if reply == QMessageBox.Cancel:
                 return 
             elif reply == QMessageBox.Yes:
-                self.newpointindex.remove(index)            
+                print "before", self.newpointindex
+                self.newpointindex.remove(index)
+                #update index
+                for i in range(len(self.newpointindex)):
+                    if i > index:
+                        self.newpointindex[i] -= 1
+                print "after", self.newpointindex
                 self.timex.pop(index)        
                 self.temp1.pop(index)
                 self.temp2.pop(index)    
@@ -2977,13 +3020,14 @@ class tgraphcanvas(FigureCanvas):
         timexcopy = self.timex[:]       #NOTE: we need python to do a deep copy, not a shallow copy, therefore the [:]
         temp1copy = self.temp1[:]
         temp2copy = self.temp2[:]
-        
+
+
         #make a barebone copy without any extra added points except main marks (FC, etc)
         for i in range (len(self.newpointindex)):
             timexcopy.remove(self.timex[self.newpointindex[i]])
             temp1copy.remove(self.temp1[self.newpointindex[i]])
             temp2copy.remove(self.temp2[self.newpointindex[i]])
-
+       
         count = 0        
         if self.designerconfig[0]:
             self.timeindex[0] = self.time2index(timexcopy[count])
@@ -3070,7 +3114,6 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.canvas.mpl_disconnect(self.designerconnections[i])
         self.setCursor(Qt.ArrowCursor)
         self.designerflag = False
-
               
     #launches designer config Window    
     def desconfig(self):
