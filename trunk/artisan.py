@@ -339,8 +339,9 @@ class tgraphcanvas(FigureCanvas):
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
         
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
+        # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 750
-        self.ylimit_min = 0
+        self.ylimit_min = 0        
         self.endofx = 60
         self.startofx = 0
         self.keeptimeflag = 1
@@ -1024,7 +1025,6 @@ class tgraphcanvas(FigureCanvas):
         self.designertemp1init = []
         self.designertemp2init = []
         self.newpointindex = []
-        self.designertimeinit = [50,300,540,560,660,700,800]
         if self.mode == u"C":
                                       #CH, DE, Fcs,Fce,Scs,Sce,Drop  
             self.designertemp1init = [290,290,290,290,290,290,290]
@@ -2745,7 +2745,7 @@ class tgraphcanvas(FigureCanvas):
             self.endofx = 960
             self.redraw()
 
-        self.setdesignerinitvars()
+        #self.setdesignerinitvars()
         
         aw.sendmessage("Designer ON. Press [OFF] to save file and finish")
         
@@ -2772,29 +2772,49 @@ class tgraphcanvas(FigureCanvas):
             
         #load designer flags
         self.designerconfig = [0,0,0,0,0,0,0]  #init to zero 
-        time,t1,t2 = [],[],[]                               #temp lists
+        time,t1,t2 = [],[],[]                               #ceate empty temp lists
         for i in range(len(self.timeindex)):
-            if self.timeindex[i]:                           #match from timeindex
+            if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
                 self.designerconfig[i] = 1                
                 time.append(self.timex[self.timeindex[i]])  #add time
                 t1.append(self.temp1[self.timeindex[i]])    #add temp1
                 t2.append(self.temp2[self.timeindex[i]])    #add temp2
-                
-        self.reset()                                            #erase profile
-        self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists after reset()
-        self.setDmarks()                                        #find new indexes
-        self.redrawdesigner()                                   #redraw
 
-    #redraws designer()	
+    	endofx  = self.endofx               
+        self.reset()                                            #erase profile and screen
+        #restore xend limit
+        self.endofx = endofx
+                
+        self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists back after reset() with the main points
+        self.setDmarks()                                        #set main point indexes
+        self.redrawdesigner()                                   #redraw the designer screen
+
+    #redraws designer
     def redrawdesigner(self):
+        #reset lines
         if self.background:
             self.ax.lines = self.ax.lines[0:4]
         else:
             self.ax.lines = []
-        self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='-')             #picker = 10 means 10 points tolerance
+        #create designer plot
+        self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='-')     #picker = 10 means 10 points tolerance
         self.ax.plot(self.timex,self.temp1,color = self.palette["met"],marker = "o",picker=10,linestyle='-')
         self.fig.canvas.draw()
-        
+
+        #create statistics bar
+        #calculate the positions for the statistics elements
+        ydist = self.ylimit - self.ylimit_min
+        statisticsheight = self.ylimit - (0.13 * ydist)
+        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]],[statisticsheight,statisticsheight],color = self.palette["rect1"],alpha=.5,linewidth=5) 
+        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[2]]],[statisticsheight,statisticsheight],color = self.palette["rect2"],alpha=.5,linewidth=5) 
+        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[6]]],[statisticsheight,statisticsheight],color = self.palette["rect3"],alpha=.5,linewidth=5) 
+
+        #plot phase division lines
+        ylist = [self.ylimit,0]
+        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
+        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--")
+        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
+        self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
 
     #CONTEXT MENU  = Right click
     def on_press(self,event):
@@ -2876,22 +2896,60 @@ class tgraphcanvas(FigureCanvas):
                                 self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
                             if i == 0:
-                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font>")
+                                time = self.stringfromseconds(0)
+                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> " + time)
                             elif i == 1:
-                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font>")
+                                time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
+                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> " + time)
                             elif i == 2:
-                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font>")
+                                time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
+                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> " + time)
                             elif i == 3:
-                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font>")
+                                time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
+                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> " + time)
                             elif i == 4:
-                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font>")
+                                time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
+                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> " + time)
                             elif i == 5:
-                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font>")
+                                time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
+                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> " + time)
                             elif i == 6:
-                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: #f07800\">[ DROP ]</font>")
+                                time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
+                                aw.sendmessage("<font style=\"BACKGROUND-COLOR: #f07800\">[ DROP ]</font> " + time)
                             break
                         else:
-                             aw.sendmessage("")
+                            totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
+                            dryphasetime = self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]
+                            midphasetime = self.timex[self.timeindex[2]] - self.timex[self.timeindex[1]]
+                            finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]]
+                            dryphaseP = int(dryphasetime*50/totaltime)
+                            midphaseP = int(midphasetime*50/totaltime)
+                            finishphaseP = int(finishphasetime*50/totaltime)
+                            spc1,spc2,spc3 = "&nbsp;","&nbsp;","&nbsp;"
+                            for i in range(dryphaseP):
+                                spc1 += "&nbsp;"
+                            for i in range(midphaseP):
+                                spc2 += "&nbsp;"
+                            for i in range(finishphaseP):
+                                spc3 += "&nbsp;"                                
+                            string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s</font> "%(self.palette["rect1"],spc1,self.stringfromseconds(dryphasetime),spc1)
+                            string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s</font> "%(self.palette["rect2"],spc2,self.stringfromseconds(midphasetime),spc2)
+                            string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s</font> "%(self.palette["rect3"],spc3,self.stringfromseconds(finishphasetime),spc3)
+                            aw.sendmessage(string1+string2+string3)
+
+                    for i in range(len(self.newpointindex)):
+                        if abs(int(event.xdata) - self.timex[self.newpointindex[i]]) < 7:
+                            if abs(self.temp2[self.newpointindex[i]] - event.ydata) < 10:
+                                self.ax.plot(self.timex[self.newpointindex[i]],self.temp2[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)
+                                self.fig.canvas.draw()
+                                QTimer.singleShot(600, self.redrawdesigner)
+                            elif abs(self.temp1[self.newpointindex[i]] - event.ydata) < 10:
+                                self.ax.plot(self.timex[self.newpointindex[i]],self.temp1[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)                                                                               
+                                self.fig.canvas.draw()
+                                QTimer.singleShot(600, self.redrawdesigner)
+                            time = self.stringfromseconds(self.timex[self.newpointindex[i]] - self.timex[self.timeindex[0]])
+                            aw.sendmessage("<font style=\"BACKGROUND-COLOR: lightblue\">%s</font> "%time)
+                           
             else:
                 self.disconnect_designer()
         except Exception,e:
@@ -2983,7 +3041,7 @@ class tgraphcanvas(FigureCanvas):
                 return 
             elif reply == QMessageBox.Yes:
                 self.newpointindex.remove(index)
-                #update index
+                #update self.newpointindex index (removing an index creates ripple new indexes values after the index location, assuming indexes are sorted)
                 for i in range(len(self.newpointindex)):
                     if i > index:
                         self.newpointindex[i] -= 1
@@ -3090,7 +3148,6 @@ class tgraphcanvas(FigureCanvas):
             self.startend[3] = 0
             self.timeindex[6] = 0
         self.xaxistosm()
-        #self.timeindexupdate()
 
     #activates mouse events	
     def connect_designer(self):
@@ -3098,20 +3155,21 @@ class tgraphcanvas(FigureCanvas):
             self.designerflag = True
             self.setCursor(Qt.OpenHandCursor)
             self.mousepress = None
-            #create mouse events. cid = connection id
+            #create mouse events. Note: keeping the ids inside a list helps protect against extrange python behaviour.
             self.designerconnections = [0,0,0,0]
             self.designerconnections[0] = self.fig.canvas.mpl_connect('pick_event', self.on_pick)
             self.designerconnections[1] = self.fig.canvas.mpl_connect('button_release_event', self.on_release)
             self.designerconnections[2] = self.fig.canvas.mpl_connect('motion_notify_event', self.on_motion)
             self.designerconnections[3] = self.fig.canvas.mpl_connect('button_press_event', self.on_press)      
 
-    #desactivates mouse events    
+    #deactivates mouse events    
     def disconnect_designer(self):
         for i in range(len(self.designerconnections)):
             if self.designerconnections[i]:
                 self.fig.canvas.mpl_disconnect(self.designerconnections[i])
         self.setCursor(Qt.ArrowCursor)
         self.designerflag = False
+        self.newpointindex = []
               
     #launches designer config Window    
     def desconfig(self):
@@ -9692,52 +9750,132 @@ class designerconfigDlg(QDialog):
         self.connect(self.scs, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,4))
         self.connect(self.sce, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,5))
         self.connect(self.drop, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,6))
+
+        self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))                                                                   #CHARGE
+        self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[1] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #DRY END - aw.qmc.startend[0]
+        self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[2] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #FC START
+        self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[3] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #FC END
+        self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[4] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #SC START
+        self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[5] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #SC END
+        self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[6] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #DROP
+        
+        regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
+        self.Edit0.setValidator(QRegExpValidator(regextime,self))
+        self.Edit1.setValidator(QRegExpValidator(regextime,self))
+        self.Edit2.setValidator(QRegExpValidator(regextime,self))
+        self.Edit3.setValidator(QRegExpValidator(regextime,self))
+        self.Edit4.setValidator(QRegExpValidator(regextime,self))
+        self.Edit5.setValidator(QRegExpValidator(regextime,self))
+        self.Edit6.setValidator(QRegExpValidator(regextime,self))
+        
+        self.Edit0.setMaximumWidth(50)
+        self.Edit1.setMaximumWidth(50)
+        self.Edit2.setMaximumWidth(50)
+        self.Edit3.setMaximumWidth(50)
+        self.Edit4.setMaximumWidth(50)
+        self.Edit5.setMaximumWidth(50)
+        self.Edit6.setMaximumWidth(50)
+
+        saveButton = QPushButton("Save")
+        self.connect(saveButton, SIGNAL("clicked()"), self.settimes)
+        defaultButton = QPushButton("Defaults")
+        self.connect(defaultButton, SIGNAL("clicked()"), self.setdefaults)
+        closeButton = QPushButton("Close")
+        self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("accept()"))
+
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addWidget(defaultButton)
+        buttonLayout.addWidget(closeButton)
+        buttonLayout.addWidget(saveButton)
+        
            
-        marksLayout = QHBoxLayout()  
-        marksLayout.addWidget(self.charge) 
-        marksLayout.addWidget(self.dryend)
-        marksLayout.addWidget(self.fcs) 
-        marksLayout.addWidget(self.fce)
-        marksLayout.addWidget(self.scs) 
-        marksLayout.addWidget(self.sce)
-        marksLayout.addWidget(self.drop) 
+        marksLayout = QGridLayout()  
+        marksLayout.addWidget(self.charge,0,0)
+        marksLayout.addWidget(self.Edit0,0,1)
+        marksLayout.addWidget(self.dryend,1,0)
+        marksLayout.addWidget(self.Edit1,1,1)
+        marksLayout.addWidget(self.fcs,2,0)
+        marksLayout.addWidget(self.Edit2,2,1)
+        marksLayout.addWidget(self.fce,3,0)
+        marksLayout.addWidget(self.Edit3,3,1)
+        marksLayout.addWidget(self.scs,4,0)
+        marksLayout.addWidget(self.Edit4,4,1)
+        marksLayout.addWidget(self.sce,5,0)
+        marksLayout.addWidget(self.Edit5,5,1)
+        marksLayout.addWidget(self.drop,6,0)
+        marksLayout.addWidget(self.Edit6,6,1)
 
         marksGroupLayout = QGroupBox("Marks")
         marksGroupLayout.setLayout(marksLayout)
         
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(marksGroupLayout)
+        mainLayout.addLayout(buttonLayout)
         
         self.setLayout(mainLayout)
-        
+
+    def settimes(self):
+        pass
+##        aw.qmc.timex[aw.qmc.timeindex[0]] = aw.qmc.stringtoseconds(unicode(self.Edit0.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+##
+##        aw.qmc.timex[aw.qmc.timeindex[1]] = aw.qmc.stringtoseconds(unicode(self.Edit1.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+##        aw.qmc.timex[aw.qmc.timeindex[2]] = aw.qmc.stringtoseconds(unicode(self.Edit2.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+##        aw.qmc.timex[aw.qmc.timeindex[3]] = aw.qmc.stringtoseconds(unicode(self.Edit3.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+##        aw.qmc.timex[aw.qmc.timeindex[4]] = aw.qmc.stringtoseconds(unicode(self.Edit4.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+##        aw.qmc.timex[aw.qmc.timeindex[5]] = aw.qmc.stringtoseconds(unicode(self.Edit5.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+##        aw.qmc.timex[aw.qmc.timeindex[6]] = aw.qmc.stringtoseconds(unicode(self.Edit6.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]       
+##        for i in range(len(aw.qmc.timeindex)):
+##            aw.qmc.designertimeinit[i] = aw.qmc.timex[aw.qmc.timeindex[i]]
+##
+##        aw.qmc.redrawdesigner()
+
+    def setdefaults(self):
+        designertimeinit = [50,300,540,560,660,700,800]
+        self.Edit0.setText(aw.qmc.stringfromseconds(0))
+        self.Edit1.setText(aw.qmc.stringfromseconds(designertimeinit[1]))
+        self.Edit2.setText(aw.qmc.stringfromseconds(designertimeinit[2]))
+        self.Edit3.setText(aw.qmc.stringfromseconds(designertimeinit[3]))
+        self.Edit4.setText(aw.qmc.stringfromseconds(designertimeinit[4]))
+        self.Edit5.setText(aw.qmc.stringfromseconds(designertimeinit[5]))
+        self.Edit6.setText(aw.qmc.stringfromseconds(designertimeinit[6]))
+
+        self.settimes()                          
     def changeflags(self,x,idi):
         oldconfig = aw.qmc.designerconfig[:]
-        #change config
+        #toggle config
         if aw.qmc.designerconfig[idi]:
             aw.qmc.designerconfig[idi] = 0               
         else:
             aw.qmc.designerconfig[idi] = 1
         for i in range(len(oldconfig)):
             if oldconfig[i] != aw.qmc.designerconfig[i]:
-                if not aw.qmc.designerconfig[idi]:
-                    #erase point
+                if not aw.qmc.designerconfig[idi]:                    
+                    #erase mark point
                     aw.qmc.timex.pop(aw.qmc.timeindex[i])
                     aw.qmc.temp1.pop(aw.qmc.timeindex[i])
                     aw.qmc.temp2.pop(aw.qmc.timeindex[i])
+                    #re-evaluate indexes in self.newpointindex after mark point
+                    for r in range(len(aw.qmc.newpointindex)):
+                        if aw.qmc.newpointindex[r] > aw.qmc.timeindex[i]:
+                            aw.qmc.newpointindex[r] -= 1
                     break
                 else:
-                    #add point
-                    if idi != 0:
-                        aw.qmc.timex.insert(aw.qmc.timeindex[i-1]+1,aw.qmc.designertimeinit[i])
-                        aw.qmc.temp1.insert(aw.qmc.timeindex[i-1]+1,aw.qmc.designertemp1init[i])
-                        aw.qmc.temp2.insert(aw.qmc.timeindex[i-1]+1,aw.qmc.designertemp2init[i])
-                        break
-                    else:
-                        aw.qmc.timex.insert(0,aw.qmc.designertimeinit[i])
-                        aw.qmc.temp1.insert(0,aw.qmc.designertemp1init[i])
-                        aw.qmc.temp2.insert(0,aw.qmc.designertemp2init[i])
-                        break                        
-                                        
+                    #add mark point. Find index for mark point
+                    index = 0
+                    for x in range(len(aw.qmc.timex)):
+                        if aw.qmc.timex[x] < aw.qmc.designertimeinit[i]:
+                            index += 1
+                    #add mark point
+                    aw.qmc.timex.insert(index,aw.qmc.designertimeinit[i])
+                    aw.qmc.temp1.insert(index,aw.qmc.designertemp1init[i])
+                    aw.qmc.temp2.insert(index,aw.qmc.designertemp2init[i])                                
+
+                    #re-evaluate  indexes in self.newpointindex after adding mark point
+                    for x in range(len(aw.qmc.newpointindex)):
+                        if aw.qmc.newpointindex[x] > index:
+                            aw.qmc.newpointindex[x] += 1
+                    break
+                                       
         aw.qmc.setDmarks()
         aw.qmc.redrawdesigner()        
        
