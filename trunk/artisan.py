@@ -2723,89 +2723,102 @@ class tgraphcanvas(FigureCanvas):
         
     #used to start designer from scracth (not from a loaded profile)	
     def designerinit(self):
-        self.newpointindex = []
-        #check x limits
-        if self.endofx < 960:
-            self.endofx = 960
-            self.redraw()
+        try:
+            self.newpointindex = []
+            #check x limits
+            if self.endofx < 960:
+                self.endofx = 960
+                self.redraw()
 
-        #self.setdesignerinitvars()
-        
-        aw.sendmessage("Designer ON. Press [OFF] to save file and finish")
-        
-        self.timex,self.temp1,self.temp2 = [],[],[]
-                    
-        for i in range(len(self.designerconfig)):
-            if self.designerconfig[i]:
-                self.temp1.append(self.designertemp1init[i])
-                self.temp2.append(self.designertemp2init[i])
-                self.timex.append(self.designertimeinit[i])
+            #self.setdesignerinitvars()
+            
+            aw.sendmessage("Designer ON. Press [OFF] to save file and finish")
+            
+            self.timex,self.temp1,self.temp2 = [],[],[]
+                        
+            for i in range(len(self.designerconfig)):
+                if self.designerconfig[i]:
+                    self.temp1.append(self.designertemp1init[i])
+                    self.temp2.append(self.designertemp2init[i])
+                    self.timex.append(self.designertimeinit[i])
 
-        self.setDmarks()
-        self.redrawdesigner()
+            self.setDmarks()
+            self.redrawdesigner()
+        except Exception,e:
+            self.adderror(u"Exception: designerinit() " + unicode(e) + " ")
+            return 
 
     #loads main points from a profile so that they can be edited
     def initfromprofile(self):
-        self.newpointindex = []
-        #save events. They will be deleted on qmc.reset()
-        self.specialeventsStringscopy = self.specialeventsStrings[:]
-        self.specialeventsvaluecopy = self.specialeventsvalue[:]
-        self.specialeventstypecopy = self.specialeventstype[:]
-        self.eventtimecopy = []
-        for i in range(len(self.specialevents)):
-            self.eventtimecopy.append(self.timex[self.specialevents[i]])
-            
-        #load designer flags
-        self.designerconfig = [1,0,0,0,0,0,0]  #init to zero 
-        time,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]                               #ceate empty temp lists
-        for i in range(1,len(self.timeindex)):
-            if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
-                self.designerconfig[i] = 1
-                time.append(self.timex[self.timeindex[i]])  #add time
-                t1.append(self.temp1[self.timeindex[i]])    #add temp1
-                t2.append(self.temp2[self.timeindex[i]])    #add temp2
-                self.designertimeinit[i] = self.timex[self.timeindex[i]]
-
-    	endofx  = self.endofx               
-        self.reset()                                            #erase profile and screen
-        #restore xend limit
-        self.endofx = endofx
+        try:
+            self.newpointindex = []
+            #save events. They will be deleted on qmc.reset()
+            self.specialeventsStringscopy = self.specialeventsStrings[:]
+            self.specialeventsvaluecopy = self.specialeventsvalue[:]
+            self.specialeventstypecopy = self.specialeventstype[:]
+            self.eventtimecopy = []
+            for i in range(len(self.specialevents)):
+                self.eventtimecopy.append(self.timex[self.specialevents[i]])
                 
-        self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists back after reset() with the main points
-        self.setDmarks()                                        #set main point indexes
-        self.redrawdesigner()                                   #redraw the designer screen
+            #load designer flags
+            self.designerconfig = [1,0,0,0,0,0,0]  #init to zero 
+            time,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]                               #ceate empty temp lists
+            for i in range(1,len(self.timeindex)):
+                if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
+                    self.designerconfig[i] = 1
+                    time.append(self.timex[self.timeindex[i]])  #add time
+                    t1.append(self.temp1[self.timeindex[i]])    #add temp1
+                    t2.append(self.temp2[self.timeindex[i]])    #add temp2
+                    self.designertimeinit[i] = self.timex[self.timeindex[i]]
+
+            endofx  = self.endofx               
+            self.reset()                                            #erase profile and screen
+            #restore xend limit
+            self.endofx = endofx
+                    
+            self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists back after reset() with the main points
+            self.setDmarks()                                        #set main point indexes
+            self.redrawdesigner()                                   #redraw the designer screen
+            
+        except Exception,e:
+            self.adderror(u"Exception: designer initfromprofile() " + unicode(e) + " ")
+            return 
 
     #redraws designer
     def redrawdesigner(self):
-        #reset lines
-        if self.background:
-            self.ax.lines = self.ax.lines[0:4]
-        else:
-            self.ax.lines = []
-        #create designer plot
-        self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='-')     #picker = 10 means 10 points tolerance
-        self.ax.plot(self.timex,self.temp1,color = self.palette["met"],marker = "o",picker=10,linestyle='-')
+        try:
+            #reset lines
+            if self.background:
+                self.ax.lines = self.ax.lines[0:4]
+            else:
+                self.ax.lines = []
+            #create designer plot
+            self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='-')     #picker = 10 means 10 points tolerance
+            self.ax.plot(self.timex,self.temp1,color = self.palette["met"],marker = "o",picker=10,linestyle='-')
 
-        #create statistics bar
-        #calculate the positions for the statistics elements
-        ydist = self.ylimit - self.ylimit_min
-        statisticsheight = self.ylimit - (0.13 * ydist)
-        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]],[statisticsheight,statisticsheight],color = self.palette["rect1"],alpha=.5,linewidth=5) 
-        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[2]]],[statisticsheight,statisticsheight],color = self.palette["rect2"],alpha=.5,linewidth=5) 
-        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[6]]],[statisticsheight,statisticsheight],color = self.palette["rect3"],alpha=.5,linewidth=5) 
+            #create statistics bar
+            #calculate the positions for the statistics elements
+            ydist = self.ylimit - self.ylimit_min
+            statisticsheight = self.ylimit - (0.13 * ydist)
+            self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]],[statisticsheight,statisticsheight],color = self.palette["rect1"],alpha=.5,linewidth=5) 
+            self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[2]]],[statisticsheight,statisticsheight],color = self.palette["rect2"],alpha=.5,linewidth=5) 
+            self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[6]]],[statisticsheight,statisticsheight],color = self.palette["rect3"],alpha=.5,linewidth=5) 
 
-        #plot phase division lines
-        ylist = [self.ylimit,0]
-        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
-        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--")
-        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
-        self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
+            #plot phase division lines
+            ylist = [self.ylimit,0]
+            self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
+            self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--")
+            self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
+            self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
 
-        if self.timex[-1] < self.endofx:
-            self.endofx = self.timex[-1] + 120
-            self.xaxistosm()
-            
-        self.fig.canvas.draw()
+            if self.timex[-1] < self.endofx:
+                self.endofx = self.timex[-1] + 120
+                self.xaxistosm()
+                
+            self.fig.canvas.draw()
+        except Exception,e:
+            self.adderror(u"Exception: redrawdesigner() " + unicode(e) + " ")
+            return 
 
     #CONTEXT MENU  = Right click
     def on_press(self,event):
@@ -2875,7 +2888,7 @@ class tgraphcanvas(FigureCanvas):
                 self.redrawdesigner()
                 return
             if self.designerflag:
-                if type(event.xdata):
+                if type(event.xdata):                       #outside graph type is None
                     for i in range(len(self.timeindex)):
                         if abs(int(event.xdata) - self.timex[self.timeindex[i]]) < 7:
                             if abs(self.temp2[self.timeindex[i]] - event.ydata) < 10:
@@ -2959,217 +2972,239 @@ class tgraphcanvas(FigureCanvas):
             self.connect_designer()
 
     def addpoint(self):
-        #current x, and y is obtained when doing right click in mouse: on_press()
-        
-        if self.timex[-1] < self.currentx:       #if point is beyond max timex
-            #find closest line
-            d1 = abs(self.temp1[-1] - self.currenty)
-            d2 = abs(self.temp2[-1] - self.currenty)
-            if d2 < d1:
-                self.temp2.append(self.currenty)
-                self.temp1.append(self.temp1[-1])
-            else:
-                self.temp2.append(self.temp2[-1])
-                self.temp1.append(self.currenty) 
-            self.timex.append(self.currentx)
-            self.newpointindex.sort()
-            self.newpointindex.append(len(self.timex)-1) #no need to update newpointindex
+        try:
+            #current x, and y is obtained when doing right click in mouse: on_press()
+            
+            if self.timex[-1] < self.currentx:       #if point is beyond max timex
+                #find closest line
+                d1 = abs(self.temp1[-1] - self.currenty)
+                d2 = abs(self.temp2[-1] - self.currenty)
+                if d2 < d1:
+                    self.temp2.append(self.currenty)
+                    self.temp1.append(self.temp1[-1])
+                else:
+                    self.temp2.append(self.temp2[-1])
+                    self.temp1.append(self.currenty) 
+                self.timex.append(self.currentx)
+                self.newpointindex.sort()
+                self.newpointindex.append(len(self.timex)-1) #no need to update newpointindex
 
-        elif self.timex[0] > self.currentx:         #if point is bellow min timex
-            #find closest line
-            d1 = abs(self.temp1[0] - self.currenty)
-            d2 = abs(self.temp2[0] - self.currenty)
-            if d2 < d1:
-                self.temp2.insert(0,self.currenty)
-                self.temp1.insert(0,self.temp1[0])
-            else:
-                self.temp2.insert(0,self.temp2[0])
-                self.temp1.insert(0,self.currenty) 
-            self.timex.insert(0,self.currentx)
-            self.newpointindex.sort()
-            self.newpointindex.insert(0,0)
-            #update newpoints list
-            for u in range(1,len(self.newpointindex)):
-                self.newpointindex[u] += 1
-                
-        else:                                           #mid range
-            #find index
-            for i in range(len(self.timex)):
-                if self.timex[i] > self.currentx:  
-                    break
-            #find closest line
-            d1 = abs(self.temp1[i] - self.currenty)
-            d2 = abs(self.temp2[i] - self.currenty)
-            self.timex.insert(i,self.currentx)        
-            if d2 < d1:
-                self.temp2.insert(i,self.currenty)
-                self.temp1.insert(i,self.temp1[i])
-            else:
-                self.temp2.insert(i,self.temp2[i])
-                self.temp1.insert(i,self.currenty)
-            self.newpointindex.append(i)
-            #update newpoints list
-            self.newpointindex.sort()
-            start = self.newpointindex.index(i)
-            for x in range(len(self.newpointindex)):
-                if x > start:
-                    self.newpointindex[x] += 1
+            elif self.timex[0] > self.currentx:         #if point is bellow min timex
+                #find closest line
+                d1 = abs(self.temp1[0] - self.currenty)
+                d2 = abs(self.temp2[0] - self.currenty)
+                if d2 < d1:
+                    self.temp2.insert(0,self.currenty)
+                    self.temp1.insert(0,self.temp1[0])
+                else:
+                    self.temp2.insert(0,self.temp2[0])
+                    self.temp1.insert(0,self.currenty) 
+                self.timex.insert(0,self.currentx)
+                self.newpointindex.sort()
+                self.newpointindex.insert(0,0)
+                #update newpoints list
+                for u in range(1,len(self.newpointindex)):
+                    self.newpointindex[u] += 1
                     
-        self.setDmarks()
-        self.redrawdesigner()
+            else:                                           #mid range
+                #find index
+                for i in range(len(self.timex)):
+                    if self.timex[i] > self.currentx:  
+                        break
+                #find closest line
+                d1 = abs(self.temp1[i] - self.currenty)
+                d2 = abs(self.temp2[i] - self.currenty)
+                self.timex.insert(i,self.currentx)        
+                if d2 < d1:
+                    self.temp2.insert(i,self.currenty)
+                    self.temp1.insert(i,self.temp1[i])
+                else:
+                    self.temp2.insert(i,self.temp2[i])
+                    self.temp1.insert(i,self.currenty)
+                self.newpointindex.append(i)
+                #update newpoints list
+                self.newpointindex.sort()
+                start = self.newpointindex.index(i)
+                for x in range(len(self.newpointindex)):
+                    if x > start:
+                        self.newpointindex[x] += 1
+                        
+            self.setDmarks()
+            self.redrawdesigner()
+            
+        except Exception,e:
+            self.adderror(u"Exception: designer addpoint() " + unicode(e) + " ")
+            return 
+
 
     #removes point
     def removepoint(self):
-        #current x, and y is obtained when doing right click in mouse: on_press()
-        #find index
-        for i in range(len(self.timex)):
-            if self.timex[i] > self.currentx:
-                break
-        if abs(self.timex[i]- self.currentx) < abs(self.timex[i-1] - self.currentx):
-            index = i
-        else:
-            index = i-1
-    
-        #check if if it is a landmark point
-        if index in self.timeindex:
-            mark = self.timeindex.index(index)
-            st1 = "Point selected to delete is "
-            st2 = " Please Use Designer Configuration Dialog"
-            for i in range(len(self.timeindex)):
-                if mark == 0:
-                    message = "%s <font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> %s"%(st1,st2)
-                elif mark == 1:
-                    message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> %s"%(st1,st2)
-                elif mark == 1:
-                    message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> %s"%(st1,st2)
-                elif mark == 2:
-                    message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> %s"%(st1,st2)
-                elif mark == 3:
-                    message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> %s"%(st1,st2)
-                elif mark == 4:
-                    message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> %s"%(st1,st2)
-                elif mark == 5:
-                    message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ DROP ]</font> %s"%(st1,st2)
-            QMessageBox.information(self,u"Delete point",message)
-   
-        else:
-            time = self.stringfromseconds(self.timex[index]-self.startend[0])
-            string = u"Delete point at %s?"%time
-            reply = QMessageBox.question(self,u"Delete point",string,
-                    QMessageBox.Yes|QMessageBox.Cancel)
-            if reply == QMessageBox.Cancel:
-                return 
-            elif reply == QMessageBox.Yes:
-                self.newpointindex.remove(index)
-                #update self.newpointindex index (removing an index creates ripple new indexes values after the index location, assuming indexes are sorted)
-                for i in range(len(self.newpointindex)):
-                    if i > index:
-                        self.newpointindex[i] -= 1
-                self.timex.pop(index)        
-                self.temp1.pop(index)
-                self.temp2.pop(index)    
-                self.redrawdesigner()
-                self.setDmarks()
+        try:
+            #current x, and y is obtained when doing right click in mouse: on_press()
+            #find index
+            for i in range(len(self.timex)):
+                if self.timex[i] > self.currentx:
+                    break
+            if abs(self.timex[i]- self.currentx) < abs(self.timex[i-1] - self.currentx):
+                index = i
+            else:
+                index = i-1
+        
+            #check if if it is a landmark point
+            if index in self.timeindex:
+                mark = self.timeindex.index(index)
+                st1 = "Point selected to delete is "
+                st2 = " Please Use Designer Configuration Dialog"
+                for i in range(len(self.timeindex)):
+                    if mark == 0:
+                        message = "%s <font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> %s"%(st1,st2)
+                    elif mark == 1:
+                        message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> %s"%(st1,st2)
+                    elif mark == 1:
+                        message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> %s"%(st1,st2)
+                    elif mark == 2:
+                        message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> %s"%(st1,st2)
+                    elif mark == 3:
+                        message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> %s"%(st1,st2)
+                    elif mark == 4:
+                        message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> %s"%(st1,st2)
+                    elif mark == 5:
+                        message = "%s <font style=\"BACKGROUND-COLOR: orange\">[ DROP ]</font> %s"%(st1,st2)
+                QMessageBox.information(self,u"Delete point",message)
+       
+            else:
+                time = self.stringfromseconds(self.timex[index]-self.startend[0])
+                string = u"Delete point at %s?"%time
+                reply = QMessageBox.question(self,u"Delete point",string,
+                        QMessageBox.Yes|QMessageBox.Cancel)
+                if reply == QMessageBox.Cancel:
+                    return 
+                elif reply == QMessageBox.Yes:
+                    self.newpointindex.remove(index)
+                    #update self.newpointindex index (removing an index creates ripple new indexes values after the index location, assuming indexes are sorted)
+                    for i in range(len(self.newpointindex)):
+                        if i > index:
+                            self.newpointindex[i] -= 1
+                    self.timex.pop(index)        
+                    self.temp1.pop(index)
+                    self.temp2.pop(index)
+                    self.setDmarks()                
+                    self.redrawdesigner()
+                    
+        except Exception,e:
+            self.adderror(u"Exception: designer removepoint() " + unicode(e) + " ")
+            return 
                                
     #converts from a designer profile to a normal profile	        
     def convert_designer(self):
-        self.setDmarks()
-        answer = self.createFromManual(self.splinedegree)
-        if answer:
-            aw.sendmessage("New profile created")
-        else:
-            return
-        
-        #check events
-        if len(self.eventtimecopy):
-            for i in range(len(self.eventtimecopy)):
-                self.specialevents.append(self.time2index(self.eventtimecopy[i]))
-            self.specialeventsStrings = self.specialeventsStringscopy[:]
-            self.specialeventsvalue = self.specialeventsvaluecopy[:]
-            self.specialeventstype = self.specialeventstypecopy[:]
+        try:
+            self.setDmarks()
+            answer = self.createFromManual(self.splinedegree)
+            if answer:
+                aw.sendmessage("New profile created")
+            else:
+                return
             
-        self.disconnect_designer()           
-        self.redraw()
+            #check events
+            if len(self.eventtimecopy):
+                for i in range(len(self.eventtimecopy)):
+                    self.specialevents.append(self.time2index(self.eventtimecopy[i]))
+                self.specialeventsStrings = self.specialeventsStringscopy[:]
+                self.specialeventsvalue = self.specialeventsvaluecopy[:]
+                self.specialeventstype = self.specialeventstypecopy[:]
+                
+            self.disconnect_designer()           
+            self.redraw()
+            
+        except Exception,e:
+            self.adderror(u"Exception: convert_designer() " + unicode(e) + " ")
+            return 
 
     #obtains index of landmarks from timex,temp by reading designer config flags	
     def setDmarks(self):
-        timexcopy = self.timex[:]       #NOTE: we need python to do a deep copy, not a shallow copy, therefore the [:]
-        temp1copy = self.temp1[:]
-        temp2copy = self.temp2[:]
+        try:
+            timexcopy = self.timex[:]       #NOTE: we need python to do a deep copy, not a shallow copy, therefore the [:]
+            temp1copy = self.temp1[:]
+            temp2copy = self.temp2[:]
 
-        #after making a working copy, delete all extra points except Marks 
-        #make a barebone copy without any extra added points except main marks (FC, etc)
+            #after making a working copy, delete all extra points except Marks 
+            #make a barebone copy without any extra added points except main marks (FC, etc)
 
-        for i in range (len(self.newpointindex)):
-            timexcopy.remove(self.timex[self.newpointindex[i]])
-            temp1copy.remove(self.temp1[self.newpointindex[i]])
-            temp2copy.remove(self.temp2[self.newpointindex[i]])
+            for i in range (len(self.newpointindex)):
+                timexcopy.remove(self.timex[self.newpointindex[i]])
+                temp1copy.remove(self.temp1[self.newpointindex[i]])
+                temp2copy.remove(self.temp2[self.newpointindex[i]])
 
-        count = 0
-        timexlength = len(timexcopy)
-        if self.designerconfig[0] and timexlength:
-            self.timeindex[0] = self.time2index(timexcopy[count])
-            self.startend[0] = timexcopy[count]
-            self.startend[1] = temp2copy[count]
-            count += 1
-        else:
-            self.startend[0] = 0
-            self.startend[1] = 0
-            self.timeindex[0] = 0
-        if self.designerconfig[1] and timexlength > count:
-            self.timeindex[1] = self.time2index(timexcopy[count])
-            self.dryend[0] = timexcopy[count]
-            self.dryend[1] = temp2copy[count]
-            count += 1
-        else:
-            self.dryend[0] = 0
-            self.dryend[1] = 0
-            self.timeindex[1] = 0
-        if self.designerconfig[2] and timexlength > count:
-            self.timeindex[2] = self.time2index(timexcopy[count])
-            self.varC[0] = timexcopy[count]
-            self.varC[1] = temp2copy[count]
-            count += 1
-        else:
-            self.varC[0] = 0
-            self.varC[1] = 0
-            self.timeindex[2] = 0
-        if self.designerconfig[3] and timexlength > count:
-            self.timeindex[3] = self.time2index(timexcopy[count])
-            self.varC[2] = timexcopy[count]
-            self.varC[3] = temp2copy[count]
-            count += 1
-        else:
-            self.varC[2] = 0
-            self.varC[3] = 3
-            self.timeindex[3] = 0
-        if self.designerconfig[4] and timexlength > count:
-            self.timeindex[4] = self.time2index(timexcopy[count])
-            self.varC[4] = timexcopy[count]
-            self.varC[5] = temp2copy[count]
-            count += 1
-        else:
-            self.varC[4] = 0
-            self.varC[5] = 0
-            self.timeindex[4] = 0
-        if self.designerconfig[5] and timexlength > count:
-            self.timeindex[5] = self.time2index(timexcopy[count])
-            self.varC[6] = timexcopy[count]
-            self.varC[7] = temp2copy[count]
-            count += 1
-        else:
-            self.varC[6] = 0
-            self.varC[7] = 0
-            self.timeindex[5] = 0
-        if self.designerconfig[6] and timexlength > count:
-            self.timeindex[6] = self.time2index(timexcopy[count])
-            self.startend[2] = timexcopy[count]
-            self.startend[3] = temp2copy[count]
-        else:
-            self.startend[2] = 0
-            self.startend[3] = 0
-            self.timeindex[6] = 0
-        self.xaxistosm()
+            count = 0
+            timexcopy.sort()
+            timexlength = len(timexcopy)
+            if self.designerconfig[0] and timexlength:
+                self.timeindex[0] = self.time2index(timexcopy[count])
+                self.startend[0] = timexcopy[count]
+                self.startend[1] = temp2copy[count]
+                count += 1
+            else:
+                self.startend[0] = 0
+                self.startend[1] = 0
+                self.timeindex[0] = 0
+            if self.designerconfig[1] and timexlength > count:
+                self.timeindex[1] = self.time2index(timexcopy[count])
+                self.dryend[0] = timexcopy[count]
+                self.dryend[1] = temp2copy[count]
+                count += 1
+            else:
+                self.dryend[0] = 0
+                self.dryend[1] = 0
+                self.timeindex[1] = 0
+            if self.designerconfig[2] and timexlength > count:
+                self.timeindex[2] = self.time2index(timexcopy[count])
+                self.varC[0] = timexcopy[count]
+                self.varC[1] = temp2copy[count]
+                count += 1
+            else:
+                self.varC[0] = 0
+                self.varC[1] = 0
+                self.timeindex[2] = 0
+            if self.designerconfig[3] and timexlength > count:
+                self.timeindex[3] = self.time2index(timexcopy[count])
+                self.varC[2] = timexcopy[count]
+                self.varC[3] = temp2copy[count]
+                count += 1
+            else:
+                self.varC[2] = 0
+                self.varC[3] = 3
+                self.timeindex[3] = 0
+            if self.designerconfig[4] and timexlength > count:
+                self.timeindex[4] = self.time2index(timexcopy[count])
+                self.varC[4] = timexcopy[count]
+                self.varC[5] = temp2copy[count]
+                count += 1
+            else:
+                self.varC[4] = 0
+                self.varC[5] = 0
+                self.timeindex[4] = 0
+            if self.designerconfig[5] and timexlength > count:
+                self.timeindex[5] = self.time2index(timexcopy[count])
+                self.varC[6] = timexcopy[count]
+                self.varC[7] = temp2copy[count]
+                count += 1
+            else:
+                self.varC[6] = 0
+                self.varC[7] = 0
+                self.timeindex[5] = 0
+            if self.designerconfig[6] and timexlength > count:
+                self.timeindex[6] = self.time2index(timexcopy[count])
+                self.startend[2] = timexcopy[count]
+                self.startend[3] = temp2copy[count]
+            else:
+                self.startend[2] = 0
+                self.startend[3] = 0
+                self.timeindex[6] = 0
+            self.xaxistosm()
+            
+        except Exception,e:
+            self.adderror(u"Exception: designer setDmarks() " + unicode(e) + " ")
+            return 
 
     #activates mouse events	
     def connect_designer(self):
