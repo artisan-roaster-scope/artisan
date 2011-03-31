@@ -36,6 +36,14 @@ FILE_MENU_SAVEGRAPH = QApplication.translate("Menu", "Save Graph", None, QApplic
 FILE_MENU_HTMLREPORT = QApplication.translate("Menu", "HTML Report", None, QApplication.UnicodeUTF8)
 FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None, QApplication.UnicodeUTF8)
 
+#Edit menu items
+EDIT_MENU = QApplication.translate("Menu", "Edit", None, QApplication.UnicodeUTF8)
+if platf != u'Darwin':
+    EDIT_MENU = "&" + EDIT_MENU
+EDIT_MENU_CUT = QApplication.translate("Menu", "Cut", None, QApplication.UnicodeUTF8)
+EDIT_MENU_COPY = QApplication.translate("Menu", "Copy", None, QApplication.UnicodeUTF8)
+EDIT_MENU_PASTE = QApplication.translate("Menu", "Paste", None, QApplication.UnicodeUTF8)
+    
 #Roast menu items
 ROAST_MENU = QApplication.translate("Menu", "Roast", None, QApplication.UnicodeUTF8)
 if platf != u'Darwin':
