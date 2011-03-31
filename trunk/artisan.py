@@ -196,6 +196,8 @@ class tgraphcanvas(FigureCanvas):
                                    ]
         
         self.fig = Figure()
+        self.fig.patch.set_facecolor('#E8E8E8')
+        self.fig.patch.set_edgecolor('#D6D6D6')
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
         #legend location
         self.legendloc = 2
@@ -9641,11 +9643,11 @@ class serialport(object):
                 s206 = binascii.hexlify(r[6])
                 s207 = binascii.hexlify(r[7])
                 s208 = binascii.hexlify(r[8])
-                s209 = binascii.hexlify(r[9])
-                s210 = binascii.hexlify(r[10])
-                s211 = binascii.hexlify(r[11])
-                s212 = binascii.hexlify(r[12])
-                s213 = binascii.hexlify(r[13])
+#                s209 = binascii.hexlify(r[9])
+#                s210 = binascii.hexlify(r[10])
+#                s211 = binascii.hexlify(r[11])
+#                s212 = binascii.hexlify(r[12])
+#                s213 = binascii.hexlify(r[13])
            
                 t200 = int(s200,16)
                 t201 = int(s201,16)
@@ -9656,26 +9658,11 @@ class serialport(object):
                 t206 = int(s206,16)
                 t207 = int(s207,16)
                 t208 = int(s208,16)
-                t209 = int(s209,16)
-                t210 = int(s210,16)
-                t211 = int(s211,16)
-                t212 = int(s212,16)
-                t213 = int(s213,16)
-
-         #       print str(((t200 & 0xf0) >> 4)) + " = " + str((t200 & 0x0f))
-         #       print str(((t201 & 0xf0) >> 4)) + " = " + str((t201 & 0x0f))
-         #       print str(((t202 & 0xf0) >> 4)) + " = " + str((t202 & 0x0f))
-         #       print str(((t203 & 0xf0) >> 4)) + " = " + str((t203 & 0x0f))
-         #       print str(((t204 & 0xf0) >> 4)) + " = " + str((t204 & 0x0f))
-         #       print str(((t205 & 0xf0) >> 4)) + " = " + str((t205 & 0x0f))
-         #       print str(((t206 & 0xf0) >> 4)) + " = " + str((t206 & 0x0f))
-         #       print str(((t207 & 0xf0) >> 4)) + " = " + str((t207 & 0x0f))
-         #       print str(((t208 & 0xf0) >> 4)) + " = " + str((t208 & 0x0f))
-         #       print str(((t209 & 0xf0) >> 4)) + " = " + str((t209 & 0x0f))
-         #       print str(((t210 & 0xf0) >> 4)) + " = " + str((t210 & 0x0f))
-         #       print str(((t211 & 0xf0) >> 4)) + " = " + str((t211 & 0x0f))
-         #       print str(((t212 & 0xf0) >> 4)) + " = " + str((t212 & 0x0f))
-         #       print str(((t213 & 0xf0) >> 4)) + " = " + str((t213 & 0x0f))
+#                t209 = int(s209,16)
+#                t210 = int(s210,16)
+#                t211 = int(s211,16)
+#                t212 = int(s212,16)
+#                t213 = int(s213,16)
 
                 # is meter in temp mode?
                 # first check byte order
@@ -9719,12 +9706,6 @@ class serialport(object):
                     seg4 = ((t207 & 0x0f) << 4) + (t208 & 0x0f)
                 else:
                      raise ValueError
-
-                
-        #        print ('Seg1: {0:x}'.format(seg1))
-        #        print ('Seg2: {0:x}'.format(seg2))
-        #        print ('Seg3: {0:x}'.format(seg3))
-        #        print ('Seg4: {0:x}'.format(seg4))
 
                 # is negative?
                 if (seg1 & 0x80):
