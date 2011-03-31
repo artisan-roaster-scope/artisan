@@ -6606,6 +6606,7 @@ class editGraphDlg(QDialog):
         self.chargeeditcopy = aw.qmc.stringfromseconds(0)
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
+        self.chargeedit.setMinimumWidth(50)
         chargelabel.setBuddy(self.chargeedit)
 
         drylabel  = QLabel("<b>DRY END</b>")
@@ -6619,6 +6620,7 @@ class editGraphDlg(QDialog):
         self.dryeditcopy = aw.qmc.stringfromseconds(t2)
         self.dryedit.setValidator(QRegExpValidator(regextime,self))
         self.dryedit.setMaximumWidth(50)
+        self.dryedit.setMinimumWidth(50)
         drylabel.setBuddy(self.dryedit)
  
         Cstartlabel = QLabel("<b>FC START</b>")
@@ -6631,6 +6633,7 @@ class editGraphDlg(QDialog):
         self.Cstarteditcopy = aw.qmc.stringfromseconds(t3)
         self.Cstartedit.setValidator(QRegExpValidator(regextime,self))
         self.Cstartedit.setMaximumWidth(50)
+        self.Cstartedit.setMinimumWidth(50)
         Cstartlabel.setBuddy(self.Cstartedit)
         
         Cendlabel = QLabel("<b>FC END</b>")
@@ -6643,6 +6646,7 @@ class editGraphDlg(QDialog):
         self.Cendeditcopy = aw.qmc.stringfromseconds(t4)
         self.Cendedit.setValidator(QRegExpValidator(regextime,self))
         self.Cendedit.setMaximumWidth(50)
+        self.Cendedit.setMinimumWidth(50)
         Cendlabel.setBuddy(self.Cendedit)
    
         CCstartlabel = QLabel("<b>SC START</b>")
@@ -6655,6 +6659,7 @@ class editGraphDlg(QDialog):
         self.CCstarteditcopy = aw.qmc.stringfromseconds(t5)
         self.CCstartedit.setValidator(QRegExpValidator(regextime,self))
         self.CCstartedit.setMaximumWidth(50)
+        self.CCstartedit.setMinimumWidth(50)
         CCstartlabel.setBuddy(self.CCstartedit)
 
         CCendlabel = QLabel("<b>SC END</b>")
@@ -6667,6 +6672,7 @@ class editGraphDlg(QDialog):
         self.CCendeditcopy = aw.qmc.stringfromseconds(t6)
         self.CCendedit.setValidator(QRegExpValidator(regextime,self))
         self.CCendedit.setMaximumWidth(50)
+        self.CCendedit.setMinimumWidth(50)
         CCendlabel.setBuddy(self.CCendedit)
         
         droplabel = QLabel("<b>DROP</b>")
@@ -6679,6 +6685,7 @@ class editGraphDlg(QDialog):
         self.dropeditcopy = aw.qmc.stringfromseconds(t7)
         self.dropedit.setValidator(QRegExpValidator(regextime,self))
         self.dropedit.setMaximumWidth(50)
+        self.dropedit.setMinimumWidth(50)
         droplabel.setBuddy(self.dropedit)
         
         # EVENTS
@@ -7006,6 +7013,7 @@ class editGraphDlg(QDialog):
         okLayout.addStretch()
         okLayout.addWidget(cancelButton,0)
         okLayout.addWidget(saveButton,1)
+        okLayout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom       
 
         timeLayoutBox = QHBoxLayout()
         timeLayoutBox.addLayout(timeLayout)
@@ -7034,6 +7042,8 @@ class editGraphDlg(QDialog):
         tab1bLayout.addLayout(ambientLayout)
         tab1bLayout.addStretch()  
         tab1Layout = QVBoxLayout()
+        tab1Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
+        tab1Layout.setMargin(0)
         tab1Layout.addLayout(self.tab1aLayout)
         tab1Layout.addLayout(tab1bLayout)
         
@@ -7043,15 +7053,21 @@ class editGraphDlg(QDialog):
         #tab 2
         tab2Layout = QVBoxLayout()
         tab2Layout.addLayout(anotationLayout)
+        tab2Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
+        tab2Layout.setMargin(0)
  
         #tab3 events
         tab3Layout = QVBoxLayout()
         tab3Layout.addWidget(self.eventtable)
         tab3Layout.addLayout(eventbuttonLayout)
+        tab3Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
+        tab3Layout.setMargin(0)
 
         #tab 4 data
         tab4Layout = QVBoxLayout()
-        tab4Layout.addWidget(self.datatable)        
+        tab4Layout.addWidget(self.datatable) 
+        tab4Layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom 
+        tab4Layout.setMargin(0)      
         
         #tabwidget
         self.TabWidget = QTabWidget()
@@ -7075,7 +7091,8 @@ class editGraphDlg(QDialog):
         #incorporate layouts
         totallayout = QVBoxLayout()
         totallayout.addWidget(self.TabWidget)
-        totallayout.addLayout(okLayout)
+        totallayout.addLayout(okLayout)        
+        totallayout.setMargin(10)      
 
         #totallayout.addStretch()
         #totallayout.addLayout(buttonsLayout)
