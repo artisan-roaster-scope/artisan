@@ -97,7 +97,6 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as Naviga
 
 platf = unicode(platform.system())
 
-
 #######################################################################################
 #################### Main Application  ################################################
 #######################################################################################
@@ -1037,6 +1036,8 @@ class tgraphcanvas(FigureCanvas):
         self.fig.clf()   #wipe out figure
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         #Set axes same as in __init__
+        if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
+            self.endofx = 60
         self.ax.set_xlim(self.startofx, self.endofx)
         self.ax.set_ylim(self.ylimit_min, self.ylimit)
         self.ax.set_autoscale_on(False)
@@ -1432,6 +1433,7 @@ class tgraphcanvas(FigureCanvas):
 
         #ready to plot    
         self.fig.canvas.draw()     
+
 
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
     #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep (changes value in self.redraw())
@@ -2771,10 +2773,12 @@ class tgraphcanvas(FigureCanvas):
                     t2.append(self.temp2[self.timeindex[i]])    #add temp2
                     self.designertimeinit[i] = self.timex[self.timeindex[i]]
 
-            endofx  = self.endofx               
+            #it is possible the user may use the flag to revert to 1 min endofx after reset
+            endofxold  = self.endofx               
             self.reset()                                            #erase profile and screen
-            #restore xend limit
-            self.endofx = endofx
+            #restore endofx limit
+            self.endofx = endofxold
+            self.xaxistom()
                     
             self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists back after reset() with the main points
             self.setDmarks()                                        #set main point indexes
@@ -3360,7 +3364,8 @@ class ApplicationWindow(QMainWindow):
         self.lcdpaletteF = { "timer":u'white',"met":'white',"bt":'white',"deltamet":'white',"deltabt":'white',"sv":'white'}
 
         ###################################################################################
-        #restore SETTINGS  after creating serial port, tgraphcanvas, and PID. 
+        #restore SETTINGS  after creating serial port, tgraphcanvas, and PID.
+        
         self.settingsLoad()        
        
         #create a Label object to display program status information
@@ -5133,7 +5138,7 @@ class ApplicationWindow(QMainWindow):
             #need to update timer delay (otherwise it uses default 5 seconds)
             self.qmc.killTimer(self.qmc.timerid) 
             self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
-            
+
             #update display
             self.qmc.redraw()
 
