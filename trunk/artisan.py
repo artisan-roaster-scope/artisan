@@ -3757,6 +3757,7 @@ class ApplicationWindow(QMainWindow):
         ###############  create MENUS 
         
         self.fileMenu = self.menuBar().addMenu(UIconst.FILE_MENU)
+        self.editMenu = self.menuBar().addMenu(UIconst.EDIT_MENU)
         self.GraphMenu = self.menuBar().addMenu(UIconst.ROAST_MENU)
         self.ConfMenu = self.menuBar().addMenu(UIconst.CONF_MENU)
         self.helpMenu = self.menuBar().addMenu(UIconst.HELP_MENU)
@@ -3868,6 +3869,20 @@ class ApplicationWindow(QMainWindow):
         printAction.setShortcut(QKeySequence.Print)
         self.connect(printAction,SIGNAL("triggered()"),self.filePrint)
         self.fileMenu.addAction(printAction)
+        
+        # EDIT menu
+        self.cutAction = QAction(UIconst.EDIT_MENU_CUT,self)
+        self.cutAction.setShortcut(QKeySequence.Cut)
+        self.editMenu.addAction(self.cutAction)
+        self.connect(self.cutAction,SIGNAL("triggered()"),self.on_actionCut_triggered)
+        self.copyAction = QAction(UIconst.EDIT_MENU_COPY,self)
+        self.copyAction.setShortcut(QKeySequence.Copy)
+        self.editMenu.addAction(self.copyAction)
+        self.connect(self.copyAction,SIGNAL("triggered()"),self.on_actionCopy_triggered)
+        self.pasteAction = QAction(UIconst.EDIT_MENU_PASTE,self)
+        self.pasteAction.setShortcut(QKeySequence.Paste)
+        self.editMenu.addAction(self.pasteAction)
+        self.connect(self.pasteAction,SIGNAL("triggered()"),self.on_actionPaste_triggered)        
 
         # ROAST menu
         editGraphAction = QAction(UIconst.ROAST_MENU_PROPERTIES,self)
@@ -4011,6 +4026,24 @@ class ApplicationWindow(QMainWindow):
         self.keyboardmoveindex = 0
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
+        
+    def on_actionCut_triggered(self,checked=None):
+        try:
+            app.activeWindow().focusWidget().cut()
+        except:
+            pass
+        
+    def on_actionCopy_triggered(self,checked=None):
+        try:
+            app.activeWindow().focusWidget().copy()
+        except:
+            pass
+        
+    def on_actionPaste_triggered(self,checked=None):
+        try:
+            app.activeWindow().focusWidget().paste()
+        except:
+            pass
             
     def sendmessage(self,message):
         #keep a max of 100 messages
