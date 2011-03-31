@@ -2778,7 +2778,7 @@ class tgraphcanvas(FigureCanvas):
             self.reset()                                            #erase profile and screen
             #restore endofx limit
             self.endofx = endofxold
-            self.xaxistom()
+            self.xaxistosm()
                     
             self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists back after reset() with the main points
             self.setDmarks()                                        #set main point indexes
