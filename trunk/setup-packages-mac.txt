@@ -6,7 +6,7 @@ o Numpy 1.5.1
 o SIP 4.12.1
 o PyQt 4.8.3
 o matplotlib 1.0.1
-o scipy 0.9.0rc1
+o scipy 0.9.0
 o elixir 0.7.1 (for Green)
 o pyaudio
 o py2app 0.5.3
@@ -16,11 +16,13 @@ o py2app 0.5.3
 
 Install universal binary setup on Snow Leopard 10.6.5 (with support for 10.5.x)
 
-0) Install Python 2.6.6
+0) Install Python 2.6.6 / 2.7.1
 
 download and install:
 
 http://www.python.org/ftp/python/2.6.6/python-2.6.6-macosx10.3.dmg
+or
+http://www.python.org/ftp/python/2.7.1/python-2.7.1-macosx10.3.dmg
 
 
 set default to 32bit:
@@ -32,7 +34,7 @@ download and install:
 
 http://get.qt.nokia.com/qt/source/qt-mac-carbon-opensource-4.7.2.dmg (Carbon)
 
-2) Install pyserial for Python 2.6
+2) Install pyserial 
 
 download latest source (pyserial-2.5.tar.gz) from http://pypi.python.org/pypi/pyserial
 
@@ -42,6 +44,8 @@ download latest source (pyserial-2.5.tar.gz) from http://pypi.python.org/pypi/py
 # python setup.py install
 
 3) Install Numpy
+
+get latest source from http://sourceforge.net/projects/numpy/files/
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 export CFLAGS="-arch i386"
@@ -168,10 +172,13 @@ fetch modulegraph 0.8.2 from repository:
 
 
 
-10) scipy-0.8.0
+10) scipy-0.9.0
 
 
-Best install binary from http://sourceforge.net/projects/scipy/files/scipy/0.9.0rc1/scipy-0.9.0rc1-py2.7-python.org-macosx10.6.dmg
+Best install binary from http://sourceforge.net/projects/scipy/files/scipy/0.9.0/scipy-0.9.0-py2.7-python.org-macosx10.3.dmg
+
+=====
+From Source (incomplete!)
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
 export CFLAGS="-arch i386"

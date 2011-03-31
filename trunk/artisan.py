@@ -3783,9 +3783,9 @@ class ApplicationWindow(QMainWindow):
 
         #pack RESET buttons + GRAPHS
         midLayout = QHBoxLayout()
-        midLayout.addLayout(controlLayout,0)
-        midLayout.addWidget(self.stack,1)
-        
+        midLayout.addLayout(controlLayout)
+        midLayout.addWidget(self.stack)
+
         
         #pack all into the grid MASTER LAYOUT manager (widget,row,column)
         gl.addLayout(naviLayout,0,0)               #Navigation Tool bar
@@ -4072,6 +4072,7 @@ class ApplicationWindow(QMainWindow):
         self.keyboardmoveindex = 0
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
+
         
     def on_actionCut_triggered(self,checked=None):
         try:
@@ -7762,15 +7763,19 @@ class calculatorDlg(QDialog):
         self.WinComboBox = QComboBox()
         weightunits = ["g","Kg","lb"]
         self.WinComboBox.addItems(weightunits)
-        self.WinComboBox.setMaximumWidth(50)
+        self.WinComboBox.setMaximumWidth(80)
+        self.WinComboBox.setMinimumWidth(80)
         self.WoutComboBox = QComboBox()
-        self.WoutComboBox.setMaximumWidth(50)
+        self.WoutComboBox.setMaximumWidth(80)
+        self.WoutComboBox.setMinimumWidth(80)
         self.WoutComboBox.addItems(weightunits)
         self.WoutComboBox.setCurrentIndex(2)
         self.WinEdit = QLineEdit()
         self.WoutEdit = QLineEdit()
-        self.WinEdit.setMaximumWidth(60)
-        self.WoutEdit.setMaximumWidth(60)
+        #self.WinEdit.setMaximumWidth(60)
+        #self.WoutEdit.setMaximumWidth(60)
+        self.WinEdit.setMinimumWidth(60)
+        self.WoutEdit.setMinimumWidth(60)
         self.WinEdit.setValidator(QDoubleValidator(0., 99999., 2, self.WinEdit))
         self.WoutEdit.setValidator(QDoubleValidator(0., 99999., 2, self.WoutEdit))
         self.connect(self.WinEdit,SIGNAL("editingFinished()"),lambda x="ItoO":self.convertWeight(x))
@@ -7780,15 +7785,19 @@ class calculatorDlg(QDialog):
         self.VinComboBox = QComboBox()
         volumeunits = ["liter","gallon","quart","pint","cup","cm^3"]
         self.VinComboBox.addItems(volumeunits )
-        self.VinComboBox.setMaximumWidth(50)
+        self.VinComboBox.setMaximumWidth(80)
+        self.VinComboBox.setMinimumWidth(80)
         self.VoutComboBox = QComboBox()
-        self.VoutComboBox.setMaximumWidth(50)
+        self.VoutComboBox.setMaximumWidth(80)
+        self.VoutComboBox.setMinimumWidth(80)
         self.VoutComboBox.addItems(volumeunits )
         self.VoutComboBox.setCurrentIndex(4)
         self.VinEdit = QLineEdit()
         self.VoutEdit = QLineEdit()
-        self.VinEdit.setMaximumWidth(60)
-        self.VoutEdit.setMaximumWidth(60)
+        #self.VinEdit.setMaximumWidth(60)
+        #self.VoutEdit.setMaximumWidth(60)
+        self.VinEdit.setMinimumWidth(60)
+        self.VoutEdit.setMinimumWidth(60)
         self.VinEdit.setValidator(QDoubleValidator(0., 99999., 2, self.VinEdit))
         self.VoutEdit.setValidator(QDoubleValidator(0., 99999., 2, self.VoutEdit))
         self.connect(self.VinEdit,SIGNAL("editingFinished()"),lambda x="ItoO":self.convertVolume(x))
@@ -7820,17 +7829,17 @@ class calculatorDlg(QDialog):
 
         #weight conversions
         weightLayout = QHBoxLayout()
-        weightLayout.addWidget(self.WinComboBox,0)
-        weightLayout.addWidget(self.WinEdit,1)
-        weightLayout.addWidget(self.WoutEdit,2)
-        weightLayout.addWidget(self.WoutComboBox,3)
+        weightLayout.addWidget(self.WinComboBox)
+        weightLayout.addWidget(self.WinEdit)
+        weightLayout.addWidget(self.WoutEdit)
+        weightLayout.addWidget(self.WoutComboBox)
 
         #volume conversions
         volumeLayout = QHBoxLayout()
-        volumeLayout.addWidget(self.VinComboBox,0)
-        volumeLayout.addWidget(self.VinEdit,1)
-        volumeLayout.addWidget(self.VoutEdit,2)
-        volumeLayout.addWidget(self.VoutComboBox,3)
+        volumeLayout.addWidget(self.VinComboBox)
+        volumeLayout.addWidget(self.VinEdit)
+        volumeLayout.addWidget(self.VoutEdit)
+        volumeLayout.addWidget(self.VoutComboBox)
 
 
         RoCGroup = QGroupBox("Rate of Change")
@@ -7982,14 +7991,14 @@ class EventsDlg(QDialog):
         self.setWindowTitle("Events")
         self.setModal(True)
 
-        self.eventsbuttonflag = QCheckBox("Events Button")
+        self.eventsbuttonflag = QCheckBox("Button")
         if aw.eventsbuttonflag:
             self.eventsbuttonflag.setChecked(True)
         else:
             self.eventsbuttonflag.setChecked(False)
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)  
         
-        self.minieventsflag = QCheckBox("Event mini editor")
+        self.minieventsflag = QCheckBox("Mini Editor")
         self.minieventsflag.setToolTip("Allows to enter a description of the last event")
         if aw.minieventsflag:
             self.minieventsflag.setChecked(True)
@@ -7997,7 +8006,7 @@ class EventsDlg(QDialog):
             self.minieventsflag.setChecked(False)
         self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)
         
-        self.eventsGraphflag = QCheckBox("Events type bars")
+        self.eventsGraphflag = QCheckBox("Type Bars")
         if aw.qmc.eventsGraphflag:
             self.eventsGraphflag.setChecked(True)
         else:
@@ -8013,11 +8022,26 @@ class EventsDlg(QDialog):
         self.etype1 = QLineEdit(aw.qmc.etypes[1])
         self.etype2 = QLineEdit(aw.qmc.etypes[2])
         self.etype3 = QLineEdit(aw.qmc.etypes[3])
+        
+        typeLayout0 = QHBoxLayout()
+        typeLayout0.addWidget(typelabel1)
+        typeLayout0.addWidget(self.etype0)
+        
+        typeLayout1 = QHBoxLayout()
+        typeLayout1.addWidget(typelabel2)
+        typeLayout1.addWidget(self.etype1)
+        
+        typeLayout2 = QHBoxLayout()
+        typeLayout2.addWidget(typelabel3)
+        typeLayout2.addWidget(self.etype2)
+        
+        typeLayout3 = QHBoxLayout()
+        typeLayout3.addWidget(typelabel4)
+        typeLayout3.addWidget(self.etype3)
 
         okButton = QPushButton("OK")  
-        closeButton = QPushButton("Close")
+        closeButton = QPushButton("Cancel")
         defaultButton = QPushButton("Defaults")
-        okButton.setFocusPolicy(Qt.NoFocus)
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
         
@@ -8026,30 +8050,38 @@ class EventsDlg(QDialog):
         self.connect(defaultButton,SIGNAL("clicked()"),self.settypedefault)
 
         #layouts
-        typelayout  = QGridLayout()
-        typelayout.addWidget(typelabel1,0,0)
-        typelayout.addWidget(typelabel2,0,1)
-        typelayout.addWidget(self.etype0,1,0)
-        typelayout.addWidget(self.etype1,1,1)
-        typelayout.addWidget(typelabel3,2,0)
-        typelayout.addWidget(typelabel4,2,1)
-        typelayout.addWidget(self.etype2,3,0)
-        typelayout.addWidget(self.etype3,3,1)
+        typelayout = QGridLayout()
+        typelayout.addLayout(typeLayout0,0,0)
+        typelayout.addLayout(typeLayout1,0,1)
+        typelayout.addLayout(typeLayout2,1,0)
+        typelayout.addLayout(typeLayout3,1,1)
+#        typelayout.addWidget(typelabel1,0,0)
+#        typelayout.addWidget(typelabel2,0,1)
+#        typelayout.addWidget(self.etype0,1,0)
+#        typelayout.addWidget(self.etype1,1,1)
+#        typelayout.addWidget(typelabel3,2,0)
+#        typelayout.addWidget(typelabel4,2,1)
+#        typelayout.addWidget(self.etype2,3,0)
+#        typelayout.addWidget(self.etype3,3,1)
 
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(defaultButton,0)
-        buttonLayout.addWidget(okButton,1)
-        buttonLayout.addWidget(closeButton,2)
+        buttonLayout.addWidget(defaultButton)
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(closeButton)
+        buttonLayout.addWidget(okButton)
 
         TypeGroupLayout = QGroupBox("Event Types")
         TypeGroupLayout.setLayout(typelayout)
 
+        FlagsLayout = QHBoxLayout()
+        FlagsLayout.addWidget(self.eventsbuttonflag)
+        FlagsLayout.addWidget(self.minieventsflag)
+        FlagsLayout.addWidget(self.eventsGraphflag)
+
         EventsLayout = QVBoxLayout()
-        EventsLayout.addWidget(self.eventsbuttonflag,0)
-        EventsLayout.addWidget(self.minieventsflag,1)
-        EventsLayout.addWidget(self.eventsGraphflag,2)
-        EventsLayout.addWidget(TypeGroupLayout,3)
-        EventsLayout.addLayout(buttonLayout,4)
+        EventsLayout.addLayout(FlagsLayout)
+        EventsLayout.addWidget(TypeGroupLayout)
+        EventsLayout.addLayout(buttonLayout)
         
         self.setLayout(EventsLayout)
         
@@ -8586,7 +8618,7 @@ class backgroundDLG(QDialog):
         delButton = QPushButton("Delete")
         delButton.setFocusPolicy(Qt.NoFocus)
         
-        cancelButton = QPushButton("Close")
+        #okButton = QPushButton("Ok")
         
         selectButton =QPushButton("Select Profile")
         selectButton.setFocusPolicy(Qt.NoFocus)
@@ -8595,7 +8627,7 @@ class backgroundDLG(QDialog):
         alignButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(loadButton, SIGNAL("clicked()"),self.load)
-        self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
+        #self.connect(okButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
         self.connect(selectButton, SIGNAL("clicked()"), self.selectpath)
         self.connect(alignButton, SIGNAL("clicked()"), self.timealign)
 
@@ -8728,29 +8760,37 @@ class backgroundDLG(QDialog):
         upperlayout.addLayout(layout) 
         
         layoutBoxed = QHBoxLayout()
+        layoutBoxed.addStretch()
         layoutBoxed.addLayout(upperlayout)
         layoutBoxed.addStretch()
 
-        cancelButtonBoxed = QHBoxLayout()
-        cancelButtonBoxed.addStretch()
-        cancelButtonBoxed.addWidget(alignButton)
-        cancelButtonBoxed.addWidget(cancelButton)
+        alignButtonBoxed = QHBoxLayout()
+        alignButtonBoxed.addStretch()
+        alignButtonBoxed.addWidget(alignButton)
         
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(layoutBoxed)  
         tab1layout.addStretch()
-        tab1layout.addLayout(cancelButtonBoxed)
+        tab1layout.addLayout(alignButtonBoxed)
+        tab1layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom 
+        tab1layout.setMargin(0)      
 
         tab2layout = QVBoxLayout()
         tab2layout.addWidget(self.eventtable)
+        tab2layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom 
+        tab2layout.setMargin(0)      
 
         tab3layout = QVBoxLayout()
         tab3layout.addWidget(self.datatable)
+        tab3layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom 
+        tab3layout.setMargin(0)      
         
         tab4layout = QGridLayout()
         tab4layout.addWidget(self.backgroundReproduce,0,0)
         tab4layout.addWidget(etimelabel,1,0)
         tab4layout.addWidget(self.etimeSpinBox,1,1)
+        tab4layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom 
+        tab4layout.setMargin(0)      
        
         #tab layout
         TabWidget = QTabWidget()
@@ -8771,9 +8811,15 @@ class backgroundDLG(QDialog):
         C4Widget.setLayout(tab4layout)
         TabWidget.addTab(C4Widget,"Playback")
         
+#        buttonLayout = QHBoxLayout()
+#        buttonLayout.addStretch()
+#        buttonLayout.addWidget(okButton)
+        
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.status)
-        mainLayout.addWidget(TabWidget)
+        mainLayout.addWidget(TabWidget) 
+        #mainLayout.addLayout(buttonLayout)    
+        mainLayout.setMargin(0)      
 
         self.setLayout(mainLayout)
 
@@ -11188,10 +11234,8 @@ class graphColorDlg(QDialog):
         self.lcd6spinbox.setMaximum(359)
         self.connect(self.lcd6spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd6spinbox.value(),lcd=6:self.setLED(val,lcd))
 
-        closeButton = QPushButton("Close")
-        self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("reject()"))
 
-        LCDdefaultButton = QPushButton("Set all LCDs to B/W")
+        LCDdefaultButton = QPushButton("B/W")
         self.connect(LCDdefaultButton, SIGNAL("clicked()"),self.setLCDdefaults)
         
         #LAYOUTS
@@ -11301,9 +11345,8 @@ class graphColorDlg(QDialog):
         LCD6GroupLayout.setLayout(lcd6layout)
 
         buttonlayout  = QHBoxLayout()
+        buttonlayout.addStretch()
         buttonlayout.addWidget(LCDdefaultButton)
-        buttonlayout.addWidget(closeButton)
-        
 
         lcdlayout.addWidget(LCD1GroupLayout)
         lcdlayout.addWidget(LCD2GroupLayout)
@@ -11324,10 +11367,22 @@ class graphColorDlg(QDialog):
         C2Widget = QWidget()
         C2Widget.setLayout(lcdlayout)
         TabWidget.addTab(C2Widget,"LCDs")      
-
+      
+        okLayout = QHBoxLayout()
+        okLayout.addStretch()
+        okLayout.addWidget(okButton)
+        okLayout.setMargin(0)
+        okLayout.setContentsMargins(0, 0, 0, 0)
+        TabWidget.setContentsMargins(0, 0, 0, 0)
+        C1Widget.setContentsMargins(0, 0, 0, 0)
+        C2Widget.setContentsMargins(0, 0, 0, 0)
+        graphLayout.setMargin(0)
+        
         #incorporate layouts
         Mlayout = QVBoxLayout()
-        Mlayout.addWidget(TabWidget,1)
+        Mlayout.addWidget(TabWidget)
+        Mlayout.addLayout(okLayout)
+        Mlayout.setMargin(10)
         self.setLayout(Mlayout)
 
     def setLCDdefaults(self):
