@@ -114,9 +114,16 @@ VERSION HISTORY
 
 v0.3.5 (??)
 - improved CSV import/export
+- K202 CSV support added
 - adds localization support
+- adds german, french, spanish, swedish, italian translations
 - fixed cut-copy-paste on Mac
--
+- LCD color configuration
+- replay of events via background dialog
+- relative times are used everywhere
+- adds profile designer
+- adds alarms
+- 
 
 v0.3.4 (28.02.2011)
 - adds ArduinoTC4 device support
