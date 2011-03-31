@@ -6637,8 +6637,7 @@ class editGraphDlg(QDialog):
     def __init__(self, parent = None):
         super(editGraphDlg,self).__init__(parent)
 
-        #commented out because it could be used now to compare data with background tables
-        #self.setModal(True)
+        self.setModal(True)
 
         self.setWindowTitle(u"Roast Properties")
 
@@ -8582,6 +8581,7 @@ class backgroundDLG(QDialog):
     def __init__(self, parent = None):
         super(backgroundDLG,self).__init__(parent)
         self.setWindowTitle("Profile Background")
+        self.setModal(True)
 
     	#TAB 1
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
@@ -8618,7 +8618,7 @@ class backgroundDLG(QDialog):
         delButton = QPushButton("Delete")
         delButton.setFocusPolicy(Qt.NoFocus)
         
-        #okButton = QPushButton("Ok")
+        okButton = QPushButton("Ok")
         
         selectButton =QPushButton("Select Profile")
         selectButton.setFocusPolicy(Qt.NoFocus)
@@ -8627,7 +8627,7 @@ class backgroundDLG(QDialog):
         alignButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(loadButton, SIGNAL("clicked()"),self.load)
-        #self.connect(okButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
+        self.connect(okButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
         self.connect(selectButton, SIGNAL("clicked()"), self.selectpath)
         self.connect(alignButton, SIGNAL("clicked()"), self.timealign)
 
@@ -8811,14 +8811,15 @@ class backgroundDLG(QDialog):
         C4Widget.setLayout(tab4layout)
         TabWidget.addTab(C4Widget,"Playback")
         
-#        buttonLayout = QHBoxLayout()
-#        buttonLayout.addStretch()
-#        buttonLayout.addWidget(okButton)
+        
+        buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
+        buttonLayout.addWidget(okButton)
         
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.status)
         mainLayout.addWidget(TabWidget) 
-        #mainLayout.addLayout(buttonLayout)    
+        mainLayout.addLayout(buttonLayout)    
         mainLayout.setMargin(0)      
 
         self.setLayout(mainLayout)
