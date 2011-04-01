@@ -66,6 +66,7 @@ import tempfile
 import time
 import glob
 import os
+import warnings
 import string
 import cgi
 import codecs
@@ -96,6 +97,8 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 
 platf = unicode(platform.system())
+
+
 
 #######################################################################################
 #################### Main Application  ################################################
@@ -451,7 +454,7 @@ class tgraphcanvas(FigureCanvas):
         elif self.mode == u"F":
             self.designertemp1init = [500,500,500,500,500,500,500]
             self.designertemp2init = [380,300,390,395,410,412,420]
-        self.splinedegree = 2
+        self.splinedegree = 3
         self.reproducedesigner = 0      #flag to add events that help reporduce the profile: 0 = none; 1 = sv; 2 = ramp
             
     #event handler from startTimer()
@@ -1034,6 +1037,7 @@ class tgraphcanvas(FigureCanvas):
         
     #Redraws data   
     def redraw(self):
+
         self.fig.clf()   #wipe out figure
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         #Set axes same as in __init__
@@ -1247,95 +1251,96 @@ class tgraphcanvas(FigureCanvas):
                     
         #write legend
         self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
-    
-        #Add markers for CHARGE
-        if self.startend[0]:
-            #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0], self.startend[1]+self.ystep),
-                               color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-        #Add Dry End markers            
-        if self.dryend[0]:
-            self.ystep = self.findtextgap(self.startend[1],self.dryend[1])
-            st1 = u"DE " + unicode(self.stringfromseconds(self.dryend[0]-self.startend[0]))
-            #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0], self.dryend[1] + self.ystep), 
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1] - self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
-        #Add 1Cs markers
-        if self.varC[0]:
-            if self.dryend[0]:
-                self.ystep = self.findtextgap(self.dryend[1],self.varC[1])
-            else:
-                self.ystep = self.findtextgap(self.startend[1],self.varC[1])
-            st1 = u"FCs " + unicode(self.stringfromseconds(self.varC[0]-self.startend[0]))
-            #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]+self.ystep), 
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1] - self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-        #Add 1Ce markers
-        if self.varC[2]:
-            self.ystep = self.findtextgap(self.varC[1],self.varC[3])
-            st1 = u"FCe " + unicode(self.stringfromseconds(self.varC[2]-self.startend[0]))
-            #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]+ self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #add a water mark
-            self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
 
-        #Add 2Cs markers
-        if self.varC[4]:
-            if self.varC[2]:
-                self.ystep = self.findtextgap(self.varC[3],self.varC[5])
-            else:
-                self.ystep = self.findtextgap(self.varC[1],self.varC[5])
-            st1 = u"SCs " + unicode(self.stringfromseconds(self.varC[4]-self.startend[0]))
-            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]+self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
-            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-self.ystep),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-        #Add 2Ce markers
-        if self.varC[6]:
-            self.ystep = self.findtextgap(self.varC[5],self.varC[7])
-            st1 =  u"SCe " + unicode(self.stringfromseconds(self.varC[6]-self.startend[0]))
-            #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]+self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #do water mark
-            self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
-
-        #Add DROP markers
-        if self.startend[2]:
-            if self.varC[6]:
-                self.ystep = self.findtextgap(self.varC[7],self.startend[3])
-            elif self.varC[4]:
-                self.ystep = self.findtextgap(self.varC[5],self.startend[3])
-            elif self.varC[2]:
-                self.ystep = self.findtextgap(self.varC[3],self.startend[3])
-            else:
-                ystep = self.findtextgap(self.varC[1],self.startend[3])
-                
-            st1 = u"END " + unicode(self.stringfromseconds(self.startend[2]-self.startend[0]))
-            #anotate temperature
-            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]+self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-self.ystep),
+        if not self.designerflag:    
+            #Add markers for CHARGE
+            if self.startend[0]:
+                #anotate temperature
+                self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0], self.startend[1]+self.ystep),
+                                   color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            
-            self.writestatistics()
+            #Add Dry End markers            
+            if self.dryend[0]:
+                self.ystep = self.findtextgap(self.startend[1],self.dryend[1])
+                st1 = u"DE " + unicode(self.stringfromseconds(self.dryend[0]-self.startend[0]))
+                #anotate temperature
+                self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0], self.dryend[1] + self.ystep), 
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1] - self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
+            #Add 1Cs markers
+            if self.varC[0]:
+                if self.dryend[0]:
+                    self.ystep = self.findtextgap(self.dryend[1],self.varC[1])
+                else:
+                    self.ystep = self.findtextgap(self.startend[1],self.varC[1])
+                st1 = u"FCs " + unicode(self.stringfromseconds(self.varC[0]-self.startend[0]))
+                #anotate temperature
+                self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]+self.ystep), 
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1] - self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            #Add 1Ce markers
+            if self.varC[2]:
+                self.ystep = self.findtextgap(self.varC[1],self.varC[3])
+                st1 = u"FCe " + unicode(self.stringfromseconds(self.varC[2]-self.startend[0]))
+                #anotate temperature
+                self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]+ self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #add a water mark
+                self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
+
+            #Add 2Cs markers
+            if self.varC[4]:
+                if self.varC[2]:
+                    self.ystep = self.findtextgap(self.varC[3],self.varC[5])
+                else:
+                    self.ystep = self.findtextgap(self.varC[1],self.varC[5])
+                st1 = u"SCs " + unicode(self.stringfromseconds(self.varC[4]-self.startend[0]))
+                self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]+self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
+                self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-self.ystep),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            #Add 2Ce markers
+            if self.varC[6]:
+                self.ystep = self.findtextgap(self.varC[5],self.varC[7])
+                st1 =  u"SCe " + unicode(self.stringfromseconds(self.varC[6]-self.startend[0]))
+                #anotate temperature
+                self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]+self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #do water mark
+                self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
+
+            #Add DROP markers
+            if self.startend[2]:
+                if self.varC[6]:
+                    self.ystep = self.findtextgap(self.varC[7],self.startend[3])
+                elif self.varC[4]:
+                    self.ystep = self.findtextgap(self.varC[5],self.startend[3])
+                elif self.varC[2]:
+                    self.ystep = self.findtextgap(self.varC[3],self.startend[3])
+                else:
+                    ystep = self.findtextgap(self.varC[1],self.startend[3])
+                    
+                st1 = u"END " + unicode(self.stringfromseconds(self.startend[2]-self.startend[0]))
+                #anotate temperature
+                self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]+self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-self.ystep),
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                
+                self.writestatistics()
             
         #write events
         Nevents = len(self.specialevents)
@@ -1434,6 +1439,13 @@ class tgraphcanvas(FigureCanvas):
 
         #ready to plot    
         self.fig.canvas.draw()     
+
+        # if designer ON
+        if self.designerflag:
+            if self.background:                
+                self.ax.lines = self.ax.lines[2:]
+            if len(self.timex):
+                self.redrawdesigner()
 
 
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
@@ -1755,14 +1767,11 @@ class tgraphcanvas(FigureCanvas):
         aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))     
         aw.button_1.setDisabled(True)                     #button ON
         aw.button_1.setStyleSheet("QPushButton { background-color: #88ff18}")
-        aw.soundpop()        
+        aw.soundpop()
+        
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
-        
-        if self.designerflag:
-           self.convert_designer() 
-           return
-        
+
         self.flagon = False
         aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
         aw.button_1.setDisabled(False)
@@ -1771,8 +1780,7 @@ class tgraphcanvas(FigureCanvas):
         
         if self.device == 18:        
             self.createFromManual()           
-        
-   
+           
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
         if self.flagon:
@@ -2489,7 +2497,7 @@ class tgraphcanvas(FigureCanvas):
             self.adderror(u"Exception Error: univariateinfo() " + unicode(e) + " ")
             return  
 
-    #interpolates profile (creates new data). Call when using device 18 (manual) at [OFF]
+    #interpolates profile (creates new data). 
     def createFromManual(self, sd=None):
         try:
             #sd = spline degree, an int from 1-5
@@ -2525,7 +2533,7 @@ class tgraphcanvas(FigureCanvas):
             self.ax.plot(time, etvals, color=self.palette["met"], linestyle = '-.', linewidth=2)
             self.fig.canvas.draw()
 
-            reply = QMessageBox.question(self,u"Convert","Interpolate?",
+            reply = QMessageBox.question(self,u"Interpolation","Create?",
                                 QMessageBox.Yes|QMessageBox.Cancel)
 
             if reply == QMessageBox.Cancel:
@@ -2717,123 +2725,117 @@ class tgraphcanvas(FigureCanvas):
         
     #used to start designer from scracth (not from a loaded profile)	
     def designerinit(self):
-        try:
-            self.newpointindex = []
-            #check x limits
-            if self.endofx < 960:
-                self.endofx = 960
-                self.redraw()
 
-            #self.setdesignerinitvars()
+        self.newpointindex = []
+        #check x limits
+        if self.endofx < 960:
+            self.endofx = 960
+            self.redraw()
             
-            aw.sendmessage("Designer ON. Press [OFF] to save file and finish")
-            
-            self.timex,self.temp1,self.temp2 = [],[],[]
-                        
-            for i in range(len(self.designerconfig)):
-                if self.designerconfig[i]:
-                    self.temp1.append(self.designertemp1init[i])
-                    self.temp2.append(self.designertemp2init[i])
-                    self.timex.append(self.designertimeinit[i])
+        self.timex,self.temp1,self.temp2 = [],[],[]
+                    
+        for i in range(len(self.designerconfig)):
+            if self.designerconfig[i]:
+                self.temp1.append(self.designertemp1init[i])
+                self.temp2.append(self.designertemp2init[i])
+                self.timex.append(self.designertimeinit[i])
 
-            self.setDmarks()
-            self.redrawdesigner()
-        except Exception,e:
-            self.adderror(u"Exception: designerinit() " + unicode(e) + " ")
-            return 
+        self.setDmarks()
+        self.redrawdesigner()
+
 
     #loads main points from a profile so that they can be edited
     def initfromprofile(self):
-        try:
-            self.newpointindex = []
-            #save events. They will be deleted on qmc.reset()
-            self.specialeventsStringscopy = self.specialeventsStrings[:]
-            self.specialeventsvaluecopy = self.specialeventsvalue[:]
-            self.specialeventstypecopy = self.specialeventstype[:]
-            self.eventtimecopy = []
-            for i in range(len(self.specialevents)):
-                self.eventtimecopy.append(self.timex[self.specialevents[i]])
-                
-            #load designer flags
-            self.designerconfig = [1,0,0,0,0,0,0]  #init to zero 
-            time,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]                               #ceate empty temp lists
-            for i in range(1,len(self.timeindex)):
-                if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
-                    self.designerconfig[i] = 1
-                    time.append(self.timex[self.timeindex[i]])  #add time
-                    t1.append(self.temp1[self.timeindex[i]])    #add temp1
-                    t2.append(self.temp2[self.timeindex[i]])    #add temp2
-                    self.designertimeinit[i] = self.timex[self.timeindex[i]]
+    
+        self.newpointindex = []
+        #save events. They will be deleted on qmc.reset()
+        self.specialeventsStringscopy = self.specialeventsStrings[:]
+        self.specialeventsvaluecopy = self.specialeventsvalue[:]
+        self.specialeventstypecopy = self.specialeventstype[:]
+        self.eventtimecopy = []
+        for i in range(len(self.specialevents)):
+            self.eventtimecopy.append(self.timex[self.specialevents[i]])
 
-            #it is possible the user may use the flag to revert to 1 min endofx after reset
-            endofxold  = self.endofx               
-            self.reset()                                            #erase profile and screen
-            #restore endofx limit
-            self.endofx = endofxold
-            self.xaxistosm()
-                    
-            self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists back after reset() with the main points
-            self.setDmarks()                                        #set main point indexes
-            self.redrawdesigner()                                   #redraw the designer screen
+        #find lowest point from profile to be converted
+        lpindex = aw.findTP()
+        if lpindex != -1:
+            lptime  = self.timex[lpindex]
+            lptemp2 = self.temp2[lpindex]
+        
             
-        except Exception,e:
-            self.adderror(u"Exception: designer initfromprofile() " + unicode(e) + " ")
-            return 
+        #load designer flags from profile
+        self.designerconfig = [1,0,0,0,0,0,0]  #init to zero except CHARGE 
+        time,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]    #ceate lists with CHARGE point
+        for i in range(1,len(self.timeindex)):
+            if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
+                self.designerconfig[i] = 1
+                time.append(self.timex[self.timeindex[i]])  #add time
+                t1.append(self.temp1[self.timeindex[i]])    #add temp1
+                t2.append(self.temp2[self.timeindex[i]])    #add temp2
+                self.designertimeinit[i] = self.timex[self.timeindex[i]]
 
+        #it is possible the user may use the flag to revert to 1 min endofx after reset
+        endofxold  = self.endofx               
+        self.reset()                                            #erase profile and screen
+        #restore endofx limit
+        self.endofx = endofxold
+        self.xaxistosm()
+                
+        self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists back after reset() with the main points
+        self.setDmarks()                                        #set main point indexes
+
+        #add lowest point as extra point
+        if lpindex != -1:
+            self.currentx = lptime
+            self.currenty = lptemp2
+            self.addpoint()
+        
+        self.redrawdesigner()                                   #redraw the designer screen
+        
     #redraws designer
-    def redrawdesigner(self):
-        try:
-            #reset lines
-            if self.background:
-                self.ax.lines = self.ax.lines[0:4]
-            else:
-                self.ax.lines = []
-            #create designer plot
-            self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='',markersize=8)     #picker = 10 means 10 points tolerance
-            self.ax.plot(self.timex,self.temp1,color = self.palette["met"],marker = "o",picker=10,linestyle='',markersize=8)
-
-            #create statistics bar
-            #calculate the positions for the statistics elements
-            ydist = self.ylimit - self.ylimit_min
-            statisticsheight = self.ylimit - (0.13 * ydist)
-            self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]],[statisticsheight,statisticsheight],color = self.palette["rect1"],alpha=.5,linewidth=5) 
-            self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[2]]],[statisticsheight,statisticsheight],color = self.palette["rect2"],alpha=.5,linewidth=5) 
-            self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[6]]],[statisticsheight,statisticsheight],color = self.palette["rect3"],alpha=.5,linewidth=5) 
-
-            #plot phase division lines
-            ylist = [self.ylimit,0]
-            self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
-            self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--")
-            self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
-            self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
-
-            if self.timex[-1] < self.endofx:
-                self.endofx = self.timex[-1] + 120
-                self.xaxistosm()
-                
-            self.redraw_designer_curviness()
+    def redrawdesigner(self):    
+        #reset (clear) plot
+        if self.background:
+            self.ax.lines = self.ax.lines[0:4]
+        else:
+            self.ax.lines = []
             
-        except Exception,e:
-            self.adderror(u"Exception: redrawdesigner() " + unicode(e) + " ")
-            return 
+        #create statistics bar
+        #calculate the positions for the statistics elements
+        ydist = self.ylimit - self.ylimit_min
+        statisticsheight = self.ylimit - (0.13 * ydist)
+        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]],[statisticsheight,statisticsheight],color = self.palette["rect1"],alpha=.5,linewidth=5) 
+        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[2]]],[statisticsheight,statisticsheight],color = self.palette["rect2"],alpha=.5,linewidth=5) 
+        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[6]]],[statisticsheight,statisticsheight],color = self.palette["rect3"],alpha=.5,linewidth=5) 
 
-    def redraw_designer_curviness(self):
-        #self.redrawdesigner()
+        #plot phase division lines
+        ylist = [self.ylimit,0]
+        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
+        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--")
+        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
+        self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
+
+        #create designer plot lines
+        self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='',markersize=8)     #picker = 10 means 10 points tolerance
+        self.ax.plot(self.timex,self.temp1,color = self.palette["met"],marker = "o",picker=10,linestyle='',markersize=8)
+
+        if self.timex[-1] < self.endofx:
+            self.endofx = self.timex[-1] + 120
+            self.xaxistosm()
+
         if self.splinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
             self.splinedegree = len(self.timex)-1
+            
         func = inter.UnivariateSpline(self.timex,self.temp2, k = self.splinedegree )
         func2 = inter.UnivariateSpline(self.timex,self.temp1, k = self.splinedegree )
-        #create longer list of time values
         time = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
         #convert all time values to temperature
         btvals = func(time).tolist()
         etvals = func2(time).tolist()
-        #plot to verify
         self.ax.plot(time, btvals, color=self.palette["bt"], linestyle = '-', linewidth=2)
         self.ax.plot(time, etvals, color=self.palette["met"], linestyle = '-', linewidth=2)
         self.fig.canvas.draw()
-
-
+       
     #CONTEXT MENU  = Right click
     def on_press(self,event):
         if event.inaxes != self.ax: return
@@ -2846,20 +2848,33 @@ class tgraphcanvas(FigureCanvas):
         self.currentx = event.xdata 
         self.currenty = event.ydata
         
-        menu = QMenu(self)
-        configAction = QAction("Designer Config...",self)
+        designermenu = QMenu(self)
+        
+        configAction = QAction("Designer...",self)
         self.connect(configAction,SIGNAL("triggered()"),self.desconfig)
-        menu.addAction(configAction)
+        designermenu.addAction(configAction)
+
+        backgroundAction = QAction(UIconst.ROAST_MENU_BACKGROUND,self)
+        self.connect(backgroundAction,SIGNAL("triggered()"),aw.background)
+        designermenu.addAction(backgroundAction)  
+
+        designermenu.addSeparator()  
 
         addpointAction = QAction("Add point",self)
         self.connect(addpointAction,SIGNAL("triggered()"),self.addpoint)
-        menu.addAction(addpointAction)
+        designermenu.addAction(addpointAction)
         
         removepointAction = QAction("Remove point",self)
         self.connect(removepointAction,SIGNAL("triggered()"),self.removepoint)
-        menu.addAction(removepointAction)        
+        designermenu.addAction(removepointAction)        
+
+        designermenu.addSeparator()  
+
+        resetAction = QAction("Reset",self)
+        self.connect(resetAction,SIGNAL("triggered()"),self.reset_designer)
+        designermenu.addAction(resetAction)
         
-        menu.exec_(QCursor.pos())        
+        designermenu.exec_(QCursor.pos())        
 
     def on_pick(self,event):
         self.setCursor(Qt.ClosedHandCursor)
@@ -2884,108 +2899,106 @@ class tgraphcanvas(FigureCanvas):
     #handler for moving point
     def on_motion(self,event):
         if not event.inaxes: return
-        try:
-            if self.mousepress:
-                self.timex[self.indexpoint] = event.xdata
-                if self.workingline == 1:
-                    self.temp1[self.indexpoint] = event.ydata
-                else:
-                    self.temp2[self.indexpoint] = event.ydata
+        #try:                
+        if self.mousepress:
+            self.timex[self.indexpoint] = event.xdata
+            if self.workingline == 1:
+                self.temp1[self.indexpoint] = event.ydata
+            else:
+                self.temp2[self.indexpoint] = event.ydata
 
-                #check point going over point
-                #check to the left    
-                if self.indexpoint > 0:
-                    if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint - 1]) < 10:
-                        self.unrarefy_designer()
-                        return
-                #check to the right
-                if self.indexpoint <= len(self.timex)-2:
-                    if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint + 1]) < 10:
-                        self.unrarefy_designer()
-                        return                    
+            #check point going over point
+            #check to the left    
+            if self.indexpoint > 0:
+                if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint - 1]) < 10:
+                    self.unrarefy_designer()
+                    return
+            #check to the right
+            if self.indexpoint <= len(self.timex)-2:
+                if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint + 1]) < 10:
+                    self.unrarefy_designer()
+                    return                    
 
-                #check for possible CHARGE time moving    
+            #check for possible CHARGE time moving
+            if self.indexpoint == self.timeindex[0]:
                 self.setDmarks()
 
-                #redraw
-                self.redrawdesigner()
-                return
-            
-            if self.designerflag:
-                if type(event.xdata):                       #outside graph type is None
-                    for i in range(len(self.timeindex)):
-                        if abs(int(event.xdata) - self.timex[self.timeindex[i]]) < 7:
-                            if abs(self.temp2[self.timeindex[i]] - event.ydata) < 10:
-                                self.ax.plot(self.timex[self.timeindex[i]],self.temp2[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)
-                                self.fig.canvas.draw()
-                                QTimer.singleShot(600, self.redrawdesigner)
-                            elif abs(self.temp1[self.timeindex[i]] - event.ydata) < 10:
-                                self.ax.plot(self.timex[self.timeindex[i]],self.temp1[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)                                                                               
-                                self.fig.canvas.draw()
-                                QTimer.singleShot(600, self.redrawdesigner)
-                            if i == 0:
-                                time = self.stringfromseconds(0)
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> " + time)
-                            elif i == 1:
-                                time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> " + time)
-                            elif i == 2:
-                                time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> " + time)
-                            elif i == 3:
-                                time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> " + time)
-                            elif i == 4:
-                                time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> " + time)
-                            elif i == 5:
-                                time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> " + time)
-                            elif i == 6:
-                                time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ DROP ]</font> " + time)
-                            break
-                        else:
-                            totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
-                            dryphasetime = self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]
-                            midphasetime = self.timex[self.timeindex[2]] - self.timex[self.timeindex[1]]
-                            finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]]
-                            dryphaseP = int(dryphasetime*100/totaltime)
-                            midphaseP = int(midphasetime*100/totaltime)
-                            finishphaseP = int(finishphasetime*100/totaltime)
-                            (st1,st2,st3) = aw.defect_estimation()
-                            margin = "&nbsp;&nbsp;"
-                            string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect1"],margin,self.stringfromseconds(dryphasetime),dryphaseP,margin)
-                            string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect2"],margin,self.stringfromseconds(midphasetime),midphaseP,margin)
-                            string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect3"],margin,self.stringfromseconds(finishphasetime),finishphaseP,margin)
-                            aw.messagelabel.setText(string1+string2+string3)
+            #redraw
+            self.redrawdesigner()
+            return
+        
+        if type(event.xdata):                       #outside graph type is None
+            for i in range(len(self.timeindex)):
+                if abs(int(event.xdata) - self.timex[self.timeindex[i]]) < 7:
+                    if abs(self.temp2[self.timeindex[i]] - event.ydata) < 10:
+                        self.ax.plot(self.timex[self.timeindex[i]],self.temp2[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)
+                        self.fig.canvas.draw()
+                        QTimer.singleShot(600, self.redrawdesigner)
+                    elif abs(self.temp1[self.timeindex[i]] - event.ydata) < 10:
+                        self.ax.plot(self.timex[self.timeindex[i]],self.temp1[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)                                                                               
+                        self.fig.canvas.draw()
+                        QTimer.singleShot(600, self.redrawdesigner)
+                    if i == 0:
+                        time = self.stringfromseconds(0)
+                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> " + time)
+                    elif i == 1:
+                        time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
+                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> " + time)
+                    elif i == 2:
+                        time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
+                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> " + time)
+                    elif i == 3:
+                        time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
+                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> " + time)
+                    elif i == 4:
+                        time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
+                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> " + time)
+                    elif i == 5:
+                        time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
+                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> " + time)
+                    elif i == 6:
+                        time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
+                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ DROP ]</font> " + time)
+                    break
+                else:
+                    totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
+                    dryphasetime = self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]
+                    midphasetime = self.timex[self.timeindex[2]] - self.timex[self.timeindex[1]]
+                    finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]]
+                    dryphaseP = int(dryphasetime*100/totaltime)
+                    midphaseP = int(midphasetime*100/totaltime)
+                    finishphaseP = int(finishphasetime*100/totaltime)
+                    (st1,st2,st3) = aw.defect_estimation()
+                    margin = "&nbsp;&nbsp;"
+                    string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect1"],margin,self.stringfromseconds(dryphasetime),dryphaseP,margin)
+                    string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect2"],margin,self.stringfromseconds(midphasetime),midphaseP,margin)
+                    string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect3"],margin,self.stringfromseconds(finishphasetime),finishphaseP,margin)
+                    aw.messagelabel.setText(string1+string2+string3)
 
-                    for i in range(len(self.newpointindex)):
-                        if abs(int(event.xdata) - self.timex[self.newpointindex[i]]) < 7:
-                            if abs(self.temp2[self.newpointindex[i]] - event.ydata) < 10:
-                                self.ax.plot(self.timex[self.newpointindex[i]],self.temp2[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)
-                                self.fig.canvas.draw()
-                                QTimer.singleShot(600, self.redrawdesigner)
-                            elif abs(self.temp1[self.newpointindex[i]] - event.ydata) < 10:
-                                self.ax.plot(self.timex[self.newpointindex[i]],self.temp1[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)                                                                               
-                                self.fig.canvas.draw()
-                                QTimer.singleShot(600, self.redrawdesigner)
-                            time = self.stringfromseconds(self.timex[self.newpointindex[i]] - self.timex[self.timeindex[0]])
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: lightblue\">%s</font> "%time)
-                           
-            else:
-                self.disconnect_designer()
-        except Exception,e:
-            self.unrarefy_designer()
-            self.adderror(u"Exception: on_motion() " + unicode(e) + " ")
-            return 
+            for i in range(len(self.newpointindex)):
+                if self.newpointindex[i] < len(self.timex):
+                    if abs(int(event.xdata) - self.timex[self.newpointindex[i]]) < 7:
+                        if abs(self.temp2[self.newpointindex[i]] - event.ydata) < 10:
+                            self.ax.plot(self.timex[self.newpointindex[i]],self.temp2[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)
+                            self.fig.canvas.draw()
+                            QTimer.singleShot(600, self.redrawdesigner)
+                        elif abs(self.temp1[self.newpointindex[i]] - event.ydata) < 10:
+                            self.ax.plot(self.timex[self.newpointindex[i]],self.temp1[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)                                                                               
+                            self.fig.canvas.draw()
+                            QTimer.singleShot(600, self.redrawdesigner)
+                        time = self.stringfromseconds(self.timex[self.newpointindex[i]] - self.timex[self.timeindex[0]])
+                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: lightblue\">%s</font> "%time)
 
-    #this is used in on_motion() exception handler when points are placed too closed together and the hand tries to pick them all creating an exception 
+##        except Exception,e:
+##            self.unrarefy_designer()
+##            self.adderror(u"Exception: designer on_motion() " + unicode(e) + " ")
+##            return                            
+
+    #this is used in on_motion() to try to prevent points crossing over points 
     def unrarefy_designer(self):
         for i in range(len(self.timex)-1):
             if abs(self.timex[i]-self.timex[i+1]) < 20:
                 self.timex[i+1] = self.timex[i] + 20
-
             self.setDmarks()
             self.disconnect_designer()
             self.connect_designer()
@@ -3055,10 +3068,9 @@ class tgraphcanvas(FigureCanvas):
             self.adderror(u"Exception: designer addpoint() " + unicode(e) + " ")
             return 
 
-
     #removes point
     def removepoint(self):
-        try:
+        try:                
             #current x, and y is obtained when doing right click in mouse: on_press()
             #find index
             for i in range(len(self.timex)):
@@ -3068,7 +3080,8 @@ class tgraphcanvas(FigureCanvas):
                 index = i
             else:
                 index = i-1
-        
+
+            message = ""
             #check if if it is a landmark point
             if index in self.timeindex:
                 mark = self.timeindex.index(index)
@@ -3099,139 +3112,148 @@ class tgraphcanvas(FigureCanvas):
                 if reply == QMessageBox.Cancel:
                     return 
                 elif reply == QMessageBox.Yes:
-                    self.newpointindex.remove(index)
-                    #update self.newpointindex index (removing an index creates ripple new indexes values after the index location, assuming indexes are sorted)
-                    for i in range(len(self.newpointindex)):
-                        if i > index:
-                            self.newpointindex[i] -= 1
-                    self.timex.pop(index)        
-                    self.temp1.pop(index)
-                    self.temp2.pop(index)
+                    if index in self.newpointindex:
+                        self.newpointindex.remove(index)
+                        #update self.newpointindex index (removing an index creates ripple new indexes values after the index location, assuming indexes are sorted)
+                        for i in range(len(self.newpointindex)):
+                            if i > index:
+                                self.newpointindex[i] -= 1
+                        self.timex.pop(index)        
+                        self.temp1.pop(index)
+                        self.temp2.pop(index)
                     self.setDmarks()                
                     self.redrawdesigner()
                     
         except Exception,e:
             self.adderror(u"Exception: designer removepoint() " + unicode(e) + " ")
-            return 
+            return                 
+
+    #finds a proper index location for a time that does not exists yet.
+    def designerfindindex(self,time):
+        if time < aw.qmc.timex[0]:
+            return 0
+        elif time > aw.qmc.timex[-1]:
+            return len(aw.qmc.timex)
+        else:
+            for i in range(len(aw.qmc.timex)):
+                if time == aw.qmc.timex[i]:
+                    return i
+                if aw.qmc.timex[i] > time:
+                    return i-1
                                
     #converts from a designer profile to a normal profile	        
     def convert_designer(self):
-        try:
-            self.setDmarks()
-            answer = self.createFromManual(self.splinedegree)
-            if answer:
-                aw.sendmessage("New profile created")
-            else:
-                return
+        
+        self.setDmarks()
+        answer = self.createFromManual(self.splinedegree)
+        if answer:
+            aw.sendmessage("New profile created")
+        else:
+            return
+        
+        #check events
+        if len(self.eventtimecopy):
+            for i in range(len(self.eventtimecopy)):
+                self.specialevents.append(self.time2index(self.eventtimecopy[i]))
+            self.specialeventsStrings = self.specialeventsStringscopy[:]
+            self.specialeventsvalue = self.specialeventsvaluecopy[:]
+            self.specialeventstype = self.specialeventstypecopy[:]
             
-            #check events
-            if len(self.eventtimecopy):
-                for i in range(len(self.eventtimecopy)):
-                    self.specialevents.append(self.time2index(self.eventtimecopy[i]))
-                self.specialeventsStrings = self.specialeventsStringscopy[:]
-                self.specialeventsvalue = self.specialeventsvaluecopy[:]
-                self.specialeventstype = self.specialeventstypecopy[:]
+        self.disconnect_designer()           
+
+        #create playback events
+        if self.reproducedesigner:
+            if self.reproducedesigner == 1:
+                self.designer_create_sv_command()
+            elif self.reproducedesigner == 2:
+                self.designer_create_ramp_command()
                 
-            self.disconnect_designer()           
-
-            #create playback events
-            if self.reproducedesigner:
-                if self.reproducedesigner == 1:
-                    self.designer_create_sv_command()
-                elif self.reproducedesigner == 2:
-                    self.designer_create_ramp_command()
-                    
-            self.redraw()
-            
-        except Exception,e:
-            self.adderror(u"Exception: convert_designer() " + unicode(e) + " ")
-            return 
-
+        self.redraw()
+        
     #obtains index of landmarks from timex,temp by reading designer config flags	
     def setDmarks(self):
-        try:
-            timexcopy = self.timex[:]       #NOTE: we need python to do a deep copy, not a shallow copy, therefore the [:]
-            temp1copy = self.temp1[:]
-            temp2copy = self.temp2[:]
+    
+        timexcopy = self.timex[:]       #NOTE: we need python to do a deep copy, not a shallow copy, therefore the [:]
+        temp1copy = self.temp1[:]
+        temp2copy = self.temp2[:]
 
-            #after making a working copy, delete all extra points except Marks 
-            #make a barebone copy without any extra added points except main marks (FC, etc)
+        #after making a working copy, delete all extra points except Marks 
+        #make a barebone copy without any extra added points except main marks (FC, etc)
 
-            for i in range (len(self.newpointindex)):
+        for i in range (len(self.newpointindex)):
+            if self.newpointindex[i] < len(self.timex):
                 timexcopy.remove(self.timex[self.newpointindex[i]])
                 temp1copy.remove(self.temp1[self.newpointindex[i]])
                 temp2copy.remove(self.temp2[self.newpointindex[i]])
-
-            count = 0
-            timexcopy.sort()
-            timexlength = len(timexcopy)
-            if self.designerconfig[0] and timexlength:
-                self.timeindex[0] = self.time2index(timexcopy[count])
-                self.startend[0] = timexcopy[count]
-                self.startend[1] = temp2copy[count]
-                count += 1
             else:
-                self.startend[0] = 0
-                self.startend[1] = 0
-                self.timeindex[0] = 0
-            if self.designerconfig[1] and timexlength > count:
-                self.timeindex[1] = self.time2index(timexcopy[count])
-                self.dryend[0] = timexcopy[count]
-                self.dryend[1] = temp2copy[count]
-                count += 1
-            else:
-                self.dryend[0] = 0
-                self.dryend[1] = 0
-                self.timeindex[1] = 0
-            if self.designerconfig[2] and timexlength > count:
-                self.timeindex[2] = self.time2index(timexcopy[count])
-                self.varC[0] = timexcopy[count]
-                self.varC[1] = temp2copy[count]
-                count += 1
-            else:
-                self.varC[0] = 0
-                self.varC[1] = 0
-                self.timeindex[2] = 0
-            if self.designerconfig[3] and timexlength > count:
-                self.timeindex[3] = self.time2index(timexcopy[count])
-                self.varC[2] = timexcopy[count]
-                self.varC[3] = temp2copy[count]
-                count += 1
-            else:
-                self.varC[2] = 0
-                self.varC[3] = 3
-                self.timeindex[3] = 0
-            if self.designerconfig[4] and timexlength > count:
-                self.timeindex[4] = self.time2index(timexcopy[count])
-                self.varC[4] = timexcopy[count]
-                self.varC[5] = temp2copy[count]
-                count += 1
-            else:
-                self.varC[4] = 0
-                self.varC[5] = 0
-                self.timeindex[4] = 0
-            if self.designerconfig[5] and timexlength > count:
-                self.timeindex[5] = self.time2index(timexcopy[count])
-                self.varC[6] = timexcopy[count]
-                self.varC[7] = temp2copy[count]
-                count += 1
-            else:
-                self.varC[6] = 0
-                self.varC[7] = 0
-                self.timeindex[5] = 0
-            if self.designerconfig[6] and timexlength > count:
-                self.timeindex[6] = self.time2index(timexcopy[count])
-                self.startend[2] = timexcopy[count]
-                self.startend[3] = temp2copy[count]
-            else:
-                self.startend[2] = 0
-                self.startend[3] = 0
-                self.timeindex[6] = 0
-            self.xaxistosm()
-            
-        except Exception,e:
-            self.adderror(u"Exception: designer setDmarks() " + unicode(e) + " ")
-            return 
+                return
+        count = 0
+        timexcopy.sort()
+        timexlength = len(timexcopy)
+        if self.designerconfig[0] and timexlength:
+            self.timeindex[0] = self.time2index(timexcopy[count])
+            self.startend[0] = timexcopy[count]
+            self.startend[1] = temp2copy[count]
+            count += 1
+        else:
+            self.startend[0] = 0
+            self.startend[1] = 0
+            self.timeindex[0] = 0
+        if self.designerconfig[1] and timexlength > count:
+            self.timeindex[1] = self.time2index(timexcopy[count])
+            self.dryend[0] = timexcopy[count]
+            self.dryend[1] = temp2copy[count]
+            count += 1
+        else:
+            self.dryend[0] = 0
+            self.dryend[1] = 0
+            self.timeindex[1] = 0
+        if self.designerconfig[2] and timexlength > count:
+            self.timeindex[2] = self.time2index(timexcopy[count])
+            self.varC[0] = timexcopy[count]
+            self.varC[1] = temp2copy[count]
+            count += 1
+        else:
+            self.varC[0] = 0
+            self.varC[1] = 0
+            self.timeindex[2] = 0
+        if self.designerconfig[3] and timexlength > count:
+            self.timeindex[3] = self.time2index(timexcopy[count])
+            self.varC[2] = timexcopy[count]
+            self.varC[3] = temp2copy[count]
+            count += 1
+        else:
+            self.varC[2] = 0
+            self.varC[3] = 3
+            self.timeindex[3] = 0
+        if self.designerconfig[4] and timexlength > count:
+            self.timeindex[4] = self.time2index(timexcopy[count])
+            self.varC[4] = timexcopy[count]
+            self.varC[5] = temp2copy[count]
+            count += 1
+        else:
+            self.varC[4] = 0
+            self.varC[5] = 0
+            self.timeindex[4] = 0
+        if self.designerconfig[5] and timexlength > count:
+            self.timeindex[5] = self.time2index(timexcopy[count])
+            self.varC[6] = timexcopy[count]
+            self.varC[7] = temp2copy[count]
+            count += 1
+        else:
+            self.varC[6] = 0
+            self.varC[7] = 0
+            self.timeindex[5] = 0
+        if self.designerconfig[6] and timexlength > count:
+            self.timeindex[6] = self.time2index(timexcopy[count])
+            self.startend[2] = timexcopy[count]
+            self.startend[3] = temp2copy[count]
+        else:
+            self.startend[2] = 0
+            self.startend[3] = 0
+            self.timeindex[6] = 0
+        self.xaxistosm()
+        
 
     #activates mouse events	
     def connect_designer(self):
@@ -3244,7 +3266,9 @@ class tgraphcanvas(FigureCanvas):
             self.designerconnections[0] = self.fig.canvas.mpl_connect('pick_event', self.on_pick)
             self.designerconnections[1] = self.fig.canvas.mpl_connect('button_release_event', self.on_release)
             self.designerconnections[2] = self.fig.canvas.mpl_connect('motion_notify_event', self.on_motion)
-            self.designerconnections[3] = self.fig.canvas.mpl_connect('button_press_event', self.on_press)      
+            self.designerconnections[3] = self.fig.canvas.mpl_connect('button_press_event', self.on_press)
+            #this is needed to prevent complaints from inter.UnivariateSpline() -used in redraw()- in extreme cases of difficulty
+            warnings.simplefilter('ignore', UserWarning)
 
     #deactivates mouse events    
     def disconnect_designer(self):
@@ -3253,6 +3277,7 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.canvas.mpl_disconnect(self.designerconnections[i])
         self.setCursor(Qt.ArrowCursor)
         self.designerflag = False
+        warnings.simplefilter('default', UserWarning)
               
     #launches designer config Window    
     def desconfig(self):
@@ -3943,8 +3968,6 @@ class ApplicationWindow(QMainWindow):
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
         self.GraphMenu.addAction(flavorAction)
         
-        self.GraphMenu.addSeparator()
-
         designerAction = QAction("Designer",self)
         self.connect(designerAction ,SIGNAL("triggered()"),self.startdesigner)
         self.GraphMenu.addAction(designerAction)
@@ -7914,13 +7937,14 @@ class calculatorDlg(QDialog):
             self.result1.setText(string1)        
             self.result2.setText(string2)
 
-            #plot visual line 
-            aw.qmc.resetlines()
-            aw.qmc.ax.plot(aw.qmc.timex[startindex], aw.qmc.temp2[startindex], "o", color = aw.qmc.palette["text"])
-            aw.qmc.ax.plot(aw.qmc.timex[endindex], aw.qmc.temp2[endindex], "o", color = aw.qmc.palette["text"])
-            aw.qmc.ax.plot([aw.qmc.timex[startindex],aw.qmc.timex[endindex]],[aw.qmc.temp2[startindex],aw.qmc.temp2[endindex]],
-                            linewidth=1, color = aw.qmc.palette["text"],linestyle="-.")
-            aw.qmc.fig.canvas.draw()
+            #plot visual line
+            if aw.qmc.designerflag == False:
+                aw.qmc.resetlines()
+                aw.qmc.ax.plot(aw.qmc.timex[startindex], aw.qmc.temp2[startindex], "o", color = aw.qmc.palette["text"])
+                aw.qmc.ax.plot(aw.qmc.timex[endindex], aw.qmc.temp2[endindex], "o", color = aw.qmc.palette["text"])
+                aw.qmc.ax.plot([aw.qmc.timex[startindex],aw.qmc.timex[endindex]],[aw.qmc.temp2[startindex],aw.qmc.temp2[endindex]],
+                                linewidth=1, color = aw.qmc.palette["text"],linestyle="-.")
+                aw.qmc.fig.canvas.draw()
             
         else:
             self.result1.setText("No profile found")  
@@ -9936,7 +9960,7 @@ class serialport(object):
 class designerconfigDlg(QDialog):
     def __init__(self, parent = None):
         super(designerconfigDlg,self).__init__(parent)
-        self.setWindowTitle("Initial Designer Config")
+        self.setWindowTitle("Designer Config")
 
         #landmarks
         self.charge = QCheckBox("CHARGE")
@@ -10002,8 +10026,8 @@ class designerconfigDlg(QDialog):
         closeButton = QPushButton("Close")
         self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         
-        convertButton = QPushButton("Convert")
-        self.connect(convertButton, SIGNAL("clicked()"),self.convertd)
+        convertButton = QPushButton("Create")
+        self.connect(convertButton, SIGNAL("clicked()"),self.create)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(defaultButton)
@@ -10076,32 +10100,32 @@ class designerconfigDlg(QDialog):
         
         if self.charge.isChecked():
                 time = aw.qmc.stringtoseconds(unicode(self.Edit0.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[0] = self.findindex(time)
+                aw.qmc.timeindex[0] = aw.qmc.designerfindindex(time)
                 aw.qmc.timex[aw.qmc.timeindex[0]] = time 
         if self.dryend.isChecked():
             if aw.qmc.stringtoseconds(unicode(self.Edit1.text())):
                 time = aw.qmc.stringtoseconds(unicode(self.Edit1.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[1] = self.findindex(time)
+                aw.qmc.timeindex[1] = aw.qmc.designerfindindex(time)
                 aw.qmc.timex[aw.qmc.timeindex[1]] = time                
         if self.fcs.isChecked():
             if aw.qmc.stringtoseconds(unicode(self.Edit2.text())):
                 time = aw.qmc.stringtoseconds(unicode(self.Edit2.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[2] = self.findindex(time)
+                aw.qmc.timeindex[2] = aw.qmc.designerfindindex(time)
                 aw.qmc.timex[aw.qmc.timeindex[2]] = time 
         if self.fce.isChecked():
             if aw.qmc.stringtoseconds(unicode(self.Edit3.text())):
                 time = aw.qmc.stringtoseconds(unicode(self.Edit3.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[3] = self.findindex(time)
+                aw.qmc.timeindex[3] = aw.qmc.designerfindindex(time)
                 aw.qmc.timex[aw.qmc.timeindex[3]] = time 
         if self.scs.isChecked():
             if aw.qmc.stringtoseconds(unicode(self.Edit4.text())):
                 time = aw.qmc.stringtoseconds(unicode(self.Edit4.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[4] = self.findindex(time)
+                aw.qmc.timeindex[4] = aw.qmc.designerfindindex(time)
                 aw.qmc.timex[aw.qmc.timeindex[4]] = time 
         if self.sce.isChecked():
             if aw.qmc.stringtoseconds(unicode(self.Edit5.text())):
                 time = aw.qmc.stringtoseconds(unicode(self.Edit5.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[5] = self.findindex(time)
+                aw.qmc.timeindex[5] = aw.qmc.designerfindindex(time)
                 aw.qmc.timex[aw.qmc.timeindex[5]] = time 
         if self.drop.isChecked():
             if aw.qmc.stringtoseconds(unicode(self.Edit6.text())):
@@ -10167,21 +10191,8 @@ class designerconfigDlg(QDialog):
             checks[6] = 1
             
         return checks
-    
-    #supporting function for settimes()    
-    def findindex(self,time):
-        if time < aw.qmc.timex[0]:
-            return 0
-        elif time > aw.qmc.timex[-1]:
-            return len(aw.qmc.timex)
-        else:
-            for i in range(len(aw.qmc.timex)):
-                if time == aw.qmc.timex[i]:
-                    return i
-                if aw.qmc.timex[i] > time:
-                    return i-1
-                
-    def convertd(self):
+                   
+    def create(self):
         self.close()
         aw.qmc.convert_designer()
 
@@ -10238,7 +10249,7 @@ class designerconfigDlg(QDialog):
                     break
                 else:
                     #add mark point. Find index for mark point
-                    index = self.findindex(aw.qmc.designertimeinit[i])
+                    index = aw.qmc.designerfindindex(aw.qmc.designertimeinit[i])
                     #add mark point
                     if i > 0:
                         if aw.qmc.designertimeinit[i] > aw.qmc.designertimeinit[i-1]:
