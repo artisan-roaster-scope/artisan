@@ -1037,7 +1037,7 @@ class tgraphcanvas(FigureCanvas):
         
     #Redraws data   
     def redraw(self):
-
+        
         self.fig.clf()   #wipe out figure
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         #Set axes same as in __init__
@@ -2899,100 +2899,100 @@ class tgraphcanvas(FigureCanvas):
     #handler for moving point
     def on_motion(self,event):
         if not event.inaxes: return
-        #try:                
-        if self.mousepress:
-            self.timex[self.indexpoint] = event.xdata
-            if self.workingline == 1:
-                self.temp1[self.indexpoint] = event.ydata
-            else:
-                self.temp2[self.indexpoint] = event.ydata
-
-            #check point going over point
-            #check to the left    
-            if self.indexpoint > 0:
-                if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint - 1]) < 10:
-                    self.unrarefy_designer()
-                    return
-            #check to the right
-            if self.indexpoint <= len(self.timex)-2:
-                if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint + 1]) < 10:
-                    self.unrarefy_designer()
-                    return                    
-
-            #check for possible CHARGE time moving
-            if self.indexpoint == self.timeindex[0]:
-                self.setDmarks()
-
-            #redraw
-            self.redrawdesigner()
-            return
-        
-        if type(event.xdata):                       #outside graph type is None
-            for i in range(len(self.timeindex)):
-                if abs(int(event.xdata) - self.timex[self.timeindex[i]]) < 7:
-                    if abs(self.temp2[self.timeindex[i]] - event.ydata) < 10:
-                        self.ax.plot(self.timex[self.timeindex[i]],self.temp2[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)
-                        self.fig.canvas.draw()
-                        QTimer.singleShot(600, self.redrawdesigner)
-                    elif abs(self.temp1[self.timeindex[i]] - event.ydata) < 10:
-                        self.ax.plot(self.timex[self.timeindex[i]],self.temp1[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)                                                                               
-                        self.fig.canvas.draw()
-                        QTimer.singleShot(600, self.redrawdesigner)
-                    if i == 0:
-                        time = self.stringfromseconds(0)
-                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> " + time)
-                    elif i == 1:
-                        time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> " + time)
-                    elif i == 2:
-                        time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> " + time)
-                    elif i == 3:
-                        time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
-                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> " + time)
-                    elif i == 4:
-                        time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> " + time)
-                    elif i == 5:
-                        time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> " + time)
-                    elif i == 6:
-                        time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ DROP ]</font> " + time)
-                    break
+        try:                
+            if self.mousepress:
+                self.timex[self.indexpoint] = event.xdata
+                if self.workingline == 1:
+                    self.temp1[self.indexpoint] = event.ydata
                 else:
-                    totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
-                    dryphasetime = self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]
-                    midphasetime = self.timex[self.timeindex[2]] - self.timex[self.timeindex[1]]
-                    finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]]
-                    dryphaseP = int(dryphasetime*100/totaltime)
-                    midphaseP = int(midphasetime*100/totaltime)
-                    finishphaseP = int(finishphasetime*100/totaltime)
-                    (st1,st2,st3) = aw.defect_estimation()
-                    margin = "&nbsp;&nbsp;"
-                    string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect1"],margin,self.stringfromseconds(dryphasetime),dryphaseP,margin)
-                    string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect2"],margin,self.stringfromseconds(midphasetime),midphaseP,margin)
-                    string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect3"],margin,self.stringfromseconds(finishphasetime),finishphaseP,margin)
-                    aw.messagelabel.setText(string1+string2+string3)
+                    self.temp2[self.indexpoint] = event.ydata
 
-            for i in range(len(self.newpointindex)):
-                if self.newpointindex[i] < len(self.timex):
-                    if abs(int(event.xdata) - self.timex[self.newpointindex[i]]) < 7:
-                        if abs(self.temp2[self.newpointindex[i]] - event.ydata) < 10:
-                            self.ax.plot(self.timex[self.newpointindex[i]],self.temp2[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)
+                #check point going over point
+                #check to the left    
+                if self.indexpoint > 0:
+                    if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint - 1]) < 10:
+                        self.unrarefy_designer()
+                        return
+                #check to the right
+                if self.indexpoint <= len(self.timex)-2:
+                    if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint + 1]) < 10:
+                        self.unrarefy_designer()
+                        return                    
+
+                #check for possible CHARGE time moving
+                if self.indexpoint == self.timeindex[0]:
+                    self.setDmarks()
+
+                #redraw
+                self.redrawdesigner()
+                return
+            
+            if type(event.xdata):                       #outside graph type is None
+                for i in range(len(self.timeindex)):
+                    if abs(int(event.xdata) - self.timex[self.timeindex[i]]) < 7:
+                        if abs(self.temp2[self.timeindex[i]] - event.ydata) < 10:
+                            self.ax.plot(self.timex[self.timeindex[i]],self.temp2[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)
                             self.fig.canvas.draw()
                             QTimer.singleShot(600, self.redrawdesigner)
-                        elif abs(self.temp1[self.newpointindex[i]] - event.ydata) < 10:
-                            self.ax.plot(self.timex[self.newpointindex[i]],self.temp1[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)                                                                               
+                        elif abs(self.temp1[self.timeindex[i]] - event.ydata) < 10:
+                            self.ax.plot(self.timex[self.timeindex[i]],self.temp1[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)                                                                               
                             self.fig.canvas.draw()
                             QTimer.singleShot(600, self.redrawdesigner)
-                        time = self.stringfromseconds(self.timex[self.newpointindex[i]] - self.timex[self.timeindex[0]])
-                        aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: lightblue\">%s</font> "%time)
+                        if i == 0:
+                            time = self.stringfromseconds(0)
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> " + time)
+                        elif i == 1:
+                            time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> " + time)
+                        elif i == 2:
+                            time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> " + time)
+                        elif i == 3:
+                            time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> " + time)
+                        elif i == 4:
+                            time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> " + time)
+                        elif i == 5:
+                            time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> " + time)
+                        elif i == 6:
+                            time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ DROP ]</font> " + time)
+                        break
+                    else:
+                        totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
+                        dryphasetime = self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]
+                        midphasetime = self.timex[self.timeindex[2]] - self.timex[self.timeindex[1]]
+                        finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]]
+                        dryphaseP = int(dryphasetime*100/totaltime)
+                        midphaseP = int(midphasetime*100/totaltime)
+                        finishphaseP = int(finishphasetime*100/totaltime)
+                        (st1,st2,st3) = aw.defect_estimation()
+                        margin = "&nbsp;&nbsp;"
+                        string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect1"],margin,self.stringfromseconds(dryphasetime),dryphaseP,margin)
+                        string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect2"],margin,self.stringfromseconds(midphasetime),midphaseP,margin)
+                        string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect3"],margin,self.stringfromseconds(finishphasetime),finishphaseP,margin)
+                        aw.messagelabel.setText(string1+string2+string3)
 
-##        except Exception,e:
-##            self.unrarefy_designer()
-##            self.adderror(u"Exception: designer on_motion() " + unicode(e) + " ")
-##            return                            
+                for i in range(len(self.newpointindex)):
+                    if self.newpointindex[i] < len(self.timex):
+                        if abs(int(event.xdata) - self.timex[self.newpointindex[i]]) < 7:
+                            if abs(self.temp2[self.newpointindex[i]] - event.ydata) < 10:
+                                self.ax.plot(self.timex[self.newpointindex[i]],self.temp2[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)
+                                self.fig.canvas.draw()
+                                QTimer.singleShot(600, self.redrawdesigner)
+                            elif abs(self.temp1[self.newpointindex[i]] - event.ydata) < 10:
+                                self.ax.plot(self.timex[self.newpointindex[i]],self.temp1[self.newpointindex[i]],color = "blue",marker = "o",alpha = .3,markersize=20)                                                                               
+                                self.fig.canvas.draw()
+                                QTimer.singleShot(600, self.redrawdesigner)
+                            time = self.stringfromseconds(self.timex[self.newpointindex[i]] - self.timex[self.timeindex[0]])
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: lightblue\">%s</font> "%time)
+
+        except Exception,e:
+            self.unrarefy_designer()
+            self.adderror(u"Exception: designer on_motion() " + unicode(e) + " ")
+            return                            
 
     #this is used in on_motion() to try to prevent points crossing over points 
     def unrarefy_designer(self):
@@ -3315,7 +3315,9 @@ class tgraphcanvas(FigureCanvas):
         for i in range(3):
             command += u"SETRS::" + tempinits[i] + u"::" + minutes_segments[i] + u"::0::"
         command += u"SETRS::" + tempinits[-1] + u"::0::0"
-                        
+
+        self.clean_old_pid_commands()
+                    
         self.specialevents.append(0)                                     
         self.specialeventstype.append(0)                                           
         self.specialeventsStrings.append(command)                          
@@ -3323,12 +3325,30 @@ class tgraphcanvas(FigureCanvas):
 
     #this is used to create a string in ET temp language to reproduce the profile from Designer    
     def designer_create_sv_command(self):
+        self.clean_old_pid_commands()
         for i in range(len(self.timeindex)):
             command = u"SETSV::%.1f"%self.temp1[self.timeindex[i]]
             self.specialevents.append(self.timeindex[i])                    
             self.specialeventstype.append(0)                                           
             self.specialeventsStrings.append(command)                          
-            self.specialeventsvalue.append(0)                
+            self.specialeventsvalue.append(0)
+            
+    #verifies there are no previos machine commands on events
+    def clean_old_pid_commands(self):
+        #check for possible preloaded machine commands
+        target = 0
+        if len(self.specialevents):
+            for i in range(len(self.specialevents)):
+                if "::" in self.specialeventsStrings[i]:
+                    self.specialevents.pop(i)
+                    self.specialeventstype.pop(i)
+                    self.specialeventsStrings.pop(i)
+                    self.specialeventsvalue.pop(i)
+                    target = 1
+                    break     #break or the index i can become larger than the new shorted length of specialevents
+        if target:
+           self.check_pid_command() 
+                    
         
                 
 #######################################################################################
