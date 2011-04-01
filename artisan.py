@@ -3863,7 +3863,7 @@ class ApplicationWindow(QMainWindow):
 
         saveGraphMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_SAVEGRAPH)
 
-        fullsizeAction = QAction("Full Size...",self)
+        fullsizeAction = QAction(UIconst.FILE_MENU_SAVEGRAPH_FULL_SIZE,self)
         self.connect(fullsizeAction,SIGNAL("triggered()"),lambda x=0,y=1:self.resize(x,y))
         saveGraphMenu.addAction(fullsizeAction)
 
@@ -3872,35 +3872,35 @@ class ApplicationWindow(QMainWindow):
         saveGraphMenuPC = saveGraphMenu.addMenu("PlanetCafe.fr")
         saveGraphMenuRC = saveGraphMenu.addMenu("RiktigtKaffe.se")
 
-        HomeBaristaActionLow = QAction("Low Quality...",self)
+        HomeBaristaActionLow = QAction(UIconst.FILE_MENU_SAVEGRAPH_LOW_QUALITY,self)
         self.connect(HomeBaristaActionLow,SIGNAL("triggered()"),lambda x=700,y=0:self.resize(x,y))
         saveGraphMenuHB.addAction(HomeBaristaActionLow)
 
-        HomeBaristaActionHigh = QAction("High Quality...",self)
+        HomeBaristaActionHigh = QAction(UIconst.FILE_MENU_SAVEGRAPH_HIGH_QUALITY,self)
         self.connect(HomeBaristaActionHigh,SIGNAL("triggered()"),lambda x=700,y=1:self.resize(x,y))
         saveGraphMenuHB.addAction(HomeBaristaActionHigh)
 
-        CoffeeGeekActionLow = QAction("Low Quality...",self)
+        CoffeeGeekActionLow = QAction(UIconst.FILE_MENU_SAVEGRAPH_LOW_QUALITY,self)
         self.connect(CoffeeGeekActionLow,SIGNAL("triggered()"),lambda x=500,y=0:self.resize(x,y))
         saveGraphMenuCG.addAction(CoffeeGeekActionLow)
 
-        CoffeeGeekActionHigh = QAction("High Quality...",self)
+        CoffeeGeekActionHigh = QAction(UIconst.FILE_MENU_SAVEGRAPH_HIGH_QUALITY,self)
         self.connect(CoffeeGeekActionHigh,SIGNAL("triggered()"),lambda x=500,y=1:self.resize(x,y))
         saveGraphMenuCG.addAction(CoffeeGeekActionHigh)
 
-        PlanetCafeActionLow = QAction("Low Quality...",self)
+        PlanetCafeActionLow = QAction(UIconst.FILE_MENU_SAVEGRAPH_LOW_QUALITY,self)
         self.connect(PlanetCafeActionLow,SIGNAL("triggered()"),lambda x=600,y=0:self.resize(x,y))
         saveGraphMenuPC.addAction(PlanetCafeActionLow)
 
-        PlanetCafeActionHigh = QAction("High Quality...",self)
+        PlanetCafeActionHigh = QAction(UIconst.FILE_MENU_SAVEGRAPH_HIGH_QUALITY,self)
         self.connect(PlanetCafeActionHigh,SIGNAL("triggered()"),lambda x=600,y=1:self.resize(x,y))
         saveGraphMenuPC.addAction(PlanetCafeActionHigh)
 
-        RiktigtKaffeActionLow = QAction("Low Quality...",self)
+        RiktigtKaffeActionLow = QAction(UIconst.FILE_MENU_SAVEGRAPH_LOW_QUALITY,self)
         self.connect(RiktigtKaffeActionLow,SIGNAL("triggered()"),lambda x=620,y=0:self.resize(x,y))
         saveGraphMenuRC.addAction(RiktigtKaffeActionLow)
 
-        RiktigtKaffeActionHigh = QAction("High Quality...",self)
+        RiktigtKaffeActionHigh = QAction(UIconst.FILE_MENU_SAVEGRAPH_HIGH_QUALITY,self)
         self.connect(RiktigtKaffeActionHigh,SIGNAL("triggered()"),lambda x=620,y=1:self.resize(x,y))
         saveGraphMenuRC.addAction(RiktigtKaffeActionHigh)
 
@@ -3953,19 +3953,19 @@ class ApplicationWindow(QMainWindow):
         
         temperatureMenu = self.GraphMenu.addMenu(UIconst.ROAST_MENU_TEMPERATURE)
         
-        self.ConvertToFahrenheitAction = QAction("Convert profile to Fahrenheit",self)
+        self.ConvertToFahrenheitAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_FAHRENHEIT,self)
         self.connect(self.ConvertToFahrenheitAction,SIGNAL("triggered()"),lambda t="F":self.qmc.convertTemperature(t))
         temperatureMenu.addAction(self.ConvertToFahrenheitAction)
 
-        self.ConvertToCelsiusAction = QAction("Convert profile to Celsius",self)
+        self.ConvertToCelsiusAction = QAction(UIconst.ROAST_MENU_CONVERT_TO_CELSIUS,self)
         self.connect(self.ConvertToCelsiusAction,SIGNAL("triggered()"),lambda t="C":self.qmc.convertTemperature(t))
         temperatureMenu.addAction(self.ConvertToCelsiusAction)
 
-        self.FahrenheitAction = QAction("Set display to Fahrenheit Mode",self)
+        self.FahrenheitAction = QAction(UIconst.ROAST_MENU_FAHRENHEIT_MODE,self)
         self.connect(self.FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
         temperatureMenu.addAction(self.FahrenheitAction)
 
-        self.CelsiusAction = QAction("Set display to Celsius Mode",self)
+        self.CelsiusAction = QAction(UIconst.ROAST_MENU_CELSIUS_MODE,self)
         self.connect(self.CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusMode)
         temperatureMenu.addAction(self.CelsiusAction)
         
@@ -7521,7 +7521,8 @@ class messageDlg(QDialog):
         
 class autosaveDlg(QDialog):
     def __init__(self, parent = None):
-        super(autosaveDlg,self).__init__(parent)
+        super(autosaveDlg,self).__init__(parent)        
+        self.setModal(True)
         self.setWindowTitle("Keyboard Autosave [s]")
         
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
@@ -11564,6 +11565,7 @@ class graphColorDlg(QDialog):
 class AlarmDlg(QDialog):
     def __init__(self, parent = None):
         super(AlarmDlg,self).__init__(parent)
+        self.setModal(True)
         self.setWindowTitle("Alarms")
 
         #table for alarms
@@ -11572,21 +11574,26 @@ class AlarmDlg(QDialog):
 
         allonButton = QPushButton("Set All ON")
         self.connect(allonButton,  SIGNAL("clicked()"), lambda flag=1: self.alarmson(flag))
+        allonButton.setFocusPolicy(Qt.NoFocus)
 
         alloffButton = QPushButton("Set All OFF")
         self.connect(alloffButton, SIGNAL("clicked()"), lambda flag=0: self.alarmson(flag))
+        alloffButton.setFocusPolicy(Qt.NoFocus)
 
         addButton = QPushButton("Add")
         self.connect(addButton, SIGNAL("clicked()"),self.addalarm)
+        addButton.setFocusPolicy(Qt.NoFocus)
 
         deleteButton = QPushButton("Delete")
         self.connect(deleteButton, SIGNAL("clicked()"),self.deletealarm)
+        deleteButton.setFocusPolicy(Qt.NoFocus)
 
-        saveButton = QPushButton("Save Changes")
-        self.connect(saveButton, SIGNAL("clicked()"),self.savealarms)
-
-        closeButton = QPushButton("Close")
+        closeButton = QPushButton("Cancel")
         self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+        closeButton.setFocusPolicy(Qt.NoFocus)
+
+        saveButton = QPushButton("Ok")
+        self.connect(saveButton, SIGNAL("clicked()"),self.savealarms)
 
         tablelayout = QVBoxLayout()
         buttonlayout = QHBoxLayout()
@@ -11597,8 +11604,9 @@ class AlarmDlg(QDialog):
         buttonlayout.addWidget(allonButton)
         buttonlayout.addWidget(deleteButton)
         buttonlayout.addWidget(addButton)
-        buttonlayout.addWidget(saveButton)
+        buttonlayout.addStretch()
         buttonlayout.addWidget(closeButton)
+        buttonlayout.addWidget(saveButton)
 
         mainlayout.addLayout(tablelayout)
         mainlayout.addLayout(buttonlayout)
@@ -11653,6 +11661,7 @@ class AlarmDlg(QDialog):
             aw.qmc.alarmaction[i] = int(unicode(action.currentIndex()))
             description = self.alarmtable.cellWidget(i,5)
             aw.qmc.alarmstrings[i] = unicode(description.text())
+        self.accept()
                
     def createalarmtable(self):
         self.alarmtable.clear()

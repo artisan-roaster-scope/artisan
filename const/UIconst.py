@@ -33,6 +33,9 @@ FILE_MENU_SAVE = QApplication.translate("Menu", "Save", None, QApplication.Unico
 FILE_MENU_SAVEAS = QApplication.translate("Menu", "Save As...", None, QApplication.UnicodeUTF8)
 FILE_MENU_EXPORT = QApplication.translate("Menu", "Export...", None, QApplication.UnicodeUTF8)
 FILE_MENU_SAVEGRAPH = QApplication.translate("Menu", "Save Graph", None, QApplication.UnicodeUTF8)
+FILE_MENU_SAVEGRAPH_FULL_SIZE = QApplication.translate("Menu", "Full Size...", None, QApplication.UnicodeUTF8)
+FILE_MENU_SAVEGRAPH_LOW_QUALITY = QApplication.translate("Menu", "Low Quality...", None, QApplication.UnicodeUTF8)
+FILE_MENU_SAVEGRAPH_HIGH_QUALITY = QApplication.translate("Menu", "High Quality...", None, QApplication.UnicodeUTF8)
 FILE_MENU_HTMLREPORT = QApplication.translate("Menu", "HTML Report", None, QApplication.UnicodeUTF8)
 FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None, QApplication.UnicodeUTF8)
 
@@ -52,6 +55,10 @@ ROAST_MENU_PROPERTIES = QApplication.translate("Menu", "Properties...", None, QA
 ROAST_MENU_BACKGROUND = QApplication.translate("Menu", "Background...", None, QApplication.UnicodeUTF8)
 ROAST_MENU_CUPPROFILE = QApplication.translate("Menu", "Cup Profile...", None, QApplication.UnicodeUTF8)
 ROAST_MENU_TEMPERATURE = QApplication.translate("Menu", "Temperature", None, QApplication.UnicodeUTF8)
+ROAST_MENU_CONVERT_TO_FAHRENHEIT = QApplication.translate("Menu", "Convert to Fahrenheit", None, QApplication.UnicodeUTF8)
+ROAST_MENU_CONVERT_TO_CELSIUS = QApplication.translate("Menu", "Convert to Celsius", None, QApplication.UnicodeUTF8)
+ROAST_MENU_FAHRENHEIT_MODE = QApplication.translate("Menu", "Fahrenheit Mode", None, QApplication.UnicodeUTF8)
+ROAST_MENU_CELSIUS_MODE = QApplication.translate("Menu", "Celsius Mode", None, QApplication.UnicodeUTF8)
 ROAST_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None, QApplication.UnicodeUTF8)
 
 #Conf menu items
