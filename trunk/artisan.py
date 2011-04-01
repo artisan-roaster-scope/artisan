@@ -2658,6 +2658,32 @@ class tgraphcanvas(FigureCanvas):
             elif choice2 < choice1:
                 return i-1
 
+    #selects closest time INDEX in self.timeB from a given input float seconds
+    def backgroundtime2index(self,seconds):
+        #find where given seconds crosses aw.qmc.timex
+        if len(self.timeB):                           #check that time is not empty just in case
+            #if input seconds longer than available time return last index
+            if  seconds > self.timeB[-1]:
+                return len(self.timeB)-1
+
+            #if given input seconds smaller than first time return first index
+            if seconds < self.timeB[0]:
+                return 0
+            
+            for i in range(len(self.timeB)):
+                # first find the index i where seconds crosses timex
+                if self.timeB[i] > seconds:
+                    break
+
+            #look around    
+            choice1 = abs(self.timeB[i] - seconds)
+            choice2 = abs(self.timeB[i-1] - seconds)
+
+            #return closest (smallest) index
+            if choice1 < choice2:  
+                return i
+            elif choice2 < choice1:
+                return i-1
 
     #updates list self.timeindex when found an _old_ profile without self.timeindex (new version)
     def timeindexupdate(self):
@@ -2676,10 +2702,9 @@ class tgraphcanvas(FigureCanvas):
         times = [self.startendB[0],self.dryendB[0],self.varCB[0],self.varCB[2],self.varCB[4],self.varCB[6],self.startendB[2]]
         for i in range(7):               
             if times[i]:
-                self.backgroundtimeindex[i] = self.time2index(times[i])
+                self.backgroundtimeindex[i] = self.backgroundtime2index(times[i])
             else:
                 self.backgroundtimeindex[i] = 0
-
     def restore_message_label(self):
         aw.messagelabel.setStyleSheet("background-color:'transparent';")
 
@@ -9092,7 +9117,6 @@ class backgroundDLG(QDialog):
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
             self.datatable.setSelectionMode(QTableWidget.SingleSelection)
             self.datatable.setShowGrid(True)
-
             for i in range(ndata):
                 Atime = QTableWidgetItem("%.03f"%aw.qmc.timeB[i])
                 Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-aw.qmc.startendB[0]))))
