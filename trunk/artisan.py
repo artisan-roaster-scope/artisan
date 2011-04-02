@@ -3372,7 +3372,7 @@ class tgraphcanvas(FigureCanvas):
                     target = 1
                     break     #break or the index i can become larger than the new shorted length of specialevents
         if target:
-           self.check_pid_command() 
+           self.clean_old_pid_commands() 
                     
         
                 
@@ -10174,7 +10174,7 @@ class designerconfigDlg(QDialog):
         if self.drop.isChecked():
             if aw.qmc.stringtoseconds(unicode(self.Edit6.text())):
                 time = aw.qmc.stringtoseconds(unicode(self.Edit6.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[6] = self.findindex(time)
+                aw.qmc.timeindex[6] = aw.qmc.designerfindindex(time)
                 aw.qmc.timex[aw.qmc.timeindex[6]] = time 
 
         for i in range(len(aw.qmc.timeindex)):
