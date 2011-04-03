@@ -11660,7 +11660,7 @@ class AlarmDlg(QDialog):
         closeButton.setFocusPolicy(Qt.NoFocus)
 
         saveButton = QPushButton("Ok")
-        self.connect(saveButton, SIGNAL("clicked()"),self.savealarms)
+        self.connect(saveButton, SIGNAL("clicked()"),self.closealarms)
 
         tablelayout = QVBoxLayout()
         buttonlayout = QHBoxLayout()
@@ -11713,6 +11713,10 @@ class AlarmDlg(QDialog):
             if self.alarmtable.rowCount():
                 self.alarmtable.setRowCount(0)
        
+    def closealarms(self):
+        self.savealarms()
+        self.accept()
+        
     def savealarms(self):
         nalarms = self.alarmtable.rowCount()
         for i in range(nalarms):
