@@ -11655,9 +11655,9 @@ class AlarmDlg(QDialog):
         self.connect(deleteButton, SIGNAL("clicked()"),self.deletealarm)
         deleteButton.setFocusPolicy(Qt.NoFocus)
 
-        closeButton = QPushButton("Cancel")
-        self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        closeButton.setFocusPolicy(Qt.NoFocus)
+#        closeButton = QPushButton("Cancel")
+#        self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+#        closeButton.setFocusPolicy(Qt.NoFocus)
 
         saveButton = QPushButton("Ok")
         self.connect(saveButton, SIGNAL("clicked()"),self.closealarms)
@@ -11672,7 +11672,8 @@ class AlarmDlg(QDialog):
         buttonlayout.addWidget(deleteButton)
         buttonlayout.addWidget(addButton)
         buttonlayout.addStretch()
-        buttonlayout.addWidget(closeButton)
+# close button makes no sense as the actions are taking immediately and an undo is not possible
+#        buttonlayout.addWidget(closeButton)
         buttonlayout.addWidget(saveButton)
 
         mainlayout.addLayout(tablelayout)
@@ -11689,25 +11690,36 @@ class AlarmDlg(QDialog):
         self.createalarmtable()
 
     def addalarm(self):
-        self.savealarms()
+        #self.savealarms()
         aw.qmc.alarmtime.append(1)
         aw.qmc.alarmflag.append(1)
         aw.qmc.alarmsource.append(1)
         aw.qmc.alarmtemperature.append(500)
         aw.qmc.alarmaction.append(0)
         aw.qmc.alarmstrings.append("Enter description")
-
         self.createalarmtable()
         
-    def deletealarm(self):
+    def deletealarm(self):        
         nalarms = len(aw.qmc.alarmflag)
         if nalarms:
-            aw.qmc.alarmtime.pop()                                                                
-            aw.qmc.alarmflag.pop()            
-            aw.qmc.alarmsource.pop()
-            aw.qmc.alarmtemperature.pop()
-            aw.qmc.alarmaction.pop()
-            aw.qmc.alarmstrings.pop()
+            # check for selection            
+            selected = self.alarmtable.selectedRanges()
+            if selected and len(selected) > 0:
+                selected_row = selected[0].topRow()
+                aw.qmc.alarmtime = aw.qmc.alarmtime[0:selected_row] + aw.qmc.alarmtime[selected_row + 1:]
+                aw.qmc.alarmflag = aw.qmc.alarmflag[0:selected_row] + aw.qmc.alarmflag[selected_row + 1:]
+                aw.qmc.alarmsource = aw.qmc.alarmsource[0:selected_row] + aw.qmc.alarmsource[selected_row + 1:]
+                aw.qmc.alarmtemperature = aw.qmc.alarmtemperature[0:selected_row] + aw.qmc.alarmtemperature[selected_row + 1:]
+                aw.qmc.alarmaction = aw.qmc.alarmaction[0:selected_row] + aw.qmc.alarmaction[selected_row + 1:]
+                aw.qmc.alarmstrings = aw.qmc.alarmstrings[0:selected_row] + aw.qmc.alarmstrings[selected_row + 1:]
+            else:
+                # nothing selected, we pop the last element
+                aw.qmc.alarmtime.pop()                                                                
+                aw.qmc.alarmflag.pop()            
+                aw.qmc.alarmsource.pop()
+                aw.qmc.alarmtemperature.pop()
+                aw.qmc.alarmaction.pop()
+                aw.qmc.alarmstrings.pop()
             self.createalarmtable()
         if not len(aw.qmc.alarmflag):
             if self.alarmtable.rowCount():
