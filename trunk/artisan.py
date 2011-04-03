@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.3.5"
+__version__ = u"0.4.0"
 
 
 # ABOUT
@@ -4014,7 +4014,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
         self.GraphMenu.addAction(flavorAction)
         
-        designerAction = QAction(ROAST_MENU_DESIGNER,self)
+        designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
         self.connect(designerAction ,SIGNAL("triggered()"),self.startdesigner)
         self.GraphMenu.addAction(designerAction)
         
