@@ -53,6 +53,7 @@ if platf != u'Darwin':
     ROAST_MENU = "&" + ROAST_MENU
 ROAST_MENU_PROPERTIES = QApplication.translate("Menu", "Properties...", None, QApplication.UnicodeUTF8)
 ROAST_MENU_BACKGROUND = QApplication.translate("Menu", "Background...", None, QApplication.UnicodeUTF8)
+ROAST_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None, QApplication.UnicodeUTF8)
 ROAST_MENU_CUPPROFILE = QApplication.translate("Menu", "Cup Profile...", None, QApplication.UnicodeUTF8)
 ROAST_MENU_TEMPERATURE = QApplication.translate("Menu", "Temperature", None, QApplication.UnicodeUTF8)
 ROAST_MENU_CONVERT_TO_FAHRENHEIT = QApplication.translate("Menu", "Convert to Fahrenheit", None, QApplication.UnicodeUTF8)

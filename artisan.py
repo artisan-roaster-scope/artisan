@@ -77,7 +77,7 @@ import struct
 from scipy import fft
 from scipy import interpolate as inter
 
-from PyQt4.QtGui import (QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
+from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
@@ -4014,7 +4014,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
         self.GraphMenu.addAction(flavorAction)
         
-        designerAction = QAction("Designer",self)
+        designerAction = QAction(ROAST_MENU_DESIGNER,self)
         self.connect(designerAction ,SIGNAL("triggered()"),self.startdesigner)
         self.GraphMenu.addAction(designerAction)
         
@@ -6568,6 +6568,8 @@ class HUDDlg(QDialog):
         Slayout.addStretch()
         Slayout.addLayout(buttonsLayout)
         
+        Slayout.setSizeConstraint(QLayout.SetFixedSize)
+
         self.setLayout(Slayout)
         
     def setappearance(self):        
@@ -8326,6 +8328,8 @@ class phasesGraphDlg(QDialog):
         mainLayout.addLayout(boxedPhaseFlagLayout)
         mainLayout.addStretch()
         mainLayout.addLayout(buttonsLayout)
+        
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
 
         self.setLayout(mainLayout)
         aw.qmc.redraw()
@@ -9283,6 +9287,8 @@ class StatisticsDLG(QDialog):
         mainLayout.addStretch()
         mainLayout.addLayout(buttonsLayout)
         
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+
         self.setLayout(mainLayout)        
 
         
@@ -10771,7 +10777,9 @@ class DeviceAssignmentDLG(QDialog):
         mainLayout.addWidget(PIDGroupLayout)
         mainLayout.addStretch()  
         mainLayout.addLayout(buttonLayout)
-        
+                
+        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+
         self.setLayout(mainLayout)
 
     def accept(self):
@@ -11441,6 +11449,9 @@ class graphColorDlg(QDialog):
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(okLayout)
         Mlayout.setMargin(10)
+        
+        Mlayout.setSizeConstraint(QLayout.SetFixedSize)
+
         self.setLayout(Mlayout)
 
     def setLCDdefaults(self):
