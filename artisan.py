@@ -3352,12 +3352,13 @@ class tgraphcanvas(FigureCanvas):
     def designer_create_sv_command(self):
         self.clean_old_pid_commands()
         for i in range(len(self.timeindex)):
-            command = u"SETSV::%.1f"%self.temp1[self.timeindex[i]]
-            self.specialevents.append(self.timeindex[i])                    
-            self.specialeventstype.append(0)                                           
-            self.specialeventsStrings.append(command)                          
-            self.specialeventsvalue.append(0)
-            
+            command = u"SETSV::%.1f"%self.temp1[self.timeindex[i]]           
+            if i > 0 and self.timeindex[i]:
+                self.specialevents.append(self.timeindex[i])                    
+                self.specialeventstype.append(0)                                           
+                self.specialeventsStrings.append(command)                          
+                self.specialeventsvalue.append(0)
+
     #verifies there are no previos machine commands on events
     def clean_old_pid_commands(self):
         #check for possible preloaded machine commands
@@ -11716,10 +11717,9 @@ class AlarmDlg(QDialog):
             aw.qmc.alarmaction[i] = int(unicode(action.currentIndex()))
             description = self.alarmtable.cellWidget(i,5)
             aw.qmc.alarmstrings[i] = unicode(description.text())
-        self.accept()
                
     def createalarmtable(self):
-        self.alarmtable.clear()
+        self.alarmtable.clear()        
         nalarms = len(aw.qmc.alarmtemperature)
         if nalarms:    
             self.alarmtable.setRowCount(nalarms)
@@ -11767,7 +11767,7 @@ class AlarmDlg(QDialog):
                 self.alarmtable.setCellWidget(i,3,tempedit)
                 self.alarmtable.setCellWidget(i,4,actionComboBox)                
                 self.alarmtable.setCellWidget(i,5,descriptionedit)
-            
+
 
 #########################################################################
 ######################## FUJI PXR CONTROL DIALOG  #######################
