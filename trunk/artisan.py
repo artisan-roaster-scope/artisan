@@ -4015,7 +4015,9 @@ class ApplicationWindow(QMainWindow):
         self.GraphMenu.addAction(flavorAction)
         
         designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
-        self.connect(designerAction ,SIGNAL("triggered()"),self.startdesigner)
+        designerAction.setCheckable(True)
+        designerAction.setChecked(self.qmc.designerflag)
+        self.connect(designerAction ,SIGNAL("triggered()"),self.designerTriggered)
         self.GraphMenu.addAction(designerAction)
         
         self.GraphMenu.addSeparator()
@@ -5988,9 +5990,19 @@ $cupping_notes
         dialog = flavorDlg(self)
         dialog.show()
 
+    def designerTriggered(self):
+        if self.qmc.designerflag:
+            self.stopdesigner()
+        else:
+            self.startdesigner()
+    
     def startdesigner(self):
         self.qmc.designer()
         self.qmc.designerflag = True
+
+    def stopdesigner(self):  
+        self.qmc.reset()
+        self.qmc.designerflag = False        
         
     def editgraph(self):
         dialog = editGraphDlg(self)
