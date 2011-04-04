@@ -98,6 +98,7 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as Naviga
 
 platf = unicode(platform.system())
 
+import pdb
 
 
 #######################################################################################
@@ -251,8 +252,9 @@ class tgraphcanvas(FigureCanvas):
         
         #indexes for buttons START[0],Dryend[1],FCs[2],FCe[3],SCs[4],SCe[5], and DROP[6]
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryeEnd
-        #Example: Use self.temp2[self.timeindex[4]] to get the BT temperature of SCs 
-        self.timeindex = [0,0,0,0,0,0,0] #they are all ints
+        #Example: Use self.temp2[self.timeindex[4]] to get the BT temperature of SCs
+        
+        self.timeindex = [-1,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
 
         #prevents accidentally deleting a finished profile. Activated at [DROP]
         self.safesaveflag = False
@@ -262,7 +264,8 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundDetails = False
         self.backgroundeventsflag = False
         self.backgroundpath = ""
-        self.backgroundET,self.backgroundBT,self.timeB = [],[],[]
+        self.temp1B,self.temp2B,self.timeB = [],[],[]
+        self.timeindexB = [0,0,0,0,0,0,0]
         self.startendB,self.varCB,self.dryendB = [0.,0.,0.,0.],[0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.]
         self.backgroundEvents = [] #indexes of background events
         self.backgroundEtypes = []
@@ -276,7 +279,6 @@ class tgraphcanvas(FigureCanvas):
         self.backmoveflag = 1
         self.detectBackgroundEventTime = 20 #seconds    	
         self.backgroundReproduce = False
-        self.backgroundtimeindex = [0,0,0,0,0,0,0]
         self.Betypes = [u"None",u"Power",u"Damper",u"Fan"]
 
     	
@@ -953,7 +955,7 @@ class tgraphcanvas(FigureCanvas):
         self.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
         self.dryend = [0.,0.]
         self.startend = [0.,0.,0.,0.]
-        self.timeindex = [0,0,0,0,0,0,0]
+        self.timeindex = [-1,0,0,0,0,0,0]
         self.specialevents=[]
         if not self.keeptimeflag:
             self.endofx = 60
@@ -1090,19 +1092,20 @@ class tgraphcanvas(FigureCanvas):
         #check BACKGROUND flag
         if self.background:
             #check to see if there is both a profile loaded and a background loaded
-            if self.startend[0] and self.startendB[0] and (self.startend[0] != self.startendB[0]) and self.backmoveflag:
-                #align the background profile so they both plot with the same CHARGE time
-                difference = self.startend[0] - self.startendB[0]
-                if difference > 0:
-                    self.movebackground(u"left",-difference)
-                elif difference < 0:
-                    self.movebackground(u"right",difference)
-                self.backmoveflag = 0
+            if self.timeindex[0] != -1 and self.timeindexB[0] and self.backmoveflag:
+                if self.timex[self.timeindex[0]] != self.timeB[self.timeindexB[0]]:
+                    #align the background profile so they both plot with the same CHARGE time
+                    difference = self.timex[self.timeindex[0]] - self.timeB[self.timeindexB[0]]
+                    if difference > 0:
+                        self.movebackground(u"left",-difference)
+                    elif difference < 0:
+                        self.movebackground(u"right",difference)
+                    self.backmoveflag = 0
                 
             #draw background
-            self.l_back1, = self.ax.plot(self.timeB, self.backgroundET,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
+            self.l_back1, = self.ax.plot(self.timeB, self.temp1B,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
                                          linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=QApplication.translate("Scope Label", "BackgroundET", None, QApplication.UnicodeUTF8))
-            self.l_back2, = self.ax.plot(self.timeB, self.backgroundBT,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
+            self.l_back2, = self.ax.plot(self.timeB, self.temp2B,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
                                          linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=QApplication.translate("Scope Label", "BackgroundBT", None, QApplication.UnicodeUTF8))
 
             #check backgroundevents flag	
@@ -1113,10 +1116,10 @@ class tgraphcanvas(FigureCanvas):
                     height = 20
                 for p in range(len(self.backgroundEvents)):
                     st1 = unicode(self.Betypes[self.backgroundEtypes[p]][0] + self.eventsvalues[self.backgroundEvalues[p]])                   
-                    if self.backgroundET[self.backgroundEvents[p]] > self.backgroundBT[self.backgroundEvents[p]]:
-                        temp = self.backgroundET[self.backgroundEvents[p]]
+                    if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
+                        temp = self.temp1B[self.backgroundEvents[p]]
                     else:
-                        temp = self.backgroundBT[self.backgroundEvents[p]]
+                        temp = self.temp2B[self.backgroundEvents[p]]
                     self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),
                                         xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
                                         fontsize=10,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
@@ -1124,68 +1127,75 @@ class tgraphcanvas(FigureCanvas):
 
             #check backgroundDetails flag
             if self.backgroundDetails:
-                st1 = unicode(self.stringfromseconds(self.startendB[0]-self.startend[0]))
-                self.ax.annotate(u"%.1f"%(self.startendB[1]), xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]-5,self.startendB[1]+50),fontsize=10,
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                 alpha=self.backgroundalpha)
-                
-                self.ax.annotate(st1, xy=(self.startendB[0], self.startendB[1]),xytext=(self.startendB[0]+5,self.startendB[1]-100),fontsize=10,
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                alpha=self.backgroundalpha)
+                #if there is a profile loaded with CHARGE, then save time to get the relative time
+                if self.timeindex[0] >  len(self.timex):   #verify it exists before loading it, otherwise the list could go out of index
+                    start = self.timex[self.timeindex[0]]
+                else:
+                    start = 0
 
-                if self.dryendB[0]:
-                    st1 = unicode(self.stringfromseconds(self.dryendB[0]-self.startend[0]))
-                    self.ax.annotate(u"%.1f"%(self.dryendB[1]), xy=(self.dryendB[0], self.dryendB[1]),xytext=(self.dryendB[0]-5,self.dryendB[1]+50),fontsize=10,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)
-                    self.ax.annotate(st1, xy=(self.dryendB[0], self.dryendB[1]),xytext=(self.dryendB[0],self.dryendB[1]-50),fontsize=10,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)
+                #background CHARGE
+                st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[0]] - start))
+                self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[0]]), xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
+                                 xytext=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]] + 50),fontsize=10,color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                
+                self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
+                                 xytext=(self.timeB[self.timeindexB[0]]+5,self.temp2B[self.timeindexB[0]] - 100),fontsize=10,color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+
+                if self.timeindexB[1]:
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[1]]- start))
+                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[1]]), xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
+                                     xytext=(self.timeB[self.timeindexB[1]]-5,self.temp2B[self.timeindexB[1]]+50),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
+                                     xytext=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]-50),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
+                if self.timeindexB[2]:
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[2]]-start))
+                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[2]]), xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
+                                     xytext=(self.timeB[self.timeindexB[2]]-5,self.temp2B[self.timeindexB[2]]+50),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
+                                     xytext=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]-50),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
-                if self.varCB[0]:
-                    st1 = unicode(self.stringfromseconds(self.varCB[0]-self.startend[0]))
-                    self.ax.annotate(u"%.1f"%(self.varCB[1]), xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0]-5,self.varCB[1]+50),fontsize=10,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)
-                    self.ax.annotate(st1, xy=(self.varCB[0], self.varCB[1]),xytext=(self.varCB[0],self.varCB[1]-50),fontsize=10,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)
+                if self.timeindexB[3]:
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[3]]-start))          
+                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[3]]), xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
+                                     xytext=(self.timeB[self.timeindexB[3]]-5,self.temp2B[self.timeindexB[3]]+70),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
+                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
+                                     xytext=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]-80),fontsize=10, color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
-                if self.varCB[2]:
-                    st1 = unicode(self.stringfromseconds(self.varCB[2]-self.startend[0]))          
-                    self.ax.annotate(u"%.1f"%(self.varCB[3]), xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2]-5,self.varCB[3]+70),fontsize=10,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)              
-                    self.ax.annotate(st1, xy=(self.varCB[2], self.varCB[3]),xytext=(self.varCB[2],self.varCB[3]-80),fontsize=10,
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)
+                if self.timeindexB[4]:
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[4]]-start))
+                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[4]]), xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
+                                     xytext=(self.timeB[self.timeindexB[4]]-5,self.temp2B[self.timeindexB[4]]+90),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
+                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
+                                     xytext=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]-110),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
-                if self.varCB[4]:
-                    st1 = unicode(self.stringfromseconds(self.varCB[4]-self.startend[0]))
-                    self.ax.annotate(u"%.1f"%(self.varCB[5]), xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4]-5,self.varCB[5]+90),fontsize=10,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)      
-                    self.ax.annotate(st1, xy=(self.varCB[4], self.varCB[5]),xytext=(self.varCB[4],self.varCB[5]-110),fontsize=10,
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)
+                if self.timeindexB[5]:
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[5]]-start))
+                    self.ax.annotate(u"%.1f"%(self.timeB[self.timeindexB[5]]), xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
+                                     xytext=(self.timeB[self.timeindexB[5]]-5,self.temp2B[self.timeindexB[5]]+50),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
+                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
+                                     xytext=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]-40),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
-                if self.varCB[6]:
-                    st1 = unicode(self.stringfromseconds(self.varCB[6]-self.startend[0]))
-                    self.ax.annotate(u"%.1f"%(self.varCB[7]), xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6]-5,self.varCB[7]+50),fontsize=10,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)                
-                    self.ax.annotate(st1, xy=(self.varCB[6], self.varCB[7]),xytext=(self.varCB[6],self.varCB[7]-40),fontsize=10,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),
-                                     alpha=self.backgroundalpha)
-                    
-                if self.startendB[2]:
-                    st1 = unicode(self.stringfromseconds(self.startendB[2]-self.startend[0]))
-                    self.ax.annotate(u"%.1f"%(self.startendB[3]), xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2]-5,self.startendB[3]+70),
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,
-                                    alpha=self.backgroundalpha)
-                    self.ax.annotate(st1, xy=(self.startendB[2], self.startendB[3]),xytext=(self.startendB[2],self.startendB[3]-80),fontsize=10,
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                if self.timeindexB[6]:
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[6]]-start))
+                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[6]]), xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
+                                     xytext=(self.timeB[self.timeindexB[6]]-5,self.temp2B[self.timeindexB[6]]+70),color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
+                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
+                                     xytext=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]-80),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
 
             #END of Background
 
@@ -1253,92 +1263,111 @@ class tgraphcanvas(FigureCanvas):
         self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
         if not self.designerflag:    
-            #Add markers for CHARGE
-            if self.startend[0]:
+            #Add markers for CHARGE           
+            if self.timeindex[0] != -1:
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0], self.startend[1]+self.ystep),
-                                   color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
+                                xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]+self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(u"START 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
+                self.ax.annotate(u"START 00:00", xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
+                                 xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]-self.ystep),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #Add Dry End markers            
-            if self.dryend[0]:
-                self.ystep = self.findtextgap(self.startend[1],self.dryend[1])
-                st1 = u"DE " + unicode(self.stringfromseconds(self.dryend[0]-self.startend[0]))
+            if self.timeindex[1]:
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
+                st1 = u"DE " + unicode(self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0], self.dryend[1] + self.ystep), 
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
+                                xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] + self.ystep), 
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1] - self.ystep),
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
+                                xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] - self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
             #Add 1Cs markers
-            if self.varC[0]:
-                if self.dryend[0]:
-                    self.ystep = self.findtextgap(self.dryend[1],self.varC[1])
+            if self.timeindex[2]:
+                if self.timeindex[1]: #if dryend
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
                 else:
-                    self.ystep = self.findtextgap(self.startend[1],self.varC[1])
-                st1 = u"FCs " + unicode(self.stringfromseconds(self.varC[0]-self.startend[0]))
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])
+                st1 = u"FCs " + unicode(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]+self.ystep), 
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
+                                xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] + self.ystep), 
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1] - self.ystep),
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
+                                xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] - self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #Add 1Ce markers
-            if self.varC[2]:
-                self.ystep = self.findtextgap(self.varC[1],self.varC[3])
-                st1 = u"FCe " + unicode(self.stringfromseconds(self.varC[2]-self.startend[0]))
+            if self.timeindex[3]:
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
+                st1 = u"FCe " + unicode(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]+ self.ystep),
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
+                                xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]] + self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-self.ystep),
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
+                                xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #add a water mark
-                self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
+                self.ax.axvspan(self.timex[self.timeindex[2]],self.timex[self.timeindex[3]], facecolor=self.palette["watermarks"], alpha=0.2)
 
             #Add 2Cs markers
-            if self.varC[4]:
-                if self.varC[2]:
-                    self.ystep = self.findtextgap(self.varC[3],self.varC[5])
+            if self.timeindex[4]:
+                if self.timeindex[3]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
                 else:
-                    self.ystep = self.findtextgap(self.varC[1],self.varC[5])
-                st1 = u"SCs " + unicode(self.stringfromseconds(self.varC[4]-self.startend[0]))
-                self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]+self.ystep),
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])
+                st1 = u"SCs " + unicode(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
+                                xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]] + self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
-                self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-self.ystep),
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
+                                 xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #Add 2Ce markers
-            if self.varC[6]:
-                self.ystep = self.findtextgap(self.varC[5],self.varC[7])
-                st1 =  u"SCe " + unicode(self.stringfromseconds(self.varC[6]-self.startend[0]))
+            if self.timeindex[5]:
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
+                st1 =  u"SCe " + unicode(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]+self.ystep),
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
+                                xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] + self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-self.ystep),
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
+                                xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] - self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #do water mark
-                self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
+                self.ax.axvspan(self.timex[self.timeindex[4]],self.timex[self.timeindex[5]], facecolor=self.palette["watermarks"], alpha=0.2)
 
             #Add DROP markers
-            if self.startend[2]:
-                if self.varC[6]:
-                    self.ystep = self.findtextgap(self.varC[7],self.startend[3])
-                elif self.varC[4]:
-                    self.ystep = self.findtextgap(self.varC[5],self.startend[3])
-                elif self.varC[2]:
-                    self.ystep = self.findtextgap(self.varC[3],self.startend[3])
+            if self.timeindex[6]:
+                if self.timeindex[5]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
+                elif self.timeindex[4]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]])
+                elif self.timeindex[3]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]])
+                elif self.timeindex[2]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]])
+            	elif self.timeindex[1]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]])
                 else:
-                    ystep = self.findtextgap(self.varC[1],self.startend[3])
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[6]])                
                     
-                st1 = u"END " + unicode(self.stringfromseconds(self.startend[2]-self.startend[0]))
+                st1 = u"END " + unicode(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]+self.ystep),
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
+                                xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] + self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-self.ystep),
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
+                                 xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] - self.ystep),
+                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 
                 self.writestatistics()
             
@@ -1508,8 +1537,6 @@ class tgraphcanvas(FigureCanvas):
             aw.CelsiusAction.setEnabled(True)
             aw.ConvertToFahrenheitAction.setDisabled(True)
             aw.ConvertToCelsiusAction.setEnabled(True) 
-        self.redraw()
-
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
@@ -1524,8 +1551,16 @@ class tgraphcanvas(FigureCanvas):
             aw.CelsiusAction.setDisabled(True)
             aw.FahrenheitAction.setEnabled(True)
             aw.ConvertToCelsiusAction.setDisabled(True)
-            aw.ConvertToFahrenheitAction.setEnabled(True)
+            aw.ConvertToFahrenheitAction.setEnabled(True)  
+
+    def fahrenheitModeRedraw(self):
+        self.fahrenheitMode()
         self.redraw()
+
+    def celsiusModeRedraw(self):
+        self.celsiusMode()
+        self.redraw()
+
 
     #converts a loaded profile to a different temperature scale. t input is the requested mode (F or C).
     def convertTemperature(self,t):
@@ -1550,32 +1585,14 @@ class tgraphcanvas(FigureCanvas):
                             if self.device != 18:
                                 self.delta1[i] = self.fromCtoF(self.delta1[i])  #Delta ET
                                 self.delta2[i] = self.fromCtoF(self.delta2[i])  #Delta BT
-                                
-                        self.dryend[1] =   self.fromCtoF(self.dryend[1])    
-                        self.varC[1] =   self.fromCtoF(self.varC[1])        #1C start temp
-                        self.varC[3] =   self.fromCtoF(self.varC[3])        #1C end temp
-                        self.varC[5] =   self.fromCtoF(self.varC[5])        #2C start temp
-                        self.varC[7] =   self.fromCtoF(self.varC[7])        #2C end temp
-                        self.startend[1] = self.fromCtoF(self.startend[1])  #CHARGE temp
-                        self.startend[3] = self.fromCtoF(self.startend[3])  #DROP temp
 
                         self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
                         self.bag_humidity[1] = self.fromCtoF(self.bag_humidity[1]) #bag humidity temperature
 
-                        backgroundlength = len(self.timeB)
-                        if backgroundlength > 0:
-                            for i in range(backgroundlength):
-                                self.backgroundET[i] = self.fromCtoF(self.backgroundET[i])
-                                self.backgroundBT[i] = self.fromCtoF(self.backgroundBT[i])
+                        for i in range(len(self.timeB)):
+                            self.temp1B[i] = self.fromCtoF(self.temp1B[i])
+                            self.temp2B[i] = self.fromCtoF(self.temp2B[i])
                                 
-                            self.dryendB[1] =   self.fromCtoF(self.dryendB[1])    
-                            self.varCB[1] =   self.fromCtoF(self.varCB[1])       #1C start temp B
-                            self.varCB[3] =   self.fromCtoF(self.varCB[3])       #1C end temp B
-                            self.varCB[5] =   self.fromCtoF(self.varCB[5])       #2C start temp B
-                            self.varCB[7] =   self.fromCtoF(self.varCB[7])       #2C end temp B
-                            self.startendB[1] = self.fromCtoF(self.startendB[1]) #CHARGE temp B
-                            self.startendB[3] = self.fromCtoF(self.startendB[3]) #DROP temp B
-
                         self.fahrenheitMode()
                         aw.sendmessage(QApplication.translate("Message Area","Profile changed to Fahrenheit", None, QApplication.UnicodeUTF8))
 
@@ -1603,31 +1620,14 @@ class tgraphcanvas(FigureCanvas):
                             if self.device != 18:
                                 self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
                                 self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
-                            
-                        self.dryend[1] =   self.fromFtoC(self.dryend[1])    
-                        self.varC[1] =   self.fromFtoC(self.varC[1])        #1C start temp
-                        self.varC[3] =   self.fromFtoC(self.varC[3])        #1C end temp
-                        self.varC[5] =   self.fromFtoC(self.varC[5])        #2C start temp
-                        self.varC[7] =   self.fromFtoC(self.varC[7])        #2C end temp
-                        self.startend[1] = self.fromFtoC(self.startend[1])  #CHARGE temp
-                        self.startend[3] = self.fromFtoC(self.startend[3])  #DROP temp
 
                         self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
                         self.bag_humidity[1] = self.fromFtoC(self.bag_humidity[1])  #bag humidity temperature                        
                         
-                        backgroundlength = len(self.timeB)
-                        if backgroundlength > 0:
-                            for i in range(backgroundlength):
-                                self.backgroundET[i] = self.fromFtoC(self.backgroundET[i]) #ET B
-                                self.backgroundBT[i] = self.fromFtoC(self.backgroundBT[i]) #BT B
+                        for i in range(len(self.timeB)):
+                            self.temp1B[i] = self.fromFtoC(self.temp1B[i]) #ET B
+                            self.temp2B[i] = self.fromFtoC(self.temp2B[i]) #BT B
                                 
-                            self.dryendB[1] =   self.fromFtoC(self.dryendB[1])    
-                            self.varCB[1] =   self.fromFtoC(self.varCB[1])       #1C start temp B
-                            self.varCB[3] =   self.fromFtoC(self.varCB[3])       #1C end temp B
-                            self.varCB[5] =   self.fromFtoC(self.varCB[5])       #2C start temp B
-                            self.varCB[7] =   self.fromFtoC(self.varCB[7])       #2C end temp B
-                            self.startendB[1] = self.fromFtoC(self.startendB[1]) #CHARGE temp B
-                            self.startendB[3] = self.fromFtoC(self.startendB[3]) #DROP temp B
                     else:
                         QMessageBox.information(self,u"Convert Profile Temperature",
                                                 u"Unable to comply. You already are in Celsius")
@@ -1787,8 +1787,6 @@ class tgraphcanvas(FigureCanvas):
             if self.device != 18:
                 if len(self.timex) >= 3:
                     self.flagclock = True
-                    self.startend[0] = self.timeclock.elapsed()/1000.
-                    self.startend[1] = self.temp2[-1]
                     self.timeindex[0] = len(self.timex)-1
                 else:
                     message = u"Not enough variables collected yet. Try again in a few seconds"
@@ -1798,20 +1796,20 @@ class tgraphcanvas(FigureCanvas):
                 et,bt = aw.ser.NONE()
                 if bt != 1 and et != -1:  #cancel
                     self.drawmanual(et,bt,tx)
-                    self.startend[0] = tx
-                    self.startend[1] = bt
                     self.timeindex[0] = len(self.timex)-1
 
                     # put initial marker on graph
-                    rect = patches.Rectangle( (self.startend[0],0), width=.01, height=self.ylimit, color = self.palette["text"])
+                    rect = patches.Rectangle( (self.timex[self.timeindex[0]],0), width=.01, height=self.ylimit, color = self.palette["text"])
                     self.ax.add_patch(rect)
                 else:
                     return
             #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-            self.ax.annotate(u"%.1f"%(self.startend[1]), xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]+ self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
+                             xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] +  self.ystep),color=self.palette["text"],
+                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(u"Start 00:00", xy=(self.startend[0], self.startend[1]),xytext=(self.startend[0],self.startend[1]-self.ystep),
+            self.ax.annotate(u"Start 00:00", xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
+                             xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] - self.ystep),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
             message = u"Roast time starts now 00:00 BT = " + unicode(self.startend[1]) + self.mode
@@ -1827,37 +1825,32 @@ class tgraphcanvas(FigureCanvas):
         
     def markDryEnd(self):
         if self.flagon:
-            # record Dry end only if Charge mark has been done
-            
             if self.device != 18:
-                self.dryend[0] = self.timeclock.elapsed()/1000.
-                self.dryend[1] = self.temp2[-1]
                 self.timeindex[1] = len(self.timex)-1
-
             else:
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
                 if et != -1 and bt != -1:
                     self.drawmanual(et,bt,tx)
-                    self.dryend[0] = tx
-                    self.dryend[1] = bt
                     self.timeindex[1] = len(self.timex)-1
                 else:
                     return
                 
             #calculate time elapsed since charge time
-            st1 = u"DE " + self.stringfromseconds(self.dryend[0] - self.startend[0])
+            st1 = u"DE " + self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
             #anotate temperature
-            self.ystep = self.findtextgap(self.startend[1],self.dryend[1])
-            self.ax.annotate(u"%.1f"%(self.dryend[1]), xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]+self.ystep), 
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
+            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
+                             xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]+self.ystep), color=self.palette["text"],
+                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(st1, xy=(self.dryend[0], self.dryend[1]),xytext=(self.dryend[0],self.dryend[1]-self.ystep),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
+                             xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]-self.ystep),color=self.palette["text"],
+                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
             aw.button_19.setDisabled(True)
             aw.button_19.setFlat(True)
-            message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.dryend[1]) + self.mode)
+            message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[1]]) + self.mode)
             
             if aw.qmc.phasesbuttonflag:     
                 self.phases[1] = int(round(self.dryend[1]))
@@ -1867,44 +1860,43 @@ class tgraphcanvas(FigureCanvas):
 
         #set message at bottom
         aw.sendmessage(message)
-        aw.soundpop()        
+        aw.soundpop()
+        
     #redord 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
         if self.flagon:
             # record 1Cs only if Charge mark has been done
             if self.device != 18:                
-                self.varC[0] = self.timeclock.elapsed()/1000.
-                self.varC[1] = self.temp2[-1]
                 self.timeindex[2] = len(self.timex)-1
             else:
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
                 if et != -1 and bt != -1:
                     self.drawmanual(et,bt,tx)                               
-                    self.varC[0] = tx
-                    self.varC[1] = bt
                     self.timeindex[2] = len(self.timex)-1
                 else:
                     return
             #calculate time elapsed since charge time
-            st1 = u"FCs " + self.stringfromseconds(self.varC[0]-self.startend[0])
+            st1 = u"FCs " + self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
             #anotate temperature
             if self.dryend[0]:
-                self.ystep = self.findtextgap(self.dryend[1],self.varC[1])
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
             else:
-                self.ystep = self.findtextgap(self.startend[1],self.varC[1])                
-            self.ax.annotate(u"%.1f"%(self.varC[1]), xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1] + self.ystep), 
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])                
+            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
+                             xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]+ self.ystep),color=self.palette["text"],
+                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(st1, xy=(self.varC[0], self.varC[1]),xytext=(self.varC[0],self.varC[1]-self.ystep),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
+                             xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]-self.ystep),color=self.palette["text"],
+                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
             aw.button_3.setDisabled(True)
             aw.button_3.setFlat(True)
-            message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[1]) + self.mode)
+            message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[2]]) + self.mode)
 
             if aw.qmc.phasesbuttonflag:     
-                self.phases[2] = int(round(self.varC[1]))
+                self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
                 self.redraw()
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -1916,37 +1908,35 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cend(self):
         if self.flagon:
             # record only if 1Cs has been saved
-            if self.varC[0]:
+            if self.timeindex[2]:
                 if self.device != 18:
-                    self.varC[2] = self.timeclock.elapsed()/1000.
-                    self.varC[3] = self.temp2[-1]
                     self.timeindex[3] = len(self.timex)-1
                 else:
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
                         self.drawmanual(et,bt,tx)                           
-                        self.varC[2] = tx
-                        self.varC[3] = bt
                         self.timeindex[3] = len(self.timex)-1
                     else:
                         return                    
                 #calculate time elapsed since charge time
-                st1 = u"FCe " + self.stringfromseconds(self.varC[2]-self.startend[0]) 
+                st1 = u"FCe " + self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]) 
                 #anotate temperature
-                self.ystep = self.findtextgap(self.varC[1],self.varC[3])
-                self.ax.annotate(u"%.1f"%(self.varC[3]), xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]+self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
+                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]+self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.varC[2], self.varC[3]),xytext=(self.varC[2],self.varC[3]-self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
+                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
-                self.ax.axvspan(self.varC[0], self.varC[2], facecolor=self.palette["watermarks"], alpha=0.2)
+                self.ax.axvspan(self.timex[self.timeindex[2]],self.timex[self.timeindex[3]], facecolor=self.palette["watermarks"], alpha=0.2)
 
                 aw.button_4.setDisabled(True)
                 aw.button_4.setFlat(True)
 
-                message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[3]) + self.mode)
+                message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[3]]) + self.mode)
             else:
                 message = QApplication.translate("Message Area","1Cs mark missing. Do that first", None, QApplication.UnicodeUTF8)
         else:
@@ -1958,34 +1948,32 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cstart(self):
         if self.flagon:
             if self.device != 18:
-                self.varC[4] = self.timeclock.elapsed()/1000.
-                self.varC[5] = self.temp2[-1]
                 self.timeindex[4] = len(self.timex)-1
             else:
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
                 if et != -1 and bt != -1:
                     self.drawmanual(et,bt,tx)                           
-                    self.varC[4] = tx
-                    self.varC[5] = bt
                     self.timeindex[4] = len(self.timex)-1
                 else:
                     return              
-            st1 = u"SCs " + self.stringfromseconds(self.varC[4]-self.startend[0])
-            if self.varC[2]:
-                self.ystep = self.findtextgap(self.varC[3],self.varC[5])
+            st1 = u"SCs " + self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
+            if self.timeindex[3]:
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
             else:
-                self.ystep = self.findtextgap(self.varC[1],self.varC[5])            
-            self.ax.annotate(u"%.1f"%(self.varC[5]), xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]+self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])            
+            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
+                             xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]+self.ystep),color=self.palette["text"],
+                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
              
-            self.ax.annotate(st1, xy=(self.varC[4], self.varC[5]),xytext=(self.varC[4],self.varC[5]-self.ystep),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
+                             xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),color=self.palette["text"],
+                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
             aw.button_5.setDisabled(True)
             aw.button_5.setFlat(True)
 
-            message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[5]) + self.mode)
+            message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[4]]) + self.mode)
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
             
@@ -1995,37 +1983,35 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cend(self):
         if self.flagon:
             # record only if 1Cs has been saved
-            if self.varC[4]:
+            if self.timeindex[4]:
                 if self.device != 18:                
-                    self.varC[6] = self.timeclock.elapsed()/1000. 
-                    self.varC[7] = self.temp2[-1]
                     self.timeindex[5] = len(self.timex)-1
                 else:
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
                     if et != -1 and bt != -1:
                         self.drawmanual(et,bt,tx)                           
-                        self.varC[6] = tx
-                        self.varC[7] = bt
                         self.timeindex[5] = len(self.timex)-1
                     else:
                         return
-                st1 =  u"SCe " + self.stringfromseconds(self.varC[6]-self.startend[0])
+                st1 =  u"SCe " + self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
                 #anotate temperature
-                self.ystep = self.findtextgap(self.varC[5],self.varC[7])
-                self.ax.annotate(u"%.1f"%(self.varC[7]), xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]+self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
+                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]+self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(st1, xy=(self.varC[6], self.varC[7]),xytext=(self.varC[6],self.varC[7]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
+                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]-self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
 
-                self.ax.axvspan(self.varC[4], self.varC[6], facecolor=self.palette["watermarks"], alpha=0.2)
+                self.ax.axvspan(self.timex[self.timeindex[4]],self.timex[self.timeindex[5]], facecolor=self.palette["watermarks"], alpha=0.2)
 
                 aw.button_6.setDisabled(True)
                 aw.button_6.setFlat(True)
 
-                message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.varC[7]) + self.mode)
+                message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[5]]) + self.mode)
             else:
                 message = QApplication.translate("Message Area","SCs mark missing. Do that first", None, QApplication.UnicodeUTF8)
         else:
@@ -2037,49 +2023,49 @@ class tgraphcanvas(FigureCanvas):
     def markDrop(self):
         if self.flagon:
             if self.device != 18:        
-                self.startend[2] = self.timeclock.elapsed()/1000.
-                self.startend[3] = self.temp2[-1]
                 self.timeindex[6] = len(self.timex)-1
             else:
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
                 if et != -1 and bt != -1:
                     self.drawmanual(et,bt,tx)
-                    self.startend[2] = tx
-                    self.startend[3] = bt
                     self.timeindex[6] = len(self.timex)-1
                     # put final BT marker on graph
-                    rect = patches.Rectangle( (self.startend[2],0), width=.01, height=self.ylimit, color = self.palette["text"])
+                    rect = patches.Rectangle( (self.timex[self.timeindex[6]],0), width=.01, height=self.ylimit, color = self.palette["text"])
                     self.ax.add_patch(rect)
                     if et >  bt:
                         #put ET marker on graph
-                        rect = patches.Rectangle( (self.startend[2],bt), width=.05, height=et-bt, color = self.palette["met"])
+                        rect = patches.Rectangle( (self.timex[self.timeindex[6]],bt), width=.05, height=et-bt, color = self.palette["met"])
                         self.ax.add_patch(rect)
                 else:
                     return             
-            st1 = u"End " + self.stringfromseconds(self.startend[2]-self.startend[0]) 
+            st1 = u"End " + self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]) 
             #anotate temperature
-            if self.varC[6]:
-                self.ystep = self.findtextgap(self.varC[7],self.startend[3])
-            elif self.varC[4]:
-                self.ystep = self.findtextgap(self.varC[5],self.startend[3])
-            elif self.varC[2]:
-                self.ystep = self.findtextgap(self.varC[3],self.startend[3])
-            else:
-                self.ystep = self.findtextgap(self.varC[1],self.startend[3])
+            if self.timeindex[5]:
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
+            elif self.timeindex[4]:
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]])
+            elif self.timeindex[3]:
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]])
+            elif self.timeindex[2]:
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]])
+            elif self.timeindex[1]:
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]])
                             
-            self.ax.annotate(u"%.1f"%(self.startend[3]), xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]+self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
+                             xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]+self.ystep),color=self.palette["text"],
+                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #anotate time
-            self.ax.annotate(st1, xy=(self.startend[2], self.startend[3]),xytext=(self.startend[2],self.startend[3]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
+                             xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]-self.ystep),color=self.palette["text"],
+                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             
             self.writestatistics()
             
             aw.button_9.setDisabled(True)
             aw.button_9.setFlat(True)
             
-            message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.startend[-1]) + self.mode)
+            message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[6]]) + self.mode)
             
             #prevents accidentally deleting a finished roast
             self.safesaveflag = True
@@ -2091,39 +2077,37 @@ class tgraphcanvas(FigureCanvas):
     # Writes information about the finished profile in the graph
     def writestatistics(self):
         TP_index = aw.findTP()
-        if aw.qmc.dryend[0] and aw.qmc.phasesbuttonflag:
+        if self.timeindex[1] and aw.qmc.phasesbuttonflag:
             #manual dryend available
-            dryEndTime = aw.qmc.dryend[0]
-            BTdrycross = aw.qmc.dryend[1]
-            dryEndIndex = aw.qmc.time2index(dryEndTime)
+            dryEndTime = self.timex[self.timeindex[1]]
+            BTdrycross = self.temp2[self.timeindex[1]]
+            dryEndIndex = self.timeindex[1]
         else:
             #find when dry phase ends 
             dryEndIndex = aw.findDryEnd(TP_index)
             dryEndTime = self.timex[dryEndIndex]
             BTdrycross = self.temp2[dryEndIndex]  
-                  
-        
-        #self.varC [1C starttime[0],1C startTemp[1],  1C endtime[2],1C endtemp[3],  2C starttime[4], 2C startTemp[5],  2C endtime[6], 2C endtemp[7]]
-        #self.startend [starttime[0], starttempBT[1], endtime[2],endtempBT[3]]      
-        if self.startend[2]:
-            totaltime = int(self.startend[2]-self.startend[0])
+
+        #if DROP             
+        if self.timeindex[6]:
+            totaltime = int(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
             if totaltime == 0:
                 aw.sendmessage(QApplication.translate("Message Area","Statistics cancelled: need complete profile [CHARGE] + [DROP]", None, QApplication.UnicodeUTF8))
                 return
                         
             self.statisticstimes[0] = totaltime
             #if 1Ce use middle point of 1Cs and 1Ce            
-            if self.varC[2]:
+            if self.timex[self.timeindex[3]]:
                 
-                dryphasetime = int(dryEndTime - self.startend[0])
-                midphasetime = int(self.varC[0] - dryEndTime)
-                finishphasetime = int(self.startend[2]- self.varC[0])
+                dryphasetime = int(dryEndTime - self.timex[self.timeindex[0]])
+                midphasetime = int(self.timex[self.timeindex[2]] - dryEndTime)
+                finishphasetime = int(self.timex[self.timeindex[6]]- self.timex[self.timeindex[2]])
                                    
             else: #very light roast)
                 #use 1Cs (start of 1C) as 1C
-                dryphasetime = int(dryEndTime - self.startend[0])
-                midphasetime = int(self.varC[0] - dryEndTime)     
-                finishphasetime = int(self.startend[2] - self.varC[0])
+                dryphasetime = int(dryEndTime - self.timex[self.timeindex[0]])
+                midphasetime = int(self.timex[self.timeindex[2]] - dryEndTime)     
+                finishphasetime = int(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
                 
             self.statisticstimes[1] = dryphasetime
             self.statisticstimes[2] = midphasetime
@@ -2149,17 +2133,17 @@ class tgraphcanvas(FigureCanvas):
                 
                 #Draw finish phase rectangle
                 #chech to see if end of 1C exists. If so, use half between start of 1C and end of 1C. Otherwise use only the start of 1C
-                rect = patches.Rectangle( (self.varC[0], statisticsheight), width = finishphasetime, height = statisticsbarheight,
+                rect = patches.Rectangle( (self.timex[self.timeindex[2]], statisticsheight), width = finishphasetime, height = statisticsbarheight,
                                             color = self.palette["rect3"],alpha=0.5)
                 self.ax.add_patch(rect)
                 
                 # Draw mid phase rectangle
-                rect = patches.Rectangle( (self.startend[0]+dryphasetime, statisticsheight), width = midphasetime, height = statisticsbarheight,
+                rect = patches.Rectangle( (self.timex[self.timeindex[0]]+dryphasetime, statisticsheight), width = midphasetime, height = statisticsbarheight,
                                           color = self.palette["rect2"],alpha=0.5)
                 self.ax.add_patch(rect)
 
                 # Draw dry phase rectangle
-                rect = patches.Rectangle( (self.startend[0], statisticsheight), width = dryphasetime, height = statisticsbarheight,
+                rect = patches.Rectangle( (self.timex[self.timeindex[0]], statisticsheight), width = dryphasetime, height = statisticsbarheight,
                                           color = self.palette["rect1"],alpha=0.5)
                 self.ax.add_patch(rect)
 
@@ -2174,9 +2158,9 @@ class tgraphcanvas(FigureCanvas):
                 LP = self.temp2[TP_index]
 
             if self.statisticsflags[0]:            
-                self.ax.text(self.startend[0]+ dryphasetime/3,statisticsupper,st1 + u" "+ unicode(int(dryphaseP))+u"%",color=self.palette["text"])
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime/3,statisticsupper,st2+ " " + unicode(int(midphaseP))+u"%",color=self.palette["text"])
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/3,statisticsupper,st3 + u" " + unicode(int(finishphaseP))+ u"%",color=self.palette["text"])
+                self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/3,statisticsupper,st1 + u" "+ unicode(int(dryphaseP))+u"%",color=self.palette["text"])
+                self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/3,statisticsupper,st2+ " " + unicode(int(midphaseP))+u"%",color=self.palette["text"])
+                self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/3,statisticsupper,st3 + u" " + unicode(int(finishphaseP))+ u"%",color=self.palette["text"])
 
             if self.statisticsflags[2]:
                 (st1,st2,st3) = aw.defect_estimation()
@@ -2199,10 +2183,10 @@ class tgraphcanvas(FigureCanvas):
 
                 #find the index of time when the roasts starts and finish 
                 for i in range(len(self.timex)):
-                    if self.timex[i] > self.startend[0]:
+                    if self.timex[i] > self.timex[self.timeindex[0]]:
                         break            
                 for j in range(len(self.timex)):
-                    if self.timex[j] > self.startend[2]:
+                    if self.timex[j] > self.timex[self.timeindex[6]]:
                         break
 
                 for k in range(i,j):
@@ -2214,11 +2198,11 @@ class tgraphcanvas(FigureCanvas):
                         
                 lowestBT = u"%.1f"%LP
                 #timeLP = unicode(self.stringfromseconds(self.timex[k] - self.startend[0]))
-                time = self.stringfromseconds(self.startend[2]-self.startend[0])
+                time = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
                 #end temperature
 
                 strline = QApplication.translate("Scope Label", "[BT = %1 - %2] [ETarea - BTarea = %3] [Time = %4]", None,
-                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.startend[3] + self.mode).arg(unicode(deltaAcc)).arg(time)                              
+                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.temp2[self.timeindex[6]] + self.mode).arg(unicode(deltaAcc)).arg(time)                              
                             
                 #text metrics 
                 #if self.mode == u"C":
@@ -2312,87 +2296,28 @@ class tgraphcanvas(FigureCanvas):
         
     def movebackground(self,direction,step):
         lt = len(self.timeB)
-        le = len(self.backgroundET)
-        lb = len(self.backgroundBT)
+        le = len(self.temp1B)
+        lb = len(self.temp2B)
         #all background curves must have same dimension in order to plot. Check just in case.
         if lt > 1 and lt == le and lb == le:
             if  direction == u"up":
                 for i in range(lt):
-                    self.backgroundET[i] += step
-                    self.backgroundBT[i] += step
-                    
-                if self.varCB[1]:
-                   self.varCB[1] += step
-                if self.varCB[3]:
-                   self.varCB[3] += step
-                if self.varCB[5]:
-                   self.varCB[5] += step
-                if self.varCB[7]:
-                   self.varCB[7] += step
-                if self.dryendB[1]:
-                   self.dryendB[1] += step
-                   
-                self.startendB[1] += step
-                self.startendB[3] += step
-                
+                    self.temp1B[i] += step
+                    self.temp2B[i] += step
+                                    
             elif direction == u"left":
                 for i in range(lt):
                     self.timeB[i] -= step
-                    
-                if self.varCB[0]:
-                   self.varCB[0] -= step
-                if self.varCB[2]:
-                   self.varCB[2] -= step
-                if self.varCB[4]:
-                   self.varCB[4] -= step
-                if self.varCB[6]:
-                   self.varCB[6] -= step
-                if self.dryendB[0]:
-                   self.dryendB[0] -= step
-                   
-                self.startendB[0] -= step
-                self.startendB[2] -= step
-
-                self.timebackgroundindexupdate()                
-                
+                                   
             elif direction == u"right":
                 for i in range(lt):
                     self.timeB[i] += step
-                    
-                if self.varCB[0]:
-                   self.varCB[0] += step
-                if self.varCB[2]:
-                   self.varCB[2] += step
-                if self.varCB[4]:
-                   self.varCB[4] += step
-                if self.varCB[6]:
-                   self.varCB[6] += step
-                if self.dryendB[0]:
-                   self.dryendB[0] += step
-                   
-                self.startendB[0] += step
-                self.startendB[2] += step
-
-                self.timebackgroundindexupdate()
                 
             elif direction == u"down":
                 for i in range(lt):
-                    self.backgroundET[i] -= step
-                    self.backgroundBT[i] -= step
+                    self.temp1B[i] -= step
+                    self.temp2B[i] -= step
                     
-                if self.varCB[1]:
-                   self.varCB[1] -= step
-                if self.varCB[3]:
-                   self.varCB[3] -= step
-                if self.varCB[5]:
-                   self.varCB[5] -= step
-                if self.varCB[7]:
-                   self.varCB[7] -= step
-                if self.dryendB[1]:
-                   self.dryendB[1] -= step
-                   
-                self.startendB[1] -= step
-                self.startendB[3] -= step    
         else:
             aw.sendmessage(QApplication.translate("Message Area","Unable to move background", None, QApplication.UnicodeUTF8))
             return
@@ -2481,14 +2406,6 @@ class tgraphcanvas(FigureCanvas):
             
             QMessageBox.information(self,u"Profile information",string)
 
-
-    ##       derivatives(self, x)
-    ##       Return all derivatives of the spline at the point x.
-    ##       
-    ##       integral(self, a, b)
-    ##       Return definite integral of the spline between two
-    ##       given points.
-
         except ValueError,e:
             self.adderror(u"Value Error: univariateinfo() " + unicode(e) + " ")
             return
@@ -2516,17 +2433,16 @@ class tgraphcanvas(FigureCanvas):
             else:
                 splinedegree = sd
                 
-                #create BT function        
-                func = inter.UnivariateSpline(self.timex,self.temp2, k = splinedegree )
-
-            func2 = inter.UnivariateSpline(self.timex,self.temp1, k = splinedegree )
+            #create functions        
+            funcBT = inter.UnivariateSpline(self.timex,self.temp2, k = splinedegree )
+            funcET = inter.UnivariateSpline(self.timex,self.temp1, k = splinedegree )
 
             #create longer list of time values
             time = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
 
             #convert all time values to temperature
-            btvals = func(time).tolist()
-            etvals = func2(time).tolist()
+            btvals = funcBT(time).tolist()
+            etvals = funcET(time).tolist()
 
             #plot to verify
             self.ax.plot(time, btvals, color=self.palette["bt"], linestyle = '-.', linewidth=2)
@@ -2696,20 +2612,21 @@ class tgraphcanvas(FigureCanvas):
                 self.timeindex[i] = 0
 
 
-    #updates list self.backgroundtimeindex when found an _old_ profile without self.timeindex 
+    #updates list self.timeindexB when found an _old_ profile without self.timeindex 
     def timebackgroundindexupdate(self):
         #          STARTB            DRYENDB          FCsB       FCeB         SCsB         SCeB               DROPB
         times = [self.startendB[0],self.dryendB[0],self.varCB[0],self.varCB[2],self.varCB[4],self.varCB[6],self.startendB[2]]
         for i in range(7):               
             if times[i]:
-                self.backgroundtimeindex[i] = self.backgroundtime2index(times[i])
+                self.timeindexB[i] = self.backgroundtime2index(times[i])
             else:
-                self.backgroundtimeindex[i] = 0
+                self.timeindexB[i] = 0
     def restore_message_label(self):
         aw.messagelabel.setStyleSheet("background-color:'transparent';")
 
     #adds errors
     def adderror(self,error):
+        print error
         aw.messagelabel.setStyleSheet("background-color:'red';")
         time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
         #keep a max of 500 errors
@@ -2994,10 +2911,22 @@ class tgraphcanvas(FigureCanvas):
                         midphaseP = int(midphasetime*100/totaltime)
                         finishphaseP = int(finishphasetime*100/totaltime)
                         (st1,st2,st3) = aw.defect_estimation()
-                        margin = "&nbsp;&nbsp;"
-                        string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect1"],margin,self.stringfromseconds(dryphasetime),dryphaseP,margin)
-                        string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect2"],margin,self.stringfromseconds(midphasetime),midphaseP,margin)
-                        string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s - %i%% %s</font>"%(self.palette["rect3"],margin,self.stringfromseconds(finishphasetime),finishphaseP,margin)
+                        
+                        dryramp = self.temp2[self.timeindex[1]] - self.temp2[self.timeindex[0]]
+                        midramp = self.temp2[self.timeindex[2]] - self.temp2[self.timeindex[1]]
+                        finishramp = self.temp2[self.timeindex[6]] - self.temp2[self.timeindex[2]]
+                        
+                        dryroc = u" %.1f (d/m)"%((dryramp/dryphasetime)*60.)
+                        midroc = u" %.1f (d/m)"%((midramp/midphasetime)*60.)
+                        finishroc = u" %.1f (d/m)"%((finishramp/finishphasetime)*60.)
+                        
+                        margin = "&nbsp;&nbsp;&nbsp;"
+                        string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette["rect1"],
+                                  margin,self.stringfromseconds(dryphasetime),margin, dryphaseP, margin,dryroc,margin)
+                        string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette["rect2"],
+                                  margin,self.stringfromseconds(midphasetime),margin,midphaseP,margin,midroc,margin)
+                        string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette["rect3"],
+                                  margin,self.stringfromseconds(finishphasetime),margin,finishphaseP,margin,finishroc,margin)
                         aw.messagelabel.setText(string1+string2+string3)
 
                 for i in range(len(self.newpointindex)):
@@ -3217,65 +3146,37 @@ class tgraphcanvas(FigureCanvas):
         timexlength = len(timexcopy)
         if self.designerconfig[0] and timexlength:
             self.timeindex[0] = self.time2index(timexcopy[count])
-            self.startend[0] = timexcopy[count]
-            self.startend[1] = temp2copy[count]
             count += 1
         else:
-            self.startend[0] = 0
-            self.startend[1] = 0
-            self.timeindex[0] = 0
+            self.timeindex[0] = -1
         if self.designerconfig[1] and timexlength > count:
             self.timeindex[1] = self.time2index(timexcopy[count])
-            self.dryend[0] = timexcopy[count]
-            self.dryend[1] = temp2copy[count]
             count += 1
         else:
-            self.dryend[0] = 0
-            self.dryend[1] = 0
             self.timeindex[1] = 0
         if self.designerconfig[2] and timexlength > count:
             self.timeindex[2] = self.time2index(timexcopy[count])
-            self.varC[0] = timexcopy[count]
-            self.varC[1] = temp2copy[count]
             count += 1
         else:
-            self.varC[0] = 0
-            self.varC[1] = 0
             self.timeindex[2] = 0
         if self.designerconfig[3] and timexlength > count:
             self.timeindex[3] = self.time2index(timexcopy[count])
-            self.varC[2] = timexcopy[count]
-            self.varC[3] = temp2copy[count]
             count += 1
         else:
-            self.varC[2] = 0
-            self.varC[3] = 3
             self.timeindex[3] = 0
         if self.designerconfig[4] and timexlength > count:
             self.timeindex[4] = self.time2index(timexcopy[count])
-            self.varC[4] = timexcopy[count]
-            self.varC[5] = temp2copy[count]
             count += 1
         else:
-            self.varC[4] = 0
-            self.varC[5] = 0
             self.timeindex[4] = 0
         if self.designerconfig[5] and timexlength > count:
             self.timeindex[5] = self.time2index(timexcopy[count])
-            self.varC[6] = timexcopy[count]
-            self.varC[7] = temp2copy[count]
             count += 1
         else:
-            self.varC[6] = 0
-            self.varC[7] = 0
             self.timeindex[5] = 0
         if self.designerconfig[6] and timexlength > count:
             self.timeindex[6] = self.time2index(timexcopy[count])
-            self.startend[2] = timexcopy[count]
-            self.startend[3] = temp2copy[count]
         else:
-            self.startend[2] = 0
-            self.startend[3] = 0
             self.timeindex[6] = 0
         self.xaxistosm()
         
@@ -3374,8 +3275,7 @@ class tgraphcanvas(FigureCanvas):
                     break     #break or the index i can become larger than the new shorted length of specialevents
         if target:
            self.clean_old_pid_commands() 
-                    
-        
+
                 
 #######################################################################################
 #####   temporary hack for windows till better solution found about toolbar icon problem
@@ -4033,11 +3933,11 @@ class ApplicationWindow(QMainWindow):
         temperatureMenu.addAction(self.ConvertToCelsiusAction)
 
         self.FahrenheitAction = QAction(UIconst.ROAST_MENU_FAHRENHEIT_MODE,self)
-        self.connect(self.FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitMode)
+        self.connect(self.FahrenheitAction,SIGNAL("triggered()"),self.qmc.fahrenheitModeRedraw)
         temperatureMenu.addAction(self.FahrenheitAction)
 
         self.CelsiusAction = QAction(UIconst.ROAST_MENU_CELSIUS_MODE,self)
-        self.connect(self.CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusMode)
+        self.connect(self.CelsiusAction,SIGNAL("triggered()"),self.qmc.celsiusModeRedraw)
         temperatureMenu.addAction(self.CelsiusAction)
         
         if self.qmc.mode == u"F":
@@ -4752,8 +4652,8 @@ class ApplicationWindow(QMainWindow):
                 f.close()
                 profile = self.deserialize(filename)
                 self.qmc.timeB = profile["timex"]
-                self.qmc.backgroundET = profile["temp1"]
-                self.qmc.backgroundBT = profile["temp2"]
+                self.qmc.temp1B = profile["temp1"]
+                self.qmc.temp2B = profile["temp2"]
                 self.qmc.startendB = profile["startend"]
                 self.qmc.varCB = profile["cracks"]
                 self.qmc.backgroundEvents = profile["specialevents"]
@@ -4764,7 +4664,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.Betypes = profile["etypes"]
                 
                 if "timeindex" in profile:
-                    self.qmc.backgroundtimeindex = profile["timeindex"]
+                    self.qmc.timeindexB = profile["timeindex"]
                 else:
                     self.qmc.timebackgroundindexupdate()
                     
@@ -4866,6 +4766,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2]) 
         self.qmc.endofx = self.qmc.timex[-1]
         self.sendmessage(QApplication.translate("Message Area","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
+        aw.qmc.timeindexupdate() #no longer using varC in redraw(). Need convert varC to timeindex[]        
         self.qmc.redraw()
 
             
@@ -9010,11 +8911,11 @@ class backgroundDLG(QDialog):
         self.backgroundCheck.setChecked(False)
         self.backgroundeventsflag.setChecked(False)
         
-        aw.qmc.backgroundET, aw.qmc.backgroundBT, aw.qmc.timeB = [],[],[]
+        aw.qmc.temp1B, aw.qmc.temp2B, aw.qmc.timeB = [],[],[]
         aw.qmc.startendB, aw.qmc.varCB = [0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.,0.,0.]
         aw.qmc.backgroundEvents, aw.qmc.backgroundEtypes = [],[]
         aw.qmc.backgroundEvalues, aw.qmc.backgroundEStrings = [],[]
-        aw.qmc.backgroundtimeindex = [0,0,0,0,0,0,0]
+        aw.qmc.timeindexB = [0,0,0,0,0,0,0]
         self.eventtable.clear()
         self.datatable.clear()
         aw.qmc.dryendB = [0.,0.]
@@ -9137,47 +9038,47 @@ class backgroundDLG(QDialog):
             for i in range(ndata):
                 Atime = QTableWidgetItem("%.03f"%aw.qmc.timeB[i])
                 Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-aw.qmc.startendB[0]))))
-                ET = QTableWidgetItem("%.02f"%aw.qmc.backgroundET[i])
-                BT = QTableWidgetItem("%.02f"%aw.qmc.backgroundBT[i])
+                ET = QTableWidgetItem("%.02f"%aw.qmc.temp1B[i])
+                BT = QTableWidgetItem("%.02f"%aw.qmc.temp2B[i])
                 if i:
-                    deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.backgroundET[i]-aw.qmc.backgroundET[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
-                    deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.backgroundBT[i]-aw.qmc.backgroundBT[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
+                    deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp1B[i]-aw.qmc.temp1B[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
+                    deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp2B[i]-aw.qmc.temp2B[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
                 else:
                     deltaET = QTableWidgetItem("00:00")
                     deltaBT = QTableWidgetItem("00:00")
                 if i:                
                         #identify by color and add notation
-                    if i == aw.qmc.backgroundtimeindex[0]:
+                    if i == aw.qmc.timeindexB[0]:
                         Rtime.setBackgroundColor(QColor('#f07800'))
                         text = Rtime.text()
                         text += " START"
                         Rtime.setText(text)
-                    elif i == aw.qmc.backgroundtimeindex[1]:
+                    elif i == aw.qmc.timeindexB[1]:
                         Rtime.setBackgroundColor(QColor('orange'))
                         text = Rtime.text()
                         text += " DRY END"
                         Rtime.setText(text)
-                    elif i == aw.qmc.backgroundtimeindex[2]:
+                    elif i == aw.qmc.timeindexB[2]:
                         Rtime.setBackgroundColor(QColor('orange'))
                         text = Rtime.text()
                         text += " FC START"
                         Rtime.setText(text)
-                    elif i == aw.qmc.backgroundtimeindex[3]:
+                    elif i == aw.qmc.timeindexB[3]:
                         Rtime.setBackgroundColor(QColor('orange'))
                         text = Rtime.text()
                         text += " FC END"
                         Rtime.setText(text)
-                    elif i == aw.qmc.backgroundtimeindex[4]:
+                    elif i == aw.qmc.timeindexB[4]:
                         Rtime.setBackgroundColor(QColor('orange'))
                         text = Rtime.text()
                         text += " SC START"
                         Rtime.setText(text)
-                    elif i == aw.qmc.backgroundtimeindex[5]:
+                    elif i == aw.qmc.timeindexB[5]:
                         Rtime.setBackgroundColor(QColor('orange'))
                         text = Rtime.text()
                         text += " SC END"
                         Rtime.setText(text)
-                    elif i == aw.qmc.backgroundtimeindex[6]:
+                    elif i == aw.qmc.timeindexB[6]:
                         Rtime.setBackgroundColor(QColor('#f07800'))
                         text = Rtime.text()
                         text += " END"
@@ -10088,7 +9989,7 @@ class designerconfigDlg(QDialog):
         self.connect(defaultButton, SIGNAL("clicked()"), self.setdefaults)
         closeButton = QPushButton("Close")
         self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("accept()"))
-        
+               
         convertButton = QPushButton("Create")
         self.connect(convertButton, SIGNAL("clicked()"),self.create)
 
