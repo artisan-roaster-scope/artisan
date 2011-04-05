@@ -238,18 +238,9 @@ class tgraphcanvas(FigureCanvas):
 
         #lists to store temps and rates of change. Second most IMPORTANT variables. All need same dimension.
         #self.temp1 = ET ; self.temp2 = BT; self.delta1 = deltaMET; self.delta2 = deltaBT
-        self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]
+        self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]        
         
-        #variables to record 1C and 2C. Store as list of 8 elements:
-        #1C start time [0],1C start Temp [1],1C end time [2],1C end temp [3],2C start time [4], 2C start Temp [5],
-        #2C end time [6], 2C end temp [7]
-        self.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
-        #dryend time, dryend BTtemp
-        self.dryend = [0.,0.]
-        #variable to mark the begining and end of the roast [starttime [0], starttempBT [1], endtime [2],endtempBT [3]]
-        self.startend = [0.,0.,0.,0.]
-        
-        #indexes for buttons START[0],Dryend[1],FCs[2],FCe[3],SCs[4],SCe[5], and DROP[6]
+        #indexes for START[0],Dryend[1],FCs[2],FCe[3],SCs[4],SCe[5], and DROP[6]
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryeEnd
         #Example: Use self.temp2[self.timeindex[4]] to get the BT temperature of SCs
         
@@ -264,8 +255,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundeventsflag = False
         self.backgroundpath = ""
         self.temp1B,self.temp2B,self.timeB = [],[],[]
-        self.timeindexB = [0,0,0,0,0,0,0]
-        self.startendB,self.varCB,self.dryendB = [0.,0.,0.,0.],[0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.]
+        self.timeindexB = [-1,0,0,0,0,0,0]
         self.backgroundEvents = [] #indexes of background events
         self.backgroundEtypes = []
         self.backgroundEvalues = []
@@ -516,7 +506,10 @@ class tgraphcanvas(FigureCanvas):
 
                 #update LCDs
                 if self.flagclock:
-                    ts = tx - self.startend[0]
+                    if self.timeindex[0] != -1:
+                        ts = tx - self.timex[self.timeindex[0]]
+                    else:
+                        ts = tx 
                     st2 = self.stringfromseconds(ts)
                     timelcd = QString(st2)
                     aw.lcd1.display(timelcd)
@@ -550,7 +543,10 @@ class tgraphcanvas(FigureCanvas):
                 
                 #update LCDs
                 if self.flagclock:
-                    ts = tx - self.startend[0]
+                    if self.timeindex[0] != -1:
+                        ts = tx - self.timex[self.timeindex[0]]
+                    else:
+                        ts = tx
                     st2 = self.stringfromseconds(ts)
                     timelcd = QString(st2)
                     aw.lcd1.display(timelcd)
@@ -955,9 +951,6 @@ class tgraphcanvas(FigureCanvas):
         self.rateofchange2 = 0.0
         self.sensitivity = 100.0 # was 20.0
         self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
-        self.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
-        self.dryend = [0.,0.]
-        self.startend = [0.,0.,0.,0.]
         self.timeindex = [-1,0,0,0,0,0,0]
         self.specialevents=[]
         if not self.keeptimeflag:
@@ -1095,7 +1088,7 @@ class tgraphcanvas(FigureCanvas):
         #check BACKGROUND flag
         if self.background:
             #check to see if there is both a profile loaded and a background loaded
-            if self.timeindex[0] != -1 and self.timeindexB[0] and self.backmoveflag:
+            if self.timeindex[0] != -1 and self.timeindexB[0] != -1 and self.backmoveflag:
                 if self.timex[self.timeindex[0]] != self.timeB[self.timeindexB[0]]:
                     #align the background profile so they both plot with the same CHARGE time
                     difference = self.timex[self.timeindex[0]] - self.timeB[self.timeindexB[0]]
@@ -1499,7 +1492,7 @@ class tgraphcanvas(FigureCanvas):
         if seconds >= 0:
             return "%02d:%02d"% divmod(seconds, 60)
         else:
-            #usually the startend[0] is alreday taken away in seconds before calling stringfromseconds()
+            #usually the timex[timeindex[0]] is alreday taken away in seconds before calling stringfromseconds()
             negtime = abs(seconds)
             return "-%02d:%02d"% divmod(negtime, 60)
         
@@ -1815,7 +1808,7 @@ class tgraphcanvas(FigureCanvas):
                              xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] - self.ystep),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
-            message = u"Roast time starts now 00:00 BT = " + unicode(self.startend[1]) + self.mode
+            message = u"Roast time starts now 00:00 BT = " + unicode(self.temp2[self.timeindex[0]]) + self.mode
  
             aw.button_8.setDisabled(True)
             aw.button_8.setFlat(True)
@@ -1856,7 +1849,7 @@ class tgraphcanvas(FigureCanvas):
             message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[1]]) + self.mode)
             
             if aw.qmc.phasesbuttonflag:     
-                self.phases[1] = int(round(self.dryend[1]))
+                self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
                 self.redraw()     
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -1882,7 +1875,7 @@ class tgraphcanvas(FigureCanvas):
             #calculate time elapsed since charge time
             st1 = u"FCs " + self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
             #anotate temperature
-            if self.dryend[0]:
+            if self.timeindex[1]:
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
             else:
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])                
@@ -2175,9 +2168,9 @@ class tgraphcanvas(FigureCanvas):
                 st3 += u"  (%.1f deg/min)"%rates_of_changes[2]
         
                 #Write flavor estimation
-                self.ax.text(self.startend[0]+ dryphasetime/2-len(st1)*8/2,statisticslower,st1,color=self.palette["text"],fontsize=11)
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime/2-len(st2)*8/2,statisticslower,st2,color=self.palette["text"],fontsize=11)
-                self.ax.text(self.startend[0]+ dryphasetime+midphasetime+finishphasetime/2-len(st3)*8/2,statisticslower,st3,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2-len(st1)*8/2,statisticslower,st1,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2-len(st2)*8/2,statisticslower,st2,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2-len(st3)*8/2,statisticslower,st3,color=self.palette["text"],fontsize=11)
 
             if self.statisticsflags[3]:
                 #calculate AREA under BT and ET
@@ -2200,7 +2193,7 @@ class tgraphcanvas(FigureCanvas):
                 deltaAcc = int(AccMET) - int(AccBT)
                         
                 lowestBT = u"%.1f"%LP
-                #timeLP = unicode(self.stringfromseconds(self.timex[k] - self.startend[0]))
+                #timeLP = unicode(self.stringfromseconds(self.timex[k] - self.timex[self.timeindex[0]]))
                 time = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
                 #end temperature
 
@@ -2327,17 +2320,17 @@ class tgraphcanvas(FigureCanvas):
 
     #points are used to draw interpolation
     def findpoints(self):
-    
-        if self.startend[0]:
-            Xpoints = []
+        #if profile found
+        if self.timeindex[0] != -1:
+            Xpoints = []                        #make temporary lists to hold the values to return
             Ypoints = []
             
             #start point from begining of time
             Xpoints.append(self.timex[0])
             Ypoints.append(self.temp2[0])
             #input beans (CHARGE)
-            Xpoints.append(self.startend[0])
-            Ypoints.append(self.startend[1])
+            Xpoints.append(self.timex[self.timeindex[0]])
+            Ypoints.append(self.temp2[self.timeindex[0]])
 
             #find indexes of lowest point and dryend            
             LPind = aw.findTP()
@@ -2354,35 +2347,35 @@ class tgraphcanvas(FigureCanvas):
                 Xpoints.append(self.timex[LPind])
                 Ypoints.append(self.temp2[LPind])
                 
-            if self.dryend[1] > self.timex[DE] and self.dryend[1] > self.timex[LPind]:
-                Xpoints.append(self.dryend[0])
-                Ypoints.append(self.dryend[1])
-                
-            if self.varC[0]:
-                Xpoints.append(self.varC[0])
-                Ypoints.append(self.varC[1])
-            if self.varC[2]:
-                Xpoints.append(self.varC[2])
-                Ypoints.append(self.varC[3])            
-            if self.varC[4]:
-                Xpoints.append(self.varC[4])
-                Ypoints.append(self.varC[5])       
-            if self.varC[6]:
-                Xpoints.append(self.varC[6])
-                Ypoints.append(self.varC[7])
-                
-            if self.startend[2]:
-                Xpoints.append(self.startend[2])
-                Ypoints.append(self.startend[3])            
+            if self.temp2[self.timeindex[1]] > self.timex[DE] and self.temp2[self.timeindex[1]] > self.timex[LPind]:
+                Xpoints.append(self.timex[self.timeindex[1]])
+                Ypoints.append(self.temp2[self.timeindex[1]])
+            if self.timeindex[2]:
+                Xpoints.append(self.timex[self.timeindex[2]])
+                Ypoints.append(self.temp2[self.timeindex[2]])
+            if self.timeindex[3]:
+                Xpoints.append(self.timex[self.timeindex[3]])
+                Ypoints.append(self.temp2[self.timeindex[3]])            
+            if self.timeindex[4]:
+                Xpoints.append(self.timex[self.timeindex[4]])
+                Ypoints.append(self.temp2[self.timeindex[4]])       
+            if self.timeindex[5]:
+                Xpoints.append(self.timex[self.timeindex[5]])
+                Ypoints.append(self.temp2[self.timeindex[5]])
+            if self.timeindex[6]:
+                Xpoints.append(self.timex[self.timeindex[6]])
+                Ypoints.append(self.temp2[self.timeindex[6]])            
             
-            #end points
-            Xpoints.append(self.timex[-1])
-            Ypoints.append(self.temp2[-1])
-
+            #end point
+            if self.timex[self.timeindex[6]] != self.timex[-1]:
+                Xpoints.append(self.timex[-1])
+                Ypoints.append(self.temp2[-1])
+                
+            return Xpoints,Ypoints
+        
         else:
             aw.sendmessage(QApplication.translate("Message Area","No finished profile found", None, QApplication.UnicodeUTF8))
-
-        return Xpoints,Ypoints
+            return [],[]
 
     #collects info about the univariate interpolation
     def univariateinfo(self):
@@ -2481,7 +2474,6 @@ class tgraphcanvas(FigureCanvas):
         self.timex = time[:]
         self.temp1 = etvals[:]    
 
-        self.timeindexupdate()
         self.redraw()
                                    
     #interpolation type        
@@ -2604,26 +2596,27 @@ class tgraphcanvas(FigureCanvas):
             elif choice2 < choice1:
                 return i-1
 
-    #updates list self.timeindex when found an _old_ profile without self.timeindex (new version)
-    def timeindexupdate(self):
+    #updates list self.timeindex when found an _OLD_ profile without self.timeindex (new version)
+    def timeindexupdate(self,times):
         #          START            DRYEND          FCs             FCe         SCs         SCe         DROP
-        times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
-        for i in range(7):               
+#        times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
+        for i in range(len(times)):               
             if times[i]:
                 self.timeindex[i] = self.time2index(times[i])
             else:
                 self.timeindex[i] = 0
 
 
-    #updates list self.timeindexB when found an _old_ profile without self.timeindex 
-    def timebackgroundindexupdate(self):
-        #          STARTB            DRYENDB          FCsB       FCeB         SCsB         SCeB               DROPB
-        times = [self.startendB[0],self.dryendB[0],self.varCB[0],self.varCB[2],self.varCB[4],self.varCB[6],self.startendB[2]]
-        for i in range(7):               
+    #updates list self.timeindexB when found an _OLD_ profile without self.timeindexB 
+    def timebackgroundindexupdate(self,times):
+##        #          STARTB            DRYENDB          FCsB       FCeB         SCsB         SCeB               DROPB
+##        times = [self.startendB[0],self.dryendB[0],self.varCB[0],self.varCB[2],self.varCB[4],self.varCB[6],self.startendB[2]]
+        for i in range(len(times)):               
             if times[i]:
                 self.timeindexB[i] = self.backgroundtime2index(times[i])
             else:
                 self.timeindexB[i] = 0
+                
     def restore_message_label(self):
         aw.messagelabel.setStyleSheet("background-color:'transparent';")
 
@@ -3062,7 +3055,7 @@ class tgraphcanvas(FigureCanvas):
                 QMessageBox.information(self,u"Delete point",message)
        
             else:
-                time = self.stringfromseconds(self.timex[index]-self.startend[0])
+                time = self.stringfromseconds(self.timex[index]-self.timex[self.timeindex[0]])
                 string = u"Delete point at %s?"%time
                 reply = QMessageBox.question(self,u"Delete point",string,
                         QMessageBox.Yes|QMessageBox.Cancel)
@@ -4402,7 +4395,7 @@ class ApplicationWindow(QMainWindow):
            return
        else:
            self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
-           time = self.qmc.stringfromseconds(int(self.qmc.timex[aw.qmc.specialevents[currentevent-1]]-aw.qmc.startend[0]))
+           time = self.qmc.stringfromseconds(int(self.qmc.timex[aw.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.timeindex[0]]))
            self.etimeline.setText(time)
            self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[currentevent-1])
            self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
@@ -4426,7 +4419,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
             self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
             self.qmc.specialeventsStrings[lenevents-1] = unicode(self.lineEvent.text())
-            self.qmc.specialevents[lenevents-1] = self.qmc.time2index(self.qmc.startend[0]+ self.qmc.stringtoseconds(unicode(self.etimeline.text())))
+            self.qmc.specialevents[lenevents-1] = self.qmc.time2index(self.qmc.timex[self.timeindex[0]]+ self.qmc.stringtoseconds(unicode(self.etimeline.text())))
 
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
@@ -4550,11 +4543,11 @@ class ApplicationWindow(QMainWindow):
     def newRoast(self):
         #stop current roast (if any)
         if self.qmc.flagon:
-            if self.qmc.startend[0] == 0.0:
+            if self.qmc.timeindex[0] == -1:
                 self.sendmessage(QApplication.translate("Message Area","No profile found", None, QApplication.UnicodeUTF8))
                 return
             #mark drop if not yet done
-            if self.qmc.startend[2] == 0.0:
+            if self.qmc.timeindex[6] == 0:
                 self.qmc.markDrop()
             #invoke "OFF"
             self.qmc.OffMonitor()
@@ -4657,26 +4650,35 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timeB = profile["timex"]
                 self.qmc.temp1B = profile["temp1"]
                 self.qmc.temp2B = profile["temp2"]
-                self.qmc.startendB = profile["startend"]
-                self.qmc.varCB = profile["cracks"]
                 self.qmc.backgroundEvents = profile["specialevents"]
                 self.qmc.backgroundEtypes = profile["specialeventstype"]
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
                 self.qmc.backgroundEStrings = profile["specialeventsStrings"]
                 if "etypes" in profile:
                     self.qmc.Betypes = profile["etypes"]
-                
                 if "timeindex" in profile:
-                    self.qmc.timeindexB = profile["timeindex"]
+                    self.qmc.timeindexB = profile["timeindex"]          #if new profile found with variable timeindex
                 else:
-                    self.qmc.timebackgroundindexupdate()
-                    
-                if "dryend" in profile:
-                    self.qmc.dryendB = profile["dryend"]                
+                    startendB = profile["startend"]
+                    varCB = profile["cracks"]
+                    if "dryend" in profile:
+                        dryendB = profile["dryend"]
+                    else:
+                        dryendB = [0,0]
+                    times = []
+                    times.append(startendB[0])
+                    times.append(dryend[0])
+                    times.append(varCB[0])
+                    times.append(varCB[2])
+                    times.append(varCB[4])
+                    times.append(varCB[6])
+                    times.append(startendB[2])                    
+                    self.qmc.timebackgroundindexupdate(times[:])
+                
             else:      
                 self.sendmessage(u"Invalid artisan format")
 
-            message =  u"Background " + unicode(filename) + u" loaded successfully "+unicode(self.qmc.stringfromseconds(self.qmc.startendB[2]))
+            message =  u"Background " + unicode(filename) + u" loaded successfully "+unicode(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))
             self.sendmessage(message)
 
         except IOError,e:
@@ -4741,60 +4743,66 @@ class ApplicationWindow(QMainWindow):
         #set events
         CHARGE = aw.qmc.stringtoseconds(header[2].split('CHARGE:')[1])
         if CHARGE > 0:
-            aw.qmc.startend[0] = CHARGE
-            aw.qmc.startend[1] = aw.BTfromseconds(aw.qmc.startend[0])
+            aw.qmc.timeindex[0] = self.time2index(CHARGE)
         DRYe = aw.qmc.stringtoseconds(header[4].split('DRYe:')[1])
         if DRYe > 0:
-            aw.qmc.dryend[0] = DRYe
-            aw.qmc.dryend[1] = aw.BTfromseconds(aw.qmc.dryend[0])
+            aw.qmc.timeindex[1] = self.time2index(DRYe)
         FCs = aw.qmc.stringtoseconds(header[5].split('FCs:')[1])
-        if FCs > 0: 
-            aw.qmc.varC[0] = FCs
-            aw.qmc.varC[1] = aw.BTfromseconds(aw.qmc.varC[0])  
+        if FCs > 0:
+            aw.qmc.timeindex[2] = self.time2index(FCs)
         FCe = aw.qmc.stringtoseconds(header[6].split('FCe:')[1])        
-        if FCe > 0:    
-            aw.qmc.varC[2] = FCe
-            aw.qmc.varC[3] = aw.BTfromseconds(aw.qmc.varC[2])
+        if FCe > 0:
+            aw.qmc.timeindex[3] = self.time2index(FCe)
         SCs = aw.qmc.stringtoseconds(header[7].split('SCs:')[1])
-        if SCs > 0:    
-            aw.qmc.varC[4] = SCs
-            aw.qmc.varC[5] = aw.BTfromseconds(aw.qmc.varC[4])
+        if SCs > 0:
+            aw.qmc.timeindex[4] = self.time2index(SCs)
         SCe = aw.qmc.stringtoseconds(header[8].split('SCe:')[1])
         if SCe> 0:
-            aw.qmc.varC[6] = SCe
-            aw.qmc.varC[7] = aw.BTfromseconds(aw.qmc.varC[6])   
+            aw.qmc.timeindex[5] = self.time2index(SCe) 
         DROP = aw.qmc.stringtoseconds(header[9].split('DROP:')[1])           
         if DROP > 0:
-            aw.qmc.startend[2] = DROP
-            aw.qmc.startend[3] = aw.BTfromseconds(aw.qmc.startend[2]) 
+            aw.qmc.timeindex[6] = self.time2index(DROP)
         self.qmc.endofx = self.qmc.timex[-1]
         self.sendmessage(QApplication.translate("Message Area","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
-        aw.qmc.timeindexupdate() #no longer using varC in redraw(). Need convert varC to timeindex[]        
         self.qmc.redraw()
-
             
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
-        CHARGE = self.qmc.startend[0]
+        CHARGE = aw.qmc.timex[aw.qmc.timeindex[0]] 
         TP_index = self.findTP()
         TP = 0.
         if TP_index and TP_index < len(self.qmc.timex):
             TP = self.qmc.timex[TP_index]
         dryEndIndex = self.findDryEnd(TP_index)
-        if aw.qmc.dryend[0]:
+        if self.qmc.timeindex[1]:
             #manual dryend available
-            DRYe = self.qmc.dryend[0]
+            DRYe = self.qmc.timex[aw.qmc.timeindex[1]]
         else:
             #we use the dryEndIndex respecting the dry phase
-            if dryEndIndex < len(aw.qmc.timex):
+            if dryEndIndex < len(self.qmc.timex):
                 DRYe = self.qmc.timex[dryEndIndex]
             else:
                 DRYe = 0.
-        FCs = self.qmc.varC[0]
-        FCe = self.qmc.varC[2]
-        SCs = self.qmc.varC[4]
-        SCe = self.qmc.varC[6]
-        DROP = self.qmc.startend[2]
+        if self.qmc.timeindex[2]:
+            FCs = self.qmc.timex[self.qmc.timeindex[2]]
+        else:
+            FCs = 0
+        if self.qmc.timeindex[3]:
+            FCe = self.qmc.timex[self.qmc.timeindex[3]]
+        else:
+            FCe = 0
+        if self.qmc.timeindex[4]:
+            SCs = self.qmc.timex[self.qmc.timeindex[4]]
+        else:
+            SCs = 0
+        if self.qmc.timeindex[5]:
+            SCe = self.qmc.timex[self.qmc.timeindex[5]]
+        else:
+            SCe = 0
+        if self.qmc.timeindex[6]:
+            DROP = self.qmc.timex[self.qmc.timeindex[6]]
+        else:
+            DROP = 0
         events = [     
             [CHARGE,"Charge",False],
             [TP,"TP",False],      
@@ -4866,14 +4874,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.fahrenheitMode()
         if self.qmc.mode == u"C" and old_mode == "F":
             self.qmc.celsiusMode()
-        if "startend" in profile:
-            self.qmc.startend = [float(fl) for fl in profile["startend"]]  
-        else:
-            self.qmc.startend = [0.,0.,0.,0.]     
-        if "cracks" in profile:
-            self.qmc.varC = [float(fl) for fl in profile["cracks"]]
-        else:
-            self.qmc.varC = [0.,0.,0.,0.,0.,0.,0.,0.]
         if "flavors" in profile:
             self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
         if "flavorlabels" in profile:
@@ -4955,22 +4955,9 @@ class ApplicationWindow(QMainWindow):
             #Set the xlimits
             if self.qmc.timex:
                 self.qmc.endofx = self.qmc.timex[-1] + 40         
-##        if "statisticsflags" in profile:
-##            self.qmc.statisticsflags = profile["statisticsflags"]
-##        if "statisticsconditions" in profile:
-##            self.qmc.statisticsconditions = profile["statisticsconditions"]
-##        if "DeltaET" in profile:
-##            self.qmc.DeltaETflag = bool(profile["DeltaET"])
-##        if "DeltaBT" in profile:
-##            self.qmc.DeltaBTflag = bool(profile["DeltaBT"])
-##        if "DeltaFilter" in profile:
-##            self.qmc.deltafilter = int(profile["DeltaFilter"])
         if "ambientTemp" in profile:
             self.qmc.ambientTemp = profile["ambientTemp"]
-        if "dryend" in profile:
-            self.qmc.dryend = profile["dryend"]
-        else:
-            self.qmc.dryend = [0.,0.]
+
         if "bag_humidity" in profile:
             self.qmc.bag_humidity = profile["bag_humidity"]   
         else:
@@ -4978,7 +4965,29 @@ class ApplicationWindow(QMainWindow):
         if "timeindex" in profile:
             self.qmc.timeindex = profile["timeindex"]
         else:
-            self.qmc.timeindexupdate()
+            ###########      OLD PROFILE FORMAT
+            if "startend" in profile:
+                startend = [float(fl) for fl in profile["startend"]]  
+            else:
+                startend = [0.,0.,0.,0.]
+            if "dryend" in profile:
+                dryend = profile["dryend"]
+            else:
+                dryend = [0.,0.]
+            if "cracks" in profile:
+                varC = [float(fl) for fl in profile["cracks"]]
+            else:
+                varC = [0.,0.,0.,0.,0.,0.,0.,0.]
+            times = []
+            times.append(startend[0])
+            times.append(dryend[0])
+            times.append(varC[0])
+            times.append(varC[2])
+            times.append(varC[4])
+            times.append(varC[6])
+            times.append(startend[2])
+            #convert to new profile
+            self.qmc.timeindexupdate(times)
             
             
     #used by filesave()
@@ -4986,8 +4995,6 @@ class ApplicationWindow(QMainWindow):
     def getProfile(self):
         profile = {}
         profile["mode"] = self.qmc.mode
-        profile["startend"] = self.qmc.startend
-        profile["cracks"] = self.qmc.varC
         profile["timeindex"] = self.qmc.timeindex
         profile["flavors"] = self.qmc.flavors
         profile["flavorlabels"] = [unicode(fl) for fl in self.qmc.flavorlabels]
@@ -5014,13 +5021,7 @@ class ApplicationWindow(QMainWindow):
         profile["ymax"] = self.qmc.ylimit
         profile["xmin"] = self.qmc.startofx
         profile["xmax"] = self.qmc.endofx       
-##        profile["statisticsflags"] = self.qmc.statisticsflags
-##        profile["statisticsconditions"] = self.qmc.statisticsconditions
-##        profile["DeltaET"] = self.qmc.DeltaETflag
-##        profile["DeltaBT"] = self.qmc.DeltaBTflag
-##        profile["DeltaFilter"] = self.qmc.deltafilter
         profile["ambientTemp"] = self.qmc.ambientTemp
-        profile["dryend"] = self.qmc.dryend
         profile["bag_humidity"] = self.qmc.bag_humidity
         return profile
     
@@ -5486,8 +5487,8 @@ $cupping_notes
         if len(beans) > 43:
             beans = beans[:41] + "&hellip;"
         charge = "--"
-        if self.qmc.startend[0] > 0.:
-            charge = "BT " + "%.1f"%self.qmc.startend[1] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.ETfromseconds(self.qmc.startend[0]) + "&deg;" + self.qmc.mode
+        if self.qmc.timeindex[0] != -1:
+            charge = "BT " + "%.1f"%self.qmc.temp2[self.qmc.timeindex[0]] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.qmc.temp1[self.qmc.timeindex[0]] + "&deg;" + self.qmc.mode
         TP_index = self.findTP()
         TP_time = TP_temp = None
         if TP_index > 0 and len(aw.qmc.timex) > 0:
@@ -5496,10 +5497,10 @@ $cupping_notes
         dryEndIndex = self.findDryEnd(TP_index)
         rates_of_changes = aw.RoR(TP_index,dryEndIndex)
         
-        if aw.qmc.dryend[0]:
+        if self.qmc.timeindex[1]:
             #manual dryend available
-            DRY_time = aw.qmc.dryend[0]
-            DRY_temp = aw.qmc.dryend[1]
+            DRY_time = self.qmc.timex[self.qmc.timeindex[1]]
+            DRY_temp = self.qmc.temp2[self.qmc.timeindex[1]]
         else:
             #we use the dryEndIndex respecting the dry phase
             if dryEndIndex < len(aw.qmc.timex):
@@ -5553,11 +5554,11 @@ $cupping_notes
             charge=charge,
             TP=self.event2html(TP_time,TP_temp),
             DRY=self.event2html(DRY_time,DRY_temp),
-            FCs=self.event2html(self.qmc.varC[0],self.qmc.varC[1]),
-            FCe=self.event2html(self.qmc.varC[2],self.qmc.varC[3]),
-            SCs=self.event2html(self.qmc.varC[4],self.qmc.varC[5]),
-            SCe=self.event2html(self.qmc.varC[6],self.qmc.varC[7]),
-            drop=self.event2html(self.qmc.startend[2],self.qmc.startend[3]),
+            FCs=self.event2html(self.qmc.timex[self.qmc.timeindex[2]],self.qmc.temp2[self.qmc.timeindex[2]]),
+            FCe=self.event2html(self.qmc.timex[self.qmc.timeindex[3]],self.qmc.temp2[self.qmc.timeindex[3]]),
+            SCs=self.event2html(self.qmc.timex[self.qmc.timeindex[4]],self.qmc.temp2[self.qmc.timeindex[4]]),
+            SCe=self.event2html(self.qmc.timex[self.qmc.timeindex[5]],self.qmc.temp2[self.qmc.timeindex[5]]),
+            drop=self.event2html(self.qmc.timex[self.qmc.timeindex[6]],self.qmc.temp2[self.qmc.timeindex[6]]),
             dry_phase=self.phase2html(self.qmc.statisticstimes[1],rates_of_changes[0],evaluations[0]),
             mid_phase=self.phase2html(self.qmc.statisticstimes[2],rates_of_changes[1],evaluations[1]),
             finish_phase=self.phase2html(self.qmc.statisticstimes[3],rates_of_changes[2],evaluations[2]),
@@ -5594,7 +5595,11 @@ $cupping_notes
             
     def event2html(self,time,temp):
         if time:
-            return self.qmc.stringfromseconds(time - self.qmc.startend[0])+ " (%.1f"%temp + "&deg;" + self.qmc.mode + ")"
+            if self.qmc.timeindex[0] != -1:
+                start = self.qmc.timex[self.qmc.timeindex[0]]
+            else:
+                start = 0    
+            return self.qmc.stringfromseconds(time - start)+ " (%.1f"%temp + "&deg;" + self.qmc.mode + ")"
         else:
             return "--"
             
@@ -5602,10 +5607,14 @@ $cupping_notes
         html = ""  
         if self.qmc.specialevents and len(self.qmc.specialevents) > 0:
             html += '<center>\n<table cellpadding="2">\n'
+            if self.qmc.timeindex[0] != -1:
+                start = self.qmc.timex[self.qmc.timeindex[0]]
+            else:
+                start = 0
             for i in range(len(self.qmc.specialevents)):
                 html += ("<tr>"+
                      "\n<td>" + unicode(i+1) + "</td><td>[" +
-                     self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[i]]-self.qmc.startend[0])) +
+                     self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[i]] - start)) +
                      "</td><td>at " + "%.1f"%self.qmc.temp2[self.qmc.specialevents[i]] + self.qmc.mode +
                      "]</td><td>" + self.qmc.specialeventsStrings[i] +"</td></tr>\n")     
             html += '</table>\n</center>'
@@ -5647,7 +5656,7 @@ $cupping_notes
         else:
             return 0.0
         
-    # converts times (values of timex) to indices in aw.qmc.temp1 and aw.qmc.temp2
+    # converts times (values of timex) to indices
     def time2index(self,time):
         for i in range(len(aw.qmc.timex)):
             if aw.qmc.timex[i] > time:
@@ -5663,20 +5672,20 @@ $cupping_notes
         end = len(aw.qmc.timex)
         # try to consider only indices until the roast end and not beyond
         EOR_index = end
-        if aw.qmc.startend[2] > 0.:
-            EOR_index = self.time2index(aw.qmc.startend[2])
+        if aw.qmc.timeindex[6]:
+            EOR_index = aw.qmc.timeindex[6]
         if EOR_index > start and EOR_index < end:
             end = EOR_index
         # try to consider only indices until FCs and not beyond
         FCs_index = end
-        if aw.qmc.varC[0] > 0.:
-            FCs_index = self.time2index(aw.qmc.varC[0])
+        if aw.qmc.timeindex[2]:
+            FCs_index = aw.qmc.timeindex[2]
         if FCs_index > start and FCs_index < end:
             end = FCs_index
         # try to consider only indices from start of roast on and not before
         SOR_index = start
-        if aw.qmc.startend[0] > 0.:
-            SOR_index = self.time2index(aw.qmc.startend[0]) 
+        if aw.qmc.timeindex[0] != -1:
+            SOR_index = aw.qmc.timeindex[0] 
         if SOR_index > start and SOR_index < end:
             start = SOR_index
         for i in range(end - 1, start -1, -1):
@@ -5745,20 +5754,20 @@ $cupping_notes
         end = len(aw.qmc.timex)
         # try to consider only indices until the roast end and not beyond
         EOR_index = end
-        if aw.qmc.startend[2] > 0.:
-            EOR_index = self.time2index(aw.qmc.startend[2])
+        if aw.qmc.timeindex[6]:
+            EOR_index = aw.qmc.timeindex[6]
         if EOR_index > start and EOR_index < end:
             end = EOR_index
         # try to consider only indices until FCs and not beyond
         FCs_index = end
-        if aw.qmc.varC[0] > 0.:
-            FCs_index = self.time2index(aw.qmc.varC[0])
+        if aw.qmc.timeindex[2]:
+            FCs_index = aw.qmc.timeindex[6]
         if FCs_index > start and FCs_index < end:
             end = FCs_index
         # try to consider only indices from start of roast on and not before
         SOR_index = start
-        if aw.qmc.startend[0] > 0.:
-            SOR_index = self.time2index(aw.qmc.startend[0]) 
+        if aw.qmc.timeindex[0] != -1:
+            SOR_index = aw.qmc.timeindex[0] 
         if SOR_index > start and SOR_index < end:
             start = SOR_index
         # try to consider only indices from TP of roast on and not before
@@ -5787,11 +5796,11 @@ $cupping_notes
         if BTdrycross and TP_index < 1000 and TP_index > -1 and dryphasetime and TP_index < len(aw.qmc.temp2):
             LP = aw.qmc.temp2[TP_index]
             rc1 = ((BTdrycross - LP) / (dryphasetime - aw.qmc.timex[TP_index]))*60.
-        if aw.qmc.varC[0]:
+        if aw.qmc.timeindex[2]:
             if midphasetime and BTdrycross:
-                rc2 = ((aw.qmc.varC[1] - BTdrycross)/midphasetime)*60.
+                rc2 = ((aw.qmc.temp2[aw.qmc.timeindex[2]] - BTdrycross)/midphasetime)*60.
             if finishphasetime:
-                rc3 = ((aw.qmc.startend[3] - aw.qmc.varC[1])/finishphasetime)*60.
+                rc3 = ((aw.qmc.temp2[aw.qmc.timeindex[6]]- aw.qmc.temp2[aw.qmc.timeindex[2]])/finishphasetime)*60.
         return (rc1,rc2,rc3)    
         
     def viewErrorLog(self):
@@ -6508,7 +6517,7 @@ class HUDDlg(QDialog):
         pass
 
     def showunivarinfo(self):
-        if aw.qmc.startend[2]:
+        if aw.qmc.timeindex[6]:
             aw.qmc.univariateinfo()
         else:
             self.status.showMessage("Need to load a finished profile first",5000)     
@@ -6516,7 +6525,7 @@ class HUDDlg(QDialog):
     def univar(self,i):
         if self.univarCheck.isChecked():
             #check for finished roast
-            if aw.qmc.startend[2]:
+            if aw.qmc.timeindex[6]:
                 aw.qmc.univariate()
             else:
                 self.status.showMessage("Need to load a finished profile first",5000)
@@ -6529,7 +6538,7 @@ class HUDDlg(QDialog):
         mode = unicode(self.interpComboBox.currentText())
         if self.interpCheck.isChecked():
             #check for finished roast
-            if aw.qmc.startend[2]:
+            if aw.qmc.timeindex[6]:
                 aw.qmc.drawinterp(mode)
             else:
                 self.status.showMessage("Need to load a finished profile first",5000)
@@ -7841,9 +7850,13 @@ class calculatorDlg(QDialog):
         nevents = len(aw.qmc.specialevents)
         Aevent = int(self.eventAComboBox.currentIndex())
         Bevent = int(self.eventBComboBox.currentIndex())
-        if Aevent <= nevents and Bevent <= nevents and Aevent and Bevent:      
-            self.startEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Aevent-1]]-aw.qmc.startend[0]))        
-            self.endEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Bevent-1]]-aw.qmc.startend[0]))
+        if Aevent <= nevents and Bevent <= nevents and Aevent and Bevent:
+            if aw.qmc.timeindex[0] != -1:
+                start = aw.qmc.timex[aw.qmc.timeindex[0]]
+            else:
+                start = 0
+            self.startEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Aevent-1]] - start))        
+            self.endEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.specialevents[Bevent-1]] - start))
             self.calculateRC()
 
     
@@ -7865,9 +7878,14 @@ class calculatorDlg(QDialog):
                 self.result1.setText("Error: End time smaller than Start time")
                 self.result2.setText("")
                 return
-
-            startindex = aw.qmc.time2index(starttime + aw.qmc.startend[0])
-            endindex = aw.qmc.time2index(endtime + aw.qmc.startend[0])
+            
+            if aw.qmc.timeindex[0] != -1:
+                start = aw.qmc.timex[aw.qmc.timeindex[0]]
+            else:
+                start = 0
+                
+            startindex = aw.qmc.time2index(starttime + start)
+            endindex = aw.qmc.time2index(endtime + start)
             
             
             #delta
@@ -7879,8 +7897,8 @@ class calculatorDlg(QDialog):
                 deltaseconds = deltatemperature/deltatime
             deltaminutes = deltaseconds*60.
         
-            string1 = ( u"Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- aw.qmc.startend[0]) +
-                        u" to " + aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- aw.qmc.startend[0]))
+            string1 = ( u"Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- start) +
+                        u" to " + aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- start))
             string2 = u"deg/sec = " + u"%.2f"%(deltaseconds) + u"    deg/min = <b>" + u"%.2f<\b>"%(deltaminutes)
             
             self.result1.setText(string1)        
@@ -8244,12 +8262,12 @@ class phasesGraphDlg(QDialog):
     def events2phases(self):
         if aw.qmc.phasesbuttonflag:
             # adjust phases by DryEnd and FCs events
-            if aw.qmc.dryend[0]:
-                aw.qmc.phases[1] = int(round(aw.qmc.dryend[1]))  
+            if aw.qmc.timeindex[1]:
+                aw.qmc.phases[1] = int(round(aw.qmc.temp2[aw.qmc.timeindex[1]]))  
                 self.enddry.setDisabled(True)
                 self.startmid.setDisabled(True)
-            if aw.qmc.varC[0]:
-                aw.qmc.phases[2] = int(round(aw.qmc.varC[1]))
+            if aw.qmc.timeindex[2]:
+                aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
                 self.endmid.setDisabled(True)
                 self.startfinish.setDisabled(True)
 
@@ -8820,8 +8838,19 @@ class backgroundDLG(QDialog):
 
 
     def timealign(self):
-        btime = aw.qmc.startendB[0]
-        ptime = aw.qmc.startend[0]
+        if aw.qmc.timeindex[0] != -1:
+            start = aw.qmc.timex[aw.qmc.timeindex[0]]
+        else:
+            start = 0
+
+        if aw.qmc.timeindexB[0] != -1:
+            startB = aw.qmc.timeB[aw.qmc.timeindexB[0]]
+        else:
+            startB = 0
+
+        btime = startB
+        ptime = start
+        
         difference = ptime - btime
         if difference > 0:
            aw.qmc.movebackground("right",abs(difference))
@@ -8900,10 +8929,9 @@ class backgroundDLG(QDialog):
         self.backgroundeventsflag.setChecked(False)
         
         aw.qmc.temp1B, aw.qmc.temp2B, aw.qmc.timeB = [],[],[]
-        aw.qmc.startendB, aw.qmc.varCB = [0.,0.,0.,0.,0.,0.,0.,0.],[0.,0.,0.,0.]
         aw.qmc.backgroundEvents, aw.qmc.backgroundEtypes = [],[]
         aw.qmc.backgroundEvalues, aw.qmc.backgroundEStrings = [],[]
-        aw.qmc.timeindexB = [0,0,0,0,0,0,0]
+        aw.qmc.timeindexB = [-1,0,0,0,0,0,0]
         self.eventtable.clear()
         self.datatable.clear()
         aw.qmc.dryendB = [0.,0.]
@@ -8998,8 +9026,13 @@ class backgroundDLG(QDialog):
             self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
             self.eventtable.setShowGrid(True)
 
+            if aw.qmc.timeindex[0] != -1:
+                start = aw.qmc.timex[aw.qmc.timeindex[0]]
+            else:
+                start = 0
+
             for i in range(ndata):
-                time = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-aw.qmc.startendB[0])))
+                time = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start)))
                 description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
                 etype = QTableWidgetItem(aw.qmc.Betypes[aw.qmc.backgroundEtypes[i]])
                 evalue = QTableWidgetItem(aw.qmc.eventsvalues[aw.qmc.backgroundEvalues[i]])
@@ -9014,6 +9047,12 @@ class backgroundDLG(QDialog):
     def createDataTable(self):
         self.datatable.clear()
         ndata = len(aw.qmc.timeB)
+        
+        if aw.qmc.timeindex[0] != -1:
+            start = aw.qmc.timex[aw.qmc.timeindex[0]]
+        else:
+            start = 0
+            
         if ndata:    
             self.datatable.setRowCount(ndata)
             self.datatable.setColumnCount(6)
@@ -9025,7 +9064,7 @@ class backgroundDLG(QDialog):
             self.datatable.setShowGrid(True)
             for i in range(ndata):
                 Atime = QTableWidgetItem("%.03f"%aw.qmc.timeB[i])
-                Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-aw.qmc.startendB[0]))))
+                Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
                 ET = QTableWidgetItem("%.02f"%aw.qmc.temp1B[i])
                 BT = QTableWidgetItem("%.02f"%aw.qmc.temp2B[i])
                 if i:
@@ -9036,7 +9075,7 @@ class backgroundDLG(QDialog):
                     deltaBT = QTableWidgetItem("00:00")
                 if i:                
                         #identify by color and add notation
-                    if i == aw.qmc.timeindexB[0]:
+                    if i == aw.qmc.timeindexB[0] != -1:
                         Rtime.setBackgroundColor(QColor('#f07800'))
                         text = Rtime.text()
                         text += " START"
@@ -9932,13 +9971,18 @@ class designerconfigDlg(QDialog):
         self.connect(self.sce, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,5))
         self.connect(self.drop, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,6))
 
-        self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))                                                                   #CHARGE
-        self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[1] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #DRY END - aw.qmc.startend[0]
-        self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[2] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #FC START
-        self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[3] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #FC END
-        self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[4] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #SC START
-        self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[5] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #SC END
-        self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[6] - aw.qmc.timex[aw.qmc.timeindex[0]]))      #DROP
+        if aw.qmc.timeindex[0] != -1:
+            start = aw.qmc.timex[aw.qmc.timeindex[0]]
+        else:
+            start = 0
+
+        self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))                                       #CHARGE
+        self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[1] - start))      #DRY END 
+        self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[2] - start))      #FC START
+        self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[3] - start))      #FC END
+        self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[4] - start))      #SC START
+        self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[5] - start))      #SC END
+        self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[6] - start))      #DROP
         
         regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
         self.Edit0.setValidator(QRegExpValidator(regextime,self))
