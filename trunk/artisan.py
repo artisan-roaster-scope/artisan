@@ -2622,7 +2622,7 @@ class tgraphcanvas(FigureCanvas):
 
     #adds errors
     def adderror(self,error):
-        print error
+        #print error
         aw.messagelabel.setStyleSheet("background-color:'red';")
         time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
         #keep a max of 500 errors
@@ -5490,24 +5490,21 @@ $cupping_notes
         if self.qmc.timeindex[0] != -1:
             charge = "BT " + "%.1f"%self.qmc.temp2[self.qmc.timeindex[0]] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.qmc.temp1[self.qmc.timeindex[0]] + "&deg;" + self.qmc.mode
         TP_index = self.findTP()
-        TP_time = TP_temp = None
+        TP_time_idx = None
         if TP_index > 0 and len(aw.qmc.timex) > 0:
-            TP_time = aw.qmc.timex[TP_index]            
-            TP_temp = aw.qmc.temp2[TP_index]
+            TP_time_idx = TP_index
         dryEndIndex = self.findDryEnd(TP_index)
         rates_of_changes = aw.RoR(TP_index,dryEndIndex)
         
         if self.qmc.timeindex[1]:
             #manual dryend available
-            DRY_time = self.qmc.timex[self.qmc.timeindex[1]]
-            DRY_temp = self.qmc.temp2[self.qmc.timeindex[1]]
+            DRY_time_idx = self.qmc.timeindex[1]
         else:
             #we use the dryEndIndex respecting the dry phase
             if dryEndIndex < len(aw.qmc.timex):
-                DRY_time = aw.qmc.timex[dryEndIndex]
-                DRY_temp = aw.qmc.temp2[dryEndIndex]        
+                DRY_time_idx = dryEndIndex      
             else:
-                DRY_time = DRY_temp = 0
+                DRY_time_idx = 0
         evaluations = aw.defect_estimation()        
         #print graph
         self.qmc.redraw()   
@@ -5545,20 +5542,20 @@ $cupping_notes
             title=cgi.escape(self.qmc.title),
             datetime=unicode(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
             beans=beans,
-            weight=unicode(self.qmc.weight[0]) + self.qmc.weight[2] + " (" + "%.1f"%weight_loss + "%)",
+            weight=self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[2],weight_loss),
             degree=aw.roast_degree(weight_loss),
-            volume=unicode(self.qmc.volume[0]) + self.qmc.volume[2] + " (" + "%.1f"%volume_gain + "%)",
+            volume=self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[2],volume_gain),
             roaster=cgi.escape(self.qmc.roastertype),
             operator=cgi.escape(self.qmc.operator),
             cup=str(self.cuppingSum()),
             charge=charge,
-            TP=self.event2html(TP_time,TP_temp),
-            DRY=self.event2html(DRY_time,DRY_temp),
-            FCs=self.event2html(self.qmc.timex[self.qmc.timeindex[2]],self.qmc.temp2[self.qmc.timeindex[2]]),
-            FCe=self.event2html(self.qmc.timex[self.qmc.timeindex[3]],self.qmc.temp2[self.qmc.timeindex[3]]),
-            SCs=self.event2html(self.qmc.timex[self.qmc.timeindex[4]],self.qmc.temp2[self.qmc.timeindex[4]]),
-            SCe=self.event2html(self.qmc.timex[self.qmc.timeindex[5]],self.qmc.temp2[self.qmc.timeindex[5]]),
-            drop=self.event2html(self.qmc.timex[self.qmc.timeindex[6]],self.qmc.temp2[self.qmc.timeindex[6]]),
+            TP=self.event2html(TP_time_idx),
+            DRY=self.event2html(DRY_time_idx),
+            FCs=self.event2html(self.qmc.timeindex[2]),
+            FCe=self.event2html(self.qmc.timeindex[3]),
+            SCs=self.event2html(self.qmc.timeindex[4]),
+            SCe=self.event2html(self.qmc.timeindex[5]),
+            drop=self.event2html(self.qmc.timeindex[6]),
             dry_phase=self.phase2html(self.qmc.statisticstimes[1],rates_of_changes[0],evaluations[0]),
             mid_phase=self.phase2html(self.qmc.statisticstimes[2],rates_of_changes[1],evaluations[1]),
             finish_phase=self.phase2html(self.qmc.statisticstimes[3],rates_of_changes[2],evaluations[2]),
@@ -5586,6 +5583,12 @@ $cupping_notes
         for i in range(8):
             sum += int(aw.qmc.flavors[i]*10.)
         return sum
+        
+    def volume_weight2html(self,amount,unit,change):
+        if amount:
+            return unicode(amount) + unit + " (" + "%.1f"%change + "%)"
+        else:
+            return "--"
                 
     def phase2html(self,time,RoR,eval):
         if self.qmc.statisticstimes[0] > 0 and time and time > 0:
@@ -5593,8 +5596,10 @@ $cupping_notes
         else:
             return "--"
             
-    def event2html(self,time,temp):
-        if time:
+    def event2html(self,time_idx):
+        if time_idx:
+            time = self.qmc.timex[time_idx]
+            temp = self.qmc.temp2[time_idx]
             if self.qmc.timeindex[0] != -1:
                 start = self.qmc.timex[self.qmc.timeindex[0]]
             else:
