@@ -7296,13 +7296,14 @@ class editGraphDlg(QDialog):
             # update graph time variables
             #check it does not updates the graph with zero times
             if aw.qmc.timeindex[0] == -1:
+                aw.qmc.timeindex[0] = 0
                 start = 0
             else:
                 start = aw.qmc.timex[aw.qmc.timeindex[0]]
             
             if self.chargeeditcopy != unicode(self.chargeedit.text()):
                 if aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0:
-                    startindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
+                    startindex = aw.qmc.time2index( aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
                     aw.qmc.timeindex[0] = startindex
                     aw.qmc.xaxistosm()
             if self.dryeditcopy != unicode(self.dryedit.text()):
