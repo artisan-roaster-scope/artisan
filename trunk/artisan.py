@@ -2685,6 +2685,10 @@ class tgraphcanvas(FigureCanvas):
 
     #loads main points from a profile so that they can be edited
     def initfromprofile(self):
+        if self.timeindex[0] == -1 or self.timeindex[6] == 0:
+            QMessageBox.information(self,u"Designer Init","Unable to start designer.\nProfile missing [CHARGE] or [DROP]")
+            self.disconnect_designer()
+            return()
 
         #save events. They will be deleted on qmc.reset()
         self.specialeventsStringscopy = self.specialeventsStrings[:]
@@ -3047,7 +3051,6 @@ class tgraphcanvas(FigureCanvas):
             if index in self.timeindex:
                 whichone = self.timeindex.index(index)
                 if whichone == 0 or whichone == 6:  #if charge or drop
-                    QMessageBox.information(self,u"Designer Config","Cannot delete [ CHARGE ] or [ DROP ]" )
                     return
                 self.timeindex[whichone] = 0
                 
@@ -7292,34 +7295,39 @@ class editGraphDlg(QDialog):
         if len(aw.qmc.timex):   
             # update graph time variables
             #check it does not updates the graph with zero times
+            if aw.qmc.timeindex[0] == -1:
+                start = 0
+            else:
+                start = aw.qmc.timex[aw.qmc.timeindex[0]]
+            
             if self.chargeeditcopy != unicode(self.chargeedit.text()):
                 if aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0:
-                    startindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
+                    startindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
                     aw.qmc.timeindex[0] = startindex
                     aw.qmc.xaxistosm()
             if self.dryeditcopy != unicode(self.dryedit.text()):
                 if aw.qmc.stringtoseconds(unicode(self.dryedit.text())) > 0:
-                    dryindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(unicode(self.dryedit.text())))
+                    dryindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.dryedit.text())))
                     aw.qmc.timeindex[1] = dryindex
             if self.Cstarteditcopy != unicode(self.Cstartedit.text()):
                 if aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())) > 0:
-                    fcsindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))
+                    fcsindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.Cstartedit.text())))
                     aw.qmc.timeindex[2] = fcsindex
             if self.Cendeditcopy != unicode(self.Cendedit.text()):
                 if aw.qmc.stringtoseconds(unicode(self.Cendedit.text())) > 0:
-                    fceindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))
+                    fceindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.Cendedit.text())))
                     aw.qmc.timeindex[3] = fceindex
             if self.CCstarteditcopy != unicode(self.CCstartedit.text()):
                 if aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())) > 0:
-                    scsindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))
+                    scsindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.CCstartedit.text())))
                     aw.qmc.timeindex[4] = scsindex
             if self.CCendeditcopy != unicode(self.CCendedit.text()):        
                 if aw.qmc.stringtoseconds(unicode(self.CCendedit.text())) > 0:
-                    sceindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))
+                    sceindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.CCendedit.text())))
                     aw.qmc.timeindex[5] = sceindex
             if self.dropeditcopy != unicode(self.dropedit.text()):
                 if aw.qmc.stringtoseconds(unicode(self.dropedit.text())) > 0:
-                    dropindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(unicode(self.dropedit.text())))
+                    dropindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.dropedit.text())))
                     aw.qmc.timeindex[6] = dropindex
 
             if aw.qmc.phasesbuttonflag:   
