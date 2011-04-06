@@ -943,7 +943,7 @@ class tgraphcanvas(FigureCanvas):
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')  
 
-        #reset all variables that need to be reseted
+        #reset all variables that need to be reset
         self.flagon = False
         self.flagclock = False
         self.rateofchange1 = 0.0
@@ -9676,12 +9676,30 @@ class serialport(object):
                 command = "R" + aw.qmc.mode + "2000"  #Read command, unit, arguments
                 self.SP.write(command)
                                 
-                t0, t1, t2 = self.SP.readline().rsplit(',')  #t0 = ambient; t1 = ET; t2 = BT
-                if not self.arduinoAmbFlag:
-                    aw.qmc.ambientTemp = float(t0)
+                res = self.SP.readline().rsplit(',')  # a list [t0,t1,t2] with t0 = ambient; t1 = ET; t2 = BT
+                t0 = 0 
+                if len(aw.qmc.timex) > 2:                           
+                    t1 = aw.qmc.temp1[-1]
+                    t2 = aw.qmc.temp2[-1]     
+                else:
+                    t1 = t2 = -1
+                try:
+                    t0 = float(res[0])
+                except:
+                    pass
+                try:
+                    t1 = float(res[1])
+                except:
+                    pass
+                try:
+                    t2 = float(res[2])
+                except:
+                    pass
+                if t0 and not self.arduinoAmbFlag:
+                    aw.qmc.ambientTemp = t0
                     self.arduinoAmbFlag = 1
                 
-                return float(t1), float(t2)
+                return t1, t2
 
         except serial.SerialException, e:
             aw.qmc.adderror("Serial Exception: ser.ARDUINOTC4temperature() ")
