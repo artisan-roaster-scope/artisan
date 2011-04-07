@@ -14323,7 +14323,6 @@ class FujiPID(object):
 ###########################################################################################################################################
 
 aw = None # this is to ensure that the variable aw is already defined during application initialization
-print QPalette().color(QPalette.Window).name()
 aw = ApplicationWindow()
 aw.show()
 #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
