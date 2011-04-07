@@ -5889,7 +5889,7 @@ $cupping_notes
             
     def importK202(self):
         try:
-            filename = aw.ArtisanOpenFileDialog(msg=u"Load Profile for a K202",ext="")
+            filename = aw.ArtisanOpenFileDialog(msg=u"Import K202 CSV",ext="*.csv")
             if  filename == "":
                 return
             self.qmc.reset()
@@ -5953,7 +5953,7 @@ $cupping_notes
             
     def importHH506RA(self):
         try:
-            filename = aw.ArtisanOpenFileDialog(msg=u"Load Profile for a HH506RA",ext="")
+            filename = aw.ArtisanOpenFileDialog(msg=u"Import HH506RA CSV",ext="*.csv")
             if  filename == "":
                 return
             self.qmc.reset()
