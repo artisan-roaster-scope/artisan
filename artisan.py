@@ -200,13 +200,13 @@ class tgraphcanvas(FigureCanvas):
         self.fig = Figure()
 
         #find graph background color (changes with operating systems)
-        cc = QPalette()    	
-        backcolor =  unicode(cc.color(QPalette.Inactive,QPalette.Window).name())
+        if platf == 'Darwin':
+            # on MacOS X QPalette().color(.) always returns #ffffff so we set the correct color manually:
+            backcolor ="#EEEEEE"
+        else:
+            backcolor = QPalette().color(QPalette.Inactive,QPalette.Window).name()
         self.fig.patch.set_facecolor(backcolor)
         self.fig.patch.set_edgecolor(backcolor)
-        
-##        self.fig.patch.set_facecolor('#E8E8E8')
-##        self.fig.patch.set_edgecolor('#D6D6D6')
         
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
         
@@ -14323,6 +14323,7 @@ class FujiPID(object):
 ###########################################################################################################################################
 
 aw = None # this is to ensure that the variable aw is already defined during application initialization
+print QPalette().color(QPalette.Window).name()
 aw = ApplicationWindow()
 aw.show()
 #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
