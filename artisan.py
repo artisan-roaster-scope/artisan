@@ -79,10 +79,10 @@ from scipy import interpolate as inter
 
 from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
-                         QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPainter,QImage,
+                         QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPalette,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
-                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor)
+                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime)
 
@@ -198,9 +198,18 @@ class tgraphcanvas(FigureCanvas):
                                    ]
         
         self.fig = Figure()
-        self.fig.patch.set_facecolor('#E8E8E8')
-        self.fig.patch.set_edgecolor('#D6D6D6')
+
+        #find graph background color (changes with operating systems)
+        cc = QPalette()    	
+        backcolor =  unicode(cc.color(QPalette.Inactive,QPalette.Window).name())
+        self.fig.patch.set_facecolor(backcolor)
+        self.fig.patch.set_edgecolor(backcolor)
+        
+##        self.fig.patch.set_facecolor('#E8E8E8')
+##        self.fig.patch.set_edgecolor('#D6D6D6')
+        
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
+        
         #legend location
         self.legendloc = 2
         self.fig.subplots_adjust(
@@ -364,7 +373,7 @@ class tgraphcanvas(FigureCanvas):
             
         self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"])
         self.ax.set_xlabel(u'Time',size=16,color = self.palette["xlabel"])
-        self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')
+        self.ax.set_title(self.title,size=20,color=self.palette["title"])
 
         #put a right tick on the graph
         for tick in self.ax.yaxis.get_major_ticks():
@@ -442,7 +451,8 @@ class tgraphcanvas(FigureCanvas):
         elif self.mode == u"F":
             self.designertemp1init = [500,500,500,500,500,500,500]
             self.designertemp2init = [380,300,390,395,410,412,420]
-        self.splinedegree = 3
+        self.BTsplinedegree = 3
+        self.ETsplinedegree = 1
         self.reproducedesigner = 0      #flag to add events that help reporduce the profile: 0 = none; 1 = sv; 2 = ramp
             
     #event handler from startTimer()
@@ -939,7 +949,7 @@ class tgraphcanvas(FigureCanvas):
             self.toggleHUD()
             
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
-        self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')  
+        self.ax.set_title(self.title,size=20,color=self.palette["title"])  
 
         #reset all variables that need to be reset
         self.flagon = False
@@ -1042,7 +1052,7 @@ class tgraphcanvas(FigureCanvas):
         self.ax.grid(True,linewidth=2,color=self.palette["grid"])
         self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"])
         self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
-        self.ax.set_title(self.title,size=20,color=self.palette["title"],fontweight='bold')
+        self.ax.set_title(self.title,size=20,color=self.palette["title"])
         for tick in self.ax.yaxis.get_major_ticks():
             tick.label2On = True
             
@@ -1762,15 +1772,12 @@ class tgraphcanvas(FigureCanvas):
         
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
-
+        
         self.flagon = False
         aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
         aw.button_1.setDisabled(False)
         aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
         aw.soundpop()
-        
-        if self.device == 18:        
-            self.createFromManual()           
            
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
@@ -2404,78 +2411,6 @@ class tgraphcanvas(FigureCanvas):
         except Exception,e:
             self.adderror(u"Exception Error: univariateinfo() " + unicode(e) + " ")
             return  
-
-    #interpolates profile (creates new data). 
-    def createFromManual(self, sd=None):
-        try:
-            #sd = spline degree, an int from 1-5
-            if sd == None:
-                #for device NONE we need to check the number of points given because the length of points must be larger than the spline degree k
-                #NOTE: k must always be <= 5
-                if len(self.timex) > 2:        
-                    splinedegree = 3
-                    if self.device == 18:
-                        npoints = len(self.timex)
-                        if npoints < 5:
-                            splinedegree = npoints -1
-                else:
-                    #no need to interpolate (only 2 points or less)
-                    return
-            else:
-                splinedegree = sd
-                
-            #create functions        
-            funcBT = inter.UnivariateSpline(self.timex,self.temp2, k = splinedegree )
-            funcET = inter.UnivariateSpline(self.timex,self.temp1, k = splinedegree )
-
-            #create longer list of time values
-            time = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
-
-            #convert all time values to temperature
-            btvals = funcBT(time).tolist()
-            etvals = funcET(time).tolist()
-
-            #plot to verify
-            self.ax.plot(time, btvals, color=self.palette["bt"], linestyle = '-.', linewidth=2)
-            self.ax.plot(time, etvals, color=self.palette["met"], linestyle = '-.', linewidth=2)
-            self.fig.canvas.draw()
-
-            reply = QMessageBox.question(self,u"Interpolation","Create?",
-                                QMessageBox.Yes|QMessageBox.Cancel)
-
-            if reply == QMessageBox.Cancel:
-                return 0
-            elif reply == QMessageBox.Yes:
-                self.saveFromManual(time[:],btvals[:],etvals[:])
-                return 1
-       
-        except ValueError:
-            self.adderror(u"Value Error: createFromManual() ")
-            return
-
-        except Exception,e:
-            self.adderror(u"Exception: createFromManual() " + unicode(e) + " ")
-            return
-
-    def saveFromManual(self,time,btvals,etvals):
-        #find new indexes for events
-        for i in range(len(self.specialevents)):
-            for p in range(len(time)):
-                if time[p] > self.timex[self.specialevents[i]]:
-                    self.specialevents[i] = p
-                    break
-
-        times = []
-        for i in range(len(self.timeindex)):
-            times.append(self.timex[self.timeindex[i]])
-                        
-        self.temp2 = btvals[:]
-        self.timex = time[:]
-        self.temp1 = etvals[:]
-
-        self.timeindexupdate(times)
-
-        self.redraw()
                                    
     #interpolation type        
     def univariate(self):
@@ -2592,7 +2527,7 @@ class tgraphcanvas(FigureCanvas):
             choice2 = abs(self.timeB[i-1] - seconds)
 
             #return closest (smallest) index
-            if choice1 < choice2:  
+            if choice1 <= choice2:  
                 return i
             elif choice2 < choice1:
                 return i-1
@@ -2638,7 +2573,7 @@ class tgraphcanvas(FigureCanvas):
     #launches designer	
     def designer(self):       
         if len(self.timex):
-            reply = QMessageBox.question(self,u"Import profile","Importing a profile in to Designer will decimate\nall data except the main [points].\nContinue?",
+            reply = QMessageBox.question(self,u"Designer Start","Importing a profile in to Designer will decimate\nall data except the main [points].\nContinue?",
                                 QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
                 self.initfromprofile()
@@ -2691,17 +2626,18 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventstypecopy = self.specialeventstype[:]
         self.eventtimecopy = []
         for i in range(len(self.specialevents)):
-            self.eventtimecopy.append(self.timex[self.specialevents[i]])
+            #save relative time of events
+            self.eventtimecopy.append(self.timex[self.specialevents[i]]-self.timex[self.timeindex[0]])
 
         #find lowest point from profile to be converted
         lpindex = aw.findTP()
-        if lpindex != -1:
+        if lpindex != -1 and not lpindex in self.timeindex:
             lptime  = self.timex[lpindex]
             lptemp2 = self.temp2[lpindex]
-
+        else:
+            lpindex = -1
         
         timeindexhold = [self.timex[self.timeindex[0]],0,0,0,0,0,0]
-        #load designer flags from profile
         time,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]    #first CHARGE point
         for i in range(1,len(self.timeindex)):
             if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
@@ -2759,11 +2695,14 @@ class tgraphcanvas(FigureCanvas):
             self.endofx = self.timex[-1] + 120
             self.xaxistosm()
 
-        if self.splinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
-            self.splinedegree = len(self.timex)-1
-            
-        func = inter.UnivariateSpline(self.timex,self.temp2, k = self.splinedegree )
-        func2 = inter.UnivariateSpline(self.timex,self.temp1, k = self.splinedegree )
+        if self.BTsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
+            self.BTsplinedegree = len(self.timex)-1
+
+        if self.ETsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
+            self.ETsplinedegree = len(self.timex)-1
+
+        func = inter.UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree )
+        func2 = inter.UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree )
         time = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
         #convert all time values to temperature
         btvals = func(time).tolist()
@@ -3100,32 +3039,63 @@ class tgraphcanvas(FigureCanvas):
                                
     #converts from a designer profile to a normal profile	        
     def convert_designer(self):
+        try:
+            #create functions        
+            funcBT = inter.UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree )
+            funcET = inter.UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree )
 
-        answer = self.createFromManual(self.splinedegree)
-        if answer:
-            aw.sendmessage("New profile created")
-        else:
-            return
+            #create longer list of time values
+            time = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
+
+            #convert all time values to temperature
+            btvals = funcBT(time).tolist()
+            etvals = funcET(time).tolist()
+
+            #find new indexes for events
+            for i in range(len(self.specialevents)):
+                for p in range(len(time)):
+                    if time[p] > self.timex[self.specialevents[i]]:
+                        self.specialevents[i] = p
+                        break
+
+            #save landmarks        
+            maintimes = []
+            for i in range(len(self.timeindex)):
+                maintimes.append(self.timex[self.timeindex[i]])
+
+            self.timex = time[:]
+            self.temp1 = etvals[:]
+            self.temp2 = btvals[:]
+                            
+            self.timeindexupdate(maintimes)
         
-        #check events
-        if len(self.eventtimecopy):
-            for i in range(len(self.eventtimecopy)):
-                self.specialevents.append(self.time2index(self.eventtimecopy[i]))
-            self.specialeventsStrings = self.specialeventsStringscopy[:]
-            self.specialeventsvalue = self.specialeventsvaluecopy[:]
-            self.specialeventstype = self.specialeventstypecopy[:]
-            
-        self.disconnect_designer()           
-
-        #create playback events
-        if self.reproducedesigner:
-            if self.reproducedesigner == 1:
-                self.designer_create_sv_command()
-            elif self.reproducedesigner == 2:
-                self.designer_create_ramp_command()
+            #check and restore carried over events
+            if len(self.eventtimecopy):
+                for i in range(len(self.eventtimecopy)):
+                    self.specialevents.append(self.time2index(self.eventtimecopy[i] + self.timex[self.timeindex[0]]))
+                self.specialeventsStrings = self.specialeventsStringscopy[:]
+                self.specialeventsvalue = self.specialeventsvaluecopy[:]
+                self.specialeventstype = self.specialeventstypecopy[:]
                 
-        self.redraw()
-        
+            self.disconnect_designer()           
+
+            #create playback events
+            if self.reproducedesigner:
+                if self.reproducedesigner == 1:
+                    self.designer_create_sv_command()
+                elif self.reproducedesigner == 2:
+                    self.designer_create_ramp_command()
+                
+            self.redraw()        
+            aw.sendmessage("New profile created")
+            
+        except ValueError:
+            self.adderror(u"Value Error: createFromDesigner() ")
+            return
+
+        except Exception,e:
+            self.adderror(u"Exception: createFromDesigner() " + unicode(e) + " ")
+            return
 
     #activates mouse events	
     def connect_designer(self):
@@ -3221,6 +3191,7 @@ class tgraphcanvas(FigureCanvas):
                     break     #break or the index i can become larger than the new shorted length of specialevents
         if target:
            self.clean_old_pid_commands() 
+
 
                 
 #######################################################################################
@@ -4544,7 +4515,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
 
             #change Title
-            self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"], fontweight='bold')
+            self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
 
             #update etypes combo box
             self.etypeComboBox.clear()
@@ -5798,15 +5769,15 @@ $cupping_notes
         QDesktopServices.openUrl(QUrl(u"http://coffeetroupe.com/artisandocs/", QUrl.TolerantMode))
 
     def calibratedelay(self):
-        calSpinBox = QSpinBox()
-        calSpinBox.setRange(1,30)
-        calSpinBox.setValue(self.qmc.delay/1000)
-        secondsdelay, ok = QInputDialog.getInteger(self,
+        calSpinBox = QDoubleSpinBox()
+        calSpinBox.setRange(.1,30.)
+        calSpinBox.setValue(self.qmc.delay/1000.)
+        secondsdelay, ok = QInputDialog.getDouble(self,
                 "Sampling Interval", "Seconds",
-                calSpinBox.value(),1,30)
+                calSpinBox.value(),.1,30.)
         if ok:
             self.qmc.killTimer(self.qmc.timerid) 
-            self.qmc.delay = secondsdelay*1000
+            self.qmc.delay = int(secondsdelay*1000) 	    	    	#self.qmc.delay is saved as int in QSettings
             self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
 
     def setcommport(self):
@@ -7359,7 +7330,7 @@ class editGraphDlg(QDialog):
 
 
         # Update Title
-        aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"],fontweight='bold')
+        aw.qmc.ax.set_title(unicode(self.titleedit.text()),size=20,color=aw.qmc.palette["title"])
         aw.qmc.title = unicode(self.titleedit.text())
         # Update beans
         aw.qmc.beans = unicode(self.beansedit.toPlainText())
@@ -9933,15 +9904,19 @@ class designerconfigDlg(QDialog):
 
         #landmarks
         charge = QLabel("CHARGE")
-        charge.setStyleSheet("background-color: lightgrey;")
-
+        charge.setStyleSheet("background-color: #f07800")
         self.dryend = QCheckBox("DRY END")
+        self.dryend.setStyleSheet("background-color: orange")
         self.fcs = QCheckBox("FC START")
+        self.fcs.setStyleSheet("background-color: orange")
         self.fce = QCheckBox("FC END")
+        self.fce.setStyleSheet("background-color: orange")
         self.scs = QCheckBox("SC START")
+        self.scs.setStyleSheet("background-color: orange")
         self.sce = QCheckBox("SC END")
+        self.sce.setStyleSheet("background-color: orange")
         drop = QLabel("DROP")
-        drop.setStyleSheet("background-color: lightgrey;")
+        drop.setStyleSheet("background-color: #f07800")
 
 
         self.loadconfigflags()
@@ -9957,14 +9932,33 @@ class designerconfigDlg(QDialog):
         else:
             start = 0
 
-        self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))                                       #CHARGE
-        self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[1] - start))      #DRY END 
-        self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[2] - start))      #FC START
-        self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[3] - start))      #FC END
-        self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[4] - start))      #SC START
-        self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[5] - start))      #SC END
-        self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[6] - start))      #DROP
-        
+        self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+        if aw.qmc.timeindex[1]:
+            self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[1]] - start))      
+        else:
+            self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+        if aw.qmc.timeindex[2]:
+            self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[2]] - start))      
+        else:
+            self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+        if aw.qmc.timeindex[3]:
+            self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[3]] - start))      
+        else:
+            self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+        if aw.qmc.timeindex[4]:
+            self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[4]] - start))      
+        else:
+            self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+        if aw.qmc.timeindex[5]:
+            self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[5]] - start))      
+        else:
+            self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+        if aw.qmc.timeindex[6]:
+            self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[6]] - start))      
+        else:
+            self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+            
+       
         regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
         self.Edit0.setValidator(QRegExpValidator(regextime,self))
         self.Edit1.setValidator(QRegExpValidator(regextime,self))
@@ -9982,13 +9976,23 @@ class designerconfigDlg(QDialog):
         self.Edit5.setMaximumWidth(50)
         self.Edit6.setMaximumWidth(50)
 
-        splinelabel = QLabel("Curviness")
-        self.splineComboBox = QComboBox()
-        self.splineComboBox.addItems(["1","2","3","4","5"])
-        self.splineComboBox.setCurrentIndex(aw.qmc.splinedegree - 1)
-        self.connect(self.splineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
+        splinelabel = QLabel("Curvines")
+        etcurviness = QLabel("ET")
+        btcurviness = QLabel("BT")
+        self.ETsplineComboBox = QComboBox()
+        self.ETsplineComboBox.setMaximumWidth(30)                                  
+        self.ETsplineComboBox.addItems(["1","2","3","4","5"])
+        self.ETsplineComboBox.setCurrentIndex(aw.qmc.ETsplinedegree - 1)
+        self.connect(self.ETsplineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
 
-        reproducelabel = QLabel("Machine Playback")
+        self.BTsplineComboBox = QComboBox()
+        self.BTsplineComboBox.setMaximumWidth(30)                                  
+        self.BTsplineComboBox.addItems(["1","2","3","4","5"])
+        self.BTsplineComboBox.setCurrentIndex(aw.qmc.BTsplinedegree - 1)
+        self.connect(self.BTsplineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
+
+
+        reproducelabel = QLabel("Events Playback")
         self.reproduceComboBox = QComboBox()
         self.reproduceComboBox.addItems(["None","SV commands","Ramp command"])
         self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
@@ -10028,13 +10032,19 @@ class designerconfigDlg(QDialog):
         marksLayout.addWidget(self.Edit6,6,1)
         marksLayout.addWidget(saveButton,7,1)
 
+        curvinessLayout = QHBoxLayout()
+        curvinessLayout.addWidget(etcurviness)
+        curvinessLayout.addWidget(self.ETsplineComboBox)
+        curvinessLayout.addWidget(btcurviness)        
+        curvinessLayout.addWidget(self.BTsplineComboBox)                                 
+
         modLayout = QGridLayout()
         modLayout.addWidget(splinelabel,0,0)
-        modLayout.addWidget(self.splineComboBox,0,1)
+        modLayout.addLayout(curvinessLayout,0,1)        
         modLayout.addWidget(reproducelabel,1,0)
         modLayout.addWidget(self.reproduceComboBox,1,1)
         
-        marksGroupLayout = QGroupBox("Initial Marks")
+        marksGroupLayout = QGroupBox("Initial Times")
         marksGroupLayout.setLayout(marksLayout)
         
         mainLayout = QVBoxLayout()
@@ -10048,16 +10058,27 @@ class designerconfigDlg(QDialog):
         aw.qmc.reproducedesigner = self.reproduceComboBox.currentIndex()
         
     def redrawcurviness(self):
-        curviness = int(self.splineComboBox.currentText())
+        ETcurviness = int(self.ETsplineComboBox.currentText())
+        BTcurviness = int(self.BTsplineComboBox.currentText())
+                                        
         timepoints = len(aw.qmc.timex)
-        if (timepoints - curviness) >= 1:
-            aw.qmc.splinedegree = curviness
+                                          
+        if (timepoints - ETcurviness) >= 1:
+            aw.qmc.ETsplinedegree = ETcurviness
         else:
-            aw.qmc.splinedegree = len(aw.qmc.timex)-1
-            self.splineComboBox.setCurrentIndex(aw.qmc.splinedegree-1)
-            ms = "Not enough time points for a curviness of %i. Set curviness to %i"%(curviness,aw.qmc.splinedegree)
-            aw.sendmessage(ms)
-        
+            aw.qmc.ETsplinedegree = len(aw.qmc.timex)-1
+            self.ETsplineComboBox.setCurrentIndex(aw.qmc.ETsplinedegree-1)
+            ms = "Not enough time points for an ET curviness of %i. Set curviness to %i"%(ETcurviness,aw.qmc.ETsplinedegree)
+            QMessageBox.information(self,u"Designer Config",ms) 
+
+        if (timepoints - BTcurviness) >= 1:
+            aw.qmc.BTsplinedegree = BTcurviness
+        else:
+            aw.qmc.BTsplinedegree = len(aw.qmc.timex)-1
+            self.BTsplineComboBox.setCurrentIndex(aw.qmc.BTsplinedegree-1)
+            ms = "Not enough time points for an BT curviness of %i. Set curviness to %i"%(BTcurviness,aw.qmc.BTsplinedegree)
+            QMessageBox.information(self,u"Designer Config",ms) 
+                                          
         aw.qmc.redrawdesigner()
 
     def settimes(self):
@@ -10201,7 +10222,6 @@ class designerconfigDlg(QDialog):
     #adds deletes landmarks        
     def changeflags(self,x,idi):
         if self.validatetimeorder() != 1000:
-
             if idi == 1:
                 self.dryend.setChecked(False)
             elif idi == 2:
@@ -10226,8 +10246,21 @@ class designerconfigDlg(QDialog):
             aw.qmc.removepoint()
         else:
             #ADD mark point
-            aw.qmc.currentx = aw.qmc.designertimeinit[idi] 
-            aw.qmc.currenty = aw.qmc.designertemp2init[idi]
+            if idi == 1:
+                time = aw.qmc.stringtoseconds(unicode(self.Edit1.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+            if idi == 2:
+                time = aw.qmc.stringtoseconds(unicode(self.Edit2.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+            if idi == 3:
+                time = aw.qmc.stringtoseconds(unicode(self.Edit3.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+            if idi == 4:
+                time = aw.qmc.stringtoseconds(unicode(self.Edit4.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+            if idi == 5:
+                time = aw.qmc.stringtoseconds(unicode(self.Edit5.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+
+            tempindex = aw.qmc.designerfindindex(time)
+            temp = aw.qmc.temp2[tempindex]
+            aw.qmc.currentx = time 
+            aw.qmc.currenty = temp
             newindex = aw.qmc.addpoint()
             aw.qmc.timeindex[idi] = newindex
        
