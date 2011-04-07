@@ -98,7 +98,7 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as Naviga
 
 platf = unicode(platform.system())
 
-
+import pdb
 
 #######################################################################################
 #################### Main Application  ################################################
@@ -435,7 +435,6 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventstypecopy = []
         self.currentx = 0               #used to add point when right click
         self.currenty = 0               #used to add point when right click
-        self.newpointindex = []
         self.designertimeinit = [50,300,540,560,660,700,800]
         if self.mode == u"C":
                                       #CH, DE, Fcs,Fce,Scs,Sce,Drop  
@@ -1015,13 +1014,11 @@ class tgraphcanvas(FigureCanvas):
         #Designer variables
         self.indexpoint = 0
         self.rightclickcid = 0
-        self.workingline = 2  #selects ET or BT
+        self.workingline = 2            #selects ET or BT
         self.currentx = 0               #used to add point when right click
         self.currenty = 0               #used to add point when right click
-        self.newpointindex = []
         self.designertemp1init = []
         self.designertemp2init = []
-        self.newpointindex = []
         if self.mode == u"C":
                                       #CH, DE, Fcs,Fce,Scs,Sce,Drop  
             self.designertemp1init = [290,290,290,290,290,290,290]
@@ -1029,7 +1026,7 @@ class tgraphcanvas(FigureCanvas):
         elif self.mode == u"F":
             self.designertemp1init = [500,500,500,500,500,500,500]
             self.designertemp2init = [380,300,390,395,410,412,420]
-        self.disconnect_designer()
+        self.disconnect_designer()  #sets designer flag false
         self.setCursor(Qt.ArrowCursor)
         
     #Redraws data   
@@ -2470,10 +2467,9 @@ class tgraphcanvas(FigureCanvas):
                     break
 
         times = []
-        for i in range(len(self.timex)):
+        for i in range(len(self.timeindex)):
             times.append(self.timex[self.timeindex[i]])
-            
-            
+                        
         self.temp2 = btvals[:]
         self.timex = time[:]
         self.temp1 = etvals[:]
@@ -2703,8 +2699,9 @@ class tgraphcanvas(FigureCanvas):
         if lpindex != -1:
             lptime  = self.timex[lpindex]
             lptemp2 = self.temp2[lpindex]
+
         
-            
+        timeindexhold = [self.timex[self.timeindex[0]],0,0,0,0,0,0]
         #load designer flags from profile
         time,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]    #first CHARGE point
         for i in range(1,len(self.timeindex)):
@@ -2712,7 +2709,8 @@ class tgraphcanvas(FigureCanvas):
                 time.append(self.timex[self.timeindex[i]])  #add time
                 t1.append(self.temp1[self.timeindex[i]])    #add temp1
                 t2.append(self.temp2[self.timeindex[i]])    #add temp2
-                self.designertimeinit[i] = self.timex[self.timeindex[i]]
+                timeindexhold[i] =  self.timex[self.timeindex[i]]
+
 
         #it is possible the user may use the flag to revert to 60 seconds endofx when doing a reset
         endofxold  = self.endofx               
@@ -2722,6 +2720,8 @@ class tgraphcanvas(FigureCanvas):
         self.xaxistosm()
                 
         self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists back after reset() with the main points
+
+        self.timeindexupdate(timeindexhold) #create new timeindex[]
 
         #add lowest point as extra point
         if lpindex != -1:
@@ -2795,7 +2795,7 @@ class tgraphcanvas(FigureCanvas):
         
         designermenu = QMenu(self)
         
-        configAction = QAction("Designer...",self)
+        configAction = QAction("Designer Config...",self)
         self.connect(configAction,SIGNAL("triggered()"),self.desconfig)
         designermenu.addAction(configAction)
 
@@ -2815,10 +2815,14 @@ class tgraphcanvas(FigureCanvas):
 
         designermenu.addSeparator()  
 
-        resetAction = QAction("Reset",self)
+        resetAction = QAction("Reset Designer",self)
         self.connect(resetAction,SIGNAL("triggered()"),self.reset_designer)
         designermenu.addAction(resetAction)
-        
+
+        exitAction = QAction("Exit Designer",self)
+        self.connect(exitAction,SIGNAL("triggered()"),aw.stopdesigner)
+        designermenu.addAction(exitAction)
+
         designermenu.exec_(QCursor.pos())        
 
     def on_pick(self,event):
@@ -2873,38 +2877,52 @@ class tgraphcanvas(FigureCanvas):
                 return
             
             if type(event.xdata):                       #outside graph type is None
-                for i in range(len(self.timeindex)):
-                    if abs(int(event.xdata) - self.timex[self.timeindex[i]]) < 7:
-                        if abs(self.temp2[self.timeindex[i]] - event.ydata) < 10:
-                            self.ax.plot(self.timex[self.timeindex[i]],self.temp2[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)
-                            self.fig.canvas.draw()
-                            QTimer.singleShot(600, self.redrawdesigner)
-                        elif abs(self.temp1[self.timeindex[i]] - event.ydata) < 10:
-                            self.ax.plot(self.timex[self.timeindex[i]],self.temp1[self.timeindex[i]],color = "orange",marker = "o",alpha = .3,markersize=30)                                                                               
-                            self.fig.canvas.draw()
-                            QTimer.singleShot(600, self.redrawdesigner)
-                        if i == 0:
-                            time = self.stringfromseconds(0)
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> " + time)
-                        elif i == 1:
-                            time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> " + time)
-                        elif i == 2:
-                            time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> " + time)
-                        elif i == 3:
-                            time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> " + time)
-                        elif i == 4:
-                            time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> " + time)
-                        elif i == 5:
-                            time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> " + time)
-                        elif i == 6:
-                            time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ DROP ]</font> " + time)
-                        break
+                for i in range(len(self.timex)):
+                    if abs(event.xdata - self.timex[i]) < 7:
+                        if i in self.timeindex:
+                            if abs(self.temp2[i] - event.ydata) < 10:
+                                self.ax.plot(self.timex[i],self.temp2[i],color = "orange",marker = "o",alpha = .3,markersize=30)
+                                self.fig.canvas.draw()
+                                QTimer.singleShot(600, self.redrawdesigner)
+                            elif abs(self.temp1[i] - event.ydata) < 10:
+                                self.ax.plot(self.timex[i],self.temp1[i],color = "orange",marker = "o",alpha = .3,markersize=30)                                                                               
+                                self.fig.canvas.draw()
+                                QTimer.singleShot(600, self.redrawdesigner)
+                            index = self.timeindex.index(i)
+                            if index == 0:
+                                time = self.stringfromseconds(0)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> " + time)
+                            elif index == 1:
+                                time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> " + time)
+                            elif index == 2:
+                                time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> " + time)
+                            elif index == 3:
+                                time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> " + time)
+                            elif index == 4:
+                                time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> " + time)
+                            elif index == 5:
+                                time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> " + time)
+                            elif index == 6:
+                                time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ DROP ]</font> " + time)
+                            break
+                        else:
+                            if abs(self.temp2[i] - event.ydata) < 10:
+                                self.ax.plot(self.timex[i],self.temp2[i],color = "blue",marker = "o",alpha = .3,markersize=30)
+                                self.fig.canvas.draw()
+                                QTimer.singleShot(600, self.redrawdesigner)
+                            elif abs(self.temp1[i] - event.ydata) < 10:
+                                self.ax.plot(self.timex[i],self.temp1[i],color = "blue",marker = "o",alpha = .3,markersize=30)                                                                               
+                                self.fig.canvas.draw()
+                                QTimer.singleShot(600, self.redrawdesigner)
+                            time = self.stringfromseconds(self.timex[i] - self.timex[self.timeindex[0]])
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: lightblue\">%s</font> "%time)
+                            break
                     else:
                         totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
                         dryphasetime = self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]
@@ -3843,11 +3861,11 @@ class ApplicationWindow(QMainWindow):
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
         self.GraphMenu.addAction(flavorAction)
         
-        designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
-        designerAction.setCheckable(True)
-        designerAction.setChecked(self.qmc.designerflag)
-        self.connect(designerAction ,SIGNAL("triggered()"),self.designerTriggered)
-        self.GraphMenu.addAction(designerAction)
+        self.designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
+        self.designerAction.setCheckable(True)
+        self.designerAction.setChecked(self.qmc.designerflag)
+        self.connect(self.designerAction ,SIGNAL("triggered()"),self.designerTriggered)
+        self.GraphMenu.addAction(self.designerAction)
         
         self.GraphMenu.addSeparator()
         
@@ -5849,11 +5867,10 @@ $cupping_notes
     
     def startdesigner(self):
         self.qmc.designer()
-        self.qmc.designerflag = True
 
     def stopdesigner(self):  
         self.qmc.reset()
-        self.qmc.designerflag = False        
+        self.designerAction.setChecked(False)
         
     def editgraph(self):
         dialog = editGraphDlg(self)
@@ -6439,6 +6456,7 @@ class HUDDlg(QDialog):
         app.setStyle(self.styleComboBox.currentText())
         
     def showsound(self):
+        warnings.simplefilter('ignore', Warning) #for Comlex warning 
         aw.sendmessage(QApplication.translate("Message Area","Testing Mike...", None, QApplication.UnicodeUTF8))
         aw.stack.setCurrentIndex(2)
         aw.sound.opensound()
@@ -6449,6 +6467,7 @@ class HUDDlg(QDialog):
         aw.stack.setCurrentIndex(0)
         aw.sound.closesound()
         aw.sendmessage("")
+        warnings.simplefilter('default', Warning)
         
              
     def saveinterp(self):
@@ -7293,11 +7312,10 @@ class editGraphDlg(QDialog):
     def accept(self):
         #check for graph
         if len(aw.qmc.timex):   
-            # update graph time variables
-            #check it does not updates the graph with zero times
+            # check CHARGE (with index aw.qmc.timeindex[0])
             if aw.qmc.timeindex[0] == -1:
                 aw.qmc.timeindex[0] = 0
-                start = 0
+                start = 0                   #relative start time
             else:
                 start = aw.qmc.timex[aw.qmc.timeindex[0]]
             
@@ -10018,7 +10036,7 @@ class designerconfigDlg(QDialog):
         modLayout.addWidget(reproducelabel,1,0)
         modLayout.addWidget(self.reproduceComboBox,1,1)
         
-        marksGroupLayout = QGroupBox("Marks")
+        marksGroupLayout = QGroupBox("Initial Marks")
         marksGroupLayout.setLayout(marksLayout)
         
         mainLayout = QVBoxLayout()
