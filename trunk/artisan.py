@@ -98,7 +98,6 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as Naviga
 
 platf = unicode(platform.system())
 
-import pdb
 
 #######################################################################################
 #################### Main Application  ################################################
@@ -908,11 +907,11 @@ class tgraphcanvas(FigureCanvas):
     #creates X axis labels ticks in mm:ss instead of seconds     
     def xaxistosm(self):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
-            starttemp = self.timex[self.timeindex[0]]
+            starttime = self.timex[self.timeindex[0]]
         else:
-            starttemp = 0
-        formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - round(starttemp), 60))
-        locator = ticker.IndexLocator(120, round(starttemp))
+            starttime = 0
+        formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - round(starttime), 60))
+        locator = ticker.IndexLocator(120, round(starttime))
         self.ax.xaxis.set_major_formatter(formatter)
         self.ax.xaxis.set_major_locator(locator)
        
@@ -2566,7 +2565,7 @@ class tgraphcanvas(FigureCanvas):
             choice2 = abs(self.timex[i-1] - seconds)
 
             #return closest (smallest) index
-            if choice1 < choice2:  
+            if choice1 <= choice2:  
                 return i
             elif choice2 < choice1:
                 return i-1
@@ -3275,8 +3274,7 @@ class ApplicationWindow(QMainWindow):
             QDir().setCurrent(preference_path)
         
         #checks executable directory. dirstruct() checks or creates: /profile/year/month directory to store profiles
-        self.dirstruct()
-        
+        self.dirstruct()        
         
         #defaults the users profile path to the standard profilepath (incl. month/year subdirectories)
         self.userprofilepath = self.profilepath
