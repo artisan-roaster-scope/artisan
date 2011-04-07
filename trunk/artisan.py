@@ -4315,7 +4315,7 @@ class ApplicationWindow(QMainWindow):
            return
        else:
            self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
-           time = self.qmc.stringfromseconds(int(self.qmc.timex[aw.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.timeindex[0]]))
+           time = self.qmc.stringfromseconds(int(self.qmc.timex[aw.qmc.specialevents[currentevent-1]]-self.qmc.timex[aw.qmc.timeindex[0]]))
            self.etimeline.setText(time)
            self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[currentevent-1])
            self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
