@@ -4379,7 +4379,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventstype[lenevents-1] = self.etypeComboBox.currentIndex()
             self.qmc.specialeventsvalue[lenevents-1] = self.valueComboBox.currentIndex()
             self.qmc.specialeventsStrings[lenevents-1] = unicode(self.lineEvent.text())
-            self.qmc.specialevents[lenevents-1] = self.qmc.time2index(self.qmc.timex[self.timeindex[0]]+ self.qmc.stringtoseconds(unicode(self.etimeline.text())))
+            self.qmc.specialevents[lenevents-1] = self.qmc.time2index(self.qmc.timex[self.qmc.timeindex[0]]+ self.qmc.stringtoseconds(unicode(self.etimeline.text())))
 
             self.lineEvent.clearFocus()
             self.eNumberSpinBox.clearFocus()
