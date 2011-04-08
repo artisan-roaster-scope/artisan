@@ -9298,13 +9298,11 @@ class serialport(object):
                                  errorcode += "SendFUJIcommand(): ERROR 1 Illegal Function in unit %i " %ord(command[0])
                                  aw.qmc.adderror(errorcode)
                             if ord(r[2]) == 2:
-                                 errorcode = "F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n \
-                                             number cannot be used by the specified function code. "
+                                 errorcode = "F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code. "
                                  errorcode += "SendFUJIcommand() ERROR 2 Illegal Address for unit %i "%(ord(command[0]))
                                  aw.qmc.adderror(errorcode)
                             if ord(r[2]) == 3:
-                                 errorcode = "F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n \
-                                              coil numbers or resistor numbers."
+                                 errorcode = "F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers."
                                  errorcode += "sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i "%(ord(command[0]))
                                  aw.qmc.adderror(errorcode)
                     else:
