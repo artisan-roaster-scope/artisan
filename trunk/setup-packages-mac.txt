@@ -2,15 +2,14 @@
 Current Versions
 o Python 2.7.1
 o QT 4.7.2
-o Numpy 1.5.1
+o Numpy 1.6.0b2
 o SIP 4.12.1
 o PyQt 4.8.3
 o matplotlib 1.0.1
 o scipy 0.9.0
 o elixir 0.7.1 (for Green)
 o pyaudio
-o py2app 0.5.3
-
+o py2app 0.5.2
 
 --- 32bit Leopard & Snow Leopard Carbon Setup:
 
@@ -52,7 +51,7 @@ export CFLAGS="-arch i386"
 export FFLAGS="-m32"
 export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
-# cd numpy-1.5.1
+# cd numpy-
 # cp site.cfg.example site.cfg
 
 add the following lines on the head of the setup.py file
@@ -166,9 +165,23 @@ fetch modulegraph 0.8.2 from repository:
 # python setup.py build
 # python setup.py install
 
-9) py2app (0.5.3 from Dist)
+9) py2app (0.5.2 from Dist)
 
+do the following in a folder that does not contain any py2app elements
+# curl -O http://peak.telecommunity.com/dist/ez_setup.py
+# sudo python ez_setup.py -U setuptools
+for the latest version (note: 0.6.0-0.6.1 has an issue ignoring OPTIONS and data_files)
 # sudo easy_install -U py2app
+for installing a specific version
+# sudo easy_install -U "py2app==0.5.2"
+
+
+NOTE:
+
+if you receive a ".. dist.pyc'> has no 'check_packages' attribute" on doing an easy_install do the following:
+# curl -O http://peak.telecommunity.com/dist/ez_setup.py
+# sudo python ez_setup.py -U setuptools
+
 
 
 
@@ -289,7 +302,7 @@ export CFLAGS="-arch i386 -arch x86_64"
 export FFLAGS="-m32 -m64"
 export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
-# cd numpy-1.5.1
+# cd numpy-1.6.0b2
 # cp site.cfg.example site.cfg
 
 add the following lines on the head of the setup.py file

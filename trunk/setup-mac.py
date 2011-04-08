@@ -58,7 +58,7 @@ OPTIONS = {
                       '_wxagg','_gtagg','_cocoaagg','_wx'],
     'plist'    : {  'CFBundleDisplayName': 'Artisan',
                     'CFBundleGetInfoString' : 'Artisan, Roast Logger',
-                    'CFBundleIdentifier':'com.google.groups.questm3',
+                    'CFBundleIdentifier':'com.google.code.p.Artisan',
                     'CFBundleShortVersionString':VERSION,
                     'CFBundleVersion': 'Artisan ' + VERSION,
                     'LSMinimumSystemVersion':'10.5',
