@@ -3138,31 +3138,35 @@ class tgraphcanvas(FigureCanvas):
     #saves next BT rate of change till next landmark as an event (example idea for arduino TC4)
     def designer_create_BT_rateofchange(self):
         self.deleteEvents()
+        lastindexused = 0
         for i in range(1,len(self.timeindex)):
             if self.timeindex[i]:
-                difftemp = self.temp2[self.timeindex[i]] - self.temp2[self.timeindex[i-1]]
-                difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[i-1]])/60.
+                difftemp = self.temp2[self.timeindex[i]] - self.temp2[self.timeindex[lastindexused]]
+                difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = u"BT %.1f d/m for %s"%((difftemp/difftime),self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[i-1]]))
-                    self.specialevents.append(self.timeindex[i-1])                                     
+                    string = u"BT %.1f d/m for %s"%((difftemp/difftime),self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]]))
+                    self.specialevents.append(self.timeindex[lastindexused])                                     
                     self.specialeventstype.append(0)                                           
                     self.specialeventsStrings.append(string)                          
                     self.specialeventsvalue.append(0)
+                    lastindexused = i
                     
-    #saves next ET rate of change till next landmark as an event (example idea for arduino TC4)
+    #saves next BT rate of change till next landmark as an event (example idea for arduino TC4)
     def designer_create_ET_rateofchange(self):
         self.deleteEvents()
+        lastindexused = 0
         for i in range(1,len(self.timeindex)):
             if self.timeindex[i]:
-                difftemp = self.temp1[self.timeindex[i]] - self.temp1[self.timeindex[i-1]]
-                difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[i-1]])/60.
+                difftemp = self.temp1[self.timeindex[i]] - self.temp1[self.timeindex[lastindexused]]
+                difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = u"ET %.1f d/m for %s"%((difftemp/difftime),self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[i-1]]))
-                    self.specialevents.append(self.timeindex[i-1])                                     
+                    string = u"ET %.1f d/m for %s"%((difftemp/difftime),self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]]))
+                    self.specialevents.append(self.timeindex[lastindexused])                                     
                     self.specialeventstype.append(0)                                           
                     self.specialeventsStrings.append(string)                          
                     self.specialeventsvalue.append(0)
-
+                    lastindexused = i
+                    
     def deleteEvents(self):
         self.specialevents = []                                    
         self.specialeventstype = []                                           
