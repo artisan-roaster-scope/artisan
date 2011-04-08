@@ -199,12 +199,10 @@ class tgraphcanvas(FigureCanvas):
         
         self.fig = Figure()
 
-        #find graph background color (changes with operating systems)
         if platf == 'Darwin':
-            # on MacOS X QPalette().color(.) always returns #ffffff so we set the correct color manually:
             backcolor ="#EEEEEE"
         else:
-            backcolor = QPalette().color(QPalette.Inactive,QPalette.Window).name()
+            backcolor = "white"
         self.fig.patch.set_facecolor(backcolor)
         self.fig.patch.set_edgecolor(backcolor)
         
@@ -2686,10 +2684,10 @@ class tgraphcanvas(FigureCanvas):
 
         #add phase division lines
         ylist = [self.ylimit,0]
-        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
-        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--")
-        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
-        self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.6,linewidth=1,linestyle="--") 
+        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--") 
+        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--")
+        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--") 
+        self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--") 
 
         if self.timex[-1] < self.endofx:
             self.endofx = self.timex[-1] + 120
@@ -3029,13 +3027,14 @@ class tgraphcanvas(FigureCanvas):
         if time < aw.qmc.timex[0]:
             return 0
         elif time > aw.qmc.timex[-1]:
-            return len(aw.qmc.timex)
+            return len(aw.qmc.timex)-1
         else:
             for i in range(len(aw.qmc.timex)):
                 if time == aw.qmc.timex[i]:
                     return i
                 if aw.qmc.timex[i] > time:
                     return i-1
+
                                
     #converts from a designer profile to a normal profile	        
     def convert_designer(self):
@@ -3081,10 +3080,13 @@ class tgraphcanvas(FigureCanvas):
 
             #create playback events
             if self.reproducedesigner:
-                if self.reproducedesigner == 1:
-                    self.designer_create_sv_command()
-                elif self.reproducedesigner == 2:
-                    self.designer_create_ramp_command()
+                functioncall = [0,
+                                self.designer_create_BT_rateofchange,
+                                self.designer_create_ET_rateofchange,
+                                self.designer_create_sv_command,
+                                self.designer_create_ramp_command]
+                
+                functioncall[self.reproducedesigner]()
                 
             self.redraw()        
             aw.sendmessage("New profile created")
@@ -3132,7 +3134,41 @@ class tgraphcanvas(FigureCanvas):
         self.setdesignerinitvars()
         self.connect_designer()
         self.designerinit()
-        
+
+    #saves next BT rate of change till next landmark as an event (example idea for arduino TC4)
+    def designer_create_BT_rateofchange(self):
+        self.deleteEvents()
+        for i in range(1,len(self.timeindex)):
+            if self.timeindex[i]:
+                difftemp = self.temp2[self.timeindex[i]] - self.temp2[self.timeindex[i-1]]
+                difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[i-1]])/60.
+                if difftime:
+                    string = u"BT %.1f d/m for %s"%((difftemp/difftime),self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[i-1]]))
+                    self.specialevents.append(self.timeindex[i-1])                                     
+                    self.specialeventstype.append(0)                                           
+                    self.specialeventsStrings.append(string)                          
+                    self.specialeventsvalue.append(0)
+                    
+    #saves next ET rate of change till next landmark as an event (example idea for arduino TC4)
+    def designer_create_ET_rateofchange(self):
+        self.deleteEvents()
+        for i in range(1,len(self.timeindex)):
+            if self.timeindex[i]:
+                difftemp = self.temp1[self.timeindex[i]] - self.temp1[self.timeindex[i-1]]
+                difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[i-1]])/60.
+                if difftime:
+                    string = u"ET %.1f d/m for %s"%((difftemp/difftime),self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[i-1]]))
+                    self.specialevents.append(self.timeindex[i-1])                                     
+                    self.specialeventstype.append(0)                                           
+                    self.specialeventsStrings.append(string)                          
+                    self.specialeventsvalue.append(0)
+
+    def deleteEvents(self):
+        self.specialevents = []                                    
+        self.specialeventstype = []                                           
+        self.specialeventsStrings = []                          
+        self.specialeventsvalue = []        
+
     #this is used to create a string in pid language to reproduce the profile from Designer
     #NOTE: pid runs ET (temp1)    
     def designer_create_ramp_command(self):
@@ -3159,7 +3195,8 @@ class tgraphcanvas(FigureCanvas):
         command += u"SETRS::" + tempinits[-1] + u"::0::0"
 
         self.clean_old_pid_commands()
-                    
+
+        #do only one event but with all segments            
         self.specialevents.append(0)                                     
         self.specialeventstype.append(0)                                           
         self.specialeventsStrings.append(command)                          
@@ -3168,8 +3205,8 @@ class tgraphcanvas(FigureCanvas):
     #this is used to create a string in ET temp language to reproduce the profile from Designer    
     def designer_create_sv_command(self):
         self.clean_old_pid_commands()
-        for i in range(len(self.timeindex)):
-            command = u"SETSV::%.1f"%self.temp1[self.timeindex[i]]           
+        for i in range(len(self.timeindex)-1):
+            command = u"SETSV::%.1f"%self.temp1[self.timeindex[i+1]]           
             if i > 0 and self.timeindex[i]:
                 self.specialevents.append(self.timeindex[i])                    
                 self.specialeventstype.append(0)                                           
@@ -3830,11 +3867,9 @@ class ApplicationWindow(QMainWindow):
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
         self.GraphMenu.addAction(flavorAction)
         
-        self.designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
-        self.designerAction.setCheckable(True)
-        self.designerAction.setChecked(self.qmc.designerflag)
-        self.connect(self.designerAction ,SIGNAL("triggered()"),self.designerTriggered)
-        self.GraphMenu.addAction(self.designerAction)
+        designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
+        self.connect(designerAction ,SIGNAL("triggered()"),self.designerTriggered)
+        self.GraphMenu.addAction(designerAction)
         
         self.GraphMenu.addSeparator()
         
@@ -4278,10 +4313,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.safesaveflag = False
 
                 return filename
-##                #reset graph
-##                self.qmc.reset()
-##                #turn ON
-##                self.qmc.OnMonitor()
+
             else:
                 self.sendmessage(QApplication.translate("Message Area","Empty path or box unchecked in Autosave", None, QApplication.UnicodeUTF8))
                 self.autosaveconf()               
@@ -4290,14 +4322,18 @@ class ApplicationWindow(QMainWindow):
             self.qmc.adderror(u"IO Error: automaticsave() " + unicode(e) + " ")
           
     def viewKshortcuts(self):
-        string = "<b>[ENTER]</b> = Turns ON/OFF keys<br><br>"
+        string = "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts<br><br>"
         string += "<b>[SPACE]</b> = Choses current button<br><br>"  
         string += "<b>[LEFT]</b> = Move to the left<br><br>"
         string += "<b>[RIGHT]</b> = Move to the right<br><br>"
         string += "<b>[s]</b> = Autosave<br><br>"
         string += "<b>[CRTL N]</b> = Autosave + Reset + ON<br><br>"
 
+        QMessageBox.information(self,u"Keyboard Shotcuts",string)
+
     def changeEventNumber(self):
+       if self.qmc.designerflag:
+           return
        #check
        lenevents = len(self.qmc.specialevents)
        currentevent = self.eNumberSpinBox.value()
@@ -5839,7 +5875,6 @@ $cupping_notes
 
     def stopdesigner(self):  
         self.qmc.reset()
-        self.designerAction.setChecked(False)
         
     def editgraph(self):
         dialog = editGraphDlg(self)
@@ -7835,15 +7870,12 @@ class calculatorDlg(QDialog):
             self.result1.setText(string1)        
             self.result2.setText(string2)
 
-            #plot visual line
-            if aw.qmc.designerflag == False:
-                aw.qmc.resetlines()
-                aw.qmc.ax.plot(aw.qmc.timex[startindex], aw.qmc.temp2[startindex], "o", color = aw.qmc.palette["text"])
-                aw.qmc.ax.plot(aw.qmc.timex[endindex], aw.qmc.temp2[endindex], "o", color = aw.qmc.palette["text"])
-                aw.qmc.ax.plot([aw.qmc.timex[startindex],aw.qmc.timex[endindex]],[aw.qmc.temp2[startindex],aw.qmc.temp2[endindex]],
-                                linewidth=1, color = aw.qmc.palette["text"],linestyle="-.")
-                aw.qmc.fig.canvas.draw()
-            
+##            #plot visual line
+##            if aw.qmc.designerflag == False:
+##                aw.qmc.resetlines()
+##                aw.qmc.ax.plot([aw.qmc.timex[startindex],aw.qmc.timex[endindex]],[aw.qmc.temp2[startindex],aw.qmc.temp2[endindex]],
+##                                color = aw.qmc.palette["grid"],marker = "^",linestyle="--",markersize=8, linewidth=3, alpha = .7)
+##                aw.qmc.fig.canvas.draw()            
         else:
             self.result1.setText("No profile found")  
             self.result2.setText("")
@@ -7897,10 +7929,11 @@ class calculatorDlg(QDialog):
            outx = float(unicode(self.VoutEdit.text()))
            inx = outx*convtable[self.VoutComboBox.currentIndex()][self.VinComboBox.currentIndex()]
            self.VinEdit.setText(u"%.3f"%inx)
-           
-    def closeEvent(self, event):    
-        aw.qmc.redraw()        
-                         
+       
+##    def closeEvent(self, event):
+##        aw.qmc.resetlines()
+##        aw.qmc.fig.canvas.draw()
+  
 ##########################################################################
 #####################  EVENTS CONFIGURATION DLG     ######################
 ##########################################################################
@@ -9930,7 +9963,9 @@ class designerconfigDlg(QDialog):
         else:
             start = 0
 
-        self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+        self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))
+        self.Edit0.setEnabled(False)
+
         if aw.qmc.timeindex[1]:
             self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[1]] - start))      
         else:
@@ -9954,8 +9989,14 @@ class designerconfigDlg(QDialog):
         if aw.qmc.timeindex[6]:
             self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[6]] - start))      
         else:
-            self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
-            
+            self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(0))
+        self.Edit6.setEnabled(False)
+
+        self.Edit1copy = self.Edit1.text()            
+        self.Edit2copy = self.Edit1.text()            
+        self.Edit3copy = self.Edit1.text()            
+        self.Edit4copy = self.Edit1.text()            
+        self.Edit5copy = self.Edit1.text()                      
        
         regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
         self.Edit0.setValidator(QRegExpValidator(regextime,self))
@@ -9992,7 +10033,11 @@ class designerconfigDlg(QDialog):
 
         reproducelabel = QLabel("Events Playback")
         self.reproduceComboBox = QComboBox()
-        self.reproduceComboBox.addItems(["None","SV commands","Ramp command"])
+        self.reproduceComboBox.addItems(["None",
+                                         "BT Rate of Change",
+                                         "ET Rate of Change",
+                                         "Machine SV commands",
+                                         "Machine Ramp command"])
         self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
         self.connect(self.reproduceComboBox,SIGNAL("currentIndexChanged(int)"), self.changereproducemode)
 
@@ -10093,32 +10138,37 @@ class designerconfigDlg(QDialog):
             st = "Times need to be in ascending order. Please recheck %s time"%strings[checkvalue+1]
             QMessageBox.information(self,u"Designer Config",st)            
             return 1
-
+        
         if self.dryend.isChecked():
-            if aw.qmc.stringtoseconds(unicode(self.Edit1.text())):
-                time = aw.qmc.stringtoseconds(unicode(self.Edit1.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[1] = aw.qmc.designerfindindex(time)
-                aw.qmc.timex[aw.qmc.timeindex[1]] = time                
+            if self.Edit1.text() != self.Edit1copy:
+                if aw.qmc.stringtoseconds(unicode(self.Edit1.text())):
+                    time = aw.qmc.stringtoseconds(unicode(self.Edit1.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[1] = aw.qmc.designerfindindex(time)
+                    aw.qmc.timex[aw.qmc.timeindex[1]] = time                
         if self.fcs.isChecked():
-            if aw.qmc.stringtoseconds(unicode(self.Edit2.text())):
-                time = aw.qmc.stringtoseconds(unicode(self.Edit2.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[2] = aw.qmc.designerfindindex(time)
-                aw.qmc.timex[aw.qmc.timeindex[2]] = time 
+            if self.Edit2.text() != self.Edit2copy:
+                if aw.qmc.stringtoseconds(unicode(self.Edit2.text())):
+                    time = aw.qmc.stringtoseconds(unicode(self.Edit2.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[2] = aw.qmc.designerfindindex(time)
+                    aw.qmc.timex[aw.qmc.timeindex[2]] = time 
         if self.fce.isChecked():
-            if aw.qmc.stringtoseconds(unicode(self.Edit3.text())):
-                time = aw.qmc.stringtoseconds(unicode(self.Edit3.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[3] = aw.qmc.designerfindindex(time)
-                aw.qmc.timex[aw.qmc.timeindex[3]] = time 
+            if self.Edit3.text() != self.Edit3copy:
+                if aw.qmc.stringtoseconds(unicode(self.Edit3.text())):
+                    time = aw.qmc.stringtoseconds(unicode(self.Edit3.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[3] = aw.qmc.designerfindindex(time)
+                    aw.qmc.timex[aw.qmc.timeindex[3]] = time 
         if self.scs.isChecked():
-            if aw.qmc.stringtoseconds(unicode(self.Edit4.text())):
-                time = aw.qmc.stringtoseconds(unicode(self.Edit4.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[4] = aw.qmc.designerfindindex(time)
+            if self.Edit4.text() != self.Edit4copy:
+                if aw.qmc.stringtoseconds(unicode(self.Edit4.text())):
+                    time = aw.qmc.stringtoseconds(unicode(self.Edit4.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[4] = aw.qmc.designerfindindex(time)
                 aw.qmc.timex[aw.qmc.timeindex[4]] = time 
         if self.sce.isChecked():
-            if aw.qmc.stringtoseconds(unicode(self.Edit5.text())):
-                time = aw.qmc.stringtoseconds(unicode(self.Edit5.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                aw.qmc.timeindex[5] = aw.qmc.designerfindindex(time)
-                aw.qmc.timex[aw.qmc.timeindex[5]] = time 
+            if self.Edit5.text() != self.Edit5copy:
+                if aw.qmc.stringtoseconds(unicode(self.Edit5.text())):
+                    time = aw.qmc.stringtoseconds(unicode(self.Edit5.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[5] = aw.qmc.designerfindindex(time)
+                    aw.qmc.timex[aw.qmc.timeindex[5]] = time 
 
         for i in range(1,6): #1-5
             aw.qmc.designertimeinit[i] = aw.qmc.timex[aw.qmc.timeindex[i]]
@@ -11150,7 +11200,7 @@ class graphColorDlg(QDialog):
         lcd3backButton = QPushButton("Background")
         self.connect(lcd3backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=3:self.paintlcds(text,flag,x))   
         lcd4backButton = QPushButton("Background")
-        self.connect(lcd4backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=4:self.kpaintlcds(text,flag,x))   
+        self.connect(lcd4backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=4:self.paintlcds(text,flag,x))   
         lcd5backButton = QPushButton("Background")
         self.connect(lcd5backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=5:self.paintlcds(text,flag,x))   
         lcd6backButton = QPushButton("Background")
