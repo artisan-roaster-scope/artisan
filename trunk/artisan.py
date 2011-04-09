@@ -1312,8 +1312,9 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #add a water mark
-                self.ax.axvspan(self.timex[self.timeindex[2]],self.timex[self.timeindex[3]], facecolor=self.palette["watermarks"], alpha=0.2)
+                #add a water mark if FCs
+                if self.timeindex[2]:
+                    self.ax.axvspan(self.timex[self.timeindex[2]],self.timex[self.timeindex[3]], facecolor=self.palette["watermarks"], alpha=0.2)
 
             #Add 2Cs markers
             if self.timeindex[4]:
@@ -1340,8 +1341,9 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] - self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #do water mark
-                self.ax.axvspan(self.timex[self.timeindex[4]],self.timex[self.timeindex[5]], facecolor=self.palette["watermarks"], alpha=0.2)
+                #do water mark if SCs
+                if self.timeindex[4]:
+                    self.ax.axvspan(self.timex[self.timeindex[4]],self.timex[self.timeindex[5]], facecolor=self.palette["watermarks"], alpha=0.2)
 
             #Add DROP markers
             if self.timeindex[6]:
@@ -1759,9 +1761,12 @@ class tgraphcanvas(FigureCanvas):
 
     #Turns ON flag self.flagon to read and plot. Called from push button_1. 
     def OnMonitor(self):
+        if self.designerflag: return
+        
         #Call start() to start the first measurement if no data collected
         if not len(self.timex):
-            self.timeclock.start()        
+            self.timeclock.start()
+            
         self.flagon = True
         aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))     
         aw.button_1.setDisabled(True)                     #button ON
@@ -2583,25 +2588,25 @@ class tgraphcanvas(FigureCanvas):
         #if no profile found
         self.reset()
         self.connect_designer()
-        self.designerinit()
-
-    def setdesignerinitvars(self):
-        if self.mode == u"C":
-                                      #CH, DE, Fcs,Fce,Scs,Sce,Drop  
-            self.designertemp1init = [290,290,290,290,290,290,290]
-            self.designertemp2init = [200,150,200,210,220,225,240]   #CHARGE,DRY END,FCs, FCe,SCs,SCe,DROP
-        elif self.mode == u"F":
-            self.designertemp1init = [500,500,500,500,500,500,500]
-            self.designertemp2init = [380,300,390,395,410,412,420]
-        
+        self.designerinit()       
         
     #used to start designer from scracth (not from a loaded profile)	
     def designerinit(self):
+        #init start vars        #CH, DE, Fcs,Fce,Scs,Sce,Drop
+        self.designertimeinit = [50,300,540,570,660,700,800]
+        if self.mode == u"C":
+                                      #CH, DE, Fcs,Fce,Scs,Sce,Drop  
+            self.designertemp1init = [290.,290.,290.,290.,290.,290.,290.]
+            self.designertemp2init = [200.,150.,200.,210.,220.,225.,240.]   #CHARGE,DRY END,FCs, FCe,SCs,SCe,DROP
+        elif self.mode == u"F":
+            self.designertemp1init = [500.,500.,500.,500.,500.,500.,500.]
+            self.designertemp2init = [380.,300.,390.,395.,410.,412.,420.]
+
         #check x limits
         if self.endofx < 960:
             self.endofx = 960
             self.redraw()
-            
+
         self.timex,self.temp1,self.temp2 = [],[],[]
         for i in range(len(self.timeindex)):
             self.timex.append(self.designertimeinit[i])
@@ -2869,7 +2874,6 @@ class tgraphcanvas(FigureCanvas):
                             dryphaseP = int(dryphasetime*100/totaltime)
                             midphaseP = int(midphasetime*100/totaltime)
                             finishphaseP = int(finishphasetime*100/totaltime)
-                            (st1,st2,st3) = aw.defect_estimation()
                         else:
                             return
                         
@@ -3131,7 +3135,6 @@ class tgraphcanvas(FigureCanvas):
     def reset_designer(self):
         self.reset()
         self.disconnect_designer()
-        self.setdesignerinitvars()
         self.connect_designer()
         self.designerinit()
 
@@ -3332,7 +3335,7 @@ class ApplicationWindow(QMainWindow):
         self.ser = serialport()
         # create a PID object
         self.pid = FujiPID()
-
+        
         self.soundflag = 0
 
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv 
@@ -3867,13 +3870,13 @@ class ApplicationWindow(QMainWindow):
         self.connect(backgroundAction,SIGNAL("triggered()"),self.background)
         self.GraphMenu.addAction(backgroundAction)  
 
-        flavorAction = QAction(UIconst.ROAST_MENU_CUPPROFILE,self)
-        self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
-        self.GraphMenu.addAction(flavorAction)
-        
         designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
         self.connect(designerAction ,SIGNAL("triggered()"),self.designerTriggered)
         self.GraphMenu.addAction(designerAction)
+
+        flavorAction = QAction(UIconst.ROAST_MENU_CUPPROFILE,self)
+        self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
+        self.GraphMenu.addAction(flavorAction)
         
         self.GraphMenu.addSeparator()
         
@@ -3921,18 +3924,22 @@ class ApplicationWindow(QMainWindow):
         calibrateDelayAction = QAction(UIconst.CONF_MENU_SAMPLING,self)
         self.connect(calibrateDelayAction,SIGNAL("triggered()"),self.calibratedelay)
         self.ConfMenu.addAction(calibrateDelayAction)
-        
-        colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
-        self.connect(colorsAction,SIGNAL("triggered()"),lambda x=3:self.qmc.changeGColor(x))
-        self.ConfMenu.addAction(colorsAction)
 
-        phasesGraphAction = QAction(UIconst.CONF_MENU_PHASES,self)
-        self.connect(phasesGraphAction,SIGNAL("triggered()"),self.editphases)
-        self.ConfMenu.addAction(phasesGraphAction)
-        
+        self.ConfMenu.addSeparator()
+
         eventsAction = QAction(UIconst.CONF_MENU_EVENTS,self)
         self.connect(eventsAction,SIGNAL("triggered()"),self.eventsconf)
         self.ConfMenu.addAction(eventsAction)        
+
+        alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
+        self.connect(alarmAction,SIGNAL("triggered()"),self.alarmconfig)
+        self.ConfMenu.addAction(alarmAction) 
+
+        self.ConfMenu.addSeparator()
+        
+        phasesGraphAction = QAction(UIconst.CONF_MENU_PHASES,self)
+        self.connect(phasesGraphAction,SIGNAL("triggered()"),self.editphases)
+        self.ConfMenu.addAction(phasesGraphAction)
        
         StatisticsAction = QAction(UIconst.CONF_MENU_STATISTICS,self)
         self.connect(StatisticsAction,SIGNAL("triggered()"),self.showstatistics)
@@ -3942,13 +3949,15 @@ class ApplicationWindow(QMainWindow):
         self.connect(WindowconfigAction,SIGNAL("triggered()"),self.Windowconfig)
         self.ConfMenu.addAction(WindowconfigAction) 
 
+        self.ConfMenu.addSeparator()
+
+        colorsAction = QAction(UIconst.CONF_MENU_COLORS,self)
+        self.connect(colorsAction,SIGNAL("triggered()"),lambda x=3:self.qmc.changeGColor(x))
+        self.ConfMenu.addAction(colorsAction)
+
         autosaveAction = QAction(UIconst.CONF_MENU_AUTOSAVE,self)
         self.connect(autosaveAction,SIGNAL("triggered()"),self.autosaveconf)
         self.ConfMenu.addAction(autosaveAction) 
-
-        alarmAction = QAction(UIconst.CONF_MENU_ALARMS,self)
-        self.connect(alarmAction,SIGNAL("triggered()"),self.alarmconfig)
-        self.ConfMenu.addAction(alarmAction) 
 
         hudAction = QAction(UIconst.CONF_MENU_EXTRAS,self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
@@ -6698,6 +6707,7 @@ class editGraphDlg(QDialog):
         # EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
+        self.eventtable.setTabKeyNavigation(True)
         self.eventtablecopy = []
         self.createEventTable()
 
@@ -6716,6 +6726,7 @@ class editGraphDlg(QDialog):
 
         #DATA Table
         self.datatable = QTableWidget()
+        self.datatable.setTabKeyNavigation(True)
         self.createDataTable()        
            
         #TITLE
@@ -8665,11 +8676,13 @@ class backgroundDLG(QDialog):
         #TAB 2 EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
+        self.eventtable.setTabKeyNavigation(True)
         self.createEventTable()
         
         #TAB 3 DATA
         #table for showing data
         self.datatable = QTableWidget()
+        self.datatable.setTabKeyNavigation(True)
         self.createDataTable()
         
     	#TAB 4
@@ -10019,9 +10032,11 @@ class designerconfigDlg(QDialog):
         self.Edit5.setMaximumWidth(50)
         self.Edit6.setMaximumWidth(50)
 
-        splinelabel = QLabel("Curvines")
+        splinelabel = QLabel("Curviness")
         etcurviness = QLabel("ET")
         btcurviness = QLabel("BT")
+        etcurviness.setAlignment(Qt.AlignRight)
+        btcurviness.setAlignment(Qt.AlignRight)
         self.ETsplineComboBox = QComboBox()
         self.ETsplineComboBox.setMaximumWidth(30)                                  
         self.ETsplineComboBox.addItems(["1","2","3","4","5"])
@@ -11596,6 +11611,7 @@ class AlarmDlg(QDialog):
 
         #table for alarms
         self.alarmtable = QTableWidget()
+        self.alarmtable.setTabKeyNavigation(True)
         self.createalarmtable()        
 
         allonButton = QPushButton("Set All ON")
