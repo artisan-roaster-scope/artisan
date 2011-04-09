@@ -11,7 +11,7 @@ __version__ = u"0.4.0"
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
 # version 3 of the License, or (at your option) any later version. It is
-# provided for educational purposes and is distributed in the hope that
+# provided for educational purposes and is distributed in the hope that 
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 # the GNU General Public License for more details.
@@ -3107,6 +3107,7 @@ class tgraphcanvas(FigureCanvas):
     def connect_designer(self):
         if not self.designerflag:
             self.designerflag = True
+            aw.designerAction.setChecked(True)
             self.setCursor(Qt.OpenHandCursor)
             self.mousepress = None
             #create mouse events. Note: keeping the ids inside a list helps protect against extrange python behaviour.
@@ -3125,6 +3126,7 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.canvas.mpl_disconnect(self.designerconnections[i])
         self.setCursor(Qt.ArrowCursor)
         self.designerflag = False
+        aw.designerAction.setChecked(False)
         warnings.simplefilter('default', UserWarning)
               
     #launches designer config Window    
@@ -3870,9 +3872,11 @@ class ApplicationWindow(QMainWindow):
         self.connect(backgroundAction,SIGNAL("triggered()"),self.background)
         self.GraphMenu.addAction(backgroundAction)  
 
-        designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
-        self.connect(designerAction ,SIGNAL("triggered()"),self.designerTriggered)
-        self.GraphMenu.addAction(designerAction)
+        self.designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
+        self.connect(self.designerAction ,SIGNAL("triggered()"),self.designerTriggered)
+        self.designerAction.setCheckable(True)
+        self.designerAction.setChecked(self.qmc.designerflag)
+        self.GraphMenu.addAction(self.designerAction)
 
         flavorAction = QAction(UIconst.ROAST_MENU_CUPPROFILE,self)
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
