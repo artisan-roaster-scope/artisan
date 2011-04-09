@@ -25,7 +25,7 @@ o ET/BT logging and PID control supporting the following devices
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
  - VOLTCRAFT K202, K204, 300K, 302KJ
  - EXTECH 421509
- - ArduinoTC4
+ - Arduino/TC4
  - TE VA18B
 o Fahrenheit and Celsius display and conversion
 o manual logging of extra events (FCs,FCe,..)
@@ -37,6 +37,9 @@ o background reference profile
 o user defined cup profiles and cup profile graphs
 o HTML report creation
 o CSV export
+o Omega HH506 and K202 CSV import
+o profile designer
+o localizations (partial translations for German, French, Spanish, Swedish, Italian)
 
 
 INSTALLATION
@@ -89,11 +92,11 @@ LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
 
-- Python 2.7.x 2.6.X released under the PSF licence http://www.python.org/psf/
+- Python 2.7.x and 2.6.X released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
 - QT 4.7.x under the Qt GNU GPL v. 3.0 licence
   http://qt.nokia.com/
-- Numpy 1.5.x and Scipy 0.9.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
+- Numpy 1.6.x and Scipy 0.9.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
 - PyQt 4.8.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
@@ -112,21 +115,22 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
-v0.3.5 (??)
+v0.4.0 (10.4.2011)
 - improved CSV import/export
 - K202 CSV support added
 - adds localization support
-- adds german, french, spanish, swedish, italian translations
-- fixed cut-copy-paste on Mac
+- adds german, french, spanish, swedish, italian menu translations
+- fixed cut-copy-paste on Mac and added cut-copy-paste menu
 - LCD color configuration
 - replay of events via background dialog
 - relative times are used everywhere
 - adds profile designer
 - adds alarms
-- 
+- more robust Arduino/TC4 communication
+- bug fixes
 
 v0.3.4 (28.02.2011)
-- adds ArduinoTC4 device support
+- adds Arduino/TC4 device support
 - adds TE VA18b device support
 - improved Fuji PXR/PXG support
 - support for file paths with accent characters
