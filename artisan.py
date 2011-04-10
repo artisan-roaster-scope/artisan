@@ -1127,13 +1127,13 @@ class tgraphcanvas(FigureCanvas):
             #check backgroundDetails flag
             if self.backgroundDetails:
                 #if there is a profile loaded with CHARGE, then save time to get the relative time
-                if self.timeindex[0] >  len(self.timex):   #verify it exists before loading it, otherwise the list could go out of index
-                    start = self.timex[self.timeindex[0]]
+                if self.timeindex[0] != -1:   #verify it exists before loading it, otherwise the list could go out of index
+                    startB = self.timex[self.timeindex[0]]
                 else:
-                    start = 0
+                    startB = 0
 
                 #background CHARGE
-                st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[0]] - start))
+                st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[0]] - startB))
                 self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[0]]), xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
                                  xytext=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]] + 50),fontsize=10,color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
@@ -1143,7 +1143,7 @@ class tgraphcanvas(FigureCanvas):
                                  arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
 
                 if self.timeindexB[1]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[1]]- start))
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[1]]- startB))
                     self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[1]]), xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
                                      xytext=(self.timeB[self.timeindexB[1]]-5,self.temp2B[self.timeindexB[1]]+50),fontsize=10,color=self.palette["text"],
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
@@ -1152,7 +1152,7 @@ class tgraphcanvas(FigureCanvas):
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
                 if self.timeindexB[2]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[2]]-start))
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[2]]-startB))
                     self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[2]]), xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
                                      xytext=(self.timeB[self.timeindexB[2]]-5,self.temp2B[self.timeindexB[2]]+50),fontsize=10,color=self.palette["text"],
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
@@ -1161,7 +1161,7 @@ class tgraphcanvas(FigureCanvas):
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
                 if self.timeindexB[3]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[3]]-start))          
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[3]]-startB))          
                     self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[3]]), xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
                                      xytext=(self.timeB[self.timeindexB[3]]-5,self.temp2B[self.timeindexB[3]]+70),fontsize=10,color=self.palette["text"],
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
@@ -1170,7 +1170,7 @@ class tgraphcanvas(FigureCanvas):
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
                 if self.timeindexB[4]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[4]]-start))
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[4]]-startB))
                     self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[4]]), xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
                                      xytext=(self.timeB[self.timeindexB[4]]-5,self.temp2B[self.timeindexB[4]]+90),fontsize=10,color=self.palette["text"],
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
@@ -1179,7 +1179,7 @@ class tgraphcanvas(FigureCanvas):
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
                 if self.timeindexB[5]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[5]]-start))
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[5]]-startB))
                     self.ax.annotate(u"%.1f"%(self.timeB[self.timeindexB[5]]), xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
                                      xytext=(self.timeB[self.timeindexB[5]]-5,self.temp2B[self.timeindexB[5]]+50),fontsize=10,color=self.palette["text"],
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
@@ -1188,7 +1188,7 @@ class tgraphcanvas(FigureCanvas):
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     
                 if self.timeindexB[6]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[6]]-start))
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[6]]-startB))
                     self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[6]]), xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
                                      xytext=(self.timeB[self.timeindexB[6]]-5,self.temp2B[self.timeindexB[6]]+70),color=self.palette["text"],
                                      arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
