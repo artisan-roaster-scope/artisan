@@ -2270,17 +2270,29 @@ class tgraphcanvas(FigureCanvas):
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
     def DeviceEventRecord(self,command):
         #number of events
-
-
-        message = QApplication.translate("Message Area","Computer Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
-        aw.sendmessage(message)
-        #write label in mini recorder if flag checked
-        if aw.minieventsflag:
-            aw.eNumberSpinBox.setValue(Nevents+1)
-            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-            aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-        self.redraw()
+        Nevents = len(self.specialevents)
+        #index number            
+        i = len(self.timex)-1
+        if i > 0:
+            self.specialevents.append(i)                                     # store absolute time index
+            self.specialeventstype.append(0)                                 # set type (to the first index 0)          
+            self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
+            self.specialeventsvalue.append(0)                                # empty
+            temp = unicode(self.temp2[i])
+            if self.timeindex[0] != -1:
+                start = self.timex[self.timeindex[0]]
+            else:
+                start = 0
+            timed = self.stringfromseconds(self.timex[i]-start)
+            message = QApplication.translate("Message Area","Computer Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
+            aw.sendmessage(message)
+            #write label in mini recorder if flag checked
+            if aw.minieventsflag:
+                aw.eNumberSpinBox.setValue(Nevents+1)
+                aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+            self.redraw()
             
     #called from markdryen(), markcharge(), mark1Cstart(), etc when using device 18 (manual mode)
     def drawmanual(self,et,bt,tx):
@@ -7683,8 +7695,7 @@ class calculatorDlg(QDialog):
     def __init__(self, parent = None):
         super(calculatorDlg,self).__init__(parent)
         self.setWindowTitle("Roast Calculator")
-
-        
+       
         #RATE OF CHANGE
         self.result1 = QLabel("Enter two times along profile")
         self.result2 = QLabel()
@@ -7738,10 +7749,10 @@ class calculatorDlg(QDialog):
         self.WoutComboBox.setCurrentIndex(2)
         self.WinEdit = QLineEdit()
         self.WoutEdit = QLineEdit()
-        #self.WinEdit.setMaximumWidth(60)
-        #self.WoutEdit.setMaximumWidth(60)
-        self.WinEdit.setMinimumWidth(60)
-        self.WoutEdit.setMinimumWidth(60)
+        self.WinEdit.setMaximumWidth(70)
+        self.WoutEdit.setMaximumWidth(70)
+        #self.WinEdit.setMinimumWidth(60)
+        #self.WoutEdit.setMinimumWidth(60)
         self.WinEdit.setValidator(QDoubleValidator(0., 99999., 2, self.WinEdit))
         self.WoutEdit.setValidator(QDoubleValidator(0., 99999., 2, self.WoutEdit))
         self.connect(self.WinEdit,SIGNAL("editingFinished()"),lambda x="ItoO":self.convertWeight(x))
@@ -7760,10 +7771,10 @@ class calculatorDlg(QDialog):
         self.VoutComboBox.setCurrentIndex(4)
         self.VinEdit = QLineEdit()
         self.VoutEdit = QLineEdit()
-        #self.VinEdit.setMaximumWidth(60)
-        #self.VoutEdit.setMaximumWidth(60)
-        self.VinEdit.setMinimumWidth(60)
-        self.VoutEdit.setMinimumWidth(60)
+        self.VinEdit.setMaximumWidth(70)
+        self.VoutEdit.setMaximumWidth(70)
+        #self.VinEdit.setMinimumWidth(60)
+        #self.VoutEdit.setMinimumWidth(60)
         self.VinEdit.setValidator(QDoubleValidator(0., 99999., 2, self.VinEdit))
         self.VoutEdit.setValidator(QDoubleValidator(0., 99999., 2, self.VoutEdit))
         self.connect(self.VinEdit,SIGNAL("editingFinished()"),lambda x="ItoO":self.convertVolume(x))
@@ -11774,7 +11785,6 @@ class AlarmDlg(QDialog):
                 self.alarmtable.setCellWidget(i,4,actionComboBox)                
                 self.alarmtable.setCellWidget(i,5,descriptionedit)
 
-
 #########################################################################
 ######################## FUJI PXR CONTROL DIALOG  #######################
 #########################################################################
@@ -14121,6 +14131,8 @@ class FujiPID(object):
                 #record command as an Event 
                 strcommand = u"SETSV::" + unicode("%.1f"%float(value))
                 aw.qmc.DeviceEventRecord(strcommand)
+                print value
+                aw.lcd6.display(u"%.1f"%float(value))
             else:
                 aw.qmc.adderror(u"setPXGsv(): bad response from PID")
                 return -1
@@ -14137,6 +14149,8 @@ class FujiPID(object):
                 #record command as an Event 
                 strcommand = u"SETSV::" + unicode("%.1f"%float(value))
                 aw.qmc.DeviceEventRecord(strcommand)
+                aw.lcd6.display(u"%.1f"%float(value))
+
             else:
                 aw.qmc.adderror(u"setPXRsv(): bad response from PID")
                 return -1
@@ -14162,12 +14176,12 @@ class FujiPID(object):
                     if len(r) == 8:
                         message = QApplication.translate("Message Area","SV%1 changed from %2 to %3)",None, QApplication.UnicodeUTF8).arg(unicode(N)).arg(unicode(currentsv)).arg(unicode(newsv/10.))
                         aw.sendmessage(message)
-                        self.PXG4[svkey][0] = newsv
+                        self.PXG4[svkey][0] = newsv/10
                         
                         #record command as an Event to replay (not binary as it needs to be stored in a text file)
                         strcommand = u"SETSV::" + unicode("%.1f"%(newsv/10.))
                         aw.qmc.DeviceEventRecord(strcommand)
-                            
+                        aw.lcd6.display(u"%.1f"%float(newsv/10.))   
                     else:
                         msg = QApplication.translate("Message Area","Unable to set sv%1",None, QApplication.UnicodeUTF8).arg(unicode(N))
                         aw.sendmessage(msg)       
@@ -14180,11 +14194,13 @@ class FujiPID(object):
                     message = u" SV changed from " + unicode(currentsv) + u" to " + unicode(newsv/10.)
                     message = QApplication.translate("Message Area"," SV changed from %1 to %2)",None, QApplication.UnicodeUTF8).arg(unicode(currentsv)).arg(unicode(newsv/10.))                           
                     aw.sendmessage(message)
-                    self.PXR["sv0"][0] = newsv
+                    self.PXR["sv0"][0] = newsv/10
 
                     #record command as an Event to replay (not binary as it needs to be stored in a text file)
                     strcommand = u"SETSV::" + unicode("%.1f"%(newsv/10.))
                     aw.qmc.DeviceEventRecord(strcommand)
+                    aw.lcd6.display(u"%.1f"%float(newsv/10.))   
+
                 else:
                     aw.sendmessage(QApplication.translate("Message Area","Unable to set sv", None, QApplication.UnicodeUTF8))
         else:
