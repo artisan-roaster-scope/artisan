@@ -9793,155 +9793,166 @@ class serialport(object):
 
     def TEVA18Btemperature(self):
         try:
-            if not self.SP.isOpen():
-                self.openport()                    
-                time.sleep(2)
+            run = 1
+            counter = 0
+            
+            while(run):
                 
-            if self.SP.isOpen():
-                self.SP.flushInput()
-
-                r = self.SP.read(14)
-
-                if len(r) != 14:
-                    raise ValueError
-
-                s200 = binascii.hexlify(r[0])
-                s201 = binascii.hexlify(r[1])
-                s202 = binascii.hexlify(r[2])
-                s203 = binascii.hexlify(r[3])
-                s204 = binascii.hexlify(r[4])
-                s205 = binascii.hexlify(r[5])
-                s206 = binascii.hexlify(r[6])
-                s207 = binascii.hexlify(r[7])
-                s208 = binascii.hexlify(r[8])
-#                s209 = binascii.hexlify(r[9])
-#                s210 = binascii.hexlify(r[10])
-#                s211 = binascii.hexlify(r[11])
-#                s212 = binascii.hexlify(r[12])
-#                s213 = binascii.hexlify(r[13])
-           
-                t200 = int(s200,16)
-                t201 = int(s201,16)
-                t202 = int(s202,16)
-                t203 = int(s203,16)
-                t204 = int(s204,16)
-                t205 = int(s205,16)
-                t206 = int(s206,16)
-                t207 = int(s207,16)
-                t208 = int(s208,16)
-#                t209 = int(s209,16)
-#                t210 = int(s210,16)
-#                t211 = int(s211,16)
-#                t212 = int(s212,16)
-#                t213 = int(s213,16)
-
-                # is meter in temp mode?
-                # first check byte order
-                if(((t213 & 0xf0) >> 4) != 14):
-                    #ERROR
-                    raise ValueError
-
-                elif(((t213 & 0x0f) & 0x02) != 2 ):
-                    #ERROR
-                    # device seems not to be in temp mode
-                    # print "No TempMode ...."
-                    raise ValueError
+                #MaWa
+                #really interesting:
+                #need this sleep. without artisan hungs after 20 to 40 seconds.
+                #seems like iam running the loop forever, forever .... with sleep it is ok
+                #seen this sometimes in communication between threads in C or C++. --> volatile problem?
+                if counter > 0:
+                    time.sleep(1)
                 
-                # convert
-                bNegative = 0
-                iDivisor = 0
-
-                # first lets check the byte order
-                # seg1 bytes
-                if (((t201 & 0xf0) >> 4) == 2) and (((t202 & 0xf0) >> 4 ) == 3):
-                    seg1 = ((t201 & 0x0f) << 4) + (t202 & 0x0f)
-                else:
-                     raise ValueError
-
-                # seg2 bytes
-                if (((t203 & 0xf0) >> 4) == 4) and (((t204 & 0xf0) >> 4 ) == 5):
-                    seg2 = ((t203 & 0x0f) << 4) + (t204 & 0x0f)
-                else:
-                     raise ValueError
-
-                
-                # seg3 bytes
-                if (((t205 & 0xf0) >> 4) == 6) and (((t206 & 0xf0) >> 4 ) == 7):
-                    seg3 = ((t205 & 0x0f) << 4) + (t206 & 0x0f)
-                else:
-                     raise ValueError
-
-                
-                # seg4 bytes
-                if (((t207 & 0xf0) >> 4) == 8) and (((t208 & 0xf0) >> 4 ) == 9):
-                    seg4 = ((t207 & 0x0f) << 4) + (t208 & 0x0f)
-                else:
-                     raise ValueError
-
-                # is negative?
-                if (seg1 & 0x80):
-                    bNegative = 1
-                    seg1 = seg1 & ~0x80
-                # check divisor
-                if (seg2 & 0x80):
-                    iDivisor = 1000.
-                    seg2 = seg2 & ~0x80
-                elif (seg3 & 0x80):
-                    iDivisor = 100.
-                    seg3 = seg3 & ~0x80        
-                elif (seg4 & 0x80):
-                    iDivisor = 10.
-                    seg4 = seg4 & ~0x80
+                counter = counter + 1
+            
+                if not self.SP.isOpen():
+                    self.openport()    
+                    time.sleep(2)
                     
-                iValue = 0
-                fReturn = 0
+                if self.SP.isOpen():
+                    self.SP.flushInput()
+
+                    r = self.SP.read(14)
+                    
+                    if len(r) != 14:
+                        continue
+
+#                    s200 = binascii.hexlify(r[0])
+                    s201 = binascii.hexlify(r[1])
+                    s202 = binascii.hexlify(r[2])
+                    s203 = binascii.hexlify(r[3])
+                    s204 = binascii.hexlify(r[4])
+                    s205 = binascii.hexlify(r[5])
+                    s206 = binascii.hexlify(r[6])
+                    s207 = binascii.hexlify(r[7])
+                    s208 = binascii.hexlify(r[8])
+    #                s209 = binascii.hexlify(r[9])
+    #                s210 = binascii.hexlify(r[10])
+    #                s211 = binascii.hexlify(r[11])
+    #                s212 = binascii.hexlify(r[12])
+                    s213 = binascii.hexlify(r[13])
+               
+ #                   t200 = int(s200,16)
+                    t201 = int(s201,16)
+                    t202 = int(s202,16)
+                    t203 = int(s203,16)
+                    t204 = int(s204,16)
+                    t205 = int(s205,16)
+                    t206 = int(s206,16)
+                    t207 = int(s207,16)
+                    t208 = int(s208,16)
+    #                t209 = int(s209,16)
+    #                t210 = int(s210,16)
+    #                t211 = int(s211,16)
+    #                t212 = int(s212,16)
+                    t213 = int(s213,16)
+
+                    # is meter in temp mode?
+                    # first check byte order
+                    if(((t213 & 0xf0) >> 4) != 14):
+                        #ERROR try again .....
+                        continue
+
+                    elif(((t213 & 0x0f) & 0x02) != 2 ):
+                        #ERROR
+                        # device seems not to be in temp mode, break here
+                        raise ValueError
+                    
+                    # convert
+                    bNegative = 0
+                    iDivisor = 0
+
+                    # first lets check the byte order
+                    # seg1 bytes
+                    if (((t201 & 0xf0) >> 4) == 2) and (((t202 & 0xf0) >> 4 ) == 3):
+                        seg1 = ((t201 & 0x0f) << 4) + (t202 & 0x0f)
+                    else:
+                        continue
+                        
+                    # seg2 bytes
+                    if (((t203 & 0xf0) >> 4) == 4) and (((t204 & 0xf0) >> 4 ) == 5):
+                        seg2 = ((t203 & 0x0f) << 4) + (t204 & 0x0f)
+                    else:
+                        continue
+                        
+                    # seg3 bytes
+                    if (((t205 & 0xf0) >> 4) == 6) and (((t206 & 0xf0) >> 4 ) == 7):
+                        seg3 = ((t205 & 0x0f) << 4) + (t206 & 0x0f)
+                    else:
+                        continue
+                        
+                    # seg4 bytes
+                    if (((t207 & 0xf0) >> 4) == 8) and (((t208 & 0xf0) >> 4 ) == 9):
+                        seg4 = ((t207 & 0x0f) << 4) + (t208 & 0x0f)
+                    else:
+                        continue
+                        
+                    # is negative?
+                    if (seg1 & 0x80):
+                        bNegative = 1
+                        seg1 = seg1 & ~0x80
+                    # check divisor
+                    if (seg2 & 0x80):
+                        iDivisor = 1000.
+                        seg2 = seg2 & ~0x80
+                    elif (seg3 & 0x80):
+                        iDivisor = 100.
+                        seg3 = seg3 & ~0x80        
+                    elif (seg4 & 0x80):
+                        iDivisor = 10.
+                        seg4 = seg4 & ~0x80
+                        
+                    iValue = 0
+                    fReturn = 0
+                    
+                    i = self.TEVA18Bconvert(seg1)
+                    if ( i < 0 ):
+                        # recv nonsense, try again
+                        continue
+
+                    iValue = i * 1000
+
+                    i = self.TEVA18Bconvert(seg2)
+                    if ( i < 0 ):
+                        # recv nonsense, try again
+                        continue
+
+                    iValue = iValue + (i * 100)
+                    i = self.TEVA18Bconvert(seg3)
+                    
+                    if ( i < 0 ):
+                        # recv nonsense, try again
+                        continue
+
+                    iValue = iValue + (i * 10)
+                    i = self.TEVA18Bconvert(seg4)
+                    
+                    if ( i < 0 ):
+                        # recv nonsense, try again
+                        continue
+                    
+                    iValue = iValue + i
+                    
+                    # what about the divisor?
+                    if( iDivisor > 0 ):
+                        fReturn = iValue / iDivisor
+                    # is value negative?
+                    if( fReturn ):
+                        if( bNegative ):
+                            fReturn = fReturn * (-1)
+                    
+                    #ok seems we got valid value
+                    # break loop here
+                    run = 0
                 
-                i = self.TEVA18Bconvert(seg1)
-                if ( i < 0 ):
-                     raise ValueError
-
-                iValue = i * 1000
-
-                i = self.TEVA18Bconvert(seg2)
-                if ( i < 0 ):
-                     raise ValueError
-
-                
-                iValue = iValue + (i * 100)
-                i = self.TEVA18Bconvert(seg3)
-                
-                if ( i < 0 ):
-                     raise ValueError
-
-                iValue = iValue + (i * 10)
-                i = self.TEVA18Bconvert(seg4)
-                
-                if ( i < 0 ):
-                     raise ValueError
-                
-                iValue = iValue + i
-
-        #       print ('Val: {0:d}'.format(iValue))
-
-                # what about the divisor?
-                if( iDivisor > 0 ):
-                    fReturn = iValue / iDivisor
-                # is value negative?
-                if( fReturn ):
-                    if( bNegative ):
-                        fReturn = fReturn * (-1)
-
-        #      print ('Return: {0:f}'.format(fReturn))
-
-
-                if fReturn <= -2000:
-                     raise ValueError
-                
-                #Since the meter reads only one temperature, send 0 as ET and fReturn as BT
-                if fReturn:
-                    return 0.,fReturn    #  **** RETURN T HERE  ******
-                else:
-                    raise ValueError
+            #Since the meter reads only one temperature, send 0 as ET and fReturn as BT
+            if fReturn:
+                return 0.,fReturn    #  **** RETURN T HERE  ******
+            else:
+                raise ValueError
 
         except ValueError:
             aw.qmc.adderror("Value Error: ser.TEVA18Btemperature() ")
