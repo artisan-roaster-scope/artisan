@@ -11,12 +11,12 @@
 <context>
     <name>Form Label</name>
     <message>
-        <location filename="artisan.py" line="10423"/>
+        <location filename="artisan.py" line="10445"/>
         <source>Comm Port</source>
         <translation>Port série</translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10429"/>
+        <location filename="artisan.py" line="10451"/>
         <source>Baud Rate</source>
         <translation>Bits par seconde</translation>
     </message>
@@ -350,162 +350,162 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="2323"/>
+        <location filename="artisan.py" line="2335"/>
         <source>Unable to move background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="2382"/>
+        <location filename="artisan.py" line="2394"/>
         <source>No finished profile found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="4102"/>
+        <location filename="artisan.py" line="4114"/>
         <source>Keyboard moves turned ON</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="4109"/>
+        <location filename="artisan.py" line="4121"/>
         <source>Keyboard moves turned OFF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="4533"/>
+        <location filename="artisan.py" line="4545"/>
         <source>Empty path or box unchecked in Autosave</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7260"/>
+        <location filename="artisan.py" line="7272"/>
         <source>No profile found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="4566"/>
+        <location filename="artisan.py" line="4578"/>
         <source>Invalid artisan format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="6058"/>
+        <location filename="artisan.py" line="6070"/>
         <source>HH506RA file loaded successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="5011"/>
+        <location filename="artisan.py" line="5023"/>
         <source>Profile saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="5039"/>
+        <location filename="artisan.py" line="5051"/>
         <source>Cancelled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="5025"/>
+        <location filename="artisan.py" line="5037"/>
         <source>Readings exported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="5037"/>
+        <location filename="artisan.py" line="5049"/>
         <source>Readings imported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="5994"/>
+        <location filename="artisan.py" line="6006"/>
         <source>K202 file loaded successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="6481"/>
+        <location filename="artisan.py" line="6493"/>
         <source>Testing Mike...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="6532"/>
+        <location filename="artisan.py" line="6544"/>
         <source>Sound turned ON</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="6536"/>
+        <location filename="artisan.py" line="6548"/>
         <source>Sound turned OFF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7275"/>
+        <location filename="artisan.py" line="7287"/>
         <source>No events found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7423"/>
+        <location filename="artisan.py" line="7435"/>
         <source>Roast properties updated but profile not saved to disk</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7550"/>
+        <location filename="artisan.py" line="7562"/>
         <source>Autosave OFF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="8107"/>
+        <location filename="artisan.py" line="8118"/>
         <source>Event types saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="8110"/>
+        <location filename="artisan.py" line="8121"/>
         <source>Found empty event type box</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="9684"/>
+        <location filename="artisan.py" line="9695"/>
         <source>Please connect T1 &amp; T2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="9689"/>
+        <location filename="artisan.py" line="9700"/>
         <source>T1 &amp; T2 connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10617"/>
+        <location filename="artisan.py" line="10639"/>
         <source>Port scan on this platform not yet supported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13734"/>
+        <location filename="artisan.py" line="13755"/>
         <source>Pattern did not changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13737"/>
+        <location filename="artisan.py" line="13758"/>
         <source>Ramp/Soak was found ON! Turn it off before changing the pattern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13739"/>
+        <location filename="artisan.py" line="13760"/>
         <source>Ramp/Soak was found in Hold! Turn it off before changing the pattern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14097"/>
+        <location filename="artisan.py" line="14118"/>
         <source>RS ON and running...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14099"/>
+        <location filename="artisan.py" line="14120"/>
         <source>RS OFF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14101"/>
+        <location filename="artisan.py" line="14122"/>
         <source>RS on HOLD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14189"/>
+        <location filename="artisan.py" line="14216"/>
         <source>Unable to set sv</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14191"/>
+        <location filename="artisan.py" line="14218"/>
         <source>Unable to set new sv</source>
         <translation type="unfinished"></translation>
     </message>
@@ -545,157 +545,157 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="2275"/>
+        <location filename="artisan.py" line="2287"/>
         <source>Computer Event # %1 recorded at BT = %2 Time = %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="4329"/>
+        <location filename="artisan.py" line="4341"/>
         <source>Profile %1 saved in: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="4417"/>
+        <location filename="artisan.py" line="4429"/>
         <source>Event #%1:  %2 has been updated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="4540"/>
+        <location filename="artisan.py" line="4552"/>
         <source>%1 has been saved. New roast has started</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="4580"/>
+        <location filename="artisan.py" line="4592"/>
         <source>%1  loaded successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="6116"/>
+        <location filename="artisan.py" line="6128"/>
         <source>%1  (%2x) saved</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="6596"/>
+        <location filename="artisan.py" line="6608"/>
         <source>[ET target = %1] [BT target =   (%2]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7257"/>
+        <location filename="artisan.py" line="7269"/>
         <source>Event #%1 added</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7272"/>
+        <location filename="artisan.py" line="7284"/>
         <source> Event #%1 deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7545"/>
+        <location filename="artisan.py" line="7557"/>
         <source>Autosave ON. Prefix: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7663"/>
+        <location filename="artisan.py" line="7675"/>
         <source>ylimit = (%1,%2) xlimit = (%3,%4)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="8303"/>
+        <location filename="artisan.py" line="8314"/>
         <source>Phases changed to %1 default: %2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10558"/>
+        <location filename="artisan.py" line="10580"/>
         <source>Serial Port Settings: %1, %2, %3, %4, %5, %6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10793"/>
+        <location filename="artisan.py" line="10815"/>
         <source>PID to control ET set to %1 %2 ; PID to read BT set to %3 %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10971"/>
+        <location filename="artisan.py" line="10993"/>
         <source>Device set to %1. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10961"/>
+        <location filename="artisan.py" line="10983"/>
         <source>Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10976"/>
+        <location filename="artisan.py" line="10998"/>
         <source>Device set to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10981"/>
+        <location filename="artisan.py" line="11003"/>
         <source>Device set to %1%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11001"/>
+        <location filename="artisan.py" line="11023"/>
         <source>Device set to %1. Now, check Serial Port settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11603"/>
+        <location filename="artisan.py" line="11625"/>
         <source>Color of %1 set to %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13732"/>
+        <location filename="artisan.py" line="13753"/>
         <source>Pattern changed to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14118"/>
+        <location filename="artisan.py" line="14139"/>
         <source>PXG sv#%1 set to %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14134"/>
+        <location filename="artisan.py" line="14157"/>
         <source>PXR sv set to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14163"/>
+        <location filename="artisan.py" line="14188"/>
         <source>SV%1 changed from %2 to %3)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14172"/>
+        <location filename="artisan.py" line="14197"/>
         <source>Unable to set sv%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14181"/>
+        <location filename="artisan.py" line="14206"/>
         <source> SV changed from %1 to %2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10851"/>
+        <location filename="artisan.py" line="10873"/>
         <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10911"/>
+        <location filename="artisan.py" line="10933"/>
         <source>Device set to %1, which is equivalent to CENTER 309. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10941"/>
+        <location filename="artisan.py" line="10963"/>
         <source>Device set to %1, which is equivalent to CENTER 303. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10921"/>
+        <location filename="artisan.py" line="10943"/>
         <source>Device set to %1, which is equivalent to CENTER 306. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10951"/>
+        <location filename="artisan.py" line="10973"/>
         <source>Device set to %1, which is equivalent to Omega HH506RA. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
@@ -711,7 +711,7 @@
 <context>
     <name>Scope Button</name>
     <message>
-        <location filename="artisan.py" line="3357"/>
+        <location filename="artisan.py" line="3369"/>
         <source>ON</source>
         <translation>MARCHE</translation>
     </message>
@@ -765,7 +765,7 @@
 <context>
     <name>Tooltip</name>
     <message>
-        <location filename="artisan.py" line="3362"/>
+        <location filename="artisan.py" line="3374"/>
         <source>Starts recording</source>
         <translation>Démarre l&apos;enregistrement</translation>
     </message>
