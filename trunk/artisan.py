@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.4.0"
+__version__ = u"0.4.1"
 
 
 # ABOUT
@@ -5043,7 +5043,7 @@ class ApplicationWindow(QMainWindow):
             
     def fileImport(self):
         try:         
-            filename = aw.ArtisanOpenFileDialog(msg="Import CSV",ext="*.csv")
+            filename = aw.ArtisanOpenFileDialog(msg="Import CSV")
             if filename:
                 self.importCSV(filename)
                 self.sendmessage(QApplication.translate("Message Area","Readings imported", None, QApplication.UnicodeUTF8))
@@ -5953,7 +5953,7 @@ $cupping_notes
             
     def importK202(self):
         try:
-            filename = aw.ArtisanOpenFileDialog(msg=u"Import K202 CSV",ext="*.csv")
+            filename = aw.ArtisanOpenFileDialog(msg=u"Import K202 CSV")
             if  filename == "":
                 return
             self.qmc.reset()
@@ -6017,7 +6017,7 @@ $cupping_notes
             
     def importHH506RA(self):
         try:
-            filename = aw.ArtisanOpenFileDialog(msg=u"Import HH506RA CSV",ext="*.csv")
+            filename = aw.ArtisanOpenFileDialog(msg=u"Import HH506RA CSV")
             if  filename == "":
                 return
             self.qmc.reset()

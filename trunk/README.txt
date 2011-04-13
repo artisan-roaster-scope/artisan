@@ -115,6 +115,11 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.4.1 (13.4.2011)
+- import of CSV is not limited anymore to filenames with "csv" extension
+- improved VA18B support
+- Windows binary includes the language translations that were missing in v0.4.0
+
 v0.4.0 (10.4.2011)
 - improved CSV import/export
 - K202 CSV support added
