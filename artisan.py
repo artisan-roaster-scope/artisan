@@ -3591,34 +3591,34 @@ class ApplicationWindow(QMainWindow):
 
         #MET
         label2 = QLabel()
-        label2.setText( "<font color='black'><b>ET<\b></font>")
+        label2.setText(QApplication.translate("Form Label", "<font color='black'><b>ET<\b></font>",None, QApplication.UnicodeUTF8))
         label2.setAlignment(Qt.AlignRight)
         label2.setIndent(5)
         #BT
         label3 = QLabel()
         label3.setAlignment(Qt.AlignRight)
-        label3.setText( "<font color='black'><b>BT<\b></font>")
+        label3.setText(QApplication.translate("Form Label", "<font color='black'><b>BT<\b></font>",None, QApplication.UnicodeUTF8))
         label3.setIndent(5)
         #DELTA MET
         label4 = QLabel()
         label4.setAlignment(Qt.AlignRight)
-        label4.setText( "<font color='black'><b>DeltaET<\b></font>")
+        label4.setText(QApplication.translate("Form Label", "<font color='black'><b>DeltaET<\b></font>",None, QApplication.UnicodeUTF8))
         label4.setIndent(5)
         # DELTA BT
         label5 = QLabel()
         label5.setAlignment(Qt.AlignRight)       
-        label5.setText( "<font color='black'><b>DeltaBT<\b></font>")
+        label5.setText(QApplication.translate("Form Label", "<font color='black'><b>DeltaBT<\b></font>",None, QApplication.UnicodeUTF8))
         label5.setIndent(5)
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.AlignRight)
-        self.label6.setText( "<font color='black'><b>PID SV<\b></font>")
+        self.label6.setText(QApplication.translate("Form Label", "<font color='black'><b>PID SV<\b></font>",None, QApplication.UnicodeUTF8))
         self.label6.setIndent(5)
 
         self.messagehist = []
 
         #convenience EVENT mini editor; View&Edits events without opening roast properties Dlg.
-        self.eventlabel = QLabel("Event #<b>0 </b>")
+        self.eventlabel = QLabel(QApplication.translate("Form Label","Event #<b>0 </b>", None, QApplication.UnicodeUTF8))
         self.eventlabel.setIndent(5)
         self.eNumberSpinBox = QSpinBox()
         
@@ -6263,11 +6263,11 @@ class HUDDlg(QDialog):
         self.org_Sensitivity = aw.qmc.sensitivity
         self.org_Projection = aw.qmc.projectFlag
         
-        ETLabel = QLabel("ET Target")
+        ETLabel = QLabel(QApplication.translate("Form Label", "ET Target",None, QApplication.UnicodeUTF8))
         ETLabel.setAlignment(Qt.AlignRight)
-        BTLabel = QLabel("BT Target")
+        BTLabel = QLabel(QApplication.translate("Form Label", "BT Target",None, QApplication.UnicodeUTF8))
         BTLabel.setAlignment(Qt.AlignRight)        
-        modeLabel = QLabel("Mode")
+        modeLabel = QLabel(QApplication.translate("Form Label", "Mode",None, QApplication.UnicodeUTF8))
         modeLabel.setAlignment(Qt.AlignRight)
 
         #delta ET    
@@ -6284,7 +6284,7 @@ class HUDDlg(QDialog):
         else:
             self.DeltaBT.setChecked(False)
             
-        filterlabel = QLabel("Filter")
+        filterlabel = QLabel(QApplication.translate("Form Label", "Filter",None, QApplication.UnicodeUTF8))
         #DeltaFilter holds the number of pads in filter  
         self.DeltaFilter = QSpinBox()
         self.DeltaFilter.setRange(0,20)
@@ -6293,7 +6293,7 @@ class HUDDlg(QDialog):
     	
         #show projection
         self.projectCheck = QCheckBox("Projection")
-        projectionmodeLabel = QLabel("Mode")
+        projectionmodeLabel = QLabel(QApplication.translate("Form Label", "Mode",None, QApplication.UnicodeUTF8))
         self.projectionmodeComboBox = QComboBox()
         self.projectionmodeComboBox.addItems(["linear","newton"])
         self.projectionmodeComboBox.setCurrentIndex(aw.qmc.projectionmode)
@@ -6309,7 +6309,7 @@ class HUDDlg(QDialog):
         self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.changeProjection(i)) #toggle
             
         self.sensitivityValues = map(str,range(10,0,-1))
-        self.sensitivitylabel  = QLabel("Sensitivity")                          
+        self.sensitivitylabel  = QLabel(QApplication.translate("Form Label", "Sensitivity",None, QApplication.UnicodeUTF8))                          
         self.sensitivityComboBox = QComboBox()
         self.sensitivityComboBox.addItems(self.sensitivityValues)
         try:
@@ -6631,7 +6631,7 @@ class editGraphDlg(QDialog):
         regexweight = QRegExp(r"^[0-9]{1,3}[.0-9]{1,2}$")
 
         #MARKERS
-        chargelabel  = QLabel("<b>CHARGE</b>")
+        chargelabel  = QLabel(QApplication.translate("Form Label", "<b>CHARGE</b>",None, QApplication.UnicodeUTF8))
         chargelabel.setStyleSheet("background-color:'#f07800';")
 
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
@@ -6641,7 +6641,7 @@ class editGraphDlg(QDialog):
         self.chargeedit.setMinimumWidth(50)
         chargelabel.setBuddy(self.chargeedit)
 
-        drylabel  = QLabel("<b>DRY END</b>")
+        drylabel  = QLabel(QApplication.translate("Form Label", "<b>DRY END</b>",None, QApplication.UnicodeUTF8))
         drylabel.setStyleSheet("background-color:'orange';")
         
         if aw.qmc.timeindex[1]:
@@ -6746,17 +6746,17 @@ class editGraphDlg(QDialog):
         self.createDataTable()        
            
         #TITLE
-        titlelabel = QLabel("<b>Title</b>")
+        titlelabel = QLabel(QApplication.translate("Form Label", "<b>Title</b>",None, QApplication.UnicodeUTF8))
         self.titleedit = QLineEdit(aw.qmc.title)
         #Date
-        datelabel1 = QLabel("<b>Date</b>")
+        datelabel1 = QLabel(QApplication.translate("Form Label", "<b>Date</b>",None, QApplication.UnicodeUTF8))
         date = aw.qmc.roastdate.toString()
         dateedit = QLineEdit(date)
         dateedit.setReadOnly(True)
         dateedit.setStyleSheet("background-color:'lightgrey'")
 
         #Beans
-        beanslabel = QLabel("<b>Beans</b>")
+        beanslabel = QLabel(QApplication.translate("Form Label", "<b>Beans</b>",None, QApplication.UnicodeUTF8))
         self.beansedit = QTextEdit()
         self.beansedit.setMaximumHeight(100)
 
@@ -6769,9 +6769,9 @@ class editGraphDlg(QDialog):
         self.operator = QLineEdit(aw.qmc.operator)
         
         #weight
-        weightlabel = QLabel("<b>Weight</b> ")
-        weightinlabel = QLabel(" in")
-        weightoutlabel = QLabel(" out")
+        weightlabel = QLabel(QApplication.translate("Form Label", "<b>Weight </b>",None, QApplication.UnicodeUTF8))
+        weightinlabel = QLabel(QApplication.translate("Form Label", " in",None, QApplication.UnicodeUTF8))
+        weightoutlabel = QLabel(QApplication.translate("Form Label", " out",None, QApplication.UnicodeUTF8))
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw) 
@@ -6783,7 +6783,7 @@ class editGraphDlg(QDialog):
         self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
         self.weightoutedit.setMinimumWidth(55)
         self.weightoutedit.setMaximumWidth(55)
-        self.weightpercentlabel = QLabel(" %")
+        self.weightpercentlabel = QLabel(QApplication.translate("Form Label", " %",None, QApplication.UnicodeUTF8))
         self.weightpercentlabel.setMinimumWidth(45)
         self.weightpercentlabel.setMaximumWidth(45)
         self.roastdegreelabel = QLabel("")
@@ -6804,9 +6804,9 @@ class editGraphDlg(QDialog):
             self.unitsComboBox.setCurrentIndex(1)
         
         #volume
-        volumelabel = QLabel("<b>Volume</b> ")
-        volumeinlabel = QLabel(" in")
-        volumeoutlabel = QLabel(" out")
+        volumelabel = QLabel(QApplication.translate("Form Label", "<b>Volume </b>",None, QApplication.UnicodeUTF8))
+        volumeinlabel = QLabel(QApplication.translate("Form Label", " in",None, QApplication.UnicodeUTF8))
+        volumeoutlabel = QLabel(QApplication.translate("Form Label", " out",None, QApplication.UnicodeUTF8))
         inv = str(aw.qmc.volume[0])
         outv = str(aw.qmc.volume[1])
         self.volumeinedit = QLineEdit(inv) 
@@ -6844,7 +6844,7 @@ class editGraphDlg(QDialog):
         self.connect(self.unitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
 
         #density
-        bean_density_label = QLabel("<b>Density </b>")
+        bean_density_label = QLabel(QApplication.translate("Form Label", "<b>Density </b>",None, QApplication.UnicodeUTF8))
         self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
         self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_weight_edit))
         self.bean_density_weight_edit.setMinimumWidth(55)
@@ -6857,7 +6857,7 @@ class editGraphDlg(QDialog):
             self.bean_density_weightUnitsComboBox.setCurrentIndex(0)
         else:
             self.bean_density_weightUnitsComboBox.setCurrentIndex(1)
-        bean_density_per_label = QLabel("per")
+        bean_density_per_label = QLabel(QApplication.translate("Form Label", "per",None, QApplication.UnicodeUTF8))
         self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
         self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
         self.bean_density_volume_edit.setMinimumWidth(55)
@@ -6878,14 +6878,14 @@ class editGraphDlg(QDialog):
 
 
         #bag humidity
-        bag_humidity_label = QLabel("<b>Storage Humidity </b>")
+        bag_humidity_label = QLabel(QApplication.translate("Form Label", "<b>Storage Humidity </b>",None, QApplication.UnicodeUTF8))
         bag_humidity_unitslabel = QLabel(aw.qmc.mode)
-        bag_humidity_unit_label = QLabel("%")
+        bag_humidity_unit_label = QLabel(QApplication.translate("Form Label", "%",None, QApplication.UnicodeUTF8))
         self.humidity_edit = QLineEdit()
         self.humidity_edit.setText(unicode(aw.qmc.bag_humidity[0]))
         self.humidity_edit.setMaximumWidth(50)
         self.humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.humidity_edit))
-        bag_humidity_at_label = QLabel("at")
+        bag_humidity_at_label = QLabel(QApplication.translate("Form Label", "at",None, QApplication.UnicodeUTF8))
         self.bag_temp_edit = QLineEdit( )
         self.bag_temp_edit.setText(unicode(aw.qmc.bag_humidity[1]))
         self.bag_temp_edit.setMaximumWidth(50)
@@ -6896,7 +6896,7 @@ class editGraphDlg(QDialog):
         
 
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>Ambient Temperature</b>")
+        ambientlabel = QLabel(QApplication.translate("Form Label", "<b>Ambient Temperature</b>",None, QApplication.UnicodeUTF8))
         ambientunitslabel = QLabel(aw.qmc.mode)
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
@@ -6908,16 +6908,16 @@ class editGraphDlg(QDialog):
   
         # NOTES
         roastertypelabel = QLabel()
-        roastertypelabel.setText("<b>Roaster<\b>")
+        roastertypelabel.setText(QApplication.translate("Form Label", "<b>Roaster</b>",None, QApplication.UnicodeUTF8))
 
         operatorlabel = QLabel()
-        operatorlabel.setText("<b>Operator<\b>")
+        operatorlabel.setText(QApplication.translate("Form Label", "<b>Operator</b>",None, QApplication.UnicodeUTF8))
 
-        roastinglabel = QLabel("<b>Roasting Notes<\b>")
+        roastinglabel = QLabel(QApplication.translate("Form Label", "<b>Roasting Notes</b>",None, QApplication.UnicodeUTF8))
         self.roastingeditor = QTextEdit()
         self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
 
-        cuppinglabel = QLabel("<b>Cupping Notes<\b>")
+        cuppinglabel = QLabel(QApplication.translate("Form Label", "<b>Cupping Notes</b>",None, QApplication.UnicodeUTF8))
         self.cuppingeditor =  QTextEdit()
         self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
         
@@ -7451,7 +7451,9 @@ class errorDlg(QDialog):
             htmlerr += "<b>" + str(len(aw.qmc.errorlog)-i) + "</b> <i>" + aw.qmc.errorlog[-i-1] + "</i><br><br>"
 
         enumber = len(aw.qmc.errorlog)
-        labelstr =  "Number of errors found <b>" + unicode(enumber) +"</b>"
+    
+        labelstr =  QApplication.translate("Form Label","Number of errors found %1</b>", None, QApplication.UnicodeUTF8).arg(unicode(enumber))
+
         elabel = QLabel(labelstr)
         errorEdit = QTextEdit()
         errorEdit.setHtml(htmlerr)
@@ -7478,7 +7480,7 @@ class messageDlg(QDialog):
             htmlmessage += "<b>" + str(len(aw.messagehist)-i) + "</b> <i>" + aw.messagehist[-i-1] + "</i><br><br>"
 
         linenumber = len(aw.messagehist)
-        labelstr =  "Last stacked messages"
+        labelstr =  QApplication.translate("Form Label", "Last stacked messages",None, QApplication.UnicodeUTF8)
         mlabel = QLabel(labelstr)
         messageEdit = QTextEdit()
         messageEdit.setHtml(htmlmessage)
@@ -7574,10 +7576,10 @@ class WindowsDlg(QDialog):
         
         self.setModal(True)
 
-        ylimitLabel = QLabel("Max")
-        ylimitLabel_min = QLabel("Min")
-        xlimitLabel = QLabel("Max")
-        xlimitLabel_min = QLabel("Min")
+        ylimitLabel = QLabel(QApplication.translate("Form Label", "Max",None, QApplication.UnicodeUTF8))
+        ylimitLabel_min = QLabel(QApplication.translate("Form Label", "Min",None, QApplication.UnicodeUTF8))
+        xlimitLabel = QLabel(QApplication.translate("Form Label", "Max",None, QApplication.UnicodeUTF8))
+        xlimitLabel_min = QLabel(QApplication.translate("Form Label", "Min",None, QApplication.UnicodeUTF8))
         self.ylimitEdit = QLineEdit()
         self.ylimitEdit_min = QLineEdit()
         self.xlimitEdit = QLineEdit()
@@ -7697,12 +7699,12 @@ class calculatorDlg(QDialog):
         self.setWindowTitle("Roast Calculator")
        
         #RATE OF CHANGE
-        self.result1 = QLabel("Enter two times along profile")
+        self.result1 = QLabel(QApplication.translate("Form Label", "Enter two times along profile",None, QApplication.UnicodeUTF8))
         self.result2 = QLabel()
         self.result2.setStyleSheet("background-color:'lightgrey';")
 
-        startlabel = QLabel("Start (00:00)")
-        endlabel = QLabel("End (00:00)")
+        startlabel = QLabel(QApplication.translate("Form Label", "Start (00:00)",None, QApplication.UnicodeUTF8))
+        endlabel = QLabel(QApplication.translate("Form Label", "End (00:00)",None, QApplication.UnicodeUTF8))
         self.startEdit = QLineEdit()
         self.endEdit = QLineEdit()
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
@@ -7727,8 +7729,8 @@ class calculatorDlg(QDialog):
 
 
         #TEMPERATURE CONVERSION
-        flabel = QLabel("Fahrenheit")
-        clabel = QLabel("Celsius")
+        flabel = QLabel(QApplication.translate("Form Label", "Fahrenheit",None, QApplication.UnicodeUTF8))
+        clabel = QLabel(QApplication.translate("Form Label", "Celsius",None, QApplication.UnicodeUTF8))
         self.faEdit = QLineEdit()
         self.ceEdit = QLineEdit()                
         self.faEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.faEdit))
@@ -7998,10 +8000,10 @@ class EventsDlg(QDialog):
             self.eventsGraphflag.setChecked(False)
         self.connect(self.eventsGraphflag,SIGNAL("stateChanged(int)"),self.eventsGraphflagChanged)
 
-        typelabel1 = QLabel("1")
-        typelabel2 = QLabel("2")
-        typelabel3 = QLabel("3")
-        typelabel4 = QLabel("4")
+        typelabel1 = QLabel(QApplication.translate("Form Label", "1",None, QApplication.UnicodeUTF8))
+        typelabel2 = QLabel(QApplication.translate("Form Label", "2",None, QApplication.UnicodeUTF8))
+        typelabel3 = QLabel(QApplication.translate("Form Label", "3",None, QApplication.UnicodeUTF8))
+        typelabel4 = QLabel(QApplication.translate("Form Label", "4",None, QApplication.UnicodeUTF8))
         
         self.etype0 = QLineEdit(aw.qmc.etypes[0])
         self.etype1 = QLineEdit(aw.qmc.etypes[1])
@@ -8141,9 +8143,9 @@ class phasesGraphDlg(QDialog):
         
         self.phases = list(aw.qmc.phases)
 
-        dryLabel = QLabel("Dry")
-        midLabel = QLabel("Mid")
-        finishLabel = QLabel("Finish")
+        dryLabel = QLabel(QApplication.translate("Form Label", "Dry",None, QApplication.UnicodeUTF8))
+        midLabel = QLabel(QApplication.translate("Form Label", "Mid",None, QApplication.UnicodeUTF8))
+        finishLabel = QLabel(QApplication.translate("Form Label", "Finish",None, QApplication.UnicodeUTF8))
 
         self.startdry = QSpinBox()
         self.enddry = QSpinBox()
@@ -8483,8 +8485,7 @@ class flavorDlg(QDialog):
         self.connect(backButton,SIGNAL("clicked()"),self.close)
         self.connect(defaultButton,SIGNAL("clicked()"),self.defaultlabels)
 
-
-        self.sumLabel = QLabel("total: %i"%aw.cuppingSum())
+        self.sumLabel = QLabel(QApplication.translate("Form Label","total: %1", None, QApplication.UnicodeUTF8)).arg(aw.cuppingSum())
         self.sumLabel.setAlignment(Qt.AlignRight)
 
         flavorLayout = QGridLayout()
@@ -8624,21 +8625,21 @@ class backgroundDLG(QDialog):
         self.speedSpinBox.setSingleStep(10)
         self.speedSpinBox.setValue(30)
         
-        intensitylabel =QLabel("Opaqueness")
+        intensitylabel =QLabel(QApplication.translate("Form Label", "Opaqueness",None, QApplication.UnicodeUTF8))
         intensitylabel.setAlignment(Qt.AlignRight)
         self.intensitySpinBox = QSpinBox()
         self.intensitySpinBox.setRange(1,9)
         self.intensitySpinBox.setSingleStep(1)
         self.intensitySpinBox.setValue(3)
 
-        widthlabel =QLabel("Line Width")
+        widthlabel =QLabel(QApplication.translate("Form Label", "Line Width",None, QApplication.UnicodeUTF8))
         widthlabel.setAlignment(Qt.AlignRight)
         self.widthSpinBox = QSpinBox()
         self.widthSpinBox.setRange(1,20)
         self.widthSpinBox.setSingleStep(1)
         self.widthSpinBox.setValue(2)
 
-        stylelabel =QLabel("Line Style")
+        stylelabel =QLabel(QApplication.translate("Form Label", "Line Style",None, QApplication.UnicodeUTF8))
         stylelabel.setAlignment(Qt.AlignRight)        
         self.styleComboBox = QComboBox()
         self.styleComboBox.addItems(["-","--",":","-.","steps"])
@@ -8653,13 +8654,13 @@ class backgroundDLG(QDialog):
         colors.insert(1,u"bt")
         colors.pop(2)
         
-        btcolorlabel = QLabel("BT color")
+        btcolorlabel = QLabel(QApplication.translate("Form Label", "BT Color",None, QApplication.UnicodeUTF8))
         btcolorlabel.setAlignment(Qt.AlignRight)        
         self.btcolorComboBox = QComboBox()
         self.btcolorComboBox.addItems(colors)
         self.btcolorComboBox.setCurrentIndex(1)
 
-        metcolorlabel = QLabel("MET color")
+        metcolorlabel = QLabel(QApplication.translate("Form Label", "MET Color",None, QApplication.UnicodeUTF8))
         metcolorlabel.setAlignment(Qt.AlignRight)        
         self.metcolorComboBox = QComboBox()
         self.metcolorComboBox.addItems(colors)
@@ -8708,7 +8709,7 @@ class backgroundDLG(QDialog):
             self.backgroundReproduce.setChecked(False)    	
         self.connect(self.backgroundReproduce, SIGNAL("stateChanged(int)"),self.setreproduce)
 
-        etimelabel =QLabel("Text warning time (seconds)")
+        etimelabel =QLabel(QApplication.translate("Form Label", "Text warning time (seconds)",None, QApplication.UnicodeUTF8))
         self.etimeSpinBox = QSpinBox()
         self.etimeSpinBox.setRange(1,60)
         self.etimeSpinBox.setValue(aw.qmc.detectBackgroundEventTime)
@@ -9154,11 +9155,11 @@ class StatisticsDLG(QDialog):
         self.minfinishedit.setValidator(QRegExpValidator(regextime,self))
         self.maxfinishedit.setValidator(QRegExpValidator(regextime,self))
 
-        drylabel =QLabel("Dry")
-        midlabel =QLabel("Mid")
-        finishlabel =QLabel("Finish")
-        minf = QLabel("Min")
-        maxf = QLabel("Max")
+        drylabel =QLabel(QApplication.translate("Form Label", "Dry",None, QApplication.UnicodeUTF8))
+        midlabel =QLabel(QApplication.translate("Form Label", "Mid",None, QApplication.UnicodeUTF8))
+        finishlabel =QLabel(QApplication.translate("Form Label", "Finish",None, QApplication.UnicodeUTF8))
+        minf = QLabel(QApplication.translate("Form Label", "Min",None, QApplication.UnicodeUTF8))
+        maxf = QLabel(QApplication.translate("Form Label", "Max",None, QApplication.UnicodeUTF8))
 
         #temp fix for possible bug aw.qmc.statisticsflags=[] > empty list out of range
         if aw.qmc.statisticsflags:
@@ -9977,7 +9978,7 @@ class designerconfigDlg(QDialog):
         self.setWindowTitle("Designer Config")
 
         #landmarks
-        charge = QLabel("CHARGE")
+        charge = QLabel(QApplication.translate("Form Label", "CHARGE",None, QApplication.UnicodeUTF8))
         charge.setStyleSheet("background-color: #f07800")
         self.dryend = QCheckBox("DRY END")
         self.dryend.setStyleSheet("background-color: orange")
@@ -9989,7 +9990,7 @@ class designerconfigDlg(QDialog):
         self.scs.setStyleSheet("background-color: orange")
         self.sce = QCheckBox("SC END")
         self.sce.setStyleSheet("background-color: orange")
-        drop = QLabel("DROP")
+        drop = QLabel(QApplication.translate("Form Label", "DROP",None, QApplication.UnicodeUTF8))
         drop.setStyleSheet("background-color: #f07800")
 
 
@@ -10058,9 +10059,9 @@ class designerconfigDlg(QDialog):
         self.Edit5.setMaximumWidth(50)
         self.Edit6.setMaximumWidth(50)
 
-        splinelabel = QLabel("Curviness")
-        etcurviness = QLabel("ET")
-        btcurviness = QLabel("BT")
+        splinelabel = QLabel(QApplication.translate("Form Label", "Curviness",None, QApplication.UnicodeUTF8))
+        etcurviness = QLabel(QApplication.translate("Form Label", "ET",None, QApplication.UnicodeUTF8))
+        btcurviness = QLabel(QApplication.translate("Form Label", "BT",None, QApplication.UnicodeUTF8))
         etcurviness.setAlignment(Qt.AlignRight)
         btcurviness.setAlignment(Qt.AlignRight)
         self.ETsplineComboBox = QComboBox()
@@ -10076,7 +10077,7 @@ class designerconfigDlg(QDialog):
         self.connect(self.BTsplineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
 
 
-        reproducelabel = QLabel("Events Playback")
+        reproducelabel = QLabel(QApplication.translate("Form Label", "Events Playback",None, QApplication.UnicodeUTF8))
         self.reproduceComboBox = QComboBox()
         self.reproduceComboBox.addItems(["None",
                                          "BT Rate of Change",
@@ -10380,7 +10381,7 @@ class nonedevDlg(QDialog):
             btval = "0"
         
         self.etEdit = QLineEdit(etval)
-        btlabel = QLabel("BT")
+        btlabel = QLabel(QApplication.translate("Form Label", "BT",None, QApplication.UnicodeUTF8))
         self.btEdit = QLineEdit(btval)
         self.etEdit.setValidator(QIntValidator(0, 1000, self.etEdit))
         self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
@@ -10463,7 +10464,7 @@ class comportDlg(QDialog):
         else:
             pass
                    
-        bytesizelabel = QLabel("Byte Size")
+        bytesizelabel = QLabel(QApplication.translate("Form Label", "Byte Size",None, QApplication.UnicodeUTF8))
         self.bytesizeComboBox = QComboBox()
         bytesizelabel.setBuddy(self.bytesizeComboBox)
         self.bytesizeComboBox.addItems(["8","7"])
@@ -10474,10 +10475,10 @@ class comportDlg(QDialog):
         else:
             pass
 
-        paritylabel = QLabel("Parity")
+        paritylabel = QLabel(QApplication.translate("Form Label", "Parity",None, QApplication.UnicodeUTF8))
         self.parityComboBox = QComboBox()
         paritylabel.setBuddy(self.parityComboBox)
-        self.parityComboBox.addItems(["O","E","N"])
+        self.parityComboBox.addItems([QApplication.translate("Form ComboBox", "O",None, QApplication.UnicodeUTF8),QApplication.translate("Form ComboBox", "E",None, QApplication.UnicodeUTF8),QApplication.translate("Form ComboBox", "N",None, QApplication.UnicodeUTF8)])
         if aw.ser.parity == "O":
             self.parityComboBox.setCurrentIndex(0)
         elif aw.ser.parity == "E":
@@ -10488,7 +10489,7 @@ class comportDlg(QDialog):
             pass
 
         
-        stopbitslabel = QLabel("Stopbits")
+        stopbitslabel = QLabel(QApplication.translate("Form Label", "Stopbits",None, QApplication.UnicodeUTF8))
         self.stopbitsComboBox = QComboBox()
         stopbitslabel.setBuddy(self.stopbitsComboBox)
         self.stopbitsComboBox.addItems(["1","0","2"])
@@ -10501,7 +10502,7 @@ class comportDlg(QDialog):
         else:
             pass
         
-        timeoutlabel = QLabel("Timeout")
+        timeoutlabel = QLabel(QApplication.translate("Form Label", "Timeout",None, QApplication.UnicodeUTF8))
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
         regex = QRegExp(r"^[0-9]$")
         self.timeoutEdit.setValidator(QRegExpValidator(regex,self))
@@ -10682,16 +10683,16 @@ class DeviceAssignmentDLG(QDialog):
         self.devicetypeComboBox = QComboBox()
         self.devicetypeComboBox.addItems(sorted_devices)
         
-        controllabel =QLabel("Control ET")                            
+        controllabel =QLabel(QApplication.translate("Form Label", "Control ET",None, QApplication.UnicodeUTF8))                            
         self.controlpidtypeComboBox = QComboBox()
         self.controlpidunitidComboBox = QComboBox()
         self.controlpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR"])
         self.controlpidunitidComboBox.addItems(["1","2"])
 
-        label1 = QLabel("Type") 
-        label2 = QLabel("Unit ID")
+        label1 = QLabel(QApplication.translate("Form Label", "Type",None, QApplication.UnicodeUTF8)) 
+        label2 = QLabel(QApplication.translate("Form Label", "Unit ID",None, QApplication.UnicodeUTF8))
 
-        btlabel =QLabel("Read BT")                            
+        btlabel =QLabel(QApplication.translate("Form Label", "Read BT",None, QApplication.UnicodeUTF8))                            
         self.btpidtypeComboBox = QComboBox()
         self.btpidunitidComboBox = QComboBox()
         self.btpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR"])
@@ -11206,12 +11207,12 @@ class graphColorDlg(QDialog):
         self.connect(greyButton, SIGNAL("clicked()"),lambda x=2:self.recolor(x))             
 
         #TAB 2
-        lcd1label = QLabel("Timer")
-        lcd2label = QLabel("ET")
-        lcd3label = QLabel("BT")
-        lcd4label = QLabel("Delta ET")
-        lcd5label = QLabel("Dleta BT")
-        lcd6label = QLabel("SV")
+        lcd1label = QLabel(QApplication.translate("Form Label", "Timer",None, QApplication.UnicodeUTF8))
+        lcd2label = QLabel(QApplication.translate("Form Label", "ET",None, QApplication.UnicodeUTF8))
+        lcd3label = QLabel(QApplication.translate("Form Label", "BT",None, QApplication.UnicodeUTF8))
+        lcd4label = QLabel(QApplication.translate("Form Label", "Delta ET",None, QApplication.UnicodeUTF8))
+        lcd5label = QLabel(QApplication.translate("Form Label", "Delta BT",None, QApplication.UnicodeUTF8))
+        lcd6label = QLabel(QApplication.translate("Form Label", "SV",None, QApplication.UnicodeUTF8))
 
         lcdcolors = ["","grey","darkGrey","slateGrey","lightGray","black","white","transparent"]
         self.lcd1colorComboBox =  QComboBox()
@@ -11812,16 +11813,16 @@ class PXRpidDlgControl(QDialog):
         self.labelrs1 = QLabel()
         self.labelrs1.setMargin(5)
         self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs1.setText( "<font color='white'><b>Ramp/Soak<br>(1-4)<\b></font>")
+        self.labelrs1.setText(QApplication.translate("Form Label", "<font color='white'><b>Ramp/Soak<br>(1-4)<\b></font>",None, QApplication.UnicodeUTF8))
         self.labelrs1.setMaximumSize(90, 62)
 
         self.labelrs2 = QLabel()
         self.labelrs2.setMargin(5)
         self.labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs2.setText( "<font color='white'><b>Ramp/Soak<br>(5-8)<\b></font>")
+        self.labelrs2.setText(QApplication.translate("Form Label", "<font color='white'><b>Ramp/Soak<br>(5-8)<\b></font>",None, QApplication.UnicodeUTF8))
         self.labelrs2.setMaximumSize(90, 62)
 
-        labelpattern = QLabel("Ramp/Soak Pattern")
+        labelpattern = QLabel(QApplication.translate("Form Label", "Ramp/Soak Pattern",None, QApplication.UnicodeUTF8))
         self.patternComboBox =  QComboBox()
         self.patternComboBox.addItems(["1-4","5-8","1-8"])
         self.patternComboBox.setCurrentIndex(aw.pid.PXR["rampsoakpattern"][0])
@@ -11871,10 +11872,10 @@ class PXRpidDlgControl(QDialog):
         self.connect(tab2cancelbutton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(tab2easyONsvbutton, SIGNAL("clicked()"), lambda flag=1: aw.pid.activateONOFFeasySV(flag))
         self.connect(tab2easyOFFsvbutton, SIGNAL("clicked()"), lambda flag=0: aw.pid.activateONOFFeasySV(flag))
-        svwarning1 = QLabel("<CENTER><b>WARNING</b><br>Writing eeprom memory<br><u>Max life</u> 10,000 writes<br>"
-                            "Infinite read life.</CENTER>")
-        svwarning2 = QLabel("<CENTER><b>WARNING</b><br>After <u>writing</u> an adjustment,<br>never power down the pid<br>"
-                            "for the nex 5 seconds <br>or the pid may never recover.<br>Read operations manual</CENTER>")
+        svwarning1 = QLabel(QApplication.translate("Form Label", "<CENTER><b>WARNING</b><br>Writing eeprom memory<br><u>Max life</u> 10,000 writes<br>"
+                            "Infinite read life.</CENTER>",None, QApplication.UnicodeUTF8))
+        svwarning2 = QLabel(QApplication.translate("Form Label", "<CENTER><b>WARNING</b><br>After <u>writing</u> an adjustment,<br>never power down the pid<br>"
+                            "for the next 5 seconds <br>or the pid may never recover.<br>Read operations manual</CENTER>",None, QApplication.UnicodeUTF8))
         self.svedit = QLineEdit()
         self.svedit.setValidator(QDoubleValidator(0., 999., 1, self.svedit))
         
@@ -11882,9 +11883,9 @@ class PXRpidDlgControl(QDialog):
         button_p = QPushButton("Set p")
         button_i = QPushButton("Set i")
         button_d = QPushButton("Set d")
-        plabel =  QLabel("p")
-        ilabel =  QLabel("i")
-        dlabel =  QLabel("d")
+        plabel =  QLabel(QApplication.translate("Form Label", "p",None, QApplication.UnicodeUTF8))
+        ilabel =  QLabel(QApplication.translate("Form Label", "i",None, QApplication.UnicodeUTF8))
+        dlabel =  QLabel(QApplication.translate("Form Label", "d",None, QApplication.UnicodeUTF8))
         self.pedit = QLineEdit(str(aw.pid.PXR["p"][0]))
         self.iedit = QLineEdit(str(aw.pid.PXR["i"][0]))
         self.dedit = QLineEdit(str(aw.pid.PXR["d"][0]))
@@ -12554,14 +12555,14 @@ class PXG4pidDlgControl(QDialog):
         labelrs1 = QLabel()
         labelrs1.setMargin(5)
         labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs1.setText( "<font color='white'><b>RampSoak<br>(1-7)<\b></font>")
+        labelrs1.setText(QApplication.translate("Form Label", "<font color='white'><b>RampSoak<br>(1-7)<\b></font>",None, QApplication.UnicodeUTF8))
         #labelrs1.setMaximumSize(90, 42)
         #labelrs1.setMinimumHeight(50)
 
         labelrs2 = QLabel()
         labelrs2.setMargin(5)
         labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs2.setText( "<font color='white'><b>RampSoak<br>(8-16)<\b></font>")
+        labelrs2.setText(QApplication.translate("Form Label", "<font color='white'><b>RampSoak<br>(8-16)<\b></font>",None, QApplication.UnicodeUTF8))
         #labelrs2.setMaximumSize(90, 42)
         #labelrs2.setMinimumHeight(50)
 
@@ -12605,7 +12606,7 @@ class PXG4pidDlgControl(QDialog):
         
         self.paintlabels()
 
-        patternlabel = QLabel("Pattern")
+        patternlabel = QLabel(QApplication.translate("Form Label", "Pattern",None, QApplication.UnicodeUTF8))
         patternlabel.setAlignment(Qt.AlignRight)
         button_getall = QPushButton("Read RS values")
         button_rson =  QPushButton("RampSoak ON")        
@@ -12657,14 +12658,14 @@ class PXG4pidDlgControl(QDialog):
         labelsv = QLabel()
         labelsv.setMargin(10)
         labelsv.setStyleSheet("background-color:'#CCCCCC';")
-        labelsv.setText( "<font color='white'><b>SV (7-0)<\b></font>")
+        labelsv.setText(QApplication.translate("Form Label", "<font color='white'><b>SV (7-0)<\b></font>",None, QApplication.UnicodeUTF8))
         labelsv.setMaximumSize(100, 42)
         labelsv.setMinimumHeight(50)
         
         labelsvedit = QLabel()
         labelsvedit.setMargin(10)
         labelsvedit.setStyleSheet("background-color:'#CCCCCC';")
-        labelsvedit.setText( "<font color='white'><b>Write<\b></font>")
+        labelsvedit.setText(QApplication.translate("Form Label", "<font color='white'><b>Write<\b></font>",None, QApplication.UnicodeUTF8))
         labelsvedit.setMaximumSize(100, 42)
         labelsvedit.setMinimumHeight(50)
         
@@ -12760,28 +12761,28 @@ class PXG4pidDlgControl(QDialog):
         plabel = QLabel()
         plabel.setMargin(10)
         plabel.setStyleSheet("background-color:'#CCCCCC';")
-        plabel.setText( "<font color='white'><b>P<\b></font>")
+        plabel.setText(QApplication.translate("Form Label", "<font color='white'><b>P<\b></font>",None, QApplication.UnicodeUTF8))
         plabel.setMaximumSize(50, 42)
         plabel.setMinimumHeight(50)
 
         ilabel = QLabel()
         ilabel.setMargin(10)
         ilabel.setStyleSheet("background-color:'#CCCCCC';")
-        ilabel.setText( "<font color='white'><b>I<\b></font>")
+        ilabel.setText(QApplication.translate("Form Label", "<font color='white'><b>I<\b></font>",None, QApplication.UnicodeUTF8))
         ilabel.setMaximumSize(50, 42)
         ilabel.setMinimumHeight(50)
         
         dlabel = QLabel()
         dlabel.setMargin(10)
         dlabel.setStyleSheet("background-color:'#CCCCCC';")
-        dlabel.setText( "<font color='white'><b>D<\b></font>")
+        dlabel.setText(QApplication.translate("Form Label", "<font color='white'><b>D<\b></font>",None, QApplication.UnicodeUTF8))
         dlabel.setMaximumSize(50, 42)
         dlabel.setMinimumHeight(50)
 
         wlabel = QLabel()
         wlabel.setMargin(10)
         wlabel.setStyleSheet("background-color:'#CCCCCC';")
-        wlabel.setText( "<font color='white'><b>Write<\b></font>")
+        wlabel.setText(QApplication.translate("Form Label", "<font color='white'><b>Write<\b></font>",None, QApplication.UnicodeUTF8))
         wlabel.setMaximumSize(50, 42)
         wlabel.setMinimumHeight(50)
         
