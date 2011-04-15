@@ -9727,7 +9727,7 @@ class serialport(object):
         try:
             if not self.SP.isOpen():
                 self.openport()                    
-                time.sleep(2)
+                time.sleep(3)
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
