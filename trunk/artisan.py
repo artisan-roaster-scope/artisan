@@ -1894,7 +1894,12 @@ class tgraphcanvas(FigureCanvas):
             count = 0
             #set color, alpha, and text
             for r,bar[z] in zip(radii, bar[z]):
-                bar[z].set_facecolor(colors[count])
+                if "::" in names[z][count]:               #add possibility to customize each segment color by seeting label::color
+                    parts = names[z][count].strip().split("::")
+                    bar[z].set_facecolor(parts[1])
+                    names[z][count] = parts[1]
+                else:
+                    bar[z].set_facecolor(colors[count])
                 bar[z].set_alpha(0.3)
                 self.ax2.annotate(names[z][count],
                               xy=(theta[count]+pi/n[z],Wradiitext[z]),
