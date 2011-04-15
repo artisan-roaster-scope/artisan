@@ -9733,7 +9733,7 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
 
-                command = "R" + aw.qmc.mode + "2000"  #Read command, unit, arguments
+                command = "R" + aw.qmc.mode + "2000\n"  #Read command, unit, arguments
                 self.SP.write(command)
                                 
                 res = self.SP.readline().rsplit(',')  # a list [t0,t1,t2] with t0 = ambient; t1 = ET; t2 = BT
@@ -11006,7 +11006,7 @@ class DeviceAssignmentDLG(QDialog):
             elif meter == "ArduinoTC4":
                 aw.qmc.device = 19
                 aw.ser.comport = "/dev/ttyACM0"
-                aw.ser.baudrate = 57600
+                aw.ser.baudrate = 19200
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
