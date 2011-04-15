@@ -11891,6 +11891,8 @@ class WheelDlg(QDialog):
                 self.datatable.setCellWidget(i,5,txtSpinBox)
                 
     def savetable(self):
+        #old names count
+        oldwheelnames = aw.qmc.wheelnames[:]
         ndata = self.datatable.rowCount()
         for i in range(ndata):
             labelsedit =  self.datatable.cellWidget(i,1)
@@ -11904,6 +11906,7 @@ class WheelDlg(QDialog):
             txtSpinBox = self.datatable.cellWidget(i,5)
             aw.qmc.wheeltextsize[i] = txtSpinBox.value()
 
+        self.createdatatable()
         aw.qmc.drawWheel()
 
     def changetext(self,x):
