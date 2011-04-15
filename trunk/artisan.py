@@ -6045,6 +6045,7 @@ $cupping_notes
         dialog.show()       
 
     def flavorchart(self):
+        print "OK"
         dialog = flavorDlg(self)
         dialog.show()
 
@@ -8639,10 +8640,8 @@ class flavorDlg(QDialog):
         
         self.connect(backButton,SIGNAL("clicked()"),self.close)
         self.connect(defaultButton,SIGNAL("clicked()"),self.defaultlabels)
-
-        self.sumLabel = QLabel(QApplication.translate("Form Label","total: %1", None, QApplication.UnicodeUTF8)).arg(aw.cuppingSum())
-        self.sumLabel.setAlignment(Qt.AlignRight)
-
+        self.sumLabel = QLabel(QApplication.translate("Form Label","total: %1", None, QApplication.UnicodeUTF8).arg(aw.cuppingSum()))
+        
         flavorLayout = QGridLayout()
         flavorLayout.addWidget(self.line0edit,0,0)
         flavorLayout.addWidget(aciditySlider,0,1)
