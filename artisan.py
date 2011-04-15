@@ -1897,7 +1897,7 @@ class tgraphcanvas(FigureCanvas):
                 if "::" in names[z][count]:               #add possibility to customize each segment color by seeting label::color
                     parts = names[z][count].strip().split("::")
                     bar[z].set_facecolor(parts[1])
-                    names[z][count] = parts[1]
+                    names[z][count] = parts[0]
                 else:
                     bar[z].set_facecolor(colors[count])
                 bar[z].set_alpha(0.3)
