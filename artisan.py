@@ -1827,10 +1827,11 @@ class tgraphcanvas(FigureCanvas):
         if not wheels:
             self.fig.canvas.draw()
             return
+        
         n,textangles = [],[]
         for i in range(wheels):
             l = []
-            count = 0
+            count = self.startangle[i]
             #calculate text orientation
             for p in range(len(names[i])):
                 if projection[i] == 0:
@@ -1862,7 +1863,7 @@ class tgraphcanvas(FigureCanvas):
         for z in range(len(n)):            
             #create circle
             theta,segmentwidth,radii,colors = [],[],[],[]
-            count = (2*pi/100.)*startangle[z]
+            count = startangle[z]
             for i in range(n[z]):
                 theta.append(count)
                 count += (2*pi/100.)*self.segmentlengths[z][i]
@@ -1872,7 +1873,7 @@ class tgraphcanvas(FigureCanvas):
                 color = QColor()
                 color.setHsv((360/n[z])*i*self.wheelcolor,255,255,255)
                 colors.append(unicode(color.name()))
-
+                
             bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z]))
             count = 0
             #set color, alpha, and text
@@ -11923,7 +11924,6 @@ class WheelDlg(QDialog):
                 angleSpinBox.setSuffix(" dg")
                 angleSpinBox.setRange(0,360)
                 angleSpinBox.setWrapping(True)
-
                 angleSpinBox.setValue(aw.qmc.startangle[i])
                 self.connect(angleSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=i: self.setangle(z,x))
 
