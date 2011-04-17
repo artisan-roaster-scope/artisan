@@ -1828,9 +1828,9 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
             return
         
-        n,textangles = [],[]
+        n,textangles,textloc = [],[],[]
         for i in range(wheels):
-            l = []
+            l,tloc = [],[]
             count = self.startangle[i]
             #calculate text orientation
             for p in range(len(names[i])):
@@ -1840,12 +1840,15 @@ class tgraphcanvas(FigureCanvas):
                     l.append(self.findCenterWheelTextAngle(3.6*self.segmentlengths[i][p]/2. + count))
                 elif projection[i] == 2:
                     l.append(self.findRadialWheelTextAngle(3.6*self.segmentlengths[i][p]/2. + count))
+                tloc.append((3.6*self.segmentlengths[i][p]/2. + count)/57.29)
                 count += self.segmentlengths[i][p]*3.6
-         	    
+
+            textloc.append(tloc) 	    
             textangles.append(l)                   
             Wradii[i] = float(Wradii[i])/100.                   #convert radii to float between 0-1 range
             startangle[i] = startangle[i]/57.29                 #convert angles to radians
             n.append(len(names[i]))                             #store the number of names for each wheel 
+
         
         #store the absolute len-radius origin of each circle
         lbottom = [0]
@@ -1888,8 +1891,8 @@ class tgraphcanvas(FigureCanvas):
                     colorflag = 0
                 bar[z].set_alpha(0.3)
                 self.ax2.annotate(names[z][count],
-                              xy=(theta[count]+pi/n[z],Wradiitext[z]),
-                              xytext=(theta[count]+pi/n[z],Wradiitext[z]),
+                              xy=(textloc[z][count],Wradiitext[z]),
+                              xytext=(textloc[z][count],Wradiitext[z]),
                               rotation=textangles[z][count],
                               horizontalalignment="center",verticalalignment='center',fontsize=self.wheeltextsize[z])
                 #restore custom color tag
