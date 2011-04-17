@@ -455,16 +455,17 @@ class tgraphcanvas(FigureCanvas):
 
         #########################################################         wheel graph variables     #############################################################
         #create initial data for wheel
-        self.wheelnames = []
-        self.segmentlengths = []
+        self.wheelnames,self.segmentlengths,self.segmentsalpha = [],[],[]
         wheels = [4,6,12,50]
         for i in range(len(wheels)):
-            w = []
+            w,a = [],[]
             for x in range(wheels[i]):
-                w.append("Wh%i %i"%(i+1,x+1)) 
+                w.append("Wh%i %i"%(i+1,x+1))
+                a.append(0.3)
             self.wheelnames.append(w)
+            self.segmentsalpha.append(a)
             self.segmentlengths.append([100./len(self.wheelnames[i])]*len(self.wheelnames[i]))
-
+            
         #store width of each circle as percentage(sum must always = 1)
         self.wradii = [25,20,20,35]
         #starting angle for each circle. 
@@ -1889,7 +1890,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     bar[z].set_facecolor(colors[count])
                     colorflag = 0
-                bar[z].set_alpha(0.3)
+                bar[z].set_alpha(self.segmentsalpha[z][count])
                 self.ax2.annotate(names[z][count],
                               xy=(textloc[z][count],Wradiitext[z]),
                               xytext=(textloc[z][count],Wradiitext[z]),
@@ -4512,7 +4513,7 @@ class ApplicationWindow(QMainWindow):
            return
        #check
        lenevents = len(self.qmc.specialevents)
-       currentevent = self.eNumberSpinBox
+       currentevent = self.eNumberSpinBox.value()
        self.eventlabel.setText("Event #<b>%i </b>"%currentevent)
        if currentevent == 0:
            self.lineEvent.setText("")
@@ -11783,7 +11784,7 @@ class WheelDlg(QDialog):
     def __init__(self, parent = None):
         super(WheelDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle("Wheel Graph Creator")
+        self.setWindowTitle("Wheel Properties")
 
         #table for alarms
         self.datatable = QTableWidget()
@@ -11791,7 +11792,8 @@ class WheelDlg(QDialog):
 
         #table for labels
         self.labeltable = QTableWidget()
-        self.labelCloseButton = QPushButton("Close Labels Width Adjustments")
+        self.labelCloseButton = QPushButton("Close Labels properties")
+        self.labelCloseButton.setMaximumWidth(160)
         self.connect(self.labelCloseButton, SIGNAL("clicked()"),self.closelabels)
 
         self.labeltable.setVisible(False)        
@@ -11828,6 +11830,10 @@ class WheelDlg(QDialog):
         labellayout = QVBoxLayout()
         labellayout.addWidget(self.labeltable)
         labellayout.addWidget(self.labelCloseButton)
+
+        self.labelGroupLayout = QGroupBox("Label Properties")       
+        self.labelGroupLayout.setLayout(labellayout)
+        self.labelGroupLayout.setVisible(False)
         
         buttonlayout = QHBoxLayout()
         buttonlayout.addWidget(addButton)
@@ -11843,20 +11849,21 @@ class WheelDlg(QDialog):
         
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
-        mainlayout.addLayout(labellayout)
+        mainlayout.addWidget(self.labelGroupLayout)
         mainlayout.addLayout(configlayout)
         mainlayout.addLayout(buttonlayout)
         self.setLayout(mainlayout)
 
     def createlabeltable(self,x):
-        self.labeltable.setVisible(True)        
+        self.labelGroupLayout.setVisible(True)
+        self.labeltable.setVisible(True)
         self.labelCloseButton.setVisible(True)
         self.labeltable.clear()        
         nlabels = len(aw.qmc.wheelnames[x])
         if nlabels:    
             self.labeltable.setRowCount(nlabels)
-            self.labeltable.setColumnCount(2)
-            self.labeltable.setHorizontalHeaderLabels(["Labels","Width"])
+            self.labeltable.setColumnCount(4)
+            self.labeltable.setHorizontalHeaderLabels(["Label","Width","Alpha"])
             self.labeltable.setAlternatingRowColors(True)
             self.labeltable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -11872,10 +11879,20 @@ class WheelDlg(QDialog):
                 labelwidthSpinBox.setSuffix("%")
                 self.connect(labelwidthSpinBox, SIGNAL("valueChanged(double)"),lambda z=1,x=x,u=i: self.setlabelwidth(z,x,u))
 
+                colorSpinBox = QSpinBox()
+                colorSpinBox.setRange(0,10)
+                colorSpinBox.setValue(int(aw.qmc.segmentsalpha[x][i]*10))
+                self.connect(colorSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=x,u=i: self.setsegmentalpha(z,x,u))
+
                 #add widgets to the table
                 self.labeltable.setItem(i,0,label)
                 self.labeltable.setCellWidget(i,1,labelwidthSpinBox)  
+                self.labeltable.setCellWidget(i,2,colorSpinBox)  
 
+    def setsegmentalpha(self,z,x,u):
+        aw.qmc.segmentsalpha[x][u] = float(z/10.) 
+        aw.qmc.drawWheel()
+        
     def setlabelwidth(self,z,x,u):
         newwidth = z
         oldwidth = aw.qmc.segmentlengths[x][u]
@@ -11891,9 +11908,10 @@ class WheelDlg(QDialog):
         aw.qmc.drawWheel()
 
     def closelabels(self):
-        self.labeltable.setVisible(False)        
-        self.labelCloseButton.setVisible(False)        
-    
+        self.labelGroupLayout.setVisible(False)
+        self.labeltable.setVisible(False)
+        self.labelCloseButton.setVisible(False)
+        
     def createdatatable(self):
         self.datatable.clear()        
         ndata = len(aw.qmc.wheelnames)
@@ -11914,7 +11932,7 @@ class WheelDlg(QDialog):
 
                 labelsedit = QLineEdit(unicode(",".join(aw.qmc.wheelnames[i])))
 
-                setButton = QPushButton("Set Width Labels")
+                setButton = QPushButton("Labels Properties")
                 self.connect(setButton, SIGNAL("clicked()"),lambda x = i: self.createlabeltable(x))                
                                
                 widthSpinBox = QDoubleSpinBox()
@@ -11955,9 +11973,19 @@ class WheelDlg(QDialog):
         ndata = self.datatable.rowCount()
         for i in range(ndata):
             labelsedit =  self.datatable.cellWidget(i,1)
-            aw.qmc.wheelnames[i] = unicode(labelsedit.text()).strip().split(",")            
-
-        self.createdatatable()
+            aw.qmc.wheelnames[i] = unicode(labelsedit.text()).strip().split(",")
+            if len(aw.qmc.wheelnames[i]) != len(oldwheelnames[i]):
+                new = len(aw.qmc.wheelnames[i])
+                old = len(oldwheelnames[i])
+                dif = new -old
+                if  new > old:  #new names added
+                    for x in range(diff):
+                        self.insertlabel()
+                else:
+                    for x in range(diff):
+                        self.poplabel()                    
+                    
+        ###############################unfinished
         aw.qmc.drawWheel()
         
     def setwidth(self,z,x):
@@ -12008,20 +12036,15 @@ class WheelDlg(QDialog):
         if ndata:
             for i in range(ndata):
                 aw.qmc.wradii[i] -= 20./ndata
-                
-            aw.qmc.wheelnames.append(["Added1","Added2","Added3","Added4","Added5"])
             aw.qmc.wradii.append(20.)
-            aw.qmc.startangle.append(0)
-            aw.qmc.projection.append(1)
-            aw.qmc.wheeltextsize.append(10)
-            aw.qmc.segmentlengths.append([20.,20.,20.,20.,20.])
         else:
-            aw.qmc.wheelnames.append(["Added1","Added2","Added3","Added4","Added5"])
             aw.qmc.wradii.append(100.)
-            aw.qmc.startangle.append(0)
-            aw.qmc.projection.append(1)
-            aw.qmc.wheeltextsize.append(10)            
-            aw.qmc.segmentlengths.append([20.,20.,20.,20.,20.])
+        aw.qmc.wheelnames.append(["Added1","Added2","Added3","Added4","Added5"])        
+        aw.qmc.startangle.append(0)
+        aw.qmc.projection.append(1)
+        aw.qmc.wheeltextsize.append(10)
+        aw.qmc.segmentlengths.append([20.,20.,20.,20.,20.])
+        aw.qmc.segmentsalpha.append([.3,.3,.3,.3,.3])
 
         self.createdatatable()
         aw.qmc.drawWheel()
@@ -12039,7 +12062,8 @@ class WheelDlg(QDialog):
         aw.qmc.projection.pop(x)
         aw.qmc.wheeltextsize.pop(x)
         aw.qmc.segmentlengths.pop(x)
-                                         
+        aw.qmc.segmentsalpha.pop(x)
+        
         self.createdatatable()
         aw.qmc.drawWheel()
         
