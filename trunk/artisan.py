@@ -455,17 +455,19 @@ class tgraphcanvas(FigureCanvas):
 
         #########################################################         wheel graph variables     #############################################################
         #create initial data for wheel
-        self.wheelnames,self.segmentlengths,self.segmentsalpha = [],[],[]
+        self.wheelnames,self.segmentlengths,self.segmentsalpha,self.wheellabelparent = [],[],[],[]
         wheels = [4,6,12,50]
         for i in range(len(wheels)):
-            w,a = [],[]
+            w,a,c = [],[],[]
             for x in range(wheels[i]):
                 w.append("Wh%i %i"%(i+1,x+1))
                 a.append(0.3)
+                c.append(0)
             self.wheelnames.append(w)
             self.segmentsalpha.append(a)
             self.segmentlengths.append([100./len(self.wheelnames[i])]*len(self.wheelnames[i]))
-            
+            self.wheellabelparent.append(c)
+
         #store width of each circle as percentage(sum must always = 1)
         self.wradii = [25,20,20,35]
         #starting angle for each circle. 
@@ -1799,6 +1801,7 @@ class tgraphcanvas(FigureCanvas):
             return t
         else:
             return 180+t
+       
 
     def drawWheel(self):
         try:
@@ -1909,8 +1912,37 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception,e:
             self.adderror(u"Exception Error: drawWheel() " + unicode(e) + " ")
-            return  
-                                   
+            return
+        
+    # sets parent and corrects segment lengths to fit inside
+    # input: z = index of parent in previus wheel    # x = wheel number    # i = index of element in wheel
+    def setwheelparent(self,z,x,i):
+        #set same start angle
+        self.startangle[x] = self.startangle[x-1]
+        self.wheellabelparent[x][i] = z
+
+        #auto adjust widths
+        for x in range(1,len(self.segmentlengths)):
+            nsegments = len(self.segmentlengths[x])        
+            parentanglecount = 0
+            for i in range(nsegments):
+                if  self.wheellabelparent[x][i]:                                                  #if parent selected (otherwise 0) 
+                    parentindex = self.wheellabelparent[x][i]                                     #parent index
+                    if self.wheellabelparent[x][i] == parentindex:                                #if match
+                        parentangle = self.segmentlengths[x-1][self.wheellabelparent[x][i]-1]   #find parent angle (in %)
+                        #find number of labels with same parent
+                        count = self.wheellabelparent[x].count(parentindex)                       #count number of labels with same parent
+                        self.segmentlengths[x][i] = parentangle/count                                  #divide parent angle
+
+                        #calculate last total angle
+                        if i < nsegments-1:
+                            parentanglecount += self.segmentlengths[x][i]
+
+                        #adjust rest of angles to get 100 % coverage
+                        for a in range(i+1,nsegments):
+                            self.segmentlengths[x][a] = (100-parentanglecount)/(nsegments-(i+1))
+ 
+##########################################################################################################################                                   
 
 
     #Turns ON flag self.flagon to read and plot. Called from push button_1. 
@@ -6418,6 +6450,7 @@ $cupping_notes
         wheel["projection"] = self.qmc.projection
         wheel["wheeltextsize"] = self.qmc.wheeltextsize 
         wheel["wheelcolor"] = self.qmc.wheelcolor
+        wheel["wheelparent"] = self.qmc.wheellabelparent
         return wheel  
 
     def loadWheel(self,filename):         
@@ -6438,6 +6471,7 @@ $cupping_notes
                 self.qmc.projection = wheel["projection"]
                 self.qmc.wheeltextsize = wheel["wheeltextsize"] 
                 self.qmc.wheelcolor = wheel["wheelcolor"]
+                self.qmc.wheellabelparent = wheel["wheelparent"]
             else:
                 message = u"Invalid Wheel graph format"
                 self.sendmessage(message)
@@ -11865,8 +11899,14 @@ class WheelDlg(QDialog):
         self.labelCloseButton.setMaximumWidth(160)
         self.connect(self.labelCloseButton, SIGNAL("clicked()"),self.closelabels)
 
+        self.labelResetButton = QPushButton("Reset Parents")
+        self.labelResetButton.setMaximumWidth(160)
+        self.connect(self.labelResetButton, SIGNAL("clicked()"),self.resetlabelparents)
+        self.labelwheelx = 0   #index of wheel being editied on labeltable
+
         self.labeltable.setVisible(False)        
         self.labelCloseButton.setVisible(False)
+        self.labelResetButton.setVisible(False)
         
         txtlabel = QLabel("Text")
         txtlabel.setAlignment(Qt.AlignRight)
@@ -11903,12 +11943,15 @@ class WheelDlg(QDialog):
 
         aw.qmc.drawWheel()
 
-        labellayout = QVBoxLayout()
-        labellayout.addWidget(self.labeltable)
-        labellayout.addWidget(self.labelCloseButton)
+        label1layout = QVBoxLayout()
+        label2layout = QHBoxLayout()
+        label1layout.addWidget(self.labeltable)
+        label2layout.addWidget(self.labelCloseButton)
+        label2layout.addWidget(self.labelResetButton)
+        label1layout.addLayout(label2layout)
 
         self.labelGroupLayout = QGroupBox("Label Properties")       
-        self.labelGroupLayout.setLayout(labellayout)
+        self.labelGroupLayout.setLayout(label1layout)
         self.labelGroupLayout.setVisible(False)
         
         buttonlayout = QHBoxLayout()
@@ -11932,15 +11975,17 @@ class WheelDlg(QDialog):
         self.setLayout(mainlayout)
 
     def createlabeltable(self,x):
+        self.labelwheelx = x                    #wheel being edited                             
         self.labelGroupLayout.setVisible(True)
         self.labeltable.setVisible(True)
         self.labelCloseButton.setVisible(True)
+        self.labelResetButton.setVisible(True)
         self.labeltable.clear()        
         nlabels = len(aw.qmc.wheelnames[x])
         if nlabels:    
             self.labeltable.setRowCount(nlabels)
-            self.labeltable.setColumnCount(3)
-            self.labeltable.setHorizontalHeaderLabels(["Label","Width %","Color alpha"])
+            self.labeltable.setColumnCount(4)
+            self.labeltable.setHorizontalHeaderLabels(["Label","Parent","Width %","Color alpha"])
             self.labeltable.setAlternatingRowColors(True)
             self.labeltable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -11949,6 +11994,17 @@ class WheelDlg(QDialog):
             #populate table
             for i in range(nlabels):
                 label = QTableWidgetItem(aw.qmc.wheelnames[x][i])
+
+                parentComboBox =  QComboBox()
+                if x > 0:
+                    items = aw.qmc.wheelnames[x-1][:]
+                    items.insert(0,"")
+                    parentComboBox.addItems(items)
+                    if aw.qmc.wheellabelparent[x][i]:
+                        parentComboBox.setCurrentIndex(aw.qmc.wheellabelparent[x][i])
+                else:
+                    parentComboBox.addItems([])
+                self.connect(parentComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=x,i=i:self.setparent(z,x,i))
                 
                 labelwidthSpinBox = QDoubleSpinBox()
                 labelwidthSpinBox.setRange(1.,100.)
@@ -11963,10 +12019,16 @@ class WheelDlg(QDialog):
                
                 #add widgets to the table
                 self.labeltable.setItem(i,0,label)
-                self.labeltable.setCellWidget(i,1,labelwidthSpinBox)  
-                self.labeltable.setCellWidget(i,2,colorSpinBox)
-                
+                self.labeltable.setCellWidget(i,1,parentComboBox)                  
+                self.labeltable.setCellWidget(i,2,labelwidthSpinBox)  
+                self.labeltable.setCellWidget(i,3,colorSpinBox)
 
+    #input: z = index of parent in previus wheel x = wheel number i = index of element in wheel
+    def setparent(self,z,x,i):
+        aw.qmc.setwheelparent(z,x,i)
+        aw.qmc.drawWheel()
+        self.createdatatable() #update data table        
+                                
     def setsegmentalpha(self,z,x,u):
         aw.qmc.segmentsalpha[x][u] = float(z/10.) 
         aw.qmc.drawWheel()
@@ -11985,10 +12047,21 @@ class WheelDlg(QDialog):
         aw.qmc.segmentlengths[x][u] = newwidth
         aw.qmc.drawWheel()
 
+    def resetlabelparents(self):
+        x = self.labelwheelx
+        nsegments = len(aw.qmc.wheellabelparent[x])
+        for i in range(nsegments):
+            aw.qmc.wheellabelparent[x][i] = 0
+            aw.qmc.segmentlengths[x][i] = 100./nsegments
+            
+        aw.qmc.drawWheel()
+        self.createlabeltable(x)
+
     def closelabels(self):
         self.labelGroupLayout.setVisible(False)
         self.labeltable.setVisible(False)
         self.labelCloseButton.setVisible(False)
+        self.labelResetButton.setVisible(False)
         
     def createdatatable(self):
         self.datatable.clear()        
@@ -11996,7 +12069,7 @@ class WheelDlg(QDialog):
         if ndata:    
             self.datatable.setRowCount(ndata)
             self.datatable.setColumnCount(8)
-            self.datatable.setHorizontalHeaderLabels(["Del Wheel","Edit Labels","Update Labels","Properties","Width","Starting angle","Txt Projection","Txt size"])
+            self.datatable.setHorizontalHeaderLabels(["Del Wheel","Edit Labels","Update Labels","Properties","Radius","Starting angle","Txt Projection","Txt size"])
             self.datatable.setAlternatingRowColors(True)
             self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -12059,6 +12132,7 @@ class WheelDlg(QDialog):
         if oldnlabels != newnlabels:
             aw.qmc.segmentlengths[x] = [100./newnlabels]*newnlabels                    
             aw.qmc.segmentsalpha[x] = [.3]*newnlabels
+            aw.qmc.wheellabelparent[x] = [0]*newnlabels
 
         aw.qmc.wheelnames[x] = newwheellabels[:]        
         aw.qmc.drawWheel()        
@@ -12122,7 +12196,7 @@ class WheelDlg(QDialog):
         aw.qmc.wheeltextsize.append(10)
         aw.qmc.segmentlengths.append([20.,20.,20.,20.,20.])
         aw.qmc.segmentsalpha.append([.3,.3,.3,.3,.3])
-
+        aw.qmc.wheellabelparent.append([0,0,0,0,0])
         self.createdatatable()
         aw.qmc.drawWheel()
         
@@ -12140,6 +12214,7 @@ class WheelDlg(QDialog):
         aw.qmc.wheeltextsize.pop(x)
         aw.qmc.segmentlengths.pop(x)
         aw.qmc.segmentsalpha.pop(x)
+        aw.qmc.wheellabelparent.pop(x)
         
         self.createdatatable()
         aw.qmc.drawWheel()
