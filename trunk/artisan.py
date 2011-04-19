@@ -460,7 +460,7 @@ class tgraphcanvas(FigureCanvas):
         for i in range(len(wheels)):
             w,a,c = [],[],[]
             for x in range(wheels[i]):
-                w.append("Wh%i %i"%(i+1,x+1))
+                w.append("W%i %i"%(i+1,x+1))
                 a.append(0.3)
                 c.append(0)
             self.wheelnames.append(w)
@@ -12190,13 +12190,25 @@ class WheelDlg(QDialog):
             aw.qmc.wradii.append(100.-count)
         else:
             aw.qmc.wradii.append(100.)
-        aw.qmc.wheelnames.append(["Added1","Added2","Added3","Added4","Added5"])        
+        #number of labels of last wheels
+        if len(aw.qmc.wheelnames):
+            nwheels = len(aw.qmc.wheelnames[-1])
+        else:
+            nwheels = 3
+        wn,sl,sa,wlp = [],[],[],[]
+        for i in range(nwheels+1):
+            wn.append("W%i %i"%(len(aw.qmc.wheelnames)+1,i+1))
+            sl.append(100./(nwheels+1))
+            sa.append(.3)
+            wlp.append(0)
+        aw.qmc.wheelnames.append(wn)
+        aw.qmc.segmentlengths.append(sl)
+        aw.qmc.segmentsalpha.append(sa)
+        aw.qmc.wheellabelparent.append(wlp)
         aw.qmc.startangle.append(0)
-        aw.qmc.projection.append(1)
+        aw.qmc.projection.append(2)
         aw.qmc.wheeltextsize.append(10)
-        aw.qmc.segmentlengths.append([20.,20.,20.,20.,20.])
-        aw.qmc.segmentsalpha.append([.3,.3,.3,.3,.3])
-        aw.qmc.wheellabelparent.append([0,0,0,0,0])
+
         self.createdatatable()
         aw.qmc.drawWheel()
         
