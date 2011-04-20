@@ -53,14 +53,12 @@ if platf != u'Darwin':
     ROAST_MENU = "&" + ROAST_MENU
 ROAST_MENU_PROPERTIES = QApplication.translate("Menu", "Properties...", None, QApplication.UnicodeUTF8)
 ROAST_MENU_BACKGROUND = QApplication.translate("Menu", "Background...", None, QApplication.UnicodeUTF8)
-ROAST_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None, QApplication.UnicodeUTF8)
 ROAST_MENU_CUPPROFILE = QApplication.translate("Menu", "Cup Profile...", None, QApplication.UnicodeUTF8)
 ROAST_MENU_TEMPERATURE = QApplication.translate("Menu", "Temperature", None, QApplication.UnicodeUTF8)
 ROAST_MENU_CONVERT_TO_FAHRENHEIT = QApplication.translate("Menu", "Convert to Fahrenheit", None, QApplication.UnicodeUTF8)
 ROAST_MENU_CONVERT_TO_CELSIUS = QApplication.translate("Menu", "Convert to Celsius", None, QApplication.UnicodeUTF8)
 ROAST_MENU_FAHRENHEIT_MODE = QApplication.translate("Menu", "Fahrenheit Mode", None, QApplication.UnicodeUTF8)
 ROAST_MENU_CELSIUS_MODE = QApplication.translate("Menu", "Celsius Mode", None, QApplication.UnicodeUTF8)
-ROAST_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None, QApplication.UnicodeUTF8)
 
 #Conf menu items
 CONF_MENU = QApplication.translate("Menu", "Config", None, QApplication.UnicodeUTF8)
@@ -76,8 +74,17 @@ CONF_MENU_STATISTICS = QApplication.translate("Menu", "Statistics...", None, QAp
 CONF_MENU_AXES = QApplication.translate("Menu", "Axes...", None, QApplication.UnicodeUTF8)
 CONF_MENU_AUTOSAVE = QApplication.translate("Menu", "Autosave...", None, QApplication.UnicodeUTF8)
 CONF_MENU_ALARMS = QApplication.translate("Menu", "Alarms...", None, QApplication.UnicodeUTF8)
-CONF_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None, QApplication.UnicodeUTF8)
 
+#Toolkit menu
+TOOLKIT_MENU = QApplication.translate("Menu", "Tool Kit", None, QApplication.UnicodeUTF8)
+if platf != u'Darwin':
+    TOOLKIT_MENU = "&" + TOOLKIT_MENU
+TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None, QApplication.UnicodeUTF8)    
+TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None, QApplication.UnicodeUTF8)
+TOOLKIT_MENU_WHEELGRAPH = QApplication.translate("Menu", "Wheel Graph", None, QApplication.UnicodeUTF8)
+TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None, QApplication.UnicodeUTF8)
+
+    
 #Help menu items
 HELP_MENU = QApplication.translate("Menu", "Help", None, QApplication.UnicodeUTF8)
 if platf != u'Darwin':
