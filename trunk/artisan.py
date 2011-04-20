@@ -200,11 +200,11 @@ class tgraphcanvas(FigureCanvas):
         self.fig = Figure()
 
         if platf == 'Darwin':
-            backcolor ="#EEEEEE"
+            self.backcolor ="#EEEEEE"
         else:
-            backcolor = "white"
-        self.fig.patch.set_facecolor(backcolor)
-        self.fig.patch.set_edgecolor(backcolor)
+            self.backcolor = "white"
+        self.fig.patch.set_facecolor(self.backcolor)
+        self.fig.patch.set_edgecolor(self.backcolor)
         
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
         
@@ -455,18 +455,23 @@ class tgraphcanvas(FigureCanvas):
 
         #########################################################         wheel graph variables     #############################################################
         #create initial data for wheel
-        self.wheelnames,self.segmentlengths,self.segmentsalpha,self.wheellabelparent = [],[],[],[]
+        self.wheelnames,self.segmentlengths,self.segmentsalpha,self.wheellabelparent,self.wheelcolor = [],[],[],[],[]
         wheels = [4,6,12,50]
         for i in range(len(wheels)):
-            w,a,c = [],[],[]
+            w,a,c,co = [],[],[],[]
             for x in range(wheels[i]):
                 w.append("W%i %i"%(i+1,x+1))
                 a.append(0.3)
                 c.append(0)
+                color = QColor()
+                color.setHsv((360/wheels[i])*x,255,255,255)
+                co.append(unicode(color.name()))
+
             self.wheelnames.append(w)
             self.segmentsalpha.append(a)
             self.segmentlengths.append([100./len(self.wheelnames[i])]*len(self.wheelnames[i]))
             self.wheellabelparent.append(c)
+            self.wheelcolor.append(co)
 
         #store width of each circle as percentage(sum must always = 1)
         self.wradii = [25,20,20,35]
@@ -475,8 +480,9 @@ class tgraphcanvas(FigureCanvas):
         #text projection: 0 = Flat, 1 = perpendicular to center, 2 = radial from center
         self.projection = [0,1,1,2]
         self.wheeltextsize = [10,10,10,10]
-        self.wheelcolor = 1 #pattern
-            
+        self.wheelcolorpattern = 0 #pattern
+        self.wheeledge = .02  #overlaping edge
+        
     #event handler from startTimer()
     def timerEvent(self, evt):
         if self.flagon:
@@ -1719,7 +1725,7 @@ class tgraphcanvas(FigureCanvas):
         pi = math.pi
         self.fig.clf()
         #create a new name ax1 instead of ax
-        self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg='white')
+        self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor)
         g_angle = range(10,360,40) 
         self.ax1.set_thetagrids(g_angle)
         self.ax1.set_rmax(1.)
@@ -1784,31 +1790,38 @@ class tgraphcanvas(FigureCanvas):
 
 
     def findCenterWheelTextAngle(self,t):
-        if t == 360 or t == 0:
-            return 270
+        if t > 360 or t < 0:
+            p,t = divmod(t,360)
+
+        if t == 360. or t == 0.:
+            return 270.
         #check cuadrants
-        elif t < 90 and t > 0 or t > 360:                #cuadrant 1
-             return 270+t
-        elif t <= 180 and t >= 90:            #cuadrant 2
-             return t-90
-        elif t < 270 and t > 180:             #cuadrant 3
-             return t+90
+        elif t < 90. and t > 0. or t > 360.:                #cuadrant 1
+             return 270.+t
+        elif t <= 180. and t >= 90.:            #cuadrant 2
+             return t-90.
+        elif t < 270. and t > 180.:             #cuadrant 3
+             return t+90.
         else:                                 #cuadrant 4
-            return t-270
+            return t-270.
 
     def findRadialWheelTextAngle(self,t):
-        if t <= 90 and t > 0 or t > 270:    
+        if t > 360 or t < 0:
+            p,t = divmod(t,360)
+            
+        if t <= 90. and t > 0. or t > 270.:    
             return t
         else:
-            return 180+t
+            return 180.+t
        
 
     def drawWheel(self):
         try:
             pi = numpy.pi
+            rad = 360./(2*pi)
             self.fig.clf()
             #create a new name ax1 instead of ax
-            self.ax2 = self.fig.add_subplot(111, projection='polar', axisbg='white')
+            self.ax2 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor)
             self.ax2.set_rmax(1.)
             self.ax2.set_autoscale_on(True)
             self.ax2.grid(False)
@@ -1845,64 +1858,46 @@ class tgraphcanvas(FigureCanvas):
                         l.append(self.findCenterWheelTextAngle(3.6*self.segmentlengths[i][p]/2. + count))
                     elif projection[i] == 2:
                         l.append(self.findRadialWheelTextAngle(3.6*self.segmentlengths[i][p]/2. + count))
-                    tloc.append((3.6*self.segmentlengths[i][p]/2. + count)/57.29)
+                    tloc.append((3.6*self.segmentlengths[i][p]/2. + count)/rad)
                     count += self.segmentlengths[i][p]*3.6
 
                 textloc.append(tloc) 	    
                 textangles.append(l)                   
                 Wradii[i] = float(Wradii[i])/100.                   #convert radii to float between 0-1 range
-                startangle[i] = startangle[i]/57.29                 #convert angles to radians
+                startangle[i] = startangle[i]/rad                 #convert angles to radians
                 n.append(len(names[i]))                             #store the number of names for each wheel 
 
             
             #store the absolute len-radius origin of each circle
-            lbottom = [0]
-            count = 0
+            lbottom = [0.]
+            count = 0.
             for i in range(wheels-1):
                 count += Wradii[i]
                 lbottom.append(count)
          
-            Wradiitext = [Wradii[0]/2]
+            Wradiitext = [Wradii[0]/2.]
             for i in range(wheels-1):
-                Wradiitext.append(lbottom[i+1] + Wradii[i+1]/2)     #store absolute len-radius for text in each circle
-                Wradii[i] += .02    	    	    	        #create extra color edge between wheels by overlaping wheels
+                Wradiitext.append(lbottom[i+1] + Wradii[i+1]/2.)     #store absolute len-radius for text in each circle
+                Wradii[i] += self.wheeledge    	    	    	        #create extra color edge between wheels by overlaping wheels
             #Generate Wheel graph    
             bar = []                                        	#holds bar-graphs (wheels)
             for z in range(len(n)):            
-                #create circle
+                #create wheel
                 theta,segmentwidth,radii,colors = [],[],[],[]
                 count = startangle[z]
                 for i in range(n[z]):
                     theta.append(count)
                     count += (2*pi/100.)*self.segmentlengths[z][i]
                     segmentwidth.append((2*pi/100.)*self.segmentlengths[z][i])                
-                    radii.append(Wradii[z])                
-                    #create color and store it for next loop
-                    color = QColor()
-                    color.setHsv((360/n[z])*i*self.wheelcolor,255,255,255)
-                    colors.append(unicode(color.name()))
-                    
+                    radii.append(Wradii[z])                                
                 bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z]))
                 count = 0
                 #set color, alpha, and text
                 for r,bar[z] in zip(radii, bar[z]):
-                    if "::" in names[z][count]:               #add possibility to customize each segment color by seeting label::color
-                        parts = names[z][count].strip().split("::")
-                        bar[z].set_facecolor(parts[1])
-                        names[z][count] = parts[0]
-                        colorflag = 1
-                    else:
-                        bar[z].set_facecolor(colors[count])
-                        colorflag = 0
+                    bar[z].set_facecolor(self.wheelcolor[z][count])
                     bar[z].set_alpha(self.segmentsalpha[z][count])
-                    self.ax2.annotate(names[z][count],
-                                  xy=(textloc[z][count],Wradiitext[z]),
-                                  xytext=(textloc[z][count],Wradiitext[z]),
-                                  rotation=textangles[z][count],
-                                  horizontalalignment="center",verticalalignment='center',fontsize=self.wheeltextsize[z])
-                    #restore custom color tag
-                    if colorflag:
-                        names[z][count] += "::" + parts[1]
+                    self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
+                        rotation=textangles[z][count],horizontalalignment="center",verticalalignment="center",fontsize=self.wheeltextsize[z])
                     count += 1  
             self.fig.canvas.draw()            
 
@@ -1913,15 +1908,23 @@ class tgraphcanvas(FigureCanvas):
         except Exception,e:
             self.adderror(u"Exception Error: drawWheel() " + unicode(e) + " ")
             return
+
+    def makewheelcolorpattern(self): 
+        for x in range(len(self.wheelcolor)):
+            wlen = len(self.wheelcolor[x])
+            for i in range(wlen):
+                color = QColor()
+                color.setHsv((360/wlen)*i*self.wheelcolorpattern,255,255,255)
+                self.wheelcolor[x][i] = unicode(color.name())
         
-    # sets parent and corrects segment lengths to fit inside
-    # input: z = index of parent in previus wheel    # x = wheel number    # i = index of element in wheel
+    # sets parent and corrects segment lengths so that child fits inside parent (multiple children can be set to same parent)
+    # input: z = index of parent in previus wheel    # x = wheel number    # i = index of element in wheel x
     def setwheelparent(self,z,x,i):
         #set same start angle
         self.startangle[x] = self.startangle[x-1]
         self.wheellabelparent[x][i] = z
 
-        #auto adjust widths
+        #adjust lengths
         for x in range(1,len(self.segmentlengths)):
             nsegments = len(self.segmentlengths[x])        
             parentanglecount = 0
@@ -1929,10 +1932,10 @@ class tgraphcanvas(FigureCanvas):
                 if  self.wheellabelparent[x][i]:                                                  #if parent selected (otherwise 0) 
                     parentindex = self.wheellabelparent[x][i]                                     #parent index
                     if self.wheellabelparent[x][i] == parentindex:                                #if match
-                        parentangle = self.segmentlengths[x-1][self.wheellabelparent[x][i]-1]   #find parent angle (in %)
+                        parentangle = self.segmentlengths[x-1][self.wheellabelparent[x][i]-1]     #find parent angle (in %)
                         #find number of labels with same parent
                         count = self.wheellabelparent[x].count(parentindex)                       #count number of labels with same parent
-                        self.segmentlengths[x][i] = parentangle/count                                  #divide parent angle
+                        self.segmentlengths[x][i] = parentangle/count                             #divide parent angle between children
 
                         #calculate last total angle
                         if i < nsegments-1:
@@ -3931,12 +3934,13 @@ class ApplicationWindow(QMainWindow):
         gl.setHorizontalSpacing(0) # default: 9
         gl.setVerticalSpacing(0) # default: 9
         
-        ###############  create MENUS 
+        ###############  create Top MENUS 
         
         self.fileMenu = self.menuBar().addMenu(UIconst.FILE_MENU)
         self.editMenu = self.menuBar().addMenu(UIconst.EDIT_MENU)
         self.GraphMenu = self.menuBar().addMenu(UIconst.ROAST_MENU)
         self.ConfMenu = self.menuBar().addMenu(UIconst.CONF_MENU)
+        self.ToolkitMenu = self.menuBar().addMenu(UIconst.TOOLKIT_MENU)
         self.helpMenu = self.menuBar().addMenu(UIconst.HELP_MENU)
 
         #FILE menu
@@ -4070,12 +4074,6 @@ class ApplicationWindow(QMainWindow):
         self.connect(backgroundAction,SIGNAL("triggered()"),self.background)
         self.GraphMenu.addAction(backgroundAction)  
 
-        self.designerAction = QAction(UIconst.ROAST_MENU_DESIGNER,self)
-        self.connect(self.designerAction ,SIGNAL("triggered()"),self.designerTriggered)
-        self.designerAction.setCheckable(True)
-        self.designerAction.setChecked(self.qmc.designerflag)
-        self.GraphMenu.addAction(self.designerAction)
-
         flavorAction = QAction(UIconst.ROAST_MENU_CUPPROFILE,self)
         self.connect(flavorAction ,SIGNAL("triggered()"),self.flavorchart)
         self.GraphMenu.addAction(flavorAction)
@@ -4106,17 +4104,6 @@ class ApplicationWindow(QMainWindow):
         else:
             self.CelsiusAction.setDisabled(True)
             self.ConvertToCelsiusAction.setDisabled(True)
-
-        self.GraphMenu.addSeparator()
-
-        calculatorAction = QAction(UIconst.ROAST_MENU_CALCULATOR,self)
-        self.connect(calculatorAction,SIGNAL("triggered()"),self.calculator)
-        self.GraphMenu.addAction(calculatorAction)   
-
-        wheelAction = QAction("Wheel Graph",self)
-        self.connect(wheelAction,SIGNAL("triggered()"),self.graphwheel)
-        self.GraphMenu.addAction(wheelAction)   
-
 
         # CONFIGURATION menu
         deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
@@ -4165,9 +4152,25 @@ class ApplicationWindow(QMainWindow):
         self.connect(autosaveAction,SIGNAL("triggered()"),self.autosaveconf)
         self.ConfMenu.addAction(autosaveAction) 
 
-        hudAction = QAction(UIconst.CONF_MENU_EXTRAS,self)
+        # TOOLKIT menu
+        self.designerAction = QAction(UIconst.TOOLKIT_MENU_DESIGNER,self)
+        self.connect(self.designerAction ,SIGNAL("triggered()"),self.designerTriggered)
+        self.designerAction.setCheckable(True)
+        self.designerAction.setChecked(self.qmc.designerflag)
+        self.ToolkitMenu.addAction(self.designerAction)
+
+        calculatorAction = QAction(UIconst.TOOLKIT_MENU_CALCULATOR,self)
+        self.connect(calculatorAction,SIGNAL("triggered()"),self.calculator)
+        self.ToolkitMenu.addAction(calculatorAction)   
+
+        wheelAction = QAction(UIconst.TOOLKIT_MENU_WHEELGRAPH,self)
+        self.connect(wheelAction,SIGNAL("triggered()"),self.graphwheel)
+        self.ToolkitMenu.addAction(wheelAction)   
+
+        hudAction = QAction(UIconst.TOOLKIT_MENU_EXTRAS,self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
-        self.ConfMenu.addAction(hudAction)
+        self.ToolkitMenu.addAction(hudAction)
+
 
         # HELP menu
         helpAboutAction = QAction(UIconst.HELP_MENU_ABOUT,self)
@@ -6451,6 +6454,8 @@ $cupping_notes
         wheel["wheeltextsize"] = self.qmc.wheeltextsize 
         wheel["wheelcolor"] = self.qmc.wheelcolor
         wheel["wheelparent"] = self.qmc.wheellabelparent
+        wheel["wheeledge"] = self.qmc.wheeledge
+        
         return wheel  
 
     def loadWheel(self,filename):         
@@ -6472,6 +6477,7 @@ $cupping_notes
                 self.qmc.wheeltextsize = wheel["wheeltextsize"] 
                 self.qmc.wheelcolor = wheel["wheelcolor"]
                 self.qmc.wheellabelparent = wheel["wheelparent"]
+                self.qmc.wheeledge = wheel["wheeledge"]
             else:
                 message = u"Invalid Wheel graph format"
                 self.sendmessage(message)
@@ -8674,12 +8680,14 @@ class flavorDlg(QDialog):
         self.bodySpinbox = QSpinBox()
         self.bodySpinbox.setMaximum(10) 
 
-        self.bodySpinbox.setValue((int(aw.qmc.flavors[8]*10.)))        
-
+        self.bodySpinbox.setValue((int(aw.qmc.flavors[8]*10.)))
+        
+        saveImgButton = QPushButton("Save Img")
+        saveImgButton.setMaximumWidth(100)
+        self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
         backButton = QPushButton("OK")
-        #cancelButton = QPushButton("Cancel")
-        #updatelabelsButton = QPushButton("Update Labels")
+
         defaultButton = QPushButton("Defaults")
         defaultButton.setFocusPolicy(Qt.NoFocus)
         
@@ -8768,15 +8776,14 @@ class flavorDlg(QDialog):
         flavorLayout.addWidget(self.balanceSpinbox,7,2)
         flavorLayout.addWidget(self.line8edit,8,0)
         flavorLayout.addWidget(bodySlider,8,1)
-        flavorLayout.addWidget(self.bodySpinbox,8,2)
-        
+        flavorLayout.addWidget(self.bodySpinbox,8,2)        
         
         buttonsLayout = QHBoxLayout()
-        buttonsLayout.addWidget(defaultButton,0)
+        buttonsLayout.addWidget(defaultButton)
+        buttonsLayout.addWidget(saveImgButton)
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(backButton)
-        
-        
+            
         allFlavorLayout = QVBoxLayout()
         allFlavorLayout.addLayout(flavorLayout)
         allFlavorLayout.addWidget(self.sumLabel)
@@ -11885,8 +11892,8 @@ class graphColorDlg(QDialog):
 class WheelDlg(QDialog):
     def __init__(self, parent = None):
         super(WheelDlg,self).__init__(parent)
-        #self.setModal(True)
-        self.setWindowTitle("Graph Properties")
+        self.setModal(True)
+        self.setWindowTitle("Wheel Graph Properties")
 
         #table for alarms
         self.datatable = QTableWidget()
@@ -11895,14 +11902,14 @@ class WheelDlg(QDialog):
         #table for labels
         self.labeltable = QTableWidget()
         
-        self.labelCloseButton = QPushButton("Close Labels properties")
+        self.labelCloseButton = QPushButton("Close Label properties")
         self.labelCloseButton.setMaximumWidth(160)
         self.connect(self.labelCloseButton, SIGNAL("clicked()"),self.closelabels)
 
         self.labelResetButton = QPushButton("Reset Parents")
         self.labelResetButton.setMaximumWidth(160)
         self.connect(self.labelResetButton, SIGNAL("clicked()"),self.resetlabelparents)
-        self.labelwheelx = 0   #index of wheel being editied on labeltable
+        self.labelwheelx = 0   #index of wheel being edited on labeltable
 
         self.labeltable.setVisible(False)        
         self.labelCloseButton.setVisible(False)
@@ -11917,21 +11924,41 @@ class WheelDlg(QDialog):
         txtButtonminus.setMaximumWidth(30)
         self.connect(txtButtonminus, SIGNAL("clicked()"),lambda x = 0: self.changetext(x))
 
+        edgelabel = QLabel("Edge")
+        edgelabel.setAlignment(Qt.AlignRight)
+        self.edgeSpinBox = QSpinBox()
+        self.edgeSpinBox.setMaximumWidth(80)
+        self.edgeSpinBox.setRange(0,5)
+        self.edgeSpinBox.setValue(int(aw.qmc.wheeledge*100))
+        self.connect(self.edgeSpinBox, SIGNAL("valueChanged(int)"),self.setedge)
+        
         colorlabel = QLabel("Color pattern")    	
         self.colorSpinBox = QSpinBox()
         self.colorSpinBox.setMaximumWidth(80)
-        self.colorSpinBox.setRange(1,255)
-        self.colorSpinBox.setValue(aw.qmc.wheelcolor)
+        self.colorSpinBox.setRange(0,255)
+        self.colorSpinBox.setValue(aw.qmc.wheelcolorpattern)
         self.colorSpinBox.setWrapping(True)
-        self.connect(self.colorSpinBox, SIGNAL("valueChanged(int)"),self.setcolor)
+        self.connect(self.colorSpinBox, SIGNAL("valueChanged(int)"),self.setcolorpattern)
 
         addButton = QPushButton("Add")
         addButton.setMaximumWidth(100)
         self.connect(addButton, SIGNAL("clicked()"),self.insertwheel)
 
-        saveButton = QPushButton("Save")
+        rotateLeftButton = QPushButton("< Rotate")
+        rotateLeftButton.setMaximumWidth(80)
+        self.connect(rotateLeftButton, SIGNAL("clicked()"),lambda x = 1: self.rotatewheels(x))
+        
+        rotateRightButton = QPushButton("Rotate >")
+        rotateRightButton.setMaximumWidth(80)
+        self.connect(rotateRightButton, SIGNAL("clicked()"),lambda x = 0: self.rotatewheels(x))
+
+        saveButton = QPushButton("Save File")
         saveButton.setMaximumWidth(100)
         self.connect(saveButton, SIGNAL("clicked()"),self.fileSave)
+
+        saveImgButton = QPushButton("Save Img")
+        saveImgButton.setMaximumWidth(100)
+        self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
         openButton = QPushButton("Open")
         openButton.setMaximumWidth(100)
@@ -11957,6 +11984,7 @@ class WheelDlg(QDialog):
         buttonlayout = QHBoxLayout()
         buttonlayout.addWidget(openButton)
         buttonlayout.addWidget(saveButton)
+        buttonlayout.addWidget(saveImgButton)
         buttonlayout.addWidget(closeButton)
 
         configlayout =  QHBoxLayout()
@@ -11965,10 +11993,17 @@ class WheelDlg(QDialog):
         configlayout.addWidget(txtlabel)
         configlayout.addWidget(txtButtonplus)
         configlayout.addWidget(txtButtonminus)
-        
+        configlayout.addWidget(edgelabel)
+        configlayout.addWidget(self.edgeSpinBox)
+
+    	controlLayout = QHBoxLayout()
+    	controlLayout.addWidget(addButton)
+    	controlLayout.addWidget(rotateLeftButton)
+    	controlLayout.addWidget(rotateRightButton)
+
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
-        mainlayout.addWidget(addButton)
+        mainlayout.addLayout(controlLayout)
         mainlayout.addWidget(self.labelGroupLayout)
         mainlayout.addLayout(configlayout)
         mainlayout.addLayout(buttonlayout)
@@ -11984,8 +12019,8 @@ class WheelDlg(QDialog):
         nlabels = len(aw.qmc.wheelnames[x])
         if nlabels:    
             self.labeltable.setRowCount(nlabels)
-            self.labeltable.setColumnCount(4)
-            self.labeltable.setHorizontalHeaderLabels(["Label","Parent","Width %","Color alpha"])
+            self.labeltable.setColumnCount(5)
+            self.labeltable.setHorizontalHeaderLabels(["Label","Parent","Width","Color", "Color Intensity"])
             self.labeltable.setAlternatingRowColors(True)
             self.labeltable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -12012,25 +12047,64 @@ class WheelDlg(QDialog):
                 labelwidthSpinBox.setSuffix("%")
                 self.connect(labelwidthSpinBox, SIGNAL("valueChanged(double)"),lambda z=1,x=x,u=i: self.setlabelwidth(z,x,u))
 
-                colorSpinBox = QSpinBox()
-                colorSpinBox.setRange(0,10)
-                colorSpinBox.setValue(int(aw.qmc.segmentsalpha[x][i]*10))
-                self.connect(colorSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=x,u=i: self.setsegmentalpha(z,x,u))
+                colorButton = QPushButton("Set Color")
+                self.connect(colorButton, SIGNAL("clicked()"),lambda x =x,i=i: self.setsegmentcolor(x,i))
+
+                alphaSpinBox = QSpinBox()
+                alphaSpinBox.setRange(0,10)
+                alphaSpinBox.setValue(int(aw.qmc.segmentsalpha[x][i]*10))
+                self.connect(alphaSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=x,u=i: self.setsegmentalpha(z,x,u))
                
                 #add widgets to the table
                 self.labeltable.setItem(i,0,label)
                 self.labeltable.setCellWidget(i,1,parentComboBox)                  
-                self.labeltable.setCellWidget(i,2,labelwidthSpinBox)  
-                self.labeltable.setCellWidget(i,3,colorSpinBox)
+                self.labeltable.setCellWidget(i,2,labelwidthSpinBox)
+                self.labeltable.setCellWidget(i,3,colorButton)
+                self.labeltable.setCellWidget(i,4,alphaSpinBox)
 
     #input: z = index of parent in previus wheel x = wheel number i = index of element in wheel
     def setparent(self,z,x,i):
         aw.qmc.setwheelparent(z,x,i)
         aw.qmc.drawWheel()
         self.createdatatable() #update data table        
-                                
+
+    def setsegmentcolor(self,x,i):
+        colorf = QColorDialog.getColor(QColor(aw.qmc.wheelcolor[x][i]),self)
+        if colorf.isValid():
+            colorname = unicode(colorf.name())
+            aw.qmc.wheelcolor[x][i] = colorname      #add new color to label
+            
+            self.createdatatable()                           #update main table with label names (label::color)
+            aw.qmc.drawWheel()
+
+    def setwheelcolor(self,x):
+        colorf = QColorDialog.getColor(QColor(aw.qmc.wheelcolor[x][0]),self)
+        if colorf.isValid():
+            colorname = unicode(colorf.name())
+            for i in range(len(aw.qmc.wheelcolor[x])):                  
+                aw.qmc.wheelcolor[x][i] =  colorname
+                
+        self.createdatatable()                           
+        aw.qmc.drawWheel()
+
+    #sets color pattern    
+    def setcolorpattern(self):
+        aw.qmc.wheelcolorpattern = self.colorSpinBox.value()
+        if aw.qmc.wheelcolorpattern:
+            aw.qmc.makewheelcolorpattern()
+            aw.qmc.drawWheel()
+        
     def setsegmentalpha(self,z,x,u):
         aw.qmc.segmentsalpha[x][u] = float(z/10.) 
+        aw.qmc.drawWheel()
+
+    def rotatewheels(self,x):
+        if x == 1: #left
+            for i in range(len(aw.qmc.startangle)):
+                aw.qmc.startangle[i] += 1
+        elif x == 0:
+            for i in range(len(aw.qmc.startangle)):              
+                aw.qmc.startangle[i] -= 1
         aw.qmc.drawWheel()
         
     def setlabelwidth(self,z,x,u):
@@ -12057,6 +12131,11 @@ class WheelDlg(QDialog):
         aw.qmc.drawWheel()
         self.createlabeltable(x)
 
+    def setedge(self):
+        aw.qmc.wheeledge = float(self.edgeSpinBox.value())/100.
+        aw.qmc.drawWheel()
+
+    
     def closelabels(self):
         self.labelGroupLayout.setVisible(False)
         self.labeltable.setVisible(False)
@@ -12068,8 +12147,9 @@ class WheelDlg(QDialog):
         ndata = len(aw.qmc.wheelnames)
         if ndata:    
             self.datatable.setRowCount(ndata)
-            self.datatable.setColumnCount(8)
-            self.datatable.setHorizontalHeaderLabels(["Del Wheel","Edit Labels","Update Labels","Properties","Radius","Starting angle","Txt Projection","Txt size"])
+            self.datatable.setColumnCount(9)
+            self.datatable.setHorizontalHeaderLabels(["Del Wheel","Edit Labels","Update Labels","Properties",
+                                                      "Radius","Starting angle","Txt Projection","Txt size","Color"])
             self.datatable.setAlternatingRowColors(True)
             self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -12111,6 +12191,9 @@ class WheelDlg(QDialog):
                 txtSpinBox.setRange(1,30)
                 txtSpinBox.setValue(aw.qmc.wheeltextsize[i])
                 self.connect(txtSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=i: self.setTextsizeX(z,x))                
+
+                colorButton = QPushButton("Set Color")
+                self.connect(colorButton, SIGNAL("clicked()"),lambda x =i: self.setwheelcolor(x))
                 
                 #add widgets to the table
                 self.datatable.setCellWidget(i,0,delButton)
@@ -12121,6 +12204,7 @@ class WheelDlg(QDialog):
                 self.datatable.setCellWidget(i,5,angleSpinBox)
                 self.datatable.setCellWidget(i,6,projectionComboBox)
                 self.datatable.setCellWidget(i,7,txtSpinBox)
+                self.datatable.setCellWidget(i,8,colorButton)
 
     def updatelabels(self,x):
         labelsedit =  self.datatable.cellWidget(x,1)
@@ -12149,7 +12233,21 @@ class WheelDlg(QDialog):
                     aw.qmc.wradii[i] -= abs(float(diff))/(l-1)
                 else:
                     aw.qmc.wradii[i] += abs(float(diff))/(l-1)
+
         aw.qmc.wradii[x] = newwidth
+        
+        #correct for numerical floating rouding errors:
+        count = 0.            
+        for i in range(len(aw.qmc.wradii)):
+            count +=  aw.qmc.wradii[i]
+        diff = 100. - count
+        if diff  != 0.:
+            if diff > 0.000:  #if count smaller
+                aw.qmc.wradii[x] += abs(diff)
+            else:
+                aw.qmc.wradii[x] -= abs(diff)
+                
+
         aw.qmc.drawWheel()
 
     def setangle(self,z,x):
@@ -12175,10 +12273,6 @@ class WheelDlg(QDialog):
                 aw.qmc.wheeltextsize[i] -= 1
         aw.qmc.drawWheel()
 
-    #sets color pattern    
-    def setcolor(self):
-        aw.qmc.wheelcolor = self.colorSpinBox.value()
-        aw.qmc.drawWheel()
 
     def insertwheel(self):
         ndata = len(aw.qmc.wradii)
@@ -12195,12 +12289,16 @@ class WheelDlg(QDialog):
             nwheels = len(aw.qmc.wheelnames[-1])
         else:
             nwheels = 3
-        wn,sl,sa,wlp = [],[],[],[]
+        wn,sl,sa,wlp,co = [],[],[],[],[]
         for i in range(nwheels+1):
             wn.append("W%i %i"%(len(aw.qmc.wheelnames)+1,i+1))
             sl.append(100./(nwheels+1))
             sa.append(.3)
             wlp.append(0)
+            color = QColor()
+            color.setHsv((360/(nwheels+1))*i,255,255,255)
+            co.append(unicode(color.name()))       
+            
         aw.qmc.wheelnames.append(wn)
         aw.qmc.segmentlengths.append(sl)
         aw.qmc.segmentsalpha.append(sa)
@@ -12208,6 +12306,7 @@ class WheelDlg(QDialog):
         aw.qmc.startangle.append(0)
         aw.qmc.projection.append(2)
         aw.qmc.wheeltextsize.append(10)
+        aw.qmc.wheelcolor.append(co)
 
         self.createdatatable()
         aw.qmc.drawWheel()
@@ -12227,12 +12326,13 @@ class WheelDlg(QDialog):
         aw.qmc.segmentlengths.pop(x)
         aw.qmc.segmentsalpha.pop(x)
         aw.qmc.wheellabelparent.pop(x)
+        aw.qmc.wheelcolor.pop(x)
         
         self.createdatatable()
         aw.qmc.drawWheel()
 
     def fileSave(self):
-        try:         
+        try:
             filename = aw.ArtisanSaveFileDialog(msg="Save Wheel graph",ext="*.wg")
             if filename:
                 #write
@@ -12247,7 +12347,7 @@ class WheelDlg(QDialog):
         aw.loadWheel(filename)
         self.createdatatable()
         aw.qmc.drawWheel()
-        
+
     def closeEvent(self, event):    
         aw.qmc.redraw()
         
