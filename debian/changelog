@@ -1,3 +1,25 @@
+artisan (0.4.1-0) maverick; urgency=low
+
+  * new upstream release 0.4.1:
+    - import of CSV is not limited anymore to filenames with "csv" extension
+    - improved VA18B support
+    - Windows binary includes the language translations that were missing in v0.4.0
+  * new upstream release 0.4.0:
+    - improved CSV import/export
+    - K202 CSV support added
+    - adds localization support
+    - adds german, french, spanish, swedish, italian menu translations
+    - fixed cut-copy-paste on Mac and added cut-copy-paste menu
+    - LCD color configuration
+    - replay of events via background dialog
+    - relative times are used everywhere
+    - adds profile designer
+    - adds alarms
+    - more robust Arduino/TC4 communication
+    - bug fixes
+
+ -- lukas <lukas@einfachkaffee.de>  Thu, 21 Apr 2011 16:37:58 +0200
+
 artisan (0.3.3-2) maverick; urgency=low
 
   * Rebuild with some last-minute fixes:
