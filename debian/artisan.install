@@ -1,4 +1,6 @@
 artisan.py /usr/share/artisan
+artisan.desktop /usr/share/applications
+artisan.png /usr/share/artisan
 const/__init__.py /usr/share/artisan/const
 const/UIconst.py /usr/share/artisan/const
 translations/artisan_de.qm /usr/share/artisan/translations
