@@ -1,2 +1,9 @@
 artisan.py /usr/share/artisan
-artisan /usr/bin
+const/__init__.py /usr/share/artisan/const
+const/UIconst.py /usr/share/artisan/const
+translations/artisan_de.qm /usr/share/artisan/translations
+translations/artisan_es.qm /usr/share/artisan/translations
+translations/artisan_fr.qm /usr/share/artisan/translations
+translations/artisan_it.qm /usr/share/artisan/translations
+translations/artisan_sv.qm /usr/share/artisan/translations
+debian/artisan.sh /usr/bin
