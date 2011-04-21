@@ -1,3 +1,10 @@
+artisan (0.4.1-1) maverick; urgency=low
+
+  * add .desktop file for menu entry
+  * add icon to desktop menu entry
+
+ -- lukas <lukas@einfachkaffee.de>  Thu, 21 Apr 2011 17:28:59 +0200
+
 artisan (0.4.1-0) maverick; urgency=low
 
   * new upstream release 0.4.1:
