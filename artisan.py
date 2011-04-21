@@ -1917,9 +1917,9 @@ class tgraphcanvas(FigureCanvas):
                 color.setHsv((360/wlen)*i*self.wheelcolorpattern,255,255,255)
                 self.wheelcolor[x][i] = unicode(color.name())
         
-    # sets parent and corrects segment lengths so that child fits inside parent (multiple children can be set to same parent)
+    # corrects segment lengths so that child fits inside parent (multiple children can be set to same parent)
     # input: z = index of parent in previus wheel    # x = wheel number    # i = index of element in wheel x
-    def setwheelparent(self,z,x,i):
+    def setwheelchild(self,z,x,i):
         #set same start angle
         self.startangle[x] = self.startangle[x-1]
         self.wheellabelparent[x][i] = z
@@ -1944,7 +1944,25 @@ class tgraphcanvas(FigureCanvas):
                         #adjust rest of angles to get 100 % coverage
                         for a in range(i+1,nsegments):
                             self.segmentlengths[x][a] = (100-parentanglecount)/(nsegments-(i+1))
- 
+
+    def setWheelHierarchi(self):
+        for i in range(len(self.segmentlengths[-1])):
+            self.segmentlengths[-1][i] = 100./len(self.segmentlengths[-1])
+        
+        for p in range(len(self.wheellabelparent)-1,0,-1):
+            nsegments = len(self.wheellabelparent[p])
+            nparentsegments = len(self.wheellabelparent[p-1])
+            angles = [0]*nparentsegments
+            for x in range(nparentsegments):
+                for i in range(nsegments):
+                    if self.wheellabelparent[p][i]-1 == x:
+                        angles[x] += self.segmentlengths[p][i]
+
+            #adjust angle length of parents proportionaly          
+            for i in range(nparentsegments):
+                self.segmentlengths[p-1][i] = angles[i]
+
+        self.drawWheel()
 ##########################################################################################################################                                   
 
 
@@ -11911,6 +11929,10 @@ class WheelDlg(QDialog):
         self.connect(self.labelResetButton, SIGNAL("clicked()"),self.resetlabelparents)
         self.labelwheelx = 0   #index of wheel being edited on labeltable
 
+        self.hierarchiButton = QPushButton("Set Hierarchi")
+        self.hierarchiButton.setMaximumWidth(100)
+        self.connect(self.hierarchiButton, SIGNAL("clicked()"),aw.qmc.setWheelHierarchi)
+
         self.labeltable.setVisible(False)        
         self.labelCloseButton.setVisible(False)
         self.labelResetButton.setVisible(False)
@@ -11944,12 +11966,12 @@ class WheelDlg(QDialog):
         addButton.setMaximumWidth(100)
         self.connect(addButton, SIGNAL("clicked()"),self.insertwheel)
 
-        rotateLeftButton = QPushButton("< Rotate")
-        rotateLeftButton.setMaximumWidth(80)
+        rotateLeftButton = QPushButton("<")
+        rotateLeftButton.setMaximumWidth(30)
         self.connect(rotateLeftButton, SIGNAL("clicked()"),lambda x = 1: self.rotatewheels(x))
         
-        rotateRightButton = QPushButton("Rotate >")
-        rotateRightButton.setMaximumWidth(80)
+        rotateRightButton = QPushButton(">")
+        rotateRightButton.setMaximumWidth(30)
         self.connect(rotateRightButton, SIGNAL("clicked()"),lambda x = 0: self.rotatewheels(x))
 
         saveButton = QPushButton("Save File")
@@ -11993,6 +12015,7 @@ class WheelDlg(QDialog):
         configlayout.addWidget(txtlabel)
         configlayout.addWidget(txtButtonplus)
         configlayout.addWidget(txtButtonminus)
+
         configlayout.addWidget(edgelabel)
         configlayout.addWidget(self.edgeSpinBox)
 
@@ -12000,6 +12023,7 @@ class WheelDlg(QDialog):
         controlLayout.addWidget(addButton)
         controlLayout.addWidget(rotateLeftButton)
         controlLayout.addWidget(rotateRightButton)
+    	controlLayout.addWidget(self.hierarchiButton)
 
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
@@ -12015,6 +12039,7 @@ class WheelDlg(QDialog):
         self.labeltable.setVisible(True)
         self.labelCloseButton.setVisible(True)
         self.labelResetButton.setVisible(True)
+
         self.labeltable.clear()        
         nlabels = len(aw.qmc.wheelnames[x])
         if nlabels:    
@@ -12039,7 +12064,7 @@ class WheelDlg(QDialog):
                         parentComboBox.setCurrentIndex(aw.qmc.wheellabelparent[x][i])
                 else:
                     parentComboBox.addItems([])
-                self.connect(parentComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=x,i=i:self.setparent(z,x,i))
+                self.connect(parentComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=x,i=i:self.setwheelchild(z,x,i))
                 
                 labelwidthSpinBox = QDoubleSpinBox()
                 labelwidthSpinBox.setRange(1.,100.)
@@ -12062,11 +12087,6 @@ class WheelDlg(QDialog):
                 self.labeltable.setCellWidget(i,3,colorButton)
                 self.labeltable.setCellWidget(i,4,alphaSpinBox)
 
-    #input: z = index of parent in previus wheel x = wheel number i = index of element in wheel
-    def setparent(self,z,x,i):
-        aw.qmc.setwheelparent(z,x,i)
-        aw.qmc.drawWheel()
-        self.createdatatable() #update data table        
 
     def setsegmentcolor(self,x,i):
         colorf = QColorDialog.getColor(QColor(aw.qmc.wheelcolor[x][i]),self)
@@ -12121,6 +12141,12 @@ class WheelDlg(QDialog):
         aw.qmc.segmentlengths[x][u] = newwidth
         aw.qmc.drawWheel()
 
+    #input: z = index of parent in previus wheel; x = wheel number; i = index of element in wheel
+    def setwheelchild(self,z,x,i):
+        aw.qmc.setwheelchild(z,x,i)
+        aw.qmc.drawWheel()
+        self.createdatatable() #update data table        
+
     def resetlabelparents(self):
         x = self.labelwheelx
         nsegments = len(aw.qmc.wheellabelparent[x])
@@ -12130,6 +12156,7 @@ class WheelDlg(QDialog):
             
         aw.qmc.drawWheel()
         self.createlabeltable(x)
+
 
     def setedge(self):
         aw.qmc.wheeledge = float(self.edgeSpinBox.value())/100.
@@ -12217,7 +12244,8 @@ class WheelDlg(QDialog):
             aw.qmc.segmentlengths[x] = [100./newnlabels]*newnlabels                    
             aw.qmc.segmentsalpha[x] = [.3]*newnlabels
             aw.qmc.wheellabelparent[x] = [0]*newnlabels
-
+            aw.qmc.wheelcolor[x] = [aw.qmc.wheelcolor[x][0]]*newnlabels
+            
         aw.qmc.wheelnames[x] = newwheellabels[:]        
         aw.qmc.drawWheel()        
 
