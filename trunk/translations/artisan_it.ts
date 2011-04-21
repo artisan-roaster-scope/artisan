@@ -1180,6 +1180,96 @@
         <source>ON</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="artisan.py" line="3566"/>
+        <source>OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3576"/>
+        <source>FC START</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3584"/>
+        <source>FC END</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3592"/>
+        <source>SC START</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3600"/>
+        <source>SC END</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3609"/>
+        <source>RESET</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3617"/>
+        <source>CHARGE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3626"/>
+        <source>DROP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3635"/>
+        <source>PID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3642"/>
+        <source>EVENT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3651"/>
+        <source>SV +5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3660"/>
+        <source>SV +10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3669"/>
+        <source>SV +20</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3678"/>
+        <source>SV -20</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3687"/>
+        <source>SV -10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3696"/>
+        <source>SV -5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3704"/>
+        <source>HUD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3712"/>
+        <source>DRY END</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Scope Label</name>
@@ -1232,6 +1322,168 @@
     <message>
         <location filename="artisan.py" line="3563"/>
         <source>Starts recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3572"/>
+        <source>Stops recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3581"/>
+        <source>Marks the begining of First Crack (FC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3589"/>
+        <source>Marks the end of First Crack (FC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3597"/>
+        <source>Marks the begining of Second Crack (SC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3605"/>
+        <source>Marks the end of Second Crack (SC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3613"/>
+        <source>Resets Graph and Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3622"/>
+        <source>Marks the begining of the roast (beans in)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3631"/>
+        <source>Marks the end of the roast (drop beans)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3647"/>
+        <source>Marks an Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3656"/>
+        <source>Increases the current SV value by 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3665"/>
+        <source>Increases the current SV value by 10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3674"/>
+        <source>Increases the current SV value by 20</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3683"/>
+        <source>Decreases the current SV value by 20</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3692"/>
+        <source>Decreases the current SV value by 10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3701"/>
+        <source>Decreases the current SV value by 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3709"/>
+        <source>Turns ON/OFF the HUD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3717"/>
+        <source>Marks the end of the Dry phase (DRYEND)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3774"/>
+        <source>Timer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3775"/>
+        <source>ET Temperature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3776"/>
+        <source>BT Temperature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3777"/>
+        <source>ET/time (degrees/min)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3778"/>
+        <source>BT/time (degrees/min)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3779"/>
+        <source>Value of SV in PID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3816"/>
+        <source>Number of events found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3827"/>
+        <source>Type of event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3832"/>
+        <source>Value of event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="3847"/>
+        <source>Updates the event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="6647"/>
+        <source>linear: linear interpolation
+cubic: 3rd order spline interpolation
+nearest: y value of the nearest point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="7770"/>
+        <source>Automatic generated name = This text + date + time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="7773"/>
+        <source>ON/OFF of automatic saving when pressing keyboard letter [s]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="7787"/>
+        <source>Sets the directory to store batch profiles when using the letter [s]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="8250"/>
+        <source>Allows to enter a description of the last event</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
