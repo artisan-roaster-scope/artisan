@@ -3780,28 +3780,28 @@ class ApplicationWindow(QMainWindow):
 
         #MET
         label2 = QLabel()
-        label2.setText(QApplication.translate("Form Label", "<font color='black'><b>ET<\b></font>",None, QApplication.UnicodeUTF8))
+        label2.setText("<font color='black'><b>" + QApplication.translate("Form Label", "ET",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label2.setAlignment(Qt.AlignRight)
         label2.setIndent(5)
         #BT
         label3 = QLabel()
         label3.setAlignment(Qt.AlignRight)
-        label3.setText(QApplication.translate("Form Label", "<font color='black'><b>BT<\b></font>",None, QApplication.UnicodeUTF8))
+        label3.setText("<font color='black'><b>" + QApplication.translate("Form Label", "BT",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label3.setIndent(5)
         #DELTA MET
         label4 = QLabel()
         label4.setAlignment(Qt.AlignRight)
-        label4.setText(QApplication.translate("Form Label", "<font color='black'><b>DeltaET<\b></font>",None, QApplication.UnicodeUTF8))
+        label4.setText("<font color='black'><b>" + QApplication.translate("Form Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label4.setIndent(5)
         # DELTA BT
         label5 = QLabel()
         label5.setAlignment(Qt.AlignRight)       
-        label5.setText(QApplication.translate("Form Label", "<font color='black'><b>DeltaBT<\b></font>",None, QApplication.UnicodeUTF8))
+        label5.setText("<font color='black'><b>" + QApplication.translate("Form Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label5.setIndent(5)
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.AlignRight)
-        self.label6.setText(QApplication.translate("Form Label", "<font color='black'><b>PID SV<\b></font>",None, QApplication.UnicodeUTF8))
+        self.label6.setText("<font color='black'><b>" + QApplication.translate("Form Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.label6.setIndent(5)
 
         self.messagehist = []
@@ -6892,7 +6892,7 @@ class editGraphDlg(QDialog):
         regexweight = QRegExp(r"^[0-9]{1,3}[.0-9]{1,2}$")
 
         #MARKERS
-        chargelabel  = QLabel(QApplication.translate("Form Label", "<b>CHARGE</b>",None, QApplication.UnicodeUTF8))
+        chargelabel  = QLabel("<b>" + QApplication.translate("Form Label", "CHARGE",None, QApplication.UnicodeUTF8) + "</b>")
         chargelabel.setStyleSheet("background-color:'#f07800';")
 
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
@@ -6902,7 +6902,7 @@ class editGraphDlg(QDialog):
         self.chargeedit.setMinimumWidth(50)
         chargelabel.setBuddy(self.chargeedit)
 
-        drylabel  = QLabel(QApplication.translate("Form Label", "<b>DRY END</b>",None, QApplication.UnicodeUTF8))
+        drylabel  = QLabel("<b>" + QApplication.translate("Form Label", "DRY END",None, QApplication.UnicodeUTF8) + "</b>")
         drylabel.setStyleSheet("background-color:'orange';")
         
         if aw.qmc.timeindex[1]:
@@ -6916,7 +6916,7 @@ class editGraphDlg(QDialog):
         self.dryedit.setMinimumWidth(50)
         drylabel.setBuddy(self.dryedit)
  
-        Cstartlabel = QLabel("<b>FC START</b>")
+        Cstartlabel = QLabel("<b>" + QApplication.translate("Form Label","FC START",None, QApplication.UnicodeUTF8) + "</b>")
         Cstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[2]:
             t3 = int(aw.qmc.timex[aw.qmc.timeindex[2]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -6929,7 +6929,7 @@ class editGraphDlg(QDialog):
         self.Cstartedit.setMinimumWidth(50)
         Cstartlabel.setBuddy(self.Cstartedit)
         
-        Cendlabel = QLabel("<b>FC END</b>")
+        Cendlabel = QLabel("<b>" + QApplication.translate("Form Label","FC END",None, QApplication.UnicodeUTF8) + "</b>")
         Cendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[3]:
             t4 = int(aw.qmc.timex[aw.qmc.timeindex[3]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -6942,7 +6942,7 @@ class editGraphDlg(QDialog):
         self.Cendedit.setMinimumWidth(50)
         Cendlabel.setBuddy(self.Cendedit)
    
-        CCstartlabel = QLabel("<b>SC START</b>")
+        CCstartlabel = QLabel("<b>" + QApplication.translate("Form Label","SC START",None, QApplication.UnicodeUTF8) + "</b>")
         CCstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[4]:
             t5 = int(aw.qmc.timex[aw.qmc.timeindex[4]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -6955,7 +6955,7 @@ class editGraphDlg(QDialog):
         self.CCstartedit.setMinimumWidth(50)
         CCstartlabel.setBuddy(self.CCstartedit)
 
-        CCendlabel = QLabel("<b>SC END</b>")
+        CCendlabel = QLabel("<b>" + QApplication.translate("Form Label","SC END",None, QApplication.UnicodeUTF8) + "</b>")
         CCendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[5]:
             t6 = int(aw.qmc.timex[aw.qmc.timeindex[5]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -6968,7 +6968,7 @@ class editGraphDlg(QDialog):
         self.CCendedit.setMinimumWidth(50)
         CCendlabel.setBuddy(self.CCendedit)
         
-        droplabel = QLabel("<b>DROP</b>")
+        droplabel = QLabel("<b>" + QApplication.translate("Form Label", "DROP",None, QApplication.UnicodeUTF8) + "</b>")
         droplabel.setStyleSheet("background-color:'#f07800';")
         if aw.qmc.timeindex[6]:
             t7 = int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -7007,17 +7007,17 @@ class editGraphDlg(QDialog):
         self.createDataTable()        
            
         #TITLE
-        titlelabel = QLabel(QApplication.translate("Form Label", "<b>Title</b>",None, QApplication.UnicodeUTF8))
+        titlelabel = QLabel("<b>" + QApplication.translate("Form Label", "Title",None, QApplication.UnicodeUTF8) + "</b>")
         self.titleedit = QLineEdit(aw.qmc.title)
         #Date
-        datelabel1 = QLabel(QApplication.translate("Form Label", "<b>Date</b>",None, QApplication.UnicodeUTF8))
+        datelabel1 = QLabel("<b>" + QApplication.translate("Form Label", "Date",None, QApplication.UnicodeUTF8) + "</b>")
         date = aw.qmc.roastdate.toString()
         dateedit = QLineEdit(date)
         dateedit.setReadOnly(True)
         dateedit.setStyleSheet("background-color:'lightgrey'")
 
         #Beans
-        beanslabel = QLabel(QApplication.translate("Form Label", "<b>Beans</b>",None, QApplication.UnicodeUTF8))
+        beanslabel = QLabel("<b>" + QApplication.translate("Form Label", "Beans",None, QApplication.UnicodeUTF8) + "</b>")
         self.beansedit = QTextEdit()
         self.beansedit.setMaximumHeight(100)
 
@@ -7030,7 +7030,7 @@ class editGraphDlg(QDialog):
         self.operator = QLineEdit(aw.qmc.operator)
         
         #weight
-        weightlabel = QLabel(QApplication.translate("Form Label", "<b>Weight </b>",None, QApplication.UnicodeUTF8))
+        weightlabel = QLabel("<b>" + QApplication.translate("Form Label", "Weight",None, QApplication.UnicodeUTF8) + "</b>")
         weightinlabel = QLabel(QApplication.translate("Form Label", " in",None, QApplication.UnicodeUTF8))
         weightoutlabel = QLabel(QApplication.translate("Form Label", " out",None, QApplication.UnicodeUTF8))
         inw = str(aw.qmc.weight[0])
@@ -7065,7 +7065,7 @@ class editGraphDlg(QDialog):
             self.unitsComboBox.setCurrentIndex(1)
         
         #volume
-        volumelabel = QLabel(QApplication.translate("Form Label", "<b>Volume </b>",None, QApplication.UnicodeUTF8))
+        volumelabel = QLabel("<b>" + QApplication.translate("Form Label", "Volume",None, QApplication.UnicodeUTF8) + "</b>")
         volumeinlabel = QLabel(QApplication.translate("Form Label", " in",None, QApplication.UnicodeUTF8))
         volumeoutlabel = QLabel(QApplication.translate("Form Label", " out",None, QApplication.UnicodeUTF8))
         inv = str(aw.qmc.volume[0])
@@ -7105,7 +7105,7 @@ class editGraphDlg(QDialog):
         self.connect(self.unitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
 
         #density
-        bean_density_label = QLabel(QApplication.translate("Form Label", "<b>Density </b>",None, QApplication.UnicodeUTF8))
+        bean_density_label = QLabel("<b>" + QApplication.translate("Form Label", "Density",None, QApplication.UnicodeUTF8) + "</b>")
         self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
         self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_weight_edit))
         self.bean_density_weight_edit.setMinimumWidth(55)
@@ -7139,7 +7139,7 @@ class editGraphDlg(QDialog):
 
 
         #bag humidity
-        bag_humidity_label = QLabel(QApplication.translate("Form Label", "<b>Storage Humidity </b>",None, QApplication.UnicodeUTF8))
+        bag_humidity_label = QLabel("<b>" + QApplication.translate("Form Label", "Storage Humidity",None, QApplication.UnicodeUTF8) + "</b>")
         bag_humidity_unitslabel = QLabel(aw.qmc.mode)
         bag_humidity_unit_label = QLabel(QApplication.translate("Form Label", "%",None, QApplication.UnicodeUTF8))
         self.humidity_edit = QLineEdit()
@@ -7157,7 +7157,7 @@ class editGraphDlg(QDialog):
         
 
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel(QApplication.translate("Form Label", "<b>Ambient Temperature</b>",None, QApplication.UnicodeUTF8))
+        ambientlabel = QLabel("<b>" + QApplication.translate("Form Label", "Ambient Temperature",None, QApplication.UnicodeUTF8) + "</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
@@ -7169,16 +7169,16 @@ class editGraphDlg(QDialog):
   
         # NOTES
         roastertypelabel = QLabel()
-        roastertypelabel.setText(QApplication.translate("Form Label", "<b>Roaster</b>",None, QApplication.UnicodeUTF8))
+        roastertypelabel.setText("<b>" + QApplication.translate("Form Label", "Roaster",None, QApplication.UnicodeUTF8) + "</b>")
 
         operatorlabel = QLabel()
-        operatorlabel.setText(QApplication.translate("Form Label", "<b>Operator</b>",None, QApplication.UnicodeUTF8))
+        operatorlabel.setText("<b>" + QApplication.translate("Form Label", "Operator",None, QApplication.UnicodeUTF8) + "</b>")
 
-        roastinglabel = QLabel(QApplication.translate("Form Label", "<b>Roasting Notes</b>",None, QApplication.UnicodeUTF8))
+        roastinglabel = QLabel("<b>" + QApplication.translate("Form Label", "Roasting Notes",None, QApplication.UnicodeUTF8) + "</b>")
         self.roastingeditor = QTextEdit()
         self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
 
-        cuppinglabel = QLabel(QApplication.translate("Form Label", "<b>Cupping Notes</b>",None, QApplication.UnicodeUTF8))
+        cuppinglabel = QLabel("<b>" + QApplication.translate("Form Label", "Cupping Notes",None, QApplication.UnicodeUTF8) + "</b>")
         self.cuppingeditor =  QTextEdit()
         self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
         
@@ -11996,10 +11996,10 @@ class WheelDlg(QDialog):
         configlayout.addWidget(edgelabel)
         configlayout.addWidget(self.edgeSpinBox)
 
-    	controlLayout = QHBoxLayout()
-    	controlLayout.addWidget(addButton)
-    	controlLayout.addWidget(rotateLeftButton)
-    	controlLayout.addWidget(rotateRightButton)
+        controlLayout = QHBoxLayout()
+        controlLayout.addWidget(addButton)
+        controlLayout.addWidget(rotateLeftButton)
+        controlLayout.addWidget(rotateRightButton)
 
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
@@ -12538,13 +12538,13 @@ class PXRpidDlgControl(QDialog):
         self.labelrs1 = QLabel()
         self.labelrs1.setMargin(5)
         self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs1.setText(QApplication.translate("Form Label", "<font color='white'><b>Ramp/Soak<br>(1-4)<\b></font>",None, QApplication.UnicodeUTF8))
+        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Form Label", "Ramp/Soak<br>(1-4)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.labelrs1.setMaximumSize(90, 62)
 
         self.labelrs2 = QLabel()
         self.labelrs2.setMargin(5)
         self.labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs2.setText(QApplication.translate("Form Label", "<font color='white'><b>Ramp/Soak<br>(5-8)<\b></font>",None, QApplication.UnicodeUTF8))
+        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Form Label", "Ramp/Soak<br>(5-8)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.labelrs2.setMaximumSize(90, 62)
 
         labelpattern = QLabel(QApplication.translate("Form Label", "Ramp/Soak Pattern",None, QApplication.UnicodeUTF8))
@@ -13280,14 +13280,14 @@ class PXG4pidDlgControl(QDialog):
         labelrs1 = QLabel()
         labelrs1.setMargin(5)
         labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs1.setText(QApplication.translate("Form Label", "<font color='white'><b>RampSoak<br>(1-7)<\b></font>",None, QApplication.UnicodeUTF8))
+        labelrs1.setText("<font color='white'><b>" + QApplication.translate("Form Label", "RampSoak<br>(1-7)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         #labelrs1.setMaximumSize(90, 42)
         #labelrs1.setMinimumHeight(50)
 
         labelrs2 = QLabel()
         labelrs2.setMargin(5)
         labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs2.setText(QApplication.translate("Form Label", "<font color='white'><b>RampSoak<br>(8-16)<\b></font>",None, QApplication.UnicodeUTF8))
+        labelrs2.setText("<font color='white'><b>" + QApplication.translate("Form Label", "RampSoak<br>(8-16)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         #labelrs2.setMaximumSize(90, 42)
         #labelrs2.setMinimumHeight(50)
 
@@ -13383,14 +13383,14 @@ class PXG4pidDlgControl(QDialog):
         labelsv = QLabel()
         labelsv.setMargin(10)
         labelsv.setStyleSheet("background-color:'#CCCCCC';")
-        labelsv.setText(QApplication.translate("Form Label", "<font color='white'><b>SV (7-0)<\b></font>",None, QApplication.UnicodeUTF8))
+        labelsv.setText("<font color='white'><b>" + QApplication.translate("Form Label", "SV (7-0)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         labelsv.setMaximumSize(100, 42)
         labelsv.setMinimumHeight(50)
         
         labelsvedit = QLabel()
         labelsvedit.setMargin(10)
         labelsvedit.setStyleSheet("background-color:'#CCCCCC';")
-        labelsvedit.setText(QApplication.translate("Form Label", "<font color='white'><b>Write<\b></font>",None, QApplication.UnicodeUTF8))
+        labelsvedit.setText("<font color='white'><b>" + QApplication.translate("Form Label", "Write",None, QApplication.UnicodeUTF8) + "<\b></font>")
         labelsvedit.setMaximumSize(100, 42)
         labelsvedit.setMinimumHeight(50)
         
@@ -13486,28 +13486,28 @@ class PXG4pidDlgControl(QDialog):
         plabel = QLabel()
         plabel.setMargin(10)
         plabel.setStyleSheet("background-color:'#CCCCCC';")
-        plabel.setText(QApplication.translate("Form Label", "<font color='white'><b>P<\b></font>",None, QApplication.UnicodeUTF8))
+        plabel.setText("<font color='white'><b>" + QApplication.translate("Form Label", "P",None, QApplication.UnicodeUTF8) + "<\b></font>")
         plabel.setMaximumSize(50, 42)
         plabel.setMinimumHeight(50)
 
         ilabel = QLabel()
         ilabel.setMargin(10)
         ilabel.setStyleSheet("background-color:'#CCCCCC';")
-        ilabel.setText(QApplication.translate("Form Label", "<font color='white'><b>I<\b></font>",None, QApplication.UnicodeUTF8))
+        ilabel.setText("<font color='white'><b>" + QApplication.translate("Form Label", "I",None, QApplication.UnicodeUTF8) + "<\b></font>")
         ilabel.setMaximumSize(50, 42)
         ilabel.setMinimumHeight(50)
         
         dlabel = QLabel()
         dlabel.setMargin(10)
         dlabel.setStyleSheet("background-color:'#CCCCCC';")
-        dlabel.setText(QApplication.translate("Form Label", "<font color='white'><b>D<\b></font>",None, QApplication.UnicodeUTF8))
+        dlabel.setText("<font color='white'><b>" + QApplication.translate("Form Label", "D",None, QApplication.UnicodeUTF8) + "<\b></font>")
         dlabel.setMaximumSize(50, 42)
         dlabel.setMinimumHeight(50)
 
         wlabel = QLabel()
         wlabel.setMargin(10)
         wlabel.setStyleSheet("background-color:'#CCCCCC';")
-        wlabel.setText(QApplication.translate("Form Label", "<font color='white'><b>Write<\b></font>",None, QApplication.UnicodeUTF8))
+        wlabel.setText("<font color='white'><b>" + QApplication.translate("Form Label", "Write",None, QApplication.UnicodeUTF8) + "<\b></font>")
         wlabel.setMaximumSize(50, 42)
         wlabel.setMinimumHeight(50)
         
