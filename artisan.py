@@ -3563,158 +3563,158 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
 
-        self.button_2 = QPushButton("OFF")
+        self.button_2 = QPushButton(QApplication.translate("Scope Button", "OFF", None, QApplication.UnicodeUTF8))
         self.button_2.setFocusPolicy(Qt.NoFocus)
         self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
         self.button_2.setMaximumSize(90, 50)
         self.button_2.setMinimumHeight(50)
         #self.button_2.setToolTip("<font color=red size=2><b>" + "Press here to Stop monitoring" + "</font></b>")
-        self.button_2.setToolTip("Stops recording")
+        self.button_2.setToolTip(QApplication.translate("Tooltip", "Stops recording", None, QApplication.UnicodeUTF8))
         self.connect(self.button_2, SIGNAL("clicked()"), self.qmc.OffMonitor)
 
         #create 1C START, 1C END, 2C START and 2C END buttons
-        self.button_3 = QPushButton("FC START")
+        self.button_3 = QPushButton(QApplication.translate("Scope Button", "FC START", None, QApplication.UnicodeUTF8))
         self.button_3.setFocusPolicy(Qt.NoFocus)
         self.button_3.setStyleSheet("QPushButton { background-color: orange }")
         self.button_3.setMaximumSize(90, 50)
         self.button_3.setMinimumHeight(50)
-        self.button_3.setToolTip("Marks the begining of First Crack (FC)")
+        self.button_3.setToolTip(QApplication.translate("Tooltip", "Marks the begining of First Crack (FC)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_3, SIGNAL("clicked()"), self.qmc.mark1Cstart)
 
-        self.button_4 = QPushButton("FC END")
+        self.button_4 = QPushButton(QApplication.translate("Scope Button", "FC END", None, QApplication.UnicodeUTF8))
         self.button_4.setFocusPolicy(Qt.NoFocus)
         self.button_4.setStyleSheet("QPushButton { background-color: orange }")
         self.button_4.setMaximumSize(90, 50)
         self.button_4.setMinimumHeight(50)
-        self.button_4.setToolTip("Marks the end of First Crack (FC)")
+        self.button_4.setToolTip(QApplication.translate("Tooltip", "Marks the end of First Crack (FC)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_4, SIGNAL("clicked()"), self.qmc.mark1Cend)
 
-        self.button_5 = QPushButton("SC START")
+        self.button_5 = QPushButton(QApplication.translate("Scope Button", "SC START", None, QApplication.UnicodeUTF8))
         self.button_5.setFocusPolicy(Qt.NoFocus)
         self.button_5.setStyleSheet("QPushButton { background-color: orange }")
         self.button_5.setMaximumSize(90, 50)
         self.button_5.setMinimumHeight(50)
-        self.button_5.setToolTip("Marks the begining of Second Crack (SC)")
+        self.button_5.setToolTip(QApplication.translate("Tooltip", "Marks the begining of Second Crack (SC)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_5, SIGNAL("clicked()"), self.qmc.mark2Cstart)
 
-        self.button_6 = QPushButton("SC END")
+        self.button_6 = QPushButton(QApplication.translate("Scope Button", "SC END", None, QApplication.UnicodeUTF8))
         self.button_6.setFocusPolicy(Qt.NoFocus)
         self.button_6.setStyleSheet("QPushButton { background-color: orange }")
         self.button_6.setMaximumSize(90, 50)
         self.button_6.setMinimumHeight(50)
-        self.button_6.setToolTip("Marks the end of Second Crack (SC)")
+        self.button_6.setToolTip(QApplication.translate("Tooltip", "Marks the end of Second Crack (SC)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_6, SIGNAL("clicked()"), self.qmc.mark2Cend)
 
         #create RESET button
-        self.button_7 = QPushButton("RESET")
+        self.button_7 = QPushButton(QApplication.translate("Scope Button", "RESET", None, QApplication.UnicodeUTF8))
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet("QPushButton { background-color: white }")
         self.button_7.setMaximumSize(90, 45)
-        self.button_7.setToolTip("Resets Graph and Time")
+        self.button_7.setToolTip(QApplication.translate("Tooltip", "Resets Graph and Time", None, QApplication.UnicodeUTF8))
         self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset_and_redraw)
 
         #create CHARGE button
-        self.button_8 = QPushButton("CHARGE")
+        self.button_8 = QPushButton(QApplication.translate("Scope Button", "CHARGE", None, QApplication.UnicodeUTF8))
         self.button_8.setFocusPolicy(Qt.NoFocus)
         self.button_8.setStyleSheet("QPushButton { background-color: #f07800 }")
         self.button_8.setMaximumSize(90, 50)
         self.button_8.setMinimumHeight(50)
-        self.button_8.setToolTip("Marks the begining of the roast (beans in)")
+        self.button_8.setToolTip(QApplication.translate("Tooltip", "Marks the begining of the roast (beans in)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_8, SIGNAL("clicked()"), self.qmc.markCharge)
 
         #create DROP button
-        self.button_9 = QPushButton("DROP")
+        self.button_9 = QPushButton(QApplication.translate("Scope Button", "DROP", None, QApplication.UnicodeUTF8))
         self.button_9.setFocusPolicy(Qt.NoFocus)
         self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
         self.button_9.setMaximumSize(90, 50)
         self.button_9.setMinimumHeight(50)
-        self.button_9.setToolTip("Marks the end of the roast (drop beans)")
+        self.button_9.setToolTip(QApplication.translate("Tooltip", "Marks the end of the roast (drop beans)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_9, SIGNAL("clicked()"), self.qmc.markDrop)
 
         #create PID control button
-        self.button_10 = QPushButton("PID")
+        self.button_10 = QPushButton(QApplication.translate("Scope Button", "PID", None, QApplication.UnicodeUTF8))
         self.button_10.setFocusPolicy(Qt.NoFocus)
         self.button_10.setStyleSheet("QPushButton { background-color: '#92C3FF'}")
         self.button_10.setMaximumSize(90, 45)
         self.connect(self.button_10, SIGNAL("clicked()"), self.PIDcontrol)        
 
         #create EVENT record button
-        self.button_11 = QPushButton("EVENT")
+        self.button_11 = QPushButton(QApplication.translate("Scope Button", "EVENT", None, QApplication.UnicodeUTF8))
         self.button_11.setFocusPolicy(Qt.NoFocus)
         self.button_11.setStyleSheet("QPushButton { background-color: yellow}")
         self.button_11.setMaximumSize(90, 50)
         self.button_11.setMinimumHeight(50)
-        self.button_11.setToolTip("Marks an Event")
+        self.button_11.setToolTip(QApplication.translate("Tooltip", "Marks an Event", None, QApplication.UnicodeUTF8))
         self.connect(self.button_11, SIGNAL("clicked()"), self.qmc.EventRecord) 
         
     	#create PID+5 button
-        self.button_12 = QPushButton("SV +5")
+        self.button_12 = QPushButton(QApplication.translate("Scope Button", "SV +5", None, QApplication.UnicodeUTF8))
         self.button_12.setFocusPolicy(Qt.NoFocus)
         self.button_12.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_12.setMaximumSize(90, 50)
         self.button_12.setMinimumHeight(50)
-        self.button_12.setToolTip("Increases the current SV value by 5")
+        self.button_12.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 5", None, QApplication.UnicodeUTF8))
 
 
         #create PID+10 button
-        self.button_13 = QPushButton("SV +10")
+        self.button_13 = QPushButton(QApplication.translate("Scope Button", "SV +10", None, QApplication.UnicodeUTF8))
         self.button_13.setFocusPolicy(Qt.NoFocus)
         self.button_13.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_13.setMaximumSize(90, 50)
         self.button_13.setMinimumHeight(50)
-        self.button_13.setToolTip("Increases the current SV value by 10")
+        self.button_13.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 10", None, QApplication.UnicodeUTF8))
 
 
         #create PID+20 button
-        self.button_14 = QPushButton("SV +20")
+        self.button_14 = QPushButton(QApplication.translate("Scope Button", "SV +20", None, QApplication.UnicodeUTF8))
         self.button_14.setFocusPolicy(Qt.NoFocus)
         self.button_14.setStyleSheet("QPushButton { background-color: #ffaaff}")
         self.button_14.setMaximumSize(90, 50)
         self.button_14.setMinimumHeight(50)
-        self.button_14.setToolTip("Increases the current SV value by 20")
+        self.button_14.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 20", None, QApplication.UnicodeUTF8))
 
 
         #create PID-20 button
-        self.button_15 = QPushButton("SV -20")
+        self.button_15 = QPushButton(QApplication.translate("Scope Button", "SV -20", None, QApplication.UnicodeUTF8))
         self.button_15.setFocusPolicy(Qt.NoFocus)
         self.button_15.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_15.setMaximumSize(90, 50)
         self.button_15.setMinimumHeight(50)
-        self.button_15.setToolTip("Decreases the current SV value by 20")
+        self.button_15.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 20", None, QApplication.UnicodeUTF8))
 
 
         #create PID-10 button
-        self.button_16 = QPushButton("SV -10")
+        self.button_16 = QPushButton(QApplication.translate("Scope Button", "SV -10", None, QApplication.UnicodeUTF8))
         self.button_16.setFocusPolicy(Qt.NoFocus)
         self.button_16.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_16.setMaximumSize(90, 50)
         self.button_16.setMinimumHeight(50)
-        self.button_16.setToolTip("Decreases the current SV value by 10")
+        self.button_16.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 10", None, QApplication.UnicodeUTF8))
 
 
         #create PID-5 button
-        self.button_17 = QPushButton("SV -5")
+        self.button_17 = QPushButton(QApplication.translate("Scope Button", "SV -5", None, QApplication.UnicodeUTF8))
         self.button_17.setFocusPolicy(Qt.NoFocus)
         self.button_17.setStyleSheet("QPushButton { background-color: lightblue}")
         self.button_17.setMaximumSize(90, 50)
         self.button_17.setMinimumHeight(50)
-        self.button_17.setToolTip("Decreases the current SV value by 5")
+        self.button_17.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 5", None, QApplication.UnicodeUTF8))
         
         #create HUD button
-        self.button_18 = QPushButton("HUD")
+        self.button_18 = QPushButton(QApplication.translate("Scope Button", "HUD", None, QApplication.UnicodeUTF8))
         self.button_18.setFocusPolicy(Qt.NoFocus)
         self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
         self.button_18.setMaximumSize(90, 45)
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
-        self.button_18.setToolTip("Turns ON/OFF the HUD")
+        self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None, QApplication.UnicodeUTF8))
 
         #create DRY button
-        self.button_19 = QPushButton("DRY END")
+        self.button_19 = QPushButton(QApplication.translate("Scope Button", "DRY END", None, QApplication.UnicodeUTF8))
         self.button_19.setFocusPolicy(Qt.NoFocus)
         self.button_19.setStyleSheet("QPushButton { background-color: orange }")
         self.button_19.setMaximumSize(90, 50)
         self.button_19.setMinimumHeight(50)
-        self.button_19.setToolTip("Marks the end of the Dry phase (DRYEND)")
+        self.button_19.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Dry phase (DRYEND)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_19, SIGNAL("clicked()"), self.qmc.markDryEnd)
  
         #connect PID sv easy buttons
@@ -3771,12 +3771,12 @@ class ApplicationWindow(QMainWindow):
         self.lcd5.setMaximumSize(90, 45)
         self.lcd6.setMaximumSize(90, 45)
 
-        self.lcd1.setToolTip("Timer")
-        self.lcd2.setToolTip("ET Temperature")
-        self.lcd3.setToolTip("BT Temperature")
-        self.lcd4.setToolTip("ET/time (degrees/min)")
-        self.lcd5.setToolTip("BT/time (degrees/min)")
-        self.lcd6.setToolTip("Value of SV in PID")
+        self.lcd1.setToolTip(QApplication.translate("Tooltip", "Timer",None, QApplication.UnicodeUTF8))
+        self.lcd2.setToolTip(QApplication.translate("Tooltip", "ET Temperature",None, QApplication.UnicodeUTF8))
+        self.lcd3.setToolTip(QApplication.translate("Tooltip", "BT Temperature",None, QApplication.UnicodeUTF8))
+        self.lcd4.setToolTip(QApplication.translate("Tooltip", "ET/time (degrees/min)",None, QApplication.UnicodeUTF8))
+        self.lcd5.setToolTip(QApplication.translate("Tooltip", "BT/time (degrees/min)",None, QApplication.UnicodeUTF8))
+        self.lcd6.setToolTip(QApplication.translate("Tooltip", "Value of SV in PID",None, QApplication.UnicodeUTF8))
 
         #MET
         label2 = QLabel()
@@ -3813,7 +3813,7 @@ class ApplicationWindow(QMainWindow):
         
         self.eNumberSpinBox.setFocusPolicy(Qt.NoFocus)
         self.eNumberSpinBox.setAlignment(Qt.AlignCenter)
-        self.eNumberSpinBox.setToolTip("Number of events found")
+        self.eNumberSpinBox.setToolTip(QApplication.translate("Tooltip", "Number of events found", None, QApplication.UnicodeUTF8))
         self.eNumberSpinBox.setRange(0,20)
         self.connect(self.eNumberSpinBox, SIGNAL("valueChanged(int)"),self.changeEventNumber)
         self.eNumberSpinBox.setMaximumWidth(40)
@@ -3824,12 +3824,12 @@ class ApplicationWindow(QMainWindow):
         self.eventlabel.setStyleSheet("background-color:'yellow';")
 
         self.etypeComboBox = QComboBox()
-        self.etypeComboBox.setToolTip("Type of event")
+        self.etypeComboBox.setToolTip(QApplication.translate("Tooltip", "Type of event", None, QApplication.UnicodeUTF8))
         self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.etypeComboBox.addItems(self.qmc.etypes)
         
         self.valueComboBox = QComboBox()
-        self.valueComboBox.setToolTip("Value of event")
+        self.valueComboBox.setToolTip(QApplication.translate("Tooltip", "Value of event", None, QApplication.UnicodeUTF8))
         self.valueComboBox.setFocusPolicy(Qt.NoFocus)
         self.valueComboBox.addItems(self.qmc.eventsvalues)
         self.valueComboBox.setMaximumWidth(50)
@@ -3844,7 +3844,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonminiEvent = QPushButton("Update")
         self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
-        self.buttonminiEvent.setToolTip("Updates the event")
+        self.buttonminiEvent.setToolTip(QApplication.translate("Tooltip", "Updates the event", None, QApplication.UnicodeUTF8))
         
         EventsLayout = QHBoxLayout()
         EventsLayout.addWidget(self.eventlabel)
@@ -6644,7 +6644,7 @@ class HUDDlg(QDialog):
         self.interpComboBox.setMaximumWidth(100)
         self.interpComboBox.setMinimumWidth(55)
         self.interpComboBox.addItems([u"linear", u"cubic",u"nearest"])
-        self.interpComboBox.setToolTip("linear: linear interpolation\ncubic: 3rd order spline interpolation\nnearest: y value of the nearest point")
+        self.interpComboBox.setToolTip(QApplication.translate("Tooltip", "linear: linear interpolation\ncubic: 3rd order spline interpolation\nnearest: y value of the nearest point", None, QApplication.UnicodeUTF8))
         self.connect(self.interpComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.interpComboBox.currentIndex() :self.changeInterpolationMode(i))
 
        
@@ -7767,10 +7767,10 @@ class autosaveDlg(QDialog):
         self.setWindowTitle("Keyboard Autosave [s]")
         
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
-        self.prefixEdit.setToolTip("Automatic generated name = This text + date + time")
+        self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None, QApplication.UnicodeUTF8))
         
         self.autocheckbox = QCheckBox("Autosave [s]")
-        self.autocheckbox.setToolTip("ON/OFF of automatic saving when pressing keyboard letter [s]")
+        self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [s]",None, QApplication.UnicodeUTF8))
         
         if aw.qmc.autosaveflag:
             self.autocheckbox.setChecked(True)
@@ -7784,7 +7784,7 @@ class autosaveDlg(QDialog):
         pathButton = QPushButton("Path")        
         pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(unicode(aw.qmc.autosavepath))
-        self.pathEdit.setToolTip("Sets the directory to store batch profiles when using the letter [s]")
+        self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [s]",None, QApplication.UnicodeUTF8))
         
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)        
         self.connect(okButton,SIGNAL("clicked()"),self.autoChanged)  
@@ -8247,7 +8247,7 @@ class EventsDlg(QDialog):
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)  
         
         self.minieventsflag = QCheckBox("Mini Editor")
-        self.minieventsflag.setToolTip("Allows to enter a description of the last event")
+        self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event",None, QApplication.UnicodeUTF8))
         if aw.minieventsflag:
             self.minieventsflag.setChecked(True)
         else:
