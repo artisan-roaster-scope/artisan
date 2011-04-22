@@ -76,7 +76,7 @@ CONF_MENU_AUTOSAVE = QApplication.translate("Menu", "Autosave...", None, QApplic
 CONF_MENU_ALARMS = QApplication.translate("Menu", "Alarms...", None, QApplication.UnicodeUTF8)
 
 #Toolkit menu
-TOOLKIT_MENU = QApplication.translate("Menu", "Tool Kit", None, QApplication.UnicodeUTF8)
+TOOLKIT_MENU = QApplication.translate("Menu", "Tools", None, QApplication.UnicodeUTF8)
 if platf != u'Darwin':
     TOOLKIT_MENU = "&" + TOOLKIT_MENU
 TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None, QApplication.UnicodeUTF8)    
