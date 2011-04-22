@@ -95,6 +95,7 @@ import matplotlib.path as mpath
 import matplotlib.ticker as ticker
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+import matplotlib as mpl
 
 platf = unicode(platform.system())
 
@@ -1784,9 +1785,12 @@ class tgraphcanvas(FigureCanvas):
         txt = u"%.2f" %score
 
         self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
-
-        #needs matplotlib 1.0.0+
-        self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
+        
+        if mpl.__version__.split(".")[0] == '1':
+            #needs matplotlib 1.0.0+
+            self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
+        
+        #'0.98.0'
            
         self.ax1.plot(angles,self.flavors)
         self.fig.canvas.draw()
