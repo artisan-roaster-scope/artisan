@@ -95,7 +95,6 @@ import matplotlib.path as mpath
 import matplotlib.ticker as ticker
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
-import matplotlib as mpl
 
 platf = unicode(platform.system())
 
@@ -144,7 +143,15 @@ class tgraphcanvas(FigureCanvas):
                         "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
                         "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'blue'}
         
-        self.flavordefaultlabels = [u'Acidity',u'After Taste',u'Clean Cup',u'Head',u'Fragance',u'Sweetness',u'Aroma',u'Balance',u'Body']
+        self.flavordefaultlabels = [QApplication.translate("Form Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Form Textbox", "After Taste",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Form Textbox", "Clean Cup",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Form Textbox", "Head",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Form Textbox", "Fragance",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Form Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Form Textbox", "Aroma",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Form Textbox", "Balance",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Form Textbox", "Body",None, QApplication.UnicodeUTF8)]
         self.flavorlabels = list(self.flavordefaultlabels)
         
 
@@ -275,7 +282,10 @@ class tgraphcanvas(FigureCanvas):
         self.backmoveflag = 1
         self.detectBackgroundEventTime = 20 #seconds    	
         self.backgroundReproduce = False
-        self.Betypes = [u"None",u"Power",u"Damper",u"Fan"]
+        self.Betypes = [QApplication.translate("Scope Annotation", "None",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("Scope Annotation", "Power",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("Scope Annotation", "Damper",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("Scope Annotation", "Fan",None, QApplication.UnicodeUTF8)]
 
     	
         #Initial flavor parameters. 
@@ -318,9 +328,15 @@ class tgraphcanvas(FigureCanvas):
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
         self.specialevents = []
         #Combobox text event types. They can be modified in eventsDlg()
-        self.etypes = [u"None",u"Power",u"Damper",u"Fan"]
+        self.etypes = [QApplication.translate("Form Combobox", "None",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("Form Combobox", "Power",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("Form Combobox", "Damper",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("Form Combobox", "Fan",None, QApplication.UnicodeUTF8)]
         #default etype settings to restore 
-        self.etypesdefault = [u"None",u"Power",u"Damper",u"Fan"]
+        self.etypesdefault = [QApplication.translate("Form Combobox", "None",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("Form Combobox", "Power",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("Form Combobox", "Damper",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("Form Combobox", "Fan",None, QApplication.UnicodeUTF8)]
         #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc. 
         self.specialeventstype = []
         #stores text string descriptions for each event. 
@@ -355,7 +371,7 @@ class tgraphcanvas(FigureCanvas):
 
         # autosave
         self.autosaveflag = 0
-        self.autosaveprefix = u"edit-text"
+        self.autosaveprefix = QApplication.translate("Autosave Prefix", "edit-text",None, QApplication.UnicodeUTF8)
         self.autosavepath = u""
         
         #used to place correct height of text to avoid placing text over text (annotations)
@@ -481,9 +497,8 @@ class tgraphcanvas(FigureCanvas):
         #text projection: 0 = Flat, 1 = perpendicular to center, 2 = radial from center
         self.projection = [0,1,1,2]
         self.wheeltextsize = [10,10,10,10]
-        self.wheelcolorpattern = 0              #main pattern
-        self.wheeledge = .02                    #overlaping edge
-        self.wheellinewidth = 1                 
+        self.wheelcolorpattern = 0 #pattern
+        self.wheeledge = .02  #overlaping edge
         
     #event handler from startTimer()
     def timerEvent(self, evt):
@@ -658,15 +673,15 @@ class tgraphcanvas(FigureCanvas):
     def setalarm(self,alarmnumber):
         if self.alarmaction[alarmnumber] == 0:
             self.alarmflag[alarmnumber] = 0    #turn off flag as it has been read
-            QMessageBox.information(self,u"Alarm notice",self.alarmstrings[alarmnumber])
+            QMessageBox.information(self,QApplication.translate("MessageBox", "Alarm notice",None, QApplication.UnicodeUTF8),self.alarmstrings[alarmnumber])
         elif self.alarmaction[alarmnumber] == 1:
             self.alarmflag[alarmnumber] = 0
             try:
                 #self.alarmstrings[alarmnumber] = "filepath"
                 os.startfile(unicode(self.alarmstrings[alarmnumber]))
-                aw.sendmessage("Alarm is calling: %s"%unicode(self.alarmstrings[alarmnumber]))
+                aw.sendmessage(QApplication.translate("Message Area","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(self.alarmstrings[alarmnumber]))
             except Exception,e:
-                self.adderror(u"Exception Error: setalarm() " + unicode(e) + " ")
+                self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
                 return  
 
     def playbackevent(self):
@@ -1019,9 +1034,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_9.setFlat(False)
         aw.button_19.setFlat(False)        
         
-        self.title = u"Roaster Scope"
-        aw.setWindowTitle(aw.windowTitle)
-
+        self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
         #the following should be taken from the users settings or at least not cleared such
         #that users don't have to reenter those
         #self.roastertype = u""
@@ -1043,7 +1056,7 @@ class tgraphcanvas(FigureCanvas):
         aw.etypeComboBox.setCurrentIndex(0)
         aw.valueComboBox.setCurrentIndex(0)    
         self.ambientTemp = 0.
-        aw.curFile = None                 #current file name
+        self.curFile = None                 #current file name
         self.ystep = 45
         
         #aw.settingsLoad()        
@@ -1304,13 +1317,13 @@ class tgraphcanvas(FigureCanvas):
                                 xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]+self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
-                self.ax.annotate(u"START 00:00", xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
+                self.ax.annotate(QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
                                  xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]-self.ystep),
                                  color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
             #Add Dry End markers            
             if self.timeindex[1]:
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
-                st1 = u"DE " + unicode(self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]]))
+                st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])))
                 #anotate temperature
                 self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
                                 xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] + self.ystep), 
@@ -1325,7 +1338,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
                 else:
                     self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])
-                st1 = u"FCs " + unicode(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
+                st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
                 #anotate temperature
                 self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
                                 xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] + self.ystep), 
@@ -1337,7 +1350,7 @@ class tgraphcanvas(FigureCanvas):
             #Add 1Ce markers
             if self.timeindex[3]:
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
-                st1 = u"FCe " + unicode(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
+                st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
                 #anotate temperature
                 self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]] + self.ystep),
@@ -1356,7 +1369,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
                 else:
                     self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])
-                st1 = u"SCs " + unicode(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
+                st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
                 self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
                                 xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]] + self.ystep),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
@@ -1366,7 +1379,7 @@ class tgraphcanvas(FigureCanvas):
             #Add 2Ce markers
             if self.timeindex[5]:
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
-                st1 =  u"SCe " + unicode(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
+                st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
                 #anotate temperature
                 self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] + self.ystep),
@@ -1394,7 +1407,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[6]])                
                     
-                st1 = u"END " + unicode(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
+                st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
                 #anotate temperature
                 self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
                                 xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] + self.ystep),
@@ -1603,8 +1616,8 @@ class tgraphcanvas(FigureCanvas):
         profilelength = len(self.timex)
         if profilelength > 0:
             if t == u"F":
-                string = u"Convert profile data to Fahrenheit?"
-                reply = QMessageBox.question(self,u"Convert Profile Temperature",string,
+                string = QApplication.translate("MessageBox", "Convert profile data to Fahrenheit?",None, QApplication.UnicodeUTF8)
+                reply = QMessageBox.question(self,QApplication.translate("MessageBox Caption", "Convert Profile Temperature",None, QApplication.UnicodeUTF8),string,
                         QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Cancel:
                     return 
@@ -1632,14 +1645,14 @@ class tgraphcanvas(FigureCanvas):
                         aw.sendmessage(QApplication.translate("Message Area","Profile changed to Fahrenheit", None, QApplication.UnicodeUTF8))
 
                     else:
-                        QMessageBox.information(self,u"Convert Profile Temperature",
-                                                u"Unable to comply. You already are in Fahrenheit")
+                        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Convert Profile Temperature",None, QApplication.UnicodeUTF8),
+                                                QApplication.translate("MessageBox", "Unable to comply. You already are in Fahrenheit", None, QApplication.UnicodeUTF8))
                         aw.sendmessage(QApplication.translate("Message Area","Profile not changed", None, QApplication.UnicodeUTF8))
                         return
 
             elif t == u"C":
-                string = u"Convert profile data to Celsius?"
-                reply = QMessageBox.question(self,u"Convert Profile Temperature",string,
+                string = QApplication.translate("MessageBox", "Convert profile data to Celsius?",None, QApplication.UnicodeUTF8)
+                reply = QMessageBox.question(self,QApplication.translate("MessageBox Caption", "Convert Profile Temperature",None, QApplication.UnicodeUTF8),string,
                         QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Cancel:
                     return 
@@ -1664,8 +1677,8 @@ class tgraphcanvas(FigureCanvas):
                             self.temp2B[i] = self.fromFtoC(self.temp2B[i]) #BT B
                                 
                     else:
-                        QMessageBox.information(self,u"Convert Profile Temperature",
-                                                u"Unable to comply. You already are in Celsius")
+                        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Convert Profile Temperature",None, QApplication.UnicodeUTF8),
+                                                QApplication.translate("MessageBox", "Unable to comply. You already are in Celsius",None, QApplication.UnicodeUTF8))
                         aw.sendmessage(QApplication.translate("Message Area","Profile not changed", None, QApplication.UnicodeUTF8))
                         return
 
@@ -1675,7 +1688,8 @@ class tgraphcanvas(FigureCanvas):
             self.redraw()
 
         else:
-             QMessageBox.information(self,u"Convert Profile Scale","No profile data found")
+             QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Convert Profile Scale",None, QApplication.UnicodeUTF8),
+                                          QApplication.translate("MessageBox", "No profile data found",None, QApplication.UnicodeUTF8))
                                     
 
     #selects color mode: input 1=color mode; input 2=black and white mode (printing); input 3 = customize colors
@@ -1785,12 +1799,9 @@ class tgraphcanvas(FigureCanvas):
         txt = u"%.2f" %score
 
         self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
-        
-        if mpl.__version__.split(".")[0] == '1':
-            #needs matplotlib 1.0.0+
-            self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
-        
-        #'0.98.0'
+
+        #needs matplotlib 1.0.0+
+        self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
            
         self.ax1.plot(angles,self.flavors)
         self.fig.canvas.draw()
@@ -1897,28 +1908,36 @@ class tgraphcanvas(FigureCanvas):
                     count += (2*pi/100.)*self.segmentlengths[z][i]
                     segmentwidth.append((2*pi/100.)*self.segmentlengths[z][i])                
                     radii.append(Wradii[z])                                
-                bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],linewidth=self.wheellinewidth))
+                bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z]))
                 count = 0
                 #set color, alpha, and text
                 for r,bar[z] in zip(radii, bar[z]):
                     bar[z].set_facecolor(self.wheelcolor[z][count])
                     bar[z].set_alpha(self.segmentsalpha[z][count])
                     self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
-                        rotation=textangles[z][count],horizontalalignment="center",verticalalignment="center",fontsize=self.wheeltextsize[z],color = self.palette["text"])
+                        rotation=textangles[z][count],horizontalalignment="center",verticalalignment="center",fontsize=self.wheeltextsize[z])
                     count += 1  
             self.fig.canvas.draw()            
 
         except ValueError,e:
-            self.adderror(u"Value Error: drawWheel() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message", "Value Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except Exception,e:
-            self.adderror(u"Exception Error: drawWheel() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message", "Exception Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
+
+    def makewheelcolorpattern(self): 
+        for x in range(len(self.wheelcolor)):
+            wlen = len(self.wheelcolor[x])
+            for i in range(wlen):
+                color = QColor()
+                color.setHsv((360/wlen)*i*self.wheelcolorpattern,255,255,255)
+                self.wheelcolor[x][i] = unicode(color.name())
         
-    # corrects segment lengths so that child fits inside parent (multiple children can be set to same parent)
+    # sets parent and corrects segment lengths so that child fits inside parent (multiple children can be set to same parent)
     # input: z = index of parent in previus wheel    # x = wheel number    # i = index of element in wheel x
-    def setwheelchild(self,z,x,i):
+    def setwheelparent(self,z,x,i):
         #set same start angle
         self.startangle[x] = self.startangle[x-1]
         self.wheellabelparent[x][i] = z
@@ -1943,37 +1962,7 @@ class tgraphcanvas(FigureCanvas):
                         #adjust rest of angles to get 100 % coverage
                         for a in range(i+1,nsegments):
                             self.segmentlengths[x][a] = (100-parentanglecount)/(nsegments-(i+1))
-
-    #adjusts size of all segements of the graph based on child parent relation
-    #expects all segments to have a parent except in the first wheel
-    def setWheelHierarchi(self):
-        #check for not stablished relashionships (will cause graph plotting problems) and give warning
-        for x in range(1,len(self.wheellabelparent)):
-            for i in range(len(self.wheellabelparent[x])):
-                if self.wheellabelparent[x][i] == 0:
-                    QMessageBox.information(self,u"Wheel Hierarchi Problem",
-                    "Please assign a  a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
-                    return        
-        
-        #adjust top wheel and make all segments equal
-        for i in range(len(self.segmentlengths[-1])):
-            self.segmentlengths[-1][i] = 100./len(self.segmentlengths[-1])
-
-        #adjust lower wheels based on previous wheels
-        for p in range(len(self.wheellabelparent)-1,0,-1):
-            nsegments = len(self.wheellabelparent[p])
-            nparentsegments = len(self.wheellabelparent[p-1])
-            angles = [0]*nparentsegments
-            for x in range(nparentsegments):
-                for i in range(nsegments):
-                    if self.wheellabelparent[p][i]-1 == x:
-                        angles[x] += self.segmentlengths[p][i]
-
-            #adjust angle length of parents proportionaly          
-            for i in range(nparentsegments):
-                self.segmentlengths[p-1][i] = angles[i]
-
-        self.drawWheel()
+ 
 ##########################################################################################################################                                   
 
 
@@ -2008,7 +1997,7 @@ class tgraphcanvas(FigureCanvas):
                     self.flagclock = True
                     self.timeindex[0] = len(self.timex)-1
                 else:
-                    message = u"Not enough variables collected yet. Try again in a few seconds"
+                    message = QApplication.translate("Message Area","Not enough variables collected yet. Try again in a few seconds", None, QApplication.UnicodeUTF8)
             #device 18  = manual mode        
             else:
                 tx = self.timeclock.elapsed()/1000.
@@ -6484,7 +6473,7 @@ $cupping_notes
         wheel["wheelcolor"] = self.qmc.wheelcolor
         wheel["wheelparent"] = self.qmc.wheellabelparent
         wheel["wheeledge"] = self.qmc.wheeledge
-        wheel["wheelline"] = self.qmc.wheellinewidth
+        
         return wheel  
 
     def loadWheel(self,filename):         
@@ -6507,8 +6496,6 @@ $cupping_notes
                 self.qmc.wheelcolor = wheel["wheelcolor"]
                 self.qmc.wheellabelparent = wheel["wheelparent"]
                 self.qmc.wheeledge = wheel["wheeledge"]
-                self.qmc.wheellinewidth = wheel["wheelline"]
-                
             else:
                 message = u"Invalid Wheel graph format"
                 self.sendmessage(message)
@@ -7696,54 +7683,27 @@ class editGraphDlg(QDialog):
         aw.qmc.roaster = unicode(self.roaster.text())
 
         #update weight
-        try:
-            aw.qmc.weight[0] = float(self.weightinedit.text())
-        except:
-            aw.qmc.weight[0] = 0
-        try:
-            aw.qmc.weight[1] = float(self.weightoutedit.text())
-        except:
-            aw.qmc.weight[1] = 0
+        aw.qmc.weight[0] = float(self.weightinedit.text())
+        aw.qmc.weight[1] = float(self.weightoutedit.text())
         aw.qmc.weight[2] = unicode(self.unitsComboBox.currentText())
         
         #update volume
-        try:
-            aw.qmc.volume[0] = float(self.volumeinedit.text())
-        except:
-            aw.qmc.volume[0] = 0
-        try:
-            aw.qmc.volume[1] = float(self.volumeoutedit.text())
-        except:
-            aw.qmc.volume[1] = 0
+        aw.qmc.volume[0] = float(self.volumeinedit.text())
+        aw.qmc.volume[1] = float(self.volumeoutedit.text())
         aw.qmc.volume[2] = unicode(self.volumeUnitsComboBox.currentText())
 
         #update density
-        try:
-            aw.qmc.density[0] = float(self.bean_density_weight_edit.text())
-        except:
-            aw.qmc.density[0] = 0
+        aw.qmc.density[0] = float(self.bean_density_weight_edit.text())
         aw.qmc.density[1] = unicode(self.bean_density_weightUnitsComboBox.currentText())
-        try:
-            aw.qmc.density[2] = float(self.bean_density_volume_edit.text())
-        except:
-            aw.qmc.density[2] = 0
+        aw.qmc.density[2] = float(self.bean_density_volume_edit.text())
         aw.qmc.density[3] = unicode(self.bean_density_volumeUnitsComboBox.currentText())
 
         #update humidity
-        try:
-            aw.qmc.bag_humidity[0] = float(self.humidity_edit.text())
-        except:
-            aw.qmc.bag_humidity[0] = 0
-        try:
-            aw.qmc.bag_humidity[1] = float(self.bag_temp_edit.text())
-        except:
-            aw.qmc.bag_humidity[1] = 0
+        aw.qmc.bag_humidity[0] = float(self.humidity_edit.text())
+        aw.qmc.bag_humidity[1] = float(self.bag_temp_edit.text())
 
     	#update ambient temperature
-    	try:
-            aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
-        except:
-            aw.qmc.ambientTemp = 0
+        aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
          
         #update notes
         aw.qmc.roastertype = unicode(self.roaster.text())
@@ -11969,15 +11929,12 @@ class WheelDlg(QDialog):
         self.connect(self.labelResetButton, SIGNAL("clicked()"),self.resetlabelparents)
         self.labelwheelx = 0   #index of wheel being edited on labeltable
 
-        self.hierarchiButton = QPushButton("Set Hierarchi")
-        self.hierarchiButton.setMaximumWidth(100)
-        self.connect(self.hierarchiButton, SIGNAL("clicked()"),aw.qmc.setWheelHierarchi)
-
         self.labeltable.setVisible(False)        
         self.labelCloseButton.setVisible(False)
         self.labelResetButton.setVisible(False)
         
         txtlabel = QLabel("Text")
+        txtlabel.setAlignment(Qt.AlignRight)
         txtButtonplus = QPushButton("+")
         txtButtonplus.setMaximumWidth(30)
         self.connect(txtButtonplus, SIGNAL("clicked()"),lambda x = 1: self.changetext(x))
@@ -11986,18 +11943,12 @@ class WheelDlg(QDialog):
         self.connect(txtButtonminus, SIGNAL("clicked()"),lambda x = 0: self.changetext(x))
 
         edgelabel = QLabel("Edge")
+        edgelabel.setAlignment(Qt.AlignRight)
         self.edgeSpinBox = QSpinBox()
         self.edgeSpinBox.setMaximumWidth(80)
         self.edgeSpinBox.setRange(0,5)
         self.edgeSpinBox.setValue(int(aw.qmc.wheeledge*100))
         self.connect(self.edgeSpinBox, SIGNAL("valueChanged(int)"),self.setedge)
-
-        linewidthlabel = QLabel("Line")
-        self.linewidthSpinBox = QSpinBox()
-        self.linewidthSpinBox.setMaximumWidth(80)
-        self.linewidthSpinBox.setRange(0,20)
-        self.linewidthSpinBox.setValue(aw.qmc.wheellinewidth)
-        self.connect(self.linewidthSpinBox, SIGNAL("valueChanged(int)"),self.setlinewidth)
         
         colorlabel = QLabel("Color pattern")    	
         self.colorSpinBox = QSpinBox()
@@ -12011,12 +11962,12 @@ class WheelDlg(QDialog):
         addButton.setMaximumWidth(100)
         self.connect(addButton, SIGNAL("clicked()"),self.insertwheel)
 
-        rotateLeftButton = QPushButton("<")
-        rotateLeftButton.setMaximumWidth(30)
+        rotateLeftButton = QPushButton("< Rotate")
+        rotateLeftButton.setMaximumWidth(80)
         self.connect(rotateLeftButton, SIGNAL("clicked()"),lambda x = 1: self.rotatewheels(x))
         
-        rotateRightButton = QPushButton(">")
-        rotateRightButton.setMaximumWidth(30)
+        rotateRightButton = QPushButton("Rotate >")
+        rotateRightButton.setMaximumWidth(80)
         self.connect(rotateRightButton, SIGNAL("clicked()"),lambda x = 0: self.rotatewheels(x))
 
         saveButton = QPushButton("Save File")
@@ -12060,17 +12011,13 @@ class WheelDlg(QDialog):
         configlayout.addWidget(txtlabel)
         configlayout.addWidget(txtButtonplus)
         configlayout.addWidget(txtButtonminus)
-
         configlayout.addWidget(edgelabel)
         configlayout.addWidget(self.edgeSpinBox)
-        configlayout.addWidget(linewidthlabel)
-        configlayout.addWidget(self.linewidthSpinBox)
 
         controlLayout = QHBoxLayout()
         controlLayout.addWidget(addButton)
         controlLayout.addWidget(rotateLeftButton)
         controlLayout.addWidget(rotateRightButton)
-    	controlLayout.addWidget(self.hierarchiButton)
 
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
@@ -12086,7 +12033,6 @@ class WheelDlg(QDialog):
         self.labeltable.setVisible(True)
         self.labelCloseButton.setVisible(True)
         self.labelResetButton.setVisible(True)
-
         self.labeltable.clear()        
         nlabels = len(aw.qmc.wheelnames[x])
         if nlabels:    
@@ -12111,7 +12057,7 @@ class WheelDlg(QDialog):
                         parentComboBox.setCurrentIndex(aw.qmc.wheellabelparent[x][i])
                 else:
                     parentComboBox.addItems([])
-                self.connect(parentComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=x,i=i:self.setwheelchild(z,x,i))
+                self.connect(parentComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=x,i=i:self.setparent(z,x,i))
                 
                 labelwidthSpinBox = QDoubleSpinBox()
                 labelwidthSpinBox.setRange(1.,100.)
@@ -12134,6 +12080,11 @@ class WheelDlg(QDialog):
                 self.labeltable.setCellWidget(i,3,colorButton)
                 self.labeltable.setCellWidget(i,4,alphaSpinBox)
 
+    #input: z = index of parent in previus wheel x = wheel number i = index of element in wheel
+    def setparent(self,z,x,i):
+        aw.qmc.setwheelparent(z,x,i)
+        aw.qmc.drawWheel()
+        self.createdatatable() #update data table        
 
     def setsegmentcolor(self,x,i):
         colorf = QColorDialog.getColor(QColor(aw.qmc.wheelcolor[x][i]),self)
@@ -12154,28 +12105,11 @@ class WheelDlg(QDialog):
         self.createdatatable()                           
         aw.qmc.drawWheel()
 
-    #sets color pattern for single wheel    
-    def setwheelcolorpattern(self,z,x):
-        wsb =  self.datatable.cellWidget(x,9)
-        wpattern = wsb.value()        
-        wlen = len(aw.qmc.wheelcolor[x])
-        for i in range(wlen):
-            color = QColor()
-            color.setHsv((360/wlen)*i*wpattern,255,255,255)
-            aw.qmc.wheelcolor[x][i] = unicode(color.name())
-        aw.qmc.drawWheel()
-
-    #sets color pattern for whole graph    
+    #sets color pattern    
     def setcolorpattern(self):
         aw.qmc.wheelcolorpattern = self.colorSpinBox.value()
         if aw.qmc.wheelcolorpattern:
-            for x in range(len(aw.qmc.wheelcolor)):
-                wlen = len(aw.qmc.wheelcolor[x])
-                for i in range(wlen):
-                    color = QColor()
-                    color.setHsv((360/wlen)*i*aw.qmc.wheelcolorpattern,255,255,255)
-                    aw.qmc.wheelcolor[x][i] = unicode(color.name())
-
+            aw.qmc.makewheelcolorpattern()
             aw.qmc.drawWheel()
         
     def setsegmentalpha(self,z,x,u):
@@ -12205,12 +12139,6 @@ class WheelDlg(QDialog):
         aw.qmc.segmentlengths[x][u] = newwidth
         aw.qmc.drawWheel()
 
-    #input: z = index of parent in previus wheel; x = wheel number; i = index of element in wheel
-    def setwheelchild(self,z,x,i):
-        aw.qmc.setwheelchild(z,x,i)
-        aw.qmc.drawWheel()
-        self.createdatatable() #update data table        
-
     def resetlabelparents(self):
         x = self.labelwheelx
         nsegments = len(aw.qmc.wheellabelparent[x])
@@ -12221,14 +12149,10 @@ class WheelDlg(QDialog):
         aw.qmc.drawWheel()
         self.createlabeltable(x)
 
-
     def setedge(self):
         aw.qmc.wheeledge = float(self.edgeSpinBox.value())/100.
         aw.qmc.drawWheel()
 
-    def setlinewidth(self):
-        aw.qmc.wheellinewidth = self.linewidthSpinBox.value()
-        aw.qmc.drawWheel()
     
     def closelabels(self):
         self.labelGroupLayout.setVisible(False)
@@ -12241,9 +12165,9 @@ class WheelDlg(QDialog):
         ndata = len(aw.qmc.wheelnames)
         if ndata:    
             self.datatable.setRowCount(ndata)
-            self.datatable.setColumnCount(10)
+            self.datatable.setColumnCount(9)
             self.datatable.setHorizontalHeaderLabels(["Del Wheel","Edit Labels","Update Labels","Properties",
-                                                      "Radius","Starting angle","Txt Projection","Txt size","Color","Color Pattern"])
+                                                      "Radius","Starting angle","Txt Projection","Txt size","Color"])
             self.datatable.setAlternatingRowColors(True)
             self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -12271,7 +12195,7 @@ class WheelDlg(QDialog):
 
                 angleSpinBox = QSpinBox()
                 angleSpinBox.setSuffix(" dg")
-                angleSpinBox.setRange(0,359)
+                angleSpinBox.setRange(0,360)
                 angleSpinBox.setWrapping(True)
                 angleSpinBox.setValue(aw.qmc.startangle[i])
                 self.connect(angleSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=i: self.setangle(z,x))
@@ -12288,12 +12212,6 @@ class WheelDlg(QDialog):
 
                 colorButton = QPushButton("Set Color")
                 self.connect(colorButton, SIGNAL("clicked()"),lambda x =i: self.setwheelcolor(x))
-
-                colorSpinBox = QSpinBox()
-                colorSpinBox.setRange(0,255)
-                colorSpinBox.setWrapping(True)
-                self.connect(colorSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=i,: self.setwheelcolorpattern(z,x))
-
                 
                 #add widgets to the table
                 self.datatable.setCellWidget(i,0,delButton)
@@ -12305,7 +12223,6 @@ class WheelDlg(QDialog):
                 self.datatable.setCellWidget(i,6,projectionComboBox)
                 self.datatable.setCellWidget(i,7,txtSpinBox)
                 self.datatable.setCellWidget(i,8,colorButton)
-                self.datatable.setCellWidget(i,9,colorSpinBox)
 
     def updatelabels(self,x):
         labelsedit =  self.datatable.cellWidget(x,1)
@@ -12318,8 +12235,7 @@ class WheelDlg(QDialog):
             aw.qmc.segmentlengths[x] = [100./newnlabels]*newnlabels                    
             aw.qmc.segmentsalpha[x] = [.3]*newnlabels
             aw.qmc.wheellabelparent[x] = [0]*newnlabels
-            aw.qmc.wheelcolor[x] = [aw.qmc.wheelcolor[x][0]]*newnlabels
-            
+
         aw.qmc.wheelnames[x] = newwheellabels[:]        
         aw.qmc.drawWheel()        
 
