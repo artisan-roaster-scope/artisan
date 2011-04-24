@@ -95,7 +95,8 @@ import matplotlib.path as mpath
 import matplotlib.ticker as ticker
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
-
+import matplotlib as mpl
+	
 platf = unicode(platform.system())
 
 
@@ -1035,6 +1036,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_19.setFlat(False)        
         
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
+        aw.setWindowTitle(aw.windowTitle)
         #the following should be taken from the users settings or at least not cleared such
         #that users don't have to reenter those
         #self.roastertype = u""
@@ -1056,7 +1058,7 @@ class tgraphcanvas(FigureCanvas):
         aw.etypeComboBox.setCurrentIndex(0)
         aw.valueComboBox.setCurrentIndex(0)    
         self.ambientTemp = 0.
-        self.curFile = None                 #current file name
+        aw.curFile = None                 #current file name
         self.ystep = 45
         
         #aw.settingsLoad()        
@@ -1801,7 +1803,8 @@ class tgraphcanvas(FigureCanvas):
         self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
 
         #needs matplotlib 1.0.0+
-        self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
+        if mpl.__version__.split(".")[0] == '1':
+            self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
            
         self.ax1.plot(angles,self.flavors)
         self.fig.canvas.draw()
@@ -7683,27 +7686,54 @@ class editGraphDlg(QDialog):
         aw.qmc.roaster = unicode(self.roaster.text())
 
         #update weight
-        aw.qmc.weight[0] = float(self.weightinedit.text())
-        aw.qmc.weight[1] = float(self.weightoutedit.text())
+        try:
+            aw.qmc.weight[0] = float(self.weightinedit.text())
+        except:
+            aw.qmc.weight[0] = 0
+        try:
+            aw.qmc.weight[1] = float(self.weightoutedit.text())
+        except:
+            aw.qmc.weight[1] = 0
         aw.qmc.weight[2] = unicode(self.unitsComboBox.currentText())
         
         #update volume
-        aw.qmc.volume[0] = float(self.volumeinedit.text())
-        aw.qmc.volume[1] = float(self.volumeoutedit.text())
+        try:
+            aw.qmc.volume[0] = float(self.volumeinedit.text())
+        except:
+            aw.qmc.volume[0] = 0
+        try:
+            aw.qmc.volume[1] = float(self.volumeoutedit.text())
+        except:
+            aw.qmc.volume[1] = 0
         aw.qmc.volume[2] = unicode(self.volumeUnitsComboBox.currentText())
 
         #update density
-        aw.qmc.density[0] = float(self.bean_density_weight_edit.text())
+        try:
+            aw.qmc.density[0] = float(self.bean_density_weight_edit.text())
+        except:
+            aw.qmc.density[0] = 0
         aw.qmc.density[1] = unicode(self.bean_density_weightUnitsComboBox.currentText())
-        aw.qmc.density[2] = float(self.bean_density_volume_edit.text())
+        try:
+            aw.qmc.density[2] = float(self.bean_density_volume_edit.text())
+        except: 
+            aw.qmc.density[2] = 0
         aw.qmc.density[3] = unicode(self.bean_density_volumeUnitsComboBox.currentText())
 
         #update humidity
-        aw.qmc.bag_humidity[0] = float(self.humidity_edit.text())
-        aw.qmc.bag_humidity[1] = float(self.bag_temp_edit.text())
+        try:
+            aw.qmc.bag_humidity[0] = float(self.humidity_edit.text())
+        except:
+            aw.qmc.bag_humidity[0] = 0
+        try:
+            aw.qmc.bag_humidity[1] = float(self.bag_temp_edit.text())
+        except:
+            aw.qmc.bag_humidity[1] = 0
 
     	#update ambient temperature
-        aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
+    	try:
+            aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
+        except:
+            aw.qmc.ambientTemp = 0
          
         #update notes
         aw.qmc.roastertype = unicode(self.roaster.text())
