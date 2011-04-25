@@ -144,15 +144,15 @@ class tgraphcanvas(FigureCanvas):
                         "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
                         "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'blue'}
         
-        self.flavordefaultlabels = [QApplication.translate("Form Textbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Form Textbox", "After Taste",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Form Textbox", "Clean Cup",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Form Textbox", "Head",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Form Textbox", "Fragance",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Form Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Form Textbox", "Aroma",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Form Textbox", "Balance",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Form Textbox", "Body",None, QApplication.UnicodeUTF8)]
+        self.flavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Textbox", "After Taste",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Textbox", "Clean Cup",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Textbox", "Head",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Textbox", "Fragance",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8)]
         self.flavorlabels = list(self.flavordefaultlabels)
         
 
@@ -328,16 +328,16 @@ class tgraphcanvas(FigureCanvas):
         #stores _indexes_ of self.timex to record events. Use as self.timex[self.specialevents[x]] to get the time of an event
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
         self.specialevents = []
-        #Combobox text event types. They can be modified in eventsDlg()
-        self.etypes = [QApplication.translate("Form Combobox", "None",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("Form Combobox", "Power",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("Form Combobox", "Damper",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("Form Combobox", "Fan",None, QApplication.UnicodeUTF8)]
+        #ComboBox text event types. They can be modified in eventsDlg()
+        self.etypes = [QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Power",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Damper",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox", "Fan",None, QApplication.UnicodeUTF8)]
         #default etype settings to restore 
-        self.etypesdefault = [QApplication.translate("Form Combobox", "None",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("Form Combobox", "Power",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("Form Combobox", "Damper",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("Form Combobox", "Fan",None, QApplication.UnicodeUTF8)]
+        self.etypesdefault = [QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("ComboBox", "Power",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("ComboBox", "Damper",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("ComboBox", "Fan",None, QApplication.UnicodeUTF8)]
         #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc. 
         self.specialeventstype = []
         #stores text string descriptions for each event. 
@@ -979,8 +979,8 @@ class tgraphcanvas(FigureCanvas):
     def reset(self):
         #prevents deleting accidentally a finished roast
         if self.safesaveflag== True:
-            string = QApplication.translate("Message Box","Do you want to save the profile?", None, QApplication.UnicodeUTF8)
-            reply = QMessageBox.warning(self,QApplication.translate("Form Caption","Profile unsaved", None, QApplication.UnicodeUTF8),string,
+            string = QApplication.translate("MessageBox","Do you want to save the profile?", None, QApplication.UnicodeUTF8)
+            reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Profile unsaved", None, QApplication.UnicodeUTF8),string,
                                 QMessageBox.Reset |QMessageBox.Save|QMessageBox.Cancel)
             if reply == QMessageBox.Reset :
                 self.safesaveflag == False
@@ -2023,7 +2023,7 @@ class tgraphcanvas(FigureCanvas):
                              xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] - self.ystep),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
-            message = u"Roast time starts now 00:00 BT = " + unicode(self.temp2[self.timeindex[0]]) + self.mode
+            message = QApplication.translate("Message Area","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(unicode(self.temp2[self.timeindex[0]]) + self.mode)
  
             aw.button_8.setDisabled(True)
             aw.button_8.setFlat(True)
@@ -2048,7 +2048,7 @@ class tgraphcanvas(FigureCanvas):
                     return
                 
             #calculate time elapsed since charge time
-            st1 = u"DE " + self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
+            st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]))
             #anotate temperature
             self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
             self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
@@ -2088,7 +2088,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     return
             #calculate time elapsed since charge time
-            st1 = u"FCs " + self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
+            st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
             #anotate temperature
             if self.timeindex[1]:
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
@@ -2131,7 +2131,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         return                    
                 #calculate time elapsed since charge time
-                st1 = u"FCe " + self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]) 
+                st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
                 self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
@@ -2168,7 +2168,7 @@ class tgraphcanvas(FigureCanvas):
                     self.timeindex[4] = len(self.timex)-1
                 else:
                     return              
-            st1 = u"SCs " + self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
+            st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
             if self.timeindex[3]:
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
             else:
@@ -2205,7 +2205,7 @@ class tgraphcanvas(FigureCanvas):
                         self.timeindex[5] = len(self.timex)-1
                     else:
                         return
-                st1 =  u"SCe " + self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
+                st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
                 self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
@@ -2250,7 +2250,7 @@ class tgraphcanvas(FigureCanvas):
                         self.ax.add_patch(rect)
                 else:
                     return             
-            st1 = u"End " + self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]) 
+            st1 = QApplication.translate("Scope Annotation","End %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
             #anotate temperature
             if self.timeindex[5]:
                 self.ystep = self.findtextgap(self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
@@ -2378,9 +2378,9 @@ class tgraphcanvas(FigureCanvas):
 
                 rates_of_changes = aw.RoR(TP_index,dryEndIndex)
 
-                st1 += u"  (%.1f deg/min)"%rates_of_changes[0]
-                st2 += u"  (%.1f deg/min)"%rates_of_changes[1]
-                st3 += u"  (%.1f deg/min)"%rates_of_changes[2]
+                st1 += QApplication.translate("Scope Label", "  (%1 deg/min)",None, QApplication.UnicodeUTF8).arg("%.1f"%rates_of_changes[0])
+                st2 += QApplication.translate("Scope Label", "  (%1 deg/min)",None, QApplication.UnicodeUTF8).arg("%.1f"%rates_of_changes[1])
+                st3 += QApplication.translate("Scope Label", "  (%1 deg/min)",None, QApplication.UnicodeUTF8).arg("%.1f"%rates_of_changes[2])
         
                 #Write flavor estimation
                 self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2-len(st1)*8/2,statisticslower,st1,color=self.palette["text"],fontsize=11)
@@ -2430,7 +2430,7 @@ class tgraphcanvas(FigureCanvas):
                 # even better: use xlabel
                 self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
             else:
-                self.ax.set_xlabel(u'Time',size=16,color = self.palette["xlabel"])
+                self.ax.set_xlabel(QApplication.translate("Scope Label", "Time",None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"])
 
     #used in EventRecord()
     def restorebutton_11(self):
@@ -2618,23 +2618,27 @@ class tgraphcanvas(FigureCanvas):
             #interpretation of coefficients: http://www.sagenb.org/home/pub/1708/
             #spline=[ans[0,i]+(x-xi)*(ans[1,i]+(x-xi)*(ans[2,i]+(x-xi)*ans[3,i]/3)/2) for i,xi in enumerate(a[:-1])]
             
-            string = "<b>Polynomial coefficients (Horner form):</b><br><br>"
+            string = "<b>" + QApplication.translate("MessageBox","Polynomial coefficients (Horner form):",
+                                                    None, QApplication.UnicodeUTF8) + "</b><br><br>"
             string += str(coeffs) + "<br><br>"
-            string += "<b>Knots:</b><br><br>"
+            string += "<b>" + QApplication.translate("MessageBox","Knots:",
+                                                     None, QApplication.UnicodeUTF8) + "</b><br><br>"
             string += str(knots)+ "<br><br>"
-            string += "<b>Residual:</b><br><br>"
+            string += "<b>" + QApplication.translate("MessageBox","Residual:",
+                                                     None, QApplication.UnicodeUTF8) + "</b><br><br>"
             string += str(resid)  + "<br><br>"      
-            string += "<b>Roots:</b><br><br>"
+            string += "<b>" + QApplication.translate("MessageBox","Roots:",
+                                                     None, QApplication.UnicodeUTF8) + "</b><br><br>"
             string += str(roots)
             
-            QMessageBox.information(self,u"Profile information",string)
+            QMessageBox.information(self,QApplication.translate("MessageBox Caption","Profile information",None, QApplication.UnicodeUTF8),string)
 
         except ValueError,e:
-            self.adderror(u"Value Error: univariateinfo() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message","Value Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except Exception,e:
-            self.adderror(u"Exception Error: univariateinfo() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message","Exception Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return  
                                    
     #interpolation type        
@@ -2654,11 +2658,11 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
 
         except ValueError:
-            self.adderror(u"value Error: univariate() " )
+            self.adderror(QApplication.translate("Error Message","value Error: univariate() ",None, QApplication.UnicodeUTF8))
             return
 
         except Exception:
-            self.adderror(u"Exception: univariate() ")
+            self.adderror(QApplication.translate("Error Message","Exception: univariate() ",None, QApplication.UnicodeUTF8))
             return  
             
     def drawinterp(self,mode):
@@ -2673,11 +2677,11 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
 
         except ValueError,e:
-            self.adderror(u"value error in drawinterp() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message","value error in drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except Exception,e:
-            self.adderror(u"Exception: drawinterp() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message","Exception: drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return        
 
     # predicate that returns true if the given temperature reading is out of range
@@ -2798,8 +2802,9 @@ class tgraphcanvas(FigureCanvas):
     #launches designer	
     def designer(self):       
         if len(self.timex):
-            reply = QMessageBox.question(self,u"Designer Start","Importing a profile in to Designer will decimate\nall data except the main [points].\nContinue?",
-                                QMessageBox.Yes|QMessageBox.Cancel)
+            reply = QMessageBox.question(self,QApplication.translate("MessageBox Caption","Designer Start",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("MessageBox","Importing a profile in to Designer will decimate\nall data except the main [points].\nContinue?",None, QApplication.UnicodeUTF8),
+                                         QMessageBox.Yes|QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
                 self.initfromprofile()
                 self.connect_designer()
@@ -2841,7 +2846,8 @@ class tgraphcanvas(FigureCanvas):
     #loads main points from a profile so that they can be edited
     def initfromprofile(self):
         if self.timeindex[0] == -1 or self.timeindex[6] == 0:
-            QMessageBox.information(self,u"Designer Init","Unable to start designer.\nProfile missing [CHARGE] or [DROP]")
+            QMessageBox.information(self,QApplication.translate("MessageBox Caption","Designer Init",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("MessageBox","Unable to start designer.\nProfile missing [CHARGE] or [DROP]",None, QApplication.UnicodeUTF8))
             self.disconnect_designer()
             return()
 
@@ -2958,7 +2964,7 @@ class tgraphcanvas(FigureCanvas):
         
         designermenu = QMenu(self)
         
-        configAction = QAction("Designer Config...",self)
+        configAction = QAction(QApplication.translate("Contextual Menu", "Designer Config...",None, QApplication.UnicodeUTF8),self)
         self.connect(configAction,SIGNAL("triggered()"),self.desconfig)
         designermenu.addAction(configAction)
 
@@ -2968,21 +2974,21 @@ class tgraphcanvas(FigureCanvas):
 
         designermenu.addSeparator()  
 
-        addpointAction = QAction("Add point",self)
+        addpointAction = QAction(QApplication.translate("Contextual Menu", "Add point",None, QApplication.UnicodeUTF8),self)
         self.connect(addpointAction,SIGNAL("triggered()"),self.addpoint)
         designermenu.addAction(addpointAction)
         
-        removepointAction = QAction("Remove point",self)
+        removepointAction = QAction(QApplication.translate("Contextual Menu", "Remove point",None, QApplication.UnicodeUTF8),self)
         self.connect(removepointAction,SIGNAL("triggered()"),self.removepoint)
         designermenu.addAction(removepointAction)        
 
         designermenu.addSeparator()  
 
-        resetAction = QAction("Reset Designer",self)
+        resetAction = QAction(QApplication.translate("Contextual Menu", "Reset Designer",None, QApplication.UnicodeUTF8),self)
         self.connect(resetAction,SIGNAL("triggered()"),self.reset_designer)
         designermenu.addAction(resetAction)
 
-        exitAction = QAction("Exit Designer",self)
+        exitAction = QAction(QApplication.translate("Contextual Menu", "Exit Designer",None, QApplication.UnicodeUTF8),self)
         self.connect(exitAction,SIGNAL("triggered()"),aw.stopdesigner)
         designermenu.addAction(exitAction)
 
@@ -3054,25 +3060,25 @@ class tgraphcanvas(FigureCanvas):
                             index = self.timeindex.index(i)
                             if index == 0:
                                 time = self.stringfromseconds(0)
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ CHARGE ]</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Status Bar", "[ CHARGE ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 1:
                                 time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ DRY END ]</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ DRY END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 2:
                                 time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC START ]</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ FC START ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 3:
                                 time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ FC END ]</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ FC END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 4:
                                 time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC START ]</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ SC START ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 5:
                                 time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">[ SC END ]</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ SC END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 6:
                                 time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">[ DROP ]</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Status Bar", "[ DROP ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             break
                         else:
                             if abs(self.temp2[i] - event.ydata) < 10:
@@ -3129,7 +3135,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception,e:
             self.unrarefy_designer()
-            self.adderror(u"Exception: designer on_motion() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message", "Exception: designer on_motion() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return                            
 
     #this is used in on_motion() to try to prevent points crossing over points 
@@ -3210,7 +3216,7 @@ class tgraphcanvas(FigureCanvas):
                 return i
             
         except Exception,e:
-            self.adderror(u"Exception: designer addpoint() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message", "Exception: designer addpoint() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return 
 
     #removes point
@@ -3245,7 +3251,7 @@ class tgraphcanvas(FigureCanvas):
             self.redrawdesigner()
                     
         except Exception,e:
-            self.adderror(u"Exception: designer removepoint() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message", "Exception: designer removepoint() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return                 
 
     #finds a proper index location for a time that does not exists yet.
@@ -3315,14 +3321,14 @@ class tgraphcanvas(FigureCanvas):
                 functioncall[self.reproducedesigner]()
                 
             self.redraw()        
-            aw.sendmessage("New profile created")
+            aw.sendmessage(QApplication.translate("Message Area", "New profile created",None, QApplication.UnicodeUTF8))
             
         except ValueError:
-            self.adderror(u"Value Error: createFromDesigner() ")
+            self.adderror(QApplication.translate("Error Message", "Value Error: createFromDesigner() ",None, QApplication.UnicodeUTF8))
             return
 
         except Exception,e:
-            self.adderror(u"Exception: createFromDesigner() " + unicode(e) + " ")
+            self.adderror(QApplication.translate("Error Message", "Exception: createFromDesigner() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
     #activates mouse events	
@@ -3371,7 +3377,7 @@ class tgraphcanvas(FigureCanvas):
                 difftemp = self.temp2[self.timeindex[i]] - self.temp2[self.timeindex[lastindexused]]
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = u"BT %.1f d/m for %s"%((difftemp/difftime),self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]]))
+                    string = QApplication.translate("Event String", "BT %1 d/m for %2",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]]))
                     self.specialevents.append(self.timeindex[lastindexused])                                     
                     self.specialeventstype.append(0)                                           
                     self.specialeventsStrings.append(string)                          
@@ -3387,7 +3393,7 @@ class tgraphcanvas(FigureCanvas):
                 difftemp = self.temp1[self.timeindex[i]] - self.temp1[self.timeindex[lastindexused]]
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = u"ET %.1f d/m for %s"%((difftemp/difftime),self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]]))
+                    string = QApplication.translate("Event String", "ET %1 d/m for %2",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]]))
                     self.specialevents.append(self.timeindex[lastindexused])                                     
                     self.specialeventstype.append(0)                                           
                     self.specialeventsStrings.append(string)                          
@@ -3493,7 +3499,7 @@ class ApplicationWindow(QMainWindow):
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         # set window title
-        self.windowTitle = u"Artisan " + str(__version__)
+        self.windowTitle = QApplication.translate("Application Title", "Artisan %1",None, QApplication.UnicodeUTF8).arg(str(__version__))
         self.setWindowTitle(self.windowTitle)
         for i in range(self.MaxRecentFiles):
             self.recentFileActs.append(
@@ -3505,7 +3511,7 @@ class ApplicationWindow(QMainWindow):
 
         # on the Mac preferences should be stored outside of applications in the users ~/Library/Preferences path
         if platf == u'Darwin':
-            preference_path = QDir().homePath().append(QString("/Library/Preferences/Artisan/"))
+            preference_path = QDir().homePath().append(QString("/Library/Preferences//"))
             preference_dir = QDir()
             preference_dir.setPath(preference_path)
             if not preference_dir.exists():
@@ -3801,34 +3807,34 @@ class ApplicationWindow(QMainWindow):
 
         #MET
         label2 = QLabel()
-        label2.setText("<font color='black'><b>" + QApplication.translate("Form Label", "ET",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        label2.setText("<font color='black'><b>" + QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label2.setAlignment(Qt.AlignRight)
         label2.setIndent(5)
         #BT
         label3 = QLabel()
         label3.setAlignment(Qt.AlignRight)
-        label3.setText("<font color='black'><b>" + QApplication.translate("Form Label", "BT",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        label3.setText("<font color='black'><b>" + QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label3.setIndent(5)
         #DELTA MET
         label4 = QLabel()
         label4.setAlignment(Qt.AlignRight)
-        label4.setText("<font color='black'><b>" + QApplication.translate("Form Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        label4.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label4.setIndent(5)
         # DELTA BT
         label5 = QLabel()
         label5.setAlignment(Qt.AlignRight)       
-        label5.setText("<font color='black'><b>" + QApplication.translate("Form Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        label5.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label5.setIndent(5)
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.AlignRight)
-        self.label6.setText("<font color='black'><b>" + QApplication.translate("Form Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.label6.setText("<font color='black'><b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.label6.setIndent(5)
 
         self.messagehist = []
 
         #convenience EVENT mini editor; View&Edits events without opening roast properties Dlg.
-        self.eventlabel = QLabel(QApplication.translate("Form Label","Event #<b>0 </b>", None, QApplication.UnicodeUTF8))
+        self.eventlabel = QLabel(QApplication.translate("Label","Event #<b>0 </b>", None, QApplication.UnicodeUTF8))
         self.eventlabel.setIndent(5)
         self.eNumberSpinBox = QSpinBox()
         
@@ -3862,7 +3868,7 @@ class ApplicationWindow(QMainWindow):
         self.etimeline.setMaximumWidth(50)
         
         #create EVENT mini button
-        self.buttonminiEvent = QPushButton("Update")
+        self.buttonminiEvent = QPushButton(QApplication.translate("Button", "Update", None, QApplication.UnicodeUTF8))
         self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
         self.buttonminiEvent.setToolTip(QApplication.translate("Tooltip", "Updates the event", None, QApplication.UnicodeUTF8))
@@ -3943,7 +3949,7 @@ class ApplicationWindow(QMainWindow):
 
         
         #pack all into the grid MASTER LAYOUT manager (widget,row,column)
-        gl.addLayout(naviLayout,0,0)               #Navigation Tool bar
+        gl.addLayout(naviLayout,0,0)        #Navigation Tool bar
         gl.addWidget(self.lcd1,0,1)         #timer LCD
         gl.addWidget(self.messagelabel,1,0) #add a message label to give program feedback to user
         gl.addLayout(midLayout,2,0)         #GRAPHS
@@ -3983,15 +3989,15 @@ class ApplicationWindow(QMainWindow):
 
         importMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_IMPORT)
 
-        fileImportAction = QAction("Artisan...",self)
+        fileImportAction = QAction(QApplication.translate("Menu", "Artisan...",None, QApplication.UnicodeUTF8),self)
         self.connect(fileImportAction,SIGNAL("triggered()"),self.fileImport)
         importMenu.addAction(fileImportAction)  
         
-        importHH506RAAction = QAction("HH506RA...",self)
+        importHH506RAAction = QAction(QApplication.translate("Menu", "HH506RA...",None, QApplication.UnicodeUTF8),self)
         self.connect(importHH506RAAction,SIGNAL("triggered()"),self.importHH506RA)
         importMenu.addAction(importHH506RAAction)
 
-        importK202Action = QAction("K202...",self)
+        importK202Action = QAction(QApplication.translate("Menu", "K202...",None, QApplication.UnicodeUTF8),self)
         self.connect(importK202Action,SIGNAL("triggered()"),self.importK202)
         importMenu.addAction(importK202Action)
         
@@ -4023,10 +4029,10 @@ class ApplicationWindow(QMainWindow):
         self.connect(fullsizeAction,SIGNAL("triggered()"),lambda x=0,y=1:self.resize(x,y))
         saveGraphMenu.addAction(fullsizeAction)
 
-        saveGraphMenuHB = saveGraphMenu.addMenu("Home-Barista.com")
-        saveGraphMenuCG = saveGraphMenu.addMenu("CoffeeGeek.com")
-        saveGraphMenuPC = saveGraphMenu.addMenu("PlanetCafe.fr")
-        saveGraphMenuRC = saveGraphMenu.addMenu("RiktigtKaffe.se")
+        saveGraphMenuHB = saveGraphMenu.addMenu(QApplication.translate("Menu", "Home-Barista.com",None, QApplication.UnicodeUTF8))
+        saveGraphMenuCG = saveGraphMenu.addMenu(QApplication.translate("Menu", "CoffeeGeek.com",None, QApplication.UnicodeUTF8))
+        saveGraphMenuPC = saveGraphMenu.addMenu(QApplication.translate("Menu", "PlanetCafe.fr",None, QApplication.UnicodeUTF8))
+        saveGraphMenuRC = saveGraphMenu.addMenu(QApplication.translate("Menu", "RiktigtKaffe.se",None, QApplication.UnicodeUTF8))
 
         HomeBaristaActionLow = QAction(UIconst.FILE_MENU_SAVEGRAPH_LOW_QUALITY,self)
         self.connect(HomeBaristaActionLow,SIGNAL("triggered()"),lambda x=700,y=0:self.resize(x,y))
@@ -4562,17 +4568,17 @@ class ApplicationWindow(QMainWindow):
                 self.autosaveconf()               
 
         except IOError,e:
-            self.qmc.adderror(u"IO Error: automaticsave() " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: automaticsave() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
           
     def viewKshortcuts(self):
-        string = "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts<br><br>"
-        string += "<b>[SPACE]</b> = Choses current button<br><br>"  
-        string += "<b>[LEFT]</b> = Move to the left<br><br>"
-        string += "<b>[RIGHT]</b> = Move to the right<br><br>"
-        string += "<b>[s]</b> = Autosave<br><br>"
-        string += "<b>[CRTL N]</b> = Autosave + Reset + ON<br><br>"
+        string = QApplication.translate("MessageBox", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[SPACE]</b> = Choses current button",None, QApplication.UnicodeUTF8) + "<br><br>"  
+        string += QApplication.translate("MessageBox", "<b>[LEFT]</b> = Move to the left",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[RIGHT]</b> = Move to the right",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[s]</b> = Autosave",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8) + "<br><br>"
 
-        QMessageBox.information(self,u"Keyboard Shotcuts",string)
+        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
 
     def changeEventNumber(self):
        if self.qmc.designerflag:
@@ -4580,7 +4586,7 @@ class ApplicationWindow(QMainWindow):
        #check
        lenevents = len(self.qmc.specialevents)
        currentevent = self.eNumberSpinBox.value()
-       self.eventlabel.setText("Event #<b>%i </b>"%currentevent)
+       self.eventlabel.setText(QApplication.translate("Event Label", "Event #<b>%1 </b>",None, QApplication.UnicodeUTF8).arg(currentevent))
        if currentevent == 0:
            self.lineEvent.setText("")
            self.valueComboBox.setCurrentIndex(0)
@@ -4723,7 +4729,7 @@ class ApplicationWindow(QMainWindow):
  
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanSaveFileDialog(self,msg="Save",ext="*.txt",path=None):
+    def ArtisanSaveFileDialog(self,msg=QApplication.translate("MessageBox Caption","Save",None, QApplication.UnicodeUTF8),ext="*.txt",path=None):
         if path == None:
             path = self.getDefaultPath() 
         file = unicode(QFileDialog.getSaveFileName(self,msg,path,ext))
@@ -4732,7 +4738,7 @@ class ApplicationWindow(QMainWindow):
  
     #the central ExistingDirectoryDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanExistingDirectoryDialog(self,msg="Select Directory",path=None):
+    def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("MessageBox Caption","Select Directory",None, QApplication.UnicodeUTF8),path=None):
         if path == None:
             path = self.getDefaultPath() 
         file = unicode(QFileDialog.getExistingDirectory(self,msg,path))
@@ -4812,21 +4818,21 @@ class ApplicationWindow(QMainWindow):
             #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.qmc.adderror(u"IO Error: fileload() " + unicode(e) + u" ")
+            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except ValueError,e:
             #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.qmc.adderror(u"Value Error: fileload() " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message", "Value Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except Exception,e:
             #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.qmc.adderror(u"Exception Error: loadFile() " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadFile() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
         
         finally:
@@ -4875,21 +4881,21 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.timebackgroundindexupdate(times[:])
                 
             else:      
-                self.sendmessage(u"Invalid artisan format")
+                self.sendmessage(QApplication.translate("Message Area", "Invalid artisan format",None, QApplication.UnicodeUTF8))
 
-            message =  u"Background " + unicode(filename) + u" loaded successfully "+unicode(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))
+            message =  QApplication.translate("Message Area", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(unicode(filename)).arg(unicode(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]])))
             self.sendmessage(message)
 
         except IOError,e:
-            self.qmc.adderror(u"IO Error: loadbackground() " + unicode(e) + u" ")
+            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except ValueError,e:
-            self.qmc.adderror(u"Value Error: loadbackground() " + unicode(e) + u" ")
+            self.qmc.adderror(QApplication.translate("Error Message", "Value Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except Exception,e:
-            self.qmc.adderror(u"Exception Error: loadbackground() " + unicode(e) + u" ")
+            self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
         
         finally:
@@ -5229,7 +5235,7 @@ class ApplicationWindow(QMainWindow):
         try:         
             filename = fname
             if not filename:
-                 filename = self.ArtisanSaveFileDialog(msg="Save Profile") 
+                 filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption", "Save Profile",None, QApplication.UnicodeUTF8)) 
             if filename:
                 #write
                 self.serialize(filename,self.getProfile())
@@ -5240,31 +5246,31 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message Area","Cancelled", None, QApplication.UnicodeUTF8))
         except IOError,e:
-            self.qmc.adderror(u"IO Error on filesave(): " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message", "IO Error on filesave(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
             
     def fileExport(self):
         try:         
-            filename = aw.ArtisanSaveFileDialog(msg="Export CSV",ext="*.csv")
+            filename = aw.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption", "Export CSV",None, QApplication.UnicodeUTF8),ext="*.csv")
             if filename:
                 self.exportCSV(filename)
                 self.sendmessage(QApplication.translate("Message Area","Readings exported", None, QApplication.UnicodeUTF8))
             else:
                 self.sendmessage(QApplication.translate("Message Area","Cancelled", None, QApplication.UnicodeUTF8))
         except IOError,e:
-            self.qmc.adderror(u"IO Error on fileExport(): " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message", "IO Error on fileExport(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
             
     def fileImport(self):
         try:         
-            filename = aw.ArtisanOpenFileDialog(msg="Import CSV")
+            filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption", "Import CSV",None, QApplication.UnicodeUTF8))
             if filename:
                 self.importCSV(filename)
                 self.sendmessage(QApplication.translate("Message Area","Readings imported", None, QApplication.UnicodeUTF8))
             else:
                 self.sendmessage(QApplication.translate("Message Area","Cancelled", None, QApplication.UnicodeUTF8))
         except IOError,e:
-            self.qmc.adderror(u"IO Error on fileImport(): " + unicode(e) + " ")            
+            self.qmc.adderror(QApplication.translate("Error Message", "IO Error on fileImport(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))        
             return
 
 
@@ -5400,7 +5406,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.redraw()
 
         except Exception,e:
-            self.qmc.adderror(u"Exception: settingsLoad() " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message", "Exception: settingsLoad() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return                            
 
 
@@ -5512,7 +5518,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("profilepath",self.userprofilepath)
             
         except Exception,e:
-            self.qmc.adderror(u"Exception: closeEvent() " + str(e) + " ")            
+            self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))            
 
     def filePrint(self):
 
@@ -5539,7 +5545,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 painter.drawImage(0, 0, image)
 
- 
+ ##BOOKMARK: Translation. Create constants for this...
     def htmlReport(self):
         HTML_REPORT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -5771,7 +5777,7 @@ $cupping_notes
             f.close()
             QDesktopServices.openUrl(QUrl(u"file:///" + unicode(QDir().current().absolutePath()) + u"/Artisanreport.html", QUrl.TolerantMode))            
         except IOError,e:
-            self.qmc.adderror("IO Error: htmlReport() " + str(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: htmlReport() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
         finally:
             if f:
@@ -5917,14 +5923,14 @@ $cupping_notes
         dryphasetime = aw.qmc.statisticstimes[1]
         midphasetime = aw.qmc.statisticstimes[2]
         finishphasetime = aw.qmc.statisticstimes[3]
-        PerfectPhase = "OK"
-        ShortDryingPhase = "Grassy"
-        LongDryingPhase = "Leathery"
-        ShortTo1CPhase = "Toasty"
-        LongTo1CPhase = "Bready"
-        ShortFinishPhase = "Acidic"
-        LongFinishPhase = "Flat"        
-        st1 = st2 = st3 = 'OK'
+        PerfectPhase = QApplication.translate("Flavor Scope Label", "OK",None, QApplication.UnicodeUTF8)
+        ShortDryingPhase = QApplication.translate("Flavor Scope Label", "Grassy",None, QApplication.UnicodeUTF8)
+        LongDryingPhase = QApplication.translate("Flavor Scope Label", "Leathery",None, QApplication.UnicodeUTF8)
+        ShortTo1CPhase = QApplication.translate("Flavor Scope Label", "Toasty",None, QApplication.UnicodeUTF8)
+        LongTo1CPhase = QApplication.translate("Flavor Scope Label", "Bready",None, QApplication.UnicodeUTF8)
+        ShortFinishPhase = QApplication.translate("Flavor Scope Label", "Acidic",None, QApplication.UnicodeUTF8)
+        LongFinishPhase = QApplication.translate("Flavor Scope Label", "Flat",None, QApplication.UnicodeUTF8)        
+        st1 = st2 = st3 = QApplication.translate("Flavor Scope Label", "OK",None, QApplication.UnicodeUTF8)
         #CHECK CONDITIONS                
         #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
         #  => ShortDryingPhase
@@ -6545,11 +6551,11 @@ class HUDDlg(QDialog):
         self.org_Sensitivity = aw.qmc.sensitivity
         self.org_Projection = aw.qmc.projectFlag
         
-        ETLabel = QLabel(QApplication.translate("Form Label", "ET Target",None, QApplication.UnicodeUTF8))
+        ETLabel = QLabel(QApplication.translate("Label", "ET Target",None, QApplication.UnicodeUTF8))
         ETLabel.setAlignment(Qt.AlignRight)
-        BTLabel = QLabel(QApplication.translate("Form Label", "BT Target",None, QApplication.UnicodeUTF8))
+        BTLabel = QLabel(QApplication.translate("Label", "BT Target",None, QApplication.UnicodeUTF8))
         BTLabel.setAlignment(Qt.AlignRight)        
-        modeLabel = QLabel(QApplication.translate("Form Label", "Mode",None, QApplication.UnicodeUTF8))
+        modeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
         modeLabel.setAlignment(Qt.AlignRight)
 
         #delta ET    
@@ -6566,7 +6572,7 @@ class HUDDlg(QDialog):
         else:
             self.DeltaBT.setChecked(False)
             
-        filterlabel = QLabel(QApplication.translate("Form Label", "Filter",None, QApplication.UnicodeUTF8))
+        filterlabel = QLabel(QApplication.translate("Label", "Filter",None, QApplication.UnicodeUTF8))
         #DeltaFilter holds the number of pads in filter  
         self.DeltaFilter = QSpinBox()
         self.DeltaFilter.setRange(0,20)
@@ -6575,7 +6581,7 @@ class HUDDlg(QDialog):
     	
         #show projection
         self.projectCheck = QCheckBox("Projection")
-        projectionmodeLabel = QLabel(QApplication.translate("Form Label", "Mode",None, QApplication.UnicodeUTF8))
+        projectionmodeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
         self.projectionmodeComboBox = QComboBox()
         self.projectionmodeComboBox.addItems(["linear","newton"])
         self.projectionmodeComboBox.setCurrentIndex(aw.qmc.projectionmode)
@@ -6591,7 +6597,7 @@ class HUDDlg(QDialog):
         self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.changeProjection(i)) #toggle
             
         self.sensitivityValues = map(str,range(10,0,-1))
-        self.sensitivitylabel  = QLabel(QApplication.translate("Form Label", "Sensitivity",None, QApplication.UnicodeUTF8))                          
+        self.sensitivitylabel  = QLabel(QApplication.translate("Label", "Sensitivity",None, QApplication.UnicodeUTF8))                          
         self.sensitivityComboBox = QComboBox()
         self.sensitivityComboBox.addItems(self.sensitivityValues)
         try:
@@ -6913,7 +6919,7 @@ class editGraphDlg(QDialog):
         regexweight = QRegExp(r"^[0-9]{1,3}[.0-9]{1,2}$")
 
         #MARKERS
-        chargelabel  = QLabel("<b>" + QApplication.translate("Form Label", "CHARGE",None, QApplication.UnicodeUTF8) + "</b>")
+        chargelabel  = QLabel("<b>" + QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8) + "</b>")
         chargelabel.setStyleSheet("background-color:'#f07800';")
 
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
@@ -6923,7 +6929,7 @@ class editGraphDlg(QDialog):
         self.chargeedit.setMinimumWidth(50)
         chargelabel.setBuddy(self.chargeedit)
 
-        drylabel  = QLabel("<b>" + QApplication.translate("Form Label", "DRY END",None, QApplication.UnicodeUTF8) + "</b>")
+        drylabel  = QLabel("<b>" + QApplication.translate("Label", "DRY END",None, QApplication.UnicodeUTF8) + "</b>")
         drylabel.setStyleSheet("background-color:'orange';")
         
         if aw.qmc.timeindex[1]:
@@ -6937,7 +6943,7 @@ class editGraphDlg(QDialog):
         self.dryedit.setMinimumWidth(50)
         drylabel.setBuddy(self.dryedit)
  
-        Cstartlabel = QLabel("<b>" + QApplication.translate("Form Label","FC START",None, QApplication.UnicodeUTF8) + "</b>")
+        Cstartlabel = QLabel("<b>" + QApplication.translate("Label","FC START",None, QApplication.UnicodeUTF8) + "</b>")
         Cstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[2]:
             t3 = int(aw.qmc.timex[aw.qmc.timeindex[2]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -6950,7 +6956,7 @@ class editGraphDlg(QDialog):
         self.Cstartedit.setMinimumWidth(50)
         Cstartlabel.setBuddy(self.Cstartedit)
         
-        Cendlabel = QLabel("<b>" + QApplication.translate("Form Label","FC END",None, QApplication.UnicodeUTF8) + "</b>")
+        Cendlabel = QLabel("<b>" + QApplication.translate("Label","FC END",None, QApplication.UnicodeUTF8) + "</b>")
         Cendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[3]:
             t4 = int(aw.qmc.timex[aw.qmc.timeindex[3]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -6963,7 +6969,7 @@ class editGraphDlg(QDialog):
         self.Cendedit.setMinimumWidth(50)
         Cendlabel.setBuddy(self.Cendedit)
    
-        CCstartlabel = QLabel("<b>" + QApplication.translate("Form Label","SC START",None, QApplication.UnicodeUTF8) + "</b>")
+        CCstartlabel = QLabel("<b>" + QApplication.translate("Label","SC START",None, QApplication.UnicodeUTF8) + "</b>")
         CCstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[4]:
             t5 = int(aw.qmc.timex[aw.qmc.timeindex[4]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -6976,7 +6982,7 @@ class editGraphDlg(QDialog):
         self.CCstartedit.setMinimumWidth(50)
         CCstartlabel.setBuddy(self.CCstartedit)
 
-        CCendlabel = QLabel("<b>" + QApplication.translate("Form Label","SC END",None, QApplication.UnicodeUTF8) + "</b>")
+        CCendlabel = QLabel("<b>" + QApplication.translate("Label","SC END",None, QApplication.UnicodeUTF8) + "</b>")
         CCendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[5]:
             t6 = int(aw.qmc.timex[aw.qmc.timeindex[5]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -6989,7 +6995,7 @@ class editGraphDlg(QDialog):
         self.CCendedit.setMinimumWidth(50)
         CCendlabel.setBuddy(self.CCendedit)
         
-        droplabel = QLabel("<b>" + QApplication.translate("Form Label", "DROP",None, QApplication.UnicodeUTF8) + "</b>")
+        droplabel = QLabel("<b>" + QApplication.translate("Label", "DROP",None, QApplication.UnicodeUTF8) + "</b>")
         droplabel.setStyleSheet("background-color:'#f07800';")
         if aw.qmc.timeindex[6]:
             t7 = int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]])
@@ -7028,17 +7034,17 @@ class editGraphDlg(QDialog):
         self.createDataTable()        
            
         #TITLE
-        titlelabel = QLabel("<b>" + QApplication.translate("Form Label", "Title",None, QApplication.UnicodeUTF8) + "</b>")
+        titlelabel = QLabel("<b>" + QApplication.translate("Label", "Title",None, QApplication.UnicodeUTF8) + "</b>")
         self.titleedit = QLineEdit(aw.qmc.title)
         #Date
-        datelabel1 = QLabel("<b>" + QApplication.translate("Form Label", "Date",None, QApplication.UnicodeUTF8) + "</b>")
+        datelabel1 = QLabel("<b>" + QApplication.translate("Label", "Date",None, QApplication.UnicodeUTF8) + "</b>")
         date = aw.qmc.roastdate.toString()
         dateedit = QLineEdit(date)
         dateedit.setReadOnly(True)
         dateedit.setStyleSheet("background-color:'lightgrey'")
 
         #Beans
-        beanslabel = QLabel("<b>" + QApplication.translate("Form Label", "Beans",None, QApplication.UnicodeUTF8) + "</b>")
+        beanslabel = QLabel("<b>" + QApplication.translate("Label", "Beans",None, QApplication.UnicodeUTF8) + "</b>")
         self.beansedit = QTextEdit()
         self.beansedit.setMaximumHeight(100)
 
@@ -7051,9 +7057,9 @@ class editGraphDlg(QDialog):
         self.operator = QLineEdit(aw.qmc.operator)
         
         #weight
-        weightlabel = QLabel("<b>" + QApplication.translate("Form Label", "Weight",None, QApplication.UnicodeUTF8) + "</b>")
-        weightinlabel = QLabel(QApplication.translate("Form Label", " in",None, QApplication.UnicodeUTF8))
-        weightoutlabel = QLabel(QApplication.translate("Form Label", " out",None, QApplication.UnicodeUTF8))
+        weightlabel = QLabel("<b>" + QApplication.translate("Label", "Weight",None, QApplication.UnicodeUTF8) + "</b>")
+        weightinlabel = QLabel(QApplication.translate("Label", " in",None, QApplication.UnicodeUTF8))
+        weightoutlabel = QLabel(QApplication.translate("Label", " out",None, QApplication.UnicodeUTF8))
         inw = str(aw.qmc.weight[0])
         outw = str(aw.qmc.weight[1])
         self.weightinedit = QLineEdit(inw) 
@@ -7065,7 +7071,7 @@ class editGraphDlg(QDialog):
         self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
         self.weightoutedit.setMinimumWidth(55)
         self.weightoutedit.setMaximumWidth(55)
-        self.weightpercentlabel = QLabel(QApplication.translate("Form Label", " %",None, QApplication.UnicodeUTF8))
+        self.weightpercentlabel = QLabel(QApplication.translate("Label", " %",None, QApplication.UnicodeUTF8))
         self.weightpercentlabel.setMinimumWidth(45)
         self.weightpercentlabel.setMaximumWidth(45)
         self.roastdegreelabel = QLabel("")
@@ -7086,9 +7092,9 @@ class editGraphDlg(QDialog):
             self.unitsComboBox.setCurrentIndex(1)
         
         #volume
-        volumelabel = QLabel("<b>" + QApplication.translate("Form Label", "Volume",None, QApplication.UnicodeUTF8) + "</b>")
-        volumeinlabel = QLabel(QApplication.translate("Form Label", " in",None, QApplication.UnicodeUTF8))
-        volumeoutlabel = QLabel(QApplication.translate("Form Label", " out",None, QApplication.UnicodeUTF8))
+        volumelabel = QLabel("<b>" + QApplication.translate("Label", "Volume",None, QApplication.UnicodeUTF8) + "</b>")
+        volumeinlabel = QLabel(QApplication.translate("Label", " in",None, QApplication.UnicodeUTF8))
+        volumeoutlabel = QLabel(QApplication.translate("Label", " out",None, QApplication.UnicodeUTF8))
         inv = str(aw.qmc.volume[0])
         outv = str(aw.qmc.volume[1])
         self.volumeinedit = QLineEdit(inv) 
@@ -7126,7 +7132,7 @@ class editGraphDlg(QDialog):
         self.connect(self.unitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
 
         #density
-        bean_density_label = QLabel("<b>" + QApplication.translate("Form Label", "Density",None, QApplication.UnicodeUTF8) + "</b>")
+        bean_density_label = QLabel("<b>" + QApplication.translate("Label", "Density",None, QApplication.UnicodeUTF8) + "</b>")
         self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
         self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_weight_edit))
         self.bean_density_weight_edit.setMinimumWidth(55)
@@ -7139,7 +7145,7 @@ class editGraphDlg(QDialog):
             self.bean_density_weightUnitsComboBox.setCurrentIndex(0)
         else:
             self.bean_density_weightUnitsComboBox.setCurrentIndex(1)
-        bean_density_per_label = QLabel(QApplication.translate("Form Label", "per",None, QApplication.UnicodeUTF8))
+        bean_density_per_label = QLabel(QApplication.translate("Label", "per",None, QApplication.UnicodeUTF8))
         self.bean_density_volume_edit = QLineEdit(str(aw.qmc.density[2]))
         self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
         self.bean_density_volume_edit.setMinimumWidth(55)
@@ -7160,14 +7166,14 @@ class editGraphDlg(QDialog):
 
 
         #bag humidity
-        bag_humidity_label = QLabel("<b>" + QApplication.translate("Form Label", "Storage Humidity",None, QApplication.UnicodeUTF8) + "</b>")
+        bag_humidity_label = QLabel("<b>" + QApplication.translate("Label", "Storage Humidity",None, QApplication.UnicodeUTF8) + "</b>")
         bag_humidity_unitslabel = QLabel(aw.qmc.mode)
-        bag_humidity_unit_label = QLabel(QApplication.translate("Form Label", "%",None, QApplication.UnicodeUTF8))
+        bag_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
         self.humidity_edit = QLineEdit()
         self.humidity_edit.setText(unicode(aw.qmc.bag_humidity[0]))
         self.humidity_edit.setMaximumWidth(50)
         self.humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.humidity_edit))
-        bag_humidity_at_label = QLabel(QApplication.translate("Form Label", "at",None, QApplication.UnicodeUTF8))
+        bag_humidity_at_label = QLabel(QApplication.translate("Label", "at",None, QApplication.UnicodeUTF8))
         self.bag_temp_edit = QLineEdit( )
         self.bag_temp_edit.setText(unicode(aw.qmc.bag_humidity[1]))
         self.bag_temp_edit.setMaximumWidth(50)
@@ -7178,7 +7184,7 @@ class editGraphDlg(QDialog):
         
 
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>" + QApplication.translate("Form Label", "Ambient Temperature",None, QApplication.UnicodeUTF8) + "</b>")
+        ambientlabel = QLabel("<b>" + QApplication.translate("Label", "Ambient Temperature",None, QApplication.UnicodeUTF8) + "</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
@@ -7190,16 +7196,16 @@ class editGraphDlg(QDialog):
   
         # NOTES
         roastertypelabel = QLabel()
-        roastertypelabel.setText("<b>" + QApplication.translate("Form Label", "Roaster",None, QApplication.UnicodeUTF8) + "</b>")
+        roastertypelabel.setText("<b>" + QApplication.translate("Label", "Roaster",None, QApplication.UnicodeUTF8) + "</b>")
 
         operatorlabel = QLabel()
-        operatorlabel.setText("<b>" + QApplication.translate("Form Label", "Operator",None, QApplication.UnicodeUTF8) + "</b>")
+        operatorlabel.setText("<b>" + QApplication.translate("Label", "Operator",None, QApplication.UnicodeUTF8) + "</b>")
 
-        roastinglabel = QLabel("<b>" + QApplication.translate("Form Label", "Roasting Notes",None, QApplication.UnicodeUTF8) + "</b>")
+        roastinglabel = QLabel("<b>" + QApplication.translate("Label", "Roasting Notes",None, QApplication.UnicodeUTF8) + "</b>")
         self.roastingeditor = QTextEdit()
         self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
 
-        cuppinglabel = QLabel("<b>" + QApplication.translate("Form Label", "Cupping Notes",None, QApplication.UnicodeUTF8) + "</b>")
+        cuppinglabel = QLabel("<b>" + QApplication.translate("Label", "Cupping Notes",None, QApplication.UnicodeUTF8) + "</b>")
         self.cuppingeditor =  QTextEdit()
         self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
         
@@ -7730,7 +7736,7 @@ class editGraphDlg(QDialog):
             aw.qmc.bag_humidity[1] = 0
 
     	#update ambient temperature
-    	try:
+        try:
             aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
         except:
             aw.qmc.ambientTemp = 0
@@ -7761,7 +7767,7 @@ class errorDlg(QDialog):
 
         enumber = len(aw.qmc.errorlog)
     
-        labelstr =  QApplication.translate("Form Label","Number of errors found %1</b>", None, QApplication.UnicodeUTF8).arg(unicode(enumber))
+        labelstr =  QApplication.translate("Label","Number of errors found %1</b>", None, QApplication.UnicodeUTF8).arg(unicode(enumber))
 
         elabel = QLabel(labelstr)
         errorEdit = QTextEdit()
@@ -7789,7 +7795,7 @@ class messageDlg(QDialog):
             htmlmessage += "<b>" + str(len(aw.messagehist)-i) + "</b> <i>" + aw.messagehist[-i-1] + "</i><br><br>"
 
         linenumber = len(aw.messagehist)
-        labelstr =  QApplication.translate("Form Label", "Last stacked messages",None, QApplication.UnicodeUTF8)
+        labelstr =  QApplication.translate("Label", "Last stacked messages",None, QApplication.UnicodeUTF8)
         mlabel = QLabel(labelstr)
         messageEdit = QTextEdit()
         messageEdit.setHtml(htmlmessage)
@@ -7885,10 +7891,10 @@ class WindowsDlg(QDialog):
         
         self.setModal(True)
 
-        ylimitLabel = QLabel(QApplication.translate("Form Label", "Max",None, QApplication.UnicodeUTF8))
-        ylimitLabel_min = QLabel(QApplication.translate("Form Label", "Min",None, QApplication.UnicodeUTF8))
-        xlimitLabel = QLabel(QApplication.translate("Form Label", "Max",None, QApplication.UnicodeUTF8))
-        xlimitLabel_min = QLabel(QApplication.translate("Form Label", "Min",None, QApplication.UnicodeUTF8))
+        ylimitLabel = QLabel(QApplication.translate("Label", "Max",None, QApplication.UnicodeUTF8))
+        ylimitLabel_min = QLabel(QApplication.translate("Label", "Min",None, QApplication.UnicodeUTF8))
+        xlimitLabel = QLabel(QApplication.translate("Label", "Max",None, QApplication.UnicodeUTF8))
+        xlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None, QApplication.UnicodeUTF8))
         self.ylimitEdit = QLineEdit()
         self.ylimitEdit_min = QLineEdit()
         self.xlimitEdit = QLineEdit()
@@ -8008,12 +8014,12 @@ class calculatorDlg(QDialog):
         self.setWindowTitle("Roast Calculator")
        
         #RATE OF CHANGE
-        self.result1 = QLabel(QApplication.translate("Form Label", "Enter two times along profile",None, QApplication.UnicodeUTF8))
+        self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile",None, QApplication.UnicodeUTF8))
         self.result2 = QLabel()
         self.result2.setStyleSheet("background-color:'lightgrey';")
 
-        startlabel = QLabel(QApplication.translate("Form Label", "Start (00:00)",None, QApplication.UnicodeUTF8))
-        endlabel = QLabel(QApplication.translate("Form Label", "End (00:00)",None, QApplication.UnicodeUTF8))
+        startlabel = QLabel(QApplication.translate("Label", "Start (00:00)",None, QApplication.UnicodeUTF8))
+        endlabel = QLabel(QApplication.translate("Label", "End (00:00)",None, QApplication.UnicodeUTF8))
         self.startEdit = QLineEdit()
         self.endEdit = QLineEdit()
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
@@ -8038,8 +8044,8 @@ class calculatorDlg(QDialog):
 
 
         #TEMPERATURE CONVERSION
-        flabel = QLabel(QApplication.translate("Form Label", "Fahrenheit",None, QApplication.UnicodeUTF8))
-        clabel = QLabel(QApplication.translate("Form Label", "Celsius",None, QApplication.UnicodeUTF8))
+        flabel = QLabel(QApplication.translate("Label", "Fahrenheit",None, QApplication.UnicodeUTF8))
+        clabel = QLabel(QApplication.translate("Label", "Celsius",None, QApplication.UnicodeUTF8))
         self.faEdit = QLineEdit()
         self.ceEdit = QLineEdit()                
         self.faEdit.setValidator(QDoubleValidator(-999., 9999., 2, self.faEdit))
@@ -8309,10 +8315,10 @@ class EventsDlg(QDialog):
             self.eventsGraphflag.setChecked(False)
         self.connect(self.eventsGraphflag,SIGNAL("stateChanged(int)"),self.eventsGraphflagChanged)
 
-        typelabel1 = QLabel(QApplication.translate("Form Label", "1",None, QApplication.UnicodeUTF8))
-        typelabel2 = QLabel(QApplication.translate("Form Label", "2",None, QApplication.UnicodeUTF8))
-        typelabel3 = QLabel(QApplication.translate("Form Label", "3",None, QApplication.UnicodeUTF8))
-        typelabel4 = QLabel(QApplication.translate("Form Label", "4",None, QApplication.UnicodeUTF8))
+        typelabel1 = QLabel(QApplication.translate("Label", "1",None, QApplication.UnicodeUTF8))
+        typelabel2 = QLabel(QApplication.translate("Label", "2",None, QApplication.UnicodeUTF8))
+        typelabel3 = QLabel(QApplication.translate("Label", "3",None, QApplication.UnicodeUTF8))
+        typelabel4 = QLabel(QApplication.translate("Label", "4",None, QApplication.UnicodeUTF8))
         
         self.etype0 = QLineEdit(aw.qmc.etypes[0])
         self.etype1 = QLineEdit(aw.qmc.etypes[1])
@@ -8452,9 +8458,9 @@ class phasesGraphDlg(QDialog):
         
         self.phases = list(aw.qmc.phases)
 
-        dryLabel = QLabel(QApplication.translate("Form Label", "Dry",None, QApplication.UnicodeUTF8))
-        midLabel = QLabel(QApplication.translate("Form Label", "Mid",None, QApplication.UnicodeUTF8))
-        finishLabel = QLabel(QApplication.translate("Form Label", "Finish",None, QApplication.UnicodeUTF8))
+        dryLabel = QLabel(QApplication.translate("Label", "Dry",None, QApplication.UnicodeUTF8))
+        midLabel = QLabel(QApplication.translate("Label", "Mid",None, QApplication.UnicodeUTF8))
+        finishLabel = QLabel(QApplication.translate("Label", "Finish",None, QApplication.UnicodeUTF8))
 
         self.startdry = QSpinBox()
         self.enddry = QSpinBox()
@@ -8795,7 +8801,7 @@ class flavorDlg(QDialog):
         
         self.connect(backButton,SIGNAL("clicked()"),self.close)
         self.connect(defaultButton,SIGNAL("clicked()"),self.defaultlabels)
-        self.sumLabel = QLabel(QApplication.translate("Form Label","total: %1", None, QApplication.UnicodeUTF8).arg(aw.cuppingSum()))
+        self.sumLabel = QLabel(QApplication.translate("Label","total: %1", None, QApplication.UnicodeUTF8).arg(aw.cuppingSum()))
         
         flavorLayout = QGridLayout()
         flavorLayout.addWidget(self.line0edit,0,0)
@@ -8933,21 +8939,21 @@ class backgroundDLG(QDialog):
         self.speedSpinBox.setSingleStep(10)
         self.speedSpinBox.setValue(30)
         
-        intensitylabel =QLabel(QApplication.translate("Form Label", "Opaqueness",None, QApplication.UnicodeUTF8))
+        intensitylabel =QLabel(QApplication.translate("Label", "Opaqueness",None, QApplication.UnicodeUTF8))
         intensitylabel.setAlignment(Qt.AlignRight)
         self.intensitySpinBox = QSpinBox()
         self.intensitySpinBox.setRange(1,9)
         self.intensitySpinBox.setSingleStep(1)
         self.intensitySpinBox.setValue(3)
 
-        widthlabel =QLabel(QApplication.translate("Form Label", "Line Width",None, QApplication.UnicodeUTF8))
+        widthlabel =QLabel(QApplication.translate("Label", "Line Width",None, QApplication.UnicodeUTF8))
         widthlabel.setAlignment(Qt.AlignRight)
         self.widthSpinBox = QSpinBox()
         self.widthSpinBox.setRange(1,20)
         self.widthSpinBox.setSingleStep(1)
         self.widthSpinBox.setValue(2)
 
-        stylelabel =QLabel(QApplication.translate("Form Label", "Line Style",None, QApplication.UnicodeUTF8))
+        stylelabel =QLabel(QApplication.translate("Label", "Line Style",None, QApplication.UnicodeUTF8))
         stylelabel.setAlignment(Qt.AlignRight)        
         self.styleComboBox = QComboBox()
         self.styleComboBox.addItems(["-","--",":","-.","steps"])
@@ -8962,13 +8968,13 @@ class backgroundDLG(QDialog):
         colors.insert(1,u"bt")
         colors.pop(2)
         
-        btcolorlabel = QLabel(QApplication.translate("Form Label", "BT Color",None, QApplication.UnicodeUTF8))
+        btcolorlabel = QLabel(QApplication.translate("Label", "BT Color",None, QApplication.UnicodeUTF8))
         btcolorlabel.setAlignment(Qt.AlignRight)        
         self.btcolorComboBox = QComboBox()
         self.btcolorComboBox.addItems(colors)
         self.btcolorComboBox.setCurrentIndex(1)
 
-        metcolorlabel = QLabel(QApplication.translate("Form Label", "MET Color",None, QApplication.UnicodeUTF8))
+        metcolorlabel = QLabel(QApplication.translate("Label", "MET Color",None, QApplication.UnicodeUTF8))
         metcolorlabel.setAlignment(Qt.AlignRight)        
         self.metcolorComboBox = QComboBox()
         self.metcolorComboBox.addItems(colors)
@@ -9017,7 +9023,7 @@ class backgroundDLG(QDialog):
             self.backgroundReproduce.setChecked(False)    	
         self.connect(self.backgroundReproduce, SIGNAL("stateChanged(int)"),self.setreproduce)
 
-        etimelabel =QLabel(QApplication.translate("Form Label", "Text warning time (seconds)",None, QApplication.UnicodeUTF8))
+        etimelabel =QLabel(QApplication.translate("Label", "Text warning time (seconds)",None, QApplication.UnicodeUTF8))
         self.etimeSpinBox = QSpinBox()
         self.etimeSpinBox.setRange(1,60)
         self.etimeSpinBox.setValue(aw.qmc.detectBackgroundEventTime)
@@ -9463,11 +9469,11 @@ class StatisticsDLG(QDialog):
         self.minfinishedit.setValidator(QRegExpValidator(regextime,self))
         self.maxfinishedit.setValidator(QRegExpValidator(regextime,self))
 
-        drylabel =QLabel(QApplication.translate("Form Label", "Dry",None, QApplication.UnicodeUTF8))
-        midlabel =QLabel(QApplication.translate("Form Label", "Mid",None, QApplication.UnicodeUTF8))
-        finishlabel =QLabel(QApplication.translate("Form Label", "Finish",None, QApplication.UnicodeUTF8))
-        minf = QLabel(QApplication.translate("Form Label", "Min",None, QApplication.UnicodeUTF8))
-        maxf = QLabel(QApplication.translate("Form Label", "Max",None, QApplication.UnicodeUTF8))
+        drylabel =QLabel(QApplication.translate("Label", "Dry",None, QApplication.UnicodeUTF8))
+        midlabel =QLabel(QApplication.translate("Label", "Mid",None, QApplication.UnicodeUTF8))
+        finishlabel =QLabel(QApplication.translate("Label", "Finish",None, QApplication.UnicodeUTF8))
+        minf = QLabel(QApplication.translate("Label", "Min",None, QApplication.UnicodeUTF8))
+        maxf = QLabel(QApplication.translate("Label", "Max",None, QApplication.UnicodeUTF8))
 
         #temp fix for possible bug aw.qmc.statisticsflags=[] > empty list out of range
         if aw.qmc.statisticsflags:
@@ -10286,7 +10292,7 @@ class designerconfigDlg(QDialog):
         self.setWindowTitle("Designer Config")
 
         #landmarks
-        charge = QLabel(QApplication.translate("Form Label", "CHARGE",None, QApplication.UnicodeUTF8))
+        charge = QLabel(QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8))
         charge.setStyleSheet("background-color: #f07800")
         self.dryend = QCheckBox("DRY END")
         self.dryend.setStyleSheet("background-color: orange")
@@ -10298,7 +10304,7 @@ class designerconfigDlg(QDialog):
         self.scs.setStyleSheet("background-color: orange")
         self.sce = QCheckBox("SC END")
         self.sce.setStyleSheet("background-color: orange")
-        drop = QLabel(QApplication.translate("Form Label", "DROP",None, QApplication.UnicodeUTF8))
+        drop = QLabel(QApplication.translate("Label", "DROP",None, QApplication.UnicodeUTF8))
         drop.setStyleSheet("background-color: #f07800")
 
 
@@ -10367,9 +10373,9 @@ class designerconfigDlg(QDialog):
         self.Edit5.setMaximumWidth(50)
         self.Edit6.setMaximumWidth(50)
 
-        splinelabel = QLabel(QApplication.translate("Form Label", "Curviness",None, QApplication.UnicodeUTF8))
-        etcurviness = QLabel(QApplication.translate("Form Label", "ET",None, QApplication.UnicodeUTF8))
-        btcurviness = QLabel(QApplication.translate("Form Label", "BT",None, QApplication.UnicodeUTF8))
+        splinelabel = QLabel(QApplication.translate("Label", "Curviness",None, QApplication.UnicodeUTF8))
+        etcurviness = QLabel(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
+        btcurviness = QLabel(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8))
         etcurviness.setAlignment(Qt.AlignRight)
         btcurviness.setAlignment(Qt.AlignRight)
         self.ETsplineComboBox = QComboBox()
@@ -10385,7 +10391,7 @@ class designerconfigDlg(QDialog):
         self.connect(self.BTsplineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
 
 
-        reproducelabel = QLabel(QApplication.translate("Form Label", "Events Playback",None, QApplication.UnicodeUTF8))
+        reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None, QApplication.UnicodeUTF8))
         self.reproduceComboBox = QComboBox()
         self.reproduceComboBox.addItems(["None",
                                          "BT Rate of Change",
@@ -10689,7 +10695,7 @@ class nonedevDlg(QDialog):
             btval = "0"
         
         self.etEdit = QLineEdit(etval)
-        btlabel = QLabel(QApplication.translate("Form Label", "BT",None, QApplication.UnicodeUTF8))
+        btlabel = QLabel(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8))
         self.btEdit = QLineEdit(btval)
         self.etEdit.setValidator(QIntValidator(0, 1000, self.etEdit))
         self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
@@ -10751,13 +10757,13 @@ class comportDlg(QDialog):
               
         self.setModal(True)
 
-        comportlabel =QLabel(QApplication.translate("Form Label", "Comm Port", None, QApplication.UnicodeUTF8))
+        comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.comportEdit = QComboBox()
         self.comportEdit.addItems([aw.ser.comport])
         self.comportEdit.setEditable(True)
         comportlabel.setBuddy(self.comportEdit)
         
-        baudratelabel = QLabel(QApplication.translate("Form Label", "Baud Rate", None, QApplication.UnicodeUTF8))
+        baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
         self.baudrateComboBox.addItems(["2400","9600","19200","57600"])
@@ -10772,7 +10778,7 @@ class comportDlg(QDialog):
         else:
             pass
                    
-        bytesizelabel = QLabel(QApplication.translate("Form Label", "Byte Size",None, QApplication.UnicodeUTF8))
+        bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None, QApplication.UnicodeUTF8))
         self.bytesizeComboBox = QComboBox()
         bytesizelabel.setBuddy(self.bytesizeComboBox)
         self.bytesizeComboBox.addItems(["8","7"])
@@ -10783,10 +10789,10 @@ class comportDlg(QDialog):
         else:
             pass
 
-        paritylabel = QLabel(QApplication.translate("Form Label", "Parity",None, QApplication.UnicodeUTF8))
+        paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
         self.parityComboBox = QComboBox()
         paritylabel.setBuddy(self.parityComboBox)
-        self.parityComboBox.addItems([QApplication.translate("Form ComboBox", "O",None, QApplication.UnicodeUTF8),QApplication.translate("Form ComboBox", "E",None, QApplication.UnicodeUTF8),QApplication.translate("Form ComboBox", "N",None, QApplication.UnicodeUTF8)])
+        self.parityComboBox.addItems([QApplication.translate("ComboBox", "O",None, QApplication.UnicodeUTF8),QApplication.translate("ComboBox", "E",None, QApplication.UnicodeUTF8),QApplication.translate("ComboBox", "N",None, QApplication.UnicodeUTF8)])
         if aw.ser.parity == "O":
             self.parityComboBox.setCurrentIndex(0)
         elif aw.ser.parity == "E":
@@ -10797,7 +10803,7 @@ class comportDlg(QDialog):
             pass
 
         
-        stopbitslabel = QLabel(QApplication.translate("Form Label", "Stopbits",None, QApplication.UnicodeUTF8))
+        stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None, QApplication.UnicodeUTF8))
         self.stopbitsComboBox = QComboBox()
         stopbitslabel.setBuddy(self.stopbitsComboBox)
         self.stopbitsComboBox.addItems(["1","0","2"])
@@ -10810,7 +10816,7 @@ class comportDlg(QDialog):
         else:
             pass
         
-        timeoutlabel = QLabel(QApplication.translate("Form Label", "Timeout",None, QApplication.UnicodeUTF8))
+        timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
         regex = QRegExp(r"^[0-9]$")
         self.timeoutEdit.setValidator(QRegExpValidator(regex,self))
@@ -10991,16 +10997,16 @@ class DeviceAssignmentDLG(QDialog):
         self.devicetypeComboBox = QComboBox()
         self.devicetypeComboBox.addItems(sorted_devices)
         
-        controllabel =QLabel(QApplication.translate("Form Label", "Control ET",None, QApplication.UnicodeUTF8))                            
+        controllabel =QLabel(QApplication.translate("Label", "Control ET",None, QApplication.UnicodeUTF8))                            
         self.controlpidtypeComboBox = QComboBox()
         self.controlpidunitidComboBox = QComboBox()
         self.controlpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR"])
         self.controlpidunitidComboBox.addItems(["1","2"])
 
-        label1 = QLabel(QApplication.translate("Form Label", "Type",None, QApplication.UnicodeUTF8)) 
-        label2 = QLabel(QApplication.translate("Form Label", "Unit ID",None, QApplication.UnicodeUTF8))
+        label1 = QLabel(QApplication.translate("Label", "Type",None, QApplication.UnicodeUTF8)) 
+        label2 = QLabel(QApplication.translate("Label", "Unit ID",None, QApplication.UnicodeUTF8))
 
-        btlabel =QLabel(QApplication.translate("Form Label", "Read BT",None, QApplication.UnicodeUTF8))                            
+        btlabel =QLabel(QApplication.translate("Label", "Read BT",None, QApplication.UnicodeUTF8))                            
         self.btpidtypeComboBox = QComboBox()
         self.btpidunitidComboBox = QComboBox()
         self.btpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR"])
@@ -11515,12 +11521,12 @@ class graphColorDlg(QDialog):
         self.connect(greyButton, SIGNAL("clicked()"),lambda x=2:self.recolor(x))             
 
         #TAB 2
-        lcd1label = QLabel(QApplication.translate("Form Label", "Timer",None, QApplication.UnicodeUTF8))
-        lcd2label = QLabel(QApplication.translate("Form Label", "ET",None, QApplication.UnicodeUTF8))
-        lcd3label = QLabel(QApplication.translate("Form Label", "BT",None, QApplication.UnicodeUTF8))
-        lcd4label = QLabel(QApplication.translate("Form Label", "Delta ET",None, QApplication.UnicodeUTF8))
-        lcd5label = QLabel(QApplication.translate("Form Label", "Delta BT",None, QApplication.UnicodeUTF8))
-        lcd6label = QLabel(QApplication.translate("Form Label", "SV",None, QApplication.UnicodeUTF8))
+        lcd1label = QLabel(QApplication.translate("Label", "Timer",None, QApplication.UnicodeUTF8))
+        lcd2label = QLabel(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
+        lcd3label = QLabel(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8))
+        lcd4label = QLabel(QApplication.translate("Label", "Delta ET",None, QApplication.UnicodeUTF8))
+        lcd5label = QLabel(QApplication.translate("Label", "Delta BT",None, QApplication.UnicodeUTF8))
+        lcd6label = QLabel(QApplication.translate("Label", "SV",None, QApplication.UnicodeUTF8))
 
         lcdcolors = ["","grey","darkGrey","slateGrey","lightGray","black","white","transparent"]
         self.lcd1colorComboBox =  QComboBox()
@@ -12586,16 +12592,16 @@ class PXRpidDlgControl(QDialog):
         self.labelrs1 = QLabel()
         self.labelrs1.setMargin(5)
         self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Form Label", "Ramp/Soak<br>(1-4)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp/Soak<br>(1-4)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.labelrs1.setMaximumSize(90, 62)
 
         self.labelrs2 = QLabel()
         self.labelrs2.setMargin(5)
         self.labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Form Label", "Ramp/Soak<br>(5-8)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp/Soak<br>(5-8)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.labelrs2.setMaximumSize(90, 62)
 
-        labelpattern = QLabel(QApplication.translate("Form Label", "Ramp/Soak Pattern",None, QApplication.UnicodeUTF8))
+        labelpattern = QLabel(QApplication.translate("Label", "Ramp/Soak Pattern",None, QApplication.UnicodeUTF8))
         self.patternComboBox =  QComboBox()
         self.patternComboBox.addItems(["1-4","5-8","1-8"])
         self.patternComboBox.setCurrentIndex(aw.pid.PXR["rampsoakpattern"][0])
@@ -12645,9 +12651,9 @@ class PXRpidDlgControl(QDialog):
         self.connect(tab2cancelbutton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(tab2easyONsvbutton, SIGNAL("clicked()"), lambda flag=1: aw.pid.activateONOFFeasySV(flag))
         self.connect(tab2easyOFFsvbutton, SIGNAL("clicked()"), lambda flag=0: aw.pid.activateONOFFeasySV(flag))
-        svwarning1 = QLabel(QApplication.translate("Form Label", "<CENTER><b>WARNING</b><br>Writing eeprom memory<br><u>Max life</u> 10,000 writes<br>"
+        svwarning1 = QLabel(QApplication.translate("Label", "<CENTER><b>WARNING</b><br>Writing eeprom memory<br><u>Max life</u> 10,000 writes<br>"
                             "Infinite read life.</CENTER>",None, QApplication.UnicodeUTF8))
-        svwarning2 = QLabel(QApplication.translate("Form Label", "<CENTER><b>WARNING</b><br>After <u>writing</u> an adjustment,<br>never power down the pid<br>"
+        svwarning2 = QLabel(QApplication.translate("Label", "<CENTER><b>WARNING</b><br>After <u>writing</u> an adjustment,<br>never power down the pid<br>"
                             "for the next 5 seconds <br>or the pid may never recover.<br>Read operations manual</CENTER>",None, QApplication.UnicodeUTF8))
         self.svedit = QLineEdit()
         self.svedit.setValidator(QDoubleValidator(0., 999., 1, self.svedit))
@@ -12656,9 +12662,9 @@ class PXRpidDlgControl(QDialog):
         button_p = QPushButton("Set p")
         button_i = QPushButton("Set i")
         button_d = QPushButton("Set d")
-        plabel =  QLabel(QApplication.translate("Form Label", "p",None, QApplication.UnicodeUTF8))
-        ilabel =  QLabel(QApplication.translate("Form Label", "i",None, QApplication.UnicodeUTF8))
-        dlabel =  QLabel(QApplication.translate("Form Label", "d",None, QApplication.UnicodeUTF8))
+        plabel =  QLabel(QApplication.translate("Label", "p",None, QApplication.UnicodeUTF8))
+        ilabel =  QLabel(QApplication.translate("Label", "i",None, QApplication.UnicodeUTF8))
+        dlabel =  QLabel(QApplication.translate("Label", "d",None, QApplication.UnicodeUTF8))
         self.pedit = QLineEdit(str(aw.pid.PXR["p"][0]))
         self.iedit = QLineEdit(str(aw.pid.PXR["i"][0]))
         self.dedit = QLineEdit(str(aw.pid.PXR["d"][0]))
@@ -13328,14 +13334,14 @@ class PXG4pidDlgControl(QDialog):
         labelrs1 = QLabel()
         labelrs1.setMargin(5)
         labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs1.setText("<font color='white'><b>" + QApplication.translate("Form Label", "RampSoak<br>(1-7)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "RampSoak<br>(1-7)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         #labelrs1.setMaximumSize(90, 42)
         #labelrs1.setMinimumHeight(50)
 
         labelrs2 = QLabel()
         labelrs2.setMargin(5)
         labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs2.setText("<font color='white'><b>" + QApplication.translate("Form Label", "RampSoak<br>(8-16)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "RampSoak<br>(8-16)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         #labelrs2.setMaximumSize(90, 42)
         #labelrs2.setMinimumHeight(50)
 
@@ -13379,7 +13385,7 @@ class PXG4pidDlgControl(QDialog):
         
         self.paintlabels()
 
-        patternlabel = QLabel(QApplication.translate("Form Label", "Pattern",None, QApplication.UnicodeUTF8))
+        patternlabel = QLabel(QApplication.translate("Label", "Pattern",None, QApplication.UnicodeUTF8))
         patternlabel.setAlgnment(Qt.AlignRight)
         button_getall = QPushButton("Read RS values")
         button_rson =  QPushButton("RampSoak ON")        
@@ -13431,14 +13437,14 @@ class PXG4pidDlgControl(QDialog):
         labelsv = QLabel()
         labelsv.setMargin(10)
         labelsv.setStyleSheet("background-color:'#CCCCCC';")
-        labelsv.setText("<font color='white'><b>" + QApplication.translate("Form Label", "SV (7-0)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        labelsv.setText("<font color='white'><b>" + QApplication.translate("Label", "SV (7-0)",None, QApplication.UnicodeUTF8) + "<\b></font>")
         labelsv.setMaximumSize(100, 42)
         labelsv.setMinimumHeight(50)
         
         labelsvedit = QLabel()
         labelsvedit.setMargin(10)
         labelsvedit.setStyleSheet("background-color:'#CCCCCC';")
-        labelsvedit.setText("<font color='white'><b>" + QApplication.translate("Form Label", "Write",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        labelsvedit.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None, QApplication.UnicodeUTF8) + "<\b></font>")
         labelsvedit.setMaximumSize(100, 42)
         labelsvedit.setMinimumHeight(50)
         
@@ -13534,28 +13540,28 @@ class PXG4pidDlgControl(QDialog):
         plabel = QLabel()
         plabel.setMargin(10)
         plabel.setStyleSheet("background-color:'#CCCCCC';")
-        plabel.setText("<font color='white'><b>" + QApplication.translate("Form Label", "P",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        plabel.setText("<font color='white'><b>" + QApplication.translate("Label", "P",None, QApplication.UnicodeUTF8) + "<\b></font>")
         plabel.setMaximumSize(50, 42)
         plabel.setMinimumHeight(50)
 
         ilabel = QLabel()
         ilabel.setMargin(10)
         ilabel.setStyleSheet("background-color:'#CCCCCC';")
-        ilabel.setText("<font color='white'><b>" + QApplication.translate("Form Label", "I",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        ilabel.setText("<font color='white'><b>" + QApplication.translate("Label", "I",None, QApplication.UnicodeUTF8) + "<\b></font>")
         ilabel.setMaximumSize(50, 42)
         ilabel.setMinimumHeight(50)
         
         dlabel = QLabel()
         dlabel.setMargin(10)
         dlabel.setStyleSheet("background-color:'#CCCCCC';")
-        dlabel.setText("<font color='white'><b>" + QApplication.translate("Form Label", "D",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        dlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "D",None, QApplication.UnicodeUTF8) + "<\b></font>")
         dlabel.setMaximumSize(50, 42)
         dlabel.setMinimumHeight(50)
 
         wlabel = QLabel()
         wlabel.setMargin(10)
         wlabel.setStyleSheet("background-color:'#CCCCCC';")
-        wlabel.setText("<font color='white'><b>" + QApplication.translate("Form Label", "Write",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        wlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None, QApplication.UnicodeUTF8) + "<\b></font>")
         wlabel.setMaximumSize(50, 42)
         wlabel.setMinimumHeight(50)
         
