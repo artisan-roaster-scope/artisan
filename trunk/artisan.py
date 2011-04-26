@@ -6056,13 +6056,18 @@ $cupping_notes
         
     def helpAbout(self):
         coredevelopers = "<br>Rafael Cobo <br> Marko Luther <br> Sebastien Delgrande"
-        contributors = "<br>Lukas Kolbe, linux binary<br>Rich Helms, documentation<br>Markus Wagner, TEVA18B support"
-        contributors += "<br>Martin Kral, Swedish localization<br>Bluequijote, Spanish localization<br>Marcio Carneiro, Arduino/TC4"
+        contributors =  "<br>" + QApplication.translate("About", "%1, linux binary",None, QApplication.UnicodeUTF8).arg("Lukas Kolbe")
+        contributors += "<br>" + QApplication.translate("About", "%1, documentation",None, QApplication.UnicodeUTF8).arg("Rich Helms")
+        contributors += "<br>" + QApplication.translate("About", "%1, TEVA18B support",None, QApplication.UnicodeUTF8).arg("Markus Wagner")
+        contributors += "<br>" + QApplication.translate("About", "%1, Swedish localization",None, QApplication.UnicodeUTF8).arg("Martin Kral")
+        contributors += "<br>" + QApplication.translate("About", "%1, Spanish localization",None, QApplication.UnicodeUTF8).arg("Bluequijote")
+        contributors += "<br>" + QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Marcio Carneiro")
         box = QMessageBox()
+        
         #create a html QString
         box.about(self,
-                "About",
-                """<b>Version:</b> {0} 
+                QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
+                "<b>" + QApplication.translate("About", "Version:",None, QApplication.UnicodeUTF8) + """</b> {0} 
                 <p>
                 <b>Python:</b> [ {1} ]
                 <b>Qt:</b> [ {2} ]
@@ -6070,10 +6075,10 @@ $cupping_notes
                 <b>OS:</b/>[ {4} ]
                 </p>
                 <p>
-                <b>Core developers:</b> {5}
+                <b>""" + QApplication.translate("About", "Core developers:",None, QApplication.UnicodeUTF8) + """</b> {5}
                 </p>
                 <p>
-                <b>Contributors:</b> {6}
+                <b>""" + QApplication.translate("About", "Contributors:",None, QApplication.UnicodeUTF8) + """</b> {6}
                 </p>""".format(
                 __version__,
                 platform.python_version(),
@@ -12108,7 +12113,7 @@ class WheelDlg(QDialog):
         controlLayout.addWidget(addButton)
         controlLayout.addWidget(rotateLeftButton)
         controlLayout.addWidget(rotateRightButton)
-    	controlLayout.addWidget(self.hierarchiButton)
+        controlLayout.addWidget(self.hierarchiButton)
 
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
