@@ -8270,12 +8270,12 @@ class calculatorDlg(QDialog):
             endtime = aw.qmc.stringtoseconds(unicode(self.endEdit.text()))
 
             if starttime == -1 or endtime == -1:
-                self.result1.setText("Time syntax error. Time not valid")
+                self.result1.setText(QApplication.translate("Label", "Time syntax error. Time not valid",None, QApplication.UnicodeUTF8))
                 self.result2.setText("")
                 return
 
             if  endtime > aw.qmc.timex[-1] or endtime < starttime:
-                self.result1.setText("Error: End time smaller than Start time")
+                self.result1.setText(QApplication.translate("Label", "Error: End time smaller than Start time",None, QApplication.UnicodeUTF8))
                 self.result2.setText("")
                 return
             
@@ -8297,9 +8297,8 @@ class calculatorDlg(QDialog):
                 deltaseconds = deltatemperature/deltatime
             deltaminutes = deltaseconds*60.
         
-            string1 = ( u"Best approximation was made from " + aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- start) +
-                        u" to " + aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- start))
-            string2 = u"deg/sec = " + u"%.2f"%(deltaseconds) + u"    deg/min = <b>" + u"%.2f<\b>"%(deltaminutes)
+            string1 = QApplication.translate("Label", "Best approximation was made from %1 to %2",None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- start)).arg(aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- start))
+            string2 = QApplication.translate("Label", "deg/sec = %1    deg/min = <b>%2<\b>",None, QApplication.UnicodeUTF8).arg(u"%.2f"%(deltaseconds)).arg(u"%.2f"%(deltaminutes))
             
             self.result1.setText(string1)        
             self.result2.setText(string2)
@@ -8311,7 +8310,7 @@ class calculatorDlg(QDialog):
 ##                                color = aw.qmc.palette["grid"],marker = "^",linestyle="--",markersize=8, linewidth=3, alpha = .7)
 ##                aw.qmc.fig.canvas.draw()            
         else:
-            self.result1.setText("No profile found")  
+            self.result1.setText(QApplication.translate("Label", "No profile found",None, QApplication.UnicodeUTF8))  
             self.result2.setText("")
 
     def convertTemp(self,x):
@@ -8377,17 +8376,17 @@ class EventsDlg(QDialog):
     def __init__(self, parent = None):
         super(EventsDlg,self).__init__(parent)
 
-        self.setWindowTitle("Events")
+        self.setWindowTitle(QApplication.translate("Form Caption","Events",None, QApplication.UnicodeUTF8))
         self.setModal(True)
 
-        self.eventsbuttonflag = QCheckBox("Button")
+        self.eventsbuttonflag = QCheckBox(QApplication.translate("Checkbox","Button",None, QApplication.UnicodeUTF8))
         if aw.eventsbuttonflag:
             self.eventsbuttonflag.setChecked(True)
         else:
             self.eventsbuttonflag.setChecked(False)
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)  
         
-        self.minieventsflag = QCheckBox("Mini Editor")
+        self.minieventsflag = QCheckBox(QApplication.translate("Checkbox","Mini Editor",None, QApplication.UnicodeUTF8))
         self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event",None, QApplication.UnicodeUTF8))
         if aw.minieventsflag:
             self.minieventsflag.setChecked(True)
@@ -8395,7 +8394,7 @@ class EventsDlg(QDialog):
             self.minieventsflag.setChecked(False)
         self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)
         
-        self.eventsGraphflag = QCheckBox("Type Bars")
+        self.eventsGraphflag = QCheckBox(QApplication.translate("Checkbox","Type Bars",None, QApplication.UnicodeUTF8))
         if aw.qmc.eventsGraphflag:
             self.eventsGraphflag.setChecked(True)
         else:
@@ -8428,9 +8427,9 @@ class EventsDlg(QDialog):
         typeLayout3.addWidget(typelabel4)
         typeLayout3.addWidget(self.etype3)
 
-        okButton = QPushButton("OK")  
-        closeButton = QPushButton("Cancel")
-        defaultButton = QPushButton("Defaults")
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
+        closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
         
@@ -8459,7 +8458,7 @@ class EventsDlg(QDialog):
         buttonLayout.addWidget(closeButton)
         buttonLayout.addWidget(okButton)
 
-        TypeGroupLayout = QGroupBox("Event Types")
+        TypeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Event Types",None, QApplication.UnicodeUTF8))
         TypeGroupLayout.setLayout(typelayout)
 
         FlagsLayout = QHBoxLayout()
@@ -8540,7 +8539,7 @@ class phasesGraphDlg(QDialog):
     def __init__(self, parent = None):
         super(phasesGraphDlg,self).__init__(parent)
 
-        self.setWindowTitle("Roast Phases")
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Phases",None, QApplication.UnicodeUTF8))
         self.setModal(True)
         
         self.phases = list(aw.qmc.phases)
@@ -8595,16 +8594,16 @@ class phasesGraphDlg(QDialog):
 
         self.getphases()
 
-        self.pushbuttonflag = QCheckBox("Auto Adjusted")
+        self.pushbuttonflag = QCheckBox(QApplication.translate("CheckBox","Auto Adjusted",None, QApplication.UnicodeUTF8))
         if aw.qmc.phasesbuttonflag:
             self.pushbuttonflag.setChecked(True)
         else:
             self.pushbuttonflag.setChecked(False)
         self.connect(self.pushbuttonflag,SIGNAL("stateChanged(int)"),self.pushbuttonflagChanged)  
             
-        okButton = QPushButton("OK")  
-        cancelButton = QPushButton("Cancel")
-        setDefaultButton = QPushButton("Defaults")
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        setDefaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         
         cancelButton.setFocusPolicy(Qt.NoFocus)
         setDefaultButton.setFocusPolicy(Qt.NoFocus)
@@ -8726,7 +8725,7 @@ class flavorDlg(QDialog):
     def __init__(self, parent = None):
         super(flavorDlg,self).__init__(parent)
 
-        self.setWindowTitle("Cup Profile")        
+        self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None, QApplication.UnicodeUTF8))        
         self.setModal(True)
 
         self.line0edit = QLineEdit(aw.qmc.flavorlabels[0])  
@@ -8823,13 +8822,13 @@ class flavorDlg(QDialog):
 
         self.bodySpinbox.setValue((int(aw.qmc.flavors[8]*10.)))
         
-        saveImgButton = QPushButton("Save Img")
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None, QApplication.UnicodeUTF8))
         saveImgButton.setMaximumWidth(100)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
-        backButton = QPushButton("OK")
+        backButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
 
-        defaultButton = QPushButton("Defaults")
+        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         defaultButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(self.aciditySpinbox,SIGNAL("valueChanged(int)"),aciditySlider.setValue)
@@ -8952,7 +8951,8 @@ class flavorDlg(QDialog):
         aw.qmc.flavorchart()
         
     def adjustflavor(self,key,val):
-        self.sumLabel.setText("total: %i"%aw.cuppingSum())
+        self.sumLabel.setText(QApplication.translate("Label","total: %1", None, QApplication.UnicodeUTF8).arg(aw.cuppingSum()))
+        
         aw.qmc.flavors[key] = float(val)/10.
 
     def closeEvent(self, event):    
@@ -8970,7 +8970,7 @@ class flavorDlg(QDialog):
 class backgroundDLG(QDialog):
     def __init__(self, parent = None):
         super(backgroundDLG,self).__init__(parent)
-        self.setWindowTitle("Profile Background")
+        self.setWindowTitle(QApplication.translate("Form Caption","Profile Background", None, QApplication.UnicodeUTF8))
         self.setModal(True)
 
     	#TAB 1
@@ -8978,9 +8978,9 @@ class backgroundDLG(QDialog):
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
         self.filename = u""
         
-        self.backgroundCheck = QCheckBox("Show")
-        self.backgroundDetails = QCheckBox("Text")
-        self.backgroundeventsflag = QCheckBox("Events")
+        self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Show", None, QApplication.UnicodeUTF8))
+        self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Text", None, QApplication.UnicodeUTF8))
+        self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None, QApplication.UnicodeUTF8))
         
         if aw.qmc.background:
             self.backgroundCheck.setChecked(True)
@@ -8989,7 +8989,7 @@ class backgroundDLG(QDialog):
 
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
-        self.status.showMessage("Ready",3000)
+        self.status.showMessage(QApplication.translate("StatusBar","Ready", None, QApplication.UnicodeUTF8),3000)
 
         if aw.qmc.backgroundDetails:
             self.backgroundDetails.setChecked(True)
@@ -9002,18 +9002,18 @@ class backgroundDLG(QDialog):
             self.backgroundeventsflag.setChecked(False)
             
 
-        loadButton = QPushButton("Load")
+        loadButton = QPushButton(QApplication.translate("Button","Load", None, QApplication.UnicodeUTF8))
         loadButton.setFocusPolicy(Qt.NoFocus)
 
-        delButton = QPushButton("Delete")
+        delButton = QPushButton(QApplication.translate("Button","Delete", None, QApplication.UnicodeUTF8))
         delButton.setFocusPolicy(Qt.NoFocus)
         
-        okButton = QPushButton("Ok")
+        okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))
         
-        selectButton =QPushButton("Select Profile")
+        selectButton =QPushButton(QApplication.translate("Button","Select Profile", None, QApplication.UnicodeUTF8))
         selectButton.setFocusPolicy(Qt.NoFocus)
 
-        alignButton = QPushButton("Align")
+        alignButton = QPushButton(QApplication.translate("Button","Align", None, QApplication.UnicodeUTF8))
         alignButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(loadButton, SIGNAL("clicked()"),self.load)
@@ -9043,7 +9043,11 @@ class backgroundDLG(QDialog):
         stylelabel =QLabel(QApplication.translate("Label", "Line Style",None, QApplication.UnicodeUTF8))
         stylelabel.setAlignment(Qt.AlignRight)        
         self.styleComboBox = QComboBox()
-        self.styleComboBox.addItems(["-","--",":","-.","steps"])
+        self.styleComboBox.addItems([QApplication.translate("ComboBox","-",None, QApplication.UnicodeUTF8),
+                                     QApplication.translate("ComboBox","--",None, QApplication.UnicodeUTF8),
+                                     QApplication.translate("ComboBox",":",None, QApplication.UnicodeUTF8),
+                                     QApplication.translate("ComboBox","-.",None, QApplication.UnicodeUTF8),
+                                     QApplication.translate("ComboBox","steps",None, QApplication.UnicodeUTF8)])
         self.styleComboBox.setCurrentIndex(0)
 
 
@@ -9103,7 +9107,7 @@ class backgroundDLG(QDialog):
         self.createDataTable()
         
     	#TAB 4
-        self.backgroundReproduce = QCheckBox("Playback Aid Mode")    
+        self.backgroundReproduce = QCheckBox(QApplication.translate("CheckBox","Playback Aid Mode",None, QApplication.UnicodeUTF8))    
         if aw.qmc.backgroundReproduce:
             self.backgroundReproduce.setChecked(True)
         else:
@@ -9189,19 +9193,19 @@ class backgroundDLG(QDialog):
         
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
-        TabWidget.addTab(C1Widget,"Config")
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None, QApplication.UnicodeUTF8))
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        TabWidget.addTab(C2Widget,"Events")
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Events",None, QApplication.UnicodeUTF8))
 
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
-        TabWidget.addTab(C3Widget,"Data")
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Data",None, QApplication.UnicodeUTF8))
 
         C4Widget = QWidget()
         C4Widget.setLayout(tab4layout)
-        TabWidget.addTab(C4Widget,"Playback")
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Playback",None, QApplication.UnicodeUTF8))
         
         
         buttonLayout = QHBoxLayout()
@@ -12331,7 +12335,7 @@ class WheelDlg(QDialog):
         controlLayout.addWidget(addButton)
         controlLayout.addWidget(rotateLeftButton)
         controlLayout.addWidget(rotateRightButton)
-    	controlLayout.addWidget(self.hierarchyButton)
+        controlLayout.addWidget(self.hierarchyButton)
 
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
