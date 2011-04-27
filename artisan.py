@@ -3093,25 +3093,25 @@ class tgraphcanvas(FigureCanvas):
                             index = self.timeindex.index(i)
                             if index == 0:
                                 time = self.stringfromseconds(0)
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Status Bar", "[ CHARGE ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Message Area", "[ CHARGE ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 1:
                                 time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ DRY END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ DRY END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 2:
                                 time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ FC START ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ FC START ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 3:
                                 time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ FC END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ FC END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 4:
                                 time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ SC START ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ SC START ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 5:
                                 time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Status Bar", "[ SC END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ SC END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             elif index == 6:
                                 time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Status Bar", "[ DROP ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Message Area", "[ DROP ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
                             break
                         else:
                             if abs(self.temp2[i] - event.ydata) < 10:
@@ -4619,7 +4619,7 @@ class ApplicationWindow(QMainWindow):
        #check
        lenevents = len(self.qmc.specialevents)
        currentevent = self.eNumberSpinBox.value()
-       self.eventlabel.setText(QApplication.translate("Event Label", "Event #<b>%1 </b>",None, QApplication.UnicodeUTF8).arg(currentevent))
+       self.eventlabel.setText(QApplication.translate("Label", "Event #<b>%1 </b>",None, QApplication.UnicodeUTF8).arg(currentevent))
        if currentevent == 0:
            self.lineEvent.setText("")
            self.valueComboBox.setCurrentIndex(0)
@@ -7814,7 +7814,7 @@ class errorDlg(QDialog):
 
         enumber = len(aw.qmc.errorlog)
     
-        labelstr =  QApplication.translate("Label","Number of errors found %1</b>", None, QApplication.UnicodeUTF8).arg(unicode(enumber))
+        labelstr =  QApplication.translate("Label","Number of errors found %1", None, QApplication.UnicodeUTF8).arg(unicode(enumber)) + "</b>"
 
         elabel = QLabel(labelstr)
         errorEdit = QTextEdit()
@@ -12768,10 +12768,13 @@ class PXRpidDlgControl(QDialog):
         self.connect(tab2cancelbutton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(tab2easyONsvbutton, SIGNAL("clicked()"), lambda flag=1: aw.pid.activateONOFFeasySV(flag))
         self.connect(tab2easyOFFsvbutton, SIGNAL("clicked()"), lambda flag=0: aw.pid.activateONOFFeasySV(flag))
-        svwarning1 = QLabel(QApplication.translate("Label", "<CENTER><b>WARNING</b><br>Writing eeprom memory<br><u>Max life</u> 10,000 writes<br>"
-                            "Infinite read life.</CENTER>",None, QApplication.UnicodeUTF8))
-        svwarning2 = QLabel(QApplication.translate("Label", "<CENTER><b>WARNING</b><br>After <u>writing</u> an adjustment,<br>never power down the pid<br>"
-                            "for the next 5 seconds <br>or the pid may never recover.<br>Read operations manual</CENTER>",None, QApplication.UnicodeUTF8))
+        svwarning1 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None, QApplication.UnicodeUTF8) + "</b><br>"
+                            + QApplication.translate("Label", "Writing eeprom memory",None, QApplication.UnicodeUTF8) + "<br>"
+                            + QApplication.translate("Label", "<u>Max life</u> 10,000 writes",None, QApplication.UnicodeUTF8) + "<br>"
+                            + QApplication.translate("Label", "Infinite read life.",None, QApplication.UnicodeUTF8)) + "</CENTER>"
+        svwarning2 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None, QApplication.UnicodeUTF8) + "</b><br>"
+                            + QApplication.translate("Label", "After <u>writing</u> an adjustment,<br>never power down the pid<br>for the next 5 seconds <br>or the pid may never recover.",None, QApplication.UnicodeUTF8) + "<br>"
+                            + QApplication.translate("Label", "Read operations manual",None, QApplication.UnicodeUTF8) + "</CENTER>")
         self.svedit = QLineEdit()
         self.svedit.setValidator(QDoubleValidator(0., 999., 1, self.svedit))
         
