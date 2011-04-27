@@ -182,7 +182,28 @@ class tgraphcanvas(FigureCanvas):
         # device 1 (with index 1 bellow) is Omega HH806
         # device 2 (with index 2 bellow) is omega HH506
         # etc
-        self.device = 0 
+        self.device = 0                                     #main device to used read BT and ET
+        self.devices = ["Omega HH806AU",                    #device labels (used in Dialog config)
+                   "Omega HH506RA",
+                   "CENTER 309",
+                   "CENTER 306",
+                   "CENTER 305",
+                   "CENTER 304",
+                   "CENTER 303",
+                   "CENTER 302",
+                   "CENTER 301",
+                   "CENTER 300",
+                   "VOLTCRAFT K204",
+                   "VOLTCRAFT K202",
+                   "VOLTCRAFT 300K",
+                   "VOLTCRAFT 302KJ",
+                   "EXTECH 421509",
+                   "Omega HH802U",
+                   "Omega HH309",
+                   "NONE",
+                   "ArduinoTC4",
+                   "TE VA18B"
+                   ]        
         self.devicefunctionlist = [self.fujitemperature,
                                    self.HH806AU,
                                    self.HH506RA,
@@ -205,6 +226,12 @@ class tgraphcanvas(FigureCanvas):
                                    self.ARDUINOTC4,
                                    self.TEVA18B
                                    ]
+
+        #extra devices
+        self.extradevices = []
+        self.extradevicecolor1 = []             #line 1 color
+        self.extradevicecolor2 = []             #line 2 color
+
         
         self.fig = Figure()
 
@@ -1971,12 +1998,12 @@ class tgraphcanvas(FigureCanvas):
 
     #adjusts size of all segements of the graph based on child parent relation
     #expects all segments to have a parent except in the first wheel
-    def setWheelHierarchi(self):
+    def setWheelHierarchy(self):
         #check for not stablished relashionships (will cause graph plotting problems) and give warning
         for x in range(1,len(self.wheellabelparent)):
             for i in range(len(self.wheellabelparent[x])):
                 if self.wheellabelparent[x][i] == 0:
-                    QMessageBox.information(self,u"Wheel Hierarchi Problem",
+                    QMessageBox.information(self,u"Wheel Hierarchy Problem",
                     "Please assign a  a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
                     return        
         
@@ -9691,6 +9718,11 @@ class serialport(object):
         #initial ambient temperature flag for ARDUINOTC4 meter
         self.arduinoAmbFlag = 0
 
+
+        #EXTRA COMM PORTS VARIABLES
+        self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
+        #comm ports available after Scan
+        self.commavailable = []
         
     def openport(self):
         try:
@@ -10807,16 +10839,19 @@ class nonedevDlg(QDialog):
         
                 
 #########################################################################
-#############  SERIAL PORT DIALOG #######################################                                   
+#############  SERIAL PORT CONFIGUARTION DIALOG #########################                                   
 #########################################################################
 
             
 class comportDlg(QDialog):
     def __init__(self, parent = None):
         super(comportDlg,self).__init__(parent)
+        self.setWindowTitle("Serial Ports Configuration")
               
         self.setModal(True)
 
+        ##########################    TAB 1 WIDGETS
+        
         comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.comportEdit = QComboBox()
         self.comportEdit.addItems([aw.ser.comport])
@@ -10826,60 +10861,36 @@ class comportDlg(QDialog):
         baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
-        self.baudrateComboBox.addItems(["2400","9600","19200","57600"])
-        if aw.ser.baudrate == 2400:
-            self.baudrateComboBox.setCurrentIndex(0)
-        elif aw.ser.baudrate == 9600:
-            self.baudrateComboBox.setCurrentIndex(1)     
-        elif aw.ser.baudrate == 19200:
-            self.baudrateComboBox.setCurrentIndex(2)
-        elif aw.ser.baudrate == 57600:
-            self.baudrateComboBox.setCurrentIndex(3)
-        else:
-            pass
+        self.bauds = ["2400","9600","19200","57600"]
+        self.baudrateComboBox.addItems(self.bauds)
+        self.baudrateComboBox.setCurrentIndex(self.bauds.index(str(aw.ser.baudrate)))
                    
         bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None, QApplication.UnicodeUTF8))
         self.bytesizeComboBox = QComboBox()
         bytesizelabel.setBuddy(self.bytesizeComboBox)
-        self.bytesizeComboBox.addItems(["8","7"])
-        if aw.ser.bytesize == 8:
-            self.bytesizeComboBox.setCurrentIndex(0)
-        elif aw.ser.bytesize == 7:
-            self.bytesizeComboBox.setCurrentIndex(1)
-        else:
-            pass
+        self.bytesizes = ["7","8"]
+        self.bytesizeComboBox.setCurrentIndex(self.bytesizes.index(str(aw.ser.bytesize)))
+        self.bytesizeComboBox.addItems(self.bytesizes)
 
         paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
         self.parityComboBox = QComboBox()
         paritylabel.setBuddy(self.parityComboBox)
-        self.parityComboBox.addItems([QApplication.translate("ComboBox", "O",None, QApplication.UnicodeUTF8),QApplication.translate("ComboBox", "E",None, QApplication.UnicodeUTF8),QApplication.translate("ComboBox", "N",None, QApplication.UnicodeUTF8)])
-        if aw.ser.parity == "O":
-            self.parityComboBox.setCurrentIndex(0)
-        elif aw.ser.parity == "E":
-            self.parityComboBox.setCurrentIndex(1)
-        elif aw.ser.parity == "N":
-            self.parityComboBox.setCurrentIndex(2)
-        else:
-            pass
+        #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
+        self.parity = ["O","E","N"]
+        self.parityComboBox.addItems(self.parity)
+        self.parityComboBox.setCurrentIndex(self.parity.index(aw.ser.parity))
 
-        
         stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None, QApplication.UnicodeUTF8))
         self.stopbitsComboBox = QComboBox()
         stopbitslabel.setBuddy(self.stopbitsComboBox)
-        self.stopbitsComboBox.addItems(["1","0","2"])
-        if aw.ser.stopbits == 1:
-            self.stopbitsComboBox.setCurrentIndex(0)
-        elif aw.ser.stopbits == 0:
-            self.stopbitsComboBox.setCurrentIndex(1)
-        elif aw.ser.stopbits == 2:
-            self.stopbitsComboBox.setCurrentIndex(2)
-        else:
-            pass
+        self.stopbits = ["0","1","2"]
+        self.stopbitsComboBox.addItems(self.stopbits)
+        self.stopbitsComboBox.setCurrentIndex(aw.ser.stopbits)
         
         timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
-        regex = QRegExp(r"^[0-9]$")
-        self.timeoutEdit.setValidator(QRegExpValidator(regex,self))
+        self.timeoutEdit.setValidator(QIntValidator(0,5,self.timeoutEdit))
+
 
         self.messagelabel = QLabel()
         
@@ -10888,8 +10899,18 @@ class comportDlg(QDialog):
         cancelButton.setFocusPolicy(Qt.NoFocus)
         scanButton = QPushButton("Scan for Ports")
         scanButton.setFocusPolicy(Qt.NoFocus)
+
+        self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
+        self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
+        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)
         
 
+        ##########################    TAB 2  WIDGETS   EXTRA DEVICES
+        self.serialtable = QTableWidget()
+        self.serialtable.setTabKeyNavigation(True)
+        self.createserialTable()
+        
+        #tab1 layout
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(scanButton)
         buttonLayout.addStretch()  
@@ -10916,17 +10937,80 @@ class comportDlg(QDialog):
         gridBoxLayout.addLayout(grid)
         gridBoxLayout.addStretch()  
         
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(gridBoxLayout)
-        mainLayout.addStretch()  
-        mainLayout.addLayout(buttonLayout)
+        tab1Layout = QVBoxLayout()
+        tab1Layout.addLayout(gridBoxLayout)
+        tab1Layout.addStretch()  
 
-        self.setLayout(mainLayout)
 
-        self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
-        self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)
-        self.setWindowTitle("Serial Port Settings")
+        #LAYOUT TAB 2
+        tab2Layout = QVBoxLayout()
+        tab2Layout.addWidget(self.serialtable)
+
+        #tab widget
+        TabWidget = QTabWidget()
+        C1Widget = QWidget()
+        C1Widget.setLayout(tab1Layout)
+        TabWidget.addTab(C1Widget,"ET/BT device")
+
+        C2Widget = QWidget()
+        C2Widget.setLayout(tab2Layout)
+        TabWidget.addTab(C2Widget,"Extra devices")
+
+        #incorporate layouts
+        Mlayout = QVBoxLayout()
+        Mlayout.addWidget(TabWidget)
+        Mlayout.addLayout(buttonLayout)
+        
+        self.setLayout(Mlayout)
+
+    def createserialTable(self):
+        self.serialtable.clear()        
+        ndevices = len(aw.qmc.extradevices)
+        if ndevices:    
+            self.serialtable.setRowCount(ndevices)
+            self.serialtable.setColumnCount(7)
+            self.serialtable.setHorizontalHeaderLabels(["Extra Dev","Comm Port","Baud Rate","Byte Size","Parity","Stopbits","Timeout"])
+            self.serialtable.setAlternatingRowColors(True)
+            self.serialtable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
+            self.serialtable.setShowGrid(True)
+
+            for i in range(ndevices):
+                device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]])    #type identification of the device
+
+                comportComboBox =  QComboBox()
+                comportComboBox.addItems(aw.ser.commavailable)
+
+                baudComboBox =  QComboBox()
+                baudComboBox.addItems(self.bauds)
+                baudComboBox.setCurrentIndex(self.bauds.index(str(aw.ser.extrabaudrate[i])))
+
+                byteComboBox =  QComboBox()
+                byteComboBox.addItems(self.bytesizes)
+                byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.ser.extrabytesize[i])))
+
+                parityComboBox =  QComboBox()
+                parityComboBox.addItems(self.parity)
+                parityComboBox.setCurrentIndex(self.parity.index(aw.ser.extraparity[i]))
+              
+                #self.connect(baudComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
+                 
+                stopbitsComboBox =  QComboBox()
+                stopbitsComboBox.addItems(self.stopbits)
+                stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.ser.extrastopbits[i])))
+
+                timeoutEdit = QLineEdit(str(aw.ser.extratimeout[i]))
+                timeoutEdit.setValidator(QIntValidator(0,5,timeoutEdit))
+
+                #add widgets to the table
+                self.serialtable.setItem(i,0,device)              
+                self.serialtable.setCellWidget(i,1,comportComboBox)
+                self.serialtable.setCellWidget(i,2,baudComboBox)                
+                self.serialtable.setCellWidget(i,3,byteComboBox)
+                self.serialtable.setCellWidget(i,4,parityComboBox)              
+                self.serialtable.setCellWidget(i,5,stopbitsComboBox)              
+                self.serialtable.setCellWidget(i,6,timeoutEdit)              
 
     def accept(self):
         #validate serial parameter against input errors
@@ -11013,11 +11097,12 @@ class comportDlg(QDialog):
         else:
             self.sendmessage(QApplication.translate("Message Area","Port scan on this platform not yet supported", None, QApplication.UnicodeUTF8))
                                 
-        self.comportEdit.clear()              
+        self.comportEdit.clear()
         self.comportEdit.addItems(available)
         if len(available):
             self.comportEdit.setCurrentIndex(len(available)-1)
-
+            aw.ser.commavailable = available[:]
+            self.createserialTable()
 
 #################################################################################            
 ##################   Device assignments DIALOG for reading temperature   ########
@@ -11026,34 +11111,16 @@ class comportDlg(QDialog):
 class DeviceAssignmentDLG(QDialog):       
     def __init__(self, parent = None):
         super(DeviceAssignmentDLG,self).__init__(parent)
+        self.setWindowTitle("Device Assignment")
         
         self.setModal(True)
 
+        ################ TAB 1   WIDGETS
+        
         self.nonpidButton = QRadioButton("Device")
         self.pidButton = QRadioButton("PID")
 
-        devices = ["Omega HH806AU",
-                   "Omega HH506RA",
-                   "CENTER 309",
-                   "CENTER 306",
-                   "CENTER 305",
-                   "CENTER 304",
-                   "CENTER 303",
-                   "CENTER 302",
-                   "CENTER 301",
-                   "CENTER 300",
-                   "VOLTCRAFT K204",
-                   "VOLTCRAFT K202",
-                   "VOLTCRAFT 300K",
-                   "VOLTCRAFT 302KJ",
-                   "EXTECH 421509",
-                   "Omega HH802U",
-                   "Omega HH309",
-                   "NONE",
-                   "ArduinoTC4",
-                   "TE VA18B"
-                   ]
-        sorted_devices = sorted(devices)
+        sorted_devices = sorted(aw.qmc.devices)
         self.devicetypeComboBox = QComboBox()
         self.devicetypeComboBox.addItems(sorted_devices)
         
@@ -11109,8 +11176,17 @@ class DeviceAssignmentDLG(QDialog):
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
 
-        self.setWindowTitle("Device Assignment")
-        
+
+        ##########################    TAB 2  WIDGETS   EXTRA DEVICES
+        #table for showing data
+        self.devicetable = QTableWidget()
+        self.devicetable.setTabKeyNavigation(True)
+        self.createDeviceTable()
+
+        addButton = QPushButton("Add")
+        self.connect(addButton, SIGNAL("clicked()"),self.adddevice)                
+
+        #LAYOUT TAB 1
         grid = QGridLayout()
 
         grid.addWidget(self.nonpidButton,0,0)
@@ -11141,21 +11217,128 @@ class DeviceAssignmentDLG(QDialog):
         PIDGroupLayout = QGroupBox("PID")
         PIDGroupLayout.setLayout(PIDBox)
         
-        
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()  
         buttonLayout.addWidget(cancelButton)
         buttonLayout.addWidget(okButton)
         
-        mainLayout = QVBoxLayout()
-        mainLayout.addLayout(gridBox)
-        mainLayout.addWidget(PIDGroupLayout)
-        mainLayout.addStretch()  
-        mainLayout.addLayout(buttonLayout)
-                
-        mainLayout.setSizeConstraint(QLayout.SetFixedSize)
+        tab1Layout = QVBoxLayout()
+        tab1Layout.addLayout(gridBox)
+        tab1Layout.addWidget(PIDGroupLayout)
+        tab1Layout.addStretch()  
 
-        self.setLayout(mainLayout)
+        #LAYOUT TAB 2
+        tab2Layout = QVBoxLayout()
+        tab2Layout.addWidget(self.devicetable)
+        tab2Layout.addWidget(addButton)
+
+        #tab widget
+        TabWidget = QTabWidget()
+        C1Widget = QWidget()
+        C1Widget.setLayout(tab1Layout)
+        TabWidget.addTab(C1Widget,"ET/BT Dev.")
+
+        C2Widget = QWidget()
+        C2Widget.setLayout(tab2Layout)
+        TabWidget.addTab(C2Widget,"Extra Dev.")
+
+        #incorporate layouts
+        Mlayout = QVBoxLayout()
+        Mlayout.addWidget(TabWidget)
+        Mlayout.addLayout(buttonLayout)
+        
+        self.setLayout(Mlayout)
+
+    def createDeviceTable(self):
+        self.devicetable.clear()        
+        ndevices = len(aw.qmc.extradevices)
+        if ndevices:    
+            self.devicetable.setRowCount(ndevices)
+            self.devicetable.setColumnCount(4)
+            self.devicetable.setHorizontalHeaderLabels(["Delete","Device type","Color line 1", "Color line 2"])
+            self.devicetable.setAlternatingRowColors(True)
+            self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.devicetable.setSelectionMode(QTableWidget.SingleSelection)
+            self.devicetable.setShowGrid(True)
+
+            #populate table
+            devices = aw.qmc.devices[:]  
+            devices.insert(0,"")         #add empty space for PID
+            for i in range(ndevices):
+                typeComboBox =  QComboBox()
+                typeComboBox.addItems(devices)
+                typeComboBox.setCurrentIndex(aw.qmc.extradevices[i])
+                self.connect(typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
+
+                color1Button = QPushButton("Color 1")
+                self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
+
+                color2Button = QPushButton("Color 2")
+                self.connect(color2Button, SIGNAL("clicked()"),lambda l = 2, c = i: self.setextracolor(l,c))
+
+                delButton = QPushButton("Del")
+                self.connect(delButton, SIGNAL("clicked()"),lambda x = i: self.delextradevice(x))
+
+                #add widgets to the table
+                self.devicetable.setCellWidget(i,0,delButton)              
+                self.devicetable.setCellWidget(i,1,typeComboBox)
+                self.devicetable.setCellWidget(i,2,color1Button)
+                self.devicetable.setCellWidget(i,3,color2Button)              
+
+    def adddevice(self):
+        self.savedevicetable()
+        aw.qmc.extradevices.append(0)
+        aw.qmc.extradevicecolor1.append("black")
+        aw.qmc.extradevicecolor2.append("black")
+        self.createDeviceTable()
+
+        #add and init dummy serial port settings
+        aw.ser.extracomport.append("COM1")
+        aw.ser.extrabaudrate.append(9600)
+        aw.ser.extrabytesize.append(8)
+        aw.ser.extraparity.append("E")
+        aw.ser.extrastopbits.append(1)
+        aw.ser.extratimeout.append(1) 
+        
+    def delextradevice(self,x):
+        aw.qmc.extradevices.pop(x)
+        aw.qmc.extradevicecolor1.pop(x)
+        aw.qmc.extradevicecolor2.pop(x)
+        self.createDeviceTable()
+
+        #serial port settings
+        aw.ser.extracomport.pop(x)
+        aw.ser.extrabaudrate.pop(x)
+        aw.ser.extrabytesize.pop(x)
+        aw.ser.extraparity.pop(x)
+        aw.ser.extrastopbits.pop(x)
+        aw.ser.extratimeout.pop(x) 
+
+    def savedevicetable(self):
+        for i in range(len(aw.qmc.extradevices)):
+            typecombobox = self.devicetable.cellWidget(i,1)
+            if typecombobox.currentIndex(): 
+                aw.qmc.extradevices[i] = typecombobox.currentIndex()
+                
+    def setextradevice(self,z,x):
+        typecombobox = self.devicetable.cellWidget(x,1)
+        if typecombobox.currentIndex(): 
+            aw.qmc.extradevices[x] = typecombobox.currentIndex()
+            
+    def setextracolor(self,l,i):
+        #line 1
+        if l == 1:
+            colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor1[i]),self)
+            if colorf.isValid():
+                colorname = unicode(colorf.name())
+                aw.qmc.extradevicecolor1[i] = colorname
+        #line 2
+        elif l == 2:
+            colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor2[i]),self)
+            if colorf.isValid():
+                colorname = unicode(colorf.name())
+                aw.qmc.extradevicecolor2[i] = colorname            
 
     def accept(self):
         message = "Device left empty"
@@ -11197,6 +11380,7 @@ class DeviceAssignmentDLG(QDialog):
         if self.nonpidButton.isChecked():
             meter = str(self.devicetypeComboBox.currentText())
             message = "device err"
+            
             if meter == "Omega HH806AU":
                 aw.qmc.device = 1
                 aw.ser.comport = "COM11"
@@ -11406,7 +11590,7 @@ class DeviceAssignmentDLG(QDialog):
             aw.button_17.setVisible(False)
             aw.label6.setVisible(False)
             aw.lcd6.setVisible(False)
-                        
+
         aw.sendmessage(message)
         
         if self.nonpidButton.isChecked():
@@ -12008,7 +12192,7 @@ class WheelDlg(QDialog):
     def __init__(self, parent = None):
         super(WheelDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle("Wheel Graph Properties")
+        self.setWindowTitle("Wheel Graph Editor")
 
         #table for alarms
         self.datatable = QTableWidget()
@@ -12022,13 +12206,15 @@ class WheelDlg(QDialog):
         self.connect(self.labelCloseButton, SIGNAL("clicked()"),self.closelabels)
 
         self.labelResetButton = QPushButton("Reset Parents")
+        self.labelResetButton.setToolTip("Erases wheel parent hierarchy")
         self.labelResetButton.setMaximumWidth(160)
         self.connect(self.labelResetButton, SIGNAL("clicked()"),self.resetlabelparents)
         self.labelwheelx = 0   #index of wheel being edited on labeltable
 
-        self.hierarchiButton = QPushButton("Set Hierarchi")
-        self.hierarchiButton.setMaximumWidth(100)
-        self.connect(self.hierarchiButton, SIGNAL("clicked()"),aw.qmc.setWheelHierarchi)
+        self.hierarchyButton = QPushButton("Set Hierarchy")
+        self.hierarchyButton.setToolTip("Set graph hierarchy after creating parent relationships")
+        self.hierarchyButton.setMaximumWidth(100)
+        self.connect(self.hierarchyButton, SIGNAL("clicked()"),aw.qmc.setWheelHierarchy)
 
         self.labeltable.setVisible(False)        
         self.labelCloseButton.setVisible(False)
@@ -12036,14 +12222,17 @@ class WheelDlg(QDialog):
         
         txtlabel = QLabel("Text")
         txtButtonplus = QPushButton("+")
+        txtButtonplus.setToolTip("Increase size of text in all the graph")
         txtButtonplus.setMaximumWidth(30)
         self.connect(txtButtonplus, SIGNAL("clicked()"),lambda x = 1: self.changetext(x))
         txtButtonminus = QPushButton("-")
+        txtButtonminus.setToolTip("Decrease size of text in all the graph")
         txtButtonminus.setMaximumWidth(30)
         self.connect(txtButtonminus, SIGNAL("clicked()"),lambda x = 0: self.changetext(x))
 
         edgelabel = QLabel("Edge")
         self.edgeSpinBox = QSpinBox()
+        self.edgeSpinBox.setToolTip("Decorative edge beween wheels")
         self.edgeSpinBox.setMaximumWidth(80)
         self.edgeSpinBox.setRange(0,5)
         self.edgeSpinBox.setValue(int(aw.qmc.wheeledge*100))
@@ -12051,17 +12240,20 @@ class WheelDlg(QDialog):
 
         linewidthlabel = QLabel("Line")
         self.linewidthSpinBox = QSpinBox()
+        self.linewidthSpinBox.setToolTip("Line thickness")
         self.linewidthSpinBox.setMaximumWidth(80)
         self.linewidthSpinBox.setRange(0,20)
         self.linewidthSpinBox.setValue(aw.qmc.wheellinewidth)
         self.connect(self.linewidthSpinBox, SIGNAL("valueChanged(int)"),self.setlinewidth)
 
         linecolor = QPushButton("Line Color")
+        linecolor.setToolTip("Line color")
         linecolor.setMaximumWidth(100)
         self.connect(linecolor, SIGNAL("clicked()"),self.setlinecolor)
         
         colorlabel = QLabel("Color pattern")    	
         self.colorSpinBox = QSpinBox()
+        self.colorSpinBox.setToolTip("Apply color pattern to whole graph")
         self.colorSpinBox.setMaximumWidth(80)
         self.colorSpinBox.setRange(0,255)
         self.colorSpinBox.setValue(aw.qmc.wheelcolorpattern)
@@ -12069,30 +12261,37 @@ class WheelDlg(QDialog):
         self.connect(self.colorSpinBox, SIGNAL("valueChanged(int)"),self.setcolorpattern)
 
         addButton = QPushButton("Add")
+        addButton.setToolTip("Add new wheel")
         addButton.setMaximumWidth(100)
         self.connect(addButton, SIGNAL("clicked()"),self.insertwheel)
 
         rotateLeftButton = QPushButton("<")
+        rotateLeftButton.setToolTip("Rotate graph 1 degree counter clockwise")
         rotateLeftButton.setMaximumWidth(30)
         self.connect(rotateLeftButton, SIGNAL("clicked()"),lambda x = 1: self.rotatewheels(x))
         
         rotateRightButton = QPushButton(">")
+        rotateRightButton.setToolTip("Rotate graph 1 degree clockwise")
         rotateRightButton.setMaximumWidth(30)
         self.connect(rotateRightButton, SIGNAL("clicked()"),lambda x = 0: self.rotatewheels(x))
 
         saveButton = QPushButton("Save File")
         saveButton.setMaximumWidth(100)
         self.connect(saveButton, SIGNAL("clicked()"),self.fileSave)
-
+        saveButton.setToolTip("Save graph to a text file.wg")
+        
         saveImgButton = QPushButton("Save Img")
+        saveImgButton.setToolTip("Save image using current graph size to a png format")
         saveImgButton.setMaximumWidth(100)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
         openButton = QPushButton("Open")
+        openButton.setToolTip("open graph file.wg")
         openButton.setMaximumWidth(100)
         self.connect(openButton, SIGNAL("clicked()"),self.loadWheel)
 
         closeButton = QPushButton("Close")
+        closeButton.setToolTip("Close wheel graph editor")
         closeButton.setMaximumWidth(100)
         self.connect(closeButton, SIGNAL("clicked()"),self.close)
 
@@ -12132,10 +12331,11 @@ class WheelDlg(QDialog):
         controlLayout.addWidget(addButton)
         controlLayout.addWidget(rotateLeftButton)
         controlLayout.addWidget(rotateRightButton)
-        controlLayout.addWidget(self.hierarchiButton)
+    	controlLayout.addWidget(self.hierarchyButton)
 
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.datatable)
+        mainlayout.addWidget(self.labelGroupLayout)
         mainlayout.addLayout(controlLayout)
         mainlayout.addWidget(self.labelGroupLayout)
         mainlayout.addLayout(configlayout)
@@ -12313,6 +12513,8 @@ class WheelDlg(QDialog):
             self.datatable.setColumnCount(10)
             self.datatable.setHorizontalHeaderLabels(["Del Wheel","Edit Labels","Update Labels","Properties",
                                                       "Radius","Starting angle","Txt Projection","Txt size","Color","Color Pattern"])
+            self.datatable.setHorizontalHeaderLabels(["Delete Wheel","Edit Labels","Update Labels","Properties",
+                                                      "Radius","Starting angle","Txt Projection","Text size","Color","Color Pattern"])
             self.datatable.setAlternatingRowColors(True)
             self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -12322,6 +12524,7 @@ class WheelDlg(QDialog):
             #populate table
             for i in range(ndata):
                 delButton = QPushButton("Del")
+                delButton = QPushButton("Delete")
                 self.connect(delButton, SIGNAL("clicked()"),lambda x = i: self.popwheel(x))
 
                 labelsedit = QLineEdit(unicode(",".join(aw.qmc.wheelnames[i])))
@@ -12408,6 +12611,7 @@ class WheelDlg(QDialog):
         aw.qmc.wradii[x] = newwidth
         
         #correct for numerical floating rouding errors:
+        #Need 100.0% coverage. Correct for numerical floating point rounding errors:
         count = 0.            
         for i in range(len(aw.qmc.wradii)):
             count +=  aw.qmc.wradii[i]
@@ -12418,7 +12622,6 @@ class WheelDlg(QDialog):
             else:
                 aw.qmc.wradii[x] -= abs(diff)
                 
-
         aw.qmc.drawWheel()
 
     def setangle(self,z,x):
@@ -12455,7 +12658,7 @@ class WheelDlg(QDialog):
             aw.qmc.wradii.append(100.-count)
         else:
             aw.qmc.wradii.append(100.)
-        #number of labels of last wheels
+        #find number of labels of most outer wheel
         if len(aw.qmc.wheelnames):
             nwheels = len(aw.qmc.wheelnames[-1])
         else:
@@ -12483,6 +12686,7 @@ class WheelDlg(QDialog):
         aw.qmc.drawWheel()
         
     def popwheel(self,x):
+        #correct raius of other wheels (to use 100% space)
         width = aw.qmc.wradii[x]
         l = len(aw.qmc.wradii)
         for i in range(l):
