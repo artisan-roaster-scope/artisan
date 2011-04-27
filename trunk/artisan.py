@@ -5578,14 +5578,13 @@ class ApplicationWindow(QMainWindow):
             else:
                 painter.drawImage(0, 0, image)
 
- ##BOOKMARK: Translation. Create constants for this...
     def htmlReport(self):
         HTML_REPORT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<title>Roasting Report</title>
+<title>""" + QApplication.translate("HTML Report Template", "Roasting Report", None, QApplication.UnicodeUTF8) + """</title>
 <style type="text/css">
 td { 
   vertical-align: top;
@@ -5610,15 +5609,15 @@ th {
 <td>
 <table width="220">
 <tr>
-<th>Date:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Date:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$datetime</td>
 </tr>
 <tr>
-<th>Beans:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Beans:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$beans</td>
 </tr>
 <tr>
-<th>Weight:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Weight:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$weight</td>
 </tr>
 <tr>
@@ -5626,19 +5625,19 @@ th {
 <td>$degree</td>
 </tr>
 <tr>
-<th>Volume:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Volume:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$volume</td>
 </tr>
 <tr>
-<th>Roaster:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Roaster:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$roaster</td>
 </tr>
 <tr>
-<th>Operator:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Operator:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$operator</td>
 </tr>
 <tr>
-<th>Cupping:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Cupping:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$cup</td>
 </tr>
 </table>
@@ -5646,7 +5645,7 @@ th {
 <td>
 <table width="180">
 <tr>
-<th>Charge:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Charge:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$charge</td>
 </tr>
 <tr>
@@ -5654,27 +5653,27 @@ th {
 <td>$TP</td>
 </tr>
 <tr>
-<th>DRY:</th>
+<th>""" + QApplication.translate("HTML Report Template", "DRY:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$DRY</td>
 </tr>
 <tr>
-<th>FCs:</th>
+<th>""" + QApplication.translate("HTML Report Template", "FCs:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$FCs</td>
 </tr>
 <tr>
-<th>FCe:</th>
+<th>""" + QApplication.translate("HTML Report Template", "FCe:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$FCe</td>
 </tr>
 <tr>
-<th>SCs:</th>
+<th>""" + QApplication.translate("HTML Report Template", "SCs:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$SCs</td>
 </tr>
 <tr>
-<th>SCe:</th>
+<th>""" + QApplication.translate("HTML Report Template", "SCe:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$SCe</td>
 </tr>
 <tr>
-<th>Drop:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Drop:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$drop</td>
 </tr>
 </table>
@@ -5682,15 +5681,15 @@ th {
 <td>
 <table width="210">
 <tr>
-<th>Dry phase:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Dry phase:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$dry_phase</td>
 </tr>
 <tr>
-<th>Mid phase:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Mid phase:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$mid_phase</td>
 </tr>
 <tr>
-<th>Finish phase:</th>
+<th>""" + QApplication.translate("HTML Report Template", "Finish phase:", None, QApplication.UnicodeUTF8) + """</th>
 <td>$finish_phase</td>
 </tr>
 </table>
@@ -5700,7 +5699,7 @@ th {
 </center>
 </td>
 <td>
-<center><b>Roasting Notes</b></center>
+<center><b>""" + QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8) + """</b></center>
 $roasting_notes
 </td>
 </tr>
@@ -5709,10 +5708,10 @@ $roasting_notes
 <td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'/></td>
 </tr>
 <tr>
-<td><center><b>Events</b></center><br/>
+<td><center><b>""" + QApplication.translate("HTML Report Template", "Events", None, QApplication.UnicodeUTF8) + """</b></center><br/>
 $specialevents
 </td>
-<td><center><b>Cupping Notes</b></center>
+<td><center><b>""" + QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8) + """</b></center>
 $cupping_notes
 </td>
 </tr>
@@ -6096,7 +6095,8 @@ $cupping_notes
         calSpinBox.setRange(.1,30.)
         calSpinBox.setValue(self.qmc.delay/1000.)
         secondsdelay, ok = QInputDialog.getDouble(self,
-                "Sampling Interval", "Seconds",
+                QApplication.translate("MessageBox Caption", "Sampling Interval",None, QApplication.UnicodeUTF8),
+                QApplication.translate("MessageBox", "Seconds",None, QApplication.UnicodeUTF8),
                 calSpinBox.value(),.1,30.)
         if ok:
             self.qmc.killTimer(self.qmc.timerid) 
@@ -6184,10 +6184,11 @@ $cupping_notes
             dialog = AlarmDlg(self)
             dialog.show()
         else:
-            QMessageBox.information(self,u"Alarm Config","Alarms are not available for device None")
+            QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Alarm Config",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("MessageBox", "Alarms are not available for device None",None, QApplication.UnicodeUTF8))
         
     # takes the weight of the green and roasted coffee as floats and
-    # returns the weight loos in percentage as float
+    # returns the weight loss in percentage as float
     def weight_loss(self,green,roasted):
       if float(green) == 0.0 or float(green) < float(roasted):
         return 0.
@@ -6201,21 +6202,21 @@ $cupping_notes
         if percent < 13.5:
             return ""
         elif percent < 14.5:
-            return "City"
+            return QApplication.translate("Label", "City",None, QApplication.UnicodeUTF8)
         elif percent < 15.5:
-            return "City+"
+            return QApplication.translate("Label", "City+",None, QApplication.UnicodeUTF8)
         elif percent < 16.5:
-            return "Full City"
+            return QApplication.translate("Label", "Full City",None, QApplication.UnicodeUTF8)
         elif percent < 17.5:
-            return "Full City+"
+            return QApplication.translate("Label", "Full City+",None, QApplication.UnicodeUTF8)
         elif percent < 18.5:
-            return "Light French"
+            return QApplication.translate("Label", "Light French",None, QApplication.UnicodeUTF8)
         else:
-            return "French"
+            return QApplication.translate("Label", "French",None, QApplication.UnicodeUTF8)
             
     def importK202(self):
         try:
-            filename = aw.ArtisanOpenFileDialog(msg=u"Import K202 CSV")
+            filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Import K202 CSV",None, QApplication.UnicodeUTF8))
             if  filename == "":
                 return
             self.qmc.reset()
@@ -6269,17 +6270,17 @@ $cupping_notes
             self.qmc.redraw()
  
         except IOError,e:
-            self.qmc.adderror(u"IO Error: importK202(): " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message","IO Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return            
 
         except ValueError,e:
-            self.qmc.adderror(u"Value Error: importK202(): " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message","Value Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
             
     def importHH506RA(self):
         try:
-            filename = aw.ArtisanOpenFileDialog(msg=u"Import HH506RA CSV")
+            filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Import HH506RA CSV", None, QApplication.UnicodeUTF8))
             if  filename == "":
                 return
             self.qmc.reset()
@@ -6333,22 +6334,22 @@ $cupping_notes
             self.qmc.redraw()
  
         except IOError,e:
-            self.qmc.adderror("IO Error: importHH506RA(): " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message","IO Error: importHH506RA(): %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return            
 
         except ValueError,e:
-            self.qmc.adderror("Value Error: importHH506RA(): " + unicode(e) + " ")
+            self.qmc.adderror(QApplication.translate("Error Message","Value Error: importHH506RA(): %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
 
     #checks or creates directory structure
     def dirstruct(self):
         currentdir = QDir().current()     #selects the current dir
-        if not currentdir.exists(u"profiles"):
-            profilesdir = currentdir.mkdir(u"profiles")
+        if not currentdir.exists(QApplication.translate("Directory","profiles", None, QApplication.UnicodeUTF8)):
+            profilesdir = currentdir.mkdir(QApplication.translate("Directory","profiles",None, QApplication.UnicodeUTF8))
 
         #check/create 'other' directory inside profiles/
-        otherpath = QString(u"profiles/other")
+        otherpath = QString(QApplication.translate("Directory","profiles", None, QApplication.UnicodeUTF8) + "/" + QApplication.translate("Directory","other", None, QApplication.UnicodeUTF8))
         if not currentdir.exists(otherpath):
             yeardir = currentdir.mkdir(otherpath)
             
@@ -6356,12 +6357,12 @@ $cupping_notes
         date =  QDate.currentDate()       
         
         #check / create year dir 
-        yearpath = QString(u"profiles/" + unicode(date.year()))
+        yearpath = QString(QApplication.translate("Directory","profiles", None, QApplication.UnicodeUTF8) + "/" + unicode(date.year()))
         if not currentdir.exists(yearpath):
             yeardir = currentdir.mkdir(yearpath)
 
         #check /create month dir to store profiles
-        monthpath = QString(u"profiles/" + unicode(date.year()) + u"/" + unicode(date.month()))
+        monthpath = QString(QApplication.translate("Directory","profiles", None, QApplication.UnicodeUTF8) + "/" + unicode(date.year()) + u"/" + unicode(date.month()))
         if not currentdir.exists(monthpath):
             monthdir = currentdir.mkdir(monthpath)
         if  self.profilepath == u"":   
@@ -6377,7 +6378,7 @@ $cupping_notes
             if w != 0:        
                 image = image.scaledToWidth(w,transformationmode)
         
-            filename = aw.ArtisanSaveFileDialog(msg="Save Image for Web",ext="*.png")            
+            filename = aw.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption","Save Image for Web", None, QApplication.UnicodeUTF8),ext="*.png")            
             if filename:
                 if u".png" not in filename:
                     filename += u".png"
@@ -6390,7 +6391,7 @@ $cupping_notes
             self.sendmessage(QApplication.translate("Message Area","%1  (%2x) saved", None, QApplication.UnicodeUTF8).arg(unicode(filename)).arg(unicode(x)).arg(unicode(y)))
 
         except IOError,e:
-            self.qmc.adderror(u"IO Error: resize() " + unicode(e) + u" ")
+            self.qmc.adderror(QApplication.translate("Error Message","IO Error: resize() %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
     #displays Dialog for the setting of the HUD
@@ -6402,14 +6403,14 @@ $cupping_notes
         ETreachTime,BTreachTime = self.qmc.getTargetTime()
         
         if ETreachTime > 0 and BTreachTime < 5940:
-            text1 =  self.qmc.stringfromseconds(int(ETreachTime)) + u" to reach ET target " + unicode(self.qmc.ETtarget) + self.qmc.mode
+            text1 =  QApplication.translate("Scope Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(unicode(self.qmc.ETtarget) + self.qmc.mode)
         else:
-            text1 = u"xx:xx to reach ET target " + unicode(self.qmc.ETtarget) + self.qmc.mode
+            text1 =  QApplication.translate("Scope Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(unicode(self.qmc.ETtarget) + self.qmc.mode)
             
         if BTreachTime > 0 and BTreachTime < 5940:    
-            text2 =  self.qmc.stringfromseconds(int(BTreachTime)) + u" to reach BT target " + unicode(self.qmc.BTtarget) + self.qmc.mode 
+            text2 =  QApplication.translate("Scope Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(unicode(self.qmc.BTtarget) + self.qmc.mode)
         else:
-            text2 = u"xx:xx to reach BT target " + unicode(self.qmc.BTtarget) + self.qmc.mode
+            text2 =  QApplication.translate("Scope Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(unicode(self.qmc.BTtarget) + self.qmc.mode)
 
         img = QPixmap().grabWidget(aw.qmc)
 
@@ -6437,7 +6438,7 @@ $cupping_notes
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8),QString(text2))
         
         p.setPen(QColor(self.qmc.palette["text"]))
-        delta = "ET - BT = " + "%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])
+        delta = QApplication.translate("Scope Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]))
         p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/6),QString(delta))        
 
         p.setOpacity(1.)
@@ -6494,7 +6495,7 @@ $cupping_notes
         #draw BT circle
         p.drawEllipse (Wwidth/2 -BTradius/2 , Wheight/2 - BTradius/2 , BTradius,BTradius)
 
-        delta = "ET-BT = %.1f%s"%(self.qmc.temp1[-1]- self.qmc.temp2[-1],self.qmc.mode)
+        delta = QApplication.translate("Scope Label","ET - BT = %1%2", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])).arg(self.qmc.mode)
         p.setFont(QFont('Utopia', 14, -1))
         p.drawText(QPoint(Wwidth/2,Wheight/2),QString(delta))
         
@@ -6505,7 +6506,7 @@ $cupping_notes
     #wrap values in unicode(.) if and only if those are of type string
     def getWheelGraph(self):
         wheel = {}
-        #convert lables to unicode
+        #convert labels to unicode
         for i in range(len(self.qmc.wheelnames)):
             for x in range(len(self.qmc.wheelnames[i])):
                 self.qmc.wheelnames[i][x]= unicode(self.qmc.wheelnames[i][x])
@@ -6547,22 +6548,22 @@ $cupping_notes
                 self.qmc.wheellinewidth = wheel["wheellinewidth"]
                 self.qmc.wheellinecolor = wheel["wheellinecolor"]
             else:
-                message = u"Invalid Wheel graph format"
+                message = QApplication.translate("Message Area","Invalid Wheel graph format", None, QApplication.UnicodeUTF8)
                 self.sendmessage(message)
                 return
-            message =  u"Wheel Graph succesfully open"
+            message =QApplication.translate("Message Area","Wheel Graph succesfully open", None, QApplication.UnicodeUTF8)
             self.sendmessage(message)
 
         except IOError,e:
-            self.qmc.adderror(u"IO Error: loadWheel() " + unicode(e) + u" ")
+            self.qmc.adderror(QApplication.translate("Error Message","IO Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except ValueError,e:
-            self.qmc.adderror(u"Value Error: loadWheel() " + unicode(e) + u" ")
+            self.qmc.adderror(QApplication.translate("Error Message","Value Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except Exception,e:
-            self.qmc.adderror(u"Exception Error: loadWheel() " + unicode(e) + u" ")
+            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
         
         finally:
@@ -6577,12 +6578,12 @@ class HUDDlg(QDialog):
     def __init__(self, parent = None):
         super(HUDDlg,self).__init__(parent)
 
-        self.setWindowTitle("Extras")
+        self.setWindowTitle(QApplication.translate("Form Caption","Extras", None, QApplication.UnicodeUTF8))
         self.setModal(True)
 
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
-        self.status.showMessage("Ready",1000)
+        self.status.showMessage(QApplication.translate("StatusBar","Ready", None, QApplication.UnicodeUTF8),1000)
 
         #### TAB 1
         
@@ -6600,14 +6601,14 @@ class HUDDlg(QDialog):
         modeLabel.setAlignment(Qt.AlignRight)
 
         #delta ET    
-        self.DeltaET = QCheckBox("DeltaET")
+        self.DeltaET = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None, QApplication.UnicodeUTF8))
         if aw.qmc.DeltaETflag == True:
             self.DeltaET.setChecked(True)
         else:
             self.DeltaET.setChecked(False)
 
         #delta BT   
-        self.DeltaBT = QCheckBox("DeltaBT")        
+        self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None, QApplication.UnicodeUTF8))        
         if aw.qmc.DeltaBTflag == True:
             self.DeltaBT.setChecked(True)
         else:
@@ -6621,10 +6622,11 @@ class HUDDlg(QDialog):
         self.connect(self.DeltaFilter ,SIGNAL("valueChanged(int)"),lambda i=0:self.changeDeltaFilter(i)) 
     	
         #show projection
-        self.projectCheck = QCheckBox("Projection")
+        self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection",None, QApplication.UnicodeUTF8))
         projectionmodeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
         self.projectionmodeComboBox = QComboBox()
-        self.projectionmodeComboBox.addItems(["linear","newton"])
+        self.projectionmodeComboBox.addItems([QApplication.translate("ComboBox","linear",None, QApplication.UnicodeUTF8),
+                                              QApplication.translate("ComboBox","newton",None, QApplication.UnicodeUTF8)])
         self.projectionmodeComboBox.setCurrentIndex(aw.qmc.projectionmode)
         self.connect(self.projectionmodeComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.projectionmodeComboBox.currentIndex() :self.changeProjectionMode(i))
 
@@ -6650,7 +6652,8 @@ class HUDDlg(QDialog):
         self.modeComboBox = QComboBox()
         self.modeComboBox.setMaximumWidth(100)
         self.modeComboBox.setMinimumWidth(55)
-        self.modeComboBox.addItems([u"metrics",u"thermal"])
+        self.modeComboBox.addItems([QApplication.translate("ComboBox","metrics",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("ComboBox","thermal",None, QApplication.UnicodeUTF8)])
         self.modeComboBox.setCurrentIndex(aw.HUDfunction)
         
         self.ETlineEdit = QLineEdit(str(aw.qmc.ETtarget))           
@@ -6658,8 +6661,8 @@ class HUDDlg(QDialog):
         self.ETlineEdit.setValidator(QIntValidator(0, 1000, self.ETlineEdit))
         self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
 
-        okButton = QPushButton("OK")  
-        cancelButton = QPushButton("Cancel")   
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))   
         cancelButton.setFocusPolicy(Qt.NoFocus)     
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
@@ -6693,10 +6696,10 @@ class HUDDlg(QDialog):
         curvesLayout.addLayout(rorBoxLayout)
         curvesLayout.addLayout(sensitivityLayout)
         
-        rorGroupLayout = QGroupBox("Curves")        
+        rorGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curves",None, QApplication.UnicodeUTF8))        
         rorGroupLayout.setLayout(curvesLayout)
         
-        hudGroupLayout = QGroupBox("HUD")
+        hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","HUD",None, QApplication.UnicodeUTF8))
         hudGroupLayout.setLayout(hudLayout)       
                                
         tab1Layout = QVBoxLayout()
@@ -6705,13 +6708,15 @@ class HUDDlg(QDialog):
 
 
         ##### TAB 2
-        self.interpCheck = QCheckBox("Interpolation")
+        self.interpCheck = QCheckBox(QApplication.translate("CheckBox","Interpolation",None, QApplication.UnicodeUTF8))
         self.connect(self.interpCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.interpolation(i)) #toggle
         
         self.interpComboBox = QComboBox()
         self.interpComboBox.setMaximumWidth(100)
         self.interpComboBox.setMinimumWidth(55)
-        self.interpComboBox.addItems([u"linear", u"cubic",u"nearest"])
+        self.interpComboBox.addItems([QApplication.translate("ComboBox","linear",None, QApplication.UnicodeUTF8),
+                                      QApplication.translate("ComboBox","cubic",None, QApplication.UnicodeUTF8),
+                                      QApplication.translate("ComboBox","nearest",None, QApplication.UnicodeUTF8)])
         self.interpComboBox.setToolTip(QApplication.translate("Tooltip", "linear: linear interpolation\ncubic: 3rd order spline interpolation\nnearest: y value of the nearest point", None, QApplication.UnicodeUTF8))
         self.connect(self.interpComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.interpComboBox.currentIndex() :self.changeInterpolationMode(i))
 
@@ -6722,10 +6727,10 @@ class HUDDlg(QDialog):
          'nearest' : take the y value of the nearest point
         """
 
-        self.univarCheck = QCheckBox("Univariate")
+        self.univarCheck = QCheckBox(QApplication.translate("CheckBox", "Univariate",None, QApplication.UnicodeUTF8))
         self.connect(self.univarCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.univar(i)) #toggle
 
-        univarButton = QPushButton("Info")
+        univarButton = QPushButton(QApplication.translate("Button","Info",None, QApplication.UnicodeUTF8))
         univarButton.setFocusPolicy(Qt.NoFocus)
         univarButton.setMaximumSize(50, 30)
         self.connect(univarButton,SIGNAL("clicked()"),self.showunivarinfo)
@@ -6735,28 +6740,28 @@ class HUDDlg(QDialog):
         interLayout.addWidget(self.interpCheck,0,0)
         interLayout.addWidget(self.interpComboBox,0,1)
         
-        interGroupLayout = QGroupBox("Interpolate")
+        interGroupLayout = QGroupBox(QApplication.translate("GroupBox","Interpolate",None, QApplication.UnicodeUTF8))
         interGroupLayout.setLayout(interLayout)
 
         uniLayout = QHBoxLayout()
         uniLayout.addWidget(self.univarCheck,0)
         uniLayout.addWidget(univarButton,1)
 
-        univarGroupLayout = QGroupBox("Univariate")
+        univarGroupLayout = QGroupBox(QApplication.translate("GroupBox","Univariate",None, QApplication.UnicodeUTF8))
         univarGroupLayout.setLayout(uniLayout)
 
         tab2Layout.addWidget(interGroupLayout)
         tab2Layout.addWidget(univarGroupLayout)
 
         ##### TAB 3
-        self.soundCheck = QCheckBox("Beep")
+        self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None, QApplication.UnicodeUTF8))
         if aw.soundflag:
             self.soundCheck.setChecked(True)
         else:
             self.soundCheck.setChecked(False)    
         self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
 
-        mikeButton = QPushButton("Test Mike" )             
+        mikeButton = QPushButton(QApplication.translate("Button","Test Mike",None, QApplication.UnicodeUTF8))             
         mikeButton.setFocusPolicy(Qt.NoFocus)        
         self.connect(mikeButton,SIGNAL("clicked()"),self.showsound)
 
@@ -6770,7 +6775,7 @@ class HUDDlg(QDialog):
         self.styleComboBox = QComboBox()
         available = map(QString, QStyleFactory.keys())
         self.styleComboBox.addItems(available)
-        styleButton = QPushButton("Set style" )
+        styleButton = QPushButton(QApplication.translate("Button","Set style",None, QApplication.UnicodeUTF8))
         styleButton.setFocusPolicy(Qt.NoFocus)   
         styleButton.setMaximumWidth(90)
         self.connect(styleButton,SIGNAL("clicked()"),self.setappearance)        
@@ -6783,19 +6788,19 @@ class HUDDlg(QDialog):
         
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,"HUD")
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","HUD",None, QApplication.UnicodeUTF8))
         
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,"Math")
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Math",None, QApplication.UnicodeUTF8))
 
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        TabWidget.addTab(C3Widget,"Sound")
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Sound",None, QApplication.UnicodeUTF8))
 
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        TabWidget.addTab(C4Widget,"Style")
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Style",None, QApplication.UnicodeUTF8))
         
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
@@ -6818,7 +6823,7 @@ class HUDDlg(QDialog):
         app.setStyle(self.styleComboBox.currentText())
         
     def showsound(self):
-        warnings.simplefilter('ignore', Warning) #for Comlex warning 
+        warnings.simplefilter('ignore', Warning) #for Complex warning 
         aw.sendmessage(QApplication.translate("Message Area","Testing Mike...", None, QApplication.UnicodeUTF8))
         aw.stack.setCurrentIndex(2)
         aw.sound.opensound()
@@ -6839,7 +6844,7 @@ class HUDDlg(QDialog):
         if aw.qmc.timeindex[6]:
             aw.qmc.univariateinfo()
         else:
-            self.status.showMessage("Need to load a finished profile first",5000)     
+            self.status.showMessage(QApplication.translate("StatusBar","Need to load a finished profile first", None, QApplication.UnicodeUTF8),5000)     
                    
     def univar(self,i):
         if self.univarCheck.isChecked():
@@ -6847,7 +6852,7 @@ class HUDDlg(QDialog):
             if aw.qmc.timeindex[6]:
                 aw.qmc.univariate()
             else:
-                self.status.showMessage("Need to load a finished profile first",5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Need to load a finished profile first", None, QApplication.UnicodeUTF8),5000)
                 self.univarCheck.setChecked(False)               
         else:
             aw.qmc.resetlines()
@@ -6860,7 +6865,7 @@ class HUDDlg(QDialog):
             if aw.qmc.timeindex[6]:
                 aw.qmc.drawinterp(mode)
             else:
-                self.status.showMessage("Need to load a finished profile first",5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Need to load a finished profile first", None, QApplication.UnicodeUTF8),5000)
                 self.interpCheck.setChecked(False)
                 
         else:
@@ -6927,9 +6932,9 @@ class HUDDlg(QDialog):
 
     def updatetargets(self):
         mode = unicode(self.modeComboBox.currentText())
-        if mode == u"metrics":
+        if mode == QApplication.translate("ComboBox","metrics", None, QApplication.UnicodeUTF8):
             aw.HUDfunction = 0
-        elif mode == u"thermal":
+        elif mode == QApplication.translate("ComboBox","thermal", None, QApplication.UnicodeUTF8):
             aw.HUDfunction = 1
         aw.qmc.ETtarget = int(self.ETlineEdit.text())
         aw.qmc.BTtarget = int(self.BTlineEdit.text())
@@ -6954,7 +6959,7 @@ class editGraphDlg(QDialog):
 
         self.setModal(True)
 
-        self.setWindowTitle(u"Roast Properties")
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None, QApplication.UnicodeUTF8))
 
         regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
         regexweight = QRegExp(r"^[0-9]{1,3}[.0-9]{1,2}$")
@@ -7056,13 +7061,13 @@ class editGraphDlg(QDialog):
         self.eventtablecopy = []
         self.createEventTable()
 
-        self.neweventTableButton = QPushButton("Add")
+        self.neweventTableButton = QPushButton(QApplication.translate("Button", "Add",None, QApplication.UnicodeUTF8))
         self.neweventTableButton.setFocusPolicy(Qt.NoFocus)
         self.neweventTableButton.setMaximumSize(self.neweventTableButton.sizeHint())
         self.neweventTableButton.setMinimumSize(self.neweventTableButton.minimumSizeHint())
         self.connect(self.neweventTableButton,SIGNAL("clicked()"),self.addEventTable)
 
-        self.deleventTableButton = QPushButton("Delete")
+        self.deleventTableButton = QPushButton(QApplication.translate("Button", "Delete",None, QApplication.UnicodeUTF8))
         self.deleventTableButton.setFocusPolicy(Qt.NoFocus)
         self.deleventTableButton.setMaximumSize(self.deleventTableButton.sizeHint())
         self.deleventTableButton.setMinimumSize(self.deleventTableButton.minimumSizeHint())
@@ -7126,8 +7131,9 @@ class editGraphDlg(QDialog):
         self.unitsComboBox = QComboBox()
         self.unitsComboBox.setMaximumWidth(60)
         self.unitsComboBox.setMinimumWidth(60)
-        self.unitsComboBox.addItems(["g","Kg"])
-        if aw.qmc.weight[2] == "g":
+        self.unitsComboBox.addItems([QApplication.translate("ComboBox", "g", None, QApplication.UnicodeUTF8),
+                                     QApplication.translate("ComboBox", "Kg", None, QApplication.UnicodeUTF8)])
+        if aw.qmc.weight[2] == QApplication.translate("ComboBox", "g", None, QApplication.UnicodeUTF8):
             self.unitsComboBox.setCurrentIndex(0)
         else:
             self.unitsComboBox.setCurrentIndex(1)
@@ -7147,7 +7153,7 @@ class editGraphDlg(QDialog):
         self.volumeoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeoutedit))
         self.volumeoutedit.setMinimumWidth(55)
         self.volumeoutedit.setMaximumWidth(55)
-        self.volumepercentlabel = QLabel(" %")
+        self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None, QApplication.UnicodeUTF8))
         self.volumepercentlabel.setMinimumWidth(45)
         self.volumepercentlabel.setMaximumWidth(45)
 
@@ -7158,8 +7164,9 @@ class editGraphDlg(QDialog):
         self.volumeUnitsComboBox = QComboBox()
         self.volumeUnitsComboBox.setMaximumWidth(60)
         self.volumeUnitsComboBox.setMinimumWidth(60)
-        self.volumeUnitsComboBox.addItems(["ml","l"])        
-        if aw.qmc.volume[2] == "ml":
+        self.volumeUnitsComboBox.addItems([QApplication.translate("ComboBox", "ml",None, QApplication.UnicodeUTF8),
+                                           QApplication.translate("ComboBox", "l",None, QApplication.UnicodeUTF8)])        
+        if aw.qmc.volume[2] == QApplication.translate("ComboBox", "ml",None, QApplication.UnicodeUTF8):
             self.volumeUnitsComboBox.setCurrentIndex(0)
         else:
             self.volumeUnitsComboBox.setCurrentIndex(1)
@@ -7181,8 +7188,9 @@ class editGraphDlg(QDialog):
         self.bean_density_weightUnitsComboBox = QComboBox()
         self.bean_density_weightUnitsComboBox.setMaximumWidth(60)
         self.bean_density_weightUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_weightUnitsComboBox.addItems(["g","Kg"])        
-        if aw.qmc.density[1] == "g":
+        self.bean_density_weightUnitsComboBox.addItems([QApplication.translate("ComboBox", "g",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("ComboBox", "Kg",None, QApplication.UnicodeUTF8)])        
+        if aw.qmc.density[1] == QApplication.translate("ComboBox", "g",None, QApplication.UnicodeUTF8):
             self.bean_density_weightUnitsComboBox.setCurrentIndex(0)
         else:
             self.bean_density_weightUnitsComboBox.setCurrentIndex(1)
@@ -7194,8 +7202,9 @@ class editGraphDlg(QDialog):
         self.bean_density_volumeUnitsComboBox = QComboBox()
         self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
         self.bean_density_volumeUnitsComboBox.setMinimumWidth(60)
-        self.bean_density_volumeUnitsComboBox.addItems(["ml","l"])        
-        if aw.qmc.density[3] == "ml":
+        self.bean_density_volumeUnitsComboBox.addItems([QApplication.translate("ComboBox", "ml",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("ComboBox", "l",None, QApplication.UnicodeUTF8)])        
+        if aw.qmc.density[3] == QApplication.translate("ComboBox", "ml",None, QApplication.UnicodeUTF8):
             self.bean_density_volumeUnitsComboBox.setCurrentIndex(0)
         else:
             self.bean_density_volumeUnitsComboBox.setCurrentIndex(1)
@@ -7252,14 +7261,14 @@ class editGraphDlg(QDialog):
         
 
         # Save button
-        saveButton = QPushButton("OK")
+        saveButton = QPushButton(QApplication.translate("Button", "OK",None, QApplication.UnicodeUTF8))
         self.connect(saveButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
         saveButton.setMaximumSize(saveButton.sizeHint())
         saveButton.setMinimumSize(saveButton.minimumSizeHint()) 
         
         #Cancel Button
-        cancelButton = QPushButton("Cancel")
+        cancelButton = QPushButton(QApplication.translate("Button", "Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         #cancelButton.setMaximumSize(70, 30)
@@ -7385,7 +7394,7 @@ class editGraphDlg(QDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(timeLayoutBox)
         
-        timeGroupLayout = QGroupBox("Times")
+        timeGroupLayout = QGroupBox(QApplication.translate("GroupBox", "Times",None, QApplication.UnicodeUTF8))
         timeGroupLayout.setLayout(mainLayout)
 
         eventbuttonLayout = QHBoxLayout()
@@ -7437,19 +7446,19 @@ class editGraphDlg(QDialog):
         
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        self.TabWidget.addTab(C1Widget,"General")
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab", "General",None, QApplication.UnicodeUTF8))
         
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        self.TabWidget.addTab(C2Widget,"Notes")
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab", "Notes",None, QApplication.UnicodeUTF8))
 
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        self.TabWidget.addTab(C3Widget,"Events")
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab", "Events",None, QApplication.UnicodeUTF8))
 
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        self.TabWidget.addTab(C4Widget,"Data")
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab", "Data",None, QApplication.UnicodeUTF8))
         
         #incorporate layouts
         totallayout = QVBoxLayout()
@@ -7468,7 +7477,12 @@ class editGraphDlg(QDialog):
         ndata = len(aw.qmc.timex)
         self.datatable.setRowCount(ndata)
         self.datatable.setColumnCount(6)
-        self.datatable.setHorizontalHeaderLabels(["Abs Time","Rel Time","ET","BT","DeltaBT (d/m)","DEltaET (d/m)"])
+        self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table", "Abs Time",None, QApplication.UnicodeUTF8),
+                                                  QApplication.translate("Table", "Rel Time",None, QApplication.UnicodeUTF8),
+                                                  QApplication.translate("Table", "ET",None, QApplication.UnicodeUTF8),
+                                                  QApplication.translate("Table", "BT",None, QApplication.UnicodeUTF8),
+                                                  QApplication.translate("Table", "DeltaBT (d/m)",None, QApplication.UnicodeUTF8),
+                                                  QApplication.translate("Table", "DeltaET (d/m)",None, QApplication.UnicodeUTF8)])
         self.datatable.setAlternatingRowColors(True)
         self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -7489,48 +7503,37 @@ class editGraphDlg(QDialog):
                     #identify by color and add notation
                 if i == aw.qmc.timeindex[0]:
                     Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = Rtime.text()
-                    text += " START"
+                    text = QApplication.translate("Table", "%1 START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                     Rtime.setText(text)
                 elif i == aw.qmc.timeindex[1]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " DRY END"
+                    text = QApplication.translate("Table", "%1 DRY END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                     Rtime.setText(text)
                 elif i == aw.qmc.timeindex[2]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " FC START"
+                    text = QApplication.translate("Table", "%1 FC START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                     Rtime.setText(text)
                 elif i == aw.qmc.timeindex[3]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " FC END"
+                    text = QApplication.translate("Table", "%1 FC END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                     Rtime.setText(text)
                 elif i == aw.qmc.timeindex[4]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " SC START"
+                    text = QApplication.translate("Table", "%1 SC START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                     Rtime.setText(text)
                 elif i == aw.qmc.timeindex[5]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = Rtime.text()
-                    text += " SC END"
+                    text = QApplication.translate("Table", "%1 SC END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                     Rtime.setText(text)
                 elif i == aw.qmc.timeindex[6]:
                     Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = Rtime.text()
-                    text += " END"
+                    text = QApplication.translate("Table", "%1 END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                     Rtime.setText(text)
                     
             if i in aw.qmc.specialevents:
                     Rtime.setBackgroundColor(QColor('yellow'))
-                    text = Rtime.text()
-                    text += " EVENT #"
                     index = aw.qmc.specialevents.index(i)
-                    text += str(index+1)
-                    text += " " + aw.qmc.etypes[aw.qmc.specialeventstype[index]][0]
-                    text += str(aw.qmc.specialeventsvalue[index]-1)
+                    text = QApplication.translate("Table", "%1 EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(Rtime.text()).arg(str(index+1)).arg(aw.qmc.etypes[aw.qmc.specialeventstype[index]][0]).arg(str(aw.qmc.specialeventsvalue[index]-1))
                     Rtime.setText(text)
                 
             self.datatable.setItem(i,0,Atime) 
@@ -7545,7 +7548,10 @@ class editGraphDlg(QDialog):
         nevents = len(aw.qmc.specialevents)        
         self.eventtable.setRowCount(nevents)
         self.eventtable.setColumnCount(4)
-        self.eventtable.setHorizontalHeaderLabels(["Time","Description","Type","Value"])
+        self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table", "Time", None, QApplication.UnicodeUTF8),
+                                                   QApplication.translate("Table", "Description", None, QApplication.UnicodeUTF8),
+                                                   QApplication.translate("Table", "Type", None, QApplication.UnicodeUTF8),
+                                                   QApplication.translate("Table", "Value", None, QApplication.UnicodeUTF8)])
         self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
@@ -7642,16 +7648,16 @@ class editGraphDlg(QDialog):
         weightin = float(self.weightinedit.text())
         weightout = float(self.weightoutedit.text())
         if volumein != 0.0 and volumeout and weightin != 0.0 and weightout != 0.0:
-            if self.volumeUnitsComboBox.currentText() == "ml" :
+            if self.volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
                 volumein = volumein / 1000.0
                 volumeout = volumeout / 1000.0      
-            if self.unitsComboBox.currentText() != "g" :
+            if self.unitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8) :
                 weightin = weightin * 1000.0
                 weightout = weightout * 1000.0
             din = (weightin / volumein) 
             dout = (weightout / volumeout)
             if din > 1 and dout > 1:
-                self.calculateddensitylabel.setText(QString(u"                 Density in: %d" % din + u" g/l   =>   Density out: %d" % dout + u" g/l"))                
+                self.calculateddensitylabel.setText(QApplication.translate("Label","                 Density in: %1  g/l   =>   Density out: %2 g/l", None, QApplication.UnicodeUTF8).arg(din).arg(dout))                
                 self.tab1aLayout.addWidget(self.calculateddensitylabel)
             else:
                 self.calculateddensitylabel.setText("")
@@ -7664,11 +7670,11 @@ class editGraphDlg(QDialog):
         volume = float(self.bean_density_volume_edit.text())
         weight = float(self.bean_density_weight_edit.text())
         if volume != 0.0 and weight != 0.0:
-            if self.bean_density_volumeUnitsComboBox.currentText() == "ml" :
+            if self.bean_density_volumeUnitsComboBox.currentText() == QApplication.translate("ComboBox","ml", None, QApplication.UnicodeUTF8) :
                 volume = volume / 1000.0
-            if self.bean_density_weightUnitsComboBox.currentText() != "g" :
+            if self.bean_density_weightUnitsComboBox.currentText() != QApplication.translate("ComboBox","g", None, QApplication.UnicodeUTF8) :
                 weight = weight * 1000.0
-            self.standarddensitylabel.setText(QString(u"(%d" % (weight / volume) + u" g/l)"))
+            self.standarddensitylabel.setText(QApplication.translate("Label","(%1 g/l)", None, QApplication.UnicodeUTF8).arg((weight / volume)))
         else:
             self.standarddensitylabel.setText("")
         
@@ -7799,7 +7805,7 @@ class editGraphDlg(QDialog):
 class errorDlg(QDialog):
     def __init__(self, parent = None):
         super(errorDlg,self).__init__(parent)
-        self.setWindowTitle("Error Log")
+        self.setWindowTitle(QApplication.translate("Form Caption","Error Log", None, QApplication.UnicodeUTF8))
 
         #convert list of errors to an html string
         htmlerr = ""
@@ -7828,7 +7834,7 @@ class errorDlg(QDialog):
 class messageDlg(QDialog):
     def __init__(self, parent = None):
         super(messageDlg,self).__init__(parent)
-        self.setWindowTitle("Message History")
+        self.setWindowTitle(QApplication.translate("Form Caption","Message History", None, QApplication.UnicodeUTF8))
 
         #convert list of messages to an html string
         htmlmessage = ""
@@ -7849,8 +7855,6 @@ class messageDlg(QDialog):
         self.setLayout(layout)
 
 
-
-
 ##########################################################################
 #####################  AUTOSAVE DLG  #####################################
 ##########################################################################
@@ -7859,12 +7863,12 @@ class autosaveDlg(QDialog):
     def __init__(self, parent = None):
         super(autosaveDlg,self).__init__(parent)        
         self.setModal(True)
-        self.setWindowTitle("Keyboard Autosave [s]")
+        self.setWindowTitle(QApplication.translate("Form Caption","Keyboard Autosave [s]", None, QApplication.UnicodeUTF8))
         
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None, QApplication.UnicodeUTF8))
         
-        self.autocheckbox = QCheckBox("Autosave [s]")
+        self.autocheckbox = QCheckBox(QApplication.translate("CheckBox","Autosave [s]", None, QApplication.UnicodeUTF8))
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [s]",None, QApplication.UnicodeUTF8))
         
         if aw.qmc.autosaveflag:
@@ -7872,11 +7876,11 @@ class autosaveDlg(QDialog):
         else:
             self.autocheckbox.setChecked(False)
 
-        okButton = QPushButton("OK")  
-        cancelButton = QPushButton("Cancel")
+        okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))  
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel", None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
 
-        pathButton = QPushButton("Path")        
+        pathButton = QPushButton(QApplication.translate("Button","Path", None, QApplication.UnicodeUTF8))        
         pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(unicode(aw.qmc.autosavepath))
         self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [s]",None, QApplication.UnicodeUTF8))
@@ -7904,7 +7908,7 @@ class autosaveDlg(QDialog):
         self.setLayout(mainLayout)
 
     def getpath(self):
-        filename = aw.ArtisanExistingDirectoryDialog(msg="AutoSave Path")
+        filename = aw.ArtisanExistingDirectoryDialog(msg=QApplication.translate("Form Caption","AutoSave Path", None, QApplication.UnicodeUTF8))
         self.pathEdit.setText(filename)
         
     def autoChanged(self):
@@ -7928,7 +7932,7 @@ class autosaveDlg(QDialog):
 class WindowsDlg(QDialog):
     def __init__(self, parent = None):
         super(WindowsDlg,self).__init__(parent)
-        self.setWindowTitle("Axis")
+        self.setWindowTitle(QApplication.translate("Form Caption","Axis",None, QApplication.UnicodeUTF8))
         
         self.setModal(True)
 
@@ -7952,22 +7956,30 @@ class WindowsDlg(QDialog):
         self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx))
 
         self.legendComboBox = QComboBox()
-        legendlocs = ["upper right","upper left","lower left","lower right","right",
-                      "center left","center right", "lower center","upper center","center"]
+        legendlocs = [QApplication.translate("ComboBox", "upper right",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "upper left",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "lower left",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "lower right",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "right",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "center left",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "center right",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "lower center",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "upper center",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "center",None, QApplication.UnicodeUTF8)]
         self.legendComboBox.addItems(legendlocs)
         self.legendComboBox.setCurrentIndex(aw.qmc.legendloc-1)
         self.connect(self.legendComboBox,SIGNAL("currentIndexChanged(int)"),self.changelegendloc)
 
-        self.timeflag = QCheckBox("Keep Max time after RESET")
+        self.timeflag = QCheckBox(QApplication.translate("CheckBox", "Keep Max time after RESET",None, QApplication.UnicodeUTF8))
         if aw.qmc.keeptimeflag:
             self.timeflag.setChecked(True)
         else:
             self.timeflag.setChecked(False)
 
-        okButton = QPushButton("OK")  
-        cancelButton = QPushButton("Cancel")
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
-        resetButton = QPushButton("Defaults")
+        resetButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         resetButton.setFocusPolicy(Qt.NoFocus)
         
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
@@ -7991,12 +8003,12 @@ class WindowsDlg(QDialog):
         legentlayout.addWidget(self.legendComboBox)
                                      
         
-        xGroupLayout = QGroupBox("Time")
+        xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time",None, QApplication.UnicodeUTF8))
         xGroupLayout.setLayout(xlayout)
-        yGroupLayout = QGroupBox("Temperature")
+        yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature",None, QApplication.UnicodeUTF8))
         yGroupLayout.setLayout(ylayout)
                                      
-        legendLayout = QGroupBox("Legend Location")
+        legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None, QApplication.UnicodeUTF8))
         legendLayout.setLayout(legentlayout)                                     
                                      
         buttonLayout = QHBoxLayout()
@@ -8052,7 +8064,7 @@ class WindowsDlg(QDialog):
 class calculatorDlg(QDialog):
     def __init__(self, parent = None):
         super(calculatorDlg,self).__init__(parent)
-        self.setWindowTitle("Roast Calculator")
+        self.setWindowTitle(QApplication.translate("Form Caption","Roast Calculator",None, QApplication.UnicodeUTF8))
        
         #RATE OF CHANGE
         self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile",None, QApplication.UnicodeUTF8))
@@ -8071,9 +8083,9 @@ class calculatorDlg(QDialog):
         self.connect(self.endEdit,SIGNAL("editingFinished()"),self.calculateRC)
 
         nevents = len(aw.qmc.specialevents)
-        events_found = ["Event #0"]
+        events_found = [QApplication.translate("ComboBox","Event #0",None, QApplication.UnicodeUTF8)]
         for i in range(nevents):
-            events_found.append("Event #" + str(i+1))
+            events_found.append(QApplication.translate("ComboBox","Event #%1",None, QApplication.UnicodeUTF8).arg(str(i+1)))
             
         self.eventAComboBox = QComboBox()
         self.eventAComboBox.addItems(events_found)
@@ -8096,7 +8108,9 @@ class calculatorDlg(QDialog):
 
         #WEIGHT CONVERSION
         self.WinComboBox = QComboBox()
-        weightunits = ["g","Kg","lb"]
+        weightunits = [QApplication.translate("ComboBox","g",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox","Kg",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox","lb",None, QApplication.UnicodeUTF8)]
         self.WinComboBox.addItems(weightunits)
         self.WinComboBox.setMaximumWidth(80)
         self.WinComboBox.setMinimumWidth(80)
@@ -8118,7 +8132,12 @@ class calculatorDlg(QDialog):
 
         #VOLUME CONVERSION
         self.VinComboBox = QComboBox()
-        volumeunits = ["liter","gallon","quart","pint","cup","cm^3"]
+        volumeunits = [QApplication.translate("ComboBox","liter",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox","gallon",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox","quart",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox","pint",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox","cup",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("ComboBox","cm^3",None, QApplication.UnicodeUTF8)]
         self.VinComboBox.addItems(volumeunits )
         self.VinComboBox.setMaximumWidth(80)
         self.VinComboBox.setMinimumWidth(80)
@@ -8177,16 +8196,16 @@ class calculatorDlg(QDialog):
         volumeLayout.addWidget(self.VoutComboBox)
 
 
-        RoCGroup = QGroupBox("Rate of Change")
+        RoCGroup = QGroupBox(QApplication.translate("GroupBox","Rate of Change",None, QApplication.UnicodeUTF8))
         RoCGroup.setLayout(rclayout)
         
-        tempConvGroup = QGroupBox("Temperature Conversion")
+        tempConvGroup = QGroupBox(QApplication.translate("GroupBox","Temperature Conversion",None, QApplication.UnicodeUTF8))
         tempConvGroup.setLayout(tempLayout)
         
-        weightConvGroup = QGroupBox("Weight Conversion")
+        weightConvGroup = QGroupBox(QApplication.translate("GroupBox","Weight Conversion",None, QApplication.UnicodeUTF8))
         weightConvGroup.setLayout(weightLayout)
 
-        volumeConvGroup = QGroupBox("Volume Conversion")
+        volumeConvGroup = QGroupBox(QApplication.translate("GroupBox","Volume Conversion",None, QApplication.UnicodeUTF8))
         volumeConvGroup.setLayout(volumeLayout)
 
         #main
