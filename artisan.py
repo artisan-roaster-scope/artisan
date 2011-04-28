@@ -9486,47 +9486,37 @@ class backgroundDLG(QDialog):
                         #identify by color and add notation
                     if i == aw.qmc.timeindexB[0] != -1:
                         Rtime.setBackgroundColor(QColor('#f07800'))
-                        text = Rtime.text()
-                        text += " START"
+                        text = QApplication.translate("Table", "%1 START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                         Rtime.setText(text)
                     elif i == aw.qmc.timeindexB[1]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = Rtime.text()
-                        text += " DRY END"
+                        text = QApplication.translate("Table", "%1 DRY END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                         Rtime.setText(text)
                     elif i == aw.qmc.timeindexB[2]:
                         Rtime.setBackgroundColor(QColor('orange'))
                         text = Rtime.text()
-                        text += " FC START"
+                        text = QApplication.translate("Table", "%1 FC START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                         Rtime.setText(text)
                     elif i == aw.qmc.timeindexB[3]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = Rtime.text()
-                        text += " FC END"
+                        text = QApplication.translate("Table", "%1 DRY END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                         Rtime.setText(text)
                     elif i == aw.qmc.timeindexB[4]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = Rtime.text()
-                        text += " SC START"
+                        text = QApplication.translate("Table", "%1 SC START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                         Rtime.setText(text)
                     elif i == aw.qmc.timeindexB[5]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = Rtime.text()
-                        text += " SC END"
+                        text = QApplication.translate("Table", "%1 SC END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                         Rtime.setText(text)
                     elif i == aw.qmc.timeindexB[6]:
                         Rtime.setBackgroundColor(QColor('#f07800'))
-                        text = Rtime.text()
-                        text += " END"
+                        text = QApplication.translate("Table", "%1 END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                         Rtime.setText(text)
                     elif i in aw.qmc.backgroundEvents:
                         Rtime.setBackgroundColor(QColor('yellow'))
-                        text = Rtime.text()
-                        text += " EVENT #"
                         index = aw.qmc.backgroundEvents.index(i)
-                        text += str(index+1)
-                        text += " " + aw.qmc.Betypes[aw.qmc.backgroundEtypes[index]][0]
-                        text += str(aw.qmc.backgroundEvalues[index]-1)
+                        text = QApplication.translate("Table", "%1 EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(Rtime.text()).arg(str(index+1)).arg(aw.qmc.Betypes[aw.qmc.backgroundEtypes[index]][0]).arg(str(aw.qmc.backgroundEvalues[index]-1))
                         Rtime.setText(text)
                     
                 self.datatable.setItem(i,0,Atime) 
@@ -9543,15 +9533,15 @@ class backgroundDLG(QDialog):
 class StatisticsDLG(QDialog):       
     def __init__(self, parent = None):
         super(StatisticsDLG,self).__init__(parent)
-        self.setWindowTitle("Statistics")
+        self.setWindowTitle(QApplication.translate("Form Caption","Statistics",None, QApplication.UnicodeUTF8))
         self.setModal(True)
 
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
 
-        self.time = QCheckBox("Time")
-        self.bar = QCheckBox("Bar")
-        self.flavor = QCheckBox("Evaluation")
-        self.area = QCheckBox("Characteristics")
+        self.time = QCheckBox(QApplication.translate("CheckBox","Time",None, QApplication.UnicodeUTF8))
+        self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None, QApplication.UnicodeUTF8))
+        self.flavor = QCheckBox(QApplication.translate("CheckBox","Evaluation",None, QApplication.UnicodeUTF8))
+        self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None, QApplication.UnicodeUTF8))
                 
         self.mindryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))        
         self.maxdryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[1]))        
@@ -9592,8 +9582,8 @@ class StatisticsDLG(QDialog):
         self.connect(self.area,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,3)) 
 
 
-        okButton = QPushButton("OK")
-        resetButton = QPushButton("Defaults")
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        resetButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(resetButton, SIGNAL("clicked()"),self.initialsettings)   
         
@@ -9619,10 +9609,10 @@ class StatisticsDLG(QDialog):
         
         resetButton.setFocusPolicy(Qt.NoFocus)
         
-        eventsGroupLayout = QGroupBox("Evaluation")
+        eventsGroupLayout = QGroupBox(QApplication.translate("GroupBox","Evaluation",None, QApplication.UnicodeUTF8))
         eventsGroupLayout.setLayout(layout)
         
-        displayGroupLayout = QGroupBox("Display")
+        displayGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display",None, QApplication.UnicodeUTF8))
         displayGroupLayout.setLayout(flagsLayout)
         
         buttonsLayout = QHBoxLayout()
@@ -9704,10 +9694,10 @@ class serialport(object):
     
     def __init__(self):
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
-        self.comport = "COM4"
+        self.comport = QApplication.translate("ComboBox","COM4",None, QApplication.UnicodeUTF8)
         self.baudrate = 9600
         self.bytesize = 8
-        self.parity= 'O'
+        self.parity= QApplication.translate("ComboBox","O",None, QApplication.UnicodeUTF8)
         self.stopbits = 1
         self.timeout=1
 
@@ -9751,7 +9741,7 @@ class serialport(object):
             self.SP.open()        
                
         except serial.SerialException,e:
-            aw.qmc.adderror("Serial Exception: Unable to open serial port ")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8))
             
     def closeEvent(self):
         try:        
@@ -9777,16 +9767,16 @@ class serialport(object):
                     # CHECK FOR RECEIVED ERROR CODES
                     if ord(r[1]) == 128:
                             if ord(r[2]) == 1:
-                                 errorcode = " F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. "
-                                 errorcode += "SendFUJIcommand(): ERROR 1 Illegal Function in unit %i " %ord(command[0])
+                                 errorcode = QApplication.translate("ErrorMessage"," F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. ",None, QApplication.UnicodeUTF8)
+                                 errorcode += QApplication.translate("ErrorMessage","SendFUJIcommand(): ERROR 1 Illegal Function in unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(command[0]))
                                  aw.qmc.adderror(errorcode)
                             if ord(r[2]) == 2:
-                                 errorcode = "F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code. "
-                                 errorcode += "SendFUJIcommand() ERROR 2 Illegal Address for unit %i "%(ord(command[0]))
+                                 errorcode = QApplication.translate("ErrorMessage","F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code. ",None, QApplication.UnicodeUTF8)
+                                 errorcode += QApplication.translate("ErrorMessage","SendFUJIcommand() ERROR 2 Illegal Address for unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(command[0]))
                                  aw.qmc.adderror(errorcode)
                             if ord(r[2]) == 3:
-                                 errorcode = "F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers."
-                                 errorcode += "sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %i "%(ord(command[0]))
+                                 errorcode = QApplication.translate("ErrorMessage","F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers.",None, QApplication.UnicodeUTF8)
+                                 errorcode += QApplication.translate("ErrorMessage","sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(command[0]))
                                  aw.qmc.adderror(errorcode)
                     else:
                         #Check crc16
@@ -9795,16 +9785,16 @@ class serialport(object):
                         if crcCal1 == crcRx:  
                             return r           #OK. Return r after it has been checked for errors
                         else:
-                            aw.qmc.adderror("Crc16 data corruption ERROR. TX does not match RX. Check wiring ")
+                            aw.qmc.adderror(QApplication.translate("ErrorMessage","Crc16 data corruption ERROR. TX does not match RX. Check wiring ",None, QApplication.UnicodeUTF8))
                             return "0"
                 else:
-                    aw.qmc.adderror(u"No RX data received ")
+                    aw.qmc.adderror(QApplication.translate("ErrorMessage","No RX data received ",None, QApplication.UnicodeUTF8))
                     return u"0"
             else:
                 return u"0"                                    
                 
         except serial.SerialException,e:
-            aw.qmc.adderror("SerialException: ser.sendFUJIcommand() ")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8))
             return "0"
 
      #t2 and t1 from Omega HH806 or HH802 meter 
@@ -9829,7 +9819,7 @@ class serialport(object):
                     return int(s1,16)/10., int(s2,16)/10.
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(u"HH806AUtemperature(): %i bytes received but 14 needed"%nbytes)
+                    aw.qmc.adderror(QApplication.translate("ErrorMessage","HH806AUtemperature(): %1 bytes received but 14 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
                     if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
                     else:
@@ -9842,7 +9832,7 @@ class serialport(object):
                     return -1,-1                                    
                                    
         except serial.SerialException, e:
-            aw.qmc.adderror(u"Serial Exception: ser.HH806AUtemperature() ")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.HH806AUtemperature() ",None, QApplication.UnicodeUTF8))
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -9856,7 +9846,7 @@ class serialport(object):
         if self.HH506RAid == "X":                                         
             self.HH506RAGetID()                       # obtain new id one time; self.HH506RAid should not be "X" any more
             if self.HH506RAid == "X":                 # if self.HH506RAGetID() went wrong and self.HH506RAid is still "X"
-                aw.qmc.adderror(u"HH506RAtemperature(): Unable to get id from HH506RA device ")
+                aw.qmc.adderror(QApplication.translate("ErrorMessage","HH506RAtemperature(): Unable to get id from HH506RA device ",None, QApplication.UnicodeUTF8))
                 return -1,-1
            
         try:
@@ -9875,7 +9865,7 @@ class serialport(object):
                     return int(r[1:5],16)/10., int(r[7:11],16)/10.                
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror("HH506RAtemperature(): %i bytes received but 14 needed"%nbytes)               
+                    aw.qmc.adderror(QApplication.translate("ErrorMessage","HH506RAtemperature(): %1 bytes received but 14 needed",None, QApplication.UnicodeUTF8).arg(nbytes))               
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -9887,7 +9877,7 @@ class serialport(object):
                     return -1,-1 
                 
         except serial.SerialException, e:
-            aw.qmc.adderror("Serial Exception: ser.HH506RAtemperature() ")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.HH506RAtemperature() ",None, QApplication.UnicodeUTF8))
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -9914,10 +9904,10 @@ class serialport(object):
                     self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
                 else:
                     nbytes = len(ID)
-                    aw.qmc.adderror("HH506RAGetID: %i bytes received but 5 needed"%nbytes)
+                    aw.qmc.adderror(QApplication.translate("ErrorMessage","HH506RAGetID: %1 bytes received but 5 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
                     
         except serial.SerialException, e:
-            aw.qmc.adderror("Serial Exception: ser.HH506RAGetID()")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.HH506RAGetID()",None, QApplication.UnicodeUTF8))
 
     def CENTER306temperature(self):
         try:
@@ -9968,7 +9958,7 @@ class serialport(object):
                 
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror("CENTER306temperature(): %i bytes received but 10 needed "%nbytes)
+                    aw.qmc.adderror(QApplication.translate("ErrorMessage","CENTER306temperature(): %1 bytes received but 10 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))
                    
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
@@ -9981,7 +9971,7 @@ class serialport(object):
                     return -1,-1 
                      
         except serial.SerialException, e:
-            aw.qmc.adderror("Serial Exception: ser.CENTER306temperature() ")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8))
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10047,7 +10037,7 @@ class serialport(object):
 
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror("CENTER303temperature(): %i bytes received but 8 needed "%nbytes)                
+                    aw.qmc.adderror(QApplication.translate("ErrorMessage","CENTER303temperature(): %i bytes received but 8 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))             
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -10059,7 +10049,7 @@ class serialport(object):
                     return -1,-1 
             
         except serial.SerialException, e:
-            aw.qmc.adderror("Serial Exception: ser.CENTER303temperature()")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER303temperature()",None, QApplication.UnicodeUTF8))
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10122,7 +10112,7 @@ class serialport(object):
                 
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror("ser.CENTER309(): %i bytes received but 45 needed "%nbytes)                
+                    aw.qmc.adderror(QApplication.translate("ErrorMessage","ser.CENTER309(): %1 bytes received but 45 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -10134,7 +10124,7 @@ class serialport(object):
                         return -1,-1 
             
         except serial.SerialException, e:
-            aw.qmc.adderror("Serial Exception: ser.CENTER309temperature() ")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER309temperature() ",None, QApplication.UnicodeUTF8))
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10179,7 +10169,7 @@ class serialport(object):
                 return t1, t2
 
         except serial.SerialException, e:
-            aw.qmc.adderror("Serial Exception: ser.ARDUINOTC4temperature() ")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8))
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10373,14 +10363,14 @@ class serialport(object):
                 raise ValueError
 
         except ValueError:
-            aw.qmc.adderror("Value Error: ser.TEVA18Btemperature() ")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Value Error: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8))
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1 
         
         except serial.SerialException:
-            aw.qmc.adderror("Serial Exception: ser.TEVA18Btemperature() ")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8))
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10392,20 +10382,20 @@ class serialport(object):
 class designerconfigDlg(QDialog):
     def __init__(self, parent = None):
         super(designerconfigDlg,self).__init__(parent)
-        self.setWindowTitle("Designer Config")
+        self.setWindowTitle(QApplication.translate("Form Caption","Designer Config",None, QApplication.UnicodeUTF8))
 
         #landmarks
         charge = QLabel(QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8))
         charge.setStyleSheet("background-color: #f07800")
-        self.dryend = QCheckBox("DRY END")
+        self.dryend = QCheckBox(QApplication.translate("CheckBox","DRY END",None, QApplication.UnicodeUTF8))
         self.dryend.setStyleSheet("background-color: orange")
-        self.fcs = QCheckBox("FC START")
+        self.fcs = QCheckBox(QApplication.translate("CheckBox","FC START",None, QApplication.UnicodeUTF8))
         self.fcs.setStyleSheet("background-color: orange")
-        self.fce = QCheckBox("FC END")
+        self.fce = QCheckBox(QApplication.translate("CheckBox","FC END",None, QApplication.UnicodeUTF8))
         self.fce.setStyleSheet("background-color: orange")
-        self.scs = QCheckBox("SC START")
+        self.scs = QCheckBox(QApplication.translate("CheckBox","SC START",None, QApplication.UnicodeUTF8))
         self.scs.setStyleSheet("background-color: orange")
-        self.sce = QCheckBox("SC END")
+        self.sce = QCheckBox(QApplication.translate("CheckBox","SC END",None, QApplication.UnicodeUTF8))
         self.sce.setStyleSheet("background-color: orange")
         drop = QLabel(QApplication.translate("Label", "DROP",None, QApplication.UnicodeUTF8))
         drop.setStyleSheet("background-color: #f07800")
@@ -10850,7 +10840,7 @@ class nonedevDlg(QDialog):
         
                 
 #########################################################################
-#############  SERIAL PORT CONFIGUARTION DIALOG #########################                                   
+#############  SERIAL PORT CONFIGURATION DIALOG #########################                                   
 #########################################################################
 
             
