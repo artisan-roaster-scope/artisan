@@ -77,7 +77,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="9011"/>
+        <location filename="artisan.py" line="9585"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
@@ -117,7 +117,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="8831"/>
+        <location filename="artisan.py" line="9586"/>
         <source>Defaults</source>
         <translation type="unfinished"></translation>
     </message>
@@ -207,6 +207,51 @@
     <message>
         <location filename="artisan.py" line="9110"/>
         <source>Playback Aid Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9541"/>
+        <source>Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9542"/>
+        <source>Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9543"/>
+        <source>Evaluation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9544"/>
+        <source>Characteristics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10390"/>
+        <source>DRY END</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10392"/>
+        <source>FC START</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10394"/>
+        <source>FC END</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10396"/>
+        <source>SC START</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10398"/>
+        <source>SC END</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -418,6 +463,16 @@
     <message>
         <location filename="artisan.py" line="9046"/>
         <source>steps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9697"/>
+        <source>COM4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9700"/>
+        <source>O</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -641,6 +696,141 @@
     </message>
 </context>
 <context>
+    <name>ErrorMessage</name>
+    <message>
+        <location filename="artisan.py" line="9744"/>
+        <source>Serial Exception: Unable to open serial port </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9770"/>
+        <source> F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9771"/>
+        <source>SendFUJIcommand(): ERROR 1 Illegal Function in unit %1 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9774"/>
+        <source>F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor
+ number cannot be used by the specified function code. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9775"/>
+        <source>SendFUJIcommand() ERROR 2 Illegal Address for unit %1 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9778"/>
+        <source>F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain
+ coil numbers or resistor numbers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9779"/>
+        <source>sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %1 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9788"/>
+        <source>Crc16 data corruption ERROR. TX does not match RX. Check wiring </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9791"/>
+        <source>No RX data received </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9797"/>
+        <source>SerialException: ser.sendFUJIcommand() </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9822"/>
+        <source>HH806AUtemperature(): %1 bytes received but 14 needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9835"/>
+        <source>Serial Exception: ser.HH806AUtemperature() </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9849"/>
+        <source>HH506RAtemperature(): Unable to get id from HH506RA device </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9868"/>
+        <source>HH506RAtemperature(): %1 bytes received but 14 needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9880"/>
+        <source>Serial Exception: ser.HH506RAtemperature() </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9907"/>
+        <source>HH506RAGetID: %1 bytes received but 5 needed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9910"/>
+        <source>Serial Exception: ser.HH506RAGetID()</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9961"/>
+        <source>CENTER306temperature(): %1 bytes received but 10 needed </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9974"/>
+        <source>Serial Exception: ser.CENTER306temperature() </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10040"/>
+        <source>CENTER303temperature(): %i bytes received but 8 needed </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10052"/>
+        <source>Serial Exception: ser.CENTER303temperature()</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10115"/>
+        <source>ser.CENTER309(): %1 bytes received but 45 needed </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10127"/>
+        <source>Serial Exception: ser.CENTER309temperature() </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10172"/>
+        <source>Serial Exception: ser.ARDUINOTC4temperature() </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10366"/>
+        <source>Value Error: ser.TEVA18Btemperature() </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10373"/>
+        <source>Serial Exception: ser.TEVA18Btemperature() </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Event String</name>
     <message>
         <location filename="artisan.py" line="3440"/>
@@ -753,6 +943,16 @@
         <source>Profile Background</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="artisan.py" line="9536"/>
+        <source>Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="10385"/>
+        <source>Designer Config</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>GroupBox</name>
@@ -819,6 +1019,16 @@
     <message>
         <location filename="artisan.py" line="8461"/>
         <source>Event Types</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9612"/>
+        <source>Evaluation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisan.py" line="9615"/>
+        <source>Display</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -933,12 +1143,12 @@
 <context>
     <name>Label</name>
     <message>
-        <location filename="artisan.py" line="11780"/>
+        <location filename="artisan.py" line="11770"/>
         <source>ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11781"/>
+        <location filename="artisan.py" line="11771"/>
         <source>BT</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1018,7 +1228,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10398"/>
+        <location filename="artisan.py" line="10388"/>
         <source>CHARGE</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1048,7 +1258,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10410"/>
+        <location filename="artisan.py" line="10400"/>
         <source>DROP</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1158,12 +1368,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="9574"/>
+        <location filename="artisan.py" line="9564"/>
         <source>Max</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="9573"/>
+        <location filename="artisan.py" line="9563"/>
         <source>Min</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1213,17 +1423,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="9570"/>
+        <location filename="artisan.py" line="9560"/>
         <source>Dry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="9571"/>
+        <location filename="artisan.py" line="9561"/>
         <source>Mid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="9572"/>
+        <location filename="artisan.py" line="9562"/>
         <source>Finish</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1263,152 +1473,152 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10479"/>
+        <location filename="artisan.py" line="10469"/>
         <source>Curviness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10497"/>
+        <location filename="artisan.py" line="10487"/>
         <source>Events Playback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10866"/>
+        <location filename="artisan.py" line="10856"/>
         <source>Comm Port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10872"/>
+        <location filename="artisan.py" line="10862"/>
         <source>Baud Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10879"/>
+        <location filename="artisan.py" line="10869"/>
         <source>Byte Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10886"/>
+        <location filename="artisan.py" line="10876"/>
         <source>Parity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10894"/>
+        <location filename="artisan.py" line="10884"/>
         <source>Stopbits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10901"/>
+        <location filename="artisan.py" line="10891"/>
         <source>Timeout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11138"/>
+        <location filename="artisan.py" line="11128"/>
         <source>Control ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11144"/>
+        <location filename="artisan.py" line="11134"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11145"/>
+        <location filename="artisan.py" line="11135"/>
         <source>Unit ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11147"/>
+        <location filename="artisan.py" line="11137"/>
         <source>Read BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11779"/>
+        <location filename="artisan.py" line="11769"/>
         <source>Timer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11782"/>
+        <location filename="artisan.py" line="11772"/>
         <source>Delta ET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11783"/>
+        <location filename="artisan.py" line="11773"/>
         <source>Delta BT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11784"/>
+        <location filename="artisan.py" line="11774"/>
         <source>SV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12927"/>
+        <location filename="artisan.py" line="12917"/>
         <source>Ramp/Soak&lt;br&gt;(1-4)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12933"/>
+        <location filename="artisan.py" line="12923"/>
         <source>Ramp/Soak&lt;br&gt;(5-8)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12936"/>
+        <location filename="artisan.py" line="12926"/>
         <source>Ramp/Soak Pattern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13000"/>
+        <location filename="artisan.py" line="12990"/>
         <source>p</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13001"/>
+        <location filename="artisan.py" line="12991"/>
         <source>i</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13002"/>
+        <location filename="artisan.py" line="12992"/>
         <source>d</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13672"/>
+        <location filename="artisan.py" line="13662"/>
         <source>RampSoak&lt;br&gt;(1-7)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13679"/>
+        <location filename="artisan.py" line="13669"/>
         <source>RampSoak&lt;br&gt;(8-16)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13723"/>
+        <location filename="artisan.py" line="13713"/>
         <source>Pattern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13775"/>
+        <location filename="artisan.py" line="13765"/>
         <source>SV (7-0)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13899"/>
+        <location filename="artisan.py" line="13889"/>
         <source>Write</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13878"/>
+        <location filename="artisan.py" line="13868"/>
         <source>P</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13885"/>
+        <location filename="artisan.py" line="13875"/>
         <source>I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="13892"/>
+        <location filename="artisan.py" line="13882"/>
         <source>D</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1423,32 +1633,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12990"/>
+        <location filename="artisan.py" line="12980"/>
         <source>WARNING</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12986"/>
+        <location filename="artisan.py" line="12976"/>
         <source>Writing eeprom memory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12986"/>
+        <location filename="artisan.py" line="12976"/>
         <source>&lt;u&gt;Max life&lt;/u&gt; 10,000 writes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12986"/>
+        <location filename="artisan.py" line="12976"/>
         <source>Infinite read life.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12990"/>
+        <location filename="artisan.py" line="12980"/>
         <source>After &lt;u&gt;writing&lt;/u&gt; an adjustment,&lt;br&gt;never power down the pid&lt;br&gt;for the next 5 seconds &lt;br&gt;or the pid may never recover.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12990"/>
+        <location filename="artisan.py" line="12980"/>
         <source>Read operations manual</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1949,57 +2159,57 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10113"/>
+        <location filename="artisan.py" line="10103"/>
         <source>Please connect T1 &amp; T2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="10118"/>
+        <location filename="artisan.py" line="10108"/>
         <source>T1 &amp; T2 connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11109"/>
+        <location filename="artisan.py" line="11099"/>
         <source>Port scan on this platform not yet supported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14870"/>
+        <location filename="artisan.py" line="14860"/>
         <source>Pattern did not changed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14873"/>
+        <location filename="artisan.py" line="14863"/>
         <source>Ramp/Soak was found ON! Turn it off before changing the pattern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14875"/>
+        <location filename="artisan.py" line="14865"/>
         <source>Ramp/Soak was found in Hold! Turn it off before changing the pattern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15233"/>
+        <location filename="artisan.py" line="15223"/>
         <source>RS ON and running...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15235"/>
+        <location filename="artisan.py" line="15225"/>
         <source>RS OFF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15237"/>
+        <location filename="artisan.py" line="15227"/>
         <source>RS on HOLD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15331"/>
+        <location filename="artisan.py" line="15321"/>
         <source>Unable to set sv</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15333"/>
+        <location filename="artisan.py" line="15323"/>
         <source>Unable to set new sv</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2099,97 +2309,97 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11050"/>
+        <location filename="artisan.py" line="11040"/>
         <source>Serial Port Settings: %1, %2, %3, %4, %5, %6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11384"/>
+        <location filename="artisan.py" line="11374"/>
         <source>PID to control ET set to %1 %2 ; PID to read BT set to %3 %4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11563"/>
+        <location filename="artisan.py" line="11553"/>
         <source>Device set to %1. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11553"/>
+        <location filename="artisan.py" line="11543"/>
         <source>Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11568"/>
+        <location filename="artisan.py" line="11558"/>
         <source>Device set to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11573"/>
+        <location filename="artisan.py" line="11563"/>
         <source>Device set to %1%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11593"/>
+        <location filename="artisan.py" line="11583"/>
         <source>Device set to %1. Now, check Serial Port settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="12195"/>
+        <location filename="artisan.py" line="12185"/>
         <source>Color of %1 set to %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="14868"/>
+        <location filename="artisan.py" line="14858"/>
         <source>Pattern changed to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15254"/>
+        <location filename="artisan.py" line="15244"/>
         <source>PXG sv#%1 set to %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15272"/>
+        <location filename="artisan.py" line="15262"/>
         <source>PXR sv set to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15303"/>
+        <location filename="artisan.py" line="15293"/>
         <source>SV%1 changed from %2 to %3)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15312"/>
+        <location filename="artisan.py" line="15302"/>
         <source>Unable to set sv%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="15321"/>
+        <location filename="artisan.py" line="15311"/>
         <source> SV changed from %1 to %2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11443"/>
+        <location filename="artisan.py" line="11433"/>
         <source>Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11503"/>
+        <location filename="artisan.py" line="11493"/>
         <source>Device set to %1, which is equivalent to CENTER 309. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11533"/>
+        <location filename="artisan.py" line="11523"/>
         <source>Device set to %1, which is equivalent to CENTER 303. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11513"/>
+        <location filename="artisan.py" line="11503"/>
         <source>Device set to %1, which is equivalent to CENTER 306. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="11543"/>
+        <location filename="artisan.py" line="11533"/>
         <source>Device set to %1, which is equivalent to Omega HH506RA. Now, chose serial port</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2829,17 +3039,17 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7533"/>
+        <location filename="artisan.py" line="9489"/>
         <source>%1 START</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7537"/>
+        <location filename="artisan.py" line="9502"/>
         <source>%1 DRY END</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7541"/>
+        <location filename="artisan.py" line="9498"/>
         <source>%1 FC START</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2849,22 +3059,22 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7549"/>
+        <location filename="artisan.py" line="9506"/>
         <source>%1 SC START</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7553"/>
+        <location filename="artisan.py" line="9510"/>
         <source>%1 SC END</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7557"/>
+        <location filename="artisan.py" line="9514"/>
         <source>%1 END</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="artisan.py" line="7563"/>
+        <location filename="artisan.py" line="9519"/>
         <source>%1 EVENT #%2 %3%4</source>
         <translation type="unfinished"></translation>
     </message>
