@@ -177,33 +177,34 @@ class tgraphcanvas(FigureCanvas):
         #records length in seconds of total time [0], dry phase [1],mid phase[2],finish phase[3]
         self.statisticstimes = [0,0,0,0]
 
+        #DEVICES
+        self.device = 0                                     # device selected to read BT and ET
+        self.devices = ["Omega HH806AU",                    # device labels (used in Dialog config)
+                       "Omega HH506RA",
+                       "CENTER 309",
+                       "CENTER 306",
+                       "CENTER 305",
+                       "CENTER 304",
+                       "CENTER 303",
+                       "CENTER 302",
+                       "CENTER 301",
+                       "CENTER 300",
+                       "VOLTCRAFT K204",
+                       "VOLTCRAFT K202",
+                       "VOLTCRAFT 300K",
+                       "VOLTCRAFT 302KJ",
+                       "EXTECH 421509",
+                       "Omega HH802U",
+                       "Omega HH309",
+                       "NONE",
+                       "ArduinoTC4",
+                       "TE VA18B"
+                       ]
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
         # device 1 (with index 1 bellow) is Omega HH806
         # device 2 (with index 2 bellow) is omega HH506
         # etc
-        self.device = 0                                     #main device to used read BT and ET
-        self.devices = ["Omega HH806AU",                    #device labels (used in Dialog config)
-                   "Omega HH506RA",
-                   "CENTER 309",
-                   "CENTER 306",
-                   "CENTER 305",
-                   "CENTER 304",
-                   "CENTER 303",
-                   "CENTER 302",
-                   "CENTER 301",
-                   "CENTER 300",
-                   "VOLTCRAFT K204",
-                   "VOLTCRAFT K202",
-                   "VOLTCRAFT 300K",
-                   "VOLTCRAFT 302KJ",
-                   "EXTECH 421509",
-                   "Omega HH802U",
-                   "Omega HH309",
-                   "NONE",
-                   "ArduinoTC4",
-                   "TE VA18B"
-                   ]        
         self.devicefunctionlist = [self.fujitemperature,
                                    self.HH806AU,
                                    self.HH506RA,
@@ -228,10 +229,11 @@ class tgraphcanvas(FigureCanvas):
                                    ]
 
         #extra devices
-        self.extradevices = []
-        self.extradevicecolor1 = []             #line 1 color
-        self.extradevicecolor2 = []             #line 2 color
-
+        self.extradevices = []                                      #list with indexes for extra devices
+        self.extradevicecolor1 = []                                 #extra line 1 color. list with colors
+        self.extradevicecolor2 = []                                 #extra line 2 color. list with colors
+        self.extratemp1,self.extratemp2 = [],[]                        #extra temp1, temp2
+        self.extratemp1lines,self.extratemp2lines = [],[]
         
         self.fig = Figure()
 
@@ -554,6 +556,23 @@ class tgraphcanvas(FigureCanvas):
 
                 self.timex.append(tx)
 
+                #######  UNDER TEST  #########   if using more than one device
+                ndevices = len(self.extradevices)
+                if ndevices:
+                    oldSP = aw.ser.SP
+                    for i in range(ndevices):
+                        aw.ser.SP = aw.ser.extraSP[i]
+                        extratimetx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
+                        self.extratemp1[i].append(extrat1)
+                        self.extratemp2[i].append(extrat2)
+                        # update extra lines 
+                        self.extratemp1lines[i].set_data(self.timex, self.extratemp1[i])
+                        self.extratemp2lines[i].set_data(self.timex, self.extratemp2[i])
+
+                    #restore ET/BT serial comm port
+                    aw.ser.SP = oldSP
+                ################################################################
+                    
                 #we need a minimum of two readings to calculate rate of change
                 if len(self.timex) > 2:
                     timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
@@ -606,7 +625,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.lcd3.display(t2)                               # BT
                 aw.lcd4.display(int(round(self.rateofchange1*60)))       # rate of change MET (degress per minute)
                 aw.lcd5.display(int(round(self.rateofchange2*60)))       # rate of change BT (degrees per minute)
-
+                     
                 self.fig.canvas.draw()
                 
                 if self.projectFlag:
@@ -1113,6 +1132,10 @@ class tgraphcanvas(FigureCanvas):
             self.designertemp2init = [380,300,390,395,410,412,420]
         self.disconnect_designer()  #sets designer flag false
         self.setCursor(Qt.ArrowCursor)
+
+        #extra devices
+        self.extratemp1,self.extratemp2 = [],[]                        #extra temp1, temp2
+
         
     #Redraws data   
     def redraw(self):
@@ -1165,6 +1188,14 @@ class tgraphcanvas(FigureCanvas):
         ##### ET,BT curves
         self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8))
         self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))
+
+        ##### Extra devices curves
+        self.extratemp1lines,self.extratemp2lines = [],[]
+        for i in range(len(self.extradevices)):
+            labelA = "Extra %iA"%(i+1)
+            labelB = "Extra %iB"%(i+1)
+            self.extratemp1lines.append(self.ax.plot(self.timex, self.extratemp1[i],color="black",linewidth=2,label= labelA)[0])
+            self.extratemp2lines.append(self.ax.plot(self.timex, self.extratemp2[i],color="black",linewidth=2,label= labelB)[0])
 
         #check BACKGROUND flag
         if self.background:
@@ -5462,10 +5493,44 @@ class ApplicationWindow(QMainWindow):
             self.qmc.killTimer(self.qmc.timerid) 
             self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
 
+            # Extra devices
+            settings.beginGroup("ExtraDev")
+            if settings.contains("extradevices"):
+                self.qmc.extradevices = map(lambda x:x.toInt()[0],settings.value("extradevices").toList())
+                self.qmc.extradevicecolor1 = settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList()
+                self.qmc.extradevicecolor2 = settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList()
+            settings.endGroup()
+            settings.beginGroup("ExtraComm")
+            if settings.contains("extracomport"):
+                self.ser.extracomport = settings.value("extracomport",self.ser.extracomport).toStringList()
+                self.ser.extrabaudrate = map(lambda x:x.toInt()[0],settings.value("extrabaudrate").toList())
+                self.ser.extrabytesize = map(lambda x:x.toInt()[0],settings.value("extrabytesize").toList())
+                self.ser.extraparity = settings.value("extraparity",self.ser.extraparity).toStringList()
+                self.ser.extrastopbits = map(lambda x:x.toInt()[0],settings.value("extrastopbits").toList())
+                self.ser.extratimeout = map(lambda x:x.toInt()[0],settings.value("extratimeout").toList())
+            settings.endGroup() 
+
+            for i in range(len(self.qmc.extradevices)):
+                self.qmc.extratemp1.append([])
+                self.qmc.extratemp2.append([])        
+                l = len(self.qmc.extradevices)-1
+                #init empty lines
+                self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.timex, self.qmc.extratemp1[l],color="black",linewidth=2,label= "Extra1")[0])
+                self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.timex, self.qmc.extratemp2[l],color="black",linewidth=2,label= "Extra2")[0])
+                self.ser.extraSP.insert(i,serial.Serial())
+                #load serial ports
+                self.ser.extraSP[i].setPort(unicode(self.ser.extracomport[i]))
+                self.ser.extraSP[i].setBaudrate(self.ser.extrabaudrate[i])
+                self.ser.extraSP[i].setByteSize(self.ser.extrabytesize[i])
+                self.ser.extraSP[i].setParity(unicode(self.ser.extraparity[i]))
+                self.ser.extraSP[i].setStopbits(self.ser.extrastopbits[i])
+                self.ser.extraSP[i].setTimeout(self.ser.extratimeout[i])                                                                                                    
+
             #update display
             self.qmc.redraw()
 
         except Exception,e:
+            #print e
             self.qmc.adderror(QApplication.translate("Error Message", "Exception: settingsLoad() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return                            
 
@@ -5576,6 +5641,20 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("alarmstrings",self.qmc.alarmstrings)
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
+            #save extra devices
+            settings.beginGroup("ExtraDev")
+            settings.setValue("extradevices",self.qmc.extradevices)                                                                
+            settings.setValue("extradevicecolor1",self.qmc.extradevicecolor1)                                                                
+            settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
+            settings.endGroup()
+            #save extra serial comm ports settings
+            settings.beginGroup("ExtraComm")
+            settings.setValue("extracomport",self.ser.extracomport)                                                                
+            settings.setValue("extrabaudrate",self.ser.extrabaudrate)                                                                
+            settings.setValue("extrabytesize",self.ser.extrabytesize)                                                                
+            settings.setValue("extraparity",self.ser.extraparity)                                                                
+            settings.setValue("extrastopbits",self.ser.extrastopbits)                                                                
+            settings.setValue("extratimeout",self.ser.extratimeout)                                                                           
             
         except Exception,e:
             self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))            
@@ -9701,7 +9780,7 @@ class serialport(object):
         self.stopbits = 1
         self.timeout=1
 
-        #serial port
+        #serial port for ET/BT
         self.SP  = serial.Serial()
 
         ##### SPECIAL METER FLAGS ########
@@ -9719,11 +9798,13 @@ class serialport(object):
         #initial ambient temperature flag for ARDUINOTC4 meter
         self.arduinoAmbFlag = 0
 
-
         #EXTRA COMM PORTS VARIABLES
         self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
         #comm ports available after Scan
         self.commavailable = []
+
+        #comm ports for extra devices
+        self.extraSP = []
         
     def openport(self):
         try:
@@ -9747,6 +9828,9 @@ class serialport(object):
         try:        
            if self.SP.isOpen(): 
                self.SP.close()
+           for i in range(len(self.extraSP)):
+               if self.extraSP[i].isOpen():
+                  self.extraSP[i].close() 
         except serial.SerialException,e:
             pass
         
@@ -10870,8 +10954,8 @@ class comportDlg(QDialog):
         self.bytesizeComboBox = QComboBox()
         bytesizelabel.setBuddy(self.bytesizeComboBox)
         self.bytesizes = ["7","8"]
-        self.bytesizeComboBox.setCurrentIndex(self.bytesizes.index(str(aw.ser.bytesize)))
         self.bytesizeComboBox.addItems(self.bytesizes)
+        self.bytesizeComboBox.setCurrentIndex(self.bytesizes.index(str(aw.ser.bytesize)))
 
         paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
         self.parityComboBox = QComboBox()
@@ -10978,28 +11062,34 @@ class comportDlg(QDialog):
             self.serialtable.setShowGrid(True)
 
             for i in range(ndevices):
-                device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]])    #type identification of the device
+                device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]])    #type identification of the device. Non editable
 
                 comportComboBox =  QComboBox()
                 comportComboBox.addItems(aw.ser.commavailable)
+                if aw.ser.extracomport[i] in aw.ser.commavailable:
+                    comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.ser.extracomport[i]))
 
                 baudComboBox =  QComboBox()
                 baudComboBox.addItems(self.bauds)
-                baudComboBox.setCurrentIndex(self.bauds.index(str(aw.ser.extrabaudrate[i])))
+                if str(aw.ser.extrabaudrate[i]) in self.bauds:
+                    baudComboBox.setCurrentIndex(self.bauds.index(str(aw.ser.extrabaudrate[i])))
 
                 byteComboBox =  QComboBox()
                 byteComboBox.addItems(self.bytesizes)
-                byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.ser.extrabytesize[i])))
+                if str(aw.ser.extrabytesize[i]) in self.bytesizes:
+                    byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.ser.extrabytesize[i])))
 
                 parityComboBox =  QComboBox()
                 parityComboBox.addItems(self.parity)
-                parityComboBox.setCurrentIndex(self.parity.index(aw.ser.extraparity[i]))
+                if aw.ser.extraparity[i] in self.parity:
+                    parityComboBox.setCurrentIndex(self.parity.index(aw.ser.extraparity[i]))
               
                 #self.connect(baudComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
                  
                 stopbitsComboBox =  QComboBox()
                 stopbitsComboBox.addItems(self.stopbits)
-                stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.ser.extrastopbits[i])))
+                if str(aw.ser.extrastopbits[i]) in self.stopbits:
+                    stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.ser.extrastopbits[i])))
 
                 timeoutEdit = QLineEdit(str(aw.ser.extratimeout[i]))
                 timeoutEdit.setValidator(QIntValidator(0,5,timeoutEdit))
@@ -11013,6 +11103,48 @@ class comportDlg(QDialog):
                 self.serialtable.setCellWidget(i,5,stopbitsComboBox)              
                 self.serialtable.setCellWidget(i,6,timeoutEdit)              
 
+    def saveserialtable(self):
+        ndevices = len(aw.qmc.extradevices)
+        for i in range(ndevices):
+            
+            comportComboBox =  self.serialtable.cellWidget(i,1)
+            aw.ser.extracomport[i] = unicode(comportComboBox.currentText())
+
+            baudComboBox =  self.serialtable.cellWidget(i,2)
+            aw.ser.extrabaudrate[i] = int(baudComboBox.currentText())
+
+            byteComboBox =  self.serialtable.cellWidget(i,3)
+            aw.ser.extrabytesize[i] = int(byteComboBox.currentText())
+
+            parityComboBox =  self.serialtable.cellWidget(i,4)
+            aw.ser.extraparity[i] = unicode(parityComboBox.currentText())
+
+            stopbitsComboBox =  self.serialtable.cellWidget(i,5)
+            aw.ser.extrastopbits[i] = int(stopbitsComboBox.currentText())
+
+            timeoutEdit = self.serialtable.cellWidget(i,6)
+            aw.ser.extratimeout[i] = int(timeoutEdit.text())
+
+        nserial = len(aw.ser.extraSP)
+        if ndevices != nserial:
+            aw.ser.extraSP = [serial.Serial()]*ndevices
+
+        for i in range(ndevices):
+            #load serial ports
+            aw.ser.extraSP[i].setPort(unicode(aw.ser.extracomport[i]))
+            aw.ser.extraSP[i].setBaudrate(aw.ser.extrabaudrate[i])
+            aw.ser.extraSP[i].setByteSize(aw.ser.extrabytesize[i])
+            aw.ser.extraSP[i].setParity(unicode(aw.ser.extraparity[i]))
+            aw.ser.extraSP[i].setStopbits(aw.ser.extrastopbits[i])
+            aw.ser.extraSP[i].setTimeout(aw.ser.extratimeout[i])
+
+        try:
+            for i in range(ndevices):
+               aw.ser.extraSP[i].open()
+
+        except serial.SerialException, e:
+            print e
+            
     def accept(self):
         #validate serial parameter against input errors
         class comportError(Exception): pass
@@ -11028,6 +11160,8 @@ class comportDlg(QDialog):
         parity = unicode(self.parityComboBox.currentText())
         stopbits = unicode(self.stopbitsComboBox.currentText())
         timeout = unicode(self.timeoutEdit.text())
+
+        self.saveserialtable()
         
         try:
             #check here comport errors
@@ -11148,7 +11282,7 @@ class DeviceAssignmentDLG(QDialog):
             self.nonpidButton.setChecked(True)
             selected_device_index = 0
             try:
-                selected_device_index = sorted_devices.index(devices[aw.qmc.device - 1])            
+                selected_device_index = sorted_devices.index(aw.qmc.devices[aw.qmc.device - 1])            
             except Exception:
                 pass
             self.devicetypeComboBox.setCurrentIndex(selected_device_index)           
@@ -11290,8 +11424,8 @@ class DeviceAssignmentDLG(QDialog):
     def adddevice(self):
         self.savedevicetable()
         aw.qmc.extradevices.append(0)
-        aw.qmc.extradevicecolor1.append("black")
-        aw.qmc.extradevicecolor2.append("black")
+        aw.qmc.extradevicecolor1.append(u"black")
+        aw.qmc.extradevicecolor2.append(u"black")
         self.createDeviceTable()
 
         #add and init dummy serial port settings
@@ -11301,7 +11435,16 @@ class DeviceAssignmentDLG(QDialog):
         aw.ser.extraparity.append("E")
         aw.ser.extrastopbits.append(1)
         aw.ser.extratimeout.append(1) 
-        
+
+        aw.qmc.extratemp1.append([])
+        aw.qmc.extratemp2.append([])
+        l = len(aw.qmc.extradevices)-1
+        aw.qmc.extratemp1lines.append(aw.qmc.ax.plot(aw.qmc.timex, aw.qmc.extratemp1[l],color="black",linewidth=2,label= "UNO")[0])
+        aw.qmc.extratemp2lines.append(aw.qmc.ax.plot(aw.qmc.timex, aw.qmc.extratemp2[l],color="black",linewidth=2,label= "UNO")[0])
+        #create new port                                    
+        aw.ser.extraSP.append(serial.Serial())                                        
+                                                
+
     def delextradevice(self,x):
         aw.qmc.extradevices.pop(x)
         aw.qmc.extradevicecolor1.pop(x)
@@ -12212,8 +12355,8 @@ class WheelDlg(QDialog):
         self.connect(self.labelResetButton, SIGNAL("clicked()"),self.resetlabelparents)
         self.labelwheelx = 0   #index of wheel being edited on labeltable
 
-        self.hierarchyButton = QPushButton("Set Hierarchy")
-        self.hierarchyButton.setToolTip("Set graph hierarchy after creating parent relationships")
+        self.hierarchyButton = QPushButton("Reverse Hierarchy")
+        self.hierarchyButton.setToolTip("Sets graph hierarchy child->parent instead of parent->child")
         self.hierarchyButton.setMaximumWidth(100)
         self.connect(self.hierarchyButton, SIGNAL("clicked()"),aw.qmc.setWheelHierarchy)
 
@@ -12343,6 +12486,7 @@ class WheelDlg(QDialog):
         mainlayout.addLayout(buttonlayout)
         self.setLayout(mainlayout)
 
+    #creates config table for wheel with index x
     def createlabeltable(self,x):
         self.labelwheelx = x                    #wheel being edited                             
         self.labelGroupLayout.setVisible(True)
@@ -12355,7 +12499,7 @@ class WheelDlg(QDialog):
         if nlabels:    
             self.labeltable.setRowCount(nlabels)
             self.labeltable.setColumnCount(5)
-            self.labeltable.setHorizontalHeaderLabels(["Label","Parent","Width","Color", "Color Intensity"])
+            self.labeltable.setHorizontalHeaderLabels(["Label","Parent","Width","Color", "Opaqueness"])
             self.labeltable.setAlternatingRowColors(True)
             self.labeltable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -12407,6 +12551,7 @@ class WheelDlg(QDialog):
             self.createdatatable()                           #update main table with label names (label::color)
             aw.qmc.drawWheel()
 
+    #sets a uniform color in wheel
     def setwheelcolor(self,x):
         colorf = QColorDialog.getColor(QColor(aw.qmc.wheelcolor[x][0]),self)
         if colorf.isValid():
@@ -12417,7 +12562,7 @@ class WheelDlg(QDialog):
         self.createdatatable()                           
         aw.qmc.drawWheel()
 
-    #sets color pattern for single wheel    
+    #sets color pattern (many colors) in wheel    
     def setwheelcolorpattern(self,z,x):
         wsb =  self.datatable.cellWidget(x,9)
         wpattern = wsb.value()        
@@ -12428,7 +12573,7 @@ class WheelDlg(QDialog):
             aw.qmc.wheelcolor[x][i] = unicode(color.name())
         aw.qmc.drawWheel()
 
-    #sets color pattern for whole graph    
+    #sets color pattern (many colors) for whole graph    
     def setcolorpattern(self):
         aw.qmc.wheelcolorpattern = self.colorSpinBox.value()
         if aw.qmc.wheelcolorpattern:
@@ -12445,15 +12590,17 @@ class WheelDlg(QDialog):
         aw.qmc.segmentsalpha[x][u] = float(z/10.) 
         aw.qmc.drawWheel()
 
+    #rotate whole graph 
     def rotatewheels(self,x):
-        if x == 1: #left
+        if x == 1: #left,counterclockwise
             for i in range(len(aw.qmc.startangle)):
                 aw.qmc.startangle[i] += 1
-        elif x == 0:
+        elif x == 0: #right,clockwise
             for i in range(len(aw.qmc.startangle)):              
                 aw.qmc.startangle[i] -= 1
         aw.qmc.drawWheel()
-        
+
+    #z= new width%, x= wheel number index, u = index of segment in the wheel    
     def setlabelwidth(self,z,x,u):
         newwidth = z
         oldwidth = aw.qmc.segmentlengths[x][u]
@@ -12474,6 +12621,7 @@ class WheelDlg(QDialog):
         aw.qmc.drawWheel()
         self.createdatatable() #update data table        
 
+    #deletes parent-child relation in a wheel. It obtains the wheel index by self.labelwheelx
     def resetlabelparents(self):
         x = self.labelwheelx
         nsegments = len(aw.qmc.wheellabelparent[x])
@@ -12484,28 +12632,32 @@ class WheelDlg(QDialog):
         aw.qmc.drawWheel()
         self.createlabeltable(x)
 
-
+    #adjust decorative edge between wheels
     def setedge(self):
         aw.qmc.wheeledge = float(self.edgeSpinBox.value())/100.
         aw.qmc.drawWheel()
 
+    #adjusts line thickness
     def setlinewidth(self):
         aw.qmc.wheellinewidth = self.linewidthSpinBox.value()
         aw.qmc.drawWheel()
 
+    #sets line color
     def setlinecolor(self):
         colorf = QColorDialog.getColor(QColor(aw.qmc.wheellinecolor),self)
         if colorf.isValid():
             colorname = unicode(colorf.name())
             aw.qmc.wheellinecolor = colorname      #add new color to label            
             aw.qmc.drawWheel()
-    
+
+    #makes not visible the wheel config table 
     def closelabels(self):
         self.labelGroupLayout.setVisible(False)
         self.labeltable.setVisible(False)
         self.labelCloseButton.setVisible(False)
         self.labelResetButton.setVisible(False)
-        
+
+    #creates graph table    
     def createdatatable(self):
         self.datatable.clear()        
         ndata = len(aw.qmc.wheelnames)
@@ -12580,6 +12732,7 @@ class WheelDlg(QDialog):
                 self.datatable.setCellWidget(i,8,colorButton)
                 self.datatable.setCellWidget(i,9,colorSpinBox)
 
+    #reads label edit box for wheel with index x, and updates labels 
     def updatelabels(self,x):
         labelsedit =  self.datatable.cellWidget(x,1)
         newwheellabels = unicode(labelsedit.text()).strip().split(",")
@@ -12596,6 +12749,7 @@ class WheelDlg(QDialog):
         aw.qmc.wheelnames[x] = newwheellabels[:]        
         aw.qmc.drawWheel()        
 
+    #sets radii for a wheel. z is a variable dummy with no meaning but passed by the Qt inner workings
     def setwidth(self,z,x):
         widthSpinBox = self.datatable.cellWidget(x,4)
         newwidth = widthSpinBox.value()
@@ -12611,7 +12765,6 @@ class WheelDlg(QDialog):
 
         aw.qmc.wradii[x] = newwidth
         
-        #correct for numerical floating rouding errors:
         #Need 100.0% coverage. Correct for numerical floating point rounding errors:
         count = 0.            
         for i in range(len(aw.qmc.wradii)):
@@ -12625,21 +12778,25 @@ class WheelDlg(QDialog):
                 
         aw.qmc.drawWheel()
 
+    #sets starting angle (rotation) for a wheel with index x
     def setangle(self,z,x):
         angleSpinBox = self.datatable.cellWidget(x,5)
         aw.qmc.startangle[x] = angleSpinBox.value()
         aw.qmc.drawWheel()
 
+    #sets text projection style for a wheel with index x
     def setprojection(self,z,x):
         projectionComboBox = self.datatable.cellWidget(x,6)
         aw.qmc.projection[x] = projectionComboBox.currentIndex()
         aw.qmc.drawWheel()
 
+    #chages text size in wheel with index x
     def setTextsizeX(self,z,x):
         txtSpinBox = self.datatable.cellWidget(x,7)
         aw.qmc.wheeltextsize[x] = txtSpinBox.value()
         aw.qmc.drawWheel()
-        
+
+    #changes size of text in whole graph
     def changetext(self,x):
         for i in range(len(aw.qmc.wheeltextsize)):
             if x == 1:
@@ -12648,7 +12805,7 @@ class WheelDlg(QDialog):
                 aw.qmc.wheeltextsize[i] -= 1
         aw.qmc.drawWheel()
 
-
+    #adds new top wheel 
     def insertwheel(self):
         ndata = len(aw.qmc.wradii)
         if ndata:
@@ -12659,10 +12816,10 @@ class WheelDlg(QDialog):
             aw.qmc.wradii.append(100.-count)
         else:
             aw.qmc.wradii.append(100.)
-        #find number of labels of most outer wheel
+        #find number of labels of most outer wheel (last)
         if len(aw.qmc.wheelnames):
             nwheels = len(aw.qmc.wheelnames[-1])
-        else:
+        else:                                       #if no wheels
             nwheels = 3
         wn,sl,sa,wlp,co = [],[],[],[],[]
         for i in range(nwheels+1):
@@ -12685,9 +12842,10 @@ class WheelDlg(QDialog):
 
         self.createdatatable()
         aw.qmc.drawWheel()
-        
+
+    #deletes wheel with index x
     def popwheel(self,x):
-        #correct raius of other wheels (to use 100% space)
+        #correct raius of other wheels (to use 100% coverage)
         width = aw.qmc.wradii[x]
         l = len(aw.qmc.wradii)
         for i in range(l):
