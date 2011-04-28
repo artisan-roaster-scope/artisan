@@ -9223,20 +9223,19 @@ class backgroundDLG(QDialog):
     def setreproduce(self):
         if aw.qmc.background:
             aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
-            
-            msg = "Playback Aid set "
+                        
             if self.backgroundReproduce.isChecked():
                 aw.qmc.backgroundReproduce = True
-                msg += "ON at " + str(aw.qmc.detectBackgroundEventTime) + " secs" 
+                msg = QApplication.translate("StatusBar","Playback Aid set ON at %1 secs",None, QApplication.UnicodeUTF8).arg(str(aw.qmc.detectBackgroundEventTime))
             else:
                 aw.qmc.backgroundReproduce = False
-                msg += "OFF"
+                msg = QApplication.translate("StatusBar","Playback Aid set OFF",None, QApplication.UnicodeUTF8)
                 aw.messagelabel.setStyleSheet("background-color:'transparent';")
                 
             self.status.showMessage(msg,5000)
         else:
             self.backgroundReproduce.setChecked(False)
-            self.status.showMessage("No profile background found",5000)
+            self.status.showMessage(QApplication.translate("StatusBar","No profile background found",None, QApplication.UnicodeUTF8),5000)
 
 
     def timealign(self):
@@ -9263,18 +9262,18 @@ class backgroundDLG(QDialog):
 
     def adjuststyle(self):
         
-        self.status.showMessage("Processing...",5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         #block button
         self.styleComboBox.setDisabled(True) 
         aw.qmc.backgroundstyle = unicode(self.styleComboBox.currentText())
         aw.qmc.redraw()
         #reactivate button
         self.styleComboBox.setDisabled(False)
-        self.status.showMessage("Ready",5000)         
+        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)         
 
     def adjustcolor(self,color,curve):
         color = str(color)
-        self.status.showMessage("Processing...",5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
      
         self.btcolorComboBox.setDisabled(True)
         self.metcolorComboBox.setDisabled(True)
@@ -9298,33 +9297,33 @@ class backgroundDLG(QDialog):
         aw.qmc.redraw()
         self.btcolorComboBox.setDisabled(False)
         self.metcolorComboBox.setDisabled(False)
-        self.status.showMessage("Ready",5000) 
+        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000) 
 
     def adjustwidth(self):
         
-        self.status.showMessage("Processing...",5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         #block button
         self.widthSpinBox.setDisabled(True)
         aw.qmc.backgroundwidth = self.widthSpinBox.value()
         aw.qmc.redraw()
         #reactivate button
         self.widthSpinBox.setDisabled(False)
-        self.status.showMessage("Ready",5000)        
+        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)        
 
     def adjustintensity(self):
         
-        self.status.showMessage("Processing...",5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         #block button
         self.intensitySpinBox.setDisabled(True)
         aw.qmc.backgroundalpha = self.intensitySpinBox.value()/10.
         aw.qmc.redraw()
         #reactivate button
         self.intensitySpinBox.setDisabled(False)
-        self.status.showMessage("Ready",5000)   
+        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)   
         
     def delete(self):
         
-        self.status.showMessage("Processing...",5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         self.pathedit.setText(u"")
         self.backgroundDetails.setChecked(False)
         self.backgroundCheck.setChecked(False)
@@ -9343,10 +9342,10 @@ class backgroundDLG(QDialog):
         aw.qmc.backmoveflag = 1
         aw.qmc.redraw()
         
-        self.status.showMessage("Ready",5000)   
+        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)   
         
     def move(self,m):        
-         self.status.showMessage("Processing...",5000)
+         self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
          #block button
          if m == "up":
              self.upButton.setDisabled(True)
@@ -9373,10 +9372,10 @@ class backgroundDLG(QDialog):
          elif m == "right":
             self.rightButton.setDisabled(False)
             
-         self.status.showMessage("Ready",5000)       
+         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)       
 
     def readChecks(self):
-        self.status.showMessage("Processing...",5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         if self.backgroundCheck.isChecked():
             aw.qmc.background = True
         else:
@@ -9393,7 +9392,7 @@ class backgroundDLG(QDialog):
             aw.qmc.backgroundeventsflag = False            
             
         aw.qmc.redraw()
-        self.status.showMessage("Ready",5000)   
+        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)   
         
 
     def selectpath(self):
@@ -9403,9 +9402,9 @@ class backgroundDLG(QDialog):
 
     def load(self):        
         if unicode(self.pathedit.text()) == "":
-            self.status.showMessage("Empty file path",5000)   
+            self.status.showMessage(QApplication.translate("StatusBar","Empty file path",None, QApplication.UnicodeUTF8),5000)   
             return
-        self.status.showMessage("Reading file...",5000)   
+        self.status.showMessage(QApplication.translate("StatusBar","Reading file...",None, QApplication.UnicodeUTF8),5000)   
         aw.qmc.backgroundpath = unicode(self.pathedit.text())
         aw.loadbackground(unicode(self.pathedit.text()))
         self.backgroundCheck.setChecked(True)
@@ -9421,7 +9420,10 @@ class backgroundDLG(QDialog):
         if ndata:
             self.eventtable.setRowCount(ndata)
             self.eventtable.setColumnCount(4)
-            self.eventtable.setHorizontalHeaderLabels(["Time","Description","Type","Value"])
+            self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8)])
             self.eventtable.setAlternatingRowColors(True)
             self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -9458,7 +9460,12 @@ class backgroundDLG(QDialog):
         if ndata:    
             self.datatable.setRowCount(ndata)
             self.datatable.setColumnCount(6)
-            self.datatable.setHorizontalHeaderLabels(["Abs Time","Rel Time","ET","BT","DeltaBT (d/m)","DEltaET (d/m)"])
+            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Abs Time",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Rel Time",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","ET",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","BT",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","DeltaBT (d/m)",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","DeltaET (d/m)",None, QApplication.UnicodeUTF8)])
             self.datatable.setAlternatingRowColors(True)
             self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
