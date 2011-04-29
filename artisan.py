@@ -9776,7 +9776,7 @@ class serialport(object):
         self.comport = QApplication.translate("ComboBox","COM4",None, QApplication.UnicodeUTF8)
         self.baudrate = 9600
         self.bytesize = 8
-        self.parity= QApplication.translate("ComboBox","O",None, QApplication.UnicodeUTF8)
+        self.parity= 'O'
         self.stopbits = 1
         self.timeout=1
 
@@ -10570,24 +10570,24 @@ class designerconfigDlg(QDialog):
 
         reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None, QApplication.UnicodeUTF8))
         self.reproduceComboBox = QComboBox()
-        self.reproduceComboBox.addItems(["None",
-                                         "BT Rate of Change",
-                                         "ET Rate of Change",
-                                         "Machine SV commands",
-                                         "Machine Ramp command"])
+        self.reproduceComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","BT Rate of Change",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","ET Rate of Change",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","Machine SV commands",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","Machine Ramp command",None, QApplication.UnicodeUTF8)])
         self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
         self.connect(self.reproduceComboBox,SIGNAL("currentIndexChanged(int)"), self.changereproducemode)
 
-        saveButton = QPushButton("Update")
+        saveButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
         self.connect(saveButton, SIGNAL("clicked()"), self.settimes)
         saveButton.setMaximumWidth(50)
         
-        defaultButton = QPushButton("Reset")
+        defaultButton = QPushButton(QApplication.translate("Button","Reset",None, QApplication.UnicodeUTF8))
         self.connect(defaultButton, SIGNAL("clicked()"), self.reset)
-        closeButton = QPushButton("Close")
+        closeButton = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
         self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("accept()"))
                
-        convertButton = QPushButton("Create")
+        convertButton = QPushButton(QApplication.translate("Button","Create",None, QApplication.UnicodeUTF8))
         self.connect(convertButton, SIGNAL("clicked()"),self.create)
 
         buttonLayout = QHBoxLayout()
@@ -10624,7 +10624,7 @@ class designerconfigDlg(QDialog):
         modLayout.addWidget(reproducelabel,1,0)
         modLayout.addWidget(self.reproduceComboBox,1,1)
         
-        marksGroupLayout = QGroupBox("Initial Times")
+        marksGroupLayout = QGroupBox(QApplication.translate("Grid","Initial Times",None, QApplication.UnicodeUTF8))
         marksGroupLayout.setLayout(marksLayout)
         
         mainLayout = QVBoxLayout()
@@ -10648,32 +10648,38 @@ class designerconfigDlg(QDialog):
         else:
             aw.qmc.ETsplinedegree = len(aw.qmc.timex)-1
             self.ETsplineComboBox.setCurrentIndex(aw.qmc.ETsplinedegree-1)
-            ms = "Not enough time points for an ET curviness of %i. Set curviness to %i"%(ETcurviness,aw.qmc.ETsplinedegree)
-            QMessageBox.information(self,u"Designer Config",ms) 
+            ms = QApplication.translate("MessageBox","Not enough time points for an ET curviness of %1. Set curviness to %2",None, QApplication.UnicodeUTF8).arg(ETcurviness).arg(aw.qmc.ETsplinedegree)
+            QMessageBox.information(self,QApplication.translate("MessageBox Caption","Designer Config",None, QApplication.UnicodeUTF8),ms) 
 
         if (timepoints - BTcurviness) >= 1:
             aw.qmc.BTsplinedegree = BTcurviness
         else:
             aw.qmc.BTsplinedegree = len(aw.qmc.timex)-1
             self.BTsplineComboBox.setCurrentIndex(aw.qmc.BTsplinedegree-1)
-            ms = "Not enough time points for an BT curviness of %i. Set curviness to %i"%(BTcurviness,aw.qmc.BTsplinedegree)
-            QMessageBox.information(self,u"Designer Config",ms) 
+            ms = QApplication.translate("MessageBox","Not enough time points for an BT curviness of %1. Set curviness to %2",None, QApplication.UnicodeUTF8).arg(BTcurviness).arg(aw.qmc.BTsplinedegree)
+            QMessageBox.information(self,QApplication.translate("MessageBox Caption","Designer Config",None, QApplication.UnicodeUTF8),ms) 
                                           
         aw.qmc.redrawdesigner()
 
     def settimes(self):
         #check input
-        strings = ["CHARGE","DRY END","FC START","FC END","SC START","SC END","DROP"]
+        strings = [QApplication.translate("MessageBox","CHARGE",None, QApplication.UnicodeUTF8),
+                   QApplication.translate("MessageBox","DRY END",None, QApplication.UnicodeUTF8),
+                   QApplication.translate("MessageBox","FC START",None, QApplication.UnicodeUTF8),
+                   QApplication.translate("MessageBox","FC END",None, QApplication.UnicodeUTF8),
+                   QApplication.translate("MessageBox","SC START",None, QApplication.UnicodeUTF8),
+                   QApplication.translate("MessageBox","SC END",None, QApplication.UnicodeUTF8),
+                   QApplication.translate("MessageBox","DROP",None, QApplication.UnicodeUTF8)]
         timecheck = self.validatetime()
         if timecheck != 1000:
-            st = "Incorrect time format. Please recheck %s time"%strings[timecheck]
-            QMessageBox.information(self,u"Designer Config",st)            
+            st = QApplication.translate("MessageBox","Incorrect time format. Please recheck %1 time",None, QApplication.UnicodeUTF8).arg(strings[timecheck])
+            QMessageBox.information(self,QApplication.translate("MessageBox Caption","Designer Config",None, QApplication.UnicodeUTF8),st)            
             return 1
         
         checkvalue = self.validatetimeorder()
         if checkvalue != 1000:
-            st = "Times need to be in ascending order. Please recheck %s time"%strings[checkvalue+1]
-            QMessageBox.information(self,u"Designer Config",st)            
+            st = QApplication.translate("MessageBox","Times need to be in ascending order. Please recheck %1 time",None, QApplication.UnicodeUTF8).arg(strings[checkvalue+1])
+            QMessageBox.information(self,QApplication.translate("MessageBox Caption","Designer Config",None, QApplication.UnicodeUTF8),st)            
             return 1
         
         if self.dryend.isChecked():
@@ -10780,7 +10786,7 @@ class designerconfigDlg(QDialog):
         self.Edit4.setText(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[4]))
         self.Edit5.setText(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[5]))
         self.Edit6.setText(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[6]))
-        aw.sendmessage("Designer has been reset")
+        aw.sendmessage(QApplication.translate("Message Area","Designer has been reset",None, QApplication.UnicodeUTF8)).arg()
 
     def loadconfigflags(self):
         if aw.qmc.timeindex[1]:
@@ -10818,9 +10824,15 @@ class designerconfigDlg(QDialog):
             elif idi == 5:
                 self.sce.setChecked(False)
 
-            strings = ["CHARGE","DRY END","FC START","FC END","SC START","SC END","DROP"]
-            st = "Times need to be in ascending order. Please recheck %s time"%strings[idi]
-            QMessageBox.information(self,u"Designer Config",st)    
+            strings = [QApplication.translate("MessageBox","CHARGE",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("MessageBox","DRY END",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("MessageBox","FC START",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("MessageBox","FC END",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("MessageBox","SC START",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("MessageBox","SC END",None, QApplication.UnicodeUTF8),
+                       QApplication.translate("MessageBox","DROP",None, QApplication.UnicodeUTF8)]
+            st = QApplication.translate("MessageBox","Times need to be in ascending order. Please recheck %1 time",None, QApplication.UnicodeUTF8).arg(strings[idi])
+            QMessageBox.information(self,QApplication.translate("MessageBox Caption","Designer Config",None, QApplication.UnicodeUTF8),st)    
             return
         
         #idi = id index
@@ -10859,7 +10871,7 @@ class nonedevDlg(QDialog):
     def __init__(self, parent = None):
         super(nonedevDlg,self).__init__(parent)
        
-        self.setWindowTitle("Manual Temperature Logger")
+        self.setWindowTitle(QApplication.translate("Form Caption","Manual Temperature Logger",None, QApplication.UnicodeUTF8))
 
         if len(aw.qmc.timex):
             if aw.qmc.manuallogETflag:
@@ -10877,7 +10889,7 @@ class nonedevDlg(QDialog):
         self.etEdit.setValidator(QIntValidator(0, 1000, self.etEdit))
         self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
 
-        self.ETbox = QCheckBox("ET")
+        self.ETbox = QCheckBox(QApplication.translate("CheckBox","ET",None, QApplication.UnicodeUTF8))
         if aw.qmc.manuallogETflag == True:
             self.ETbox.setChecked(True)
             
@@ -10887,8 +10899,8 @@ class nonedevDlg(QDialog):
            
         self.connect(self.ETbox,SIGNAL("stateChanged(int)"),self.changemanuallogETflag)
 
-        okButton = QPushButton("OK")
-        cancelButton = QPushButton("Cancel")
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
 
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
@@ -10931,7 +10943,7 @@ class nonedevDlg(QDialog):
 class comportDlg(QDialog):
     def __init__(self, parent = None):
         super(comportDlg,self).__init__(parent)
-        self.setWindowTitle("Serial Ports Configuration")
+        self.setWindowTitle(QApplication.translate("Form Caption","Serial Ports Configuration",None, QApplication.UnicodeUTF8))
               
         self.setModal(True)
 
@@ -10979,10 +10991,10 @@ class comportDlg(QDialog):
 
         self.messagelabel = QLabel()
         
-        okButton = QPushButton("&OK")
-        cancelButton = QPushButton("Cancel")
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
-        scanButton = QPushButton("Scan for Ports")
+        scanButton = QPushButton(QApplication.translate("Button","Scan for Ports",None, QApplication.UnicodeUTF8))
         scanButton.setFocusPolicy(Qt.NoFocus)
 
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
@@ -11035,11 +11047,11 @@ class comportDlg(QDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,"ET/BT device")
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT device",None, QApplication.UnicodeUTF8))
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,"Extra devices")
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra devices",None, QApplication.UnicodeUTF8))
 
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -11054,7 +11066,13 @@ class comportDlg(QDialog):
         if ndevices:    
             self.serialtable.setRowCount(ndevices)
             self.serialtable.setColumnCount(7)
-            self.serialtable.setHorizontalHeaderLabels(["Extra Dev","Comm Port","Baud Rate","Byte Size","Parity","Stopbits","Timeout"])
+            self.serialtable.setHorizontalHeaderLabels([QApplication.translate("Table","Extra Dev",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table","Comm Port",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table","Baud Rate",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table","Byte Size",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table","Parity",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table","Stopbits",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table","Timeout",None, QApplication.UnicodeUTF8)])
             self.serialtable.setAlternatingRowColors(True)
             self.serialtable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -11174,13 +11192,13 @@ class comportDlg(QDialog):
             aw.sendmessage(QApplication.translate("Message Area","Serial Port Settings: %1, %2, %3, %4, %5, %6", None, QApplication.UnicodeUTF8).arg(comport).arg(baudrate).arg(bytesize).arg(parity).arg(stopbits).arg(timeout))
                         
         except comportError,e:
-            aw.qmc.adderror(u"Comport Error: Invalid Comm entry ")
+            aw.qmc.adderror(QApplication.translate("Error Message","Comport Error: Invalid Comm entry ", None, QApplication.UnicodeUTF8))
             self.comportEdit.selectAll()
             self.comportEdit.setFocus()           
             return
 
         except timeoutError,e:
-            aw.qmc.adderror(u"Timeout Error: Invalid Timeout entry ")
+            aw.qmc.adderror(QApplication.translate("Error Message","Timeout Error: Invalid Timeout entry ", None, QApplication.UnicodeUTF8))
             self.timeoutEdit.selectAll()
             self.timeoutEdit.setFocus()           
             return
@@ -11246,14 +11264,14 @@ class comportDlg(QDialog):
 class DeviceAssignmentDLG(QDialog):       
     def __init__(self, parent = None):
         super(DeviceAssignmentDLG,self).__init__(parent)
-        self.setWindowTitle("Device Assignment")
+        self.setWindowTitle(QApplication.translate("Form Caption","Device Assignment", None, QApplication.UnicodeUTF8))
         
         self.setModal(True)
 
         ################ TAB 1   WIDGETS
         
-        self.nonpidButton = QRadioButton("Device")
-        self.pidButton = QRadioButton("PID")
+        self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Device", None, QApplication.UnicodeUTF8))
+        self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None, QApplication.UnicodeUTF8))
 
         sorted_devices = sorted(aw.qmc.devices)
         self.devicetypeComboBox = QComboBox()
@@ -11262,7 +11280,10 @@ class DeviceAssignmentDLG(QDialog):
         controllabel =QLabel(QApplication.translate("Label", "Control ET",None, QApplication.UnicodeUTF8))                            
         self.controlpidtypeComboBox = QComboBox()
         self.controlpidunitidComboBox = QComboBox()
-        self.controlpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR"])
+
+        ## No need to translate (also used later)            
+        self.controlpidtypeComboBox.addItems(["Fuji PXG",
+                                              "Fuji PXR"])
         self.controlpidunitidComboBox.addItems(["1","2"])
 
         label1 = QLabel(QApplication.translate("Label", "Type",None, QApplication.UnicodeUTF8)) 
@@ -11271,7 +11292,8 @@ class DeviceAssignmentDLG(QDialog):
         btlabel =QLabel(QApplication.translate("Label", "Read BT",None, QApplication.UnicodeUTF8))                            
         self.btpidtypeComboBox = QComboBox()
         self.btpidunitidComboBox = QComboBox()
-        self.btpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR"])
+        self.btpidtypeComboBox.addItems([QApplication.translate("ComboBox","Fuji PXG",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","Fuji PXR",None, QApplication.UnicodeUTF8)])
         self.btpidunitidComboBox.addItems(["2","1"])
 
         #check previous pid settings for radio button
@@ -11305,8 +11327,8 @@ class DeviceAssignmentDLG(QDialog):
             self.btpidunitidComboBox.setCurrentIndex(0)
                 
 
-        okButton = QPushButton("OK")
-        cancelButton = QPushButton("Cancel")
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
@@ -11318,7 +11340,7 @@ class DeviceAssignmentDLG(QDialog):
         self.devicetable.setTabKeyNavigation(True)
         self.createDeviceTable()
 
-        addButton = QPushButton("Add")
+        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
         self.connect(addButton, SIGNAL("clicked()"),self.adddevice)                
 
         #LAYOUT TAB 1
@@ -11349,7 +11371,7 @@ class DeviceAssignmentDLG(QDialog):
         PIDBox.addLayout(PIDgrid)
         PIDBox.addStretch()
         
-        PIDGroupLayout = QGroupBox("PID")
+        PIDGroupLayout = QGroupBox(QApplication.translate("GroupBox","PID",None, QApplication.UnicodeUTF8))
         PIDGroupLayout.setLayout(PIDBox)
         
         buttonLayout = QHBoxLayout()
@@ -11371,11 +11393,11 @@ class DeviceAssignmentDLG(QDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,"ET/BT Dev.")
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT Dev.",None, QApplication.UnicodeUTF8))
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,"Extra Dev.")
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Dev.",None, QApplication.UnicodeUTF8))
 
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -11390,7 +11412,10 @@ class DeviceAssignmentDLG(QDialog):
         if ndevices:    
             self.devicetable.setRowCount(ndevices)
             self.devicetable.setColumnCount(4)
-            self.devicetable.setHorizontalHeaderLabels(["Delete","Device type","Color line 1", "Color line 2"])
+            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table","Delete",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table","Device type",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table","Color line 1",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table","Color line 2",None, QApplication.UnicodeUTF8)])
             self.devicetable.setAlternatingRowColors(True)
             self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -11406,13 +11431,13 @@ class DeviceAssignmentDLG(QDialog):
                 typeComboBox.setCurrentIndex(aw.qmc.extradevices[i])
                 self.connect(typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
 
-                color1Button = QPushButton("Color 1")
+                color1Button = QPushButton(QApplication.translate("Button","Color 1",None, QApplication.UnicodeUTF8))
                 self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
 
-                color2Button = QPushButton("Color 2")
+                color2Button = QPushButton(QApplication.translate("Button","Color 2",None, QApplication.UnicodeUTF8))
                 self.connect(color2Button, SIGNAL("clicked()"),lambda l = 2, c = i: self.setextracolor(l,c))
 
-                delButton = QPushButton("Del")
+                delButton = QPushButton(QApplication.translate("Button","Del",None, QApplication.UnicodeUTF8))
                 self.connect(delButton, SIGNAL("clicked()"),lambda x = i: self.delextradevice(x))
 
                 #add widgets to the table
@@ -11487,7 +11512,7 @@ class DeviceAssignmentDLG(QDialog):
     def accept(self):
         message = "Device left empty"
         if self.pidButton.isChecked():
-            # 0 = PXG, 1 = PXR
+            # 0 = PXG, 1 = PXR - Not translated
             if str(self.controlpidtypeComboBox.currentText()) == "Fuji PXG":
                 aw.ser.controlETpid[0] = 0
                 str1 = "Fuji PXG"
@@ -11523,7 +11548,7 @@ class DeviceAssignmentDLG(QDialog):
             
         if self.nonpidButton.isChecked():
             meter = str(self.devicetypeComboBox.currentText())
-            message = "device err"
+            message = QApplication.translate("Error Message","device err",None,QApplication.UnicodeUTF8)
             
             if meter == "Omega HH806AU":
                 aw.qmc.device = 1
@@ -11752,14 +11777,14 @@ class DeviceAssignmentDLG(QDialog):
 class graphColorDlg(QDialog):
     def __init__(self, parent = None):
         super(graphColorDlg,self).__init__(parent)
-        self.setWindowTitle("Colors")
+        self.setWindowTitle(QApplication.translate("Form Caption","Colors", None, QApplication.UnicodeUTF8))
         frameStyle = QFrame.Sunken | QFrame.Panel
 
         #TAB1
         self.backgroundLabel = QLabel(aw.qmc.palette["background"])
         self.backgroundLabel.setPalette(QPalette(QColor(aw.qmc.palette["background"])))
         self.backgroundLabel.setAutoFillBackground(True)
-        self.backgroundButton = QPushButton("Background")
+        self.backgroundButton = QPushButton(QApplication.translate("Button","Background", None, QApplication.UnicodeUTF8))
         self.backgroundButton.setFocusPolicy(Qt.NoFocus)
         self.backgroundLabel.setFrameStyle(frameStyle)
         self.connect(self.backgroundButton, SIGNAL("clicked()"), lambda var=self.backgroundLabel,color="background": self.setColor("Background",var,color))
@@ -11768,7 +11793,7 @@ class graphColorDlg(QDialog):
         self.gridLabel =QLabel(aw.qmc.palette["grid"])
         self.gridLabel.setPalette(QPalette(QColor(aw.qmc.palette["grid"])))
         self.gridLabel.setAutoFillBackground(True)
-        self.gridButton = QPushButton("Grid")
+        self.gridButton = QPushButton(QApplication.translate("Button","Grid", None, QApplication.UnicodeUTF8))
         self.gridButton.setFocusPolicy(Qt.NoFocus)
         self.gridLabel.setFrameStyle(frameStyle)
         self.connect(self.gridButton, SIGNAL("clicked()"), lambda var=self.gridLabel, color= "grid": self.setColor("Grid",var,color))
@@ -11777,7 +11802,7 @@ class graphColorDlg(QDialog):
         self.titleLabel =QLabel(aw.qmc.palette["title"])
         self.titleLabel.setPalette(QPalette(QColor(aw.qmc.palette["title"])))
         self.titleLabel.setAutoFillBackground(True)
-        self.titleButton = QPushButton("Title")
+        self.titleButton = QPushButton(QApplication.translate("Button","Title", None, QApplication.UnicodeUTF8))
         self.titleButton.setFocusPolicy(Qt.NoFocus)
         self.titleLabel.setFrameStyle(frameStyle)
         self.connect(self.titleButton, SIGNAL("clicked()"), lambda var=self.titleLabel,color="title": self.setColor("Title",var,color))
@@ -11786,7 +11811,7 @@ class graphColorDlg(QDialog):
         self.yLabel =QLabel(aw.qmc.palette["ylabel"])
         self.yLabel.setPalette(QPalette(QColor(aw.qmc.palette["ylabel"])))
         self.yLabel.setAutoFillBackground(True)
-        self.yButton = QPushButton("Y Label")
+        self.yButton = QPushButton(QApplication.translate("Button","Y Label", None, QApplication.UnicodeUTF8))
         self.yButton.setFocusPolicy(Qt.NoFocus)
         self.yLabel.setFrameStyle(frameStyle)
         self.connect(self.yButton, SIGNAL("clicked()"), lambda var=self.yLabel,color="ylabel": self.setColor("Y Label",var,color))
@@ -11795,7 +11820,7 @@ class graphColorDlg(QDialog):
         self.xLabel =QLabel(aw.qmc.palette["xlabel"])
         self.xLabel.setPalette(QPalette(QColor(aw.qmc.palette["xlabel"])))
         self.xLabel.setAutoFillBackground(True)
-        self.xButton = QPushButton("X Label")
+        self.xButton = QPushButton(QApplication.translate("Button","X Label", None, QApplication.UnicodeUTF8))
         self.xButton.setFocusPolicy(Qt.NoFocus)
         self.xLabel.setFrameStyle(frameStyle)
         self.connect(self.xButton, SIGNAL("clicked()"), lambda var=self.xLabel,color="xlabel": self.setColor("X Label",var,color))
@@ -11804,7 +11829,7 @@ class graphColorDlg(QDialog):
         self.rect1Label =QLabel(aw.qmc.palette["rect1"])
         self.rect1Label.setPalette(QPalette(QColor(aw.qmc.palette["rect1"])))
         self.rect1Label.setAutoFillBackground(True)
-        self.rect1Button = QPushButton("Dry Phase")
+        self.rect1Button = QPushButton(QApplication.translate("Button","Dry Phase", None, QApplication.UnicodeUTF8))
         self.rect1Button.setFocusPolicy(Qt.NoFocus)
         self.rect1Label.setFrameStyle(frameStyle)
         self.connect(self.rect1Button, SIGNAL("clicked()"), lambda var=self.rect1Label,color="rect1": self.setColor("Dry Phase",var,color))
@@ -11813,7 +11838,7 @@ class graphColorDlg(QDialog):
         self.rect2Label =QLabel(aw.qmc.palette["rect2"])
         self.rect2Label.setPalette(QPalette(QColor(aw.qmc.palette["rect2"])))
         self.rect2Label.setAutoFillBackground(True)
-        self.rect2Button = QPushButton("Mid FC Phase")
+        self.rect2Button = QPushButton(QApplication.translate("Button","Mid FC Phase", None, QApplication.UnicodeUTF8))
         self.rect2Button.setFocusPolicy(Qt.NoFocus)
         self.rect2Label.setFrameStyle(frameStyle)
         self.connect(self.rect2Button, SIGNAL("clicked()"), lambda var=self.rect2Label,color="rect2": self.setColor("Mid FC Phase",var,color))
@@ -11822,7 +11847,7 @@ class graphColorDlg(QDialog):
         self.rect3Label =QLabel(aw.qmc.palette["rect3"])
         self.rect3Label.setPalette(QPalette(QColor(aw.qmc.palette["rect3"])))
         self.rect3Label.setAutoFillBackground(True)
-        self.rect3Button = QPushButton("Finish Phase")
+        self.rect3Button = QPushButton(QApplication.translate("Button","Finish Phase", None, QApplication.UnicodeUTF8))
         self.rect3Button.setFocusPolicy(Qt.NoFocus)
         self.rect3Label.setFrameStyle(frameStyle)
         self.connect(self.rect3Button, SIGNAL("clicked()"), lambda var=self.rect3Label,color="rect3": self.setColor("Finish Phase",var,color))
@@ -11831,7 +11856,7 @@ class graphColorDlg(QDialog):
         self.metLabel =QLabel(aw.qmc.palette["met"])
         self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["met"])))
         self.metLabel.setAutoFillBackground(True)
-        self.metButton = QPushButton("ET")
+        self.metButton = QPushButton(QApplication.translate("Button","ET", None, QApplication.UnicodeUTF8))
         self.metButton.setFocusPolicy(Qt.NoFocus)
         self.metLabel.setFrameStyle(frameStyle)
         self.connect(self.metButton, SIGNAL("clicked()"), lambda var=self.metLabel,color="met": self.setColor("ET",var,color))
@@ -11840,7 +11865,7 @@ class graphColorDlg(QDialog):
         self.btLabel =QLabel(aw.qmc.palette["bt"])
         self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
         self.btLabel.setAutoFillBackground(True)
-        self.btButton = QPushButton("BT")
+        self.btButton = QPushButton(QApplication.translate("Button","BT", None, QApplication.UnicodeUTF8))
         self.btButton.setFocusPolicy(Qt.NoFocus)
         self.btLabel.setFrameStyle(frameStyle)
         self.connect(self.btButton, SIGNAL("clicked()"), lambda var=self.btLabel,color="bt": self.setColor("BT",var,color))
@@ -11849,7 +11874,7 @@ class graphColorDlg(QDialog):
         self.deltametLabel =QLabel(aw.qmc.palette["deltamet"])
         self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltamet"])))
         self.deltametLabel.setAutoFillBackground(True)
-        self.deltametButton = QPushButton("DeltaET")
+        self.deltametButton = QPushButton(QApplication.translate("Button","DeltaET", None, QApplication.UnicodeUTF8))
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
         self.connect(self.deltametButton, SIGNAL("clicked()"), lambda var=self.deltametLabel,color="deltamet": self.setColor("DeltaET",var,color))
@@ -11858,7 +11883,7 @@ class graphColorDlg(QDialog):
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
         self.deltabtLabel.setAutoFillBackground(True)
-        self.deltabtButton = QPushButton("DeltaBT")
+        self.deltabtButton = QPushButton(QApplication.translate("Button","DeltaBT", None, QApplication.UnicodeUTF8))
         self.deltabtButton.setFocusPolicy(Qt.NoFocus)
         self.deltabtLabel.setFrameStyle(frameStyle)
         self.connect(self.deltabtButton, SIGNAL("clicked()"), lambda var=self.deltabtLabel,color="deltabt": self.setColor("DeltaBT",var,color))
@@ -11867,7 +11892,7 @@ class graphColorDlg(QDialog):
         self.markersLabel =QLabel(aw.qmc.palette["markers"])
         self.markersLabel.setPalette(QPalette(QColor(aw.qmc.palette["markers"])))
         self.markersLabel.setAutoFillBackground(True)
-        self.markersButton = QPushButton("Markers")
+        self.markersButton = QPushButton(QApplication.translate("Button","Markers", None, QApplication.UnicodeUTF8))
         self.markersButton.setFocusPolicy(Qt.NoFocus)
         self.markersLabel.setFrameStyle(frameStyle)
         self.connect(self.markersButton, SIGNAL("clicked()"), lambda var=self.markersLabel,color="markers": self.setColor("Markers",var,color))
@@ -11876,7 +11901,7 @@ class graphColorDlg(QDialog):
         self.textLabel =QLabel(aw.qmc.palette["text"])
         self.textLabel.setPalette(QPalette(QColor(aw.qmc.palette["text"])))
         self.textLabel.setAutoFillBackground(True)
-        self.textButton = QPushButton("Text")
+        self.textButton = QPushButton(QApplication.translate("Button","Text", None, QApplication.UnicodeUTF8))
         self.textButton.setFocusPolicy(Qt.NoFocus)
         self.textLabel.setFrameStyle(frameStyle)
         self.connect(self.textButton, SIGNAL("clicked()"), lambda var=self.textLabel,color="text": self.setColor("Text",var,color))
@@ -11884,7 +11909,7 @@ class graphColorDlg(QDialog):
         self.watermarksLabel =QLabel(aw.qmc.palette["watermarks"])
         self.watermarksLabel.setPalette(QPalette(QColor(aw.qmc.palette["watermarks"])))
         self.watermarksLabel.setAutoFillBackground(True)
-        self.watermarksButton = QPushButton("Watermarks")
+        self.watermarksButton = QPushButton(QApplication.translate("Button","Watermarks", None, QApplication.UnicodeUTF8))
         self.watermarksButton.setFocusPolicy(Qt.NoFocus)
         self.watermarksLabel.setFrameStyle(frameStyle)
         self.connect(self.watermarksButton, SIGNAL("clicked()"), lambda var=self.watermarksLabel,color="watermarks": self.setColor("Watermarks",var,color))
@@ -11892,19 +11917,19 @@ class graphColorDlg(QDialog):
         self.ClineLabel =QLabel(aw.qmc.palette["Cline"])
         self.ClineLabel.setPalette(QPalette(QColor(aw.qmc.palette["Cline"])))
         self.ClineLabel.setAutoFillBackground(True)
-        self.ClineButton = QPushButton("C Lines")
+        self.ClineButton = QPushButton(QApplication.translate("Button","C Lines", None, QApplication.UnicodeUTF8))
         self.ClineButton.setFocusPolicy(Qt.NoFocus)
         self.ClineLabel.setFrameStyle(frameStyle)
         self.connect(self.ClineButton, SIGNAL("clicked()"), lambda var=self.ClineLabel,color="Cline": self.setColor("C Lines",var,color))
 
-        okButton = QPushButton("OK")
+        okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))   
 
-        defaultsButton = QPushButton("Defaults")
+        defaultsButton = QPushButton(QApplication.translate("Button","Defaults", None, QApplication.UnicodeUTF8))
         defaultsButton.setFocusPolicy(Qt.NoFocus)
         self.connect(defaultsButton, SIGNAL("clicked()"),lambda x=1:self.recolor(x))   
         
-        greyButton = QPushButton("Grey")
+        greyButton = QPushButton(QApplication.translate("Button","Grey", None, QApplication.UnicodeUTF8))
         greyButton.setFocusPolicy(Qt.NoFocus)
         self.connect(greyButton, SIGNAL("clicked()"),lambda x=2:self.recolor(x))             
 
@@ -11916,7 +11941,15 @@ class graphColorDlg(QDialog):
         lcd5label = QLabel(QApplication.translate("Label", "Delta BT",None, QApplication.UnicodeUTF8))
         lcd6label = QLabel(QApplication.translate("Label", "SV",None, QApplication.UnicodeUTF8))
 
-        lcdcolors = ["","grey","darkGrey","slateGrey","lightGray","black","white","transparent"]
+        #How do we translate that...
+        lcdcolors = ["",
+                     grey,
+                     darkGrey,
+                     slateGrey,
+                     lightGray,
+                     black,
+                     white,
+                     transparent]
         self.lcd1colorComboBox =  QComboBox()
         self.lcd1colorComboBox.addItems(lcdcolors)
         self.connect(self.lcd1colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd1colorComboBox.currentText(),flag = 2,x=1:self.paintlcds(text,flag,x))
@@ -11941,7 +11974,7 @@ class graphColorDlg(QDialog):
         self.lcd6colorComboBox.addItems(lcdcolors)
         self.connect(self.lcd6colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text =self.lcd6colorComboBox.currentText(),flag = 2,x=6:self.paintlcds(text,flag,x))
 
-        lcd1backButton = QPushButton("Background")
+        lcd1backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
         self.connect(lcd1backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=1:self.paintlcds(text,flag,x))
         lcd2backButton = QPushButton("Background")
         self.connect(lcd2backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=2:self.paintlcds(text,flag,x))   
@@ -11954,7 +11987,7 @@ class graphColorDlg(QDialog):
         lcd6backButton = QPushButton("Background")
         self.connect(lcd6backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=6:self.paintlcds(text,flag,x))   
 
-        lcd1LEDButton = QPushButton("LED")
+        lcd1LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
         self.connect(lcd1LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=1:self.paintlcds(text,flag,x))
         lcd2LEDButton = QPushButton("LED")
         self.connect(lcd2LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=2:self.paintlcds(text,flag,x))   
@@ -12004,7 +12037,7 @@ class graphColorDlg(QDialog):
         self.connect(self.lcd6spinbox, SIGNAL("valueChanged(int)"),lambda val=self.lcd6spinbox.value(),lcd=6:self.setLED(val,lcd))
 
 
-        LCDdefaultButton = QPushButton("B/W")
+        LCDdefaultButton = QPushButton(QApplication.translate("Button","B/W",None, QApplication.UnicodeUTF8))
         self.connect(LCDdefaultButton, SIGNAL("clicked()"),self.setLCDdefaults)
         
         #LAYOUTS
