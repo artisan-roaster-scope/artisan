@@ -229,14 +229,18 @@ class tgraphcanvas(FigureCanvas):
                                    ]
 
         #extra devices
-        self.extradevices = []                                      #list with indexes for extra devices
-        self.extradevicecolor1 = []                                 #extra line 1 color. list with colors
-        self.extradevicecolor2 = []                                 #extra line 2 color. list with colors
-        self.extratemp1,self.extratemp2 = [],[]                        #extra temp1, temp2
-        self.extratemp1lines,self.extratemp2lines = [],[]
-        
+        self.extradevices = []                                      # list with indexes for extra devices
+        self.extratimex = []                                        # individual time for each extra device (more accurate). List of lists (2 dimension)
+        self.extradevicecolor1 = []                                 # extra line 1 color. list with colors. List of lists
+        self.extradevicecolor2 = []                                 # extra line 2 color. list with colors. List of lists
+        self.extratemp1,self.extratemp2 = [],[]                     # extra temp1, temp2. List of lists
+        self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing. List of lists
+        self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
+
+        #main matplot figure with plot(s) inside
         self.fig = Figure()
 
+        #figure back color
         if platf == 'Darwin':
             self.backcolor ="#EEEEEE"
         else:
@@ -498,7 +502,7 @@ class tgraphcanvas(FigureCanvas):
             self.designertemp2init = [380,300,390,395,410,412,420]
         self.BTsplinedegree = 3
         self.ETsplinedegree = 1
-        self.reproducedesigner = 0      #flag to add events that help reporduce the profile: 0 = none; 1 = sv; 2 = ramp
+        self.reproducedesigner = 0      #flag to add events to help reproduce (replay) the profile: 0 = none; 1 = sv; 2 = ramp
 
         #########################################################         wheel graph variables     #############################################################
         #create initial data for wheel
@@ -520,17 +524,17 @@ class tgraphcanvas(FigureCanvas):
             self.wheellabelparent.append(c)
             self.wheelcolor.append(co)
 
-        #store width of each circle as percentage(sum must always = 1)
-        self.wradii = [25,20,20,35]
-        #starting angle for each circle. 
+        #store radius of each circle as percentage(sum of all must at all times add up to 100.0%)
+        self.wradii = [25.,20.,20.,35.]
+        #starting angle for each circle (0-360). 
         self.startangle = [0,0,0,0]
         #text projection: 0 = Flat, 1 = perpendicular to center, 2 = radial from center
         self.projection = [0,1,1,2]
         self.wheeltextsize = [10,10,10,10]
-        self.wheelcolorpattern = 0 #pattern
-        self.wheeledge = .02  #overlaping edge
+        self.wheelcolorpattern = 0                  #pattern
+        self.wheeledge = .02                        #overlaping decorative edge
         self.wheellinewidth = 1
-        self.wheellinecolor = "black"
+        self.wheellinecolor = u"black"               #initial color
         
     #event handler from startTimer()
     def timerEvent(self, evt):
@@ -556,22 +560,23 @@ class tgraphcanvas(FigureCanvas):
 
                 self.timex.append(tx)
 
-                #######  UNDER TEST  #########   if using more than one device
+                #######  if using more than one device
                 ndevices = len(self.extradevices)
                 if ndevices:
-                    oldSP = aw.ser.SP
+                    oldSP = aw.ser.SP                       #save the serial port used by ET/BT device
                     for i in range(ndevices):
                         aw.ser.SP = aw.ser.extraSP[i]
-                        extratimetx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
+                        extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
+                        self.extratimex[i].append(extratx)
                         self.extratemp1[i].append(extrat1)
                         self.extratemp2[i].append(extrat2)
                         # update extra lines 
-                        self.extratemp1lines[i].set_data(self.timex, self.extratemp1[i])
-                        self.extratemp2lines[i].set_data(self.timex, self.extratemp2[i])
+                        self.extratemp1lines[i].set_data(self.extratimex, self.extratemp1[i])
+                        self.extratemp2lines[i].set_data(self.extratimex, self.extratemp2[i])
 
-                    #restore ET/BT serial comm port
+                    #restore ET/BT serial port
                     aw.ser.SP = oldSP
-                ################################################################
+                ##########
                     
                 #we need a minimum of two readings to calculate rate of change
                 if len(self.timex) > 2:
@@ -699,7 +704,7 @@ class tgraphcanvas(FigureCanvas):
         aw.soundpop()        
 
     def resetlines(self):
-        linecount = 2         #ET + BT
+        linecount = 2  + 2*len(self.extradevices)       #ET + BT + extradevices
         if self.DeltaETflag:  #delta ET
             linecount += 1
         if self.DeltaBTflag: #delta BT
@@ -1134,7 +1139,8 @@ class tgraphcanvas(FigureCanvas):
         self.setCursor(Qt.ArrowCursor)
 
         #extra devices
-        self.extratemp1,self.extratemp2 = [],[]                        #extra temp1, temp2
+        for i in range(len(self.extradevices)):
+            self.extratimex[i],self.extratemp1[i],self.extratemp2[i] = [],[],[]                       
 
         
     #Redraws data   
@@ -1184,18 +1190,14 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     jump -= 20
                     
-
         ##### ET,BT curves
         self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8))
         self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))
 
-        ##### Extra devices curves
-        self.extratemp1lines,self.extratemp2lines = [],[]
+        ##### Extra devices-curves
         for i in range(len(self.extradevices)):
-            labelA = "Extra %iA"%(i+1)
-            labelB = "Extra %iB"%(i+1)
-            self.extratemp1lines.append(self.ax.plot(self.timex, self.extratemp1[i],color="black",linewidth=2,label= labelA)[0])
-            self.extratemp2lines.append(self.ax.plot(self.timex, self.extratemp2[i],color="black",linewidth=2,label= labelB)[0])
+            self.extratemp1lines[i] = self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0]
+            self.extratemp2lines[i] = self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0]
 
         #check BACKGROUND flag
         if self.background:
@@ -1366,7 +1368,15 @@ class tgraphcanvas(FigureCanvas):
         if  self.DeltaBTflag:
             handles.append(self.l_delta2)
             labels.append(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8))
-                    
+
+        ndevices = len(self.extradevices)
+        if ndevices:
+            for i in range(ndevices):
+                handles.append(self.extratemp1lines[i])
+                handles.append(self.extratemp2lines[i])
+                labels.append(self.extraname1[i])
+                labels.append(self.extraname2[i])
+                
         #write legend
         self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
@@ -3590,7 +3600,7 @@ class ApplicationWindow(QMainWindow):
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
         # set window title
-        self.windowTitle = QApplication.translate("Application Title", "Artisan %1",None, QApplication.UnicodeUTF8).arg(str(__version__))
+        self.windowTitle = unicode(QApplication.translate("Application Title", "Artisan %1",None, QApplication.UnicodeUTF8).arg(str(__version__)))
         self.setWindowTitle(self.windowTitle)
         for i in range(self.MaxRecentFiles):
             self.recentFileActs.append(
@@ -5258,6 +5268,15 @@ class ApplicationWindow(QMainWindow):
             self.qmc.bag_humidity = profile["bag_humidity"]   
         else:
             self.qmc.bag_humidity = [0.,0.]
+        #extra devices    
+        if "extratimex" in profile:
+            self.qmc.extratimex = profile["extratimex"]            
+            self.qmc.extratemp1 = profile["extratemp1"]
+            self.qmc.extratemp2 = profile["extratemp2"]
+            self.qmc.extradevicecolor1 = profile["extradevicecolor1"]
+            self.qmc.extradevicecolor2 = profile["extradevicecolor2"]
+            
+            
         if "timeindex" in profile:
             self.qmc.timeindex = profile["timeindex"]
         else:
@@ -5284,7 +5303,6 @@ class ApplicationWindow(QMainWindow):
             times.append(startend[2])
             #convert to new profile
             self.qmc.timeindexupdate(times)
-            
             
     #used by filesave()
     #wrap values in unicode(.) if and only if those are of type string
@@ -5319,6 +5337,13 @@ class ApplicationWindow(QMainWindow):
         profile["xmax"] = self.qmc.endofx       
         profile["ambientTemp"] = self.qmc.ambientTemp
         profile["bag_humidity"] = self.qmc.bag_humidity
+        profile["extratimex"] = self.qmc.extratimex
+        profile["extratemp1"] = self.qmc.extratemp1
+        profile["extratemp2"] = self.qmc.extratemp2
+        profile["extradevicecolor1"] = self.qmc.extradevicecolor1
+        profile["extradevicecolor2"] = self.qmc.extradevicecolor2
+        
+
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -5464,7 +5489,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.sensitivity = settings.value("Sensitivity",self.qmc.sensitivity).toInt()[0]
             settings.endGroup()
             settings.beginGroup("HUD")
-            self.qmc.projectFlag = settings.value("Projection",self.qmc.projectFlag).toInt()[0]
+            self.qmc.projectFlag = settings.value("Projection",self.qmc.projectFlag).toBool()
             self.qmc.projectionmode = settings.value("ProjectionMode",self.qmc.projectionmode).toInt()[0]
             self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
@@ -5494,38 +5519,42 @@ class ApplicationWindow(QMainWindow):
             self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
 
             # Extra devices
-            settings.beginGroup("ExtraDev")
-            if settings.contains("extradevices"):
-                self.qmc.extradevices = map(lambda x:x.toInt()[0],settings.value("extradevices").toList())
-                self.qmc.extradevicecolor1 = settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList()
-                self.qmc.extradevicecolor2 = settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList()
-            settings.endGroup()
             settings.beginGroup("ExtraComm")
             if settings.contains("extracomport"):
-                self.ser.extracomport = settings.value("extracomport",self.ser.extracomport).toStringList()
+                self.ser.extracomport = list(settings.value("extracomport",self.ser.extracomport).toStringList())
                 self.ser.extrabaudrate = map(lambda x:x.toInt()[0],settings.value("extrabaudrate").toList())
                 self.ser.extrabytesize = map(lambda x:x.toInt()[0],settings.value("extrabytesize").toList())
-                self.ser.extraparity = settings.value("extraparity",self.ser.extraparity).toStringList()
+                self.ser.extraparity = list(settings.value("extraparity",self.ser.extraparity).toStringList())
                 self.ser.extrastopbits = map(lambda x:x.toInt()[0],settings.value("extrastopbits").toList())
                 self.ser.extratimeout = map(lambda x:x.toInt()[0],settings.value("extratimeout").toList())
             settings.endGroup() 
-
+            settings.beginGroup("ExtraDev")
+            if settings.contains("extradevices"):
+                self.qmc.extradevices = map(lambda x:x.toInt()[0],settings.value("extradevices").toList())
+                self.qmc.extradevicecolor1 = list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList())
+                self.qmc.extradevicecolor2 = list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())
+                self.qmc.extraname1 = list(settings.value("extraname1",self.qmc.extraname1).toStringList())
+                self.qmc.extraname2 = list(settings.value("extraname2",self.qmc.extraname2).toStringList())
+                #convert Qstrings to unicode
+                for i in range(len(self.qmc.extradevicecolor1)):
+                    self.qmc.extradevicecolor1[i] = unicode(self.qmc.extradevicecolor1[i])
+                    self.qmc.extradevicecolor2[i] = unicode(self.qmc.extradevicecolor2[i])
+                    self.ser.extracomport[i] = unicode(self.ser.extracomport[i])
+                    self.ser.extraparity[i] = unicode(self.ser.extraparity[i])
+                    self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
+                    self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
+            settings.endGroup()
+            #create empty containers
             for i in range(len(self.qmc.extradevices)):
                 self.qmc.extratemp1.append([])
-                self.qmc.extratemp2.append([])        
-                l = len(self.qmc.extradevices)-1
+                self.qmc.extratemp2.append([])
+                self.qmc.extratimex.append([])
                 #init empty lines
-                self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.timex, self.qmc.extratemp1[l],color="black",linewidth=2,label= "Extra1")[0])
-                self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.timex, self.qmc.extratemp2[l],color="black",linewidth=2,label= "Extra2")[0])
-                self.ser.extraSP.insert(i,serial.Serial())
-                #load serial ports
-                self.ser.extraSP[i].setPort(unicode(self.ser.extracomport[i]))
-                self.ser.extraSP[i].setBaudrate(self.ser.extrabaudrate[i])
-                self.ser.extraSP[i].setByteSize(self.ser.extrabytesize[i])
-                self.ser.extraSP[i].setParity(unicode(self.ser.extraparity[i]))
-                self.ser.extraSP[i].setStopbits(self.ser.extrastopbits[i])
-                self.ser.extraSP[i].setTimeout(self.ser.extratimeout[i])                                                                                                    
-
+                self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp1[i],color="black",linewidth=2,label= self.qmc.extraname1[i])[0])
+                self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp2[i],color="black",linewidth=2,label= self.qmc.extraname1[i])[0])
+                #create serial port objects
+                self.ser.extraSP.append(serial.Serial())
+                
             #update display
             self.qmc.redraw()
 
@@ -5646,6 +5675,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extradevices",self.qmc.extradevices)                                                                
             settings.setValue("extradevicecolor1",self.qmc.extradevicecolor1)                                                                
             settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
+            settings.setValue("extraname1",self.qmc.extraname1)
+            settings.setValue("extraname2",self.qmc.extraname2)
             settings.endGroup()
             #save extra serial comm ports settings
             settings.beginGroup("ExtraComm")
@@ -9773,7 +9804,7 @@ class serialport(object):
     
     def __init__(self):
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
-        self.comport = QApplication.translate("ComboBox","COM4",None, QApplication.UnicodeUTF8)
+        self.comport = u"COM4"      #NOTE: this string should not be translated. It is an argument for lib Pyserial
         self.baudrate = 9600
         self.bytesize = 8
         self.parity= 'O'
@@ -9789,8 +9820,8 @@ class serialport(object):
         self.HH506RAid = "X"
 
         #select PID type that controls the roaster. 
-        self.controlETpid = [0,1]        # [ 0 = FujiPXG 1= FujiPXR3, second number is unitID] Can be changed in PID menu. Reads/Controls ET
-        self.readBTpid = [1,2]           # [ 0 = FujiPXG 1= FujiPXR3, second number is unitID] Can be changed in PID menu. Reads BT
+        self.controlETpid = [0,1]        # [type 0 = FujiPXG 1= FujiPXR3, second number is unitID] Can be changed in device menu. Reads/Controls ET
+        self.readBTpid = [1,2]           # [type 0 = FujiPXG 1= FujiPXR3, second number is unitID] Can be changed in device menu. Reads BT
 
         #initial message flag for CENTER 309 meter
         self.CENTER309flag = 0
@@ -9798,13 +9829,13 @@ class serialport(object):
         #initial ambient temperature flag for ARDUINOTC4 meter
         self.arduinoAmbFlag = 0
 
-        #EXTRA COMM PORTS VARIABLES
-        self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
         #comm ports available after Scan
         self.commavailable = []
 
         #comm ports for extra devices
         self.extraSP = []
+        #EXTRA COMM PORTS VARIABLES
+        self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
         
     def openport(self):
         try:
@@ -9819,7 +9850,17 @@ class serialport(object):
             self.SP.setStopbits(self.stopbits)
             self.SP.setTimeout(self.timeout)
             #open port
-            self.SP.open()        
+            self.SP.open()
+
+            for i in range(len(self.extraSP)):
+                self.extraSP[i].close()
+                self.extraSP[i].setPort(unicode(self.extracomport[i]))
+                self.extraSP[i].setBaudrate(self.extrabaudrate[i])
+                self.extraSP[i].setByteSize(self.extrabytesize[i])
+                self.extraSP[i].setParity(unicode(self.extraparity[i]))
+                self.extraSP[i].setStopbits(self.extrastopbits[i])
+                self.extraSP[i].setTimeout(self.extratimeout[i])
+                self.extraSP[i].open()                
                
         except serial.SerialException,e:
             aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8))
@@ -10947,14 +10988,13 @@ class comportDlg(QDialog):
               
         self.setModal(True)
 
-        ##########################    TAB 1 WIDGETS
-        
+        ##########################    TAB 1 WIDGETS        
         comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.comportEdit = QComboBox()
         self.comportEdit.addItems([aw.ser.comport])
         self.comportEdit.setEditable(True)
         comportlabel.setBuddy(self.comportEdit)
-        
+
         baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
@@ -10999,14 +11039,13 @@ class comportDlg(QDialog):
 
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)
-        
+        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)        
 
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
         self.serialtable = QTableWidget()
         self.serialtable.setTabKeyNavigation(True)
         self.createserialTable()
-        
+
         #tab1 layout
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(scanButton)
@@ -11080,12 +11119,11 @@ class comportDlg(QDialog):
             self.serialtable.setShowGrid(True)
 
             for i in range(ndevices):
-                device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]])    #type identification of the device. Non editable
+                device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]-1])    #type identification of the device. Non editable
 
                 comportComboBox =  QComboBox()
-                comportComboBox.addItems(aw.ser.commavailable)
-                if aw.ser.extracomport[i] in aw.ser.commavailable:
-                    comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.ser.extracomport[i]))
+                comportComboBox.addItems(aw.ser.extracomport)
+                comportComboBox.setCurrentIndex(i)
 
                 baudComboBox =  QComboBox()
                 baudComboBox.addItems(self.bauds)
@@ -11143,26 +11181,20 @@ class comportDlg(QDialog):
             timeoutEdit = self.serialtable.cellWidget(i,6)
             aw.ser.extratimeout[i] = int(timeoutEdit.text())
 
+        #create serial ports for each extra device
         nserial = len(aw.ser.extraSP)
         if ndevices != nserial:
             aw.ser.extraSP = [serial.Serial()]*ndevices
 
+        #load the settings for the extra serial ports found
         for i in range(ndevices):
-            #load serial ports
             aw.ser.extraSP[i].setPort(unicode(aw.ser.extracomport[i]))
             aw.ser.extraSP[i].setBaudrate(aw.ser.extrabaudrate[i])
             aw.ser.extraSP[i].setByteSize(aw.ser.extrabytesize[i])
             aw.ser.extraSP[i].setParity(unicode(aw.ser.extraparity[i]))
             aw.ser.extraSP[i].setStopbits(aw.ser.extrastopbits[i])
             aw.ser.extraSP[i].setTimeout(aw.ser.extratimeout[i])
-
-        try:
-            for i in range(ndevices):
-               aw.ser.extraSP[i].open()
-
-        except serial.SerialException, e:
-            print e
-            
+           
     def accept(self):
         #validate serial parameter against input errors
         class comportError(Exception): pass
@@ -11179,6 +11211,7 @@ class comportDlg(QDialog):
         stopbits = unicode(self.stopbitsComboBox.currentText())
         timeout = unicode(self.timeoutEdit.text())
 
+        #save extra serial ports by reading the serial extra table
         self.saveserialtable()
         
         try:
@@ -11249,13 +11282,24 @@ class comportDlg(QDialog):
                         pass
         else:
             self.sendmessage(QApplication.translate("Message Area","Port scan on this platform not yet supported", None, QApplication.UnicodeUTF8))
-                                
+
+        #set comboBoxes                        
         self.comportEdit.clear()
         self.comportEdit.addItems(available)
         if len(available):
-            self.comportEdit.setCurrentIndex(len(available)-1)
+            if aw.ser.comport in available:
+                self.comportEdit.setCurrentIndex(available.index(aw.ser.comport))
+            else:    
+                self.comportEdit.setCurrentIndex(len(available)-1)
             aw.ser.commavailable = available[:]
-            self.createserialTable()
+            for i in range(len(aw.qmc.extradevices)):
+                comportComboBox =  self.serialtable.cellWidget(i,1)
+                comportComboBox.clear()
+                comportComboBox.addItems(aw.ser.commavailable)
+                if aw.ser.extracomport[i] in aw.ser.commavailable:
+                    comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.ser.extracomport[i]))
+                else:    
+                    comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)                
 
 #################################################################################            
 ##################   Device assignments DIALOG for reading temperature   ########
@@ -11411,11 +11455,8 @@ class DeviceAssignmentDLG(QDialog):
         ndevices = len(aw.qmc.extradevices)
         if ndevices:    
             self.devicetable.setRowCount(ndevices)
-            self.devicetable.setColumnCount(4)
-            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table","Delete",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table","Device type",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table","Color line 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table","Color line 2",None, QApplication.UnicodeUTF8)])
+            self.devicetable.setColumnCount(6)
+            self.devicetable.setHorizontalHeaderLabels(["Delete","Device type","Color line 1", "Color line 2","Label 1","Label 2"])
             self.devicetable.setAlternatingRowColors(True)
             self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -11429,7 +11470,6 @@ class DeviceAssignmentDLG(QDialog):
                 typeComboBox =  QComboBox()
                 typeComboBox.addItems(devices)
                 typeComboBox.setCurrentIndex(aw.qmc.extradevices[i])
-                self.connect(typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
 
                 color1Button = QPushButton(QApplication.translate("Button","Color 1",None, QApplication.UnicodeUTF8))
                 self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
@@ -11440,61 +11480,85 @@ class DeviceAssignmentDLG(QDialog):
                 delButton = QPushButton(QApplication.translate("Button","Del",None, QApplication.UnicodeUTF8))
                 self.connect(delButton, SIGNAL("clicked()"),lambda x = i: self.delextradevice(x))
 
+                name1edit = QLineEdit(unicode(aw.qmc.extraname1[i]))            
+                name2edit = QLineEdit(unicode(aw.qmc.extraname2[i]))
                 #add widgets to the table
                 self.devicetable.setCellWidget(i,0,delButton)              
                 self.devicetable.setCellWidget(i,1,typeComboBox)
                 self.devicetable.setCellWidget(i,2,color1Button)
                 self.devicetable.setCellWidget(i,3,color2Button)              
+                self.devicetable.setCellWidget(i,4,name1edit)              
+                self.devicetable.setCellWidget(i,5,name2edit)              
 
+    #adds extra device
     def adddevice(self):
         self.savedevicetable()
-        aw.qmc.extradevices.append(0)
-        aw.qmc.extradevicecolor1.append(u"black")
+        aw.qmc.extradevices.append(1)
+        aw.qmc.extradevicecolor1.append(u"black") #init color to black
         aw.qmc.extradevicecolor2.append(u"black")
-        self.createDeviceTable()
+        aw.qmc.extraname1.append("Extra 1")
+        aw.qmc.extraname2.append("Extra 2")     
 
+        #create new serial port (but not opened-connected)                                   
+        aw.ser.extraSP.append(serial.Serial()) 
         #add and init dummy serial port settings
         aw.ser.extracomport.append("COM1")
         aw.ser.extrabaudrate.append(9600)
         aw.ser.extrabytesize.append(8)
         aw.ser.extraparity.append("E")
         aw.ser.extrastopbits.append(1)
-        aw.ser.extratimeout.append(1) 
+        aw.ser.extratimeout.append(1)
 
+    	#add new line variables
+        aw.qmc.extratimex.append([])        
         aw.qmc.extratemp1.append([])
         aw.qmc.extratemp2.append([])
-        l = len(aw.qmc.extradevices)-1
-        aw.qmc.extratemp1lines.append(aw.qmc.ax.plot(aw.qmc.timex, aw.qmc.extratemp1[l],color="black",linewidth=2,label= "UNO")[0])
-        aw.qmc.extratemp2lines.append(aw.qmc.ax.plot(aw.qmc.timex, aw.qmc.extratemp2[l],color="black",linewidth=2,label= "UNO")[0])
-        #create new port                                    
-        aw.ser.extraSP.append(serial.Serial())                                        
-                                                
 
+        #add two extra lines
+        l = len(aw.qmc.extradevices)-1  #new line index
+        aw.qmc.extratemp1lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp1[l],color=aw.qmc.extradevicecolor1[l],linewidth=2,label= aw.qmc.extraname1[l])[0])
+        aw.qmc.extratemp2lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp2[l],color=aw.qmc.extradevicecolor2[l],linewidth=2,label= aw.qmc.extraname2[l])[0])
+    	
+        self.createDeviceTable()
+    	aw.qmc.redraw()
+                                                
     def delextradevice(self,x):
         aw.qmc.extradevices.pop(x)
         aw.qmc.extradevicecolor1.pop(x)
         aw.qmc.extradevicecolor2.pop(x)
-        self.createDeviceTable()
+        aw.qmc.extratimex.pop(x)
+        aw.qmc.extratemp1.pop(x)
+        aw.qmc.extratemp2.pop(x)
+        aw.qmc.extratemp1lines.pop(x)
+        aw.qmc.extratemp2lines.pop(x)
+        aw.qmc.extraname1.pop(x)
+        aw.qmc.extraname2.pop(x)
 
-        #serial port settings
+        #pop serial port settings
         aw.ser.extracomport.pop(x)
         aw.ser.extrabaudrate.pop(x)
         aw.ser.extrabytesize.pop(x)
         aw.ser.extraparity.pop(x)
         aw.ser.extrastopbits.pop(x)
-        aw.ser.extratimeout.pop(x) 
-
+        aw.ser.extratimeout.pop(x)
+        if aw.ser.extraSP[x].isOpen():
+            aw.ser.extraSP[x].close()
+        aw.ser.extraSP.pop(x)
+        
+        self.createDeviceTable()
+        aw.qmc.redraw()
+        
     def savedevicetable(self):
         for i in range(len(aw.qmc.extradevices)):
             typecombobox = self.devicetable.cellWidget(i,1)
+            name1edit = self.devicetable.cellWidget(i,4)
+            name2edit = self.devicetable.cellWidget(i,5)
             if typecombobox.currentIndex(): 
                 aw.qmc.extradevices[i] = typecombobox.currentIndex()
-                
-    def setextradevice(self,z,x):
-        typecombobox = self.devicetable.cellWidget(x,1)
-        if typecombobox.currentIndex(): 
-            aw.qmc.extradevices[x] = typecombobox.currentIndex()
-            
+            aw.qmc.extraname1[i] = unicode(name1edit.text())
+            aw.qmc.extraname2[i] = unicode(name2edit.text())
+        #update legend
+        aw.qmc.redraw()                       
     def setextracolor(self,l,i):
         #line 1
         if l == 1:
@@ -11760,6 +11824,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.label6.setVisible(False)
             aw.lcd6.setVisible(False)
 
+    	self.savedevicetable()
+    	
         aw.sendmessage(message)
         
         if self.nonpidButton.isChecked():
