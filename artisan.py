@@ -231,10 +231,10 @@ class tgraphcanvas(FigureCanvas):
         #extra devices
         self.extradevices = []                                      # list with indexes for extra devices
         self.extratimex = []                                        # individual time for each extra device (more accurate). List of lists (2 dimension)
-        self.extradevicecolor1 = []                                 # extra line 1 color. list with colors. List of lists
-        self.extradevicecolor2 = []                                 # extra line 2 color. list with colors. List of lists
+        self.extradevicecolor1 = []                                 # extra line 1 color. list with colors. 
+        self.extradevicecolor2 = []                                 # extra line 2 color. list with colors.
         self.extratemp1,self.extratemp2 = [],[]                     # extra temp1, temp2. List of lists
-        self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing. List of lists
+        self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
 
         #main matplot figure with plot(s) inside
@@ -571,8 +571,8 @@ class tgraphcanvas(FigureCanvas):
                         self.extratemp1[i].append(extrat1)
                         self.extratemp2[i].append(extrat2)
                         # update extra lines 
-                        self.extratemp1lines[i].set_data(self.extratimex, self.extratemp1[i])
-                        self.extratemp2lines[i].set_data(self.extratimex, self.extratemp2[i])
+                        self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
+                        self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
 
                     #restore ET/BT serial port
                     aw.ser.SP = oldSP
