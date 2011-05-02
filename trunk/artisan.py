@@ -384,7 +384,9 @@ class tgraphcanvas(FigureCanvas):
 
         #Temperature Alarms lists. Data is writen in  alarmDlg 
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
-        self.alarmflag = []    # 0 = OFF; 1 = ON flags 
+        self.alarmflag = []    # 0 = OFF; 1 = ON flags
+        # alarmstate is set to 'not triggered' on reset()
+        self.alarmstate = []   # 1=triggered, 0=not triggered. Needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
         self.alarmsource = []   # 0 = ET , 1= BT
         self.alarmtemperature = []  # set temperature number (example 500)
         self.alarmaction = []       # 0 = open a window; 1 = call program with a filepath equal to alarmstring
@@ -559,46 +561,27 @@ class tgraphcanvas(FigureCanvas):
                     self.temp1.append(t1)
 
                 self.timex.append(tx)
-
-                #######  if using more than one device
-                ndevices = len(self.extradevices)
-                if ndevices:
-                    oldSP = aw.ser.SP                       #save the serial port used by ET/BT device
-                    for i in range(ndevices):
-                        aw.ser.SP = aw.ser.extraSP[i]
-                        extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
-                        self.extratimex[i].append(extratx)
-                        self.extratemp1[i].append(extrat1)
-                        self.extratemp2[i].append(extrat2)
-                        # update extra lines 
-                        self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
-                        self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-
-                    #restore ET/BT serial port
-                    aw.ser.SP = oldSP
-                ##########
+                # update lines data using the lists with new data
+                self.l_temp1.set_data(self.timex, self.temp1)
+                self.l_temp2.set_data(self.timex, self.temp2)
                     
                 #we need a minimum of two readings to calculate rate of change
                 if len(self.timex) > 2:
                     timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
                     #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
-                    self.rateofchange1 = (self.temp1[-1] - self.temp1[-2]) / timed  #delta ET (degress / second)
-                    self.rateofchange2 = (self.temp2[-1] - self.temp2[-2]) / timed  #delta  BT (degress / second)
-                    rateofchange1plot = 100 + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 100
-                    rateofchange2plot = 50 + self.sensitivity*self.rateofchange2    #lift to plot on the grpah at Temp  = 50
+                    self.rateofchange1 = (self.temp1[-1] - self.temp1[-2])/timed  #delta ET (degress / second)
+                    self.rateofchange2 = (self.temp2[-1] - self.temp2[-2])/timed  #delta  BT (degress / second)
+                    rateofchange1plot = 100. + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 100
+                    rateofchange2plot = 50. + self.sensitivity*self.rateofchange2    #lift to plot on the grpah at Temp  = 50
                 else:
                     self.rateofchange1 = 100.
                     self.rateofchange2 = 50.
-                    rateofchange1plot = 0
-                    rateofchange2plot = 0
+                    rateofchange1plot = 0.
+                    rateofchange2plot = 0.
                 # append new data to the rateofchange
                 self.delta1.append(rateofchange1plot)
                 self.delta2.append(rateofchange2plot)
                             
-                # update lines data using the lists with new data
-                self.l_temp1.set_data(self.timex, self.temp1)
-                self.l_temp2.set_data(self.timex, self.temp2)
-
                 if self.DeltaETflag:
                     self.l_delta1.set_data(self.timex, self.delta1)
                 if self.DeltaBTflag:
@@ -628,11 +611,9 @@ class tgraphcanvas(FigureCanvas):
                     
                 aw.lcd2.display(t1)                               # MET
                 aw.lcd3.display(t2)                               # BT
-                aw.lcd4.display(int(round(self.rateofchange1*60)))       # rate of change MET (degress per minute)
-                aw.lcd5.display(int(round(self.rateofchange2*60)))       # rate of change BT (degrees per minute)
-                     
-                self.fig.canvas.draw()
-                
+                aw.lcd4.display("%.1f"%(self.rateofchange1*60.))       # rate of change MET (degress per minute)
+                aw.lcd5.display("%.1f"%(self.rateofchange2*60.))       # rate of change BT (degrees per minute)
+                                     
                 if self.projectFlag:
                     self.viewProjection()
                 if self.HUDflag:
@@ -675,8 +656,28 @@ class tgraphcanvas(FigureCanvas):
                 
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
-                
-                self.fig.canvas.draw()
+
+
+            #######  if using more than one device
+            ndevices = len(self.extradevices)
+            if ndevices:
+                oldSP = aw.ser.SP                       #save the serial port used by ET/BT device
+                for i in range(ndevices):
+                    aw.ser.SP = aw.ser.extraSP[i]
+                    extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
+                    self.extratimex[i].append(extratx)
+                    self.extratemp1[i].append(extrat1)
+                    self.extratemp2[i].append(extrat2)
+                    # update extra lines 
+                    self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
+                    self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
+
+                #restore ET/BT serial port
+                aw.ser.SP = oldSP
+            ##########
+
+            #update screen                
+            self.fig.canvas.draw()
 
     def toggleHUD(self):
         #OFF
@@ -716,7 +717,8 @@ class tgraphcanvas(FigureCanvas):
 
     def checkalarms(self):
         for i in range(len(self.alarmflag)):
-            if self.alarmflag[i] and self.timeindex[self.alarmtime[i]]:    
+            #if alarm on, and not triggered, and time is after set time:
+            if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
                 if self.alarmsource[i] == 0:                        #check ET
                     if self.temp1[-1] > self.alarmtemperature[i]:
                         self.setalarm(i)
@@ -726,10 +728,10 @@ class tgraphcanvas(FigureCanvas):
 
     def setalarm(self,alarmnumber):
         if self.alarmaction[alarmnumber] == 0:
-            self.alarmflag[alarmnumber] = 0    #turn off flag as it has been read
+            self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
             QMessageBox.information(self,QApplication.translate("MessageBox", "Alarm notice",None, QApplication.UnicodeUTF8),self.alarmstrings[alarmnumber])
         elif self.alarmaction[alarmnumber] == 1:
-            self.alarmflag[alarmnumber] = 0
+            self.alarmstate[alarmnumber] = 1
             try:
                 #self.alarmstrings[alarmnumber] = "filepath"
                 os.startfile(unicode(self.alarmstrings[alarmnumber]))
@@ -866,11 +868,17 @@ class tgraphcanvas(FigureCanvas):
     def fujitemperature(self):
         # get the temperature for ET. RS485 unit ID (1)
         t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
-        #get time of each temperature reading in seconds from start; .elapsed() returns miliseconds
-        tx = self.timeclock.elapsed()/1000.         
-        # get the temperature for BT. RS485 unit ID (2)
-        t2 = aw.pid.gettemperature(2)/10.
-        #read and update SV LCD
+        #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
+        tx = self.timeclock.elapsed()/1000.
+
+        #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None)
+        if aw.ser.readBTpid[0] != 2:                    
+            # get the temperature for BT. RS485 unit ID (2)
+            t2 = aw.pid.gettemperature(2)/10.
+        else:
+            t2 = 0.
+
+        #read and update ET SV LCD
         aw.pid.readcurrentsv()
                
         return tx,t2,t1
@@ -1140,7 +1148,10 @@ class tgraphcanvas(FigureCanvas):
 
         #extra devices
         for i in range(len(self.extradevices)):
-            self.extratimex[i],self.extratemp1[i],self.extratemp2[i] = [],[],[]                       
+            self.extratimex[i],self.extratemp1[i],self.extratemp2[i] = [],[],[]
+
+        #reset alarms that have been triggered
+        self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
 
         
     #Redraws data   
@@ -5465,6 +5476,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.alarmtemperature = map(lambda x:x.toInt()[0],settings.value("alarmtemperature").toList())
                 self.qmc.alarmaction = map(lambda x:x.toInt()[0],settings.value("alarmaction").toList())
                 self.qmc.alarmstrings = list(settings.value("alarmstrings",self.qmc.alarmstrings).toStringList())
+                self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)
             settings.endGroup()
 
             #restore pid settings
@@ -9821,7 +9833,7 @@ class serialport(object):
 
         #select PID type that controls the roaster. 
         self.controlETpid = [0,1]        # [type 0 = FujiPXG 1= FujiPXR3, second number is unitID] Can be changed in device menu. Reads/Controls ET
-        self.readBTpid = [1,2]           # [type 0 = FujiPXG 1= FujiPXR3, second number is unitID] Can be changed in device menu. Reads BT
+        self.readBTpid = [1,2]           # [type 0 = FujiPXG 1= FujiPXR3 2 = None, second number is unitID] Can be changed in device menu. Reads BT
 
         #initial message flag for CENTER 309 meter
         self.CENTER309flag = 0
@@ -11337,7 +11349,8 @@ class DeviceAssignmentDLG(QDialog):
         self.btpidtypeComboBox = QComboBox()
         self.btpidunitidComboBox = QComboBox()
         self.btpidtypeComboBox.addItems([QApplication.translate("ComboBox","Fuji PXG",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Fuji PXR",None, QApplication.UnicodeUTF8)])
+                                         QApplication.translate("ComboBox","Fuji PXR",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8)])
         self.btpidunitidComboBox.addItems(["2","1"])
 
         #check previous pid settings for radio button
@@ -11353,14 +11366,9 @@ class DeviceAssignmentDLG(QDialog):
                 pass
             self.devicetypeComboBox.setCurrentIndex(selected_device_index)           
                 
-        if aw.ser.controlETpid[0] == 0 :       # control is PXG4
-            self.controlpidtypeComboBox.setCurrentIndex(0)
-        else:
-            self.controlpidtypeComboBox.setCurrentIndex(1)
-        if aw.ser.readBTpid[0] == 0:
-            self.btpidtypeComboBox.setCurrentIndex(0)
-        else:
-            self.btpidtypeComboBox.setCurrentIndex(1)
+        self.controlpidtypeComboBox.setCurrentIndex(aw.ser.controlETpid[0])
+        self.btpidtypeComboBox.setCurrentIndex(aw.ser.readBTpid[0])
+
         if aw.ser.controlETpid[1] == 1 :       # control is PXG4
             self.controlpidunitidComboBox.setCurrentIndex(0)
         else:
@@ -11593,6 +11601,9 @@ class DeviceAssignmentDLG(QDialog):
             elif str(self.btpidtypeComboBox.currentText()) == "Fuji PXR":
                 aw.ser.readBTpid[0] = 1
                 str2 = "Fuji PXR"
+            elif str(self.btpidtypeComboBox.currentText()) == "None":
+                aw.ser.readBTpid[0] = 2
+                str2 = "None"            
             aw.ser.readBTpid[1] =  int(str(self.btpidunitidComboBox.currentText()))
 
             aw.qmc.device = 0
@@ -13058,6 +13069,8 @@ class AlarmDlg(QDialog):
         aw.qmc.alarmaction.append(0)
         aw.qmc.alarmstrings.append("Enter description")
         self.createalarmtable()
+
+        aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)   # 0 = not triggered
         
     def deletealarm(self):        
         nalarms = len(aw.qmc.alarmflag)
@@ -13081,6 +13094,9 @@ class AlarmDlg(QDialog):
                 aw.qmc.alarmaction.pop()
                 aw.qmc.alarmstrings.pop()
             self.createalarmtable()
+
+            aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
+
         if not len(aw.qmc.alarmflag):
             if self.alarmtable.rowCount():
                 self.alarmtable.setRowCount(0)
@@ -13104,6 +13120,9 @@ class AlarmDlg(QDialog):
             aw.qmc.alarmaction[i] = int(unicode(action.currentIndex()))
             description = self.alarmtable.cellWidget(i,5)
             aw.qmc.alarmstrings[i] = unicode(description.text())
+
+            aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
+
                
     def createalarmtable(self):
         self.alarmtable.clear()        
