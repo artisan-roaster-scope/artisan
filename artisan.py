@@ -74,6 +74,7 @@ import numpy
 import array
 import codecs
 import struct
+import copy
 from scipy import fft
 from scipy import interpolate as inter
 
@@ -198,7 +199,8 @@ class tgraphcanvas(FigureCanvas):
                        "Omega HH309",
                        "NONE",
                        "ArduinoTC4",
-                       "TE VA18B"
+                       "TE VA18B",
+                       "+309_34" 
                        ]
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
@@ -225,7 +227,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.HH309,
                                    self.NONE,
                                    self.ARDUINOTC4,
-                                   self.TEVA18B
+                                   self.TEVA18B,
+                                   self.CENTER309_34
                                    ]
 
         #extra devices
@@ -661,8 +664,9 @@ class tgraphcanvas(FigureCanvas):
             #######  if using more than one device
             ndevices = len(self.extradevices)
             if ndevices:
-                oldSP = aw.ser.SP                       #save the serial port used by ET/BT device
+                oldSP = aw.ser.SP                                  # save the serial port used by ET/BT device
                 for i in range(ndevices):
+                    oldsett = aw.ser.extraSP[i].getSettingsDict()  # need pyserial2.5 .getSettingsDict()  .applySettingsDict()
                     aw.ser.SP = aw.ser.extraSP[i]
                     extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
                     self.extratimex[i].append(extratx)
@@ -671,13 +675,14 @@ class tgraphcanvas(FigureCanvas):
                     # update extra lines 
                     self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
                     self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-
+                    aw.ser.extraSP[i].applySettingsDict(oldsett)
                 #restore ET/BT serial port
                 aw.ser.SP = oldSP
             ##########
 
             #update screen                
             self.fig.canvas.draw()
+
 
     def toggleHUD(self):
         #OFF
@@ -917,6 +922,14 @@ class tgraphcanvas(FigureCanvas):
          tx = self.timeclock.elapsed()/1000.
 
          return tx,t2,t1         
+
+    def CENTER309_34(self):
+         #return saved readings
+         t2,t1 = aw.ser.extra309T3, aw.ser.extra309T4
+         tx = self.timeclock.elapsed()/1000.
+
+         return tx,t2,t1   
+
 
     def CENTER306(self):
 
@@ -2903,7 +2916,7 @@ class tgraphcanvas(FigureCanvas):
         aw.messagelabel.setStyleSheet("background-color:'red';")
         time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
         #keep a max of 500 errors
-        if self.errorlog > 499:
+        if len(self.errorlog) > 499:
             self.errorlog = self.errorlog[1:]
         self.errorlog.append(time + " " + error)
         aw.sendmessage(error)
@@ -9848,6 +9861,10 @@ class serialport(object):
         self.extraSP = []
         #EXTRA COMM PORTS VARIABLES
         self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
+
+        #extra T3 and T4 for center 309
+        self.extra309T3 = 0.
+        self.extra309T4 = 0.
         
     def openport(self):
         try:
@@ -9875,7 +9892,17 @@ class serialport(object):
                 self.extraSP[i].open()                
                
         except serial.SerialException,e:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8))
+            error = QApplication.translate("ErrorMessage","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
+
+    def closeports(self):
+        self.SP.close()
+        for i in range(len(self.extraSP)):
+            self.extraSP[i].close()        
             
     def closeEvent(self):
         try:        
@@ -9931,7 +9958,12 @@ class serialport(object):
                 return u"0"                                    
                 
         except serial.SerialException,e:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8))
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("ErrorMessage","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8)
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
             return "0"
 
      #t2 and t1 from Omega HH806 or HH802 meter 
@@ -9969,7 +10001,12 @@ class serialport(object):
                     return -1,-1                                    
                                    
         except serial.SerialException, e:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.HH806AUtemperature() ",None, QApplication.UnicodeUTF8))
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("ErrorMessage","Serial Exception: ser.HH806AUtemperature() ",None, QApplication.UnicodeUTF8)
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10014,7 +10051,12 @@ class serialport(object):
                     return -1,-1 
                 
         except serial.SerialException, e:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.HH506RAtemperature() ",None, QApplication.UnicodeUTF8))
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("ErrorMessage","Serial Exception: ser.HH506RAtemperature() ",None, QApplication.UnicodeUTF8)
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10044,7 +10086,12 @@ class serialport(object):
                     aw.qmc.adderror(QApplication.translate("ErrorMessage","HH506RAGetID: %1 bytes received but 5 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
                     
         except serial.SerialException, e:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.HH506RAGetID()",None, QApplication.UnicodeUTF8))
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("ErrorMessage","Serial Exception: ser.HH506RAGetID()",None, QApplication.UnicodeUTF8)
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
 
     def CENTER306temperature(self):
         try:
@@ -10095,8 +10142,12 @@ class serialport(object):
                 
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("ErrorMessage","CENTER306temperature(): %1 bytes received but 10 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))
-                   
+                    error  = QApplication.translate("ErrorMessage","CENTER306temperature(): %1 bytes received but 10 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+                    #keep a max of 500 errors
+                    if len(aw.qmc.errorlog) > 499:
+                        aw.qmc.errorlog = aw.qmc.errorlog[1:]
+                    aw.qmc.errorlog.append(time + " " + error)                   
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -10108,7 +10159,12 @@ class serialport(object):
                     return -1,-1 
                      
         except serial.SerialException, e:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8))
+            error  = QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8)
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10119,7 +10175,7 @@ class serialport(object):
         if dialogx.exec_():
             ET = int(dialogx.etEdit.text())
             BT = int(dialogx.btEdit.text())
-            aw.lcd2.display(ET)                               # MET
+            aw.lcd2.display(ET)                               # ET
             aw.lcd3.display(BT)
             return ET,BT
         else:
@@ -10174,7 +10230,12 @@ class serialport(object):
 
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("ErrorMessage","CENTER303temperature(): %i bytes received but 8 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))             
+                    error = QApplication.translate("ErrorMessage","CENTER303temperature(): %i bytes received but 8 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+                    #keep a max of 500 errors
+                    if len(aw.qmc.errorlog) > 499:
+                        aw.qmc.errorlog = aw.qmc.errorlog[1:]
+                    aw.qmc.errorlog.append(time + " " + error)
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -10186,7 +10247,12 @@ class serialport(object):
                     return -1,-1 
             
         except serial.SerialException, e:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER303temperature()",None, QApplication.UnicodeUTF8))
+            error = QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER303temperature()",None, QApplication.UnicodeUTF8)
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10231,20 +10297,9 @@ class serialport(object):
                 if len(r) == 45:
                     T1 = int(binascii.hexlify(r[7] + r[8]),16)/10.
                     T2 = int(binascii.hexlify(r[9] + r[10]),16)/10.
-                    
-                    #Display initial message to check T1 and T2 connectivity
-                    if not self.CENTER309flag:
-                        Tcheck = int(binascii.hexlify(r[43]),16)
-                        if Tcheck != 12:
-                            if T1 < 200 and T2 < 200:
-                                aw.sendmessage(QApplication.translate("Message Area","Please connect T1 & T2", None, QApplication.UnicodeUTF8))
-                            else:
-                                #don't display any message
-                                self.CENTER309flag = 1
-                        elif Tcheck ==12 and T1 < 200 and T2 < 200:
-                            aw.sendmessage(QApplication.translate("Message Area","T1 & T2 connected", None, QApplication.UnicodeUTF8))
-                            self.CENTER309flag = 1
-                                               
+                    self.extra309T3 = int(binascii.hexlify(r[11] + r[12]),16)/10.
+                    self.extra309T4 = int(binascii.hexlify(r[13] + r[14]),16)/10.
+                                                                   
                     return T1,T2
                 
                 else:
@@ -10261,7 +10316,12 @@ class serialport(object):
                         return -1,-1 
             
         except serial.SerialException, e:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER309temperature() ",None, QApplication.UnicodeUTF8))
+            error  = QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER309temperature() ",None, QApplication.UnicodeUTF8)
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10306,7 +10366,12 @@ class serialport(object):
                 return t1, t2
 
         except serial.SerialException, e:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8))
+            error = QApplication.translate("ErrorMessage","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10500,14 +10565,24 @@ class serialport(object):
                 raise ValueError
 
         except ValueError:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Value Error: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8))
+            error  = QApplication.translate("ErrorMessage","Value Error: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8)
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1 
         
         except serial.SerialException:
-            aw.qmc.adderror(QApplication.translate("ErrorMessage","Serial Exception: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8))
+            error  = QApplication.translate("ErrorMessage","Serial Exception: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8)
+            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(time + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10923,9 +10998,10 @@ class designerconfigDlg(QDialog):
 class nonedevDlg(QDialog):
     def __init__(self, parent = None):
         super(nonedevDlg,self).__init__(parent)
-       
         self.setWindowTitle(QApplication.translate("Form Caption","Manual Temperature Logger",None, QApplication.UnicodeUTF8))
 
+        self.closeserialports()
+        
         if len(aw.qmc.timex):
             if aw.qmc.manuallogETflag:
                 etval = str(int(aw.qmc.temp1[-1]))
@@ -11252,6 +11328,8 @@ class comportDlg(QDialog):
 
 
     def scanforport(self):
+        aw.ser.closeports()
+        
         available = []      
         if platf in ('Windows', 'Microsoft'):
             #scans serial ports in Windows computer
@@ -11312,6 +11390,13 @@ class comportDlg(QDialog):
                     comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.ser.extracomport[i]))
                 else:    
                     comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)                
+
+    def closeserialports(self):
+        if aw.ser.SP.isOpen():
+            aw.ser.SP.close()
+        for i in range(len(aw.ser.extraSP)):
+            if aw.ser.extraSP[i].isOpen():
+               aw.ser.extraSP[i].close() 
 
 #################################################################################            
 ##################   Device assignments DIALOG for reading temperature   ########
@@ -11526,9 +11611,9 @@ class DeviceAssignmentDLG(QDialog):
         l = len(aw.qmc.extradevices)-1  #new line index
         aw.qmc.extratemp1lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp1[l],color=aw.qmc.extradevicecolor1[l],linewidth=2,label= aw.qmc.extraname1[l])[0])
         aw.qmc.extratemp2lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp2[l],color=aw.qmc.extradevicecolor2[l],linewidth=2,label= aw.qmc.extraname2[l])[0])
-    	
+        
         self.createDeviceTable()
-    	aw.qmc.redraw()
+        aw.qmc.redraw()
                                                 
     def delextradevice(self,x):
         aw.qmc.extradevices.pop(x)
@@ -11824,7 +11909,17 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.stopbits = 1
                 aw.ser.timeout=2
                 message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
-                
+
+            elif meter == "+309_34":
+                aw.qmc.device = 21
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
             aw.button_13.setVisible(False)
@@ -11835,8 +11930,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.label6.setVisible(False)
             aw.lcd6.setVisible(False)
 
-    	self.savedevicetable()
-    	
+        self.savedevicetable()
+        
         aw.sendmessage(message)
         
         if self.nonpidButton.isChecked():
