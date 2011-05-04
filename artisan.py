@@ -240,6 +240,9 @@ class tgraphcanvas(FigureCanvas):
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
 
+        #holds the power % ducty cycle of PIDs for plotting    	
+    	self.dutycycle = []
+
         #main matplot figure with plot(s) inside
         self.fig = Figure()
 
@@ -466,25 +469,20 @@ class tgraphcanvas(FigureCanvas):
     
         self.timeclock = QTime()
 
-        ############################    TRIGGER  TIMER       ##################################
-        # start a Qtimer object (Qt) with default delay (self.delay 5000 millisecs). This calls event handler timerEvent() on every delay.
-        # do not confuse this timer with self.timeclock (above), which is used to log clock time and put it in the LCD.
-        # This timer just triggers timerEvent at every self.delay (ie. reads temperature at every delay, updates graph, etc).
+        ############################    TRIGGER  TIMERS       ##################################
+        # start a Qtimer object (Qt) with default delay (self.delay 5000 millisecs). 
+        # do not confuse this timer with self.timeclock (above), which is used to log clock time
         
-        self.timerid = self.startTimer(self.delay)
+        self.timer = QTimer()
+        self.timer.setInterval(self.delay) 
+        self.connect(self.timer,SIGNAL("timeout()"),self.sample)
 
-        # DESCRIPTION of TRIGGER TIMER
-        # Python26/Lib/site-packages/PyQt4/doc/html/qobject.html#startTimer
-        # int QObject.startTimer (self, int interval)
-        # Starts a timer and returns a timer identifier, or returns zero if it could not start a timer.
-        # A timer event will occur every interval milliseconds until killTimer() is called. If interval is 0,
-        # then the timer event occurs once every time there are no more window system events to process.
+        self.LCDtimer = QTimer()
+        self.LCDtimer.setInterval(1000)  #miliseconds
+        self.connect(self.LCDtimer,SIGNAL("timeout()"),self.updateLCDtime)
         
-        # The virtual timerEvent() function is called with the QTimerEvent event parameter class when a timer
-        # event occurs. Reimplement this function to get timer events. If multiple timers are running, the QTimerEvent.timerId()
-        # can be used to find out which timer was activated.
-
-
+        self.seconds = 0.    #helps make time in LCD update more even
+        
         ########################################################     Designer variables       ##############################################################
         self.designerflag = False
         self.designerconnections = [0,0,0,0]   #mouse event ids
@@ -541,8 +539,8 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color
         
-    #event handler from startTimer()
-    def timerEvent(self, evt):
+    #sample devices at interval self.delay miliseconds
+    def sample(self):
         if self.flagon:
             #if using a meter (thermocouple device)
             if self.device != 18:
@@ -595,27 +593,11 @@ class tgraphcanvas(FigureCanvas):
                     self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
                     self.ax.set_xlim(self.startofx,self.endofx)
                     self.xaxistosm()
-
-                #update LCDs
-                if self.flagclock:
-                    if self.timeindex[0] != -1:
-                        ts = tx - self.timex[self.timeindex[0]]
-                    else:
-                        ts = tx 
-                    st2 = self.stringfromseconds(ts)
-                    timelcd = QString(st2)
-                    aw.lcd1.display(timelcd)
-
-                else:
-                    ts = tx
-                    st2 = self.stringfromseconds(ts)
-                    timelcd = QString(st2)
-                    aw.lcd1.display(timelcd)                
-                    
-                aw.lcd2.display(t1)                               # MET
-                aw.lcd3.display(t2)                               # BT
-                aw.lcd4.display("%.1f"%(self.rateofchange1*60.))       # rate of change MET (degress per minute)
-                aw.lcd5.display("%.1f"%(self.rateofchange2*60.))       # rate of change BT (degrees per minute)
+                   
+                aw.lcd2.display(t1)                                     # ET
+                aw.lcd3.display(t2)                                     # BT
+                aw.lcd4.display("%.1f"%(self.rateofchange1*60.))        # rate of change MET (degress per minute)
+                aw.lcd5.display("%.1f"%(self.rateofchange2*60.))        # rate of change BT (degrees per minute)
                                      
                 if self.projectFlag:
                     self.viewProjection()
@@ -628,25 +610,7 @@ class tgraphcanvas(FigureCanvas):
                     
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
-            else:
-                tx = self.timeclock.elapsed()/1000.
-                
-                #update LCDs
-                if self.flagclock:
-                    if self.timeindex[0] != -1:
-                        ts = tx - self.timex[self.timeindex[0]]
-                    else:
-                        ts = tx
-                    st2 = self.stringfromseconds(ts)
-                    timelcd = QString(st2)
-                    aw.lcd1.display(timelcd)
-
-                else:
-                    ts = tx
-                    st2 = self.stringfromseconds(ts)
-                    timelcd = QString(st2)
-                    aw.lcd1.display(timelcd)
-                    
+            else:                    
                 #readjust xlimit of plot if needed
                 if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
                     self.endofx = int(tx + 180)         # increase x limit by 3 minutes (180)
@@ -659,7 +623,6 @@ class tgraphcanvas(FigureCanvas):
                 
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
-
 
             #######  if using more than one device
             ndevices = len(self.extradevices)
@@ -679,11 +642,23 @@ class tgraphcanvas(FigureCanvas):
                 #restore ET/BT serial port
                 aw.ser.SP = oldSP
             ##########
+                
+                
 
             #update screen                
             self.fig.canvas.draw()
 
-
+    def updateLCDtime(self):
+        tx = self.timeclock.elapsed()/1000.
+        #avoid quick uneven time updades 
+        if  tx - self.seconds > .8: 
+            if self.timeindex[0] != -1:
+                ts = tx - self.timex[self.timeindex[0]]
+            else:
+                ts = tx 
+            aw.lcd1.display(QString(self.stringfromseconds(round(ts))))
+            self.seconds = tx
+    
     def toggleHUD(self):
         #OFF
         if self.HUDflag:
@@ -885,7 +860,12 @@ class tgraphcanvas(FigureCanvas):
 
         #read and update ET SV LCD
         aw.pid.readcurrentsv()
-               
+
+        #get current duty cycle
+        dc = aw.pid.readdutycycle()
+        self.dutycycle.append(dc)
+        aw.lcd7.display(dc)
+        
         return tx,t2,t1
 
     def HH506RA(self):
@@ -925,11 +905,7 @@ class tgraphcanvas(FigureCanvas):
 
     def CENTER309_34(self):
          #return saved readings
-         t2,t1 = aw.ser.extra309T3, aw.ser.extra309T4
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1   
-
+         return aw.ser.extra309TX,aw.ser.extra309T3, aw.ser.extra309T4 
 
     def CENTER306(self):
 
@@ -1082,7 +1058,7 @@ class tgraphcanvas(FigureCanvas):
         self.specialevents=[]
         if not self.keeptimeflag:
             self.endofx = 60
-        aw.lcd1.display(0.0)
+        aw.lcd1.display("00:00")
         aw.lcd2.display(0.0)
         aw.lcd3.display(0.0)
         aw.lcd4.display(0)
@@ -1111,11 +1087,7 @@ class tgraphcanvas(FigureCanvas):
         
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
         aw.setWindowTitle(aw.windowTitle)
-        #the following should be taken from the users settings or at least not cleared such
-        #that users don't have to reenter those
-        #self.roastertype = u""
-        #self.operator = u""
-        #self.projectFlag = False
+
         self.roastingnotes = u""
         self.cuppingnotes = u""
         self.roastdate = QDate.currentDate()
@@ -1137,10 +1109,10 @@ class tgraphcanvas(FigureCanvas):
         
         #aw.settingsLoad()        
         self.timeclock.restart()
+        self.timer.stop()
+        self.LCDtimer.stop()
+        self.seconds = 0.
 
-        self.redraw()
-        aw.soundpop()
-  
         #Designer variables
         self.indexpoint = 0
         self.rightclickcid = 0
@@ -1165,6 +1137,9 @@ class tgraphcanvas(FigureCanvas):
 
         #reset alarms that have been triggered
         self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
+
+        self.redraw()
+        aw.soundpop()
 
         
     #Redraws data   
@@ -2101,6 +2076,9 @@ class tgraphcanvas(FigureCanvas):
         #Call start() to start the first measurement if no data collected
         if not len(self.timex):
             self.timeclock.start()
+        self.timer.start()
+        self.LCDtimer.start()
+        self.seconds = 0.
             
         self.flagon = True
         aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))     
@@ -2110,7 +2088,10 @@ class tgraphcanvas(FigureCanvas):
         
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
-        
+
+        self.timer.stop()
+        self.LCDtimer.stop()
+        self.seconds = 0.
         self.flagon = False
         aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
         aw.button_1.setDisabled(False)
@@ -3670,7 +3651,7 @@ class ApplicationWindow(QMainWindow):
 
         ####################    HUD   
         self.HUD = QLabel()  #main canvas for hud widget
-        #This is a list of different HUD functions. They are called at the end of qmc.timerEvent()
+        #This is a list of different HUD functions. 
         self.showHUD = [self.showHUDmetrics, self.showHUDthermal]
         #this holds the index of the HUD functions above
         self.HUDfunction = 0
@@ -3906,7 +3887,9 @@ class ApplicationWindow(QMainWindow):
         self.lcd6 = QLCDNumber() # pid sv
         self.lcd6.setSegmentStyle(2)
         self.lcd6.setMinimumHeight(45)
-
+        self.lcd7 = QLCDNumber() # pid power % duty cycle
+        self.lcd7.setSegmentStyle(2)
+        self.lcd7.setMinimumHeight(45)
         #self.lcd1.setStyleSheet("QLCDNumber { }")
 
         self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
@@ -3915,6 +3898,7 @@ class ApplicationWindow(QMainWindow):
         self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltamet"],self.lcdpaletteB["deltamet"]))
         self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
         self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+        self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
         
         self.lcd1.setMaximumSize(90, 45)
         self.lcd2.setMaximumSize(90, 45)
@@ -3922,6 +3906,7 @@ class ApplicationWindow(QMainWindow):
         self.lcd4.setMaximumSize(90, 45)
         self.lcd5.setMaximumSize(90, 45)
         self.lcd6.setMaximumSize(90, 45)
+        self.lcd7.setMaximumSize(90, 45)
 
         self.lcd1.setToolTip(QApplication.translate("Tooltip", "Timer",None, QApplication.UnicodeUTF8))
         self.lcd2.setToolTip(QApplication.translate("Tooltip", "ET Temperature",None, QApplication.UnicodeUTF8))
@@ -3929,6 +3914,7 @@ class ApplicationWindow(QMainWindow):
         self.lcd4.setToolTip(QApplication.translate("Tooltip", "ET/time (degrees/min)",None, QApplication.UnicodeUTF8))
         self.lcd5.setToolTip(QApplication.translate("Tooltip", "BT/time (degrees/min)",None, QApplication.UnicodeUTF8))
         self.lcd6.setToolTip(QApplication.translate("Tooltip", "Value of SV in PID",None, QApplication.UnicodeUTF8))
+        self.lcd7.setToolTip(QApplication.translate("Tooltip", "PID power %",None, QApplication.UnicodeUTF8))
 
         #MET
         label2 = QLabel()
@@ -3955,7 +3941,12 @@ class ApplicationWindow(QMainWindow):
         self.label6.setAlignment(Qt.AlignRight)
         self.label6.setText("<font color='black'><b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.label6.setIndent(5)
-
+        # pid power % duty cycle
+        self.label7 = QLabel()
+        self.label7.setAlignment(Qt.AlignRight)
+        self.label7.setText("<font color='black'><b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.label7.setIndent(5)
+        
         self.messagehist = []
 
         #convenience EVENT mini editor; View&Edits events without opening roast properties Dlg.
@@ -4019,6 +4010,8 @@ class ApplicationWindow(QMainWindow):
             self.button_10.setVisible(False)
             self.label6.setVisible(False)
             self.lcd6.setVisible(False)
+            self.label7.setVisible(False)
+            self.lcd7.setVisible(False)
             
         self.button_12.setVisible(False)
         self.button_13.setVisible(False)
@@ -4027,16 +4020,19 @@ class ApplicationWindow(QMainWindow):
         self.button_16.setVisible(False)
         self.button_17.setVisible(False)
 
-        #place control buttons + LCDs inside vertical button layout manager           
-        LCDlayout.addWidget(self.label6)
-        LCDlayout.addWidget(self.lcd6)
-        LCDlayout.addStretch()   
+        #place control buttons + LCDs inside vertical button layout manager
         LCDlayout.addWidget(label2)
         LCDlayout.addWidget(self.lcd2)
         LCDlayout.addStretch()   
         LCDlayout.addWidget(label3)
         LCDlayout.addWidget(self.lcd3)
-        LCDlayout.addStretch()   
+        LCDlayout.addStretch()
+        LCDlayout.addWidget(self.label7)
+        LCDlayout.addWidget(self.lcd7)
+        LCDlayout.addStretch()        
+        LCDlayout.addWidget(self.label6)
+        LCDlayout.addWidget(self.lcd6)
+        LCDlayout.addStretch()
         LCDlayout.addWidget(label4)
         LCDlayout.addWidget(self.lcd4)
         LCDlayout.addStretch()   
@@ -5413,7 +5409,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.adderror(QApplication.translate("Error Message", "IO Error on fileImport(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))        
             return
 
-
     #loads the settings at the start of application. See the oppposite closeEvent()
     def settingsLoad(self):
         try:
@@ -5540,8 +5535,9 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             self.userprofilepath = unicode(settings.value("profilepath",self.userprofilepath).toString())
             #need to update timer delay (otherwise it uses default 5 seconds)
-            self.qmc.killTimer(self.qmc.timerid) 
-            self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
+            #self.qmc.killTimer(self.qmc.timerid)
+            #self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
+            self.qmc.timer.setInterval(self.qmc.delay) 
 
             # Extra devices
             settings.beginGroup("ExtraComm")
@@ -6261,9 +6257,11 @@ $cupping_notes
                 QApplication.translate("MessageBox", "Seconds",None, QApplication.UnicodeUTF8),
                 calSpinBox.value(),.1,30.)
         if ok:
-            self.qmc.killTimer(self.qmc.timerid) 
-            self.qmc.delay = int(secondsdelay*1000) 	    	    	#self.qmc.delay is saved as int in QSettings
-            self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
+            self.qmc.delay = int(secondsdelay*1000.) 	    	            
+            self.qmc.timer.setInterval(self.qmc.delay)
+##            self.qmc.killTimer(self.qmc.timerid) 
+##            self.qmc.delay = int(secondsdelay*1000) 	    	    	#self.qmc.delay is saved as int in QSettings
+##            self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
 
     def setcommport(self):
         dialog = comportDlg(self)
@@ -9865,6 +9863,7 @@ class serialport(object):
         #extra T3 and T4 for center 309
         self.extra309T3 = 0.
         self.extra309T4 = 0.
+        self.extra309TX = 0.
         
     def openport(self):
         try:
@@ -10297,9 +10296,10 @@ class serialport(object):
                 if len(r) == 45:
                     T1 = int(binascii.hexlify(r[7] + r[8]),16)/10.
                     T2 = int(binascii.hexlify(r[9] + r[10]),16)/10.
+                    #save these variables if using T3 and T4
                     self.extra309T3 = int(binascii.hexlify(r[11] + r[12]),16)/10.
                     self.extra309T4 = int(binascii.hexlify(r[13] + r[14]),16)/10.
-                                                                   
+                    self.extra309TX = aw.qmc.timeclock.elapsed()/1000.                                                
                     return T1,T2
                 
                 else:
@@ -10326,6 +10326,9 @@ class serialport(object):
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1 
+
+
+
 
     def ARDUINOTC4temperature(self):
         try:
@@ -11705,6 +11708,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.button_10.setVisible(True)
             aw.label6.setVisible(True)
             aw.lcd6.setVisible(True)
+            aw.label7.setVisible(True)
+            aw.lcd7.setVisible(True)
             
         if self.nonpidButton.isChecked():
             meter = str(self.devicetypeComboBox.currentText())
@@ -11929,7 +11934,9 @@ class DeviceAssignmentDLG(QDialog):
             aw.button_17.setVisible(False)
             aw.label6.setVisible(False)
             aw.lcd6.setVisible(False)
-
+            aw.label7.setVisible(False)
+            aw.lcd7.setVisible(False)
+            
         self.savedevicetable()
         
         aw.sendmessage(message)
@@ -12113,38 +12120,33 @@ class graphColorDlg(QDialog):
         lcd5label = QLabel(QApplication.translate("Label", "Delta BT",None, QApplication.UnicodeUTF8))
         lcd6label = QLabel(QApplication.translate("Label", "SV",None, QApplication.UnicodeUTF8))
 
-        #How do we translate that...
-        lcdcolors = ["",
-                     grey,
-                     darkGrey,
-                     slateGrey,
-                     lightGray,
-                     black,
-                     white,
-                     transparent]
+        #use indexes to translate
+        self.lcdcolors = ["","grey","darkGrey","slateGrey","lightGray","black","white","transparent"]     #this one is not to be translated as arguments need to be in English
+        lcdcolorstranslate = [u"",u"grey",u"Dark Grey",u"Slate Grey",u"Light Gray",u"Black",u"White",u"Transparent"]  # translated
+        
         self.lcd1colorComboBox =  QComboBox()
-        self.lcd1colorComboBox.addItems(lcdcolors)
+        self.lcd1colorComboBox.addItems(lcdcolorstranslate)
         self.connect(self.lcd1colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd1colorComboBox.currentText(),flag = 2,x=1:self.paintlcds(text,flag,x))
 
         self.lcd2colorComboBox =  QComboBox()
-        self.lcd2colorComboBox.addItems(lcdcolors)
+        self.lcd2colorComboBox.addItems(lcdcolorstranslate)
         self.connect(self.lcd2colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd2colorComboBox.currentText(),flag = 2,x=2:self.paintlcds(text,flag,x))
     
         self.lcd3colorComboBox =  QComboBox()
-        self.lcd3colorComboBox.addItems(lcdcolors)
+        self.lcd3colorComboBox.addItems(lcdcolorstranslate)
         self.connect(self.lcd3colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd3colorComboBox.currentText(),flag = 2,x=3:self.paintlcds(text,flag,x))
     
         self.lcd4colorComboBox =  QComboBox()
-        self.lcd4colorComboBox.addItems(lcdcolors)
+        self.lcd4colorComboBox.addItems(lcdcolorstranslate)
         self.connect(self.lcd4colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd4colorComboBox.currentText(),flag = 2,x=4:self.paintlcds(text,flag,x))
     
         self.lcd5colorComboBox =  QComboBox()
-        self.lcd5colorComboBox.addItems(lcdcolors)
+        self.lcd5colorComboBox.addItems(lcdcolorstranslate)
         self.connect(self.lcd5colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd5colorComboBox.currentText(),flag = 2,x=5:self.paintlcds(text,flag,x))
     
         self.lcd6colorComboBox =  QComboBox()
-        self.lcd6colorComboBox.addItems(lcdcolors)
-        self.connect(self.lcd6colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text =self.lcd6colorComboBox.currentText(),flag = 2,x=6:self.paintlcds(text,flag,x))
+        self.lcd6colorComboBox.addItems(lcdcolorstranslate)
+        self.connect(self.lcd6colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd6colorComboBox.currentText(),flag = 2,x=6:self.paintlcds(text,flag,x))
 
         lcd1backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
         self.connect(lcd1backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=1:self.paintlcds(text,flag,x))
@@ -12315,7 +12317,7 @@ class graphColorDlg(QDialog):
         LCD5GroupLayout = QGroupBox("Delta BT LCD")
         LCD5GroupLayout.setLayout(lcd5layout)
         
-        LCD6GroupLayout = QGroupBox("PID SV LCD")
+        LCD6GroupLayout = QGroupBox("PID SV & POWER % LCD")
         LCD6GroupLayout.setLayout(lcd6layout)
 
         buttonlayout  = QHBoxLayout()
@@ -12381,6 +12383,7 @@ class graphColorDlg(QDialog):
         aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltamet"],aw.lcdpaletteB["deltamet"]))
         aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
         aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+        aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         
     def setLED(self,hue,lcd):
         if lcd == 1:
@@ -12413,6 +12416,7 @@ class graphColorDlg(QDialog):
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["sv"] = unicode(color.name())
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+            aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             
             
     def paintlcds(self,text,flag,lcdnumber):
@@ -12422,7 +12426,7 @@ class graphColorDlg(QDialog):
             elif flag == 1:
                 aw.lcdpaletteF["timer"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["timer"]),self)).name())
             elif flag == 2 and text:
-                aw.lcdpaletteB["timer"] = unicode(text)
+                aw.lcdpaletteB["timer"] = self.lcdcolors[self.lcd1colorComboBox.currentIndex()]
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
             
         if lcdnumber ==2:
@@ -12431,7 +12435,7 @@ class graphColorDlg(QDialog):
             elif flag == 1:
                 aw.lcdpaletteF["met"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["met"]),self)).name())
             elif flag == 2 and text:
-                aw.lcdpaletteB["met"] = unicode(self.lcd2colorComboBox.currentText())
+                aw.lcdpaletteB["met"] = self.lcdcolors[self.lcd2colorComboBox.currentIndex()]
             aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["met"],aw.lcdpaletteB["met"]))
             
         if lcdnumber ==3:
@@ -12440,7 +12444,7 @@ class graphColorDlg(QDialog):
             elif flag == 1:
                 aw.lcdpaletteF["bt"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["bt"]),self)).name())
             elif flag == 2 and text:
-                aw.lcdpaletteB["bt"] = unicode(text)
+                aw.lcdpaletteB["bt"] = self.lcdcolors[self.lcd3colorComboBox.currentIndex()]
             aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
             
         if lcdnumber ==4:
@@ -12449,7 +12453,7 @@ class graphColorDlg(QDialog):
             elif flag == 1:
                 aw.lcdpaletteF["deltamet"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["deltamet"]),self)).name())
             elif flag == 2 and text:
-                aw.lcdpaletteB["deltamet"] = unicode(text)
+                aw.lcdpaletteB["deltamet"] = self.lcdcolors[self.lcd4colorComboBox.currentIndex()]
             aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltamet"],aw.lcdpaletteB["deltamet"]))
         if lcdnumber ==5:
             if flag == 0:
@@ -12457,7 +12461,7 @@ class graphColorDlg(QDialog):
             elif flag == 1:
                 aw.lcdpaletteF["deltabt"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["deltabt"]),self)).name())
             elif flag == 2 and text:
-                aw.lcdpaletteB["deltabt"] = unicode(text)
+                aw.lcdpaletteB["deltabt"] = self.lcdcolors[self.lcd5colorComboBox.currentIndex()]
             aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))            
         if lcdnumber ==6:
             if flag == 0:
@@ -12465,8 +12469,9 @@ class graphColorDlg(QDialog):
             elif flag == 1:
                 aw.lcdpaletteF["sv"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["sv"]),self)).name())
             elif flag == 2 and text:
-                aw.lcdpaletteB["sv"] = unicode(text)
+                aw.lcdpaletteB["sv"] = self.lcdcolors[self.lcd6colorComboBox.currentIndex()]
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))            
+            aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))            
             
         
     # adds a new event to the Dlg
@@ -15457,6 +15462,7 @@ class FujiPID(object):
                   
                   ################  CH5    Checks the ramp soak progress, control output, remaining time and other status functions
                   "stat":[41561], #reads only. 0=off,1=1ramp,2=1soak,3=2ramp,4=2soak,...31=16ramp,32=16soak,33=end
+                  
         
                   ################  CH6    Sets up the thermocouple type, input range, output range and other items for the controller
                   #input type: 0=NA,1=PT100ohms,2=J,3=K,4=R,5=B,6=S,7=T,8=E,12=N,13=PL2,15=(0-5volts),16=(1-5V),17=(0-10V),18=(2-10V),19=(0-100mV)
@@ -15478,7 +15484,7 @@ class FujiPID(object):
                   #################  CH12    Sets the parameters mask functions to hide parameters from the user, Sv0 = currently selected sv value in display
 
                   ################# READ ONLY MEMORY 
-                  "pv?":[31001],"sv?":[0,31002],"alarm?":[31007],"fault?":[31008],"stat?":[31041]
+                  "pv?":[31001],"sv?":[0,31002],"alarm?":[31007],"fault?":[31008],"stat?":[31041],"mv1":[31042]
                   }
 
         # "KEY": [VALUE,MEMORY ]
@@ -15517,7 +15523,8 @@ class FujiPID(object):
                     #current sv on display (during ramp soak it changes)
                     "sv?":[0,31002],
                     #rampsoak current running position (1-8)
-                    "segment?":[0,31009]
+                    "segment?":[0,31009],
+                    "mv1":[30004]   	    	    	#duty cycle rx -300 to 10300  = -3.00% to 103.00% (divide by 100.)
                     }
                         
                       
@@ -15572,6 +15579,25 @@ class FujiPID(object):
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
             val = self.readoneword(command)/10.
             if val != -0.1:
+                return val
+            else:
+                return -1
+
+    def readdutycycle(self):
+        #if control pid is fuji PXG4
+        if aw.ser.controlETpid[0] == 0:        
+            command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["mv1"][1],1)
+            val = self.readoneword(command)/100.
+            if val != -0.01:
+                return val
+            else:
+                return -1
+ 
+        #or if control pid is fuji PXR
+        elif aw.ser.controlETpid[0] == 1:
+            command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
+            val = self.readoneword(command)/100.
+            if val != -0.01:
                 return val
             else:
                 return -1
