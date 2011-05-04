@@ -63,7 +63,7 @@ import serial
 import math
 import binascii
 import tempfile
-import time
+import time as libtime
 import glob
 import os
 import warnings
@@ -74,7 +74,6 @@ import numpy
 import array
 import codecs
 import struct
-import copy
 from scipy import fft
 from scipy import interpolate as inter
 
@@ -771,7 +770,7 @@ class tgraphcanvas(FigureCanvas):
                         
                         if "::" in self.backgroundEStrings[i]:   
                             aw.pid.replay(self.backgroundEStrings[i])
-                            time.sleep(.5)  #avoid possible close times (rounding off) 
+                            libtime.sleep(.5)  #avoid possible close times (rounding off) 
                             
                     #future Arduino
                     #if self.device == 19:
@@ -846,27 +845,31 @@ class tgraphcanvas(FigureCanvas):
 
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD.
     def fujitemperature(self):
-        # get the temperature for ET. RS485 unit ID (1)
-        t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
-        #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
-        tx = self.timeclock.elapsed()/1000.
+        try:
+            # get the temperature for ET. RS485 unit ID (1)
+            t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
+            #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
+            tx = self.timeclock.elapsed()/1000.
 
-        #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None)
-        if aw.ser.readBTpid[0] != 2:                    
-            # get the temperature for BT. RS485 unit ID (2)
-            t2 = aw.pid.gettemperature(2)/10.
-        else:
-            t2 = 0.
+            #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None)
+            if aw.ser.readBTpid[0] != 2:                    
+                # get the temperature for BT. RS485 unit ID (2)
+                t2 = aw.pid.gettemperature(2)/10.
+            else:
+                t2 = 0.
 
-        #read and update ET SV LCD
-        aw.pid.readcurrentsv()
+            #read and update ET SV LCD
+            aw.pid.readcurrentsv()
 
-        #get current duty cycle
-        dc = aw.pid.readdutycycle()
-        self.dutycycle.append(dc)
-        aw.lcd7.display(dc)
+            #get current duty cycle
+            aw.pid.readdutycycle()
+            
+            
+            return tx,t2,t1
         
-        return tx,t2,t1
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: fujitemperature() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
 
     def HH506RA(self):
         
@@ -2515,11 +2518,11 @@ class tgraphcanvas(FigureCanvas):
                         
                 lowestBT = u"%.1f"%LP
                 #timeLP = unicode(self.stringfromseconds(self.timex[k] - self.timex[self.timeindex[0]]))
-                time = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
+                timez = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
                 #end temperature
 
                 strline = QApplication.translate("Scope Label", "[BT = %1 - %2] [ETarea - BTarea = %3] [Time = %4]", None,
-                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.temp2[self.timeindex[6]] + self.mode).arg(unicode(deltaAcc)).arg(time)                              
+                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.temp2[self.timeindex[6]] + self.mode).arg(unicode(deltaAcc)).arg(timez)                              
                             
                 #text metrics 
                 #if self.mode == u"C":
@@ -2895,11 +2898,11 @@ class tgraphcanvas(FigureCanvas):
     def adderror(self,error):
         #print error
         aw.messagelabel.setStyleSheet("background-color:'red';")
-        time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+        timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
         #keep a max of 500 errors
         if len(self.errorlog) > 499:
             self.errorlog = self.errorlog[1:]
-        self.errorlog.append(time + " " + error)
+        self.errorlog.append(timez + " " + error)
         aw.sendmessage(error)
 
         QTimer.singleShot(600, self.restore_message_label)  #set a time less than 1 second to restore color
@@ -3040,14 +3043,14 @@ class tgraphcanvas(FigureCanvas):
 
         func = inter.UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree )
         func2 = inter.UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree )
-        time = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
+        timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
         #convert all time values to temperature
         btvals = func(time).tolist()
         etvals = func2(time).tolist()
 
         #add curves
-        self.ax.plot(time, btvals, color=self.palette["bt"], linestyle = '-', linewidth=2)
-        self.ax.plot(time, etvals, color=self.palette["met"], linestyle = '-', linewidth=2)
+        self.ax.plot(timez, btvals, color=self.palette["bt"], linestyle = '-', linewidth=2)
+        self.ax.plot(timez, etvals, color=self.palette["met"], linestyle = '-', linewidth=2)
 
         #add markers (big circles) '0'
         self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='',markersize=8)     #picker = 10 means 10 points tolerance
@@ -3165,26 +3168,26 @@ class tgraphcanvas(FigureCanvas):
                                 QTimer.singleShot(600, self.redrawdesigner)
                             index = self.timeindex.index(i)
                             if index == 0:
-                                time = self.stringfromseconds(0)
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Message Area", "[ CHARGE ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                timez = self.stringfromseconds(0)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Message Area", "[ CHARGE ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
                             elif index == 1:
-                                time = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ DRY END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                timez = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ DRY END ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
                             elif index == 2:
-                                time = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ FC START ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                timez = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ FC START ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
                             elif index == 3:
-                                time = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ FC END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                timez = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ FC END ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
                             elif index == 4:
-                                time = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ SC START ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                timez = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ SC START ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
                             elif index == 5:
-                                time = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ SC END ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                timez = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message Area", "[ SC END ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
                             elif index == 6:
-                                time = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Message Area", "[ DROP ]",None, QApplication.UnicodeUTF8) + "</font> " + time)
+                                timez = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Message Area", "[ DROP ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
                             break
                         else:
                             if abs(self.temp2[i] - event.ydata) < 10:
@@ -3195,8 +3198,8 @@ class tgraphcanvas(FigureCanvas):
                                 self.ax.plot(self.timex[i],self.temp1[i],color = "blue",marker = "o",alpha = .3,markersize=30)                                                                               
                                 self.fig.canvas.draw()
                                 QTimer.singleShot(600, self.redrawdesigner)
-                            time = self.stringfromseconds(self.timex[i] - self.timex[self.timeindex[0]])
-                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: lightblue\">%s</font> "%time)
+                            timez = self.stringfromseconds(self.timex[i] - self.timex[self.timeindex[0]])
+                            aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: lightblue\">%s</font> "%timez)
                             break
                     else:
                         totaltime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]]
@@ -3382,7 +3385,7 @@ class tgraphcanvas(FigureCanvas):
             funcET = inter.UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree )
 
             #create longer list of time values
-            time = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
+            timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
 
             #convert all time values to temperature
             btvals = funcBT(time).tolist()
@@ -3390,8 +3393,8 @@ class tgraphcanvas(FigureCanvas):
 
             #find new indexes for events
             for i in range(len(self.specialevents)):
-                for p in range(len(time)):
-                    if time[p] > self.timex[self.specialevents[i]]:
+                for p in range(len(timez)):
+                    if timez[p] > self.timex[self.specialevents[i]]:
                         self.specialevents[i] = p
                         break
 
@@ -3400,7 +3403,7 @@ class tgraphcanvas(FigureCanvas):
             for i in range(len(self.timeindex)):
                 maintimes.append(self.timex[self.timeindex[i]])
 
-            self.timex = time[:]
+            self.timex = timez[:]
             self.temp1 = etvals[:]
             self.temp2 = btvals[:]
                             
@@ -4388,8 +4391,8 @@ class ApplicationWindow(QMainWindow):
         #keep a max of 100 messages
         if len(self.messagehist) > 99:
             self.messagehist = self.messagehist[1:]
-        time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz ")))    #zzz = miliseconds
-        self.messagehist.append(time + message)
+        timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz ")))    #zzz = miliseconds
+        self.messagehist.append(timez + message)
         self.messagelabel.setText(message)
 
     
@@ -4721,8 +4724,8 @@ class ApplicationWindow(QMainWindow):
            return
        else:
            self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
-           time = self.qmc.stringfromseconds(int(self.qmc.timex[aw.qmc.specialevents[currentevent-1]]-self.qmc.timex[aw.qmc.timeindex[0]]))
-           self.etimeline.setText(time)
+           timez = self.qmc.stringfromseconds(int(self.qmc.timex[aw.qmc.specialevents[currentevent-1]]-self.qmc.timex[aw.qmc.timeindex[0]]))
+           self.etimeline.setText(timez)
            self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[currentevent-1])
            self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
            etimeindex = self.qmc.specialevents[currentevent-1]
@@ -5054,12 +5057,12 @@ class ApplicationWindow(QMainWindow):
             for (name, value) in items:
                 item[name] = value.strip()
             #add one measurement
-            time = float(self.qmc.stringtoseconds(item['Time1']))
-            if not last_time or last_time < time:
-                self.qmc.timex.append(time)
+            timez = float(self.qmc.stringtoseconds(item['Time1']))
+            if not last_time or last_time < timez:
+                self.qmc.timex.append(timez)
                 self.qmc.temp1.append(float(item['ET']))
                 self.qmc.temp2.append(float(item['BT']))
-            last_time = time
+            last_time = timez
         csvFile.close()
         #swap temperature curves if needed such that BT is the lower and ET the upper one
         if len(self.qmc.temp2) > 0 and len(self.qmc.temp1) > 0 and (reduce (lambda x,y:x + y, self.qmc.temp2)) > reduce (lambda x,y:x + y, self.qmc.temp1):
@@ -5993,13 +5996,13 @@ $cupping_notes
             
     def event2html(self,time_idx):
         if time_idx:
-            time = self.qmc.timex[time_idx]
+            timez = self.qmc.timex[time_idx]
             temp = self.qmc.temp2[time_idx]
             if self.qmc.timeindex[0] != -1:
                 start = self.qmc.timex[self.qmc.timeindex[0]]
             else:
                 start = 0    
-            return self.qmc.stringfromseconds(time - start)+ " (%.1f"%temp + "&deg;" + self.qmc.mode + ")"
+            return self.qmc.stringfromseconds(timez - start)+ " (%.1f"%temp + "&deg;" + self.qmc.mode + ")"
         else:
             return "--"
             
@@ -7727,9 +7730,9 @@ class editGraphDlg(QDialog):
             valueComboBox.addItems(aw.qmc.eventsvalues)
             valueComboBox.setCurrentIndex(aw.qmc.specialeventsvalue[i])
             timeline = QLineEdit()
-            time = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
-            self.eventtablecopy.append(unicode(time)) 
-            timeline.setText(time)
+            timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+            self.eventtablecopy.append(unicode(timez)) 
+            timeline.setText(timez)
             timeline.setValidator(QRegExpValidator(regextime,self))
             stringline = QLineEdit(aw.qmc.specialeventsStrings[i])
 
@@ -7742,9 +7745,9 @@ class editGraphDlg(QDialog):
     def saveEventTable(self):
         nevents  = self.eventtable.rowCount() 
         for i in range(nevents):
-            time = self.eventtable.cellWidget(i,0)
-            if self.eventtablecopy[i] !=  unicode(time.text()):
-                aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(unicode(time.text())))                
+            timez = self.eventtable.cellWidget(i,0)
+            if self.eventtablecopy[i] !=  unicode(timez.text()):
+                aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(unicode(timez.text())))                
             description = self.eventtable.cellWidget(i,1)
             aw.qmc.specialeventsStrings[i] = unicode(description.text())
             etype = self.eventtable.cellWidget(i,2)
@@ -9569,13 +9572,13 @@ class backgroundDLG(QDialog):
                 start = 0
 
             for i in range(ndata):
-                time = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start)))
+                timez = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start)))
                 description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
                 etype = QTableWidgetItem(aw.qmc.Betypes[aw.qmc.backgroundEtypes[i]])
                 evalue = QTableWidgetItem(aw.qmc.eventsvalues[aw.qmc.backgroundEvalues[i]])
 
                 #add widgets to the table
-                self.eventtable.setItem(i,0,time)
+                self.eventtable.setItem(i,0,timez)
                 self.eventtable.setItem(i,1,description)
                 self.eventtable.setItem(i,2,etype)
                 self.eventtable.setItem(i,3,evalue)            
@@ -9671,7 +9674,7 @@ class StatisticsDLG(QDialog):
 
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
 
-        self.time = QCheckBox(QApplication.translate("CheckBox","Time",None, QApplication.UnicodeUTF8))
+        self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None, QApplication.UnicodeUTF8))
         self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None, QApplication.UnicodeUTF8))
         self.flavor = QCheckBox(QApplication.translate("CheckBox","Evaluation",None, QApplication.UnicodeUTF8))
         self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None, QApplication.UnicodeUTF8))
@@ -9699,7 +9702,7 @@ class StatisticsDLG(QDialog):
         #temp fix for possible bug aw.qmc.statisticsflags=[] > empty list out of range
         if aw.qmc.statisticsflags:
             if aw.qmc.statisticsflags[0]:
-                self.time.setChecked(True)
+                self.timez.setChecked(True)
             if aw.qmc.statisticsflags[1]:
                 self.bar.setChecked(True)
             if aw.qmc.statisticsflags[2]:
@@ -9709,7 +9712,7 @@ class StatisticsDLG(QDialog):
         else:
             aw.qmc.statisticsflags = [1,1,1,1]
             
-        self.connect(self.time,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,0)) 
+        self.connect(self.timez,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,0)) 
         self.connect(self.bar,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,1)) 
         self.connect(self.flavor,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,2)) 
         self.connect(self.area,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,3)) 
@@ -9721,7 +9724,7 @@ class StatisticsDLG(QDialog):
         self.connect(resetButton, SIGNAL("clicked()"),self.initialsettings)   
         
         flagsLayout = QGridLayout()
-        flagsLayout.addWidget(self.time,0,0)
+        flagsLayout.addWidget(self.timez,0,0)
         flagsLayout.addWidget(self.bar,0,1)
         flagsLayout.addWidget(self.flavor,0,2)
         flagsLayout.addWidget(self.area,0,3)
@@ -9791,7 +9794,7 @@ class StatisticsDLG(QDialog):
             aw.qmc.statisticsconditions[4] = minfinish
             aw.qmc.statisticsconditions[5] = maxfinish
             
-            if self.time.isChecked(): 
+            if self.timez.isChecked(): 
                 aw.qmc.statisticsflags[0] = 1
             else:
                 aw.qmc.statisticsflags[0] = 0
@@ -9892,11 +9895,11 @@ class serialport(object):
                
         except serial.SerialException,e:
             error = QApplication.translate("ErrorMessage","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
 
     def closeports(self):
         self.SP.close()
@@ -9924,7 +9927,7 @@ class serialport(object):
                 self.SP.write(binstring)
                 r = self.SP.read(nbytes)
                 #serTX.close()
-                time.sleep(0.035)                     #this gurantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.035)                     #this gurantees a minimum of 35 miliseconds between readings (for all Fujis)
                 lenstring = len(r)
                 if lenstring:
                     # CHECK FOR RECEIVED ERROR CODES
@@ -9957,12 +9960,12 @@ class serialport(object):
                 return u"0"                                    
                 
         except serial.SerialException,e:
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("ErrorMessage","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
             return "0"
 
      #t2 and t1 from Omega HH806 or HH802 meter 
@@ -10000,12 +10003,12 @@ class serialport(object):
                     return -1,-1                                    
                                    
         except serial.SerialException, e:
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("ErrorMessage","Serial Exception: ser.HH806AUtemperature() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10050,12 +10053,12 @@ class serialport(object):
                     return -1,-1 
                 
         except serial.SerialException, e:
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("ErrorMessage","Serial Exception: ser.HH506RAtemperature() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10074,7 +10077,7 @@ class serialport(object):
                 while sync != "Err\r\n":
                     self.SP.write("\r\n")
                     sync = self.SP.read(5)
-                    time.sleep(1)
+                    libtime.sleep(1)
                     
                 self.SP.write("%000R")
                 ID = self.SP.read(5)
@@ -10085,12 +10088,12 @@ class serialport(object):
                     aw.qmc.adderror(QApplication.translate("ErrorMessage","HH506RAGetID: %1 bytes received but 5 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
                     
         except serial.SerialException, e:
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("ErrorMessage","Serial Exception: ser.HH506RAGetID()",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
 
     def CENTER306temperature(self):
         try:
@@ -10142,11 +10145,11 @@ class serialport(object):
                 else:
                     nbytes = len(r)
                     error  = QApplication.translate("ErrorMessage","CENTER306temperature(): %1 bytes received but 10 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
-                    time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+                    timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
                     #keep a max of 500 errors
                     if len(aw.qmc.errorlog) > 499:
                         aw.qmc.errorlog = aw.qmc.errorlog[1:]
-                    aw.qmc.errorlog.append(time + " " + error)                   
+                    aw.qmc.errorlog.append(timez + " " + error)                   
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -10159,11 +10162,11 @@ class serialport(object):
                      
         except serial.SerialException, e:
             error  = QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8)
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10230,11 +10233,11 @@ class serialport(object):
                 else:
                     nbytes = len(r)
                     error = QApplication.translate("ErrorMessage","CENTER303temperature(): %i bytes received but 8 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
-                    time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+                    timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
                     #keep a max of 500 errors
                     if len(aw.qmc.errorlog) > 499:
                         aw.qmc.errorlog = aw.qmc.errorlog[1:]
-                    aw.qmc.errorlog.append(time + " " + error)
+                    aw.qmc.errorlog.append(timez + " " + error)
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
@@ -10247,11 +10250,11 @@ class serialport(object):
             
         except serial.SerialException, e:
             error = QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER303temperature()",None, QApplication.UnicodeUTF8)
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10317,11 +10320,11 @@ class serialport(object):
             
         except serial.SerialException, e:
             error  = QApplication.translate("ErrorMessage","Serial Exception: ser.CENTER309temperature() ",None, QApplication.UnicodeUTF8)
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10334,7 +10337,7 @@ class serialport(object):
         try:
             if not self.SP.isOpen():
                 self.openport()                    
-                time.sleep(3)
+                libtime.sleep(3)
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -10370,11 +10373,11 @@ class serialport(object):
 
         except serial.SerialException, e:
             error = QApplication.translate("ErrorMessage","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10417,13 +10420,13 @@ class serialport(object):
                 #seems like iam running the loop forever, forever .... with sleep it is ok
                 #seen this sometimes in communication between threads in C or C++. --> volatile problem?
                 if counter > 0:
-                    time.sleep(1)
+                    libtime.sleep(1)
                 
                 counter = counter + 1
             
                 if not self.SP.isOpen():
                     self.openport()    
-                    time.sleep(2)
+                    libtime.sleep(2)
                     
                 if self.SP.isOpen():
                     self.SP.flushInput()
@@ -10569,11 +10572,11 @@ class serialport(object):
 
         except ValueError:
             error  = QApplication.translate("ErrorMessage","Value Error: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8)
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10581,11 +10584,11 @@ class serialport(object):
         
         except serial.SerialException:
             error  = QApplication.translate("ErrorMessage","Serial Exception: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8)
-            time = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(time + " " + error)
+            aw.qmc.errorlog.append(timez + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
@@ -10816,33 +10819,33 @@ class designerconfigDlg(QDialog):
         if self.dryend.isChecked():
             if self.Edit1.text() != self.Edit1copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit1.text())):
-                    time = aw.qmc.stringtoseconds(unicode(self.Edit1.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[1] = aw.qmc.designerfindindex(time)
-                    aw.qmc.timex[aw.qmc.timeindex[1]] = time                
+                    timez = aw.qmc.stringtoseconds(unicode(self.Edit1.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[1] = aw.qmc.designerfindindex(timez)
+                    aw.qmc.timex[aw.qmc.timeindex[1]] = timez                
         if self.fcs.isChecked():
             if self.Edit2.text() != self.Edit2copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit2.text())):
-                    time = aw.qmc.stringtoseconds(unicode(self.Edit2.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[2] = aw.qmc.designerfindindex(time)
-                    aw.qmc.timex[aw.qmc.timeindex[2]] = time 
+                    timez = aw.qmc.stringtoseconds(unicode(self.Edit2.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[2] = aw.qmc.designerfindindex(timez)
+                    aw.qmc.timex[aw.qmc.timeindex[2]] = timez 
         if self.fce.isChecked():
             if self.Edit3.text() != self.Edit3copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit3.text())):
-                    time = aw.qmc.stringtoseconds(unicode(self.Edit3.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[3] = aw.qmc.designerfindindex(time)
-                    aw.qmc.timex[aw.qmc.timeindex[3]] = time 
+                    timez = aw.qmc.stringtoseconds(unicode(self.Edit3.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[3] = aw.qmc.designerfindindex(timez)
+                    aw.qmc.timex[aw.qmc.timeindex[3]] = timez 
         if self.scs.isChecked():
             if self.Edit4.text() != self.Edit4copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit4.text())):
-                    time = aw.qmc.stringtoseconds(unicode(self.Edit4.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[4] = aw.qmc.designerfindindex(time)
-                aw.qmc.timex[aw.qmc.timeindex[4]] = time 
+                    timez = aw.qmc.stringtoseconds(unicode(self.Edit4.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[4] = aw.qmc.designerfindindex(timez)
+                    aw.qmc.timex[aw.qmc.timeindex[4]] = timez 
         if self.sce.isChecked():
             if self.Edit5.text() != self.Edit5copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit5.text())):
-                    time = aw.qmc.stringtoseconds(unicode(self.Edit5.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[5] = aw.qmc.designerfindindex(time)
-                    aw.qmc.timex[aw.qmc.timeindex[5]] = time 
+                    timez = aw.qmc.stringtoseconds(unicode(self.Edit5.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                    aw.qmc.timeindex[5] = aw.qmc.designerfindindex(timez)
+                    aw.qmc.timex[aw.qmc.timeindex[5]] = timez 
 
         for i in range(1,6): #1-5
             aw.qmc.designertimeinit[i] = aw.qmc.timex[aw.qmc.timeindex[i]]
@@ -10975,19 +10978,19 @@ class designerconfigDlg(QDialog):
         else:
             #ADD mark point
             if idi == 1:
-                time = aw.qmc.stringtoseconds(unicode(self.Edit1.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                timez = aw.qmc.stringtoseconds(unicode(self.Edit1.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
             if idi == 2:
-                time = aw.qmc.stringtoseconds(unicode(self.Edit2.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                timez = aw.qmc.stringtoseconds(unicode(self.Edit2.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
             if idi == 3:
-                time = aw.qmc.stringtoseconds(unicode(self.Edit3.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                timez = aw.qmc.stringtoseconds(unicode(self.Edit3.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
             if idi == 4:
-                time = aw.qmc.stringtoseconds(unicode(self.Edit4.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                timez = aw.qmc.stringtoseconds(unicode(self.Edit4.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
             if idi == 5:
-                time = aw.qmc.stringtoseconds(unicode(self.Edit5.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                timez = aw.qmc.stringtoseconds(unicode(self.Edit5.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
 
-            tempindex = aw.qmc.designerfindindex(time)
+            tempindex = aw.qmc.designerfindindex(timez)
             temp = aw.qmc.temp2[tempindex]
-            aw.qmc.currentx = time 
+            aw.qmc.currentx = timez 
             aw.qmc.currenty = temp
             newindex = aw.qmc.addpoint()
             aw.qmc.timeindex[idi] = newindex
@@ -13208,8 +13211,8 @@ class AlarmDlg(QDialog):
     def savealarms(self):
         nalarms = self.alarmtable.rowCount()
         for i in range(nalarms):
-            time =  self.alarmtable.cellWidget(i,0)
-            aw.qmc.alarmtime[i] = int(unicode(time.currentIndex()))                                       
+            timez =  self.alarmtable.cellWidget(i,0)
+            aw.qmc.alarmtime[i] = int(unicode(timez.currentIndex()))                                       
             flag = self.alarmtable.cellWidget(i,1)
             aw.qmc.alarmflag[i] = int(unicode(flag.currentIndex()))
             atype = self.alarmtable.cellWidget(i,2)
@@ -13352,7 +13355,7 @@ class PXRpidDlgControl(QDialog):
         svwarning1 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None, QApplication.UnicodeUTF8) + "</b><br>"
                             + QApplication.translate("Label", "Writing eeprom memory",None, QApplication.UnicodeUTF8) + "<br>"
                             + QApplication.translate("Label", "<u>Max life</u> 10,000 writes",None, QApplication.UnicodeUTF8) + "<br>"
-                            + QApplication.translate("Label", "Infinite read life.",None, QApplication.UnicodeUTF8)) + "</CENTER>"
+                            + QApplication.translate("Label", "Infinite read life.",None, QApplication.UnicodeUTF8) + "</CENTER>")
         svwarning2 = QLabel("<CENTER><b>" + QApplication.translate("Label", "WARNING",None, QApplication.UnicodeUTF8) + "</b><br>"
                             + QApplication.translate("Label", "After <u>writing</u> an adjustment,<br>never power down the pid<br>for the next 5 seconds <br>or the pid may never recover.",None, QApplication.UnicodeUTF8) + "<br>"
                             + QApplication.translate("Label", "Read operations manual",None, QApplication.UnicodeUTF8) + "</CENTER>")
@@ -14087,7 +14090,7 @@ class PXG4pidDlgControl(QDialog):
         self.paintlabels()
 
         patternlabel = QLabel(QApplication.translate("Label", "Pattern",None, QApplication.UnicodeUTF8))
-        patternlabel.setAlgnment(Qt.AlignRight)
+        patternlabel.setAlignment(Qt.AlignRight)
         button_getall = QPushButton("Read RS values")
         button_rson =  QPushButton("RampSoak ON")        
         button_rsoff =  QPushButton("RampSoak OFF")
@@ -15291,7 +15294,7 @@ class PXG4pidDlgControl(QDialog):
             msg = u"Reading Ramp/Soak " + unicode(i) + u" ..."
             self.status.showMessage(msg,500)
             k = self.getsegment(i)
-            time.sleep(0.03)
+            libtime.sleep(0.03)
             if k == -1:
                 self.status.showMessage(u"problem reading Ramp/Soak",5000)
                 return
@@ -15484,7 +15487,7 @@ class FujiPID(object):
                   #################  CH12    Sets the parameters mask functions to hide parameters from the user, Sv0 = currently selected sv value in display
 
                   ################# READ ONLY MEMORY 
-                  "pv?":[31001],"sv?":[0,31002],"alarm?":[31007],"fault?":[31008],"stat?":[31041],"mv1":[31042]
+                  "pv?":[31001],"sv?":[0,31002],"alarm?":[31007],"fault?":[31008],"stat?":[31041],"mv1":[0,31042]
                   }
 
         # "KEY": [VALUE,MEMORY ]
@@ -15524,7 +15527,7 @@ class FujiPID(object):
                     "sv?":[0,31002],
                     #rampsoak current running position (1-8)
                     "segment?":[0,31009],
-                    "mv1":[30004]   	    	    	#duty cycle rx -300 to 10300  = -3.00% to 103.00% (divide by 100.)
+                    "mv1":[0,30004]   	    	    	#duty cycle rx -300 to 10300  = -3.00% to 103.00% (divide by 100.)
                     }
                         
                       
@@ -15589,10 +15592,10 @@ class FujiPID(object):
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["mv1"][1],1)
             val = self.readoneword(command)/100.
             if val != -0.01:
+                aw.lcd7.display(val)
                 return val
             else:
                 return -1
- 
         #or if control pid is fuji PXR
         elif aw.ser.controlETpid[0] == 1:
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
