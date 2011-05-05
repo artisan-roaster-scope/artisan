@@ -67,7 +67,7 @@ import time as libtime
 import glob
 import os
 import warnings
-import string
+import string as libstring
 import cgi
 import codecs
 import numpy
@@ -199,7 +199,8 @@ class tgraphcanvas(FigureCanvas):
                        "NONE",
                        "ArduinoTC4",
                        "TE VA18B",
-                       "+309_34" 
+                       "+309_34",
+                       "+FUJI DUTY %" 
                        ]
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
@@ -227,7 +228,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.NONE,
                                    self.ARDUINOTC4,
                                    self.TEVA18B,
-                                   self.CENTER309_34
+                                   self.CENTER309_34,
+                                   self.fujidutycycle
                                    ]
 
         #extra devices
@@ -238,10 +240,7 @@ class tgraphcanvas(FigureCanvas):
         self.extratemp1,self.extratemp2 = [],[]                     # extra temp1, temp2. List of lists
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
-
-        #holds the power % ducty cycle of PIDs for plotting    	
-    	self.dutycycle = []
-
+ 
         #main matplot figure with plot(s) inside
         self.fig = Figure()
 
@@ -543,7 +542,7 @@ class tgraphcanvas(FigureCanvas):
         if self.flagon:
             #if using a meter (thermocouple device)
             if self.device != 18:
-                #read time, ET (t2) and BT (t1) TEMPERATURE
+                #read time, ET (t2) and BT (t1) TEMPERATURE                      
                 tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
 
                 # test for a possible change
@@ -623,25 +622,45 @@ class tgraphcanvas(FigureCanvas):
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
 
+
             #######  if using more than one device
             ndevices = len(self.extradevices)
             if ndevices:
-                oldSP = aw.ser.SP                                  # save the serial port used by ET/BT device
+                oldSP = aw.ser.SP.port                                  # save the name of the serial port used by ET/BT device
+                oldSPsettings = aw.ser.SP.getSettingsDict()             # save ET/BT device serial settings
                 for i in range(ndevices):
-                    oldsett = aw.ser.extraSP[i].getSettingsDict()  # need pyserial2.5 .getSettingsDict()  .applySettingsDict()
-                    aw.ser.SP = aw.ser.extraSP[i]
+                    aw.ser.SP.setPort(aw.ser.extraSP[i].port)                                 # change name
+                    aw.ser.SP.applySettingsDict(aw.ser.extraSP[i].getSettingsDict())          # change settings
                     extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
+                    
+                    # TEST READINGS FOR METER ERRORS
+                    if len(self.extratimex[i]):
+                        #test for out of range
+                        if extrat2 < -5 or extrat2 > 800:
+                            extrat2 = self.extratemp2[i-1]
+                        if extrat1 < -5 or extrat1 > 800:
+                            extrat1 = self.extratemp1[i-1]
+                        #test for swap
+                        if extrat1 == self.extratemp2[i][-1] and extrat2 == self.extratemp1[i][-1]:
+                            #let's better swap the readings (also they are just repeating the previous ones)
+                            self.extratemp2[i].append(extrat1)
+                            self.extratemp1[i].append(extrat2)
+                        else:
+                            #the readings seem to be "in order"                    
+                            self.extratemp1[i].append(extrat1)
+                            self.extratemp2[i].append(extrat2)
+                    else:
+                        self.extratemp1[i].append(extrat1)
+                        self.extratemp2[i].append(extrat2)
+                        
                     self.extratimex[i].append(extratx)
-                    self.extratemp1[i].append(extrat1)
-                    self.extratemp2[i].append(extrat2)
                     # update extra lines 
                     self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
                     self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-                    aw.ser.extraSP[i].applySettingsDict(oldsett)
-                #restore ET/BT serial port
-                aw.ser.SP = oldSP
+                #restore ET/BT device serial port 
+                aw.ser.SP.setPort(oldSP)
+                aw.ser.SP.applySettingsDict(oldSPsettings)
             ##########
-                
                 
 
             #update screen                
@@ -843,9 +862,12 @@ class tgraphcanvas(FigureCanvas):
         return ETreachTime, BTreachTime
 
 
-    #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD.
+    #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
     def fujitemperature(self):
         try:
+            #update ET SV LCD 6
+            aw.pid.readcurrentsv()
+
             # get the temperature for ET. RS485 unit ID (1)
             t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
             #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
@@ -858,18 +880,24 @@ class tgraphcanvas(FigureCanvas):
             else:
                 t2 = 0.
 
-            #read and update ET SV LCD
-            aw.pid.readcurrentsv()
-
-            #get current duty cycle
-            aw.pid.readdutycycle()
-            
+            #get current duty cycle and update LCD 7
+            aw.ser.dutycycle = aw.pid.readdutycycle()
+            aw.ser.dutycycletime = tx
+            if t2:
+                aw.ser.fujiETBT = t1-t2
+            else:
+                aw.ser.fujiETBT = 0.
             
             return tx,t2,t1
         
         except Exception,e:
             self.adderror(QApplication.translate("Error Message", "Exception Error: fujitemperature() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
+
+    #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
+    def fujidutycycle(self):
+        #return saved readings
+        return aw.ser.dutycycleTX,(100.+aw.ser.dutycycle),(50.+aw.ser.fujiETBT)  #raise duty cycle in graph to 100, et-bt to 50 
 
     def HH506RA(self):
         
@@ -906,6 +934,7 @@ class tgraphcanvas(FigureCanvas):
 
          return tx,t2,t1         
 
+    #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
     def CENTER309_34(self):
          #return saved readings
          return aw.ser.extra309TX,aw.ser.extra309T3, aw.ser.extra309T4 
@@ -4030,11 +4059,10 @@ class ApplicationWindow(QMainWindow):
         LCDlayout.addWidget(label3)
         LCDlayout.addWidget(self.lcd3)
         LCDlayout.addStretch()
-        LCDlayout.addWidget(self.label7)
-        LCDlayout.addWidget(self.lcd7)
-        LCDlayout.addStretch()        
         LCDlayout.addWidget(self.label6)
         LCDlayout.addWidget(self.lcd6)
+        LCDlayout.addWidget(self.label7)
+        LCDlayout.addWidget(self.lcd7)
         LCDlayout.addStretch()
         LCDlayout.addWidget(label4)
         LCDlayout.addWidget(self.lcd4)
@@ -5578,7 +5606,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp2[i],color="black",linewidth=2,label= self.qmc.extraname1[i])[0])
                 #create serial port objects
                 self.ser.extraSP.append(serial.Serial())
-                
+
+            #configure all serial ports (loads configurations but does not open ports)
+            self.ser.confport()
+            
             #update display
             self.qmc.redraw()
 
@@ -5936,8 +5967,8 @@ $cupping_notes
         volume_gain = aw.weight_loss(self.qmc.volume[1],self.qmc.volume[0])
         #return screen to GRAPH profile mode
         self.qmc.redraw()
-        html = string.Template(HTML_REPORT_TEMPLATE).safe_substitute(
-            title=cgi.escape(self.qmc.title),
+        html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
+            title=cgi.escape(unicode(self.qmc.title)),
             datetime=unicode(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
             beans=beans,
             weight=self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[2],weight_loss),
@@ -9863,34 +9894,24 @@ class serialport(object):
         #EXTRA COMM PORTS VARIABLES
         self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
 
-        #extra T3 and T4 for center 309
+        #holds extra T3 and T4 values for center 309
         self.extra309T3 = 0.
         self.extra309T4 = 0.
         self.extra309TX = 0.
+
+        #holds the power % ducty cycle of Fuji PIDs  and ET-BT  	
+    	self.dutycycle = 0.
+    	self.dutycycleTX = 0.
+        self.fujiETBT = 0.
         
     def openport(self):
         try:
-            #reset previous settings
-            self.SP.close()
+            self.closeport()
+            self.confport()
             self.arduinoAmbFlag = 0
-            #provision port 
-            self.SP.setPort(self.comport)
-            self.SP.setBaudrate(self.baudrate)
-            self.SP.setByteSize(self.bytesize)
-            self.SP.setParity(self.parity)
-            self.SP.setStopbits(self.stopbits)
-            self.SP.setTimeout(self.timeout)
             #open port
             self.SP.open()
-
             for i in range(len(self.extraSP)):
-                self.extraSP[i].close()
-                self.extraSP[i].setPort(unicode(self.extracomport[i]))
-                self.extraSP[i].setBaudrate(self.extrabaudrate[i])
-                self.extraSP[i].setByteSize(self.extrabytesize[i])
-                self.extraSP[i].setParity(unicode(self.extraparity[i]))
-                self.extraSP[i].setStopbits(self.extrastopbits[i])
-                self.extraSP[i].setTimeout(self.extratimeout[i])
                 self.extraSP[i].open()                
                
         except serial.SerialException,e:
@@ -9901,18 +9922,30 @@ class serialport(object):
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
 
-    def closeports(self):
+    #configure ports
+    def confport(self):
+        self.SP.setPort(self.comport)
+        self.SP.setBaudrate(self.baudrate)
+        self.SP.setByteSize(self.bytesize)
+        self.SP.setParity(self.parity)
+        self.SP.setStopbits(self.stopbits)
+        self.SP.setTimeout(self.timeout)
+        for i in range(len(self.extraSP)):
+            self.extraSP[i].setPort(unicode(self.extracomport[i]))
+            self.extraSP[i].setBaudrate(self.extrabaudrate[i])
+            self.extraSP[i].setByteSize(self.extrabytesize[i])
+            self.extraSP[i].setParity(unicode(self.extraparity[i]))
+            self.extraSP[i].setStopbits(self.extrastopbits[i])
+            self.extraSP[i].setTimeout(self.extratimeout[i])
+
+    def closeport(self):
         self.SP.close()
         for i in range(len(self.extraSP)):
             self.extraSP[i].close()        
             
     def closeEvent(self):
         try:        
-           if self.SP.isOpen(): 
-               self.SP.close()
-           for i in range(len(self.extraSP)):
-               if self.extraSP[i].isOpen():
-                  self.extraSP[i].close() 
+           self.closeport() 
         except serial.SerialException,e:
             pass
         
@@ -11334,7 +11367,7 @@ class comportDlg(QDialog):
 
 
     def scanforport(self):
-        aw.ser.closeports()
+        aw.ser.closeport()
         
         available = []      
         if platf in ('Windows', 'Microsoft'):
@@ -11420,7 +11453,16 @@ class DeviceAssignmentDLG(QDialog):
         self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Device", None, QApplication.UnicodeUTF8))
         self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None, QApplication.UnicodeUTF8))
 
-        sorted_devices = sorted(aw.qmc.devices)
+        #As a main device, don't show the devices that start with a "+"
+        dev = aw.qmc.devices[:]
+        limit = len(dev)
+        for k in range(limit):
+            for i in range(len(dev)):
+                if dev[i][0] == "+":
+                    dev.pop(i)              #pop() will make the list smaller 
+                    break 
+                
+        sorted_devices = sorted(dev)
         self.devicetypeComboBox = QComboBox()
         self.devicetypeComboBox.addItems(sorted_devices)
         
@@ -11564,11 +11606,12 @@ class DeviceAssignmentDLG(QDialog):
 
             #populate table
             devices = aw.qmc.devices[:]  
+            devices = sorted(devices)
             devices.insert(0,"")         #add empty space for PID
             for i in range(ndevices):
                 typeComboBox =  QComboBox()
-                typeComboBox.addItems(devices)
-                typeComboBox.setCurrentIndex(aw.qmc.extradevices[i])
+                typeComboBox.addItems(sorted(devices))
+                typeComboBox.setCurrentIndex(devices.index(aw.qmc.devices[aw.qmc.extradevices[i]-1]))
 
                 color1Button = QPushButton(QApplication.translate("Button","Color 1",None, QApplication.UnicodeUTF8))
                 self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
@@ -11652,8 +11695,12 @@ class DeviceAssignmentDLG(QDialog):
             typecombobox = self.devicetable.cellWidget(i,1)
             name1edit = self.devicetable.cellWidget(i,4)
             name2edit = self.devicetable.cellWidget(i,5)
-            if typecombobox.currentIndex(): 
-                aw.qmc.extradevices[i] = typecombobox.currentIndex()
+            if not unicode(typecombobox.currentText()):
+##                aw.qmc.errorlog.append("Extra device empty")
+##                QMessageBox.information(self,"Device Conf","Extra device empty")    
+                return
+            else:
+                aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1  
             aw.qmc.extraname1[i] = unicode(name1edit.text())
             aw.qmc.extraname2[i] = unicode(name2edit.text())
         #update legend
@@ -11926,7 +11973,17 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                message = ""  #empty message especial device
+
+            elif meter == "+FUJI DUTY%":
+                aw.qmc.device = 22
+                aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'E'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = ""   #empty message especial devoce
 
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
@@ -15571,39 +15628,30 @@ class FujiPID(object):
         #if control pid is fuji PXG4
         if aw.ser.controlETpid[0] == 0:        
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["sv?"][1],1)
-            val = self.readoneword(command)/10.
-            if val != -0.1:
-                return val
-            else:
-                return -1
- 
         #or if control pid is fuji PXR
         elif aw.ser.controlETpid[0] == 1:
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
-            val = self.readoneword(command)/10.
-            if val != -0.1:
-                return val
-            else:
-                return -1
-
+        val = self.readoneword(command)/10.
+        if val != -0.1:
+            aw.lcd6.display(val)
+            return val
+        else:
+            return -1
+ 
     def readdutycycle(self):
         #if control pid is fuji PXG4
         if aw.ser.controlETpid[0] == 0:        
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["mv1"][1],1)
-            val = self.readoneword(command)/100.
-            if val != -0.01:
-                aw.lcd7.display(val)
-                return val
-            else:
-                return -1
         #or if control pid is fuji PXR
         elif aw.ser.controlETpid[0] == 1:
-            command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)
-            val = self.readoneword(command)/100.
-            if val != -0.01:
-                return val
-            else:
-                return -1
+            command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)            
+        val = self.readoneword(command)/100.
+        if val != -0.01:
+            aw.lcd7.display(val)
+            return val
+        else:
+            return -1
+
 
     #turns ON turns OFF current ramp soak mode
     #flag =0 OFF, flag = 1 ON, flag = 2 hold
