@@ -12144,6 +12144,10 @@ class graphColorDlg(QDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Colors", None, QApplication.UnicodeUTF8))
         frameStyle = QFrame.Sunken | QFrame.Panel
 
+
+        ## Translation: Right now the default palette colors are not translated (as they are used as-is)
+        ##              We will add a translation list.
+        
         #TAB1
         self.backgroundLabel = QLabel(aw.qmc.palette["background"])
         self.backgroundLabel.setPalette(QPalette(QColor(aw.qmc.palette["background"])))
@@ -12307,7 +12311,14 @@ class graphColorDlg(QDialog):
 
         #use indexes to translate
         self.lcdcolors = ["","grey","darkGrey","slateGrey","lightGray","black","white","transparent"]     #this one is not to be translated as arguments need to be in English
-        lcdcolorstranslate = [u"",u"grey",u"Dark Grey",u"Slate Grey",u"Light Gray",u"Black",u"White",u"Transparent"]  # translated
+        lcdcolorstranslate = [u"",
+                              QApplication.translate("ComboBox","grey",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("ComboBox","Dark Grey",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("ComboBox","Slate Grey",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("ComboBox","Light Gray",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("ComboBox","Black",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("ComboBox","White",None, QApplication.UnicodeUTF8),
+                              QApplication.translate("ComboBox","Transparent",None, QApplication.UnicodeUTF8)]  # translated
         
         self.lcd1colorComboBox =  QComboBox()
         self.lcd1colorComboBox.addItems(lcdcolorstranslate)
@@ -12487,22 +12498,22 @@ class graphColorDlg(QDialog):
         lcd6layout.addWidget(lcd6LEDButton,2)
         lcd6layout.addWidget(self.lcd6spinbox,3)
 
-        LCD1GroupLayout = QGroupBox("Timer LCD")
+        LCD1GroupLayout = QGroupBox(QApplication.translate("GroupBox","Timer LCD",None, QApplication.UnicodeUTF8))
         LCD1GroupLayout.setLayout(lcd1layout)
         
-        LCD2GroupLayout = QGroupBox("ET LCD")
+        LCD2GroupLayout = QGroupBox(QApplication.translate("GroupBox","ET LCD",None, QApplication.UnicodeUTF8))
         LCD2GroupLayout.setLayout(lcd2layout)
         
-        LCD3GroupLayout = QGroupBox("BT LCD")
+        LCD3GroupLayout = QGroupBox(QApplication.translate("GroupBox","BT LCD",None, QApplication.UnicodeUTF8))
         LCD3GroupLayout.setLayout(lcd3layout)
         
-        LCD4GroupLayout = QGroupBox("Delta ET LCD")
+        LCD4GroupLayout = QGroupBox(QApplication.translate("GroupBox","Delta ET LCD",None, QApplication.UnicodeUTF8))
         LCD4GroupLayout.setLayout(lcd4layout)
         
-        LCD5GroupLayout = QGroupBox("Delta BT LCD")
+        LCD5GroupLayout = QGroupBox(QApplication.translate("GroupBox","Delta BT LCD",None, QApplication.UnicodeUTF8))
         LCD5GroupLayout.setLayout(lcd5layout)
         
-        LCD6GroupLayout = QGroupBox("PID SV & POWER % LCD")
+        LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","PID SV & POWER % LCD",None, QApplication.UnicodeUTF8))
         LCD6GroupLayout.setLayout(lcd6layout)
 
         buttonlayout  = QHBoxLayout()
@@ -12523,11 +12534,11 @@ class graphColorDlg(QDialog):
         
         C1Widget = QWidget()
         C1Widget.setLayout(graphLayout)
-        TabWidget.addTab(C1Widget,"Graph")
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Graph",None, QApplication.UnicodeUTF8))
         
         C2Widget = QWidget()
         C2Widget.setLayout(lcdlayout)
-        TabWidget.addTab(C2Widget,"LCDs")      
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","LCDs",None, QApplication.UnicodeUTF8))      
       
         okLayout = QHBoxLayout()
         okLayout.addStretch()
@@ -12731,7 +12742,7 @@ class WheelDlg(QDialog):
     def __init__(self, parent = None):
         super(WheelDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle("Wheel Graph Editor")
+        self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None, QApplication.UnicodeUTF8))
 
         #table for alarms
         self.datatable = QTableWidget()
@@ -12740,18 +12751,18 @@ class WheelDlg(QDialog):
         #table for labels
         self.labeltable = QTableWidget()
         
-        self.labelCloseButton = QPushButton("Close Label properties")
+        self.labelCloseButton = QPushButton(QApplication.translate("Button","Close Label properties",None, QApplication.UnicodeUTF8))
         self.labelCloseButton.setMaximumWidth(160)
         self.connect(self.labelCloseButton, SIGNAL("clicked()"),self.closelabels)
 
-        self.labelResetButton = QPushButton("Reset Parents")
-        self.labelResetButton.setToolTip("Erases wheel parent hierarchy")
+        self.labelResetButton = QPushButton(QApplication.translate("Button","Reset Parents",None, QApplication.UnicodeUTF8))
+        self.labelResetButton.setToolTip(QApplication.translate("ToolTip","Erases wheel parent hierarchy",None, QApplication.UnicodeUTF8))
         self.labelResetButton.setMaximumWidth(160)
         self.connect(self.labelResetButton, SIGNAL("clicked()"),self.resetlabelparents)
         self.labelwheelx = 0   #index of wheel being edited on labeltable
 
-        self.hierarchyButton = QPushButton("Reverse Hierarchy")
-        self.hierarchyButton.setToolTip("Sets graph hierarchy child->parent instead of parent->child")
+        self.hierarchyButton = QPushButton(QApplication.translate("Button","Reverse Hierarchy",None, QApplication.UnicodeUTF8))
+        self.hierarchyButton.setToolTip(QApplication.translate("ToolTip","Sets graph hierarchy child->parent instead of parent->child",None, QApplication.UnicodeUTF8))
         self.hierarchyButton.setMaximumWidth(100)
         self.connect(self.hierarchyButton, SIGNAL("clicked()"),aw.qmc.setWheelHierarchy)
 
@@ -12759,78 +12770,78 @@ class WheelDlg(QDialog):
         self.labelCloseButton.setVisible(False)
         self.labelResetButton.setVisible(False)
         
-        txtlabel = QLabel("Text")
-        txtButtonplus = QPushButton("+")
-        txtButtonplus.setToolTip("Increase size of text in all the graph")
+        txtlabel = QLabel(QApplication.translate("Label","Text",None, QApplication.UnicodeUTF8))
+        txtButtonplus = QPushButton(QApplication.translate("Button","+",None, QApplication.UnicodeUTF8))
+        txtButtonplus.setToolTip(QApplication.translate("ToolTip","Increase size of text in all the graph",None, QApplication.UnicodeUTF8))
         txtButtonplus.setMaximumWidth(30)
         self.connect(txtButtonplus, SIGNAL("clicked()"),lambda x = 1: self.changetext(x))
-        txtButtonminus = QPushButton("-")
-        txtButtonminus.setToolTip("Decrease size of text in all the graph")
+        txtButtonminus = QPushButton(QApplication.translate("Button","-")
+        txtButtonminus.setToolTip(QApplication.translate("ToolTip","Decrease size of text in all the graph",None, QApplication.UnicodeUTF8))
         txtButtonminus.setMaximumWidth(30)
         self.connect(txtButtonminus, SIGNAL("clicked()"),lambda x = 0: self.changetext(x))
 
-        edgelabel = QLabel("Edge")
+        edgelabel = QLabel(QApplication.translate("Label","Edge",None, QApplication.UnicodeUTF8))
         self.edgeSpinBox = QSpinBox()
-        self.edgeSpinBox.setToolTip("Decorative edge beween wheels")
+        self.edgeSpinBox.setToolTip(QApplication.translate("ToolTip","Decorative edge beween wheels",None, QApplication.UnicodeUTF8))
         self.edgeSpinBox.setMaximumWidth(80)
         self.edgeSpinBox.setRange(0,5)
         self.edgeSpinBox.setValue(int(aw.qmc.wheeledge*100))
         self.connect(self.edgeSpinBox, SIGNAL("valueChanged(int)"),self.setedge)
 
-        linewidthlabel = QLabel("Line")
+        linewidthlabel = QLabel(QApplication.translate("Label","Line",None, QApplication.UnicodeUTF8))
         self.linewidthSpinBox = QSpinBox()
-        self.linewidthSpinBox.setToolTip("Line thickness")
+        self.linewidthSpinBox.setToolTip(QApplication.translate("ToolTip","Line thickness",None, QApplication.UnicodeUTF8))
         self.linewidthSpinBox.setMaximumWidth(80)
         self.linewidthSpinBox.setRange(0,20)
         self.linewidthSpinBox.setValue(aw.qmc.wheellinewidth)
         self.connect(self.linewidthSpinBox, SIGNAL("valueChanged(int)"),self.setlinewidth)
 
-        linecolor = QPushButton("Line Color")
-        linecolor.setToolTip("Line color")
+        linecolor = QPushButton(QApplication.translate("Button","Line Color",None, QApplication.UnicodeUTF8))
+        linecolor.setToolTip(QApplication.translate("ToolTip","Line color",None, QApplication.UnicodeUTF8))
         linecolor.setMaximumWidth(100)
         self.connect(linecolor, SIGNAL("clicked()"),self.setlinecolor)
         
-        colorlabel = QLabel("Color pattern")    	
+        colorlabel = QLabel(QApplication.translate("Label","Color pattern",None, QApplication.UnicodeUTF8))    	
         self.colorSpinBox = QSpinBox()
-        self.colorSpinBox.setToolTip("Apply color pattern to whole graph")
+        self.colorSpinBox.setToolTip(QApplication.translate("ToolTip","Apply color pattern to whole graph",None, QApplication.UnicodeUTF8))
         self.colorSpinBox.setMaximumWidth(80)
         self.colorSpinBox.setRange(0,255)
         self.colorSpinBox.setValue(aw.qmc.wheelcolorpattern)
         self.colorSpinBox.setWrapping(True)
         self.connect(self.colorSpinBox, SIGNAL("valueChanged(int)"),self.setcolorpattern)
 
-        addButton = QPushButton("Add")
-        addButton.setToolTip("Add new wheel")
+        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
+        addButton.setToolTip(QApplication.translate("ToolTip","Add new wheel",None, QApplication.UnicodeUTF8))
         addButton.setMaximumWidth(100)
         self.connect(addButton, SIGNAL("clicked()"),self.insertwheel)
 
-        rotateLeftButton = QPushButton("<")
-        rotateLeftButton.setToolTip("Rotate graph 1 degree counter clockwise")
+        rotateLeftButton = QPushButton(QApplication.translate("Button","<",None, QApplication.UnicodeUTF8))
+        rotateLeftButton.setToolTip(QApplication.translate("ToolTip","Rotate graph 1 degree counter clockwise",None, QApplication.UnicodeUTF8))
         rotateLeftButton.setMaximumWidth(30)
         self.connect(rotateLeftButton, SIGNAL("clicked()"),lambda x = 1: self.rotatewheels(x))
         
-        rotateRightButton = QPushButton(">")
-        rotateRightButton.setToolTip("Rotate graph 1 degree clockwise")
+        rotateRightButton = QPushButton(QApplication.translate("Button",">",None, QApplication.UnicodeUTF8))
+        rotateRightButton.setToolTip(QApplication.translate("ToolTip","Rotate graph 1 degree clockwise",None, QApplication.UnicodeUTF8))
         rotateRightButton.setMaximumWidth(30)
         self.connect(rotateRightButton, SIGNAL("clicked()"),lambda x = 0: self.rotatewheels(x))
 
-        saveButton = QPushButton("Save File")
+        saveButton = QPushButton(QApplication.translate("Button","Save File",None, QApplication.UnicodeUTF8))
         saveButton.setMaximumWidth(100)
         self.connect(saveButton, SIGNAL("clicked()"),self.fileSave)
-        saveButton.setToolTip("Save graph to a text file.wg")
+        saveButton.setToolTip(QApplication.translate("ToolTip","Save graph to a text file.wg",None, QApplication.UnicodeUTF8))
         
-        saveImgButton = QPushButton("Save Img")
-        saveImgButton.setToolTip("Save image using current graph size to a png format")
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None, QApplication.UnicodeUTF8))
+        saveImgButton.setToolTip(QApplication.translate("ToolTip","Save image using current graph size to a png format",None, QApplication.UnicodeUTF8))
         saveImgButton.setMaximumWidth(100)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
-        openButton = QPushButton("Open")
-        openButton.setToolTip("open graph file.wg")
+        openButton = QPushButton(QApplication.translate("Button","Open",None, QApplication.UnicodeUTF8))
+        openButton.setToolTip(QApplication.translate("ToolTip","open graph file.wg",None, QApplication.UnicodeUTF8))
         openButton.setMaximumWidth(100)
         self.connect(openButton, SIGNAL("clicked()"),self.loadWheel)
 
-        closeButton = QPushButton("Close")
-        closeButton.setToolTip("Close wheel graph editor")
+        closeButton = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
+        closeButton.setToolTip(QApplication.translate("ToolTip","Close wheel graph editor",None, QApplication.UnicodeUTF8))
         closeButton.setMaximumWidth(100)
         self.connect(closeButton, SIGNAL("clicked()"),self.close)
 
@@ -12843,7 +12854,7 @@ class WheelDlg(QDialog):
         label2layout.addWidget(self.labelResetButton)
         label1layout.addLayout(label2layout)
 
-        self.labelGroupLayout = QGroupBox("Label Properties")       
+        self.labelGroupLayout = QGroupBox(QApplication.translate("GroupBox","Label Properties",None, QApplication.UnicodeUTF8))       
         self.labelGroupLayout.setLayout(label1layout)
         self.labelGroupLayout.setVisible(False)
         
@@ -12894,7 +12905,11 @@ class WheelDlg(QDialog):
         if nlabels:    
             self.labeltable.setRowCount(nlabels)
             self.labeltable.setColumnCount(5)
-            self.labeltable.setHorizontalHeaderLabels(["Label","Parent","Width","Color", "Opaqueness"])
+            self.labeltable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Parent",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Width",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Color",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Opaqueness",None, QApplication.UnicodeUTF8)])
             self.labeltable.setAlternatingRowColors(True)
             self.labeltable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
