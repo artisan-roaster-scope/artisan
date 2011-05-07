@@ -200,7 +200,8 @@ class tgraphcanvas(FigureCanvas):
                        "ArduinoTC4",
                        "TE VA18B",
                        "+309_34",
-                       "+FUJI DUTY %" 
+                       "+FUJI DUTY %",
+                       "Omega HHM28[6]"
                        ]
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
@@ -229,7 +230,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.ARDUINOTC4,
                                    self.TEVA18B,
                                    self.CENTER309_34,
-                                   self.fujidutycycle
+                                   self.fujidutycycle,
+                                   self.HHM28
                                    ]
 
         #extra devices
@@ -1041,7 +1043,16 @@ class tgraphcanvas(FigureCanvas):
         tx = self.timeclock.elapsed()/1000.
 
         return tx,t2,t1
-    
+
+    #multimeter
+    def HHM28(self):
+        val,symbols = aw.ser.HHM28multimeter()
+        tx = self.timeclock.elapsed()/1000.
+
+        aw.sendmessage(val + symbols)
+
+        return tx, float(val), 0.
+        
     #creates X axis labels ticks in mm:ss instead of seconds     
     def xaxistosm(self):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -9899,9 +9910,9 @@ class serialport(object):
         self.extra309T4 = 0.
         self.extra309TX = 0.
 
-        #holds the power % ducty cycle of Fuji PIDs  and ET-BT  	
-    	self.dutycycle = 0.
-    	self.dutycycleTX = 0.
+        #holds the power % ducty cycle of Fuji PIDs  and ET-BT      
+        self.dutycycle = 0.
+        self.dutycycleTX = 0.
         self.fujiETBT = 0.
         
     def openport(self):
@@ -10626,6 +10637,107 @@ class serialport(object):
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1 
+
+
+    def HHM28multimeter(self):
+        # This meter sends a continuos frame byte by byte. It only transmits data. It does not receive commands.
+        # A frame is composed of 14 ordered bytes. A byte is represented bellow enclosed in "XX"
+        # FRAME  = ["1A","2B","3C","4D","5E","6F","7G","8H","9I","10J","11K","12L","13M","14N"]
+        # The first 4 bits of each byte are dedicated to identify the byte in the frame by using a number.
+        # The last 4 bits of each byte are dedicated to carry Data. Depending on the byte number, the meaning of data changes.
+        # Bytes 2,3,4,5,6,7,8,9 carry data bits that represent actual segments of the four LCD numbers of the meter display.
+        # Bytes 1,10,11,12,13 carry data bits that represent other symbols like F (for Farad), u (for micro), M (for Mega), etc, of the meter display
+
+        try:
+            if not self.SP.isOpen():
+                self.openport()                    
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+
+            r, r2 = "",""
+            #keep reading till the first byte of next frame (till we read an actual 1 in 1A )
+            for i in range(20):  #any number > 14 will be OK     
+                r = self.SP.read(1)
+                if len(r):
+                    fb = (ord(r[0]) & 0xf0) >> 4
+                    if fb == 1:
+                        r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
+                        break
+                else:
+                    return "0",""
+                    
+            #create 14 byte frame 
+            frame = r + r2
+            if len(frame) == 14:
+                #extract data from frame in to a list containing the hex string values of the data
+                data = []
+                for i in range(14):
+                    data.append(hex((ord(frame[i]) & 0x0f))[2:])
+
+                #The four LCD digits are BC + DE + FG + HI   
+                digits = [data[1]+data[2],data[3]+data[4],data[5]+data[6],data[7]+data[8]]
+
+                #find sign 
+                sign = ""   # +
+                if (int(digits[0],16) & 0x80) >> 7:
+                    sign = "-"
+                    
+                #find location of decimal point
+                for i in range(4):
+                    if (int(digits[i],16) & 0x80) >> 7:
+                        dec = i
+                        digits[i] = hex(int(digits[i],16) & 0x7f)[2:]  #remove decimal point
+                        if len(digits[i]) < 2:
+                            digits[i] = "0" + digits[i]
+                #find value from table
+                table = {"00":" ","68":"L","7d":"0","05":"1","5b":"2","1f":"3",
+                         "27":"4","3e":"5","7e":"6","15":"7","7f":"8","3f":"9"} 
+                val = ""
+                for i in range(4):
+                    val += table[digits[i]]
+                    
+                number = ".".join((val[:dec],val[dec:]))  #add the decimal point
+
+                #find symbols
+                tablesymbols = [
+                                ["AC","","",""],    	    	#["AC","","Auto","RS232"]
+                                ["u","n","k","diode"],
+                                ["m","%","M","Beep"],
+                                ["F","Ohm","Relative","Hold"],
+                                ["A","V","Hz","Low Batt"]
+                                ]
+                masks = [0x08,0x04,0x02,0x01]
+                nbytes = [0,9,10,11,12]
+                symbols = ""
+                for p in range(5):
+                    for i in range(4):
+                        if (int(data[nbytes[p]],16) & masks[i]):
+                            symbols += " " + tablesymbols[p][i]
+                            
+                return (sign + number), symbols
+            else:
+                return "0",""
+        
+        except ValueError,e:
+            print e
+            error  = QApplication.translate("ErrorMessage","Value Error: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)
+            return "0","" 
+        
+        except serial.SerialException:
+            error  = QApplication.translate("ErrorMessage","Serial Exception: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)
+            return "0","" 
 
 #########################################################################
 #############  DESIGNER CONFIG DIALOG ###################################                                   
@@ -11983,8 +12095,18 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.parity= 'E'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
-                message = ""   #empty message especial devoce
-
+                message = ""   #empty message especial device
+                
+            elif meter == "Omega HHM28[6]":
+                aw.qmc.device = 23
+                aw.ser.comport = "COM1"
+                aw.ser.baudrate = 2400
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+                
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
             aw.button_13.setVisible(False)
