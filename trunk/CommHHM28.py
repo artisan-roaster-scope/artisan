@@ -23,18 +23,17 @@ def main():
             print "V = " , r, symbols   #print value and attached symbols
         time.sleep(delay)
 
-#FRAME  = [1A,2B,3C,4D,5E,6F,7G,8H,9I,10J,11K,12L,13M,14N]  D=Data part of byte;  numbers are the location of byte in the frame 
+#FRAME  = [1A,2B,3C,4D,5E,6F,7G,8H,9I,10J,11K,12L,13M,14N]  ALPHA = Data part of byte; Numbers are used in frame to identify byte order
 def read():
     try:
-        ser = serial.Serial()
         ser = serial.Serial(port="COM1", baudrate=2400, bytesize=8, parity='N', stopbits=1, timeout=1)
-        #keep reading till the first byte of next frame
+        #keep reading till the first byte of next frame (till we read an actual 1 in 1A )
         for i in range(28):  #any number > 14 will be OK     
             r = ser.read(1)
             if len(r):
                 fb = (ord(r[0]) & 0xf0) >> 4
                 if fb == 1:
-                    r2 = ser.read(13)   #read the remaining 13 bytes
+                    r2 = ser.read(13)   #read the remaining 13 bytes to get 14 bytes
                     ser.close()
                     break
                 
