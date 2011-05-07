@@ -1051,8 +1051,11 @@ class tgraphcanvas(FigureCanvas):
 
         aw.sendmessage(val + symbols)
 
-        return tx, float(val), 0.
-        
+        if "L" in val:
+            return tx, 0, 0.
+        else:
+            return tx, float(val), 0.
+
     #creates X axis labels ticks in mm:ss instead of seconds     
     def xaxistosm(self):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -5787,7 +5790,7 @@ class ApplicationWindow(QMainWindow):
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<title>""" + QApplication.translate("HTML Report Template", "Roasting Report", None, QApplication.UnicodeUTF8) + """</title>
+<title>""" + unicode(QApplication.translate("HTML Report Template", "Roasting Report", None, QApplication.UnicodeUTF8)) + """</title>
 <style type="text/css">
 td { 
   vertical-align: top;
@@ -5812,15 +5815,15 @@ th {
 <td>
 <table width="220">
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Date:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Date:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$datetime</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Beans:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Beans:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$beans</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Weight:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Weight:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$weight</td>
 </tr>
 <tr>
@@ -5828,19 +5831,19 @@ th {
 <td>$degree</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Volume:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Volume:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$volume</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Roaster:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Roaster:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$roaster</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Operator:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Operator:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$operator</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Cupping:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Cupping:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$cup</td>
 </tr>
 </table>
@@ -5848,7 +5851,7 @@ th {
 <td>
 <table width="180">
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Charge:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Charge:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$charge</td>
 </tr>
 <tr>
@@ -5856,27 +5859,27 @@ th {
 <td>$TP</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "DRY:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "DRY:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$DRY</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "FCs:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "FCs:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$FCs</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "FCe:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "FCe:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$FCe</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "SCs:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "SCs:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$SCs</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "SCe:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "SCe:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$SCe</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Drop:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Drop:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$drop</td>
 </tr>
 </table>
@@ -5884,15 +5887,15 @@ th {
 <td>
 <table width="210">
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Dry phase:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Dry phase:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$dry_phase</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Mid phase:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Mid phase:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$mid_phase</td>
 </tr>
 <tr>
-<th>""" + QApplication.translate("HTML Report Template", "Finish phase:", None, QApplication.UnicodeUTF8) + """</th>
+<th>""" + unicode(QApplication.translate("HTML Report Template", "Finish phase:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$finish_phase</td>
 </tr>
 </table>
@@ -5902,7 +5905,7 @@ th {
 </center>
 </td>
 <td>
-<center><b>""" + QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8) + """</b></center>
+<center><b>""" + unicode(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
 $roasting_notes
 </td>
 </tr>
@@ -5911,10 +5914,10 @@ $roasting_notes
 <td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'/></td>
 </tr>
 <tr>
-<td><center><b>""" + QApplication.translate("HTML Report Template", "Events", None, QApplication.UnicodeUTF8) + """</b></center><br/>
+<td><center><b>""" + unicode(QApplication.translate("HTML Report Template", "Events", None, QApplication.UnicodeUTF8)) + """</b></center><br/>
 $specialevents
 </td>
-<td><center><b>""" + QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8) + """</b></center>
+<td><center><b>""" + unicode(QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
 $cupping_notes
 </td>
 </tr>
@@ -10658,7 +10661,7 @@ class serialport(object):
 
             r, r2 = "",""
             #keep reading till the first byte of next frame (till we read an actual 1 in 1A )
-            for i in range(20):  #any number > 14 will be OK     
+            for i in range(28):  #any number > 14 will be OK     
                 r = self.SP.read(1)
                 if len(r):
                     fb = (ord(r[0]) & 0xf0) >> 4
