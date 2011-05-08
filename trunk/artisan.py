@@ -208,30 +208,30 @@ class tgraphcanvas(FigureCanvas):
         # device 1 (with index 1 bellow) is Omega HH806
         # device 2 (with index 2 bellow) is omega HH506
         # etc
-        self.devicefunctionlist = [self.fujitemperature,
-                                   self.HH806AU,
-                                   self.HH506RA,
-                                   self.CENTER309,
-                                   self.CENTER306,
-                                   self.CENTER305,
-                                   self.CENTER304,
-                                   self.CENTER303,
-                                   self.CENTER302,
-                                   self.CENTER301,
-                                   self.CENTER300,
-                                   self.VOLTCRAFTK204,
-                                   self.VOLTCRAFTK202,
-                                   self.VOLTCRAFT300K,
-                                   self.VOLTCRAFT302KJ,
-                                   self.EXTECH421509,
-                                   self.HH802U,
-                                   self.HH309,
-                                   self.NONE,
-                                   self.ARDUINOTC4,
-                                   self.TEVA18B,
-                                   self.CENTER309_34,
-                                   self.fujidutycycle,
-                                   self.HHM28
+        self.devicefunctionlist = [self.fujitemperature,    #0
+                                   self.HH806AU,            #1
+                                   self.HH506RA,            #2
+                                   self.CENTER309,          #3
+                                   self.CENTER306,          #4
+                                   self.CENTER305,          #5
+                                   self.CENTER304,          #6
+                                   self.CENTER303,          #7
+                                   self.CENTER302,          #8
+                                   self.CENTER301,          #9
+                                   self.CENTER300,          #10
+                                   self.VOLTCRAFTK204,      #11
+                                   self.VOLTCRAFTK202,      #12
+                                   self.VOLTCRAFT300K,      #13
+                                   self.VOLTCRAFT302KJ,     #14
+                                   self.EXTECH421509,       #15
+                                   self.HH802U,             #16
+                                   self.HH309,              #17
+                                   self.NONE,               #18
+                                   self.ARDUINOTC4,         #19
+                                   self.TEVA18B,            #20
+                                   self.CENTER309_34,       #21
+                                   self.fujidutycycle,      #22
+                                   self.HHM28               #23
                                    ]
 
         #extra devices
@@ -624,17 +624,16 @@ class tgraphcanvas(FigureCanvas):
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
 
-
             #######  if using more than one device
             ndevices = len(self.extradevices)
             if ndevices:
-                oldSP = aw.ser.SP.port                                  # save the name of the serial port used by ET/BT device
-                oldSPsettings = aw.ser.SP.getSettingsDict()             # save ET/BT device serial settings
                 for i in range(ndevices):
-                    aw.ser.SP.setPort(aw.ser.extraSP[i].port)                                 # change name
-                    aw.ser.SP.applySettingsDict(aw.ser.extraSP[i].getSettingsDict())          # change settings
+                    aw.ser.extraSP[i].close()
+                    aw.ser.SP.close()
+                    aw.ser.SP = serial.Serial(port=aw.ser.extracomport[i], baudrate=aw.ser.extrabaudrate[i],bytesize=aw.ser.extrabytesize[i],
+                                               parity=aw.ser.extraparity[i], stopbits=aw.ser.extrastopbits[i], timeout=aw.ser.extratimeout[i])
                     extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
-                    
+                    aw.ser.SP.close()
                     # TEST READINGS FOR METER ERRORS
                     if len(self.extratimex[i]):
                         #test for out of range
@@ -660,10 +659,9 @@ class tgraphcanvas(FigureCanvas):
                     self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
                     self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
                 #restore ET/BT device serial port 
-                aw.ser.SP.setPort(oldSP)
-                aw.ser.SP.applySettingsDict(oldSPsettings)
-            ##########
-                
+                aw.ser.SP = serial.Serial(port=aw.ser.comport, baudrate=aw.ser.baudrate,bytesize=aw.ser.bytesize,
+                                          parity=aw.ser.parity, stopbits=aw.ser.stopbits, timeout=aw.ser.timeout)
+            ##########  
 
             #update screen                
             self.fig.canvas.draw()
@@ -884,7 +882,7 @@ class tgraphcanvas(FigureCanvas):
 
             #get current duty cycle and update LCD 7
             aw.ser.dutycycle = aw.pid.readdutycycle()
-            aw.ser.dutycycletime = tx
+            aw.ser.dutycycleTX = tx
             if t2:
                 aw.ser.fujiETBT = t1-t2
             else:
@@ -899,7 +897,7 @@ class tgraphcanvas(FigureCanvas):
     #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
     def fujidutycycle(self):
         #return saved readings
-        return aw.ser.dutycycleTX,(100.+aw.ser.dutycycle),(50.+aw.ser.fujiETBT)  #raise duty cycle in graph to 100, et-bt to 50 
+        return aw.ser.dutycycleTX,aw.ser.dutycycle,aw.ser.fujiETBT  #raise duty cycle in graph to 100, et-bt to 50 
 
     def HH506RA(self):
         
@@ -9967,7 +9965,7 @@ class serialport(object):
     def sendFUJIcommand(self,binstring,nbytes):
         try:
             if not self.SP.isOpen():
-                self.openport()                    
+                self.SP.open()                   
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
@@ -10019,7 +10017,7 @@ class serialport(object):
     def HH806AUtemperature(self):
         try:
             if not self.SP.isOpen():
-                self.openport()
+                self.SP.open()
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -10074,7 +10072,7 @@ class serialport(object):
            
         try:
             if not self.SP.isOpen():
-                self.openport()                    
+                self.SP.open()                    
                
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -10115,7 +10113,7 @@ class serialport(object):
     def HH506RAGetID(self):   
         try:
             if not self.SP.isOpen():
-                self.openport()                    
+                self.SP.open()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -10233,7 +10231,7 @@ class serialport(object):
     def CENTER303temperature(self):
         try:
             if not self.SP.isOpen():
-                self.openport()                    
+                self.SP.open()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -10334,7 +10332,7 @@ class serialport(object):
                 
         try:
             if not self.SP.isOpen():
-                self.openport()                    
+                self.SP.open()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -10383,7 +10381,7 @@ class serialport(object):
     def ARDUINOTC4temperature(self):
         try:
             if not self.SP.isOpen():
-                self.openport()                    
+                self.SP.open()                    
                 libtime.sleep(3)
                 
             if self.SP.isOpen():
@@ -10653,7 +10651,7 @@ class serialport(object):
 
         try:
             if not self.SP.isOpen():
-                self.openport()                    
+                self.SP.open()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -11815,7 +11813,7 @@ class DeviceAssignmentDLG(QDialog):
 ##                QMessageBox.information(self,"Device Conf","Extra device empty")    
                 return
             else:
-                aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1  
+                aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1
             aw.qmc.extraname1[i] = unicode(name1edit.text())
             aw.qmc.extraname2[i] = unicode(name2edit.text())
         #update legend
