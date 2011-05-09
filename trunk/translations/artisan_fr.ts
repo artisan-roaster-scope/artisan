@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="fr_FR">
+<!DOCTYPE TS>
+<TS version="2.0" language="fr_FR">
 <context>
     <name>About</name>
     <message>
@@ -2510,7 +2511,7 @@
     <message>
         <location filename="artisan.py" line="1011"/>
         <source>Do you want to save the profile?</source>
-        <translation>Voulez-vous sauvegarder le profil ?</translation>
+        <translation type="unfinished">Voulez-vous enregistrer le profil ?</translation>
     </message>
     <message>
         <location filename="artisan.py" line="1650"/>
