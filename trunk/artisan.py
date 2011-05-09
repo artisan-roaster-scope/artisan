@@ -3656,6 +3656,9 @@ class ApplicationWindow(QMainWindow):
                     QAction(self, visible=False,
                             triggered=self.openRecentFile))
 
+        #flag to reset Qsettings
+        self.resetqsettings = 0
+
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month. file-open/save will point to profilepath
         self.profilepath = u""
 
@@ -4383,6 +4386,10 @@ class ApplicationWindow(QMainWindow):
         messageAction = QAction(UIconst.HELP_MENU_MESSAGES,self)
         self.connect(messageAction,SIGNAL("triggered()"),self.viewMessageLog)
         self.helpMenu.addAction(messageAction)
+
+        resetAction = QAction(UIconst.HELP_MENU_RESET,self)
+        self.connect(resetAction,SIGNAL("triggered()"),self.resetApplication)
+        self.helpMenu.addAction(resetAction)
         
         # activate event button
         if self.eventsbuttonflag:
@@ -4408,7 +4415,17 @@ class ApplicationWindow(QMainWindow):
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
 
-        
+    def resetApplication(self):
+        string = QApplication.translate("MessageBox","Do you want to reset all settings", None, QApplication.UnicodeUTF8)
+        reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Factory Reset", None, QApplication.UnicodeUTF8),string,
+                            QMessageBox.Reset | QMessageBox.Cancel)
+        if reply == QMessageBox.Reset :
+            #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
+            self.resetqsettings = 1
+            self.close()
+        elif reply == QMessageBox.Cancel:            
+            return
+             
     def on_actionCut_triggered(self,checked=None):
         try:
             app.activeWindow().focusWidget().cut()
@@ -5454,8 +5471,15 @@ class ApplicationWindow(QMainWindow):
 
     #loads the settings at the start of application. See the oppposite closeEvent()
     def settingsLoad(self):
-        try:
+        try: 
             settings = QSettings()
+            if settings.contains("resetqsettings"):
+                self.resetqsettings = settings.value("resetqsettings",self.resetqsettings).toInt()[0]
+                if self.resetqsettings:
+                    self.resetqsettings = 0
+                    self.qmc.redraw()
+                    return  #don't load any more settings. They could be bad (corrupted). Stop here.
+                
             #restore geometry
             self.restoreGeometry(settings.value("Geometry").toByteArray())
             #restore mode
@@ -5753,6 +5777,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraparity",self.ser.extraparity)                                                                
             settings.setValue("extrastopbits",self.ser.extrastopbits)                                                                
             settings.setValue("extratimeout",self.ser.extratimeout)                                                                           
+            settings.endGroup()
+
+            settings.setValue("resetqsettings",self.resetqsettings)
             
         except Exception,e:
             self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))            
@@ -10143,7 +10170,7 @@ class serialport(object):
     def CENTER306temperature(self):
         try:
             if not self.SP.isOpen():
-                self.openport()                    
+                self.SP.open()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -10470,7 +10497,7 @@ class serialport(object):
                 counter = counter + 1
             
                 if not self.SP.isOpen():
-                    self.openport()    
+                    self.SP.open()    
                     libtime.sleep(2)
                     
                 if self.SP.isOpen():
@@ -10667,10 +10694,18 @@ class serialport(object):
                         r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
                         break
                 else:
-                    return "0",""
+                    raise ValueError, unicode("No Data received")
                     
-            #create 14 byte frame 
+    
             frame = r + r2
+            
+            #check bytes
+            for i in range(14):
+                number  = fb = (ord(frame[i]) & 0xf0) >> 4
+                if number != i+1:
+                    #find device index
+                    raise ValueError, unicode("Data corruption")
+
             if len(frame) == 14:
                 #extract data from frame in to a list containing the hex string values of the data
                 data = []
@@ -10696,8 +10731,12 @@ class serialport(object):
                 table = {"00":" ","68":"L","7d":"0","05":"1","5b":"2","1f":"3",
                          "27":"4","3e":"5","7e":"6","15":"7","7f":"8","3f":"9"} 
                 val = ""
+                #some erros found in values: "38","5d",0A,etc
                 for i in range(4):
-                    val += table[digits[i]]
+                    if digits[i] in table:
+                        val += table[digits[i]]
+                    else:
+                        raise ValueError, unicode("Data corruption")
                     
                 number = ".".join((val[:dec],val[dec:]))  #add the decimal point
 
@@ -10715,21 +10754,32 @@ class serialport(object):
                 for p in range(5):
                     for i in range(4):
                         if (int(data[nbytes[p]],16) & masks[i]):
-                            symbols += " " + tablesymbols[p][i]
-                            
+                            symbols += " " + tablesymbols[p][i]            
                 return (sign + number), symbols
             else:
-                return "0",""
+                raise ValueError, unicode("Needed 14 bytes but only received %i"%(len(frame)))
+
         
         except ValueError,e:
-            print e
+            #print e
             error  = QApplication.translate("ErrorMessage","Value Error: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-            return "0","" 
+            #find device index
+            if aw.qmc.device == 23:
+                if len(aw.qmc.temp1):
+                    return str(aw.qmc.temp1[-1]),str(aw.qmc.temp2[-1])
+                else:
+                    return "0",""
+            else:
+                index = aw.qmc.extradevices.index(23)
+                if len(aw.qmc.extratemp1[i]):
+                    return str(aw.qmc.extratemp1[index][-1]),str(aw.qmc.temp2[index][-1])
+                else:
+                    return "0",""
         
         except serial.SerialException:
             error  = QApplication.translate("ErrorMessage","Serial Exception: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
