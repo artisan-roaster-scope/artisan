@@ -11710,7 +11710,12 @@ class DeviceAssignmentDLG(QDialog):
         if ndevices:    
             self.devicetable.setRowCount(ndevices)
             self.devicetable.setColumnCount(6)
-            self.devicetable.setHorizontalHeaderLabels(["Delete","Device type","Color line 1", "Color line 2","Label 1","Label 2"])
+            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Delete",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "Device type",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "Color line 1",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "Color line 2",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "Label 1",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "Label 2",None, QApplication.UnicodeUTF8)])
             self.devicetable.setAlternatingRowColors(True)
             self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -12773,7 +12778,7 @@ class WheelDlg(QDialog):
         txtButtonplus.setToolTip(QApplication.translate("ToolTip","Increase size of text in all the graph",None, QApplication.UnicodeUTF8))
         txtButtonplus.setMaximumWidth(30)
         self.connect(txtButtonplus, SIGNAL("clicked()"),lambda x = 1: self.changetext(x))
-        txtButtonminus = QPushButton(QApplication.translate("Button","-")
+        txtButtonminus = QPushButton(QApplication.translate("Button","-",None, QApplication.UnicodeUTF8))
         txtButtonminus.setToolTip(QApplication.translate("ToolTip","Decrease size of text in all the graph",None, QApplication.UnicodeUTF8))
         txtButtonminus.setMaximumWidth(30)
         self.connect(txtButtonminus, SIGNAL("clicked()"),lambda x = 0: self.changetext(x))
@@ -13072,10 +13077,16 @@ class WheelDlg(QDialog):
         if ndata:    
             self.datatable.setRowCount(ndata)
             self.datatable.setColumnCount(10)
-            self.datatable.setHorizontalHeaderLabels(["Del Wheel","Edit Labels","Update Labels","Properties",
-                                                      "Radius","Starting angle","Txt Projection","Txt size","Color","Color Pattern"])
-            self.datatable.setHorizontalHeaderLabels(["Delete Wheel","Edit Labels","Update Labels","Properties",
-                                                      "Radius","Starting angle","Txt Projection","Text size","Color","Color Pattern"])
+            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Delete Wheel",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Edit Labels",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Update Labels",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Properties",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Radius",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Starting angle",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Txt Projection",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Text size",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Color",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","Color Pattern",None, QApplication.UnicodeUTF8)])
             self.datatable.setAlternatingRowColors(True)
             self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -13084,16 +13095,15 @@ class WheelDlg(QDialog):
 
             #populate table
             for i in range(ndata):
-                delButton = QPushButton("Del")
-                delButton = QPushButton("Delete")
+                delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
                 self.connect(delButton, SIGNAL("clicked()"),lambda x = i: self.popwheel(x))
 
                 labelsedit = QLineEdit(unicode(",".join(aw.qmc.wheelnames[i])))
 
-                updateButton = QPushButton("Update")
+                updateButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
                 self.connect(updateButton, SIGNAL("clicked()"),lambda x = i: self.updatelabels(x))
 
-                setButton = QPushButton("Wheel Properties")
+                setButton = QPushButton(QApplication.translate("Button","Wheel Properties",None, QApplication.UnicodeUTF8))
                 self.connect(setButton, SIGNAL("clicked()"),lambda x = i: self.createlabeltable(x))                
                                
                 widthSpinBox = QDoubleSpinBox()
@@ -13103,14 +13113,16 @@ class WheelDlg(QDialog):
                 self.connect(widthSpinBox, SIGNAL("valueChanged(double)"),lambda z=1,x=i: self.setwidth(z,x))
 
                 angleSpinBox = QSpinBox()
-                angleSpinBox.setSuffix(" dg")
+                angleSpinBox.setSuffix(QApplication.translate("SpinBox"," dg",None, QApplication.UnicodeUTF8))
                 angleSpinBox.setRange(0,359)
                 angleSpinBox.setWrapping(True)
                 angleSpinBox.setValue(aw.qmc.startangle[i])
                 self.connect(angleSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=i: self.setangle(z,x))
 
                 projectionComboBox =  QComboBox()
-                projectionComboBox.addItems(["Flat","Perpendicular","Radial"])
+                projectionComboBox.addItems([QApplication.translate("ComboBox","Flat",None, QApplication.UnicodeUTF8),
+                                             QApplication.translate("ComboBox","Perpendicular",None, QApplication.UnicodeUTF8),
+                                             QApplication.translate("ComboBox","Radial",None, QApplication.UnicodeUTF8)])
                 projectionComboBox.setCurrentIndex(aw.qmc.projection[i])
                 self.connect(projectionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setprojection(z,x))
 
@@ -13119,7 +13131,7 @@ class WheelDlg(QDialog):
                 txtSpinBox.setValue(aw.qmc.wheeltextsize[i])
                 self.connect(txtSpinBox, SIGNAL("valueChanged(int)"),lambda z=1,x=i: self.setTextsizeX(z,x))                
 
-                colorButton = QPushButton("Set Color")
+                colorButton = QPushButton(QApplication.translate("Button","Set Color",None, QApplication.UnicodeUTF8))
                 self.connect(colorButton, SIGNAL("clicked()"),lambda x =i: self.setwheelcolor(x))
 
                 colorSpinBox = QSpinBox()
@@ -13275,17 +13287,17 @@ class WheelDlg(QDialog):
 
     def fileSave(self):
         try:
-            filename = aw.ArtisanSaveFileDialog(msg="Save Wheel graph",ext="*.wg")
+            filename = aw.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption","Save Wheel graph",None, QApplication.UnicodeUTF8),ext="*.wg")
             if filename:
                 #write
                 aw.serialize(filename,aw.getWheelGraph())
-                aw.sendmessage("Wheel Graph saved")
+                aw.sendmessage(QApplication.translate("Message Area","Wheel Graph saved",None, QApplication.UnicodeUTF8))
         except IOError,e:
-            aw.qmc.adderror(u"IO Error: Wheel graph filesave(): " + unicode(e) + " ")
+            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: Wheel graph filesave(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
     def loadWheel(self):        
-        filename = aw.ArtisanOpenFileDialog(msg="Open Wheel Graph",ext="*.wg")
+        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Open Wheel Graph",None, QApplication.UnicodeUTF8),ext="*.wg")
         aw.loadWheel(filename)
         self.createdatatable()
         aw.qmc.drawWheel()
@@ -13301,26 +13313,26 @@ class AlarmDlg(QDialog):
     def __init__(self, parent = None):
         super(AlarmDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle("Alarms")
+        self.setWindowTitle(QApplication.translate("Form Caption","Alarms",None, QApplication.UnicodeUTF8))
 
         #table for alarms
         self.alarmtable = QTableWidget()
         self.alarmtable.setTabKeyNavigation(True)
         self.createalarmtable()        
 
-        allonButton = QPushButton("Set All ON")
+        allonButton = QPushButton(QApplication.translate("Button","Set All ON",None, QApplication.UnicodeUTF8))
         self.connect(allonButton,  SIGNAL("clicked()"), lambda flag=1: self.alarmson(flag))
         allonButton.setFocusPolicy(Qt.NoFocus)
 
-        alloffButton = QPushButton("Set All OFF")
+        alloffButton = QPushButton(QApplication.translate("Button","Set All OFF",None, QApplication.UnicodeUTF8))
         self.connect(alloffButton, SIGNAL("clicked()"), lambda flag=0: self.alarmson(flag))
         alloffButton.setFocusPolicy(Qt.NoFocus)
 
-        addButton = QPushButton("Add")
+        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
         self.connect(addButton, SIGNAL("clicked()"),self.addalarm)
         addButton.setFocusPolicy(Qt.NoFocus)
 
-        deleteButton = QPushButton("Delete")
+        deleteButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
         self.connect(deleteButton, SIGNAL("clicked()"),self.deletealarm)
         deleteButton.setFocusPolicy(Qt.NoFocus)
 
@@ -13328,7 +13340,7 @@ class AlarmDlg(QDialog):
 #        self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("reject()"))
 #        closeButton.setFocusPolicy(Qt.NoFocus)
 
-        saveButton = QPushButton("Ok")
+        saveButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         self.connect(saveButton, SIGNAL("clicked()"),self.closealarms)
 
         tablelayout = QVBoxLayout()
@@ -13365,7 +13377,7 @@ class AlarmDlg(QDialog):
         aw.qmc.alarmsource.append(1)
         aw.qmc.alarmtemperature.append(500)
         aw.qmc.alarmaction.append(0)
-        aw.qmc.alarmstrings.append("Enter description")
+        aw.qmc.alarmstrings.append(QApplication.translate("Alarm","Enter description",None, QApplication.UnicodeUTF8))
         self.createalarmtable()
 
         aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)   # 0 = not triggered
@@ -13428,7 +13440,12 @@ class AlarmDlg(QDialog):
         if nalarms:    
             self.alarmtable.setRowCount(nalarms)
             self.alarmtable.setColumnCount(6)
-            self.alarmtable.setHorizontalHeaderLabels(["From","Status","Source","Temperature","Action","Description"])
+            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Temperature",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8)])
             self.alarmtable.setAlternatingRowColors(True)
             self.alarmtable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.alarmtable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -13439,17 +13456,24 @@ class AlarmDlg(QDialog):
             for i in range(nalarms):
                 #Effective time from
                 timeComboBox = QComboBox()
-                timeComboBox.addItems(["CHARGE","DRY END","FC START","FC END","SC START","DROP"])
+                timeComboBox.addItems([QApplication.translate("ComboBox","CHARGE",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","DRY END",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","FC START",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","FC END",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","SC START",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8)])
                 timeComboBox.setCurrentIndex(aw.qmc.alarmtime[i])
                                             
                 #flag
                 flagComboBox = QComboBox()
-                flagComboBox.addItems(["OFF","ON"])
+                flagComboBox.addItems([QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8)])
                 flagComboBox.setCurrentIndex(aw.qmc.alarmflag[i])
 
                 #type
                 typeComboBox = QComboBox()
-                typeComboBox.addItems(["ET","BT"])
+                typeComboBox.addItems([QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8)])
                 typeComboBox.setCurrentIndex(aw.qmc.alarmsource[i])
 
                 #temperature
@@ -13458,7 +13482,8 @@ class AlarmDlg(QDialog):
 
                 #action
                 actionComboBox = QComboBox()
-                actionComboBox.addItems(["Pop up window","Call program"])
+                actionComboBox.addItems([QApplication.translate("ComboBox","Pop up window",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","Call program",None, QApplication.UnicodeUTF8)])
                 actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i])
                     
                 #text description
@@ -13481,7 +13506,7 @@ class PXRpidDlgControl(QDialog):
         super(PXRpidDlgControl,self).__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         
-        self.setWindowTitle("Fuji PXR PID control")
+        self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXR PID control",None, QApplication.UnicodeUTF8))
 
         #create Ramp Soak control button colums
 
@@ -13504,7 +13529,7 @@ class PXRpidDlgControl(QDialog):
 
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
-        self.status.showMessage("Ready",5000)
+        self.status.showMessage(QApplication.translate("StatusBar",None, QApplication.UnicodeUTF8),"Ready",5000)
 
         self.label_rs1 =  QLabel()
         self.label_rs2 =  QLabel()
@@ -13518,12 +13543,12 @@ class PXRpidDlgControl(QDialog):
         self.paintlabels()
         
         #update button and exit button
-        button_getall = QPushButton("Read Ra/So values")
-        button_rson =  QPushButton("RampSoak ON")        
-        button_rsoff =  QPushButton("RampSoak OFF")
-        button_standbyON = QPushButton("PID OFF")
-        button_standbyOFF = QPushButton("PID ON")
-        button_exit = QPushButton("Close")
+        button_getall = QPushButton(QApplication.translate("Button","Read Ra/So values",None, QApplication.UnicodeUTF8))
+        button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None, QApplication.UnicodeUTF8))        
+        button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None, QApplication.UnicodeUTF8))
+        button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None, QApplication.UnicodeUTF8))
+        button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None, QApplication.UnicodeUTF8))
+        button_exit = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
 
         self.connect(self.patternComboBox,SIGNAL("currentIndexChanged(int)"),self.paintlabels)
         self.connect(button_getall, SIGNAL("clicked()"), self.getallsegments)
@@ -13534,13 +13559,13 @@ class PXRpidDlgControl(QDialog):
         self.connect(button_exit, SIGNAL("clicked()"),self, SLOT("reject()"))
 
         #TAB 2
-        tab2svbutton = QPushButton("Write SV")
-        tab2cancelbutton = QPushButton("Cancel")
-        tab2easyONsvbutton = QPushButton("Turn ON SV buttons")
+        tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None, QApplication.UnicodeUTF8))
+        tab2cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","Turn ON SV buttons",None, QApplication.UnicodeUTF8))
         tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: #ffaaff}")
-        tab2easyOFFsvbutton = QPushButton("Turn OFF SV buttons")
+        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","Turn OFF SV buttons",None, QApplication.UnicodeUTF8))
         tab2easyOFFsvbutton.setStyleSheet("QPushButton { background-color: lightblue}")
-        tab2getsvbutton = QPushButton("Read current SV value")
+        tab2getsvbutton = QPushButton(QApplication.translate("Button","Read current SV value",None, QApplication.UnicodeUTF8))
         self.readsvedit = QLineEdit()
         self.connect(tab2svbutton, SIGNAL("clicked()"),self.setsv)
         self.connect(tab2getsvbutton, SIGNAL("clicked()"),self.getsv)
@@ -13558,9 +13583,9 @@ class PXRpidDlgControl(QDialog):
         self.svedit.setValidator(QDoubleValidator(0., 999., 1, self.svedit))
         
         #TAB 3
-        button_p = QPushButton("Set p")
-        button_i = QPushButton("Set i")
-        button_d = QPushButton("Set d")
+        button_p = QPushButton(QApplication.translate("Button","Set p",None, QApplication.UnicodeUTF8))
+        button_i = QPushButton(QApplication.translate("Button","Set i",None, QApplication.UnicodeUTF8))
+        button_d = QPushButton(QApplication.translate("Button","Set d",None, QApplication.UnicodeUTF8))
         plabel =  QLabel(QApplication.translate("Label", "p",None, QApplication.UnicodeUTF8))
         ilabel =  QLabel(QApplication.translate("Label", "i",None, QApplication.UnicodeUTF8))
         dlabel =  QLabel(QApplication.translate("Label", "d",None, QApplication.UnicodeUTF8))
@@ -13573,10 +13598,10 @@ class PXRpidDlgControl(QDialog):
         self.pedit.setValidator(QDoubleValidator(0., 999., 1, self.pedit))
         self.iedit.setValidator(QIntValidator(0, 3200, self.iedit))
         self.dedit.setValidator(QDoubleValidator(0., 999.0, 1, self.dedit))
-        button_autotuneON = QPushButton("Autotune ON")
-        button_autotuneOFF = QPushButton("Autotune OFF")
-        button_readpid = QPushButton("Read PID values")
-        tab3cancelbutton = QPushButton("Cancel")
+        button_autotuneON = QPushButton(QApplication.translate("Button","Autotune ON",None, QApplication.UnicodeUTF8))
+        button_autotuneOFF = QPushButton(QApplication.translate("Button","Autotune OFF",None, QApplication.UnicodeUTF8))
+        button_readpid = QPushButton(QApplication.translate("Button","Read PID values",None, QApplication.UnicodeUTF8))
+        tab3cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
 
         self.connect(button_autotuneON, SIGNAL("clicked()"), lambda flag=1: self.setONOFFautotune(flag))
         self.connect(button_autotuneOFF, SIGNAL("clicked()"), lambda flag=0: self.setONOFFautotune(flag))
@@ -13660,19 +13685,19 @@ class PXRpidDlgControl(QDialog):
         
         C1Widget = QWidget()
         C1Widget.setLayout(buttonMasterLayout)
-        TabWidget.addTab(C1Widget,"RS")
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","RS",None, QApplication.UnicodeUTF8))
         
         C2Widget = QWidget()
         C2Widget.setLayout(svlayout)
-        TabWidget.addTab(C2Widget,"SV")
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","SV",None, QApplication.UnicodeUTF8))
 
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
-        TabWidget.addTab(C3Widget,"pid")
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","pid",None, QApplication.UnicodeUTF8))
 
         C4Widget = QWidget()
         C4Widget.setLayout(tab4layout)
-        TabWidget.addTab(C4Widget,"Set RS")        
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Set RS",None, QApplication.UnicodeUTF8))        
 
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -13744,38 +13769,38 @@ class PXRpidDlgControl(QDialog):
 
             
     def setONOFFautotune(self,flag):
-        self.status.showMessage(u"setting autotune...",500)
+        self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None, QApplication.UnicodeUTF8),500)
         command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["autotuning"][1],flag)
         #TX and RX
         r = aw.ser.sendFUJIcommand(command,8)
         if len(r) == 8:
             if flag == 0:
                 aw.pid.PXR["autotuning"][0] = 0
-                self.status.showMessage(u"Autotune successfully turned OFF",5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned OFF",None, QApplication.UnicodeUTF8),5000)
             if flag == 1:
                 aw.pid.PXR["autotuning"][0] = 1
-                self.status.showMessage(u"Autotune successfully turned ON",5000) 
+                self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned ON",None, QApplication.UnicodeUTF8),5000) 
         else:
-            mssg = u"setONOFFautotune() problem "
+            mssg = QApplication.translate("StatusBar","setONOFFautotune() problem ",None, QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
-            aw.qmc.adderror(u"setONOFFautotune(): bad response")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","setONOFFautotune(): bad response",None, QApplication.UnicodeUTF8))
         
     def setONOFFstandby(self,flag):
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
         #flag = 0 standby OFF, flag = 1 standby ON (pid off)
-        self.status.showMessage(u"wait...",500)
+        self.status.showMessage(QApplication.translate("StatusBar","wait...",None, QApplication.UnicodeUTF8),500)
         command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["runstandby"][1],flag)
         #TX and RX
         r = aw.ser.sendFUJIcommand(command,8)
         if r == command:               
             if flag == 1:
-                message = u"PID OFF"     #put pid in standby 1 (pid on)
+                message = QApplication.translate("StatusBar","PID OFF",None, QApplication.UnicodeUTF8)     #put pid in standby 1 (pid on)
                 aw.pid.PXR["runstandby"][0] = 1
             elif flag == 0:
-                message = u"PID ON"      #put pid in standby 0 (pid off)
+                message = QApplication.translate("StatusBar","PID ON",None, QApplication.UnicodeUTF8)      #put pid in standby 0 (pid off)
                 aw.pid.PXR["runstandby"][0] = 0
         else:
-            mssg = u"setONOFFstandby(): problem "
+            mssg = QApplication.translate("StatusBar","setONOFFstandby(): problem ",None, QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
@@ -13785,18 +13810,18 @@ class PXRpidDlgControl(QDialog):
             command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["sv0"][1],newSVvalue)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                message = u" SV successfully set to " + self.svedit.text()
+                message = QApplication.translate("StatusBar"," SV successfully set to %1",None, QApplication.UnicodeUTF8).arg(self.svedit.text())
                 aw.pid.PXR["sv0"][0] = float(self.svedit.text())
                 self.status.showMessage(message,5000)
                 #record command as an Event 
                 strcommand = u"SETSV::"+ unicode("%.1f"%(newSVvalue/10.))
                 aw.qmc.DeviceEventRecord(strcommand)
             else:
-                mssg = u"setsv(): unable to set sv"
+                mssg = QApplication.translate("StatusBar","setsv(): unable to set sv",None, QApplication.UnicodeUTF8)
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)                
         else:
-            self.status.showMessage(u"Empty SV box",5000)
+            self.status.showMessage(QApplication.translate("StatusBar","Empty SV box",None, QApplication.UnicodeUTF8),5000)
 
     def getsv(self):
         temp = aw.pid.readcurrentsv()
@@ -13805,7 +13830,7 @@ class PXRpidDlgControl(QDialog):
             aw.lcd6.display(aw.pid.PXR["sv0"][0])
             self.readsvedit.setText(unicode(aw.pid.PXR["sv0"][0]))           
         else:
-            self.status.showMessage(u"Unable to read SV",5000)
+            self.status.showMessage(QApplication.translate("StatusBar","Unable to read SV",None, QApplication.UnicodeUTF8),5000)
 
             
     def checkrampsoakmode(self):
@@ -13813,53 +13838,117 @@ class PXRpidDlgControl(QDialog):
         currentmode = aw.pid.readoneword(msg)
         aw.pid.PXR["rampsoakstartend"][0] = currentmode
         if currentmode == 0:
-            mode = [u"0",u"OFF",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"OFF"]
+            mode = [u"0",
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8)]
         elif currentmode == 1:
-            mode = [u"1",u"OFF",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"ON"]
+            mode = [u"1",
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8)]
         elif currentmode == 2:
-            mode = [u"2",u"OFF",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"OFF"]
+            mode = [u"2",
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8)]
         elif currentmode == 3:
-            mode = [u"3",u"OFF",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"ON"]
+            mode = [u"3",
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8)]
         elif currentmode == 4:
-            mode = [u"4",u"OFF",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"OFF"]
+            mode = [u"4",
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8)]
         elif currentmode == 5:
-            mode = [u"5",u"OFF",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"ON"]
+            mode = [u"5",
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8)]
         elif currentmode == 6:
-            mode = [u"6",u"OFF",u"STANDBY MODE",u"STANDBY MODE",u"OFF"]
+            mode = [u"6",
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8)]
         elif currentmode == 7:
-            mode = [u"7",u"OFF",u"STANDBY MODE",u"STANDBY MODE",u"ON"]
+            mode = [u"7",
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8)]
         elif currentmode == 8:
-            mode = [u"8",u"ON",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"OFF"]
+            mode = [u"8",
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8)]
         elif currentmode == 9:
-            mode = [u"9",u"ON",u"CONTINUOUS CONTROL",u"CONTINUOUS CONTROL",u"ON"]
+            mode = [u"9",
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8)]
         elif currentmode == 10:
-            mode = [u"10",u"ON",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"OFF"]
+            mode = [u"10",
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8)]
         elif currentmode == 11:
-            mode = [u"11",u"ON",u"CONTINUOUS CONTROL",u"STANDBY MODE",u"ON"]
+            mode = [u"11",
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8)]
         elif currentmode == 12:
-            mode = [u"12",u"ON",u"STANDBY MODE",u"CONTINUOUS CONTROL",u"OFF"]
+            mode = [u"12",
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8)]
         elif currentmode == 13:
-            mode = [u"13",u"ON","STANDBY MODE",u"CONTINUOUS CONTROL",u"ON"]
+            mode = [u"13",
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","CONTINUOUS CONTROL",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8)]
         elif currentmode == 14:
-            mode = [u"14",u"ON",u"STANDBY MODE","STANDBY MODE",u"OFF"]
+            mode = [u"14",
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","OFF",None, QApplication.UnicodeUTF8)]
         elif currentmode == 15:
-            mode = [u"15",u"ON",u"STANDBY MODE",u"STANDBY MODE",u"ON"]
+            mode = [u"15",
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","STANDBY MODE",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("MessageBox","ON",None, QApplication.UnicodeUTF8)]
         else:
             return -1
 
-        string = u"The rampsoak-mode tells how to start and end the ramp/soak\n\n"
-        string += u"Your rampsoak mode in this pid is:\n"
-        string += u"\nMode = " + mode[0]
-        string += u"\n-----------------------------------------------------------------------"
-        string += u"\nStart to run from PV value: " + mode[1]
-        string += u"\nEnd output status at the end of ramp/soak: " + mode[2]
-        string += u"\nOutput status while ramp/soak opearion set to OFF: " + mode[3] 
-        string += u"\nRepeat Operation at the end: " + mode[4]
-        string += u"\n-----------------------------------------------------------------------"
-        string += u"\n\nRecomended Mode = 0\n"
-        string += u"\nIf you need to change it, change it now and come back later"
-        string += u"\nUse the Parameter Loader Software by Fuji if you need to\n\n"
-        string += u"\n\n\nContinue?" 
+        string =  QApplication.translate("MessageBox","The rampsoak-mode tells how to start and end the ramp/soak",None, QApplication.UnicodeUTF8) + "\n\n"
+        string += QApplication.translate("MessageBox","Your rampsoak mode in this pid is:",None, QApplication.UnicodeUTF8) + "\n\n"
+        string += QApplication.translate("MessageBox","Mode = %1",None, QApplication.UnicodeUTF8).arg(mode[0]) + "\n"
+        string += QApplication.translate("MessageBox","-----------------------------------------------------------------------",None, QApplication.UnicodeUTF8) + "\n"
+        string += QApplication.translate("MessageBox","Start to run from PV value: %1",None, QApplication.UnicodeUTF8).arg(mode[1]) + "\n"
+        string += QApplication.translate("MessageBox","End output status at the end of ramp/soak: %1",None, QApplication.UnicodeUTF8).arg(mode[2]) + "\n"
+        string += QApplication.translate("MessageBox","Output status while ramp/soak opearion set to OFF: %1",None, QApplication.UnicodeUTF8).arg(mode[3]) + "\n"
+        string += QApplication.translate("MessageBox","\nRepeat Operation at the end: %1",None, QApplication.UnicodeUTF8).arg(mode[4]) + "\n"
+        string += QApplication.translate("MessageBox","-----------------------------------------------------------------------",None, QApplication.UnicodeUTF8) + "\n\n"
+        string += QApplication.translate("MessageBox","Recomended Mode = 0",None, QApplication.UnicodeUTF8) + "\n\n"
+        string += QApplication.translate("MessageBox","If you need to change it, change it now and come back later",None, QApplication.UnicodeUTF8) + "\n"
+        string += QApplication.translate("MessageBox","Use the Parameter Loader Software by Fuji if you need to\n\n",None, QApplication.UnicodeUTF8) + "\n\n\n"
+        string += QApplication.translate("MessageBox","Continue?",None, QApplication.UnicodeUTF8)
  
 
     def setONOFFrampsoak(self,flag):         
@@ -13869,12 +13958,12 @@ class PXRpidDlgControl(QDialog):
         if flag == 1:
             check = self.checkrampsoakmode()
             if check == 0:
-                self.status.showMessage(u"Ramp/Soak operation cancelled", 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak operation cancelled",None, QApplication.UnicodeUTF8), 5000)
                 return
             elif check == -1:
-                self.status.showMessage(u"No RX data", 5000)
+                self.status.showMessage(Application.translate("StatusBar","No RX data",None, QApplication.UnicodeUTF8), 5000)
                 
-            self.status.showMessage(u"Setting RS ON...",500)
+            self.status.showMessage(Application.translate("StatusBar","Setting RS ON...",None, QApplication.UnicodeUTF8),500)
             #0 = 1-4
             #1 = 5-8
             #2 = 1-8
@@ -13885,14 +13974,14 @@ class PXRpidDlgControl(QDialog):
                 aw.pid.PXR["rampsoakpattern"][0] = currentmode
                 if currentmode != selectedmode:
                     #set mode in pid to match the mode selected in the combobox
-                    self.status.showMessage(u"Need to change pattern mode...",1000)
+                    self.status.showMessage(Application.translate("StatusBar","Need to change pattern mode...",None, QApplication.UnicodeUTF8),1000)
                     command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["rampsoakpattern"][1],selectedmode)
                     r = aw.ser.sendFUJIcommand(command,8)
                     if len(r) == 8:
-                        self.status.showMessage(u"Pattern has been changed. Wait 5 secs.", 500)
+                        self.status.showMessage(Application.translate("StatusBar","Pattern has been changed. Wait 5 secs.",None, QApplication.UnicodeUTF8), 500)
                         aw.pid.PXR["rampsoakpattern"][0] = selectedmode
                     else:
-                        self.status.showMessage(u"Pattern could not be changed", 5000)
+                        self.status.showMessage(Application.translate("StatusBar","Pattern could not be changed",None, QApplication.UnicodeUTF8), 5000)
                         return
                 #combobox mode matches pid mode
                 #set ramp soak mode ON
@@ -13901,7 +13990,7 @@ class PXRpidDlgControl(QDialog):
                 if r == command:
                     #record command as an Event if flag = 1
                     if flag == 1:
-                        self.status.showMessage(u"RS ON and running...", 5000)
+                        self.status.showMessage(Application.translate("StatusBar","RS ON and running...",None, QApplication.UnicodeUTF8), 5000)
                         #ramp soak pattern. 0=executes 1 to 4; 1=executes 5 to 8; 2=executes 1 to 8
                         pattern =[[1,4],[5,8],[1,8]]
                         start = pattern[aw.pid.PXR["rampsoakpattern"][0]][0]
@@ -13918,13 +14007,13 @@ class PXRpidDlgControl(QDialog):
                         result = result.strip(u"::")
                         aw.qmc.DeviceEventRecord(result)
                     elif fag == 0:
-                        self.status.showMessage(u"RS turned OFF", 5000)
+                        self.status.showMessage(Application.translate("StatusBar","RS turned OFF",None, QApplication.UnicodeUTF8), 5000)
                     elif fag == 2:
-                        self.status.showMessage(u"RS on HOLD mode", 5000)
+                        self.status.showMessage(Application.translate("StatusBar","RS on HOLD mode",None, QApplication.UnicodeUTF8), 5000)
                 else:
-                    self.status.showMessage(u"RampSoak could not be changed", 5000)
+                    self.status.showMessage(Application.translate("StatusBar","RampSoak could not be changed",None, QApplication.UnicodeUTF8), 5000)
             else:
-                mssg = u"setONOFFrampsoak(): problem "
+                mssg = Application.translate("StatusBar","setONOFFrampsoak(): problem ",None, QApplication.UnicodeUTF8)
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)
                   
