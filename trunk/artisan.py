@@ -242,6 +242,7 @@ class tgraphcanvas(FigureCanvas):
         self.extratemp1,self.extratemp2 = [],[]                     # extra temp1, temp2. List of lists
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
+        self.extramathexpression1,self.extramathexpression2 = [],[]           # list with user defined math evaluating strings. Example "2*cos(x)" 
  
         #main matplot figure with plot(s) inside
         self.fig = Figure()
@@ -624,7 +625,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
 
-            #######  if using more than one device
+            ##############  if using more than one device
             ndevices = len(self.extradevices)
             if ndevices:
                 for i in range(ndevices):
@@ -634,8 +635,13 @@ class tgraphcanvas(FigureCanvas):
                                                parity=aw.ser.extraparity[i], stopbits=aw.ser.extrastopbits[i], timeout=aw.ser.extratimeout[i])
                     extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
                     aw.ser.SP.close()
-                    # TEST READINGS FOR METER ERRORS
-                    if len(self.extratimex[i]):
+                    #print self.extramathexpression2
+                    if len(self.extramathexpression1[i]):
+                        extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
+                    if len(self.extramathexpression2[i]):
+                        extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
+                    # TEST READINGS FOR METER ERRORS in thermocouple devices (but not the multimeter device 23)
+                    if len(self.extratimex[i]) and self.extradevices[i] != 23:
                         #test for out of range
                         if extrat2 < -5 or extrat2 > 800:
                             extrat2 = self.extratemp2[i-1]
@@ -897,7 +903,7 @@ class tgraphcanvas(FigureCanvas):
     #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
     def fujidutycycle(self):
         #return saved readings
-        return aw.ser.dutycycleTX,aw.ser.dutycycle,aw.ser.fujiETBT  #raise duty cycle in graph to 100, et-bt to 50 
+        return aw.ser.dutycycleTX,aw.ser.dutycycle,aw.ser.fujiETBT   
 
     def HH506RA(self):
         
@@ -936,7 +942,7 @@ class tgraphcanvas(FigureCanvas):
 
     #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
     def CENTER309_34(self):
-         #return saved readings
+         #return saved readings collected at aw.ser.CENTER309temperature()
          return aw.ser.extra309TX,aw.ser.extra309T3, aw.ser.extra309T4 
 
     def CENTER306(self):
@@ -1044,15 +1050,47 @@ class tgraphcanvas(FigureCanvas):
 
     #multimeter
     def HHM28(self):
-        val,symbols = aw.ser.HHM28multimeter()
+        val,symbols= aw.ser.HHM28multimeter()  #NOTE: val and symbols are type strings
         tx = self.timeclock.elapsed()/1000.
 
+        #temporary fix to display the output
         aw.sendmessage(val + symbols)
 
-        if "L" in val:
+        print val
+        if "L" in val:  #L = Out of Range
             return tx, 0, 0.
+##        else:
+##            #read quantifier symbols
+##            if "n" in symbols:
+##                val /= 1000000000.
+##            elif "u" in symbols:
+##                val /= 1000000.
+##            elif "m" in symbols:
+##                val /= 1000.
+##            elif "k" in symbols:
+##                val *= 1000.
+##            elif "M" in symbols:
+##                val *= 1000000.
+
+            ### not finished
         else:
-            return tx, float(val), 0.
+            return tx, float(val), 0.  #send a 0. as second reading because the meter only returns one reading
+
+    #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
+    #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
+    def eval_math_expression(self,mathexpression,x):
+        if mathexpression == "":
+            return x
+        
+        #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
+        mathdictionary = {"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e}
+        try:
+            x = float(x)
+            mathdictionary['x'] = x
+            return eval(mathexpression,{"__builtins__":None},mathdictionary)
+            
+        except Exception:
+            return 0
 
     #creates X axis labels ticks in mm:ss instead of seconds     
     def xaxistosm(self):
@@ -2115,6 +2153,9 @@ class tgraphcanvas(FigureCanvas):
 
     #Turns ON flag self.flagon to read and plot. Called from push button_1. 
     def OnMonitor(self):
+        #close all serial ports just in case there was one left open from previous sesion
+        aw.ser.closeport()
+        
         if self.designerflag: return
         
         #Call start() to start the first measurement if no data collected
@@ -4416,7 +4457,7 @@ class ApplicationWindow(QMainWindow):
         self.keyboardmoveflag = 0
 
     def resetApplication(self):
-        string = QApplication.translate("MessageBox","Do you want to reset all settings", None, QApplication.UnicodeUTF8)
+        string = QApplication.translate("MessageBox","Do you want to reset all settings?", None, QApplication.UnicodeUTF8)
         reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Factory Reset", None, QApplication.UnicodeUTF8),string,
                             QMessageBox.Reset | QMessageBox.Cancel)
         if reply == QMessageBox.Reset :
@@ -5623,6 +5664,12 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extradevicecolor2 = list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())
                 self.qmc.extraname1 = list(settings.value("extraname1",self.qmc.extraname1).toStringList())
                 self.qmc.extraname2 = list(settings.value("extraname2",self.qmc.extraname2).toStringList())
+                if settings.contains("extramathexpression1"):
+                    self.qmc.extramathexpression1 = list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList())
+                    self.qmc.extramathexpression2 = list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList())
+                    for i in range(len(self.qmc.extramathexpression1)):
+                        self.qmc.extramathexpression1[i] = unicode(self.qmc.extramathexpression1[i])
+                        self.qmc.extramathexpression2[i] = unicode(self.qmc.extramathexpression2[i])
                 #convert Qstrings to unicode
                 for i in range(len(self.qmc.extradevicecolor1)):
                     self.qmc.extradevicecolor1[i] = unicode(self.qmc.extradevicecolor1[i])
@@ -5631,6 +5678,7 @@ class ApplicationWindow(QMainWindow):
                     self.ser.extraparity[i] = unicode(self.ser.extraparity[i])
                     self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
                     self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
+
             settings.endGroup()
             #create empty containers
             for i in range(len(self.qmc.extradevices)):
@@ -5768,6 +5816,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
             settings.setValue("extraname1",self.qmc.extraname1)
             settings.setValue("extraname2",self.qmc.extraname2)
+            settings.setValue("extramathexpression1",self.qmc.extramathexpression1)
+            settings.setValue("extramathexpression2",self.qmc.extramathexpression2)
             settings.endGroup()
             #save extra serial comm ports settings
             settings.beginGroup("ExtraComm")
@@ -5776,7 +5826,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extrabytesize",self.ser.extrabytesize)                                                                
             settings.setValue("extraparity",self.ser.extraparity)                                                                
             settings.setValue("extrastopbits",self.ser.extrastopbits)                                                                
-            settings.setValue("extratimeout",self.ser.extratimeout)                                                                           
+            settings.setValue("extratimeout",self.ser.extratimeout)
             settings.endGroup()
 
             settings.setValue("resetqsettings",self.resetqsettings)
@@ -11281,6 +11331,7 @@ class comportDlg(QDialog):
         ##########################    TAB 1 WIDGETS        
         comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.comportEdit = QComboBox()
+        print aw.ser.comport
         self.comportEdit.addItems([aw.ser.comport])
         self.comportEdit.setEditable(True)
         comportlabel.setBuddy(self.comportEdit)
@@ -11501,8 +11552,11 @@ class comportDlg(QDialog):
         stopbits = unicode(self.stopbitsComboBox.currentText())
         timeout = unicode(self.timeoutEdit.text())
 
+        print aw.ser.comport
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
+
+        print aw.ser.comport
         
         try:
             #check here comport errors
@@ -11759,13 +11813,16 @@ class DeviceAssignmentDLG(QDialog):
         ndevices = len(aw.qmc.extradevices)
         if ndevices:    
             self.devicetable.setRowCount(ndevices)
-            self.devicetable.setColumnCount(6)
+            self.devicetable.setColumnCount(8)
             self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Delete",None, QApplication.UnicodeUTF8),
                                                         QApplication.translate("Table", "Device type",None, QApplication.UnicodeUTF8),
                                                         QApplication.translate("Table", "Color line 1",None, QApplication.UnicodeUTF8),
                                                         QApplication.translate("Table", "Color line 2",None, QApplication.UnicodeUTF8),
                                                         QApplication.translate("Table", "Label 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Label 2",None, QApplication.UnicodeUTF8)])
+                                                        QApplication.translate("Table", "Label 2",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "y(x) 1",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "y(x) 2",None, QApplication.UnicodeUTF8)])
+            
             self.devicetable.setAlternatingRowColors(True)
             self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -11792,6 +11849,12 @@ class DeviceAssignmentDLG(QDialog):
 
                 name1edit = QLineEdit(unicode(aw.qmc.extraname1[i]))            
                 name2edit = QLineEdit(unicode(aw.qmc.extraname2[i]))
+
+                mexpr1edit = QLineEdit(unicode(aw.qmc.extramathexpression1[i]))
+                mexpr2edit = QLineEdit(unicode(aw.qmc.extramathexpression2[i]))
+                mexpr1edit.setToolTip(QApplication.translate("ToolTip","Example: 100 + 2*x",None, QApplication.UnicodeUTF8))
+                mexpr2edit.setToolTip(QApplication.translate("ToolTip","Example: 100 + x",None, QApplication.UnicodeUTF8))
+                
                 #add widgets to the table
                 self.devicetable.setCellWidget(i,0,delButton)              
                 self.devicetable.setCellWidget(i,1,typeComboBox)
@@ -11799,6 +11862,8 @@ class DeviceAssignmentDLG(QDialog):
                 self.devicetable.setCellWidget(i,3,color2Button)              
                 self.devicetable.setCellWidget(i,4,name1edit)              
                 self.devicetable.setCellWidget(i,5,name2edit)              
+                self.devicetable.setCellWidget(i,6,mexpr1edit)              
+                self.devicetable.setCellWidget(i,7,mexpr2edit)              
 
     #adds extra device
     def adddevice(self):
@@ -11808,7 +11873,9 @@ class DeviceAssignmentDLG(QDialog):
         aw.qmc.extradevicecolor2.append(u"black")
         aw.qmc.extraname1.append("Extra 1")
         aw.qmc.extraname2.append("Extra 2")     
-
+        aw.qmc.extramathexpression1.append(u"")
+        aw.qmc.extramathexpression2.append(u"")
+        
         #create new serial port (but not opened-connected)                                   
         aw.ser.extraSP.append(serial.Serial()) 
         #add and init dummy serial port settings
@@ -11843,7 +11910,9 @@ class DeviceAssignmentDLG(QDialog):
         aw.qmc.extratemp2lines.pop(x)
         aw.qmc.extraname1.pop(x)
         aw.qmc.extraname2.pop(x)
-
+        aw.qmc.extramathexpression1.pop(x)
+        aw.qmc.extramathexpression2.pop(x)
+        
         #pop serial port settings
         aw.ser.extracomport.pop(x)
         aw.ser.extrabaudrate.pop(x)
@@ -11863,6 +11932,9 @@ class DeviceAssignmentDLG(QDialog):
             typecombobox = self.devicetable.cellWidget(i,1)
             name1edit = self.devicetable.cellWidget(i,4)
             name2edit = self.devicetable.cellWidget(i,5)
+            mexpr1edit = self.devicetable.cellWidget(i,6)
+            mexpr2edit = self.devicetable.cellWidget(i,7)
+            
             if not unicode(typecombobox.currentText()):
 ##                aw.qmc.errorlog.append("Extra device empty")
 ##                QMessageBox.information(self,"Device Conf","Extra device empty")    
@@ -11871,6 +11943,9 @@ class DeviceAssignmentDLG(QDialog):
                 aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1
             aw.qmc.extraname1[i] = unicode(name1edit.text())
             aw.qmc.extraname2[i] = unicode(name2edit.text())
+            aw.qmc.extramathexpression1[i] = unicode(mexpr1edit.text())
+            aw.qmc.extramathexpression2[i] = unicode(mexpr2edit.text())
+        
         #update legend
         aw.qmc.redraw()                       
     def setextracolor(self,l,i):
@@ -12174,7 +12249,7 @@ class DeviceAssignmentDLG(QDialog):
             aw.lcd6.setVisible(False)
             aw.label7.setVisible(False)
             aw.lcd7.setVisible(False)
-            
+
         self.savedevicetable()
         
         aw.sendmessage(message)
