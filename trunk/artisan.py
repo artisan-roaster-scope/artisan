@@ -635,31 +635,13 @@ class tgraphcanvas(FigureCanvas):
                                                parity=aw.ser.extraparity[i], stopbits=aw.ser.extrastopbits[i], timeout=aw.ser.extratimeout[i])
                     extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
                     aw.ser.SP.close()
-                    #print self.extramathexpression2
                     if len(self.extramathexpression1[i]):
                         extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
                     if len(self.extramathexpression2[i]):
                         extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
-                    # TEST READINGS FOR METER ERRORS in thermocouple devices (but not the multimeter device 23)
-                    if len(self.extratimex[i]) and self.extradevices[i] != 23:
-                        #test for out of range
-                        if extrat2 < -5 or extrat2 > 800:
-                            extrat2 = self.extratemp2[i-1]
-                        if extrat1 < -5 or extrat1 > 800:
-                            extrat1 = self.extratemp1[i-1]
-                        #test for swap
-                        if extrat1 == self.extratemp2[i][-1] and extrat2 == self.extratemp1[i][-1]:
-                            #let's better swap the readings (also they are just repeating the previous ones)
-                            self.extratemp2[i].append(extrat1)
-                            self.extratemp1[i].append(extrat2)
-                        else:
-                            #the readings seem to be "in order"                    
-                            self.extratemp1[i].append(extrat1)
-                            self.extratemp2[i].append(extrat2)
-                    else:
-                        self.extratemp1[i].append(extrat1)
-                        self.extratemp2[i].append(extrat2)
-                        
+
+                    self.extratemp1[i].append(extrat1)
+                    self.extratemp2[i].append(extrat2)                        
                     self.extratimex[i].append(extratx)
                     # update extra lines 
                     self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
@@ -11331,7 +11313,6 @@ class comportDlg(QDialog):
         ##########################    TAB 1 WIDGETS        
         comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.comportEdit = QComboBox()
-        print aw.ser.comport
         self.comportEdit.addItems([aw.ser.comport])
         self.comportEdit.setEditable(True)
         comportlabel.setBuddy(self.comportEdit)
