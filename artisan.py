@@ -548,7 +548,7 @@ class tgraphcanvas(FigureCanvas):
             #if using a meter (thermocouple device)
             if self.device != 18:
                 #read time, ET (t2) and BT (t1) TEMPERATURE                      
-                tx,t2,t1 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
+                tx,t1,t2 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
 
                 # test for a possible change
                 t1,t2 = self.filterDropOuts(t1,t2)
@@ -575,8 +575,8 @@ class tgraphcanvas(FigureCanvas):
                     #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
                     self.rateofchange1 = (self.temp1[-1] - self.temp1[-2])/timed  #delta ET (degress / second)
                     self.rateofchange2 = (self.temp2[-1] - self.temp2[-2])/timed  #delta  BT (degress / second)
-                    rateofchange1plot = 100. + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 100
-                    rateofchange2plot = 50. + self.sensitivity*self.rateofchange2    #lift to plot on the grpah at Temp  = 50
+                    rateofchange1plot = 50. + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 50
+                    rateofchange2plot = 100. + self.sensitivity*self.rateofchange2    #lift to plot on the graph at Temp  = 100
                 else:
                     self.rateofchange1 = 100.
                     self.rateofchange2 = 50.
@@ -1077,7 +1077,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             x = float(x)
             mathdictionary['x'] = x
-            #if other Ys in expression
+            #if Ys in expression
             if "Y" in mathexpression:
                 #extract Ys
                 Yval = []                   #extract value number example Y9 = 9
@@ -1089,20 +1089,20 @@ class tgraphcanvas(FigureCanvas):
                             if mathexpression[i+1].isdigit():
                                 number = mathexpression[i+1]
                             else:
-                                number = 1
+                                number = "1"
                         #check for double digit
                         if i+2 < mlen:
                             if mathexpression[i+2].isdigit():
                                 number += mathexpression[i+2]
                         Yval.append(number)
                             
-                #build Ys possible values
+                #build Ys float values
                 if len(self.timex) > 1:
                     Y = [self.temp1[-1],self.temp2[-1]]
                     for i in range(len(self.extradevices)):
                         Y.append(self.extratemp1[i][-1])
                         Y.append(self.extratemp2[i][-1])
-                    #add Ys and they value to math dictionary 
+                    #add Ys and their value to math dictionary 
                     for i in range(len(Yval)):
                         mathdictionary["Y"+ Yval[i]] = Y[i]
                 else:
@@ -1112,7 +1112,7 @@ class tgraphcanvas(FigureCanvas):
             return eval(mathexpression,{"__builtins__":None},mathdictionary)
             
         except Exception,e:
-            print e
+            #print e
             return 0
 
     #creates X axis labels ticks in mm:ss instead of seconds     
@@ -1422,8 +1422,8 @@ class tgraphcanvas(FigureCanvas):
             timed = self.timex[i+1] - self.timex[i]
             
             if timed != 0:
-                delta1 = 100+ self.sensitivity*((self.temp1[i+1] - self.temp1[i]) / timed) 
-                delta2 = 50 + self.sensitivity*((self.temp2[i+1] - self.temp2[i]) / timed)
+                delta1 = 100.+ self.sensitivity*((self.temp1[i+1] - self.temp1[i]) / timed) 
+                delta2 = 50. + self.sensitivity*((self.temp2[i+1] - self.temp2[i]) / timed)
                 
                 d1.append(delta1)
                 d2.append(delta2)
