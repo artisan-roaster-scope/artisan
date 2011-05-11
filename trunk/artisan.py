@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.4.1"
+__version__ = u"0.4.2"
 
 
 # ABOUT
@@ -201,7 +201,8 @@ class tgraphcanvas(FigureCanvas):
                        "TE VA18B",
                        "+309_34",
                        "+FUJI DUTY %",
-                       "Omega HHM28[6]"
+                       "Omega HHM28[6]",
+                       "+204_34" 
                        ]
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
@@ -231,7 +232,8 @@ class tgraphcanvas(FigureCanvas):
                                    self.TEVA18B,            #20
                                    self.CENTER309_34,       #21
                                    self.fujidutycycle,      #22
-                                   self.HHM28               #23
+                                   self.HHM28,              #23
+                                   self.K204_34             #24 
                                    ]
 
         #extra devices
@@ -649,6 +651,7 @@ class tgraphcanvas(FigureCanvas):
                 #restore ET/BT device serial port 
                 aw.ser.SP = serial.Serial(port=aw.ser.comport, baudrate=aw.ser.baudrate,bytesize=aw.ser.bytesize,
                                           parity=aw.ser.parity, stopbits=aw.ser.stopbits, timeout=aw.ser.timeout)
+
             ##########  
 
             #update screen                
@@ -984,6 +987,11 @@ class tgraphcanvas(FigureCanvas):
          
          return tx,t2,t1
 
+    #especial function that collects extra T3 and T4 from Vol K204 while keeping compatibility
+    def K204_34(self):
+         #return saved readings collected at aw.ser.CENTER309temperature()
+         return aw.ser.extra309TX,aw.ser.extra309T3, aw.ser.extra309T4 
+
     def VOLTCRAFTK202(self):
         
          t2,t1 = aw.ser.CENTER306temperature()
@@ -1040,7 +1048,7 @@ class tgraphcanvas(FigureCanvas):
 
         print val
         if "L" in val:  #L = Out of Range
-            return tx, 0, 0.
+            return tx, 0., 0.
 ##        else:
 ##            #read quantifier symbols
 ##            if "n" in symbols:
@@ -1069,9 +1077,42 @@ class tgraphcanvas(FigureCanvas):
         try:
             x = float(x)
             mathdictionary['x'] = x
+            #if other Ys in expression
+            if "Y" in mathexpression:
+                #extract Ys
+                Yval = []                   #extract value number example Y9 = 9
+                mlen = len(mathexpression)
+                for i in range(mlen):
+                    if mathexpression[i] == "Y":
+                        #find Y number
+                        if i+1 < mlen:                          #check for out of range
+                            if mathexpression[i+1].isdigit():
+                                number = mathexpression[i+1]
+                            else:
+                                number = 1
+                        #check for double digit
+                        if i+2 < mlen:
+                            if mathexpression[i+2].isdigit():
+                                number += mathexpression[i+2]
+                        Yval.append(number)
+                            
+                #build Ys possible values
+                if len(self.timex) > 1:
+                    Y = [self.temp1[-1],self.temp2[-1]]
+                    for i in range(len(self.extradevices)):
+                        Y.append(self.extratemp1[i][-1])
+                        Y.append(self.extratemp2[i][-1])
+                    #add Ys and they value to math dictionary 
+                    for i in range(len(Yval)):
+                        mathdictionary["Y"+ Yval[i]] = Y[i]
+                else:
+                    for i in range(len(Yval)):
+                        mathdictionary["Y"+ Yval[i]] = 0                    
+                            
             return eval(mathexpression,{"__builtins__":None},mathdictionary)
             
-        except Exception:
+        except Exception,e:
+            print e
             return 0
 
     #creates X axis labels ticks in mm:ss instead of seconds     
@@ -2155,7 +2196,7 @@ class tgraphcanvas(FigureCanvas):
         
     #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
     def OffMonitor(self):
-
+        aw.ser.closeport()
         self.timer.stop()
         self.LCDtimer.stop()
         self.seconds = 0.
@@ -11533,11 +11574,8 @@ class comportDlg(QDialog):
         stopbits = unicode(self.stopbitsComboBox.currentText())
         timeout = unicode(self.timeoutEdit.text())
 
-        print aw.ser.comport
         #save extra serial ports by reading the serial extra table
         self.saveserialtable()
-
-        print aw.ser.comport
         
         try:
             #check here comport errors
@@ -11925,7 +11963,7 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.extraname1[i] = unicode(name1edit.text())
             aw.qmc.extraname2[i] = unicode(name2edit.text())
             aw.qmc.extramathexpression1[i] = unicode(mexpr1edit.text())
-            aw.qmc.extramathexpression2[i] = unicode(mexpr2edit.text())
+            aw.qmc.extramathexpression2[i] = unicode(mexpr2edit.text())       
         
         #update legend
         aw.qmc.redraw()                       
@@ -11988,10 +12026,10 @@ class DeviceAssignmentDLG(QDialog):
         if self.nonpidButton.isChecked():
             meter = str(self.devicetypeComboBox.currentText())
             message = QApplication.translate("Error Message","device err",None,QApplication.UnicodeUTF8)
-            
+
             if meter == "Omega HH806AU":
                 aw.qmc.device = 1
-                aw.ser.comport = "COM11"
+                #aw.ser.comport = "COM11"
                 aw.ser.baudrate = 19200
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'E'
@@ -12001,7 +12039,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "Omega HH506RA":
                 aw.qmc.device = 2
-                aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
+                #aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
                 aw.ser.baudrate = 2400
                 aw.ser.bytesize = 7
                 aw.ser.parity= 'E'
@@ -12011,7 +12049,7 @@ class DeviceAssignmentDLG(QDialog):
                 
             elif meter == "CENTER 309":
                 aw.qmc.device = 3
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12021,7 +12059,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "CENTER 306":
                 aw.qmc.device = 4
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12031,7 +12069,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "CENTER 305":
                 aw.qmc.device = 5
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12041,7 +12079,7 @@ class DeviceAssignmentDLG(QDialog):
                 
             elif meter == "CENTER 304":
                 aw.qmc.device = 6
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12051,7 +12089,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "CENTER 303":
                 aw.qmc.device = 7
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12061,7 +12099,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "CENTER 302":
                 aw.qmc.device = 8
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12071,7 +12109,7 @@ class DeviceAssignmentDLG(QDialog):
                 
             elif meter == "CENTER 301":
                 aw.qmc.device = 9
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12081,7 +12119,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "CENTER 300":
                 aw.qmc.device = 10
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12091,7 +12129,7 @@ class DeviceAssignmentDLG(QDialog):
                 
             elif meter == "VOLTCRAFT K204":
                 aw.qmc.device = 11
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12101,7 +12139,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "VOLTCRAFT K202":
                 aw.qmc.device = 12
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12111,7 +12149,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "VOLTCRAFT 300K":
                 aw.qmc.device = 13
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12121,7 +12159,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "VOLTCRAFT 302KJ":
                 aw.qmc.device = 14
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12131,7 +12169,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "EXTECH 421509":
                 aw.qmc.device = 15
-                aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
+                #aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
                 aw.ser.baudrate = 2400
                 aw.ser.bytesize = 7
                 aw.ser.parity= 'E'
@@ -12141,7 +12179,7 @@ class DeviceAssignmentDLG(QDialog):
                                 
             elif meter == "Omega HH802U":
                 aw.qmc.device = 16
-                aw.ser.comport = "COM11"
+                #aw.ser.comport = "COM11"
                 aw.ser.baudrate = 19200
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'E'
@@ -12151,7 +12189,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "Omega HH309":
                 aw.qmc.device = 17
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12171,7 +12209,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "ArduinoTC4":
                 aw.qmc.device = 19
-                aw.ser.comport = "/dev/ttyACM0"
+                #aw.ser.comport = "/dev/ttyACM0"
                 aw.ser.baudrate = 19200
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12181,7 +12219,7 @@ class DeviceAssignmentDLG(QDialog):
                 
             elif meter == "TE VA18B":
                 aw.qmc.device = 20
-                aw.ser.comport = "COM7"
+                #aw.ser.comport = "COM7"
                 aw.ser.baudrate = 2400
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12191,7 +12229,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "+309_34":
                 aw.qmc.device = 21
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -12201,7 +12239,7 @@ class DeviceAssignmentDLG(QDialog):
 
             elif meter == "+FUJI DUTY%":
                 aw.qmc.device = 22
-                aw.ser.comport = "COM4"
+                #aw.ser.comport = "COM4"
                 aw.ser.baudrate = 9600
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'E'
@@ -12211,13 +12249,38 @@ class DeviceAssignmentDLG(QDialog):
                 
             elif meter == "Omega HHM28[6]":
                 aw.qmc.device = 23
-                aw.ser.comport = "COM1"
+                #aw.ser.comport = "COM1"
                 aw.ser.baudrate = 2400
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout=1
                 message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+
+            elif meter == "+204_34":
+                aw.qmc.device = 24
+                #aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = ""  #empty message especial device
+
+            #set of different serial settings modes options
+            ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],[19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1]]
+            #map device index to a setting mode
+            devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3]  #0-24
+                
+            self.savedevicetable()
+            #init serial settings of extra devices
+            for i in range(len(aw.qmc.extradevices)):
+                dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
+                aw.ser.extrabaudrate[i] = dsettings[0]
+                aw.ser.extrabytesize[i] = dsettings[1]
+                aw.ser.extraparity[i] = dsettings[2]
+                aw.ser.extrastopbits[i] = dsettings[3]
+                aw.ser.extratimeout[i] = dsettings[4]  
                 
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
@@ -12230,9 +12293,7 @@ class DeviceAssignmentDLG(QDialog):
             aw.lcd6.setVisible(False)
             aw.label7.setVisible(False)
             aw.lcd7.setVisible(False)
-
-        self.savedevicetable()
-        
+       
         aw.sendmessage(message)
         
         if self.nonpidButton.isChecked():
@@ -12242,6 +12303,7 @@ class DeviceAssignmentDLG(QDialog):
             aw.setcommport()
 
         self.close()
+        
 
 ############################################################
 #######################  CUSTOM COLOR DIALOG  ##############
