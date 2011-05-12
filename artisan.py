@@ -244,7 +244,11 @@ class tgraphcanvas(FigureCanvas):
         self.extratemp1,self.extratemp2 = [],[]                     # extra temp1, temp2. List of lists
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
-        self.extramathexpression1,self.extramathexpression2 = [],[]           # list with user defined math evaluating strings. Example "2*cos(x)" 
+        self.extramathexpression1,self.extramathexpression2 = [],[]           # list with user defined math evaluating strings. Example "2*cos(x)"
+
+        #holds math expressions to plot
+        self.plotcurves=[u"",u"",u"",u"",u"",u""]
+        self.plotcurvecolor = [u"black",u"black",u"black",u"black",u"black",u"black"]
  
         #main matplot figure with plot(s) inside
         self.fig = Figure()
@@ -271,7 +275,7 @@ class tgraphcanvas(FigureCanvas):
 
         # set the parent widget
         self.setParent(parent)
-        # we define the widget as expandable
+        # we define the widget as 
         FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)
 
         # the rate of chage of temperature
@@ -302,6 +306,9 @@ class tgraphcanvas(FigureCanvas):
         #Example: Use self.temp2[self.timeindex[4]] to get the BT temperature of SCs
         
         self.timeindex = [-1,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+
+        #applies a Y(x) function to ET or BT 
+        self.ETfunction,self.BTfunction = u"",u""           
 
         #prevents accidentally deleting a finished profile. Activated at [DROP]
         self.safesaveflag = False
@@ -547,9 +554,12 @@ class tgraphcanvas(FigureCanvas):
         if self.flagon:
             #if using a meter (thermocouple device)
             if self.device != 18:
-                #read time, ET (t2) and BT (t1) TEMPERATURE                      
+                #read time, ET (t1) and BT (t2) TEMPERATURE                      
                 tx,t1,t2 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
-
+                if len(self.ETfunction):
+                    t1 = self.eval_math_expression(self.ETfunction,t1)
+                if len(self.BTfunction):
+                    t2 = self.eval_math_expression(self.BTfunction,t2)
                 # test for a possible change
                 t1,t2 = self.filterDropOuts(t1,t2)
 
@@ -565,6 +575,7 @@ class tgraphcanvas(FigureCanvas):
                     self.temp1.append(t1)
 
                 self.timex.append(tx)
+
                 # update lines data using the lists with new data
                 self.l_temp1.set_data(self.timex, self.temp1)
                 self.l_temp2.set_data(self.timex, self.temp2)
@@ -1073,10 +1084,12 @@ class tgraphcanvas(FigureCanvas):
             return x
         
         #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
-        mathdictionary = {"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e}
+        mathdictionary = {"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
+                          "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
+                          "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
         try:
             x = float(x)
-            mathdictionary['x'] = x
+            mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
             #if Ys in expression
             if "Y" in mathexpression:
                 #extract Ys
@@ -1092,7 +1105,7 @@ class tgraphcanvas(FigureCanvas):
                                 number = "1"
                         #check for double digit
                         if i+2 < mlen:
-                            if mathexpression[i+2].isdigit():
+                            if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
                                 number += mathexpression[i+2]
                         Yval.append(number)
                             
@@ -1104,7 +1117,7 @@ class tgraphcanvas(FigureCanvas):
                         Y.append(self.extratemp2[i][-1])
                     #add Ys and their value to math dictionary 
                     for i in range(len(Yval)):
-                        mathdictionary["Y"+ Yval[i]] = Y[i]
+                        mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
                 else:
                     for i in range(len(Yval)):
                         mathdictionary["Y"+ Yval[i]] = 0                    
@@ -1112,7 +1125,7 @@ class tgraphcanvas(FigureCanvas):
             return eval(mathexpression,{"__builtins__":None},mathdictionary)
             
         except Exception,e:
-            #print e
+            self.adderror(QApplication.translate("Error Message", "Exception: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return 0
 
     #creates X axis labels ticks in mm:ss instead of seconds     
@@ -3083,10 +3096,10 @@ class tgraphcanvas(FigureCanvas):
             lpindex = -1
         
         timeindexhold = [self.timex[self.timeindex[0]],0,0,0,0,0,0]
-        time,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]    #first CHARGE point
+        timez,t1,t2 = [self.timex[self.timeindex[0]]],[self.temp1[self.timeindex[0]]],[self.temp2[self.timeindex[0]]]    #first CHARGE point
         for i in range(1,len(self.timeindex)):
             if self.timeindex[i]:                           # fill up empty lists with main points (FCs, etc). match from timeindex
-                time.append(self.timex[self.timeindex[i]])  #add time
+                timez.append(self.timex[self.timeindex[i]])  #add time
                 t1.append(self.temp1[self.timeindex[i]])    #add temp1
                 t2.append(self.temp2[self.timeindex[i]])    #add temp2
                 timeindexhold[i] =  self.timex[self.timeindex[i]]
@@ -3099,7 +3112,7 @@ class tgraphcanvas(FigureCanvas):
         self.endofx = endofxold
         self.xaxistosm()
                 
-        self.timex,self.temp1,self.temp2 = time[:],t1[:],t2[:]  #copy lists back after reset() with the main points
+        self.timex,self.temp1,self.temp2 = timez[:],t1[:],t2[:]  #copy lists back after reset() with the main points
 
         self.timeindexupdate(timeindexhold) #create new timeindex[]
 
@@ -3150,8 +3163,8 @@ class tgraphcanvas(FigureCanvas):
         func2 = inter.UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree )
         timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
         #convert all time values to temperature
-        btvals = func(time).tolist()
-        etvals = func2(time).tolist()
+        btvals = func(timez).tolist()
+        etvals = func2(timez).tolist()
 
         #add curves
         self.ax.plot(timez, btvals, color=self.palette["bt"], linestyle = '-', linewidth=2)
@@ -3493,8 +3506,8 @@ class tgraphcanvas(FigureCanvas):
             timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
 
             #convert all time values to temperature
-            btvals = funcBT(time).tolist()
-            etvals = funcET(time).tolist()
+            btvals = funcBT(timez).tolist()
+            etvals = funcET(timez).tolist()
 
             #find new indexes for events
             for i in range(len(self.specialevents)):
@@ -5701,7 +5714,6 @@ class ApplicationWindow(QMainWindow):
                     self.ser.extraparity[i] = unicode(self.ser.extraparity[i])
                     self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
                     self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
-
             settings.endGroup()
             #create empty containers
             for i in range(len(self.qmc.extradevices)):
@@ -5716,6 +5728,17 @@ class ApplicationWindow(QMainWindow):
 
             #configure all serial ports (loads configurations but does not open ports)
             self.ser.confport()
+
+            if settings.contains("BTfunction"):
+                self.qmc.BTfunction = unicode(settings.value("BTfunction",self.qmc.BTfunction).toString())
+                self.qmc.ETfunction = unicode(settings.value("ETfunction",self.qmc.ETfunction).toString())
+
+            if settings.contains("plotcurves"):
+                self.qmc.plotcurves = list(settings.value("plotcurves",self.qmc.plotcurves).toStringList())
+                self.qmc.plotcurvecolor = list(settings.value("plotcurvecolor",self.qmc.plotcurvecolor).toStringList())
+                for i in range(len(self.qmc.plotcurves)):
+                    self.qmc.plotcurves[i] = unicode(self.qmc.plotcurves[i])
+                    self.qmc.plotcurvecolor[i] = unicode(self.qmc.plotcurvecolor[i])
             
             #update display
             self.qmc.redraw()
@@ -5851,8 +5874,14 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extrastopbits",self.ser.extrastopbits)                                                                
             settings.setValue("extratimeout",self.ser.extratimeout)
             settings.endGroup()
+            settings.setValue("BTfunction",self.qmc.BTfunction)                                                                
+            settings.setValue("ETfunction",self.qmc.ETfunction)                                                                
 
             settings.setValue("resetqsettings",self.resetqsettings)
+
+            settings.setValue("plotcurves",self.qmc.plotcurves)                                                                
+            settings.setValue("plotcurvecolor",self.qmc.plotcurvecolor)
+
             
         except Exception,e:
             self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))            
@@ -7012,8 +7041,71 @@ class HUDDlg(QDialog):
         tab1Layout.addWidget(rorGroupLayout)
         tab1Layout.addWidget(hudGroupLayout)
 
+        #tab2
+        #Equation plotter
+        equlabel = QLabel(QApplication.translate("EQU Label", "Y(x)",None, QApplication.UnicodeUTF8))
+        self.equedit1 = QLineEdit(aw.qmc.plotcurves[0])
+        self.equedit2 = QLineEdit(aw.qmc.plotcurves[1])
+        self.equedit3 = QLineEdit(aw.qmc.plotcurves[2])
+        self.equedit4 = QLineEdit(aw.qmc.plotcurves[3])
+        self.equedit5 = QLineEdit(aw.qmc.plotcurves[4])
+        self.equedit6 = QLineEdit(aw.qmc.plotcurves[5])
+        color1Button = QPushButton("Color")
+        color1Button.setMaximumWidth(50)
+        self.connect(color1Button, SIGNAL("clicked()"),lambda x=0: self.setcurvecolor(x))
+        color2Button = QPushButton("Color")
+        color2Button.setMaximumWidth(50)
+        self.connect(color2Button, SIGNAL("clicked()"),lambda x=1: self.setcurvecolor(x))
+        color3Button = QPushButton("Color")
+        color3Button.setMaximumWidth(50)
+        self.connect(color3Button, SIGNAL("clicked()"),lambda x=2: self.setcurvecolor(x))
+        color4Button = QPushButton("Color")
+        color4Button.setMaximumWidth(50)
+        self.connect(color4Button, SIGNAL("clicked()"),lambda x=3: self.setcurvecolor(x))
+        color5Button = QPushButton("Color")
+        color5Button.setMaximumWidth(50)
+        self.connect(color5Button, SIGNAL("clicked()"),lambda x=4: self.setcurvecolor(x))
+        color6Button = QPushButton("Color")
+        color6Button.setMaximumWidth(50)
+        self.connect(color6Button, SIGNAL("clicked()"),lambda x=5: self.setcurvecolor(x))
 
-        ##### TAB 2
+        equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None, QApplication.UnicodeUTF8))
+        self.connect(equdrawbutton,SIGNAL("clicked()"),self.plotequ)
+        equdrawbutton.setMaximumWidth(80)
+        equbackgroundbutton = QPushButton(QApplication.translate("Button","Set Plot 1 as background",None, QApplication.UnicodeUTF8))
+        self.connect(equbackgroundbutton ,SIGNAL("clicked()"),self.setbackgroundequ1)
+        equdrawbutton.setMaximumWidth(80)
+        
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None, QApplication.UnicodeUTF8))
+        saveImgButton.setToolTip(QApplication.translate("ToolTip","Save image using current graph size to a png format",None, QApplication.UnicodeUTF8))
+        saveImgButton.setMaximumWidth(100)
+        self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
+        
+        curveLayout = QGridLayout()
+        curveLayout.addWidget(self.equedit1,0,0)
+        curveLayout.addWidget(color1Button,0,1)
+        curveLayout.addWidget(self.equedit2,1,0)
+        curveLayout.addWidget(color2Button,1,1)
+        curveLayout.addWidget(self.equedit3,2,0)
+        curveLayout.addWidget(color3Button,2,1)
+        curveLayout.addWidget(self.equedit4,3,0)
+        curveLayout.addWidget(color4Button,3,1)
+        curveLayout.addWidget(self.equedit5,4,0)
+        curveLayout.addWidget(color5Button,4,1)
+        curveLayout.addWidget(self.equedit6,5,0)
+        curveLayout.addWidget(color6Button,5,1)
+
+        curvebuttonlayout = QHBoxLayout()
+        curvebuttonlayout.addWidget(equdrawbutton)    	
+    	curvebuttonlayout.addWidget(saveImgButton)        
+        
+        tab2Layout = QVBoxLayout()
+        tab2Layout.addWidget(equlabel)    	
+    	tab2Layout.addLayout(curveLayout)
+        tab2Layout.addLayout(curvebuttonlayout)
+        tab2Layout.addWidget(equbackgroundbutton)
+
+        ##### TAB 3
         self.interpCheck = QCheckBox(QApplication.translate("CheckBox","Interpolation",None, QApplication.UnicodeUTF8))
         self.connect(self.interpCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.interpolation(i)) #toggle
         
@@ -7041,7 +7133,7 @@ class HUDDlg(QDialog):
         univarButton.setMaximumSize(50, 30)
         self.connect(univarButton,SIGNAL("clicked()"),self.showunivarinfo)
         
-        tab2Layout = QVBoxLayout()
+        tab3Layout = QVBoxLayout()
         interLayout = QGridLayout()
         interLayout.addWidget(self.interpCheck,0,0)
         interLayout.addWidget(self.interpComboBox,0,1)
@@ -7056,10 +7148,10 @@ class HUDDlg(QDialog):
         univarGroupLayout = QGroupBox(QApplication.translate("GroupBox","Univariate",None, QApplication.UnicodeUTF8))
         univarGroupLayout.setLayout(uniLayout)
 
-        tab2Layout.addWidget(interGroupLayout)
-        tab2Layout.addWidget(univarGroupLayout)
+        tab3Layout.addWidget(interGroupLayout)
+        tab3Layout.addWidget(univarGroupLayout)
 
-        ##### TAB 3
+        ##### TAB 4
         self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None, QApplication.UnicodeUTF8))
         if aw.soundflag:
             self.soundCheck.setChecked(True)
@@ -7073,11 +7165,11 @@ class HUDDlg(QDialog):
 
         self.showsoundflag = 0
         
-        tab3Layout = QHBoxLayout()
-        tab3Layout.addWidget(self.soundCheck)
-        tab3Layout.addWidget(mikeButton)
+        tab4Layout = QHBoxLayout()
+        tab4Layout.addWidget(self.soundCheck)
+        tab4Layout.addWidget(mikeButton)
 
-    	#tab4
+    	#### TAB 5
         self.styleComboBox = QComboBox()
         available = map(QString, QStyleFactory.keys())
         self.styleComboBox.addItems(available)
@@ -7085,9 +7177,11 @@ class HUDDlg(QDialog):
         styleButton.setFocusPolicy(Qt.NoFocus)   
         styleButton.setMaximumWidth(90)
         self.connect(styleButton,SIGNAL("clicked()"),self.setappearance)        
-        tab4Layout = QVBoxLayout()
-        tab4Layout.addWidget(self.styleComboBox)    	
-        tab4Layout.addWidget(styleButton)    	
+        tab5Layout = QVBoxLayout()
+        tab5Layout.addWidget(self.styleComboBox)    	
+        tab5Layout.addWidget(styleButton)
+
+
 
         ############################  TABS LAYOUT
         TabWidget = QTabWidget()
@@ -7095,18 +7189,23 @@ class HUDDlg(QDialog):
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         TabWidget.addTab(C1Widget,QApplication.translate("Tab","HUD",None, QApplication.UnicodeUTF8))
-        
+
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Math",None, QApplication.UnicodeUTF8))
-
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Plotter",None, QApplication.UnicodeUTF8))
+        
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Sound",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Math",None, QApplication.UnicodeUTF8))
 
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Style",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Sound",None, QApplication.UnicodeUTF8))
+
+        C5Widget = QWidget()
+        C5Widget.setLayout(tab5Layout)
+        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Style",None, QApplication.UnicodeUTF8))
+
         
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
@@ -7124,6 +7223,102 @@ class HUDDlg(QDialog):
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
 
         self.setLayout(Slayout)
+
+    def setcurvecolor(self,x):
+        colorf = QColorDialog.getColor(QColor(aw.qmc.plotcurvecolor[x]),self)
+        if colorf.isValid():
+            colorname = unicode(colorf.name())
+            aw.qmc.plotcurvecolor[x] = colorname
+
+        self.plotequ()
+
+    def setbackgroundequ1(self):
+        equ = unicode(self.equedit1.text())
+        aw.qmc.plotcurves[0] = equ
+        if len(equ):
+            aw.qmc.resetlines()
+            #create x range
+            x_range = range(aw.qmc.startofx,aw.qmc.endofx)
+            #create y range
+            y_range = []
+            for i in range(len(x_range)):
+                y_range.append(self.eval_curve_expression(equ,x_range[i]))
+
+        aw.qmc.timeB = x_range[:]
+        aw.qmc.temp1B = y_range[:]
+        aw.qmc.temp2B = [-100]*len(x_range) 
+        aw.qmc.background = True
+        aw.qmc.redraw()        
+
+    def plotequ(self):
+        EQU = [unicode(self.equedit1.text()),unicode(self.equedit2.text()),
+               unicode(self.equedit3.text()),unicode(self.equedit4.text()),
+               unicode(self.equedit5.text()),unicode(self.equedit6.text())]
+        aw.qmc.plotcurves = EQU[:]
+        aw.qmc.resetlines()                           
+        for e in range(5):
+            #create x range
+            x_range = range(aw.qmc.startofx,aw.qmc.endofx)
+            #create y range
+            y_range = []
+            for i in range(len(x_range)):
+                y_range.append(self.eval_curve_expression(EQU[e],x_range[i]))
+            aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
+            aw.qmc.fig.canvas.draw()
+
+    def eval_curve_expression(self,mathexpression,x):
+        if len(mathexpression):
+            if mathexpression[0] == "#":
+                return
+            #Since eval() is very powerful, for security reasons, only the functions in this dictionary will be allowed
+            mathdictionary = {"sin":math.sin,"cos":math.cos,"tan":math.tan,"pow":math.pow,"exp":math.exp,"pi":math.pi,"e":math.e,
+                              "abs":abs,"acos":math.acos,"asin":math.asin,"atan":math.atan,"log":math.log,"radians":math.radians,
+                              "sqrt":math.sqrt,"atan2":math.atan,"degrees":math.degrees}
+            try:
+                x = float(x)
+                mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
+                #if Ys in expression
+                if "Y" in mathexpression:
+                    #extract Ys
+                    Yval = []                   #extract value number example Y9 = 9
+                    mlen = len(mathexpression)
+                    for i in range(mlen):
+                        if mathexpression[i] == "Y":
+                            #find Y number
+                            if i+1 < mlen:                          #check for out of range
+                                if mathexpression[i+1].isdigit():
+                                    number = mathexpression[i+1]
+                                else:
+                                    number = "1"
+                            #check for double digit
+                            if i+2 < mlen:
+                                if mathexpression[i+2].isdigit() and mathexpression[i+1].isdigit():
+                                    number += mathexpression[i+2]
+                            Yval.append(number)
+                                
+                    #build Ys float values
+                    if len(aw.qmc.timex) > 1:
+                        index = aw.qmc.time2index(x)
+                        Y = [aw.qmc.temp1[index],aw.qmc.temp2[index]]
+                        if len(aw.qmc.extratimex):
+                            if len(aw.qmc.extratimex[0]):
+                                for i in range(len(aw.qmc.devices)):
+                                    Y.append(aw.qmc.extratemp1[i][index])
+                                    Y.append(aw.qmc.extratemp2[i][index])
+
+                        
+                        #add Ys and their value to math dictionary 
+                        for i in range(len(Yval)):
+                            mathdictionary["Y"+ Yval[i]] = Y[int(Yval[i])-1]
+                    else:
+                        for i in range(len(Yval)):
+                            mathdictionary["Y"+ Yval[i]] = 0                    
+                                
+                return eval(mathexpression,{"__builtins__":None},mathdictionary)
+            
+            except Exception,e:
+                aw.qmc.adderror(QApplication.translate("Error Message", "Plotter: %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+                return 0
         
     def setappearance(self):        
         app.setStyle(self.styleComboBox.currentText())
@@ -7226,7 +7421,8 @@ class HUDDlg(QDialog):
             return "10"
         else:
             return str(i / 20)
-            
+
+    #cancel button
     def close(self):    
         #restore settings
         aw.qmc.DeltaETflag = self.org_DeltaET
@@ -7234,8 +7430,10 @@ class HUDDlg(QDialog):
         aw.qmc.sensitivity = self.org_Sensitivity
         aw.qmc.projectFlag = self.org_Projection
         aw.qmc.resetlines()
+        aw.qmc.redraw()
         self.accept()
 
+    #button OK
     def updatetargets(self):
         mode = unicode(self.modeComboBox.currentText())
         if mode == QApplication.translate("ComboBox","metrics", None, QApplication.UnicodeUTF8):
@@ -7247,9 +7445,13 @@ class HUDDlg(QDialog):
 
         string = QApplication.translate("Message Area","[ET target = %1] [BT target =   (%2]", None, QApplication.UnicodeUTF8).arg(unicode(aw.qmc.ETtarget)).arg(unicode(aw.qmc.BTtarget))
         aw.sendmessage(string)
+        aw.qmc.resetlines()
+        aw.qmc.redraw()
         self.accept()
 
-    def closeEvent(self, event):    
+    #closing dialog
+    def closeEvent(self, event):
+        self.close()
         self.accept()
         aw.qmc.resetlines()
         aw.qmc.redraw()        
@@ -7274,7 +7476,6 @@ class editGraphDlg(QDialog):
         chargelabel  = QLabel("<b>" + QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8) + "</b>")
         chargelabel.setStyleSheet("background-color:'#f07800';")
 
-        self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
         self.chargeeditcopy = aw.qmc.stringfromseconds(0)
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
@@ -11755,7 +11956,7 @@ class DeviceAssignmentDLG(QDialog):
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
 
 
-        ##########################    TAB 2  WIDGETS   EXTRA DEVICES
+        ##########################    TAB 2  WIDGETS   "EXTRA DEVICES"
         #table for showing data
         self.devicetable = QTableWidget()
         self.devicetable.setTabKeyNavigation(True)
@@ -11763,6 +11964,13 @@ class DeviceAssignmentDLG(QDialog):
 
         addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
         self.connect(addButton, SIGNAL("clicked()"),self.adddevice)                
+
+        ###########################  TAB 3 WIDGETS "ADVANCED"
+        labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None, QApplication.UnicodeUTF8)) 
+        labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None, QApplication.UnicodeUTF8)) 
+        self.ETfunctionedit = QLineEdit(unicode(aw.qmc.ETfunction))            
+        self.BTfunctionedit = QLineEdit(unicode(aw.qmc.BTfunction))            
+
 
         #LAYOUT TAB 1
         grid = QGridLayout()
@@ -11810,6 +12018,13 @@ class DeviceAssignmentDLG(QDialog):
         tab2Layout.addWidget(self.devicetable)
         tab2Layout.addWidget(addButton)
 
+        #LAYOUT TAB 3
+        tab3Layout = QVBoxLayout()
+        tab3Layout.addWidget(labelETadvanced)
+        tab3Layout.addWidget(self.ETfunctionedit)
+        tab3Layout.addWidget(labelBTadvanced)
+        tab3Layout.addWidget(self.BTfunctionedit)
+
         #tab widget
         TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -11819,6 +12034,11 @@ class DeviceAssignmentDLG(QDialog):
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Dev.",None, QApplication.UnicodeUTF8))
+
+        C3Widget = QWidget()
+        C3Widget.setLayout(tab3Layout)
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Advanced",None, QApplication.UnicodeUTF8))
+
 
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -12294,8 +12514,12 @@ class DeviceAssignmentDLG(QDialog):
             aw.label7.setVisible(False)
             aw.lcd7.setVisible(False)
        
+        aw.qmc.ETfunction = unicode(self.ETfunctionedit.text())
+        aw.qmc.BTfunction = unicode(self.BTfunctionedit.text())
+
         aw.sendmessage(message)
-        
+
+        #open serial conf Dialog        
         if self.nonpidButton.isChecked():
             if meter != "NONE":
                 aw.setcommport()
