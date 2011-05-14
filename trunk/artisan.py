@@ -5739,13 +5739,13 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(self.qmc.plotcurves)):
                     self.qmc.plotcurves[i] = unicode(self.qmc.plotcurves[i])
                     self.qmc.plotcurvecolor[i] = unicode(self.qmc.plotcurvecolor[i])
-            
+
             #update display
             self.qmc.redraw()
 
         except Exception,e:
             #print e
-            self.qmc.adderror(QApplication.translate("Error Message", "Exception: settingsLoad() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),unicode(e))
             return                            
 
 
@@ -7080,6 +7080,10 @@ class HUDDlg(QDialog):
         saveImgButton.setToolTip(QApplication.translate("ToolTip","Save image using current graph size to a png format",None, QApplication.UnicodeUTF8))
         saveImgButton.setMaximumWidth(100)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
+
+        helpcurveButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
+        saveImgButton.setMaximumWidth(60)
+        self.connect(helpcurveButton, SIGNAL("clicked()"),self.showcurvehelp)
         
         curveLayout = QGridLayout()
         curveLayout.addWidget(self.equedit1,0,0)
@@ -7096,12 +7100,13 @@ class HUDDlg(QDialog):
         curveLayout.addWidget(color6Button,5,1)
 
         curvebuttonlayout = QHBoxLayout()
-        curvebuttonlayout.addWidget(equdrawbutton)    	
-    	curvebuttonlayout.addWidget(saveImgButton)        
+        curvebuttonlayout.addWidget(equdrawbutton)      
+        curvebuttonlayout.addWidget(saveImgButton)        
+        curvebuttonlayout.addWidget(helpcurveButton)        
         
         tab2Layout = QVBoxLayout()
-        tab2Layout.addWidget(equlabel)    	
-    	tab2Layout.addLayout(curveLayout)
+        tab2Layout.addWidget(equlabel)      
+        tab2Layout.addLayout(curveLayout)
         tab2Layout.addLayout(curvebuttonlayout)
         tab2Layout.addWidget(equbackgroundbutton)
 
@@ -7223,6 +7228,30 @@ class HUDDlg(QDialog):
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
 
         self.setLayout(Slayout)
+
+    def showcurvehelp(self):
+        string  = QApplication.translate("MessageBox", "<b>abs(x)</b> Return the absolute value of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>acos(x)</b> Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"  
+        string += QApplication.translate("MessageBox", "<b>asin(x)</b> Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>atan(x)</b> Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>cos(x)</b> Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>degrees(x)</b> Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>exp(x)</b> Return e raised to the power of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>log(x[, base])</b> Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8) + "<br><br>"  
+        string += QApplication.translate("MessageBox", "<b>log10(x)</b> Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>pow(x, y)</b> Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>radians(x)</b> Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>sin(x)</b> Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>sqrt(x)</b> Return the square root of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>tan(x)</b> Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Y1</b> ET curve",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Y2</b> BT curve",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Y3</b> Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Y4</b> Extra devices #1 curve 2",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Y5</b> Extra devices #2 curve 1",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Y6</b> Extra devices #2 curve 2",None, QApplication.UnicodeUTF8) + "<br><br>"
+
+        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Plotter Functions",None, QApplication.UnicodeUTF8),string)
 
     def setcurvecolor(self,x):
         colorf = QColorDialog.getColor(QColor(aw.qmc.plotcurvecolor[x]),self)
