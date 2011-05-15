@@ -624,7 +624,8 @@ class tgraphcanvas(FigureCanvas):
                     
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
-            else:                    
+            else:
+                tx = self.timeclock.elapsed()/1000. 
                 #readjust xlimit of plot if needed
                 if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
                     self.endofx = int(tx + 180)         # increase x limit by 3 minutes (180)
@@ -11504,9 +11505,7 @@ class nonedevDlg(QDialog):
     def __init__(self, parent = None):
         super(nonedevDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Manual Temperature Logger",None, QApplication.UnicodeUTF8))
-
-        self.closeserialports()
-        
+       
         if len(aw.qmc.timex):
             if aw.qmc.manuallogETflag:
                 etval = str(int(aw.qmc.temp1[-1]))
