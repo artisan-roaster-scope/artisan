@@ -7517,6 +7517,7 @@ class editGraphDlg(QDialog):
         chargelabel  = QLabel("<b>" + QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8) + "</b>")
         chargelabel.setStyleSheet("background-color:'#f07800';")
 
+        self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
         self.chargeeditcopy = aw.qmc.stringfromseconds(0)
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
