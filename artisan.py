@@ -78,7 +78,7 @@ from scipy import fft
 from scipy import interpolate as inter
 
 from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
-                         QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
+                         QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QButtonGroup,QGroupBox,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPalette,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
@@ -1183,8 +1183,6 @@ class tgraphcanvas(FigureCanvas):
         aw.lcd4.display(0)
         aw.lcd5.display(0)
         aw.sendmessage(QApplication.translate("Message Area","Scope has been reset",None, QApplication.UnicodeUTF8))
-        
-        aw.button_2.setDisabled(False)        
         aw.button_3.setDisabled(False)
         aw.button_4.setDisabled(False)
         aw.button_5.setDisabled(False)
@@ -1193,8 +1191,6 @@ class tgraphcanvas(FigureCanvas):
         aw.button_8.setDisabled(False)
         aw.button_9.setDisabled(False)
         aw.button_19.setDisabled(False)        
-        aw.button_1.setFlat(False)
-        aw.button_2.setFlat(False)
         aw.button_3.setFlat(False)
         aw.button_4.setFlat(False)
         aw.button_5.setFlat(False)
@@ -1202,7 +1198,9 @@ class tgraphcanvas(FigureCanvas):
         aw.button_7.setFlat(False)
         aw.button_8.setFlat(False)
         aw.button_9.setFlat(False)
-        aw.button_19.setFlat(False)        
+        aw.button_19.setFlat(False)
+        aw.button_1.setText("ON") 
+        aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")        
         
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
         aw.setWindowTitle(aw.windowTitle)
@@ -2188,37 +2186,36 @@ class tgraphcanvas(FigureCanvas):
 ##########################################################################################################################                                   
 
 
-    #Turns ON flag self.flagon to read and plot. Called from push button_1. 
+    #Turns ON/OFF flag self.flagon to read and plot. Called from push button_1. 
     def OnMonitor(self):
-        #close all serial ports just in case there was one left open from previous sesion
-        aw.ser.closeport()
-        
-        if self.designerflag: return
-        
-        #Call start() to start the first measurement if no data collected
-        if not len(self.timex):
-            self.timeclock.start()
-        self.timer.start()
-        self.LCDtimer.start()
-        self.seconds = 0.
+        if not self.flagon:
+            if self.designerflag: return
             
-        self.flagon = True
-        aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))     
-        aw.button_1.setDisabled(True)                     #button ON
-        aw.button_1.setStyleSheet("QPushButton { background-color: #88ff18}")
-        aw.soundpop()
-        
-    #Turns OFF flag to read and plot. Called from push button_2. It tells when to stop recording
-    def OffMonitor(self):
-        aw.ser.closeport()
-        self.timer.stop()
-        self.LCDtimer.stop()
-        self.seconds = 0.
-        self.flagon = False
-        aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
-        aw.button_1.setDisabled(False)
-        aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
-        aw.soundpop()
+            #close all serial ports just in case there was one left open from previous sesion
+            aw.ser.closeport()            
+            
+            #Call start() to start the first measurement if no data collected
+            if not len(self.timex):
+                self.timeclock.start()
+            self.timer.start()
+            self.LCDtimer.start()
+            self.seconds = 0.
+                
+            self.flagon = True
+            aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))     
+            aw.button_1.setText("OFF")                     #button ON
+            aw.button_1.setStyleSheet("QPushButton { background-color: #ff664b}")
+            aw.soundpop()
+        else:
+            aw.ser.closeport()
+            self.timer.stop()
+            self.LCDtimer.stop()
+            self.seconds = 0.
+            self.flagon = False
+            aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
+            aw.button_1.setText("ON") 
+            aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
+            aw.soundpop()
            
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
@@ -2513,7 +2510,77 @@ class tgraphcanvas(FigureCanvas):
             
         aw.sendmessage(message)
         aw.soundpop()
-    # Writes information about the finished profile in the graph
+
+    #Marks location in graph of special events. For example change a fan setting.
+    #Uses the position of the time index (variable self.timex) as location in time           
+    def EventRecord(self):
+        if self.flagon:
+            #[EVENT] push button feedback
+            aw.button_11.setFlat(True)
+            aw.button_11.setDisabled(True)
+            QTimer.singleShot(2000, self.restorebutton_11)
+            
+            Nevents = len(self.specialevents)
+            #if in manual mode record first the last point in self.timex[]
+            if self.device == 18:
+                tx = self.timeclock.elapsed()/1000.
+                et,bt = aw.ser.NONE()
+                if bt != 1 and et != -1:              
+                    self.drawmanual(et,bt,tx)                        
+                else:
+                    return
+            #i = index number of the event (current length of the time list)           
+            i = len(self.timex)-1
+
+            self.specialevents.append(i)
+            self.specialeventstype.append(0)            
+            self.specialeventsStrings.append(str(Nevents+1))
+            self.specialeventsvalue.append(0)               
+            
+            temp = unicode(self.temp2[i])
+            timed = self.stringfromseconds(self.timex[i])
+
+            message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
+            aw.sendmessage(message)
+            #write label in mini recorder if flag checked
+            if aw.minieventsflag:
+                aw.eNumberSpinBox.setValue(Nevents+1)
+                aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+            self.redraw()     
+                
+            aw.soundpop()
+
+    #called from controlling devices when roasting to record steps (commands) and produce a profile later
+    def DeviceEventRecord(self,command):
+        if self.flagon:
+            #number of events
+            Nevents = len(self.specialevents)
+            #index number            
+            i = len(self.timex)-1
+            if i > 0:
+                self.specialevents.append(i)                                     # store absolute time index
+                self.specialeventstype.append(0)                                 # set type (to the first index 0)          
+                self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
+                self.specialeventsvalue.append(0)                                # empty
+                temp = unicode(self.temp2[i])
+                if self.timeindex[0] != -1:
+                    start = self.timex[self.timeindex[0]]
+                else:
+                    start = 0
+                timed = self.stringfromseconds(self.timex[i]-start)
+                message = QApplication.translate("Message Area","Computer Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
+                aw.sendmessage(message)
+                #write label in mini recorder if flag checked
+                if aw.minieventsflag:
+                    aw.eNumberSpinBox.setValue(Nevents+1)
+                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                    aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+                self.redraw()
+
+# Writes information about the finished profile in the graph
     def writestatistics(self):
         TP_index = aw.findTP()
         if self.timeindex[1] and aw.qmc.phasesbuttonflag:
@@ -2665,72 +2732,6 @@ class tgraphcanvas(FigureCanvas):
         aw.button_11.setDisabled(False)
         aw.button_11.setFlat(False)        
 
-    #Marks location in graph of special events. For example change a fan setting.
-    #Uses the position of the time index (variable self.timex) as location in time           
-    def EventRecord(self):
-        #[EVENT] push button feedback
-        aw.button_11.setFlat(True)
-        aw.button_11.setDisabled(True)
-        QTimer.singleShot(2000, self.restorebutton_11)
-        
-        Nevents = len(self.specialevents)
-        #if in manual mode record first the last point in self.timex[]
-        if self.device == 18:
-            tx = self.timeclock.elapsed()/1000.
-            et,bt = aw.ser.NONE()
-            if bt != 1 and et != -1:              
-                self.drawmanual(et,bt,tx)                        
-            else:
-                return
-        #i = index number of the event (current length of the time list)           
-        i = len(self.timex)-1
-
-        self.specialevents.append(i)
-        self.specialeventstype.append(0)            
-        self.specialeventsStrings.append(str(Nevents+1))
-        self.specialeventsvalue.append(0)               
-        
-        temp = unicode(self.temp2[i])
-        timed = self.stringfromseconds(self.timex[i])
-
-        message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
-        aw.sendmessage(message)
-        #write label in mini recorder if flag checked
-        if aw.minieventsflag:
-            aw.eNumberSpinBox.setValue(Nevents+1)
-            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-            aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-        self.redraw()     
-            
-        aw.soundpop()
-
-    #called from controlling devices when roasting to record steps (commands) and produce a profile later
-    def DeviceEventRecord(self,command):
-        #number of events
-        Nevents = len(self.specialevents)
-        #index number            
-        i = len(self.timex)-1
-        if i > 0:
-            self.specialevents.append(i)                                     # store absolute time index
-            self.specialeventstype.append(0)                                 # set type (to the first index 0)          
-            self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
-            self.specialeventsvalue.append(0)                                # empty
-            temp = unicode(self.temp2[i])
-            if self.timeindex[0] != -1:
-                start = self.timex[self.timeindex[0]]
-            else:
-                start = 0
-            timed = self.stringfromseconds(self.timex[i]-start)
-            message = QApplication.translate("Message Area","Computer Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
-            aw.sendmessage(message)
-            #write label in mini recorder if flag checked
-            if aw.minieventsflag:
-                aw.eNumberSpinBox.setValue(Nevents+1)
-                aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-            self.redraw()
             
     #called from markdryen(), markcharge(), mark1Cstart(), etc when using device 18 (manual mode)
     def drawmanual(self,et,bt,tx):
@@ -3768,7 +3769,7 @@ class ApplicationWindow(QMainWindow):
                 
         #create vertical/horizontal boxes layout managers for buttons,etc
         LCDlayout = QVBoxLayout()
-        buttonHHbl = QHBoxLayout()
+        self.buttonHHbl = QHBoxLayout()
         controlLayout = QVBoxLayout()
         
         ###############      create Matplotlib canvas widget 
@@ -3803,6 +3804,11 @@ class ApplicationWindow(QMainWindow):
         self.lcdpaletteB = { "timer":u'black',"met":'black',"bt":'black',"deltamet":'black',"deltabt":'black',"sv":'black'}
         self.lcdpaletteF = { "timer":u'white',"met":'white',"bt":'white',"deltamet":'white',"deltabt":'white',"sv":'white'}
 
+    	#user defined event buttons
+        self.extraeventstypes,self.extraeventsvalues = [],[]
+        #self.extraeventstypes = [self.qmc.etypes[0],self.qmc.etypes[0],self.qmc.etypes[0]]
+        #self.extraeventsvalues= [5,5,5]
+
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID.
         
@@ -3811,7 +3817,7 @@ class ApplicationWindow(QMainWindow):
         #create a Label object to display program status information
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(10)
-        
+
         #create START STOP buttons        
         self.button_1 = QPushButton(QApplication.translate("Scope Button", "ON", None, QApplication.UnicodeUTF8))
         self.button_1.setFocusPolicy(Qt.NoFocus)
@@ -3820,15 +3826,6 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setMinimumHeight(50)
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
-
-        self.button_2 = QPushButton(QApplication.translate("Scope Button", "OFF", None, QApplication.UnicodeUTF8))
-        self.button_2.setFocusPolicy(Qt.NoFocus)
-        self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
-        self.button_2.setMaximumSize(90, 50)
-        self.button_2.setMinimumHeight(50)
-        #self.button_2.setToolTip("<font color=red size=2><b>" + "Press here to Stop monitoring" + "</font></b>")
-        self.button_2.setToolTip(QApplication.translate("Tooltip", "Stops recording", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_2, SIGNAL("clicked()"), self.qmc.OffMonitor)
 
         #create 1C START, 1C END, 2C START and 2C END buttons
         self.button_3 = QPushButton(QApplication.translate("Scope Button", "FC START", None, QApplication.UnicodeUTF8))
@@ -4166,17 +4163,31 @@ class ApplicationWindow(QMainWindow):
 
         
         #place RECORDING buttons inside the horizontal button layout manager
-        buttonHHbl.addWidget(self.button_1)
-        buttonHHbl.addWidget(self.button_8)
-        buttonHHbl.addWidget(self.button_19)
-        buttonHHbl.addWidget(self.button_3)
-        buttonHHbl.addWidget(self.button_4)
-        buttonHHbl.addWidget(self.button_5)
-        buttonHHbl.addWidget(self.button_6)
-        buttonHHbl.addWidget(self.button_9)
-        buttonHHbl.addWidget(self.button_2)
-        buttonHHbl.addWidget(self.button_11)
+        self.buttonHHbl.addWidget(self.button_1,0)
+        self.buttonHHbl.addWidget(self.button_8,1)
+        self.buttonHHbl.addWidget(self.button_19,2)
+        self.buttonHHbl.addWidget(self.button_3,3)
+        self.buttonHHbl.addWidget(self.button_4,4)
+        self.buttonHHbl.addWidget(self.button_5,5)
+        self.buttonHHbl.addWidget(self.button_6,6)
+        self.buttonHHbl.addWidget(self.button_9,7)
+        self.buttonHHbl.addWidget(self.button_11,8)
 
+    	if len(self.extraeventstypes):
+            # user defined Event buttons UNDER WORK  #########################################################
+            self.buttonlist = []       
+            for i in range(len(self.extraeventstypes)):
+                self.buttonlist.append(QPushButton())
+                self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
+                self.buttonlist[i].setStyleSheet("QPushButton { background-color: yellow}")
+                self.buttonlist[i].setMaximumSize(90, 50)
+                self.buttonlist[i].setMinimumHeight(50)
+                self.buttonlist[i].setText(self.extraeventstypes[i][0]+unicode(self.extraeventsvalues[i]))
+                self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
+                self.buttonHHbl.addWidget(self.buttonlist[i],(9+i))
+                
+                #use self.buttonHHbl.removeWidget(self.buttonlist[i]) to remove buttons
+            #########################################
 
         # control Buttuns                
         controlLayout.addWidget(self.button_14)       
@@ -4199,7 +4210,7 @@ class ApplicationWindow(QMainWindow):
         gl.addWidget(self.messagelabel,1,0) #add a message label to give program feedback to user
         gl.addLayout(midLayout,2,0)         #GRAPHS
         gl.addLayout(LCDlayout,2,1)         #place LCD manager inside grid box layout manager
-        gl.addLayout(buttonHHbl,4,0)        #place buttonlayout manager inside grid box layout manager
+        gl.addLayout(self.buttonHHbl,4,0)        #place buttonlayout manager inside grid box layout manager
         gl.addLayout(EventsLayout,5,0)
         
         gl.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom (defaults to 12)
@@ -4486,12 +4497,20 @@ class ApplicationWindow(QMainWindow):
 
         #list of functions to chose from (using left-right keyboard arrow)
         self.keyboardmove  = [self.qmc.OnMonitor,self.qmc.markCharge,self.qmc.markDryEnd,self.qmc.mark1Cstart,self.qmc.mark1Cend,
-                             self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.OffMonitor,self.qmc.EventRecord,
+                             self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.EventRecord,
                              self.qmc.reset_and_redraw,self.qmc.toggleHUD,self.PIDcontrol]
         #current function above
         self.keyboardmoveindex = 0
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
+
+    #call from user configured event buttons    
+    def recordextraevent(self,ee):
+        self.qmc.EventRecord()
+        self.qmc.specialeventstype[-1] = self.extraeventstypes[ee]    
+        self.qmc.specialeventsvalue[-1] = self.extraeventsvalues[ee]
+        self.setminieditor2lastevent()
+        self.qmc.redraw()
 
     def resetApplication(self):
         string = QApplication.translate("MessageBox","Do you want to reset all settings?", None, QApplication.UnicodeUTF8)
@@ -4609,7 +4628,6 @@ class ApplicationWindow(QMainWindow):
                 self.button_5.setStyleSheet("QPushButton { background-color: orange }")
                 self.button_6.setStyleSheet("QPushButton { background-color: orange }")
                 self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
-                self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
                 self.button_11.setStyleSheet("QPushButton { background-color: yellow }")
                 self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
                 if self.qmc.HUDflag:
@@ -4623,40 +4641,35 @@ class ApplicationWindow(QMainWindow):
                 self.keyboardmove[self.keyboardmoveindex]()   #apply button command
                 #behaviour rules after pressing a button
                 #if RESET is pressed jump to ON     
-                if self.keyboardmoveindex == 10:
+                if self.keyboardmoveindex == 9:
                     self.keyboardmoveindex = 0
                     self.button_1.setStyleSheet("QPushButton { background-color: purple }")
                     self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
-                #if OFF is pressed jump to RESET (jump over EVENT if needed)   
-                elif self.keyboardmoveindex == 8:
-                    self.keyboardmoveindex = 10
-                    self.button_7.setStyleSheet("QPushButton { background-color: purple }")
-                    self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
-                #if less than OFF jump forward to the right once automatically    
-                elif self.keyboardmoveindex < 9:
+                #if less than EVENT jump forward to the right once automatically    
+                elif self.keyboardmoveindex < 8:
                     self.moveKbutton("right")
                     
             #command left-right: moves button          
             else:
                 # self.button_1 = ON, self.button_8 = CHARGE, self.button_19 = DRYEND, self.button_3 = FC START, self.button_4 = FC END,
-                # self.button_5 = SC START, self.button_6 = SC END, self.button_9 = DROP, self.button_2 = OFF, self.button_11 = EVENT,
+                # self.button_5 = SC START, self.button_6 = SC END, self.button_9 = DROP,self.button_11 = EVENT,
                 # self.button_7 = RESET, self.button_18 = HUD
                 
                 #Check current index (location)
-                #location in button ON
+                #location in button ON/OFF
                 if self.keyboardmoveindex == 0:
                     if command == "right":
                         self.button_8.setStyleSheet("QPushButton { background-color: purple }")
                         self.keyboardmoveindex = 1                        
                         if self.qmc.flagon:    
-                            self.button_1.setStyleSheet("QPushButton { background-color: #88ff18 }")
+                            self.button_1.setStyleSheet("QPushButton { background-color: #ff664b }")
                         else:
                             self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")                        
                     elif command == "left": #jump to HUD (close circle)
-                        self.keyboardmoveindex = 11
+                        self.keyboardmoveindex = 10
                         self.button_18.setStyleSheet("QPushButton { background-color: purple }")
                         if self.qmc.flagon:    
-                            self.button_1.setStyleSheet("QPushButton { background-color: #88ff18 }")
+                            self.button_1.setStyleSheet("QPushButton { background-color: #ff664b }")
                         else:
                             self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")                        
                 #location in button CHARGE
@@ -4722,58 +4735,45 @@ class ApplicationWindow(QMainWindow):
                 #location in button DROP    
                 elif self.keyboardmoveindex == 7:
                     if command == "right":
-                        self.button_2.setStyleSheet("QPushButton { background-color: purple }")
-                        self.keyboardmoveindex = 8
+                        if self.eventsbuttonflag:
+                            self.button_11.setStyleSheet("QPushButton { background-color: purple }")
+                            self.keyboardmoveindex = 8
+                        else:
+                            self.button_7.setStyleSheet("QPushButton { background-color: purple }")
+                            self.keyboardmoveindex = 9
                     elif command == "left":
                         self.button_6.setStyleSheet("QPushButton { background-color: purple }")
                         self.keyboardmoveindex = 6
                     self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
-                        
-                #location in button OFF    
-                elif self.keyboardmoveindex == 8:
-                    if command == "right":
-                        if self.eventsbuttonflag:
-                            self.button_11.setStyleSheet("QPushButton { background-color: purple }")
-                            self.keyboardmoveindex = 9
-                        else:
-                            self.button_7.setStyleSheet("QPushButton { background-color: purple }")
-                            self.keyboardmoveindex = 10   
-                    elif command == "left":
-                        self.button_9.setStyleSheet("QPushButton { background-color: purple }")
-                        self.keyboardmoveindex = 7
-                    self.button_2.setStyleSheet("QPushButton { background-color: #ff664b }")
                     
                 #location in button EVENT    
-                elif self.keyboardmoveindex == 9:
+                elif self.keyboardmoveindex == 8:
                     if command == "right":
                         if self.eventsbuttonflag:
                             self.button_7.setStyleSheet("QPushButton { background-color: purple }")
                             self.button_11.setStyleSheet("QPushButton { background-color: yellow }")
-                            self.keyboardmoveindex = 10
-                        if not self.eventsbuttonflag:
-                            self.button_11.setStyleSheet("QPushButton { background-color: purple }")
-                            self.button_2.setStyleSheet("QPushButton { background-color: yellow }")
-                            self.keyboardmoveindex = 9                            
+                            self.keyboardmoveindex = 9
+                          
                     if command == "left":
-                        self.button_2.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_9.setStyleSheet("QPushButton { background-color: purple }")
                         self.button_11.setStyleSheet("QPushButton { background-color: yellow }")
-                        self.keyboardmoveindex = 8
+                        self.keyboardmoveindex = 7
                 #location in button RESET    
-                elif self.keyboardmoveindex == 10:
+                elif self.keyboardmoveindex == 9:
                     if command == "left":
                         self.button_18.setStyleSheet("QPushButton { background-color: purple }")
                         self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
-                        self.keyboardmoveindex = 11
+                        self.keyboardmoveindex = 10
                     if command == "right":
                         if self.eventsbuttonflag:
                             self.button_11.setStyleSheet("QPushButton { background-color: purple }")
-                            self.keyboardmoveindex = 9
-                        if not self.eventsbuttonflag:
-                            self.button_2.setStyleSheet("QPushButton { background-color: purple }")
                             self.keyboardmoveindex = 8
+                        if not self.eventsbuttonflag:
+                            self.button_9.setStyleSheet("QPushButton { background-color: purple }")
+                            self.keyboardmoveindex = 7
                     self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
                 #location in button HUD    
-                elif self.keyboardmoveindex == 11:   
+                elif self.keyboardmoveindex == 10:   
                     if command == "left":
                         self.keyboardmoveindex = 0
                         if self.qmc.HUDflag:
@@ -4783,12 +4783,12 @@ class ApplicationWindow(QMainWindow):
                         self.button_1.setStyleSheet("QPushButton { background-color: purple }")
                     elif command == "right":
                         self.button_7.setStyleSheet("QPushButton { background-color: purple }")
-                        self.keyboardmoveindex = 10 
+                        self.keyboardmoveindex = 9 
                         if self.qmc.HUDflag:
                             self.button_18.setStyleSheet("QPushButton { background-color: #61ffff }")
                         else:    
                             self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
-
+                            
     #sound feedback when pressing a push button
     def soundpop(self):
         if self.soundflag:
@@ -4839,6 +4839,15 @@ class ApplicationWindow(QMainWindow):
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
 
+    #sets minieditor 2 last event	
+    def setminieditor2lastevent(self):
+       self.lineEvent.setText(self.qmc.specialeventsStrings[-1])
+       self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[-1])
+       self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[-1])
+       timez = self.qmc.stringfromseconds(int(self.qmc.timex[aw.qmc.specialevents[-1]]-self.qmc.timex[aw.qmc.timeindex[0]]))       
+       self.etimeline.setText(timez)
+
+    #moves events in minieditor         	
     def changeEventNumber(self):
        if self.qmc.designerflag:
            return
@@ -4875,8 +4884,7 @@ class ApplicationWindow(QMainWindow):
                
            self.qmc.fig.canvas.draw()
 
-
-    # update entry in mini Event editor
+    #updates events from mini edtitor	
     def miniEventRecord(self):
         lenevents = self.eNumberSpinBox.value()
         if lenevents:
@@ -8873,9 +8881,6 @@ class calculatorDlg(QDialog):
            inx = outx*convtable[self.VoutComboBox.currentIndex()][self.VinComboBox.currentIndex()]
            self.VinEdit.setText(u"%.3f"%inx)
        
-##    def closeEvent(self, event):
-##        aw.qmc.resetlines()
-##        aw.qmc.fig.canvas.draw()
   
 ##########################################################################
 #####################  EVENTS CONFIGURATION DLG     ######################
