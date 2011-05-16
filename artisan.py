@@ -6408,25 +6408,28 @@ $cupping_notes
         #create a html QString
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
-                "<b>" + QApplication.translate("About", "Version:",None, QApplication.UnicodeUTF8) + """</b> {0} 
+                """<b>{0}</b> {1} 
                 <p>
-                <b>Python:</b> [ {1} ]
-                <b>Qt:</b> [ {2} ]
-                <b>PyQt:</b> [ {3} ]
-                <b>OS:</b/>[ {4} ]
+                <b>Python:</b> [ {2} ]
+                <b>Qt:</b> [ {3} ]
+                <b>PyQt:</b> [ {4} ]
+                <b>OS:</b/>[ {5} ]
                 </p>
                 <p>
-                <b>""" + QApplication.translate("About", "Core developers:",None, QApplication.UnicodeUTF8) + """</b> {5}
+                <b>{6}</b> {7}
                 </p>
                 <p>
-                <b>""" + QApplication.translate("About", "Contributors:",None, QApplication.UnicodeUTF8) + """</b> {6}
+                <b>{8}</b> {9}
                 </p>""".format(
+                QApplication.translate("About", "Version:",None, QApplication.UnicodeUTF8),
                 __version__,
                 platform.python_version(),
                 QT_VERSION_STR,
                 PYQT_VERSION_STR,
                 platf,
+                QApplication.translate("About", "Core developers:",None, QApplication.UnicodeUTF8),
                 coredevelopers,
+                QApplication.translate("About", "Contributors:",None, QApplication.UnicodeUTF8),
                 contributors))
                 
     def helpHelp(self):
