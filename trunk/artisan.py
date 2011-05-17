@@ -78,7 +78,7 @@ from scipy import fft
 from scipy import interpolate as inter
 
 from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
-                         QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QButtonGroup,QGroupBox,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
+                         QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QDialogButtonBox,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPalette,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
@@ -3768,8 +3768,7 @@ class ApplicationWindow(QMainWindow):
         gl = QGridLayout(self.main_widget)
                 
         #create vertical/horizontal boxes layout managers for buttons,etc
-        LCDlayout = QVBoxLayout()
-        self.buttonHHbl = QHBoxLayout()
+        LCDlayout = QVBoxLayout()    
         controlLayout = QVBoxLayout()
         
         ###############      create Matplotlib canvas widget 
@@ -3806,8 +3805,6 @@ class ApplicationWindow(QMainWindow):
 
     	#user defined event buttons
         self.extraeventstypes,self.extraeventsvalues = [],[]
-        #self.extraeventstypes = [self.qmc.etypes[0],self.qmc.etypes[0],self.qmc.etypes[0]]
-        #self.extraeventsvalues= [5,5,5]
 
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID.
@@ -3822,7 +3819,7 @@ class ApplicationWindow(QMainWindow):
         self.button_1 = QPushButton(QApplication.translate("Scope Button", "ON", None, QApplication.UnicodeUTF8))
         self.button_1.setFocusPolicy(Qt.NoFocus)
         self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
-        self.button_1.setMaximumSize(90, 50)
+        #self.button_1.setMaximumSize(90, 50)
         self.button_1.setMinimumHeight(50)
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
@@ -3831,7 +3828,7 @@ class ApplicationWindow(QMainWindow):
         self.button_3 = QPushButton(QApplication.translate("Scope Button", "FC START", None, QApplication.UnicodeUTF8))
         self.button_3.setFocusPolicy(Qt.NoFocus)
         self.button_3.setStyleSheet("QPushButton { background-color: orange }")
-        self.button_3.setMaximumSize(90, 50)
+        #self.button_3.setMaximumSize(90, 50)
         self.button_3.setMinimumHeight(50)
         self.button_3.setToolTip(QApplication.translate("Tooltip", "Marks the begining of First Crack (FC)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_3, SIGNAL("clicked()"), self.qmc.mark1Cstart)
@@ -3839,7 +3836,7 @@ class ApplicationWindow(QMainWindow):
         self.button_4 = QPushButton(QApplication.translate("Scope Button", "FC END", None, QApplication.UnicodeUTF8))
         self.button_4.setFocusPolicy(Qt.NoFocus)
         self.button_4.setStyleSheet("QPushButton { background-color: orange }")
-        self.button_4.setMaximumSize(90, 50)
+        #self.button_4.setMaximumSize(90, 50)
         self.button_4.setMinimumHeight(50)
         self.button_4.setToolTip(QApplication.translate("Tooltip", "Marks the end of First Crack (FC)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_4, SIGNAL("clicked()"), self.qmc.mark1Cend)
@@ -3847,7 +3844,7 @@ class ApplicationWindow(QMainWindow):
         self.button_5 = QPushButton(QApplication.translate("Scope Button", "SC START", None, QApplication.UnicodeUTF8))
         self.button_5.setFocusPolicy(Qt.NoFocus)
         self.button_5.setStyleSheet("QPushButton { background-color: orange }")
-        self.button_5.setMaximumSize(90, 50)
+        #self.button_5.setMaximumSize(90, 50)
         self.button_5.setMinimumHeight(50)
         self.button_5.setToolTip(QApplication.translate("Tooltip", "Marks the begining of Second Crack (SC)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_5, SIGNAL("clicked()"), self.qmc.mark2Cstart)
@@ -3855,7 +3852,7 @@ class ApplicationWindow(QMainWindow):
         self.button_6 = QPushButton(QApplication.translate("Scope Button", "SC END", None, QApplication.UnicodeUTF8))
         self.button_6.setFocusPolicy(Qt.NoFocus)
         self.button_6.setStyleSheet("QPushButton { background-color: orange }")
-        self.button_6.setMaximumSize(90, 50)
+        #self.button_6.setMaximumSize(90, 50)
         self.button_6.setMinimumHeight(50)
         self.button_6.setToolTip(QApplication.translate("Tooltip", "Marks the end of Second Crack (SC)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_6, SIGNAL("clicked()"), self.qmc.mark2Cend)
@@ -3872,7 +3869,7 @@ class ApplicationWindow(QMainWindow):
         self.button_8 = QPushButton(QApplication.translate("Scope Button", "CHARGE", None, QApplication.UnicodeUTF8))
         self.button_8.setFocusPolicy(Qt.NoFocus)
         self.button_8.setStyleSheet("QPushButton { background-color: #f07800 }")
-        self.button_8.setMaximumSize(90, 50)
+        #self.button_8.setMaximumSize(90, 50)
         self.button_8.setMinimumHeight(50)
         self.button_8.setToolTip(QApplication.translate("Tooltip", "Marks the begining of the roast (beans in)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_8, SIGNAL("clicked()"), self.qmc.markCharge)
@@ -3881,7 +3878,7 @@ class ApplicationWindow(QMainWindow):
         self.button_9 = QPushButton(QApplication.translate("Scope Button", "DROP", None, QApplication.UnicodeUTF8))
         self.button_9.setFocusPolicy(Qt.NoFocus)
         self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
-        self.button_9.setMaximumSize(90, 50)
+        #self.button_9.setMaximumSize(90, 50)
         self.button_9.setMinimumHeight(50)
         self.button_9.setToolTip(QApplication.translate("Tooltip", "Marks the end of the roast (drop beans)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_9, SIGNAL("clicked()"), self.qmc.markDrop)
@@ -3897,7 +3894,7 @@ class ApplicationWindow(QMainWindow):
         self.button_11 = QPushButton(QApplication.translate("Scope Button", "EVENT", None, QApplication.UnicodeUTF8))
         self.button_11.setFocusPolicy(Qt.NoFocus)
         self.button_11.setStyleSheet("QPushButton { background-color: yellow}")
-        self.button_11.setMaximumSize(90, 50)
+        #self.button_11.setMaximumSize(90, 50)
         self.button_11.setMinimumHeight(50)
         self.button_11.setToolTip(QApplication.translate("Tooltip", "Marks an Event", None, QApplication.UnicodeUTF8))
         self.connect(self.button_11, SIGNAL("clicked()"), self.qmc.EventRecord) 
@@ -4161,35 +4158,34 @@ class ApplicationWindow(QMainWindow):
         LCDlayout.addWidget(self.lcd5)
         LCDlayout.addStretch()   
 
+        #holds extra events buttons
+        self.buttonlist = []  
+        #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
+        self.lowerbuttondialog = QDialogButtonBox()
+        self.lowerbuttondialog.setCenterButtons(True)
         
-        #place RECORDING buttons inside the horizontal button layout manager
-        self.buttonHHbl.addWidget(self.button_1,0)
-        self.buttonHHbl.addWidget(self.button_8,1)
-        self.buttonHHbl.addWidget(self.button_19,2)
-        self.buttonHHbl.addWidget(self.button_3,3)
-        self.buttonHHbl.addWidget(self.button_4,4)
-        self.buttonHHbl.addWidget(self.button_5,5)
-        self.buttonHHbl.addWidget(self.button_6,6)
-        self.buttonHHbl.addWidget(self.button_9,7)
-        self.buttonHHbl.addWidget(self.button_11,8)
-
-    	if len(self.extraeventstypes):
-            # user defined Event buttons UNDER WORK  #########################################################
-            self.buttonlist = []       
-            for i in range(len(self.extraeventstypes)):
-                self.buttonlist.append(QPushButton())
-                self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
-                self.buttonlist[i].setStyleSheet("QPushButton { background-color: yellow}")
-                self.buttonlist[i].setMaximumSize(90, 50)
-                self.buttonlist[i].setMinimumHeight(50)
-                self.buttonlist[i].setText(self.extraeventstypes[i][0]+unicode(self.extraeventsvalues[i]))
-                self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
-                self.buttonHHbl.addWidget(self.buttonlist[i],(9+i))
-                
-                #use self.buttonHHbl.removeWidget(self.buttonlist[i]) to remove buttons
-            #########################################
-
-        # control Buttuns                
+        #initiate configuration
+        self.lowerbuttondialog.setOrientation(Qt.Horizontal)
+        self.lowerbuttondialog.addButton(self.button_1,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_8,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_19,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_3,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_4,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_5,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_6,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_9,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_11,QDialogButtonBox.ActionRole)
+        for i in range(len(self.extraeventstypes)):
+            self.buttonlist.append(QPushButton())
+            self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
+            self.buttonlist[i].setStyleSheet("QPushButton { background-color: yellow}")
+            #self.buttonlist[i].setMaximumSize(90, 50)
+            self.buttonlist[i].setMinimumHeight(50)
+            self.buttonlist[i].setText(unicode(self.qmc.etypes[self.extraeventstypes[i]][0])+unicode(self.qmc.eventsvalues[self.extraeventsvalues[i]]))
+            self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
+            self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                      
+        # control Buttons                
         controlLayout.addWidget(self.button_14)       
         controlLayout.addWidget(self.button_13)
         controlLayout.addWidget(self.button_12)
@@ -4197,12 +4193,10 @@ class ApplicationWindow(QMainWindow):
         controlLayout.addWidget(self.button_16)
         controlLayout.addWidget(self.button_15)
 
-
         #pack RESET buttons + GRAPHS
         midLayout = QHBoxLayout()
         midLayout.addLayout(controlLayout)
         midLayout.addWidget(self.stack)
-
         
         #pack all into the grid MASTER LAYOUT manager (widget,row,column)
         gl.addLayout(naviLayout,0,0)        #Navigation Tool bar
@@ -4210,7 +4204,7 @@ class ApplicationWindow(QMainWindow):
         gl.addWidget(self.messagelabel,1,0) #add a message label to give program feedback to user
         gl.addLayout(midLayout,2,0)         #GRAPHS
         gl.addLayout(LCDlayout,2,1)         #place LCD manager inside grid box layout manager
-        gl.addLayout(self.buttonHHbl,4,0)        #place buttonlayout manager inside grid box layout manager
+        gl.addWidget(self.lowerbuttondialog,4,0)        #place buttonlayout manager inside grid box layout manager       
         gl.addLayout(EventsLayout,5,0)
         
         gl.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom (defaults to 12)
@@ -5748,6 +5742,9 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(self.qmc.plotcurves)):
                     self.qmc.plotcurves[i] = unicode(self.qmc.plotcurves[i])
                     self.qmc.plotcurvecolor[i] = unicode(self.qmc.plotcurvecolor[i])
+            if settings.contains("extraeventsvalues"):
+                self.extraeventstypes = map(lambda x:x.toInt()[0],settings.value("extraeventstypes").toList())
+                self.extraeventsvalues = map(lambda x:x.toInt()[0],settings.value("extraeventsvalues").toList())   	
 
             #update display
             self.qmc.redraw()
@@ -5891,7 +5888,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("plotcurves",self.qmc.plotcurves)                                                                
             settings.setValue("plotcurvecolor",self.qmc.plotcurvecolor)
 
-            
+            settings.setValue("extraeventstypes",self.extraeventstypes)
+            settings.setValue("extraeventsvalues",self.extraeventsvalues)
+
         except Exception,e:
             self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))            
 
@@ -8898,6 +8897,7 @@ class EventsDlg(QDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Events",None, QApplication.UnicodeUTF8))
         self.setModal(True)
 
+        ## TAB 1
         self.eventsbuttonflag = QCheckBox(QApplication.translate("Checkbox","Button",None, QApplication.UnicodeUTF8))
         if aw.eventsbuttonflag:
             self.eventsbuttonflag.setChecked(True)
@@ -8930,6 +8930,33 @@ class EventsDlg(QDialog):
         self.etype2 = QLineEdit(aw.qmc.etypes[2])
         self.etype3 = QLineEdit(aw.qmc.etypes[3])
         
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
+        closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
+        closeButton.setFocusPolicy(Qt.NoFocus)
+        defaultButton.setFocusPolicy(Qt.NoFocus)
+        
+        self.connect(closeButton,SIGNAL("clicked()"),self, SLOT("reject()"))
+        self.connect(okButton,SIGNAL("clicked()"),self.updatetypes)
+        self.connect(defaultButton,SIGNAL("clicked()"),self.settypedefault)
+
+        ###  TAB 2
+        #table for showing events
+        self.eventbuttontable = QTableWidget()
+        self.eventbuttontable.setTabKeyNavigation(True)
+        self.createEventbuttonTable()
+
+        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
+        addButton.setToolTip(QApplication.translate("ToolTip","Add new extra Event button",None, QApplication.UnicodeUTF8))
+        addButton.setMaximumWidth(100)
+        self.connect(addButton, SIGNAL("clicked()"),self.insertextraeventbutton)
+
+        delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
+        delButton.setToolTip(QApplication.translate("ToolTip","Delete the last extra Event button",None, QApplication.UnicodeUTF8))
+        delButton.setMaximumWidth(100)
+        self.connect(delButton, SIGNAL("clicked()"),self.delextraeventbutton)
+        
+        #### tab1 layout
         typeLayout0 = QHBoxLayout()
         typeLayout0.addWidget(typelabel1)
         typeLayout0.addWidget(self.etype0)
@@ -8946,30 +8973,11 @@ class EventsDlg(QDialog):
         typeLayout3.addWidget(typelabel4)
         typeLayout3.addWidget(self.etype3)
 
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
-        closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
-        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
-        closeButton.setFocusPolicy(Qt.NoFocus)
-        defaultButton.setFocusPolicy(Qt.NoFocus)
-        
-        self.connect(closeButton,SIGNAL("clicked()"),self, SLOT("reject()"))
-        self.connect(okButton,SIGNAL("clicked()"),self.updatetypes)
-        self.connect(defaultButton,SIGNAL("clicked()"),self.settypedefault)
-
-        #layouts
         typelayout = QGridLayout()
         typelayout.addLayout(typeLayout0,0,0)
         typelayout.addLayout(typeLayout1,0,1)
         typelayout.addLayout(typeLayout2,1,0)
         typelayout.addLayout(typeLayout3,1,1)
-#        typelayout.addWidget(typelabel1,0,0)
-#        typelayout.addWidget(typelabel2,0,1)
-#        typelayout.addWidget(self.etype0,1,0)
-#        typelayout.addWidget(self.etype1,1,1)
-#        typelayout.addWidget(typelabel3,2,0)
-#        typelayout.addWidget(typelabel4,2,1)
-#        typelayout.addWidget(self.etype2,3,0)
-#        typelayout.addWidget(self.etype3,3,1)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(defaultButton)
@@ -8985,13 +8993,103 @@ class EventsDlg(QDialog):
         FlagsLayout.addWidget(self.minieventsflag)
         FlagsLayout.addWidget(self.eventsGraphflag)
 
-        EventsLayout = QVBoxLayout()
-        EventsLayout.addLayout(FlagsLayout)
-        EventsLayout.addWidget(TypeGroupLayout)
-        EventsLayout.addLayout(buttonLayout)
+        tab1layout = QVBoxLayout()
+        tab1layout.addLayout(FlagsLayout)
+        tab1layout.addWidget(TypeGroupLayout)
+        tab1layout.addLayout(buttonLayout)
+
+
+        ### tab2 layout
+        tab2layout = QVBoxLayout()
+        tab2layout.addWidget(self.eventbuttontable)
+        tab2buttonlayout = QHBoxLayout()    
+        tab2buttonlayout.addWidget(addButton)
+        tab2buttonlayout.addWidget(delButton)
+        tab2layout.addLayout(tab2buttonlayout)  
         
-        self.setLayout(EventsLayout)
+###########################################
+        #tab layout
+        TabWidget = QTabWidget()
         
+        C1Widget = QWidget()
+        C1Widget.setLayout(tab1layout)
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None, QApplication.UnicodeUTF8))
+
+        C2Widget = QWidget()
+        C2Widget.setLayout(tab2layout)
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Buttons",None, QApplication.UnicodeUTF8))        
+        
+        mainLayout = QVBoxLayout()
+        mainLayout.addWidget(TabWidget) 
+        mainLayout.setMargin(0)      
+
+        self.setLayout(mainLayout)
+
+    def createEventbuttonTable(self):
+        self.eventbuttontable.clear()
+        nbuttons = len(aw.extraeventstypes) 
+        if nbuttons:
+            self.eventbuttontable.setRowCount(nbuttons)
+            self.eventbuttontable.setColumnCount(2)
+            self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Del",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8)])
+            self.eventbuttontable.setAlternatingRowColors(True)
+            self.eventbuttontable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
+            self.eventbuttontable.setShowGrid(True)
+
+            for i in range(nbuttons):                
+                typeComboBox =  QComboBox()
+                typeComboBox.addItems(aw.qmc.etypes)
+                typeComboBox.setCurrentIndex(aw.extraeventstypes[i])
+                self.connect(typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.settypeeventbutton(z,i))
+
+                valueComboBox =  QComboBox()
+                valueComboBox.addItems(aw.qmc.eventsvalues)
+                valueComboBox.setCurrentIndex(aw.extraeventsvalues[i])
+                self.connect(valueComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setvalueeventbutton(z,i))
+
+                #add widgets to the table
+                self.eventbuttontable.setCellWidget(i,0,typeComboBox)
+                self.eventbuttontable.setCellWidget(i,1,valueComboBox)
+        
+    def setvalueeventbutton(self,z,i):
+        valuecombobox = self.eventbuttontable.cellWidget(i,1)
+        aw.extraeventsvalues[i] = valuecombobox.currentIndex()
+        aw.buttonlist[i].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[i]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[i]]))        
+
+
+    def settypeeventbutton(self,z,i):
+        typecombobox = self.eventbuttontable.cellWidget(i,0)
+        aw.extraeventstypes[i] = typecombobox.currentIndex()
+        aw.buttonlist[i].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[i]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[i]]))        
+
+    def delextraeventbutton(self):
+        bindex = len(aw.extraeventstypes)-1
+        aw.extraeventstypes.pop(bindex)
+        aw.extraeventsvalues.pop(bindex)
+        self.createEventbuttonTable()  #update table
+        aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
+        aw.buttonlist.pop(bindex)
+        
+
+    def insertextraeventbutton(self):	
+        aw.extraeventstypes.append(0)
+        aw.extraeventsvalues.append(1)
+        self.createEventbuttonTable() 
+
+        aw.buttonlist.append(QPushButton())
+        bindex = len(aw.buttonlist)-1
+        aw.buttonlist[bindex].setFocusPolicy(Qt.NoFocus)
+        aw.buttonlist[bindex].setStyleSheet("QPushButton { background-color: yellow}")
+        aw.buttonlist[bindex].setMaximumSize(90, 50)
+        aw.buttonlist[bindex].setMinimumHeight(50)
+        aw.buttonlist[bindex].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[-1]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[-1]]))        
+        aw.connect(aw.buttonlist[bindex], SIGNAL("clicked()"), lambda ee=bindex:aw.recordextraevent(ee))        
+        aw.lowerbuttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+
     def eventsbuttonflagChanged(self):
         if self.eventsbuttonflag.isChecked():
             aw.button_11.setVisible(True)
