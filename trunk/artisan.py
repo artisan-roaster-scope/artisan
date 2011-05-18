@@ -5728,8 +5728,7 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(self.ser.extracomport)):                
                     self.ser.extracomport[i] = unicode(self.ser.extracomport[i])
                     self.ser.extraparity[i] = unicode(self.ser.extraparity[i])
-                    self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
-                    self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
+
             settings.endGroup() 
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
@@ -5741,7 +5740,9 @@ class ApplicationWindow(QMainWindow):
                 #convert Qstrings to unicode
                 for i in range(len(self.qmc.extradevicecolor1)):
                     self.qmc.extradevicecolor1[i] = unicode(self.qmc.extradevicecolor1[i])
-                    self.qmc.extradevicecolor2[i] = unicode(self.qmc.extradevicecolor2[i])                    
+                    self.qmc.extradevicecolor2[i] = unicode(self.qmc.extradevicecolor2[i])
+                    self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
+                    self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
                 self.qmc.extramathexpression1 = list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList())
                 self.qmc.extramathexpression2 = list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList())
                 for i in range(len(self.qmc.extramathexpression1)):
@@ -9049,7 +9050,7 @@ class EventsDlg(QDialog):
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Buttons",None, QApplication.UnicodeUTF8))        
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Custom Buttons",None, QApplication.UnicodeUTF8))        
         
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(TabWidget) 
