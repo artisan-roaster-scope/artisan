@@ -361,9 +361,6 @@ class tgraphcanvas(FigureCanvas):
         self.deltafilter = 5
 
         # projection variables of change of rate
-        self.HUDflag = 0
-        self.ETtarget = 350
-        self.BTtarget = 250
         self.projectionconstant = 1
         self.projectionmode = 0     # 0 = linear; 1 = newton
         
@@ -1257,7 +1254,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.redraw()
         aw.soundpop()
-
+        
         
     #Redraws data   
     def redraw(self):
@@ -2202,9 +2199,10 @@ class tgraphcanvas(FigureCanvas):
             self.seconds = 0.
                 
             self.flagon = True
-            aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))     
-            aw.button_1.setText("OFF")                     #button ON
-            aw.button_1.setStyleSheet("QPushButton { background-color: #ff664b}")
+            aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
+            aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
+            aw.button_1.setText("OFF") # text means click to turn OFF (it is ON)                   
+            
             aw.soundpop()
         else:
             aw.ser.closeport()
@@ -2213,8 +2211,9 @@ class tgraphcanvas(FigureCanvas):
             self.seconds = 0.
             self.flagon = False
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
+            aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])            
             aw.button_1.setText("ON") 
-            aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
+            
             aw.soundpop()
            
     #Records charge (put beans in) marker. called from push button 'Charge'
@@ -3722,18 +3721,13 @@ class VMToolbar(NavigationToolbar):
             
 class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
+            
+        #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
         self.MaxRecentFiles = 10
         self.recentFileActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
-        # set window title
-        self.windowTitle = unicode(QApplication.translate("Application Title", "Artisan %1",None, QApplication.UnicodeUTF8).arg(str(__version__)))
-        self.setWindowTitle(self.windowTitle)
-        for i in range(self.MaxRecentFiles):
-            self.recentFileActs.append(
-                    QAction(self, visible=False,
-                            triggered=self.openRecentFile))
 
         #flag to reset Qsettings
         self.resetqsettings = 0
@@ -3764,17 +3758,11 @@ class ApplicationWindow(QMainWindow):
         self.main_widget.setMinimumWidth(811)
         #self.main_widget.setMinimumHeight(670)
         
-        # create MASTER grid layout manager to place all widgets
-        gl = QGridLayout(self.main_widget)
-                
-        #create vertical/horizontal boxes layout managers for buttons,etc
-        LCDlayout = QVBoxLayout()    
-        controlLayout = QVBoxLayout()
         
-        ###############      create Matplotlib canvas widget 
+        ####      create Matplotlib canvas widget 
         self.qmc = tgraphcanvas(self.main_widget)
 
-        ####################    HUD   
+        ####    HUD   
         self.HUD = QLabel()  #main canvas for hud widget
         #This is a list of different HUD functions. 
         self.showHUD = [self.showHUDmetrics, self.showHUDthermal]
@@ -3804,413 +3792,24 @@ class ApplicationWindow(QMainWindow):
         self.lcdpaletteF = { "timer":u'white',"met":'white',"bt":'white',"deltamet":'white',"deltabt":'white',"sv":'white'}
 
     	#user defined event buttons
-        self.extraeventstypes,self.extraeventsvalues = [],[]
+        self.extraeventstypes,self.extraeventsvalues = [],[]  #hold indexes
 
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID.
         
         self.settingsLoad()        
-       
-        #create a Label object to display program status information
-        self.messagelabel = QLabel()
-        self.messagelabel.setIndent(10)
-
-        #create START STOP buttons        
-        self.button_1 = QPushButton(QApplication.translate("Scope Button", "ON", None, QApplication.UnicodeUTF8))
-        self.button_1.setFocusPolicy(Qt.NoFocus)
-        self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")
-        #self.button_1.setMaximumSize(90, 50)
-        self.button_1.setMinimumHeight(50)
-        self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
-
-        #create 1C START, 1C END, 2C START and 2C END buttons
-        self.button_3 = QPushButton(QApplication.translate("Scope Button", "FC START", None, QApplication.UnicodeUTF8))
-        self.button_3.setFocusPolicy(Qt.NoFocus)
-        self.button_3.setStyleSheet("QPushButton { background-color: orange }")
-        #self.button_3.setMaximumSize(90, 50)
-        self.button_3.setMinimumHeight(50)
-        self.button_3.setToolTip(QApplication.translate("Tooltip", "Marks the begining of First Crack (FC)", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_3, SIGNAL("clicked()"), self.qmc.mark1Cstart)
-
-        self.button_4 = QPushButton(QApplication.translate("Scope Button", "FC END", None, QApplication.UnicodeUTF8))
-        self.button_4.setFocusPolicy(Qt.NoFocus)
-        self.button_4.setStyleSheet("QPushButton { background-color: orange }")
-        #self.button_4.setMaximumSize(90, 50)
-        self.button_4.setMinimumHeight(50)
-        self.button_4.setToolTip(QApplication.translate("Tooltip", "Marks the end of First Crack (FC)", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_4, SIGNAL("clicked()"), self.qmc.mark1Cend)
-
-        self.button_5 = QPushButton(QApplication.translate("Scope Button", "SC START", None, QApplication.UnicodeUTF8))
-        self.button_5.setFocusPolicy(Qt.NoFocus)
-        self.button_5.setStyleSheet("QPushButton { background-color: orange }")
-        #self.button_5.setMaximumSize(90, 50)
-        self.button_5.setMinimumHeight(50)
-        self.button_5.setToolTip(QApplication.translate("Tooltip", "Marks the begining of Second Crack (SC)", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_5, SIGNAL("clicked()"), self.qmc.mark2Cstart)
-
-        self.button_6 = QPushButton(QApplication.translate("Scope Button", "SC END", None, QApplication.UnicodeUTF8))
-        self.button_6.setFocusPolicy(Qt.NoFocus)
-        self.button_6.setStyleSheet("QPushButton { background-color: orange }")
-        #self.button_6.setMaximumSize(90, 50)
-        self.button_6.setMinimumHeight(50)
-        self.button_6.setToolTip(QApplication.translate("Tooltip", "Marks the end of Second Crack (SC)", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_6, SIGNAL("clicked()"), self.qmc.mark2Cend)
-
-        #create RESET button
-        self.button_7 = QPushButton(QApplication.translate("Scope Button", "RESET", None, QApplication.UnicodeUTF8))
-        self.button_7.setFocusPolicy(Qt.NoFocus)
-        self.button_7.setStyleSheet("QPushButton { background-color: white }")
-        self.button_7.setMaximumSize(90, 45)
-        self.button_7.setToolTip(QApplication.translate("Tooltip", "Resets Graph and Time", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset_and_redraw)
-
-        #create CHARGE button
-        self.button_8 = QPushButton(QApplication.translate("Scope Button", "CHARGE", None, QApplication.UnicodeUTF8))
-        self.button_8.setFocusPolicy(Qt.NoFocus)
-        self.button_8.setStyleSheet("QPushButton { background-color: #f07800 }")
-        #self.button_8.setMaximumSize(90, 50)
-        self.button_8.setMinimumHeight(50)
-        self.button_8.setToolTip(QApplication.translate("Tooltip", "Marks the begining of the roast (beans in)", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_8, SIGNAL("clicked()"), self.qmc.markCharge)
-
-        #create DROP button
-        self.button_9 = QPushButton(QApplication.translate("Scope Button", "DROP", None, QApplication.UnicodeUTF8))
-        self.button_9.setFocusPolicy(Qt.NoFocus)
-        self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
-        #self.button_9.setMaximumSize(90, 50)
-        self.button_9.setMinimumHeight(50)
-        self.button_9.setToolTip(QApplication.translate("Tooltip", "Marks the end of the roast (drop beans)", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_9, SIGNAL("clicked()"), self.qmc.markDrop)
-
-        #create PID control button
-        self.button_10 = QPushButton(QApplication.translate("Scope Button", "PID", None, QApplication.UnicodeUTF8))
-        self.button_10.setFocusPolicy(Qt.NoFocus)
-        self.button_10.setStyleSheet("QPushButton { background-color: '#92C3FF'}")
-        self.button_10.setMaximumSize(90, 45)
-        self.connect(self.button_10, SIGNAL("clicked()"), self.PIDcontrol)        
-
-        #create EVENT record button
-        self.button_11 = QPushButton(QApplication.translate("Scope Button", "EVENT", None, QApplication.UnicodeUTF8))
-        self.button_11.setFocusPolicy(Qt.NoFocus)
-        self.button_11.setStyleSheet("QPushButton { background-color: yellow}")
-        #self.button_11.setMaximumSize(90, 50)
-        self.button_11.setMinimumHeight(50)
-        self.button_11.setToolTip(QApplication.translate("Tooltip", "Marks an Event", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_11, SIGNAL("clicked()"), self.qmc.EventRecord) 
-        
-    	#create PID+5 button
-        self.button_12 = QPushButton(QApplication.translate("Scope Button", "SV +5", None, QApplication.UnicodeUTF8))
-        self.button_12.setFocusPolicy(Qt.NoFocus)
-        self.button_12.setStyleSheet("QPushButton { background-color: #ffaaff}")
-        self.button_12.setMaximumSize(90, 50)
-        self.button_12.setMinimumHeight(50)
-        self.button_12.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 5", None, QApplication.UnicodeUTF8))
 
 
-        #create PID+10 button
-        self.button_13 = QPushButton(QApplication.translate("Scope Button", "SV +10", None, QApplication.UnicodeUTF8))
-        self.button_13.setFocusPolicy(Qt.NoFocus)
-        self.button_13.setStyleSheet("QPushButton { background-color: #ffaaff}")
-        self.button_13.setMaximumSize(90, 50)
-        self.button_13.setMinimumHeight(50)
-        self.button_13.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 10", None, QApplication.UnicodeUTF8))
+        # set window title
+        self.windowTitle = unicode(QApplication.translate("Application Title", "Artisan %1",None, QApplication.UnicodeUTF8).arg(str(__version__)))
+        self.setWindowTitle(self.windowTitle)
+        for i in range(self.MaxRecentFiles):
+            self.recentFileActs.append(
+                    QAction(self, visible=False,
+                            triggered=self.openRecentFile))
 
 
-        #create PID+20 button
-        self.button_14 = QPushButton(QApplication.translate("Scope Button", "SV +20", None, QApplication.UnicodeUTF8))
-        self.button_14.setFocusPolicy(Qt.NoFocus)
-        self.button_14.setStyleSheet("QPushButton { background-color: #ffaaff}")
-        self.button_14.setMaximumSize(90, 50)
-        self.button_14.setMinimumHeight(50)
-        self.button_14.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 20", None, QApplication.UnicodeUTF8))
-
-
-        #create PID-20 button
-        self.button_15 = QPushButton(QApplication.translate("Scope Button", "SV -20", None, QApplication.UnicodeUTF8))
-        self.button_15.setFocusPolicy(Qt.NoFocus)
-        self.button_15.setStyleSheet("QPushButton { background-color: lightblue}")
-        self.button_15.setMaximumSize(90, 50)
-        self.button_15.setMinimumHeight(50)
-        self.button_15.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 20", None, QApplication.UnicodeUTF8))
-
-
-        #create PID-10 button
-        self.button_16 = QPushButton(QApplication.translate("Scope Button", "SV -10", None, QApplication.UnicodeUTF8))
-        self.button_16.setFocusPolicy(Qt.NoFocus)
-        self.button_16.setStyleSheet("QPushButton { background-color: lightblue}")
-        self.button_16.setMaximumSize(90, 50)
-        self.button_16.setMinimumHeight(50)
-        self.button_16.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 10", None, QApplication.UnicodeUTF8))
-
-
-        #create PID-5 button
-        self.button_17 = QPushButton(QApplication.translate("Scope Button", "SV -5", None, QApplication.UnicodeUTF8))
-        self.button_17.setFocusPolicy(Qt.NoFocus)
-        self.button_17.setStyleSheet("QPushButton { background-color: lightblue}")
-        self.button_17.setMaximumSize(90, 50)
-        self.button_17.setMinimumHeight(50)
-        self.button_17.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 5", None, QApplication.UnicodeUTF8))
-        
-        #create HUD button
-        self.button_18 = QPushButton(QApplication.translate("Scope Button", "HUD", None, QApplication.UnicodeUTF8))
-        self.button_18.setFocusPolicy(Qt.NoFocus)
-        self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
-        self.button_18.setMaximumSize(90, 45)
-        self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
-        self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None, QApplication.UnicodeUTF8))
-
-        #create DRY button
-        self.button_19 = QPushButton(QApplication.translate("Scope Button", "DRY END", None, QApplication.UnicodeUTF8))
-        self.button_19.setFocusPolicy(Qt.NoFocus)
-        self.button_19.setStyleSheet("QPushButton { background-color: orange }")
-        self.button_19.setMaximumSize(90, 50)
-        self.button_19.setMinimumHeight(50)
-        self.button_19.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Dry phase (DRYEND)", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_19, SIGNAL("clicked()"), self.qmc.markDryEnd)
- 
-        #connect PID sv easy buttons
-        self.connect(self.button_12, SIGNAL("clicked()"),lambda x=5: self.pid.adjustsv(x))
-        self.connect(self.button_13, SIGNAL("clicked()"),lambda x=10: self.pid.adjustsv(x))
-        self.connect(self.button_14, SIGNAL("clicked()"),lambda x=20: self.pid.adjustsv(x))
-        self.connect(self.button_15, SIGNAL("clicked()"),lambda x=-20: self.pid.adjustsv(x))
-        self.connect(self.button_16, SIGNAL("clicked()"),lambda x=-10: self.pid.adjustsv(x))
-        self.connect(self.button_17, SIGNAL("clicked()"),lambda x=-5: self.pid.adjustsv(x))
-
-
-        # NavigationToolbar VMToolbar
-        ntb = VMToolbar(self.qmc, self.main_widget)
-        naviLayout = QHBoxLayout()
-        naviLayout.addWidget(ntb,0)
-        naviLayout.addWidget(self.button_10,2)
-        naviLayout.addWidget(self.button_18,1)
-        naviLayout.addWidget(self.button_7,2)
-        
-        #create LCD displays
-        #RIGHT COLUMN
-        self.lcd1 = QLCDNumber() # time
-        self.lcd1.setSegmentStyle(2)
-        self.lcd1.setMinimumHeight(45)
-        self.lcd2 = QLCDNumber() # Temperature MET
-        self.lcd2.setSegmentStyle(2)
-        self.lcd2.setMinimumHeight(45)
-        self.lcd3 = QLCDNumber() # Temperature BT
-        self.lcd3.setSegmentStyle(2)
-        self.lcd3.setMinimumHeight(45)
-        self.lcd4 = QLCDNumber() # rate of change MET
-        self.lcd4.setSegmentStyle(2)
-        self.lcd4.setMinimumHeight(45)
-        self.lcd5 = QLCDNumber() # rate of change BT
-        self.lcd5.setSegmentStyle(2)
-        self.lcd5.setMinimumHeight(45)
-        self.lcd6 = QLCDNumber() # pid sv
-        self.lcd6.setSegmentStyle(2)
-        self.lcd6.setMinimumHeight(45)
-        self.lcd7 = QLCDNumber() # pid power % duty cycle
-        self.lcd7.setSegmentStyle(2)
-        self.lcd7.setMinimumHeight(45)
-        #self.lcd1.setStyleSheet("QLCDNumber { }")
-
-        self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
-        self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["met"],self.lcdpaletteB["met"]))
-        self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
-        self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltamet"],self.lcdpaletteB["deltamet"]))
-        self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
-        self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-        self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-        
-        self.lcd1.setMaximumSize(90, 45)
-        self.lcd2.setMaximumSize(90, 45)
-        self.lcd3.setMaximumSize(90, 45)
-        self.lcd4.setMaximumSize(90, 45)
-        self.lcd5.setMaximumSize(90, 45)
-        self.lcd6.setMaximumSize(90, 45)
-        self.lcd7.setMaximumSize(90, 45)
-
-        self.lcd1.setToolTip(QApplication.translate("Tooltip", "Timer",None, QApplication.UnicodeUTF8))
-        self.lcd2.setToolTip(QApplication.translate("Tooltip", "ET Temperature",None, QApplication.UnicodeUTF8))
-        self.lcd3.setToolTip(QApplication.translate("Tooltip", "BT Temperature",None, QApplication.UnicodeUTF8))
-        self.lcd4.setToolTip(QApplication.translate("Tooltip", "ET/time (degrees/min)",None, QApplication.UnicodeUTF8))
-        self.lcd5.setToolTip(QApplication.translate("Tooltip", "BT/time (degrees/min)",None, QApplication.UnicodeUTF8))
-        self.lcd6.setToolTip(QApplication.translate("Tooltip", "Value of SV in PID",None, QApplication.UnicodeUTF8))
-        self.lcd7.setToolTip(QApplication.translate("Tooltip", "PID power %",None, QApplication.UnicodeUTF8))
-
-        #MET
-        label2 = QLabel()
-        label2.setText("<font color='black'><b>" + QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        label2.setAlignment(Qt.AlignRight)
-        label2.setIndent(5)
-        #BT
-        label3 = QLabel()
-        label3.setAlignment(Qt.AlignRight)
-        label3.setText("<font color='black'><b>" + QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        label3.setIndent(5)
-        #DELTA MET
-        label4 = QLabel()
-        label4.setAlignment(Qt.AlignRight)
-        label4.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        label4.setIndent(5)
-        # DELTA BT
-        label5 = QLabel()
-        label5.setAlignment(Qt.AlignRight)       
-        label5.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        label5.setIndent(5)
-        # pid sv
-        self.label6 = QLabel()
-        self.label6.setAlignment(Qt.AlignRight)
-        self.label6.setText("<font color='black'><b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        self.label6.setIndent(5)
-        # pid power % duty cycle
-        self.label7 = QLabel()
-        self.label7.setAlignment(Qt.AlignRight)
-        self.label7.setText("<font color='black'><b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        self.label7.setIndent(5)
-        
-        self.messagehist = []
-
-        #convenience EVENT mini editor; View&Edits events without opening roast properties Dlg.
-        self.eventlabel = QLabel(QApplication.translate("Label","Event #<b>0 </b>", None, QApplication.UnicodeUTF8))
-        self.eventlabel.setIndent(5)
-        self.eNumberSpinBox = QSpinBox()
-        
-        self.eNumberSpinBox.setFocusPolicy(Qt.NoFocus)
-        self.eNumberSpinBox.setAlignment(Qt.AlignCenter)
-        self.eNumberSpinBox.setToolTip(QApplication.translate("Tooltip", "Number of events found", None, QApplication.UnicodeUTF8))
-        self.eNumberSpinBox.setRange(0,20)
-        self.connect(self.eNumberSpinBox, SIGNAL("valueChanged(int)"),self.changeEventNumber)
-        self.eNumberSpinBox.setMaximumWidth(40)
-        self.lineEvent = QLineEdit()
-        self.lineEvent.setFocusPolicy(Qt.ClickFocus)
-        self.lineEvent.setMinimumWidth(200)
-            
-        self.eventlabel.setStyleSheet("background-color:'yellow';")
-
-        self.etypeComboBox = QComboBox()
-        self.etypeComboBox.setToolTip(QApplication.translate("Tooltip", "Type of event", None, QApplication.UnicodeUTF8))
-        self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
-        self.etypeComboBox.addItems(self.qmc.etypes)
-        
-        self.valueComboBox = QComboBox()
-        self.valueComboBox.setToolTip(QApplication.translate("Tooltip", "Value of event", None, QApplication.UnicodeUTF8))
-        self.valueComboBox.setFocusPolicy(Qt.NoFocus)
-        self.valueComboBox.addItems(self.qmc.eventsvalues)
-        self.valueComboBox.setMaximumWidth(50)
-
-        regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
-        self.etimeline = QLineEdit()
-        self.etimeline.setValidator(QRegExpValidator(regextime,self))
-        self.etimeline.setFocusPolicy(Qt.ClickFocus)
-        self.etimeline.setMaximumWidth(50)
-        
-        #create EVENT mini button
-        self.buttonminiEvent = QPushButton(QApplication.translate("Button", "Update", None, QApplication.UnicodeUTF8))
-        self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
-        self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
-        self.buttonminiEvent.setToolTip(QApplication.translate("Tooltip", "Updates the event", None, QApplication.UnicodeUTF8))
-        
-        EventsLayout = QHBoxLayout()
-        EventsLayout.addWidget(self.eventlabel)
-        EventsLayout.addSpacing(5)
-        EventsLayout.addWidget(self.etimeline)
-        EventsLayout.addSpacing(5)
-        EventsLayout.addWidget(self.lineEvent)  
-        EventsLayout.addSpacing(5)
-        EventsLayout.addWidget(self.etypeComboBox)
-        EventsLayout.addSpacing(5)
-        EventsLayout.addWidget(self.valueComboBox)
-        EventsLayout.addSpacing(5)
-        EventsLayout.addWidget(self.eNumberSpinBox)        
-        EventsLayout.addSpacing(5)      
-        EventsLayout.addWidget(self.buttonminiEvent)
-
-        #only leave operational the control button if the device is Fuji PID
-        #the SV buttons are activated from the PID control panel 
-        if self.qmc.device > 0:
-            self.button_10.setVisible(False)
-            self.label6.setVisible(False)
-            self.lcd6.setVisible(False)
-            self.label7.setVisible(False)
-            self.lcd7.setVisible(False)
-            
-        self.button_12.setVisible(False)
-        self.button_13.setVisible(False)
-        self.button_14.setVisible(False)
-        self.button_15.setVisible(False)
-        self.button_16.setVisible(False)
-        self.button_17.setVisible(False)
-
-        #place control buttons + LCDs inside vertical button layout manager
-        LCDlayout.addWidget(label2)
-        LCDlayout.addWidget(self.lcd2)
-        LCDlayout.addStretch()   
-        LCDlayout.addWidget(label3)
-        LCDlayout.addWidget(self.lcd3)
-        LCDlayout.addStretch()
-        LCDlayout.addWidget(self.label6)
-        LCDlayout.addWidget(self.lcd6)
-        LCDlayout.addWidget(self.label7)
-        LCDlayout.addWidget(self.lcd7)
-        LCDlayout.addStretch()
-        LCDlayout.addWidget(label4)
-        LCDlayout.addWidget(self.lcd4)
-        LCDlayout.addStretch()   
-        LCDlayout.addWidget(label5)
-        LCDlayout.addWidget(self.lcd5)
-        LCDlayout.addStretch()   
-
-        #holds extra events buttons
-        self.buttonlist = []  
-        #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
-        self.lowerbuttondialog = QDialogButtonBox()
-        self.lowerbuttondialog.setCenterButtons(True)
-        
-        #initiate configuration
-        self.lowerbuttondialog.setOrientation(Qt.Horizontal)
-        self.lowerbuttondialog.addButton(self.button_1,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_8,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_19,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_3,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_4,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_5,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_6,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_9,QDialogButtonBox.ActionRole)
-        self.lowerbuttondialog.addButton(self.button_11,QDialogButtonBox.ActionRole)
-        for i in range(len(self.extraeventstypes)):
-            self.buttonlist.append(QPushButton())
-            self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
-            self.buttonlist[i].setStyleSheet("QPushButton { background-color: yellow}")
-            #self.buttonlist[i].setMaximumSize(90, 50)
-            self.buttonlist[i].setMinimumHeight(50)
-            self.buttonlist[i].setText(unicode(self.qmc.etypes[self.extraeventstypes[i]][0])+unicode(self.qmc.eventsvalues[self.extraeventsvalues[i]]))
-            self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
-            self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-                      
-        # control Buttons                
-        controlLayout.addWidget(self.button_14)       
-        controlLayout.addWidget(self.button_13)
-        controlLayout.addWidget(self.button_12)
-        controlLayout.addWidget(self.button_17)
-        controlLayout.addWidget(self.button_16)
-        controlLayout.addWidget(self.button_15)
-
-        #pack RESET buttons + GRAPHS
-        midLayout = QHBoxLayout()
-        midLayout.addLayout(controlLayout)
-        midLayout.addWidget(self.stack)
-        
-        #pack all into the grid MASTER LAYOUT manager (widget,row,column)
-        gl.addLayout(naviLayout,0,0)        #Navigation Tool bar
-        gl.addWidget(self.lcd1,0,1)         #timer LCD
-        gl.addWidget(self.messagelabel,1,0) #add a message label to give program feedback to user
-        gl.addLayout(midLayout,2,0)         #GRAPHS
-        gl.addLayout(LCDlayout,2,1)         #place LCD manager inside grid box layout manager
-        gl.addWidget(self.lowerbuttondialog,4,0)        #place buttonlayout manager inside grid box layout manager       
-        gl.addLayout(EventsLayout,5,0)
-        
-        gl.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom (defaults to 12)
-        gl.setHorizontalSpacing(0) # default: 9
-        gl.setVerticalSpacing(0) # default: 9
-        
+        #######################    MENUS SECTION ##################################################
         ###############  create Top MENUS 
         
         self.fileMenu = self.menuBar().addMenu(UIconst.FILE_MENU)
@@ -4473,7 +4072,353 @@ class ApplicationWindow(QMainWindow):
         resetAction = QAction(UIconst.HELP_MENU_RESET,self)
         self.connect(resetAction,SIGNAL("triggered()"),self.resetApplication)
         self.helpMenu.addAction(resetAction)
+
+        ############################## WIDGETS SECTION ########################################
+       
+        #create a Label object to display program status information
+        self.messagelabel = QLabel()
+        self.messagelabel.setIndent(10)
+
+        self.pushbuttonstyles = {"OFF":"font-size: 16pt; font-weight: bold; color: grey; background-color: #43d300 ",
+                                 "ON":"font-size: 16pt; font-weight: bold; color: yellow; background-color: red ",
+                                 "DRY END":"font-size: 10pt; font-weight: bold; color: white; background-color: orange  ",
+                                 "CHARGE":"font-size: 8pt; font-weight: bold; color: white; background-color: #f07800 ",                                 
+                                 "FC START":"font-size: 10pt; font-weight: bold; color: white; background-color: orange  ",
+                                 "FC END":"font-size: 10pt; font-weight: bold; color: white; background-color: orange ",
+                                 "SC START":"font-size: 10pt; font-weight: bold; color: white; background-color: orange ",
+                                 "SC END":"font-size: 10pt; font-weight: bold; color: white; background-color: orange ",
+                                 "RESET":"font-size: 10pt; font-weight: bold; color: purple; background-color: white ",
+                                 "HUD_OFF":"font-size: 10pt; font-weight: bold; color: white; background-color: #b5baff  ",
+                                 "HUD_ON":"font-size: 10pt; font-weight: bold; color: white; background-color: #60ffed   ",                                 
+                                 "EVENT":"font-size: 10pt; font-weight: bold; color: grey; background-color: yellow ",                                 
+                                 "DROP":"font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 ",
+                                 "PID":"font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF ",
+                                 "SV +":"font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff ",
+                                 "SV -":"font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff ",
+                                 "SELECTED":"font-size: 12pt; font-weight: bold; color: yellow; background-color: purple"  #keyboard moves
+                                 }
+                                 
+                                 
+        #create START STOP buttons        
+        self.button_1 = QPushButton(QApplication.translate("Scope Button", "ON", None, QApplication.UnicodeUTF8))
+        self.button_1.setFocusPolicy(Qt.NoFocus)
+        #self.button_1.setStyleSheet("")
+        self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
+        self.button_1.setMinimumHeight(50)
+        self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
+
+        #create 1C START, 1C END, 2C START and 2C END buttons
+        self.button_3 = QPushButton(QApplication.translate("Scope Button", "FC\nSTART", None, QApplication.UnicodeUTF8))
+        self.button_3.setFocusPolicy(Qt.NoFocus)
+        self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])        
+        self.button_3.setMinimumHeight(50)
+        self.button_3.setToolTip(QApplication.translate("Tooltip", "Marks the begining of First Crack (FC)", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_3, SIGNAL("clicked()"), self.qmc.mark1Cstart)
+
+        self.button_4 = QPushButton(QApplication.translate("Scope Button", "FC\nEND", None, QApplication.UnicodeUTF8))
+        self.button_4.setFocusPolicy(Qt.NoFocus)
+        self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
+        self.button_4.setMinimumHeight(50)
+        self.button_4.setToolTip(QApplication.translate("Tooltip", "Marks the end of First Crack (FC)", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_4, SIGNAL("clicked()"), self.qmc.mark1Cend)
+
+        self.button_5 = QPushButton(QApplication.translate("Scope Button", "SC\nSTART", None, QApplication.UnicodeUTF8))
+        self.button_5.setFocusPolicy(Qt.NoFocus)
+        self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
+        self.button_5.setMinimumHeight(50)
+        self.button_5.setToolTip(QApplication.translate("Tooltip", "Marks the begining of Second Crack (SC)", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_5, SIGNAL("clicked()"), self.qmc.mark2Cstart)
+
+        self.button_6 = QPushButton(QApplication.translate("Scope Button", "SC\nEND", None, QApplication.UnicodeUTF8))
+        self.button_6.setFocusPolicy(Qt.NoFocus)
+        self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
+        self.button_6.setMinimumHeight(50)
+        self.button_6.setToolTip(QApplication.translate("Tooltip", "Marks the end of Second Crack (SC)", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_6, SIGNAL("clicked()"), self.qmc.mark2Cend)
+
+        #create RESET button
+        self.button_7 = QPushButton(QApplication.translate("Scope Button", "RESET", None, QApplication.UnicodeUTF8))
+        self.button_7.setFocusPolicy(Qt.NoFocus)
+        self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
+        self.button_7.setMaximumSize(90, 45)
+        self.button_7.setToolTip(QApplication.translate("Tooltip", "Resets Graph and Time", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset_and_redraw)
+
+        #create CHARGE button
+        self.button_8 = QPushButton(QApplication.translate("Scope Button", "CHARGE", None, QApplication.UnicodeUTF8))
+        self.button_8.setFocusPolicy(Qt.NoFocus)
+        self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
+        self.button_8.setMinimumHeight(50)
+        self.button_8.setToolTip(QApplication.translate("Tooltip", "Marks the begining of the roast (beans in)", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_8, SIGNAL("clicked()"), self.qmc.markCharge)
+
+        #create DROP button
+        self.button_9 = QPushButton(QApplication.translate("Scope Button", "DROP", None, QApplication.UnicodeUTF8))
+        self.button_9.setFocusPolicy(Qt.NoFocus)
+        self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
+        self.button_9.setMinimumHeight(50)
+        self.button_9.setToolTip(QApplication.translate("Tooltip", "Marks the end of the roast (drop beans)", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_9, SIGNAL("clicked()"), self.qmc.markDrop)
+
+        #create PID control button
+        self.button_10 = QPushButton(QApplication.translate("Scope Button", "PID", None, QApplication.UnicodeUTF8))
+        self.button_10.setFocusPolicy(Qt.NoFocus)
+        self.button_10.setStyleSheet(self.pushbuttonstyles["PID"])        
+        self.button_10.setMaximumSize(90, 45)
+        self.connect(self.button_10, SIGNAL("clicked()"), self.PIDcontrol)        
+
+        #create EVENT record button
+        self.button_11 = QPushButton(QApplication.translate("Scope Button", "EVENT", None, QApplication.UnicodeUTF8))
+        self.button_11.setFocusPolicy(Qt.NoFocus)
+        self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])                
+        self.button_11.setMinimumHeight(50)
+        self.button_11.setToolTip(QApplication.translate("Tooltip", "Marks an Event", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_11, SIGNAL("clicked()"), self.qmc.EventRecord) 
         
+    	#create PID+5 button
+        self.button_12 = QPushButton(QApplication.translate("Scope Button", "SV +5", None, QApplication.UnicodeUTF8))
+        self.button_12.setFocusPolicy(Qt.NoFocus)
+        self.button_12.setStyleSheet(self.pushbuttonstyles["SV +"])        
+        self.button_12.setMaximumSize(90, 50)
+        self.button_12.setMinimumHeight(50)
+        self.button_12.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 5", None, QApplication.UnicodeUTF8))
+
+        #create PID+10 button
+        self.button_13 = QPushButton(QApplication.translate("Scope Button", "SV +10", None, QApplication.UnicodeUTF8))
+        self.button_13.setFocusPolicy(Qt.NoFocus)
+        self.button_13.setStyleSheet(self.pushbuttonstyles["SV +"])        
+        self.button_13.setMaximumSize(90, 50)
+        self.button_13.setMinimumHeight(50)
+        self.button_13.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 10", None, QApplication.UnicodeUTF8))
+
+        #create PID+20 button
+        self.button_14 = QPushButton(QApplication.translate("Scope Button", "SV +20", None, QApplication.UnicodeUTF8))
+        self.button_14.setFocusPolicy(Qt.NoFocus)
+        self.button_14.setStyleSheet(self.pushbuttonstyles["SV +"])        
+        self.button_14.setMaximumSize(90, 50)
+        self.button_14.setMinimumHeight(50)
+        self.button_14.setToolTip(QApplication.translate("Tooltip", "Increases the current SV value by 20", None, QApplication.UnicodeUTF8))
+
+        #create PID-20 button
+        self.button_15 = QPushButton(QApplication.translate("Scope Button", "SV -20", None, QApplication.UnicodeUTF8))
+        self.button_15.setFocusPolicy(Qt.NoFocus)
+        self.button_15.setStyleSheet(self.pushbuttonstyles["SV -"])        
+        self.button_15.setMaximumSize(90, 50)
+        self.button_15.setMinimumHeight(50)
+        self.button_15.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 20", None, QApplication.UnicodeUTF8))
+
+        #create PID-10 button
+        self.button_16 = QPushButton(QApplication.translate("Scope Button", "SV -10", None, QApplication.UnicodeUTF8))
+        self.button_16.setFocusPolicy(Qt.NoFocus)
+        self.button_16.setStyleSheet(self.pushbuttonstyles["SV -"])        
+        self.button_16.setMaximumSize(90, 50)
+        self.button_16.setMinimumHeight(50)
+        self.button_16.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 10", None, QApplication.UnicodeUTF8))
+
+        #create PID-5 button
+        self.button_17 = QPushButton(QApplication.translate("Scope Button", "SV -5", None, QApplication.UnicodeUTF8))
+        self.button_17.setFocusPolicy(Qt.NoFocus)
+        self.button_17.setStyleSheet(self.pushbuttonstyles["SV -"])        
+        self.button_17.setMaximumSize(90, 50)
+        self.button_17.setMinimumHeight(50)
+        self.button_17.setToolTip(QApplication.translate("Tooltip", "Decreases the current SV value by 5", None, QApplication.UnicodeUTF8))
+        
+        #create HUD button
+        self.button_18 = QPushButton(QApplication.translate("Scope Button", "HUD", None, QApplication.UnicodeUTF8))
+        self.button_18.setFocusPolicy(Qt.NoFocus)
+        self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])        
+        self.button_18.setMaximumSize(90, 45)
+        self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
+        self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None, QApplication.UnicodeUTF8))
+
+        #create DRY button
+        self.button_19 = QPushButton(QApplication.translate("Scope Button", "DRY\nEND", None, QApplication.UnicodeUTF8))
+        self.button_19.setFocusPolicy(Qt.NoFocus)
+        self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])        
+        #self.button_19.setMaximumSize(90, 50)
+        self.button_19.setMinimumHeight(50)
+        self.button_19.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Dry phase (DRYEND)", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_19, SIGNAL("clicked()"), self.qmc.markDryEnd)
+ 
+        #connect PID sv easy buttons
+        self.connect(self.button_12, SIGNAL("clicked()"),lambda x=5: self.pid.adjustsv(x))
+        self.connect(self.button_13, SIGNAL("clicked()"),lambda x=10: self.pid.adjustsv(x))
+        self.connect(self.button_14, SIGNAL("clicked()"),lambda x=20: self.pid.adjustsv(x))
+        self.connect(self.button_15, SIGNAL("clicked()"),lambda x=-20: self.pid.adjustsv(x))
+        self.connect(self.button_16, SIGNAL("clicked()"),lambda x=-10: self.pid.adjustsv(x))
+        self.connect(self.button_17, SIGNAL("clicked()"),lambda x=-5: self.pid.adjustsv(x))
+
+        # NavigationToolbar VMToolbar
+        ntb = VMToolbar(self.qmc, self.main_widget)
+        ntb.setMinimumHeight(45)
+
+        
+        #create LCD displays
+        #RIGHT COLUMN
+        self.lcd1 = QLCDNumber() # time
+        self.lcd1.setSegmentStyle(2)
+        self.lcd1.setMinimumHeight(45)
+        self.lcd1.display("00:00")
+        self.lcd2 = QLCDNumber() # Temperature MET
+        self.lcd2.setSegmentStyle(2)
+        self.lcd2.setMinimumHeight(45)
+        self.lcd3 = QLCDNumber() # Temperature BT
+        self.lcd3.setSegmentStyle(2)
+        self.lcd3.setMinimumHeight(45)
+        self.lcd4 = QLCDNumber() # rate of change MET
+        self.lcd4.setSegmentStyle(2)
+        self.lcd4.setMinimumHeight(45)
+        self.lcd5 = QLCDNumber() # rate of change BT
+        self.lcd5.setSegmentStyle(2)
+        self.lcd5.setMinimumHeight(45)
+        self.lcd6 = QLCDNumber() # pid sv
+        self.lcd6.setSegmentStyle(2)
+        self.lcd6.setMinimumHeight(45)
+        self.lcd7 = QLCDNumber() # pid power % duty cycle
+        self.lcd7.setSegmentStyle(2)
+        self.lcd7.setMinimumHeight(45)
+        #self.lcd1.setStyleSheet("QLCDNumber { }")
+
+        self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
+        self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["met"],self.lcdpaletteB["met"]))
+        self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
+        self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltamet"],self.lcdpaletteB["deltamet"]))
+        self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
+        self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+        self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+        
+        self.lcd1.setMaximumSize(90, 45)
+        self.lcd2.setMaximumSize(90, 45)
+        self.lcd3.setMaximumSize(90, 45)
+        self.lcd4.setMaximumSize(90, 45)
+        self.lcd5.setMaximumSize(90, 45)
+        self.lcd6.setMaximumSize(90, 45)
+        self.lcd7.setMaximumSize(90, 45)
+
+        self.lcd1.setToolTip(QApplication.translate("Tooltip", "Timer",None, QApplication.UnicodeUTF8))
+        self.lcd2.setToolTip(QApplication.translate("Tooltip", "ET Temperature",None, QApplication.UnicodeUTF8))
+        self.lcd3.setToolTip(QApplication.translate("Tooltip", "BT Temperature",None, QApplication.UnicodeUTF8))
+        self.lcd4.setToolTip(QApplication.translate("Tooltip", "ET/time (degrees/min)",None, QApplication.UnicodeUTF8))
+        self.lcd5.setToolTip(QApplication.translate("Tooltip", "BT/time (degrees/min)",None, QApplication.UnicodeUTF8))
+        self.lcd6.setToolTip(QApplication.translate("Tooltip", "Value of SV in PID",None, QApplication.UnicodeUTF8))
+        self.lcd7.setToolTip(QApplication.translate("Tooltip", "PID power %",None, QApplication.UnicodeUTF8))
+
+        #MET
+        label2 = QLabel()
+        label2.setText("<font color='black'><b>" + QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        label2.setAlignment(Qt.AlignRight)
+        label2.setIndent(5)
+        #BT
+        label3 = QLabel()
+        label3.setAlignment(Qt.AlignRight)
+        label3.setText("<font color='black'><b>" + QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        label3.setIndent(5)
+        #DELTA MET
+        label4 = QLabel()
+        label4.setAlignment(Qt.AlignRight)
+        label4.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        label4.setIndent(5)
+        # DELTA BT
+        label5 = QLabel()
+        label5.setAlignment(Qt.AlignRight)       
+        label5.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        label5.setIndent(5)
+        # pid sv
+        self.label6 = QLabel()
+        self.label6.setAlignment(Qt.AlignRight)
+        self.label6.setText("<font color='black'><b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.label6.setIndent(5)
+        # pid power % duty cycle
+        self.label7 = QLabel()
+        self.label7.setAlignment(Qt.AlignRight)
+        self.label7.setText("<font color='black'><b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.label7.setIndent(5)
+
+
+        # Stores messages up to 500        
+        self.messagehist = []
+
+        #only leave operational the control button if the device is Fuji PID
+        #the SV buttons are activated from the PID control panel 
+        if self.qmc.device > 0:
+            self.button_10.setVisible(False)
+            self.label6.setVisible(False)
+            self.lcd6.setVisible(False)
+            self.label7.setVisible(False)
+            self.lcd7.setVisible(False)
+            
+        self.button_12.setVisible(False)
+        self.button_13.setVisible(False)
+        self.button_14.setVisible(False)
+        self.button_15.setVisible(False)
+        self.button_16.setVisible(False)
+        self.button_17.setVisible(False)
+
+        #### EVENT MINI EDITOR: View&Edits events without opening roast properties Dlg.
+        self.eventlabel = QLabel(QApplication.translate("Label","Event #<b>0 </b>", None, QApplication.UnicodeUTF8))
+        self.eventlabel.setIndent(5)
+        self.eNumberSpinBox = QSpinBox()
+        
+        self.eNumberSpinBox.setFocusPolicy(Qt.NoFocus)
+        self.eNumberSpinBox.setAlignment(Qt.AlignCenter)
+        self.eNumberSpinBox.setToolTip(QApplication.translate("Tooltip", "Number of events found", None, QApplication.UnicodeUTF8))
+        self.eNumberSpinBox.setRange(0,20)
+        self.connect(self.eNumberSpinBox, SIGNAL("valueChanged(int)"),self.changeEventNumber)
+        self.eNumberSpinBox.setMaximumWidth(40)
+        self.lineEvent = QLineEdit()
+        self.lineEvent.setFocusPolicy(Qt.ClickFocus)
+        self.lineEvent.setMinimumWidth(200)
+            
+        self.eventlabel.setStyleSheet("background-color:'yellow';")
+
+        self.etypeComboBox = QComboBox()
+        self.etypeComboBox.setToolTip(QApplication.translate("Tooltip", "Type of event", None, QApplication.UnicodeUTF8))
+        self.etypeComboBox.setFocusPolicy(Qt.NoFocus)
+        self.etypeComboBox.addItems(self.qmc.etypes)
+        
+        self.valueComboBox = QComboBox()
+        self.valueComboBox.setToolTip(QApplication.translate("Tooltip", "Value of event", None, QApplication.UnicodeUTF8))
+        self.valueComboBox.setFocusPolicy(Qt.NoFocus)
+        self.valueComboBox.addItems(self.qmc.eventsvalues)
+        self.valueComboBox.setMaximumWidth(50)
+
+        regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
+        self.etimeline = QLineEdit()
+        self.etimeline.setValidator(QRegExpValidator(regextime,self))
+        self.etimeline.setFocusPolicy(Qt.ClickFocus)
+        self.etimeline.setMaximumWidth(50)
+        
+        #create EVENT mini button
+        self.buttonminiEvent = QPushButton(QApplication.translate("Button", "Update", None, QApplication.UnicodeUTF8))
+        self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
+        self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
+        self.buttonminiEvent.setToolTip(QApplication.translate("Tooltip", "Updates the event", None, QApplication.UnicodeUTF8))
+
+        #### CUSTOM events buttons
+        self.buttonlist = []  
+        #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
+        self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
+        self.lowerbuttondialog.setCenterButtons(True)
+        #initiate configuration
+        self.lowerbuttondialog.addButton(self.button_1,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_8,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_19,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_3,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_4,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_5,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_6,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_9,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_11,QDialogButtonBox.ActionRole)
+        for i in range(len(self.extraeventstypes)):
+            self.buttonlist.append(QPushButton())
+            self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
+            self.buttonlist[i].setStyleSheet("font-size: 10pt; font-weight: bold; color: grey; background-color: yellow ") 
+            self.buttonlist[i].setMinimumHeight(50)
+            self.buttonlist[i].setText(unicode(self.qmc.etypes[self.extraeventstypes[i]][0])+unicode(self.qmc.eventsvalues[self.extraeventsvalues[i]]))
+            self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
+            self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+
         # activate event button
         if self.eventsbuttonflag:
             self.button_11.setVisible(True)
@@ -4490,13 +4435,97 @@ class ApplicationWindow(QMainWindow):
         self.update_minieventline_visibility()
 
         #list of functions to chose from (using left-right keyboard arrow)
-        self.keyboardmove  = [self.qmc.OnMonitor,self.qmc.markCharge,self.qmc.markDryEnd,self.qmc.mark1Cstart,self.qmc.mark1Cend,
-                             self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.EventRecord,
-                             self.qmc.reset_and_redraw,self.qmc.toggleHUD,self.PIDcontrol]
+        self.keyboardmove  = [self.qmc.reset_and_redraw,self.qmc.toggleHUD,self.qmc.OnMonitor,self.qmc.markCharge,self.qmc.markDryEnd,self.qmc.mark1Cstart,self.qmc.mark1Cend,
+                             self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.EventRecord]
+        
         #current function above
         self.keyboardmoveindex = 0
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
+
+        ####################   APPLICATION WINDOW (AW) LAYOUT  ##############################################
+        
+        mainlayout = QVBoxLayout(self.main_widget)
+        mainlayout.setMargin(0)
+        mainlayout.setSpacing(0)
+        
+        level1layout = QHBoxLayout()   # matplotlib toolbox + HUD button + reset button + LCD Timer
+        level2layout = QHBoxLayout()   # message label   
+        level3layout = QHBoxLayout()   # PID buttons, graph, temperature LCDs
+        level4layout = QHBoxLayout()   # log buttons
+        level5layout = QHBoxLayout()   # event mini editor   
+        
+        mainlayout.addLayout(level1layout)
+        mainlayout.addLayout(level2layout)
+        mainlayout.addLayout(level3layout)
+        mainlayout.addLayout(level4layout)
+        mainlayout.addLayout(level5layout)
+        
+        EventsLayout = QHBoxLayout()        
+        LCDlayout = QVBoxLayout()    
+        pidbuttonLayout = QVBoxLayout()
+             
+        #EVENT MINIEDITOR layout        
+        EventsLayout.addWidget(self.eventlabel)
+        EventsLayout.addSpacing(5)
+        EventsLayout.addWidget(self.etimeline)
+        EventsLayout.addSpacing(5)
+        EventsLayout.addWidget(self.lineEvent)  
+        EventsLayout.addSpacing(5)
+        EventsLayout.addWidget(self.etypeComboBox)
+        EventsLayout.addSpacing(5)
+        EventsLayout.addWidget(self.valueComboBox)
+        EventsLayout.addSpacing(5)
+        EventsLayout.addWidget(self.eNumberSpinBox)        
+        EventsLayout.addSpacing(5)      
+        EventsLayout.addWidget(self.buttonminiEvent)
+ 
+
+        #place control buttons + LCDs inside vertical button layout manager
+        LCDlayout.addWidget(label2)
+        LCDlayout.addWidget(self.lcd2)
+        LCDlayout.addStretch()   
+        LCDlayout.addWidget(label3)
+        LCDlayout.addWidget(self.lcd3)
+        LCDlayout.addStretch()
+        LCDlayout.addWidget(self.label6)
+        LCDlayout.addWidget(self.lcd6)
+        LCDlayout.addWidget(self.label7)
+        LCDlayout.addWidget(self.lcd7)
+        LCDlayout.addStretch()
+        LCDlayout.addWidget(label4)
+        LCDlayout.addWidget(self.lcd4)
+        LCDlayout.addStretch()   
+        LCDlayout.addWidget(label5)
+        LCDlayout.addWidget(self.lcd5)
+        LCDlayout.addStretch()   
+                      
+        #PID Buttons                
+        pidbuttonLayout.addWidget(self.button_14)       
+        pidbuttonLayout.addWidget(self.button_13)
+        pidbuttonLayout.addWidget(self.button_12)
+        pidbuttonLayout.addWidget(self.button_17)
+        pidbuttonLayout.addWidget(self.button_16)
+        pidbuttonLayout.addWidget(self.button_15)
+
+    	#level 1
+        level1layout.addWidget(ntb,0)
+        level1layout.addWidget(self.button_10,2)
+        level1layout.addWidget(self.button_18,1)
+        level1layout.addWidget(self.button_7,2)
+        level1layout.addWidget(self.lcd1,3)
+        #level 2
+        level2layout.addWidget(self.messagelabel)
+        #level 3
+        level3layout.addLayout(pidbuttonLayout,0)
+        level3layout.addWidget(self.stack,1)
+        level3layout.addLayout(LCDlayout,2)
+        #level 4
+        level4layout.addWidget(self.lowerbuttondialog)
+        #level 5
+        level5layout.addLayout(EventsLayout)
+
+###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
 
     #call from user configured event buttons    
     def recordextraevent(self,ee):
@@ -4602,9 +4631,9 @@ class ApplicationWindow(QMainWindow):
             if self.keyboardmoveflag == 0:                                     
                 #turn on
                 self.keyboardmoveflag = 1
-                self.keyboardmoveindex = 0
+                self.keyboardmoveindex = 2
                 self.sendmessage(QApplication.translate("Message Area","Keyboard moves turned ON", None, QApplication.UnicodeUTF8))
-                self.button_1.setStyleSheet("QPushButton { background-color: purple }")
+                self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                 
             elif self.keyboardmoveflag == 1:                  
                 # turn off 
@@ -4612,22 +4641,22 @@ class ApplicationWindow(QMainWindow):
                 # clear all
                 self.sendmessage(QApplication.translate("Message Area","Keyboard moves turned OFF", None, QApplication.UnicodeUTF8))
                 if self.qmc.flagon:    
-                    self.button_1.setStyleSheet("QPushButton { background-color: #88ff18 }")
+                    self.button_1.setStyleSheet(self.pushbuttonstyles["ON"])
                 else:
-                    self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")                 
-                self.button_8.setStyleSheet("QPushButton { background-color: #f07800 }")
-                self.button_19.setStyleSheet("QPushButton { background-color: orange }")
-                self.button_3.setStyleSheet("QPushButton { background-color: orange }")
-                self.button_4.setStyleSheet("QPushButton { background-color: orange }")
-                self.button_5.setStyleSheet("QPushButton { background-color: orange }")
-                self.button_6.setStyleSheet("QPushButton { background-color: orange }")
-                self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
-                self.button_11.setStyleSheet("QPushButton { background-color: yellow }")
-                self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
+                    self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])                 
+                self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
+                self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
+                self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
+                self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
+                self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
+                self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
+                self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
+                self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
+                self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
                 if self.qmc.HUDflag:
-                    self.button_18.setStyleSheet("QPushButton { background-color: #61ffff }")
+                    self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_ON"])
                 else:    
-                    self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+                    self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
 
         #if moves on              
         if self.keyboardmoveflag:       
@@ -4635,12 +4664,12 @@ class ApplicationWindow(QMainWindow):
                 self.keyboardmove[self.keyboardmoveindex]()   #apply button command
                 #behaviour rules after pressing a button
                 #if RESET is pressed jump to ON     
-                if self.keyboardmoveindex == 9:
-                    self.keyboardmoveindex = 0
-                    self.button_1.setStyleSheet("QPushButton { background-color: purple }")
-                    self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
+                if self.keyboardmoveindex == 0:
+                    self.keyboardmoveindex = 2
+                    self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                    self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
                 #if less than EVENT jump forward to the right once automatically    
-                elif self.keyboardmoveindex < 8:
+                elif self.keyboardmoveindex > 1:
                     self.moveKbutton("right")
                     
             #command left-right: moves button          
@@ -4650,138 +4679,139 @@ class ApplicationWindow(QMainWindow):
                 # self.button_7 = RESET, self.button_18 = HUD
                 
                 #Check current index (location)
-                #location in button ON/OFF
+                #location in button RESET    
                 if self.keyboardmoveindex == 0:
+                    if command == "left":
+                        self.button_18.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
+                        self.keyboardmoveindex = 1
                     if command == "right":
-                        self.button_8.setStyleSheet("QPushButton { background-color: purple }")
-                        self.keyboardmoveindex = 1                        
-                        if self.qmc.flagon:    
-                            self.button_1.setStyleSheet("QPushButton { background-color: #ff664b }")
-                        else:
-                            self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")                        
-                    elif command == "left": #jump to HUD (close circle)
-                        self.keyboardmoveindex = 10
-                        self.button_18.setStyleSheet("QPushButton { background-color: purple }")
-                        if self.qmc.flagon:    
-                            self.button_1.setStyleSheet("QPushButton { background-color: #ff664b }")
-                        else:
-                            self.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")                        
-                #location in button CHARGE
-                elif self.keyboardmoveindex == 1:
-                    if command == "right":
-                        self.button_19.setStyleSheet("QPushButton { background-color: purple }")
+                        if self.eventsbuttonflag:
+                            self.button_11.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                            self.keyboardmoveindex = 10
+                        if not self.eventsbuttonflag:
+                            self.button_9.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                            self.keyboardmoveindex = 9
+                    self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
+                #location in button HUD    
+                elif self.keyboardmoveindex == 1:   
+                    if command == "left":
                         self.keyboardmoveindex = 2
-                    elif command == "left":
-                        self.button_1.setStyleSheet("QPushButton { background-color: purple }")
-                        self.keyboardmoveindex = 0
-                    self.button_8.setStyleSheet("QPushButton { background-color: #f07800 }")
-                    
-                #location in button DRY END    
+                        if self.qmc.HUDflag:
+                            self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_ON"])
+                        else:    
+                            self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
+                        self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                    elif command == "right":
+                        self.button_7.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.keyboardmoveindex = 0 
+                        if self.qmc.HUDflag:
+                            self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_ON"])
+                        else:    
+                            self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
+                
+                #location in button ON/OFF
                 elif self.keyboardmoveindex == 2:
                     if command == "right":
-                        self.button_3.setStyleSheet("QPushButton { background-color: purple }")
-                        self.keyboardmoveindex = 3
-                    elif command == "left":
-                        self.button_8.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_8.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.keyboardmoveindex = 3                        
+                        if self.qmc.flagon:    
+                            self.button_1.setStyleSheet(self.pushbuttonstyles["ON"])
+                        else:
+                            self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])                        
+                    elif command == "left": #jump to HUD (close circle)
                         self.keyboardmoveindex = 1
-                    self.button_19.setStyleSheet("QPushButton { background-color: orange }")
-                    
-                #location in button FC START    
+                        self.button_18.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        if self.qmc.flagon:    
+                            self.button_1.setStyleSheet(self.pushbuttonstyles["ON"])
+                        else:
+                            self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])                        
+                #location in button CHARGE
                 elif self.keyboardmoveindex == 3:
                     if command == "right":
-                        self.button_4.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_19.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 4
                     elif command == "left":
-                        self.button_19.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 2
-                    self.button_3.setStyleSheet("QPushButton { background-color: orange }")
-                   
-                #location in button FC END        
-                elif self.keyboardmoveindex == 4:    
+                    self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
+                    
+                #location in button DRY END    
+                elif self.keyboardmoveindex == 4:
                     if command == "right":
-                        self.button_5.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_3.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 5
                     elif command == "left":
-                        self.button_3.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_8.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 3
-                    self.button_4.setStyleSheet("QPushButton { background-color: orange }")
-                        
-                #location in button SC START        
+                    self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
+                    
+                #location in button FC START    
                 elif self.keyboardmoveindex == 5:
                     if command == "right":
-                        self.button_6.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_4.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 6
                     elif command == "left":
-                        self.button_4.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_19.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 4
-                    self.button_5.setStyleSheet("QPushButton { background-color: orange }")
-                       
-                #location in button SC END    
-                elif self.keyboardmoveindex == 6:
+                    self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
+                   
+                #location in button FC END        
+                elif self.keyboardmoveindex == 6:    
                     if command == "right":
-                        self.button_9.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_5.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 7
                     elif command == "left":
-                        self.button_5.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_3.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 5
-                    self.button_6.setStyleSheet("QPushButton { background-color: orange }")
+                    self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
                         
-                #location in button DROP    
+                #location in button SC START        
                 elif self.keyboardmoveindex == 7:
                     if command == "right":
-                        if self.eventsbuttonflag:
-                            self.button_11.setStyleSheet("QPushButton { background-color: purple }")
-                            self.keyboardmoveindex = 8
-                        else:
-                            self.button_7.setStyleSheet("QPushButton { background-color: purple }")
-                            self.keyboardmoveindex = 9
+                        self.button_6.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.keyboardmoveindex = 8
                     elif command == "left":
-                        self.button_6.setStyleSheet("QPushButton { background-color: purple }")
+                        self.button_4.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 6
-                    self.button_9.setStyleSheet("QPushButton { background-color: #f07800 }")
-                    
-                #location in button EVENT    
+                    self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
+                       
+                #location in button SC END    
                 elif self.keyboardmoveindex == 8:
                     if command == "right":
-                        if self.eventsbuttonflag:
-                            self.button_7.setStyleSheet("QPushButton { background-color: purple }")
-                            self.button_11.setStyleSheet("QPushButton { background-color: yellow }")
-                            self.keyboardmoveindex = 9
-                          
-                    if command == "left":
-                        self.button_9.setStyleSheet("QPushButton { background-color: purple }")
-                        self.button_11.setStyleSheet("QPushButton { background-color: yellow }")
+                        self.button_9.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.keyboardmoveindex = 9
+                    elif command == "left":
+                        self.button_5.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 7
-                #location in button RESET    
+                    self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
+                        
+                #location in button DROP    
                 elif self.keyboardmoveindex == 9:
-                    if command == "left":
-                        self.button_18.setStyleSheet("QPushButton { background-color: purple }")
-                        self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
-                        self.keyboardmoveindex = 10
                     if command == "right":
                         if self.eventsbuttonflag:
-                            self.button_11.setStyleSheet("QPushButton { background-color: purple }")
-                            self.keyboardmoveindex = 8
-                        if not self.eventsbuttonflag:
-                            self.button_9.setStyleSheet("QPushButton { background-color: purple }")
-                            self.keyboardmoveindex = 7
-                    self.button_7.setStyleSheet("QPushButton { background-color: #ffffff }")
-                #location in button HUD    
-                elif self.keyboardmoveindex == 10:   
+                            self.button_11.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                            self.keyboardmoveindex = 10
+                        else:
+                            self.button_7.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                            self.keyboardmoveindex = 0
+                    elif command == "left":
+                        self.button_6.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.keyboardmoveindex = 8
+                        
+                    self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
+                    
+                #location in button EVENT    
+                elif self.keyboardmoveindex == 10:
+                    if command == "right":
+                            self.button_7.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                            self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
+                            self.keyboardmoveindex = 0                            
                     if command == "left":
-                        self.keyboardmoveindex = 0
-                        if self.qmc.HUDflag:
-                            self.button_18.setStyleSheet("QPushButton { background-color: #61ffff }")
-                        else:    
-                            self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
-                        self.button_1.setStyleSheet("QPushButton { background-color: purple }")
-                    elif command == "right":
-                        self.button_7.setStyleSheet("QPushButton { background-color: purple }")
-                        self.keyboardmoveindex = 9 
-                        if self.qmc.HUDflag:
-                            self.button_18.setStyleSheet("QPushButton { background-color: #61ffff }")
-                        else:    
-                            self.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
+                        self.button_9.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
+                        self.keyboardmoveindex = 9
+
                             
     #sound feedback when pressing a push button
     def soundpop(self):
@@ -9068,12 +9098,12 @@ class EventsDlg(QDialog):
 
     def delextraeventbutton(self):
         bindex = len(aw.extraeventstypes)-1
-        aw.extraeventstypes.pop(bindex)
-        aw.extraeventsvalues.pop(bindex)
-        self.createEventbuttonTable()  #update table
-        aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
-        aw.buttonlist.pop(bindex)
-        
+        if bindex >= 0:        
+            aw.extraeventstypes.pop(bindex)
+            aw.extraeventsvalues.pop(bindex)
+            self.createEventbuttonTable()  #update table
+            aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
+            aw.buttonlist.pop(bindex)        
 
     def insertextraeventbutton(self):	
         aw.extraeventstypes.append(0)
@@ -9083,7 +9113,7 @@ class EventsDlg(QDialog):
         aw.buttonlist.append(QPushButton())
         bindex = len(aw.buttonlist)-1
         aw.buttonlist[bindex].setFocusPolicy(Qt.NoFocus)
-        aw.buttonlist[bindex].setStyleSheet("QPushButton { background-color: yellow}")
+        aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ") 
         aw.buttonlist[bindex].setMaximumSize(90, 50)
         aw.buttonlist[bindex].setMinimumHeight(50)
         aw.buttonlist[bindex].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[-1]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[-1]]))        
