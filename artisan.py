@@ -1197,7 +1197,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_9.setFlat(False)
         aw.button_19.setFlat(False)
         aw.button_1.setText("ON") 
-        aw.button_1.setStyleSheet("QPushButton { background-color: #43d300 }")        
+        aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
         
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
         aw.setWindowTitle(aw.windowTitle)
@@ -5715,7 +5715,6 @@ class ApplicationWindow(QMainWindow):
             #self.qmc.killTimer(self.qmc.timerid)
             #self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
             self.qmc.timer.setInterval(self.qmc.delay) 
-
             # Extra devices
             settings.beginGroup("ExtraComm")
             if settings.contains("extracomport"):
@@ -5725,6 +5724,12 @@ class ApplicationWindow(QMainWindow):
                 self.ser.extraparity = list(settings.value("extraparity",self.ser.extraparity).toStringList())
                 self.ser.extrastopbits = map(lambda x:x.toInt()[0],settings.value("extrastopbits").toList())
                 self.ser.extratimeout = map(lambda x:x.toInt()[0],settings.value("extratimeout").toList())
+                #convert Qstrings to unicode                
+                for i in range(len(self.ser.extracomport)):                
+                    self.ser.extracomport[i] = unicode(self.ser.extracomport[i])
+                    self.ser.extraparity[i] = unicode(self.ser.extraparity[i])
+                    self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
+                    self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
             settings.endGroup() 
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
@@ -5733,20 +5738,16 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extradevicecolor2 = list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())
                 self.qmc.extraname1 = list(settings.value("extraname1",self.qmc.extraname1).toStringList())
                 self.qmc.extraname2 = list(settings.value("extraname2",self.qmc.extraname2).toStringList())
-                if settings.contains("extramathexpression1"):
-                    self.qmc.extramathexpression1 = list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList())
-                    self.qmc.extramathexpression2 = list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList())
-                    for i in range(len(self.qmc.extramathexpression1)):
-                        self.qmc.extramathexpression1[i] = unicode(self.qmc.extramathexpression1[i])
-                        self.qmc.extramathexpression2[i] = unicode(self.qmc.extramathexpression2[i])
                 #convert Qstrings to unicode
                 for i in range(len(self.qmc.extradevicecolor1)):
                     self.qmc.extradevicecolor1[i] = unicode(self.qmc.extradevicecolor1[i])
-                    self.qmc.extradevicecolor2[i] = unicode(self.qmc.extradevicecolor2[i])
-                    self.ser.extracomport[i] = unicode(self.ser.extracomport[i])
-                    self.ser.extraparity[i] = unicode(self.ser.extraparity[i])
-                    self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
-                    self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
+                    self.qmc.extradevicecolor2[i] = unicode(self.qmc.extradevicecolor2[i])                    
+                self.qmc.extramathexpression1 = list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList())
+                self.qmc.extramathexpression2 = list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList())
+                for i in range(len(self.qmc.extramathexpression1)):
+                    self.qmc.extramathexpression1[i] = unicode(self.qmc.extramathexpression1[i])
+                    self.qmc.extramathexpression2[i] = unicode(self.qmc.extramathexpression2[i])
+
             settings.endGroup()
             #create empty containers
             for i in range(len(self.qmc.extradevices)):
@@ -5772,10 +5773,11 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(self.qmc.plotcurves)):
                     self.qmc.plotcurves[i] = unicode(self.qmc.plotcurves[i])
                     self.qmc.plotcurvecolor[i] = unicode(self.qmc.plotcurvecolor[i])
+                    
             if settings.contains("extraeventsvalues"):
                 self.extraeventstypes = map(lambda x:x.toInt()[0],settings.value("extraeventstypes").toList())
                 self.extraeventsvalues = map(lambda x:x.toInt()[0],settings.value("extraeventsvalues").toList())   	
-
+        
             #update display
             self.qmc.redraw()
 
