@@ -4555,7 +4555,7 @@ class ApplicationWindow(QMainWindow):
                     	extraeventsactionstringscopy = ""
                     	#example a2b_uu("Hello") sends Hello in binary format instead of ASCII
                         if "a2b_uu" in aw.extraeventsactionstrings[ee]:
-                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][(len(keys[i])+2):]  # removes function-name and ( and "
+                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][(len("a2b_uu")+2):]  # removes function-name + char ( and "
                             aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][:2]                 # removes " and )  
                             extraeventsactionstringscopy = binascii.a2b_uu(aw.extraeventsactionstrings[ee])
                         if extraeventsactionstringscopy:
