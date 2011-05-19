@@ -2551,6 +2551,9 @@ class tgraphcanvas(FigureCanvas):
                 
             aw.soundpop()
 
+    	else:
+            aw.sendmessage(QApplication.translate("EventRecord","Timer is OFF", None, QApplication.UnicodeUTF8))
+
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
     def DeviceEventRecord(self,command):
         if self.flagon:
@@ -3793,6 +3796,7 @@ class ApplicationWindow(QMainWindow):
 
     	#user defined event buttons
         self.extraeventstypes,self.extraeventsvalues = [],[]  #hold indexes
+        self.extraeventsactionstrings,self.extraeventsactions = [],[] #hold 
 
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID.
@@ -4090,14 +4094,13 @@ class ApplicationWindow(QMainWindow):
                                  "RESET":"font-size: 10pt; font-weight: bold; color: purple; background-color: white ",
                                  "HUD_OFF":"font-size: 10pt; font-weight: bold; color: white; background-color: #b5baff  ",
                                  "HUD_ON":"font-size: 10pt; font-weight: bold; color: white; background-color: #60ffed   ",                                 
-                                 "EVENT":"font-size: 10pt; font-weight: bold; color: grey; background-color: yellow ",                                 
+                                 "EVENT":"font-size: 10pt; font-weight: bold; color: black; background-color: yellow ",                                 
                                  "DROP":"font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 ",
                                  "PID":"font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF ",
                                  "SV +":"font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff ",
-                                 "SV -":"font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff ",
+                                 "SV -":"font-size: 10pt; font-weight: bold; color: white; background-color: lightblue ",
                                  "SELECTED":"font-size: 12pt; font-weight: bold; color: yellow; background-color: purple"  #keyboard moves
-                                 }
-                                 
+                                 }                                 
                                  
         #create START STOP buttons        
         self.button_1 = QPushButton(QApplication.translate("Scope Button", "ON", None, QApplication.UnicodeUTF8))
@@ -4413,7 +4416,7 @@ class ApplicationWindow(QMainWindow):
         for i in range(len(self.extraeventstypes)):
             self.buttonlist.append(QPushButton())
             self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
-            self.buttonlist[i].setStyleSheet("font-size: 10pt; font-weight: bold; color: grey; background-color: yellow ") 
+            self.buttonlist[i].setStyleSheet(self.pushbuttonstyles["EVENT"]) 
             self.buttonlist[i].setMinimumHeight(50)
             self.buttonlist[i].setText(unicode(self.qmc.etypes[self.extraeventstypes[i]][0])+unicode(self.qmc.eventsvalues[self.extraeventsvalues[i]]))
             self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
@@ -4431,9 +4434,6 @@ class ApplicationWindow(QMainWindow):
         # set the central widget of MainWindow to main_widget
         self.setCentralWidget(self.main_widget)   
         
-        # set visibility of mini event line
-        self.update_minieventline_visibility()
-
         #list of functions to chose from (using left-right keyboard arrow)
         self.keyboardmove  = [self.qmc.reset_and_redraw,self.qmc.toggleHUD,self.qmc.OnMonitor,self.qmc.markCharge,self.qmc.markDryEnd,self.qmc.mark1Cstart,self.qmc.mark1Cend,
                              self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.EventRecord]
@@ -4461,7 +4461,9 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addLayout(level4layout)
         mainlayout.addLayout(level5layout)
         
-        EventsLayout = QHBoxLayout()        
+        EventsLayout = QHBoxLayout()
+        EventsLayout.setMargin(0)
+        EventsLayout.setSpacing(0)       
         LCDlayout = QVBoxLayout()    
         pidbuttonLayout = QVBoxLayout()
              
@@ -4479,8 +4481,9 @@ class ApplicationWindow(QMainWindow):
         EventsLayout.addWidget(self.eNumberSpinBox)        
         EventsLayout.addSpacing(5)      
         EventsLayout.addWidget(self.buttonminiEvent)
+        self.EventsGroupLayout = QGroupBox()        
+        self.EventsGroupLayout.setLayout(EventsLayout)
  
-
         #place control buttons + LCDs inside vertical button layout manager
         LCDlayout.addWidget(label2)
         LCDlayout.addWidget(self.lcd2)
@@ -4500,7 +4503,7 @@ class ApplicationWindow(QMainWindow):
         LCDlayout.addWidget(self.lcd5)
         LCDlayout.addStretch()   
                       
-        #PID Buttons                
+        #PID Buttons       
         pidbuttonLayout.addWidget(self.button_14)       
         pidbuttonLayout.addWidget(self.button_13)
         pidbuttonLayout.addWidget(self.button_12)
@@ -4523,17 +4526,53 @@ class ApplicationWindow(QMainWindow):
         #level 4
         level4layout.addWidget(self.lowerbuttondialog)
         #level 5
-        level5layout.addLayout(EventsLayout)
+        level5layout.addWidget(self.EventsGroupLayout)
+
+        # set visibility of mini event line
+        self.update_minieventline_visibility()
+
+
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
 
     #call from user configured event buttons    
     def recordextraevent(self,ee):
-        self.qmc.EventRecord()
-        self.qmc.specialeventstype[-1] = self.extraeventstypes[ee]    
-        self.qmc.specialeventsvalue[-1] = self.extraeventsvalues[ee]
-        self.setminieditor2lastevent()
-        self.qmc.redraw()
+        if self.qmc.flagon:
+            self.qmc.EventRecord()
+            self.qmc.specialeventstype[-1] = self.extraeventstypes[ee]    
+            self.qmc.specialeventsvalue[-1] = self.extraeventsvalues[ee]
+            self.setminieditor2lastevent()
+            self.qmc.redraw()
+            if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program
+                if self.extraeventsactions[ee] == 1:
+                    try:
+                        aw.extraeventsactionstrings[ee] = str(aw.extraeventsactionstrings[ee])
+                        self.ser.closeport()
+                        self.ser.SP = serial.Serial(port=self.ser.comport, baudrate=self.ser.baudrate,bytesize=self.ser.bytesize,
+                                                  parity=self.ser.parity, stopbits=self.ser.stopbits, timeout=self.ser.timeout)
+                        self.ser.SP.flushOutput()
+                    	keys = commands.keys()
+                    	extraeventsactionstringscopy = ""
+                    	#example a2b_uu("Hello") sends Hello in binary format instead of ASCII
+                        if "a2b_uu" in aw.extraeventsactionstrings[ee]:
+                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][(len(keys[i])+2):]  # removes function-name and ( and "
+                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][:2]                 # removes " and )  
+                            extraeventsactionstringscopy = binascii.a2b_uu(aw.extraeventsactionstrings[ee])
+                        if extraeventsactionstringscopy:
+                            self.ser.SP.write(extraeventsactionstringscopy)                
+                        else:    
+                            self.ser.SP.write(aw.extraeventsactionstrings[ee])                
+                        self.ser.SP.close()
+                    except Exception, e:
+                        self.qmc.adderror(QApplication.translate("Error Message", "Exception: recordextraevent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+                        
+                elif aw.extraeventsactions[ee] == 2:
+                    try:
+                        os.startfile(unicode(self.extraeventsactionstrings[ee]))
+                    except Exception,e:
+                        self.qmc.adderror(QApplication.translate("Error Message","Exception Error: recordextraevent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+        else:
+            self.sendmessage(QApplication.translate("recordextraevent","Timer is OFF", None, QApplication.UnicodeUTF8))
 
     def resetApplication(self):
         string = QApplication.translate("MessageBox","Do you want to reset all settings?", None, QApplication.UnicodeUTF8)
@@ -4582,6 +4621,7 @@ class ApplicationWindow(QMainWindow):
             self.lineEvent.setVisible(True)
             self.eNumberSpinBox.setVisible(True)
             self.etimeline.setVisible(True)
+            self.EventsGroupLayout.setVisible(True)
         else:
             self.lineEvent.setVisible(False)
             self.etypeComboBox.setVisible(False)
@@ -4590,6 +4630,7 @@ class ApplicationWindow(QMainWindow):
             self.buttonminiEvent.setVisible(False)
             self.eNumberSpinBox.setVisible(False)
             self.etimeline.setVisible(False)
+            self.EventsGroupLayout.setVisible(False)            
 
     #keyboard presses. There must not be widgets (pushbuttons, comboboxes, etc) in focus in order to work 
     def keyPressEvent(self,event):    
@@ -4791,7 +4832,7 @@ class ApplicationWindow(QMainWindow):
                     if command == "right":
                         if self.eventsbuttonflag:
                             self.button_11.setStyleSheet(self.pushbuttonstyles["SELECTED"])
-                            self.keyboardmoveindex = 10
+                            self.keyboardmoveindex = 10                            
                         else:
                             self.button_7.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                             self.keyboardmoveindex = 0
@@ -5466,7 +5507,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extradevicecolor1 = profile["extradevicecolor1"]
             self.qmc.extradevicecolor2 = profile["extradevicecolor2"]
             
-            
         if "timeindex" in profile:
             self.qmc.timeindex = profile["timeindex"]
         else:
@@ -5733,23 +5773,22 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
                 self.qmc.extradevices = map(lambda x:x.toInt()[0],settings.value("extradevices").toList())
-                self.qmc.extradevicecolor1 = list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList())
-                self.qmc.extradevicecolor2 = list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())
                 self.qmc.extraname1 = list(settings.value("extraname1",self.qmc.extraname1).toStringList())
                 self.qmc.extraname2 = list(settings.value("extraname2",self.qmc.extraname2).toStringList())
-                #convert Qstrings to unicode
-                for i in range(len(self.qmc.extradevicecolor1)):
-                    self.qmc.extradevicecolor1[i] = unicode(self.qmc.extradevicecolor1[i])
-                    self.qmc.extradevicecolor2[i] = unicode(self.qmc.extradevicecolor2[i])
-                    self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
-                    self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
                 self.qmc.extramathexpression1 = list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList())
                 self.qmc.extramathexpression2 = list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList())
-                for i in range(len(self.qmc.extramathexpression1)):
+                self.qmc.extradevicecolor1 = list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList())
+                self.qmc.extradevicecolor2 = list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())                
+                #convert Qstrings to unicode
+                for i in range(len(self.qmc.extradevicecolor1)):
+                    self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
+                    self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
                     self.qmc.extramathexpression1[i] = unicode(self.qmc.extramathexpression1[i])
                     self.qmc.extramathexpression2[i] = unicode(self.qmc.extramathexpression2[i])
-
+                    self.qmc.extradevicecolor1[i] = unicode(self.qmc.extradevicecolor1[i])
+                    self.qmc.extradevicecolor2[i] = unicode(self.qmc.extradevicecolor2[i])                    
             settings.endGroup()
+            
             #create empty containers
             for i in range(len(self.qmc.extradevices)):
                 self.qmc.extratemp1.append([])
@@ -5774,11 +5813,17 @@ class ApplicationWindow(QMainWindow):
                 for i in range(len(self.qmc.plotcurves)):
                     self.qmc.plotcurves[i] = unicode(self.qmc.plotcurves[i])
                     self.qmc.plotcurvecolor[i] = unicode(self.qmc.plotcurvecolor[i])
-                    
-            if settings.contains("extraeventsvalues"):
+
+            settings.beginGroup("ExtraEventButtons")                    
+            if settings.contains("extraeventsactions"):
                 self.extraeventstypes = map(lambda x:x.toInt()[0],settings.value("extraeventstypes").toList())
-                self.extraeventsvalues = map(lambda x:x.toInt()[0],settings.value("extraeventsvalues").toList())   	
-        
+                self.extraeventsvalues = map(lambda x:x.toInt()[0],settings.value("extraeventsvalues").toList())
+                self.extraeventsactions = map(lambda x:x.toInt()[0],settings.value("extraeventsactions").toList())
+                self.extraeventsactionstrings = list(settings.value("extraeventsactionstrings",self.extraeventsactionstrings).toStringList())
+                for i in range(len(self.extraeventsactionstrings)):
+                    self.extraeventsactionstrings[i] = unicode(self.extraeventsactionstrings[i])                    
+            settings.endGroup()
+
             #update display
             self.qmc.redraw()
 
@@ -5896,7 +5941,12 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("profilepath",self.userprofilepath)
             #save extra devices
             settings.beginGroup("ExtraDev")
-            settings.setValue("extradevices",self.qmc.extradevices)                                                                
+            settings.setValue("extradevices",self.qmc.extradevices)
+            #Note: self.qmc.extradevicecolor can also be passed by opening a profile but they must have same dimensions as self.qmc.extradevices in Qsettings.
+            if len(self.qmc.extradevices) < len(self.qmc.extradevicecolor1):
+                #equalize lengths  
+                self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:len(self.qmc.extradevices)]
+                self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
             settings.setValue("extradevicecolor1",self.qmc.extradevicecolor1)                                                                
             settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
             settings.setValue("extraname1",self.qmc.extraname1)
@@ -5920,10 +5970,15 @@ class ApplicationWindow(QMainWindow):
 
             settings.setValue("plotcurves",self.qmc.plotcurves)                                                                
             settings.setValue("plotcurvecolor",self.qmc.plotcurvecolor)
-
+            
+            #custom event buttons
+            settings.beginGroup("ExtraEventButtons")
             settings.setValue("extraeventstypes",self.extraeventstypes)
             settings.setValue("extraeventsvalues",self.extraeventsvalues)
-
+            settings.setValue("extraeventsactionstrings",self.extraeventsactionstrings)
+            settings.setValue("extraeventsactions",self.extraeventsactions)
+            settings.endGroup()
+            
         except Exception,e:
             self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))            
 
@@ -8988,7 +9043,12 @@ class EventsDlg(QDialog):
         delButton.setToolTip(QApplication.translate("ToolTip","Delete the last extra Event button",None, QApplication.UnicodeUTF8))
         delButton.setMaximumWidth(100)
         self.connect(delButton, SIGNAL("clicked()"),self.delextraeventbutton)
-        
+
+        savetableButton = QPushButton(QApplication.translate("Button","Save table",None, QApplication.UnicodeUTF8))
+        savetableButton.setToolTip(QApplication.translate("ToolTip","Save table",None, QApplication.UnicodeUTF8))
+        savetableButton.setMaximumWidth(100)
+        self.connect(savetableButton, SIGNAL("clicked()"),self.savetableextraeventbutton)
+                
         #### tab1 layout
         typeLayout0 = QHBoxLayout()
         typeLayout0.addWidget(typelabel1)
@@ -9038,6 +9098,7 @@ class EventsDlg(QDialog):
         tab2buttonlayout = QHBoxLayout()    
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(delButton)
+        tab2buttonlayout.addWidget(savetableButton)
         tab2layout.addLayout(tab2buttonlayout)  
         
 ###########################################
@@ -9063,36 +9124,59 @@ class EventsDlg(QDialog):
         nbuttons = len(aw.extraeventstypes) 
         if nbuttons:
             self.eventbuttontable.setRowCount(nbuttons)
-            self.eventbuttontable.setColumnCount(2)
-            self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Del",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8)])
+            self.eventbuttontable.setColumnCount(4)
+            self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Action Description",None, QApplication.UnicodeUTF8)])
             self.eventbuttontable.setAlternatingRowColors(True)
             self.eventbuttontable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
             self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
             self.eventbuttontable.setShowGrid(True)
 
-            for i in range(nbuttons):                
+            for i in range(nbuttons):
+                #type
                 typeComboBox =  QComboBox()
                 typeComboBox.addItems(aw.qmc.etypes)
                 typeComboBox.setCurrentIndex(aw.extraeventstypes[i])
                 self.connect(typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.settypeeventbutton(z,i))
-
+                #value    	
                 valueComboBox =  QComboBox()
                 valueComboBox.addItems(aw.qmc.eventsvalues)
                 valueComboBox.setCurrentIndex(aw.extraeventsvalues[i])
                 self.connect(valueComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setvalueeventbutton(z,i))
-
+                #action
+                actionComboBox = QComboBox()
+                actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
+                                    	 QApplication.translate("ComboBox","Serial command",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","Call program",None, QApplication.UnicodeUTF8)])
+                actionComboBox.setCurrentIndex(aw.extraeventsactions[i])
+                self.connect(actionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setactioneventbutton(z,i))
+                
+                #action description
+                descriptionedit = QLineEdit(unicode(aw.extraeventsactionstrings[i]))
+                
                 #add widgets to the table
                 self.eventbuttontable.setCellWidget(i,0,typeComboBox)
                 self.eventbuttontable.setCellWidget(i,1,valueComboBox)
-        
+                self.eventbuttontable.setCellWidget(i,2,actionComboBox)
+                self.eventbuttontable.setCellWidget(i,3,descriptionedit)
+
+    def savetableextraeventbutton(self):
+        for i in range(len(aw.extraeventstypes)):
+            descriptionedit = self.eventbuttontable.cellWidget(i,3)
+            aw.extraeventsactionstrings[i] = unicode(descriptionedit.text())
+            aw.sendmessage(QApplication.translate("Message Area","Custom Event buttons configuration saved", None, QApplication.UnicodeUTF8))        
+
+    def setactioneventbutton(self,z,i):
+        actioncombobox = self.eventbuttontable.cellWidget(i,2)
+        aw.extraeventsactions[i] = actioncombobox.currentIndex()
+    	
     def setvalueeventbutton(self,z,i):
         valuecombobox = self.eventbuttontable.cellWidget(i,1)
         aw.extraeventsvalues[i] = valuecombobox.currentIndex()
         aw.buttonlist[i].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[i]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[i]]))        
-
 
     def settypeeventbutton(self,z,i):
         typecombobox = self.eventbuttontable.cellWidget(i,0)
@@ -9104,6 +9188,8 @@ class EventsDlg(QDialog):
         if bindex >= 0:        
             aw.extraeventstypes.pop(bindex)
             aw.extraeventsvalues.pop(bindex)
+            aw.extraeventsactions.pop(bindex)
+            aw.extraeventsactionstrings.pop(bindex)
             self.createEventbuttonTable()  #update table
             aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
             aw.buttonlist.pop(bindex)        
@@ -9111,6 +9197,8 @@ class EventsDlg(QDialog):
     def insertextraeventbutton(self):	
         aw.extraeventstypes.append(0)
         aw.extraeventsvalues.append(1)
+        aw.extraeventsactions.append(0)
+        aw.extraeventsactionstrings.append(u"")
         self.createEventbuttonTable() 
 
         aw.buttonlist.append(QPushButton())
@@ -9377,6 +9465,8 @@ class flavorDlg(QDialog):
 
         self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None, QApplication.UnicodeUTF8))        
         self.setModal(True)
+        aw.lowerbuttondialog.setVisible(False)
+        aw.EventsGroupLayout.setVisible(False)
 
         self.line0edit = QLineEdit(aw.qmc.flavorlabels[0])  
         self.line1edit = QLineEdit(aw.qmc.flavorlabels[1])       
@@ -9608,10 +9698,14 @@ class flavorDlg(QDialog):
     def closeEvent(self, event):    
         self.accept()
         aw.qmc.redraw()
+        aw.lowerbuttondialog.setVisible(True)
+    	aw.update_minieventline_visibility()
         
     def close(self):    
-        self.accept()
         aw.qmc.redraw()
+        aw.lowerbuttondialog.setVisible(True)
+    	aw.update_minieventline_visibility()
+        self.accept()
 
 #################################################################
 #################### BACKGROUND DIALOG  #########################
@@ -13307,6 +13401,9 @@ class WheelDlg(QDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None, QApplication.UnicodeUTF8))
 
+        aw.lowerbuttondialog.setVisible(False)
+    	aw.EventsGroupLayout.setVisible(False)
+    	
         #table for alarms
         self.datatable = QTableWidget()
         self.createdatatable()
@@ -13450,7 +13547,6 @@ class WheelDlg(QDialog):
         mainlayout.addWidget(self.datatable)
         mainlayout.addWidget(self.labelGroupLayout)
         mainlayout.addLayout(controlLayout)
-        mainlayout.addWidget(self.labelGroupLayout)
         mainlayout.addLayout(configlayout)
         mainlayout.addLayout(buttonlayout)
         self.setLayout(mainlayout)
@@ -13864,6 +13960,9 @@ class WheelDlg(QDialog):
 
     def closeEvent(self, event):    
         aw.qmc.redraw()
+        aw.lowerbuttondialog.setVisible(True)
+        if aw.minieventsflag:
+            aw.EventsGroupLayout.setVisible(True)
            
 ############################################################
 #######################  ALARM DIALOG  #####################
