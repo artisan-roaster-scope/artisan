@@ -4551,7 +4551,6 @@ class ApplicationWindow(QMainWindow):
                         self.ser.SP = serial.Serial(port=self.ser.comport, baudrate=self.ser.baudrate,bytesize=self.ser.bytesize,
                                                   parity=self.ser.parity, stopbits=self.ser.stopbits, timeout=self.ser.timeout)
                         self.ser.SP.flushOutput()
-                    	keys = commands.keys()
                     	extraeventsactionstringscopy = ""
                     	#example a2b_uu("Hello") sends Hello in binary format instead of ASCII
                         if "a2b_uu" in aw.extraeventsactionstrings[ee]:
