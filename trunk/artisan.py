@@ -4091,7 +4091,7 @@ class ApplicationWindow(QMainWindow):
         self.pushbuttonstyles = {"OFF":"font-size: 16pt; font-weight: bold; color: grey; background-color: #43d300 ",
                                  "ON":"font-size: 16pt; font-weight: bold; color: yellow; background-color: red ",
                                  "DRY END":"font-size: 10pt; font-weight: bold; color: white; background-color: orange  ",
-                                 "CHARGE":"font-size: 8pt; font-weight: bold; color: white; background-color: #f07800 ",                                 
+                                 "CHARGE":"font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 ",                                 
                                  "FC START":"font-size: 10pt; font-weight: bold; color: white; background-color: orange  ",
                                  "FC END":"font-size: 10pt; font-weight: bold; color: white; background-color: orange ",
                                  "SC START":"font-size: 10pt; font-weight: bold; color: white; background-color: orange ",
@@ -8476,7 +8476,7 @@ class errorDlg(QDialog):
 
         enumber = len(aw.qmc.errorlog)
     
-        labelstr =  QApplication.translate("Label","Number of errors found %1", None, QApplication.UnicodeUTF8).arg(unicode(enumber)) + "</b>"
+        labelstr =  "<b>"+ QApplication.translate("Label","Number of errors found %1", None, QApplication.UnicodeUTF8).arg(unicode(enumber)) + "</b>"
 
         elabel = QLabel(labelstr)
         errorEdit = QTextEdit()
