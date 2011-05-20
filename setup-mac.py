@@ -9,7 +9,7 @@ from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
 def my_parse_makefile(filename, g):
     their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.5'
+    g['MACOSX_DEPLOYMENT_TARGET'] = '10.4'
 sysconfig.parse_makefile = my_parse_makefile
 
 import sys, os
@@ -40,12 +40,15 @@ DATA_FILES = [
   ]
   
 OPTIONS = {
+    'strip':True,
     'argv_emulation': False,
     'semi_standalone': False,
     'site_packages': True,
     'packages':['matplotlib'],
     'optimize':  2,
+    'compressed':True,
     'iconfile': 'artisan.icns',
+#    'frameworks' : ['/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/lib/libfreetype.dylib'], # cannot be relocated!
     'includes': ['sip',
                  'serial',
                  'PyQt4.QtCore',
@@ -61,7 +64,7 @@ OPTIONS = {
                     'CFBundleIdentifier':'com.google.code.p.Artisan',
                     'CFBundleShortVersionString':VERSION,
                     'CFBundleVersion': 'Artisan ' + VERSION,
-                    'LSMinimumSystemVersion':'10.5',
+                    'LSMinimumSystemVersion':'10.4',
                     'LSMultipleInstancesProhibited':'false',
                     'NSHumanReadableCopyright':LICENSE
                 }}

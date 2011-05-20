@@ -1,7 +1,10 @@
+12.5.11
+ - upgraded to QT 4.7.2 => 4.7.3
+---
 
 Current Versions
 o Python 2.7.1
-o QT 4.7.2
+o QT 4.7.3
 o Numpy 1.6.0b2
 o SIP 4.12.1
 o PyQt 4.8.3
@@ -13,7 +16,56 @@ o py2app 0.5.2
 
 --- 32bit Leopard & Snow Leopard Carbon Setup:
 
-Install universal binary setup on Snow Leopard 10.6.5 (with support for 10.5.x)
+X) before any installation (for 10.4 PPC compatibility if XCode 4 is installed!)
+
+Install XCode3+XCode4:
+1) Install XCode3 without System Tools or Unix Development packages. Choose /Xcode3 as installation folder!
+2) Install XCode4 with System Tools and Unix Development packages
+3) Restoring 10.4/10.5 SDK Support
+# cd /Developer/SDKs
+# sudo ln -s /Xcode3/SDKs/MacOSX10.4u.sdk .
+# sudo ln -s /Xcode3/SDKs/MacOSX10.5.sdk .
+4) Restoreing GCC 4.0 Support
+# cd /Developer/usr/bin
+# for SRC_FILE in /Xcode3/usr/bin/*4.0*; do sudo ln -s "$SRC_FILE" .; done
+# cd /Developer/usr/libexec/gcc/powerpc-apple-darwin10
+# sudo ln -s /Xcode3/usr/libexec/gcc/powerpc-apple-darwin10/4.0.1 .
+# cd /Developer/Library/Xcode/PrivatePlugIns
+# cd Xcode3Core.ideplugin/Contents/SharedSupport/Developer/Library/Xcode/Plug-ins
+# sudo ln -s "/Xcode3/Library/Xcode/Plug-ins/GCC 4.0.xcplugin" . 
+5) Restoring PPC Support for GCC 4.0.1 
+# cd /usr/libexec/gcc/powerpc-apple-darwin10/4.0.1
+# sudo mv as as.bak
+# sudo ln -s /Xcode3/usr/bin/as .
+# sudo mv ld ld.bak
+# sudo ln -s /Xcode3/usr/bin/ld .
+
+------
+
+a) ensure to use gcc-4.0 (as otherwise there is a issue with stdarg.h in MacOSX10.4.u.sdk)
+sudo rm /usr/bin/cc
+sudo rm /usr/bin/gcc
+sudo rm /usr/bin/c++
+sudo rm /usr/bin/g++
+sudo ln -s /usr/bin/gcc-4.0 /usr/bin/gcc
+sudo ln -s /usr/bin/gcc-4.0 /usr/bin/cc
+sudo ln -s /usr/bin/c++-4.0 /usr/bin/c++
+sudo ln -s /usr/bin/g++-4.0 /usr/bin/g++
+
+b) switch back to gcc-4.2
+
+sudo rm /usr/bin/cc
+sudo rm /usr/bin/gcc
+sudo rm /usr/bin/c++
+sudo rm /usr/bin/g++
+sudo ln -s /usr/bin/gcc-4.2 /usr/bin/cc
+sudo ln -s /usr/bin/gcc-4.2 /usr/bin/gcc
+sudo ln -s /usr/bin/c++-4.2 /usr/bin/c++
+sudo ln -s /usr/bin/g++-4.2 /usr/bin/g++
+
+
+
+Install universal binary (PPC/Intel) setup on Snow Leopard 10.6.5 (with support for 10.4.x)
 
 0) Install Python 2.6.6 / 2.7.1
 
@@ -22,7 +74,6 @@ download and install:
 http://www.python.org/ftp/python/2.6.6/python-2.6.6-macosx10.3.dmg
 or
 http://www.python.org/ftp/python/2.7.1/python-2.7.1-macosx10.3.dmg
-
 
 set default to 32bit:
 # defaults write com.apple.versioner.python Prefer-32-Bit -bool yes
@@ -35,23 +86,61 @@ http://get.qt.nokia.com/qt/source/qt-mac-carbon-opensource-4.7.2.dmg (Carbon)
 
 2) Install pyserial 
 
+
 download latest source (pyserial-2.5.tar.gz) from http://pypi.python.org/pypi/pyserial
 
 # tar xzf pyserial-2.5.tar.gz
 # cd pyserial-2.5
+export MACOSX_DEPLOYMENT_TARGET=10.4
+export CFLAGS="-arch i386 -arch ppc"
+export FFLAGS="-m32"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc -Xlinker -headerpad_max_install_names"
+export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
+export CC=/usr/bin/gcc-4.0
+
+add the following lines on the head of the setup.py file
+# vi setup.py
+from distutils import sysconfig
+their_parse_makefile = sysconfig.parse_makefile
+def my_parse_makefile(filename, g):
+    their_parse_makefile(filename, g)
+    g['MACOSX_DEPLOYMENT_TARGET'] = '10.4'
+sysconfig.parse_makefile = my_parse_makefile
+
 # python setup.py build
 # python setup.py install
 
+
+*) freetype 2.4.4
+
+the X11 one in /Developer/SDK is not "relocatable"
+
+install freetype from FreeType_Framework-2.3.9-1.dmg
+into /Library/Frameworks/FreeType.framework/Versions/2.3/unix/lib/libfreetype.dylib
+recompile matplotlib with corresponding paths:
+
+#    module.include_dirs.append('/Library/Frameworks/FreeType.framework/Versions/2.3/unix/include')
+#    module.include_dirs.append('/Library/Frameworks/FreeType.framework/Versions/2.3/unix/include/freetype2')
+
+
 3) Install Numpy
+
+the 10.4/PPC port works only with the 1.5.1 numpy universal 10.3 installer. The 1.6.1b2 installer comes without PPC code
+(note that the matplotlib needs to be recompiled to work with this older numpy version!)
+
+--
+from Source:
 
 get latest source from http://sourceforge.net/projects/numpy/files/
 
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386"
-export FFLAGS="-m32"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386"
+export MACOSX_DEPLOYMENT_TARGET=10.4
+export CFLAGS="-arch i386 -arch ppc -I/usr/local/include -isysroot /Developer/SDKs/MacOSX10.4u.sdk”"
+export FFLAGS="-m32 -arch i386 -arch ppc"
+export LDFLAGS="-lgfortran -shared -Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc -L/usr/local/lib -syslibroot /Developer/SDKs/MacOSX10.4u.sdk -Xlinker -headerpad_max_install_names"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
-# cd numpy-
+
+export CC=/usr/bin/gcc-4.0
+# cd numpy-1.6.0b2
 # cp site.cfg.example site.cfg
 
 add the following lines on the head of the setup.py file
@@ -60,56 +149,129 @@ from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
 def my_parse_makefile(filename, g):
     their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.5'
+    g['MACOSX_DEPLOYMENT_TARGET'] = '10.4'
 sysconfig.parse_makefile = my_parse_makefile
 
 # python setup.py build
 # python setup.py install
+
 
 test
 # unset MACOSX_DEPLOYMENT_TARGET
 # easy_install nose
 # python -c 'import numpy; numpy.test()'
 
+
+[CPC385:/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/numpy/core] otool -L multiarray.so
+multiarray.so (architecture ppc):
+	/usr/lib/libgcc_s.1.dylib (compatibility version 1.0.0, current version 1.0.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 88.3.11)
+multiarray.so (architecture i386):
+	/usr/lib/libgcc_s.1.dylib (compatibility version 1.0.0, current version 1.0.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 88.3.11)
+=> does not work on PPC/ 10.4
+
+with numpy-1.5.1 installer:
+[CPC385:/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/numpy/core] otool -L multiarray.somultiarray.so (architecture ppc):
+	/usr/lib/libmx.A.dylib (compatibility version 1.0.0, current version 47.1.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 88.3.6)
+multiarray.so (architecture i386):
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 88.3.6)
+
+
+install_name_tool -change /usr/lib/libgcc_s.1.dylib /opt/local/lib/gcc43/libgcc_s.1.dylib multiarray.so
+
+
+
+
+===
+install scons
+
+a) install numscons
+
+download numscons-0.12.0
+# cd numscons-0.12.0
+# python setup.py build
+# sudo python setup.py install
+
+
+b)
+download scons-2.0.1.tar.gz
+# tar xzf scons-2.0.1.tar.gz
+# cd scons-2.0.1/
+
+# sudo python setup.py install
+
+
+install numpy via scons:
+# python setupscons.py scons --jobs=2
+or
+# LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc -Xlinker -headerpad_max_install_names"  FFLAGS="-arch i386 -arch ppc" python setupscons.py install
+
+
+
+
 4) Install SIP
 
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386"
+export MACOSX_DEPLOYMENT_TARGET=10.4
+export CFLAGS="-arch i386 -arch ppc"
 export FFLAGS="-m32"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc -Xlinker -headerpad_max_install_names"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
-# cd sip-4.12
-# python configure.py -n --arch i386 --sdk MacOSX10.5.sdk -d/Library/Frameworks/Python.framework/Versions/2.6/lib/
+export CC=/usr/bin/gcc-4.0
+
+
+# cd sip-4.12.1
+# python configure.py -n --deployment-target=10.4 --arch i386 --arch ppc --sdk MacOSX10.4u.sdk -d/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages -b /usr/local/bin -e /usr/local/include -v /usr/local/share/sip 
 # make
 # sudo make install
+
 
 5) Install PyQt
 
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386"
+export MACOSX_DEPLOYMENT_TARGET=10.4
+export CFLAGS="-arch i386 -arch ppc"
 export FFLAGS="-m32"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc "
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
-# tar xzf PyQt-mac-gpl-4.8.2.tar.gz 
-# cd PyQt-mac-gpl-4.8.2
-# python configure.py --use-arch i386  
+export CC=/usr/bin/gcc-4.0
+# tar xzf PyQt-mac-gpl-4.8.3.tar.gz 
+# cd PyQt-mac-gpl-4.8.3
+
+ensure that the sip configuration file generated in the previous step is found
+# export PYTHONPATH=/Library/Frameworks/Python.framework/Versions/2.7/lib/:/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages:$PYTHONPATH
+
+## test if correct sipconfig from the sip install in step 4 above is loaded:
+# import sipconfig
+# sipcfg = sipconfig.Configuration()
+# print sipcfg.arch
+i386 ppc
+
+# python configure.py --use-arch i386 -d/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages  -b /usr/local/bin
 # make
 # sudo make install
 
 
-
 6) Install matplotlib
+
+installing matplotlib from the binary distribution
+	matplotlib-1.0.1-python.org-32bit-py2.7-macosx10.3.dmg
+supports PPC and Intel and seems not to depend on freetype (nor X11)
+
+---
+from source:
 
 download from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.0.1/
 
 
 # tar xzf matplotlib-1.0.1.tar.gz
 # cd matplotlib-1.0.1
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386"
+export MACOSX_DEPLOYMENT_TARGET=10.4
+export CFLAGS="-arch i386 -arch ppc"
 export FFLAGS="-m32"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc "
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
+export CC=/usr/bin/gcc-4.0
 
 add the following lines on the head of the setup.py file
 # vi setup.py
@@ -117,7 +279,7 @@ from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
 def my_parse_makefile(filename, g):
     their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.5'
+    g['MACOSX_DEPLOYMENT_TARGET'] = '10.4'
 sysconfig.parse_makefile = my_parse_makefile
 
 replace add_base_flags
@@ -142,9 +304,21 @@ def add_base_flags(module):
 
     module.include_dirs.extend(incdirs)
     module.include_dirs.append('.')
-    module.include_dirs.append('/usr/local/include')
-    module.include_dirs.append('/usr/local/include/freetype2')
+#    module.include_dirs.append('/usr/local/include')
+#    module.include_dirs.append('/usr/local/include/freetype2')
+# the following works for 10.4/PPC but depends on X11 installation that fails to be relocated
+#    module.include_dirs.append('/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include')
+#    module.include_dirs.append('/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/include/freetype2')
+# the following works for 10.4/PPC and does not depend on X11 installation, but freetype binary that can be included in the app
+    module.include_dirs.append('/Library/Frameworks/FreeType.framework/Versions/2.3/unix/include')
+    module.include_dirs.append('/Library/Frameworks/FreeType.framework/Versions/2.3/unix/include/freetype2')
+# V3:
+    module.include_dirs.append('/usr/X11R6/include')
+    module.include_dirs.append('/usr/X11R6/include/freetype2')
     module.library_dirs.extend(libdirs)
+#    module.library_dirs.append('/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/lib')
+    module.library_dirs.append('/Library/Frameworks/FreeType.framework/Versions/2.3/unix/lib')
+    module.include_dirs.append('/usr/X11R6/lib')
 
 
 # python setup.py build
@@ -194,12 +368,12 @@ Best install binary from http://sourceforge.net/projects/scipy/files/scipy/0.9.0
 From Source (incomplete!)
 
 export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386"
+export CFLAGS="-arch i386 -arch ppc"
 export CPPFLAGS="-m32"
 export CXXFLAGS="-m32"
 export FFLAGS="-m32"
 export FCFLAGS="-m32"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc "
 
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
 # cd scipy-0.8.0
@@ -300,7 +474,7 @@ download latest source (pyserial-2.5.tar.gz) from http://pypi.python.org/pypi/py
 export MACOSX_DEPLOYMENT_TARGET=10.5
 export CFLAGS="-arch i386 -arch x86_64"
 export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 "
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
 # cd numpy-1.6.0b2
 # cp site.cfg.example site.cfg
@@ -327,7 +501,7 @@ test
 export MACOSX_DEPLOYMENT_TARGET=10.5
 export CFLAGS="-arch i386 -arch x86_64"
 export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
 # cd sip-4.12
 # python configure.py -n --arch i386 --arch x86_64 --sdk MacOSX10.5.sdk -d/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages -s MacOSX10.5.sdk
@@ -339,7 +513,7 @@ export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2
 export MACOSX_DEPLOYMENT_TARGET=10.5
 export CFLAGS="-arch i386 -arch x86_64"
 export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
 # tar xzf PyQt-mac-gpl-4.8.2.tar.gz 
 # cd PyQt-mac-gpl-4.8.2
@@ -358,7 +532,7 @@ download from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplo
 export MACOSX_DEPLOYMENT_TARGET=10.5
 export CFLAGS="-arch i386 -arch x86_64"
 export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
 
 add the following lines on the head of the setup.py file
@@ -482,7 +656,7 @@ download from http://sourceforge.net/projects/libpng/files/zlib/1.2.5/zlib-1.2.5
 export MACOSX_DEPLOYMENT_TARGET=10.5
 export CFLAGS="-arch i386 -arch x86_64"
 export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
 # ./configure
 # make
 
@@ -507,7 +681,7 @@ cause by matplotlib
 export MACOSX_DEPLOYMENT_TARGET=10.5
 export CFLAGS="-arch i386 -arch x86_64"
 export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
 
 one could install 
 
@@ -520,7 +694,9 @@ download freetype-2.4.4.tar.gz from http://download.savannah.gnu.org/releases/fr
 export MACOSX_DEPLOYMENT_TARGET=10.5
 export CFLAGS="-arch i386 -arch x86_64"
 export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
 # ./configure --host i386-apple-darwin10.5.0
 # make
 # sudo make install
+
+
