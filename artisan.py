@@ -2680,9 +2680,9 @@ class tgraphcanvas(FigureCanvas):
 
                 rates_of_changes = aw.RoR(TP_index,dryEndIndex)
 
-                st1 += QApplication.translate("Scope Label", "  (%1 deg/min)",None, QApplication.UnicodeUTF8).arg("%.1f"%rates_of_changes[0])
-                st2 += QApplication.translate("Scope Label", "  (%1 deg/min)",None, QApplication.UnicodeUTF8).arg("%.1f"%rates_of_changes[1])
-                st3 += QApplication.translate("Scope Label", "  (%1 deg/min)",None, QApplication.UnicodeUTF8).arg("%.1f"%rates_of_changes[2])
+                st1 = st1 + " (%.1f "%rates_of_changes[0]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"
+                st2 = st2 + " (%.1f "%rates_of_changes[1]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"
+                st3 = st3 + " (%.1f "%rates_of_changes[2]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"
         
                 #Write flavor estimation
                 self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2-len(st1)*8/2,statisticslower,st1,color=self.palette["text"],fontsize=11)
@@ -5886,6 +5886,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
+            settings.setValue("StatisticsConds",self.qmc.statisticsconditions)
             #save Events settings
             settings.beginGroup("events")
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
