@@ -548,124 +548,129 @@ class tgraphcanvas(FigureCanvas):
         
     #sample devices at interval self.delay miliseconds
     def sample(self):
-        if self.flagon:
-            #if using a meter (thermocouple device)
-            if self.device != 18:
-                #read time, ET (t1) and BT (t2) TEMPERATURE                      
-                tx,t1,t2 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
-                if len(self.ETfunction):
-                    t1 = self.eval_math_expression(self.ETfunction,t1)
-                if len(self.BTfunction):
-                    t2 = self.eval_math_expression(self.BTfunction,t2)
-                # test for a possible change
-                t1,t2 = self.filterDropOuts(t1,t2)
+        try:
+            if self.flagon:
+                #if using a meter (thermocouple device)
+                if self.device != 18:
+                    #read time, ET (t1) and BT (t2) TEMPERATURE                      
+                    tx,t1,t2 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
+                    if len(self.ETfunction):
+                        t1 = self.eval_math_expression(self.ETfunction,t1)
+                    if len(self.BTfunction):
+                        t2 = self.eval_math_expression(self.BTfunction,t2)
+                    # test for a possible change
+                    t1,t2 = self.filterDropOuts(t1,t2)
 
-                #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
-                #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
-                if len(self.timex) > 2 and t1 == self.temp2[-1] and t2 == self.temp1[-1]:
-                    #let's better swap the readings (also they are just repeating the previous ones)
-                    self.temp2.append(t1)
-                    self.temp1.append(t2)
+                    #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
+                    #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
+                    if len(self.timex) > 2 and t1 == self.temp2[-1] and t2 == self.temp1[-1]:
+                        #let's better swap the readings (also they are just repeating the previous ones)
+                        self.temp2.append(t1)
+                        self.temp1.append(t2)
+                    else:
+                        #the readings seem to be "in order"
+                        self.temp2.append(t2)
+                        self.temp1.append(t1)
+
+                    self.timex.append(tx)
+
+                    # update lines data using the lists with new data
+                    self.l_temp1.set_data(self.timex, self.temp1)
+                    self.l_temp2.set_data(self.timex, self.temp2)
+                        
+                    #we need a minimum of two readings to calculate rate of change
+                    if len(self.timex) > 2:
+                        timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
+                        #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
+                        self.rateofchange1 = (self.temp1[-1] - self.temp1[-2])/timed  #delta ET (degress / second)
+                        self.rateofchange2 = (self.temp2[-1] - self.temp2[-2])/timed  #delta  BT (degress / second)
+                        rateofchange1plot = 50. + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 50
+                        rateofchange2plot = 100. + self.sensitivity*self.rateofchange2    #lift to plot on the graph at Temp  = 100
+                    else:
+                        self.rateofchange1 = 100.
+                        self.rateofchange2 = 50.
+                        rateofchange1plot = 0.
+                        rateofchange2plot = 0.
+                    # append new data to the rateofchange
+                    self.delta1.append(rateofchange1plot)
+                    self.delta2.append(rateofchange2plot)
+                                
+                    if self.DeltaETflag:
+                        self.l_delta1.set_data(self.timex, self.delta1)
+                    if self.DeltaBTflag:
+                        self.l_delta2.set_data(self.timex, self.delta2)
+
+                    #readjust xlimit of plot if needed
+                    if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds  
+                        self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
+                        self.ax.set_xlim(self.startofx,self.endofx)
+                        self.xaxistosm()
+                       
+                    aw.lcd2.display(t1)                                     # ET
+                    aw.lcd3.display(t2)                                     # BT
+                    aw.lcd4.display("%.1f"%(self.rateofchange1*60.))        # rate of change MET (degress per minute)
+                    aw.lcd5.display("%.1f"%(self.rateofchange2*60.))        # rate of change BT (degrees per minute)
+                                         
+                    if self.projectFlag:
+                        self.viewProjection()
+                    if self.HUDflag:
+                        aw.showHUD[aw.HUDfunction]()
+                    if self.background and self.backgroundReproduce:
+                        self.playbackevent()
+
+                    self.checkalarms()
+                        
+                #############    if using DEVICE 18 (no device). Manual mode
+                # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
                 else:
-                    #the readings seem to be "in order"
-                    self.temp2.append(t2)
-                    self.temp1.append(t1)
-
-                self.timex.append(tx)
-
-                # update lines data using the lists with new data
-                self.l_temp1.set_data(self.timex, self.temp1)
-                self.l_temp2.set_data(self.timex, self.temp2)
+                    tx = self.timeclock.elapsed()/1000. 
+                    #readjust xlimit of plot if needed
+                    if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
+                        self.endofx = int(tx + 180)         # increase x limit by 3 minutes (180)
+                        self.ax.set_xlim(self.startofx,self.endofx)
+                        self.xaxistosm()
+                        
+                    self.resetlines()
+                    #plot a vertical time line
+                    self.ax.plot([tx,tx], [0,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
                     
-                #we need a minimum of two readings to calculate rate of change
-                if len(self.timex) > 2:
-                    timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
-                    #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
-                    self.rateofchange1 = (self.temp1[-1] - self.temp1[-2])/timed  #delta ET (degress / second)
-                    self.rateofchange2 = (self.temp2[-1] - self.temp2[-2])/timed  #delta  BT (degress / second)
-                    rateofchange1plot = 50. + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 50
-                    rateofchange2plot = 100. + self.sensitivity*self.rateofchange2    #lift to plot on the graph at Temp  = 100
-                else:
-                    self.rateofchange1 = 100.
-                    self.rateofchange2 = 50.
-                    rateofchange1plot = 0.
-                    rateofchange2plot = 0.
-                # append new data to the rateofchange
-                self.delta1.append(rateofchange1plot)
-                self.delta2.append(rateofchange2plot)
-                            
-                if self.DeltaETflag:
-                    self.l_delta1.set_data(self.timex, self.delta1)
-                if self.DeltaBTflag:
-                    self.l_delta2.set_data(self.timex, self.delta2)
+                    if self.background and self.backgroundReproduce:
+                        self.playbackevent()
 
-                #readjust xlimit of plot if needed
-                if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds  
-                    self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
-                    self.ax.set_xlim(self.startofx,self.endofx)
-                    self.xaxistosm()
-                   
-                aw.lcd2.display(t1)                                     # ET
-                aw.lcd3.display(t2)                                     # BT
-                aw.lcd4.display("%.1f"%(self.rateofchange1*60.))        # rate of change MET (degress per minute)
-                aw.lcd5.display("%.1f"%(self.rateofchange2*60.))        # rate of change BT (degrees per minute)
-                                     
-                if self.projectFlag:
-                    self.viewProjection()
-                if self.HUDflag:
-                    aw.showHUD[aw.HUDfunction]()
-                if self.background and self.backgroundReproduce:
-                    self.playbackevent()
+                ##############  if using more than one device
+                ndevices = len(self.extradevices)
+                if ndevices:
+                    for i in range(ndevices):
+                        aw.ser.extraSP[i].close()
+                        aw.ser.SP.close()
+                        aw.ser.SP = serial.Serial(port=aw.ser.extracomport[i], baudrate=aw.ser.extrabaudrate[i],bytesize=aw.ser.extrabytesize[i],
+                                                   parity=aw.ser.extraparity[i], stopbits=aw.ser.extrastopbits[i], timeout=aw.ser.extratimeout[i])
+                        extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
+                        aw.ser.SP.close()
+                        if len(self.extramathexpression1[i]):
+                            extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
+                        if len(self.extramathexpression2[i]):
+                            extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
 
-                self.checkalarms()
-                    
-            #############    if using DEVICE 18 (no device). Manual mode
-            # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
-            else:
-                tx = self.timeclock.elapsed()/1000. 
-                #readjust xlimit of plot if needed
-                if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
-                    self.endofx = int(tx + 180)         # increase x limit by 3 minutes (180)
-                    self.ax.set_xlim(self.startofx,self.endofx)
-                    self.xaxistosm()
-                    
-                self.resetlines()
-                #plot a vertical time line
-                self.ax.plot([tx,tx], [0,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
+                        self.extratemp1[i].append(extrat1)
+                        self.extratemp2[i].append(extrat2)                        
+                        self.extratimex[i].append(extratx)
+                        # update extra lines 
+                        self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
+                        self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
+                    #restore ET/BT device serial port 
+                    aw.ser.SP = serial.Serial(port=aw.ser.comport, baudrate=aw.ser.baudrate,bytesize=aw.ser.bytesize,
+                                              parity=aw.ser.parity, stopbits=aw.ser.stopbits, timeout=aw.ser.timeout)
+
+                ##########  
+
+                #update screen                
+                self.fig.canvas.draw()
                 
-                if self.background and self.backgroundReproduce:
-                    self.playbackevent()
-
-            ##############  if using more than one device
-            ndevices = len(self.extradevices)
-            if ndevices:
-                for i in range(ndevices):
-                    aw.ser.extraSP[i].close()
-                    aw.ser.SP.close()
-                    aw.ser.SP = serial.Serial(port=aw.ser.extracomport[i], baudrate=aw.ser.extrabaudrate[i],bytesize=aw.ser.extrabytesize[i],
-                                               parity=aw.ser.extraparity[i], stopbits=aw.ser.extrastopbits[i], timeout=aw.ser.extratimeout[i])
-                    extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
-                    aw.ser.SP.close()
-                    if len(self.extramathexpression1[i]):
-                        extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
-                    if len(self.extramathexpression2[i]):
-                        extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
-
-                    self.extratemp1[i].append(extrat1)
-                    self.extratemp2[i].append(extrat2)                        
-                    self.extratimex[i].append(extratx)
-                    # update extra lines 
-                    self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
-                    self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-                #restore ET/BT device serial port 
-                aw.ser.SP = serial.Serial(port=aw.ser.comport, baudrate=aw.ser.baudrate,bytesize=aw.ser.bytesize,
-                                          parity=aw.ser.parity, stopbits=aw.ser.stopbits, timeout=aw.ser.timeout)
-
-            ##########  
-
-            #update screen                
-            self.fig.canvas.draw()
-
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
+        
     def updateLCDtime(self):
         tx = self.timeclock.elapsed()/1000.
         #avoid quick uneven time updades 
@@ -2674,10 +2679,10 @@ class tgraphcanvas(FigureCanvas):
                 (st1,st2,st3) = aw.defect_estimation()
 
                 rates_of_changes = aw.RoR(TP_index,dryEndIndex)
-                
-                st1 = st1 + " (%.1f "%rates_of_changes[0]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"
-                st2 = st2 + " (%.1f "%rates_of_changes[1]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"
-                st3 = st3 + " (%.1f "%rates_of_changes[2]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"                
+
+                st1 += QApplication.translate("Scope Label", "  (%1 deg/min)",None, QApplication.UnicodeUTF8).arg("%.1f"%rates_of_changes[0])
+                st2 += QApplication.translate("Scope Label", "  (%1 deg/min)",None, QApplication.UnicodeUTF8).arg("%.1f"%rates_of_changes[1])
+                st3 += QApplication.translate("Scope Label", "  (%1 deg/min)",None, QApplication.UnicodeUTF8).arg("%.1f"%rates_of_changes[2])
         
                 #Write flavor estimation
                 self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2-len(st1)*8/2,statisticslower,st1,color=self.palette["text"],fontsize=11)
@@ -3795,8 +3800,8 @@ class ApplicationWindow(QMainWindow):
         self.lcdpaletteF = { "timer":u'white',"met":'white',"bt":'white',"deltamet":'white',"deltabt":'white',"sv":'white'}
 
     	#user defined event buttons
-        self.extraeventstypes,self.extraeventsvalues = [],[]  #hold indexes
-        self.extraeventsactionstrings,self.extraeventsactions = [],[] #hold 
+        self.extraeventslabels,self.extraeventsdescriptions, self.extraeventstypes,self.extraeventsvalues = [],[],[],[]  #hold string,string,index,index
+        self.extraeventsactionstrings,self.extraeventsactions,self.extraeventsvisibility = [],[],[] #hold string,index,index
 
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID.
@@ -4418,7 +4423,7 @@ class ApplicationWindow(QMainWindow):
             self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
             self.buttonlist[i].setStyleSheet(self.pushbuttonstyles["EVENT"]) 
             self.buttonlist[i].setMinimumHeight(50)
-            self.buttonlist[i].setText(unicode(self.qmc.etypes[self.extraeventstypes[i]][0])+unicode(self.qmc.eventsvalues[self.extraeventsvalues[i]]))
+            self.buttonlist[i].setText(self.extraeventslabels[i])
             self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
             self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
 
@@ -4427,6 +4432,7 @@ class ApplicationWindow(QMainWindow):
             self.button_11.setVisible(True)
         else:
             self.button_11.setVisible(False)
+        self.update_extraeventbuttons_visibility()
 
         # set the focus on the main widget
         self.main_widget.setFocus()
@@ -4450,16 +4456,8 @@ class ApplicationWindow(QMainWindow):
         mainlayout.setSpacing(0)
         
         level1layout = QHBoxLayout()   # matplotlib toolbox + HUD button + reset button + LCD Timer
-        level2layout = QHBoxLayout()   # message label   
+
         level3layout = QHBoxLayout()   # PID buttons, graph, temperature LCDs
-        level4layout = QHBoxLayout()   # log buttons
-        level5layout = QHBoxLayout()   # event mini editor   
-        
-        mainlayout.addLayout(level1layout)
-        mainlayout.addLayout(level2layout)
-        mainlayout.addLayout(level3layout)
-        mainlayout.addLayout(level4layout)
-        mainlayout.addLayout(level5layout)
         
         EventsLayout = QHBoxLayout()
         EventsLayout.setMargin(0)
@@ -4516,18 +4514,20 @@ class ApplicationWindow(QMainWindow):
         level1layout.addWidget(self.button_10,2)
         level1layout.addWidget(self.button_18,1)
         level1layout.addWidget(self.button_7,2)
+        level1layout.addSpacing(5)
         level1layout.addWidget(self.lcd1,3)
-        #level 2
-        level2layout.addWidget(self.messagelabel)
+
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
         level3layout.addWidget(self.stack,1)
         level3layout.addLayout(LCDlayout,2)
-        #level 4
-        level4layout.addWidget(self.lowerbuttondialog)
-        #level 5
-        level5layout.addWidget(self.EventsGroupLayout)
-
+        
+        mainlayout.addLayout(level1layout)       
+        mainlayout.addWidget(self.messagelabel)
+        mainlayout.addLayout(level3layout)
+        mainlayout.addWidget(self.lowerbuttondialog)
+        mainlayout.addWidget(self.EventsGroupLayout)
+        
         # set visibility of mini event line
         self.update_minieventline_visibility()
 
@@ -4541,9 +4541,12 @@ class ApplicationWindow(QMainWindow):
             self.qmc.EventRecord()
             self.qmc.specialeventstype[-1] = self.extraeventstypes[ee]    
             self.qmc.specialeventsvalue[-1] = self.extraeventsvalues[ee]
+            self.qmc.specialeventsStrings[-1] = self.extraeventsdescriptions[ee]
+            
             self.setminieditor2lastevent()
             self.qmc.redraw()
-            if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program
+            
+            if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event
                 if self.extraeventsactions[ee] == 1:
                     try:
                         aw.extraeventsactionstrings[ee] = str(aw.extraeventsactionstrings[ee])
@@ -4554,8 +4557,8 @@ class ApplicationWindow(QMainWindow):
                     	extraeventsactionstringscopy = ""
                     	#example a2b_uu("Hello") sends Hello in binary format instead of ASCII
                         if "a2b_uu" in aw.extraeventsactionstrings[ee]:
-                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][(len("a2b_uu")+2):]  # removes function-name + char ( and "
-                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][:2]                 # removes " and )  
+                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][(len("a2b_uu")+1):]  # removes function-name + char ( 
+                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][:1]                 # removes )  
                             extraeventsactionstringscopy = binascii.a2b_uu(aw.extraeventsactionstrings[ee])
                         if extraeventsactionstringscopy:
                             self.ser.SP.write(extraeventsactionstringscopy)                
@@ -4570,6 +4573,13 @@ class ApplicationWindow(QMainWindow):
                         os.startfile(unicode(self.extraeventsactionstrings[ee]))
                     except Exception,e:
                         self.qmc.adderror(QApplication.translate("Error Message","Exception Error: recordextraevent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+                elif aw.extraeventsactions[ee] == 3:
+                    events = aw.extraeventsactionstrings[ee].split(",")
+                    for i in range(len(events)):
+                        buttonnumber = int(events[i])-1
+                        if aw.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
+                            self.recordextraevent(buttonnumber)
+                    
         else:
             self.sendmessage(QApplication.translate("recordextraevent","Timer is OFF", None, QApplication.UnicodeUTF8))
 
@@ -4610,6 +4620,12 @@ class ApplicationWindow(QMainWindow):
         self.messagehist.append(timez + message)
         self.messagelabel.setText(message)
 
+    def update_extraeventbuttons_visibility(self):
+        for i in range(len(self.buttonlist)):
+            if self.extraeventsvisibility[i]:
+                self.buttonlist[i].setVisible(True)
+            else:
+                self.buttonlist[i].setVisible(False)
     
     def update_minieventline_visibility(self):
         if self.minieventsflag:
@@ -5666,8 +5682,6 @@ class ApplicationWindow(QMainWindow):
     	    #restore statistics
             if settings.contains("Statistics"):
                 self.qmc.statisticsflags = map(lambda x:x.toInt()[0],settings.value("Statistics").toList())
-            if settings.contains("StatisticsConds"):
-                self.qmc.statisticsconditions = map(lambda x:x.toInt()[0],settings.value("StatisticsConds").toList())
 
             #restore delay
             self.qmc.delay = settings.value("Delay",int(self.qmc.delay)).toInt()[0]
@@ -5820,11 +5834,18 @@ class ApplicationWindow(QMainWindow):
                 self.extraeventstypes = map(lambda x:x.toInt()[0],settings.value("extraeventstypes").toList())
                 self.extraeventsvalues = map(lambda x:x.toInt()[0],settings.value("extraeventsvalues").toList())
                 self.extraeventsactions = map(lambda x:x.toInt()[0],settings.value("extraeventsactions").toList())
+                self.extraeventsvisibility = map(lambda x:x.toInt()[0],settings.value("extraeventsvisibility").toList())
                 self.extraeventsactionstrings = list(settings.value("extraeventsactionstrings",self.extraeventsactionstrings).toStringList())
+                self.extraeventslabels = list(settings.value("extraeventslabels",self.extraeventslabels).toStringList())
+                self.extraeventsdescriptions= list(settings.value("extraeventsdescriptions",self.extraeventsdescriptions).toStringList())
+                
                 for i in range(len(self.extraeventsactionstrings)):
-                    self.extraeventsactionstrings[i] = unicode(self.extraeventsactionstrings[i])                    
+                    self.extraeventsactionstrings[i] = unicode(self.extraeventsactionstrings[i])
+                    self.extraeventslabels[i] = unicode(self.extraeventslabels[i])
+                    self.extraeventsdescriptions[i] = unicode(self.extraeventsdescriptions[i])
+                    
             settings.endGroup()
-
+            
             #update display
             self.qmc.redraw()
 
@@ -5865,7 +5886,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
-            settings.setValue("StatisticsConds",self.qmc.statisticsconditions)
             #save Events settings
             settings.beginGroup("events")
             settings.setValue("eventsbuttonflag",self.eventsbuttonflag)
@@ -5979,6 +5999,9 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraeventsvalues",self.extraeventsvalues)
             settings.setValue("extraeventsactionstrings",self.extraeventsactionstrings)
             settings.setValue("extraeventsactions",self.extraeventsactions)
+            settings.setValue("extraeventsdescriptions",self.extraeventsdescriptions)
+            settings.setValue("extraeventsvisibility",self.extraeventsvisibility)
+            settings.setValue("extraeventslabels",self.extraeventslabels)
             settings.endGroup()
             
         except Exception,e:
@@ -6393,6 +6416,7 @@ $cupping_notes
         LongTo1CPhase = QApplication.translate("Flavor Scope Label", "Bready",None, QApplication.UnicodeUTF8)
         ShortFinishPhase = QApplication.translate("Flavor Scope Label", "Acidic",None, QApplication.UnicodeUTF8)
         LongFinishPhase = QApplication.translate("Flavor Scope Label", "Flat",None, QApplication.UnicodeUTF8)        
+        st1 = st2 = st3 = QApplication.translate("Flavor Scope Label", "OK",None, QApplication.UnicodeUTF8)
         #CHECK CONDITIONS                
         #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
         #  => ShortDryingPhase
@@ -9022,6 +9046,9 @@ class EventsDlg(QDialog):
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
+        okButton.setMaximumWidth(100)
+        closeButton.setMaximumWidth(100)
+        defaultButton.setMaximumWidth(100)
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
         
@@ -9045,10 +9072,15 @@ class EventsDlg(QDialog):
         delButton.setMaximumWidth(100)
         self.connect(delButton, SIGNAL("clicked()"),self.delextraeventbutton)
 
-        savetableButton = QPushButton(QApplication.translate("Button","Save table",None, QApplication.UnicodeUTF8))
+        savetableButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
         savetableButton.setToolTip(QApplication.translate("ToolTip","Save table",None, QApplication.UnicodeUTF8))
         savetableButton.setMaximumWidth(100)
         self.connect(savetableButton, SIGNAL("clicked()"),self.savetableextraeventbutton)
+
+        helpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
+        helpButton.setToolTip(QApplication.translate("ToolTip","Show help",None, QApplication.UnicodeUTF8))
+        helpButton.setMaximumWidth(100)
+        self.connect(helpButton, SIGNAL("clicked()"),self.showEventbuttonhelp)
                 
         #### tab1 layout
         typeLayout0 = QHBoxLayout()
@@ -9072,10 +9104,9 @@ class EventsDlg(QDialog):
         typelayout.addLayout(typeLayout1,0,1)
         typelayout.addLayout(typeLayout2,1,0)
         typelayout.addLayout(typeLayout3,1,1)
+        typelayout.addWidget(defaultButton,2,0)
 
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(defaultButton)
-        buttonLayout.addStretch()
         buttonLayout.addWidget(closeButton)
         buttonLayout.addWidget(okButton)
 
@@ -9090,8 +9121,6 @@ class EventsDlg(QDialog):
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(FlagsLayout)
         tab1layout.addWidget(TypeGroupLayout)
-        tab1layout.addLayout(buttonLayout)
-
 
         ### tab2 layout
         tab2layout = QVBoxLayout()
@@ -9100,6 +9129,7 @@ class EventsDlg(QDialog):
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(delButton)
         tab2buttonlayout.addWidget(savetableButton)
+        tab2buttonlayout.addWidget(helpButton)        
         tab2layout.addLayout(tab2buttonlayout)  
         
 ###########################################
@@ -9115,7 +9145,10 @@ class EventsDlg(QDialog):
         TabWidget.addTab(C2Widget,QApplication.translate("Tab","Custom Buttons",None, QApplication.UnicodeUTF8))        
         
         mainLayout = QVBoxLayout()
-        mainLayout.addWidget(TabWidget) 
+        mainLayout.addWidget(TabWidget)
+        mainLayout.addLayout(buttonLayout)
+
+        
         mainLayout.setMargin(0)      
 
         self.setLayout(mainLayout)
@@ -9125,18 +9158,26 @@ class EventsDlg(QDialog):
         nbuttons = len(aw.extraeventstypes) 
         if nbuttons:
             self.eventbuttontable.setRowCount(nbuttons)
-            self.eventbuttontable.setColumnCount(4)
-            self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8),
+            self.eventbuttontable.setColumnCount(7)
+            self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Button Label",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Event Description",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Event Type",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Event Value",None, QApplication.UnicodeUTF8),
                                                              QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Action Description",None, QApplication.UnicodeUTF8)])
+                                                             QApplication.translate("Table","Action Description",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Button Visibility",None, QApplication.UnicodeUTF8)])
             self.eventbuttontable.setAlternatingRowColors(True)
             self.eventbuttontable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
             self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
             self.eventbuttontable.setShowGrid(True)
-
+            visibility = [QApplication.translate("visibility","OFF",None, QApplication.UnicodeUTF8),
+                          QApplication.translate("visibility","ON",None, QApplication.UnicodeUTF8)]
             for i in range(nbuttons):
+                #label
+                labeledit = QLineEdit( unicode(aw.extraeventslabels[i]))
+                #description
+                descriptionedit = QLineEdit(unicode(aw.extraeventsdescriptions[i]))
                 #type
                 typeComboBox =  QComboBox()
                 typeComboBox.addItems(aw.qmc.etypes)
@@ -9151,55 +9192,90 @@ class EventsDlg(QDialog):
                 actionComboBox = QComboBox()
                 actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
                                     	 QApplication.translate("ComboBox","Serial command",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Call program",None, QApplication.UnicodeUTF8)])
+                                         QApplication.translate("ComboBox","Call program",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","Multiple Event",None, QApplication.UnicodeUTF8)])
                 actionComboBox.setCurrentIndex(aw.extraeventsactions[i])
                 self.connect(actionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setactioneventbutton(z,i))
-                
                 #action description
-                descriptionedit = QLineEdit(unicode(aw.extraeventsactionstrings[i]))
+                actiondescriptionedit = QLineEdit(unicode(aw.extraeventsactionstrings[i]))
+                #visibility
+                visibilityComboBox =  QComboBox()
+                visibilityComboBox.addItems(visibility)
+                visibilityComboBox.setCurrentIndex(aw.extraeventsvisibility[i])
+                self.connect(visibilityComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setvisibilitytyeventbutton(z,i))                
                 
                 #add widgets to the table
-                self.eventbuttontable.setCellWidget(i,0,typeComboBox)
-                self.eventbuttontable.setCellWidget(i,1,valueComboBox)
-                self.eventbuttontable.setCellWidget(i,2,actionComboBox)
-                self.eventbuttontable.setCellWidget(i,3,descriptionedit)
+                self.eventbuttontable.setCellWidget(i,0,labeledit)                
+                self.eventbuttontable.setCellWidget(i,1,descriptionedit)                
+                self.eventbuttontable.setCellWidget(i,2,typeComboBox)
+                self.eventbuttontable.setCellWidget(i,3,valueComboBox)
+                self.eventbuttontable.setCellWidget(i,4,actionComboBox)
+                self.eventbuttontable.setCellWidget(i,5,actiondescriptionedit)
+                self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
 
     def savetableextraeventbutton(self):
-        for i in range(len(aw.extraeventstypes)):
-            descriptionedit = self.eventbuttontable.cellWidget(i,3)
-            aw.extraeventsactionstrings[i] = unicode(descriptionedit.text())
+        for i in range(len(aw.extraeventstypes)):            
+            labeledit = self.eventbuttontable.cellWidget(i,0)
+            label = unicode(labeledit.text())
+            if "\\n" in label:              #make multiple line text if "\n" found in label string
+                parts = label.split("\\n")
+                label = chr(10).join(parts)
+            aw.extraeventslabels[i] = label
+            aw.buttonlist[i].setText(aw.extraeventslabels[i])
+            
+            descriptionedit = self.eventbuttontable.cellWidget(i,1)
+            aw.extraeventsdescriptions[i] = unicode(descriptionedit.text())
+            
+            actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
+            aw.extraeventsactionstrings[i] = unicode(actiondescriptionedit.text())
+            
             aw.sendmessage(QApplication.translate("Message Area","Custom Event buttons configuration saved", None, QApplication.UnicodeUTF8))        
 
+    def setvisibilitytyeventbutton(self,z,i):
+        actioncombobox = self.eventbuttontable.cellWidget(i,6)
+        aw.extraeventsvisibility[i] = actioncombobox.currentIndex()
+        aw.update_extraeventbuttons_visibility()
+
     def setactioneventbutton(self,z,i):
-        actioncombobox = self.eventbuttontable.cellWidget(i,2)
+        actioncombobox = self.eventbuttontable.cellWidget(i,4)
         aw.extraeventsactions[i] = actioncombobox.currentIndex()
     	
     def setvalueeventbutton(self,z,i):
-        valuecombobox = self.eventbuttontable.cellWidget(i,1)
+        valuecombobox = self.eventbuttontable.cellWidget(i,3)
         aw.extraeventsvalues[i] = valuecombobox.currentIndex()
         aw.buttonlist[i].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[i]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[i]]))        
 
     def settypeeventbutton(self,z,i):
-        typecombobox = self.eventbuttontable.cellWidget(i,0)
+        typecombobox = self.eventbuttontable.cellWidget(i,2)
         aw.extraeventstypes[i] = typecombobox.currentIndex()
         aw.buttonlist[i].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[i]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[i]]))        
 
     def delextraeventbutton(self):
         bindex = len(aw.extraeventstypes)-1
-        if bindex >= 0:        
+        if bindex >= 0:
+            aw.extraeventslabels.pop(bindex)
+            aw.extraeventsdescriptions.pop(bindex)
             aw.extraeventstypes.pop(bindex)
             aw.extraeventsvalues.pop(bindex)
             aw.extraeventsactions.pop(bindex)
             aw.extraeventsactionstrings.pop(bindex)
+            aw.extraeventsvisibility.pop(bindex)
+            
             self.createEventbuttonTable()  #update table
             aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
             aw.buttonlist.pop(bindex)        
+        aw.update_extraeventbuttons_visibility()
 
-    def insertextraeventbutton(self):	
+    def insertextraeventbutton(self):
+        aw.extraeventsdescriptions.append("")
         aw.extraeventstypes.append(0)
         aw.extraeventsvalues.append(1)
         aw.extraeventsactions.append(0)
         aw.extraeventsactionstrings.append(u"")
+        aw.extraeventsvisibility.append(1)
+        initialtext = unicode(aw.qmc.etypes[aw.extraeventstypes[-1]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[-1]])
+        aw.extraeventslabels.append(initialtext)
+
         self.createEventbuttonTable() 
 
         aw.buttonlist.append(QPushButton())
@@ -9208,9 +9284,11 @@ class EventsDlg(QDialog):
         aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ") 
         aw.buttonlist[bindex].setMaximumSize(90, 50)
         aw.buttonlist[bindex].setMinimumHeight(50)
-        aw.buttonlist[bindex].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[-1]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[-1]]))        
+        aw.buttonlist[bindex].setText(initialtext)        
         aw.connect(aw.buttonlist[bindex], SIGNAL("clicked()"), lambda ee=bindex:aw.recordextraevent(ee))        
         aw.lowerbuttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+
+        aw.update_extraeventbuttons_visibility()
 
     def eventsbuttonflagChanged(self):
         if self.eventsbuttonflag.isChecked():
@@ -9257,18 +9335,31 @@ class EventsDlg(QDialog):
             aw.etypeComboBox.addItems(aw.qmc.etypes)
         
             aw.qmc.redraw()
-            aw.sendmessage(QApplication.translate("Message Area","Event types saved", None, QApplication.UnicodeUTF8))        
+            aw.sendmessage(QApplication.translate("Message Area","Event configuration saved", None, QApplication.UnicodeUTF8))
+            self.savetableextraeventbutton()
             self.close()
         else:
             aw.sendmessage(QApplication.translate("Message Area","Found empty event type box", None, QApplication.UnicodeUTF8))    
             
-
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
         self.etype0.setText(aw.qmc.etypesdefault[0])
         self.etype1.setText(aw.qmc.etypesdefault[1])
         self.etype2.setText(aw.qmc.etypesdefault[2])
         self.etype3.setText(aw.qmc.etypesdefault[3])
+
+    def showEventbuttonhelp(self):
+        string  = QApplication.translate("MessageBox", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Event Description</b> Description of the Event to be recorded.",None, QApplication.UnicodeUTF8) + "<br><br>"  
+        string += QApplication.translate("MessageBox", "<b>Event type</b> Type of event to be recorded.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Event value</b> Value of event (1-10) to be recorded",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Action</b> Perform an action at the time of the event",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Action description</b> Depends on the Action type:",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
+        string += QApplication.translate("MessageBox", "Serial command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
+        string += QApplication.translate("MessageBox", "Call program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
+        string += QApplication.translate("MessageBox", "Multiple Event: Event button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Button Visibility</b> Hides/shows button",None, QApplication.UnicodeUTF8) + "<br><br>"
+        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
         
 ##########################################################################
 #####################  PHASES GRAPH EDIT DLG  ############################
