@@ -2556,7 +2556,7 @@ class tgraphcanvas(FigureCanvas):
                 
             aw.soundpop()
 
-    	else:
+        else:
             aw.sendmessage(QApplication.translate("EventRecord","Timer is OFF", None, QApplication.UnicodeUTF8))
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
@@ -4554,7 +4554,7 @@ class ApplicationWindow(QMainWindow):
                         self.ser.SP = serial.Serial(port=self.ser.comport, baudrate=self.ser.baudrate,bytesize=self.ser.bytesize,
                                                   parity=self.ser.parity, stopbits=self.ser.stopbits, timeout=self.ser.timeout)
                         self.ser.SP.flushOutput()
-                    	extraeventsactionstringscopy = ""
+                        extraeventsactionstringscopy = ""
                     	#example a2b_uu("Hello") sends Hello in binary format instead of ASCII
                         if "a2b_uu" in aw.extraeventsactionstrings[ee]:
                             aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][(len("a2b_uu")+1):]  # removes function-name + char ( 
@@ -9792,12 +9792,12 @@ class flavorDlg(QDialog):
         self.accept()
         aw.qmc.redraw()
         aw.lowerbuttondialog.setVisible(True)
-    	aw.update_minieventline_visibility()
+        aw.update_minieventline_visibility()
         
     def close(self):    
         aw.qmc.redraw()
         aw.lowerbuttondialog.setVisible(True)
-    	aw.update_minieventline_visibility()
+        aw.update_minieventline_visibility()
         self.accept()
 
 #################################################################
@@ -13495,7 +13495,7 @@ class WheelDlg(QDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None, QApplication.UnicodeUTF8))
 
         aw.lowerbuttondialog.setVisible(False)
-    	aw.EventsGroupLayout.setVisible(False)
+        aw.EventsGroupLayout.setVisible(False)
     	
         #table for alarms
         self.datatable = QTableWidget()
@@ -14771,14 +14771,14 @@ class PXRpidDlgControl(QDialog):
                   
         #set ramp soak OFF       
         elif flag == 0:
-            self.status.showMessage(u"setting RS OFF...",500)
+            self.status.showMessage(Application.translate("StatusBar","setting RS OFF...",None, QApplication.UnicodeUTF8),500)
             command = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR["rampsoak"][1],flag)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                self.status.showMessage(u"RS successfully turned OFF", 5000)
+                self.status.showMessage(Application.translate("StatusBar","RS successfully turned OFF",None, QApplication.UnicodeUTF8), 5000)
                 aw.pid.PXR["rampsoak"][0] = flag
             else:
-                mssg = u"setONOFFrampsoak(): Ramp Soak could not be set OFF"
+                mssg = Application.translate("StatusBar","setONOFFrampsoak(): Ramp Soak could not be set OFF",None, QApplication.UnicodeUTF8)
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)
 
@@ -14787,7 +14787,7 @@ class PXRpidDlgControl(QDialog):
         svcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR[svkey][1],1)
         sv = aw.pid.readoneword(svcommand)
         if sv == -1:
-            mssg = u"getsegment(): problem reading sv "
+            mssg = Application.translate("StatusBar","getsegment(): problem reading sv ",None, QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
@@ -14797,7 +14797,7 @@ class PXRpidDlgControl(QDialog):
         rampcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR[rampkey][1],1)
         ramp = aw.pid.readoneword(rampcommand)
         if ramp == -1:
-            mssg = u"getsegment(): problem reading ramp "
+            mssg = Application.translate("StatusBar","getsegment(): problem reading ramp ",None, QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
@@ -14807,7 +14807,7 @@ class PXRpidDlgControl(QDialog):
         soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR[soakkey][1],1)
         soak = aw.pid.readoneword(soakcommand)
         if soak == -1:
-            mssg = u"getsegment(): problem reading soak "
+            mssg = Application.translate("StatusBar","getsegment(): problem reading soak ",None, QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
@@ -14822,13 +14822,13 @@ class PXRpidDlgControl(QDialog):
             self.status.showMessage(msg,500)
             k = self.getsegment(i+1)
             if k == -1:
-                mssg = u"getallsegments(): problem reading R/S "
+                mssg = Application.translate("StatusBar","getallsegments(): problem reading R/S ",None, QApplication.UnicodeUTF8)
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)
                 return
             self.paintlabels()
             
-        self.status.showMessage(u"Finished reading Ramp/Soak val.",5000)
+        self.status.showMessage(Application.translate("StatusBar","Finished reading Ramp/Soak val.",None, QApplication.UnicodeUTF8),5000)
         
     def getpid(self):        
         pcommand= aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXR["p"][1],1)
@@ -14856,7 +14856,7 @@ class PXRpidDlgControl(QDialog):
             self.dedit.setText(unicode(d))
             aw.pid.PXR["d"][0] = d
             
-        self.status.showMessage(u"Finished reading pid values",5000)
+        self.status.showMessage(Application.translate("StatusBar","Finished reading pid values",None, QApplication.UnicodeUTF8),5000)
         
 
     def setpid(self,var):
@@ -14884,7 +14884,7 @@ class PXRpidDlgControl(QDialog):
                 return -1
                 
         if len(r) == 8:
-            message = var + u" successfully send to pid "
+            message = Application.translate("StatusBar","%1 successfully send to pid ",None, QApplication.UnicodeUTF8).arg(var)
             self.status.showMessage(message,5000)
             if var == u"p":
                 aw.pid.PXR["p"][0] = p
@@ -14894,14 +14894,16 @@ class PXRpidDlgControl(QDialog):
                 aw.pid.PXR["i"][0] = d
             
         else:
-            mssg = u"setpid(): There was a problem setting " + var 
+            mssg = Application.translate("StatusBar","setpid(): There was a problem setting %1",None, QApplication.UnicodeUTF8).arg(var) 
             self.status.showMessage(mssg,5000)        
             aw.qmc.adderror(mssg)
 
     def createsegmenttable(self):
         self.segmenttable.setRowCount(8)
         self.segmenttable.setColumnCount(4)
-        self.segmenttable.setHorizontalHeaderLabels(["SV","Ramp (mins)","Soak (mins)",""])
+        self.segmenttable.setHorizontalHeaderLabels([Application.translate("Table","SV",None, QApplication.UnicodeUTF8),
+                                                     Application.translate("Table","Ramp (mins)",None, QApplication.UnicodeUTF8),
+                                                     Application.translate("Table","Soak (mins)",None, QApplication.UnicodeUTF8),""])
         self.segmenttable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
@@ -14920,7 +14922,7 @@ class PXRpidDlgControl(QDialog):
             rampedit.setValidator(QIntValidator(0,20,rampedit))
             soakedit  = QLineEdit(unicode(aw.pid.PXR[soakkey][0]))
             soakedit.setValidator(QIntValidator(0,20,soakedit))
-            setButton = QPushButton("Set")
+            setButton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
             self.connect(setButton,SIGNAL("clicked()"),lambda idn =i+1, sv=float(svedit.text()),ramp=int(rampedit.text()),
                          soak=int(soakedit.text()):self.setsegment(idn,sv,ramp,soak))
             #add widgets to the table
@@ -14953,7 +14955,7 @@ class PXRpidDlgControl(QDialog):
             self.paintlabels()
         
         else:
-            aw.qmc.adderror(u"Segment values could not be writen into PID")
+            aw.qmc.adderror(QApplication.translate("ErrorMessage","Segment values could not be writen into PID",None, QApplication.UnicodeUTF8))
 
 
 # UNDER WORK 
@@ -15064,11 +15066,11 @@ class PXG4pidDlgControl(QDialog):
         super(PXG4pidDlgControl,self).__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         
-        self.setWindowTitle("Fuji PXG PID Control")
+        self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXG PID Control",None, QApplication.UnicodeUTF8))
 
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
-        self.status.showMessage("Ready",5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
 
         #*************    TAB 1 WIDGETS
         labelrs1 = QLabel()
@@ -15125,15 +15127,15 @@ class PXG4pidDlgControl(QDialog):
         
         self.paintlabels()
 
-        patternlabel = QLabel(QApplication.translate("Label", "Pattern",None, QApplication.UnicodeUTF8))
+        patternlabel = QLabel(QApplication.translate("Label","Pattern",None, QApplication.UnicodeUTF8))
         patternlabel.setAlignment(Qt.AlignRight)
-        button_getall = QPushButton("Read RS values")
-        button_rson =  QPushButton("RampSoak ON")        
-        button_rsoff =  QPushButton("RampSoak OFF")
-        button_exit = QPushButton("Close")
-        button_exit2 = QPushButton("Close")
-        button_standbyON = QPushButton("PID OFF")
-        button_standbyOFF = QPushButton("PID ON")
+        button_getall = QPushButton(QApplication.translate("Button","Read RS values",None, QApplication.UnicodeUTF8))
+        button_rson =  QPushButton(QApplication.translate("Button","RampSoak ON",None, QApplication.UnicodeUTF8))        
+        button_rsoff =  QPushButton(QApplication.translate("Button","RampSoak OFF",None, QApplication.UnicodeUTF8))
+        button_exit = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
+        button_exit2 = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
+        button_standbyON = QPushButton(QApplication.translate("Button","PID OFF",None, QApplication.UnicodeUTF8))
+        button_standbyOFF = QPushButton(QApplication.translate("Button","PID ON",None, QApplication.UnicodeUTF8))
         
         self.connect(button_getall, SIGNAL("clicked()"), self.getallsegments)
         self.connect(button_rson, SIGNAL("clicked()"), lambda flag=1: self.setONOFFrampsoak(flag))
@@ -15188,13 +15190,13 @@ class PXG4pidDlgControl(QDialog):
         labelsvedit.setMaximumSize(100, 42)
         labelsvedit.setMinimumHeight(50)
         
-        button_sv1 =QPushButton("Write SV1")
-        button_sv2 =QPushButton("Write SV2")
-        button_sv3 =QPushButton("Write SV3")
-        button_sv4 =QPushButton("Write SV4")
-        button_sv5 =QPushButton("Write SV5")
-        button_sv6 =QPushButton("Write SV6")
-        button_sv7 =QPushButton("Write SV7")
+        button_sv1 =QPushButton(QApplication.translate("Button","Write SV1",None, QApplication.UnicodeUTF8))
+        button_sv2 =QPushButton(QApplication.translate("Button","Write SV2",None, QApplication.UnicodeUTF8))
+        button_sv3 =QPushButton(QApplication.translate("Button","Write SV3",None, QApplication.UnicodeUTF8))
+        button_sv4 =QPushButton(QApplication.translate("Button","Write SV4",None, QApplication.UnicodeUTF8))
+        button_sv5 =QPushButton(QApplication.translate("Button","Write SV5",None, QApplication.UnicodeUTF8))
+        button_sv6 =QPushButton(QApplication.translate("Button","Write SV6",None, QApplication.UnicodeUTF8))
+        button_sv7 =QPushButton(QApplication.translate("Button","Write SV7",None, QApplication.UnicodeUTF8))
 
         self.connect(self.patternComboBox,SIGNAL("currentIndexChanged(int)"),self.paintlabels)
         self.connect(button_sv1, SIGNAL("clicked()"), lambda v=1: self.setsv(v))
@@ -15255,13 +15257,13 @@ class PXG4pidDlgControl(QDialog):
         elif N == 7:
             self.radiosv7.setChecked(True)
 
-        tab2svbutton = QPushButton("Write SV")
-        tab2cancelbutton = QPushButton("Cancel")
-        tab2easyONsvbutton = QPushButton("ON SV buttons")
+        tab2svbutton = QPushButton(QApplication.translate("Button","Write SV",None, QApplication.UnicodeUTF8))
+        tab2cancelbutton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
+        tab2easyONsvbutton = QPushButton(QApplication.translate("Button","ON SV buttons",None, QApplication.UnicodeUTF8))
         tab2easyONsvbutton.setStyleSheet("QPushButton { background-color: 'lightblue'}")
-        tab2easyOFFsvbutton = QPushButton("OFF SV buttons")
+        tab2easyOFFsvbutton = QPushButton(QApplication.translate("Button","OFF SV buttons",None, QApplication.UnicodeUTF8))
         tab2easyOFFsvbutton.setStyleSheet("QPushButton { background-color:'#ffaaff' }")
-        tab2getsvbutton = QPushButton("Read SV (7-0)")
+        tab2getsvbutton = QPushButton(QApplication.translate("Button","Read SV (7-0)",None, QApplication.UnicodeUTF8))
         
         self.connect(tab2svbutton, SIGNAL("clicked()"),self.setsv)
         self.connect(tab2getsvbutton, SIGNAL("clicked()"),self.getallsv)
@@ -15373,17 +15375,17 @@ class PXG4pidDlgControl(QDialog):
         self.d6edit.setValidator(QDoubleValidator(0., 999., 1, self.d6edit))
         self.d7edit.setValidator(QDoubleValidator(0., 999., 1, self.d7edit))
         
-        pid1button = QPushButton("pid 1")
-        pid2button = QPushButton("pid 2")
-        pid3button = QPushButton("pid 3")
-        pid4button = QPushButton("pid 4")
-        pid5button = QPushButton("pid 5")
-        pid6button = QPushButton("pid 6")
-        pid7button = QPushButton("pid 7")
-        pidreadallbutton = QPushButton("Read All")
-        autotuneONbutton = QPushButton("Auto Tune ON")
-        autotuneOFFbutton = QPushButton("Auto Tune OFF")
-        cancel3button = QPushButton("Cancel")
+        pid1button = QPushButton(QApplication.translate("Button","pid 1",None, QApplication.UnicodeUTF8))
+        pid2button = QPushButton(QApplication.translate("Button","pid 2",None, QApplication.UnicodeUTF8))
+        pid3button = QPushButton(QApplication.translate("Button","pid 3",None, QApplication.UnicodeUTF8))
+        pid4button = QPushButton(QApplication.translate("Button","pid 4",None, QApplication.UnicodeUTF8))
+        pid5button = QPushButton(QApplication.translate("Button","pid 5",None, QApplication.UnicodeUTF8))
+        pid6button = QPushButton(QApplication.translate("Button","pid 6",None, QApplication.UnicodeUTF8))
+        pid7button = QPushButton(QApplication.translate("Button","pid 7",None, QApplication.UnicodeUTF8))
+        pidreadallbutton = QPushButton(QApplication.translate("Button","Read All",None, QApplication.UnicodeUTF8))
+        autotuneONbutton = QPushButton(QApplication.translate("Button","Auto Tune ON",None, QApplication.UnicodeUTF8))
+        autotuneOFFbutton = QPushButton(QApplication.translate("Button","Auto Tune OFF",None, QApplication.UnicodeUTF8))
+        cancel3button = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         
         self.radiopid1 = QRadioButton()
         self.radiopid2 = QRadioButton()
@@ -15528,19 +15530,19 @@ class PXG4pidDlgControl(QDialog):
         
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,"RS")
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","RS",None, QApplication.UnicodeUTF8))
         
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,"SV")
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","SV",None, QApplication.UnicodeUTF8))
 
         C3Widget = QWidget()
         C3Widget.setLayout(tab3MasterLayout)
-        TabWidget.addTab(C3Widget,"PID")
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","PID",None, QApplication.UnicodeUTF8))
 
         C4Widget = QWidget()
         C4Widget.setLayout(tab4layout)
-        TabWidget.addTab(C4Widget,"Set RS")
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Set RS",None, QApplication.UnicodeUTF8))
         
         #incorporate layouts
         layout = QVBoxLayout()
