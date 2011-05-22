@@ -15552,22 +15552,22 @@ class PXG4pidDlgControl(QDialog):
 
     def paintlabels(self):
         #read values of computer variables (not the actual pid values) to place in buttons
-        str1 = u"1 [T " + unicode(aw.pid.PXG4["segment1sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment1ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment1soak"][0])+u"]"
-        str2 = u"2 [T " + unicode(aw.pid.PXG4["segment2sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment2ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment2soak"][0])+u"]"
-        str3 = u"3 [T " + unicode(aw.pid.PXG4["segment3sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment3ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment3soak"][0])+u"]"
-        str4 = u"4 [T " + unicode(aw.pid.PXG4["segment4sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment4ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment4soak"][0])+u"]"
-        str5 = u"5 [T " + unicode(aw.pid.PXG4["segment5sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment5ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment5soak"][0])+u"]"
-        str6 = u"6 [T " + unicode(aw.pid.PXG4["segment6sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment6ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment6soak"][0])+u"]"
-        str7 = u"7 [T " + unicode(aw.pid.PXG4["segment7sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment7ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment7soak"][0])+u"]"
-        str8 = u"8 [T " + unicode(aw.pid.PXG4["segment8sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment8ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment8soak"][0])+u"]"
-        str9 = u"9 [T " + unicode(aw.pid.PXG4["segment9sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment9ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment9soak"][0])+u"]"
-        str10 = u"10 [T " + unicode(aw.pid.PXG4["segment10sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment10ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment10soak"][0])+u"]"
-        str11 = u"11 [T "+ unicode(aw.pid.PXG4["segment11sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment11ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment11soak"][0])+u"]"
-        str12 = u"12 [T "+ unicode(aw.pid.PXG4["segment12sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment12ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment12soak"][0])+u"]"
-        str13 = u"13 [T "+ unicode(aw.pid.PXG4["segment13sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment13ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment13soak"][0])+u"]"
-        str14 = u"14 [T "+ unicode(aw.pid.PXG4["segment14sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment14ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment14soak"][0])+u"]"
-        str15 = u"15 [T "+ unicode(aw.pid.PXG4["segment15sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment15ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment15soak"][0])+u"]"
-        str16 = u"16 [T "+ unicode(aw.pid.PXG4["segment16sv"][0]) + u"] [R " + unicode(aw.pid.PXG4["segment16ramp"][0]) + u"] [S " + unicode(aw.pid.PXG4["segment16soak"][0])+u"]"
+        str1 = QApplication.translate("Label","1 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment1sv"][0])).arg(unicode(aw.pid.PXG4["segment1ramp"][0])).arg(unicode(aw.pid.PXG4["segment1soak"][0]))
+        str2 = QApplication.translate("Label","2 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment2sv"][0])).arg(unicode(aw.pid.PXG4["segment2ramp"][0])).arg(unicode(aw.pid.PXG4["segment2soak"][0]))
+        str3 = QApplication.translate("Label","3 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment3sv"][0])).arg(unicode(aw.pid.PXG4["segment3ramp"][0])).arg(unicode(aw.pid.PXG4["segment3soak"][0]))
+        str4 = QApplication.translate("Label","4 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment4sv"][0])).arg(unicode(aw.pid.PXG4["segment4ramp"][0])).arg(unicode(aw.pid.PXG4["segment4soak"][0]))
+        str5 = QApplication.translate("Label","5 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment5sv"][0])).arg(unicode(aw.pid.PXG4["segment5ramp"][0])).arg(unicode(aw.pid.PXG4["segment5soak"][0]))
+        str6 = QApplication.translate("Label","6 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment6sv"][0])).arg(unicode(aw.pid.PXG4["segment6ramp"][0])).arg(unicode(aw.pid.PXG4["segment6soak"][0]))
+        str7 = QApplication.translate("Label","7 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment7sv"][0])).arg(unicode(aw.pid.PXG4["segment7ramp"][0])).arg(unicode(aw.pid.PXG4["segment7soak"][0]))
+        str8 = QApplication.translate("Label","8 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment8sv"][0])).arg(unicode(aw.pid.PXG4["segment8ramp"][0])).arg(unicode(aw.pid.PXG4["segment8soak"][0]))
+        str9 = QApplication.translate("Label","9 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment9sv"][0])).arg(unicode(aw.pid.PXG4["segment9ramp"][0])).arg(unicode(aw.pid.PXG4["segment9soak"][0]))
+        str10 = QApplication.translate("Label","10 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment10sv"][0])).arg(unicode(aw.pid.PXG4["segment10ramp"][0])).arg(unicode(aw.pid.PXG4["segment10soak"][0]))
+        str11 = QApplication.translate("Label","11 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment11sv"][0])).arg(unicode(aw.pid.PXG4["segment11ramp"][0])).arg(unicode(aw.pid.PXG4["segment11soak"][0]))
+        str12 = QApplication.translate("Label","12 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment12sv"][0])).arg(unicode(aw.pid.PXG4["segment12ramp"][0])).arg(unicode(aw.pid.PXG4["segment12soak"][0]))
+        str13 = QApplication.translate("Label","13 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment13sv"][0])).arg(unicode(aw.pid.PXG4["segment13ramp"][0])).arg(unicode(aw.pid.PXG4["segment13soak"][0]))
+        str14 = QApplication.translate("Label","14 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment14sv"][0])).arg(unicode(aw.pid.PXG4["segment14ramp"][0])).arg(unicode(aw.pid.PXG4["segment14soak"][0]))
+        str15 = QApplication.translate("Label","15 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment15sv"][0])).arg(unicode(aw.pid.PXG4["segment15ramp"][0])).arg(unicode(aw.pid.PXG4["segment15soak"][0]))
+        str16 = QApplication.translate("Label","16 [T %1] [R %2] [S %3]",None,QApplication.UnicodeUTF8).arg(unicode(aw.pid.PXG4["segment16sv"][0])).arg(unicode(aw.pid.PXG4["segment16ramp"][0])).arg(unicode(aw.pid.PXG4["segment16soak"][0]))
 
         self.label_rs1.setText(QString(str1))
         self.label_rs2.setText(QString(str2))
@@ -15671,8 +15671,8 @@ class PXG4pidDlgControl(QDialog):
         # if current svN is different than requested svN
         if N != -1:
             if N != svn:
-                string = u"Current sv = " + unicode(N) + u" .Change now to sv =" + unicode(svn) + u"?"
-                reply = QMessageBox.question(self,u"Change svN",string,
+                string = QApplication.translate("MessageBox","Current sv = %1. Change now to sv = %2?",None,QApplication.UnicodeUTF8).arg(unicode(N)).arg(unicode(svn))
+                reply = QMessageBox.question(self,QApplication.translate("MessageBox Caption","Change svN",None,QApplication.UnicodeUTF8),string,
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     #change variable svN
@@ -15683,13 +15683,13 @@ class PXG4pidDlgControl(QDialog):
                     if r == command:
                         aw.pid.PXG4["selectsv"][0] = svn
                         key = u"sv" + unicode(svn)
-                        message = u"SV" + unicode(svn) + u" set to " + unicode(aw.pid.PXG4[key][0])
+                        message = QApplication.translate("StatusBar","SV%1 set to %2",None,QApplication.UnicodeUTF8).arg(unicode(svn)).arg(unicode(aw.pid.PXG4[key][0]))
                         aw.lcd6.display(unicode(aw.pid.PXG4[key][0]))
                         self.status.showMessage(message, 5000)
                     else:
-                        self.status.showMessage(u"Problem setting SV",5000)
+                        self.status.showMessage(QApplication.translate("StatusBar","Problem setting SV",None,QApplication.UnicodeUTF8),5000)
                 elif reply == QMessageBox.Cancel:
-                    self.status.showMessage(u"Cancelled svN change",5000)
+                    self.status.showMessage(QApplication.translate("StatusBar","Cancelled svN change",None,QApplication.UnicodeUTF8),5000)
                     #set radio button
                     if N == 1:
                         self.radiosv1.setChecked(True)
@@ -15707,10 +15707,10 @@ class PXG4pidDlgControl(QDialog):
                         self.radiosv7.setChecked(True)
                     return 
             else:
-                mssg = u"PID already using sv" + unicode(N)
+                mssg = QApplication.translate("StatusBar","PID already using sv%1",None,QApplication.UnicodeUTF8).arg(unicode(N))
                 self.status.showMessage(mssg,1000)
         else:
-            mssg = u"setNsv(): bad response"
+            mssg = QApplication.translate("StatusBar","setNsv(): bad response",None,QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,1000)
             aw.qmc.adderror(mssg)
 
@@ -15724,8 +15724,8 @@ class PXG4pidDlgControl(QDialog):
             aw.pid.PXG4["selectedpid"][0] = N
             # if current svN is different than requested svN
             if N != pidn:
-                string = u"Current pid = " + unicode(N) + u" .Change now to pid =" + unicode(pidn) + u"?"
-                reply = QMessageBox.question(self,"Change svN",string,
+                string = QApplication.translate("MessageBox","Current pid = %1. Change now to pid =%2?",None,QApplication.UnicodeUTF8).arg(unicode(N)).arg(unicode(pidn))
+                reply = QMessageBox.question(self,QApplication.translate("MessageBox Caption","Change svN",None,QApplication.UnicodeUTF8),string,
                                     QMessageBox.Yes|QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     #change variable svN
@@ -15736,15 +15736,15 @@ class PXG4pidDlgControl(QDialog):
                     if r == command:
                         aw.pid.PXG4["selectedpid"][0] = pidn
                         key = u"sv" + unicode(pidn)
-                        message = u"pid" + unicode(pidn) + u" changed to " + unicode(aw.pid.PXG4[key][0])
+                        message = QApplication.translate("StatusBar","pid%1 changed to %2",None,QApplication.UnicodeUTF8).arg(unicode(pidn)).arg(unicode(aw.pid.PXG4[key][0]))
                         self.status.showMessage(message, 5000)
                     else:
-                        mssg = u"setNpid(): bad confirmation" 
+                        mssg = QApplication.translate("StatusBar","setNpid(): bad confirmation",None,QApplication.UnicodeUTF8)
                         self.status.showMessage(mssg,1000)
                         aw.qmc.adderror(mssg)
                         
                 elif reply == QMessageBox.Cancel:
-                    self.status.showMessage(u"Cancelled pid change",5000)
+                    self.status.showMessage(QApplication.translate("StatusBar","Cancelled pid change",None,QApplication.UnicodeUTF8),5000)
                     #put back radio button
                     if N == 1:
                         self.radiosv1.setChecked(True)
@@ -15762,10 +15762,10 @@ class PXG4pidDlgControl(QDialog):
                         self.radiosv7.setChecked(True)
                     return
             else:
-                mssg = u"PID was already using pid " + unicode(N) 
+                mssg = QApplication.translate("StatusBar","PID was already using pid %1",None,QApplication.UnicodeUTF8).arg(unicode(N))
                 self.status.showMessage(mssg,1000)
         else:
-            mssg = u"setNpid(): Unable to set pid " + unicode(N) + u" "
+            mssg = QApplication.translate("StatusBar","setNpid(): Unable to set pid %1 ",None,QApplication.UnicodeUTF8).arg(unicode(N))
             self.status.showMessage(mssg,1000)
             aw.qmc.adderror(mssg)
 
@@ -15803,43 +15803,43 @@ class PXG4pidDlgControl(QDialog):
         if len(r) == 8:
             if i == 1:               
                  aw.pid.PXG4[svkey][0] = float(self.sv1edit.text())
-                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv1edit.text())
+                 message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(unicode(i)).arg(unicode(self.sv1edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNsv(1)
                  aw.lcd6.display(unicode(self.sv1edit.text()))
             elif i == 2:
                  aw.pid.PXG4[svkey][0] = float(self.sv2edit.text())
-                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv2edit.text())
+                 message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(unicode(i)).arg(unicode(self.sv2edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNsv(2)
                  aw.lcd6.display(unicode(self.sv2edit.text()))
             elif i == 3:
                  aw.pid.PXG4[svkey][0] = float(self.sv3edit.text())
-                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv3edit.text())
+                 message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(unicode(i)).arg(unicode(self.sv3edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNsv(3)
                  aw.lcd6.display(unicode(self.sv3edit.text()))
             elif i == 4:
                  aw.pid.PXG4[svkey][0] = float(self.sv4edit.text())
-                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv4edit.text())
+                 message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(unicode(i)).arg(unicode(self.sv4edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNsv(4)
                  aw.lcd6.display(unicode(self.sv4edit.text()))
             elif i == 5:
                  aw.pid.PXG4[svkey][0] = float(self.sv5edit.text())
-                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv5edit.text())
+                 message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(unicode(i)).arg(unicode(self.sv5edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNsv(5)
                  aw.lcd6.display(unicode(self.sv5edit.text()))
             elif i == 6:
                  aw.pid.PXG4[svkey][0] = float(self.sv6edit.text())
-                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv6edit.text())
+                 message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(unicode(i)).arg(unicode(self.sv6edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNsv(6)
                  aw.lcd6.display(unicode(self.sv6edit.text()))
             elif i == 7:
                  aw.pid.PXG4[svkey][0] = float(self.sv7edit.text())
-                 message = u"SV" + unicode(i)+ u" successfully set to " + unicode(self.sv7edit.text())
+                 message = QApplication.translate("StatusBar","SV%1 successfully set to %2",None,QApplication.UnicodeUTF8).arg(unicode(i)).arg(unicode(self.sv7edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNsv(7)
                  aw.lcd6.display(unicode(self.sv7edit.text()))
@@ -15849,7 +15849,7 @@ class PXG4pidDlgControl(QDialog):
             aw.qmc.DeviceEventRecord(strcommand)
 
         else:
-            mssg = u"setsv(): Unable to set SV "
+            mssg = QApplication.translate("StatusBar","setsv(): Unable to set SV ",None,QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
@@ -15912,63 +15912,64 @@ class PXG4pidDlgControl(QDialog):
                  aw.pid.PXG4[pkey][0] = float(self.p1edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i1edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d1edit.text())
-                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p1edit.text()) + u"," +
-                            unicode(self.i1edit.text()) + u"," + unicode(self.d1edit.text())+ u")")              
+                 message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
+                                                   QApplication.UnicodeUTF8)).arg(unicode(k)).arg(unicode(self.p1edit.text())).arg(unicode(self.i1edit.text())).arg(unicode(self.d1edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNpid(1)
             elif k == 2:
                  aw.pid.PXG4[pkey][0] = float(self.p2edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i2edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d2edit.text())
-                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p2edit.text())+ u"," +
-                            unicode(self.i2edit.text()) + u"," + unicode(self.d2edit.text())+ u")")
+                 message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
+                                                   QApplication.UnicodeUTF8)).arg(unicode(k)).arg(unicode(self.p2edit.text())).arg(unicode(self.i2edit.text())).arg(unicode(self.d2edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNpid(2)
             elif k == 3:
                  aw.pid.PXG4[pkey][0] = float(self.p3edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i3edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d3edit.text())
-                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p3edit.text()) + u"," +
-                            unicode(self.i3edit.text()) + u"," + unicode(self.d3edit.text()) + u")")
+                 message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
+                                                   QApplication.UnicodeUTF8)).arg(unicode(k)).arg(unicode(self.p3edit.text())).arg(unicode(self.i3edit.text())).arg(unicode(self.d3edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNpid(3)
             elif k == 4:
                  aw.pid.PXG4[pkey][0] = float(self.p4edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i4edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d4edit.text())
-                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p4edit.text()) + u"," +
-                            unicode(self.i4edit.text()) + u"," + unicode(self.d4edit.text()) + u")")
+                 message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
+                                                   QApplication.UnicodeUTF8)).arg(unicode(k)).arg(unicode(self.p4edit.text())).arg(unicode(self.i4edit.text())).arg(unicode(self.d4edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNpid(4)
             elif k == 5:
                  aw.pid.PXG4[pkey][0] = float(self.p5edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i5edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d5edit.text())
-                 message = (u"pid #" + unicode(k)+ u" successfully set to (" + unicode(self.p5edit.text()) + u"," +
-                             unicode(self.i5edit.text()) + u"," + unicode(self.d5edit.text()) + u")")
+                 message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
+                                                   QApplication.UnicodeUTF8)).arg(unicode(k)).arg(unicode(self.p5edit.text())).arg(unicode(self.i5edit.text())).arg(unicode(self.d5edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNpid(5)
             elif k == 6:
                  aw.pid.PXG4[pkey][0] = float(self.p6edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i6edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d6edit.text())
-                 message = (u"pid" + unicode(k) + u" successfully set to (" + unicode(self.p6edit.text()) + u"," +
-                            unicode(self.i6edit.text()) + u"," + unicode(self.d6edit.text()) + u")")
+                 message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
+                                                   QApplication.UnicodeUTF8)).arg(unicode(k)).arg(unicode(self.p6edit.text())).arg(unicode(self.i6edit.text())).arg(unicode(self.d6edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNpid(6)
             elif k == 7:
                  aw.pid.PXG4[pkey][0] = float(self.p7edit.text())
                  aw.pid.PXG4[ikey][0] = float(self.i7edit.text())
                  aw.pid.PXG4[dkey][0] = float(self.d7edit.text())
-                 message = (u"pid" + unicode(k)+ u" successfully set to (" + unicode(self.p7edit.text()) + u"," +
-                            unicode(self.i7edit.text()) + u"," + unicode(self.d7edit.text()) + u")")
+                 message = (QApplication.translate("StatusBar","pid #%1 successfully set to (%2,%3,%4)",None,
+                                                   QApplication.UnicodeUTF8)).arg(unicode(k)).arg(unicode(self.p7edit.text())).arg(unicode(self.i7edit.text())).arg(unicode(self.d7edit.text()))
                  self.status.showMessage(message,5000)
                  self.setNpid(7) 
         else:
             lp = len(p)
             li = len(i)
             ld = len(d)
-            mssg = u"pid command failed. Bad data at pid" + unicode(k) + u" (8,8,8): (" + unicode(lp)+ u"," + unicode(li)+u"," + unicode(ld) + u") "
+            mssg = QApplication.translate("StatusBar","pid command failed. Bad data at pid%1 (8,8,8): (%2,%3,%4) ",None,
+                                                   QApplication.UnicodeUTF8).arg(unicode(k)).arg(unicode(lp)).arg(unicode(li)).arg(unicode(ld))
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
@@ -15979,7 +15980,8 @@ class PXG4pidDlgControl(QDialog):
             ikey = u"i" + unicode(k)
             dkey = u"d" + unicode(k)
 
-            msg = u"sending commands for p" + unicode(k) + u" i" + unicode(k) + u" d" + unicode(k) 
+            msg = QApplication.translate("StatusBar","sending commands for p%1 i%2 d%3",None,
+                                                   QApplication.UnicodeUTF8).arg(unicode(k)).arg(unicode(k)).arg(unicode(k))
             self.status.showMessage(msg,1000)
             commandp = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[pkey][1],1)
             p = aw.pid.readoneword(commandp)/10.
