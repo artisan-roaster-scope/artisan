@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.4.2"
+__version__ = u"0.5.0"
 
 
 # ABOUT
@@ -412,7 +412,14 @@ class tgraphcanvas(FigureCanvas):
         self.endofx = 60
         self.startofx = 0
         self.keeptimeflag = 1
-        
+        self.xgrid = 120   #initial time separation; 120 = 2 minutes        
+        self.ygrid = 50    #initial temperature separation
+        self.gridstyles =    ["-","--","-.",":"," "]  #solid,dashed,dash-dot,dotted,None
+        self.gridlinestyle = 3
+    	self.gridthickness = 2
+    	self.gridalpha = 1.
+    	self.xrotation = 0
+    	
         #height of statistics bar
         self.statisticsheight = 650
         self.statisticsupper = 655
@@ -433,7 +440,7 @@ class tgraphcanvas(FigureCanvas):
         self.ax.set_autoscale_on(False)
 
         #set grid + axle labels + title
-        self.ax.grid(True,linewidth=2,color=self.palette["grid"])
+        self.ax.grid(True,color=self.palette["grid"],linestyle = self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
             
         self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"])
         self.ax.set_xlabel(u'Time',size=16,color = self.palette["xlabel"])
@@ -1060,7 +1067,6 @@ class tgraphcanvas(FigureCanvas):
         #temporary fix to display the output
         aw.sendmessage(val + symbols)
 
-        print val
         if "L" in val:  #L = Out of Range
             return tx, 0., 0.
 ##        else:
@@ -1138,10 +1144,12 @@ class tgraphcanvas(FigureCanvas):
         else:
             starttime = 0
         formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - round(starttime), 60))
-        locator = ticker.IndexLocator(120, round(starttime))
+        locator = ticker.IndexLocator(self.xgrid, round(starttime))
         self.ax.xaxis.set_major_formatter(formatter)
         self.ax.xaxis.set_major_locator(locator)
-       
+        for label in self.ax.xaxis.get_ticklabels():
+            label.set_rotation(self.xrotation)
+
     def reset_and_redraw(self):
         self.reset()
         self.redraw()
@@ -1173,7 +1181,6 @@ class tgraphcanvas(FigureCanvas):
         self.flagclock = False
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
-        self.sensitivity = 100.0 # was 20.0
         self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
         self.timeindex = [-1,0,0,0,0,0,0]
         self.specialevents=[]
@@ -1263,7 +1270,7 @@ class tgraphcanvas(FigureCanvas):
         
     #Redraws data   
     def redraw(self):
-        
+
         self.fig.clf()   #wipe out figure
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         #Set axes same as in __init__
@@ -1272,12 +1279,13 @@ class tgraphcanvas(FigureCanvas):
         self.ax.set_xlim(self.startofx, self.endofx)
         self.ax.set_ylim(self.ylimit_min, self.ylimit)
         self.ax.set_autoscale_on(False)
-        self.ax.grid(True,linewidth=2,color=self.palette["grid"])
+        self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
         self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"])
         self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"])
         for tick in self.ax.yaxis.get_major_ticks():
             tick.label2On = True
+        self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
             
         #draw water marks for dry phase region, mid phase region, and finish phase region
         trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
@@ -5843,9 +5851,17 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventsactionstrings[i] = unicode(self.extraeventsactionstrings[i])
                     self.extraeventslabels[i] = unicode(self.extraeventslabels[i])
                     self.extraeventsdescriptions[i] = unicode(self.extraeventsdescriptions[i])
-                    
             settings.endGroup()
-            
+            settings.beginGroup("grid")             
+            if settings.contains("xgrid"):
+    	        self.qmc.xgrid = settings.value("xgrid",self.qmc.xgrid).toInt()[0]
+    	        self.qmc.ygrid = settings.value("ygrid",self.qmc.ygrid).toInt()[0]
+    	        self.qmc.gridthickness = settings.value("gridthickness",self.qmc.gridthickness).toInt()[0]
+    	        self.qmc.xrotation = settings.value("xrotation",self.qmc.xrotation).toInt()[0]
+    	        self.qmc.gridlinestyle = settings.value("gridlinestyle",self.qmc.gridlinestyle).toInt()[0]
+                self.qmc.gridalpha = settings.value("gridalpha",self.qmc.gridalpha).toDouble()[0]
+            settings.endGroup()
+    	           
             #update display
             self.qmc.redraw()
 
@@ -6004,6 +6020,16 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraeventsvisibility",self.extraeventsvisibility)
             settings.setValue("extraeventslabels",self.extraeventslabels)
             settings.endGroup()
+            
+            settings.beginGroup("grid")
+            settings.setValue("xgrid",self.qmc.xgrid)
+            settings.setValue("ygrid",self.qmc.ygrid)
+            settings.setValue("gridlinestyle",self.qmc.gridlinestyle)
+            settings.setValue("gridthickness",self.qmc.gridthickness)
+            settings.setValue("gridalpha",self.qmc.gridalpha)
+            settings.setValue("xrotation",self.qmc.xrotation)
+            settings.endGroup()
+         
             
         except Exception,e:
             self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))            
@@ -8594,7 +8620,7 @@ class autosaveDlg(QDialog):
 class WindowsDlg(QDialog):
     def __init__(self, parent = None):
         super(WindowsDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Axis",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Axes",None, QApplication.UnicodeUTF8))
         
         self.setModal(True)
 
@@ -8603,9 +8629,15 @@ class WindowsDlg(QDialog):
         xlimitLabel = QLabel(QApplication.translate("Label", "Max",None, QApplication.UnicodeUTF8))
         xlimitLabel_min = QLabel(QApplication.translate("Label", "Min",None, QApplication.UnicodeUTF8))
         self.ylimitEdit = QLineEdit()
+        self.ylimitEdit.setMaximumWidth(100)
         self.ylimitEdit_min = QLineEdit()
+        self.ylimitEdit_min.setMaximumWidth(100)
+        
         self.xlimitEdit = QLineEdit()
+    	self.xlimitEdit.setMaximumWidth(100)        
         self.xlimitEdit_min = QLineEdit()
+    	self.xlimitEdit_min.setMaximumWidth(100)        
+
         self.ylimitEdit.setValidator(QIntValidator(0, 1000, self.ylimitEdit))
         self.ylimitEdit_min.setValidator(QIntValidator(0, 1000, self.ylimitEdit_min))
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
@@ -8617,7 +8649,16 @@ class WindowsDlg(QDialog):
         self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx))
         self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx))
 
+        xrotationlabel = QLabel(QApplication.translate("xrotation", "Rotation",None, QApplication.UnicodeUTF8))
+        self.xrotationSpinBox = QSpinBox()
+        self.xrotationSpinBox.setRange(0,90)
+        self.xrotationSpinBox.setSingleStep(5)
+        self.xrotationSpinBox.setValue(aw.qmc.xrotation)
+        self.connect(self.xrotationSpinBox, SIGNAL("valueChanged(int)"),self.changexrotation)
+        self.xrotationSpinBox.setMaximumWidth(40)
+
         self.legendComboBox = QComboBox()
+        self.legendComboBox.setMaximumWidth(160)
         legendlocs = [QApplication.translate("ComboBox", "upper right",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "upper left",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "lower left",None, QApplication.UnicodeUTF8),
@@ -8638,12 +8679,54 @@ class WindowsDlg(QDialog):
         else:
             self.timeflag.setChecked(False)
 
+        timegridlabel = QLabel(QApplication.translate("xgridlabel", "Step",None, QApplication.UnicodeUTF8))
+        self.xaxislencombobox = QComboBox()
+        timelocs =   [QApplication.translate("timeComboBox", "30 seconds",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("timeCComboBox", "1 minute",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("timeCComboBox", "2 minute",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("timeCComboBox", "3 minute",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("timeCComboBox", "4 minute",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("timeCComboBox", "5 minute",None, QApplication.UnicodeUTF8)]
+        self.xaxislencombobox.addItems(timelocs)
+        self.timeconversion = [30,60,120,180,240,300]
+        self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(aw.qmc.xgrid))
+        self.connect(self.xaxislencombobox,SIGNAL("currentIndexChanged(int)"),self.xaxislenloc)
+
+        ygridlabel = QLabel(QApplication.translate("ygridlabel", "Step",None, QApplication.UnicodeUTF8))
+        self.ygridSpinBox = QSpinBox()
+        self.ygridSpinBox.setRange(5,100)
+        self.ygridSpinBox.setSingleStep(5)
+        self.ygridSpinBox.setValue (aw.qmc.ygrid)
+        self.connect(self.ygridSpinBox, SIGNAL("valueChanged(int)"),self.changeygrid)
+        self.ygridSpinBox.setMaximumWidth(40)
+
+        linestylegridlabel = QLabel(QApplication.translate("gridlinestyle", "Style",None, QApplication.UnicodeUTF8))
+        self.gridstylecombobox = QComboBox()
+        gridstyles = ["solid","dashed","dash-dot","dotted","None"] 
+        self.gridstylecombobox.addItems(gridstyles) 
+        self.gridstylecombobox.setCurrentIndex(aw.qmc.gridlinestyle)
+        self.connect(self.gridstylecombobox,SIGNAL("currentIndexChanged(int)"),self.changegridstyle)
+
+    	gridthicknesslabel = QLabel(QApplication.translate("gridwidth", "Width",None, QApplication.UnicodeUTF8))
+        self.gridwidthSpinBox = QSpinBox()
+        self.gridwidthSpinBox.setRange(1,5)
+        self.gridwidthSpinBox.setValue(aw.qmc.gridthickness)
+        self.connect(self.gridwidthSpinBox, SIGNAL("valueChanged(int)"),self.changegridwidth)
+        self.gridwidthSpinBox.setMaximumWidth(40)    	
+
+    	gridalphalabel = QLabel(QApplication.translate("gridalpha", "Opaqueness",None, QApplication.UnicodeUTF8))
+        self.gridalphaSpinBox = QSpinBox()
+        self.gridalphaSpinBox.setRange(1,10)
+        self.gridalphaSpinBox.setValue(int(aw.qmc.gridalpha*10))
+        self.connect(self.gridalphaSpinBox, SIGNAL("valueChanged(int)"),self.changegridalpha)
+        self.gridalphaSpinBox.setMaximumWidth(40)
+        
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
         resetButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         resetButton.setFocusPolicy(Qt.NoFocus)
-        
+
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatewindow)
         self.connect(resetButton,SIGNAL("clicked()"),self.reset)
@@ -8651,27 +8734,41 @@ class WindowsDlg(QDialog):
         xlayout = QGridLayout()
         xlayout.addWidget(xlimitLabel_min,0,0)
         xlayout.addWidget(self.xlimitEdit_min,0,1)
-        xlayout.addWidget(xlimitLabel,1,0)
-        xlayout.addWidget(self.xlimitEdit,1,1)
-        xlayout.addWidget(self.timeflag,2,1)
+        xlayout.addWidget(xlimitLabel,0,2)
+        xlayout.addWidget(self.xlimitEdit,0,3)
+        xlayout.addWidget(timegridlabel,1,0)
+        xlayout.addWidget(self.xaxislencombobox,1,1)
+        xlayout.addWidget(self.timeflag,1,3)
+        xlayout.addWidget(xrotationlabel,2,0)
+        xlayout.addWidget( self.xrotationSpinBox,2,1)
         
         ylayout = QGridLayout()
         ylayout.addWidget(ylimitLabel_min,0,0)
         ylayout.addWidget(self.ylimitEdit_min,0,1)
-        ylayout.addWidget(ylimitLabel,1,0)
-        ylayout.addWidget(self.ylimitEdit,1,1)
-
-        legentlayout = QHBoxLayout()
-        legentlayout.addWidget(self.legendComboBox)
-                                     
+        ylayout.addWidget(ylimitLabel,0,2)
+        ylayout.addWidget(self.ylimitEdit,0,3)
+        ylayout.addWidget(ygridlabel,1,0)
+        ylayout.addWidget(self.ygridSpinBox,1,1)
         
-        xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time",None, QApplication.UnicodeUTF8))
-        xGroupLayout.setLayout(xlayout)
-        yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature",None, QApplication.UnicodeUTF8))
-        yGroupLayout.setLayout(ylayout)
+        legentlayout = QHBoxLayout()
+        legentlayout.addWidget(self.legendComboBox,0,Qt.AlignLeft)
                                      
+        graphgridlayout = QGridLayout() 
+        graphgridlayout.addWidget(linestylegridlabel,1,0)
+        graphgridlayout.addWidget(self.gridstylecombobox,1,1,Qt.AlignLeft)
+        graphgridlayout.addWidget(gridthicknesslabel,1,2)
+        graphgridlayout.addWidget(self.gridwidthSpinBox,1,3,Qt.AlignLeft)
+        graphgridlayout.addWidget(gridalphalabel,2,0)
+        graphgridlayout.addWidget(self.gridalphaSpinBox,2,1,Qt.AlignLeft)
+        
+        xGroupLayout = QGroupBox(QApplication.translate("GroupBox","Time Axis",None, QApplication.UnicodeUTF8))
+        xGroupLayout.setLayout(xlayout)
+        yGroupLayout = QGroupBox(QApplication.translate("GroupBox","Temperature Axis",None, QApplication.UnicodeUTF8))
+        yGroupLayout.setLayout(ylayout)                                     
         legendLayout = QGroupBox(QApplication.translate("GroupBox","Legend Location",None, QApplication.UnicodeUTF8))
-        legendLayout.setLayout(legentlayout)                                     
+        legendLayout.setLayout(legentlayout)
+        GridGroupLayout = QGroupBox(QApplication.translate("GroupBox","Grid",None, QApplication.UnicodeUTF8))
+        GridGroupLayout.setLayout(graphgridlayout)       
                                      
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(resetButton)
@@ -8683,16 +8780,43 @@ class WindowsDlg(QDialog):
         mainLayout.addWidget(xGroupLayout)
         mainLayout.addWidget(yGroupLayout)
         mainLayout.addWidget(legendLayout)
+        mainLayout.addWidget(GridGroupLayout)
                                      
         mainLayout.addStretch()
         mainLayout.addLayout(buttonLayout)
         
         self.setLayout(mainLayout)
 
+    def changexrotation(self):
+        aw.qmc.xrotation = self.xrotationSpinBox.value()
+        aw.qmc.xaxistosm()       
+        aw.qmc.redraw()    	
+
+    def changegridalpha(self):
+        aw.qmc.gridalpha = self.gridalphaSpinBox.value()/10.
+        aw.qmc.redraw()
+        
+    def changegridwidth(self):
+        aw.qmc.gridthickness = self.gridwidthSpinBox.value()
+        aw.qmc.redraw()
+        
+    def changegridstyle(self):
+        aw.qmc.gridlinestyle = self.gridstylecombobox.currentIndex()
+        aw.qmc.redraw()
+
     def changelegendloc(self):
         aw.qmc.legendloc = self.legendComboBox.currentIndex() + 1
         aw.qmc.redraw()
 
+    def xaxislenloc(self):
+        aw.qmc.xgrid = self.timeconversion[self.xaxislencombobox.currentIndex()]
+        aw.qmc.xaxistosm()       
+        aw.qmc.redraw()
+
+    def changeygrid(self):
+        aw.qmc.ygrid = self.ygridSpinBox.value()
+        aw.qmc.redraw()
+                               
     def updatewindow(self):
         aw.qmc.ylimit = int(self.ylimitEdit.text())
         aw.qmc.ylimit_min = int(self.ylimitEdit_min.text())
@@ -8702,6 +8826,7 @@ class WindowsDlg(QDialog):
             aw.qmc.keeptimeflag = 1
         else:
             aw.qmc.keeptimeflag = 0
+
         aw.qmc.redraw()
         
         string = QApplication.translate("Message Area","ylimit = (%1,%2) xlimit = (%3,%4)",None, QApplication.UnicodeUTF8).arg(unicode(self.ylimitEdit_min.text())).arg(unicode(self.ylimitEdit.text())).arg(unicode(self.xlimitEdit_min.text())).arg(unicode(self.xlimitEdit.text()))                                        
@@ -9336,8 +9461,8 @@ class EventsDlg(QDialog):
             aw.etypeComboBox.addItems(aw.qmc.etypes)
         
             aw.qmc.redraw()
-            aw.sendmessage(QApplication.translate("Message Area","Event configuration saved", None, QApplication.UnicodeUTF8))
             self.savetableextraeventbutton()
+            aw.sendmessage(QApplication.translate("Message Area","Event configuration saved", None, QApplication.UnicodeUTF8))
             self.close()
         else:
             aw.sendmessage(QApplication.translate("Message Area","Found empty event type box", None, QApplication.UnicodeUTF8))    
@@ -9358,7 +9483,7 @@ class EventsDlg(QDialog):
         string += QApplication.translate("MessageBox", "<b>Action description</b> Depends on the Action type:",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Serial command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Call program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("MessageBox", "Multiple Event: Event button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Button Visibility</b> Hides/shows button",None, QApplication.UnicodeUTF8) + "<br><br>"
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
         
