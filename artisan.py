@@ -8702,7 +8702,11 @@ class WindowsDlg(QDialog):
 
         linestylegridlabel = QLabel(QApplication.translate("gridlinestyle", "Style",None, QApplication.UnicodeUTF8))
         self.gridstylecombobox = QComboBox()
-        gridstyles = ["solid","dashed","dash-dot","dotted","None"] 
+        gridstyles = [QApplication.translate("styleComboBox", "solid",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("styleComboBox", "dashed",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("styleComboBox", "dashed-dot",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("styleComboBox", "dotted",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("styleComboBox", "None",None, QApplication.UnicodeUTF8)]
         self.gridstylecombobox.addItems(gridstyles) 
         self.gridstylecombobox.setCurrentIndex(aw.qmc.gridlinestyle)
         self.connect(self.gridstylecombobox,SIGNAL("currentIndexChanged(int)"),self.changegridstyle)
