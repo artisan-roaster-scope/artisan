@@ -416,10 +416,10 @@ class tgraphcanvas(FigureCanvas):
         self.ygrid = 50    #initial temperature separation
         self.gridstyles =    ["-","--","-.",":"," "]  #solid,dashed,dash-dot,dotted,None
         self.gridlinestyle = 3
-    	self.gridthickness = 2
-    	self.gridalpha = 1.
-    	self.xrotation = 0
-    	
+        self.gridthickness = 2
+        self.gridalpha = 1.
+        self.xrotation = 0
+        
         #height of statistics bar
         self.statisticsheight = 650
         self.statisticsupper = 655
@@ -4277,7 +4277,7 @@ class ApplicationWindow(QMainWindow):
         self.lcd1.setMinimumHeight(45)
         self.lcd1.display("00:00")
         self.lcd2 = QLCDNumber() # Temperature MET
-        self.lcd2.setSegmentStyle(2)
+        self.lcd2.setSegmentStyle(2)   
         self.lcd2.setMinimumHeight(35)
         self.lcd3 = QLCDNumber() # Temperature BT
         self.lcd3.setSegmentStyle(2)
@@ -4290,7 +4290,7 @@ class ApplicationWindow(QMainWindow):
         self.lcd5.setMinimumHeight(35)
         self.lcd6 = QLCDNumber() # pid sv
         self.lcd6.setSegmentStyle(2)
-        self.lcd6.setMinimumHeight(35)
+        self.lcd6.setMinimumHeight(35) 
         self.lcd7 = QLCDNumber() # pid power % duty cycle
         self.lcd7.setSegmentStyle(2)
         self.lcd7.setMinimumHeight(35)
@@ -5165,7 +5165,7 @@ class ApplicationWindow(QMainWindow):
             #Plot everything
             self.qmc.redraw()
 
-            message =  QApplication.translate("Message Area","%1  loaded successfully", None, QApplication.UnicodeUTF8).arg(unicode(filename))
+            message =  QApplication.translate("Message Area","%1  loaded ", None, QApplication.UnicodeUTF8).arg(unicode(filename))
             self.sendmessage(message)
             
             self.setCurrentFile(filename)
@@ -5855,11 +5855,11 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.beginGroup("grid")             
             if settings.contains("xgrid"):
-    	        self.qmc.xgrid = settings.value("xgrid",self.qmc.xgrid).toInt()[0]
-    	        self.qmc.ygrid = settings.value("ygrid",self.qmc.ygrid).toInt()[0]
-    	        self.qmc.gridthickness = settings.value("gridthickness",self.qmc.gridthickness).toInt()[0]
-    	        self.qmc.xrotation = settings.value("xrotation",self.qmc.xrotation).toInt()[0]
-    	        self.qmc.gridlinestyle = settings.value("gridlinestyle",self.qmc.gridlinestyle).toInt()[0]
+                self.qmc.xgrid = settings.value("xgrid",self.qmc.xgrid).toInt()[0]
+                self.qmc.ygrid = settings.value("ygrid",self.qmc.ygrid).toInt()[0]
+                self.qmc.gridthickness = settings.value("gridthickness",self.qmc.gridthickness).toInt()[0]
+                self.qmc.xrotation = settings.value("xrotation",self.qmc.xrotation).toInt()[0]
+                self.qmc.gridlinestyle = settings.value("gridlinestyle",self.qmc.gridlinestyle).toInt()[0]
                 self.qmc.gridalpha = settings.value("gridalpha",self.qmc.gridalpha).toDouble()[0]
             settings.endGroup()
     	           
@@ -7962,7 +7962,7 @@ class editGraphDlg(QDialog):
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         #cancelButton.setMaximumSize(70, 30)
         cancelButton.setMaximumSize(cancelButton.sizeHint())
-        cancelButton.setMinimumSize(cancelButton.minimumSizeHint())
+        cancelButton.setMinimumSize(cancelButton.minimum())
 
         ##### LAYOUTS
 
@@ -8635,9 +8635,9 @@ class WindowsDlg(QDialog):
         self.ylimitEdit_min.setMaximumWidth(100)
         
         self.xlimitEdit = QLineEdit()
-    	self.xlimitEdit.setMaximumWidth(100)        
+        self.xlimitEdit.setMaximumWidth(100)        
         self.xlimitEdit_min = QLineEdit()
-    	self.xlimitEdit_min.setMaximumWidth(100)        
+        self.xlimitEdit_min.setMaximumWidth(100)        
 
         self.ylimitEdit.setValidator(QIntValidator(0, 1000, self.ylimitEdit))
         self.ylimitEdit_min.setValidator(QIntValidator(0, 1000, self.ylimitEdit_min))
@@ -15314,22 +15314,26 @@ class PXRpidDlgControl(QDialog):
         svkey = u"segment" + unicode(idn) + u"sv"
         svcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR[svkey][1],int(sv*10))
         r1 = aw.ser.sendFUJIcommand(svcommand,8)
+
+        libtime.sleep(0.1) #important time between writings
         
         rampkey = u"segment" + unicode(idn) + u"ramp"
-        rampcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR[rampkey][1],aw.pid.fromtimetoPIDtime(ramp))
+        rampcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR[rampkey][1],ramp)
         r2 = aw.ser.sendFUJIcommand(rampcommand,8)
-         
+
+        libtime.sleep(0.1) #important time between writings
+ 
         soakkey = u"segment" + unicode(idn) + u"soak"
-        soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR[soakkey][1],aw.pid.fromtimetoPIDtime(soak))
+        soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXR[soakkey][1],soak)
         r3 = aw.ser.sendFUJIcommand(soakcommand,8)
     
         #check if OK
-        if r1==svcommand and r2==rampcommand and r3==soakcommand:
+        if len(r1) == 8 and len(r2) == 8 and len(r3) == 8:
             aw.pid.PXR[svkey][0] = sv
             aw.pid.PXR[rampkey][0] = ramp
             aw.pid.PXR[soakkey][0] = soak
             self.paintlabels()
-        
+            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully writen",None, QApplication.UnicodeUTF8),5000) 
         else:
             aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be writen into PID",None, QApplication.UnicodeUTF8))
 
@@ -15968,17 +15972,19 @@ class PXG4pidDlgControl(QDialog):
                 if aw.ser.readBTpid[0] == 0:
                     command = aw.pid.message2send(aw.ser.readBTpid[1],3,aw.pid.PXG4["pvinputtype"][1],1)
                 elif aw.ser.readBTpid[0] == 1:
-                    command = aw.pid.message2send(aw.ser.readBTpid[1],3,aw.pid.PXR["pvinputtype"][1],1)
+                    command = aw.pid.message2send(aw.ser.readBTpid[1],3,aw.pid.PXR["pvinputtype"][1],1)  
             if command:
                 Thtype = aw.pid.readoneword(command)
                 if Thtype in conversiontoindex:      #0-16 range
                     if PID == "ET":
                         aw.pid.PXG4["pvinputtype"][0] = Thtype
+                        self.ETthermocombobox.setCurrentIndex(conversiontoindex.index(Thtype))
                     elif PID == "BT":
                         if aw.ser.readBTpid[0] == 0:
                             aw.pid.PXG4["pvinputtype"][0] = Thtype
                         elif aw.ser.readBTpid[0] == 1:
-                            aw.pid.PXR["pvinputtype"][0] = Thtype             
+                            aw.pid.PXR["pvinputtype"][0] = Thtype
+                        self.BTthermocombobox.setCurrentIndex(conversiontoindex.index(Thtype))
                     self.status.showMessage(self.thermotypes[conversiontoindex.index(Thtype)],5000)       
                 else:                    
                     self.status.showMessage(QApplication.translate("StatusBar","Problem reading thermocouple type",None,QApplication.UnicodeUTF8),5000)
@@ -16819,14 +16825,14 @@ class PXG4pidDlgControl(QDialog):
         ramp = aw.pid.readoneword(rampcommand)
         if ramp == -1:
             return -1
-        aw.pid.PXG4[rampkey][0] = ramp/10.
+        aw.pid.PXG4[rampkey][0] = ramp
         
         soakkey = u"segment" + unicode(idn) + u"soak"
         soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],3,aw.pid.PXG4[soakkey][1],1)
         soak = aw.pid.readoneword(soakcommand)
         if soak == -1:
             return -1
-        aw.pid.PXG4[soakkey][0] = soak/10.
+        aw.pid.PXG4[soakkey][0] = soak
 
     #get all Ramp Soak values for all 8 segments                                  
     def getallsegments(self):
@@ -16840,7 +16846,8 @@ class PXG4pidDlgControl(QDialog):
                 return
             self.paintlabels()
         self.status.showMessage(QApplication.translate("StatusBar","Finished reading Ramp/Soak val.",None, QApplication.UnicodeUTF8),5000)
-
+        self.createsegmenttable()
+        
     def setONOFFautotune(self,flag):
         self.status.showMessage(QApplication.translate("StatusBar","setting autotune...",None, QApplication.UnicodeUTF8),500)
         #read current pidN
@@ -16909,26 +16916,29 @@ class PXG4pidDlgControl(QDialog):
 
         sv = float(svedit.text())
         ramp = aw.qmc.stringtoseconds(unicode(rampedit.text()))
-        soak = aw.qmc.stringtoseconds(unicode(soakedit.text())) 
-        
+        soak = aw.qmc.stringtoseconds(unicode(soakedit.text()))
+
         svkey = u"segment" + unicode(idn) + u"sv"
         svcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[svkey][1],int(sv*10))
         r1 = aw.ser.sendFUJIcommand(svcommand,8)
-        
+
+        libtime.sleep(0.1) #important time between writings
         rampkey = u"segment" + unicode(idn) + u"ramp"
-        rampcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[rampkey][1],aw.pid.fromtimetoPIDtime(ramp))
+        rampcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[rampkey][1],ramp)
         r2 = aw.ser.sendFUJIcommand(rampcommand,8)
-         
+
+        libtime.sleep(0.1) #important time between writings
         soakkey = u"segment" + unicode(idn) + u"soak"
-        soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[soakkey][1],aw.pid.fromtimetoPIDtime(soak))
+        soakcommand = aw.pid.message2send(aw.ser.controlETpid[1],6,aw.pid.PXG4[soakkey][1],soak)
         r3 = aw.ser.sendFUJIcommand(soakcommand,8)
       
         #check if OK
-        if r1==svcommand and r2==rampcommand and r3==soakcommand:
+        if len(r1) == 8 and len(r2) == 8 and len(r3) == 8:
             aw.pid.PXG4[svkey][0] = sv
             aw.pid.PXG4[rampkey][0] = ramp
             aw.pid.PXG4[soakkey][0] = soak
             self.paintlabels()
+            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully writen",None, QApplication.UnicodeUTF8),5000) 
         else:
             aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None, QApplication.UnicodeUTF8))
 
@@ -16987,26 +16997,26 @@ class FujiPID(object):
                   #sv stands for Set Value (desired temperature value)
                   #the time to reach sv is called ramp 
                   #the time to hold the temperature at sv is called soak 
-                  "timeunits": [1,41562],  #0=hh.MM (hour:min)  1=MM.SS (min:sec)                               PXG has two time formats HH:MM (factory default) and MM:SS 
+                  "timeunits": [1,41562],  #0=hh.MM (hour:min)  1=MM.SS (min:sec)                             # PXG has two time formats HH:MM (factory default) and MM:SS 
                   # Example. Dry roast phase. selects 3 or 4 minutes                                          # PXG needs to have parameter TIMU set to 1 (MM:SS)
-                  "segment1sv": [270.0,41581],"segment1ramp": [3*60,41582],"segment1soak": [0,41583],         # See PXG Manual chapter 6: Ramp/Soak Time Units to set the parameter TIMU    
-                  "segment2sv": [300.0,41584],"segment2ramp": [3*60,41585],"segment2soak": [0,41586],         # PXG: ramp/soak times are stored as seconds in artisan
-                  "segment3sv": [350.0,41587],"segment3ramp": [3*60,41588],"segment3soak": [0,41589],
-                  "segment4sv": [400.0,41590],"segment4ramp": [3*60,41591],"segment4soak": [0,41591],
+                  "segment1sv": [270.0,41581],"segment1ramp": [180,41582],"segment1soak": [0,41583],          # See PXG Manual chapter 6: Ramp/Soak Time Units to set the parameter TIMU    
+                  "segment2sv": [300.0,41584],"segment2ramp": [180,41585],"segment2soak": [0,41586],         
+                  "segment3sv": [350.0,41587],"segment3ramp": [180,41588],"segment3soak": [0,41589],
+                  "segment4sv": [400.0,41590],"segment4ramp": [180,41591],"segment4soak": [0,41591],
                   # Example. Phase to 1C. selects 6 or 8 mins
-                  "segment5sv": [530.0,41593],"segment5ramp": [5*60,41594],"segment5soak": [0,41595],
-                  "segment6sv": [530.0,41596],"segment6ramp": [8*60,41597],"segment6soak": [0,41598],
-                  "segment7sv": [540.0,41599],"segment7ramp": [5*60,41600],"segment7soak": [0,41601],
-                  "segment8sv": [540.0,41602],"segment8ramp": [8*60,41603],"segment8soak": [0,41604],
-                  "segment9sv": [550.0,41605],"segment9ramp": [5*60,41606],"segment9soak": [0,41607],
-                  "segment10sv": [550.0,41608],"segment10ramp": [8*60,41609],"segment10soak": [0,41610],
-                  "segment11sv": [560.0,41611],"segment11ramp": [5*60,41612],"segment11soak": [0,41613],
-                  "segment12sv": [560.0,41614],"segment12ramp": [8*60,41615],"segment12soak": [0,41616],
+                  "segment5sv": [530.0,41593],"segment5ramp": [180,41594],"segment5soak": [0,41595],
+                  "segment6sv": [530.0,41596],"segment6ramp": [180,41597],"segment6soak": [0,41598],
+                  "segment7sv": [540.0,41599],"segment7ramp": [180,41600],"segment7soak": [0,41601],
+                  "segment8sv": [540.0,41602],"segment8ramp": [180,41603],"segment8soak": [0,41604],
+                  "segment9sv": [550.0,41605],"segment9ramp": [180,41606],"segment9soak": [0,41607],
+                  "segment10sv": [550.0,41608],"segment10ramp": [180,41609],"segment10soak": [0,41610],
+                  "segment11sv": [560.0,41611],"segment11ramp": [180,41612],"segment11soak": [0,41613],
+                  "segment12sv": [560.0,41614],"segment12ramp": [180,41615],"segment12soak": [0,41616],
                   # Eaxample. Finish phase. selects 3 mins for regular coffee or 5 mins for espresso
-                  "segment13sv": [570.0,41617],"segment13ramp": [3*60,41618],"segment13soak": [0,41619],
-                  "segment14sv": [570.0,41620],"segment14ramp": [5*60,41621],"segment14soak": [0,41622],
-                  "segment15sv": [580.0,41623],"segment15ramp": [3*60,41624],"segment15soak": [0,41625],
-                  "segment16sv": [580.0,41626],"segment16ramp": [5*60,41627],"segment16soak": [0,41628],
+                  "segment13sv": [570.0,41617],"segment13ramp": [180,41618],"segment13soak": [0,41619],
+                  "segment14sv": [570.0,41620],"segment14ramp": [180,41621],"segment14soak": [0,41622],
+                  "segment15sv": [580.0,41623],"segment15ramp": [180,41624],"segment15soak": [0,41625],
+                  "segment16sv": [580.0,41626],"segment16ramp": [180,41627],"segment16soak": [0,41628],
                   # "rampsoakmode" 0-15 = 1-16 IMPORTANT: Factory setting is 3 (BAD). Set it up to number 0 or it will
                   # sit on stanby (SV blinks) at the end till rampsoakmode changes. It will appear as if the PID broke (unresponsive)
                   "rampsoakmode":[0,41081],
@@ -17068,7 +17078,7 @@ class FujiPID(object):
                     "decimalposition": [1,41020],
                     "svlowerlimit":[0,41031],
                     "svupperlimit":[0,41032],
-                    "pvinputtype":[3,40016],
+                    "pvinputtype":[3,41016],
                     #READ ONLY
                     #current pv
                     "pv?":[0,31001],
@@ -17355,25 +17365,22 @@ class FujiPID(object):
         
         if aw.ser.controlETpid[0] == 0:
             svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[svkey][1],int(sv*10))
-            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[rampkey][1],self.fromtimetoPIDtime(ramp))
-            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[soakkey][1],self.fromtimetoPIDtime(soak))
+            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[rampkey][1],ramp)
+            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXG4[soakkey][1],soak)
         elif  aw.ser.controlETpid[0] == 1:
             svcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[svkey][1],int(sv*10))
-            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[rampkey][1],self.fromtimetoPIDtime(ramp))
-            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[soakkey][1],self.fromtimetoPIDtime(soak))
+            rampcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[rampkey][1],ramp)
+            soakcommand = self.message2send(aw.ser.controlETpid[1],6,self.PXR[soakkey][1],soak)
             
         r1 = self.sendFUJIcommand(svcommand,8)
+        libtime.sleep(0.11) #important time between writings
         r2 = self.sendFUJIcommand(rampcommand,8)
+        libtime.sleep(0.11) #important time between writings        
         r3 = self.sendFUJIcommand(soakcommand,8)
       
         #check if OK
-        if r1!=svcommand or r2!=rampcommand or r3!=soakcommand:
+        if len(r1)!=8 or len(r2)!=8 or len(r3)!=8:
             aw.qmc.adderror(QApplication.translate("Error Message","pid: Segment values could not be writen into PID",None, QApplication.UnicodeUTF8))
-
-    #converts an integer time like 180 to a time interger 0300 
-    def fromtimetoPIDtime(self,time):
-        p,r =  divmod(time, 60)
-        return int("%02d"%p + "%02d"%r)
 
     def dec2HexRaw(self,decimal):
         # This method converts a decimal to a raw string appropiate for Fuji serial TX
