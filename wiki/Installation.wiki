@@ -33,6 +33,7 @@ _NOTE: for now a binary is only provided for OS X 10.6 Snow Leopard_
 
   # Install USB/serial driver
     ** for Omega meters download and run the [http://www.ftdichip.com/Drivers/VCP.htm FTDI VCP OS X installer]
+    ** for the original Voltkraft USB cable it is the [http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx CP210x driver from Silicon Labs]
   # Download and run the [http://code.google.com/p/artisan/downloads/list artisan OS X installer]
   ## Double click on the `dmg` file you just downloaded
   ## Double click the disk image which appears on your desktop
