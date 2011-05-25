@@ -461,10 +461,10 @@ class tgraphcanvas(FigureCanvas):
         self.xaxistosm()
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
-        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8))
-        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))
-        self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label=QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8))
-        self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8))
+        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
+        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
+        self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+        self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
         # add legend to plot.
         handles = [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2]
@@ -1317,8 +1317,8 @@ class tgraphcanvas(FigureCanvas):
                     jump -= 20
                     
         ##### ET,BT curves
-        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8))
-        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))
+        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
+        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
 
         ##### Extra devices-curves
         for i in range(len(self.extradevices)):
@@ -1340,9 +1340,9 @@ class tgraphcanvas(FigureCanvas):
                 
             #draw background
             self.l_back1, = self.ax.plot(self.timeB, self.temp1B,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=QApplication.translate("Scope Label", "BackgroundET", None, QApplication.UnicodeUTF8))
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=unicode(QApplication.translate("Scope Label", "BackgroundET", None, QApplication.UnicodeUTF8)))
             self.l_back2, = self.ax.plot(self.timeB, self.temp2B,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=QApplication.translate("Scope Label", "BackgroundBT", None, QApplication.UnicodeUTF8))
+                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=unicode(QApplication.translate("Scope Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
 
             #check backgroundevents flag	
             if self.backgroundeventsflag:
@@ -1479,21 +1479,21 @@ class tgraphcanvas(FigureCanvas):
 
         ##### DeltaET,DeltaBT curves
         if self.DeltaETflag:
-            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label=QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8))
+            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
         if self.DeltaBTflag:
-            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8))
+            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
         
         handles = [self.l_temp1,self.l_temp2]
-        labels = [QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)]
+        labels = [unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)),unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))]
 
         #add Rate of Change if flags are True
         if  self.DeltaETflag:
             handles.append(self.l_delta1)
-            labels.append(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8))
+            labels.append(unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
             
         if  self.DeltaBTflag:
             handles.append(self.l_delta2)
-            labels.append(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8))
+            labels.append(unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
         ndevices = len(self.extradevices)
         if ndevices:
@@ -4245,6 +4245,7 @@ class ApplicationWindow(QMainWindow):
         self.button_18.setFocusPolicy(Qt.NoFocus)
         self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])        
         self.button_18.setMaximumSize(90, 45)
+        self.button_18.setContentsMargins(0,0,0,0)
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
         self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None, QApplication.UnicodeUTF8))
 
@@ -4523,7 +4524,6 @@ class ApplicationWindow(QMainWindow):
         level1layout.addWidget(self.button_10,2)
         level1layout.addWidget(self.button_18,1)
         level1layout.addWidget(self.button_7,2)
-        level1layout.addSpacing(5)
         level1layout.addWidget(self.lcd1,3)
 
         #level 3
@@ -5076,7 +5076,7 @@ class ApplicationWindow(QMainWindow):
                 
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanOpenFileDialog(self,msg="Open",ext="*.txt",path=None):
+    def ArtisanOpenFileDialog(self,msg="Open",ext="*",path=None):
         if path == None:   
             path = self.getDefaultPath() 
         file = unicode(QFileDialog.getOpenFileName(self,msg,path,ext))
@@ -5691,6 +5691,8 @@ class ApplicationWindow(QMainWindow):
     	    #restore statistics
             if settings.contains("Statistics"):
                 self.qmc.statisticsflags = map(lambda x:x.toInt()[0],settings.value("Statistics").toList())
+            if settings.contains("StatisticsConds"):
+                self.qmc.statisticsconditions = map(lambda x:x.toInt()[0],settings.value("StatisticsConds").toList())
 
             #restore delay
             self.qmc.delay = settings.value("Delay",int(self.qmc.delay)).toInt()[0]
@@ -6429,7 +6431,7 @@ $cupping_notes
         elif phase_length < lower_limit + third_of_optimal_phase:
             result = short_taste + '/' + result
         elif phase_length > upper_limit - third_of_optimal_phase:
-            result += '/' + long_taste
+            result = result + '/' + long_taste
         return result
     
     #Flavor defect estimation chart for each leg. Thanks to Jim Schulman 
@@ -6444,7 +6446,6 @@ $cupping_notes
         LongTo1CPhase = QApplication.translate("Flavor Scope Label", "Bready",None, QApplication.UnicodeUTF8)
         ShortFinishPhase = QApplication.translate("Flavor Scope Label", "Acidic",None, QApplication.UnicodeUTF8)
         LongFinishPhase = QApplication.translate("Flavor Scope Label", "Flat",None, QApplication.UnicodeUTF8)        
-        st1 = st2 = st3 = QApplication.translate("Flavor Scope Label", "OK",None, QApplication.UnicodeUTF8)
         #CHECK CONDITIONS                
         #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
         #  => ShortDryingPhase
@@ -7962,7 +7963,7 @@ class editGraphDlg(QDialog):
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         #cancelButton.setMaximumSize(70, 30)
         cancelButton.setMaximumSize(cancelButton.sizeHint())
-        cancelButton.setMinimumSize(cancelButton.minimum())
+        cancelButton.setMinimumSize(cancelButton.minimumSize())
 
         ##### LAYOUTS
 

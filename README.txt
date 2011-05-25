@@ -60,6 +60,8 @@ o Mac OS X (10.5.x/10.6x)
 - Install USB/serial driver for your meter
  . for Omega meters download and run the FTDI VCP OS X installer
    http://www.ftdichip.com/Drivers/VCP.htm
+ . for Voltkraft meters using the original Voltkraft USB cable it is the CP210x driver from Silicon Labs
+   http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx
 - Download and run the Artisan OS X installer
 - Double click on the dmg file you just downloaded
 - Double click the disk image which appears on your desktop
