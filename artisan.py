@@ -74,6 +74,7 @@ import numpy
 import array
 import codecs
 import struct
+import threading
 from scipy import fft
 from scipy import interpolate as inter
 
@@ -84,7 +85,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
                          QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread)
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
@@ -559,7 +560,7 @@ class tgraphcanvas(FigureCanvas):
             if self.flagon:
                 #if using a meter (thermocouple device)
                 if self.device != 18:
-                    #read time, ET (t1) and BT (t2) TEMPERATURE                      
+                    #read time, ET (t1) and BT (t2) TEMPERATURE                    
                     tx,t1,t2 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
                     if len(self.ETfunction):
                         t1 = self.eval_math_expression(self.ETfunction,t1)
@@ -608,7 +609,7 @@ class tgraphcanvas(FigureCanvas):
                         self.l_delta2.set_data(self.timex, self.delta2)
 
                     #readjust xlimit of plot if needed
-                    if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds  
+                    if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds
                         self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
                         self.ax.set_xlim(self.startofx,self.endofx)
                         self.xaxistosm()
@@ -1143,12 +1144,45 @@ class tgraphcanvas(FigureCanvas):
             starttime = self.timex[self.timeindex[0]]
         else:
             starttime = 0
-        formatter = ticker.FuncFormatter(lambda x, y: '%d:%02d' % divmod(x - round(starttime), 60))
-        locator = ticker.IndexLocator(self.xgrid, round(starttime))
+          
+        #majorlocator = ticker.IndexLocator(self.xgrid, starttime)          	#does not plot right second time around
+        #majorlocator = artilocatorLocator(self.xgrid)      	    	    	#does not have offset          
+        majorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-10*self.xgrid,self.endofx*2.,self.xgrid)
+        minorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-10*self.xgrid,self.endofx*2.,self.xgrid/6.)
+        majorlocator = ticker.FixedLocator(majorloc)        
+        minorlocator = ticker.FixedLocator(minorloc)        
+      
+        self.ax.xaxis.set_major_locator(majorlocator)
+        self.ax.xaxis.set_minor_locator(minorlocator)
+        self.ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
+
+        formatter = ticker.FuncFormatter(self.formtime)
         self.ax.xaxis.set_major_formatter(formatter)
-        self.ax.xaxis.set_major_locator(locator)
+
+        #adjust the length of the major ticks
+        for i in self.ax.get_xticklines() + self.ax.get_yticklines():
+            i.set_markersize(10)
+            #i.set_markeredgewidth(2)   #adjust the width
+
+        for i in self.ax.xaxis.get_minorticklines() + self.ax.yaxis.get_minorticklines():
+            i.set_markersize(5)        
+      
+                
         for label in self.ax.xaxis.get_ticklabels():
             label.set_rotation(self.xrotation)
+
+    #used by xaxistosm()
+    def formtime(self,x,pos):
+        if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
+            starttime = self.timex[self.timeindex[0]]
+        else:
+            starttime = 0
+            
+        if x >=  starttime:   
+            return  '%d:%02d' % divmod((x - starttime), 60)
+        else:
+            return  '-%d:%02d' % divmod(abs(x - starttime), 60)
+            
 
     def reset_and_redraw(self):
         self.reset()
@@ -2264,6 +2298,7 @@ class tgraphcanvas(FigureCanvas):
  
             aw.button_8.setDisabled(True)
             aw.button_8.setFlat(True)
+            self.xaxistosm()
                     
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -8713,14 +8748,14 @@ class WindowsDlg(QDialog):
         self.gridstylecombobox.setCurrentIndex(aw.qmc.gridlinestyle)
         self.connect(self.gridstylecombobox,SIGNAL("currentIndexChanged(int)"),self.changegridstyle)
 
-    	gridthicknesslabel = QLabel(QApplication.translate("gridwidth", "Width",None, QApplication.UnicodeUTF8))
+        gridthicknesslabel = QLabel(QApplication.translate("gridwidth", "Width",None, QApplication.UnicodeUTF8))
         self.gridwidthSpinBox = QSpinBox()
         self.gridwidthSpinBox.setRange(1,5)
         self.gridwidthSpinBox.setValue(aw.qmc.gridthickness)
         self.connect(self.gridwidthSpinBox, SIGNAL("valueChanged(int)"),self.changegridwidth)
-        self.gridwidthSpinBox.setMaximumWidth(40)    	
+        self.gridwidthSpinBox.setMaximumWidth(40)       
 
-    	gridalphalabel = QLabel(QApplication.translate("gridalpha", "Opaqueness",None, QApplication.UnicodeUTF8))
+        gridalphalabel = QLabel(QApplication.translate("gridalpha", "Opaqueness",None, QApplication.UnicodeUTF8))
         self.gridalphaSpinBox = QSpinBox()
         self.gridalphaSpinBox.setRange(1,10)
         self.gridalphaSpinBox.setValue(int(aw.qmc.gridalpha*10))
@@ -11118,7 +11153,7 @@ class serialport(object):
         ##                                        If T4 thermocouple connected alone, then r[43]  = \x07 = 7
         ##                                        Note: Print r[43] if you want to find other connect-combinations
         ##                                        THIS ONLY WORKS WHEN TEMPERATURE < 200. If T >= 200 r[43] changes
-                
+        
         try:
             if not self.SP.isOpen():
                 self.SP.open()                    
@@ -11126,10 +11161,10 @@ class serialport(object):
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "\x41"                 
+                command = "\x41"
                 self.SP.write(command)
                 r = self.SP.read(45)
-                
+            
                 if len(r) == 45:
                     T1 = int(binascii.hexlify(r[7] + r[8]),16)/10.
                     T2 = int(binascii.hexlify(r[9] + r[10]),16)/10.
@@ -11150,8 +11185,8 @@ class serialport(object):
                     if len(aw.qmc.timex) > 2:                           
                         return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
                     else:
-                        return -1,-1 
-            
+                        return -1,-1
+                                
         except serial.SerialException, e:
             error  = QApplication.translate("Error Message","Serial Exception: ser.CENTER309temperature() ",None, QApplication.UnicodeUTF8)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -11162,10 +11197,7 @@ class serialport(object):
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1 
-
-
-
+                return -1,-1
 
     def ARDUINOTC4temperature(self):
         try:
