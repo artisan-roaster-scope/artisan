@@ -55,7 +55,7 @@ http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A
 If artisan starts when clicling on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything. Newer OS like Windows 7 come with this file.
 
 
-o Mac OS X (10.5.x/10.6x)
+o Mac OS X (10.4.x/10.5.x/10.6x on PPC/Intel)
 
 - Install USB/serial driver for your meter
  . for Omega meters download and run the FTDI VCP OS X installer
@@ -116,6 +116,9 @@ Artisan uses the following libraries in unmodified forms:
 
 
 VERSION HISTORY
+
+v0.5.0 (28.5.2011)
+- support for Mac OS X 10.4 and PPC added
 
 v0.4.1 (13.4.2011)
 - import of CSV is not limited anymore to filenames with "csv" extension
