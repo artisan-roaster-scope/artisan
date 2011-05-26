@@ -1291,7 +1291,8 @@ class tgraphcanvas(FigureCanvas):
         self.setCursor(Qt.ArrowCursor)
 
         #extra devices
-        for i in range(len(self.extradevices)):
+##        print len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2)
+        for i in range(len(self.extradevices)):            
             self.extratimex[i],self.extratemp1[i],self.extratemp2[i] = [],[],[]
 
         #reset alarms that have been triggered
@@ -4571,6 +4572,7 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addWidget(self.messagelabel)
         mainlayout.addLayout(level3layout)
         mainlayout.addWidget(self.lowerbuttondialog)
+        mainlayout.addSpacing(2)
         mainlayout.addWidget(self.EventsGroupLayout)
         
         # set visibility of mini event line
@@ -5840,7 +5842,16 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extramathexpression1 = list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList())
                 self.qmc.extramathexpression2 = list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList())
                 self.qmc.extradevicecolor1 = list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList())
-                self.qmc.extradevicecolor2 = list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())                
+                self.qmc.extradevicecolor2 = list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())
+                #Note: self.qmc.extradevicecolor can also be passed by opening a profile but they must have same dimensions as self.qmc.extradevices in Qsettings.
+                if len(self.qmc.extradevices) < len(self.qmc.extradevicecolor1):
+                    #equalize lengths  
+                    self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:len(self.qmc.extradevices)]
+                    self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
+                if len(self.qmc.extradevices) > len(self.qmc.extradevicecolor1):
+                    for i in range(len(self.qmc.extradevices) - len(self.qmc.extradevicecolor1)):
+                        self.qmc.extradevicecolor1.append(u"black")
+                        self.qmc.extradevicecolor2.append(u"black")
                 #convert Qstrings to unicode
                 for i in range(len(self.qmc.extradevicecolor1)):
                     self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
@@ -6025,6 +6036,11 @@ class ApplicationWindow(QMainWindow):
                 #equalize lengths  
                 self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:len(self.qmc.extradevices)]
                 self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
+            if len(self.qmc.extradevices) > len(self.qmc.extradevicecolor1):
+                for i in range(len(self.qmc.extradevices) - len(self.qmc.extradevicecolor1)):
+                    self.qmc.extradevicecolor1.append(u"black")
+                    self.qmc.extradevicecolor2.append(u"black")
+                
             settings.setValue("extradevicecolor1",self.qmc.extradevicecolor1)                                                                
             settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
             settings.setValue("extraname1",self.qmc.extraname1)
@@ -8534,7 +8550,7 @@ class errorDlg(QDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Error Log", None, QApplication.UnicodeUTF8))
 
         #convert list of errors to an html string
-        htmlerr = ""
+        htmlerr = "version = " +__version__ +"<br><br>"
         for i in range(len(aw.qmc.errorlog)):
             htmlerr += "<b>" + str(len(aw.qmc.errorlog)-i) + "</b> <i>" + aw.qmc.errorlog[-i-1] + "</i><br><br>"
 
