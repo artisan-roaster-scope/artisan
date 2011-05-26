@@ -29,7 +29,7 @@ Newer OS like Windows 7 come with this file.
 
 =Installation Mac OS X=
 
-_NOTE: for now a binary is only provided for OS X 10.6 Snow Leopard_
+_NOTE: from v0.5.0 on the Systems 10.4.x/10.5.x/10.6.x (eg. Tiger, Leopard, Snow Leopard)  on PPC and Intel machines are supported _
 
   # Install USB/serial driver
     ** for Omega meters download and run the [http://www.ftdichip.com/Drivers/VCP.htm FTDI VCP OS X installer]
