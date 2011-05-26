@@ -74,7 +74,6 @@ import numpy
 import array
 import codecs
 import struct
-import threading
 from scipy import fft
 from scipy import interpolate as inter
 
@@ -85,7 +84,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
                          QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime)
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
@@ -416,9 +415,9 @@ class tgraphcanvas(FigureCanvas):
         self.xgrid = 120   #initial time separation; 120 = 2 minutes        
         self.ygrid = 50    #initial temperature separation
         self.gridstyles =    ["-","--","-.",":"," "]  #solid,dashed,dash-dot,dotted,None
-        self.gridlinestyle = 3
-        self.gridthickness = 2
-        self.gridalpha = 1.
+        self.gridlinestyle = 0
+        self.gridthickness = 1
+        self.gridalpha = .3
         self.xrotation = 0
         
         #height of statistics bar
@@ -458,8 +457,6 @@ class tgraphcanvas(FigureCanvas):
         for label in self.ax.xaxis.get_ticklabels():
             label.set_color(self.palette["xlabel"])            
         
-        #Create x axis labels in minutes:seconds instead of seconds
-        self.xaxistosm()
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
         self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
@@ -474,6 +471,9 @@ class tgraphcanvas(FigureCanvas):
 
         # draw of the Figure
         self.fig.canvas.draw()
+
+        #Create x axis labels in minutes:seconds instead of seconds
+        self.xaxistosm()
 
         ###########################  TIME  CLOCK     ##########################
         # NOTE: there are two times that can cause confusion: one is a trigger-timer to trigger timerevent at every
@@ -1145,15 +1145,15 @@ class tgraphcanvas(FigureCanvas):
         else:
             starttime = 0
           
-        #majorlocator = ticker.IndexLocator(self.xgrid, starttime)          	#does not plot right second time around
-        #majorlocator = artilocatorLocator(self.xgrid)      	    	    	#does not have offset          
+        #majorlocator = ticker.IndexLocator(self.xgrid, starttime)          	        #IndexLocator does not work righ when updating (new value)self.endofx
+        #majorlocator = ticker.MultipleLocator(self.xgrid)      	    	    	#MultipleLocator does not provide an offset for startime          
         majorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-10*self.xgrid,self.endofx*2.,self.xgrid)
         minorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-10*self.xgrid,self.endofx*2.,self.xgrid/6.)
         majorlocator = ticker.FixedLocator(majorloc)        
-        minorlocator = ticker.FixedLocator(minorloc)        
-      
+        minorlocator = ticker.FixedLocator(minorloc)
+        
+        self.ax.xaxis.set_minor_locator(minorlocator)      
         self.ax.xaxis.set_major_locator(majorlocator)
-        self.ax.xaxis.set_minor_locator(minorlocator)
         self.ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
 
         formatter = ticker.FuncFormatter(self.formtime)
@@ -1166,12 +1166,11 @@ class tgraphcanvas(FigureCanvas):
 
         for i in self.ax.xaxis.get_minorticklines() + self.ax.yaxis.get_minorticklines():
             i.set_markersize(5)        
-      
                 
         for label in self.ax.xaxis.get_ticklabels():
             label.set_rotation(self.xrotation)
 
-    #used by xaxistosm()
+    #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
             starttime = self.timex[self.timeindex[0]]
@@ -1737,10 +1736,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.etypeComboBox.setCurrentIndex(0)
                 aw.valueComboBox.setCurrentIndex(0)
             aw.eNumberSpinBox.setValue(Nevents)
-            
-
-        #update X label names and colors        
-        self.xaxistosm()
 
         #update Y label colors
         for label in self.ax.yaxis.get_ticklabels():
@@ -1749,6 +1744,9 @@ class tgraphcanvas(FigureCanvas):
         #ready to plot    
         self.fig.canvas.draw()     
 
+        #update X ticks, labels, and colors        
+        self.xaxistosm()
+
         # if designer ON
         if self.designerflag:
             if self.background:                
@@ -1756,20 +1754,23 @@ class tgraphcanvas(FigureCanvas):
             if len(self.timex):
                 self.redrawdesigner()
 
-
+    # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
-    #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep (changes value in self.redraw())
+    #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep (which changes value in self.redraw())
     def findtextgap(self,height1,height2):
         if self.mode == "F":
-            init = 50
-            gap = 30
+            init = 38  #was 50  (original values were too high)
+            gap = 19  #was 30
+            for i in range(init,81):  # was 90
+                if abs((height1 + self.ystep) - (height2+i)) > gap and abs((height1-self.ystep) - (height2-i)) > gap:
+                    break
         else:
-            init = 40
-            gap = 20
-        for i in range(init,90):
-            if abs((height1 + self.ystep) - (height2+i)) > gap and abs((height1-self.ystep) - (height2-i)) > gap:
-                break
-        return i 
+            init = 20  #was 40
+            gap = 11   #was 20
+            for i in range(init,54):  # was 90
+                if abs((height1 + self.ystep) - (height2+i)) > gap and abs((height1-self.ystep) - (height2-i)) > gap:
+                    break
+        return i  #return height of arm
                
     # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
     def stringfromseconds(self, seconds):
@@ -4559,7 +4560,7 @@ class ApplicationWindow(QMainWindow):
         level1layout.addWidget(self.button_10,2)
         level1layout.addWidget(self.button_18,1)
         level1layout.addWidget(self.button_7,2)
-        level1layout.addWidget(self.lcd1,3)
+        level1layout.addWidget(self.lcd1,3,Qt.AlignVCenter)  #note: Mac OS needs vertical alignment
 
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
@@ -7117,7 +7118,7 @@ class HUDDlg(QDialog):
         self.org_Projection = aw.qmc.projectFlag
         
         ETLabel = QLabel(QApplication.translate("Label", "ET Target",None, QApplication.UnicodeUTF8))
-        ETLabel.setAlignment(Qt.AlignRight)
+        ETLabel.setAlignment()
         BTLabel = QLabel(QApplication.translate("Label", "BT Target",None, QApplication.UnicodeUTF8))
         BTLabel.setAlignment(Qt.AlignRight)        
         modeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
@@ -12589,7 +12590,7 @@ class DeviceAssignmentDLG(QDialog):
             #populate table
             devices = aw.qmc.devices[:]  
             devices = sorted(devices)
-            devices.insert(0,"")         #add empty space for PID
+            #devices.insert(0,"")         #add empty space for PID
             for i in range(ndevices):
                 typeComboBox =  QComboBox()
                 typeComboBox.addItems(sorted(devices))
@@ -12692,19 +12693,15 @@ class DeviceAssignmentDLG(QDialog):
             mexpr1edit = self.devicetable.cellWidget(i,6)
             mexpr2edit = self.devicetable.cellWidget(i,7)
             
-            if not unicode(typecombobox.currentText()):
-##                aw.qmc.errorlog.append("Extra device empty")
-##                QMessageBox.information(self,"Device Conf","Extra device empty")    
-                return
-            else:
-                aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1
+            aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1
             aw.qmc.extraname1[i] = unicode(name1edit.text())
             aw.qmc.extraname2[i] = unicode(name2edit.text())
             aw.qmc.extramathexpression1[i] = unicode(mexpr1edit.text())
             aw.qmc.extramathexpression2[i] = unicode(mexpr2edit.text())       
         
         #update legend
-        aw.qmc.redraw()                       
+        aw.qmc.redraw()
+        
     def setextracolor(self,l,i):
         #line 1
         if l == 1:
