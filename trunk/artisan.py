@@ -7118,7 +7118,7 @@ class HUDDlg(QDialog):
         self.org_Projection = aw.qmc.projectFlag
         
         ETLabel = QLabel(QApplication.translate("Label", "ET Target",None, QApplication.UnicodeUTF8))
-        ETLabel.setAlignment()
+        ETLabel.setAlignment(Qt.AlignRight)
         BTLabel = QLabel(QApplication.translate("Label", "BT Target",None, QApplication.UnicodeUTF8))
         BTLabel.setAlignment(Qt.AlignRight)        
         modeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
