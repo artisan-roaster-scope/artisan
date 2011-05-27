@@ -250,6 +250,7 @@ class tgraphcanvas(FigureCanvas):
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
         self.extramathexpression1,self.extramathexpression2 = [],[]           # list with user defined math evaluating strings. Example "2*cos(x)"
+        self.extramatrix  = [len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1)]
 
         #holds math expressions to plot
         self.plotcurves=[u"",u"",u"",u"",u"",u""]
@@ -1296,10 +1297,9 @@ class tgraphcanvas(FigureCanvas):
         self.setCursor(Qt.ArrowCursor)
 
         #extra devices
-##        print len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2)
         for i in range(len(self.extradevices)):            
             self.extratimex[i],self.extratemp1[i],self.extratemp2[i] = [],[],[]
-
+        
         #reset alarms that have been triggered
         self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
 
@@ -1360,9 +1360,10 @@ class tgraphcanvas(FigureCanvas):
         self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
 
         ##### Extra devices-curves
-        for i in range(len(self.extradevices)):
-            self.extratemp1lines[i] = self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0]
-            self.extratemp2lines[i] = self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0]
+        self.extratemp1lines,self.extratemp2lines = [],[]
+        for i in range(len(self.extratimex)):
+            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
+            self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
 
         #check BACKGROUND flag
         if self.background:
@@ -5648,6 +5649,11 @@ class ApplicationWindow(QMainWindow):
             self.qmc.bag_humidity = [0.,0.]
         #extra devices    
         if "extratimex" in profile:
+            self.qmc.extradevices = profile["extradevices"]
+            self.qmc.extraname1 = profile["extraname1"]
+            self.qmc.extraname2 = profile["extraname2"]
+            self.qmc.extramathexpression1 = profile["extramathexpression1"]
+            self.qmc.extramathexpression2 = profile["extramathexpression2"]            
             self.qmc.extratimex = profile["extratimex"]            
             self.qmc.extratemp1 = profile["extratemp1"]
             self.qmc.extratemp2 = profile["extratemp2"]
@@ -5714,13 +5720,18 @@ class ApplicationWindow(QMainWindow):
         profile["xmax"] = self.qmc.endofx       
         profile["ambientTemp"] = self.qmc.ambientTemp
         profile["bag_humidity"] = self.qmc.bag_humidity
+
+        profile["extradevices"] = self.qmc.extradevices
+        profile["extraname1"] = self.qmc.extraname1        
+        profile["extraname2"] = self.qmc.extraname2 
+        profile["extramathexpression1"] = self.qmc.extramathexpression1
+        profile["extramathexpression2"] = self.qmc.extramathexpression2        
         profile["extratimex"] = self.qmc.extratimex
         profile["extratemp1"] = self.qmc.extratemp1
         profile["extratemp2"] = self.qmc.extratemp2
         profile["extradevicecolor1"] = self.qmc.extradevicecolor1
         profile["extradevicecolor2"] = self.qmc.extradevicecolor2
         
-
         return profile
     
     #saves recorded profile in hard drive. Called from file menu 
@@ -5928,15 +5939,6 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extramathexpression2 = list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList())
                 self.qmc.extradevicecolor1 = list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList())
                 self.qmc.extradevicecolor2 = list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())
-                #Note: self.qmc.extradevicecolor can also be passed by opening a profile but they must have same dimensions as self.qmc.extradevices in Qsettings.
-                if len(self.qmc.extradevices) < len(self.qmc.extradevicecolor1):
-                    #equalize lengths  
-                    self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:len(self.qmc.extradevices)]
-                    self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
-                if len(self.qmc.extradevices) > len(self.qmc.extradevicecolor1):
-                    for i in range(len(self.qmc.extradevices) - len(self.qmc.extradevicecolor1)):
-                        self.qmc.extradevicecolor1.append(u"black")
-                        self.qmc.extradevicecolor2.append(u"black")
                 #convert Qstrings to unicode
                 for i in range(len(self.qmc.extradevicecolor1)):
                     self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
@@ -6115,17 +6117,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("profilepath",self.userprofilepath)
             #save extra devices
             settings.beginGroup("ExtraDev")
-            settings.setValue("extradevices",self.qmc.extradevices)
-            #Note: self.qmc.extradevicecolor can also be passed by opening a profile but they must have same dimensions as self.qmc.extradevices in Qsettings.
-            if len(self.qmc.extradevices) < len(self.qmc.extradevicecolor1):
-                #equalize lengths  
-                self.qmc.extradevicecolor1 = self.qmc.extradevicecolor1[:len(self.qmc.extradevices)]
-                self.qmc.extradevicecolor2 = self.qmc.extradevicecolor2[:len(self.qmc.extradevices)]
-            if len(self.qmc.extradevices) > len(self.qmc.extradevicecolor1):
-                for i in range(len(self.qmc.extradevices) - len(self.qmc.extradevicecolor1)):
-                    self.qmc.extradevicecolor1.append(u"black")
-                    self.qmc.extradevicecolor2.append(u"black")
-                
+            settings.setValue("extradevices",self.qmc.extradevices)                
             settings.setValue("extradevicecolor1",self.qmc.extradevicecolor1)                                                                
             settings.setValue("extradevicecolor2",self.qmc.extradevicecolor2)
             settings.setValue("extraname1",self.qmc.extraname1)
