@@ -4601,7 +4601,7 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addWidget(self.messagelabel)
         mainlayout.addLayout(level3layout)
         mainlayout.addWidget(self.lowerbuttondialog)
-        mainlayout.addSpacing(2)
+        mainlayout.addSpacing(10)
         mainlayout.addWidget(self.EventsGroupLayout)
         
         # set visibility of mini event line
@@ -7338,38 +7338,38 @@ class HUDDlg(QDialog):
         self.equedit5 = QLineEdit(aw.qmc.plotcurves[4])
         self.equedit6 = QLineEdit(aw.qmc.plotcurves[5])
         color1Button = QPushButton("Color")
-        color1Button.setMaximumWidth(50)
+        color1Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color1Button, SIGNAL("clicked()"),lambda x=0: self.setcurvecolor(x))
         color2Button = QPushButton("Color")
-        color2Button.setMaximumWidth(50)
+        color2Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color2Button, SIGNAL("clicked()"),lambda x=1: self.setcurvecolor(x))
         color3Button = QPushButton("Color")
-        color3Button.setMaximumWidth(50)
+        color3Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color3Button, SIGNAL("clicked()"),lambda x=2: self.setcurvecolor(x))
         color4Button = QPushButton("Color")
-        color4Button.setMaximumWidth(50)
+        color4Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color4Button, SIGNAL("clicked()"),lambda x=3: self.setcurvecolor(x))
         color5Button = QPushButton("Color")
-        color5Button.setMaximumWidth(50)
+        color5Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color5Button, SIGNAL("clicked()"),lambda x=4: self.setcurvecolor(x))
         color6Button = QPushButton("Color")
-        color6Button.setMaximumWidth(50)
+        color6Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color6Button, SIGNAL("clicked()"),lambda x=5: self.setcurvecolor(x))
 
         equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None, QApplication.UnicodeUTF8))
+        equdrawbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equdrawbutton,SIGNAL("clicked()"),self.plotequ)
-        equdrawbutton.setMaximumWidth(80)
         equbackgroundbutton = QPushButton(QApplication.translate("Button","Set Plot 1 as background",None, QApplication.UnicodeUTF8))
+        equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equbackgroundbutton ,SIGNAL("clicked()"),self.setbackgroundequ1)
-        equdrawbutton.setMaximumWidth(80)
         
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None, QApplication.UnicodeUTF8))
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Imgage",None, QApplication.UnicodeUTF8))
+        saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None, QApplication.UnicodeUTF8))
-        saveImgButton.setMaximumWidth(100)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
         helpcurveButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
-        saveImgButton.setMaximumWidth(60)
+        helpcurveButton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpcurveButton, SIGNAL("clicked()"),self.showcurvehelp)
         
         curveLayout = QGridLayout()
@@ -7517,26 +7517,26 @@ class HUDDlg(QDialog):
         self.setLayout(Slayout)
 
     def showcurvehelp(self):
-        string  = QApplication.translate("MessageBox", "<b>abs(x)</b> Return the absolute value of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>acos(x)</b> Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"  
-        string += QApplication.translate("MessageBox", "<b>asin(x)</b> Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>atan(x)</b> Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>cos(x)</b> Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>degrees(x)</b> Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>exp(x)</b> Return e raised to the power of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>log(x[, base])</b> Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8) + "<br><br>"  
-        string += QApplication.translate("MessageBox", "<b>log10(x)</b> Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>pow(x, y)</b> Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>radians(x)</b> Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>sin(x)</b> Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>sqrt(x)</b> Return the square root of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>tan(x)</b> Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Y1</b> ET curve",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Y2</b> BT curve",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Y3</b> Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Y4</b> Extra devices #1 curve 2",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Y5</b> Extra devices #2 curve 1",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Y6</b> Extra devices #2 curve 2",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string  = QApplication.translate("MessageBox", "<b>abs(x):</b> Return the absolute value of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>acos(x):</b> Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"  
+        string += QApplication.translate("MessageBox", "<b>asin(x):</b> Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>atan(x):</b> Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>cos(x):</b> Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>degrees(x):</b> Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>exp(x):</b> Return e raised to the power of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>log(x[, base]):</b> Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8) + "<br><br>"  
+        string += QApplication.translate("MessageBox", "<b>log10(x):</b> Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>pow(x, y):</b> Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>radians(x):</b> Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>sin(x):</b> Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>sqrt(x):</b> Return the square root of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>tan(x):</b> Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Y1:</b> ET curve",None, QApplication.UnicodeUTF8) + "<br>"
+        string += QApplication.translate("MessageBox", "<b>Y2:</b> BT curve",None, QApplication.UnicodeUTF8) + "<br>"
+        string += QApplication.translate("MessageBox", "<b>Y3:</b> Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) + "<br>"
+        string += QApplication.translate("MessageBox", "<b>Y4:</b> Extra devices #1 curve 2",None, QApplication.UnicodeUTF8) + "<br>"
+        string += QApplication.translate("MessageBox", "<b>Y5:</b> Extra devices #2 curve 1",None, QApplication.UnicodeUTF8) + "<br>"
+        string += QApplication.translate("MessageBox", "<b>Y6:</b> Extra devices #2 curve 2",None, QApplication.UnicodeUTF8)
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Plotter Functions",None, QApplication.UnicodeUTF8),string)
 
@@ -9331,21 +9331,25 @@ class EventsDlg(QDialog):
         addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
         addButton.setToolTip(QApplication.translate("Tooltip","Add new extra Event button",None, QApplication.UnicodeUTF8))
         addButton.setMaximumWidth(100)
+        addButton.setFocusPolicy(Qt.NoFocus)
         self.connect(addButton, SIGNAL("clicked()"),self.insertextraeventbutton)
 
         delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
         delButton.setToolTip(QApplication.translate("Tooltip","Delete the last extra Event button",None, QApplication.UnicodeUTF8))
         delButton.setMaximumWidth(100)
+        delButton.setFocusPolicy(Qt.NoFocus)
         self.connect(delButton, SIGNAL("clicked()"),self.delextraeventbutton)
 
         savetableButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
         savetableButton.setToolTip(QApplication.translate("Tooltip","Save table",None, QApplication.UnicodeUTF8))
         savetableButton.setMaximumWidth(100)
+        savetableButton.setFocusPolicy(Qt.NoFocus)
         self.connect(savetableButton, SIGNAL("clicked()"),self.savetableextraeventbutton)
 
         helpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None, QApplication.UnicodeUTF8))
         helpButton.setMaximumWidth(100)
+        helpButton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpButton, SIGNAL("clicked()"),self.showEventbuttonhelp)
                 
         #### tab1 layout
@@ -9373,6 +9377,7 @@ class EventsDlg(QDialog):
         typelayout.addWidget(defaultButton,2,0)
 
         buttonLayout = QHBoxLayout()
+        buttonLayout.addStretch()
         buttonLayout.addWidget(closeButton)
         buttonLayout.addWidget(okButton)
 
@@ -9394,6 +9399,7 @@ class EventsDlg(QDialog):
         tab2buttonlayout = QHBoxLayout()    
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(delButton)
+        tab2buttonlayout.addStretch()
         tab2buttonlayout.addWidget(savetableButton)
         tab2buttonlayout.addWidget(helpButton)        
         tab2layout.addLayout(tab2buttonlayout)  
@@ -9408,7 +9414,7 @@ class EventsDlg(QDialog):
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Custom Buttons",None, QApplication.UnicodeUTF8))        
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Buttons",None, QApplication.UnicodeUTF8))        
         
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(TabWidget)
@@ -9425,13 +9431,13 @@ class EventsDlg(QDialog):
         if nbuttons:
             self.eventbuttontable.setRowCount(nbuttons)
             self.eventbuttontable.setColumnCount(7)
-            self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Button Label",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Event Description",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Event Type",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Event Value",None, QApplication.UnicodeUTF8),
+            self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8),
                                                              QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Action Description",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Button Visibility",None, QApplication.UnicodeUTF8)])
+                                                             QApplication.translate("Table","Documentation",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Visibility",None, QApplication.UnicodeUTF8)])
             self.eventbuttontable.setAlternatingRowColors(True)
             self.eventbuttontable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -9518,6 +9524,9 @@ class EventsDlg(QDialog):
 
     def delextraeventbutton(self):
         bindex = len(aw.extraeventstypes)-1
+        selected = self.eventbuttontable.selectedRanges()
+        if len(selected) > 0:
+            bindex = selected[0].topRow()
         if bindex >= 0:
             aw.extraeventslabels.pop(bindex)
             aw.extraeventsdescriptions.pop(bindex)
@@ -9920,8 +9929,8 @@ class flavorDlg(QDialog):
 
         self.bodySpinbox.setValue((int(aw.qmc.flavors[8]*10.)))
         
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None, QApplication.UnicodeUTF8))
-        saveImgButton.setMaximumWidth(100)
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Imgage",None, QApplication.UnicodeUTF8))
+        saveImgButton.setFocusPolicy(Qt.NoFocus)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
         backButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
@@ -10060,10 +10069,10 @@ class flavorDlg(QDialog):
         aw.update_minieventline_visibility()
         
     def close(self):    
-        aw.qmc.redraw()
         aw.lowerbuttondialog.setVisible(True)
         aw.update_minieventline_visibility()
         self.accept()
+        aw.qmc.redraw()
 
 #################################################################
 #################### BACKGROUND DIALOG  #########################
@@ -12267,11 +12276,11 @@ class comportDlg(QDialog):
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT device",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None, QApplication.UnicodeUTF8))
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra devices",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra",None, QApplication.UnicodeUTF8))
 
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -12286,7 +12295,7 @@ class comportDlg(QDialog):
         if ndevices:    
             self.serialtable.setRowCount(ndevices)
             self.serialtable.setColumnCount(7)
-            self.serialtable.setHorizontalHeaderLabels([QApplication.translate("Table","Extra Dev",None, QApplication.UnicodeUTF8),
+            self.serialtable.setHorizontalHeaderLabels([QApplication.translate("Table","Device",None, QApplication.UnicodeUTF8),
                                                         QApplication.translate("Table","Comm Port",None, QApplication.UnicodeUTF8),
                                                         QApplication.translate("Table","Baud Rate",None, QApplication.UnicodeUTF8),
                                                         QApplication.translate("Table","Byte Size",None, QApplication.UnicodeUTF8),
@@ -12580,9 +12589,22 @@ class DeviceAssignmentDLG(QDialog):
         self.createDeviceTable()
 
         addButton = QPushButton(QApplication.translate("extrasButton","Add",None, QApplication.UnicodeUTF8))
-        self.connect(addButton, SIGNAL("clicked()"),self.adddevice)                
+        addButton.setFocusPolicy(Qt.NoFocus)
+        addButton.setMinimumWidth(100)
+        addButton.setMaximumWidth(100)
+        self.connect(addButton, SIGNAL("clicked()"),self.adddevice)   
+        
         resetButton = QPushButton(QApplication.translate("extrasButton","Reset",None, QApplication.UnicodeUTF8))
+        resetButton.setFocusPolicy(Qt.NoFocus)
+        resetButton.setMinimumWidth(100)
+        resetButton.setMaximumWidth(100)
         self.connect(resetButton, SIGNAL("clicked()"),self.resetextradevices)
+
+        delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
+        delButton.setFocusPolicy(Qt.NoFocus)
+        delButton.setMinimumWidth(100)
+        delButton.setMaximumWidth(100)
+        self.connect(delButton, SIGNAL("clicked()"),self.deldevice)               
 
         ###########################  TAB 3 WIDGETS "ADVANCED"
         labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None, QApplication.UnicodeUTF8)) 
@@ -12630,37 +12652,35 @@ class DeviceAssignmentDLG(QDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(gridBox)
         tab1Layout.addWidget(PIDGroupLayout)
+        
+        tab1Layout.addWidget(labelETadvanced)
+        tab1Layout.addWidget(self.ETfunctionedit)
+        tab1Layout.addWidget(labelBTadvanced)
+        tab1Layout.addWidget(self.BTfunctionedit)
+        
         tab1Layout.addStretch()  
 
+        bLayout = QHBoxLayout()
+        bLayout.addWidget(addButton)
+        bLayout.addWidget(delButton)
+        bLayout.addStretch()
+        bLayout.addSpacing(10)
+        bLayout.addWidget(resetButton)
+        
         #LAYOUT TAB 2
         tab2Layout = QVBoxLayout()
         tab2Layout.addWidget(self.devicetable)
-        tab2buttonlayout = QHBoxLayout()
-        tab2buttonlayout.addWidget(addButton)
-        tab2buttonlayout.addWidget(resetButton)
-        tab2Layout.addLayout(tab2buttonlayout)
-        
-        #LAYOUT TAB 3
-        tab3Layout = QVBoxLayout()
-        tab3Layout.addWidget(labelETadvanced)
-        tab3Layout.addWidget(self.ETfunctionedit)
-        tab3Layout.addWidget(labelBTadvanced)
-        tab3Layout.addWidget(self.BTfunctionedit)
+        tab2Layout.addLayout(bLayout)
 
         #tab widget
         TabWidget = QTabWidget()
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT Dev.",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C1Widget,QApplication.translate("Tab","ET/BT",None, QApplication.UnicodeUTF8))
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Dev.",None, QApplication.UnicodeUTF8))
-
-        C3Widget = QWidget()
-        C3Widget.setLayout(tab3Layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Advanced",None, QApplication.UnicodeUTF8))
-
+        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra",None, QApplication.UnicodeUTF8))
 
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -12674,15 +12694,14 @@ class DeviceAssignmentDLG(QDialog):
         ndevices = len(aw.qmc.extradevices)
         if ndevices:    
             self.devicetable.setRowCount(ndevices)
-            self.devicetable.setColumnCount(8)
-            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Delete",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Device type",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Color line 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Color line 2",None, QApplication.UnicodeUTF8),
+            self.devicetable.setColumnCount(7)
+            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "Color 1",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "Color 2",None, QApplication.UnicodeUTF8),
                                                         QApplication.translate("Table", "Label 1",None, QApplication.UnicodeUTF8),
                                                         QApplication.translate("Table", "Label 2",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "y(x) 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "y(x) 2",None, QApplication.UnicodeUTF8)])
+                                                        QApplication.translate("Table", "y1(x)",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "y2(x)",None, QApplication.UnicodeUTF8)])
             
             self.devicetable.setAlternatingRowColors(True)
             self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -12699,14 +12718,13 @@ class DeviceAssignmentDLG(QDialog):
                 typeComboBox.addItems(sorted(devices))
                 typeComboBox.setCurrentIndex(devices.index(aw.qmc.devices[aw.qmc.extradevices[i]-1]))
 
-                color1Button = QPushButton(QApplication.translate("Button","Color 1",None, QApplication.UnicodeUTF8))
+                color1Button = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+                color1Button.setFocusPolicy(Qt.NoFocus)
                 self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
 
-                color2Button = QPushButton(QApplication.translate("Button","Color 2",None, QApplication.UnicodeUTF8))
+                color2Button = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+                color2Button.setFocusPolicy(Qt.NoFocus)
                 self.connect(color2Button, SIGNAL("clicked()"),lambda l = 2, c = i: self.setextracolor(l,c))
-
-                delButton = QPushButton(QApplication.translate("Button","Del",None, QApplication.UnicodeUTF8))
-                self.connect(delButton, SIGNAL("clicked()"),lambda x = i: self.delextradevice(x))
 
                 name1edit = QLineEdit(unicode(aw.qmc.extraname1[i]))            
                 name2edit = QLineEdit(unicode(aw.qmc.extraname2[i]))
@@ -12717,14 +12735,13 @@ class DeviceAssignmentDLG(QDialog):
                 mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None, QApplication.UnicodeUTF8))
                 
                 #add widgets to the table
-                self.devicetable.setCellWidget(i,0,delButton)              
-                self.devicetable.setCellWidget(i,1,typeComboBox)
-                self.devicetable.setCellWidget(i,2,color1Button)
-                self.devicetable.setCellWidget(i,3,color2Button)              
-                self.devicetable.setCellWidget(i,4,name1edit)              
-                self.devicetable.setCellWidget(i,5,name2edit)              
-                self.devicetable.setCellWidget(i,6,mexpr1edit)              
-                self.devicetable.setCellWidget(i,7,mexpr2edit)              
+                self.devicetable.setCellWidget(i,0,typeComboBox)
+                self.devicetable.setCellWidget(i,1,color1Button)
+                self.devicetable.setCellWidget(i,2,color2Button)              
+                self.devicetable.setCellWidget(i,3,name1edit)              
+                self.devicetable.setCellWidget(i,4,name2edit)              
+                self.devicetable.setCellWidget(i,5,mexpr1edit)              
+                self.devicetable.setCellWidget(i,6,mexpr2edit)              
 
     #adds extra device
     def adddevice(self):
@@ -12732,6 +12749,15 @@ class DeviceAssignmentDLG(QDialog):
         aw.addDevice()
         self.createDeviceTable()
         aw.qmc.redraw()
+        
+    def deldevice(self):
+        bindex = len(aw.qmc.extradevices)-1
+        selected = self.devicetable.selectedRanges()
+        if len(selected) > 0:
+            bindex = selected[0].topRow()
+        if bindex >= 0:
+            self.delextradevice(bindex)
+         
 
     def resetextradevices(self):      
         aw.qmc.extradevices = []                                      
@@ -12778,11 +12804,11 @@ class DeviceAssignmentDLG(QDialog):
         
     def savedevicetable(self):
         for i in range(len(aw.qmc.extradevices)):
-            typecombobox = self.devicetable.cellWidget(i,1)
-            name1edit = self.devicetable.cellWidget(i,4)
-            name2edit = self.devicetable.cellWidget(i,5)
-            mexpr1edit = self.devicetable.cellWidget(i,6)
-            mexpr2edit = self.devicetable.cellWidget(i,7)
+            typecombobox = self.devicetable.cellWidget(i,0)
+            name1edit = self.devicetable.cellWidget(i,3)
+            name2edit = self.devicetable.cellWidget(i,4)
+            mexpr1edit = self.devicetable.cellWidget(i,5)
+            mexpr2edit = self.devicetable.cellWidget(i,6)
             
             aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1
             aw.qmc.extraname1[i] = unicode(name1edit.text())
@@ -14323,25 +14349,25 @@ class AlarmDlg(QDialog):
         self.alarmtable.setTabKeyNavigation(True)
         self.createalarmtable()        
 
-        allonButton = QPushButton(QApplication.translate("Button","Set All ON",None, QApplication.UnicodeUTF8))
+        allonButton = QPushButton(QApplication.translate("Button","All On",None, QApplication.UnicodeUTF8))
         self.connect(allonButton,  SIGNAL("clicked()"), lambda flag=1: self.alarmson(flag))
         allonButton.setFocusPolicy(Qt.NoFocus)
 
-        alloffButton = QPushButton(QApplication.translate("Button","Set All OFF",None, QApplication.UnicodeUTF8))
+        alloffButton = QPushButton(QApplication.translate("Button","All Off",None, QApplication.UnicodeUTF8))
         self.connect(alloffButton, SIGNAL("clicked()"), lambda flag=0: self.alarmson(flag))
         alloffButton.setFocusPolicy(Qt.NoFocus)
 
         addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
         self.connect(addButton, SIGNAL("clicked()"),self.addalarm)
+        addButton.setMaximumWidth(100)
+        addButton.setMinimumWidth(100)
         addButton.setFocusPolicy(Qt.NoFocus)
 
         deleteButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
         self.connect(deleteButton, SIGNAL("clicked()"),self.deletealarm)
+        deleteButton.setMaximumWidth(100)
+        deleteButton.setMinimumWidth(100)
         deleteButton.setFocusPolicy(Qt.NoFocus)
-
-#        closeButton = QPushButton("Cancel")
-#        self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-#        closeButton.setFocusPolicy(Qt.NoFocus)
 
         saveButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         self.connect(saveButton, SIGNAL("clicked()"),self.closealarms)
@@ -14351,13 +14377,14 @@ class AlarmDlg(QDialog):
         mainlayout = QVBoxLayout()
 
         tablelayout.addWidget(self.alarmtable)
+        buttonlayout.addWidget(addButton)
+        buttonlayout.addWidget(deleteButton)
+        buttonlayout.addStretch()
+        buttonlayout.addSpacing(10)
         buttonlayout.addWidget(alloffButton)        
         buttonlayout.addWidget(allonButton)
-        buttonlayout.addWidget(deleteButton)
-        buttonlayout.addWidget(addButton)
+        buttonlayout.addSpacing(10)
         buttonlayout.addStretch()
-# close button makes no sense as the actions are taking immediately and an undo is not possible
-#        buttonlayout.addWidget(closeButton)
         buttonlayout.addWidget(saveButton)
 
         mainlayout.addLayout(tablelayout)
