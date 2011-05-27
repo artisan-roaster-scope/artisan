@@ -119,6 +119,7 @@ VERSION HISTORY
 
 v0.5.0 (28.5.2011)
 - support for Mac OS X 10.4 and PPC added
+- new wheel graph
 
 v0.4.1 (13.4.2011)
 - import of CSV is not limited anymore to filenames with "csv" extension
