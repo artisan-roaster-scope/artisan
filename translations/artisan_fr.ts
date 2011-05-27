@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="fr_FR">
+<!DOCTYPE TS>
+<TS version="2.0" language="fr_FR">
 <context>
     <name>About</name>
     <message>
@@ -2944,7 +2945,7 @@
     <message>
         <location filename="const/UIconst.py" line="78"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Langue</translation>
     </message>
 </context>
 <context>
