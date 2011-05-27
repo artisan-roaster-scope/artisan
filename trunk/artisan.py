@@ -250,7 +250,6 @@ class tgraphcanvas(FigureCanvas):
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
         self.extramathexpression1,self.extramathexpression2 = [],[]           # list with user defined math evaluating strings. Example "2*cos(x)"
-        self.extramatrix  = [len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1)]
 
         #holds math expressions to plot
         self.plotcurves=[u"",u"",u"",u"",u"",u""]
@@ -12580,8 +12579,10 @@ class DeviceAssignmentDLG(QDialog):
         self.devicetable.setTabKeyNavigation(True)
         self.createDeviceTable()
 
-        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
+        addButton = QPushButton(QApplication.translate("extrasButton","Add",None, QApplication.UnicodeUTF8))
         self.connect(addButton, SIGNAL("clicked()"),self.adddevice)                
+        resetButton = QPushButton(QApplication.translate("extrasButton","Reset",None, QApplication.UnicodeUTF8))
+        self.connect(resetButton, SIGNAL("clicked()"),self.resetextradevices)
 
         ###########################  TAB 3 WIDGETS "ADVANCED"
         labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None, QApplication.UnicodeUTF8)) 
@@ -12634,8 +12635,11 @@ class DeviceAssignmentDLG(QDialog):
         #LAYOUT TAB 2
         tab2Layout = QVBoxLayout()
         tab2Layout.addWidget(self.devicetable)
-        tab2Layout.addWidget(addButton)
-
+        tab2buttonlayout = QHBoxLayout()
+        tab2buttonlayout.addWidget(addButton)
+        tab2buttonlayout.addWidget(resetButton)
+        tab2Layout.addLayout(tab2buttonlayout)
+        
         #LAYOUT TAB 3
         tab3Layout = QVBoxLayout()
         tab3Layout.addWidget(labelETadvanced)
@@ -12728,7 +12732,22 @@ class DeviceAssignmentDLG(QDialog):
         aw.addDevice()
         self.createDeviceTable()
         aw.qmc.redraw()
-                                                
+
+    def resetextradevices(self):      
+        aw.qmc.extradevices = []                                      
+        aw.qmc.extratimex = []                                        
+        aw.qmc.extradevicecolor1 = []                                  
+        aw.qmc.extradevicecolor2 = []                                
+        aw.qmc.extratemp1,aw.qmc.extratemp2 = [],[]                     
+        aw.qmc.extratemp1lines,aw.qmc.extratemp2lines = [],[]           
+        aw.qmc.extraname1,aw.qmc.extraname2 = [],[]                     
+        aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]           
+        aw.ser.extraSP = []
+        #EXTRA COMM PORTS VARIABLES
+        aw.ser.extracomport,aw.ser.extrabaudrate,aw.ser.extrabytesize,aw.ser.extraparity,aw.ser.extrastopbits,aw.ser.extratimeout = [],[],[],[],[],[]
+        self.createDeviceTable()
+        aw.qmc.redraw()
+        
     def delextradevice(self,x):
         aw.qmc.extradevices.pop(x)
         aw.qmc.extradevicecolor1.pop(x)
