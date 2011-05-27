@@ -4180,7 +4180,7 @@ class ApplicationWindow(QMainWindow):
                                  "PID":"font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF ",
                                  "SV +":"font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff ",
                                  "SV -":"font-size: 10pt; font-weight: bold; color: white; background-color: lightblue ",
-                                 "SELECTED":"font-size: 12pt; font-weight: bold; color: yellow; background-color: purple"  #keyboard moves
+                                 "SELECTED":"font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824"  #keyboard moves
                                  }                                 
                                  
         #create START STOP buttons        
