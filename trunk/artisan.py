@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.5.0"
+__version__ = u"0.5.0b1"
 
 
 # ABOUT
@@ -5348,6 +5348,19 @@ class ApplicationWindow(QMainWindow):
         zero_t = 0
         #read column headers
         fields = data.next() 
+        extra_fields = fields[5:] # colums after 'Event'
+        # add devices if needed
+        for i in range(max(0,(len(extra_fields) / 2) - len(aw.qmc.extradevices))):
+            aw.addDevice()
+        # set extra device names # NOTE: eventuelly we want to set/change the names only for devices that were just added in the line above!?
+        for i in range(len(extra_fields)):
+            if i % 2 == 1:
+                # odd
+                aw.qmc.extraname2[i/2 + 1] = extra_fields[i] 
+            else:
+                # even
+                aw.qmc.extraname1[i/2] = extra_fields[i]
+            
         #read data
         last_time = None
         for row in data:
@@ -5361,6 +5374,14 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timex.append(timez)
                 self.qmc.temp1.append(float(item['ET']))
                 self.qmc.temp2.append(float(item['BT']))
+                for j in range(len(extra_fields)):
+                    if j % 2 == 1:
+                        # odd
+                        aw.qmc.extratemp2[j/2].append(float(item[extra_fields[j]]))
+                    else:
+                        # even
+                        aw.qmc.extratimex[j/2].append(timez)
+                        aw.qmc.extratemp1[j/2].append(float(item[extra_fields[j]]))
             last_time = timez
         csvFile.close()
         #swap temperature curves if needed such that BT is the lower and ET the upper one
@@ -5393,88 +5414,123 @@ class ApplicationWindow(QMainWindow):
         self.qmc.endofx = self.qmc.timex[-1]
         self.sendmessage(QApplication.translate("Message Area","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
         self.qmc.redraw()
+        
+    def addDevice(self):
+        aw.qmc.extradevices.append(1)
+        aw.qmc.extradevicecolor1.append(u"black") #init color to black
+        aw.qmc.extradevicecolor2.append(u"black")
+        aw.qmc.extraname1.append("Extra 1")
+        aw.qmc.extraname2.append("Extra 2")     
+        aw.qmc.extramathexpression1.append(u"")
+        aw.qmc.extramathexpression2.append(u"")
+        
+        #create new serial port (but not opened-connected)                                   
+        aw.ser.extraSP.append(serial.Serial()) 
+        #add and init dummy serial port settings
+        aw.ser.extracomport.append("COM1")
+        aw.ser.extrabaudrate.append(9600)
+        aw.ser.extrabytesize.append(8)
+        aw.ser.extraparity.append("E")
+        aw.ser.extrastopbits.append(1)
+        aw.ser.extratimeout.append(1)
+
+    	#add new line variables
+        aw.qmc.extratimex.append([])        
+        aw.qmc.extratemp1.append([])
+        aw.qmc.extratemp2.append([])
+
+        #add two extra lines
+        l = len(aw.qmc.extradevices)-1  #new line index
+        aw.qmc.extratemp1lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp1[l],color=aw.qmc.extradevicecolor1[l],linewidth=2,label= aw.qmc.extraname1[l])[0])
+        aw.qmc.extratemp2lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp2[l],color=aw.qmc.extradevicecolor2[l],linewidth=2,label= aw.qmc.extraname2[l])[0])
             
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
-        CHARGE = aw.qmc.timex[aw.qmc.timeindex[0]] 
-        TP_index = self.findTP()
-        TP = 0.
-        if TP_index and TP_index < len(self.qmc.timex):
-            TP = self.qmc.timex[TP_index]
-        dryEndIndex = self.findDryEnd(TP_index)
-        if self.qmc.timeindex[1]:
-            #manual dryend available
-            DRYe = self.qmc.timex[aw.qmc.timeindex[1]]
-        else:
-            #we use the dryEndIndex respecting the dry phase
-            if dryEndIndex < len(self.qmc.timex):
-                DRYe = self.qmc.timex[dryEndIndex]
+        if len(aw.qmc.timex) > 0:
+            CHARGE = aw.qmc.timex[aw.qmc.timeindex[0]] 
+            TP_index = self.findTP()
+            TP = 0.
+            if TP_index and TP_index < len(self.qmc.timex):
+                TP = self.qmc.timex[TP_index]
+            dryEndIndex = self.findDryEnd(TP_index)
+            if self.qmc.timeindex[1]:
+                #manual dryend available
+                DRYe = self.qmc.timex[aw.qmc.timeindex[1]]
             else:
-                DRYe = 0.
-        if self.qmc.timeindex[2]:
-            FCs = self.qmc.timex[self.qmc.timeindex[2]]
-        else:
-            FCs = 0
-        if self.qmc.timeindex[3]:
-            FCe = self.qmc.timex[self.qmc.timeindex[3]]
-        else:
-            FCe = 0
-        if self.qmc.timeindex[4]:
-            SCs = self.qmc.timex[self.qmc.timeindex[4]]
-        else:
-            SCs = 0
-        if self.qmc.timeindex[5]:
-            SCe = self.qmc.timex[self.qmc.timeindex[5]]
-        else:
-            SCe = 0
-        if self.qmc.timeindex[6]:
-            DROP = self.qmc.timex[self.qmc.timeindex[6]]
-        else:
-            DROP = 0
-        events = [     
-            [CHARGE,"Charge",False],
-            [TP,"TP",False],      
-            [DRYe,"Dry End",False], 
-            [FCs,"FCs",False],
-            [FCe,"FCe",False],
-            [SCs,"SCs",False],
-            [SCe,"SCe",False],
-            [DROP, "Drop",False],
-            ]
+                #we use the dryEndIndex respecting the dry phase
+                if dryEndIndex < len(self.qmc.timex):
+                    DRYe = self.qmc.timex[dryEndIndex]
+                else:
+                    DRYe = 0.
+            if self.qmc.timeindex[2]:
+                FCs = self.qmc.timex[self.qmc.timeindex[2]]
+            else:
+                FCs = 0
+            if self.qmc.timeindex[3]:
+                FCe = self.qmc.timex[self.qmc.timeindex[3]]
+            else:
+                FCe = 0
+            if self.qmc.timeindex[4]:
+                SCs = self.qmc.timex[self.qmc.timeindex[4]]
+            else:
+                SCs = 0
+            if self.qmc.timeindex[5]:
+                SCe = self.qmc.timex[self.qmc.timeindex[5]]
+            else:
+                SCe = 0
+            if self.qmc.timeindex[6]:
+                DROP = self.qmc.timex[self.qmc.timeindex[6]]
+            else:
+                DROP = 0
+            events = [     
+                [CHARGE,"Charge",False],
+                [TP,"TP",False],      
+                [DRYe,"Dry End",False], 
+                [FCs,"FCs",False],
+                [FCe,"FCe",False],
+                [SCs,"SCs",False],
+                [SCe,"SCe",False],
+                [DROP, "Drop",False],
+                ]
+                
+            import csv
+            csvFile= file(filename, "wb")
+            writer= csv.writer(csvFile,delimiter='\t')
+            writer.writerow([
+                "Date:" + self.qmc.roastdate.toString("dd'.'MM'.'yyyy"),
+                "Unit:" + self.qmc.mode,
+                "CHARGE:" + self.eventtime2string(CHARGE),
+                "TP:" + self.eventtime2string(TP),
+                "DRYe:" + self.eventtime2string(DRYe),
+                "FCs:" + self.eventtime2string(FCs),
+                "FCe:" + self.eventtime2string(FCe),
+                "SCs:" + self.eventtime2string(SCs),
+                "SCe:" + self.eventtime2string(SCe),
+                "DROP:" + self.eventtime2string(DROP)])     
+            writer.writerow(['Time1','Time2','BT','ET','Event'] + reduce(lambda x,y: x + [unicode(y[0]),unicode(y[1])], zip(aw.qmc.extraname1[0:len(aw.qmc.extradevices)],aw.qmc.extraname2[0:len(aw.qmc.extradevices)]),[]))
+                
+            last_time = None
+            for i in range(len(self.qmc.timex)):
+                if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
+                    time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
+                else:
+                    time2 = "" 
+                event = ""               
+                for e in range(len(events)):
+                    if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
+                        event = events[e][1]
+                        events[e][2] = True
+                        break
+                time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
+                if not last_time or last_time != time1:
+                    extratemps = []
+                    for j in range(len(aw.qmc.extradevices)):
+                        extratemps.append(aw.qmc.extratemp1[j][i])
+                        extratemps.append(aw.qmc.extratemp2[j][i])
+                    writer.writerow([time1,time2,self.qmc.temp2[i],self.qmc.temp1[i],event] + extratemps)
+                last_time = time1
+            csvFile.close()
             
-        import csv
-        csvFile= file(filename, "wb")
-        writer= csv.writer(csvFile,delimiter='\t')
-        writer.writerow([
-            "Date:" + self.qmc.roastdate.toString("dd'.'MM'.'yyyy"),
-            "Unit:" + self.qmc.mode,
-            "CHARGE:" + self.eventtime2string(CHARGE),
-            "TP:" + self.eventtime2string(TP),
-            "DRYe:" + self.eventtime2string(DRYe),
-            "FCs:" + self.eventtime2string(FCs),
-            "FCe:" + self.eventtime2string(FCe),
-            "SCs:" + self.eventtime2string(SCs),
-            "SCe:" + self.eventtime2string(SCe),
-            "DROP:" + self.eventtime2string(DROP)])
-        writer.writerow(['Time1','Time2','BT','ET','Event'])
-
-        last_time = None
-        for i in range(len(self.qmc.timex)):
-            if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
-                time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
-            else:
-                time2 = "" 
-            event = ""               
-            for e in range(len(events)):
-                if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
-                    event = events[e][1]
-                    events[e][2] = True
-                    break
-            time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
-            if not last_time or last_time != time1:
-                writer.writerow([time1,time2,self.qmc.temp2[i],self.qmc.temp1[i],event])
-            last_time = time1
-        csvFile.close()
                 
     #Write object to file
     def serialize(self,filename,obj):
@@ -12677,34 +12733,7 @@ class DeviceAssignmentDLG(QDialog):
     #adds extra device
     def adddevice(self):
         self.savedevicetable()
-        aw.qmc.extradevices.append(1)
-        aw.qmc.extradevicecolor1.append(u"black") #init color to black
-        aw.qmc.extradevicecolor2.append(u"black")
-        aw.qmc.extraname1.append("Extra 1")
-        aw.qmc.extraname2.append("Extra 2")     
-        aw.qmc.extramathexpression1.append(u"")
-        aw.qmc.extramathexpression2.append(u"")
-        
-        #create new serial port (but not opened-connected)                                   
-        aw.ser.extraSP.append(serial.Serial()) 
-        #add and init dummy serial port settings
-        aw.ser.extracomport.append("COM1")
-        aw.ser.extrabaudrate.append(9600)
-        aw.ser.extrabytesize.append(8)
-        aw.ser.extraparity.append("E")
-        aw.ser.extrastopbits.append(1)
-        aw.ser.extratimeout.append(1)
-
-    	#add new line variables
-        aw.qmc.extratimex.append([])        
-        aw.qmc.extratemp1.append([])
-        aw.qmc.extratemp2.append([])
-
-        #add two extra lines
-        l = len(aw.qmc.extradevices)-1  #new line index
-        aw.qmc.extratemp1lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp1[l],color=aw.qmc.extradevicecolor1[l],linewidth=2,label= aw.qmc.extraname1[l])[0])
-        aw.qmc.extratemp2lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp2[l],color=aw.qmc.extradevicecolor2[l],linewidth=2,label= aw.qmc.extraname2[l])[0])
-        
+        aw.addDevice()
         self.createDeviceTable()
         aw.qmc.redraw()
                                                 
