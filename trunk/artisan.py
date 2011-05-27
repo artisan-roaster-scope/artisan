@@ -110,9 +110,14 @@ app.setOrganizationName("YourQuest")                                    #needed 
 app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system 
 if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
+
 #Localization support
-locale = QLocale.system().name()
-#locale = "fr"
+settings = QSettings()
+locale = settings.value('locale').toString()
+if locale == "":
+    locale = QLocale.system().name()
+    settings.setValue('locale', locale)
+
 qtTranslator = QTranslator()
 #load Qt default translations from QLibrary
 if qtTranslator.load("qt_" + locale, QLibraryInfo.location(QLibraryInfo.TranslationsPath)): 
@@ -4082,6 +4087,30 @@ class ApplicationWindow(QMainWindow):
         self.connect(autosaveAction,SIGNAL("triggered()"),self.autosaveconf)
         self.ConfMenu.addAction(autosaveAction) 
 
+        self.ConfMenu.addSeparator()
+
+        languageMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_LANGUAGE)
+
+        FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
+        self.connect(FrenchLanguage,SIGNAL("triggered()"),lambda lang="fr":self.changelocale(lang))
+        languageMenu.addAction(FrenchLanguage)
+
+        EnglishLanguage = QAction(UIconst.CONF_MENU_ENGLISH,self)
+        self.connect(EnglishLanguage,SIGNAL("triggered()"),lambda lang="en":self.changelocale(lang))
+        languageMenu.addAction(EnglishLanguage) 
+
+        GermanLanguage = QAction(UIconst.CONF_MENU_GERMAN,self)
+        self.connect(GermanLanguage,SIGNAL("triggered()"),lambda lang="de":self.changelocale(lang))
+        languageMenu.addAction(GermanLanguage)
+
+        SpanishLanguage = QAction(UIconst.CONF_MENU_SPANISH,self)
+        self.connect(SpanishLanguage,SIGNAL("triggered()"),lambda lang="es":self.changelocale(lang))
+        languageMenu.addAction(SpanishLanguage) 
+
+        SwedishLanguage = QAction(UIconst.CONF_MENU_SWEDISH,self)
+        self.connect(SwedishLanguage,SIGNAL("triggered()"),lambda lang="sv":self.changelocale(lang))
+        languageMenu.addAction(SwedishLanguage) 
+
         # TOOLKIT menu
         self.designerAction = QAction(UIconst.TOOLKIT_MENU_DESIGNER,self)
         self.connect(self.designerAction ,SIGNAL("triggered()"),self.designerTriggered)
@@ -6726,7 +6755,13 @@ $cupping_notes
         else:
             QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Alarm Config",None, QApplication.UnicodeUTF8),
                                     QApplication.translate("MessageBox", "Alarms are not available for device None",None, QApplication.UnicodeUTF8))
-        
+
+    def changelocale(self,languagelocale):
+        settings = QSettings()
+        settings.setValue('locale', languagelocale)
+        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Switch Language",None, QApplication.UnicodeUTF8),
+                                QApplication.translate("MessageBox","Language successfully changed. Restart the application.",None, QApplication.UnicodeUTF8))
+
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loss in percentage as float
     def weight_loss(self,green,roasted):
