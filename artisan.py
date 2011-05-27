@@ -1225,10 +1225,12 @@ class tgraphcanvas(FigureCanvas):
         if not self.keeptimeflag:
             self.endofx = 60
         aw.lcd1.display("00:00")
-        aw.lcd2.display(0.0)
-        aw.lcd3.display(0.0)
-        aw.lcd4.display(0)
-        aw.lcd5.display(0)
+        aw.lcd2.display("0.0")
+        aw.lcd3.display("0.0")
+        aw.lcd4.display("0.0")
+        aw.lcd5.display("0.0")
+        aw.lcd6.display("0.0")
+        aw.lcd7.display("0.0")
         aw.sendmessage(QApplication.translate("Message Area","Scope has been reset",None, QApplication.UnicodeUTF8))
         aw.button_3.setDisabled(False)
         aw.button_4.setDisabled(False)
@@ -4342,7 +4344,6 @@ class ApplicationWindow(QMainWindow):
         self.lcd1 = QLCDNumber() # time
         self.lcd1.setSegmentStyle(2)
         self.lcd1.setMinimumHeight(45)
-        self.lcd1.display("00:00")
         self.lcd2 = QLCDNumber() # Temperature MET
         self.lcd2.setSegmentStyle(2)   
         self.lcd2.setMinimumHeight(35)
@@ -4362,6 +4363,16 @@ class ApplicationWindow(QMainWindow):
         self.lcd7.setSegmentStyle(2)
         self.lcd7.setMinimumHeight(35)
         #self.lcd1.setStyleSheet("QLCDNumber { }")
+
+        self.lcd1.display("00:00")
+        self.lcd2.display("0.0")
+        self.lcd3.display("0.0")
+        self.lcd4.display("0.0")
+        self.lcd5.display("0.0")
+        self.lcd6.display("0.0")
+        self.lcd7.display("0.0")
+
+
 
         self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
         self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["met"],self.lcdpaletteB["met"]))
@@ -7517,28 +7528,35 @@ class HUDDlg(QDialog):
         self.setLayout(Slayout)
 
     def showcurvehelp(self):
-        string  = QApplication.translate("MessageBox", "<b>abs(x):</b> Return the absolute value of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>acos(x):</b> Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"  
-        string += QApplication.translate("MessageBox", "<b>asin(x):</b> Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>atan(x):</b> Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>cos(x):</b> Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>degrees(x):</b> Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>exp(x):</b> Return e raised to the power of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>log(x[, base]):</b> Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8) + "<br><br>"  
-        string += QApplication.translate("MessageBox", "<b>log10(x):</b> Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>pow(x, y):</b> Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>radians(x):</b> Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>sin(x):</b> Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>sqrt(x):</b> Return the square root of x.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>tan(x):</b> Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Y1:</b> ET curve",None, QApplication.UnicodeUTF8) + "<br>"
-        string += QApplication.translate("MessageBox", "<b>Y2:</b> BT curve",None, QApplication.UnicodeUTF8) + "<br>"
-        string += QApplication.translate("MessageBox", "<b>Y3:</b> Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) + "<br>"
-        string += QApplication.translate("MessageBox", "<b>Y4:</b> Extra devices #1 curve 2",None, QApplication.UnicodeUTF8) + "<br>"
-        string += QApplication.translate("MessageBox", "<b>Y5:</b> Extra devices #2 curve 1",None, QApplication.UnicodeUTF8) + "<br>"
-        string += QApplication.translate("MessageBox", "<b>Y6:</b> Extra devices #2 curve 2",None, QApplication.UnicodeUTF8)
 
-        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Plotter Functions",None, QApplication.UnicodeUTF8),string)
+        string1  = QApplication.translate("MessageBox", "<UL><LI><b>abs(x)</b> Return the absolute value of x.",None, QApplication.UnicodeUTF8)
+        string1 += QApplication.translate("MessageBox", "<LI><b>acos(x)</b> Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8)   
+        string1 += QApplication.translate("MessageBox", "<LI><b>asin(x)</b> Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8)
+        string1 += QApplication.translate("MessageBox", "<LI><b>atan(x)</b> Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8) 
+        string1 += QApplication.translate("MessageBox", "<LI><b>cos(x)</b> Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8)
+        string1 += QApplication.translate("MessageBox", "<LI><b>degrees(x)</b> Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8) 
+        string1 += QApplication.translate("MessageBox", "<LI><b>exp(x)</b> Return e raised to the power of x.",None, QApplication.UnicodeUTF8)
+        string1 += QApplication.translate("MessageBox", "<LI><b>log(x[, base])</b> Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8) 
+        string1 += QApplication.translate("MessageBox", "<LI><b>log10(x)</b> Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8) 
+        string1 += QApplication.translate("MessageBox", "<LI><b>pow(x, y)</b> Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8)
+        string1 += QApplication.translate("MessageBox", "<LI><b>radians(x)</b> Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) 
+        string1 += QApplication.translate("MessageBox", "<LI><b>sin(x)</b> Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8)
+        string1 += QApplication.translate("MessageBox", "<LI><b>sqrt(x)</b> Return the square root of x.",None, QApplication.UnicodeUTF8) 
+        string1 += QApplication.translate("MessageBox", "<LI><b>tan(x)</b> Return the tangent of x (measured in radians).</UL>",None, QApplication.UnicodeUTF8) 
+
+        string2 = QApplication.translate("MessageBox", "<UL><LI><b>x</b>",None, QApplication.UnicodeUTF8) 
+        string2 += QApplication.translate("MessageBox", "<LI><b>Y1</b> ET curve",None, QApplication.UnicodeUTF8) 
+        string2 += QApplication.translate("MessageBox", "<LI><b>Y2</b> BT curve",None, QApplication.UnicodeUTF8)
+        string2 += QApplication.translate("MessageBox", "<LI><b>Y3</b> Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) 
+        string2 += QApplication.translate("MessageBox", "<LI><b>Y4</b> Extra devices #1 curve 2",None, QApplication.UnicodeUTF8)
+        string2 += QApplication.translate("MessageBox", "<LI><b>Y5</b> Extra devices #2 curve 1",None, QApplication.UnicodeUTF8)
+        string2 += QApplication.translate("MessageBox", "<LI><b>Y6</b> Extra devices #2 curve 2</UL>",None, QApplication.UnicodeUTF8) 
+
+        string3 = "<TABLE  WIDTH=550><TR><TH>MATHEMATICAL FUNCTIONS</TH><TH>SYMBOLIC VARIABLES</TH></TR>"
+        string3 += "<TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD></TR></TABLE>"
+
+        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Plotter Functions",None, QApplication.UnicodeUTF8),string3)
+
 
     def setcurvecolor(self,x):
         colorf = QColorDialog.getColor(QColor(aw.qmc.plotcurvecolor[x]),self)
