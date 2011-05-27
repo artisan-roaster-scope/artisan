@@ -1,3 +1,4 @@
+# -*- coding: cp1252 -*-
 # UI related constants for the Artisan application.
 #
 # LICENSE
@@ -74,6 +75,12 @@ CONF_MENU_STATISTICS = QApplication.translate("Menu", "Statistics...", None, QAp
 CONF_MENU_AXES = QApplication.translate("Menu", "Axes...", None, QApplication.UnicodeUTF8)
 CONF_MENU_AUTOSAVE = QApplication.translate("Menu", "Autosave...", None, QApplication.UnicodeUTF8)
 CONF_MENU_ALARMS = QApplication.translate("Menu", "Alarms...", None, QApplication.UnicodeUTF8)
+CONF_MENU_LANGUAGE = QApplication.translate("Menu", "Language", None, QApplication.UnicodeUTF8)
+CONF_MENU_FRENCH = u"Français" # Do not translate
+CONF_MENU_ENGLISH = u"English" # Do not translate
+CONF_MENU_GERMAN = u"Deutsch"  # Do not translate
+CONF_MENU_SPANISH = u"Español" # Do not translate
+CONF_MENU_SWEDISH = u"Svenska" # Do not translate
 
 #Toolkit menu
 TOOLKIT_MENU = QApplication.translate("Menu", "Tools", None, QApplication.UnicodeUTF8)
