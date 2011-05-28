@@ -5658,17 +5658,26 @@ class ApplicationWindow(QMainWindow):
         else:
             self.qmc.bag_humidity = [0.,0.]
         #extra devices    
-        if "extratimex" in profile:
-            self.qmc.extradevices = profile["extradevices"]
-            self.qmc.extraname1 = profile["extraname1"]
-            self.qmc.extraname2 = profile["extraname2"]
-            self.qmc.extramathexpression1 = profile["extramathexpression1"]
-            self.qmc.extramathexpression2 = profile["extramathexpression2"]            
-            self.qmc.extratimex = profile["extratimex"]            
-            self.qmc.extratemp1 = profile["extratemp1"]
-            self.qmc.extratemp2 = profile["extratemp2"]
-            self.qmc.extradevicecolor1 = profile["extradevicecolor1"]
-            self.qmc.extradevicecolor2 = profile["extradevicecolor2"]
+        if "extratimex" in profile:   
+            self.qmc.extratimex = profile["extratimex"]     
+            if "extratemp1" in profile:       
+                self.qmc.extratemp1 = profile["extratemp1"]
+            if "extratemp2" in profile:
+                self.qmc.extratemp2 = profile["extratemp2"]
+            if "extradevices" in profile:
+                self.qmc.extradevices = profile["extradevices"]
+            if "extraname1" in profile:
+                self.qmc.extraname1 = profile["extraname1"]
+            if "extraname2" in profile:
+                self.qmc.extraname2 = profile["extraname2"]
+            if "extramathexpression1" in profile:
+                self.qmc.extramathexpression1 = profile["extramathexpression1"]
+            if "extramathexpression2" in profile:
+                self.qmc.extramathexpression2 = profile["extramathexpression2"]
+            if "extradevicecolor1" in profile:
+                self.qmc.extradevicecolor1 = profile["extradevicecolor1"]
+            if "extradevicecolor2" in profile:
+                self.qmc.extradevicecolor2 = profile["extradevicecolor2"]
             
         if "timeindex" in profile:
             self.qmc.timeindex = profile["timeindex"]
