@@ -7529,31 +7529,35 @@ class HUDDlg(QDialog):
 
     def showcurvehelp(self):
 
-        string1  = QApplication.translate("MessageBox", "<UL><LI><b>abs(x)</b> Return the absolute value of x.",None, QApplication.UnicodeUTF8)
-        string1 += QApplication.translate("MessageBox", "<LI><b>acos(x)</b> Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8)   
-        string1 += QApplication.translate("MessageBox", "<LI><b>asin(x)</b> Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8)
-        string1 += QApplication.translate("MessageBox", "<LI><b>atan(x)</b> Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8) 
-        string1 += QApplication.translate("MessageBox", "<LI><b>cos(x)</b> Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8)
-        string1 += QApplication.translate("MessageBox", "<LI><b>degrees(x)</b> Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8) 
-        string1 += QApplication.translate("MessageBox", "<LI><b>exp(x)</b> Return e raised to the power of x.",None, QApplication.UnicodeUTF8)
-        string1 += QApplication.translate("MessageBox", "<LI><b>log(x[, base])</b> Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8) 
-        string1 += QApplication.translate("MessageBox", "<LI><b>log10(x)</b> Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8) 
-        string1 += QApplication.translate("MessageBox", "<LI><b>pow(x, y)</b> Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8)
-        string1 += QApplication.translate("MessageBox", "<LI><b>radians(x)</b> Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) 
-        string1 += QApplication.translate("MessageBox", "<LI><b>sin(x)</b> Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8)
-        string1 += QApplication.translate("MessageBox", "<LI><b>sqrt(x)</b> Return the square root of x.",None, QApplication.UnicodeUTF8) 
-        string1 += QApplication.translate("MessageBox", "<LI><b>tan(x)</b> Return the tangent of x (measured in radians).</UL>",None, QApplication.UnicodeUTF8) 
+        string1  = "<UL><LI><b>abs(x)</b> " +  QApplication.translate("MessageBox","Return the absolute value of x.",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>acos(x)</b> " +     QApplication.translate("MessageBox","Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8)   
+        string1 += "<LI><b>asin(x)</b> " +     QApplication.translate("MessageBox","Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>atan(x)</b> " +     QApplication.translate("MessageBox","Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>cos(x)</b> "  +     QApplication.translate("MessageBox","Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>degrees(x)</b> " +  QApplication.translate("MessageBox", "Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>exp(x)</b> " +     QApplication.translate("MessageBox", "Return e raised to the power of x.",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>log(x[, base])</b> "+ QApplication.translate("MessageBox", "Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>log10(x)</b> " +   QApplication.translate("MessageBox", "Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>pow(x, y)</b> " +   QApplication.translate("MessageBox", "Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>radians(x)</b> " +  QApplication.translate("MessageBox", "Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>sin(x)</b> " +      QApplication.translate("MessageBox", "Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>sqrt(x)</b> " +     QApplication.translate("MessageBox", "Return the square root of x.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>tan(x)</b> " +      QApplication.translate("MessageBox", "Return the tangent of x (measured in radians).</UL>",None, QApplication.UnicodeUTF8) 
 
-        string2 = QApplication.translate("MessageBox", "<UL><LI><b>x</b>",None, QApplication.UnicodeUTF8) 
-        string2 += QApplication.translate("MessageBox", "<LI><b>Y1</b> ET curve",None, QApplication.UnicodeUTF8) 
-        string2 += QApplication.translate("MessageBox", "<LI><b>Y2</b> BT curve",None, QApplication.UnicodeUTF8)
-        string2 += QApplication.translate("MessageBox", "<LI><b>Y3</b> Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) 
-        string2 += QApplication.translate("MessageBox", "<LI><b>Y4</b> Extra devices #1 curve 2",None, QApplication.UnicodeUTF8)
-        string2 += QApplication.translate("MessageBox", "<LI><b>Y5</b> Extra devices #2 curve 1",None, QApplication.UnicodeUTF8)
-        string2 += QApplication.translate("MessageBox", "<LI><b>Y6</b> Extra devices #2 curve 2</UL>",None, QApplication.UnicodeUTF8) 
+        string2 = "<UL><LI><b>x</b>" 
+        string2 += "<LI><b>Y1</b> " + QApplication.translate("MessageBox", "ET curve",None, QApplication.UnicodeUTF8) 
+        string2 += "<LI><b>Y2</b> " +  QApplication.translate("MessageBox", "BT curve",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y3</b> " +  QApplication.translate("MessageBox", "Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) 
+        string2 += "<LI><b>Y4</b> " +  QApplication.translate("MessageBox", "Extra devices #1 curve 2",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y5</b> " +  QApplication.translate("MessageBox", "Extra devices #2 curve 1",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y6</b> " +  QApplication.translate("MessageBox", "Extra devices #2 curve 2</UL>",None, QApplication.UnicodeUTF8) 
 
-        string3 = "<TABLE  WIDTH=550><TR><TH>MATHEMATICAL FUNCTIONS</TH><TH>SYMBOLIC VARIABLES</TH></TR>"
-        string3 += "<TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD></TR></TABLE>"
+        #format help
+        string3 = "<TABLE  WIDTH=550><TR><TH>"
+        string3 += QApplication.translate("MessageBox",  "MATHEMATICAL FUNCTIONS",None, QApplication.UnicodeUTF8)
+        string3 += "</TH><TH>"
+        string3 += QApplication.translate("MessageBox",  "SYMBOLIC VARIABLES",None, QApplication.UnicodeUTF8)
+        string3 += "</TH></TR><TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD></TR></TABLE>"
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Plotter Functions",None, QApplication.UnicodeUTF8),string3)
 
