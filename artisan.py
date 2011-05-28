@@ -7542,7 +7542,8 @@ class HUDDlg(QDialog):
         string1 += "<LI><b>radians(x)</b> " +  QApplication.translate("MessageBox", "Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) 
         string1 += "<LI><b>sin(x)</b> " +      QApplication.translate("MessageBox", "Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8)
         string1 += "<LI><b>sqrt(x)</b> " +     QApplication.translate("MessageBox", "Return the square root of x.",None, QApplication.UnicodeUTF8) 
-        string1 += "<LI><b>tan(x)</b> " +      QApplication.translate("MessageBox", "Return the tangent of x (measured in radians).</UL>",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>tan(x)</b> " +      QApplication.translate("MessageBox", "Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8) 
+        string1 += "</UL>"
 
         string2 = "<UL><LI><b>x</b>" 
         string2 += "<LI><b>Y1</b> " + QApplication.translate("MessageBox", "ET curve",None, QApplication.UnicodeUTF8) 
@@ -7550,7 +7551,8 @@ class HUDDlg(QDialog):
         string2 += "<LI><b>Y3</b> " +  QApplication.translate("MessageBox", "Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) 
         string2 += "<LI><b>Y4</b> " +  QApplication.translate("MessageBox", "Extra devices #1 curve 2",None, QApplication.UnicodeUTF8)
         string2 += "<LI><b>Y5</b> " +  QApplication.translate("MessageBox", "Extra devices #2 curve 1",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y6</b> " +  QApplication.translate("MessageBox", "Extra devices #2 curve 2</UL>",None, QApplication.UnicodeUTF8) 
+        string2 += "<LI><b>Y6</b> " +  QApplication.translate("MessageBox", "Extra devices #2 curve 2",None, QApplication.UnicodeUTF8)
+        string2 += "</UL>"
 
         #format help
         string3 = "<TABLE  WIDTH=550><TR><TH>"
@@ -9521,7 +9523,11 @@ class EventsDlg(QDialog):
             aw.extraeventsdescriptions[i] = unicode(descriptionedit.text())
             
             actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
-            aw.extraeventsactionstrings[i] = unicode(actiondescriptionedit.text())
+            ades = unicode(actiondescriptionedit.text())
+            if "\\n" in ades:              #adds return if "\n" found in string (used by device Arduino)
+                parts = ades.split("\\n")
+                ades = chr(10).join(parts)
+            aw.extraeventsactionstrings[i] = ades 
             
             aw.sendmessage(QApplication.translate("Message Area","Custom Event buttons configuration saved", None, QApplication.UnicodeUTF8))        
 
