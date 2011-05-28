@@ -7613,7 +7613,7 @@ class HUDDlg(QDialog):
             for i in range(len(x_range)):
                 y_range.append(self.eval_curve_expression(EQU[e],x_range[i]))
             aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
-            aw.qmc.fig.canvas.draw()
+        aw.qmc.fig.canvas.draw()
 
     def eval_curve_expression(self,mathexpression,x):
         if len(mathexpression):
@@ -7651,7 +7651,7 @@ class HUDDlg(QDialog):
                         Y = [aw.qmc.temp1[index],aw.qmc.temp2[index]]
                         if len(aw.qmc.extratimex):
                             if len(aw.qmc.extratimex[0]):
-                                for i in range(len(aw.qmc.devices)):
+                                for i in range(len(aw.qmc.extradevices)):
                                     Y.append(aw.qmc.extratemp1[i][index])
                                     Y.append(aw.qmc.extratemp2[i][index])
 
