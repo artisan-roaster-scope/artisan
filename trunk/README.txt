@@ -1,4 +1,4 @@
-readme.txt
+﻿readme.txt
 
 Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
 
@@ -21,7 +21,7 @@ FEATURES
 o runs on Mac OS X 10.5/10.6, Windows, and Linux
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
- - Omega HH309, HH506RA, HH802U, HH806AU
+ - Omega HH309, HH506RA, HH802U, HH806AU, HHM28
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
  - VOLTCRAFT K202, K204, 300K, 302KJ
  - EXTECH 421509
@@ -40,6 +40,9 @@ o CSV export
 o Omega HH506 and K202 CSV import
 o profile designer
 o localizations (partial translations for German, French, Spanish, Swedish, Italian)
+o Wheel Graph editor
+o run-time multiple device compatibility with symbolic expressions support
+o mathematical plotter
 
 
 INSTALLATION
@@ -117,9 +120,21 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
-v0.5.0 (28.5.2011)
+v0.5.0 (28.5.2011 beta)
 - support for Mac OS X 10.4 and PPC added
-- new wheel graph
+- added more translations
+- added wheel graph editor
+- added custom event-control buttons
+- added Omega HHM28 multimeter device support
+- added support for devices with 4 thermocouples
+- added PID duty cycle
+- added math plotter in Extras
+- added run-time multiple device compatibility and symbolic expressions support
+- improved configuration of Axes
+- improved configuration of PID
+- improved Arduino code
+- bug fixes
+
 
 v0.4.1 (13.4.2011)
 - import of CSV is not limited anymore to filenames with "csv" extension
