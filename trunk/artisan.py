@@ -14218,7 +14218,11 @@ class WheelDlg(QDialog):
     #reads label edit box for wheel with index x, and updates labels 
     def updatelabels(self,x):
         labelsedit =  self.datatable.cellWidget(x,1)
-        newwheellabels = unicode(labelsedit.text()).strip().split(",")
+        text  = unicode(labelsedit.text())
+        if "\\n" in text:              #make multiple line text if "\n" found in label string
+            parts = text.split("\\n")
+            text = chr(10).join(parts)
+        newwheellabels = text.strip().split(",")
         newnlabels = len(newwheellabels)
         oldnlabels = len(aw.qmc.wheelnames[x])
         
