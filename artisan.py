@@ -5638,6 +5638,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.flavorlabels = QStringList(profile["flavorlabels"])
         for i in range(len(self.qmc.flavorlabels)):
             self.qmc.flavorlabels[i] = unicode(self.qmc.flavorlabels[i])
+
+        if "flavorstartangle" in profile:
+            self.qmc.flavorstartangle = int(profile["flavorstartangle"])
             
         if "title" in profile:
             self.qmc.title = unicode(profile["title"])
@@ -5780,6 +5783,7 @@ class ApplicationWindow(QMainWindow):
         profile["timeindex"] = self.qmc.timeindex
         profile["flavors"] = self.qmc.flavors
         profile["flavorlabels"] = [unicode(fl) for fl in self.qmc.flavorlabels]
+        profile["flavorstartangle"] = self.qmc.flavorstartangle
         profile["title"] = unicode(self.qmc.title)
         profile["beans"] = unicode(self.qmc.beans)
         profile["weight"] = self.qmc.weight
@@ -5805,7 +5809,6 @@ class ApplicationWindow(QMainWindow):
         profile["xmax"] = self.qmc.endofx       
         profile["ambientTemp"] = self.qmc.ambientTemp
         profile["bag_humidity"] = self.qmc.bag_humidity
-
         profile["extradevices"] = self.qmc.extradevices
         profile["extraname1"] = self.qmc.extraname1        
         profile["extraname2"] = self.qmc.extraname2 
@@ -5929,6 +5932,8 @@ class ApplicationWindow(QMainWindow):
             #restore flavors
             self.qmc.flavorlabels = settings.value("Flavors",self.qmc.flavorlabels).toStringList()
             self.qmc.flavors = [5.]*len(self.qmc.flavorlabels)
+            if settings.contains("flavorstartangle"): 
+                self.qmc.flavorstartangle = settings.value("flavorstartangle",int(self.qmc.flavorstartangle)).toInt()[0]
             
             #restore serial port     
             settings.beginGroup("SerialPort")
@@ -6142,6 +6147,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("LEDColors",self.lcdpaletteF)            
             #save flavors
             settings.setValue("Flavors",self.qmc.flavorlabels)
+            settings.setValue("flavorstartangle",self.qmc.flavorstartangle)
             #soundflag
             settings.setValue("sound",self.soundflag)
             #save serial port
@@ -9943,6 +9949,12 @@ class flavorDlg(QDialog):
     def __init__(self, parent = None):
         super(flavorDlg,self).__init__(parent)
 
+        #avoid questionm mark context help
+        flags = self.windowFlags()
+        helpFlag = Qt.WindowContextHelpButtonHint
+        flags = flags & (~helpFlag)
+        self.setWindowFlags(flags)
+        
         self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None, QApplication.UnicodeUTF8))        
         self.setModal(True)
         aw.lowerbuttondialog.setVisible(False)
@@ -10125,6 +10137,7 @@ class backgroundDLG(QDialog):
         super(backgroundDLG,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Profile Background", None, QApplication.UnicodeUTF8))
         self.setModal(True)
+        
 
     	#TAB 1
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
