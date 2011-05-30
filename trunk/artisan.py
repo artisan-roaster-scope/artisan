@@ -4668,7 +4668,7 @@ class ApplicationWindow(QMainWindow):
                             self.recordextraevent(buttonnumber)
                     
         else:
-            self.sendmessage(QApplication.translate("MessageArea","Timer is OFF", None, QApplication.UnicodeUTF8))
+            self.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
 
     def resetApplication(self):
         string = QApplication.translate("MessageBox","Do you want to reset all settings?", None, QApplication.UnicodeUTF8)
@@ -7350,7 +7350,7 @@ class HUDDlg(QDialog):
 
         #tab2
         #Equation plotter
-        equlabel = QLabel(QApplication.translate("EQU Label", "Y(x)",None, QApplication.UnicodeUTF8))
+        equlabel = QLabel(QApplication.translate("Label", "Y(x)",None, QApplication.UnicodeUTF8))
         self.equedit1 = QLineEdit(aw.qmc.plotcurves[0])
         self.equedit2 = QLineEdit(aw.qmc.plotcurves[1])
         self.equedit3 = QLineEdit(aw.qmc.plotcurves[2])
@@ -8818,7 +8818,7 @@ class WindowsDlg(QDialog):
         self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx))
         self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx))
 
-        xrotationlabel = QLabel(QApplication.translate("xrotation", "Rotation",None, QApplication.UnicodeUTF8))
+        xrotationlabel = QLabel(QApplication.translate("Label", "Rotation",None, QApplication.UnicodeUTF8))
         self.xrotationSpinBox = QSpinBox()
         self.xrotationSpinBox.setRange(0,90)
         self.xrotationSpinBox.setSingleStep(5)
@@ -8848,20 +8848,20 @@ class WindowsDlg(QDialog):
         else:
             self.timeflag.setChecked(False)
 
-        timegridlabel = QLabel(QApplication.translate("xgridlabel", "Step",None, QApplication.UnicodeUTF8))
+        timegridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
         self.xaxislencombobox = QComboBox()
-        timelocs =   [QApplication.translate("timeComboBox", "30 seconds",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("timeCComboBox", "1 minute",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("timeCComboBox", "2 minute",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("timeCComboBox", "3 minute",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("timeCComboBox", "4 minute",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("timeCComboBox", "5 minute",None, QApplication.UnicodeUTF8)]
+        timelocs =   [QApplication.translate("ComboBox", "30 seconds",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "1 minute",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "2 minute",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "3 minute",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "4 minute",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "5 minute",None, QApplication.UnicodeUTF8)]
         self.xaxislencombobox.addItems(timelocs)
         self.timeconversion = [30,60,120,180,240,300]
         self.xaxislencombobox.setCurrentIndex(self.timeconversion.index(aw.qmc.xgrid))
         self.connect(self.xaxislencombobox,SIGNAL("currentIndexChanged(int)"),self.xaxislenloc)
 
-        ygridlabel = QLabel(QApplication.translate("ygridlabel", "Step",None, QApplication.UnicodeUTF8))
+        ygridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
         self.ygridSpinBox = QSpinBox()
         self.ygridSpinBox.setRange(5,100)
         self.ygridSpinBox.setSingleStep(5)
@@ -8869,25 +8869,25 @@ class WindowsDlg(QDialog):
         self.connect(self.ygridSpinBox, SIGNAL("valueChanged(int)"),self.changeygrid)
         self.ygridSpinBox.setMaximumWidth(40)
 
-        linestylegridlabel = QLabel(QApplication.translate("gridlinestyle", "Style",None, QApplication.UnicodeUTF8))
+        linestylegridlabel = QLabel(QApplication.translate("Label", "Style",None, QApplication.UnicodeUTF8))
         self.gridstylecombobox = QComboBox()
-        gridstyles = [QApplication.translate("styleComboBox", "solid",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("styleComboBox", "dashed",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("styleComboBox", "dashed-dot",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("styleComboBox", "dotted",None, QApplication.UnicodeUTF8),
-                      QApplication.translate("styleComboBox", "None",None, QApplication.UnicodeUTF8)]
+        gridstyles = [QApplication.translate("ComboBox", "solid",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "dashed",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "dashed-dot",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "dotted",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8)]
         self.gridstylecombobox.addItems(gridstyles) 
         self.gridstylecombobox.setCurrentIndex(aw.qmc.gridlinestyle)
         self.connect(self.gridstylecombobox,SIGNAL("currentIndexChanged(int)"),self.changegridstyle)
 
-        gridthicknesslabel = QLabel(QApplication.translate("gridwidth", "Width",None, QApplication.UnicodeUTF8))
+        gridthicknesslabel = QLabel(QApplication.translate("Label", "Width",None, QApplication.UnicodeUTF8))
         self.gridwidthSpinBox = QSpinBox()
         self.gridwidthSpinBox.setRange(1,5)
         self.gridwidthSpinBox.setValue(aw.qmc.gridthickness)
         self.connect(self.gridwidthSpinBox, SIGNAL("valueChanged(int)"),self.changegridwidth)
         self.gridwidthSpinBox.setMaximumWidth(40)       
 
-        gridalphalabel = QLabel(QApplication.translate("gridalpha", "Opaqueness",None, QApplication.UnicodeUTF8))
+        gridalphalabel = QLabel(QApplication.translate("Label", "Opaqueness",None, QApplication.UnicodeUTF8))
         self.gridalphaSpinBox = QSpinBox()
         self.gridalphaSpinBox.setRange(1,10)
         self.gridalphaSpinBox.setValue(int(aw.qmc.gridalpha*10))
@@ -11893,7 +11893,7 @@ class designerconfigDlg(QDialog):
         modLayout.addWidget(reproducelabel,1,0)
         modLayout.addWidget(self.reproduceComboBox,1,1)
         
-        marksGroupLayout = QGroupBox(QApplication.translate("Grid","Initial Times",None, QApplication.UnicodeUTF8))
+        marksGroupLayout = QGroupBox(QApplication.translate("GroupBox","Initial Times",None, QApplication.UnicodeUTF8))
         marksGroupLayout.setLayout(marksLayout)
         
         mainLayout = QVBoxLayout()
@@ -12625,13 +12625,13 @@ class DeviceAssignmentDLG(QDialog):
         self.devicetable.setTabKeyNavigation(True)
         self.createDeviceTable()
 
-        addButton = QPushButton(QApplication.translate("extrasButton","Add",None, QApplication.UnicodeUTF8))
+        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
         addButton.setFocusPolicy(Qt.NoFocus)
         addButton.setMinimumWidth(100)
         addButton.setMaximumWidth(100)
         self.connect(addButton, SIGNAL("clicked()"),self.adddevice)   
         
-        resetButton = QPushButton(QApplication.translate("extrasButton","Reset",None, QApplication.UnicodeUTF8))
+        resetButton = QPushButton(QApplication.translate("Button","Reset",None, QApplication.UnicodeUTF8))
         resetButton.setFocusPolicy(Qt.NoFocus)
         resetButton.setMinimumWidth(100)
         resetButton.setMaximumWidth(100)
@@ -14789,9 +14789,9 @@ class PXRpidDlgControl(QDialog):
 
 
         #****************************   TAB5 WIDGETS
-        ETthermolabel = QLabel(QApplication.translate("ETthermolabel","ET Thermocouple type",None, QApplication.UnicodeUTF8))
-        BTthermolabel = QLabel(QApplication.translate("BTthermolabel","BT Thermocouple type",None, QApplication.UnicodeUTF8))
-        BTthermolabelnote = QLabel(QApplication.translate("BTthermolabelnote","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
+        ETthermolabel = QLabel(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
+        BTthermolabel = QLabel(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
+        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
         self.thermotypes = ["J","K","R","B","S","T","E","N"]
@@ -14799,10 +14799,10 @@ class PXRpidDlgControl(QDialog):
         self.ETthermocombobox.addItems(self.thermotypes)
         self.BTthermocombobox.addItems(self.thermotypes)
         self.ETthermocombobox.setCurrentIndex(conversiontoindex.index(aw.pid.PXG4["pvinputtype"][0]))
-        setETthermocouplebutton = QPushButton(QApplication.translate("ET thermocouple Button","Set",None, QApplication.UnicodeUTF8))
-        setBTthermocouplebutton = QPushButton(QApplication.translate("BT thermocouple Button","Set",None, QApplication.UnicodeUTF8))
-        getETthermocouplebutton = QPushButton(QApplication.translate("ET thermocouple Button","Read",None, QApplication.UnicodeUTF8))
-        getBTthermocouplebutton = QPushButton(QApplication.translate("BT thermocouple Button","Read",None, QApplication.UnicodeUTF8))
+        setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+        setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+        getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
+        getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
         setETthermocouplebutton.setMaximumWidth(80)
         getETthermocouplebutton.setMaximumWidth(80)
         setBTthermocouplebutton.setMaximumWidth(80)
@@ -14812,11 +14812,11 @@ class PXRpidDlgControl(QDialog):
         self.connect(getETthermocouplebutton, SIGNAL("clicked()"), lambda PID="ET": self.readthermocoupletype(PID))
         self.connect(getBTthermocouplebutton, SIGNAL("clicked()"), lambda PID="BT": self.readthermocoupletype(PID))
 
-        PointButtonET = QPushButton(QApplication.translate("Point Button","Set ET PID to 1 decimal point",None, QApplication.UnicodeUTF8))
-        PointButtonBT = QPushButton(QApplication.translate("Point Button","Set BT PID to 1 decimal point",None, QApplication.UnicodeUTF8))
+        PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None, QApplication.UnicodeUTF8))
+        PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None, QApplication.UnicodeUTF8))
         PointButtonET.setMaximumWidth(180)
         PointButtonBT.setMaximumWidth(180)
-        pointlabel = QLabel(QApplication.translate("point label","Artisan uses 1 decimal point",None, QApplication.UnicodeUTF8))
+        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None, QApplication.UnicodeUTF8))
         self.connect(PointButtonET, SIGNAL("clicked()"), lambda PID="ET": self.setpoint(PID))
         self.connect(PointButtonBT, SIGNAL("clicked()"), lambda PID="BT": self.setpoint(PID))
         
@@ -15890,9 +15890,9 @@ class PXG4pidDlgControl(QDialog):
         self.createsegmenttable()
 
         #****************************   TAB5 WIDGETS
-        ETthermolabel = QLabel(QApplication.translate("ETthermolabel","ET Thermocouple type",None, QApplication.UnicodeUTF8))
-        BTthermolabel = QLabel(QApplication.translate("BTthermolabel","BT Thermocouple type",None, QApplication.UnicodeUTF8))
-        BTthermolabelnote = QLabel(QApplication.translate("BTthermolabelnote","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
+        ETthermolabel = QLabel(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
+        BTthermolabel = QLabel(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
+        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
         self.thermotypes = ["J","K","R","B","S","T","E","N"]
@@ -15900,10 +15900,10 @@ class PXG4pidDlgControl(QDialog):
         self.ETthermocombobox.addItems(self.thermotypes)
         self.BTthermocombobox.addItems(self.thermotypes)
         self.ETthermocombobox.setCurrentIndex(conversiontoindex.index(aw.pid.PXG4["pvinputtype"][0]))
-        setETthermocouplebutton = QPushButton(QApplication.translate("ET thermocouple Button","Set",None, QApplication.UnicodeUTF8))
-        setBTthermocouplebutton = QPushButton(QApplication.translate("BT thermocouple Button","Set",None, QApplication.UnicodeUTF8))
-        getETthermocouplebutton = QPushButton(QApplication.translate("ET thermocouple Button","Read",None, QApplication.UnicodeUTF8))
-        getBTthermocouplebutton = QPushButton(QApplication.translate("BT thermocouple Button","Read",None, QApplication.UnicodeUTF8))
+        setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+        setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+        getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
+        getBTthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
         setETthermocouplebutton.setMaximumWidth(80)
         getETthermocouplebutton.setMaximumWidth(80)
         setBTthermocouplebutton.setMaximumWidth(80)
@@ -15914,14 +15914,14 @@ class PXG4pidDlgControl(QDialog):
         self.connect(getBTthermocouplebutton, SIGNAL("clicked()"), lambda PID="BT": self.readthermocoupletype(PID))
 
 
-        PointButtonET = QPushButton(QApplication.translate("Point Button","Set ET PID to 1 decimal point",None, QApplication.UnicodeUTF8))
-        PointButtonBT = QPushButton(QApplication.translate("Point Button","Set BT PID to 1 decimal point",None, QApplication.UnicodeUTF8))
-        timeunitsbutton = QPushButton(QApplication.translate("Time Button","Set ET PID to MM:SS time units",None, QApplication.UnicodeUTF8))
+        PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None, QApplication.UnicodeUTF8))
+        PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None, QApplication.UnicodeUTF8))
+        timeunitsbutton = QPushButton(QApplication.translate("Button","Set ET PID to MM:SS time units",None, QApplication.UnicodeUTF8))
         PointButtonET.setMaximumWidth(180)
         PointButtonBT.setMaximumWidth(180)
         timeunitsbutton.setMaximumWidth(180)
-        pointlabel = QLabel(QApplication.translate("point label","Artisan uses 1 decimal point",None, QApplication.UnicodeUTF8))
-        timelabel = QLabel(QApplication.translate("time label","Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None, QApplication.UnicodeUTF8))
+        pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None, QApplication.UnicodeUTF8))
+        timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None, QApplication.UnicodeUTF8))
         self.connect(PointButtonET, SIGNAL("clicked()"), lambda PID="ET": self.setpoint(PID))
         self.connect(PointButtonBT, SIGNAL("clicked()"), lambda PID="BT": self.setpoint(PID))
         self.connect(timeunitsbutton, SIGNAL("clicked()"), self.settimeunits)
