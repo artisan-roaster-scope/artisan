@@ -149,17 +149,72 @@ class tgraphcanvas(FigureCanvas):
                         "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
                         "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'blue'}
         
-        self.flavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Textbox", "After Taste",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Textbox", "Clean Cup",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Textbox", "Head",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Textbox", "Fragance",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8),
-                                    QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8)]
-        self.flavorlabels = list(self.flavordefaultlabels)
+        self.artisanflavordefaultlabels = [QApplication.translate("artisanTextbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("artisanTextbox", "After Taste",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("artisanTextbox", "Clean Cup",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("artisanTextbox", "Head",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("artisanTextbox", "Fragance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("artisanTextbox", "Sweetness",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("artisanTextbox", "Aroma",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("artisanTextbox", "Balance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("artisanTextbox", "Body",None, QApplication.UnicodeUTF8)]
+
+        self.SCCAflavordefaultlabels = [QApplication.translate("SCCATextbox", "Sour",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Flavor",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Critical\nStimulus",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Aftertaste",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Bitter",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Astringency",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Solubles\nConcentration",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Mouthfeel",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Other",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Aromatic\nComplexity",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Roast\nColor",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Aromatic\nPungency",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Sweet",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "pH",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SCCATextbox", "Balance",None, QApplication.UnicodeUTF8)]
+
+
+        self.CQIflavordefaultlabels =  [QApplication.translate("SQITextbox", "Fragance",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SQITextbox", "Aroma",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SQITextbox", "Flavor",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SQITextbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SQITextbox", "Body",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("SQITextbox", "Aftertaste",None, QApplication.UnicodeUTF8)]
+
+        self.SweetMariasflavordefaultlabels = [QApplication.translate("SMTextbox", "Dry Fragrance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("SMTextbox", "Uniformity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("SMTextbox", "Complexity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("SMTextbox", "Clean Cup",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("SMTextbox", "Sweetness",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("SMTextbox", "Finished",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("SMTextbox", "Body",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("SMTextbox", "Flavor",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("SMTextbox", "Brightness",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("SMTextbox", "Wet Aroma",None, QApplication.UnicodeUTF8)]
         
+        self.Cflavordefaultlabels = [QApplication.translate("CTextbox", "Fragrance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("CTextbox", "Aroma",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("CTextbox", "Taste",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("CTextbox", "Nose",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("CTextbox", "Aftertaste",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("CTextbox", "Body",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("CTextbox", "Acidity",None, QApplication.UnicodeUTF8)]
+        
+        self.Eflavordefaultlabels = [QApplication.translate("ETextbox", "Fragrance-Aroma",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("ETextbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("ETextbox", "Flavor",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("ETextbox", "Body",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("ETextbox", "Aftertaste",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("ETextbox", "Balance",None, QApplication.UnicodeUTF8)]
+
+        
+        self.flavorlabels = list(self.artisanflavordefaultlabels)
+        #Initial flavor parameters. 
+        self.flavors = [5.,5.,5.,5.,5.,5.,5.,5.,5.]
+        self.flavorstartangle = 90
 
         #F = Fahrenheit; C = Celsius
         self.mode = u"F"
@@ -341,10 +396,6 @@ class tgraphcanvas(FigureCanvas):
                         QApplication.translate("Scope Annotation", "Power",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Scope Annotation", "Damper",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Scope Annotation", "Fan",None, QApplication.UnicodeUTF8)]
-
-    	
-        #Initial flavor parameters. 
-        self.flavors = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5]
 
         # projection variables of change of rate
         self.HUDflag = 0
@@ -1185,7 +1236,7 @@ class tgraphcanvas(FigureCanvas):
         if x >=  starttime:   
             return  '%d:%02d' % divmod((x - starttime), 60)
         else:
-            return  '-%d:%02d' % divmod(abs(x - starttime), 60)
+            return  '-%d:%02d' % divmod(abs(x - round(starttime)), 60)
             
 
     def reset_and_redraw(self):
@@ -1303,6 +1354,9 @@ class tgraphcanvas(FigureCanvas):
         
         #reset alarms that have been triggered
         self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
+
+        #reset cupping flavor values
+        self.flavors = [5.]*len(self.flavorlabels)
 
         self.redraw()
         aw.soundpop()
@@ -1981,15 +2035,20 @@ class tgraphcanvas(FigureCanvas):
         
     #draws a polar star graph to score cupping. It does not delete any profile data.            
     def flavorchart(self):
+        
         pi = math.pi
         self.fig.clf()
-        #create a new name ax1 instead of ax
+        #create a new name ax1 instead of ax (ax is used when plotting profiles)
         self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor)
-        g_angle = range(10,360,40) 
+
+        #find number of divisions
+        nflavors = len(self.flavors)      #last value of nflavors is used to close circle (same as flavors[0])
+            
+        g_angle = numpy.arange(self.flavorstartangle,(360.+self.flavorstartangle),(360./nflavors))  #angles in degree
         self.ax1.set_thetagrids(g_angle)
         self.ax1.set_rmax(1.)
         self.ax1.set_autoscale_on(False)
-        self.ax1.grid(True,linewidth=2,color='grey')
+        self.ax1.grid(True,linewidth=1,color='green')
         
         #delete degrees ticks to anotate flavor characteristics 
         for tick in self.ax1.xaxis.get_major_ticks():
@@ -1999,53 +2058,49 @@ class tgraphcanvas(FigureCanvas):
         locs = self.ax1.get_yticks()
         labels = []
         for i in range(len(locs)):
-                stringlabel = str(int(locs[i]*10))
+                stringlabel = str(locs[i]*10.)
                 labels.append(stringlabel)              
         self.ax1.set_yticklabels(labels,color=self.palette["xlabel"])
                     
-        angles = [pi/2.]
-        for i in range(9): angles.append(angles[-1] + 2.*pi/9.)
+        step = 2.*pi/nflavors
+        angles = [math.radians(self.flavorstartangle)]   #angles in radians
+        for i in range(nflavors-1): angles.append(angles[-1] + step)
+
+        #To close circle we need one more element. angle and values need same dimension in order to plot. 
+        plotf = self.flavors[:]
+        plotf.append(self.flavors[0])
+        #normalize flavor values to 0-1 range
+        for i in range(len(plotf)):
+            plotf[i] /= 10.
+        angles.append(angles[-1]+step)
         
-
         #anotate labels
-        self.ax1.annotate(self.flavorlabels[0] + u" - " + unicode(int(self.flavors[0]*10)),xy =(angles[0],.9),
-                          xytext=(angles[0],1.1),horizontalalignment='left',verticalalignment='bottom')
-        self.ax1.annotate(self.flavorlabels[1]+ u" - " + unicode(int(self.flavors[1]*10)),xy=(angles[1],.9),
-                          xytext=(angles[1],1.1),horizontalalignment='right',verticalalignment='bottom')
-        self.ax1.annotate(self.flavorlabels[2]+ u" - " + unicode(int(self.flavors[2]*10)),xy=(angles[2],.9),
-                          xytext=(angles[2],1.1),horizontalalignment='right',verticalalignment='bottom')
-        self.ax1.annotate(self.flavorlabels[3]+ u" - " + unicode(int(self.flavors[3]*10)),xy=(angles[3],.9),
-                          xytext=(angles[3],1.1),horizontalalignment='right',verticalalignment='bottom')
-        self.ax1.annotate(self.flavorlabels[4]+ u" - " + unicode(int(self.flavors[4]*10)),
-                          xy=(angles[4],.9),xytext=(angles[4],1.1),horizontalalignment='right',verticalalignment='bottom')
-        self.ax1.annotate(self.flavorlabels[5]+ u" - " + unicode(int(self.flavors[5]*10)),xy=(angles[5],.9),
-                          xytext=(angles[5],1.1),horizontalalignment='left',verticalalignment='bottom')
-        self.ax1.annotate(self.flavorlabels[6]+ u" - " + unicode(int(self.flavors[6]*10)),xy=(angles[6],.9),
-                          xytext=(angles[6],1.1),horizontalalignment='left',verticalalignment='bottom')
-        self.ax1.annotate(self.flavorlabels[7]+ u" - " + unicode(int(self.flavors[7]*10)),xy=(angles[7],.9),
-                          xytext=(angles[7],1.1),horizontalalignment='left',verticalalignment='bottom')
-        self.ax1.annotate(self.flavorlabels[8]+ u" - " + unicode(int(self.flavors[8]*10)),xy=(angles[8],.9),
-                          xytext=(angles[8],1.1),horizontalalignment='left',verticalalignment='bottom')
-
-        #Needs same dimension in order to plot. To close circle we may need one more element. 
-        if len(angles) < len(self.flavors):
-            angles.append(angles[-1])  
-
+        for i in range(len(self.flavorlabels)):
+            if angles[i] > 2.*pi or angles[i] < 0.:
+                p,angles[i] = divmod(angles[i],(2.*pi))
+            if angles[i] <= (pi/2.) or angles[i] >= (1.5*pi): #if < 90 or smaller than 270 degress
+                ha = "left"
+            else:
+                ha = "right"
+            self.ax1.annotate(self.flavorlabels[i] + u" = " + unicode(u"%.2f"%self.flavors[i]),xy =(angles[i],.9),
+                              xytext=(angles[i],1.1),horizontalalignment=ha,verticalalignment='bottom')
+            
         score = 0.
-        for i in range(9):
+        for i in range(nflavors):   
             score += self.flavors[i]
-        score /= 9.
-        score *= 100.
+        score /= (nflavors)
+        score *= 10.
         
         txt = u"%.2f" %score
+        self.ax1.text(0.,0.,txt,fontsize=20,color="red",horizontalalignment="center",bbox={"facecolor":"yellow", "alpha":0.3, "pad":10})
 
-        self.ax1.annotate(txt,xy=(0.0,0.0),xytext=(0.0,0.0),horizontalalignment='center',verticalalignment='bottom',color='black')
-
+        #add to plot
+        self.ax1.plot(angles,plotf,color="red")
+        
         #needs matplotlib 1.0.0+
         if mpl.__version__.split(".")[0] == '1':
-            self.ax1.fill_between(angles,0,self.flavors, facecolor='green', alpha=0.1, interpolate=True)
-           
-        self.ax1.plot(angles,self.flavors)
+            self.ax1.fill_between(angles,0,plotf, facecolor='green', alpha=0.1, interpolate=True)
+
         self.fig.canvas.draw()
 
 
@@ -5571,8 +5626,19 @@ class ApplicationWindow(QMainWindow):
             self.qmc.celsiusMode()
         if "flavors" in profile:
             self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
+            
+        #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
+        if self.qmc.flavors[0] < 1. and self.qmc.flavors[-1] < 1.:
+            l = len(self.qmc.flavors)
+            for i in range(l):
+                self.qmc.flavors[i] *= 10.
+            self.qmc.flavors = self.qmc.flavors[:(l-1)]
+            
         if "flavorlabels" in profile:
             self.qmc.flavorlabels = QStringList(profile["flavorlabels"])
+        for i in range(len(self.qmc.flavorlabels)):
+            self.qmc.flavorlabels[i] = unicode(self.qmc.flavorlabels[i])
+            
         if "title" in profile:
             self.qmc.title = unicode(profile["title"])
         else:            
@@ -5862,6 +5928,8 @@ class ApplicationWindow(QMainWindow):
 
             #restore flavors
             self.qmc.flavorlabels = settings.value("Flavors",self.qmc.flavorlabels).toStringList()
+            self.qmc.flavors = [5.]*len(self.qmc.flavorlabels)
+            
             #restore serial port     
             settings.beginGroup("SerialPort")
             self.ser.comport = unicode(settings.value("comport",self.ser.comport).toString())
@@ -6448,11 +6516,19 @@ $cupping_notes
                 f.close()  
                 
     def cuppingSum(self):
-        sum = 10 # includes the correction to have a maximum of 100
-        for i in range(8):
-            sum += int(aw.qmc.flavors[i]*10.)
-        return sum
-        
+##        sum = 10 # includes the correction to have a maximum of 100
+##        for i in range(len(self.qmc.flavors)):
+##            sum += int(aw.qmc.flavors[i])
+##        return sum
+##        
+        score = 0.
+        nflavors = len(self.qmc.flavors)
+        for i in range(nflavors):   
+            score += self.qmc.flavors[i]
+        score /= (nflavors)
+        score *= 10.
+        return score
+
     def volume_weight2html(self,amount,unit,change):
         if amount:
             return unicode(amount) + unit + " (" + "%.1f"%change + "%)"
@@ -9872,240 +9948,169 @@ class flavorDlg(QDialog):
         aw.lowerbuttondialog.setVisible(False)
         aw.EventsGroupLayout.setVisible(False)
 
-        self.line0edit = QLineEdit(aw.qmc.flavorlabels[0])  
-        self.line1edit = QLineEdit(aw.qmc.flavorlabels[1])       
-        self.line2edit = QLineEdit(aw.qmc.flavorlabels[2])       
-        self.line3edit = QLineEdit(aw.qmc.flavorlabels[3])      
-        self.line4edit = QLineEdit(aw.qmc.flavorlabels[4])
-        self.line5edit = QLineEdit(aw.qmc.flavorlabels[5])
-        self.line6edit = QLineEdit(aw.qmc.flavorlabels[6])
-        self.line7edit = QLineEdit(aw.qmc.flavorlabels[7])
-        self.line8edit = QLineEdit(aw.qmc.flavorlabels[8])
-                
-        self.connect(self.line0edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(0,unicode(self.line0edit.displayText())))
-        self.connect(self.line1edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(1,unicode(self.line1edit.displayText())))
-        self.connect(self.line2edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(2,unicode(self.line2edit.displayText())))
-        self.connect(self.line3edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(3,unicode(self.line3edit.displayText())))
-        self.connect(self.line4edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(4,unicode(self.line4edit.displayText())))
-        self.connect(self.line5edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(5,unicode(self.line5edit.displayText())))
-        self.connect(self.line6edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(6,unicode(self.line6edit.displayText())))
-        self.connect(self.line7edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(7,unicode(self.line7edit.displayText())))
-        self.connect(self.line8edit,SIGNAL("editingFinished()"),lambda x="":self.updatelabel(8,unicode(self.line8edit.displayText())))
-        
-        aciditySlider = QSlider(Qt.Horizontal)
-        aciditySlider.setRange(0,10)
-        aciditySlider.setTickInterval(1)
-        aciditySlider.setValue((int(aw.qmc.flavors[0]*10.)))
-        self.aciditySpinbox = QSpinBox()
-        self.aciditySpinbox.setMaximum(10) 
-        self.aciditySpinbox.setValue((int(aw.qmc.flavors[0]*10.)))
+        defaultlabel = QLabel(QApplication.translate("default","Default",None, QApplication.UnicodeUTF8))
+        self.defaultcombobox = QComboBox()
+        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E"])
+        self.defaultcombobox.setCurrentIndex(0)
+        self.connect(self.defaultcombobox, SIGNAL("currentIndexChanged(int)"),self.setdefault)
 
-        aftertasteSlider = QSlider(Qt.Horizontal)
-        aftertasteSlider.setRange(0,10)
-        aftertasteSlider.setTickInterval(1)
-        aftertasteSlider.setValue((int(aw.qmc.flavors[1]*10.)))
-        self.aftertasteSpinbox = QSpinBox()
-        self.aftertasteSpinbox.setMaximum(10) 
-        self.aftertasteSpinbox.setValue((int(aw.qmc.flavors[1]*10.)))
+        self.flavortable = QTableWidget()
+        self.flavortable.setTabKeyNavigation(True)
+        self.createFlavorTable()
 
-        cleanupSlider = QSlider(Qt.Horizontal)
-        cleanupSlider.setRange(0,10)
-        cleanupSlider.setTickInterval(1)
-        cleanupSlider.setValue((int(aw.qmc.flavors[2]*10.)))
-        self.cleanupSpinbox = QSpinBox()
-        self.cleanupSpinbox.setMaximum(10) 
-        self.cleanupSpinbox.setValue((int(aw.qmc.flavors[2]*10.)))
+        leftButton = QPushButton("<")
+        leftButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(leftButton, SIGNAL("clicked()"),lambda x=0:self.move(x))
 
-        headSlider = QSlider(Qt.Horizontal)
-        headSlider.setRange(0,10)
-        headSlider.setTickInterval(1)
-        headSlider.setValue((int(aw.qmc.flavors[3]*10.)))
-        self.headSpinbox = QSpinBox()
-        self.headSpinbox.setMaximum(10) 
-        self.headSpinbox.setValue((int(aw.qmc.flavors[3]*10.)))
-        
-        fraganceSlider = QSlider(Qt.Horizontal)
-        fraganceSlider.setRange(0,10)
-        fraganceSlider.setTickInterval(1)
-        fraganceSlider.setValue((int(aw.qmc.flavors[4]*10.)))
-        self.fraganceSpinbox = QSpinBox()
-        self.fraganceSpinbox.setMaximum(10) 
+        rightButton = QPushButton(">")
+        rightButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(rightButton, SIGNAL("clicked()"),lambda x=1:self.move(x))
 
-        self.fraganceSpinbox.setValue((int(aw.qmc.flavors[4]*10.)))
+        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
+        addButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(addButton, SIGNAL("clicked()"),self.addlabel)
 
-        sweetnessSlider = QSlider(Qt.Horizontal)
-        sweetnessSlider.setRange(0,10)
-        sweetnessSlider.setTickInterval(1)
-        sweetnessSlider.setValue((int(aw.qmc.flavors[5]*10.)))
-        self.sweetnessSpinbox = QSpinBox()
-        self.sweetnessSpinbox.setMaximum(10) 
-        self.sweetnessSpinbox.setValue((int(aw.qmc.flavors[5]*10.)))
-
-        aromaSlider = QSlider(Qt.Horizontal)
-        aromaSlider.setRange(0,10)
-        aromaSlider.setTickInterval(1)
-        aromaSlider.setValue((int(aw.qmc.flavors[6]*10.)))
-        self.aromaSpinbox = QSpinBox()
-        self.aromaSpinbox.setMaximum(10) 
-        self.aromaSpinbox.setValue((int(aw.qmc.flavors[6]*10.)))
-        
-        balanceSlider = QSlider(Qt.Horizontal)
-        balanceSlider.setRange(0,10)
-        balanceSlider.setTickInterval(1)
-        balanceSlider.setValue((int(aw.qmc.flavors[7]*10.)))
-        self.balanceSpinbox = QSpinBox()
-        self.balanceSpinbox.setMaximum(10) 
-        self.balanceSpinbox.setValue((int(aw.qmc.flavors[7]*10.)))
-
-        bodySlider = QSlider(Qt.Horizontal)
-        bodySlider.setRange(0,10)
-        bodySlider.setTickInterval(1)
-        bodySlider.setValue((int(aw.qmc.flavors[8]*10.)))
-        self.bodySpinbox = QSpinBox()
-        self.bodySpinbox.setMaximum(10) 
-
-        self.bodySpinbox.setValue((int(aw.qmc.flavors[8]*10.)))
+        delButton = QPushButton(QApplication.translate("Button","Del",None, QApplication.UnicodeUTF8))
+        delButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(delButton, SIGNAL("clicked()"),self.poplabel)
         
         saveImgButton = QPushButton(QApplication.translate("Button","Save Imgage",None, QApplication.UnicodeUTF8))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
         backButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-
-        defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
-        defaultButton.setFocusPolicy(Qt.NoFocus)
-        
-        self.connect(self.aciditySpinbox,SIGNAL("valueChanged(int)"),aciditySlider.setValue)
-        self.connect(self.aciditySpinbox,SIGNAL("valueChanged(int)"), lambda val=self.aciditySpinbox.value(): self.adjustflavor(0,val))
-        self.connect(self.aciditySpinbox,SIGNAL("valueChanged(int)"), lambda val=self.aciditySpinbox.value(): self.adjustflavor(9,val))
-        self.connect(aciditySlider,SIGNAL("valueChanged(int)"),self.aciditySpinbox.setValue)
-        self.connect(self.aciditySpinbox,SIGNAL("valueChanged(int)"),aw.qmc.flavorchart)
-                     
-        self.connect(self.aftertasteSpinbox,SIGNAL("valueChanged(int)"),aftertasteSlider.setValue)
-        self.connect(aftertasteSlider,SIGNAL("valueChanged(int)"),self.aftertasteSpinbox.setValue)
-        self.connect(self.aftertasteSpinbox,SIGNAL("valueChanged(int)"), lambda val=self.aftertasteSpinbox.value(): self.adjustflavor(1,val))
-        self.connect(self.aftertasteSpinbox,SIGNAL("valueChanged(int)"),aw.qmc.flavorchart)
-
-
-        self.connect(self.cleanupSpinbox,SIGNAL("valueChanged(int)"),cleanupSlider.setValue)
-        self.connect(cleanupSlider,SIGNAL("valueChanged(int)"),self.cleanupSpinbox.setValue)
-        self.connect(self.cleanupSpinbox,SIGNAL("valueChanged(int)"), lambda val=self.cleanupSpinbox.value(): self.adjustflavor(2,val))
-        self.connect(self.cleanupSpinbox,SIGNAL("valueChanged(int)"),aw.qmc.flavorchart)
-
-
-        self.connect(self.headSpinbox,SIGNAL("valueChanged(int)"),headSlider.setValue)
-        self.connect(headSlider,SIGNAL("valueChanged(int)"),self.headSpinbox.setValue)
-        self.connect(self.headSpinbox,SIGNAL("valueChanged(int)"), lambda val=self.headSpinbox.value(): self.adjustflavor(3,val))
-        self.connect(self.headSpinbox,SIGNAL("valueChanged(int)"),aw.qmc.flavorchart)
-
-
-        self.connect(self.fraganceSpinbox,SIGNAL("valueChanged(int)"),fraganceSlider.setValue)
-        self.connect(fraganceSlider,SIGNAL("valueChanged(int)"),self.fraganceSpinbox.setValue)
-        self.connect(self.fraganceSpinbox,SIGNAL("valueChanged(int)"), lambda val=self.fraganceSpinbox.value(): self.adjustflavor(4,val))
-        self.connect(self.fraganceSpinbox,SIGNAL("valueChanged(int)"),aw.qmc.flavorchart)
-
-
-        self.connect(self.sweetnessSpinbox,SIGNAL("valueChanged(int)"),sweetnessSlider.setValue)
-        self.connect(sweetnessSlider,SIGNAL("valueChanged(int)"),self.sweetnessSpinbox.setValue)
-        self.connect(self.sweetnessSpinbox,SIGNAL("valueChanged(int)"), lambda val=self.sweetnessSpinbox.value(): self.adjustflavor(5,val))
-        self.connect(self.sweetnessSpinbox,SIGNAL("valueChanged(int)"),aw.qmc.flavorchart)
-
-
-        self.connect(self.aromaSpinbox,SIGNAL("valueChanged(int)"),aromaSlider.setValue)
-        self.connect(aromaSlider,SIGNAL("valueChanged(int)"),self.aromaSpinbox.setValue)
-        self.connect(self.aromaSpinbox,SIGNAL("valueChanged(int)"), lambda val=self.aromaSpinbox.value(): self.adjustflavor(6,val))
-        self.connect(self.aromaSpinbox,SIGNAL("valueChanged(int)"),aw.qmc.flavorchart)
-
-
-        self.connect(self.balanceSpinbox,SIGNAL("valueChanged(int)"),balanceSlider.setValue)
-        self.connect(balanceSlider,SIGNAL("valueChanged(int)"),self.balanceSpinbox.setValue)
-        self.connect(self.balanceSpinbox,SIGNAL("valueChanged(int)"), lambda val=self.balanceSpinbox.value(): self.adjustflavor(7,val))
-        self.connect(self.balanceSpinbox,SIGNAL("valueChanged(int)"),aw.qmc.flavorchart)
-
-
-        self.connect(self.bodySpinbox,SIGNAL("valueChanged(int)"),bodySlider.setValue)
-        self.connect(bodySlider,SIGNAL("valueChanged(int)"),self.bodySpinbox.setValue)
-        self.connect(self.bodySpinbox,SIGNAL("valueChanged(int)"), lambda val=self.bodySpinbox.value(): self.adjustflavor(8,val))
-        self.connect(self.bodySpinbox,SIGNAL("valueChanged(int)"),aw.qmc.flavorchart)
-
-        
         self.connect(backButton,SIGNAL("clicked()"),self.close)
-        self.connect(defaultButton,SIGNAL("clicked()"),self.defaultlabels)
-        self.sumLabel = QLabel(QApplication.translate("Label","total: %1", None, QApplication.UnicodeUTF8).arg(aw.cuppingSum()))
+
         
-        flavorLayout = QGridLayout()
-        flavorLayout.addWidget(self.line0edit,0,0)
-        flavorLayout.addWidget(aciditySlider,0,1)
-        flavorLayout.addWidget(self.aciditySpinbox,0,2)
-        flavorLayout.addWidget(self.line1edit,1,0)
-        flavorLayout.addWidget(aftertasteSlider,1,1)
-        flavorLayout.addWidget(self.aftertasteSpinbox,1,2)
-        flavorLayout.addWidget(self.line2edit,2,0)
-        flavorLayout.addWidget(cleanupSlider,2,1)
-        flavorLayout.addWidget(self.cleanupSpinbox,2,2)
-        flavorLayout.addWidget(self.line3edit,3,0)
-        flavorLayout.addWidget(headSlider,3,1)
-        flavorLayout.addWidget(self.headSpinbox,3,2)
-        flavorLayout.addWidget(self.line4edit,4,0)
-        flavorLayout.addWidget(fraganceSlider,4,1)
-        flavorLayout.addWidget(self.fraganceSpinbox,4,2)
-        flavorLayout.addWidget(self.line5edit,5,0)
-        flavorLayout.addWidget(sweetnessSlider,5,1)
-        flavorLayout.addWidget(self.sweetnessSpinbox,5,2)
-        flavorLayout.addWidget(self.line6edit,6,0)
-        flavorLayout.addWidget(aromaSlider,6,1)
-        flavorLayout.addWidget(self.aromaSpinbox,6,2)
-        flavorLayout.addWidget(self.line7edit,7,0)
-        flavorLayout.addWidget(balanceSlider,7,1)
-        flavorLayout.addWidget(self.balanceSpinbox,7,2)
-        flavorLayout.addWidget(self.line8edit,8,0)
-        flavorLayout.addWidget(bodySlider,8,1)
-        flavorLayout.addWidget(self.bodySpinbox,8,2)        
+        flavorLayout = QHBoxLayout()
+        flavorLayout.addWidget(self.flavortable)     
         
-        buttonsLayout = QHBoxLayout()
-        buttonsLayout.addWidget(defaultButton)
-        buttonsLayout.addWidget(saveImgButton)
-        buttonsLayout.addStretch()
-        buttonsLayout.addWidget(backButton)
+        buttonsLayout = QGridLayout()
+        buttonsLayout.addWidget(addButton,0,0)
+        buttonsLayout.addWidget(delButton,0,1)        
+        buttonsLayout.addWidget(defaultlabel,1,0)
+        buttonsLayout.addWidget(self.defaultcombobox,1,1)
+        buttonsLayout.addWidget(leftButton,2,0)
+        buttonsLayout.addWidget(rightButton,2,1)
+        buttonsLayout.addWidget(backButton,3,0)
             
-        allFlavorLayout = QVBoxLayout()
-        allFlavorLayout.addLayout(flavorLayout)
-        allFlavorLayout.addWidget(self.sumLabel)
-        allFlavorLayout.addStretch()
-        allFlavorLayout.addLayout(buttonsLayout)
+        mainLayout = QVBoxLayout()
+        mainLayout.addLayout(flavorLayout)
+        mainLayout.addStretch()
+        mainLayout.addLayout(buttonsLayout)
         
-        self.setLayout(allFlavorLayout)
+        self.setLayout(mainLayout)
+
+        #draw
         aw.qmc.flavorchart()
         
-    def updatelabel(self,i,val):
-        aw.qmc.flavorlabels[i] = val
+    def createFlavorTable(self):
+
+        self.flavortable.clear()        
+        nflavors = len(aw.qmc.flavorlabels)
+        if nflavors:    
+            self.flavortable.setRowCount(nflavors)
+            self.flavortable.setColumnCount(2)
+            self.flavortable.setHorizontalHeaderLabels([QApplication.translate("flavorTable", "Label",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("flavorTable", "Value",None, QApplication.UnicodeUTF8)])
+            
+            self.flavortable.setAlternatingRowColors(True)
+            self.flavortable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.flavortable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.flavortable.setSelectionMode(QTableWidget.SingleSelection)
+            self.flavortable.setShowGrid(True)
+
+            #populate table
+            for i in range(nflavors):
+                labeledit = QLineEdit(unicode(aw.qmc.flavorlabels[i]))            
+                    
+                valueSpinBox = QDoubleSpinBox()
+                valueSpinBox.setRange(0.,10.)
+                
+                val  = aw.qmc.flavors[i]
+                if aw.qmc.flavors[0] < 1. and aw.qmc.flavors[-1] < 1.: # < 0.5.0 version style compatibility
+                    val *= 10.
+                valueSpinBox.setValue(val)
+                self.connect(valueSpinBox, SIGNAL("valueChanged(double)"),lambda z=1,x=i: self.setvalue(z,x))
+                
+                #add widgets to the table
+                self.flavortable.setCellWidget(i,0,labeledit)
+                self.flavortable.setCellWidget(i,1,valueSpinBox)
+
+    def move(self,x):
+        if x == 0:
+            aw.qmc.flavorstartangle += 5
+        else:
+            aw.qmc.flavorstartangle -= 5
         aw.qmc.flavorchart()
 
-    def defaultlabels(self):
-        aw.qmc.flavorlabels = list(aw.qmc.flavordefaultlabels)
-        self.line0edit.setText(aw.qmc.flavorlabels[0])    
-        self.line1edit.setText(aw.qmc.flavorlabels[1])
-        self.line2edit.setText(aw.qmc.flavorlabels[2])
-        self.line3edit.setText(aw.qmc.flavorlabels[3])
-        self.line4edit.setText(aw.qmc.flavorlabels[4])
-        self.line5edit.setText(aw.qmc.flavorlabels[5])
-        self.line6edit.setText(aw.qmc.flavorlabels[6])
-        self.line7edit.setText(aw.qmc.flavorlabels[7])
-        self.line8edit.setText(aw.qmc.flavorlabels[8])        
-        aw.qmc.flavorchart()
-        
-    def adjustflavor(self,key,val):
-        self.sumLabel.setText(QApplication.translate("Label","total: %1", None, QApplication.UnicodeUTF8).arg(aw.cuppingSum()))
-        
-        aw.qmc.flavors[key] = float(val)/10.
+    def savetable(self):
+        for i in range(len(aw.qmc.flavorlabels)):
+            labeledit = self.flavortable.cellWidget(i,0)
+            valueSpinBox = self.flavortable.cellWidget(i,1)
 
-    def closeEvent(self, event):    
+            label = unicode(labeledit.text())
+            if "\\n" in label:              #make multiple line text if "\n" found in label string
+                parts = label.split("\\n")
+                label = chr(10).join(parts)
+                
+            aw.qmc.flavorlabels[i] = label
+            aw.qmc.flavors[i] = valueSpinBox.value()
+
+    def setvalue(self,z,x):
+        valueSpinBox = self.flavortable.cellWidget(x,1)
+        aw.qmc.flavors[x] = valueSpinBox.value()
+        aw.qmc.flavorchart()        
+            
+    def setdefault(self):
+        dindex =  self.defaultcombobox.currentIndex()
+        #["","Artisan","SCCA","CQI","SweetMarias","C","E"]
+        if dindex == 1:
+            aw.qmc.flavorlabels = list(aw.qmc.artisanflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+        elif dindex == 2:
+            aw.qmc.flavorlabels = list(aw.qmc.SCCAflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+        elif dindex == 3:
+            aw.qmc.flavorlabels = list(aw.qmc.CQIflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+        elif dindex == 4:
+            aw.qmc.flavorlabels = list(aw.qmc.SweetMariasflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+        elif dindex == 5:
+            aw.qmc.flavorlabels = list(aw.qmc.Cflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+        elif dindex == 6:
+            aw.qmc.flavorlabels = list(aw.qmc.Eflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+        else:
+            return
+        aw.qmc.flavors = [5.]*len(aw.qmc.flavorlabels)
+        self.createFlavorTable()        
+        aw.qmc.flavorchart()
+
+    def addlabel(self):
+        fn = len(aw.qmc.flavors)
+        aw.qmc.flavorlabels.append("???")
+        aw.qmc.flavors.append(5.)
+        self.createFlavorTable()
+        aw.qmc.flavorchart()
+
+    def poplabel(self):
+        fn = len(aw.qmc.flavors)
+        aw.qmc.flavors = aw.qmc.flavors[:(fn-1)]
+        aw.qmc.flavorlabels = aw.qmc.flavorlabels[:(fn -1)]
+        self.createFlavorTable()
+        aw.qmc.flavorchart()
+
+    def closeEvent(self, event):
         self.accept()
         aw.qmc.redraw()
         aw.lowerbuttondialog.setVisible(True)
         aw.update_minieventline_visibility()
         
-    def close(self):    
+    def close(self):
+        self.savetable()
         aw.lowerbuttondialog.setVisible(True)
         aw.update_minieventline_visibility()
         self.accept()
