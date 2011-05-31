@@ -238,7 +238,7 @@ class tgraphcanvas(FigureCanvas):
         self.statisticstimes = [0,0,0,0]
 
         #DEVICES
-        self.device = 0                                     # device selected to read BT and ET
+        self.device = 18                                    # default device selected to None (18)
         self.devices = ["Omega HH806AU",                    # device labels (used in Dialog config)
                        "Omega HH506RA",
                        "CENTER 309",
@@ -396,7 +396,9 @@ class tgraphcanvas(FigureCanvas):
                         QApplication.translate("Scope Annotation", "Power",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Scope Annotation", "Damper",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Scope Annotation", "Fan",None, QApplication.UnicodeUTF8)]
-
+        self.backgroundFlavors = []
+        self.flavorbackgroundflag = False
+        
         # projection variables of change of rate
         self.HUDflag = 0
         self.ETtarget = 350
@@ -1205,6 +1207,13 @@ class tgraphcanvas(FigureCanvas):
         #majorlocator = ticker.MultipleLocator(self.xgrid)      	    	    	#MultipleLocator does not provide an offset for startime          
         majorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-10*self.xgrid,self.endofx*2.,self.xgrid)
         minorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-10*self.xgrid,self.endofx*2.,self.xgrid/6.)
+
+        #sometimes we get times like 01:59 when startime is a float in the middle range of two ints. This compensates
+        for i in range(len(majorloc)):
+            majorloc[i] = round(majorloc[i])
+        for i in range(len(minorloc)):
+            minorloc[i] = round(minorloc[i])
+            
         majorlocator = ticker.FixedLocator(majorloc)        
         minorlocator = ticker.FixedLocator(minorloc)
         
@@ -1234,7 +1243,7 @@ class tgraphcanvas(FigureCanvas):
             starttime = 0
             
         if x >=  starttime:   
-            return  '%d:%02d' % divmod((x - starttime), 60)
+            return  '%d:%02d' % divmod((x - round(starttime)), 60)
         else:
             return  '-%d:%02d' % divmod(abs(x - round(starttime)), 60)
             
@@ -1421,7 +1430,7 @@ class tgraphcanvas(FigureCanvas):
             self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
 
         #check BACKGROUND flag
-        if self.background:
+        if self.background: 
             #check to see if there is both a profile loaded and a background loaded
             if self.timeindex[0] != -1 and self.timeindexB[0] != -1 and self.backmoveflag:
                 if self.timex[self.timeindex[0]] != self.timeB[self.timeindexB[0]]:
@@ -1464,69 +1473,70 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     startB = 0
 
-                #background CHARGE
-                st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[0]] - startB))
-                self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[0]]), xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
-                                 xytext=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]] + 50),fontsize=10,color=self.palette["text"],
-                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                
-                self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
-                                 xytext=(self.timeB[self.timeindexB[0]]+5,self.temp2B[self.timeindexB[0]] - 100),fontsize=10,color=self.palette["text"],
-                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                #if background CHARGE exists
+                if self.timeindexB[0] != -1: 
+                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[0]] - startB))
+                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[0]]), xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
+                                     xytext=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]] + 50),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    
+                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
+                                     xytext=(self.timeB[self.timeindexB[0]]+5,self.temp2B[self.timeindexB[0]] - 100),fontsize=10,color=self.palette["text"],
+                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
 
-                if self.timeindexB[1]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[1]]- startB))
-                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[1]]), xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
-                                     xytext=(self.timeB[self.timeindexB[1]]-5,self.temp2B[self.timeindexB[1]]+50),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
-                                     xytext=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]-50),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                    
-                if self.timeindexB[2]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[2]]-startB))
-                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[2]]), xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
-                                     xytext=(self.timeB[self.timeindexB[2]]-5,self.temp2B[self.timeindexB[2]]+50),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
-                                     xytext=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]-50),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                    
-                if self.timeindexB[3]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[3]]-startB))          
-                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[3]]), xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
-                                     xytext=(self.timeB[self.timeindexB[3]]-5,self.temp2B[self.timeindexB[3]]+70),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
-                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
-                                     xytext=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]-80),fontsize=10, color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                    
-                if self.timeindexB[4]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[4]]-startB))
-                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[4]]), xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
-                                     xytext=(self.timeB[self.timeindexB[4]]-5,self.temp2B[self.timeindexB[4]]+90),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
-                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
-                                     xytext=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]-110),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                    
-                if self.timeindexB[5]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[5]]-startB))
-                    self.ax.annotate(u"%.1f"%(self.timeB[self.timeindexB[5]]), xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
-                                     xytext=(self.timeB[self.timeindexB[5]]-5,self.temp2B[self.timeindexB[5]]+50),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
-                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
-                                     xytext=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]-40),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                    
-                if self.timeindexB[6]:
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[6]]-startB))
-                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[6]]), xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
-                                     xytext=(self.timeB[self.timeindexB[6]]-5,self.temp2B[self.timeindexB[6]]+70),color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
-                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
-                                     xytext=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]-80),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    if self.timeindexB[1]:
+                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[1]]- startB))
+                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[1]]), xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
+                                         xytext=(self.timeB[self.timeindexB[1]]-5,self.temp2B[self.timeindexB[1]]+50),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
+                                         xytext=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]-50),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        
+                    if self.timeindexB[2]:
+                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[2]]-startB))
+                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[2]]), xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
+                                         xytext=(self.timeB[self.timeindexB[2]]-5,self.temp2B[self.timeindexB[2]]+50),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
+                                         xytext=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]-50),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        
+                    if self.timeindexB[3]:
+                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[3]]-startB))          
+                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[3]]), xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
+                                         xytext=(self.timeB[self.timeindexB[3]]-5,self.temp2B[self.timeindexB[3]]+70),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
+                                         xytext=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]-80),fontsize=10, color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        
+                    if self.timeindexB[4]:
+                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[4]]-startB))
+                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[4]]), xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
+                                         xytext=(self.timeB[self.timeindexB[4]]-5,self.temp2B[self.timeindexB[4]]+90),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
+                                         xytext=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]-110),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        
+                    if self.timeindexB[5]:
+                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[5]]-startB))
+                        self.ax.annotate(u"%.1f"%(self.timeB[self.timeindexB[5]]), xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
+                                         xytext=(self.timeB[self.timeindexB[5]]-5,self.temp2B[self.timeindexB[5]]+50),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
+                                         xytext=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]-40),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        
+                    if self.timeindexB[6]:
+                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[6]]-startB))
+                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[6]]), xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
+                                         xytext=(self.timeB[self.timeindexB[6]]-5,self.temp2B[self.timeindexB[6]]+70),color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
+                                         xytext=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]-80),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
 
             #END of Background
 
@@ -2039,7 +2049,8 @@ class tgraphcanvas(FigureCanvas):
         pi = math.pi
         self.fig.clf()
         #create a new name ax1 instead of ax (ax is used when plotting profiles)
-        self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor)
+        
+        self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
 
         #find number of divisions
         nflavors = len(self.flavors)      #last value of nflavors is used to close circle (same as flavors[0])
@@ -2048,8 +2059,13 @@ class tgraphcanvas(FigureCanvas):
         self.ax1.set_thetagrids(g_angle)
         self.ax1.set_rmax(1.)
         self.ax1.set_autoscale_on(False)
-        self.ax1.grid(True,linewidth=1,color='green')
-        
+        self.ax1.grid(True,linewidth=1.,color='black')
+
+
+        #create water marks 6-7 anf 8-9
+        self.ax1.bar(.1, .1, width=2.*pi, bottom=.6,color="green",linewidth=0.,alpha = .1)
+        self.ax1.bar(.1, .1, width=2.*pi, bottom=.8,color="green",linewidth=0.,alpha = .1)
+
         #delete degrees ticks to anotate flavor characteristics 
         for tick in self.ax1.xaxis.get_major_ticks():
             tick.label1On = False
@@ -2092,10 +2108,24 @@ class tgraphcanvas(FigureCanvas):
         score *= 10.
         
         txt = u"%.2f" %score
-        self.ax1.text(0.,0.,txt,fontsize=20,color="red",horizontalalignment="center",bbox={"facecolor":"yellow", "alpha":0.3, "pad":10})
+        self.ax1.text(0.,0.,txt,fontsize=20,color="blue",horizontalalignment="center",bbox={"facecolor":"yellow", "alpha":0.3, "pad":10})
 
+        #add background to plot if found
+        if self.background:
+            if self.flavorbackgroundflag:
+                backgroundplotf = self.backgroundFlavors[:]
+                backgroundplotf.append(self.backgroundFlavors[0])
+                #normalize flavor values to 0-1 range
+                for i in range(len(backgroundplotf)):
+                    backgroundplotf[i] /= 10.
+
+                self.ax1.plot(angles,backgroundplotf,color="orange",alpha=.5)
+                #needs matplotlib 1.0.0+
+                if mpl.__version__.split(".")[0] == '1':
+                    self.ax1.fill_between(angles,0,backgroundplotf, facecolor="yellow", alpha=0.1, interpolate=True)
+                
         #add to plot
-        self.ax1.plot(angles,plotf,color="red")
+        self.ax1.plot(angles,plotf,color="blue")
         
         #needs matplotlib 1.0.0+
         if mpl.__version__.split(".")[0] == '1':
@@ -5348,27 +5378,36 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEtypes = profile["specialeventstype"]
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
                 self.qmc.backgroundEStrings = profile["specialeventsStrings"]
+                self.qmc.backgroundFlavors = profile["flavors"]
+                #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
+                if self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
+                    l = len(self.qmc.backgroundFlavors)
+                    for i in range(l):
+                        self.qmc.backgroundFlavors[i] *= 10.
+                    self.qmc.backgroundFlavors = self.qmc.backgroundFlavors[:(l-1)]
                 if "etypes" in profile:
                     self.qmc.Betypes = profile["etypes"]
                 if "timeindex" in profile:
                     self.qmc.timeindexB = profile["timeindex"]          #if new profile found with variable timeindex
-                else:
-                    startendB = profile["startend"]
-                    varCB = profile["cracks"]
-                    if "dryend" in profile:
-                        dryendB = profile["dryend"]
-                    else:
-                        dryendB = [0,0]
-                    times = []
-                    times.append(startendB[0])
-                    times.append(dryend[0])
-                    times.append(varCB[0])
-                    times.append(varCB[2])
-                    times.append(varCB[4])
-                    times.append(varCB[6])
-                    times.append(startendB[2])                    
-                    self.qmc.timebackgroundindexupdate(times[:])
-                
+                    #print self.qmc.timeindexB
+                else:                                                   #old profile format
+                    if "startend" in profile:
+                        startendB = profile["startend"]
+                        varCB = profile["cracks"]
+                        if "dryend" in profile:
+                            dryendB = profile["dryend"]
+                        else:
+                            dryendB = [0,0]
+                        times = []
+                        times.append(startendB[0])
+                        times.append(dryend[0])
+                        times.append(varCB[0])
+                        times.append(varCB[2])
+                        times.append(varCB[4])
+                        times.append(varCB[6])
+                        times.append(startendB[2])                    
+                        self.qmc.timebackgroundindexupdate(times[:])
+
             else:      
                 self.sendmessage(QApplication.translate("Message Area", "Invalid artisan format",None, QApplication.UnicodeUTF8))
 
@@ -7107,12 +7146,12 @@ $cupping_notes
                 if u".png" not in filename:
                     filename += u".png"
 
-            image.save(filename)
-            
-            x = image.width()
-            y = image.height()
+                image.save(filename)
+                
+                x = image.width()
+                y = image.height()
 
-            self.sendmessage(QApplication.translate("Message Area","%1  (%2x) saved", None, QApplication.UnicodeUTF8).arg(unicode(filename)).arg(unicode(x)).arg(unicode(y)))
+                self.sendmessage(QApplication.translate("Message Area","%1  size(%2,%3) saved", None, QApplication.UnicodeUTF8).arg(unicode(filename)).arg(unicode(x)).arg(unicode(y)))
 
         except IOError,e:
             self.qmc.adderror(QApplication.translate("Error Message","IO Error: resize() %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -9993,6 +10032,10 @@ class flavorDlg(QDialog):
         backButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         self.connect(backButton,SIGNAL("clicked()"),self.close)
 
+        self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Background", None, QApplication.UnicodeUTF8))
+        if aw.qmc.flavorbackgroundflag:
+            self.backgroundCheck.setChecked(True)
+        self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.showbackground)
         
         flavorLayout = QHBoxLayout()
         flavorLayout.addWidget(self.flavortable)     
@@ -10004,11 +10047,12 @@ class flavorDlg(QDialog):
         buttonsLayout.addWidget(self.defaultcombobox,1,1)
         buttonsLayout.addWidget(leftButton,2,0)
         buttonsLayout.addWidget(rightButton,2,1)
-        buttonsLayout.addWidget(backButton,3,0)
+        buttonsLayout.addWidget(self.backgroundCheck,3,0)
+        buttonsLayout.addWidget(saveImgButton,4,0)
+        buttonsLayout.addWidget(backButton,4,1)
             
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(flavorLayout)
-        mainLayout.addStretch()
         mainLayout.addLayout(buttonsLayout)
         
         self.setLayout(mainLayout)
@@ -10048,6 +10092,24 @@ class flavorDlg(QDialog):
                 #add widgets to the table
                 self.flavortable.setCellWidget(i,0,labeledit)
                 self.flavortable.setCellWidget(i,1,valueSpinBox)
+
+    def showbackground(self):
+        if self.backgroundCheck.isChecked():
+            if not aw.qmc.background:
+                message = QApplication.translate("message","Background not found", None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)
+                self.backgroundCheck.setChecked(False)
+            else:
+                if len(aw.qmc.backgroundFlavors) != len(aw.qmc.flavors):
+                    message = QApplication.translate("message","Background does not match number of labels", None, QApplication.UnicodeUTF8)
+                    aw.sendmessage(message)
+                    self.backgroundCheck.setChecked(False)
+                else:
+                    aw.qmc.flavorbackgroundflag = True
+                    aw.qmc.flavorchart()
+        else:
+            aw.qmc.flavorbackgroundflag = False
+            aw.qmc.flavorchart()            
 
     def move(self,x):
         if x == 0:
@@ -10246,7 +10308,7 @@ class backgroundDLG(QDialog):
         self.rightButton = QPushButton("Right")
         self.rightButton.setFocusPolicy(Qt.NoFocus)
 
-        self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.readChecks)
+
         self.connect(self.backgroundDetails, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundeventsflag, SIGNAL("clicked()"),self.readChecks)
         self.connect(delButton, SIGNAL("clicked()"),self.delete)
@@ -10497,7 +10559,7 @@ class backgroundDLG(QDialog):
         
         aw.qmc.temp1B, aw.qmc.temp2B, aw.qmc.timeB = [],[],[]
         aw.qmc.backgroundEvents, aw.qmc.backgroundEtypes = [],[]
-        aw.qmc.backgroundEvalues, aw.qmc.backgroundEStrings = [],[]
+        aw.qmc.backgroundEvalues, aw.qmc.backgroundEStrings,aw.qmc.backgroundFlavors = [],[],[]
         aw.qmc.timeindexB = [-1,0,0,0,0,0,0]
         self.eventtable.clear()
         self.datatable.clear()
