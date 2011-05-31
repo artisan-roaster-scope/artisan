@@ -10025,7 +10025,7 @@ class flavorDlg(QDialog):
         delButton.setFocusPolicy(Qt.NoFocus)
         self.connect(delButton, SIGNAL("clicked()"),self.poplabel)
         
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Imgage",None, QApplication.UnicodeUTF8))
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None, QApplication.UnicodeUTF8))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
