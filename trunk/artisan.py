@@ -535,22 +535,12 @@ class tgraphcanvas(FigureCanvas):
         #Create x axis labels in minutes:seconds instead of seconds
         self.xaxistosm()
 
-        ###########################  TIME  CLOCK     ##########################
-        # NOTE: there are two times that can cause confusion: one is a trigger-timer to trigger timerevent at every
-        # delay (ie. read temp, update graph, etc.), and then this one (self.timeclock), which
-        # is used to record temperature-reading-time in self.timex[]. It is also used to display time in the LCD.
-        
+        ###########################  TIME  CLOCK     ##########################        
         # create an object time to measure and record time (in miliseconds) 
     
         self.timeclock = QTime()
 
-        ############################    TRIGGER  TIMERS       ##################################
-        # start a Qtimer object (Qt) with default delay (self.delay 5000 millisecs). 
-        # do not confuse this timer with self.timeclock (above), which is used to log clock time
-        
-        self.timer = QTimer()
-        self.timer.setInterval(self.delay) 
-        self.connect(self.timer,SIGNAL("timeout()"),self.sampleupdate)
+        ############################  LCD  TRIGGER  TIMER       ##################################
 
         self.LCDtimer = QTimer()
         self.LCDtimer.setInterval(1000)  #miliseconds
@@ -615,10 +605,16 @@ class tgraphcanvas(FigureCanvas):
         self.wheeledge = .02                        #overlaping decorative edge
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color
-        
-    def sampleupdate(self):
-        self.thread.start()
-        
+
+    def getsample(self):
+        while 1:
+            if self.flagon:
+                self.sample()
+                #self.thread.msleep(self.delay)   #seems that these two functions do the same load wise
+                libtime.sleep(self.delay/1000.)
+            else:
+                break
+      
     #sample devices at interval self.delay miliseconds
     def sample(self):
         try:
@@ -1277,7 +1273,6 @@ class tgraphcanvas(FigureCanvas):
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
-        self.thread.terminate()
         #prevents deleting accidentally a finished roast
         if self.safesaveflag== True:
             string = QApplication.translate("MessageBox","Do you want to save the profile?", None, QApplication.UnicodeUTF8)
@@ -1297,7 +1292,8 @@ class tgraphcanvas(FigureCanvas):
             
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"])  
-
+        self.restore_message_label()
+        
         #reset all variables that need to be reset
         self.flagon = False
         self.flagclock = False
@@ -1344,8 +1340,8 @@ class tgraphcanvas(FigureCanvas):
             self.beans = u""
             self.weight = [0,0,u"g"]
             self.volume = [0,0,u"l"]
-    	    self.ambientTemp = 0.
-    	    
+            self.ambientTemp = 0.
+            
         self.roastdate = QDate.currentDate()            
         self.errorlog = []
 
@@ -1362,7 +1358,7 @@ class tgraphcanvas(FigureCanvas):
         
         #aw.settingsLoad()        
         self.timeclock.restart()
-        self.timer.stop()
+        #self.timer.stop()
         self.LCDtimer.stop()
         self.seconds = 0.
 
@@ -2359,6 +2355,9 @@ class tgraphcanvas(FigureCanvas):
             aw.ser.closeport()            
                 
             self.flagon = True
+            if not self.thread.isRunning():
+                self.thread.start()
+                
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
             aw.button_1.setText("OFF") # text means click to turn OFF (it is ON)                   
@@ -2369,15 +2368,15 @@ class tgraphcanvas(FigureCanvas):
             self.seconds = 0.
             if not len(self.timex):
                 self.timeclock.start()
-            self.timer.start()
+            #self.timer.start()
             self.LCDtimer.start()
         else:
-            self.thread.terminate()
-            self.timer.stop()
+            self.flagon = False
+            #self.timer.stop()
             self.LCDtimer.stop()
             aw.ser.closeport()
             self.seconds = 0.
-            self.flagon = False
+            
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])            
             aw.button_1.setText("ON") 
@@ -3886,15 +3885,15 @@ class VMToolbar(NavigationToolbar):
             name = name.replace('.svg','.png')
         return QIcon(os.path.join(self.basedir, name))
 
-
 class Athread(QThread):
     def __init__(self, parent = None):
         QThread.__init__(self, parent)
     def __del__(self):   
         self.wait()        
-    def run(self):       
-        aw.qmc.sample()
-        
+    def run(self):
+        aw.qmc.getsample()
+
+            
 ########################################################################################                            
 #################### MAIN APPLICATION WINDOW ###########################################
 ########################################################################################
@@ -6084,10 +6083,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.density[3] = unicode(settings.value("densitySampleVolumeUnit",self.qmc.density[3]).toString())
             settings.endGroup()
             self.userprofilepath = unicode(settings.value("profilepath",self.userprofilepath).toString())
-            #need to update timer delay (otherwise it uses default 5 seconds)
-            #self.qmc.killTimer(self.qmc.timerid)
-            #self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
-            self.qmc.timer.setInterval(self.qmc.delay) 
+
             # Extra devices
             settings.beginGroup("ExtraComm")
             if settings.contains("extracomport"):
@@ -6902,10 +6898,6 @@ $cupping_notes
                 calSpinBox.value(),.1,30.)
         if ok:
             self.qmc.delay = int(secondsdelay*1000.) 	    	            
-            self.qmc.timer.setInterval(self.qmc.delay)
-##            self.qmc.killTimer(self.qmc.timerid) 
-##            self.qmc.delay = int(secondsdelay*1000) 	    	    	#self.qmc.delay is saved as int in QSettings
-##            self.qmc.timerid = self.qmc.startTimer(self.qmc.delay)
 
     def setcommport(self):
         dialog = comportDlg(self)
