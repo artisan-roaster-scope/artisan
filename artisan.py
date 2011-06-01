@@ -76,7 +76,7 @@ import codecs
 import struct
 from scipy import fft
 from scipy import interpolate as inter
-
+ 
 from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLabel,QMainWindow,QFileDialog,QInputDialog,QGroupBox,QDialog,QLineEdit,
                          QSizePolicy,QGridLayout,QVBoxLayout,QHBoxLayout,QPushButton,QDialogButtonBox,QLCDNumber,QKeySequence,QSpinBox,QComboBox,
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPalette,QImage,
@@ -84,7 +84,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
                          QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread)
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
@@ -140,7 +140,8 @@ from const import UIconst
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
 #######################################################################################
-
+  
+        	
 class tgraphcanvas(FigureCanvas):
     def __init__(self,parent):
 
@@ -310,9 +311,8 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=[u"",u"",u"",u"",u"",u""]
         self.plotcurvecolor = [u"black",u"black",u"black",u"black",u"black",u"black"]
  
-        #main matplot figure with plot(s) inside
-        self.fig = Figure()
-
+        self.fig = Figure() 
+            
         #figure back color
         if platf == 'Darwin':
             self.backcolor ="#EEEEEE"
@@ -349,6 +349,8 @@ class tgraphcanvas(FigureCanvas):
         self.flagclock = False
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
+        
+        self.roastpropertiesflag = 1  #resets roast properties if not zero
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
         self.ambientTemp = 0.
         #relative humidity percentage [0], corresponding temperature [1], temperature unit [2]
@@ -548,13 +550,15 @@ class tgraphcanvas(FigureCanvas):
         
         self.timer = QTimer()
         self.timer.setInterval(self.delay) 
-        self.connect(self.timer,SIGNAL("timeout()"),self.sample)
+        self.connect(self.timer,SIGNAL("timeout()"),self.sampleupdate)
 
         self.LCDtimer = QTimer()
         self.LCDtimer.setInterval(1000)  #miliseconds
         self.connect(self.LCDtimer,SIGNAL("timeout()"),self.updateLCDtime)
         
-        self.seconds = 0.    #helps make time in LCD update more even
+        self.seconds = 0.    #variable helps make time in LCD update more even
+
+        self.thread = Athread()
         
         ########################################################     Designer variables       ##############################################################
         self.designerflag = False
@@ -612,127 +616,157 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color
         
+    def sampleupdate(self):
+        self.thread.start()
+        
     #sample devices at interval self.delay miliseconds
     def sample(self):
         try:
-            if self.flagon:
-                #if using a meter (thermocouple device)
-                if self.device != 18:
-                    #read time, ET (t1) and BT (t2) TEMPERATURE                    
-                    tx,t1,t2 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
-                    if len(self.ETfunction):
-                        t1 = self.eval_math_expression(self.ETfunction,t1)
-                    if len(self.BTfunction):
-                        t2 = self.eval_math_expression(self.BTfunction,t2)
-                    # test for a possible change
-                    t1,t2 = self.filterDropOuts(t1,t2)
+            #if using a meter (thermocouple device)
+            if self.device != 18:
+                #read time, ET (t1) and BT (t2) TEMPERATURE                    
+                tx,t1,t2 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
+                if len(self.ETfunction):
+                    t1 = self.eval_math_expression(self.ETfunction,t1)
+                if len(self.BTfunction):
+                    t2 = self.eval_math_expression(self.BTfunction,t2)
 
-                    #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
-                    #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
-                    if len(self.timex) > 2 and t1 == self.temp2[-1] and t2 == self.temp1[-1]:
-                        #let's better swap the readings (also they are just repeating the previous ones)
-                        self.temp2.append(t1)
-                        self.temp1.append(t2)
-                    else:
-                        #the readings seem to be "in order"
-                        self.temp2.append(t2)
-                        self.temp1.append(t1)
-
-                    self.timex.append(tx)
-
-                    # update lines data using the lists with new data
-                    self.l_temp1.set_data(self.timex, self.temp1)
-                    self.l_temp2.set_data(self.timex, self.temp2)
-                        
-                    #we need a minimum of two readings to calculate rate of change
-                    if len(self.timex) > 2:
-                        timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
-                        #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
-                        self.rateofchange1 = (self.temp1[-1] - self.temp1[-2])/timed  #delta ET (degress / second)
-                        self.rateofchange2 = (self.temp2[-1] - self.temp2[-2])/timed  #delta  BT (degress / second)
-                        rateofchange1plot = 50. + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 50
-                        rateofchange2plot = 100. + self.sensitivity*self.rateofchange2    #lift to plot on the graph at Temp  = 100
-                    else:
-                        self.rateofchange1 = 100.
-                        self.rateofchange2 = 50.
-                        rateofchange1plot = 0.
-                        rateofchange2plot = 0.
-                    # append new data to the rateofchange
-                    self.delta1.append(rateofchange1plot)
-                    self.delta2.append(rateofchange2plot)
-                                
-                    if self.DeltaETflag:
-                        self.l_delta1.set_data(self.timex, self.delta1)
-                    if self.DeltaBTflag:
-                        self.l_delta2.set_data(self.timex, self.delta2)
-
-                    #readjust xlimit of plot if needed
-                    if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds
-                        self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
-                        self.ax.set_xlim(self.startofx,self.endofx)
-                        self.xaxistosm()
-                       
-                    aw.lcd2.display(t1)                                     # ET
-                    aw.lcd3.display(t2)                                     # BT
-                    aw.lcd4.display("%.1f"%(self.rateofchange1*60.))        # rate of change MET (degress per minute)
-                    aw.lcd5.display("%.1f"%(self.rateofchange2*60.))        # rate of change BT (degrees per minute)
-                                         
-                    if self.projectFlag:
-                        self.viewProjection()
-                    if self.HUDflag:
-                        aw.showHUD[aw.HUDfunction]()
-                    if self.background and self.backgroundReproduce:
-                        self.playbackevent()
-
-                    self.checkalarms()
-                        
-                #############    if using DEVICE 18 (no device). Manual mode
-                # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
-                else:
-                    tx = self.timeclock.elapsed()/1000. 
-                    #readjust xlimit of plot if needed
-                    if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
-                        self.endofx = int(tx + 180)         # increase x limit by 3 minutes (180)
-                        self.ax.set_xlim(self.startofx,self.endofx)
-                        self.xaxistosm()
-                        
-                    self.resetlines()
-                    #plot a vertical time line
-                    self.ax.plot([tx,tx], [0,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
-                    
-                    if self.background and self.backgroundReproduce:
-                        self.playbackevent()
-
-                ##############  if using more than one device
-                ndevices = len(self.extradevices)
-                if ndevices:
-                    for i in range(ndevices):
-                        aw.ser.extraSP[i].close()
-                        aw.ser.SP.close()
-                        aw.ser.SP = serial.Serial(port=aw.ser.extracomport[i], baudrate=aw.ser.extrabaudrate[i],bytesize=aw.ser.extrabytesize[i],
-                                                   parity=aw.ser.extraparity[i], stopbits=aw.ser.extrastopbits[i], timeout=aw.ser.extratimeout[i])
-                        extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
-                        aw.ser.SP.close()
-                        if len(self.extramathexpression1[i]):
-                            extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
-                        if len(self.extramathexpression2[i]):
-                            extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
-
-                        self.extratemp1[i].append(extrat1)
-                        self.extratemp2[i].append(extrat2)                        
-                        self.extratimex[i].append(extratx)
-                        # update extra lines 
-                        self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
-                        self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-                    #restore ET/BT device serial port 
-                    aw.ser.SP = serial.Serial(port=aw.ser.comport, baudrate=aw.ser.baudrate,bytesize=aw.ser.bytesize,
-                                              parity=aw.ser.parity, stopbits=aw.ser.stopbits, timeout=aw.ser.timeout)
-
-                ##########  
-
-                #update screen                
-                self.fig.canvas.draw()
+                # test for a possible change
+                #t1,t2 = self.filterDropOuts(t1,t2)
                 
+                #same as filterDropOuts() but faster by not making three calls to functions (OS time expensive) in self.filterDropOuts()
+                ##########################
+                if self.mode == "C":
+                    limit = 500.
+                else:
+                    limit = 800.
+                if  t1 < 1. or t1 > limit:
+                    if len(self.timex) > 2:
+                        t1 = self.temp1[-1]
+                    else:
+                        t1 = -1.
+                if t2 < 1. or t2 > limit:
+                    if len(self.timex) > 2:
+                        t2 = self.temp2[-1]
+                    else:
+                        t2 = -1.
+                ###########################        
+                                                        
+                #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
+                #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
+                if len(self.timex) > 2 and t1 == self.temp2[-1] and t2 == self.temp1[-1]:
+                    #let's better swap the readings (also they are just repeating the previous ones)
+                    self.temp2.append(t1)
+                    self.temp1.append(t2)
+                else:
+                    #the readings seem to be "in order"
+                    self.temp2.append(t2)
+                    self.temp1.append(t1)
+
+                self.timex.append(tx)
+
+                # update lines data using the lists with new data
+                self.l_temp1.set_data(self.timex, self.temp1)
+                self.l_temp2.set_data(self.timex, self.temp2)
+                    
+                #we need a minimum of two readings to calculate rate of change
+                if len(self.timex) > 2:
+                    timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
+                    #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
+                    self.rateofchange1 = (self.temp1[-1] - self.temp1[-2])/timed  #delta ET (degress / second)
+                    self.rateofchange2 = (self.temp2[-1] - self.temp2[-2])/timed  #delta  BT (degress / second)
+                    rateofchange1plot = 50. + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 50
+                    rateofchange2plot = 100. + self.sensitivity*self.rateofchange2    #lift to plot on the graph at Temp  = 100
+                else:
+                    self.rateofchange1 = 100.
+                    self.rateofchange2 = 50.
+                    rateofchange1plot = 0.
+                    rateofchange2plot = 0.
+                # append new data to the rateofchange
+                self.delta1.append(rateofchange1plot)
+                self.delta2.append(rateofchange2plot)
+                            
+                if self.DeltaETflag:
+                    self.l_delta1.set_data(self.timex, self.delta1)
+                if self.DeltaBTflag:
+                    self.l_delta2.set_data(self.timex, self.delta2)
+
+                #readjust xlimit of plot if needed
+                if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds
+                    self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
+                    self.ax.set_xlim(self.startofx,self.endofx)
+                    self.xaxistosm()
+                   
+                aw.lcd2.display(t1)                                     # ET
+                aw.lcd3.display(t2)                                     # BT
+                aw.lcd4.display("%.1f"%(self.rateofchange1*60.))        # rate of change MET (degress per minute)
+                aw.lcd5.display("%.1f"%(self.rateofchange2*60.))        # rate of change BT (degrees per minute)
+                
+                if self.projectFlag:
+                    self.viewProjection()
+                if self.HUDflag:
+                    aw.showHUD[aw.HUDfunction]()
+                if self.background and self.backgroundReproduce:
+                    self.playbackevent()
+
+                #check alarms    
+                for i in range(len(self.alarmflag)):
+                    #if alarm on, and not triggered, and time is after set time:
+                    if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
+                        if self.alarmsource[i] == 0:                        #check ET
+                            if self.temp1[-1] > self.alarmtemperature[i]:
+                                self.setalarm(i)
+                        elif self.alarmsource[i] == 1:                      #check BT
+                            if self.temp2[-1] > self.alarmtemperature[i]:
+                                self.setalarm(i)
+
+                    
+            #############    if using DEVICE 18 (no device). Manual mode
+            # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
+            else:
+                tx = self.timeclock.elapsed()/1000. 
+                #readjust xlimit of plot if needed
+                if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
+                    self.endofx = int(tx + 180)         # increase x limit by 3 minutes (180)
+                    self.ax.set_xlim(self.startofx,self.endofx)
+                    self.xaxistosm()
+                    
+                self.resetlines()
+                #plot a vertical time line
+                self.ax.plot([tx,tx], [0,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
+                
+                if self.background and self.backgroundReproduce:
+                    self.playbackevent()
+
+            	
+            ##############  if using more than one device
+            ndevices = len(self.extradevices)
+            if ndevices:
+                for i in range(ndevices):
+                    aw.ser.extraSP[i].close()
+                    aw.ser.SP.close()
+                    aw.ser.SP = serial.Serial(port=aw.ser.extracomport[i], baudrate=aw.ser.extrabaudrate[i],bytesize=aw.ser.extrabytesize[i],
+                                               parity=aw.ser.extraparity[i], stopbits=aw.ser.extrastopbits[i], timeout=aw.ser.extratimeout[i])
+                    extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
+                    aw.ser.SP.close()
+                    if len(self.extramathexpression1[i]):
+                        extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
+                    if len(self.extramathexpression2[i]):
+                        extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
+
+                    self.extratemp1[i].append(extrat1)
+                    self.extratemp2[i].append(extrat2)                        
+                    self.extratimex[i].append(extratx)
+                    # update extra lines 
+                    self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
+                    self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
+                #restore ET/BT device serial port 
+                aw.ser.SP = serial.Serial(port=aw.ser.comport, baudrate=aw.ser.baudrate,bytesize=aw.ser.bytesize,
+                                          parity=aw.ser.parity, stopbits=aw.ser.stopbits, timeout=aw.ser.timeout)
+        
+            #update screen                
+            self.fig.canvas.draw()
+
         except Exception,e:
             self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
@@ -784,16 +818,6 @@ class tgraphcanvas(FigureCanvas):
             
         self.ax.lines = self.ax.lines[0:linecount]
 
-    def checkalarms(self):
-        for i in range(len(self.alarmflag)):
-            #if alarm on, and not triggered, and time is after set time:
-            if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
-                if self.alarmsource[i] == 0:                        #check ET
-                    if self.temp1[-1] > self.alarmtemperature[i]:
-                        self.setalarm(i)
-                elif self.alarmsource[i] == 1:                      #check BT
-                    if self.temp2[-1] > self.alarmtemperature[i]:
-                        self.setalarm(i)
 
     def setalarm(self,alarmnumber):
         if self.alarmaction[alarmnumber] == 0:
@@ -1246,7 +1270,6 @@ class tgraphcanvas(FigureCanvas):
             return  '%d:%02d' % divmod((x - round(starttime)), 60)
         else:
             return  '-%d:%02d' % divmod(abs(x - round(starttime)), 60)
-            
 
     def reset_and_redraw(self):
         self.reset()
@@ -1254,6 +1277,7 @@ class tgraphcanvas(FigureCanvas):
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
+        self.thread.terminate()
         #prevents deleting accidentally a finished roast
         if self.safesaveflag== True:
             string = QApplication.translate("MessageBox","Do you want to save the profile?", None, QApplication.UnicodeUTF8)
@@ -1310,17 +1334,21 @@ class tgraphcanvas(FigureCanvas):
         aw.button_19.setFlat(False)
         aw.button_1.setText("ON") 
         aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
-        
+
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
         aw.setWindowTitle(aw.windowTitle)
 
-        self.roastingnotes = u""
-        self.cuppingnotes = u""
-        self.roastdate = QDate.currentDate()
-        self.beans = u""
+        if self.roastpropertiesflag:
+            self.roastingnotes = u""
+            self.cuppingnotes = u""
+            self.beans = u""
+            self.weight = [0,0,u"g"]
+            self.volume = [0,0,u"l"]
+    	    self.ambientTemp = 0.
+    	    
+        self.roastdate = QDate.currentDate()            
         self.errorlog = []
-        self.weight = [0,0,u"g"]
-        self.volume = [0,0,u"l"]
+
         self.specialevents = []
         self.specialeventstype = [] 
         self.specialeventsStrings = []        
@@ -1329,9 +1357,8 @@ class tgraphcanvas(FigureCanvas):
         aw.lineEvent.setText("")      
         aw.etypeComboBox.setCurrentIndex(0)
         aw.valueComboBox.setCurrentIndex(0)    
-        self.ambientTemp = 0.
         aw.curFile = None                 #current file name
-        self.ystep = 45
+        self.ystep = 45     	    	  #used to find length of arms in annotations  
         
         #aw.settingsLoad()        
         self.timeclock.restart()
@@ -1373,7 +1400,6 @@ class tgraphcanvas(FigureCanvas):
         
     #Redraws data   
     def redraw(self):
-
         self.fig.clf()   #wipe out figure
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         #Set axes same as in __init__
@@ -2331,13 +2357,6 @@ class tgraphcanvas(FigureCanvas):
             
             #close all serial ports just in case there was one left open from previous sesion
             aw.ser.closeport()            
-            
-            #Call start() to start the first measurement if no data collected
-            if not len(self.timex):
-                self.timeclock.start()
-            self.timer.start()
-            self.LCDtimer.start()
-            self.seconds = 0.
                 
             self.flagon = True
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
@@ -2345,10 +2364,18 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setText("OFF") # text means click to turn OFF (it is ON)                   
             
             aw.soundpop()
+            
+            #Call start() to start the first measurement if no data collected
+            self.seconds = 0.
+            if not len(self.timex):
+                self.timeclock.start()
+            self.timer.start()
+            self.LCDtimer.start()
         else:
-            aw.ser.closeport()
+            self.thread.terminate()
             self.timer.stop()
             self.LCDtimer.stop()
+            aw.ser.closeport()
             self.seconds = 0.
             self.flagon = False
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
@@ -3860,6 +3887,14 @@ class VMToolbar(NavigationToolbar):
         return QIcon(os.path.join(self.basedir, name))
 
 
+class Athread(QThread):
+    def __init__(self, parent = None):
+        QThread.__init__(self, parent)
+    def __del__(self):   
+        self.wait()        
+    def run(self):       
+        aw.qmc.sample()
+        
 ########################################################################################                            
 #################### MAIN APPLICATION WINDOW ###########################################
 ########################################################################################
@@ -3902,9 +3937,10 @@ class ApplicationWindow(QMainWindow):
         #set a minimum size (main window can be bigger but never smaller)
         self.main_widget.setMinimumWidth(811)
         #self.main_widget.setMinimumHeight(670)
-        
-        
-        ####      create Matplotlib canvas widget 
+       
+        ####      create Matplotlib canvas widget
+        #resolution
+        self.dpi = 80
         self.qmc = tgraphcanvas(self.main_widget)
 
         ####    HUD   
@@ -4706,6 +4742,12 @@ class ApplicationWindow(QMainWindow):
 
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
+    def setdpi(self,dpi):
+        if aw:
+            self.qmc.fig.set_dpi(dpi)
+            #move widget to update display
+            self.showFullScreen()
+            self.showNormal()        
 
     #call from user configured event buttons    
     def recordextraevent(self,ee):
@@ -6129,7 +6171,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.gridlinestyle = settings.value("gridlinestyle",self.qmc.gridlinestyle).toInt()[0]
                 self.qmc.gridalpha = settings.value("gridalpha",self.qmc.gridalpha).toDouble()[0]
             settings.endGroup()
-    	           
+
+            if settings.contains("roastpropertiesflag"):            	
+            	self.qmc.roastpropertiesflag = settings.value("roastpropertiesflag",self.qmc.roastpropertiesflag).toInt()[0]
+
             #update display
             self.qmc.redraw()
 
@@ -6293,8 +6338,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("gridalpha",self.qmc.gridalpha)
             settings.setValue("xrotation",self.qmc.xrotation)
             settings.endGroup()
+
+            settings.setValue("roastpropertiesflag",self.qmc.roastpropertiesflag)
          
-            
+           
         except Exception,e:
             self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))            
 
@@ -7603,16 +7650,39 @@ class HUDDlg(QDialog):
         tab4Layout.addWidget(mikeButton)
 
     	#### TAB 5
+
+        
         self.styleComboBox = QComboBox()
         available = map(QString, QStyleFactory.keys())
+        available = map(unicode,available)
         self.styleComboBox.addItems(available)
+        
         styleButton = QPushButton(QApplication.translate("Button","Set style",None, QApplication.UnicodeUTF8))
         styleButton.setFocusPolicy(Qt.NoFocus)   
         styleButton.setMaximumWidth(90)
-        self.connect(styleButton,SIGNAL("clicked()"),self.setappearance)        
+        self.connect(styleButton,SIGNAL("clicked()"),self.setappearance)
+        
+        self.resolutionSpinBox = QSpinBox()
+        self.resolutionSpinBox.setRange(40,120)
+        self.resolutionSpinBox.setSingleStep(5)
+        self.resolutionSpinBox.setValue(aw.dpi)
+
+        resButton = QPushButton(QApplication.translate("Button","Set dpi Resolution",None, QApplication.UnicodeUTF8))
+        resButton.setFocusPolicy(Qt.NoFocus)
+        resButton.setMaximumWidth(120)        
+        self.connect(resButton,SIGNAL("clicked()"),self.changedpi)
+
+        defresButton = QPushButton(QApplication.translate("Button","Set default Resolution",None, QApplication.UnicodeUTF8))
+        defresButton.setFocusPolicy(Qt.NoFocus)
+        defresButton.setMaximumWidth(120)        
+        self.connect(defresButton,SIGNAL("clicked()"),self.setdefaultres)
+                
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(self.styleComboBox)    	
         tab5Layout.addWidget(styleButton)
+        tab5Layout.addWidget(self.resolutionSpinBox)
+        tab5Layout.addWidget(resButton)
+        tab5Layout.addWidget(defresButton)
 
 
 
@@ -7656,6 +7726,14 @@ class HUDDlg(QDialog):
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
 
         self.setLayout(Slayout)
+
+    def changedpi(self):
+        value = self.resolutionSpinBox.value()
+        aw.setdpi(value)
+
+    def setdefaultres(self):
+        self.resolutionSpinBox.setValue(80)
+        self.changedpi()
 
     def showcurvehelp(self):
 
@@ -7790,8 +7868,9 @@ class HUDDlg(QDialog):
                 aw.qmc.adderror(QApplication.translate("Error Message", "Plotter: %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
                 return 0
         
-    def setappearance(self):        
-        app.setStyle(self.styleComboBox.currentText())
+    def setappearance(self):
+        aw.style = unicode(self.styleComboBox.currentText())
+        app.setStyle(aw.style)
         
     def showsound(self):
         warnings.simplefilter('ignore', Warning) #for Complex warning 
@@ -8031,7 +8110,14 @@ class editGraphDlg(QDialog):
         self.dropedit.setMaximumWidth(50)
         self.dropedit.setMinimumWidth(50)
         droplabel.setBuddy(self.dropedit)
-        
+
+        self.roastproperties = QCheckBox(QApplication.translate("propertiesCheckBox","Delete Roast properties on Reset", None, QApplication.UnicodeUTF8))
+        if aw.qmc.roastpropertiesflag:
+            self.roastproperties.setChecked(True)
+        else:
+            self.roastproperties.setChecked(False)
+        self.connect(self.roastproperties,SIGNAL("stateChanged(int)"),self.roastpropertiesChanged)  
+
         # EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
@@ -8396,6 +8482,7 @@ class editGraphDlg(QDialog):
         tab1Layout.setMargin(0)
         tab1Layout.addLayout(self.tab1aLayout)
         tab1Layout.addLayout(tab1bLayout)
+        tab1Layout.addWidget(self.roastproperties)
         
         self.calculated_density()
 
@@ -8449,6 +8536,11 @@ class editGraphDlg(QDialog):
                
         self.setLayout(totallayout)
 
+    def roastpropertiesChanged(self):
+        if self.roastproperties.isChecked():
+            aw.qmc.roastpropertiesflag = 1
+        else:
+            aw.qmc.roastpropertiesflag = 0
 
     def createDataTable(self):
         self.datatable.clear()
@@ -8846,7 +8938,6 @@ class autosaveDlg(QDialog):
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None, QApplication.UnicodeUTF8))
         
-        self.autocheckbox = QCheckBox(QApplication.translate("CheckBox","Autosave [s]", None, QApplication.UnicodeUTF8))
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [s]",None, QApplication.UnicodeUTF8))
         
         if aw.qmc.autosaveflag:
