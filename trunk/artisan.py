@@ -11044,8 +11044,9 @@ class serialport(object):
         #initial message flag for CENTER 309 meter
         self.CENTER309flag = 0
 
-        #initial ambient temperature flag for ARDUINOTC4 meter
-        self.arduinoAmbFlag = 0
+        #Initialization flag for ARDUINO and TC4 meter
+        self.ArduinoIsInitialized = 0
+        self.ArduinoUnit = ""
 
         #comm ports available after Scan
         self.commavailable = []
@@ -11069,7 +11070,9 @@ class serialport(object):
         try:
             self.closeport()
             self.confport()
-            self.arduinoAmbFlag = 0
+            self.ArduinoIsInitialized = 0  # Assume the Arduino has to be reinitialized
+            self.ArduinoUnit = ""
+
             #open port
             self.SP.open()
             for i in range(len(self.extraSP)):
@@ -11525,9 +11528,10 @@ class serialport(object):
                 return -1,-1
 
     def ARDUINOTC4temperature(self):
+
         try:
             if not self.SP.isOpen():
-                self.SP.open()                    
+                self.SP.open()
                 libtime.sleep(3)
                 
             if self.SP.isOpen():
@@ -11546,7 +11550,7 @@ class serialport(object):
                     except:
                         aw.qmc.errorlog.append(QApplication.translate("Error Message","Arduino could not set channels: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)) + result
 
-                    self.ArduinoUnit = ""
+                    self.ArduinoUnit = ""  # For good measure...
 
                 if not self.ArduinoUnit == aw.qmc.mode:
                     command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
@@ -11596,6 +11600,7 @@ class serialport(object):
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
+
             aw.qmc.errorlog.append(timez + " " + error)
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
