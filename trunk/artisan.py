@@ -723,21 +723,23 @@ class tgraphcanvas(FigureCanvas):
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
             else:
-                tx = self.timeclock.elapsed()/1000. 
+                tx = self.timeclock.elapsed()/1000.
+                print "OK01"
                 #readjust xlimit of plot if needed
                 if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
                     self.endofx = int(tx + 180)         # increase x limit by 3 minutes (180)
                     self.ax.set_xlim(self.startofx,self.endofx)
+                    print "1111"
                     self.xaxistosm()
+                    print "2222"
                     
+                print "OK11"    
                 self.resetlines()
                 #plot a vertical time line
                 self.ax.plot([tx,tx], [0,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
-                
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
 
-            	
             ##############  if using more than one device
             ndevices = len(self.extradevices)
             if ndevices:
@@ -770,7 +772,8 @@ class tgraphcanvas(FigureCanvas):
                     self.ser.SP.write(self.qmc.serialcommandQue[i])                                    
             	self.qmc.serialcommandQue = []                        #erase commands  (already sent)
             	
-            #update screen                
+            #update screen
+            print "OK3"	
             self.fig.canvas.draw()
 
         except Exception,e:
@@ -6085,7 +6088,11 @@ class ApplicationWindow(QMainWindow):
             #saves max-min temp limits of graph
             settings.beginGroup("Axis")
             self.qmc.startofx = settings.value("xmin",self.qmc.startofx).toInt()[0]
-            self.qmc.endofx = settings.value("xmax",self.qmc.endofx).toInt()[0]            
+            self.qmc.endofx = settings.value("xmax",self.qmc.endofx).toInt()[0]
+            #fixes Windows OS sometimes saving endofx as 0 
+            if self.qmc.endofx < 60 or self.endofx > 1800:
+                self.qmc.enofx = 60
+                
             self.qmc.ylimit_min = settings.value("ymin",self.qmc.ylimit_min).toInt()[0]            
             self.qmc.ylimit = settings.value("ymax",self.qmc.ylimit).toInt()[0]
             self.qmc.keeptimeflag = settings.value("keepTimeLimit",self.qmc.keeptimeflag).toInt()[0]
