@@ -742,10 +742,12 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(ndevices):
                     aw.ser.extraSP[i].close()
                     aw.ser.SP.close()
+                    #assign extra devices port to ser.SP so that the same serial functions work
                     aw.ser.SP = serial.Serial(port=aw.ser.extracomport[i], baudrate=aw.ser.extrabaudrate[i],bytesize=aw.ser.extrabytesize[i],
                                                parity=aw.ser.extraparity[i], stopbits=aw.ser.extrastopbits[i], timeout=aw.ser.extratimeout[i])
                     extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
                     aw.ser.SP.close()
+                    
                     if len(self.extramathexpression1[i]):
                         extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
                     if len(self.extramathexpression2[i]):
@@ -765,11 +767,10 @@ class tgraphcanvas(FigureCanvas):
             ncommands = len(self.serialcommandQue)
             if ncommands:              
                 for i in range(ncommands):                
-                    self.ser.SP.write(self.qmc.serialcommandQue[i])                                    
+                    aw.ser.SP.write(self.qmc.serialcommandQue[i])                                    
             	self.qmc.serialcommandQue = []                        #erase commands  (already sent)
             	
             #update screen
-            print "OK3"	
             self.fig.canvas.draw()
 
         except Exception,e:
@@ -11077,8 +11078,8 @@ class serialport(object):
 
             #open port
             self.SP.open()
-            for i in range(len(self.extraSP)):
-                self.extraSP[i].open()                
+##            for i in range(len(self.extraSP)):
+##                self.extraSP[i].open()                
                
         except serial.SerialException,e:
             error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
