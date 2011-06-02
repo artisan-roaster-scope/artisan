@@ -8943,7 +8943,8 @@ class autosaveDlg(QDialog):
         
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None, QApplication.UnicodeUTF8))
-        
+
+        self.autocheckbox = QCheckBox(QApplication.translate("CheckBox","Autosave [s]", None, QApplication.UnicodeUTF8))
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [s]",None, QApplication.UnicodeUTF8))
         
         if aw.qmc.autosaveflag:
