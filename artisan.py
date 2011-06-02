@@ -1328,7 +1328,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_8.setFlat(False)
         aw.button_9.setFlat(False)
         aw.button_19.setFlat(False)
-        aw.button_1.setText("ON") 
+        aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) 
         aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
 
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
@@ -2360,7 +2360,7 @@ class tgraphcanvas(FigureCanvas):
                 
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
-            aw.button_1.setText("OFF") # text means click to turn OFF (it is ON)                   
+            aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
             
             aw.soundpop()
             
@@ -2379,7 +2379,7 @@ class tgraphcanvas(FigureCanvas):
             
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])            
-            aw.button_1.setText("ON") 
+            aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) 
             
             aw.soundpop()
            
@@ -11517,10 +11517,38 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
 
-                command = "R" + aw.qmc.mode + "2000\n"  #Read command, unit, arguments
+                if not self.ArduinoIsInitialized:
+                    command = "CHAN;1200\n"  #Default channels
+                    self.SP.write(command)
+
+                    try:
+                        result = ""
+                        result = self.SP.readline()
+                        if (not result == "" and not result.startswith("#")):
+                            raise
+                    except:
+                        aw.qmc.errorlog.append(QApplication.translate("Error Message","Arduino could not set channels: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)) + result
+
+                    self.ArduinoUnit = ""
+
+                if not self.ArduinoUnit == aw.qmc.mode:
+                    command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
+                    self.ArduinoUnit = aw.qmc.mode
+                    self.SP.write(command)
+
+                    try:
+                        result = ""
+                        result = self.SP.readline()
+                        if (not result == "" and not result.startswith("#")):
+                            raise
+                    except:
+                        aw.qmc.errorlog.append(QApplication.translate("Error Message","Arduino could not set temperature unit: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)) + result
+                        self.ArduinoUnit = ""
+
+                command = "READ\n"  #Read command. Will used set channels and units
                 self.SP.write(command)
                                 
-                res = self.SP.readline().rsplit(',')  # a list [t0,t1,t2] with t0 = ambient; t1 = ET; t2 = BT
+                res = self.SP.readline().rsplit(',')  # a list [t0,t1,t2] with t0 = ambient; t1 = ET; t2 = BT (for now)
                 t0 = 0 
                 if len(aw.qmc.timex) > 2:                           
                     t1 = aw.qmc.temp1[-1]
@@ -11539,10 +11567,10 @@ class serialport(object):
                     t2 = float(res[2])
                 except:
                     pass
-                if t0 and not self.arduinoAmbFlag:
+                if t0 and not self.ArduinoIsInitialized:
                     aw.qmc.ambientTemp = t0
-                    self.arduinoAmbFlag = 1
-                
+                    
+                self.ArduinoIsInitialized = 1
                 return t1, t2
 
         except serial.SerialException, e:
