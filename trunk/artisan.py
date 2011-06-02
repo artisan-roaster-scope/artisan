@@ -150,66 +150,66 @@ class tgraphcanvas(FigureCanvas):
                         "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
                         "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'blue'}
         
-        self.artisanflavordefaultlabels = [QApplication.translate("artisanTextbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("artisanTextbox", "After Taste",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("artisanTextbox", "Clean Cup",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("artisanTextbox", "Head",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("artisanTextbox", "Fragance",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("artisanTextbox", "Sweetness",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("artisanTextbox", "Aroma",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("artisanTextbox", "Balance",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("artisanTextbox", "Body",None, QApplication.UnicodeUTF8)]
+        self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "After Taste",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Clean Cup",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Head",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Fragance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8)]
 
-        self.SCCAflavordefaultlabels = [QApplication.translate("SCCATextbox", "Sour",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Flavor",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Critical\nStimulus",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Aftertaste",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Bitter",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Astringency",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Solubles\nConcentration",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Mouthfeel",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Other",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Aromatic\nComplexity",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Roast\nColor",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Aromatic\nPungency",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Sweet",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "pH",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SCCATextbox", "Balance",None, QApplication.UnicodeUTF8)]
+        self.SCCAflavordefaultlabels = [QApplication.translate("Textbox", "Sour",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Flavor",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Critical\nStimulus",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Bitter",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Astringency",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Solubles\nConcentration",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Mouthfeel",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Other",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Aromatic\nComplexity",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Roast\nColor",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Aromatic\nPungency",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Sweet",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "pH",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
 
 
-        self.CQIflavordefaultlabels =  [QApplication.translate("SQITextbox", "Fragance",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SQITextbox", "Aroma",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SQITextbox", "Flavor",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SQITextbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SQITextbox", "Body",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("SQITextbox", "Aftertaste",None, QApplication.UnicodeUTF8)]
+        self.CQIflavordefaultlabels =  [QApplication.translate("Textbox", "Fragance",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Flavor",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
+                                        QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8)]
 
-        self.SweetMariasflavordefaultlabels = [QApplication.translate("SMTextbox", "Dry Fragrance",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("SMTextbox", "Uniformity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("SMTextbox", "Complexity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("SMTextbox", "Clean Cup",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("SMTextbox", "Sweetness",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("SMTextbox", "Finished",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("SMTextbox", "Body",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("SMTextbox", "Flavor",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("SMTextbox", "Brightness",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("SMTextbox", "Wet Aroma",None, QApplication.UnicodeUTF8)]
+        self.SweetMariasflavordefaultlabels = [QApplication.translate("Textbox", "Dry Fragrance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Uniformity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Complexity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Clean Cup",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Finished",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Flavor",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Brightness",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Wet Aroma",None, QApplication.UnicodeUTF8)]
         
-        self.Cflavordefaultlabels = [QApplication.translate("CTextbox", "Fragrance",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("CTextbox", "Aroma",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("CTextbox", "Taste",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("CTextbox", "Nose",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("CTextbox", "Aftertaste",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("CTextbox", "Body",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("CTextbox", "Acidity",None, QApplication.UnicodeUTF8)]
+        self.Cflavordefaultlabels = [QApplication.translate("Textbox", "Fragrance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Taste",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Nose",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8)]
         
-        self.Eflavordefaultlabels = [QApplication.translate("ETextbox", "Fragrance-Aroma",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("ETextbox", "Acidity",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("ETextbox", "Flavor",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("ETextbox", "Body",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("ETextbox", "Aftertaste",None, QApplication.UnicodeUTF8),
-                                            QApplication.translate("ETextbox", "Balance",None, QApplication.UnicodeUTF8)]
+        self.Eflavordefaultlabels = [QApplication.translate("Textbox", "Fragrance-Aroma",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Flavor",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
 
         
         self.flavorlabels = list(self.artisanflavordefaultlabels)
@@ -8103,11 +8103,10 @@ class editGraphDlg(QDialog):
         self.dropedit.setMinimumWidth(50)
         droplabel.setBuddy(self.dropedit)
 
-        self.roastproperties = QCheckBox(QApplication.translate("propertiesCheckBox","Delete Roast properties on Reset", None, QApplication.UnicodeUTF8))
+        self.roastproperties = QCheckBox(QApplication.translate("CheckBox","Delete Roast properties on Reset", None, QApplication.UnicodeUTF8))
         if aw.qmc.roastpropertiesflag:
             self.roastproperties.setChecked(True)
-        else:
-            self.roastproperties.setChecked(False)
+        else:            self.roastproperties.setChecked(False)
         self.connect(self.roastproperties,SIGNAL("stateChanged(int)"),self.roastpropertiesChanged)  
 
         # EVENTS
@@ -10082,7 +10081,7 @@ class flavorDlg(QDialog):
         aw.lowerbuttondialog.setVisible(False)
         aw.EventsGroupLayout.setVisible(False)
 
-        defaultlabel = QLabel(QApplication.translate("default","Default",None, QApplication.UnicodeUTF8))
+        defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
         self.defaultcombobox = QComboBox()
         self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E"])
         self.defaultcombobox.setCurrentIndex(0)
@@ -10150,8 +10149,8 @@ class flavorDlg(QDialog):
         if nflavors:    
             self.flavortable.setRowCount(nflavors)
             self.flavortable.setColumnCount(2)
-            self.flavortable.setHorizontalHeaderLabels([QApplication.translate("flavorTable", "Label",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("flavorTable", "Value",None, QApplication.UnicodeUTF8)])
+            self.flavortable.setHorizontalHeaderLabels([QApplication.translate("Table", "Label",None, QApplication.UnicodeUTF8),
+                                                        QApplication.translate("Table", "Value",None, QApplication.UnicodeUTF8)])
             
             self.flavortable.setAlternatingRowColors(True)
             self.flavortable.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -10179,12 +10178,12 @@ class flavorDlg(QDialog):
     def showbackground(self):
         if self.backgroundCheck.isChecked():
             if not aw.qmc.background:
-                message = QApplication.translate("message","Background not found", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message Area","Background not found", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
                 self.backgroundCheck.setChecked(False)
             else:
                 if len(aw.qmc.backgroundFlavors) != len(aw.qmc.flavors):
-                    message = QApplication.translate("message","Background does not match number of labels", None, QApplication.UnicodeUTF8)
+                    message = QApplication.translate("Message Area","Background does not match number of labels", None, QApplication.UnicodeUTF8)
                     aw.sendmessage(message)
                     self.backgroundCheck.setChecked(False)
                 else:
