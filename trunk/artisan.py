@@ -1238,6 +1238,8 @@ class tgraphcanvas(FigureCanvas):
 ##        majorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-2.*self.xgrid,  self.endofx*2.+abs(self.xgrid-starttime),    self.xgrid)
 ##        minorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-2.*self.xgrid,  self.endofx*2.+abs(self.xgrid-starttime),    self.xgrid/6.)
 
+        if self.xgrid == 0:
+            self.xgrid = 60
         mfactor1 =  float(2. + int(starttime)/int(self.xgrid))
         mfactor2 =  float(2. + int(self.endofx)/int(self.xgrid))
 
@@ -6086,7 +6088,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.startofx = settings.value("xmin",self.qmc.startofx).toInt()[0]
             self.qmc.endofx = settings.value("xmax",self.qmc.endofx).toInt()[0]
             #fixes Windows OS sometimes saving endofx as 0 
-            if self.qmc.endofx < 60 or self.endofx > 1800:
+            if self.qmc.endofx < 60 or self.qmc.endofx > 1800:
                 self.qmc.enofx = 60
             self.qmc.ylimit_min = settings.value("ymin",self.qmc.ylimit_min).toInt()[0]            
             self.qmc.ylimit = settings.value("ymax",self.qmc.ylimit).toInt()[0]
