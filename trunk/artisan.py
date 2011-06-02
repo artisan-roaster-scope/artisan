@@ -6864,19 +6864,19 @@ $cupping_notes
         message.show()        
         
     def helpAbout(self):
-        coredevelopers = "<br>Rafael Cobo <br> Marko Luther <br> Sebastien Delgrande"
-        contributors =  "<br>" + QApplication.translate("About", "%1, linux binary",None, QApplication.UnicodeUTF8).arg("Lukas Kolbe")
-        contributors += "<br>" + QApplication.translate("About", "%1, documentation",None, QApplication.UnicodeUTF8).arg("Rich Helms")
-        contributors += "<br>" + QApplication.translate("About", "%1, TEVA18B support",None, QApplication.UnicodeUTF8).arg("Markus Wagner")
-        contributors += "<br>" + QApplication.translate("About", "%1, Swedish localization",None, QApplication.UnicodeUTF8).arg("Martin Kral")
-        contributors += "<br>" + QApplication.translate("About", "%1, Spanish localization",None, QApplication.UnicodeUTF8).arg("Bluequijote")
-        contributors += "<br>" + QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Marcio Carneiro")
+        coredevelopers = u"<br>Rafael Cobo <br> Marko Luther <br> Sebastien Delgrande"
+        contributors =  u"<br>" + QApplication.translate(u"About", u"%1, linux binary",None, QApplication.UnicodeUTF8).arg(u"Lukas Kolbe")
+        contributors += u"<br>" + QApplication.translate(u"About", u"%1, documentation",None, QApplication.UnicodeUTF8).arg(u"Rich Helms")
+        contributors += u"<br>" + QApplication.translate(u"About", u"%1, TEVA18B support",None, QApplication.UnicodeUTF8).arg(u"Markus Wagner")
+        contributors += u"<br>" + QApplication.translate(u"About", u"%1, Swedish localization",None, QApplication.UnicodeUTF8).arg(u"Martin Kral")
+        contributors += u"<br>" + QApplication.translate(u"About", u"%1, Spanish localization",None, QApplication.UnicodeUTF8).arg(u"Bluequijote")
+        contributors += u"<br>" + QApplication.translate(u"About", u"%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg(u"Marcio Carneiro")
         box = QMessageBox()
         
         #create a html QString
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
-                """<b>{0}</b> {1} 
+                u"""<b>{0}</b> {1} 
                 <p>
                 <b>Python:</b> [ {2} ]
                 <b>Qt:</b> [ {3} ]
