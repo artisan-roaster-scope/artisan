@@ -549,7 +549,7 @@ class tgraphcanvas(FigureCanvas):
         self.seconds = 0.    #variable helps make time in LCD update more even
 
         self.thread = Athread()
-        
+    	
         ########################################################     Designer variables       ##############################################################
         self.designerflag = False
         self.designerconnections = [0,0,0,0]   #mouse event ids
@@ -606,12 +606,15 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color
 
-    def getsample(self):
+    	#list with commands scheduled for serial comm (arduino). List read at the end of self.sample()
+    	self.serialcommandQue = []
+
+    def sampleloop(self):
         while 1:
             if self.flagon:
                 self.sample()
-                #self.thread.msleep(self.delay)   #seems that these two functions do the same load wise
-                libtime.sleep(self.delay/1000.)
+                self.thread.msleep(self.delay)   #seems that these two functions do the same load wise
+                #libtime.sleep(self.delay/1000.)
             else:
                 break
       
@@ -693,8 +696,8 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.set_xlim(self.startofx,self.endofx)
                     self.xaxistosm()
                    
-                aw.lcd2.display(t1)                                     # ET
-                aw.lcd3.display(t2)                                     # BT
+                aw.lcd2.display("%.1f"%t1)                                     # ET
+                aw.lcd3.display("%.1f"%t2)                                     # BT
                 aw.lcd4.display("%.1f"%(self.rateofchange1*60.))        # rate of change MET (degress per minute)
                 aw.lcd5.display("%.1f"%(self.rateofchange2*60.))        # rate of change BT (degrees per minute)
                 
@@ -756,10 +759,17 @@ class tgraphcanvas(FigureCanvas):
                     # update extra lines 
                     self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
                     self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-                #restore ET/BT device serial port 
+                #restore ET/BT device serial port and open it
                 aw.ser.SP = serial.Serial(port=aw.ser.comport, baudrate=aw.ser.baudrate,bytesize=aw.ser.bytesize,
                                           parity=aw.ser.parity, stopbits=aw.ser.stopbits, timeout=aw.ser.timeout)
-        
+
+            ##############  scheduled serial commands  (Arduino)   ################################
+            ncommands = len(self.serialcommandQue)
+            if ncommands:              
+                for i in range(ncommands):                
+                    self.ser.SP.write(self.qmc.serialcommandQue[i])                                    
+            	self.qmc.serialcommandQue = []                        #erase commands  (already sent)
+            	
             #update screen                
             self.fig.canvas.draw()
 
@@ -1224,9 +1234,17 @@ class tgraphcanvas(FigureCanvas):
             starttime = 0
           
         #majorlocator = ticker.IndexLocator(self.xgrid, starttime)          	        #IndexLocator does not work righ when updating (new value)self.endofx
-        #majorlocator = ticker.MultipleLocator(self.xgrid)      	    	    	#MultipleLocator does not provide an offset for startime          
-        majorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-10*self.xgrid,self.endofx*2.,self.xgrid)
-        minorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-10*self.xgrid,self.endofx*2.,self.xgrid/6.)
+        #majorlocator = ticker.MultipleLocator(self.xgrid)      	    	    	#MultipleLocator does not provide an offset for startime
+            
+##        majorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-2.*self.xgrid,  self.endofx*2.+abs(self.xgrid-starttime),    self.xgrid)
+##        minorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-2.*self.xgrid,  self.endofx*2.+abs(self.xgrid-starttime),    self.xgrid/6.)
+
+        mfactor1 =  float(2. + int(starttime)/int(self.xgrid))
+        mfactor2 =  float(2. + int(self.endofx)/int(self.xgrid))
+
+        majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),  starttime+(self.xgrid*mfactor2), self.xgrid)
+        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),  starttime+(self.xgrid*mfactor2), self.xgrid/6.)
+
 
         #sometimes we get times like 01:59 when startime is a float in the middle range of two ints. This compensates
         for i in range(len(majorloc)):
@@ -2357,6 +2375,7 @@ class tgraphcanvas(FigureCanvas):
             self.flagon = True
             if not self.thread.isRunning():
                 self.thread.start()
+                self.thread.setPriority(QThread.TimeCriticalPriority)
                 
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
@@ -3891,7 +3910,7 @@ class Athread(QThread):
     def __del__(self):   
         self.wait()        
     def run(self):
-        aw.qmc.getsample()
+        aw.qmc.sampleloop()
 
             
 ########################################################################################                            
@@ -4763,10 +4782,6 @@ class ApplicationWindow(QMainWindow):
                 if self.extraeventsactions[ee] == 1:
                     try:
                         aw.extraeventsactionstrings[ee] = str(aw.extraeventsactionstrings[ee])
-                        self.ser.closeport()
-                        self.ser.SP = serial.Serial(port=self.ser.comport, baudrate=self.ser.baudrate,bytesize=self.ser.bytesize,
-                                                  parity=self.ser.parity, stopbits=self.ser.stopbits, timeout=self.ser.timeout)
-                        self.ser.SP.flushOutput()
                         extraeventsactionstringscopy = ""
                     	#example a2b_uu("Hello") sends Hello in binary format instead of ASCII
                         if "a2b_uu" in aw.extraeventsactionstrings[ee]:
@@ -4774,10 +4789,10 @@ class ApplicationWindow(QMainWindow):
                             aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][:1]                 # removes )  
                             extraeventsactionstringscopy = binascii.a2b_uu(aw.extraeventsactionstrings[ee])
                         if extraeventsactionstringscopy:
-                            self.ser.SP.write(extraeventsactionstringscopy)                
-                        else:    
-                            self.ser.SP.write(aw.extraeventsactionstrings[ee])                
-                        self.ser.SP.close()
+                            #serial commands are sent at the end of self.qmc.sample() to avoid confict of two threads using same port at the same time 
+                            self.qmc.serialcommandQue.append(extraeventsactionstringscopy)               
+                        else:
+                            self.qmc.serialcommandQue.append(aw.extraeventsactionstrings[ee])
                     except Exception, e:
                         self.qmc.adderror(QApplication.translate("Error Message", "Exception: recordextraevent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
                         
