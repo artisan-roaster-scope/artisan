@@ -609,10 +609,11 @@ class tgraphcanvas(FigureCanvas):
 
     def sampleloop(self):
         while 1:
+            timedelay = self.delay/1000.
             if self.flagon:
                 self.sample()
-                self.thread.msleep(self.delay)   #seems that these two functions do the same load wise
-                #libtime.sleep(self.delay/1000.)
+                #self.thread.msleep(self.delay)   #seems that these two functions do the same load wise.
+                libtime.sleep(timedelay)   #However, use this one. Found _safer_    
             else:
                 break
       
@@ -1265,11 +1266,35 @@ class tgraphcanvas(FigureCanvas):
         else:
             starttime = 0
             
-        if x >=  starttime:   
-            return  '%d:%02d' % divmod((x - round(starttime)), 60)
+        if x >=  starttime:
+            m,s = divmod((x - round(starttime)), 60)  #**NOTE**: divmod() returns here type numpy.float64, which could create problems
+            #print type(m),type(s)                    #it is used in: formatter = ticker.FuncFormatter(self.formtime) in xaxistosm()
+            s = int(round(s))
+            m = int(m)
+            
+            if s >= 59:
+                return '%d'%(m+1)
+            elif abs(s - 30) < 1:
+                return '%d.5'%m
+            elif s > 1:
+                return  '%d:%02d'%(m,s)
+            else:
+                return '%d'%m
+            
         else:
-            return  '-%d:%02d' % divmod(abs(x - round(starttime)), 60)
-
+            m,s = divmod(abs(x - round(starttime)), 60)
+            s = int(round(s))
+            m = int(m)
+            
+            if s >= 59:
+                return '-%d'%(m+1)
+            elif abs(s-30) < 1:
+                return '-%d.5'%m
+            elif s > 1:
+                return  '-%d:%02d'%(m,s)
+            else:
+                return '-%d'%m
+            
     def reset_and_redraw(self):
         self.reset()
         self.redraw()
@@ -4764,8 +4789,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.redraw()
             
             if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event
-                if self.extraeventsactions[ee] == 1:
-                    
+                if self.extraeventsactions[ee] == 1:                    
                     aw.extraeventsactionstrings[ee] = str(aw.extraeventsactionstrings[ee])                        
                     extraeventsactionstringscopy = ""
                     #example a2b_uu("Hello") sends Hello in binary format instead of ASCII
@@ -12007,6 +12031,7 @@ class serialport(object):
         finally:
             self.mutex.unlock()
 
+    #Example function
     #NOT USED YET, maybe FUTURE Arduino?
     #sends a command to the ET/BT device and receives data of length nbytes 
     def sendTXRXcommand(self,command,nbytes):
