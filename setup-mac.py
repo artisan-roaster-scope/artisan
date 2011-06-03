@@ -87,10 +87,13 @@ for root, dirs, files in os.walk('./dist'):
         if 'debug' in file:
             print 'Deleting', file
             os.remove(os.path.join(root,file))
-        if 'test_' in file:
+        elif 'test_' in file:
             print 'Deleting', file
             os.remove(os.path.join(root,file))
-        if '_tests' in file:
+        elif '_tests' in file:
+            print 'Deleting', file
+            os.remove(os.path.join(root,file))
+        elif '.pyc' in file:
             print 'Deleting', file
             os.remove(os.path.join(root,file))
             
