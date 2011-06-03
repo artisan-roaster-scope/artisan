@@ -11534,6 +11534,10 @@ class serialport(object):
             if not self.SP.isOpen():
                 self.SP.open()
                 libtime.sleep(3)
+
+                #Reinitialize Arduino in case communication was interupted
+                self.ArduinoIsInitialized = 0
+                self.ArduinoUnit = ""
                 
             if self.SP.isOpen():
 
