@@ -258,7 +258,7 @@ class tgraphcanvas(FigureCanvas):
                        "Omega HH802U",
                        "Omega HH309",
                        "NONE",
-                       "ArduinoTC4",
+                       "+ArduinoTC4",
                        "TE VA18B",
                        "+309_34",
                        "+FUJI DUTY %",
@@ -5996,7 +5996,12 @@ class ApplicationWindow(QMainWindow):
                 self.ser.controlETpid = map(lambda x:x.toInt()[0],settings.value("controlETpid").toList())
             if settings.contains("readBTpid"):
                 self.ser.readBTpid = map(lambda x:x.toInt()[0],settings.value("readBTpid").toList())
+            if settings.contains("arduinoETChannel"):
+                self.ser.arduinoETChannel = settings.value("arduinoETChannel").toString()[0]
+            if settings.contains("arduinoBTChannel"):
+                self.ser.arduinoBTChannel = settings.value("arduinoBTChannel").toString()[0]
             settings.endGroup()
+
             #restore phases
             if settings.contains("Phases"):
                 self.qmc.phases = map(lambda x:x.toInt()[0],settings.value("Phases").toList())
@@ -6224,6 +6229,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("id",self.qmc.device)
             settings.setValue("controlETpid",self.ser.controlETpid)
             settings.setValue("readBTpid",self.ser.readBTpid)
+            settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)
+            settings.setValue("arduinoBTChannel",self.ser.arduinoBTChannel)
             settings.endGroup()
             #save of phases is done in the phases dialog
             #only if mode was changed (and therefore the phases values have been converted)
@@ -11053,7 +11060,9 @@ class serialport(object):
         #initial message flag for CENTER 309 meter
         self.CENTER309flag = 0
 
-        #Initialization flag for ARDUINO and TC4 meter
+        #Initialization for ARDUINO and TC4 meter
+        self.arduinoETChannel = "1"
+        self.arduinoBTChannel = "2"
         self.ArduinoIsInitialized = 0
         self.ArduinoUnit = ""
 
@@ -11587,7 +11596,9 @@ class serialport(object):
                     self.SP.flushInput()
                     self.SP.flushOutput()
 
-                    command = "CHAN;1200\n"  #Default channels
+                    command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + "00\n"  
+                    print command 
+
                     self.SP.write(command)
 
                     try:
@@ -12883,6 +12894,7 @@ class DeviceAssignmentDLG(QDialog):
         
         self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Device", None, QApplication.UnicodeUTF8))
         self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None, QApplication.UnicodeUTF8))
+        self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","Arduino (TC4)", None, QApplication.UnicodeUTF8))
 
         #As a main device, don't show the devices that start with a "+"
         dev = aw.qmc.devices[:]
@@ -12917,10 +12929,21 @@ class DeviceAssignmentDLG(QDialog):
                                          QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8)])
         self.btpidunitidComboBox.addItems(["2","1"])
 
-        #check previous pid settings for radio button
+        #Arduino TC4 channel config
+        arduinoChannels = ["None","1","2","3","4"]
+        arduinoETLabel =QLabel(QApplication.translate("Label", "ET Channel",None, QApplication.UnicodeUTF8))                            
+        self.arduinoETComboBox = QComboBox()
+        self.arduinoETComboBox.addItems(arduinoChannels)
+
+        arduinoBTLabel =QLabel(QApplication.translate("Label", "BT Channel",None, QApplication.UnicodeUTF8))                            
+        self.arduinoBTComboBox = QComboBox()
+        self.arduinoBTComboBox.addItems(arduinoChannels)
+
+        #check previous settings for radio button
         if aw.qmc.device == 0:
             self.pidButton.setChecked(True)
-            
+        elif aw.qmc.device == 19:
+            self.arduinoButton.setChecked(True)
         else:
             self.nonpidButton.setChecked(True)
             selected_device_index = 0
@@ -12933,6 +12956,9 @@ class DeviceAssignmentDLG(QDialog):
         self.controlpidtypeComboBox.setCurrentIndex(aw.ser.controlETpid[0])
         self.btpidtypeComboBox.setCurrentIndex(aw.ser.readBTpid[0])
 
+        self.arduinoETComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoETChannel))
+        self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoBTChannel))
+
         if aw.ser.controlETpid[1] == 1 :       # control is PXG4
             self.controlpidunitidComboBox.setCurrentIndex(0)
         else:
@@ -12941,7 +12967,6 @@ class DeviceAssignmentDLG(QDialog):
             self.btpidunitidComboBox.setCurrentIndex(1)
         else:
             self.btpidunitidComboBox.setCurrentIndex(0)
-                
 
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
@@ -12988,6 +13013,7 @@ class DeviceAssignmentDLG(QDialog):
         grid.addWidget(self.devicetypeComboBox,0,1)
         
         grid.addWidget(self.pidButton,2,0)
+        grid.addWidget(self.arduinoButton,3,0)        
 
         gridBox = QHBoxLayout()
         gridBox.addLayout(grid)
@@ -13011,7 +13037,21 @@ class DeviceAssignmentDLG(QDialog):
         
         PIDGroupLayout = QGroupBox(QApplication.translate("GroupBox","PID",None, QApplication.UnicodeUTF8))
         PIDGroupLayout.setLayout(PIDBox)
+
+        arduinogrid = QGridLayout()
+
+        arduinogrid.addWidget(arduinoETLabel,1,0,Qt.AlignRight)
+        arduinogrid.addWidget(self.arduinoETComboBox,1,1)
+        arduinogrid.addWidget(arduinoBTLabel,2,0,Qt.AlignRight)
+        arduinogrid.addWidget(self.arduinoBTComboBox,2,1)
         
+        arduinoBox = QHBoxLayout()
+        arduinoBox.addLayout(arduinogrid)
+        arduinoBox.addStretch()
+        
+        arduinoGroupLayout = QGroupBox(QApplication.translate("GroupBox","Arduino (TC4)",None, QApplication.UnicodeUTF8))
+        arduinoGroupLayout.setLayout(arduinoBox)        
+
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()  
         buttonLayout.addWidget(cancelButton)
@@ -13020,6 +13060,7 @@ class DeviceAssignmentDLG(QDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(gridBox)
         tab1Layout.addWidget(PIDGroupLayout)
+        tab1Layout.addWidget(arduinoGroupLayout)
         
         tab1Layout.addWidget(labelETadvanced)
         tab1Layout.addWidget(self.ETfunctionedit)
@@ -13242,6 +13283,20 @@ class DeviceAssignmentDLG(QDialog):
             aw.lcd6.setVisible(True)
             aw.label7.setVisible(True)
             aw.lcd7.setVisible(True)
+
+        if self.arduinoButton.isChecked():
+            aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
+            aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
+            
+            meter = "Arduino (TC4)"
+            aw.qmc.device = 19
+            #aw.ser.comport = "/dev/ttyACM0"
+            aw.ser.baudrate = 19200
+            aw.ser.bytesize = 8
+            aw.ser.parity= 'N'
+            aw.ser.stopbits = 1
+            aw.ser.timeout=1
+            message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
             
         if self.nonpidButton.isChecked():
             meter = str(self.devicetypeComboBox.currentText())
@@ -13427,16 +13482,6 @@ class DeviceAssignmentDLG(QDialog):
                     st += ". Sampling rate changed to 1 second"
                 message = QApplication.translate("Message Area","Device set to %1%2", None, QApplication.UnicodeUTF8).arg(meter).arg(st)
 
-            elif meter == "ArduinoTC4":
-                aw.qmc.device = 19
-                #aw.ser.comport = "/dev/ttyACM0"
-                aw.ser.baudrate = 19200
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
-                
             elif meter == "TE VA18B":
                 aw.qmc.device = 20
                 #aw.ser.comport = "COM7"
@@ -13520,7 +13565,7 @@ class DeviceAssignmentDLG(QDialog):
         aw.sendmessage(message)
 
         #open serial conf Dialog        
-        if self.nonpidButton.isChecked():
+        if (self.nonpidButton.isChecked() or self.arduinoButton.isChecked()):
             if meter != "NONE":
                 aw.setcommport()
         else:
