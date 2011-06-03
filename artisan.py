@@ -84,7 +84,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
                          QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QMutex)
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
@@ -606,8 +606,6 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color
 
-    	#list with commands scheduled for serial comm (arduino). List read at the end of self.sample()
-        self.serialcommandQue = []
 
     def sampleloop(self):
         while 1:
@@ -761,12 +759,6 @@ class tgraphcanvas(FigureCanvas):
                 aw.ser.SP = serial.Serial(port=aw.ser.comport, baudrate=aw.ser.baudrate,bytesize=aw.ser.bytesize,
                                           parity=aw.ser.parity, stopbits=aw.ser.stopbits, timeout=aw.ser.timeout)
 
-            ##############  scheduled serial commands  (Arduino)   ################################
-            ncommands = len(self.serialcommandQue)
-            if ncommands:              
-                for i in range(ncommands):                
-                    self.ser.SP.write(self.qmc.serialcommandQue[i])                                    
-                self.qmc.serialcommandQue = []                        #erase commands  (already sent)
             	
             #update screen
             self.fig.canvas.draw()
@@ -1234,9 +1226,6 @@ class tgraphcanvas(FigureCanvas):
         #majorlocator = ticker.IndexLocator(self.xgrid, starttime)          	        #IndexLocator does not work righ when updating (new value)self.endofx
         #majorlocator = ticker.MultipleLocator(self.xgrid)      	    	    	#MultipleLocator does not provide an offset for startime
             
-##        majorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-2.*self.xgrid,  self.endofx*2.+abs(self.xgrid-starttime),    self.xgrid)
-##        minorloc = numpy.arange(-1.*abs(self.xgrid-starttime)-2.*self.xgrid,  self.endofx*2.+abs(self.xgrid-starttime),    self.xgrid/6.)
-
         if self.xgrid == 0:
             self.xgrid = 60
         mfactor1 =  float(2. + int(starttime)/int(self.xgrid))
@@ -1244,14 +1233,10 @@ class tgraphcanvas(FigureCanvas):
 
         majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),  starttime+(self.xgrid*mfactor2), self.xgrid)
         minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),  starttime+(self.xgrid*mfactor2), self.xgrid/6.)
+        
+        map(round,majorloc)
+        map(round,minorloc)
 
-
-        #sometimes we get times like 01:59 when startime is a float in the middle range of two ints. This compensates
-        for i in range(len(majorloc)):
-            majorloc[i] = round(majorloc[i])
-        for i in range(len(minorloc)):
-            minorloc[i] = round(minorloc[i])
-            
         majorlocator = ticker.FixedLocator(majorloc)        
         minorlocator = ticker.FixedLocator(minorloc)
         
@@ -4780,22 +4765,19 @@ class ApplicationWindow(QMainWindow):
             
             if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event
                 if self.extraeventsactions[ee] == 1:
-                    try:
-                        aw.extraeventsactionstrings[ee] = str(aw.extraeventsactionstrings[ee])
-                        extraeventsactionstringscopy = ""
-                    	#example a2b_uu("Hello") sends Hello in binary format instead of ASCII
-                        if "a2b_uu" in aw.extraeventsactionstrings[ee]:
-                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][(len("a2b_uu")+1):]  # removes function-name + char ( 
-                            aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][:1]                 # removes )  
-                            extraeventsactionstringscopy = binascii.a2b_uu(aw.extraeventsactionstrings[ee])
-                        if extraeventsactionstringscopy:
-                            #serial commands are sent at the end of self.qmc.sample() to avoid confict of two threads using same port at the same time 
-                            self.qmc.serialcommandQue.append(extraeventsactionstringscopy)               
-                        else:
-                            self.qmc.serialcommandQue.append(aw.extraeventsactionstrings[ee])
-                    except Exception, e:
-                        self.qmc.adderror(QApplication.translate("Error Message", "Exception: recordextraevent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
-                        
+                    
+                    aw.extraeventsactionstrings[ee] = str(aw.extraeventsactionstrings[ee])                        
+                    extraeventsactionstringscopy = ""
+                    #example a2b_uu("Hello") sends Hello in binary format instead of ASCII
+                    if "a2b_uu" in aw.extraeventsactionstrings[ee]:
+                        aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][(len("a2b_uu")+1):]  # removes function-name + char ( 
+                        aw.extraeventsactionstrings[ee] = aw.extraeventsactionstrings[ee][:1]                 # removes )  
+                        extraeventsactionstringscopy = binascii.a2b_uu(aw.extraeventsactionstrings[ee])
+                    if extraeventsactionstringscopy:
+                        self.ser.sendTXcommand(extraeventsactionstringscopy)                
+                    else:    
+                        self.ser.sendTXcommand(aw.extraeventsactionstrings[ee])
+                                                    
                 elif aw.extraeventsactions[ee] == 2:
                     try:
                         os.startfile(unicode(self.extraeventsactionstrings[ee]))
@@ -11022,6 +11004,8 @@ class serialport(object):
     """ this class handles the communications with all the devices"""
     
     def __init__(self):
+        self.mutex = QMutex()
+        
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = u"COM4"      #NOTE: this string should not be translated. It is an argument for lib Pyserial
         self.baudrate = 9600
@@ -11076,9 +11060,9 @@ class serialport(object):
 
             #open port
             self.SP.open()
-            for i in range(len(self.extraSP)):
-                self.extraSP[i].open()                
-               
+##            for i in range(len(self.extraSP)):
+##                self.extraSP[i].open()                
+##               
         except serial.SerialException,e:
             error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -11117,6 +11101,7 @@ class serialport(object):
     # function used by Fuji PIDs
     def sendFUJIcommand(self,binstring,nbytes):
         try:
+            self.mutex.lock()            
             if not self.SP.isOpen():
                 self.SP.open()                   
             if self.SP.isOpen():
@@ -11165,10 +11150,15 @@ class serialport(object):
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
             return "0"
-
+        
+        finally:
+            self.mutex.unlock()
+            
      #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
         try:
+            self.mutex.lock()
+            
             if not self.SP.isOpen():
                 self.SP.open()
                 
@@ -11212,7 +11202,9 @@ class serialport(object):
             else:
                 return -1,-1                                    
 
-        
+        finally:
+            self.mutex.unlock()
+            
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
     def HH506RAtemperature(self):
@@ -11224,6 +11216,8 @@ class serialport(object):
                 return -1,-1
            
         try:
+            self.mutex.lock()
+            
             if not self.SP.isOpen():
                 self.SP.open()                    
                
@@ -11260,11 +11254,16 @@ class serialport(object):
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1 
+                return -1,-1
+            
+        finally:
+            self.mutex.unlock()
             
     #reads once the id of the HH506RA meter and stores it in the serial variable self.HH506RAid. Marko Luther.
     def HH506RAGetID(self):   
         try:
+            self.mutex.lock()
+            
             if not self.SP.isOpen():
                 self.SP.open()                    
                 
@@ -11292,9 +11291,14 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-
+            
+        finally:
+            self.mutex.unlock()
+            
     def CENTER306temperature(self):
         try:
+            self.mutex.lock()
+            
             if not self.SP.isOpen():
                 self.SP.open()                    
                 
@@ -11368,8 +11372,11 @@ class serialport(object):
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1 
-       
+                return -1,-1
+            
+        finally:
+            self.mutex.unlock()
+            
     def NONE(self):
         dialogx = nonedevDlg( )
         if dialogx.exec_():
@@ -11383,6 +11390,8 @@ class serialport(object):
             
     def CENTER303temperature(self):
         try:
+            self.mutex.lock()
+            
             if not self.SP.isOpen():
                 self.SP.open()                    
                 
@@ -11456,8 +11465,11 @@ class serialport(object):
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1 
-                
+                return -1,-1
+            
+        finally:
+            self.mutex.unlock()
+            
     def CENTER309temperature(self):  
         ##    command = "\x4B" returns 4 bytes . Model number.
         ##    command = "\x48" simulates HOLD button
@@ -11484,6 +11496,8 @@ class serialport(object):
         ##                                        THIS ONLY WORKS WHEN TEMPERATURE < 200. If T >= 200 r[43] changes
         
         try:
+            self.mutex.lock()
+            
             if not self.SP.isOpen():
                 self.SP.open()                    
                 
@@ -11528,9 +11542,13 @@ class serialport(object):
             else:
                 return -1,-1
 
+        finally:
+            self.mutex.unlock()
+            
     def ARDUINOTC4temperature(self):
-
         try:
+            self.mutex.lock()
+            
             if not self.SP.isOpen():
                 self.SP.open()
                 libtime.sleep(3)
@@ -11620,8 +11638,11 @@ class serialport(object):
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1 
-
+                return -1,-1
+            
+        finally:
+            self.mutex.unlock()
+            
     def TEVA18Bconvert(self, seg):
         if seg == 0x7D:
             return 0
@@ -11648,6 +11669,8 @@ class serialport(object):
 
     def TEVA18Btemperature(self):
         try:
+            self.mutex.lock()
+            
             run = 1
             counter = 0
             
@@ -11833,7 +11856,9 @@ class serialport(object):
             else:
                 return -1,-1 
 
-
+        finally:
+            self.mutex.unlock()
+            
     def HHM28multimeter(self):
         # This meter sends a continuos frame byte by byte. It only transmits data. It does not receive commands.
         # A frame is composed of 14 ordered bytes. A byte is represented bellow enclosed in "XX"
@@ -11844,6 +11869,8 @@ class serialport(object):
         # Bytes 1,10,11,12,13 carry data bits that represent other symbols like F (for Farad), u (for micro), M (for Mega), etc, of the meter display
 
         try:
+            self.mutex.lock()
+            
             if not self.SP.isOpen():
                 self.SP.open()                    
                 
@@ -11955,8 +11982,59 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-            return "0","" 
+            return "0",""
+        
+        finally:
+            self.mutex.unlock()
 
+    #sends a command to the ET/BT device
+    def sendTXcommand(self,command):
+        try:
+            self.mutex.lock()
+            self.closeport()
+            self.SP = serial.Serial(port=self.comport, baudrate=self.baudrate,bytesize=self.bytesize,
+                                      parity=self.parity, stopbits=self.stopbits, timeout=self.timeout)
+            self.SP.write(command)
+            self.SP.close()
+        except serial.SerialException:
+            error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXcommand() ",None, QApplication.UnicodeUTF8)
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)
+        
+        finally:
+            self.mutex.unlock()
+
+    #NOT USED YET, maybe FUTURE Arduino?
+    #sends a command to the ET/BT device and receives data of length nbytes 
+    def sendTXRXcommand(self,command,nbytes):
+        try:
+            self.mutex.lock()
+            self.closeport()
+            self.SP = serial.Serial(port=self.comport, baudrate=self.baudrate,bytesize=self.bytesize,
+                                      parity=self.parity, stopbits=self.stopbits, timeout=self.timeout)
+            self.SP.write(command)
+            r = self.SP.read(nbytes)
+            self.SP.close()
+            
+            if len(r) == nbytes:
+                return r
+            else:
+                return "ERR"
+
+        except serial.SerialException:
+            error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXRXcommand() ",None, QApplication.UnicodeUTF8)
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)
+        
+        finally:
+            self.mutex.unlock()
+            
 #########################################################################
 #############  DESIGNER CONFIG DIALOG ###################################                                   
 ###############################################################
