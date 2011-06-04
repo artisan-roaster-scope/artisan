@@ -12028,42 +12028,15 @@ class serialport(object):
     def sendTXcommand(self,command):
         try:
             self.mutex.lock()
-
-            if not self.SP.isOpen():
-                self.SP.open()
-                libtime.sleep(3)
-
-                #Reinitialize Arduino in case communication was interrupted
-                if aw.qmc.device == 19:
-                    self.ArduinoIsInitialized = 0
-                    self.ArduinoUnit = ""
-
-## The reinitialization of the serial port is currently commented out.
-## This is because Arduino would have to reinitialize every time.
-## However, this is a potential problem. From Rafael:
-##                    
-## The port needs to close in theory because of extra devices.
-## Right now, there are a fix set of functions which all use the same serial object (aw.ser.SP).
-## But each extra device could use a different set of serial of properties (like different comm ports).
-## For example, if you press the event button with a serial command in the middle of the extra devices loop,
-## then you could be sending the command to another port
-## (not necessarily the ET/BT device).
-## But arduino is the only device that will use this feature.
-## Just remember that if you add mode than one device
-## that uses a different comm port, and press the button (asynchronous)
-## in the middle of the extra device loop,
-## then your command would be directed to a different port.
-## It would not hurt anything.
-
-##            self.closeport()
-##            self.SP = serial.Serial(port=self.comport, baudrate=self.baudrate,bytesize=self.bytesize,
-##                                      parity=self.parity, stopbits=self.stopbits, timeout=self.timeout)
+            self.closeport()
+            self.SP = serial.Serial(port=self.comport, baudrate=self.baudrate,bytesize=self.bytesize,
+                                      parity=self.parity, stopbits=self.stopbits, timeout=self.timeout)
+            
             if self.SP.isOpen():
                 if (aw.qmc.device == 19 and not command.endswith("\n")):
                     command += "\n"
                     
                 self.SP.write(command)
-##            self.SP.close()
 
         except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXcommand() ",None, QApplication.UnicodeUTF8)
