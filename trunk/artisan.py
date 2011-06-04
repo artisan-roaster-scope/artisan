@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.5.0b1"
+__version__ = u"0.5.0"
 
 
 # ABOUT
@@ -82,7 +82,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPalette,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
-                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox)
+                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox,QToolTip)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QMutex)
 
@@ -4313,32 +4313,34 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(10)
 
-        self.pushbuttonstyles = {"OFF":"font-size: 16pt; font-weight: bold; color: grey; background-color: #43d300 ",
-                                 "ON":"font-size: 16pt; font-weight: bold; color: yellow; background-color: red ",
-                                 "DRY END":"font-size: 10pt; font-weight: bold; color: white; background-color: orange  ",
-                                 "CHARGE":"font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 ",                                 
-                                 "FC START":"font-size: 10pt; font-weight: bold; color: white; background-color: orange  ",
-                                 "FC END":"font-size: 10pt; font-weight: bold; color: white; background-color: orange ",
-                                 "SC START":"font-size: 10pt; font-weight: bold; color: white; background-color: orange ",
-                                 "SC END":"font-size: 10pt; font-weight: bold; color: white; background-color: orange ",
-                                 "RESET":"font-size: 10pt; font-weight: bold; color: purple; background-color: white ",
-                                 "HUD_OFF":"font-size: 10pt; font-weight: bold; color: white; background-color: #b5baff  ",
-                                 "HUD_ON":"font-size: 10pt; font-weight: bold; color: white; background-color: #60ffed   ",                                 
-                                 "EVENT":"font-size: 10pt; font-weight: bold; color: black; background-color: yellow ",                                 
-                                 "DROP":"font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 ",
-                                 "PID":"font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF ",
-                                 "SV +":"font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff ",
-                                 "SV -":"font-size: 10pt; font-weight: bold; color: white; background-color: lightblue ",
-                                 "SELECTED":"font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824"  #keyboard moves
+
+        #buttontooltip = QToolTip("background-color: white; font: bold 10px;min-width: 10em;padding: 6px;")
+        
+        self.pushbuttonstyles = {"OFF":"QPushButton {font-size: 16pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                 "ON":"QPushButton {font-size: 16pt; font-weight: bold; color: yellow; background-color: red }",
+                                 "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+                                 "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",                                 
+                                 "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+                                 "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+                                 "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+                                 "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+                                 "RESET":"QPushButton {font-size: 10pt; font-weight: bold; color: purple; background-color: white }",
+                                 "HUD_OFF":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #b5baff  }",
+                                 "HUD_ON":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #60ffed   }",                                 
+                                 "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",                                 
+                                 "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
+                                 "PID":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF }",
+                                 "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
+                                 "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
+                                 "SELECTED":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
                                  }                                 
-                                 
+                        
         #create START STOP buttons        
         self.button_1 = QPushButton(QApplication.translate("Scope Button", "ON", None, QApplication.UnicodeUTF8))
         self.button_1.setFocusPolicy(Qt.NoFocus)
-        #self.button_1.setStyleSheet("")
+        self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
         self.button_1.setMinimumHeight(50)
-        self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
 
         #create 1C START, 1C END, 2C START and 2C END buttons
@@ -11597,7 +11599,7 @@ class serialport(object):
                     self.SP.flushOutput()
 
                     command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + "00\n"  
-                    print command 
+                    #print command 
 
                     self.SP.write(command)
 
