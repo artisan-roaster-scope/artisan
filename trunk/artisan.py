@@ -9776,6 +9776,8 @@ class EventsDlg(QDialog):
             
             actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
             ades = unicode(actiondescriptionedit.text())
+    
+## Rafael: Why don't we leave the "\n" for the serial command?      
             if "\\n" in ades:              #adds return if "\n" found in string (used by device Arduino)
                 parts = ades.split("\\n")
                 ades = chr(10).join(parts)
@@ -11605,8 +11607,6 @@ class serialport(object):
                     self.SP.flushOutput()
 
                     command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + "00\n"  
-                    #print command 
-
                     self.SP.write(command)
 
                     try:
@@ -12034,11 +12034,29 @@ class serialport(object):
     def sendTXcommand(self,command):
         try:
             self.mutex.lock()
-            self.closeport()
-            self.SP = serial.Serial(port=self.comport, baudrate=self.baudrate,bytesize=self.bytesize,
-                                      parity=self.parity, stopbits=self.stopbits, timeout=self.timeout)
-            self.SP.write(command)
-            self.SP.close()
+
+            if not self.SP.isOpen():
+                self.SP.open()
+                libtime.sleep(3)
+
+                #Reinitialize Arduino in case communication was interrupted
+                if self.qmc.device == 19:
+                    self.ArduinoIsInitialized = 0
+                    self.ArduinoUnit = ""
+
+##  Rafael: Please review this code change. Why do we close/open/close?
+##          Why not using the opened port if it exists?
+##            self.closeport()
+##            self.SP = serial.Serial(port=self.comport, baudrate=self.baudrate,bytesize=self.bytesize,
+##                                      parity=self.parity, stopbits=self.stopbits, timeout=self.timeout)
+
+            if self.SP.isOpen():
+                if (self.qmc.device == 19 and not command.endswith("\n")):
+                    command += "\n"
+                    
+                self.SP.write(command)
+##            self.SP.close()
+
         except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXcommand() ",None, QApplication.UnicodeUTF8)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
