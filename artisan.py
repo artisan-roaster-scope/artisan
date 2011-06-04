@@ -222,14 +222,14 @@ class tgraphcanvas(FigureCanvas):
         self.errorlog = []
 
         # default delay between readings in miliseconds
-        self.delay = 5000
+        self.delay = 1000
 
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases_fahrenheit_defaults = [200,300,390,450]
         self.phases_celsius_defaults = [95,150,200,230]
         self.phases = list(self.phases_fahrenheit_defaults)
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
-        self.phasesbuttonflag = 1 #0 no change; 1 make the DRY and FC buttons change the phases during roast automatically
+        self.phasesbuttonflag = 0 #0 no change; 1 make the DRY and FC buttons change the phases during roast automatically
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area
         self.statisticsflags = [1,1,1,1]
@@ -466,7 +466,6 @@ class tgraphcanvas(FigureCanvas):
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
         
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
-        # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 750
         self.ylimit_min = 0        
         self.endofx = 60
@@ -548,7 +547,7 @@ class tgraphcanvas(FigureCanvas):
         
         self.seconds = 0.    #variable helps make time in LCD update more even
 
-        self.thread = Athread()
+        self.threadserver = Athreadserver()
     	
         ########################################################     Designer variables       ##############################################################
         self.designerflag = False
@@ -606,16 +605,6 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color
 
-
-    def sampleloop(self):
-        while 1:
-            timedelay = self.delay/1000.
-            if self.flagon:
-                self.sample()
-                #self.thread.msleep(self.delay)   #seems that these two functions do the same load wise.
-                libtime.sleep(timedelay)   #However, use this one. Found _safer_    
-            else:
-                break
       
     #sample devices at interval self.delay miliseconds
     def sample(self):
@@ -2383,8 +2372,8 @@ class tgraphcanvas(FigureCanvas):
             aw.ser.closeport()            
                 
             self.flagon = True
-            if not self.thread.isRunning():
-                self.thread.start()
+            
+            self.threadserver.createThread()
                 #self.thread.setPriority(QThread.TimeCriticalPriority)  #causes crashes
                 
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
@@ -2401,7 +2390,7 @@ class tgraphcanvas(FigureCanvas):
             self.LCDtimer.start()
         else:
             self.flagon = False
-            #self.timer.stop()
+            self.threadserver.destroyThread()
             self.LCDtimer.stop()
             aw.ser.closeport()
             self.seconds = 0.
@@ -3917,10 +3906,32 @@ class VMToolbar(NavigationToolbar):
 class Athread(QThread):
     def __init__(self, parent = None):
         QThread.__init__(self, parent)
+        
     def __del__(self):   
-        self.wait()        
+        self.wait()
+        
     def run(self):
-        aw.qmc.sampleloop()
+        timedelay = aw.qmc.delay/1000.
+        while True:
+            if aw.qmc.flagon:
+                aw.qmc.sample()
+                libtime.sleep(timedelay)    
+            else:
+                break
+
+class Athreadserver(QWidget):
+    def _init_(self,parent=None):
+        QWidget._init_(self,parent)
+
+    def createThread(self):
+        self.thread = Athread()
+        #delete when finished to save memory 
+        self.connect(self.thread,SIGNAL("finished"),self.thread,SLOT("deleteLater()"))
+        self.thread.start()
+
+    def destroyThread(self):
+        self.thread.wait()
+        
 
             
 ########################################################################################                            
