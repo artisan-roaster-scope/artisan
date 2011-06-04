@@ -9776,12 +9776,7 @@ class EventsDlg(QDialog):
             actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
             ades = unicode(actiondescriptionedit.text())
     
-## Rafael: Why don't we leave the "\n" for the serial command?      
-            if "\\n" in ades:              #adds return if "\n" found in string (used by device Arduino)
-                parts = ades.split("\\n")
-                ades = chr(10).join(parts)
             aw.extraeventsactionstrings[i] = ades 
-            
             aw.sendmessage(QApplication.translate("Message Area","Custom Event buttons configuration saved", None, QApplication.UnicodeUTF8))        
 
     def setvisibilitytyeventbutton(self,z,i):
@@ -12039,18 +12034,32 @@ class serialport(object):
                 libtime.sleep(3)
 
                 #Reinitialize Arduino in case communication was interrupted
-                if self.qmc.device == 19:
+                if aw.qmc.device == 19:
                     self.ArduinoIsInitialized = 0
                     self.ArduinoUnit = ""
 
-##  Rafael: Please review this code change. Why do we close/open/close?
-##          Why not using the opened port if it exists?
+## The reinitialization of the serial port is currently commented out.
+## This is because Arduino would have to reinitialize every time.
+## However, this is a potential problem. From Rafael:
+##                    
+## The port needs to close in theory because of extra devices.
+## Right now, there are a fix set of functions which all use the same serial object (aw.ser.SP).
+## But each extra device could use a different set of serial of properties (like different comm ports).
+## For example, if you press the event button with a serial command in the middle of the extra devices loop,
+## then you could be sending the command to another port
+## (not necessarily the ET/BT device).
+## But arduino is the only device that will use this feature.
+## Just remember that if you add mode than one device
+## that uses a different comm port, and press the button (asynchronous)
+## in the middle of the extra device loop,
+## then your command would be directed to a different port.
+## It would not hurt anything.
+
 ##            self.closeport()
 ##            self.SP = serial.Serial(port=self.comport, baudrate=self.baudrate,bytesize=self.bytesize,
 ##                                      parity=self.parity, stopbits=self.stopbits, timeout=self.timeout)
-
             if self.SP.isOpen():
-                if (self.qmc.device == 19 and not command.endswith("\n")):
+                if (aw.qmc.device == 19 and not command.endswith("\n")):
                     command += "\n"
                     
                 self.SP.write(command)
