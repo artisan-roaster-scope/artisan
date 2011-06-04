@@ -82,7 +82,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPalette,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
-                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox,QToolTip)
+                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QMutex)
 
@@ -3903,30 +3903,29 @@ class VMToolbar(NavigationToolbar):
         return QIcon(os.path.join(self.basedir, name))
 
 class Athread(QThread):
-    def __init__(self, parent = None):
+    def __init__(self, parent = None):        
         QThread.__init__(self, parent)
-        
-    def __del__(self):   
-        self.wait()
-        
+              
     def run(self):
         timedelay = aw.qmc.delay/1000.
+        if not aw.qmc.flagon:
+            return
         while True:
             if aw.qmc.flagon:
                 aw.qmc.sample()
                 libtime.sleep(timedelay)    
             else:
-                break
+                break  #thread ends
 
 class Athreadserver(QWidget):
     def _init_(self,parent=None):
-        QWidget._init_(self,parent)
+        super(QWidget,self)._init_(parent)
 
     def createThread(self):
-        self.thread = Athread()
+        thread = Athread(self)
         #delete when finished to save memory 
-        self.connect(self.thread,SIGNAL("finished"),self.thread,SLOT("deleteLater()"))
-        self.thread.start()       
+        self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
+        thread.start()       
 
             
 ########################################################################################                            
