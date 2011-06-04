@@ -2390,7 +2390,6 @@ class tgraphcanvas(FigureCanvas):
             self.LCDtimer.start()
         else:
             self.flagon = False
-            self.threadserver.destroyThread()
             self.LCDtimer.stop()
             aw.ser.closeport()
             self.seconds = 0.
@@ -3927,11 +3926,7 @@ class Athreadserver(QWidget):
         self.thread = Athread()
         #delete when finished to save memory 
         self.connect(self.thread,SIGNAL("finished"),self.thread,SLOT("deleteLater()"))
-        self.thread.start()
-
-    def destroyThread(self):
-        self.thread.wait()
-        
+        self.thread.start()       
 
             
 ########################################################################################                            
