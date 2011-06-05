@@ -1607,15 +1607,17 @@ class tgraphcanvas(FigureCanvas):
                         d4.append(a2/self.deltafilter)
                     else:
                         d3.append(delta1) 
-                        d4.append(delta2)                     
-            
-        if self.deltafilter:
-            self.delta1 = d3
-            self.delta2 = d4
-        else:
-            self.delta1 = d1
-            self.delta2 = d2
-            
+                        d4.append(delta2)
+                        
+        #apply filter only when roaster is OFF to avoid redrawing with filter (at run time there is no filter)
+        if not self.flagon:    
+            if self.deltafilter:
+                self.delta1 = d3
+                self.delta2 = d4
+            else:
+                self.delta1 = d1
+                self.delta2 = d2
+                
         #this is needed because DeltaBT and DeltaET need 2 values of timex (difference) but they also need same dimension in order to plot
         if len(self.timex) > len(self.delta1):
             self.delta1.append(delta1)
