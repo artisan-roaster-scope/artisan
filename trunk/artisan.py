@@ -12028,10 +12028,16 @@ class serialport(object):
     def sendTXcommand(self,command):
         try:
             self.mutex.lock()
-            self.closeport()
-            self.SP = serial.Serial(port=self.comport, baudrate=self.baudrate,bytesize=self.bytesize,
-                                      parity=self.parity, stopbits=self.stopbits, timeout=self.timeout)
             
+            if not self.SP.isOpen():
+                self.SP.open()
+                libtime.sleep(3)
+                
+                #Reinitialize Arduino in case communication was interrupted
+                if aw.qmc.device == 19:
+                    self.ArduinoIsInitialized = 0
+                    self.ArduinoUnit
+                    
             if self.SP.isOpen():
                 if (aw.qmc.device == 19 and not command.endswith("\n")):
                     command += "\n"
