@@ -1,0 +1,84 @@
+#summary How to setup the artisan software
+
+=Introduction=
+
+There are usually two downloads needed in order to get the `artisan` software up and running on your platform, a driver for your meter (if it is USB) and the `artisan` application itself. 
+
+  # Install USB driver
+  # Install `artisan` application
+  # Connect your meter via USB/serial
+  # Launch `artisan` application
+  # Configure device and serial settings
+
+=Installation Windows=
+
+The main application is called artisan.exe and it is located inside the zip file. To start artisan click on artisan.exe.
+There are three configuration steps needed after downloading and unziping the artisan zip file.  
+ 
+===Visual C++ Library Requirement===
+
+Artisan for Windows needs a Visual C++ runtime library (file) from Microsoft. If artisan cannot start it will open a window error. This is because your computer is missing this file.
+If you get a window error when you try to start artisan, install this program:
+
+Microsoft Visual C++ 2008 SP1 Redistributable Package (x86) 
+
+http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
+
+If artisan starts when clicling on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything.
+Newer OS like Windows 7 come with this file.
+
+=Installation Mac OS X=
+
+_NOTE: from v0.5.0 on the Systems 10.4.x/10.5.x/10.6.x (eg. Tiger, Leopard, Snow Leopard)  on PPC and Intel machines are supported _
+
+  # Install USB/serial driver
+    ** for Omega meters download and run the [http://www.ftdichip.com/Drivers/VCP.htm FTDI VCP OS X installer]
+    ** for the original Voltkraft USB cable it is the [http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx CP210x driver from Silicon Labs]
+  # Download and run the [http://code.google.com/p/artisan/downloads/list artisan OS X installer]
+  ## Double click on the `dmg` file you just downloaded
+  ## Double click the disk image which appears on your desktop
+  ## Drag the `artisan` application icon to your `Applications` directory.
+
+=Installation Linux=
+
+The Linux package is compatible with Ubuntu Linux 10.10, aka the Maverick Meerkat, and Debian Linux 5.0 "Lenny" as well as 6.0 "Squeeze". For now, we simply offer a .deb Debian package that you have to install manually (see below). For future releases, we plan to have a repository so that you can "`apt-get install artisan`" and get updates automagically.
+
+Help on getting Artisan packaged for RPM-based distributions would be appreciated.
+
+==Installation in Ubuntu==
+In your web browser, simply download the .deb-File from the [http://code.google.com/p/artisan/downloads/list download page]. This will start the Ubuntu Software-Center that guides you through the rest of the installation. It will also download all dependencies during the process, like `python-qt4`, `python-matplotlib` and others.
+
+There is no menu entry yet, this will follow in the next version. You can start artisan by simply typing "`artisan`" into a terminal window.
+
+==Installation in Debian==
+Download the .deb from the [http://code.google.com/p/artisan/downloads/list download page]. Become root (either with "`su -`", followed by entering your root-password, or if you have sudo configured with "`sudo -i`") and install the package with "`dpkg -i artisan_VERSION_all.deb`". dpkg will possibly complain about missing dependencies and decline to configure the package. With "`apt-get -f install`" you can automatically install all missing dependencies and dpkg will be happy.
+
+There is no menu entry yet, this will follow in the next version. You can start artisan by simply typing "`artisan`" into a terminal window.
+
+=Device Configuration=
+
+Once artisan is up, chose your device using the menu *Conf* and then select the *Device* submenu. From version 0.2.0 on, the following devices are supported:
+
+  ** Fuji PXR PID (with RS485 mod bus protocol purchase option)
+  ** Fuji PXG PID (with RS485 mod bus protocol purchase option)
+  ** Omega HH506RA, HH802U, HH806AU (Check USB driver here: http://www.ftdichip.com/Drivers/VCP.htm )
+  ** CENTER 300, 301, 302, 303, 304, 305, 306, 309
+  ** VOLTCRAFT K202, K204, 300K, 302KJ
+  ** EXTECH 421509
+    
+RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers (but they need an RS485-RS232 converter).
+
+To install a USB driver. Plug the meter in USB port. Let Windows find and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one, or thorugh the manufacturer webpage
+
+
+=Serial Configuration=
+
+The serial settings for the meters (devices) are already configured by the artisan software automatically when you select a device for the first time (or when you change devices). Once you have chosen a device, the correct serial configuration is loaded and it will remain in memory. The only setting that is not configured is the serial port number being used. 
+To find out your serial port, you can press the scan button and select the correct comm port from the options found by the Scan button.
+
+You can test to see if you have the correct comm port by clicking the green button "ON" on the lower left corner. If you see the two temperatures from the meter come up on the LCDs, you have completed all the configuration steps. You can now start using artisan.
+
+Report problems here:
+
+[https://lists.mokelbu.de/listinfo/artisan-user]
+    
