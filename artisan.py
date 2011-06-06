@@ -263,7 +263,8 @@ class tgraphcanvas(FigureCanvas):
                        "+309_34",
                        "+FUJI DUTY %",
                        "Omega HHM28[6]",
-                       "+204_34" 
+                       "+204_34",
+                       "+Virtual" 
                        ]
 
         #extra devices
@@ -10852,7 +10853,8 @@ class serialport(object):
                                    self.CENTER309_34,       #21
                                    self.fujidutycycle,      #22
                                    self.HHM28,              #23
-                                   self.K204_34             #24 
+                                   self.K204_34,            #24
+                                   self.virtual             #25
                                    ]
 
 
@@ -10890,6 +10892,10 @@ class serialport(object):
         except Exception,e:
             self.adderror(QApplication.translate("Error Message", "Exception Error: fujitemperature() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
+
+    def virtual(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        return tx,1.,1.
 
     #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
     def fujidutycycle(self):
@@ -13509,10 +13515,20 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.timeout=1
                 message = ""  #empty message especial device
 
+            elif meter == "+Virtual":
+                aw.qmc.device = 25
+                #aw.ser.comport = "COM4"
+                aw.ser.baudrate = 9600
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = ""  #empty message especial device
+
             #set of different serial settings modes options
             ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],[19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1]]
             #map device index to a setting mode
-            devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3]  #0-24
+            devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3]  #0-25
                 
             self.savedevicetable()
             #init serial settings of extra devices
