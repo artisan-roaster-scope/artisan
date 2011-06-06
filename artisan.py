@@ -265,37 +265,6 @@ class tgraphcanvas(FigureCanvas):
                        "Omega HHM28[6]",
                        "+204_34" 
                        ]
-        #list of functions calls to read temperature for devices.
-        # device 0 (with index 0 bellow) is Fuji Pid
-        # device 1 (with index 1 bellow) is Omega HH806
-        # device 2 (with index 2 bellow) is omega HH506
-        # etc
-        self.devicefunctionlist = [self.fujitemperature,    #0
-                                   self.HH806AU,            #1
-                                   self.HH506RA,            #2
-                                   self.CENTER309,          #3
-                                   self.CENTER306,          #4
-                                   self.CENTER305,          #5
-                                   self.CENTER304,          #6
-                                   self.CENTER303,          #7
-                                   self.CENTER302,          #8
-                                   self.CENTER301,          #9
-                                   self.CENTER300,          #10
-                                   self.VOLTCRAFTK204,      #11
-                                   self.VOLTCRAFTK202,      #12
-                                   self.VOLTCRAFT300K,      #13
-                                   self.VOLTCRAFT302KJ,     #14
-                                   self.EXTECH421509,       #15
-                                   self.HH802U,             #16
-                                   self.HH309,              #17
-                                   self.NONE,               #18
-                                   self.ARDUINOTC4,         #19
-                                   self.TEVA18B,            #20
-                                   self.CENTER309_34,       #21
-                                   self.fujidutycycle,      #22
-                                   self.HHM28,              #23
-                                   self.K204_34             #24 
-                                   ]
 
         #extra devices
         self.extradevices = []                                      # list with indexes for extra devices
@@ -605,14 +574,26 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color
 
+
+    ###################  temporary variables for thermocouplkes 3 and 4
+        
+        #holds extra T3 and T4 values for center 309
+        self.extra309T3 = 0.
+        self.extra309T4 = 0.
+        self.extra309TX = 0.
+
+        #holds the power % ducty cycle of Fuji PIDs  and ET-BT      
+        self.dutycycle = 0.
+        self.dutycycleTX = 0.
+        self.fujiETBT = 0.
       
     #sample devices at interval self.delay miliseconds
     def sample(self):
         try:
             #if using a meter (thermocouple device)
             if self.device != 18:
-                #read time, ET (t1) and BT (t2) TEMPERATURE                    
-                tx,t1,t2 = self.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
+                #read time, ET (t1) and BT (t2) TEMPERATURE
+                tx,t1,t2 = aw.ser.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
                 if len(self.ETfunction):
                     t1 = self.eval_math_expression(self.ETfunction,t1)
                 if len(self.BTfunction):
@@ -728,27 +709,17 @@ class tgraphcanvas(FigureCanvas):
             ndevices = len(self.extradevices)
             if ndevices:
                 for i in range(ndevices):
-                    aw.ser.extraSP[i].close()
-                    aw.ser.SP.close()
-                    aw.ser.SP = serial.Serial(port=aw.ser.extracomport[i], baudrate=aw.ser.extrabaudrate[i],bytesize=aw.ser.extrabytesize[i],
-                                               parity=aw.ser.extraparity[i], stopbits=aw.ser.extrastopbits[i], timeout=aw.ser.extratimeout[i])
-                    extratx,extrat2,extrat1 = self.devicefunctionlist[self.extradevices[i]]()
-                    aw.ser.SP.close()
+                    extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[self.extradevices[i]]()
                     if len(self.extramathexpression1[i]):
                         extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
                     if len(self.extramathexpression2[i]):
                         extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
-
                     self.extratemp1[i].append(extrat1)
                     self.extratemp2[i].append(extrat2)                        
                     self.extratimex[i].append(extratx)
                     # update extra lines 
                     self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
                     self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-                #restore ET/BT device serial port and open it
-                aw.ser.SP = serial.Serial(port=aw.ser.comport, baudrate=aw.ser.baudrate,bytesize=aw.ser.bytesize,
-                                          parity=aw.ser.parity, stopbits=aw.ser.stopbits, timeout=aw.ser.timeout)
-
             	
             #update screen
             self.fig.canvas.draw()
@@ -941,219 +912,6 @@ class tgraphcanvas(FigureCanvas):
             BTreachTime = -1
 
         return ETreachTime, BTreachTime
-
-
-    #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
-    def fujitemperature(self):
-        try:
-            #update ET SV LCD 6
-            aw.pid.readcurrentsv()
-
-            # get the temperature for ET. RS485 unit ID (1)
-            t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
-            #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
-            tx = self.timeclock.elapsed()/1000.
-
-            #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None)
-            if aw.ser.readBTpid[0] != 2:                    
-                # get the temperature for BT. RS485 unit ID (2)
-                t2 = aw.pid.gettemperature(2)/10.
-            else:
-                t2 = 0.
-
-            #get current duty cycle and update LCD 7
-            aw.ser.dutycycle = aw.pid.readdutycycle()
-            aw.ser.dutycycleTX = tx
-            if t2:
-                aw.ser.fujiETBT = t1-t2
-            else:
-                aw.ser.fujiETBT = 0.
-            
-            return tx,t2,t1
-        
-        except Exception,e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: fujitemperature() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
-            return
-
-    #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
-    def fujidutycycle(self):
-        #return saved readings
-        return aw.ser.dutycycleTX,aw.ser.dutycycle,aw.ser.fujiETBT   
-
-    def HH506RA(self):
-        
-        t2,t1 = aw.ser.HH506RAtemperature()
-        tx = self.timeclock.elapsed()/1000.
-
-        return tx,t2,t1
-
-    def HH806AU(self):
-
-         t2,t1 = aw.ser.HH806AUtemperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1
-
-    def HH802U(self):
-
-         t2,t1 = aw.ser.HH806AUtemperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1
-
-    def HH309(self):
-
-         t2,t1 = aw.ser.CENTER309temperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1   
-
-    def CENTER309(self):
-
-         t2,t1 = aw.ser.CENTER309temperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1         
-
-    #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
-    def CENTER309_34(self):
-         #return saved readings collected at aw.ser.CENTER309temperature()
-         return aw.ser.extra309TX,aw.ser.extra309T3, aw.ser.extra309T4 
-
-    def CENTER306(self):
-
-         t2,t1 = aw.ser.CENTER306temperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1
-        
-    def CENTER305(self):
-
-         t2,t1 = aw.ser.CENTER306temperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1
-
-    def CENTER304(self):
-
-         t2,t1 = aw.ser.CENTER309temperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1         
-
-
-    def CENTER303(self):
-
-         t2,t1 = aw.ser.CENTER303temperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1    
-
-    def CENTER302(self):
-
-         t2,t1 = aw.ser.CENTER303temperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1  
-
-    def CENTER301(self):
-
-         t2,t1 = aw.ser.CENTER303temperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1
-
-    def CENTER300(self):
-
-         t2,t1 = aw.ser.CENTER303temperature()
-         tx = self.timeclock.elapsed()/1000.
-
-         return tx,t2,t1  
-        
-    def VOLTCRAFTK204(self):
-        
-         t2,t1 = aw.ser.CENTER309temperature()
-         tx = self.timeclock.elapsed()/1000.
-         
-         return tx,t2,t1
-
-    #especial function that collects extra T3 and T4 from Vol K204 while keeping compatibility
-    def K204_34(self):
-         #return saved readings collected at aw.ser.CENTER309temperature()
-         return aw.ser.extra309TX,aw.ser.extra309T3, aw.ser.extra309T4 
-
-    def VOLTCRAFTK202(self):
-        
-         t2,t1 = aw.ser.CENTER306temperature()
-         tx = self.timeclock.elapsed()/1000.
-         
-         return tx,t2,t1
-        
-    def VOLTCRAFT300K(self):
-        
-         t2,t1 = aw.ser.CENTER303temperature()
-         tx = self.timeclock.elapsed()/1000.
-         
-         return tx,t2,t1
-
-    def VOLTCRAFT302KJ(self):
-        
-         t2,t1 = aw.ser.CENTER303temperature()
-         tx = self.timeclock.elapsed()/1000.
-         
-         return tx,t2,t1
-        
-    def EXTECH421509(self):
-        
-        t2,t1 = aw.ser.HH506RAtemperature()
-        tx = self.timeclock.elapsed()/1000.
-
-        return tx,t2,t1
-
-    def NONE(self):
-        tx = self.timeclock.elapsed()/1000.        
-        t2,t1 = aw.ser.NONE()
-        
-        return tx,t2,t1
-
-    def ARDUINOTC4(self):
-        t2,t1 = aw.ser.ARDUINOTC4temperature()
-        tx = self.timeclock.elapsed()/1000.
-
-        return tx,t2,t1
-
-    def TEVA18B(self):
-        t2,t1 = aw.ser.TEVA18Btemperature()
-        tx = self.timeclock.elapsed()/1000.
-
-        return tx,t2,t1
-
-    #multimeter
-    def HHM28(self):
-        val,symbols= aw.ser.HHM28multimeter()  #NOTE: val and symbols are type strings
-        tx = self.timeclock.elapsed()/1000.
-
-        #temporary fix to display the output
-        aw.sendmessage(val + symbols)
-
-        if "L" in val:  #L = Out of Range
-            return tx, 0., 0.
-##        else:
-##            #read quantifier symbols
-##            if "n" in symbols:
-##                val /= 1000000000.
-##            elif "u" in symbols:
-##                val /= 1000000.
-##            elif "m" in symbols:
-##                val /= 1000.
-##            elif "k" in symbols:
-##                val *= 1000.
-##            elif "M" in symbols:
-##                val *= 1000000.
-
-            ### not finished
-        else:
-            return tx, float(val), 0.  #send a 0. as second reading because the meter only returns one reading
 
     #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
     #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
@@ -1372,10 +1130,9 @@ class tgraphcanvas(FigureCanvas):
         aw.valueComboBox.setCurrentIndex(0)    
         aw.curFile = None                 #current file name
         self.ystep = 45     	    	  #used to find length of arms in annotations  
-        
-        #aw.settingsLoad()        
+      
         self.timeclock.restart()
-        #self.timer.stop()
+
         self.LCDtimer.stop()
         self.seconds = 0.
 
@@ -1584,7 +1341,6 @@ class tgraphcanvas(FigureCanvas):
         d1,d2,d3,d4=[],[],[],[]
         delta1, delta2 = 0,0
         for i in range(len(self.timex)-1):
-            #print i, self.temp1[i+1], self.temp1[i]
             timed = self.timex[i+1] - self.timex[i]
             
             if timed != 0:
@@ -2370,18 +2126,12 @@ class tgraphcanvas(FigureCanvas):
         if not self.flagon:
             if self.designerflag: return
             
-            #close all serial ports just in case there was one left open from previous sesion
-            aw.ser.closeport()            
-                
             self.flagon = True
-            
             self.threadserver.createThread()
-                #self.thread.setPriority(QThread.TimeCriticalPriority)  #causes crashes
                 
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
             aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
-            
             aw.soundpop()
             
             #Call start() to start the first measurement if no data collected
@@ -2393,9 +2143,7 @@ class tgraphcanvas(FigureCanvas):
         else:
             self.flagon = False
             self.LCDtimer.stop()
-            aw.ser.closeport()
-            self.seconds = 0.
-            
+            self.seconds = 0.            
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])            
             aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) 
@@ -3066,7 +2814,6 @@ class tgraphcanvas(FigureCanvas):
             
             func = inter.UnivariateSpline(Xpoints, Ypoints)
             
-            #print equ.get_coeffs()
             xa = numpy.array(self.timex)
             newX = func(xa).tolist()
                
@@ -3205,7 +2952,6 @@ class tgraphcanvas(FigureCanvas):
 
     #adds errors
     def adderror(self,error):
-        #print error
         aw.messagelabel.setStyleSheet("background-color:'red';")
         timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
         #keep a max of 500 errors
@@ -3998,6 +3744,11 @@ class ApplicationWindow(QMainWindow):
        
         #create a serial port object
         self.ser = serialport()
+        #list with extra serial ports
+        self.extraser = []
+        #extra comm port settings 
+        self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
+        
         # create a PID object
         self.pid = FujiPID()
         
@@ -4014,7 +3765,7 @@ class ApplicationWindow(QMainWindow):
         ###################################################################################
         #restore SETTINGS  after creating serial port, tgraphcanvas, and PID.
         
-        self.settingsLoad()        
+               
 
 
         # set window title
@@ -4894,7 +4645,6 @@ class ApplicationWindow(QMainWindow):
     def keyPressEvent(self,event):    
         key = int(event.key())
         #uncomment next line to find the integer value of a key
-        #print key
         #keyboard move keys
         if key == 32:                       #SELECTS ACTIVE BUTTON
             self.moveKbutton("space")
@@ -5405,21 +5155,18 @@ class ApplicationWindow(QMainWindow):
             self.setCurrentFile(filename)
                 
         except IOError,e:
-            #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             self.qmc.adderror(QApplication.translate("Error Message", "IO Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except ValueError,e:
-            #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             self.qmc.adderror(QApplication.translate("Error Message", "Value Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
         except Exception,e:
-            #print e
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadFile() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -5460,7 +5207,6 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.Betypes = profile["etypes"]
                 if "timeindex" in profile:
                     self.qmc.timeindexB = profile["timeindex"]          #if new profile found with variable timeindex
-                    #print self.qmc.timeindexB
                 else:                                                   #old profile format
                     if "startend" in profile:
                         startendB = profile["startend"]
@@ -5600,22 +5346,21 @@ class ApplicationWindow(QMainWindow):
         aw.qmc.extramathexpression1.append(u"")
         aw.qmc.extramathexpression2.append(u"")
         
-        #create new serial port (but not opened-connected)                                   
-        aw.ser.extraSP.append(serial.Serial()) 
-        #add and init dummy serial port settings
-        aw.ser.extracomport.append("COM1")
-        aw.ser.extrabaudrate.append(9600)
-        aw.ser.extrabytesize.append(8)
-        aw.ser.extraparity.append("E")
-        aw.ser.extrastopbits.append(1)
-        aw.ser.extratimeout.append(1)
+        #create new serial port (but don't open it yet). Store initial settings                                   
+        self.extraser.append(serialport()) 
+        self.extracomport.append("COM1")
+        self.extrabaudrate.append(9600)
+        self.extrabytesize.append(8)
+        self.extraparity.append("E")
+        self.extrastopbits.append(1)
+        self.extratimeout.append(1)
 
     	#add new line variables
         aw.qmc.extratimex.append([])        
         aw.qmc.extratemp1.append([])
         aw.qmc.extratemp2.append([])
 
-        #add two extra lines
+        #add two extra lines in figure for extra ET and extra BT
         l = len(aw.qmc.extradevices)-1  #new line index
         aw.qmc.extratemp1lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp1[l],color=aw.qmc.extradevicecolor1[l],linewidth=2,label= aw.qmc.extraname1[l])[0])
         aw.qmc.extratemp2lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp2[l],color=aw.qmc.extradevicecolor2[l],linewidth=2,label= aw.qmc.extraname2[l])[0])
@@ -6121,22 +5866,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.density[3] = unicode(settings.value("densitySampleVolumeUnit",self.qmc.density[3]).toString())
             settings.endGroup()
             self.userprofilepath = unicode(settings.value("profilepath",self.userprofilepath).toString())
-
-            # Extra devices
-            settings.beginGroup("ExtraComm")
-            if settings.contains("extracomport"):
-                self.ser.extracomport = list(settings.value("extracomport",self.ser.extracomport).toStringList())
-                self.ser.extrabaudrate = map(lambda x:x.toInt()[0],settings.value("extrabaudrate").toList())
-                self.ser.extrabytesize = map(lambda x:x.toInt()[0],settings.value("extrabytesize").toList())
-                self.ser.extraparity = list(settings.value("extraparity",self.ser.extraparity).toStringList())
-                self.ser.extrastopbits = map(lambda x:x.toInt()[0],settings.value("extrastopbits").toList())
-                self.ser.extratimeout = map(lambda x:x.toInt()[0],settings.value("extratimeout").toList())
-                #convert Qstrings to unicode                
-                for i in range(len(self.ser.extracomport)):                
-                    self.ser.extracomport[i] = unicode(self.ser.extracomport[i])
-                    self.ser.extraparity[i] = unicode(self.ser.extraparity[i])
-
-            settings.endGroup() 
+ 
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
                 self.qmc.extradevices = map(lambda x:x.toInt()[0],settings.value("extradevices").toList())
@@ -6154,7 +5884,6 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extramathexpression2[i] = unicode(self.qmc.extramathexpression2[i])
                     self.qmc.extradevicecolor1[i] = unicode(self.qmc.extradevicecolor1[i])
                     self.qmc.extradevicecolor2[i] = unicode(self.qmc.extradevicecolor2[i])                    
-            settings.endGroup()
             
             #create empty containers
             for i in range(len(self.qmc.extradevices)):
@@ -6164,11 +5893,32 @@ class ApplicationWindow(QMainWindow):
                 #init empty lines
                 self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp1[i],color="black",linewidth=2,label= self.qmc.extraname1[i])[0])
                 self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp2[i],color="black",linewidth=2,label= self.qmc.extraname1[i])[0])
-                #create serial port objects
-                self.ser.extraSP.append(serial.Serial())
+            settings.endGroup()
 
-            #configure all serial ports (loads configurations but does not open ports)
-            self.ser.confport()
+            # Extra com ports
+            settings.beginGroup("ExtraComm")
+            if settings.contains("extracomport"):
+                self.extracomport = list(settings.value("extracomport",self.extracomport).toStringList())
+                self.extrabaudrate = map(lambda x:x.toInt()[0],settings.value("extrabaudrate").toList())
+                self.extrabytesize = map(lambda x:x.toInt()[0],settings.value("extrabytesize").toList())
+                self.extraparity = list(settings.value("extraparity",self.extraparity).toStringList())
+                self.extrastopbits = map(lambda x:x.toInt()[0],settings.value("extrastopbits").toList())
+                self.extratimeout = map(lambda x:x.toInt()[0],settings.value("extratimeout").toList())
+                #convert Qstrings to unicode                
+                for i in range(len(self.extracomport)):                
+                    self.extracomport[i] = unicode(self.extracomport[i])
+                    self.extraparity[i] = unicode(self.extraparity[i])
+                    #create serial port objects
+                    self.extraser.append(serialport())                    
+                #configure extra com ports 
+                for i in range(len(aw.extraser)):
+                    aw.extraser[i].comport = unicode(aw.extracomport[i])
+                    aw.extraser[i].baudrate = aw.extrabaudrate[i]
+                    aw.extraser[i].bytesize = aw.extrabytesize[i]
+                    aw.extraser[i].parity = unicode(aw.extraparity[i])
+                    aw.extraser[i].stopbits = aw.extrastopbits[i]
+                    aw.extraser[i].timeout = aw.extratimeout[i]
+            settings.endGroup()
 
             if settings.contains("BTfunction"):
                 self.qmc.BTfunction = unicode(settings.value("BTfunction",self.qmc.BTfunction).toString())
@@ -6213,7 +5963,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.redraw()
 
         except Exception,e:
-            #print e
             QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),unicode(e))
             return                            
 
@@ -6340,12 +6089,12 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #save extra serial comm ports settings
             settings.beginGroup("ExtraComm")
-            settings.setValue("extracomport",self.ser.extracomport)                                                                
-            settings.setValue("extrabaudrate",self.ser.extrabaudrate)                                                                
-            settings.setValue("extrabytesize",self.ser.extrabytesize)                                                                
-            settings.setValue("extraparity",self.ser.extraparity)                                                                
-            settings.setValue("extrastopbits",self.ser.extrastopbits)                                                                
-            settings.setValue("extratimeout",self.ser.extratimeout)
+            settings.setValue("extracomport",self.extracomport)                                                                
+            settings.setValue("extrabaudrate",self.extrabaudrate)                                                                
+            settings.setValue("extrabytesize",self.extrabytesize)                                                                
+            settings.setValue("extraparity",self.extraparity)                                                                
+            settings.setValue("extrastopbits",self.extrastopbits)                                                                
+            settings.setValue("extratimeout",self.extratimeout)
             settings.endGroup()
             settings.setValue("BTfunction",self.qmc.BTfunction)                                                                
             settings.setValue("ETfunction",self.qmc.ETfunction)                                                                
@@ -6571,7 +6320,6 @@ $cupping_notes
             else:
                 DRY_time_idx = 0
         evaluations = aw.defect_estimation()        
-        #print graph
         self.qmc.redraw()   
         if platf == u'Darwin':
             graph_image = "artisan-graph.svg"
@@ -6948,7 +6696,6 @@ $cupping_notes
             self.ser.stopbits = int(dialog.stopbitsComboBox.currentText())
             self.ser.parity = unicode(dialog.parityComboBox.currentText())
             self.ser.timeout = int(dialog.timeoutEdit.text())
-
 
     def PIDcontrol(self):
         if self.ser.controlETpid[0] == 0:
@@ -11054,6 +10801,9 @@ class serialport(object):
         #serial port for ET/BT
         self.SP  = serial.Serial()
 
+        #list of comm ports available after Scan
+        self.commavailable = []
+
         ##### SPECIAL METER FLAGS ########
 
         #stores the id of the meter HH506RA as a string
@@ -11072,36 +10822,266 @@ class serialport(object):
         self.ArduinoIsInitialized = 0
         self.ArduinoUnit = ""
 
-        #comm ports available after Scan
-        self.commavailable = []
 
-        #comm ports for extra devices
-        self.extraSP = []
-        #EXTRA COMM PORTS VARIABLES
-        self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
+        #list of functions calls to read temperature for devices.
+        # device 0 (with index 0 bellow) is Fuji Pid
+        # device 1 (with index 1 bellow) is Omega HH806
+        # device 2 (with index 2 bellow) is omega HH506
+        # etc
+        self.devicefunctionlist = [self.fujitemperature,    #0
+                                   self.HH806AU,            #1
+                                   self.HH506RA,            #2
+                                   self.CENTER309,          #3
+                                   self.CENTER306,          #4
+                                   self.CENTER305,          #5
+                                   self.CENTER304,          #6
+                                   self.CENTER303,          #7
+                                   self.CENTER302,          #8
+                                   self.CENTER301,          #9
+                                   self.CENTER300,          #10
+                                   self.VOLTCRAFTK204,      #11
+                                   self.VOLTCRAFTK202,      #12
+                                   self.VOLTCRAFT300K,      #13
+                                   self.VOLTCRAFT302KJ,     #14
+                                   self.EXTECH421509,       #15
+                                   self.HH802U,             #16
+                                   self.HH309,              #17
+                                   self.NONE,               #18
+                                   self.ARDUINOTC4,         #19
+                                   self.TEVA18B,            #20
+                                   self.CENTER309_34,       #21
+                                   self.fujidutycycle,      #22
+                                   self.HHM28,              #23
+                                   self.K204_34             #24 
+                                   ]
 
-        #holds extra T3 and T4 values for center 309
-        self.extra309T3 = 0.
-        self.extra309T4 = 0.
-        self.extra309TX = 0.
 
-        #holds the power % ducty cycle of Fuji PIDs  and ET-BT      
-        self.dutycycle = 0.
-        self.dutycycleTX = 0.
-        self.fujiETBT = 0.
+#################################################
+
+
+    #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
+    def fujitemperature(self):
+        try:
+            #update ET SV LCD 6
+            aw.pid.readcurrentsv()
+
+            # get the temperature for ET. RS485 unit ID (1)
+            t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
+            #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
+            tx = aw.qmc.timeclock.elapsed()/1000.
+
+            #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None)
+            if self.readBTpid[0] != 2:                    
+                # get the temperature for BT. RS485 unit ID (2)
+                t2 = aw.pid.gettemperature(2)/10.
+            else:
+                t2 = 0.
+
+            #get current duty cycle and update LCD 7
+            aw.qmc.dutycycle = aw.pid.readdutycycle()
+            aw.qmc.dutycycleTX = tx
+            if t2:
+                aw.qmc.fujiETBT = t1-t2
+            else:
+                aw.qmc.fujiETBT = 0.
+            
+            return tx,t2,t1
+        
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: fujitemperature() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
+
+    #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
+    def fujidutycycle(self):
+        #return saved readings
+        return aw.qmc.dutycycleTX,aw.qmc.dutycycle,aw.qmc.fujiETBT   
+
+    def HH506RA(self):
+        
+        t2,t1 = self.HH506RAtemperature()
+        tx = aw.qmc.timeclock.elapsed()/1000.
+
+        return tx,t2,t1
+
+    def HH806AU(self):
+
+         t2,t1 = self.HH806AUtemperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+
+    def HH802U(self):
+
+         t2,t1 = self.HH806AUtemperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+
+    def HH309(self):
+         t2,t1 = self.CENTER309temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1   
+
+    def CENTER309(self):
+
+         t2,t1 = self.CENTER309temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1         
+
+    #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
+    def CENTER309_34(self):
+         #return saved readings collected at self.CENTER309temperature()
+         return aw.qmc.extra309TX,aw.qmc.extra309T3,aw.qmc.extra309T4 
+
+    def CENTER306(self):
+
+         t2,t1 = self.CENTER306temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+        
+    def CENTER305(self):
+
+         t2,t1 = self.CENTER306temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+
+    def CENTER304(self):
+
+         t2,t1 = self.CENTER309temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1         
+
+
+    def CENTER303(self):
+
+         t2,t1 = self.CENTER303temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1    
+
+    def CENTER302(self):
+
+         t2,t1 = self.CENTER303temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1  
+
+    def CENTER301(self):
+
+         t2,t1 = self.CENTER303temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+
+    def CENTER300(self):
+
+         t2,t1 = self.CENTER303temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1  
+        
+    def VOLTCRAFTK204(self):
+        
+         t2,t1 = self.CENTER309temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1
+
+    #especial function that collects extra T3 and T4 from Vol K204 while keeping compatibility
+    def K204_34(self):
+         #return saved readings collected at self.CENTER309temperature()
+         return aw.qmc.extra309TX,aw.qmc.extra309T3,aw.qmc.extra309T4 
+
+    def VOLTCRAFTK202(self):
+        
+         t2,t1 = self.CENTER306temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1
+        
+    def VOLTCRAFT300K(self):
+        
+         t2,t1 = self.CENTER303temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1
+
+    def VOLTCRAFT302KJ(self):
+        
+         t2,t1 = self.CENTER303temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1
+        
+    def EXTECH421509(self):
+        
+        t2,t1 = self.HH506RAtemperature()
+        tx = aw.qmc.timeclock.elapsed()/1000.
+
+        return tx,t2,t1
+
+    def NONE(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.        
+        t2,t1 = self.NONE()
+        
+        return tx,t2,t1
+
+    def ARDUINOTC4(self):
+        t2,t1 = self.ARDUINOTC4temperature()
+        tx = aw.qmc.timeclock.elapsed()/1000.
+
+        return tx,t2,t1
+
+    def TEVA18B(self):
+        t2,t1 = self.TEVA18Btemperature()
+        tx = aw.qmc.timeclock.elapsed()/1000.
+
+        return tx,t2,t1
+
+    #multimeter
+    def HHM28(self):
+        val,symbols= self.HHM28multimeter()  #NOTE: val and symbols are type strings
+        tx = aw.qmc.timeclock.elapsed()/1000.
+
+        #temporary fix to display the output
+        aw.sendmessage(val + symbols)
+
+        if "L" in val:  #L = Out of Range
+            return tx, 0., 0.
+##        else:
+##            #read quantifier symbols
+##            if "n" in symbols:
+##                val /= 1000000000.
+##            elif "u" in symbols:
+##                val /= 1000000.
+##            elif "m" in symbols:
+##                val /= 1000.
+##            elif "k" in symbols:
+##                val *= 1000.
+##            elif "M" in symbols:
+##                val *= 1000000.
+
+            ### not finished
+        else:
+            return tx, 0., float(val)   #send a 0. as second reading because the meter only returns one reading
+############################################################################        
         
     def openport(self):
         try:
-            self.closeport()
+            #self.closeport()
             self.confport()
             self.ArduinoIsInitialized = 0  # Assume the Arduino has to be reinitialized
             self.ArduinoUnit = ""
 
             #open port
-            self.SP.open()
-##            for i in range(len(self.extraSP)):
-##                self.extraSP[i].open()                
-##               
+            if not self.SP.isOpen():
+                self.SP.open()
+               
         except serial.SerialException,e:
             error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -11110,7 +11090,7 @@ class serialport(object):
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
 
-    #configure ports
+    #loads configuration to ports
     def confport(self):
         self.SP.setPort(self.comport)
         self.SP.setBaudrate(self.baudrate)
@@ -11118,18 +11098,9 @@ class serialport(object):
         self.SP.setParity(self.parity)
         self.SP.setStopbits(self.stopbits)
         self.SP.setTimeout(self.timeout)
-        for i in range(len(self.extraSP)):
-            self.extraSP[i].setPort(unicode(self.extracomport[i]))
-            self.extraSP[i].setBaudrate(self.extrabaudrate[i])
-            self.extraSP[i].setByteSize(self.extrabytesize[i])
-            self.extraSP[i].setParity(unicode(self.extraparity[i]))
-            self.extraSP[i].setStopbits(self.extrastopbits[i])
-            self.extraSP[i].setTimeout(self.extratimeout[i])
 
     def closeport(self):
         self.SP.close()
-        for i in range(len(self.extraSP)):
-            self.extraSP[i].close()        
             
     def closeEvent(self):
         try:        
@@ -11142,7 +11113,7 @@ class serialport(object):
         try:
             self.mutex.lock()            
             if not self.SP.isOpen():
-                self.SP.open()                   
+                self.openport()                   
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
@@ -11199,7 +11170,7 @@ class serialport(object):
             self.mutex.lock()
             
             if not self.SP.isOpen():
-                self.SP.open()
+                self.openport()
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -11258,7 +11229,7 @@ class serialport(object):
             self.mutex.lock()
             
             if not self.SP.isOpen():
-                self.SP.open()                    
+                self.openport()                    
                
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -11304,7 +11275,7 @@ class serialport(object):
             self.mutex.lock()
             
             if not self.SP.isOpen():
-                self.SP.open()                    
+                self.openport()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -11339,7 +11310,7 @@ class serialport(object):
             self.mutex.lock()
             
             if not self.SP.isOpen():
-                self.SP.open()                    
+                self.openport()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -11432,7 +11403,7 @@ class serialport(object):
             self.mutex.lock()
             
             if not self.SP.isOpen():
-                self.SP.open()                    
+                self.openport()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -11509,7 +11480,7 @@ class serialport(object):
         finally:
             self.mutex.unlock()
             
-    def CENTER309temperature(self):  
+    def CENTER309temperature(self):
         ##    command = "\x4B" returns 4 bytes . Model number.
         ##    command = "\x48" simulates HOLD button
         ##    command = "\x4D" simulates MAX/MIN button
@@ -11533,12 +11504,12 @@ class serialport(object):
         ##                                        If T4 thermocouple connected alone, then r[43]  = \x07 = 7
         ##                                        Note: Print r[43] if you want to find other connect-combinations
         ##                                        THIS ONLY WORKS WHEN TEMPERATURE < 200. If T >= 200 r[43] changes
-        
+
         try:
             self.mutex.lock()
             
             if not self.SP.isOpen():
-                self.SP.open()                    
+                self.openport()
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -11546,14 +11517,14 @@ class serialport(object):
                 command = "\x41"
                 self.SP.write(command)
                 r = self.SP.read(45)
-            
+
                 if len(r) == 45:
                     T1 = int(binascii.hexlify(r[7] + r[8]),16)/10.
                     T2 = int(binascii.hexlify(r[9] + r[10]),16)/10.
                     #save these variables if using T3 and T4
-                    self.extra309T3 = int(binascii.hexlify(r[11] + r[12]),16)/10.
-                    self.extra309T4 = int(binascii.hexlify(r[13] + r[14]),16)/10.
-                    self.extra309TX = aw.qmc.timeclock.elapsed()/1000.                                                
+                    aw.qmc.extra309T3 = int(binascii.hexlify(r[11] + r[12]),16)/10.
+                    aw.qmc.extra309T4 = int(binascii.hexlify(r[13] + r[14]),16)/10.
+                    aw.qmc.extra309TX = aw.qmc.timeclock.elapsed()/1000.
                     return T1,T2
                 
                 else:
@@ -11589,7 +11560,7 @@ class serialport(object):
             self.mutex.lock()
             
             if not self.SP.isOpen():
-                self.SP.open()
+                self.openport()
                 libtime.sleep(3)
 
                 #Reinitialize Arduino in case communication was interupted
@@ -11726,7 +11697,7 @@ class serialport(object):
                 counter = counter + 1
             
                 if not self.SP.isOpen():
-                    self.SP.open()    
+                    self.openport()    
                     libtime.sleep(2)
                     
                 if self.SP.isOpen():
@@ -11911,7 +11882,7 @@ class serialport(object):
             self.mutex.lock()
             
             if not self.SP.isOpen():
-                self.SP.open()                    
+                self.openport()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
@@ -11994,7 +11965,6 @@ class serialport(object):
 
         
         except ValueError,e:
-            #print e
             error  = QApplication.translate("Error Message","Value Error: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
@@ -12032,7 +12002,7 @@ class serialport(object):
             self.mutex.lock()
             
             if not self.SP.isOpen():
-                self.SP.open()
+                self.openport()
                 libtime.sleep(3)
                 
                 #Reinitialize Arduino in case communication was interrupted
@@ -12063,13 +12033,8 @@ class serialport(object):
     def sendTXRXcommand(self,command,nbytes):
         try:
             self.mutex.lock()
-            self.closeport()
-            self.SP = serial.Serial(port=self.comport, baudrate=self.baudrate,bytesize=self.bytesize,
-                                      parity=self.parity, stopbits=self.stopbits, timeout=self.timeout)
             self.SP.write(command)
-            r = self.SP.read(nbytes)
-            self.SP.close()
-            
+            r = self.SP.read(nbytes)            
             if len(r) == nbytes:
                 return r
             else:
@@ -12706,32 +12671,32 @@ class comportDlg(QDialog):
                 device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]-1])    #type identification of the device. Non editable
 
                 comportComboBox =  QComboBox()
-                comportComboBox.addItems(aw.ser.extracomport)
+                comportComboBox.addItems(aw.extracomport)
                 comportComboBox.setCurrentIndex(i)
 
                 baudComboBox =  QComboBox()
                 baudComboBox.addItems(self.bauds)
-                if str(aw.ser.extrabaudrate[i]) in self.bauds:
-                    baudComboBox.setCurrentIndex(self.bauds.index(str(aw.ser.extrabaudrate[i])))
+                if str(aw.extrabaudrate[i]) in self.bauds:
+                    baudComboBox.setCurrentIndex(self.bauds.index(str(aw.extrabaudrate[i])))
 
                 byteComboBox =  QComboBox()
                 byteComboBox.addItems(self.bytesizes)
-                if str(aw.ser.extrabytesize[i]) in self.bytesizes:
-                    byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.ser.extrabytesize[i])))
+                if str(aw.extrabytesize[i]) in self.bytesizes:
+                    byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.extrabytesize[i])))
 
                 parityComboBox =  QComboBox()
                 parityComboBox.addItems(self.parity)
-                if aw.ser.extraparity[i] in self.parity:
-                    parityComboBox.setCurrentIndex(self.parity.index(aw.ser.extraparity[i]))
+                if aw.extraparity[i] in self.parity:
+                    parityComboBox.setCurrentIndex(self.parity.index(aw.extraparity[i]))
               
                 #self.connect(baudComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
                  
                 stopbitsComboBox =  QComboBox()
                 stopbitsComboBox.addItems(self.stopbits)
-                if str(aw.ser.extrastopbits[i]) in self.stopbits:
-                    stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.ser.extrastopbits[i])))
+                if str(aw.extrastopbits[i]) in self.stopbits:
+                    stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.extrastopbits[i])))
 
-                timeoutEdit = QLineEdit(str(aw.ser.extratimeout[i]))
+                timeoutEdit = QLineEdit(str(aw.extratimeout[i]))
                 timeoutEdit.setValidator(QIntValidator(0,5,timeoutEdit))
 
                 #add widgets to the table
@@ -12748,36 +12713,36 @@ class comportDlg(QDialog):
         for i in range(ndevices):
             
             comportComboBox =  self.serialtable.cellWidget(i,1)
-            aw.ser.extracomport[i] = unicode(comportComboBox.currentText())
+            aw.extracomport[i] = unicode(comportComboBox.currentText())
 
             baudComboBox =  self.serialtable.cellWidget(i,2)
-            aw.ser.extrabaudrate[i] = int(baudComboBox.currentText())
+            aw.extrabaudrate[i] = int(baudComboBox.currentText())
 
             byteComboBox =  self.serialtable.cellWidget(i,3)
-            aw.ser.extrabytesize[i] = int(byteComboBox.currentText())
+            aw.extrabytesize[i] = int(byteComboBox.currentText())
 
             parityComboBox =  self.serialtable.cellWidget(i,4)
-            aw.ser.extraparity[i] = unicode(parityComboBox.currentText())
+            aw.extraparity[i] = unicode(parityComboBox.currentText())
 
             stopbitsComboBox =  self.serialtable.cellWidget(i,5)
-            aw.ser.extrastopbits[i] = int(stopbitsComboBox.currentText())
+            aw.extrastopbits[i] = int(stopbitsComboBox.currentText())
 
             timeoutEdit = self.serialtable.cellWidget(i,6)
-            aw.ser.extratimeout[i] = int(timeoutEdit.text())
+            aw.extratimeout[i] = int(timeoutEdit.text())
 
         #create serial ports for each extra device
-        nserial = len(aw.ser.extraSP)
+        nserial = len(aw.extraser)
         if ndevices != nserial:
-            aw.ser.extraSP = [serial.Serial()]*ndevices
+            aw.extraser = [serialport()]*ndevices
 
         #load the settings for the extra serial ports found
         for i in range(ndevices):
-            aw.ser.extraSP[i].setPort(unicode(aw.ser.extracomport[i]))
-            aw.ser.extraSP[i].setBaudrate(aw.ser.extrabaudrate[i])
-            aw.ser.extraSP[i].setByteSize(aw.ser.extrabytesize[i])
-            aw.ser.extraSP[i].setParity(unicode(aw.ser.extraparity[i]))
-            aw.ser.extraSP[i].setStopbits(aw.ser.extrastopbits[i])
-            aw.ser.extraSP[i].setTimeout(aw.ser.extratimeout[i])
+            aw.extraser[i].SP.setPort(unicode(aw.extracomport[i]))
+            aw.extraser[i].SP.setBaudrate(aw.extrabaudrate[i])
+            aw.extraser[i].SP.setByteSize(aw.extrabytesize[i])
+            aw.extraser[i].SP.setParity(unicode(aw.extraparity[i]))
+            aw.extraser[i].SP.setStopbits(aw.extrastopbits[i])
+            aw.extraser[i].SP.setTimeout(aw.extratimeout[i])
            
     def accept(self):
         #validate serial parameter against input errors
@@ -12882,17 +12847,14 @@ class comportDlg(QDialog):
                 comportComboBox =  self.serialtable.cellWidget(i,1)
                 comportComboBox.clear()
                 comportComboBox.addItems(aw.ser.commavailable)
-                if aw.ser.extracomport[i] in aw.ser.commavailable:
-                    comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.ser.extracomport[i]))
+                if aw.extracomport[i] in aw.ser.commavailable:
+                    comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.extracomport[i]))
                 else:    
                     comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)                
 
     def closeserialports(self):
         if aw.ser.SP.isOpen():
             aw.ser.SP.close()
-        for i in range(len(aw.ser.extraSP)):
-            if aw.ser.extraSP[i].isOpen():
-               aw.ser.extraSP[i].close() 
 
 #################################################################################            
 ##################   Device assignments DIALOG for reading temperature   ########
@@ -13170,6 +13132,7 @@ class DeviceAssignmentDLG(QDialog):
     #adds extra device
     def adddevice(self):
         self.savedevicetable()
+        #addDevice() is located in aw so that the same function can be used in init after dynamically loading settings
         aw.addDevice()
         self.createDeviceTable()
         aw.qmc.redraw()
@@ -13213,16 +13176,15 @@ class DeviceAssignmentDLG(QDialog):
         aw.qmc.extramathexpression2.pop(x)
         
         #pop serial port settings
-        aw.ser.extracomport.pop(x)
-        aw.ser.extrabaudrate.pop(x)
-        aw.ser.extrabytesize.pop(x)
-        aw.ser.extraparity.pop(x)
-        aw.ser.extrastopbits.pop(x)
-        aw.ser.extratimeout.pop(x)
-        if aw.ser.extraSP[x].isOpen():
-            aw.ser.extraSP[x].close()
-        aw.ser.extraSP.pop(x)
-        
+        aw.extracomport.pop(x)
+        aw.extrabaudrate.pop(x)
+        aw.extrabytesize.pop(x)
+        aw.extraparity.pop(x)
+        aw.extrastopbits.pop(x)
+        aw.extratimeout.pop(x)
+        if aw.extraser[x].SP.isOpen():
+            aw.extraser[x].SP.close()
+        aw.extraser.pop(x)
         self.createDeviceTable()
         aw.qmc.redraw()
         
@@ -13556,11 +13518,11 @@ class DeviceAssignmentDLG(QDialog):
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
-                aw.ser.extrabaudrate[i] = dsettings[0]
-                aw.ser.extrabytesize[i] = dsettings[1]
-                aw.ser.extraparity[i] = dsettings[2]
-                aw.ser.extrastopbits[i] = dsettings[3]
-                aw.ser.extratimeout[i] = dsettings[4]  
+                aw.extrabaudrate[i] = dsettings[0]
+                aw.extrabytesize[i] = dsettings[1]
+                aw.extraparity[i] = dsettings[2]
+                aw.extrastopbits[i] = dsettings[3]
+                aw.extratimeout[i] = dsettings[4]  
                 
             aw.button_10.setVisible(False)
             aw.button_12.setVisible(False)
@@ -17777,7 +17739,6 @@ class FujiPID(object):
                 #record command as an Event 
                 strcommand = u"SETSV::" + unicode("%.1f"%float(value))
                 aw.qmc.DeviceEventRecord(strcommand)
-                print value
                 aw.lcd6.display(u"%.1f"%float(value))
             else:
                 aw.qmc.adderror(QApplication.translate("Error Message","setPXGsv(): bad response from PID",None, QApplication.UnicodeUTF8))
@@ -17972,7 +17933,6 @@ class FujiPID(object):
         Nbytes.reverse()
         if not Nbytes:
             Nbytes.append(0)
-        #print Nbytes
         return  "".join(chr(b) for b in Nbytes)                
 
     def message2send(self, stationNo, FunctionCode, memory, Nword):
@@ -18060,6 +18020,7 @@ class FujiPID(object):
 
 aw = None # this is to ensure that the variable aw is already defined during application initialization
 aw = ApplicationWindow()
+aw.settingsLoad()
 aw.show()
 #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
 with numpy.errstate(invalid='ignore'):
