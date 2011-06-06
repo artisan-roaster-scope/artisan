@@ -517,6 +517,7 @@ class tgraphcanvas(FigureCanvas):
         
         self.seconds = 0.    #variable helps make time in LCD update more even
 
+        #server that spawns a thread dynamically to sample (press button ON to make a thread/ press OFF to kill it) 
         self.threadserver = Athreadserver()
     	
         ########################################################     Designer variables       ##############################################################
@@ -576,14 +577,14 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinecolor = u"black"               #initial color
 
 
-    ###################  temporary variables for thermocouplkes 3 and 4
+    ###################  temporary storage to pass values for thermocouples 3 and 4. Used in serial objects
         
         #holds extra T3 and T4 values for center 309
         self.extra309T3 = 0.
         self.extra309T4 = 0.
         self.extra309TX = 0.
 
-        #holds the power % ducty cycle of Fuji PIDs  and ET-BT      
+        #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT      
         self.dutycycle = 0.
         self.dutycycleTX = 0.
         self.fujiETBT = 0.
@@ -600,11 +601,6 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.BTfunction):
                     t2 = self.eval_math_expression(self.BTfunction,t2)
 
-                # test for a possible change
-                #t1,t2 = self.filterDropOuts(t1,t2)
-                
-                #same as filterDropOuts() but faster by not making three calls to functions (OS time expensive) in self.filterDropOuts()
-                ##########################
                 if self.mode == "C":
                     limit = 500.
                 else:
@@ -618,8 +614,7 @@ class tgraphcanvas(FigureCanvas):
                     if len(self.timex) > 2:
                         t2 = self.temp2[-1]
                     else:
-                        t2 = -1.
-                ###########################        
+                        t2 = -1.       
                                                         
                 #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
                 #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
@@ -721,7 +716,10 @@ class tgraphcanvas(FigureCanvas):
                     # update extra lines 
                     self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
                     self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-            	
+
+            #this seems to stabilize ramdom a small figure flickering when under heavy load (many devices and 0.1 seconds sampling interval)
+            libtime.sleep(.01)
+            
             #update screen
             self.fig.canvas.draw()
 
@@ -3762,12 +3760,6 @@ class ApplicationWindow(QMainWindow):
     	#user defined event buttons
         self.extraeventslabels,self.extraeventsdescriptions, self.extraeventstypes,self.extraeventsvalues = [],[],[],[]  #hold string,string,index,index
         self.extraeventsactionstrings,self.extraeventsactions,self.extraeventsvisibility = [],[],[] #hold string,index,index
-
-        ###################################################################################
-        #restore SETTINGS  after creating serial port, tgraphcanvas, and PID.
-        
-               
-
 
         # set window title
         self.windowTitle = unicode(QApplication.translate("Application Title", "Artisan %1",None, QApplication.UnicodeUTF8).arg(str(__version__)))
