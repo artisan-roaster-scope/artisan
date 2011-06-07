@@ -313,7 +313,7 @@ class tgraphcanvas(FigureCanvas):
         self.rateofchange2 = 0.0
         
         # multiplication factor to increment sensitivity of rateofchange
-        self.sensitivity = 100.0 # was 20.0
+        self.sensitivity = 10 # was 20
         #read and plot on/off flag
         self.flagon = False
         self.flagclock = False
@@ -332,6 +332,7 @@ class tgraphcanvas(FigureCanvas):
         #lists to store temps and rates of change. Second most IMPORTANT variables. All need same dimension.
         #self.temp1 = ET ; self.temp2 = BT; self.delta1 = deltaMET; self.delta2 = deltaBT
         self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]        
+        self.unfiltereddelta1, self.unfiltereddelta2 = [],[]
         
         #indexes for START[0],Dryend[1],FCs[2],FCe[3],SCs[4],SCe[5], and DROP[6]
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryeEnd
@@ -498,9 +499,6 @@ class tgraphcanvas(FigureCanvas):
         labels = [QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)]
         self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
-        # draw of the Figure
-        self.fig.canvas.draw()
-
         #Create x axis labels in minutes:seconds instead of seconds
         self.xaxistosm()
 
@@ -515,12 +513,16 @@ class tgraphcanvas(FigureCanvas):
         self.LCDtimer.setInterval(1000)  #miliseconds
         self.connect(self.LCDtimer,SIGNAL("timeout()"),self.updateLCDtime)
         
-        self.seconds = 0.    #variable helps make time in LCD update more even
+        self.seconds = 0.    #this variable helps make time in LCD update more even
 
-        #server that spawns a thread dynamically to sample (press button ON to make a thread/ press OFF to kill it) 
+
+        ############################  Thread Server #################################################
+        #server that spawns a thread dynamically to sample temperature (press button ON to make a thread press OFF button to kill it) 
         self.threadserver = Athreadserver()
+        self.threadlock = False               #False = free ; True = busy
+
     	
-        ########################################################     Designer variables       ##############################################################
+        ##########################     Designer variables       #################################
         self.designerflag = False
         self.designerconnections = [0,0,0,0]   #mouse event ids
         self.mousepress = None
@@ -544,9 +546,11 @@ class tgraphcanvas(FigureCanvas):
         self.ETsplinedegree = 1
         self.reproducedesigner = 0      #flag to add events to help reproduce (replay) the profile: 0 = none; 1 = sv; 2 = ramp
 
-        #########################################################         wheel graph variables     #############################################################
-        #create initial data for wheel
+        ###########################         wheel graph variables     ################################
+        #data containers for wheel
         self.wheelnames,self.segmentlengths,self.segmentsalpha,self.wheellabelparent,self.wheelcolor = [],[],[],[],[]
+
+        #crerate starting wheel
         wheels = [4,6,12,50]
         for i in range(len(wheels)):
             w,a,c,co = [],[],[],[]
@@ -563,7 +567,8 @@ class tgraphcanvas(FigureCanvas):
             self.segmentlengths.append([100./len(self.wheelnames[i])]*len(self.wheelnames[i]))
             self.wheellabelparent.append(c)
             self.wheelcolor.append(co)
-
+            
+        #properties
         #store radius of each circle as percentage(sum of all must at all times add up to 100.0%)
         self.wradii = [25.,20.,20.,35.]
         #starting angle for each circle (0-360). 
@@ -574,7 +579,7 @@ class tgraphcanvas(FigureCanvas):
         self.wheelcolorpattern = 0                  #pattern
         self.wheeledge = .02                        #overlaping decorative edge
         self.wheellinewidth = 1
-        self.wheellinecolor = u"black"               #initial color
+        self.wheellinecolor = u"black"               #initial color of lines
 
 
     ###################  temporary storage to pass values for thermocouples 3 and 4. Used in serial objects
@@ -588,8 +593,14 @@ class tgraphcanvas(FigureCanvas):
         self.dutycycle = 0.
         self.dutycycleTX = 0.
         self.fujiETBT = 0.
-      
-    #sample devices at interval self.delay miliseconds
+
+
+    #NOTE: Figure is initialy drawn at the end of aw.settingsload()
+        
+    #################################    FUNCTIONS    ###################################
+    #####################################################################################
+        
+    # sample devices at interval self.delay miliseconds. NOTE: This function is run on its own thread. 
     def sample(self):
         try:
             #if using a meter (thermocouple device)
@@ -601,6 +612,7 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.BTfunction):
                     t2 = self.eval_math_expression(self.BTfunction,t2)
 
+                #filter droputs 
                 if self.mode == "C":
                     limit = 500.
                 else:
@@ -632,23 +644,56 @@ class tgraphcanvas(FigureCanvas):
                 # update lines data using the lists with new data
                 self.l_temp1.set_data(self.timex, self.temp1)
                 self.l_temp2.set_data(self.timex, self.temp2)
-                    
+
+                #this helps to stabilize thread load (for low performance CPUS)
+                libtime.sleep(.1)
+                
                 #we need a minimum of two readings to calculate rate of change
                 if len(self.timex) > 2:
                     timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
-                    #calculate Delta T = (changeTemp/ChangeTime) =  degress per second;
-                    self.rateofchange1 = (self.temp1[-1] - self.temp1[-2])/timed  #delta ET (degress / second)
-                    self.rateofchange2 = (self.temp2[-1] - self.temp2[-2])/timed  #delta  BT (degress / second)
-                    rateofchange1plot = 50. + self.sensitivity*self.rateofchange1   #lift to plot on the graph at Temp = 50
-                    rateofchange2plot = 100. + self.sensitivity*self.rateofchange2    #lift to plot on the graph at Temp  = 100
+                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                    self.rateofchange1 = ((self.temp1[-1] - self.temp1[-2])/timed)*60.  #delta ET (degress/minute)
+                    self.rateofchange2 = ((self.temp2[-1] - self.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
+                    
+                    self.unfiltereddelta1.append(self.rateofchange1)
+                    self.unfiltereddelta2.append(self.rateofchange2)
+                        
+                    #######   filter deltaBT deltaET
+                    if self.deltafilter:
+                        if len(self.timex) > (self.deltafilter):
+                            a1,a2 = 0.,0.
+                            for k in range(self.deltafilter):
+                                a1 += self.unfiltereddelta1[-(k+1)]
+                                a2 += self.unfiltereddelta2[-(k+1)]
+                            self.rateofchange1 = a1/float(self.deltafilter)
+                            self.rateofchange2 = a2/float(self.deltafilter)
+                            
+                    rateofchange1plot = float(self.sensitivity)*self.rateofchange1   
+                    rateofchange2plot = float(self.sensitivity)*self.rateofchange2
+
                 else:
-                    self.rateofchange1 = 100.
-                    self.rateofchange2 = 50.
-                    rateofchange1plot = 0.
-                    rateofchange2plot = 0.
+                    self.unfiltereddelta1.append(0.)
+                    self.unfiltereddelta2.append(0.)                    
+                    self.rateofchange1,self.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+
                 # append new data to the rateofchange
                 self.delta1.append(rateofchange1plot)
                 self.delta2.append(rateofchange2plot)
+
+                #verify same dimension    
+                lt,ld =  len(self.timex),len(self.delta2)
+                if lt != ld:
+                    if lt > ld:
+                        for x in range(lt - ld):
+                            if ld:
+                                self.delta1.append(self.delta1[-1])
+                                self.delta2.append(self.delta2[-1])
+                            else:
+                                self.delta1.append(0.)
+                                self.delta2.append(0.) 
+                    if lt < ld:
+                        self.delta1 = self.delta1[:lt]                
+                        self.delta2 = self.delta2[:lt]  
                             
                 if self.DeltaETflag:
                     self.l_delta1.set_data(self.timex, self.delta1)
@@ -663,8 +708,11 @@ class tgraphcanvas(FigureCanvas):
                    
                 aw.lcd2.display("%.1f"%t1)                                     # ET
                 aw.lcd3.display("%.1f"%t2)                                     # BT
-                aw.lcd4.display("%.1f"%(self.rateofchange1*60.))        # rate of change MET (degress per minute)
-                aw.lcd5.display("%.1f"%(self.rateofchange2*60.))        # rate of change BT (degrees per minute)
+                aw.lcd4.display("%.1f"%self.rateofchange1)        # rate of change MET (degress per minute)
+                aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
+
+                #this helps to stabilize thread load (for low performance CPUS)
+                libtime.sleep(.1)
                 
                 if self.projectFlag:
                     self.viewProjection()
@@ -688,10 +736,10 @@ class tgraphcanvas(FigureCanvas):
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
             else:
-                tx = self.timeclock.elapsed()/1000.
+                tx = int(self.timeclock.elapsed()/1000.)
                 #readjust xlimit of plot if needed
                 if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
-                    self.endofx = int(tx + 180)         # increase x limit by 3 minutes (180)
+                    self.endofx = tx + 180              # increase x limit by 3 minutes (180)
                     self.ax.set_xlim(self.startofx,self.endofx)
                     self.xaxistosm()
                     
@@ -701,6 +749,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
 
+            
             ##############  if using more than one device
             ndevices = len(self.extradevices)
             if ndevices:
@@ -717,8 +766,8 @@ class tgraphcanvas(FigureCanvas):
                     self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
                     self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
 
-            #this seems to stabilize ramdom a small figure flickering when under heavy load (many devices and 0.1 seconds sampling interval)
-            libtime.sleep(.01)
+            #this helps to stabilize thread load (for low performance CPUS)
+            libtime.sleep(.2)
             
             #update screen
             self.fig.canvas.draw()
@@ -730,7 +779,7 @@ class tgraphcanvas(FigureCanvas):
     def updateLCDtime(self):
         tx = self.timeclock.elapsed()/1000.
         #avoid quick uneven time updades 
-        if  tx - self.seconds > .8: 
+        if  tx - self.seconds > .9: 
             if self.timeindex[0] != -1:
                 ts = tx - self.timex[self.timeindex[0]]
             else:
@@ -1334,18 +1383,17 @@ class tgraphcanvas(FigureCanvas):
                                          arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
 
             #END of Background
-
-            
-        #populate delta BT (self.delta2) and delta MET (self.delta1)
+           
+        #populate delta ET (self.delta1) and delta BT (self.delta2)
         d1,d2,d3,d4=[],[],[],[]
-        delta1, delta2 = 0,0
+        delta1, delta2 = 0.,0.
         for i in range(len(self.timex)-1):
             timed = self.timex[i+1] - self.timex[i]
-            
-            if timed != 0:
-                delta1 = 100.+ self.sensitivity*((self.temp1[i+1] - self.temp1[i]) / timed) 
-                delta2 = 50. + self.sensitivity*((self.temp2[i+1] - self.temp2[i]) / timed)
-                
+            if timed:
+                delta1 = 60.*((self.temp1[i+1] - self.temp1[i]) / timed) #degrees pre minute
+                delta2 = 60.*((self.temp2[i+1] - self.temp2[i]) / timed)
+
+                #inputs
                 d1.append(delta1)
                 d2.append(delta2)
                 
@@ -1354,29 +1402,39 @@ class tgraphcanvas(FigureCanvas):
                         #smooth DeltaBT/DeltaET by using FIR filter of X pads.
                         #d1 and d2 are inputs, while d3 and d4 are outputs  
                         #Use only current and past input values. Don't feed parts of outputs d3 d4 to filter
-                        a1,a2 = 0,0
+                        a1,a2 = 0.,0.
                         for k in range(self.deltafilter):
                             a1 += d1[-(k+1)]
                             a2 += d2[-(k+1)]
-                        d3.append(a1/self.deltafilter)
-                        d4.append(a2/self.deltafilter)
+                        #outputs
+                        d3.append(float(self.sensitivity)*(a1/float(self.deltafilter)))
+                        d4.append(float(self.sensitivity)*(a2/float(self.deltafilter)))
                     else:
-                        d3.append(delta1) 
-                        d4.append(delta2)
-                        
-        #apply filter only when roaster is OFF to avoid redrawing with filter (at run time there is no filter)
-        if not self.flagon:    
-            if self.deltafilter:
-                self.delta1 = d3
-                self.delta2 = d4
-            else:
-                self.delta1 = d1
-                self.delta2 = d2
+                        d3.append(0.) 
+                        d4.append(0.)
+                           
+        if self.deltafilter:
+            self.delta1 = d3
+            self.delta2 = d4
+        else:
+            self.delta1 = d1
+            self.delta2 = d2
                 
         #this is needed because DeltaBT and DeltaET need 2 values of timex (difference) but they also need same dimension in order to plot
-        if len(self.timex) > len(self.delta1):
-            self.delta1.append(delta1)
-            self.delta2.append(delta2)
+        #equalize dimensions if needed
+        lt,ld =  len(self.timex),len(self.delta2)
+        if lt != ld:
+            if lt > ld:
+                for x in range(lt - ld):
+                    if ld:
+                        self.delta1.append(self.delta1[-1])
+                        self.delta2.append(self.delta2[-1])
+                    else:
+                        self.delta1.append(0.)
+                        self.delta2.append(0.)                        
+            if lt < ld:
+                self.delta1 = self.delta1[:lt]                
+                self.delta2 = self.delta2[:lt]                
 
         ##### DeltaET,DeltaBT curves
         if self.DeltaETflag:
@@ -1674,7 +1732,6 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
-        self.ylimit_min = 0
         self.ylimit = 750
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
@@ -1689,7 +1746,6 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
-        self.ylimit_min = 0
         self.ylimit = 400
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
@@ -2124,31 +2180,30 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         if not self.flagon:
             if self.designerflag: return
-            
-            self.flagon = True
-            self.threadserver.createThread()
+            if not self.threadlock:
+                self.threadserver.createThread()
+                self.flagon = True
+                aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
+                aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
+                aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
+                aw.soundpop()
                 
-            aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
-            aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
-            aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
-            aw.soundpop()
-            
-            #Call start() to start the first measurement if no data collected
-            self.seconds = 0.
-            if not len(self.timex):
-                self.timeclock.start()
-            #self.timer.start()
-            self.LCDtimer.start()
+                #Call start() to start the first measurement if no data collected
+                self.seconds = 0.
+                if not len(self.timex):
+                    self.timeclock.start()
+                #self.timer.start()
+                self.LCDtimer.start()
         else:
-            self.flagon = False
+            aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
             self.LCDtimer.stop()
-            self.seconds = 0.            
-            aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
-            aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])            
-            aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) 
-            
+            self.seconds = 0.                       
             aw.soundpop()
-           
+            aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
+            aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8))
+            self.flagon = False
+            libtime.sleep(.5)  #give time for thread to close
+
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
         if self.flagon:
@@ -2958,8 +3013,7 @@ class tgraphcanvas(FigureCanvas):
             self.errorlog = self.errorlog[1:]
         self.errorlog.append(timez + " " + error)
         aw.sendmessage(error)
-
-        QTimer.singleShot(600, self.restore_message_label)  #set a time less than 1 second to restore color
+        self.restore_message_label()  
 
     ####################  PROFILE DESIGNER   ###################################################################################
     #launches designer	
@@ -3662,6 +3716,7 @@ class Athread(QThread):
                 aw.qmc.sample()
                 libtime.sleep(timedelay)    
             else:
+                aw.qmc.threadlock = False
                 break  #thread ends
 
 class Athreadserver(QWidget):
@@ -3669,10 +3724,12 @@ class Athreadserver(QWidget):
         super(QWidget,self)._init_(parent)
 
     def createThread(self):
-        thread = Athread(self)
-        #delete when finished to save memory 
-        self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
-        thread.start()       
+        if not aw.qmc.flagon:
+            aw.qmc.threadlock = True
+            thread = Athread(self)
+            #delete when finished to save memory 
+            self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
+            thread.start()       
 
             
 ########################################################################################                            
@@ -5555,8 +5612,6 @@ class ApplicationWindow(QMainWindow):
             self.qmc.temp2 = profile["temp2"]
         if "phases" in profile:
             self.qmc.phases = profile["phases"]
-        if "ymin" in profile:
-            self.qmc.ylimit_min = int(profile["ymin"])
         if "ymax" in profile:
             self.qmc.ylimit = int(profile["ymax"])
         if "xmin" in profile:
@@ -5651,7 +5706,6 @@ class ApplicationWindow(QMainWindow):
         profile["temp1"] = self.qmc.temp1
         profile["temp2"] = self.qmc.temp2
         profile["phases"] = self.qmc.phases        
-        profile["ymin"] = self.qmc.ylimit_min
         profile["ymax"] = self.qmc.ylimit
         profile["xmin"] = self.qmc.startofx
         profile["xmax"] = self.qmc.endofx       
@@ -5797,6 +5851,7 @@ class ApplicationWindow(QMainWindow):
             self.ser.parity = unicode(settings.value("parity",self.ser.parity).toString())
             self.ser.timeout = settings.value("timeout",self.ser.timeout).toInt()[0]
             settings.endGroup()
+            
             #restore alarms
             settings.beginGroup("Alarms")
             if settings.contains("alarmtime"):
@@ -5829,6 +5884,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
             self.qmc.deltafilter = settings.value("deltafilter",self.qmc.deltafilter).toInt()[0]
             self.qmc.sensitivity = settings.value("Sensitivity",self.qmc.sensitivity).toInt()[0]
+            if self.qmc.sensitivity > 10: self.qmc.sensitivity = 10
+            
             settings.endGroup()
             settings.beginGroup("HUD")
             self.qmc.projectFlag = settings.value("Projection",self.qmc.projectFlag).toBool()
@@ -7221,15 +7278,12 @@ class HUDDlg(QDialog):
         self.connect(self.DeltaBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaBT(i))         #toggle
         self.connect(self.projectCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.changeProjection(i)) #toggle
             
-        self.sensitivityValues = map(str,range(10,0,-1))
+        sensitivityValues = map(unicode,range(0,11))  #range(0,11) = 0-10
         self.sensitivitylabel  = QLabel(QApplication.translate("Label", "Sensitivity",None, QApplication.UnicodeUTF8))                          
         self.sensitivityComboBox = QComboBox()
-        self.sensitivityComboBox.addItems(self.sensitivityValues)
-        try:
-            self.sensitivityComboBox.setCurrentIndex(self.sensitivityValues.index(self.sensitivityInt2String(aw.qmc.sensitivity)))
-        except Exception,e:
-            self.sensitivityComboBox.setCurrentIndex = 0
-        self.connect(self.sensitivityComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.sensitivityComboBox.currentIndex():self.changeSensitivity(i))
+        self.sensitivityComboBox.addItems(sensitivityValues)
+        self.sensitivityComboBox.setCurrentIndex(sensitivityValues.index(unicode(aw.qmc.sensitivity)))
+        self.connect(self.sensitivityComboBox,SIGNAL("currentIndexChanged(int)"),self.changeSensitivity)
                         
         self.modeComboBox = QComboBox()
         self.modeComboBox.setMaximumWidth(100)
@@ -7722,9 +7776,10 @@ class HUDDlg(QDialog):
             #erase old projections
             aw.qmc.resetlines()    
         
-    def changeSensitivity(self,i):
-        aw.qmc.sensitivity = self.sensitivityString2Int(self.sensitivityValues[i])
-        aw.qmc.redraw()         
+    def changeSensitivity(self):
+        aw.qmc.sensitivity = int(self.sensitivityComboBox.currentText())
+        aw.qmc.redraw()
+        libtime.sleep(0.1)
 
     def changeProjectionMode(self,i):
         aw.qmc.projectionmode = i
@@ -7733,15 +7788,6 @@ class HUDDlg(QDialog):
         aw.qmc.resetlines()
         aw.qmc.redraw()
         self.interpolation(i)
-
-    def sensitivityString2Int(self,s):
-        return int(s) * 20
-        
-    def sensitivityInt2String(self,i):
-        if i < 20:
-            return "10"
-        else:
-            return str(i / 20)
 
     #cancel button
     def close(self):    
@@ -8792,7 +8838,7 @@ class WindowsDlg(QDialog):
         self.xlimitEdit_min.setMaximumWidth(100)        
 
         self.ylimitEdit.setValidator(QIntValidator(0, 1000, self.ylimitEdit))
-        self.ylimitEdit_min.setValidator(QIntValidator(0, 1000, self.ylimitEdit_min))
+        self.ylimitEdit_min.setValidator(QIntValidator(-1000, 1000, self.ylimitEdit_min))
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
         self.xlimitEdit.setValidator(QRegExpValidator(regextime,self))
         self.xlimitEdit_min.setValidator(QRegExpValidator(regextime,self))
@@ -11173,7 +11219,7 @@ class serialport(object):
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "#0A0000NA2\r\n" 
+                command = "#0A0000NA2\r\n"   #"0A0101NA4\r\n"
                 self.SP.write(command)
                 r = self.SP.read(14) 
 
