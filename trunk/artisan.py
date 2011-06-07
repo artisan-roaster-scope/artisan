@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.5.0b2"
+__version__ = u"0.5.0"
 
 
 # ABOUT
@@ -1123,6 +1123,7 @@ class tgraphcanvas(FigureCanvas):
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
         self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
+        self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
         self.timeindex = [-1,0,0,0,0,0,0]
         self.specialevents=[]
         if not self.keeptimeflag:
@@ -11219,7 +11220,7 @@ class serialport(object):
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "#0A0000NA2\r\n"   #"0A0101NA4\r\n"
+                command = "0A0101NA4\r\n"  #"#0A0000NA2\r\n"
                 self.SP.write(command)
                 r = self.SP.read(14) 
 
