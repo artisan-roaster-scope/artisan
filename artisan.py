@@ -2999,14 +2999,14 @@ class tgraphcanvas(FigureCanvas):
 
     #adds errors
     def adderror(self,error):
-        aw.messagelabel.setStyleSheet("background-color:'red';")
+        #aw.messagelabel.setStyleSheet("background-color:'red';")
         timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
         #keep a max of 500 errors
         if len(self.errorlog) > 499:
             self.errorlog = self.errorlog[1:]
         self.errorlog.append(timez + " " + error)
         aw.sendmessage(error)
-        self.restore_message_label()  
+        #self.restore_message_label()  
 
     ####################  PROFILE DESIGNER   ###################################################################################
     #launches designer	
@@ -10915,35 +10915,32 @@ class serialport(object):
 
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
     def fujitemperature(self):
-        try:
-            #update ET SV LCD 6
-            aw.pid.readcurrentsv()
-
-            # get the temperature for ET. RS485 unit ID (1)
-            t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
-            #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
-            tx = aw.qmc.timeclock.elapsed()/1000.
-
-            #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None)
-            if self.readBTpid[0] != 2:                    
-                # get the temperature for BT. RS485 unit ID (2)
-                t2 = aw.pid.gettemperature(2)/10.
-            else:
-                t2 = 0.
-
-            #get current duty cycle and update LCD 7
-            aw.qmc.dutycycle = aw.pid.readdutycycle()
-            aw.qmc.dutycycleTX = tx
-            if t2:
-                aw.qmc.fujiETBT = t1-t2
-            else:
-                aw.qmc.fujiETBT = 0.
-            
-            return tx,t2,t1
         
-        except Exception,e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: fujitemperature() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
-            return
+        #update ET SV LCD 6
+        aw.pid.readcurrentsv()
+
+        # get the temperature for ET. RS485 unit ID (1)
+        t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
+        #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
+        tx = aw.qmc.timeclock.elapsed()/1000.
+
+        #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None)
+        if self.readBTpid[0] != 2:                    
+            # get the temperature for BT. RS485 unit ID (2)
+            t2 = aw.pid.gettemperature(2)/10.
+        else:
+            t2 = 0.
+
+        #get current duty cycle and update LCD 7
+        aw.qmc.dutycycle = aw.pid.readdutycycle()
+        aw.qmc.dutycycleTX = tx
+        if t2:
+            aw.qmc.fujiETBT = t1-t2
+        else:
+            aw.qmc.fujiETBT = 0.
+        
+        return tx,t2,t1
+
 
     def virtual(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -11141,6 +11138,7 @@ class serialport(object):
                 self.SP.open()
                
         except serial.SerialException,e:
+            self.SP.close()
             error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
@@ -11211,6 +11209,7 @@ class serialport(object):
                 return u"0"                                    
                 
         except serial.SerialException,e:
+            self.SP.close()
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
