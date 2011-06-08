@@ -714,9 +714,7 @@ class tgraphcanvas(FigureCanvas):
                 libtime.sleep(.1)
                 
                 if self.projectFlag:
-                    self.viewProjection()
-                if self.HUDflag:
-                    aw.showHUD[aw.HUDfunction]()
+                    self.viewProjection()                   
                 if self.background and self.backgroundReproduce:
                     self.playbackevent()
 
@@ -740,15 +738,14 @@ class tgraphcanvas(FigureCanvas):
                 if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
                     self.endofx = tx + 180              # increase x limit by 3 minutes (180)
                     self.ax.set_xlim(self.startofx,self.endofx)
-                    self.xaxistosm()
-                    
+                    self.xaxistosm()   
                 self.resetlines()
-                #plot a vertical time line
-                self.ax.plot([tx,tx], [0,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
-                if self.background and self.backgroundReproduce:
-                    self.playbackevent()
-
-            
+                #add to plot a vertical time line
+                self.ax.plot([tx,tx], [self.ylimit_min,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
+               
+                #important. this helps to stabilize thread
+                libtime.sleep(.1)             
+           
             ##############  if using more than one device
             ndevices = len(self.extradevices)
             if ndevices:
@@ -2218,7 +2215,7 @@ class tgraphcanvas(FigureCanvas):
                     self.timeindex[0] = len(self.timex)-1
 
                     # put initial marker on graph
-                    rect = patches.Rectangle( (self.timex[self.timeindex[0]],0), width=.01, height=self.ylimit, color = self.palette["text"])
+                    rect = patches.Rectangle( (self.timex[self.timeindex[0]],self.ylimit_min), width=.01, height=(self.ylimit+abs(self.ylimit_min)), color = self.palette["text"])
                     self.ax.add_patch(rect)
                 else:
                     return
@@ -2451,7 +2448,7 @@ class tgraphcanvas(FigureCanvas):
                     self.drawmanual(et,bt,tx)
                     self.timeindex[6] = len(self.timex)-1
                     # put final BT marker on graph
-                    rect = patches.Rectangle( (self.timex[self.timeindex[6]],0), width=.01, height=self.ylimit, color = self.palette["text"])
+                    rect = patches.Rectangle( (self.timex[self.timeindex[6]],self.ylimit_min), width=.01, height=(self.ylimit+abs(self.ylimit_min)), color = self.palette["text"])
                     self.ax.add_patch(rect)
                     if et >  bt:
                         #put ET marker on graph
@@ -3715,7 +3712,9 @@ class Athread(QThread):
                 #collect information
                 aw.qmc.sample()
                 #update screen in main GUI thread (not in this thread, which causes crashes)
-                self.emit(SIGNAL("updatefigure"))                
+                self.emit(SIGNAL("updatefigure"))
+                if aw.qmc.HUDflag:
+                    self.emit(SIGNAL("updateHUD")) 
                 libtime.sleep(timedelay)    
             else:
                 break  #thread ends
@@ -3730,10 +3729,11 @@ class Athreadserver(QWidget):
             thread = Athread(self)
             #delete when finished to save memory 
             self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
+            #connect graphics to GUI thread
             self.connect(thread, SIGNAL("updatefigure"),aw.qmc.fig.canvas.draw)
+            self.connect(thread, SIGNAL("updateHUD"),aw.launchHUD)
             thread.start()       
 
-            
 ########################################################################################                            
 #################### MAIN APPLICATION WINDOW ###########################################
 ########################################################################################
@@ -7034,6 +7034,9 @@ $cupping_notes
     def hudset(self):
         hudDl = HUDDlg(self)
         hudDl.show()
+
+    def launchHUD(self):
+        self.showHUD[self.HUDfunction]()
         
     def showHUDmetrics(self):
         ETreachTime,BTreachTime = self.qmc.getTargetTime()
@@ -7048,10 +7051,10 @@ $cupping_notes
         else:
             text2 =  QApplication.translate("Scope Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(unicode(self.qmc.BTtarget) + self.qmc.mode)
 
-        img = QPixmap().grabWidget(aw.qmc)
+        img = QPixmap().grabWidget(self.qmc)
 
-        Wwidth = aw.qmc.size().width()
-        Wheight = aw.qmc.size().height()
+        Wwidth = self.qmc.size().width()
+        Wheight = self.qmc.size().height()
         
         p = QPainter(img)        
         #chose font
@@ -7084,7 +7087,7 @@ $cupping_notes
     
         p.end()
         self.HUD.setPixmap(img)
-        
+       
     def showHUDthermal(self): 
         img = QPixmap().grabWidget(aw.qmc)        
         p = QPainter(img)
