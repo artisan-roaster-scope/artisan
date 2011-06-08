@@ -771,14 +771,17 @@ class tgraphcanvas(FigureCanvas):
         
     def updateLCDtime(self):
         tx = self.timeclock.elapsed()/1000.
+        h,d = divmod(tx,1.)
         #avoid quick uneven time updades 
-        if  tx - self.seconds > .9: 
+        if  tx - self.seconds > .8: 
             if self.timeindex[0] != -1:
                 ts = tx - self.timex[self.timeindex[0]]
             else:
                 ts = tx 
             aw.lcd1.display(QString(self.stringfromseconds(round(ts))))
             self.seconds = tx
+            return
+            
     
     def toggleHUD(self):
         #OFF
@@ -4119,9 +4122,6 @@ class ApplicationWindow(QMainWindow):
         #create a Label object to display program status information
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(10)
-
-
-        #buttontooltip = QToolTip("background-color: white; font: bold 10px;min-width: 10em;padding: 6px;")
         
         self.pushbuttonstyles = {"OFF":"QPushButton {font-size: 16pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
                                  "ON":"QPushButton {font-size: 16pt; font-weight: bold; color: yellow; background-color: red }",
@@ -4295,7 +4295,6 @@ class ApplicationWindow(QMainWindow):
         # NavigationToolbar VMToolbar
         ntb = VMToolbar(self.qmc, self.main_widget)
         ntb.setMinimumHeight(45)
-
         
         #create LCD displays
         #RIGHT COLUMN
@@ -4329,8 +4328,6 @@ class ApplicationWindow(QMainWindow):
         self.lcd5.display("0.0")
         self.lcd6.display("0.0")
         self.lcd7.display("0.0")
-
-
 
         self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
         self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["met"],self.lcdpaletteB["met"]))
@@ -4386,7 +4383,6 @@ class ApplicationWindow(QMainWindow):
         self.label7.setAlignment(Qt.AlignRight)
         self.label7.setText("<font color='black'><b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.label7.setIndent(5)
-
 
         # Stores messages up to 500        
         self.messagehist = []
@@ -4448,7 +4444,8 @@ class ApplicationWindow(QMainWindow):
         self.buttonminiEvent.setToolTip(QApplication.translate("Tooltip", "Updates the event", None, QApplication.UnicodeUTF8))
 
         #### CUSTOM events buttons
-        self.buttonlist = []  
+        self.buttonlist = []
+        
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
         self.lowerbuttondialog.setCenterButtons(True)
@@ -4462,13 +4459,6 @@ class ApplicationWindow(QMainWindow):
         self.lowerbuttondialog.addButton(self.button_6,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_9,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_11,QDialogButtonBox.ActionRole)
-        
-
-        # activate event button
-        if self.eventsbuttonflag:
-            self.button_11.setVisible(True)
-        else:
-            self.button_11.setVisible(False)
 
         # set the focus on the main widget
         self.main_widget.setFocus()
@@ -4564,11 +4554,6 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addWidget(self.lowerbuttondialog)
         mainlayout.addSpacing(10)
         mainlayout.addWidget(self.EventsGroupLayout)
-        
-        # set visibility of mini event line
-        self.update_minieventline_visibility()
-
-
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
     def setdpi(self,dpi):
@@ -5986,7 +5971,6 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventsactionstrings[i] = unicode(self.extraeventsactionstrings[i])
                     self.extraeventslabels[i] = unicode(self.extraeventslabels[i])
                     self.extraeventsdescriptions[i] = unicode(self.extraeventsdescriptions[i])
-
                 #create buttons                    
                 for i in range(len(self.extraeventstypes)):
                     self.buttonlist.append(QPushButton())
@@ -5996,7 +5980,6 @@ class ApplicationWindow(QMainWindow):
                     self.buttonlist[i].setText(self.extraeventslabels[i])
                     self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
                     self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-                    
                 self.update_extraeventbuttons_visibility()
             settings.endGroup()
             
@@ -6013,13 +5996,23 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("roastpropertiesflag"):            	
             	self.qmc.roastpropertiesflag = settings.value("roastpropertiesflag",self.qmc.roastpropertiesflag).toInt()[0]
 
+
+            # set visibility of mini event line
+            self.update_minieventline_visibility()
+
+            #update visibility of main event button
+            if self.eventsbuttonflag:
+                self.button_11.setVisible(True)
+            else:
+                self.button_11.setVisible(False)
+
+            
             #update display
             self.qmc.redraw()
 
         except Exception,e:
             QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),unicode(e))
             return                            
-
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
     def closeEvent(self, event):
