@@ -510,7 +510,7 @@ class tgraphcanvas(FigureCanvas):
         ############################  LCD  TRIGGER  TIMER       ##################################
 
         self.LCDtimer = QTimer()
-        self.LCDtimer.setInterval(1000)  #miliseconds
+        self.LCDtimer.setInterval(1000.)  #miliseconds
         self.connect(self.LCDtimer,SIGNAL("timeout()"),self.updateLCDtime)
         
         self.seconds = 0.    #this variable helps make time in LCD update more even
@@ -519,7 +519,6 @@ class tgraphcanvas(FigureCanvas):
         ############################  Thread Server #################################################
         #server that spawns a thread dynamically to sample temperature (press button ON to make a thread press OFF button to kill it) 
         self.threadserver = Athreadserver()
-        self.threadlock = False               #False = free ; True = busy
 
     	
         ##########################     Designer variables       #################################
@@ -2175,20 +2174,19 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         if not self.flagon:
             if self.designerflag: return
-            if not self.threadlock:
-                self.threadserver.createThread()
-                self.flagon = True
-                aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
-                aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
-                aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
-                aw.soundpop()
-                
-                #Call start() to start the first measurement if no data collected
-                self.seconds = 0.
-                if not len(self.timex):
-                    self.timeclock.start()
-                #self.timer.start()
-                self.LCDtimer.start()
+            self.threadserver.createThread()
+            self.flagon = True
+            aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
+            aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
+            aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
+            aw.soundpop()
+            
+            #Call start() to start the first measurement if no data collected
+            self.seconds = 0.
+            if not len(self.timex):
+                self.timeclock.start()
+            #self.timer.start()
+            self.LCDtimer.start()
         else:
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
             self.LCDtimer.stop()
@@ -3717,8 +3715,8 @@ class Athread(QThread):
                 self.emit(SIGNAL("updatefigure"))                
                 libtime.sleep(timedelay)    
             else:
-                aw.qmc.threadlock = False
                 break  #thread ends
+
 
 class Athreadserver(QWidget):
     def _init_(self,parent=None):
@@ -3726,7 +3724,6 @@ class Athreadserver(QWidget):
 
     def createThread(self):
         if not aw.qmc.flagon:
-            aw.qmc.threadlock = True
             thread = Athread(self)
             #delete when finished to save memory 
             self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
@@ -4465,21 +4462,13 @@ class ApplicationWindow(QMainWindow):
         self.lowerbuttondialog.addButton(self.button_6,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_9,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_11,QDialogButtonBox.ActionRole)
-        for i in range(len(self.extraeventstypes)):
-            self.buttonlist.append(QPushButton())
-            self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
-            self.buttonlist[i].setStyleSheet(self.pushbuttonstyles["EVENT"]) 
-            self.buttonlist[i].setMinimumHeight(50)
-            self.buttonlist[i].setText(self.extraeventslabels[i])
-            self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
-            self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+        
 
         # activate event button
         if self.eventsbuttonflag:
             self.button_11.setVisible(True)
         else:
             self.button_11.setVisible(False)
-        self.update_extraeventbuttons_visibility()
 
         # set the focus on the main widget
         self.main_widget.setFocus()
@@ -5997,7 +5986,20 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventsactionstrings[i] = unicode(self.extraeventsactionstrings[i])
                     self.extraeventslabels[i] = unicode(self.extraeventslabels[i])
                     self.extraeventsdescriptions[i] = unicode(self.extraeventsdescriptions[i])
+
+                #create buttons                    
+                for i in range(len(self.extraeventstypes)):
+                    self.buttonlist.append(QPushButton())
+                    self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
+                    self.buttonlist[i].setStyleSheet(self.pushbuttonstyles["EVENT"]) 
+                    self.buttonlist[i].setMinimumHeight(50)
+                    self.buttonlist[i].setText(self.extraeventslabels[i])
+                    self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
+                    self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                    
+                self.update_extraeventbuttons_visibility()
             settings.endGroup()
+            
             settings.beginGroup("grid")             
             if settings.contains("xgrid"):
                 self.qmc.xgrid = settings.value("xgrid",self.qmc.xgrid).toInt()[0]
