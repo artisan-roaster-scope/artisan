@@ -147,7 +147,7 @@ class tgraphcanvas(FigureCanvas):
 
         #default palette of colors
         self.palette = {"background":u'white',"grid":u'green',"ylabel":u'black',"xlabel":u'black',"title":u'black',"rect1":u'green',
-                        "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
+                        "rect2":u'orange',"rect3":u'#996633',"et":u'red',"bt":u'#00007f',"deltaet":u'orange',
                         "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'blue'}
         
         self.artisanflavordefaultlabels = [QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
@@ -359,7 +359,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundEStrings = []
         self.backgroundalpha = 0.3
         self.backgroundwidth = 2
-        self.backgroundmetcolor = self.palette["met"]
+        self.backgroundmetcolor = self.palette["et"]
         self.backgroundbtcolor = self.palette["bt"]
         self.backgroundstyle = "-"
         self.backmoveflag = 1
@@ -489,9 +489,9 @@ class tgraphcanvas(FigureCanvas):
         
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
-        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
+        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
         self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
-        self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+        self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltaet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
         self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
         # add legend to plot.
@@ -908,7 +908,7 @@ class tgraphcanvas(FigureCanvas):
             #plot projections
             self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
                              linestyle = '-.', linewidth= 8, alpha = .3)
-            self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["met"],
+            self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], ETprojection],color =  self.palette["et"],
                              linestyle = '-.', linewidth= 8, alpha = .3)
             
         elif self.projectionmode == 1:
@@ -934,7 +934,7 @@ class tgraphcanvas(FigureCanvas):
                     ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint                        
                     
                 #plot ET level (straight line) and BT curve
-                self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], self.temp1[-1]],color =  self.palette["met"],
+                self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp1[-1], self.temp1[-1]],color =  self.palette["et"],
                              linestyle = '-.', linewidth= 3, alpha = .5)
                 self.ax.plot(xpoints, ypoints, color =  self.palette["bt"],linestyle = '-.', linewidth= 3, alpha = .5)                  
 
@@ -1258,7 +1258,7 @@ class tgraphcanvas(FigureCanvas):
                     jump -= 20
                     
         ##### ET,BT curves
-        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["met"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
+        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
         self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
 
         ##### Extra devices-curves
@@ -1432,7 +1432,7 @@ class tgraphcanvas(FigureCanvas):
 
         ##### DeltaET,DeltaBT curves
         if self.DeltaETflag:
-            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltamet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltaet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
         if self.DeltaBTflag:
             self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
         
@@ -1622,7 +1622,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:
                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
                                      xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["met"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
                 else:
                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
                                  xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
@@ -1847,12 +1847,12 @@ class tgraphcanvas(FigureCanvas):
     def changeGColor(self,color):
         #COLOR (option 1) Default
         palette1 = {"background":u'white',"grid":u'green',"ylabel":u'black',"xlabel":u'black',"title":u'black',"rect1":u'green',
-                        "rect2":u'orange',"rect3":u'#996633',"met":u'red',"bt":u'#00007f',"deltamet":u'orange',
+                        "rect2":u'orange',"rect3":u'#996633',"et":u'red',"bt":u'#00007f',"deltaet":u'orange',
                         "deltabt":u'blue',"markers":u'black',"text":u'black',"watermarks":u'yellow',"Cline":u'blue'}
 
         #BLACK & WHITE (option 2) best for printing
         palette2 = {"background":u'white',"grid":u'grey',"ylabel":u'black',"xlabel":u'black',"title":u'black',"rect1":u'lightgrey',
-                   "rect2":u'darkgrey',"rect3":u'grey',"met":u'black',"bt":u'black',"deltamet":u'grey',
+                   "rect2":u'darkgrey',"rect3":u'grey',"et":u'black',"bt":u'black',"deltaet":u'grey',
                    "deltabt":u'grey',"markers":u'grey',"text":u'black',"watermarks":u'lightgrey',"Cline":u'grey'}
         
         #load selected dictionary
@@ -1877,9 +1877,9 @@ class tgraphcanvas(FigureCanvas):
                 self.palette["rect1"] = unicode(dialog.rect1Label.text())
                 self.palette["rect2"] = unicode(dialog.rect2Label.text())
                 self.palette["rect3"] = unicode(dialog.rect3Label.text())
-                self.palette["met"] = unicode(dialog.metLabel.text())
+                self.palette["et"] = unicode(dialog.metLabel.text())
                 self.palette["bt"] = unicode(dialog.btLabel.text())
-                self.palette["deltamet"] = unicode(dialog.deltametLabel.text())
+                self.palette["deltaet"] = unicode(dialog.deltametLabel.text())
                 self.palette["deltabt"] = unicode(dialog.deltabtLabel.text())
                 self.palette["markers"] = unicode(dialog.markersLabel.text())
                 self.palette["text"] = unicode(dialog.textLabel.text())
@@ -2452,7 +2452,7 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.add_patch(rect)
                     if et >  bt:
                         #put ET marker on graph
-                        rect = patches.Rectangle( (self.timex[self.timeindex[6]],bt), width=.05, height=et-bt, color = self.palette["met"])
+                        rect = patches.Rectangle( (self.timex[self.timeindex[6]],bt), width=.05, height=et-bt, color = self.palette["et"])
                         self.ax.add_patch(rect)
                 else:
                     return             
@@ -3151,11 +3151,11 @@ class tgraphcanvas(FigureCanvas):
 
         #add curves
         self.ax.plot(timez, btvals, color=self.palette["bt"], linestyle = '-', linewidth=2)
-        self.ax.plot(timez, etvals, color=self.palette["met"], linestyle = '-', linewidth=2)
+        self.ax.plot(timez, etvals, color=self.palette["et"], linestyle = '-', linewidth=2)
 
         #add markers (big circles) '0'
         self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='',markersize=8)     #picker = 10 means 10 points tolerance
-        self.ax.plot(self.timex,self.temp1,color = self.palette["met"],marker = "o",picker=10,linestyle='',markersize=8)
+        self.ax.plot(self.timex,self.temp1,color = self.palette["et"],marker = "o",picker=10,linestyle='',markersize=8)
 
         #plot
         self.fig.canvas.draw()
@@ -3813,8 +3813,8 @@ class ApplicationWindow(QMainWindow):
         self.soundflag = 0
 
         #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv 
-        self.lcdpaletteB = { "timer":u'black',"met":'black',"bt":'black',"deltamet":'black',"deltabt":'black',"sv":'black'}
-        self.lcdpaletteF = { "timer":u'white',"met":'white',"bt":'white',"deltamet":'white',"deltabt":'white',"sv":'white'}
+        self.lcdpaletteB = { "timer":u'black',"et":'black',"bt":'black',"deltaet":'black',"deltabt":'black',"sv":'black'}
+        self.lcdpaletteF = { "timer":u'white',"et":'white',"bt":'white',"deltaet":'white',"deltabt":'white',"sv":'white'}
 
     	#user defined event buttons
         self.extraeventslabels,self.extraeventsdescriptions, self.extraeventstypes,self.extraeventsvalues = [],[],[],[]  #hold string,string,index,index
@@ -4294,13 +4294,14 @@ class ApplicationWindow(QMainWindow):
 
         # NavigationToolbar VMToolbar
         ntb = VMToolbar(self.qmc, self.main_widget)
-        ntb.setMinimumHeight(45)
+        #ntb.setMinimumHeight(45)
         
         #create LCD displays
         #RIGHT COLUMN
         self.lcd1 = QLCDNumber() # time
         self.lcd1.setSegmentStyle(2)
-        self.lcd1.setMinimumHeight(45)
+        self.lcd1.setMinimumHeight(40)
+        self.lcd1.setMinimumWidth(100)
         self.lcd2 = QLCDNumber() # Temperature MET
         self.lcd2.setSegmentStyle(2)   
         self.lcd2.setMinimumHeight(35)
@@ -4330,9 +4331,9 @@ class ApplicationWindow(QMainWindow):
         self.lcd7.display("0.0")
 
         self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
-        self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["met"],self.lcdpaletteB["met"]))
+        self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
         self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
-        self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltamet"],self.lcdpaletteB["deltamet"]))
+        self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltaet"],self.lcdpaletteB["deltaet"]))
         self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
         self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
         self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -4389,12 +4390,11 @@ class ApplicationWindow(QMainWindow):
 
         #only leave operational the control button if the device is Fuji PID
         #the SV buttons are activated from the PID control panel 
-        if self.qmc.device > 0:
-            self.button_10.setVisible(False)
-            self.label6.setVisible(False)
-            self.lcd6.setVisible(False)
-            self.label7.setVisible(False)
-            self.lcd7.setVisible(False)
+        self.button_10.setVisible(False)
+        self.label6.setVisible(False)
+        self.lcd6.setVisible(False)
+        self.label7.setVisible(False)
+        self.lcd7.setVisible(False)
             
         self.button_12.setVisible(False)
         self.button_13.setVisible(False)
@@ -4537,11 +4537,15 @@ class ApplicationWindow(QMainWindow):
         pidbuttonLayout.addWidget(self.button_15)
 
     	#level 1
-        level1layout.addWidget(ntb,0)
-        level1layout.addWidget(self.button_10,2)
-        level1layout.addWidget(self.button_18,1)
-        level1layout.addWidget(self.button_7,2)
-        level1layout.addWidget(self.lcd1,3,Qt.AlignVCenter)  #note: Mac OS needs vertical alignment
+        level1layout.addWidget(ntb)
+        level1layout.addSpacing(15)
+        level1layout.addWidget(self.button_10)
+        level1layout.addSpacing(15)
+        level1layout.addWidget(self.button_18)
+        level1layout.addSpacing(15)
+        level1layout.addWidget(self.button_7)
+        level1layout.addSpacing(20)
+        level1layout.addWidget(self.lcd1)
 
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
@@ -4977,7 +4981,7 @@ class ApplicationWindow(QMainWindow):
            #plot highest ET or BT (sometimes only BT is plot (et is zero))
            if currentevent:
                if self.qmc.temp1[etimeindex] > self.qmc.temp2[etimeindex]:
-                   self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["met"])
+                   self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["et"])
                else:
                    self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp2[etimeindex], "o", color = self.qmc.palette["bt"])
                
@@ -5001,7 +5005,7 @@ class ApplicationWindow(QMainWindow):
             #plot highest ET or BT (sometimes only BT is plot (et is zero))
             etimeindex = self.qmc.specialevents[lenevents-1]
             if self.qmc.temp1[etimeindex] > self.qmc.temp2[etimeindex]:
-                self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["met"])
+                self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["et"])
             else:
                 self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp2[etimeindex], "o", color = self.qmc.palette["bt"])
                
@@ -5769,6 +5773,16 @@ class ApplicationWindow(QMainWindow):
             #restore device
             settings.beginGroup("Device")
             self.qmc.device = settings.value("id",self.qmc.device).toInt()[0]
+            
+            #only leave operational the control button if the device is Fuji PID
+            #the SV buttons are activated from the PID control panel 
+            if self.qmc.device == 0:
+                self.button_10.setVisible(True)
+                self.label6.setVisible(True)
+                self.lcd6.setVisible(True)
+                self.label7.setVisible(True)
+                self.lcd7.setVisible(True)
+            
             if settings.contains("controlETpid"):
                 self.ser.controlETpid = map(lambda x:x.toInt()[0],settings.value("controlETpid").toList())
             if settings.contains("readBTpid"):
@@ -7070,7 +7084,7 @@ $cupping_notes
                    Wheight/4)               #size y
         
         p.setOpacity(0.6)
-        p.setPen(QColor(self.qmc.palette["met"]))
+        p.setPen(QColor(self.qmc.palette["et"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),QString(text1))
         
         p.setPen(QColor(self.qmc.palette["bt"]))
@@ -7377,7 +7391,7 @@ class HUDDlg(QDialog):
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equbackgroundbutton ,SIGNAL("clicked()"),self.setbackgroundequ1)
         
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Imgage",None, QApplication.UnicodeUTF8))
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None, QApplication.UnicodeUTF8))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None, QApplication.UnicodeUTF8))
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
@@ -7493,14 +7507,14 @@ class HUDDlg(QDialog):
         self.resolutionSpinBox.setSingleStep(5)
         self.resolutionSpinBox.setValue(aw.dpi)
 
-        resButton = QPushButton(QApplication.translate("Button","Set dpi Resolution",None, QApplication.UnicodeUTF8))
+        resButton = QPushButton(QApplication.translate("Button","Set Resolution",None, QApplication.UnicodeUTF8))
         resButton.setFocusPolicy(Qt.NoFocus)
-        resButton.setMaximumWidth(120)        
+        #resButton.setMaximumWidth(120)        
         self.connect(resButton,SIGNAL("clicked()"),self.changedpi)
 
-        defresButton = QPushButton(QApplication.translate("Button","Set default Resolution",None, QApplication.UnicodeUTF8))
+        defresButton = QPushButton(QApplication.translate("Button","Default Resolution",None, QApplication.UnicodeUTF8))
         defresButton.setFocusPolicy(Qt.NoFocus)
-        defresButton.setMaximumWidth(120)        
+        #defresButton.setMaximumWidth(120)        
         self.connect(defresButton,SIGNAL("clicked()"),self.setdefaultres)
                 
         tab5Layout = QVBoxLayout()
@@ -9376,8 +9390,8 @@ class EventsDlg(QDialog):
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         okButton.setMaximumWidth(100)
-        closeButton.setMaximumWidth(100)
-        defaultButton.setMaximumWidth(100)
+        #closeButton.setMaximumWidth(100)
+        #defaultButton.setMaximumWidth(100)
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
         
@@ -9393,25 +9407,25 @@ class EventsDlg(QDialog):
 
         addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
         addButton.setToolTip(QApplication.translate("Tooltip","Add new extra Event button",None, QApplication.UnicodeUTF8))
-        addButton.setMaximumWidth(100)
+        #addButton.setMaximumWidth(100)
         addButton.setFocusPolicy(Qt.NoFocus)
         self.connect(addButton, SIGNAL("clicked()"),self.insertextraeventbutton)
 
         delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
         delButton.setToolTip(QApplication.translate("Tooltip","Delete the last extra Event button",None, QApplication.UnicodeUTF8))
-        delButton.setMaximumWidth(100)
+        #delButton.setMaximumWidth(100)
         delButton.setFocusPolicy(Qt.NoFocus)
         self.connect(delButton, SIGNAL("clicked()"),self.delextraeventbutton)
 
         savetableButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
         savetableButton.setToolTip(QApplication.translate("Tooltip","Save table",None, QApplication.UnicodeUTF8))
-        savetableButton.setMaximumWidth(100)
+        #savetableButton.setMaximumWidth(100)
         savetableButton.setFocusPolicy(Qt.NoFocus)
         self.connect(savetableButton, SIGNAL("clicked()"),self.savetableextraeventbutton)
 
         helpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None, QApplication.UnicodeUTF8))
-        helpButton.setMaximumWidth(100)
+        #helpButton.setMaximumWidth(100)
         helpButton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpButton, SIGNAL("clicked()"),self.showEventbuttonhelp)
                 
@@ -10189,7 +10203,7 @@ class backgroundDLG(QDialog):
         for key in cnames:
             colors.append(unicode(key))
         colors.sort()
-        colors.insert(0,u"met")
+        colors.insert(0,u"et")
         colors.insert(1,u"bt")
         colors.pop(2)
         
@@ -10199,19 +10213,19 @@ class backgroundDLG(QDialog):
         self.btcolorComboBox.addItems(colors)
         self.btcolorComboBox.setCurrentIndex(1)
 
-        metcolorlabel = QLabel(QApplication.translate("Label", "MET Color",None, QApplication.UnicodeUTF8))
+        metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None, QApplication.UnicodeUTF8))
         metcolorlabel.setAlignment(Qt.AlignRight)        
         self.metcolorComboBox = QComboBox()
         self.metcolorComboBox.addItems(colors)
         self.metcolorComboBox.setCurrentIndex(0)
         
-        self.upButton = QPushButton("Up")
+        self.upButton = QPushButton(QApplication.translate("Button","Up",None, QApplication.UnicodeUTF8))
         self.upButton.setFocusPolicy(Qt.NoFocus)
-        self.downButton = QPushButton("Down")
+        self.downButton = QPushButton(QApplication.translate("Button","Down",None, QApplication.UnicodeUTF8))
         self.downButton.setFocusPolicy(Qt.NoFocus)
-        self.leftButton = QPushButton("Left")
+        self.leftButton = QPushButton(QApplication.translate("Button","Left",None, QApplication.UnicodeUTF8))
         self.leftButton.setFocusPolicy(Qt.NoFocus)
-        self.rightButton = QPushButton("Right")
+        self.rightButton = QPushButton(QApplication.translate("Button","Right",None, QApplication.UnicodeUTF8))
         self.rightButton.setFocusPolicy(Qt.NoFocus)
 
 
@@ -10225,7 +10239,7 @@ class backgroundDLG(QDialog):
         self.connect(self.intensitySpinBox, SIGNAL("valueChanged(int)"),self.adjustintensity)
         self.connect(self.widthSpinBox, SIGNAL("valueChanged(int)"),self.adjustwidth)
         self.connect(self.btcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color="", curve = "bt": self.adjustcolor(color,curve))
-        self.connect(self.metcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color= "", curve = "met": self.adjustcolor(color,curve))
+        self.connect(self.metcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color= "", curve = "et": self.adjustcolor(color,curve))
         self.connect(self.styleComboBox, SIGNAL("currentIndexChanged(QString)"),self.adjuststyle)
 
         #TAB 2 EVENTS
@@ -10412,9 +10426,9 @@ class backgroundDLG(QDialog):
         self.btcolorComboBox.setDisabled(True)
         self.metcolorComboBox.setDisabled(True)
         
-        if curve == u"met":
-            if color == u"met":
-                aw.qmc.backgroundmetcolor = aw.qmc.palette["met"]
+        if curve == u"et":
+            if color == u"et":
+                aw.qmc.backgroundmetcolor = aw.qmc.palette["et"]
             elif color == u"bt":
                 aw.qmc.backgroundmetcolor = aw.qmc.palette["bt"]
             else:
@@ -10423,8 +10437,8 @@ class backgroundDLG(QDialog):
         elif curve == u"bt":
             if color == u"bt":
                 aw.qmc.backgroundbtcolor = aw.qmc.palette["bt"]
-            elif color == u"met":
-                aw.qmc.backgroundbtcolor = aw.qmc.palette["met"]                
+            elif color == u"et":
+                aw.qmc.backgroundbtcolor = aw.qmc.palette["et"]                
             else:
                 aw.qmc.backgroundbtcolor = color
 
@@ -12215,7 +12229,7 @@ class designerconfigDlg(QDialog):
 
         saveButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
         self.connect(saveButton, SIGNAL("clicked()"), self.settimes)
-        saveButton.setMaximumWidth(50)
+        #saveButton.setMaximumWidth(50)
         
         defaultButton = QPushButton(QApplication.translate("Button","Reset",None, QApplication.UnicodeUTF8))
         self.connect(defaultButton, SIGNAL("clicked()"), self.reset)
@@ -13265,6 +13279,14 @@ class DeviceAssignmentDLG(QDialog):
 
     def accept(self):
         message = "Device left empty"
+        
+        # by default switch PID buttons/LCDs off
+        aw.button_10.setVisible(False)
+        aw.label6.setVisible(False)
+        aw.lcd6.setVisible(False)
+        aw.label7.setVisible(False)
+        aw.lcd7.setVisible(False)
+            
         if self.pidButton.isChecked():
             # 0 = PXG, 1 = PXR - Not translated
             if str(self.controlpidtypeComboBox.currentText()) == "Fuji PXG":
@@ -13692,13 +13714,13 @@ class graphColorDlg(QDialog):
         self.connect(self.rect3Button, SIGNAL("clicked()"), lambda var=self.rect3Label,color="rect3": self.setColor("Finish Phase",var,color))
 
         
-        self.metLabel =QLabel(aw.qmc.palette["met"])
-        self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["met"])))
+        self.metLabel =QLabel(aw.qmc.palette["et"])
+        self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["et"])))
         self.metLabel.setAutoFillBackground(True)
         self.metButton = QPushButton(QApplication.translate("Button","ET", None, QApplication.UnicodeUTF8))
         self.metButton.setFocusPolicy(Qt.NoFocus)
         self.metLabel.setFrameStyle(frameStyle)
-        self.connect(self.metButton, SIGNAL("clicked()"), lambda var=self.metLabel,color="met": self.setColor("ET",var,color))
+        self.connect(self.metButton, SIGNAL("clicked()"), lambda var=self.metLabel,color="et": self.setColor("ET",var,color))
 
         
         self.btLabel =QLabel(aw.qmc.palette["bt"])
@@ -13710,13 +13732,13 @@ class graphColorDlg(QDialog):
         self.connect(self.btButton, SIGNAL("clicked()"), lambda var=self.btLabel,color="bt": self.setColor("BT",var,color))
 
         
-        self.deltametLabel =QLabel(aw.qmc.palette["deltamet"])
-        self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltamet"])))
+        self.deltametLabel =QLabel(aw.qmc.palette["deltaet"])
+        self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
         self.deltametLabel.setAutoFillBackground(True)
         self.deltametButton = QPushButton(QApplication.translate("Button","DeltaET", None, QApplication.UnicodeUTF8))
         self.deltametButton.setFocusPolicy(Qt.NoFocus)
         self.deltametLabel.setFrameStyle(frameStyle)
-        self.connect(self.deltametButton, SIGNAL("clicked()"), lambda var=self.deltametLabel,color="deltamet": self.setColor("DeltaET",var,color))
+        self.connect(self.deltametButton, SIGNAL("clicked()"), lambda var=self.deltametLabel,color="deltaet": self.setColor("DeltaET",var,color))
 
         
         self.deltabtLabel =QLabel(aw.qmc.palette["deltabt"])
@@ -14034,20 +14056,20 @@ class graphColorDlg(QDialog):
     def setLCDdefaults(self):
         aw.lcdpaletteB["timer"] = u"black"
         aw.lcdpaletteF["timer"] = u"white"
-        aw.lcdpaletteB["met"] = u"black"
-        aw.lcdpaletteF["met"] = u"white"
+        aw.lcdpaletteB["et"] = u"black"
+        aw.lcdpaletteF["et"] = u"white"
         aw.lcdpaletteB["bt"] = u"black"
         aw.lcdpaletteF["bt"] = u"white"
-        aw.lcdpaletteB["deltamet"] = u"black"
-        aw.lcdpaletteF["deltamet"] = u"white"
+        aw.lcdpaletteB["deltaet"] = u"black"
+        aw.lcdpaletteF["deltaet"] = u"white"
         aw.lcdpaletteB["deltabt"] = u"black"
         aw.lcdpaletteF["deltabt"] = u"white"
         aw.lcdpaletteB["sv"] = u"black"
         aw.lcdpaletteF["sv"] = u"white"
         aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-        aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["met"],aw.lcdpaletteB["met"]))
+        aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
-        aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltamet"],aw.lcdpaletteB["deltamet"]))
+        aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
         aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
         aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
@@ -14059,20 +14081,20 @@ class graphColorDlg(QDialog):
             aw.lcdpaletteF["timer"] = unicode(color.name())
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
         elif lcd == 2:
-            color = QColor(aw.lcdpaletteF["met"])
+            color = QColor(aw.lcdpaletteF["et"])
             color.setHsv(hue,255,255,255)
-            aw.lcdpaletteF["met"] = unicode(color.name())
-            aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["met"],aw.lcdpaletteB["met"]))
+            aw.lcdpaletteF["et"] = unicode(color.name())
+            aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
         elif lcd == 3:
             color = QColor(aw.lcdpaletteF["bt"])
             color.setHsv(hue,255,255,255)
             aw.lcdpaletteF["bt"] = unicode(color.name())
             aw.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["bt"],aw.lcdpaletteB["bt"]))
         elif lcd == 4:
-            color = QColor(aw.lcdpaletteF["deltamet"])
+            color = QColor(aw.lcdpaletteF["deltaet"])
             color.setHsv(hue,255,255,255)
-            aw.lcdpaletteF["deltamet"] = unicode(color.name())
-            aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltamet"],aw.lcdpaletteB["deltamet"]))
+            aw.lcdpaletteF["deltaet"] = unicode(color.name())
+            aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
         elif lcd == 5:
             color = QColor(aw.lcdpaletteF["deltabt"])
             color.setHsv(hue,255,255,255)
@@ -14098,12 +14120,12 @@ class graphColorDlg(QDialog):
             
         if lcdnumber ==2:
             if flag == 0:
-                aw.lcdpaletteB["met"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["met"]),self)).name())
+                aw.lcdpaletteB["et"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["et"]),self)).name())
             elif flag == 1:
-                aw.lcdpaletteF["met"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["met"]),self)).name())
+                aw.lcdpaletteF["et"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["et"]),self)).name())
             elif flag == 2 and text:
-                aw.lcdpaletteB["met"] = self.lcdcolors[self.lcd2colorComboBox.currentIndex()]
-            aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["met"],aw.lcdpaletteB["met"]))
+                aw.lcdpaletteB["et"] = self.lcdcolors[self.lcd2colorComboBox.currentIndex()]
+            aw.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["et"],aw.lcdpaletteB["et"]))
             
         if lcdnumber ==3:
             if flag == 0:
@@ -14116,12 +14138,12 @@ class graphColorDlg(QDialog):
             
         if lcdnumber ==4:
             if flag == 0:
-                aw.lcdpaletteB["deltamet"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["deltamet"]),self)).name())
+                aw.lcdpaletteB["deltaet"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["deltaet"]),self)).name())
             elif flag == 1:
-                aw.lcdpaletteF["deltamet"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["deltamet"]),self)).name())
+                aw.lcdpaletteF["deltaet"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteF["deltaet"]),self)).name())
             elif flag == 2 and text:
-                aw.lcdpaletteB["deltamet"] = self.lcdcolors[self.lcd4colorComboBox.currentIndex()]
-            aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltamet"],aw.lcdpaletteB["deltamet"]))
+                aw.lcdpaletteB["deltaet"] = self.lcdcolors[self.lcd4colorComboBox.currentIndex()]
+            aw.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltaet"],aw.lcdpaletteB["deltaet"]))
         if lcdnumber ==5:
             if flag == 0:
                 aw.lcdpaletteB["deltabt"] = unicode((QColorDialog.getColor(QColor(aw.lcdpaletteB["deltabt"]),self)).name())
@@ -14169,14 +14191,14 @@ class graphColorDlg(QDialog):
         self.rect3Label.setText(aw.qmc.palette["rect3"])
         self.rect3Label.setPalette(QPalette(QColor(aw.qmc.palette["rect3"])))
         
-        self.metLabel.setText(aw.qmc.palette["met"])
-        self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["met"])))
+        self.metLabel.setText(aw.qmc.palette["et"])
+        self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["et"])))
         
         self.btLabel.setText(aw.qmc.palette["bt"])
         self.btLabel.setPalette(QPalette(QColor(aw.qmc.palette["bt"])))
         
-        self.deltametLabel.setText(aw.qmc.palette["deltamet"])
-        self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltamet"])))
+        self.deltametLabel.setText(aw.qmc.palette["deltaet"])
+        self.deltametLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltaet"])))
         
         self.deltabtLabel.setText(aw.qmc.palette["deltabt"])
         self.deltabtLabel.setPalette(QPalette(QColor(aw.qmc.palette["deltabt"])))
@@ -14226,18 +14248,18 @@ class WheelDlg(QDialog):
         self.labeltable = QTableWidget()
         
         self.labelCloseButton = QPushButton(QApplication.translate("Button","Close Label properties",None, QApplication.UnicodeUTF8))
-        self.labelCloseButton.setMaximumWidth(160)
+        #self.labelCloseButton.setMaximumWidth(160)
         self.connect(self.labelCloseButton, SIGNAL("clicked()"),self.closelabels)
 
         self.labelResetButton = QPushButton(QApplication.translate("Button","Reset Parents",None, QApplication.UnicodeUTF8))
         self.labelResetButton.setToolTip(QApplication.translate("Tooltip","Erases wheel parent hierarchy",None, QApplication.UnicodeUTF8))
-        self.labelResetButton.setMaximumWidth(160)
+        #self.labelResetButton.setMaximumWidth(160)
         self.connect(self.labelResetButton, SIGNAL("clicked()"),self.resetlabelparents)
         self.labelwheelx = 0   #index of wheel being edited on labeltable
 
         self.hierarchyButton = QPushButton(QApplication.translate("Button","Reverse Hierarchy",None, QApplication.UnicodeUTF8))
         self.hierarchyButton.setToolTip(QApplication.translate("Tooltip","Sets graph hierarchy child->parent instead of parent->child",None, QApplication.UnicodeUTF8))
-        self.hierarchyButton.setMaximumWidth(100)
+        #self.hierarchyButton.setMaximumWidth(100)
         self.connect(self.hierarchyButton, SIGNAL("clicked()"),aw.qmc.setWheelHierarchy)
 
         self.labeltable.setVisible(False)        
@@ -14247,17 +14269,17 @@ class WheelDlg(QDialog):
         txtlabel = QLabel(QApplication.translate("Label","Text",None, QApplication.UnicodeUTF8))
         txtButtonplus = QPushButton(QApplication.translate("Button","+",None, QApplication.UnicodeUTF8))
         txtButtonplus.setToolTip(QApplication.translate("Tooltip","Increase size of text in all the graph",None, QApplication.UnicodeUTF8))
-        txtButtonplus.setMaximumWidth(30)
+        #txtButtonplus.setMaximumWidth(30)
         self.connect(txtButtonplus, SIGNAL("clicked()"),lambda x = 1: self.changetext(x))
         txtButtonminus = QPushButton(QApplication.translate("Button","-",None, QApplication.UnicodeUTF8))
         txtButtonminus.setToolTip(QApplication.translate("Tooltip","Decrease size of text in all the graph",None, QApplication.UnicodeUTF8))
-        txtButtonminus.setMaximumWidth(30)
+        #txtButtonminus.setMaximumWidth(30)
         self.connect(txtButtonminus, SIGNAL("clicked()"),lambda x = 0: self.changetext(x))
 
         edgelabel = QLabel(QApplication.translate("Label","Edge",None, QApplication.UnicodeUTF8))
         self.edgeSpinBox = QSpinBox()
         self.edgeSpinBox.setToolTip(QApplication.translate("Tooltip","Decorative edge beween wheels",None, QApplication.UnicodeUTF8))
-        self.edgeSpinBox.setMaximumWidth(80)
+        #self.edgeSpinBox.setMaximumWidth(80)
         self.edgeSpinBox.setRange(0,5)
         self.edgeSpinBox.setValue(int(aw.qmc.wheeledge*100))
         self.connect(self.edgeSpinBox, SIGNAL("valueChanged(int)"),self.setedge)
@@ -14265,20 +14287,20 @@ class WheelDlg(QDialog):
         linewidthlabel = QLabel(QApplication.translate("Label","Line",None, QApplication.UnicodeUTF8))
         self.linewidthSpinBox = QSpinBox()
         self.linewidthSpinBox.setToolTip(QApplication.translate("Tooltip","Line thickness",None, QApplication.UnicodeUTF8))
-        self.linewidthSpinBox.setMaximumWidth(80)
+        #self.linewidthSpinBox.setMaximumWidth(80)
         self.linewidthSpinBox.setRange(0,20)
         self.linewidthSpinBox.setValue(aw.qmc.wheellinewidth)
         self.connect(self.linewidthSpinBox, SIGNAL("valueChanged(int)"),self.setlinewidth)
 
         linecolor = QPushButton(QApplication.translate("Button","Line Color",None, QApplication.UnicodeUTF8))
         linecolor.setToolTip(QApplication.translate("Tooltip","Line color",None, QApplication.UnicodeUTF8))
-        linecolor.setMaximumWidth(100)
+        #linecolor.setMaximumWidth(100)
         self.connect(linecolor, SIGNAL("clicked()"),self.setlinecolor)
         
         colorlabel = QLabel(QApplication.translate("Label","Color pattern",None, QApplication.UnicodeUTF8))    	
         self.colorSpinBox = QSpinBox()
         self.colorSpinBox.setToolTip(QApplication.translate("Tooltip","Apply color pattern to whole graph",None, QApplication.UnicodeUTF8))
-        self.colorSpinBox.setMaximumWidth(80)
+        #self.colorSpinBox.setMaximumWidth(80)
         self.colorSpinBox.setRange(0,255)
         self.colorSpinBox.setValue(aw.qmc.wheelcolorpattern)
         self.colorSpinBox.setWrapping(True)
@@ -14286,37 +14308,37 @@ class WheelDlg(QDialog):
 
         addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
         addButton.setToolTip(QApplication.translate("Tooltip","Add new wheel",None, QApplication.UnicodeUTF8))
-        addButton.setMaximumWidth(100)
+        #addButton.setMaximumWidth(100)
         self.connect(addButton, SIGNAL("clicked()"),self.insertwheel)
 
         rotateLeftButton = QPushButton(QApplication.translate("Button","<",None, QApplication.UnicodeUTF8))
         rotateLeftButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree counter clockwise",None, QApplication.UnicodeUTF8))
-        rotateLeftButton.setMaximumWidth(30)
+        #rotateLeftButton.setMaximumWidth(30)
         self.connect(rotateLeftButton, SIGNAL("clicked()"),lambda x = 1: self.rotatewheels(x))
         
         rotateRightButton = QPushButton(QApplication.translate("Button",">",None, QApplication.UnicodeUTF8))
         rotateRightButton.setToolTip(QApplication.translate("Tooltip","Rotate graph 1 degree clockwise",None, QApplication.UnicodeUTF8))
-        rotateRightButton.setMaximumWidth(30)
+        #rotateRightButton.setMaximumWidth(30)
         self.connect(rotateRightButton, SIGNAL("clicked()"),lambda x = 0: self.rotatewheels(x))
 
         saveButton = QPushButton(QApplication.translate("Button","Save File",None, QApplication.UnicodeUTF8))
-        saveButton.setMaximumWidth(100)
+        #saveButton.setMaximumWidth(100)
         self.connect(saveButton, SIGNAL("clicked()"),self.fileSave)
         saveButton.setToolTip(QApplication.translate("Tooltip","Save graph to a text file.wg",None, QApplication.UnicodeUTF8))
         
         saveImgButton = QPushButton(QApplication.translate("Button","Save Img",None, QApplication.UnicodeUTF8))
         saveImgButton.setToolTip(QApplication.translate("Tooltip","Save image using current graph size to a png format",None, QApplication.UnicodeUTF8))
-        saveImgButton.setMaximumWidth(100)
+        #saveImgButton.setMaximumWidth(100)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
         openButton = QPushButton(QApplication.translate("Button","Open",None, QApplication.UnicodeUTF8))
         openButton.setToolTip(QApplication.translate("Tooltip","open graph file.wg",None, QApplication.UnicodeUTF8))
-        openButton.setMaximumWidth(100)
+        #openButton.setMaximumWidth(100)
         self.connect(openButton, SIGNAL("clicked()"),self.loadWheel)
 
         closeButton = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
         closeButton.setToolTip(QApplication.translate("Tooltip","Close wheel graph editor",None, QApplication.UnicodeUTF8))
-        closeButton.setMaximumWidth(100)
+        #closeButton.setMaximumWidth(100)
         self.connect(closeButton, SIGNAL("clicked()"),self.close)
 
         aw.qmc.drawWheel()
