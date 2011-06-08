@@ -765,13 +765,7 @@ class tgraphcanvas(FigureCanvas):
                     # update extra lines 
                     self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
                     self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-
-            #this helps to stabilize thread load (for low performance CPUS)
-            libtime.sleep(.2)
-            
-            #update screen
-            self.fig.canvas.draw()
-
+          
         except Exception,e:
             self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
@@ -3707,6 +3701,9 @@ class VMToolbar(NavigationToolbar):
 class Athread(QThread):
     def __init__(self, parent = None):        
         QThread.__init__(self, parent)
+
+    def __del__(self):  
+        self.wait()
               
     def run(self):
         timedelay = aw.qmc.delay/1000.
@@ -3714,7 +3711,10 @@ class Athread(QThread):
             return
         while True:
             if aw.qmc.flagon:
+                #collect information
                 aw.qmc.sample()
+                #update screen in main GUI thread (not in this thread, which causes crashes)
+                self.emit(SIGNAL("updatefigure"))                
                 libtime.sleep(timedelay)    
             else:
                 aw.qmc.threadlock = False
@@ -3730,6 +3730,7 @@ class Athreadserver(QWidget):
             thread = Athread(self)
             #delete when finished to save memory 
             self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
+            self.connect(thread, SIGNAL("updatefigure"),aw.qmc.fig.canvas.draw)
             thread.start()       
 
             
@@ -11220,7 +11221,7 @@ class serialport(object):
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "0A0101NA4\r\n"  #"#0A0000NA2\r\n"
+                command = "#0A0101NA4\r\n"  #"#0A0000NA2\r\n"
                 self.SP.write(command)
                 r = self.SP.read(14) 
 
