@@ -315,7 +315,6 @@ class tgraphcanvas(FigureCanvas):
         self.sensitivity = 10 # was 20
         #read and plot on/off flag
         self.flagon = False
-        self.flagclock = False
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
         
@@ -505,20 +504,11 @@ class tgraphcanvas(FigureCanvas):
         # create an object time to measure and record time (in miliseconds) 
     
         self.timeclock = QTime()
-
-        ############################  LCD  TRIGGER  TIMER       ##################################
-
-        self.LCDtimer = QTimer()
-        self.LCDtimer.setInterval(1000.)  #miliseconds
-        self.connect(self.LCDtimer,SIGNAL("timeout()"),self.updateLCDtime)
-        
-        self.seconds = 0.    #this variable helps make time in LCD update more even
-
+        self.timeclock.setHMS(0,0,0,0)
 
         ############################  Thread Server #################################################
         #server that spawns a thread dynamically to sample temperature (press button ON to make a thread press OFF button to kill it) 
         self.threadserver = Athreadserver()
-
     	
         ##########################     Designer variables       #################################
         self.designerflag = False
@@ -677,6 +667,9 @@ class tgraphcanvas(FigureCanvas):
                 self.delta1.append(rateofchange1plot)
                 self.delta2.append(rateofchange2plot)
 
+                self.delta1.append(rateofchange1plot)
+                self.delta2.append(rateofchange2plot)
+                
                 #verify same dimension    
                 lt,ld =  len(self.timex),len(self.delta2)
                 if lt != ld:
@@ -727,19 +720,20 @@ class tgraphcanvas(FigureCanvas):
                 ##############  if using more than one device
                 ndevices = len(self.extradevices)
                 if ndevices:
-                    for i in range(ndevices):
-                        extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[self.extradevices[i]]()
-                        if len(self.extramathexpression1[i]):
-                            extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
-                        if len(self.extramathexpression2[i]):
-                            extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
-                        self.extratemp1[i].append(extrat1)
-                        self.extratemp2[i].append(extrat2)                        
-                        self.extratimex[i].append(extratx)
-                        # update extra lines 
-                        self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
-                        self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-                                  
+                    if len(aw.extraser) == len(self.extradevices) == len(self.extratemp1) == len(self.extratemp1lines):
+                        for i in range(ndevices):
+                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[self.extradevices[i]]()
+                            if len(self.extramathexpression1[i]):
+                                extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
+                            if len(self.extramathexpression2[i]):
+                                extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
+                            self.extratemp1[i].append(extrat1)
+                            self.extratemp2[i].append(extrat2)                        
+                            self.extratimex[i].append(extratx)
+                            # update extra lines 
+                            self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
+                            self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
+         
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
             else:
@@ -755,46 +749,44 @@ class tgraphcanvas(FigureCanvas):
 
             #apply sampling interval here                
             libtime.sleep(self.delay/1000.)
-
             
         except Exception,e:
+            self.flagon = False
             self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
     #run all graphic changes from GUI thread     
     def updategraphics(self):
+        try:
+            if len(self.timex):        
+                aw.lcd2.display("%.1f"%self.temp1[-1])            # ET
+                aw.lcd3.display("%.1f"%self.temp2[-1])            # BT
+                aw.lcd4.display("%.1f"%self.rateofchange1)        # rate of change MET (degress per minute)
+                aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
+                
+                if self.device == 0:                              #extra LCDs for pid  
+                    aw.lcd6.display(self.currentpidsv)
+                    aw.lcd7.display(self.dutycycle)
 
-        if len(self.timex):        
-            aw.lcd2.display("%.1f"%self.temp1[-1])            # ET
-            aw.lcd3.display("%.1f"%self.temp2[-1])            # BT
-            aw.lcd4.display("%.1f"%self.rateofchange1)        # rate of change MET (degress per minute)
-            aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
-            
-            if self.device == 0:                              #extra LCDs for pid  
-                aw.lcd6.display(self.currentpidsv)
-                aw.lcd7.display(self.dutycycle)
+            #display new-updated canvas
+            self.fig.canvas.draw()
 
-        #display new-updated canvas
-        self.fig.canvas.draw()
+            #check if HUD is ON
+            if self.HUDflag:
+                aw.showHUD[aw.HUDfunction]() 
 
-        #check if HUD is ON
-        if self.HUDflag:
-            aw.showHUD[aw.HUDfunction]() 
+        except Exception,e:
+            self.flagon = False
+            self.adderror(QApplication.translate("Error Message","Exception Error: updategraphics() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
         
     def updateLCDtime(self):
-        tx = self.timeclock.elapsed()/1000.
-        h,d = divmod(tx,1.)
-        #avoid quick uneven time updades 
-        if  tx - self.seconds > .8: 
-            if self.timeindex[0] != -1:
-                ts = tx - self.timex[self.timeindex[0]]
-            else:
-                ts = tx 
-            aw.lcd1.display(QString(self.stringfromseconds(round(ts))))
-            self.seconds = tx
-            return
-            
-    
+        if self.flagon:
+            tx = self.timeclock.elapsed()/1000.
+            nextsample = 1000. - 1000.*(tx%1.)
+            aw.lcd1.display(QString(self.stringfromseconds(int(tx))))
+            QTimer.singleShot(nextsample,self.updateLCDtime)
+
     def toggleHUD(self):
         #OFF
         if self.HUDflag:
@@ -1124,7 +1116,6 @@ class tgraphcanvas(FigureCanvas):
         
         #reset all variables that need to be reset
         self.flagon = False
-        self.flagclock = False
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
         self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
@@ -1184,11 +1175,6 @@ class tgraphcanvas(FigureCanvas):
         aw.valueComboBox.setCurrentIndex(0)    
         aw.curFile = None                 #current file name
         self.ystep = 45     	    	  #used to find length of arms in annotations  
-      
-        self.timeclock.restart()
-
-        self.LCDtimer.stop()
-        self.seconds = 0.
 
         #Designer variables
         self.indexpoint = 0
@@ -1224,467 +1210,473 @@ class tgraphcanvas(FigureCanvas):
         
     #Redraws data   
     def redraw(self):
-        self.fig.clf()   #wipe out figure
-        self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
-        #Set axes same as in __init__
-        if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
-            self.endofx = 60
-        self.ax.set_xlim(self.startofx, self.endofx)
-        self.ax.set_ylim(self.ylimit_min, self.ylimit)
-        self.ax.set_autoscale_on(False)
-        self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
-        self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"])
-        self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
-        self.ax.set_title(self.title,size=20,color=self.palette["title"])
-        for tick in self.ax.yaxis.get_major_ticks():
-            tick.label2On = True
-        self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
-            
-        #draw water marks for dry phase region, mid phase region, and finish phase region
-        trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
-        rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
-                                  transform=trans, color=self.palette["rect1"],alpha=0.3)
-        self.ax.add_patch(rect1)
-        rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2]-self.phases[1]),
-                                  transform=trans, color=self.palette["rect2"],alpha=0.3)
-        self.ax.add_patch(rect2)
-        rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
-                                  transform=trans, color=self.palette["rect3"],alpha=0.3)
-        self.ax.add_patch(rect3)
+        try:            
+            self.fig.clf()   #wipe out figure
+            self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
+            #Set axes same as in __init__
+            if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
+                self.endofx = 60
+            self.ax.set_xlim(self.startofx, self.endofx)
+            self.ax.set_ylim(self.ylimit_min, self.ylimit)
+            self.ax.set_autoscale_on(False)
+            self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
+            self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"])
+            self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
+            self.ax.set_title(self.title,size=20,color=self.palette["title"])
+            for tick in self.ax.yaxis.get_major_ticks():
+                tick.label2On = True
+            self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
+                
+            #draw water marks for dry phase region, mid phase region, and finish phase region
+            trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
+            rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
+                                      transform=trans, color=self.palette["rect1"],alpha=0.3)
+            self.ax.add_patch(rect1)
+            rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2]-self.phases[1]),
+                                      transform=trans, color=self.palette["rect2"],alpha=0.3)
+            self.ax.add_patch(rect2)
+            rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
+                                      transform=trans, color=self.palette["rect3"],alpha=0.3)
+            self.ax.add_patch(rect3)
 
-        if self.eventsGraphflag:
-            # make blended transformations to help identify EVENT types
-            if self.mode == "C":
-                step = 5
-                start = 20
-            else:
-                step = 10
-                start = 60
-            jump = 20
-            for i in range(len(self.etypes)):
-                rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
-                self.ax.add_patch(rectEvent)
+            if self.eventsGraphflag:
+                # make blended transformations to help identify EVENT types
                 if self.mode == "C":
-                    jump -= 10
+                    step = 5
+                    start = 20
                 else:
-                    jump -= 20
+                    step = 10
+                    start = 60
+                jump = 20
+                for i in range(len(self.etypes)):
+                    rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
+                    self.ax.add_patch(rectEvent)
+                    if self.mode == "C":
+                        jump -= 10
+                    else:
+                        jump -= 20
+                        
+            ##### ET,BT curves
+            self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
+            self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
+
+            ##### Extra devices-curves
+            self.extratemp1lines,self.extratemp2lines = [],[]
+            for i in range(len(self.extratimex)):
+                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
+                self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
+
+            #check BACKGROUND flag
+            if self.background: 
+                #check to see if there is both a profile loaded and a background loaded
+                if self.timeindex[0] != -1 and self.timeindexB[0] != -1 and self.backmoveflag:
+                    if self.timex[self.timeindex[0]] != self.timeB[self.timeindexB[0]]:
+                        #align the background profile so they both plot with the same CHARGE time
+                        difference = self.timex[self.timeindex[0]] - self.timeB[self.timeindexB[0]]
+                        if difference > 0:
+                            self.movebackground(u"left",-difference)
+                        elif difference < 0:
+                            self.movebackground(u"right",difference)
+                        self.backmoveflag = 0
                     
-        ##### ET,BT curves
-        self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
-        self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
+                #draw background
+                self.l_back1, = self.ax.plot(self.timeB, self.temp1B,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
+                                             linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=unicode(QApplication.translate("Scope Label", "BackgroundET", None, QApplication.UnicodeUTF8)))
+                self.l_back2, = self.ax.plot(self.timeB, self.temp2B,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
+                                             linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=unicode(QApplication.translate("Scope Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
 
-        ##### Extra devices-curves
-        self.extratemp1lines,self.extratemp2lines = [],[]
-        for i in range(len(self.extratimex)):
-            self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
-            self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
-
-        #check BACKGROUND flag
-        if self.background: 
-            #check to see if there is both a profile loaded and a background loaded
-            if self.timeindex[0] != -1 and self.timeindexB[0] != -1 and self.backmoveflag:
-                if self.timex[self.timeindex[0]] != self.timeB[self.timeindexB[0]]:
-                    #align the background profile so they both plot with the same CHARGE time
-                    difference = self.timex[self.timeindex[0]] - self.timeB[self.timeindexB[0]]
-                    if difference > 0:
-                        self.movebackground(u"left",-difference)
-                    elif difference < 0:
-                        self.movebackground(u"right",difference)
-                    self.backmoveflag = 0
-                
-            #draw background
-            self.l_back1, = self.ax.plot(self.timeB, self.temp1B,color=self.backgroundmetcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=unicode(QApplication.translate("Scope Label", "BackgroundET", None, QApplication.UnicodeUTF8)))
-            self.l_back2, = self.ax.plot(self.timeB, self.temp2B,color=self.backgroundbtcolor,linewidth=self.backgroundwidth,
-                                         linestyle=self.backgroundstyle,alpha=self.backgroundalpha,label=unicode(QApplication.translate("Scope Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
-
-            #check backgroundevents flag	
-            if self.backgroundeventsflag:
-                if self.mode == "F":
-                    height = 50
-                else:
-                    height = 20
-                for p in range(len(self.backgroundEvents)):
-                    st1 = unicode(self.Betypes[self.backgroundEtypes[p]][0] + self.eventsvalues[self.backgroundEvalues[p]])                   
-                    if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
-                        temp = self.temp1B[self.backgroundEvents[p]]
+                #check backgroundevents flag	
+                if self.backgroundeventsflag:
+                    if self.mode == "F":
+                        height = 50
                     else:
-                        temp = self.temp2B[self.backgroundEvents[p]]
-                    self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),
-                                        xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
-                                        fontsize=10,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
-                                        alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)                        
+                        height = 20
+                    for p in range(len(self.backgroundEvents)):
+                        st1 = unicode(self.Betypes[self.backgroundEtypes[p]][0] + self.eventsvalues[self.backgroundEvalues[p]])                   
+                        if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
+                            temp = self.temp1B[self.backgroundEvents[p]]
+                        else:
+                            temp = self.temp2B[self.backgroundEvents[p]]
+                        self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),
+                                            xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
+                                            fontsize=10,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
+                                            alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)                        
 
-            #check backgroundDetails flag
-            if self.backgroundDetails:
-                #if there is a profile loaded with CHARGE, then save time to get the relative time
-                if self.timeindex[0] != -1:   #verify it exists before loading it, otherwise the list could go out of index
-                    startB = self.timex[self.timeindex[0]]
-                else:
-                    startB = 0
+                #check backgroundDetails flag
+                if self.backgroundDetails:
+                    #if there is a profile loaded with CHARGE, then save time to get the relative time
+                    if self.timeindex[0] != -1:   #verify it exists before loading it, otherwise the list could go out of index
+                        startB = self.timex[self.timeindex[0]]
+                    else:
+                        startB = 0
 
-                #if background CHARGE exists
-                if self.timeindexB[0] != -1: 
-                    st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[0]] - startB))
-                    self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[0]]), xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
-                                     xytext=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]] + 50),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    #if background CHARGE exists
+                    if self.timeindexB[0] != -1: 
+                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[0]] - startB))
+                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[0]]), xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
+                                         xytext=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]] + 50),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
+                                         xytext=(self.timeB[self.timeindexB[0]]+5,self.temp2B[self.timeindexB[0]] - 100),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+
+                        if self.timeindexB[1]:
+                            st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[1]]- startB))
+                            self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[1]]), xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
+                                             xytext=(self.timeB[self.timeindexB[1]]-5,self.temp2B[self.timeindexB[1]]+50),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
+                                             xytext=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]-50),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                            
+                        if self.timeindexB[2]:
+                            st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[2]]-startB))
+                            self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[2]]), xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
+                                             xytext=(self.timeB[self.timeindexB[2]]-5,self.temp2B[self.timeindexB[2]]+50),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
+                                             xytext=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]-50),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                            
+                        if self.timeindexB[3]:
+                            st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[3]]-startB))          
+                            self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[3]]), xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
+                                             xytext=(self.timeB[self.timeindexB[3]]-5,self.temp2B[self.timeindexB[3]]+70),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
+                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
+                                             xytext=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]-80),fontsize=10, color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                            
+                        if self.timeindexB[4]:
+                            st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[4]]-startB))
+                            self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[4]]), xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
+                                             xytext=(self.timeB[self.timeindexB[4]]-5,self.temp2B[self.timeindexB[4]]+90),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
+                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
+                                             xytext=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]-110),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                            
+                        if self.timeindexB[5]:
+                            st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[5]]-startB))
+                            self.ax.annotate(u"%.1f"%(self.timeB[self.timeindexB[5]]), xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
+                                             xytext=(self.timeB[self.timeindexB[5]]-5,self.temp2B[self.timeindexB[5]]+50),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
+                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
+                                             xytext=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]-40),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                            
+                        if self.timeindexB[6]:
+                            st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[6]]-startB))
+                            self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[6]]), xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
+                                             xytext=(self.timeB[self.timeindexB[6]]-5,self.temp2B[self.timeindexB[6]]+70),color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
+                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
+                                             xytext=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]-80),fontsize=10,color=self.palette["text"],
+                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+
+                #END of Background
+               
+            #populate delta ET (self.delta1) and delta BT (self.delta2)
+            d1,d2,d3,d4=[],[],[],[]
+            delta1, delta2 = 0.,0.
+            for i in range(len(self.timex)-1):
+                timed = self.timex[i+1] - self.timex[i]
+                if timed:
+                    delta1 = 60.*((self.temp1[i+1] - self.temp1[i]) / timed) #degrees pre minute
+                    delta2 = 60.*((self.temp2[i+1] - self.temp2[i]) / timed)
+
+                    #inputs
+                    d1.append(delta1)
+                    d2.append(delta2)
                     
-                    self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
-                                     xytext=(self.timeB[self.timeindexB[0]]+5,self.temp2B[self.timeindexB[0]] - 100),fontsize=10,color=self.palette["text"],
-                                     arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    if self.deltafilter:
+                        if i > (self.deltafilter-1):
+                            #smooth DeltaBT/DeltaET by using FIR filter of X pads.
+                            #d1 and d2 are inputs, while d3 and d4 are outputs  
+                            #Use only current and past input values. Don't feed parts of outputs d3 d4 to filter
+                            a1,a2 = 0.,0.
+                            for k in range(self.deltafilter):
+                                a1 += d1[-(k+1)]
+                                a2 += d2[-(k+1)]
+                            #outputs
+                            d3.append(float(self.sensitivity)*(a1/float(self.deltafilter)))
+                            d4.append(float(self.sensitivity)*(a2/float(self.deltafilter)))
+                        else:
+                            d3.append(0.) 
+                            d4.append(0.)
+                               
+            if self.deltafilter:
+                self.delta1 = d3
+                self.delta2 = d4
+            else:
+                self.delta1 = d1
+                self.delta2 = d2
+                    
+            #this is needed because DeltaBT and DeltaET need 2 values of timex (difference) but they also need same dimension in order to plot
+            #equalize dimensions if needed
+            lt,ld =  len(self.timex),len(self.delta2)
+            if lt != ld:
+                if lt > ld:
+                    for x in range(lt - ld):
+                        if ld:
+                            self.delta1.append(self.delta1[-1])
+                            self.delta2.append(self.delta2[-1])
+                        else:
+                            self.delta1.append(0.)
+                            self.delta2.append(0.)                        
+                if lt < ld:
+                    self.delta1 = self.delta1[:lt]                
+                    self.delta2 = self.delta2[:lt]                
 
-                    if self.timeindexB[1]:
-                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[1]]- startB))
-                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[1]]), xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
-                                         xytext=(self.timeB[self.timeindexB[1]]-5,self.temp2B[self.timeindexB[1]]+50),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
-                                         xytext=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]-50),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                        
-                    if self.timeindexB[2]:
-                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[2]]-startB))
-                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[2]]), xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
-                                         xytext=(self.timeB[self.timeindexB[2]]-5,self.temp2B[self.timeindexB[2]]+50),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
-                                         xytext=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]-50),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                        
-                    if self.timeindexB[3]:
-                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[3]]-startB))          
-                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[3]]), xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
-                                         xytext=(self.timeB[self.timeindexB[3]]-5,self.temp2B[self.timeindexB[3]]+70),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
-                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
-                                         xytext=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]-80),fontsize=10, color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                        
-                    if self.timeindexB[4]:
-                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[4]]-startB))
-                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[4]]), xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
-                                         xytext=(self.timeB[self.timeindexB[4]]-5,self.temp2B[self.timeindexB[4]]+90),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
-                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
-                                         xytext=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]-110),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                        
-                    if self.timeindexB[5]:
-                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[5]]-startB))
-                        self.ax.annotate(u"%.1f"%(self.timeB[self.timeindexB[5]]), xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
-                                         xytext=(self.timeB[self.timeindexB[5]]-5,self.temp2B[self.timeindexB[5]]+50),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
-                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
-                                         xytext=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]-40),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                        
-                    if self.timeindexB[6]:
-                        st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[6]]-startB))
-                        self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[6]]), xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
-                                         xytext=(self.timeB[self.timeindexB[6]]-5,self.temp2B[self.timeindexB[6]]+70),color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
-                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
-                                         xytext=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]-80),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-
-            #END of Background
-           
-        #populate delta ET (self.delta1) and delta BT (self.delta2)
-        d1,d2,d3,d4=[],[],[],[]
-        delta1, delta2 = 0.,0.
-        for i in range(len(self.timex)-1):
-            timed = self.timex[i+1] - self.timex[i]
-            if timed:
-                delta1 = 60.*((self.temp1[i+1] - self.temp1[i]) / timed) #degrees pre minute
-                delta2 = 60.*((self.temp2[i+1] - self.temp2[i]) / timed)
-
-                #inputs
-                d1.append(delta1)
-                d2.append(delta2)
-                
-                if self.deltafilter:
-                    if i > (self.deltafilter-1):
-                        #smooth DeltaBT/DeltaET by using FIR filter of X pads.
-                        #d1 and d2 are inputs, while d3 and d4 are outputs  
-                        #Use only current and past input values. Don't feed parts of outputs d3 d4 to filter
-                        a1,a2 = 0.,0.
-                        for k in range(self.deltafilter):
-                            a1 += d1[-(k+1)]
-                            a2 += d2[-(k+1)]
-                        #outputs
-                        d3.append(float(self.sensitivity)*(a1/float(self.deltafilter)))
-                        d4.append(float(self.sensitivity)*(a2/float(self.deltafilter)))
-                    else:
-                        d3.append(0.) 
-                        d4.append(0.)
-                           
-        if self.deltafilter:
-            self.delta1 = d3
-            self.delta2 = d4
-        else:
-            self.delta1 = d1
-            self.delta2 = d2
-                
-        #this is needed because DeltaBT and DeltaET need 2 values of timex (difference) but they also need same dimension in order to plot
-        #equalize dimensions if needed
-        lt,ld =  len(self.timex),len(self.delta2)
-        if lt != ld:
-            if lt > ld:
-                for x in range(lt - ld):
-                    if ld:
-                        self.delta1.append(self.delta1[-1])
-                        self.delta2.append(self.delta2[-1])
-                    else:
-                        self.delta1.append(0.)
-                        self.delta2.append(0.)                        
-            if lt < ld:
-                self.delta1 = self.delta1[:lt]                
-                self.delta2 = self.delta2[:lt]                
-
-        ##### DeltaET,DeltaBT curves
-        if self.DeltaETflag:
-            self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltaet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
-        if self.DeltaBTflag:
-            self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
-        
-        handles = [self.l_temp1,self.l_temp2]
-        labels = [unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)),unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))]
-
-        #add Rate of Change if flags are True
-        if  self.DeltaETflag:
-            handles.append(self.l_delta1)
-            labels.append(unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+            ##### DeltaET,DeltaBT curves
+            if self.DeltaETflag:
+                self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltaet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+            if self.DeltaBTflag:
+                self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
             
-        if  self.DeltaBTflag:
-            handles.append(self.l_delta2)
-            labels.append(unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+            handles = [self.l_temp1,self.l_temp2]
+            labels = [unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)),unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))]
 
-        ndevices = len(self.extradevices)
-        if ndevices:
-            for i in range(ndevices):
-                handles.append(self.extratemp1lines[i])
-                handles.append(self.extratemp2lines[i])
-                labels.append(self.extraname1[i])
-                labels.append(self.extraname2[i])
+            #add Rate of Change if flags are True
+            if  self.DeltaETflag:
+                handles.append(self.l_delta1)
+                labels.append(unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                 
-        #write legend
-        self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+            if  self.DeltaBTflag:
+                handles.append(self.l_delta2)
+                labels.append(unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
-        if not self.designerflag:    
-            #Add markers for CHARGE           
-            if self.timeindex[0] != -1:
-                #anotate temperature
+            ndevices = len(self.extradevices)
+            if ndevices:
+                for i in range(ndevices):
+                    handles.append(self.extratemp1lines[i])
+                    handles.append(self.extratemp2lines[i])
+                    labels.append(self.extraname1[i])
+                    labels.append(self.extraname2[i])
+                    
+            #write legend
+            self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
-                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                                xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]+self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                                 xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #Add Dry End markers            
-            if self.timeindex[1]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
-                st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])))
-                #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                                xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] + self.ystep), 
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                                xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] - self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
-            #Add 1Cs markers
-            if self.timeindex[2]:
-                if self.timeindex[1]: #if dryend
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
-                else:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])
-                st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
-                #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                                xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] + self.ystep), 
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                                xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] - self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #Add 1Ce markers
-            if self.timeindex[3]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
-                st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
-                #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]] + self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #add a water mark if FCs
+            if not self.designerflag:    
+                #Add markers for CHARGE           
+                if self.timeindex[0] != -1:
+                    #anotate temperature
+
+                    self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
+                                    xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]+self.ystep),
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    #anotate time
+                    self.ax.annotate(QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
+                                     xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]-self.ystep),
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #Add Dry End markers            
+                if self.timeindex[1]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
+                    st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])))
+                    #anotate temperature
+                    self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
+                                    xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] + self.ystep), 
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    #anotate time
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
+                                    xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] - self.ystep),
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
+                #Add 1Cs markers
                 if self.timeindex[2]:
-                    self.ax.axvspan(self.timex[self.timeindex[2]],self.timex[self.timeindex[3]], facecolor=self.palette["watermarks"], alpha=0.2)
-
-            #Add 2Cs markers
-            if self.timeindex[4]:
+                    if self.timeindex[1]: #if dryend
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
+                    else:
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])
+                    st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
+                    #anotate temperature
+                    self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
+                                    xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] + self.ystep), 
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    #anotate time
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
+                                    xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] - self.ystep),
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #Add 1Ce markers
                 if self.timeindex[3]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
-                else:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])
-                st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
-                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                                xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]] + self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
-                self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                                 xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #Add 2Ce markers
-            if self.timeindex[5]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
-                st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
-                #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] + self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] - self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #do water mark if SCs
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
+                    st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
+                    #anotate temperature
+                    self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
+                                    xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]] + self.ystep),
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    #anotate time
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
+                                    xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    #add a water mark if FCs
+                    if self.timeindex[2]:
+                        self.ax.axvspan(self.timex[self.timeindex[2]],self.timex[self.timeindex[3]], facecolor=self.palette["watermarks"], alpha=0.2)
+
+                #Add 2Cs markers
                 if self.timeindex[4]:
-                    self.ax.axvspan(self.timex[self.timeindex[4]],self.timex[self.timeindex[5]], facecolor=self.palette["watermarks"], alpha=0.2)
-
-            #Add DROP markers
-            if self.timeindex[6]:
+                    if self.timeindex[3]:
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
+                    else:
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])
+                    st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
+                    self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
+                                    xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]] + self.ystep),
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
+                                     xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #Add 2Ce markers
                 if self.timeindex[5]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
-                elif self.timeindex[4]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]])
-                elif self.timeindex[3]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]])
-                elif self.timeindex[2]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]])
-                elif self.timeindex[1]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]])
-                else:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[6]])                
-                    
-                st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
-                #anotate temperature
-                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                                xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] + self.ystep),
-                                color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                                 xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] - self.ystep),
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                
-                self.writestatistics()
-            
-        #write events
-        Nevents = len(self.specialevents)
-        if self.mode == "F":
-            lim = self.phases[0]-80
-        else:
-            lim = self.phases[0]-40
-            
-        #two modes of drawing events. The first mode aligns the events annotations to a bar height so that they can be visually identified by type. 
-        # the second mode places the events without height order.
-        
-        #Check eventsGraphflag and self.ylimit_min to see if there is enough height room           
-        if self.eventsGraphflag and self.ylimit_min <= lim:
-            char1 = self.etypes[0][0]
-            char2 = self.etypes[1][0]
-            char3 = self.etypes[2][0]
-            char4 = self.etypes[3][0]
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
+                    st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
+                    #anotate temperature
+                    self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
+                                    xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] + self.ystep),
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    #anotate time
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
+                                    xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] - self.ystep),
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    #do water mark if SCs
+                    if self.timeindex[4]:
+                        self.ax.axvspan(self.timex[self.timeindex[4]],self.timex[self.timeindex[5]], facecolor=self.palette["watermarks"], alpha=0.2)
 
-            if self.mode == "F":
-                row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
-            else:
-                row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-
-            #draw lines of color between events of the same type to help identify areas of events.
-            #count (as length of the list) and collect their times for each different type. Each type will have a different plot height 
-            netypes=[[],[],[],[]]
-            for i in range(Nevents):
-                if self.specialeventstype[i] == 0:
-                    netypes[0].append(self.timex[self.specialevents[i]])
-                elif self.specialeventstype[i] == 1:
-                    netypes[1].append(self.timex[self.specialevents[i]])
-                elif self.specialeventstype[i] == 2:
-                    netypes[2].append(self.timex[self.specialevents[i]])
-                elif self.specialeventstype[i] == 3:
-                    netypes[3].append(self.timex[self.specialevents[i]])
-                    
-            letters = self.etypes[0][0]+self.etypes[1][0]+self.etypes[2][0]+self.etypes[3][0]   #"NPDF" fisrt letter for each type (None, Power, Damper, Fan)
-            colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
-            for p in range(len(letters)):    
-                if len(netypes[p]) > 1:
-                    for i in range(len(netypes[p])-1):
-                         #draw differentiating color bars between events and place then in a different height acording with type
-                         rect = patches.Rectangle( (netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step, color = colors[i%2],alpha=0.5)
-                         self.ax.add_patch(rect)
-                         
-            # annotate event
-            for i in range(Nevents):
-                firstletter = self.etypes[self.specialeventstype[i]][0]
-                secondletter = self.eventsvalues[self.specialeventsvalue[i]]
-                #some times ET is not drawn (ET = 0) when using device NONE
-                if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:
-                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
-                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
-                else:
-                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                                 xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                #Add DROP markers
+                if self.timeindex[6]:
+                    if self.timeindex[5]:
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
+                    elif self.timeindex[4]:
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]])
+                    elif self.timeindex[3]:
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]])
+                    elif self.timeindex[2]:
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]])
+                    elif self.timeindex[1]:
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]])
+                    else:
+                        self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[6]])                
                         
-        # Second mode: old style mode (just attached the events to the graph without ordering height by type)   
-        else:
-            for i in range(Nevents):
-                firstletter = self.etypes[self.specialeventstype[i]][0]                
-                secondletter = self.eventsvalues[self.specialeventsvalue[i]]
-                if self.mode == "F":
-                    height = 50
-                else:
-                    height = 20
-                #some times ET is not drawn (ET = 0) when using device NONE
-                if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
-                    temp = self.temp1[int(self.specialevents[i])]
-                else:
-                    temp = self.temp2[int(self.specialevents[i])]
-                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                 xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
-                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-
-        #if recorder on        
-        if self.flagon:             
-            #update to last event
-            if Nevents:
-                aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                    st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
+                    #anotate temperature
+                    self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
+                                    xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] + self.ystep),
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    #anotate time
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
+                                     xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] - self.ystep),
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    
+                    self.writestatistics()
+                
+            #write events
+            Nevents = len(self.specialevents)
+            if self.mode == "F":
+                lim = self.phases[0]-80
             else:
-                aw.etypeComboBox.setCurrentIndex(0)
-                aw.valueComboBox.setCurrentIndex(0)
-            aw.eNumberSpinBox.setValue(Nevents)
+                lim = self.phases[0]-40
+                
+            #two modes of drawing events. The first mode aligns the events annotations to a bar height so that they can be visually identified by type. 
+            # the second mode places the events without height order.
+            
+            #Check eventsGraphflag and self.ylimit_min to see if there is enough height room           
+            if self.eventsGraphflag and self.ylimit_min <= lim:
+                char1 = self.etypes[0][0]
+                char2 = self.etypes[1][0]
+                char3 = self.etypes[2][0]
+                char4 = self.etypes[3][0]
 
-        #update Y label colors
-        for label in self.ax.yaxis.get_ticklabels():
-            label.set_color(self.palette["ylabel"])
+                if self.mode == "F":
+                    row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                else:
+                    row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
 
-        #ready to plot    
-        self.fig.canvas.draw()     
+                #draw lines of color between events of the same type to help identify areas of events.
+                #count (as length of the list) and collect their times for each different type. Each type will have a different plot height 
+                netypes=[[],[],[],[]]
+                for i in range(Nevents):
+                    if self.specialeventstype[i] == 0:
+                        netypes[0].append(self.timex[self.specialevents[i]])
+                    elif self.specialeventstype[i] == 1:
+                        netypes[1].append(self.timex[self.specialevents[i]])
+                    elif self.specialeventstype[i] == 2:
+                        netypes[2].append(self.timex[self.specialevents[i]])
+                    elif self.specialeventstype[i] == 3:
+                        netypes[3].append(self.timex[self.specialevents[i]])
+                        
+                letters = self.etypes[0][0]+self.etypes[1][0]+self.etypes[2][0]+self.etypes[3][0]   #"NPDF" fisrt letter for each type (None, Power, Damper, Fan)
+                colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
+                for p in range(len(letters)):    
+                    if len(netypes[p]) > 1:
+                        for i in range(len(netypes[p])-1):
+                             #draw differentiating color bars between events and place then in a different height acording with type
+                             rect = patches.Rectangle( (netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step, color = colors[i%2],alpha=0.5)
+                             self.ax.add_patch(rect)
+                             
+                # annotate event
+                for i in range(Nevents):
+                    firstletter = self.etypes[self.specialeventstype[i]][0]
+                    secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                    #some times ET is not drawn (ET = 0) when using device NONE
+                    if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:
+                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
+                                         xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
+                    else:
+                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                            
+            # Second mode: old style mode (just attached the events to the graph without ordering height by type)   
+            else:
+                for i in range(Nevents):
+                    firstletter = self.etypes[self.specialeventstype[i]][0]                
+                    secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                    if self.mode == "F":
+                        height = 50
+                    else:
+                        height = 20
+                    #some times ET is not drawn (ET = 0) when using device NONE
+                    if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
+                        temp = self.temp1[int(self.specialevents[i])]
+                    else:
+                        temp = self.temp2[int(self.specialevents[i])]
+                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                     xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
-        #update X ticks, labels, and colors        
-        self.xaxistosm()
+            #if recorder on        
+            if self.flagon:             
+                #update to last event
+                if Nevents:
+                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                else:
+                    aw.etypeComboBox.setCurrentIndex(0)
+                    aw.valueComboBox.setCurrentIndex(0)
+                aw.eNumberSpinBox.setValue(Nevents)
 
-        # if designer ON
-        if self.designerflag:
-            if self.background:                
-                self.ax.lines = self.ax.lines[2:]
-            if len(self.timex):
-                self.redrawdesigner()
+            #update Y label colors
+            for label in self.ax.yaxis.get_ticklabels():
+                label.set_color(self.palette["ylabel"])
+
+            #ready to plot    
+            self.fig.canvas.draw()     
+
+            #update X ticks, labels, and colors        
+            self.xaxistosm()
+
+            # if designer ON
+            if self.designerflag:
+                if self.background:                
+                    self.ax.lines = self.ax.lines[2:]
+                if len(self.timex):
+                    self.redrawdesigner()
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message","Exception Error: redraw() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
+
 
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
@@ -2186,35 +2178,34 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         if not self.flagon:
             if self.designerflag: return
+            
             self.threadserver.createThread()
-            self.flagon = True
+            
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
             aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
             aw.soundpop()
             
-            #Call start() to start the first measurement if no data collected
-            self.seconds = 0.
             if not len(self.timex):
-                self.timeclock.start()
-            #self.timer.start()
-            self.LCDtimer.start()
+                self.timeclock.start()   #set time to the current computer time
+                self.updateLCDtime()
+            else:
+                self.updateLCDtime()
+                
         else:
+            self.flagon = False
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
-            self.LCDtimer.stop()
-            self.seconds = 0.                       
             aw.soundpop()
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
             aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8))
-            self.flagon = False
             libtime.sleep(.5)  #give time for thread to close
+
 
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
         if self.flagon:
             if self.device != 18:
                 if len(self.timex) >= 3:
-                    self.flagclock = True
                     self.timeindex[0] = len(self.timex)-1
                 else:
                     message = QApplication.translate("Message Area","Not enough variables collected yet. Try again in a few seconds", None, QApplication.UnicodeUTF8)
@@ -3719,7 +3710,7 @@ class Athread(QThread):
                 #collect information
                 aw.qmc.sample()
                 #update screen in main GUI thread
-                self.emit(SIGNAL("updategraphics"))
+                self.emit(SIGNAL("updategraphics"))                
             else:
                 break  #thread ends
 
@@ -3729,7 +3720,8 @@ class Athreadserver(QWidget):
         super(QWidget,self)._init_(parent)
 
     def createThread(self):
-        if not aw.qmc.flagon:
+        if aw.qmc.flagon == False:
+            aw.qmc.flagon = True
             thread = Athread(self)
             #delete when finished to save memory 
             self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
@@ -13219,31 +13211,34 @@ class DeviceAssignmentDLG(QDialog):
         aw.qmc.redraw()
         
     def delextradevice(self,x):
-        aw.qmc.extradevices.pop(x)
-        aw.qmc.extradevicecolor1.pop(x)
-        aw.qmc.extradevicecolor2.pop(x)
-        aw.qmc.extratimex.pop(x)
-        aw.qmc.extratemp1.pop(x)
-        aw.qmc.extratemp2.pop(x)
-        aw.qmc.extratemp1lines.pop(x)
-        aw.qmc.extratemp2lines.pop(x)
-        aw.qmc.extraname1.pop(x)
-        aw.qmc.extraname2.pop(x)
-        aw.qmc.extramathexpression1.pop(x)
-        aw.qmc.extramathexpression2.pop(x)
-        
-        #pop serial port settings
-        aw.extracomport.pop(x)
-        aw.extrabaudrate.pop(x)
-        aw.extrabytesize.pop(x)
-        aw.extraparity.pop(x)
-        aw.extrastopbits.pop(x)
-        aw.extratimeout.pop(x)
-        if aw.extraser[x].SP.isOpen():
-            aw.extraser[x].SP.close()
-        aw.extraser.pop(x)
-        self.createDeviceTable()
-        aw.qmc.redraw()
+        try:           
+            aw.qmc.extradevices.pop(x)
+            aw.qmc.extradevicecolor1.pop(x)
+            aw.qmc.extradevicecolor2.pop(x)
+            aw.qmc.extratimex.pop(x)
+            aw.qmc.extratemp1.pop(x)
+            aw.qmc.extratemp2.pop(x)
+            aw.qmc.extratemp1lines.pop(x)
+            aw.qmc.extratemp2lines.pop(x)
+            aw.qmc.extraname1.pop(x)
+            aw.qmc.extraname2.pop(x)
+            aw.qmc.extramathexpression1.pop(x)
+            aw.qmc.extramathexpression2.pop(x)
+            
+            #pop serial port settings
+            aw.extracomport.pop(x)
+            aw.extrabaudrate.pop(x)
+            aw.extrabytesize.pop(x)
+            aw.extraparity.pop(x)
+            aw.extrastopbits.pop(x)
+            aw.extratimeout.pop(x)
+            if aw.extraser[x].SP.isOpen():
+                aw.extraser[x].SP.close()
+            aw.extraser.pop(x)
+            self.createDeviceTable()
+            aw.qmc.redraw()
+        except Exception:
+            pass
         
     def savedevicetable(self):
         for i in range(len(aw.qmc.extradevices)):
