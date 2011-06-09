@@ -647,7 +647,7 @@ class tgraphcanvas(FigureCanvas):
                         
                     #######   filter deltaBT deltaET
                     if self.deltafilter:
-                        if len(self.timex) > (self.deltafilter):
+                        if len(self.timex) > self.deltafilter:   #detafilter is an int = number of pads
                             a1,a2 = 0.,0.
                             for k in range(self.deltafilter):
                                 a1 += self.unfiltereddelta1[-(k+1)]
@@ -664,26 +664,24 @@ class tgraphcanvas(FigureCanvas):
                     self.rateofchange1,self.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
 
                 # append new data to the rateofchange
-                self.delta1.append(rateofchange1plot)
-                self.delta2.append(rateofchange2plot)
 
                 self.delta1.append(rateofchange1plot)
                 self.delta2.append(rateofchange2plot)
                 
-                #verify same dimension    
-                lt,ld =  len(self.timex),len(self.delta2)
-                if lt != ld:
-                    if lt > ld:
-                        for x in range(lt - ld):
-                            if ld:
-                                self.delta1.append(self.delta1[-1])
-                                self.delta2.append(self.delta2[-1])
-                            else:
-                                self.delta1.append(0.)
-                                self.delta2.append(0.) 
-                    if lt < ld:
-                        self.delta1 = self.delta1[:lt]                
-                        self.delta2 = self.delta2[:lt]  
+##                #verify same dimension    
+##                lt,ld =  len(self.timex),len(self.delta2)
+##                if lt != ld:
+##                    if lt > ld:
+##                        for x in range(lt - ld):
+##                            if ld:
+##                                self.delta1.append(self.delta1[-1])
+##                                self.delta2.append(self.delta2[-1])
+##                            else:
+##                                self.delta1.append(0.)
+##                                self.delta2.append(0.) 
+##                    if ld > ld:
+##                        self.delta1 = self.delta1[:lt]                
+##                        self.delta2 = self.delta2[:lt]  
                             
                 if self.DeltaETflag:
                     self.l_delta1.set_data(self.timex, self.delta1)
@@ -783,9 +781,9 @@ class tgraphcanvas(FigureCanvas):
     def updateLCDtime(self):
         if self.flagon:
             tx = self.timeclock.elapsed()/1000.
-            nextsample = 1000. - 1000.*(tx%1.)
+            nextreading = 1000. - 1000.*(tx%1.)
             aw.lcd1.display(QString(self.stringfromseconds(int(tx))))
-            QTimer.singleShot(nextsample,self.updateLCDtime)
+            QTimer.singleShot(nextreading,self.updateLCDtime)
 
     def toggleHUD(self):
         #OFF
