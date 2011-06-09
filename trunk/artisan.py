@@ -7548,8 +7548,11 @@ class HUDDlg(QDialog):
         self.setLayout(Slayout)
 
     def changedpi(self):
-        value = self.resolutionSpinBox.value()
-        aw.setdpi(value)
+        try:
+            value = self.resolutionSpinBox.value()
+            aw.setdpi(value)
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "changedpi(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def setdefaultres(self):
         self.resolutionSpinBox.setValue(80)
@@ -7593,46 +7596,55 @@ class HUDDlg(QDialog):
 
 
     def setcurvecolor(self,x):
-        colorf = QColorDialog.getColor(QColor(aw.qmc.plotcurvecolor[x]),self)
-        if colorf.isValid():
-            colorname = unicode(colorf.name())
-            aw.qmc.plotcurvecolor[x] = colorname
+        try:
+            colorf = QColorDialog.getColor(QColor(aw.qmc.plotcurvecolor[x]),self)
+            if colorf.isValid():
+                colorname = unicode(colorf.name())
+                aw.qmc.plotcurvecolor[x] = colorname
 
-        self.plotequ()
+            self.plotequ()
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "setcurvecolor(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def setbackgroundequ1(self):
-        equ = unicode(self.equedit1.text())
-        aw.qmc.plotcurves[0] = equ
-        if len(equ):
-            aw.qmc.resetlines()
-            #create x range
-            x_range = range(aw.qmc.startofx,aw.qmc.endofx)
-            #create y range
-            y_range = []
-            for i in range(len(x_range)):
-                y_range.append(self.eval_curve_expression(equ,x_range[i]))
+        try:
+            equ = unicode(self.equedit1.text())
+            aw.qmc.plotcurves[0] = equ
+            if len(equ):
+                aw.qmc.resetlines()
+                #create x range
+                x_range = range(aw.qmc.startofx,aw.qmc.endofx)
+                #create y range
+                y_range = []
+                for i in range(len(x_range)):
+                    y_range.append(self.eval_curve_expression(equ,x_range[i]))
 
-        aw.qmc.timeB = x_range[:]
-        aw.qmc.temp1B = y_range[:]
-        aw.qmc.temp2B = [-100]*len(x_range) 
-        aw.qmc.background = True
-        aw.qmc.redraw()        
+            aw.qmc.timeB = x_range[:]
+            aw.qmc.temp1B = y_range[:]
+            aw.qmc.temp2B = [-100]*len(x_range) 
+            aw.qmc.background = True
+            aw.qmc.redraw()        
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "setbackgroundequ1(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def plotequ(self):
-        EQU = [unicode(self.equedit1.text()),unicode(self.equedit2.text()),
-               unicode(self.equedit3.text()),unicode(self.equedit4.text()),
-               unicode(self.equedit5.text()),unicode(self.equedit6.text())]
-        aw.qmc.plotcurves = EQU[:]
-        aw.qmc.resetlines()                           
-        for e in range(5):
-            #create x range
-            x_range = range(aw.qmc.startofx,aw.qmc.endofx)
-            #create y range
-            y_range = []
-            for i in range(len(x_range)):
-                y_range.append(self.eval_curve_expression(EQU[e],x_range[i]))
-            aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
-        aw.qmc.fig.canvas.draw()
+        try:
+            EQU = [unicode(self.equedit1.text()),unicode(self.equedit2.text()),
+                   unicode(self.equedit3.text()),unicode(self.equedit4.text()),
+                   unicode(self.equedit5.text()),unicode(self.equedit6.text())]
+            aw.qmc.plotcurves = EQU[:]
+            aw.qmc.resetlines()                           
+            for e in range(5):
+                #create x range
+                x_range = range(aw.qmc.startofx,aw.qmc.endofx)
+                #create y range
+                y_range = []
+                for i in range(len(x_range)):
+                    y_range.append(self.eval_curve_expression(EQU[e],x_range[i]))
+                aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
+            aw.qmc.fig.canvas.draw()
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "plotequ(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def eval_curve_expression(self,mathexpression,x):
         if len(mathexpression):
@@ -7689,22 +7701,28 @@ class HUDDlg(QDialog):
                 return 0
         
     def setappearance(self):
-        aw.style = unicode(self.styleComboBox.currentText())
-        app.setStyle(aw.style)
+        try:
+            aw.style = unicode(self.styleComboBox.currentText())
+            app.setStyle(aw.style)
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "setappearance(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
     def showsound(self):
-        warnings.simplefilter('ignore', Warning) #for Complex warning 
-        aw.sendmessage(QApplication.translate("Message Area","Testing Mike...", None, QApplication.UnicodeUTF8))
-        aw.stack.setCurrentIndex(2)
-        aw.sound.opensound()
-        for i in range(80):
-            msg = str(80-i)
-            self.status.showMessage(msg,500)
-            aw.sound.blitsound()
-        aw.stack.setCurrentIndex(0)
-        aw.sound.closesound()
-        aw.sendmessage("")
-        warnings.simplefilter('default', Warning)
+        try:
+            warnings.simplefilter('ignore', Warning) #for Complex warning 
+            aw.sendmessage(QApplication.translate("Message Area","Testing Mike...", None, QApplication.UnicodeUTF8))
+            aw.stack.setCurrentIndex(2)
+            aw.sound.opensound()
+            for i in range(80):
+                msg = str(80-i)
+                self.status.showMessage(msg,500)
+                aw.sound.blitsound()
+            aw.stack.setCurrentIndex(0)
+            aw.sound.closesound()
+            aw.sendmessage("")
+            warnings.simplefilter('default', Warning)
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "showsound(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
              
     def saveinterp(self):
@@ -7757,8 +7775,11 @@ class HUDDlg(QDialog):
         aw.qmc.redraw()
 
     def changeDeltaFilter(self,i):
-        aw.qmc.deltafilter = self.DeltaFilter.value()
-        aw.qmc.redraw()
+        try:
+            aw.qmc.deltafilter = self.DeltaFilter.value()
+            aw.qmc.redraw()
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "changeDeltaFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
     def changeDeltaBT(self,i):
         aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
@@ -7771,10 +7792,12 @@ class HUDDlg(QDialog):
             aw.qmc.resetlines()    
         
     def changeSensitivity(self):
-        aw.qmc.sensitivity = int(self.sensitivityComboBox.currentText())
-        aw.qmc.redraw()
-        libtime.sleep(0.1)
-
+        try:
+            aw.qmc.sensitivity = int(self.sensitivityComboBox.currentText())
+            aw.qmc.redraw()
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "changeSensitivity(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+        
     def changeProjectionMode(self,i):
         aw.qmc.projectionmode = i
 
