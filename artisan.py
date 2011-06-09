@@ -667,22 +667,7 @@ class tgraphcanvas(FigureCanvas):
 
                 self.delta1.append(rateofchange1plot)
                 self.delta2.append(rateofchange2plot)
-                
-##                #verify same dimension    
-##                lt,ld =  len(self.timex),len(self.delta2)
-##                if lt != ld:
-##                    if lt > ld:
-##                        for x in range(lt - ld):
-##                            if ld:
-##                                self.delta1.append(self.delta1[-1])
-##                                self.delta2.append(self.delta2[-1])
-##                            else:
-##                                self.delta1.append(0.)
-##                                self.delta2.append(0.) 
-##                    if ld > ld:
-##                        self.delta1 = self.delta1[:lt]                
-##                        self.delta2 = self.delta2[:lt]  
-                            
+                                           
                 if self.DeltaETflag:
                     self.l_delta1.set_data(self.timex, self.delta1)
                 if self.DeltaBTflag:
@@ -946,12 +931,12 @@ class tgraphcanvas(FigureCanvas):
     def getTargetTime(self):
         
         if self.rateofchange1 > 0:
-            ETreachTime = (self.ETtarget - self.temp1[-1])/self.rateofchange1
+            ETreachTime = (self.ETtarget - self.temp1[-1])/(self.rateofchange1/60.)
         else:
             ETreachTime = -1
             
         if self.rateofchange2 > 0:
-            BTreachTime = (self.BTtarget - self.temp2[-1])/self.rateofchange2
+            BTreachTime = (self.BTtarget - self.temp2[-1])/(self.rateofchange2/60.)
         else:
             BTreachTime = -1
 
