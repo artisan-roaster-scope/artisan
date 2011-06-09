@@ -12685,100 +12685,110 @@ class comportDlg(QDialog):
         self.setLayout(Mlayout)
 
     def createserialTable(self):
-        self.serialtable.clear()        
-        ndevices = len(aw.qmc.extradevices)
-        if ndevices:    
-            self.serialtable.setRowCount(ndevices)
-            self.serialtable.setColumnCount(7)
-            self.serialtable.setHorizontalHeaderLabels([QApplication.translate("Table","Device",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table","Comm Port",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table","Baud Rate",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table","Byte Size",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table","Parity",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table","Stopbits",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table","Timeout",None, QApplication.UnicodeUTF8)])
-            self.serialtable.setAlternatingRowColors(True)
-            self.serialtable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
-            self.serialtable.setShowGrid(True)
+        try:
+            self.serialtable.clear()        
+            ndevices = len(aw.qmc.extradevices)
+            if ndevices:    
+                self.serialtable.setRowCount(ndevices)
+                self.serialtable.setColumnCount(7)
+                self.serialtable.setHorizontalHeaderLabels([QApplication.translate("Table","Device",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table","Comm Port",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table","Baud Rate",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table","Byte Size",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table","Parity",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table","Stopbits",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table","Timeout",None, QApplication.UnicodeUTF8)])
+                self.serialtable.setAlternatingRowColors(True)
+                self.serialtable.setEditTriggers(QTableWidget.NoEditTriggers)
+                self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
+                self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
+                self.serialtable.setShowGrid(True)
 
-            for i in range(ndevices):
-                device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]-1])    #type identification of the device. Non editable
+                for i in range(ndevices):
+                    device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]-1])    #type identification of the device. Non editable
 
-                comportComboBox =  QComboBox()
-                comportComboBox.addItems(aw.extracomport)
-                comportComboBox.setCurrentIndex(i)
+                    comportComboBox =  QComboBox()
+                    comportComboBox.addItems(aw.extracomport)
+                    comportComboBox.setCurrentIndex(i)
 
-                baudComboBox =  QComboBox()
-                baudComboBox.addItems(self.bauds)
-                if str(aw.extrabaudrate[i]) in self.bauds:
-                    baudComboBox.setCurrentIndex(self.bauds.index(str(aw.extrabaudrate[i])))
+                    baudComboBox =  QComboBox()
+                    baudComboBox.addItems(self.bauds)
+                    if str(aw.extrabaudrate[i]) in self.bauds:
+                        baudComboBox.setCurrentIndex(self.bauds.index(str(aw.extrabaudrate[i])))
 
-                byteComboBox =  QComboBox()
-                byteComboBox.addItems(self.bytesizes)
-                if str(aw.extrabytesize[i]) in self.bytesizes:
-                    byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.extrabytesize[i])))
+                    byteComboBox =  QComboBox()
+                    byteComboBox.addItems(self.bytesizes)
+                    if str(aw.extrabytesize[i]) in self.bytesizes:
+                        byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.extrabytesize[i])))
 
-                parityComboBox =  QComboBox()
-                parityComboBox.addItems(self.parity)
-                if aw.extraparity[i] in self.parity:
-                    parityComboBox.setCurrentIndex(self.parity.index(aw.extraparity[i]))
-              
-                #self.connect(baudComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
-                 
-                stopbitsComboBox =  QComboBox()
-                stopbitsComboBox.addItems(self.stopbits)
-                if str(aw.extrastopbits[i]) in self.stopbits:
-                    stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.extrastopbits[i])))
+                    parityComboBox =  QComboBox()
+                    parityComboBox.addItems(self.parity)
+                    if aw.extraparity[i] in self.parity:
+                        parityComboBox.setCurrentIndex(self.parity.index(aw.extraparity[i]))
+                  
+                    #self.connect(baudComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
+                     
+                    stopbitsComboBox =  QComboBox()
+                    stopbitsComboBox.addItems(self.stopbits)
+                    if str(aw.extrastopbits[i]) in self.stopbits:
+                        stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.extrastopbits[i])))
 
-                timeoutEdit = QLineEdit(str(aw.extratimeout[i]))
-                timeoutEdit.setValidator(QIntValidator(0,5,timeoutEdit))
+                    timeoutEdit = QLineEdit(str(aw.extratimeout[i]))
+                    timeoutEdit.setValidator(QIntValidator(0,5,timeoutEdit))
 
-                #add widgets to the table
-                self.serialtable.setItem(i,0,device)              
-                self.serialtable.setCellWidget(i,1,comportComboBox)
-                self.serialtable.setCellWidget(i,2,baudComboBox)                
-                self.serialtable.setCellWidget(i,3,byteComboBox)
-                self.serialtable.setCellWidget(i,4,parityComboBox)              
-                self.serialtable.setCellWidget(i,5,stopbitsComboBox)              
-                self.serialtable.setCellWidget(i,6,timeoutEdit)              
+                    #add widgets to the table
+                    self.serialtable.setItem(i,0,device)              
+                    self.serialtable.setCellWidget(i,1,comportComboBox)
+                    self.serialtable.setCellWidget(i,2,baudComboBox)                
+                    self.serialtable.setCellWidget(i,3,byteComboBox)
+                    self.serialtable.setCellWidget(i,4,parityComboBox)              
+                    self.serialtable.setCellWidget(i,5,stopbitsComboBox)              
+                    self.serialtable.setCellWidget(i,6,timeoutEdit)              
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "createserialTable(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
 
     def saveserialtable(self):
-        ndevices = len(aw.qmc.extradevices)
-        for i in range(ndevices):
+        try:
             
-            comportComboBox =  self.serialtable.cellWidget(i,1)
-            aw.extracomport[i] = unicode(comportComboBox.currentText())
+            ndevices = len(aw.qmc.extradevices)
+            for i in range(ndevices):
+                
+                comportComboBox =  self.serialtable.cellWidget(i,1)
+                aw.extracomport[i] = unicode(comportComboBox.currentText())
 
-            baudComboBox =  self.serialtable.cellWidget(i,2)
-            aw.extrabaudrate[i] = int(baudComboBox.currentText())
+                baudComboBox =  self.serialtable.cellWidget(i,2)
+                aw.extrabaudrate[i] = int(baudComboBox.currentText())
 
-            byteComboBox =  self.serialtable.cellWidget(i,3)
-            aw.extrabytesize[i] = int(byteComboBox.currentText())
+                byteComboBox =  self.serialtable.cellWidget(i,3)
+                aw.extrabytesize[i] = int(byteComboBox.currentText())
 
-            parityComboBox =  self.serialtable.cellWidget(i,4)
-            aw.extraparity[i] = unicode(parityComboBox.currentText())
+                parityComboBox =  self.serialtable.cellWidget(i,4)
+                aw.extraparity[i] = unicode(parityComboBox.currentText())
 
-            stopbitsComboBox =  self.serialtable.cellWidget(i,5)
-            aw.extrastopbits[i] = int(stopbitsComboBox.currentText())
+                stopbitsComboBox =  self.serialtable.cellWidget(i,5)
+                aw.extrastopbits[i] = int(stopbitsComboBox.currentText())
 
-            timeoutEdit = self.serialtable.cellWidget(i,6)
-            aw.extratimeout[i] = int(timeoutEdit.text())
+                timeoutEdit = self.serialtable.cellWidget(i,6)
+                aw.extratimeout[i] = int(timeoutEdit.text())
 
-        #create serial ports for each extra device
-        nserial = len(aw.extraser)
-        if ndevices != nserial:
-            aw.extraser = [serialport()]*ndevices
+            #create serial ports for each extra device
+            nserial = len(aw.extraser)
+            if ndevices != nserial:
+                aw.extraser = [serialport()]*ndevices
 
-        #load the settings for the extra serial ports found
-        for i in range(ndevices):
-            aw.extraser[i].SP.setPort(unicode(aw.extracomport[i]))
-            aw.extraser[i].SP.setBaudrate(aw.extrabaudrate[i])
-            aw.extraser[i].SP.setByteSize(aw.extrabytesize[i])
-            aw.extraser[i].SP.setParity(unicode(aw.extraparity[i]))
-            aw.extraser[i].SP.setStopbits(aw.extrastopbits[i])
-            aw.extraser[i].SP.setTimeout(aw.extratimeout[i])
+            #load the settings for the extra serial ports found
+            for i in range(ndevices):
+                aw.extraser[i].SP.setPort(unicode(aw.extracomport[i]))
+                aw.extraser[i].SP.setBaudrate(aw.extrabaudrate[i])
+                aw.extraser[i].SP.setByteSize(aw.extrabytesize[i])
+                aw.extraser[i].SP.setParity(unicode(aw.extraparity[i]))
+                aw.extraser[i].SP.setStopbits(aw.extrastopbits[i])
+                aw.extraser[i].SP.setTimeout(aw.extratimeout[i])
+
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "saveserialtable(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
            
     def accept(self):
         #validate serial parameter against input errors
@@ -12825,68 +12835,72 @@ class comportDlg(QDialog):
 
 
     def scanforport(self):
-        aw.ser.closeport()
-        
-        available = []      
-        if platf in ('Windows', 'Microsoft'):
-            #scans serial ports in Windows computer
-            for i in range(100):
-                try:
-                    s = serial.Serial(i)
-                    available.append(s.portstr)
-                    s.close()  
-                except serial.SerialException,e:
-                    pass
-                
-        elif platf == 'Darwin':
-            #scans serial ports in Mac computer
-            results={}
-            for name in glob.glob("/dev/cu.*"):
-                if name.upper().rfind("MODEM") < 0:
+        try:
+            aw.ser.closeport()
+            
+            available = []      
+            if platf in ('Windows', 'Microsoft'):
+                #scans serial ports in Windows computer
+                for i in range(100):
                     try:
-                        with file(name, 'rw'):
-                            available.append(name)
-                    except Exception, e:
+                        s = serial.Serial(i)
+                        available.append(s.portstr)
+                        s.close()  
+                    except serial.SerialException,e:
                         pass
                     
-        elif platf == 'Linux':
-            maxnum=9
-            for prefix, description, klass in ( 
-                ("/dev/ttyS", "Standard serial port", "serial"), 
-                ("/dev/cua", "Standard serial port", "serial"), 
-                ("/dev/ttyUSB", "USB to serial convertor", "serial"),
-                ("/dev/usb/ttyUSB", "USB to serial convertor", "serial"), 
-                ("/dev/usb/tts/", "USB to serial convertor", "serial")
-                ):
-                for num in range(maxnum+1):
-                    name=prefix+`num`
-                    if not os.path.exists(name):
-                        continue
-                    try:
-                        with file(name, 'rw'):
-                            available.append(name)
-                    except Exception, e:
-                        pass
-        else:
-            self.sendmessage(QApplication.translate("Message Area","Port scan on this platform not yet supported", None, QApplication.UnicodeUTF8))
+            elif platf == 'Darwin':
+                #scans serial ports in Mac computer
+                results={}
+                for name in glob.glob("/dev/cu.*"):
+                    if name.upper().rfind("MODEM") < 0:
+                        try:
+                            with file(name, 'rw'):
+                                available.append(name)
+                        except Exception, e:
+                            pass
+                        
+            elif platf == 'Linux':
+                maxnum=9
+                for prefix, description, klass in ( 
+                    ("/dev/ttyS", "Standard serial port", "serial"), 
+                    ("/dev/cua", "Standard serial port", "serial"), 
+                    ("/dev/ttyUSB", "USB to serial convertor", "serial"),
+                    ("/dev/usb/ttyUSB", "USB to serial convertor", "serial"), 
+                    ("/dev/usb/tts/", "USB to serial convertor", "serial")
+                    ):
+                    for num in range(maxnum+1):
+                        name=prefix+`num`
+                        if not os.path.exists(name):
+                            continue
+                        try:
+                            with file(name, 'rw'):
+                                available.append(name)
+                        except Exception, e:
+                            pass
+            else:
+                self.sendmessage(QApplication.translate("Message Area","Port scan on this platform not yet supported", None, QApplication.UnicodeUTF8))
 
-        #set comboBoxes                        
-        self.comportEdit.clear()
-        self.comportEdit.addItems(available)
-        if len(available):
-            if aw.ser.comport in available:
-                self.comportEdit.setCurrentIndex(available.index(aw.ser.comport))
-            else:    
-                self.comportEdit.setCurrentIndex(len(available)-1)
-            aw.ser.commavailable = available[:]
-            for i in range(len(aw.qmc.extradevices)):
-                comportComboBox =  self.serialtable.cellWidget(i,1)
-                comportComboBox.clear()
-                comportComboBox.addItems(aw.ser.commavailable)
-                if aw.extracomport[i] in aw.ser.commavailable:
-                    comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.extracomport[i]))
+            #set comboBoxes                        
+            self.comportEdit.clear()
+            self.comportEdit.addItems(available)
+            if len(available):
+                if aw.ser.comport in available:
+                    self.comportEdit.setCurrentIndex(available.index(aw.ser.comport))
                 else:    
-                    comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)                
+                    self.comportEdit.setCurrentIndex(len(available)-1)
+                aw.ser.commavailable = available[:]
+                for i in range(len(aw.qmc.extradevices)):
+                    comportComboBox =  self.serialtable.cellWidget(i,1)
+                    comportComboBox.clear()
+                    comportComboBox.addItems(aw.ser.commavailable)
+                    if aw.extracomport[i] in aw.ser.commavailable:
+                        comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.extracomport[i]))
+                    else:    
+                        comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)                
+
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "scanforport(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def closeserialports(self):
         if aw.ser.SP.isOpen():
@@ -13112,90 +13126,106 @@ class DeviceAssignmentDLG(QDialog):
         self.setLayout(Mlayout)
 
     def createDeviceTable(self):
-        self.devicetable.clear()        
-        ndevices = len(aw.qmc.extradevices)
-        if ndevices:    
-            self.devicetable.setRowCount(ndevices)
-            self.devicetable.setColumnCount(7)
-            self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Color 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Color 2",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Label 1",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "Label 2",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "y1(x)",None, QApplication.UnicodeUTF8),
-                                                        QApplication.translate("Table", "y2(x)",None, QApplication.UnicodeUTF8)])
-            
-            self.devicetable.setAlternatingRowColors(True)
-            self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.devicetable.setSelectionMode(QTableWidget.SingleSelection)
-            self.devicetable.setShowGrid(True)
+        try:
 
-            #populate table
-            devices = aw.qmc.devices[:]  
-            devices = sorted(devices)
-            #devices.insert(0,"")         #add empty space for PID
-            for i in range(ndevices):
-                typeComboBox =  QComboBox()
-                typeComboBox.addItems(sorted(devices))
-                typeComboBox.setCurrentIndex(devices.index(aw.qmc.devices[aw.qmc.extradevices[i]-1]))
-
-                color1Button = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
-                color1Button.setFocusPolicy(Qt.NoFocus)
-                self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
-
-                color2Button = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
-                color2Button.setFocusPolicy(Qt.NoFocus)
-                self.connect(color2Button, SIGNAL("clicked()"),lambda l = 2, c = i: self.setextracolor(l,c))
-
-                name1edit = QLineEdit(unicode(aw.qmc.extraname1[i]))            
-                name2edit = QLineEdit(unicode(aw.qmc.extraname2[i]))
-
-                mexpr1edit = QLineEdit(unicode(aw.qmc.extramathexpression1[i]))
-                mexpr2edit = QLineEdit(unicode(aw.qmc.extramathexpression2[i]))
-                mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None, QApplication.UnicodeUTF8))
-                mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None, QApplication.UnicodeUTF8))
+            self.devicetable.clear()        
+            ndevices = len(aw.qmc.extradevices)
+            if ndevices:    
+                self.devicetable.setRowCount(ndevices)
+                self.devicetable.setColumnCount(7)
+                self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "Color 1",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "Color 2",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "Label 1",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "Label 2",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "y1(x)",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "y2(x)",None, QApplication.UnicodeUTF8)])
                 
-                #add widgets to the table
-                self.devicetable.setCellWidget(i,0,typeComboBox)
-                self.devicetable.setCellWidget(i,1,color1Button)
-                self.devicetable.setCellWidget(i,2,color2Button)              
-                self.devicetable.setCellWidget(i,3,name1edit)              
-                self.devicetable.setCellWidget(i,4,name2edit)              
-                self.devicetable.setCellWidget(i,5,mexpr1edit)              
-                self.devicetable.setCellWidget(i,6,mexpr2edit)              
+                self.devicetable.setAlternatingRowColors(True)
+                self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
+                self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
+                self.devicetable.setSelectionMode(QTableWidget.SingleSelection)
+                self.devicetable.setShowGrid(True)
+
+                #populate table
+                devices = aw.qmc.devices[:]  
+                devices = sorted(devices)
+                #devices.insert(0,"")         #add empty space for PID
+                for i in range(ndevices):
+                    typeComboBox =  QComboBox()
+                    typeComboBox.addItems(sorted(devices))
+                    typeComboBox.setCurrentIndex(devices.index(aw.qmc.devices[aw.qmc.extradevices[i]-1]))
+
+                    color1Button = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+                    color1Button.setFocusPolicy(Qt.NoFocus)
+                    self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
+
+                    color2Button = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+                    color2Button.setFocusPolicy(Qt.NoFocus)
+                    self.connect(color2Button, SIGNAL("clicked()"),lambda l = 2, c = i: self.setextracolor(l,c))
+
+                    name1edit = QLineEdit(unicode(aw.qmc.extraname1[i]))            
+                    name2edit = QLineEdit(unicode(aw.qmc.extraname2[i]))
+
+                    mexpr1edit = QLineEdit(unicode(aw.qmc.extramathexpression1[i]))
+                    mexpr2edit = QLineEdit(unicode(aw.qmc.extramathexpression2[i]))
+                    mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None, QApplication.UnicodeUTF8))
+                    mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None, QApplication.UnicodeUTF8))
+                    
+                    #add widgets to the table
+                    self.devicetable.setCellWidget(i,0,typeComboBox)
+                    self.devicetable.setCellWidget(i,1,color1Button)
+                    self.devicetable.setCellWidget(i,2,color2Button)              
+                    self.devicetable.setCellWidget(i,3,name1edit)              
+                    self.devicetable.setCellWidget(i,4,name2edit)              
+                    self.devicetable.setCellWidget(i,5,mexpr1edit)              
+                    self.devicetable.setCellWidget(i,6,mexpr2edit)              
+
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "createDeviceTable(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
 
     #adds extra device
     def adddevice(self):
-        self.savedevicetable()
-        #addDevice() is located in aw so that the same function can be used in init after dynamically loading settings
-        aw.addDevice()
-        self.createDeviceTable()
-        aw.qmc.redraw()
+        try:
+            self.savedevicetable()
+            #addDevice() is located in aw so that the same function can be used in init after dynamically loading settings
+            aw.addDevice()
+            self.createDeviceTable()
+            aw.qmc.redraw()
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "adddevice(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
     def deldevice(self):
-        bindex = len(aw.qmc.extradevices)-1
-        selected = self.devicetable.selectedRanges()
-        if len(selected) > 0:
-            bindex = selected[0].topRow()
-        if bindex >= 0:
-            self.delextradevice(bindex)
-         
+        try:
+            bindex = len(aw.qmc.extradevices)-1
+            selected = self.devicetable.selectedRanges()
+            if len(selected) > 0:
+                bindex = selected[0].topRow()
+            if bindex >= 0:
+                self.delextradevice(bindex)
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "deldevice(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+             
 
-    def resetextradevices(self):      
-        aw.qmc.extradevices = []                                      
-        aw.qmc.extratimex = []                                        
-        aw.qmc.extradevicecolor1 = []                                  
-        aw.qmc.extradevicecolor2 = []                                
-        aw.qmc.extratemp1,aw.qmc.extratemp2 = [],[]                     
-        aw.qmc.extratemp1lines,aw.qmc.extratemp2lines = [],[]           
-        aw.qmc.extraname1,aw.qmc.extraname2 = [],[]                     
-        aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]           
-        aw.ser.extraSP = []
-        #EXTRA COMM PORTS VARIABLES
-        aw.ser.extracomport,aw.ser.extrabaudrate,aw.ser.extrabytesize,aw.ser.extraparity,aw.ser.extrastopbits,aw.ser.extratimeout = [],[],[],[],[],[]
-        self.createDeviceTable()
-        aw.qmc.redraw()
+    def resetextradevices(self):
+        try:
+            aw.qmc.extradevices = []                                      
+            aw.qmc.extratimex = []                                        
+            aw.qmc.extradevicecolor1 = []                                  
+            aw.qmc.extradevicecolor2 = []                                
+            aw.qmc.extratemp1,aw.qmc.extratemp2 = [],[]                     
+            aw.qmc.extratemp1lines,aw.qmc.extratemp2lines = [],[]           
+            aw.qmc.extraname1,aw.qmc.extraname2 = [],[]                     
+            aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]           
+            aw.ser.extraSP = []
+            #EXTRA COMM PORTS VARIABLES
+            aw.ser.extracomport,aw.ser.extrabaudrate,aw.ser.extrabytesize,aw.ser.extraparity,aw.ser.extrastopbits,aw.ser.extratimeout = [],[],[],[],[],[]
+            self.createDeviceTable()
+            aw.qmc.redraw()
+            
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "resetextradevices(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
     def delextradevice(self,x):
         try:           
@@ -13224,389 +13254,399 @@ class DeviceAssignmentDLG(QDialog):
             aw.extraser.pop(x)
             self.createDeviceTable()
             aw.qmc.redraw()
-        except Exception:
-            pass
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "delextradevice(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
     def savedevicetable(self):
-        for i in range(len(aw.qmc.extradevices)):
-            typecombobox = self.devicetable.cellWidget(i,0)
-            name1edit = self.devicetable.cellWidget(i,3)
-            name2edit = self.devicetable.cellWidget(i,4)
-            mexpr1edit = self.devicetable.cellWidget(i,5)
-            mexpr2edit = self.devicetable.cellWidget(i,6)
+        try:
+            for i in range(len(aw.qmc.extradevices)):
+                typecombobox = self.devicetable.cellWidget(i,0)
+                name1edit = self.devicetable.cellWidget(i,3)
+                name2edit = self.devicetable.cellWidget(i,4)
+                mexpr1edit = self.devicetable.cellWidget(i,5)
+                mexpr2edit = self.devicetable.cellWidget(i,6)
+                
+                aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1
+                aw.qmc.extraname1[i] = unicode(name1edit.text())
+                aw.qmc.extraname2[i] = unicode(name2edit.text())
+                aw.qmc.extramathexpression1[i] = unicode(mexpr1edit.text())
+                aw.qmc.extramathexpression2[i] = unicode(mexpr2edit.text())       
             
-            aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1
-            aw.qmc.extraname1[i] = unicode(name1edit.text())
-            aw.qmc.extraname2[i] = unicode(name2edit.text())
-            aw.qmc.extramathexpression1[i] = unicode(mexpr1edit.text())
-            aw.qmc.extramathexpression2[i] = unicode(mexpr2edit.text())       
-        
-        #update legend
-        aw.qmc.redraw()
+            #update legend
+            aw.qmc.redraw()
+
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "savedevicetable(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
     def setextracolor(self,l,i):
-        #line 1
-        if l == 1:
-            colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor1[i]),self)
-            if colorf.isValid():
-                colorname = unicode(colorf.name())
-                aw.qmc.extradevicecolor1[i] = colorname
-        #line 2
-        elif l == 2:
-            colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor2[i]),self)
-            if colorf.isValid():
-                colorname = unicode(colorf.name())
-                aw.qmc.extradevicecolor2[i] = colorname            
+        try:
+            #line 1
+            if l == 1:
+                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor1[i]),self)
+                if colorf.isValid():
+                    colorname = unicode(colorf.name())
+                    aw.qmc.extradevicecolor1[i] = colorname
+            #line 2
+            elif l == 2:
+                colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor2[i]),self)
+                if colorf.isValid():
+                    colorname = unicode(colorf.name())
+                    aw.qmc.extradevicecolor2[i] = colorname            
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "setextracolor(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def accept(self):
-        message = "Device left empty"
-        
-        # by default switch PID buttons/LCDs off
-        aw.button_10.setVisible(False)
-        aw.label6.setVisible(False)
-        aw.lcd6.setVisible(False)
-        aw.label7.setVisible(False)
-        aw.lcd7.setVisible(False)
+        try:    
+            message = "Device left empty"
             
-        if self.pidButton.isChecked():
-            # 0 = PXG, 1 = PXR - Not translated
-            if str(self.controlpidtypeComboBox.currentText()) == "Fuji PXG":
-                aw.ser.controlETpid[0] = 0
-                str1 = "Fuji PXG"
-                
-            elif str(self.controlpidtypeComboBox.currentText()) == "Fuji PXR":
-                aw.ser.controlETpid[0] = 1
-                str1 = "Fuji PXR"
-                
-            aw.ser.controlETpid[1] =  int(str(self.controlpidunitidComboBox.currentText()))
-
-            if str(self.btpidtypeComboBox.currentText()) == "Fuji PXG":
-                aw.ser.readBTpid[0] = 0
-                str2 = "Fuji PXG"
-            elif str(self.btpidtypeComboBox.currentText()) == "Fuji PXR":
-                aw.ser.readBTpid[0] = 1
-                str2 = "Fuji PXR"
-            elif str(self.btpidtypeComboBox.currentText()) == "None":
-                aw.ser.readBTpid[0] = 2
-                str2 = "None"            
-            aw.ser.readBTpid[1] =  int(str(self.btpidunitidComboBox.currentText()))
-
-            aw.qmc.device = 0
-            self.comport = "COM4"
-            self.baudrate = 9600
-            self.bytesize = 8
-            self.parity= 'O'
-            self.stopbits = 1
-            self.timeout=1
-
-            message = QApplication.translate("Message Area","PID to control ET set to %1 %2" + \
-                                             " ; PID to read BT set to %3 %4", None, QApplication.UnicodeUTF8).arg(str1).arg(str(aw.ser.controlETpid[1])).arg(str2).arg(str(aw.ser.readBTpid[1]))
-            
-            aw.button_10.setVisible(True)
-            aw.label6.setVisible(True)
-            aw.lcd6.setVisible(True)
-            aw.label7.setVisible(True)
-            aw.lcd7.setVisible(True)
-
-        if self.arduinoButton.isChecked():
-            aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
-            aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
-            
-            meter = "Arduino (TC4)"
-            aw.qmc.device = 19
-            #aw.ser.comport = "/dev/ttyACM0"
-            aw.ser.baudrate = 19200
-            aw.ser.bytesize = 8
-            aw.ser.parity= 'N'
-            aw.ser.stopbits = 1
-            aw.ser.timeout=1
-            message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
-            
-        if self.nonpidButton.isChecked():
-            meter = str(self.devicetypeComboBox.currentText())
-            message = QApplication.translate("Error Message","device err",None,QApplication.UnicodeUTF8)
-
-            if meter == "Omega HH806AU":
-                aw.qmc.device = 1
-                #aw.ser.comport = "COM11"
-                aw.ser.baudrate = 19200
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'E'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "Omega HH506RA":
-                aw.qmc.device = 2
-                #aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
-                aw.ser.baudrate = 2400
-                aw.ser.bytesize = 7
-                aw.ser.parity= 'E'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-                
-            elif meter == "CENTER 309":
-                aw.qmc.device = 3
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "CENTER 306":
-                aw.qmc.device = 4
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1                
-                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "CENTER 305":
-                aw.qmc.device = 5
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-                
-            elif meter == "CENTER 304":
-                aw.qmc.device = 6
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "CENTER 303":
-                aw.qmc.device = 7
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "CENTER 302":
-                aw.qmc.device = 8
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-                
-            elif meter == "CENTER 301":
-                aw.qmc.device = 9
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "CENTER 300":
-                aw.qmc.device = 10
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-                
-            elif meter == "VOLTCRAFT K204":
-                aw.qmc.device = 11
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "VOLTCRAFT K202":
-                aw.qmc.device = 12
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "VOLTCRAFT 300K":
-                aw.qmc.device = 13
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "VOLTCRAFT 302KJ":
-                aw.qmc.device = 14
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "EXTECH 421509":
-                aw.qmc.device = 15
-                #aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
-                aw.ser.baudrate = 2400
-                aw.ser.bytesize = 7
-                aw.ser.parity= 'E'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH506RA. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-                                
-            elif meter == "Omega HH802U":
-                aw.qmc.device = 16
-                #aw.ser.comport = "COM11"
-                aw.ser.baudrate = 19200
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'E'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "Omega HH309":
-                aw.qmc.device = 17
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-
-            #special device manual mode. No serial settings.    
-            elif meter == "NONE":
-                aw.qmc.device = 18
-                message = QApplication.translate("Message Area","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
-                st = ""
-                if aw.qmc.delay != 1000:
-                    aw.qmc.delay = 1000
-                    st += ". Sampling rate changed to 1 second"
-                message = QApplication.translate("Message Area","Device set to %1%2", None, QApplication.UnicodeUTF8).arg(meter).arg(st)
-
-            elif meter == "TE VA18B":
-                aw.qmc.device = 20
-                #aw.ser.comport = "COM7"
-                aw.ser.baudrate = 2400
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=2
-                message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "+309_34":
-                aw.qmc.device = 21
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = ""  #empty message especial device
-
-            elif meter == "+FUJI DUTY%":
-                aw.qmc.device = 22
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'E'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = ""   #empty message especial device
-                
-            elif meter == "Omega HHM28[6]":
-                aw.qmc.device = 23
-                #aw.ser.comport = "COM1"
-                aw.ser.baudrate = 2400
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
-
-            elif meter == "+204_34":
-                aw.qmc.device = 24
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = ""  #empty message especial device
-
-            elif meter == "+Virtual":
-                aw.qmc.device = 25
-                #aw.ser.comport = "COM4"
-                aw.ser.baudrate = 9600
-                aw.ser.bytesize = 8
-                aw.ser.parity= 'N'
-                aw.ser.stopbits = 1
-                aw.ser.timeout=1
-                message = ""  #empty message especial device
-
-            #set of different serial settings modes options
-            ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],[19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1]]
-            #map device index to a setting mode
-            devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3]  #0-25
-                
-            self.savedevicetable()
-            #init serial settings of extra devices
-            for i in range(len(aw.qmc.extradevices)):
-                dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
-                aw.extrabaudrate[i] = dsettings[0]
-                aw.extrabytesize[i] = dsettings[1]
-                aw.extraparity[i] = dsettings[2]
-                aw.extrastopbits[i] = dsettings[3]
-                aw.extratimeout[i] = dsettings[4]  
-                
+            # by default switch PID buttons/LCDs off
             aw.button_10.setVisible(False)
-            aw.button_12.setVisible(False)
-            aw.button_13.setVisible(False)
-            aw.button_14.setVisible(False)
-            aw.button_15.setVisible(False)
-            aw.button_16.setVisible(False)
-            aw.button_17.setVisible(False)
             aw.label6.setVisible(False)
             aw.lcd6.setVisible(False)
             aw.label7.setVisible(False)
             aw.lcd7.setVisible(False)
-       
-        aw.qmc.ETfunction = unicode(self.ETfunctionedit.text())
-        aw.qmc.BTfunction = unicode(self.BTfunctionedit.text())
+                
+            if self.pidButton.isChecked():
+                # 0 = PXG, 1 = PXR - Not translated
+                if str(self.controlpidtypeComboBox.currentText()) == "Fuji PXG":
+                    aw.ser.controlETpid[0] = 0
+                    str1 = "Fuji PXG"
+                    
+                elif str(self.controlpidtypeComboBox.currentText()) == "Fuji PXR":
+                    aw.ser.controlETpid[0] = 1
+                    str1 = "Fuji PXR"
+                    
+                aw.ser.controlETpid[1] =  int(str(self.controlpidunitidComboBox.currentText()))
 
-        aw.sendmessage(message)
+                if str(self.btpidtypeComboBox.currentText()) == "Fuji PXG":
+                    aw.ser.readBTpid[0] = 0
+                    str2 = "Fuji PXG"
+                elif str(self.btpidtypeComboBox.currentText()) == "Fuji PXR":
+                    aw.ser.readBTpid[0] = 1
+                    str2 = "Fuji PXR"
+                elif str(self.btpidtypeComboBox.currentText()) == "None":
+                    aw.ser.readBTpid[0] = 2
+                    str2 = "None"            
+                aw.ser.readBTpid[1] =  int(str(self.btpidunitidComboBox.currentText()))
 
-        #open serial conf Dialog        
-        if (self.nonpidButton.isChecked() or self.arduinoButton.isChecked()):
-            if meter != "NONE":
+                aw.qmc.device = 0
+                self.comport = "COM4"
+                self.baudrate = 9600
+                self.bytesize = 8
+                self.parity= 'O'
+                self.stopbits = 1
+                self.timeout=1
+
+                message = QApplication.translate("Message Area","PID to control ET set to %1 %2" + \
+                                                 " ; PID to read BT set to %3 %4", None, QApplication.UnicodeUTF8).arg(str1).arg(str(aw.ser.controlETpid[1])).arg(str2).arg(str(aw.ser.readBTpid[1]))
+                
+                aw.button_10.setVisible(True)
+                aw.label6.setVisible(True)
+                aw.lcd6.setVisible(True)
+                aw.label7.setVisible(True)
+                aw.lcd7.setVisible(True)
+
+            if self.arduinoButton.isChecked():
+                aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
+                aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
+                
+                meter = "Arduino (TC4)"
+                aw.qmc.device = 19
+                #aw.ser.comport = "/dev/ttyACM0"
+                aw.ser.baudrate = 19200
+                aw.ser.bytesize = 8
+                aw.ser.parity= 'N'
+                aw.ser.stopbits = 1
+                aw.ser.timeout=1
+                message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+                
+            if self.nonpidButton.isChecked():
+                meter = str(self.devicetypeComboBox.currentText())
+                message = QApplication.translate("Error Message","device err",None,QApplication.UnicodeUTF8)
+
+                if meter == "Omega HH806AU":
+                    aw.qmc.device = 1
+                    #aw.ser.comport = "COM11"
+                    aw.ser.baudrate = 19200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'E'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "Omega HH506RA":
+                    aw.qmc.device = 2
+                    #aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
+                    aw.ser.baudrate = 2400
+                    aw.ser.bytesize = 7
+                    aw.ser.parity= 'E'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    
+                elif meter == "CENTER 309":
+                    aw.qmc.device = 3
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "CENTER 306":
+                    aw.qmc.device = 4
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1                
+                    message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "CENTER 305":
+                    aw.qmc.device = 5
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    
+                elif meter == "CENTER 304":
+                    aw.qmc.device = 6
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "CENTER 303":
+                    aw.qmc.device = 7
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "CENTER 302":
+                    aw.qmc.device = 8
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    
+                elif meter == "CENTER 301":
+                    aw.qmc.device = 9
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "CENTER 300":
+                    aw.qmc.device = 10
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    
+                elif meter == "VOLTCRAFT K204":
+                    aw.qmc.device = 11
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "VOLTCRAFT K202":
+                    aw.qmc.device = 12
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "VOLTCRAFT 300K":
+                    aw.qmc.device = 13
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "VOLTCRAFT 302KJ":
+                    aw.qmc.device = 14
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "EXTECH 421509":
+                    aw.qmc.device = 15
+                    #aw.ser.comport = "/dev/tty.usbserial-A2001Epn"
+                    aw.ser.baudrate = 2400
+                    aw.ser.bytesize = 7
+                    aw.ser.parity= 'E'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH506RA. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                                    
+                elif meter == "Omega HH802U":
+                    aw.qmc.device = 16
+                    #aw.ser.comport = "COM11"
+                    aw.ser.baudrate = 19200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'E'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "Omega HH309":
+                    aw.qmc.device = 17
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+
+                #special device manual mode. No serial settings.    
+                elif meter == "NONE":
+                    aw.qmc.device = 18
+                    message = QApplication.translate("Message Area","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                    st = ""
+                    if aw.qmc.delay != 1000:
+                        aw.qmc.delay = 1000
+                        st += ". Sampling rate changed to 1 second"
+                    message = QApplication.translate("Message Area","Device set to %1%2", None, QApplication.UnicodeUTF8).arg(meter).arg(st)
+
+                elif meter == "TE VA18B":
+                    aw.qmc.device = 20
+                    #aw.ser.comport = "COM7"
+                    aw.ser.baudrate = 2400
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=2
+                    message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "+309_34":
+                    aw.qmc.device = 21
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = ""  #empty message especial device
+
+                elif meter == "+FUJI DUTY%":
+                    aw.qmc.device = 22
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'E'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = ""   #empty message especial device
+                    
+                elif meter == "Omega HHM28[6]":
+                    aw.qmc.device = 23
+                    #aw.ser.comport = "COM1"
+                    aw.ser.baudrate = 2400
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+
+                elif meter == "+204_34":
+                    aw.qmc.device = 24
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = ""  #empty message especial device
+
+                elif meter == "+Virtual":
+                    aw.qmc.device = 25
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = ""  #empty message especial device
+
+                #set of different serial settings modes options
+                ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],[19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1]]
+                #map device index to a setting mode
+                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3]  #0-25
+                    
+                self.savedevicetable()
+                #init serial settings of extra devices
+                for i in range(len(aw.qmc.extradevices)):
+                    dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
+                    aw.extrabaudrate[i] = dsettings[0]
+                    aw.extrabytesize[i] = dsettings[1]
+                    aw.extraparity[i] = dsettings[2]
+                    aw.extrastopbits[i] = dsettings[3]
+                    aw.extratimeout[i] = dsettings[4]  
+                    
+                aw.button_10.setVisible(False)
+                aw.button_12.setVisible(False)
+                aw.button_13.setVisible(False)
+                aw.button_14.setVisible(False)
+                aw.button_15.setVisible(False)
+                aw.button_16.setVisible(False)
+                aw.button_17.setVisible(False)
+                aw.label6.setVisible(False)
+                aw.lcd6.setVisible(False)
+                aw.label7.setVisible(False)
+                aw.lcd7.setVisible(False)
+           
+            aw.qmc.ETfunction = unicode(self.ETfunctionedit.text())
+            aw.qmc.BTfunction = unicode(self.BTfunctionedit.text())
+
+            aw.sendmessage(message)
+
+            #open serial conf Dialog        
+            if (self.nonpidButton.isChecked() or self.arduinoButton.isChecked()):
+                if meter != "NONE":
+                    aw.setcommport()
+            else:
                 aw.setcommport()
-        else:
-            aw.setcommport()
 
-        self.close()
-        
+            self.close()
+
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "device accept((): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
 ############################################################
 #######################  CUSTOM COLOR DIALOG  ##############
