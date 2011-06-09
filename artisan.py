@@ -296,8 +296,7 @@ class tgraphcanvas(FigureCanvas):
         #legend location
         self.legendloc = 2
         self.fig.subplots_adjust(
-            # all values in percent
-            top=0.93, # the top of the subplots of the figure (default: 0.9)
+            # all values in percen            top=0.93, # the top of the subplots of the figure (default: 0.9)
             bottom=0.1, # the bottom of the subplots of the figure (default: 0.1)
             left=0.068, # the left side of the subplots of the figure (default: 0.125)
             right=.95) # the right side of the subplots of the figure (default: 0.9
@@ -592,10 +591,9 @@ class tgraphcanvas(FigureCanvas):
         self.dutycycle = 0.
         self.dutycycleTX = 0.
         self.fujiETBT = 0.
+        self.currentpidsv = 0.
 
-
-    #NOTE: Figure is initialy drawn at the end of aw.settingsload()
-        
+    #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()        
     #################################    FUNCTIONS    ###################################
     #####################################################################################
         
@@ -704,11 +702,6 @@ class tgraphcanvas(FigureCanvas):
                     self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
                     self.ax.set_xlim(self.startofx,self.endofx)
                     self.xaxistosm()
-                   
-                aw.lcd2.display("%.1f"%t1)                                     # ET
-                aw.lcd3.display("%.1f"%t2)                                     # BT
-                aw.lcd4.display("%.1f"%self.rateofchange1)        # rate of change MET (degress per minute)
-                aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
 
                 #this helps to stabilize thread load (for low performance CPUS)
                 libtime.sleep(.1)
@@ -729,11 +722,28 @@ class tgraphcanvas(FigureCanvas):
                             if self.temp2[-1] > self.alarmtemperature[i]:
                                 self.setalarm(i)
 
-                    
+
+                libtime.sleep(.02)
+                ##############  if using more than one device
+                ndevices = len(self.extradevices)
+                if ndevices:
+                    for i in range(ndevices):
+                        extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[self.extradevices[i]]()
+                        if len(self.extramathexpression1[i]):
+                            extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
+                        if len(self.extramathexpression2[i]):
+                            extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
+                        self.extratemp1[i].append(extrat1)
+                        self.extratemp2[i].append(extrat2)                        
+                        self.extratimex[i].append(extratx)
+                        # update extra lines 
+                        self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
+                        self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
+                                  
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
             else:
-                tx = int(self.timeclock.elapsed()/1000.)
+                tx = int(self.timeclock.elapsed()/1000.)+1. #add a 1 second correction factor to equal the LCD time
                 #readjust xlimit of plot if needed
                 if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
                     self.endofx = tx + 180              # increase x limit by 3 minutes (180)
@@ -742,29 +752,34 @@ class tgraphcanvas(FigureCanvas):
                 self.resetlines()
                 #add to plot a vertical time line
                 self.ax.plot([tx,tx], [self.ylimit_min,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
-               
-                #important. this helps to stabilize thread
-                libtime.sleep(.1)             
-           
-            ##############  if using more than one device
-            ndevices = len(self.extradevices)
-            if ndevices:
-                for i in range(ndevices):
-                    extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[self.extradevices[i]]()
-                    if len(self.extramathexpression1[i]):
-                        extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
-                    if len(self.extramathexpression2[i]):
-                        extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
-                    self.extratemp1[i].append(extrat1)
-                    self.extratemp2[i].append(extrat2)                        
-                    self.extratimex[i].append(extratx)
-                    # update extra lines 
-                    self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
-                    self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-          
+
+            #apply sampling interval here                
+            libtime.sleep(self.delay/1000.)
+
+            
         except Exception,e:
             self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
+
+    #run all graphic changes from GUI thread     
+    def updategraphics(self):
+
+        if len(self.timex):        
+            aw.lcd2.display("%.1f"%self.temp1[-1])            # ET
+            aw.lcd3.display("%.1f"%self.temp2[-1])            # BT
+            aw.lcd4.display("%.1f"%self.rateofchange1)        # rate of change MET (degress per minute)
+            aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
+            
+            if self.device == 0:                              #extra LCDs for pid  
+                aw.lcd6.display(self.currentpidsv)
+                aw.lcd7.display(self.dutycycle)
+
+        #display new-updated canvas
+        self.fig.canvas.draw()
+
+        #check if HUD is ON
+        if self.HUDflag:
+            aw.showHUD[aw.HUDfunction]() 
         
     def updateLCDtime(self):
         tx = self.timeclock.elapsed()/1000.
@@ -813,10 +828,8 @@ class tgraphcanvas(FigureCanvas):
             linecount += 1
         if self.background:
             linecount += 2   #background ET + background BT = 2
-            
         self.ax.lines = self.ax.lines[0:linecount]
-
-
+        
     def setalarm(self,alarmnumber):
         if self.alarmaction[alarmnumber] == 0:
             self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
@@ -1108,7 +1121,6 @@ class tgraphcanvas(FigureCanvas):
             
         self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"])  
-        self.restore_message_label()
         
         #reset all variables that need to be reset
         self.flagon = False
@@ -2993,20 +3005,15 @@ class tgraphcanvas(FigureCanvas):
                 self.timeindexB[i] = self.backgroundtime2index(times[i])
             else:
                 self.timeindexB[i] = 0
-                
-    def restore_message_label(self):
-        aw.messagelabel.setStyleSheet("background-color:'transparent';")
 
     #adds errors
     def adderror(self,error):
-        #aw.messagelabel.setStyleSheet("background-color:'red';")
         timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
         #keep a max of 500 errors
         if len(self.errorlog) > 499:
             self.errorlog = self.errorlog[1:]
         self.errorlog.append(timez + " " + error)
         aw.sendmessage(error)
-        #self.restore_message_label()  
 
     ####################  PROFILE DESIGNER   ###################################################################################
     #launches designer	
@@ -3711,11 +3718,8 @@ class Athread(QThread):
             if aw.qmc.flagon:
                 #collect information
                 aw.qmc.sample()
-                #update screen in main GUI thread (not in this thread, which causes crashes)
-                self.emit(SIGNAL("updatefigure"))
-                if aw.qmc.HUDflag:
-                    self.emit(SIGNAL("updateHUD")) 
-                libtime.sleep(timedelay)    
+                #update screen in main GUI thread
+                self.emit(SIGNAL("updategraphics"))
             else:
                 break  #thread ends
 
@@ -3730,8 +3734,7 @@ class Athreadserver(QWidget):
             #delete when finished to save memory 
             self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
             #connect graphics to GUI thread
-            self.connect(thread, SIGNAL("updatefigure"),aw.qmc.fig.canvas.draw)
-            self.connect(thread, SIGNAL("updateHUD"),aw.launchHUD)
+            self.connect(thread, SIGNAL("updategraphics"),aw.qmc.updategraphics)
             thread.start()       
 
 ########################################################################################                            
@@ -6739,12 +6742,12 @@ $cupping_notes
 
     def calibratedelay(self):
         calSpinBox = QDoubleSpinBox()
-        calSpinBox.setRange(.1,30.)
+        calSpinBox.setRange(1.,30.)
         calSpinBox.setValue(self.qmc.delay/1000.)
         secondsdelay, ok = QInputDialog.getDouble(self,
                 QApplication.translate("MessageBox Caption", "Sampling Interval",None, QApplication.UnicodeUTF8),
                 QApplication.translate("MessageBox", "Seconds",None, QApplication.UnicodeUTF8),
-                calSpinBox.value(),.1,30.)
+                calSpinBox.value(),1.,30.)
         if ok:
             self.qmc.delay = int(secondsdelay*1000.) 	    	            
 
@@ -7047,10 +7050,7 @@ $cupping_notes
     #displays Dialog for the setting of the HUD
     def hudset(self):
         hudDl = HUDDlg(self)
-        hudDl.show()
-
-    def launchHUD(self):
-        self.showHUD[self.HUDfunction]()
+        hudDl.show()        
         
     def showHUDmetrics(self):
         ETreachTime,BTreachTime = self.qmc.getTargetTime()
@@ -7130,7 +7130,8 @@ $cupping_notes
         
         g = QRadialGradient(Wwidth/2, Wheight/2, ETradius)
         
-        beanbright =  100 - ETradius        
+        beanbright =  100 - ETradius
+        if beanbright < 0: beanbright = 0
         g.setColorAt(0.0, QColor(240,255,beanbright) )  #bean center
         
         g.setColorAt(.5, Qt.yellow)
@@ -10917,7 +10918,7 @@ class serialport(object):
     def fujitemperature(self):
         
         #update ET SV LCD 6
-        aw.pid.readcurrentsv()
+        aw.qmc.currentpidsv = aw.pid.readcurrentsv()
 
         # get the temperature for ET. RS485 unit ID (1)
         t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
@@ -11209,7 +11210,6 @@ class serialport(object):
                 return u"0"                                    
                 
         except serial.SerialException,e:
-            self.SP.close()
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
@@ -11232,7 +11232,7 @@ class serialport(object):
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "#0A0101NA4\r\n"  #"#0A0000NA2\r\n"
+                command = "#0A0000NA2\r\n"  #"#0A0101NA4\r\n"
                 self.SP.write(command)
                 r = self.SP.read(14) 
 
@@ -17752,7 +17752,6 @@ class FujiPID(object):
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
         val = self.readoneword(command)/10.
         if val != -0.1:
-            aw.lcd6.display(val)
             return val
         else:
             return -1
@@ -17766,7 +17765,6 @@ class FujiPID(object):
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["mv1"][1],1)            
         val = self.readoneword(command)/100.
         if val != -0.01:
-            aw.lcd7.display(val)
             return val
         else:
             return -1
