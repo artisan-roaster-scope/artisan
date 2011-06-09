@@ -766,8 +766,12 @@ class tgraphcanvas(FigureCanvas):
     def updateLCDtime(self):
         if self.flagon:
             tx = self.timeclock.elapsed()/1000.
+            if self.timeindex[0] != -1:
+                ts = tx - self.timex[self.timeindex[0]]
+            else:
+                ts = tx             
             nextreading = 1000. - 1000.*(tx%1.)
-            aw.lcd1.display(QString(self.stringfromseconds(int(tx))))
+            aw.lcd1.display(QString(self.stringfromseconds(int(ts))))
             QTimer.singleShot(nextreading,self.updateLCDtime)
 
     def toggleHUD(self):
@@ -1666,9 +1670,9 @@ class tgraphcanvas(FigureCanvas):
     #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep (which changes value in self.redraw())
     def findtextgap(self,height1,height2):
         if self.mode == "F":
-            init = 38  #was 50  (original values were too high)
-            gap = 19  #was 30
-            for i in range(init,81):  # was 90
+            init = 44  #was 50  (original values were too high)
+            gap = 22  #was 30
+            for i in range(init,110):  # was 90
                 if abs((height1 + self.ystep) - (height2+i)) > gap and abs((height1-self.ystep) - (height2-i)) > gap:
                     break
         else:
