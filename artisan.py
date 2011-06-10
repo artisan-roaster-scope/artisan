@@ -11647,58 +11647,56 @@ class serialport(object):
                             raise
                         elif result.startswith("#"):
                             self.ArduinoIsInitialized = 1
-
+                            self.ArduinoUnit = ""  # For good measure...
                     except:
                         aw.qmc.errorlog.append(QApplication.translate("Error Message","Arduino could not set channels: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)) + result
 
-                    self.ArduinoUnit = ""  # For good measure...
-                else:
-                    if not self.ArduinoUnit == aw.qmc.mode:
-                        self.SP.flushInput()
-                        self.SP.flushOutput()
-                    
-                        command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
-                        self.ArduinoUnit = aw.qmc.mode
-                        self.SP.write(command)
-
-                        try:
-                            result = ""
-                            result = self.SP.readline()
-                            if (not result == "" and not result.startswith("#")):
-                                raise
-                        except:
-                            aw.qmc.errorlog.append(QApplication.translate("Error Message","Arduino could not set temperature unit: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)) + result
-                            self.ArduinoUnit = ""
-
+                if not self.ArduinoUnit == aw.qmc.mode:
                     self.SP.flushInput()
                     self.SP.flushOutput()
-
-                    command = "READ\n"  #Read command. Will used set channels and units
+                
+                    command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
+                    self.ArduinoUnit = aw.qmc.mode
                     self.SP.write(command)
-                                    
-                    res = self.SP.readline().rsplit(',')  # a list [t0,t1,t2] with t0 = ambient; t1 = ET; t2 = BT (for now)
-                    t0 = 0 
-                    if len(aw.qmc.timex) > 2:                           
-                        t1 = aw.qmc.temp1[-1]
-                        t2 = aw.qmc.temp2[-1]     
-                    else:
-                        t1 = t2 = -1
+
                     try:
-                        t0 = float(res[0])
+                        result = ""
+                        result = self.SP.readline()
+                        if (not result == "" and not result.startswith("#")):
+                            raise
                     except:
-                        pass
-                    try:
-                        t1 = float(res[1])
-                    except:
-                        pass
-                    try:
-                        t2 = float(res[2])
-                    except:
-                        pass
-                    if t0 and not self.ArduinoIsInitialized:
-                        aw.qmc.ambientTemp = t0
-                        
-                    return t1, t2
+                        aw.qmc.errorlog.append(QApplication.translate("Error Message","Arduino could not set temperature unit: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)) + result
+                        self.ArduinoUnit = ""
+
+                self.SP.flushInput()
+                self.SP.flushOutput()
+
+                command = "READ\n"  #Read command. Will used set channels and units
+                self.SP.write(command)
+                                
+                res = self.SP.readline().rsplit(',')  # a list [t0,t1,t2] with t0 = ambient; t1 = ET; t2 = BT (for now)
+                t0 = 0 
+                if len(aw.qmc.timex) > 2:                           
+                    t1 = aw.qmc.temp1[-1]
+                    t2 = aw.qmc.temp2[-1]     
+                else:
+                    t1 = t2 = -1
+                try:
+                    t0 = float(res[0])
+                except:
+                    pass
+                try:
+                    t1 = float(res[1])
+                except:
+                    pass
+                try:
+                    t2 = float(res[2])
+                except:
+                    pass
+                if t0 and not self.ArduinoIsInitialized:
+                    aw.qmc.ambientTemp = t0
+                    
+                return t1, t2
 
         except serial.SerialException, e:
             error = QApplication.translate("Error Message","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)
