@@ -584,7 +584,7 @@ class tgraphcanvas(FigureCanvas):
         self.currentpidsv = 0.
 
         self.samplingflag = False
-
+        self.redrawingflag = False
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()        
     #################################    FUNCTIONS    ###################################
     #####################################################################################
@@ -594,7 +594,13 @@ class tgraphcanvas(FigureCanvas):
         try:
             #apply sampling interval here                
             libtime.sleep(self.delay/1000.)
-            
+            count = 0
+            while self.redrawingflag:
+                libtime.sleep(.1)
+                count += 1
+                if count == 100:
+                    break
+                
             self.samplingfag = True
             
             #if using a meter (thermocouple device)
@@ -736,12 +742,15 @@ class tgraphcanvas(FigureCanvas):
                 self.resetlines()
                 #add to plot a vertical time line
                 self.ax.plot([tx,tx], [self.ylimit_min,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
+                
             self.samplingflag = False
             
         except Exception,e:
             self.flagon = False
+            self.samplingflag = False
             self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
+
 
     #run all graphic changes from GUI thread     
     def updategraphics(self):
@@ -1204,7 +1213,6 @@ class tgraphcanvas(FigureCanvas):
         
     #Redraws data   
     def redraw(self):
-        
         #avoid redrawing in middle of sampling
         count = 0
         while self.samplingflag:
@@ -1214,7 +1222,9 @@ class tgraphcanvas(FigureCanvas):
                 self.samplingflag = False
                 return
         
-        try:            
+        try:
+            self.redrawingflag = True
+            
             self.fig.clf()   #wipe out figure
             self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
             #Set axes same as in __init__
@@ -1677,10 +1687,12 @@ class tgraphcanvas(FigureCanvas):
                 if len(self.timex):
                     self.redrawdesigner()
 
+                    
+            self.redrawingflag = False
+            
         except Exception,e:
             self.adderror(QApplication.translate("Error Message","Exception Error: redraw() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
-
 
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
@@ -2502,46 +2514,51 @@ class tgraphcanvas(FigureCanvas):
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time           
     def EventRecord(self):
-        if self.flagon:
-            #[EVENT] push button feedback
-            aw.button_11.setFlat(True)
-            aw.button_11.setDisabled(True)
-            QTimer.singleShot(2000, self.restorebutton_11)
-            
-            Nevents = len(self.specialevents)
-            #if in manual mode record first the last point in self.timex[]
-            if self.device == 18:
-                tx = self.timeclock.elapsed()/1000.
-                et,bt = aw.ser.NONE()
-                if bt != 1 and et != -1:              
-                    self.drawmanual(et,bt,tx)                        
-                else:
-                    return
-            #i = index number of the event (current length of the time list)           
-            i = len(self.timex)-1
-
-            self.specialevents.append(i)
-            self.specialeventstype.append(0)            
-            self.specialeventsStrings.append(str(Nevents+1))
-            self.specialeventsvalue.append(0)               
-            
-            temp = unicode(self.temp2[i])
-            timed = self.stringfromseconds(self.timex[i])
-
-            message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
-            aw.sendmessage(message)
-            #write label in mini recorder if flag checked
-            if aw.minieventsflag:
-                aw.eNumberSpinBox.setValue(Nevents+1)
-                aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-            self.redraw()     
+        try:
+            if self.flagon:
+                #[EVENT] push button feedback
+                aw.button_11.setFlat(True)
+                aw.button_11.setDisabled(True)
+                QTimer.singleShot(2000, self.restorebutton_11)
                 
-            aw.soundpop()
+                Nevents = len(self.specialevents)
+                #if in manual mode record first the last point in self.timex[]
+                if self.device == 18:
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if bt != 1 and et != -1:              
+                        self.drawmanual(et,bt,tx)                        
+                    else:
+                        return
+                #i = index number of the event (current length of the time list)           
+                i = len(self.timex)-1
 
-        else:
-            aw.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
+                self.specialevents.append(i)
+                self.specialeventstype.append(0)            
+                self.specialeventsStrings.append(str(Nevents+1))
+                self.specialeventsvalue.append(0)               
+                
+                temp = unicode(self.temp2[i])
+                timed = self.stringfromseconds(self.timex[i])
+
+                message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
+                aw.sendmessage(message)
+                #write label in mini recorder if flag checked
+                if aw.minieventsflag:
+                    aw.eNumberSpinBox.setValue(Nevents+1)
+                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                    aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+                self.redraw()     
+                    
+                aw.soundpop()
+
+            else:
+                aw.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: EventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
     def DeviceEventRecord(self,command):
