@@ -584,7 +584,7 @@ class tgraphcanvas(FigureCanvas):
         self.currentpidsv = 0.
 
         self.samplingflag = False
-        self.redrawingflag = False
+
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()        
     #################################    FUNCTIONS    ###################################
     #####################################################################################
@@ -592,14 +592,17 @@ class tgraphcanvas(FigureCanvas):
     # sample devices at interval self.delay miliseconds. NOTE: This function is run on its own thread. 
     def sample(self):
         try:
+            
             #apply sampling interval here                
             libtime.sleep(self.delay/1000.)
+
+            #avoid sampling while redrawing
             count = 0
-            while self.redrawingflag:
+            while self.samplingflag:
                 libtime.sleep(.1)
                 count += 1
-                if count == 100:
-                    break
+                if count == 50:
+                    self.samplingflag = False
                 
             self.samplingflag = True
             
@@ -750,6 +753,9 @@ class tgraphcanvas(FigureCanvas):
             self.samplingflag = False
             self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
+        
+        finally:
+            self.samplingflag = False
 
 
     #run all graphic changes from GUI thread     
@@ -1213,17 +1219,17 @@ class tgraphcanvas(FigureCanvas):
         
     #Redraws data   
     def redraw(self):
-        #avoid redrawing in middle of sampling
-        count = 0
-        while self.samplingflag:
-            libtime.sleep(.1)
-            count += 1
-            if count == 100:
-                self.samplingflag = False
-                return
-        
         try:
-            self.redrawingflag = True
+            
+            #avoid redrawing in middle of sampling
+            count = 0
+            while self.samplingflag:
+                libtime.sleep(.1)
+                count += 1
+                if count == 50:
+                    self.samplingflag = False
+
+            self.samplingflag = True
             
             self.fig.clf()   #wipe out figure
             self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
@@ -1686,13 +1692,16 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.lines = self.ax.lines[2:]
                 if len(self.timex):
                     self.redrawdesigner()
-
                     
-            self.redrawingflag = False
+            self.samplingflag = False
             
         except Exception,e:
             self.adderror(QApplication.translate("Error Message","Exception Error: redraw() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
+
+        finally:
+            self.samplingflag = False
+
 
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
