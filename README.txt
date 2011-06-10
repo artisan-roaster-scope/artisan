@@ -120,6 +120,22 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.5.0 (10.6.2011)
+- support for Mac OS X 10.4 and PPC added
+- added more translations
+- added wheel graph editor
+- added custom event-control buttons
+- added Omega HHM28 multimeter device support
+- added support for devices with 4 thermocouples
+- added PID duty cycle
+- added math plotter in Extras
+- added run-time multiple device compatibility and symbolic expressions support
+- improved configuration of Axes
+- improved configuration of PID
+- improved Arduino code/configuration
+- improved cupping graphs
+- improved performance/responsiveness in multi-core CPUs
+- bug fixes
 
 v0.5.0b2 (04.6.2011)
 - improved cupping graphs
