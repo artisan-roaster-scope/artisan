@@ -26,7 +26,7 @@ __version__ = u"0.5.0"
 
 #   QT GRAPHIC INTERFACE
 # 2) http://ftp3.ie.freebsd.org/pub/trolltech/pub/qt/source/qt-win-opensource-4.7.1-mingw.exe
-# add to Path environment variable the bin directory of Qt. Example ;C:\Qt\4.7.1\bin
+# add to Path environment variable the bin directory of Qt. Example ;C:\Qt\14.7.1\bin
 
 #   JAVA TO SUPPORT PYSERIAL LIBRARY
 # 3) Java JDK or JRE:  http://java.sun.com/javase/downloads/index.jsp
@@ -583,6 +583,8 @@ class tgraphcanvas(FigureCanvas):
         self.fujiETBT = 0.
         self.currentpidsv = 0.
 
+        self.samplingflag = False
+
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()        
     #################################    FUNCTIONS    ###################################
     #####################################################################################
@@ -593,7 +595,8 @@ class tgraphcanvas(FigureCanvas):
             #apply sampling interval here                
             libtime.sleep(self.delay/1000.)
             
-
+            self.samplingfag = True
+            
             #if using a meter (thermocouple device)
             if self.device != 18:
                 #read time, ET (t1) and BT (t2) TEMPERATURE
@@ -733,7 +736,8 @@ class tgraphcanvas(FigureCanvas):
                 self.resetlines()
                 #add to plot a vertical time line
                 self.ax.plot([tx,tx], [self.ylimit_min,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
-
+            self.samplingflag = False
+            
         except Exception,e:
             self.flagon = False
             self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -1192,12 +1196,24 @@ class tgraphcanvas(FigureCanvas):
         #reset cupping flavor values
         self.flavors = [5.]*len(self.flavorlabels)
 
+        self.samplingflag = False
+
         self.redraw()
         aw.soundpop()
         
         
     #Redraws data   
     def redraw(self):
+        
+        #avoid redrawing in middle of sampling
+        count = 0
+        while self.samplingflag:
+            libtime.sleep(.1)
+            count += 1
+            if count == 100:
+                self.samplingflag = False
+                return
+        
         try:            
             self.fig.clf()   #wipe out figure
             self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
