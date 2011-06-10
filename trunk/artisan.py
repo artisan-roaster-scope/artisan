@@ -590,6 +590,10 @@ class tgraphcanvas(FigureCanvas):
     # sample devices at interval self.delay miliseconds. NOTE: This function is run on its own thread. 
     def sample(self):
         try:
+            #apply sampling interval here                
+            libtime.sleep(self.delay/1000.)
+            
+
             #if using a meter (thermocouple device)
             if self.device != 18:
                 #read time, ET (t1) and BT (t2) TEMPERATURE
@@ -720,7 +724,7 @@ class tgraphcanvas(FigureCanvas):
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
             else:
-                tx = int(self.timeclock.elapsed()/1000.)+1. #add a 1 second correction factor to equal the LCD time
+                tx = int(self.timeclock.elapsed()/1000.) 
                 #readjust xlimit of plot if needed
                 if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
                     self.endofx = tx + 180              # increase x limit by 3 minutes (180)
@@ -730,9 +734,6 @@ class tgraphcanvas(FigureCanvas):
                 #add to plot a vertical time line
                 self.ax.plot([tx,tx], [self.ylimit_min,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
 
-            #apply sampling interval here                
-            libtime.sleep(self.delay/1000.)
-            
         except Exception,e:
             self.flagon = False
             self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -2186,7 +2187,8 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
             aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8))
             libtime.sleep(.5)  #give time for thread to close
-
+            if aw.ser.SP.isOpen():
+                aw.ser.closeport()
 
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
@@ -6686,6 +6688,7 @@ $cupping_notes
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, TEVA18B support",None, QApplication.UnicodeUTF8).arg(u"Markus Wagner")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Swedish localization",None, QApplication.UnicodeUTF8).arg(u"Martin Kral")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Spanish localization",None, QApplication.UnicodeUTF8).arg(u"Bluequijote")
+        contributors += u"<br>" + QApplication.translate(u"About", u"%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg(u"Jim J.")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg(u"Marcio Carneiro")
         box = QMessageBox()
         
