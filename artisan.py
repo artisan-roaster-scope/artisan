@@ -2187,8 +2187,7 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
             aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8))
             libtime.sleep(.5)  #give time for thread to close
-            if aw.ser.SP.isOpen():
-                aw.ser.closeport()
+
 
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
@@ -3701,6 +3700,8 @@ class Athread(QThread):
                 #update screen in main GUI thread
                 self.emit(SIGNAL("updategraphics"))                
             else:
+                if aw.ser.SP.isOpen():
+                    aw.ser.closeport()
                 break  #thread ends
 
 
