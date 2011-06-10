@@ -601,7 +601,7 @@ class tgraphcanvas(FigureCanvas):
                 if count == 100:
                     break
                 
-            self.samplingfag = True
+            self.samplingflag = True
             
             #if using a meter (thermocouple device)
             if self.device != 18:
