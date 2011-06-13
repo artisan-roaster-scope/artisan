@@ -589,174 +589,6 @@ class tgraphcanvas(FigureCanvas):
     #################################    FUNCTIONS    ###################################
     #####################################################################################
         
-    # sample devices at interval self.delay miliseconds. NOTE: This function is run on its own thread. 
-    def sample(self):
-        try:
-            
-            #apply sampling interval here                
-            libtime.sleep(self.delay/1000.)
-
-            #avoid sampling while redrawing
-            count = 0
-            while self.samplingflag:
-                libtime.sleep(.1)
-                count += 1
-                if count == 50:
-                    self.samplingflag = False
-                
-            self.samplingflag = True
-            
-            #if using a meter (thermocouple device)
-            if self.device != 18:
-                #read time, ET (t1) and BT (t2) TEMPERATURE
-                tx,t1,t2 = aw.ser.devicefunctionlist[self.device]()  #use a list of functions (a different one for each device) with index self.device
-                if len(self.ETfunction):
-                    t1 = self.eval_math_expression(self.ETfunction,t1)
-                if len(self.BTfunction):
-                    t2 = self.eval_math_expression(self.BTfunction,t2)
-
-                #filter droputs 
-                if self.mode == "C":
-                    limit = 500.
-                else:
-                    limit = 800.
-                if  t1 < 1. or t1 > limit:
-                    if len(self.timex) > 2:
-                        t1 = self.temp1[-1]
-                    else:
-                        t1 = -1.
-                if t2 < 1. or t2 > limit:
-                    if len(self.timex) > 2:
-                        t2 = self.temp2[-1]
-                    else:
-                        t2 = -1.       
-                                                        
-                #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
-                #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
-                if len(self.timex) > 2 and t1 == self.temp2[-1] and t2 == self.temp1[-1]:
-                    #let's better swap the readings (also they are just repeating the previous ones)
-                    self.temp2.append(t1)
-                    self.temp1.append(t2)
-                else:
-                    #the readings seem to be "in order"
-                    self.temp2.append(t2)
-                    self.temp1.append(t1)
-
-                self.timex.append(tx)
-
-                # update lines data using the lists with new data
-                self.l_temp1.set_data(self.timex, self.temp1)
-                self.l_temp2.set_data(self.timex, self.temp2)
-
-                #this helps to stabilize thread load (for low performance CPUS)
-                libtime.sleep(.1)
-                
-                #we need a minimum of two readings to calculate rate of change
-                if len(self.timex) > 2:
-                    timed = self.timex[-1] - self.timex[-2]   #time difference between last two readings
-                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                    self.rateofchange1 = ((self.temp1[-1] - self.temp1[-2])/timed)*60.  #delta ET (degress/minute)
-                    self.rateofchange2 = ((self.temp2[-1] - self.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
-                    
-                    self.unfiltereddelta1.append(self.rateofchange1)
-                    self.unfiltereddelta2.append(self.rateofchange2)
-                        
-                    #######   filter deltaBT deltaET
-                    if self.deltafilter:
-                        if len(self.timex) > self.deltafilter:   #detafilter is an int = number of pads
-                            a1,a2 = 0.,0.
-                            for k in range(self.deltafilter):
-                                a1 += self.unfiltereddelta1[-(k+1)]
-                                a2 += self.unfiltereddelta2[-(k+1)]
-                            self.rateofchange1 = a1/float(self.deltafilter)
-                            self.rateofchange2 = a2/float(self.deltafilter)
-                            
-                    rateofchange1plot = float(self.sensitivity)*self.rateofchange1   
-                    rateofchange2plot = float(self.sensitivity)*self.rateofchange2
-
-                else:
-                    self.unfiltereddelta1.append(0.)
-                    self.unfiltereddelta2.append(0.)                    
-                    self.rateofchange1,self.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
-
-                # append new data to the rateofchange
-
-                self.delta1.append(rateofchange1plot)
-                self.delta2.append(rateofchange2plot)
-                                           
-                if self.DeltaETflag:
-                    self.l_delta1.set_data(self.timex, self.delta1)
-                if self.DeltaBTflag:
-                    self.l_delta2.set_data(self.timex, self.delta2)
-
-                #readjust xlimit of plot if needed
-                if  self.timex[-1] > (self.endofx - 45):            # if difference is smaller than 30 seconds
-                    self.endofx = int(self.timex[-1] + 180)         # increase x limit by 3 minutes
-                    self.ax.set_xlim(self.startofx,self.endofx)
-                    self.xaxistosm()
-
-                #this helps to stabilize thread load (for low performance CPUS)
-                libtime.sleep(.1)
-                
-                if self.projectFlag:
-                    self.viewProjection()                   
-                if self.background and self.backgroundReproduce:
-                    self.playbackevent()
-
-                #check alarms    
-                for i in range(len(self.alarmflag)):
-                    #if alarm on, and not triggered, and time is after set time:
-                    if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
-                        if self.alarmsource[i] == 0:                        #check ET
-                            if self.temp1[-1] > self.alarmtemperature[i]:
-                                self.setalarm(i)
-                        elif self.alarmsource[i] == 1:                      #check BT
-                            if self.temp2[-1] > self.alarmtemperature[i]:
-                                self.setalarm(i)
-
-
-                libtime.sleep(.02)
-                ##############  if using more than one device
-                ndevices = len(self.extradevices)
-                if ndevices:
-                    if len(aw.extraser) == len(self.extradevices) == len(self.extratemp1) == len(self.extratemp1lines):
-                        for i in range(ndevices):
-                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[self.extradevices[i]]()
-                            if len(self.extramathexpression1[i]):
-                                extrat1 = self.eval_math_expression(self.extramathexpression1[i],extrat1)
-                            if len(self.extramathexpression2[i]):
-                                extrat2 = self.eval_math_expression(self.extramathexpression2[i],extrat2)
-                            self.extratemp1[i].append(extrat1)
-                            self.extratemp2[i].append(extrat2)                        
-                            self.extratimex[i].append(extratx)
-                            # update extra lines 
-                            self.extratemp1lines[i].set_data(self.extratimex[i], self.extratemp1[i])
-                            self.extratemp2lines[i].set_data(self.extratimex[i], self.extratemp2[i])
-         
-            #############    if using DEVICE 18 (no device). Manual mode
-            # temperatures are entered when pressing push buttons like for example at self.markDryEnd()        
-            else:
-                tx = int(self.timeclock.elapsed()/1000.) 
-                #readjust xlimit of plot if needed
-                if  tx > (self.endofx - 45):            # if difference is smaller than 45 seconds  
-                    self.endofx = tx + 180              # increase x limit by 3 minutes (180)
-                    self.ax.set_xlim(self.startofx,self.endofx)
-                    self.xaxistosm()   
-                self.resetlines()
-                #add to plot a vertical time line
-                self.ax.plot([tx,tx], [self.ylimit_min,self.ylimit],color = self.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
-                
-            self.samplingflag = False
-            
-        except Exception,e:
-            self.flagon = False
-            self.samplingflag = False
-            self.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
-            return
-        
-        finally:
-            self.samplingflag = False
-
 
     #run all graphic changes from GUI thread     
     def updategraphics(self):
@@ -777,6 +609,17 @@ class tgraphcanvas(FigureCanvas):
             #check if HUD is ON
             if self.HUDflag:
                 aw.showHUD[aw.HUDfunction]() 
+
+            #check alarms    
+            for i in range(len(self.alarmflag)):
+                #if alarm on, and not triggered, and time is after set time:
+                if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
+                    if self.alarmsource[i] == 0:                        #check ET
+                        if self.temp1[-1] > self.alarmtemperature[i]:
+                            self.setalarm(i)
+                    elif self.alarmsource[i] == 1:                      #check BT
+                        if self.temp2[-1] > self.alarmtemperature[i]:
+                            self.setalarm(i)
 
         except Exception,e:
             self.flagon = False
@@ -915,8 +758,8 @@ class tgraphcanvas(FigureCanvas):
 
         if self.projectionmode == 0:
             #calculate the temperature endpoint at endofx acording to the latest rate of change
-            BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)
-            ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)
+            BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)/60.
+            ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)/60.
             #plot projections
             self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
                              linestyle = '-.', linewidth= 8, alpha = .3)
@@ -940,7 +783,7 @@ class tgraphcanvas(FigureCanvas):
                 xpoints = list(numpy.arange (self.timex[-1],self.endofx + 120, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds)
                 #get y points
                 ypoints = [self.temp2[-1]]                              	    # start initializing with last BT
-                K =  self.projectionconstant*self.rateofchange2/den                 # multiplier
+                K =  self.projectionconstant*self.rateofchange2/den/60.                 # multiplier
                 for i in range(len(xpoints)-1):                                     # create new points from previous points 
                     DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
                     ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint                        
@@ -1215,6 +1058,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.redraw()
         aw.soundpop()
+
+        
         
         
     #Redraws data   
@@ -3728,8 +3573,165 @@ class Athread(QThread):
     def __init__(self, parent = None):        
         QThread.__init__(self, parent)
 
-    def __del__(self):  
-        self.wait()
+    # sample devices at interval self.delay miliseconds.  
+    def sample(self):
+        try:
+            
+            #apply sampling interval here                
+            libtime.sleep(aw.qmc.delay/1000.)
+
+            #avoid sampling while redrawing
+            count = 0
+            while aw.qmc.samplingflag:
+                libtime.sleep(.1)
+                count += 1
+                if count == 50:
+                    aw.qmc.samplingflag = False
+                
+            aw.qmc.samplingflag = True
+            
+            #if using a meter (thermocouple device)
+            if aw.qmc.device != 18:
+                #read time, ET (t1) and BT (t2) TEMPERATURE
+                tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                if len(aw.qmc.ETfunction):
+                    t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
+                if len(aw.qmc.BTfunction):
+                    t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
+
+                #filter droputs 
+                if aw.qmc.mode == "C":
+                    limit = 500.
+                else:
+                    limit = 800.
+                if  t1 < 1. or t1 > limit:
+                    if len(aw.qmc.timex) > 2:
+                        t1 = aw.qmc.temp1[-1]
+                    else:
+                        t1 = -1.
+                if t2 < 1. or t2 > limit:
+                    if len(aw.qmc.timex) > 2:
+                        t2 = aw.qmc.temp2[-1]
+                    else:
+                        t2 = -1.       
+                                                        
+                #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
+                #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
+                if len(aw.qmc.timex) > 2 and t1 == aw.qmc.temp2[-1] and t2 == aw.qmc.temp1[-1]:
+                    #let's better swap the readings (also they are just repeating the previous ones)
+                    aw.qmc.temp2.append(t1)
+                    aw.qmc.temp1.append(t2)
+                else:
+                    #the readings seem to be "in order"
+                    aw.qmc.temp2.append(t2)
+                    aw.qmc.temp1.append(t1)
+
+                aw.qmc.timex.append(tx)
+
+                # update lines data using the lists with new data
+                aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
+                aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+
+                #this helps to stabilize thread load (for low performance CPUS)
+                libtime.sleep(.1)
+                
+                #we need a minimum of two readings to calculate rate of change
+                if len(aw.qmc.timex) > 2:
+                    timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
+                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
+                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
+                    
+                    aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
+                    aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
+                        
+                    #######   filter deltaBT deltaET
+                    if aw.qmc.deltafilter:
+                        if len(aw.qmc.timex) > aw.qmc.deltafilter:   #detafilter is an int = number of pads
+                            a1,a2 = 0.,0.
+                            for k in range(aw.qmc.deltafilter):
+                                a1 += aw.qmc.unfiltereddelta1[-(k+1)]
+                                a2 += aw.qmc.unfiltereddelta2[-(k+1)]
+                            aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
+                            aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
+                            
+                    rateofchange1plot = float(aw.qmc.sensitivity)*aw.qmc.rateofchange1   
+                    rateofchange2plot = float(aw.qmc.sensitivity)*aw.qmc.rateofchange2
+
+                else:
+                    aw.qmc.unfiltereddelta1.append(0.)
+                    aw.qmc.unfiltereddelta2.append(0.)                    
+                    aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+
+                # append new data to the rateofchange
+
+                aw.qmc.delta1.append(rateofchange1plot)
+                aw.qmc.delta2.append(rateofchange2plot)
+                                           
+                if aw.qmc.DeltaETflag:
+                    aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
+                if aw.qmc.DeltaBTflag:
+                    aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
+
+                #readjust xlimit of plot if needed
+                if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                    aw.qmc.endofx = int(aw.qmc.timex[-1] + 180)         # increase x limit by 3 minutes
+                    aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
+                    aw.qmc.xaxistosm()
+
+                #this helps to stabilize thread load (for low performance CPUS)
+                libtime.sleep(.1)
+                
+                if aw.qmc.projectFlag:
+                    aw.qmc.viewProjection()                   
+                if aw.qmc.background and aw.qmc.backgroundReproduce:
+                    aw.qmc.playbackevent()
+
+                libtime.sleep(.02)
+                ##############  if using more than one device
+                ndevices = len(aw.qmc.extradevices)
+                if ndevices:
+                    if len(aw.extraser) == len(aw.qmc.extradevices) == len(aw.qmc.extratemp1) == len(aw.qmc.extratemp1lines):
+                        for i in range(ndevices):
+                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                            if len(aw.qmc.extramathexpression1[i]):
+                                extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                            if len(aw.qmc.extramathexpression2[i]):
+                                extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                            aw.qmc.extratemp1[i].append(extrat1)
+                            aw.qmc.extratemp2[i].append(extrat2)                        
+                            aw.qmc.extratimex[i].append(extratx)
+                            # update extra lines 
+                            aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                            aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+         
+            #############    if using DEVICE 18 (no device). Manual mode
+            # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()        
+            else:
+                tx = int(aw.qmc.timeclock.elapsed()/1000.) 
+                #readjust xlimit of plot if needed
+                if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds  
+                    aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
+                    aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
+                    aw.qmc.xaxistosm()   
+                aw.qmc.resetlines()
+                #add to plot a vertical time line
+                aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
+                
+            aw.qmc.samplingflag = False
+
+            #update screen in main GUI thread
+            self.emit(SIGNAL("updategraphics"))
+            
+        except Exception,e:
+            aw.qmc.flagon = False
+            aw.qmc.samplingflag = False
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
+        
+        finally:
+            aw.qmc.samplingflag = False
+
               
     def run(self):
         timedelay = aw.qmc.delay/1000.
@@ -3738,28 +3740,29 @@ class Athread(QThread):
         while True:
             if aw.qmc.flagon:
                 #collect information
-                aw.qmc.sample()
-                #update screen in main GUI thread
-                self.emit(SIGNAL("updategraphics"))                
+                self.sample()
             else:
                 if aw.ser.SP.isOpen():
                     aw.ser.closeport()
+                self.quit()
                 break  #thread ends
 
 
 class Athreadserver(QWidget):
-    def _init_(self,parent=None):
-        super(QWidget,self)._init_(parent)
+    def _init_(self,parent = None):
+        QWidget._init_(parent)
+        #super(QWidget,self)._init_(parent)
 
     def createThread(self):
         if aw.qmc.flagon == False:
             aw.qmc.flagon = True
             thread = Athread(self)
             #delete when finished to save memory 
-            self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
+            #self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
+            #self.connect(thread,SIGNAL("terminated()"),thread,SLOT("deleteLater()"))            
             #connect graphics to GUI thread
             self.connect(thread, SIGNAL("updategraphics"),aw.qmc.updategraphics)
-            thread.start()       
+            thread.start()
 
 ########################################################################################                            
 #################### MAIN APPLICATION WINDOW ###########################################
@@ -6731,7 +6734,7 @@ $cupping_notes
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, TEVA18B support",None, QApplication.UnicodeUTF8).arg(u"Markus Wagner")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Swedish localization",None, QApplication.UnicodeUTF8).arg(u"Martin Kral")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Spanish localization",None, QApplication.UnicodeUTF8).arg(u"Bluequijote")
-        contributors += u"<br>" + QApplication.translate(u"About", u"%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg(u"Jim J.")
+        contributors += u"<br>" + QApplication.translate(u"About", u"%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg(u"Jim G.")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg(u"Marcio Carneiro")
         box = QMessageBox()
         
@@ -10988,7 +10991,7 @@ class serialport(object):
         else:
             aw.qmc.fujiETBT = 0.
         
-        return tx,t2,t1
+        return tx,t1,t2
 
 
     def virtual(self):
