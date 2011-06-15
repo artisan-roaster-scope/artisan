@@ -84,7 +84,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
                          QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QMutex)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QMutex,QProcess)
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
@@ -610,16 +610,17 @@ class tgraphcanvas(FigureCanvas):
             if self.HUDflag:
                 aw.showHUD[aw.HUDfunction]() 
 
-            #check alarms    
-            for i in range(len(self.alarmflag)):
-                #if alarm on, and not triggered, and time is after set time:
-                if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
-                    if self.alarmsource[i] == 0:                        #check ET
-                        if self.temp1[-1] > self.alarmtemperature[i]:
-                            self.setalarm(i)
-                    elif self.alarmsource[i] == 1:                      #check BT
-                        if self.temp2[-1] > self.alarmtemperature[i]:
-                            self.setalarm(i)
+            #check alarms
+            if self.device != 18:
+                for i in range(len(self.alarmflag)):
+                    #if alarm on, and not triggered, and time is after set time:
+                    if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
+                        if self.alarmsource[i] == 0:                        #check ET
+                            if self.temp1[-1] > self.alarmtemperature[i]:
+                                self.setalarm(i)
+                        elif self.alarmsource[i] == 1:                      #check BT
+                            if self.temp2[-1] > self.alarmtemperature[i]:
+                                self.setalarm(i)
 
         except Exception,e:
             self.flagon = False
@@ -679,8 +680,8 @@ class tgraphcanvas(FigureCanvas):
         elif self.alarmaction[alarmnumber] == 1:
             self.alarmstate[alarmnumber] = 1
             try:
-                #self.alarmstrings[alarmnumber] = "filepath"
-                os.startfile(unicode(self.alarmstrings[alarmnumber]))
+                fname = unicode(self.alarmstrings[alarmnumber])
+                QDesktopServices.openUrl(QUrl(u"file:///" + unicode(QDir().current().absolutePath()) + u"/" + fname, QUrl.TolerantMode))
                 aw.sendmessage(QApplication.translate("Message Area","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(self.alarmstrings[alarmnumber]))
             except Exception,e:
                 self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -1069,9 +1070,9 @@ class tgraphcanvas(FigureCanvas):
             #avoid redrawing in middle of sampling
             count = 0
             while self.samplingflag:
-                libtime.sleep(.1)
+                libtime.sleep(.05)
                 count += 1
-                if count == 50:
+                if count == 100:
                     self.samplingflag = False
 
             self.samplingflag = True
@@ -3570,8 +3571,11 @@ class VMToolbar(NavigationToolbar):
         return QIcon(os.path.join(self.basedir, name))
 
 class Athread(QThread):
-    def __init__(self, parent = None):        
-        QThread.__init__(self, parent)
+##    def __init__(self, parent = None):        
+##        QThread.__init__(self, parent)
+
+    def _init_(self,parent = None):
+        super(Athread,self)._init_(parent)
 
     # sample devices at interval self.delay miliseconds.  
     def sample(self):
@@ -3580,12 +3584,12 @@ class Athread(QThread):
             #apply sampling interval here                
             libtime.sleep(aw.qmc.delay/1000.)
 
-            #avoid sampling while redrawing
+            #avoid sampling while redrawing. synchronization.
             count = 0
             while aw.qmc.samplingflag:
-                libtime.sleep(.1)
+                libtime.sleep(.05)
                 count += 1
-                if count == 50:
+                if count == 100:
                     aw.qmc.samplingflag = False
                 
             aw.qmc.samplingflag = True
@@ -3704,6 +3708,7 @@ class Athread(QThread):
                             # update extra lines 
                             aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
                             aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+
          
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()        
@@ -3731,7 +3736,7 @@ class Athread(QThread):
         
         finally:
             aw.qmc.samplingflag = False
-
+     
               
     def run(self):
         timedelay = aw.qmc.delay/1000.
@@ -3743,26 +3748,29 @@ class Athread(QThread):
                 self.sample()
             else:
                 if aw.ser.SP.isOpen():
-                    aw.ser.closeport()
+                    aw.ser.closeport()            
                 self.quit()
+                QApplication.processEvents()
                 break  #thread ends
 
 
 class Athreadserver(QWidget):
     def _init_(self,parent = None):
-        QWidget._init_(parent)
-        #super(QWidget,self)._init_(parent)
+        super(Athreadserver,self)._init_(parent)
 
     def createThread(self):
         if aw.qmc.flagon == False:
             aw.qmc.flagon = True
             thread = Athread(self)
+            QApplication.processEvents()
+
             #delete when finished to save memory 
-            #self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
+            self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
             #self.connect(thread,SIGNAL("terminated()"),thread,SLOT("deleteLater()"))            
             #connect graphics to GUI thread
             self.connect(thread, SIGNAL("updategraphics"),aw.qmc.updategraphics)
             thread.start()
+            thread.wait(300)    #needed in some Win OS
 
 ########################################################################################                            
 #################### MAIN APPLICATION WINDOW ###########################################
@@ -4624,7 +4632,8 @@ class ApplicationWindow(QMainWindow):
                                                     
                 elif aw.extraeventsactions[ee] == 2:
                     try:
-                        os.startfile(unicode(self.extraeventsactionstrings[ee]))
+                        fname = unicode(self.extraeventsactionstrings[ee])
+                        QDesktopServices.openUrl(QUrl(u"file:///" + unicode(QDir().current().absolutePath()) + u"/" + fname, QUrl.TolerantMode))            
                     except Exception,e:
                         self.qmc.adderror(QApplication.translate("Error Message","Exception Error: recordextraevent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
                 elif aw.extraeventsactions[ee] == 3:
