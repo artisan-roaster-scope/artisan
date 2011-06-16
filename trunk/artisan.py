@@ -1072,7 +1072,7 @@ class tgraphcanvas(FigureCanvas):
             while self.samplingflag:
                 libtime.sleep(.05)
                 count += 1
-                if count == 100:
+                if count == 150:
                     self.samplingflag = False
 
             self.samplingflag = True
@@ -2087,33 +2087,23 @@ class tgraphcanvas(FigureCanvas):
                 if bt != 1 and et != -1:  #cancel
                     self.drawmanual(et,bt,tx)
                     self.timeindex[0] = len(self.timex)-1
-
-                    # put initial marker on graph
-                    rect = patches.Rectangle( (self.timex[self.timeindex[0]],self.ylimit_min), width=.01, height=(self.ylimit+abs(self.ylimit_min)), color = self.palette["text"])
-                    self.ax.add_patch(rect)
                 else:
                     return
-            #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
-            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                             xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] +  self.ystep),color=self.palette["text"],
-                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(u"Start 00:00", xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                             xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] - self.ystep),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-
+                
+            self.xaxistosm()    
+            
             message = QApplication.translate("Message Area","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(unicode(self.temp2[self.timeindex[0]]) + self.mode)
- 
+            aw.sendmessage(message) 
             aw.button_8.setDisabled(True)
-            aw.button_8.setFlat(True)
-            self.xaxistosm()
-                    
+            aw.button_8.setFlat(True)            
+
+            aw.soundpop()
+            self.redraw()
+            
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            
-        aw.sendmessage(message)
-        aw.soundpop()
-        
+            aw.sendmessage(message)
+
     def markDryEnd(self):
         if self.flagon:
             if self.device != 18:
@@ -2127,32 +2117,24 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     return
                 
-            #calculate time elapsed since charge time
-            st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]))
-            #anotate temperature
-            self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
-            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                             xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]+self.ystep), color=self.palette["text"],
-                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                             xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]-self.ystep),color=self.palette["text"],
-                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+            if aw.qmc.phasesbuttonflag:     
+                self.phases[1] = int(round(self.temp2[self.timeindex[1]]))                
 
             aw.button_19.setDisabled(True)
             aw.button_19.setFlat(True)
-            message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[1]]) + self.mode)
             
-            if aw.qmc.phasesbuttonflag:     
-                self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
-                self.redraw()     
+            st1 = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
+            message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            #set message at bottom
+            aw.sendmessage(message)
+            aw.soundpop()
+            self.redraw()
+                        
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+            aw.sendmessage(message)
 
-        #set message at bottom
-        aw.sendmessage(message)
-        aw.soundpop()
-        
     #redord 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
         if self.flagon:
@@ -2167,74 +2149,53 @@ class tgraphcanvas(FigureCanvas):
                     self.timeindex[2] = len(self.timex)-1
                 else:
                     return
-            #calculate time elapsed since charge time
-            st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
-            #anotate temperature
-            if self.timeindex[1]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
-            else:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])                
-            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                             xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]+ self.ystep),color=self.palette["text"],
-                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                             xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]-self.ystep),color=self.palette["text"],
-                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-
-            aw.button_3.setDisabled(True)
-            aw.button_3.setFlat(True)
-            message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[2]]) + self.mode)
 
             if aw.qmc.phasesbuttonflag:     
                 self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
-                self.redraw()
+            
+            aw.button_3.setDisabled(True)
+            aw.button_3.setFlat(True)
+            
+            st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
+            message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)            
+            aw.sendmessage(message)
+            aw.soundpop()
+            self.redraw()
+            
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-
-        #set message at bottom
-        aw.sendmessage(message)
-        aw.soundpop()
+            aw.sendmessage(message)
+        
     #record 1C end markers of BT. called from button_4 of application window
     def mark1Cend(self):
         if self.flagon:
-            # record only if 1Cs has been saved
-            if self.timeindex[2]:
-                if self.device != 18:
+ 
+            if self.device != 18:
+                self.timeindex[3] = len(self.timex)-1
+            else:
+                tx = self.timeclock.elapsed()/1000.
+                et,bt = aw.ser.NONE()
+                if et != -1 and bt != -1:
+                    self.drawmanual(et,bt,tx)                           
                     self.timeindex[3] = len(self.timex)-1
                 else:
-                    tx = self.timeclock.elapsed()/1000.
-                    et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)                           
-                        self.timeindex[3] = len(self.timex)-1
-                    else:
-                        return                    
-                #calculate time elapsed since charge time
-                st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
-                #anotate temperature
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
-                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]+self.ystep),color=self.palette["text"],
-                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),color=self.palette["text"],
-                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    return                    
 
-                self.ax.axvspan(self.timex[self.timeindex[2]],self.timex[self.timeindex[3]], facecolor=self.palette["watermarks"], alpha=0.2)
-
-                aw.button_4.setDisabled(True)
-                aw.button_4.setFlat(True)
-
-                message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[3]]) + self.mode)
-            else:
-                message = QApplication.translate("Message Area","1Cs mark missing. Do that first", None, QApplication.UnicodeUTF8)
+            aw.button_4.setDisabled(True)
+            aw.button_4.setFlat(True)
+            
+            st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])                           
+            st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
+            message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            aw.sendmessage(message)
+            aw.soundpop()
+            self.redraw()
+            
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            
-        aw.sendmessage(message)
-        aw.soundpop()        
+            aw.sendmessage(message)
+
     #record 2C start markers of BT. Called from button_5 of application window
     def mark2Cstart(self):
         if self.flagon:
@@ -2248,68 +2209,50 @@ class tgraphcanvas(FigureCanvas):
                     self.timeindex[4] = len(self.timex)-1
                 else:
                     return              
-            st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
-            if self.timeindex[3]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
-            else:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])            
-            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                             xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]+self.ystep),color=self.palette["text"],
-                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-             
-            self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                             xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),color=self.palette["text"],
-                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
             aw.button_5.setDisabled(True)
             aw.button_5.setFlat(True)
 
-            message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[4]]) + self.mode)
+            st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode            
+            message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            aw.sendmessage(message)
+            aw.soundpop()
+            self.redraw()
+            
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            
-        aw.sendmessage(message)
-        aw.soundpop()        
+            aw.sendmessage(message)            
+       
     #record 2C end markers of BT. Called from button_6  of application window
     def mark2Cend(self):
         if self.flagon:
-            # record only if 1Cs has been saved
-            if self.timeindex[4]:
-                if self.device != 18:                
+            
+            if self.device != 18:                
+                self.timeindex[5] = len(self.timex)-1
+            else:
+                tx = self.timeclock.elapsed()/1000.
+                et,bt = aw.ser.NONE()
+                if et != -1 and bt != -1:
+                    self.drawmanual(et,bt,tx)                           
                     self.timeindex[5] = len(self.timex)-1
                 else:
-                    tx = self.timeclock.elapsed()/1000.
-                    et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)                           
-                        self.timeindex[5] = len(self.timex)-1
-                    else:
-                        return
-                st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
-                #anotate temperature
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
-                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]+self.ystep),color=self.palette["text"],
-                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-                #anotate time
-                self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]-self.ystep),color=self.palette["text"],
-                                 arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                    return
+                
+            aw.button_6.setDisabled(True)
+            aw.button_6.setFlat(True)
 
-
-                self.ax.axvspan(self.timex[self.timeindex[4]],self.timex[self.timeindex[5]], facecolor=self.palette["watermarks"], alpha=0.2)
-
-                aw.button_6.setDisabled(True)
-                aw.button_6.setFlat(True)
-
-                message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[5]]) + self.mode)
-            else:
-                message = QApplication.translate("Message Area","SCs mark missing. Do that first", None, QApplication.UnicodeUTF8)
+            st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
+            message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            aw.sendmessage(message)            
+            aw.soundpop()
+            self.redraw()
+            
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            
-        aw.sendmessage(message)            
-        aw.soundpop()
+            aw.sendmessage(message)            
+
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
         if self.flagon:
@@ -2321,50 +2264,25 @@ class tgraphcanvas(FigureCanvas):
                 if et != -1 and bt != -1:
                     self.drawmanual(et,bt,tx)
                     self.timeindex[6] = len(self.timex)-1
-                    # put final BT marker on graph
-                    rect = patches.Rectangle( (self.timex[self.timeindex[6]],self.ylimit_min), width=.01, height=(self.ylimit+abs(self.ylimit_min)), color = self.palette["text"])
-                    self.ax.add_patch(rect)
-                    if et >  bt:
-                        #put ET marker on graph
-                        rect = patches.Rectangle( (self.timex[self.timeindex[6]],bt), width=.05, height=et-bt, color = self.palette["et"])
-                        self.ax.add_patch(rect)
                 else:
-                    return             
-            st1 = QApplication.translate("Scope Annotation","End %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
-            #anotate temperature
-            if self.timeindex[5]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
-            elif self.timeindex[4]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]])
-            elif self.timeindex[3]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]])
-            elif self.timeindex[2]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]])
-            elif self.timeindex[1]:
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]])
-                            
-            self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                             xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]+self.ystep),color=self.palette["text"],
-                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            #anotate time
-            self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                             xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]-self.ystep),color=self.palette["text"],
-                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-            
-            self.writestatistics()
-            
+                    return
+                
             aw.button_9.setDisabled(True)
             aw.button_9.setFlat(True)
             
-            message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(unicode(self.temp2[self.timeindex[6]]) + self.mode)
+            st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
+            st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
+            message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            aw.sendmessage(message)
+            aw.soundpop()
+            self.redraw()
             
             #prevents accidentally deleting a finished roast
             self.safesaveflag = True
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+            aw.sendmessage(message)
             
-        aw.sendmessage(message)
-        aw.soundpop()
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time           
@@ -2404,8 +2322,8 @@ class tgraphcanvas(FigureCanvas):
                     aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
                     aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
                     aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                self.redraw()     
                     
+                self.redraw()     
                 aw.soundpop()
 
             else:
@@ -2443,8 +2361,9 @@ class tgraphcanvas(FigureCanvas):
                     aw.lineEvent.setText(self.specialeventsStrings[Nevents])
                 self.redraw()
 
-# Writes information about the finished profile in the graph
+    # Writes information about the finished profile in the graph
     def writestatistics(self):
+        
         TP_index = aw.findTP()
         if self.timeindex[1] and aw.qmc.phasesbuttonflag:
             #manual dryend available
@@ -2603,12 +2522,7 @@ class tgraphcanvas(FigureCanvas):
         self.temp2.append(bt)
         self.timex.append(tx)
         self.l_temp2.set_data(self.timex, self.temp2)
-        self.fig.canvas.draw()
-        #write et when above bt
-        if et >  bt and et > 10:
-            self.ax.annotate(u"%.1f"%(et), xy=(tx, et),xytext=(tx,et + 30),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
-        
+               
     def movebackground(self,direction,step):
         lt = len(self.timeB)
         le = len(self.temp1B)
@@ -3590,7 +3504,7 @@ class Athread(QThread):
                 libtime.sleep(.05)
                 count += 1
                 if count == 100:
-                    aw.qmc.samplingflag = False
+                    return
                 
             aw.qmc.samplingflag = True
             
