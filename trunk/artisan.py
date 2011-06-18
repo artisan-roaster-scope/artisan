@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.5.0"
+__version__ = u"0.5.1"
 
 
 # ABOUT
