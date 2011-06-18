@@ -1,3 +1,13 @@
+artisan (0.5.0-0) maverick; urgency=low
+
+  * new upstream release
+  * changes since beta1:
+    - improved cupping graphs
+    - improved performance/responsiveness in multi-core CPUs
+    - bug fixes
+
+ -- lukas <lukas@einfachkaffee.de>  Sat, 18 Jun 2011 16:33:39 +0200
+
 artisan (0.5.0-0.b1) maverick; urgency=low
 
   * new upstream beta release
