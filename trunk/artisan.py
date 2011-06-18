@@ -72,7 +72,6 @@ import cgi
 import codecs
 import numpy
 import array
-import codecs
 import struct
 from scipy import fft
 from scipy import interpolate as inter
@@ -82,9 +81,9 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPalette,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
-                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox)
+                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox )
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QMutex,QProcess)
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QMutex)
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
@@ -210,6 +209,20 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
                                             QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
                                             QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
+
+
+        self.coffeegeekflavordefaultlabels = [QApplication.translate("Textbox", "Aroma",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Mouthfeel",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Flavour",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Aftertaste",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
+
+
+        self.Intelligentsiaflavordefaultlabels = [QApplication.translate("Textbox", "Sweetness",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Finish",None, QApplication.UnicodeUTF8)]
 
         
         self.flavorlabels = list(self.artisanflavordefaultlabels)
@@ -569,20 +582,6 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color of lines
 
-
-    ###################  temporary storage to pass values for thermocouples 3 and 4. Used in serial objects
-        
-        #holds extra T3 and T4 values for center 309
-        self.extra309T3 = 0.
-        self.extra309T4 = 0.
-        self.extra309TX = 0.
-
-        #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT      
-        self.dutycycle = 0.
-        self.dutycycleTX = 0.
-        self.fujiETBT = 0.
-        self.currentpidsv = 0.
-
         self.samplingflag = False
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()        
@@ -600,8 +599,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
                 
                 if self.device == 0:                              #extra LCDs for pid  
-                    aw.lcd6.display(self.currentpidsv)
-                    aw.lcd7.display(self.dutycycle)
+                    aw.lcd6.display(aw.ser.currentpidsv)
+                    aw.lcd7.display(aw.ser.dutycycle)
 
             #display new-updated canvas
             self.fig.canvas.draw()
@@ -677,8 +676,9 @@ class tgraphcanvas(FigureCanvas):
         if self.alarmaction[alarmnumber] == 0:
             self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
             QMessageBox.information(self,QApplication.translate("MessageBox", "Alarm notice",None, QApplication.UnicodeUTF8),self.alarmstrings[alarmnumber])
+            aw.soundpop()
         elif self.alarmaction[alarmnumber] == 1:
-            self.alarmstate[alarmnumber] = 1
+            self.alarmstate[alarmnumber] = 1 #turn off flag as it has been read
             try:
                 fname = unicode(self.alarmstrings[alarmnumber])
                 QDesktopServices.openUrl(QUrl(u"file:///" + unicode(QDir().current().absolutePath()) + u"/" + fname, QUrl.TolerantMode))
@@ -4894,6 +4894,7 @@ class ApplicationWindow(QMainWindow):
         string += QApplication.translate("MessageBox", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8) + "<br><br>"
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
+            
 
     #sets minieditor 2 last event	
     def setminieditor2lastevent(self):
@@ -8673,10 +8674,14 @@ class editGraphDlg(QDialog):
         aw.sendmessage(QApplication.translate("Message Area","Roast properties updated but profile not saved to disk", None, QApplication.UnicodeUTF8))            
         aw.qmc.redraw()
         self.close()
-        
+
+
+
+
 ##########################################################################
 #####################  VIEW ERROR LOG DLG  ###############################
 ##########################################################################
+
         
 class errorDlg(QDialog):
     def __init__(self, parent = None):
@@ -9896,7 +9901,7 @@ class flavorDlg(QDialog):
 
         defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E"])
+        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia"])
         self.defaultcombobox.setCurrentIndex(0)
         self.connect(self.defaultcombobox, SIGNAL("currentIndexChanged(int)"),self.setdefault)
 
@@ -10033,7 +10038,7 @@ class flavorDlg(QDialog):
             
     def setdefault(self):
         dindex =  self.defaultcombobox.currentIndex()
-        #["","Artisan","SCCA","CQI","SweetMarias","C","E"]
+        #["","Artisan","SCCA","CQI","SweetMarias","C","E",coffeegeek,Intelligentsia]
         if dindex == 1:
             aw.qmc.flavorlabels = list(aw.qmc.artisanflavordefaultlabels)
             aw.qmc.flavorstartangle = 90
@@ -10052,6 +10057,13 @@ class flavorDlg(QDialog):
         elif dindex == 6:
             aw.qmc.flavorlabels = list(aw.qmc.Eflavordefaultlabels)
             aw.qmc.flavorstartangle = 90
+        elif dindex == 7:
+            aw.qmc.flavorlabels = list(aw.qmc.coffeegeekflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+        elif dindex == 8:
+            aw.qmc.flavorlabels = list(aw.qmc.Intelligentsiaflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+            
         else:
             return
         aw.qmc.flavors = [5.]*len(aw.qmc.flavorlabels)
@@ -10884,6 +10896,16 @@ class serialport(object):
                                    self.virtual             #25
                                    ]
 
+        #temporary storage to pass values. Holds extra T3 and T4 values for center 309
+        self.extra309T3 = 0.
+        self.extra309T4 = 0.
+        self.extra309TX = 0.
+
+        #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT      
+        self.dutycycle = 0.
+        self.dutycycleTX = 0.
+        self.fujiETBT = 0.
+        self.currentpidsv = 0.
 
 #################################################
 
@@ -10892,7 +10914,7 @@ class serialport(object):
     def fujitemperature(self):
         
         #update ET SV LCD 6
-        aw.qmc.currentpidsv = aw.pid.readcurrentsv()
+        self.currentpidsv = aw.pid.readcurrentsv()
 
         # get the temperature for ET. RS485 unit ID (1)
         t1 = aw.pid.gettemperature(1)/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
@@ -10907,8 +10929,8 @@ class serialport(object):
             t2 = 0.
 
         #get current duty cycle and update LCD 7
-        aw.qmc.dutycycle = aw.pid.readdutycycle()
-        aw.qmc.dutycycleTX = tx
+        self.dutycycle = aw.pid.readdutycycle()
+        self.dutycycleTX = tx
         if t2:
             aw.qmc.fujiETBT = t1-t2
         else:
@@ -10923,8 +10945,8 @@ class serialport(object):
 
     #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
     def fujidutycycle(self):
-        #return saved readings
-        return aw.qmc.dutycycleTX,aw.qmc.dutycycle,aw.qmc.fujiETBT   
+        #return saved readings from device 0
+        return aw.ser.dutycycleTX, aw.ser.dutycycle, aw.ser.fujiETBT   
 
     def HH506RA(self):
         
@@ -10963,7 +10985,7 @@ class serialport(object):
     #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
     def CENTER309_34(self):
          #return saved readings collected at self.CENTER309temperature()
-         return aw.qmc.extra309TX,aw.qmc.extra309T3,aw.qmc.extra309T4 
+         return aw.ser.extra309TX,aw.ser.extra309T3,aw.ser.extra309T4 
 
     def CENTER306(self):
 
@@ -11025,7 +11047,7 @@ class serialport(object):
     #especial function that collects extra T3 and T4 from Vol K204 while keeping compatibility
     def K204_34(self):
          #return saved readings collected at self.CENTER309temperature()
-         return aw.qmc.extra309TX,aw.qmc.extra309T3,aw.qmc.extra309T4 
+         return aw.ser.extra309TX,aw.ser.extra309T3,aw.ser.extra309T4 
 
     def VOLTCRAFTK202(self):
         
@@ -11553,9 +11575,9 @@ class serialport(object):
                     T1 = int(binascii.hexlify(r[7] + r[8]),16)/10.
                     T2 = int(binascii.hexlify(r[9] + r[10]),16)/10.
                     #save these variables if using T3 and T4
-                    aw.qmc.extra309T3 = int(binascii.hexlify(r[11] + r[12]),16)/10.
-                    aw.qmc.extra309T4 = int(binascii.hexlify(r[13] + r[14]),16)/10.
-                    aw.qmc.extra309TX = aw.qmc.timeclock.elapsed()/1000.
+                    self.extra309T3 = int(binascii.hexlify(r[11] + r[12]),16)/10.
+                    self.extra309T4 = int(binascii.hexlify(r[13] + r[14]),16)/10.
+                    self.extra309TX = aw.qmc.timeclock.elapsed()/1000.
                     return T1,T2
                 
                 else:
@@ -13627,6 +13649,9 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.ETfunction = unicode(self.ETfunctionedit.text())
             aw.qmc.BTfunction = unicode(self.BTfunctionedit.text())
 
+            #save any extra devices here
+            self.savedevicetable()
+            
             aw.sendmessage(message)
 
             #open serial conf Dialog        
