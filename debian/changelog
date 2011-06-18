@@ -1,3 +1,23 @@
+artisan (0.5.0-0.b1) maverick; urgency=low
+
+  * new upstream beta release
+  * changes: 
+    - support for Mac OS X 10.4 and PPC added
+    - added more translations
+    - added wheel graph editor
+    - added custom event-control buttons
+    - added Omega HHM28 multimeter device support
+    - added support for devices with 4 thermocouples
+    - added PID duty cycle
+    - added math plotter in Extras
+    - added run-time multiple device compatibility and symbolic expressions support
+    - improved configuration of Axes
+    - improved configuration of PID
+    - improved Arduino code
+    - bug fixes
+
+ -- lukas <lukas@einfachkaffee.de>  Sat, 28 May 2011 21:20:16 +0200
+
 artisan (0.4.1-1) maverick; urgency=low
 
   * add .desktop file for menu entry
