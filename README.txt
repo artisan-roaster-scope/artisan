@@ -18,7 +18,7 @@ Developers: <https://lists.mokelbu.de/listinfo/artisan-devel>
 
 FEATURES
 
-o runs on Mac OS X 10.5/10.6, Windows, and Linux
+o runs on Mac OS X 10.4/10.5/10.6, PPC, Windows, and Linux
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
  - Omega HH309, HH506RA, HH802U, HH806AU, HHM28
@@ -27,8 +27,14 @@ o ET/BT logging and PID control supporting the following devices
  - EXTECH 421509
  - Arduino/TC4
  - TE VA18B
+ - HHM28 multimeter
+ - virtual devices (symbolic devices)
+ - device None (no device)
+o unlimited number of devices/curves running at the same time
+o symbolic manipulation of device outputs
 o Fahrenheit and Celsius display and conversion
 o manual logging of extra events (FCs,FCe,..)
+o custom event buttons
 o large buttons supporting touch panels
 o live ET/BT rate-of-rise curves
 o metric and thermal head-up-display predicting the ET/BT future during logging
@@ -38,11 +44,12 @@ o user defined cup profiles and cup profile graphs
 o HTML report creation
 o CSV export
 o Omega HH506 and K202 CSV import
+o PID duty cycle
 o profile designer
-o localizations (partial translations for German, French, Spanish, Swedish, Italian)
-o Wheel Graph editor
-o run-time multiple device compatibility with symbolic expressions support
+o wheel graph editor
 o mathematical plotter
+o localizations (partial translations for German, French, Spanish, Swedish, Italian)
+o multi-core CPU performance enhancement support
 
 
 INSTALLATION
@@ -119,6 +126,9 @@ Artisan uses the following libraries in unmodified forms:
 
 
 VERSION HISTORY
+
+v0.5.1 (18.6.2011)
+- bug fixes
 
 v0.5.0 (10.6.2011)
 - support for Mac OS X 10.4 and PPC added
