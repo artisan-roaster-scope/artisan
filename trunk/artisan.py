@@ -387,7 +387,7 @@ class tgraphcanvas(FigureCanvas):
         self.HUDflag = 0
         self.ETtarget = 350
         self.BTtarget = 250
-        self.ETpid = [20,60,13]    # p = 20, i = 60, d = 13
+        self.hudETpid = [20,60,13]    # HUD pid: p = 20, i = 60, d = 13
         self.pidpreviouserror = 0  # temporary storage of pid error
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
@@ -5838,6 +5838,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
+            if settings.contains("hudETpid"):
+                self.qmc.hudETpid = map(lambda x:x.toInt()[0],settings.value("hudETpid").toList())
             settings.endGroup()
             settings.beginGroup("Sound")
             self.soundflag = settings.value("Beep",self.soundflag).toInt()[0]
@@ -6065,6 +6067,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETtarget",self.qmc.ETtarget)
             settings.setValue("BTtarget",self.qmc.BTtarget)
             settings.setValue("Mode",self.HUDfunction)
+            settings.setValue("hudETpid",self.qmc.hudETpid)
             settings.endGroup()
             settings.beginGroup("Sound")
             settings.setValue("Beep",self.soundflag)
@@ -7024,9 +7027,9 @@ $cupping_notes
         difftime = self.qmc.timex[-1] - self.qmc.timex[-2]
         if not difftime:
             return
-        proportionalterm = self.qmc.ETpid[0]*error
-        integralterm = self.qmc.ETpid[1]*differror*difftime
-        derivativeterm = self.qmc.ETpid[2]*differror/difftime
+        proportionalterm = self.qmc.hudETpid[0]*error
+        integralterm = self.qmc.hudETpid[1]*differror*difftime
+        derivativeterm = self.qmc.hudETpid[2]*differror/difftime
 
         self.qmc.pidpreviouserror = error
 
@@ -7289,9 +7292,9 @@ class HUDDlg(QDialog):
         self.ETlineEdit.setMaximumWidth(60)
         self.BTlineEdit.setMaximumWidth(60)
 
-        self.ETpidP = QLineEdit(str(aw.qmc.ETpid[0]))
-        self.ETpidI = QLineEdit(str(aw.qmc.ETpid[1]))
-        self.ETpidD = QLineEdit(str(aw.qmc.ETpid[2]))
+        self.ETpidP = QLineEdit(str(aw.qmc.hudETpid[0]))
+        self.ETpidI = QLineEdit(str(aw.qmc.hudETpid[1]))
+        self.ETpidD = QLineEdit(str(aw.qmc.hudETpid[2]))
         self.ETpidP.setValidator(QIntValidator(0, 1000, self.ETpidP))
         self.ETpidI.setValidator(QIntValidator(0, 1000, self.ETpidI))
         self.ETpidD.setValidator(QIntValidator(0, 1000, self.ETpidD))
@@ -7843,9 +7846,9 @@ class HUDDlg(QDialog):
         aw.qmc.ETtarget = int(self.ETlineEdit.text())
         aw.qmc.BTtarget = int(self.BTlineEdit.text())
 
-        aw.qmc.ETpid[0] = int(self.ETpidP.text())
-        aw.qmc.ETpid[1] = int(self.ETpidI.text())
-        aw.qmc.ETpid[2] = int(self.ETpidD.text())
+        aw.qmc.hudETpid[0] = int(self.ETpidP.text())
+        aw.qmc.hudETpid[1] = int(self.ETpidI.text())
+        aw.qmc.hudETpid[2] = int(self.ETpidD.text())
 
         string = QApplication.translate("Message Area","[ET target = %1] [BT target =   (%2]", None, QApplication.UnicodeUTF8).arg(unicode(aw.qmc.ETtarget)).arg(unicode(aw.qmc.BTtarget))
         aw.sendmessage(string)
