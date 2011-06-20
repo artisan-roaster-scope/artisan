@@ -387,6 +387,8 @@ class tgraphcanvas(FigureCanvas):
         self.HUDflag = 0
         self.ETtarget = 350
         self.BTtarget = 250
+        self.ETpid = [20,60,13]    # p = 20, i = 60, d = 13
+        self.pidpreviouserror = 0  # temporary storage of pid error
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
         self.roastertype = u""
@@ -3550,8 +3552,8 @@ class Athread(QThread):
                 aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
                 aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
 
-                #this helps to stabilize thread load (for low performance CPUS)
-                libtime.sleep(.1)
+##                #this helps to stabilize thread load (for low performance CPUS)
+##                libtime.sleep(.1)
                 
                 #we need a minimum of two readings to calculate rate of change
                 if len(aw.qmc.timex) > 2:
@@ -3597,15 +3599,14 @@ class Athread(QThread):
                     aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
                     aw.qmc.xaxistosm()
 
-                #this helps to stabilize thread load (for low performance CPUS)
-                libtime.sleep(.1)
+##                #this helps to stabilize thread load (for low performance CPUS)
+##                libtime.sleep(.1)
                 
                 if aw.qmc.projectFlag:
                     aw.qmc.viewProjection()                   
                 if aw.qmc.background and aw.qmc.backgroundReproduce:
                     aw.qmc.playbackevent()
 
-                libtime.sleep(.02)
                 ##############  if using more than one device
                 ndevices = len(aw.qmc.extradevices)
                 if ndevices:
@@ -7017,6 +7018,21 @@ $cupping_notes
         else:
             text2 =  QApplication.translate("Scope Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(unicode(self.qmc.BTtarget) + self.qmc.mode)
 
+        ####   ET pid    ######
+        error = self.qmc.ETtarget - self.qmc.temp1[-1]
+        differror = error - self.qmc.pidpreviouserror
+        difftime = self.qmc.timex[-1] - self.qmc.timex[-2]
+        if not difftime:
+            return
+        proportionalterm = self.qmc.ETpid[0]*error
+        integralterm = self.qmc.ETpid[1]*differror*difftime
+        derivativeterm = self.qmc.ETpid[2]*differror/difftime
+
+        self.qmc.pidpreviouserror = error
+
+        MV = proportionalterm + integralterm + derivativeterm   # Manipulated Variable
+        pidstring = "ET pid = %.1F "%MV
+        
         img = QPixmap().grabWidget(self.qmc)
 
         Wwidth = self.qmc.size().width()
@@ -7027,22 +7043,25 @@ $cupping_notes
         font = QFont('Utopia', 14, -1)
         p.setFont(font)
         #Draw begins
-        #p.begin(self)
-        p.setOpacity(0.2)
-        p.setBrush(QBrush(QColor("grey")))
-        p.drawRect(0,                       #p(x,)
-                   Wheight - Wheight/4,     #p(,y)  
-                   Wwidth,                  #size x
-                   Wheight/4)               #size y
-        
+##        #p.begin(self)
+##        p.setOpacity(0.2)
+##        p.setBrush(QBrush(QColor("grey")))
+##        p.drawRect(0,                       #p(x,)
+##                   Wheight - Wheight/4,     #p(,y)  
+##                   Wwidth,                  #size x
+##                   Wheight/4)               #size y
+##        
         p.setOpacity(0.6)
         p.setPen(QColor(self.qmc.palette["et"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),QString(text1))
         
         p.setPen(QColor(self.qmc.palette["bt"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8),QString(text2))
+
+        p.setPen(QColor("slategrey"))
+        p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/8),QString(pidstring))
         
-        p.setPen(QColor(self.qmc.palette["text"]))
+        p.setPen(QColor("slategrey"))
         delta = QApplication.translate("Scope Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]))
         p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/6),QString(delta))        
 
@@ -7060,8 +7079,8 @@ $cupping_notes
         Wwidth= aw.qmc.size().width()
         Wheight = aw.qmc.size().height()
 
-        p.setOpacity(0.05)
-        p.fillRect(0,0, aw.qmc.size().width(), aw.qmc.size().height(),QColor("blue"))
+##        p.setOpacity(0.05)
+##        p.fillRect(0,0, aw.qmc.size().width(), aw.qmc.size().height(),QColor("blue"))
         
         p.setOpacity(1)
         p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
@@ -7205,7 +7224,11 @@ class HUDDlg(QDialog):
         BTLabel.setAlignment(Qt.AlignRight)        
         modeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
         modeLabel.setAlignment(Qt.AlignRight)
-
+        ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d",None, QApplication.UnicodeUTF8))
+        pidhelpButton = QPushButton(QApplication.translate("Button","pid Help",None, QApplication.UnicodeUTF8))
+        pidhelpButton.setMaximumWidth(60)
+        self.connect(pidhelpButton,SIGNAL("clicked()"),self.showpidhelp)
+    
         #delta ET    
         self.DeltaET = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None, QApplication.UnicodeUTF8))
         if aw.qmc.DeltaETflag == True:
@@ -7263,6 +7286,18 @@ class HUDDlg(QDialog):
         self.BTlineEdit = QLineEdit(str(aw.qmc.BTtarget))
         self.ETlineEdit.setValidator(QIntValidator(0, 1000, self.ETlineEdit))
         self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
+        self.ETlineEdit.setMaximumWidth(60)
+        self.BTlineEdit.setMaximumWidth(60)
+
+        self.ETpidP = QLineEdit(str(aw.qmc.ETpid[0]))
+        self.ETpidI = QLineEdit(str(aw.qmc.ETpid[1]))
+        self.ETpidD = QLineEdit(str(aw.qmc.ETpid[2]))
+        self.ETpidP.setValidator(QIntValidator(0, 1000, self.ETpidP))
+        self.ETpidI.setValidator(QIntValidator(0, 1000, self.ETpidI))
+        self.ETpidD.setValidator(QIntValidator(0, 1000, self.ETpidD))
+        self.ETpidP.setMaximumWidth(60)
+        self.ETpidI.setMaximumWidth(60)
+        self.ETpidD.setMaximumWidth(60)
 
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))   
@@ -7273,10 +7308,15 @@ class HUDDlg(QDialog):
         hudLayout = QGridLayout()
         hudLayout.addWidget(ETLabel,0,0)
         hudLayout.addWidget(self.ETlineEdit,0,1)
-        hudLayout.addWidget(BTLabel,1,0)
-        hudLayout.addWidget(self.BTlineEdit,1,1)
+        hudLayout.addWidget(BTLabel,0,2)
+        hudLayout.addWidget(self.BTlineEdit,0,3)
+        hudLayout.addWidget(ETPIDLabel,1,0)
+        hudLayout.addWidget(self.ETpidP,1,1)
+        hudLayout.addWidget(self.ETpidI,1,2)
+        hudLayout.addWidget(self.ETpidD,1,3)
         hudLayout.addWidget(modeLabel,2,0)
         hudLayout.addWidget(self.modeComboBox,2,1)
+        hudLayout.addWidget(pidhelpButton,2,3)
         
         rorLayout = QGridLayout()
         rorLayout.addWidget(self.projectCheck,0,0)
@@ -7519,6 +7559,9 @@ class HUDDlg(QDialog):
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
 
         self.setLayout(Slayout)
+
+    def showpidhelp(self):
+        QDesktopServices.openUrl(QUrl(u"http://en.wikipedia.org/wiki/PID_controller", QUrl.TolerantMode))        
 
     def changedpi(self):
         try:
@@ -7799,6 +7842,10 @@ class HUDDlg(QDialog):
             aw.HUDfunction = 1
         aw.qmc.ETtarget = int(self.ETlineEdit.text())
         aw.qmc.BTtarget = int(self.BTlineEdit.text())
+
+        aw.qmc.ETpid[0] = int(self.ETpidP.text())
+        aw.qmc.ETpid[1] = int(self.ETpidI.text())
+        aw.qmc.ETpid[2] = int(self.ETpidD.text())
 
         string = QApplication.translate("Message Area","[ET target = %1] [BT target =   (%2]", None, QApplication.UnicodeUTF8).arg(unicode(aw.qmc.ETtarget)).arg(unicode(aw.qmc.BTtarget))
         aw.sendmessage(string)
