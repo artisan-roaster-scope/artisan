@@ -226,6 +226,19 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
                                             QApplication.translate("Textbox", "Finish",None, QApplication.UnicodeUTF8)]
 
+        self.IstitutoInternazionaleAssaggiatoriCaffe = [QApplication.translate("Textbox", "Roast Color",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Crema Texture",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Crema Volume",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Fragrance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Bitterness",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Defects",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Aroma Intensity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Aroma Persistence",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
+
+
         
         self.flavorlabels = list(self.artisanflavordefaultlabels)
         #Initial flavor parameters. 
@@ -9972,7 +9985,7 @@ class flavorDlg(QDialog):
 
         defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia"])
+        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","Istituto Internazionale Assaggiatori Caffe"])
         self.defaultcombobox.setCurrentIndex(0)
         self.connect(self.defaultcombobox, SIGNAL("currentIndexChanged(int)"),self.setdefault)
 
@@ -10133,6 +10146,9 @@ class flavorDlg(QDialog):
             aw.qmc.flavorstartangle = 90
         elif dindex == 8:
             aw.qmc.flavorlabels = list(aw.qmc.Intelligentsiaflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+        elif dindex == 9:
+            aw.qmc.flavorlabels = list(aw.qmc.IstitutoInternazionaleAssaggiatoriCaffe)
             aw.qmc.flavorstartangle = 90
             
         else:
