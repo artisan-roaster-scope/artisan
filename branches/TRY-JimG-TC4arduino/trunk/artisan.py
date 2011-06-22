@@ -84,6 +84,8 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox )
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QMutex)
+from PyQt4.QtNetwork import (QHostAddress, QTcpServer, QTcpSocket)
+
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
@@ -223,6 +225,19 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
                                             QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
                                             QApplication.translate("Textbox", "Finish",None, QApplication.UnicodeUTF8)]
+
+        self.IstitutoInternazionaleAssaggiatoriCaffe = [QApplication.translate("Textbox", "Roast Color",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Crema Texture",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Crema Volume",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Fragrance",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Acidity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Bitterness",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Defects",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Aroma Intensity",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Aroma Persistence",None, QApplication.UnicodeUTF8),
+                                            QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8)]
+
 
         
         self.flavorlabels = list(self.artisanflavordefaultlabels)
@@ -387,6 +402,8 @@ class tgraphcanvas(FigureCanvas):
         self.HUDflag = 0
         self.ETtarget = 350
         self.BTtarget = 250
+        self.hudETpid = [20,60,13]    # HUD pid: p = 20, i = 60, d = 13
+        self.pidpreviouserror = 0  # temporary storage of pid error
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
         self.roastertype = u""
@@ -436,6 +453,8 @@ class tgraphcanvas(FigureCanvas):
         self.specialeventsvalue = []
         #flag that makes the events location type bars (horizontal bars) appear on the plot. flag read on redraw()
         self.eventsGraphflag = 1
+        #flag that shows events in the graph
+        self.eventsshowflag = 1
 
         #Temperature Alarms lists. Data is writen in  alarmDlg 
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
@@ -589,7 +608,7 @@ class tgraphcanvas(FigureCanvas):
     #####################################################################################
         
 
-    #run all graphic changes from GUI thread     
+    #runs from GUI thread     
     def updategraphics(self):
         try:
             if len(self.timex):        
@@ -1059,9 +1078,6 @@ class tgraphcanvas(FigureCanvas):
 
         self.redraw()
         aw.soundpop()
-
-        
-        
         
     #Redraws data   
     def redraw(self):
@@ -1434,103 +1450,104 @@ class tgraphcanvas(FigureCanvas):
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     
                     self.writestatistics()
-                
-            #write events
-            Nevents = len(self.specialevents)
-            if self.mode == "F":
-                lim = self.phases[0]-80
-            else:
-                lim = self.phases[0]-40
-                
-            #two modes of drawing events. The first mode aligns the events annotations to a bar height so that they can be visually identified by type. 
-            # the second mode places the events without height order.
-            
-            #Check eventsGraphflag and self.ylimit_min to see if there is enough height room           
-            if self.eventsGraphflag and self.ylimit_min <= lim:
-                char1 = self.etypes[0][0]
-                char2 = self.etypes[1][0]
-                char3 = self.etypes[2][0]
-                char4 = self.etypes[3][0]
 
+            if self.eventsshowflag:
+                Nevents = len(self.specialevents)                    
+                #write events
                 if self.mode == "F":
-                    row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                    lim = self.phases[0]-80
                 else:
-                    row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                    lim = self.phases[0]-40
+                    
+                #two modes of drawing events. The first mode aligns the events annotations to a bar height so that they can be visually identified by type. 
+                # the second mode places the events without height order.
+                
+                #Check eventsGraphflag and self.ylimit_min to see if there is enough height room           
+                if self.eventsGraphflag and self.ylimit_min <= lim:
+                    char1 = self.etypes[0][0]
+                    char2 = self.etypes[1][0]
+                    char3 = self.etypes[2][0]
+                    char4 = self.etypes[3][0]
 
-                #draw lines of color between events of the same type to help identify areas of events.
-                #count (as length of the list) and collect their times for each different type. Each type will have a different plot height 
-                netypes=[[],[],[],[]]
-                for i in range(Nevents):
-                    if self.specialeventstype[i] == 0:
-                        netypes[0].append(self.timex[self.specialevents[i]])
-                    elif self.specialeventstype[i] == 1:
-                        netypes[1].append(self.timex[self.specialevents[i]])
-                    elif self.specialeventstype[i] == 2:
-                        netypes[2].append(self.timex[self.specialevents[i]])
-                    elif self.specialeventstype[i] == 3:
-                        netypes[3].append(self.timex[self.specialevents[i]])
-                        
-                letters = self.etypes[0][0]+self.etypes[1][0]+self.etypes[2][0]+self.etypes[3][0]   #"NPDF" fisrt letter for each type (None, Power, Damper, Fan)
-                colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
-                for p in range(len(letters)):    
-                    if len(netypes[p]) > 1:
-                        for i in range(len(netypes[p])-1):
-                             #draw differentiating color bars between events and place then in a different height acording with type
-                             rect = patches.Rectangle( (netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step, color = colors[i%2],alpha=0.5)
-                             self.ax.add_patch(rect)
-                             
-                # annotate event
-                for i in range(Nevents):
-                    firstletter = self.etypes[self.specialeventstype[i]][0]
-                    secondletter = self.eventsvalues[self.specialeventsvalue[i]]
-                    #some times ET is not drawn (ET = 0) when using device NONE
-                    if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:
-                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
-                                         xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
-                    else:
-                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                                     xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                            
-            # Second mode: old style mode (just attached the events to the graph without ordering height by type)   
-            else:
-                for i in range(Nevents):
-                    firstletter = self.etypes[self.specialeventstype[i]][0]                
-                    secondletter = self.eventsvalues[self.specialeventsvalue[i]]
                     if self.mode == "F":
-                        height = 50
+                        row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
                     else:
-                        height = 20
-                    #some times ET is not drawn (ET = 0) when using device NONE
-                    if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
-                        temp = self.temp1[int(self.specialevents[i])]
-                    else:
-                        temp = self.temp2[int(self.specialevents[i])]
-                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                     xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                        row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
 
-            #if recorder on        
-            if self.flagon:             
-                #update to last event
-                if Nevents:
-                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                    #draw lines of color between events of the same type to help identify areas of events.
+                    #count (as length of the list) and collect their times for each different type. Each type will have a different plot height 
+                    netypes=[[],[],[],[]]
+                    for i in range(Nevents):
+                        if self.specialeventstype[i] == 0:
+                            netypes[0].append(self.timex[self.specialevents[i]])
+                        elif self.specialeventstype[i] == 1:
+                            netypes[1].append(self.timex[self.specialevents[i]])
+                        elif self.specialeventstype[i] == 2:
+                            netypes[2].append(self.timex[self.specialevents[i]])
+                        elif self.specialeventstype[i] == 3:
+                            netypes[3].append(self.timex[self.specialevents[i]])
+                            
+                    letters = self.etypes[0][0]+self.etypes[1][0]+self.etypes[2][0]+self.etypes[3][0]   #"NPDF" fisrt letter for each type (None, Power, Damper, Fan)
+                    colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
+                    for p in range(len(letters)):    
+                        if len(netypes[p]) > 1:
+                            for i in range(len(netypes[p])-1):
+                                 #draw differentiating color bars between events and place then in a different height acording with type
+                                 rect = patches.Rectangle( (netypes[p][i], row[letters[p]]), width = (netypes[p][i+1]-netypes[p][i]), height = step, color = colors[i%2],alpha=0.5)
+                                 self.ax.add_patch(rect)
+                                 
+                    # annotate event
+                    for i in range(Nevents):
+                        firstletter = self.etypes[self.specialeventstype[i]][0]
+                        secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                        #some times ET is not drawn (ET = 0) when using device NONE
+                        if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
+                                             xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
+                        else:
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                                         xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                                
+                # Second mode: old style mode (just attached the events to the graph without ordering height by type)   
                 else:
-                    aw.etypeComboBox.setCurrentIndex(0)
-                    aw.valueComboBox.setCurrentIndex(0)
-                aw.eNumberSpinBox.setValue(Nevents)
+                    for i in range(Nevents):
+                        firstletter = self.etypes[self.specialeventstype[i]][0]                
+                        secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                        if self.mode == "F":
+                            height = 50
+                        else:
+                            height = 20
+                        #some times ET is not drawn (ET = 0) when using device NONE
+                        if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
+                            temp = self.temp1[int(self.specialevents[i])]
+                        else:
+                            temp = self.temp2[int(self.specialevents[i])]
+                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                         xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+
+                #if recorder on        
+                if self.flagon:             
+                    #update to last event
+                    if Nevents:
+                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                        aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                    else:
+                        aw.etypeComboBox.setCurrentIndex(0)
+                        aw.valueComboBox.setCurrentIndex(0)
+                    aw.eNumberSpinBox.setValue(Nevents)
 
             #update Y label colors
             for label in self.ax.yaxis.get_ticklabels():
                 label.set_color(self.palette["ylabel"])
 
-            #ready to plot    
-            self.fig.canvas.draw()     
-
             #update X ticks, labels, and colors        
             self.xaxistosm()
+
+            #ready to plot    
+            self.fig.canvas.draw()     
 
             # if designer ON
             if self.designerflag:
@@ -2050,7 +2067,7 @@ class tgraphcanvas(FigureCanvas):
         if not self.flagon:
             if self.designerflag: return
             
-            self.threadserver.createThread()
+            self.threadserver.createSampleThread()
             
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
@@ -3026,12 +3043,12 @@ class tgraphcanvas(FigureCanvas):
                 #check point going over point
                 #check to the left    
                 if self.indexpoint > 0:
-                    if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint - 1]) < 10:
+                    if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint - 1]) < 10.:
                         self.unrarefy_designer()
                         return
                 #check to the right
                 if self.indexpoint <= len(self.timex)-2:
-                    if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint + 1]) < 10:
+                    if abs(self.timex[self.indexpoint] - self.timex[self.indexpoint + 1]) < 10.:
                         self.unrarefy_designer()
                         return                    
 
@@ -3045,7 +3062,7 @@ class tgraphcanvas(FigureCanvas):
             
             if type(event.xdata):                       #outside graph type is None
                 for i in range(len(self.timex)):
-                    if abs(event.xdata - self.timex[i]) < 7:
+                    if abs(event.xdata - self.timex[i]) < 7.:
                         if i in self.timeindex:
                             if abs(self.temp2[i] - event.ydata) < 10:
                                 self.ax.plot(self.timex[i],self.temp2[i],color = "orange",marker = "o",alpha = .3,markersize=30)
@@ -3097,9 +3114,9 @@ class tgraphcanvas(FigureCanvas):
                         finishphasetime = self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]]
 
                         if totaltime:
-                            dryphaseP = int(dryphasetime*100/totaltime)
-                            midphaseP = int(midphasetime*100/totaltime)
-                            finishphaseP = int(finishphasetime*100/totaltime)
+                            dryphaseP = int(dryphasetime*100./totaltime)
+                            midphaseP = int(midphasetime*100./totaltime)
+                            finishphaseP = int(finishphasetime*100./totaltime)
                         else:
                             return
                         
@@ -3467,9 +3484,9 @@ class tgraphcanvas(FigureCanvas):
 
                 
 #######################################################################################
-#####   temporary hack for windows till better solution found about toolbar icon problem
-#####   with py2exe and svg
-
+#####   temporary hack for windows till better solution found about toolbar icon problem with py2exe and svg
+#######################################################################################
+           
 # changed "NavigationToolbar" for "VMToolbar" in ApplicationWindow
         
 class VMToolbar(NavigationToolbar):
@@ -3484,12 +3501,14 @@ class VMToolbar(NavigationToolbar):
             name = name.replace('.svg','.png')
         return QIcon(os.path.join(self.basedir, name))
 
-class Athread(QThread):
-##    def __init__(self, parent = None):        
-##        QThread.__init__(self, parent)
 
+########################################################################################
+###     Sample thread
+########################################################################################
+    
+class SampleThread(QThread):
     def _init_(self,parent = None):
-        super(Athread,self)._init_(parent)
+        super(SampleThread,self)._init_(parent)
 
     # sample devices at interval self.delay miliseconds.  
     def sample(self):
@@ -3549,9 +3568,6 @@ class Athread(QThread):
                 # update lines data using the lists with new data
                 aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
                 aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
-
-                #this helps to stabilize thread load (for low performance CPUS)
-                libtime.sleep(.1)
                 
                 #we need a minimum of two readings to calculate rate of change
                 if len(aw.qmc.timex) > 2:
@@ -3596,16 +3612,12 @@ class Athread(QThread):
                     aw.qmc.endofx = int(aw.qmc.timex[-1] + 180)         # increase x limit by 3 minutes
                     aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
                     aw.qmc.xaxistosm()
-
-                #this helps to stabilize thread load (for low performance CPUS)
-                libtime.sleep(.1)
                 
                 if aw.qmc.projectFlag:
                     aw.qmc.viewProjection()                   
                 if aw.qmc.background and aw.qmc.backgroundReproduce:
                     aw.qmc.playbackevent()
 
-                libtime.sleep(.02)
                 ##############  if using more than one device
                 ndevices = len(aw.qmc.extradevices)
                 if ndevices:
@@ -3667,15 +3679,19 @@ class Athread(QThread):
                 QApplication.processEvents()
                 break  #thread ends
 
+#########################################################################################################
+###     Artisan thread Server
+#########################################################################################################            
+
 
 class Athreadserver(QWidget):
     def _init_(self,parent = None):
         super(Athreadserver,self)._init_(parent)
 
-    def createThread(self):
+    def createSampleThread(self):
         if aw.qmc.flagon == False:
             aw.qmc.flagon = True
-            thread = Athread(self)
+            thread = SampleThread(self)
             QApplication.processEvents()
 
             #delete when finished to save memory 
@@ -3685,6 +3701,19 @@ class Athreadserver(QWidget):
             self.connect(thread, SIGNAL("updategraphics"),aw.qmc.updategraphics)
             thread.start()
             thread.wait(300)    #needed in some Win OS
+
+    def createTCPserver(self):
+        pass
+
+
+##################################################################################################################
+###   TCP server for remote operation
+##################################################################################################################
+
+            
+
+
+
 
 ########################################################################################                            
 #################### MAIN APPLICATION WINDOW ###########################################
@@ -5759,6 +5788,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.eventsGraphflag = settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)).toInt()[0]
             if settings.contains("etypes"):
                 self.qmc.etypes = settings.value("etypes",self.qmc.etypes).toStringList()
+            if settings.contains("eventsshowflag"):
+                aw.qmc.eventsshowflag  = settings.value("eventsshowflag",int(self.qmc.eventsshowflag)).toInt()[0]
             settings.endGroup()
             
     	    #restore statistics
@@ -5837,6 +5868,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]            
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
+            if settings.contains("hudETpid"):
+                self.qmc.hudETpid = map(lambda x:x.toInt()[0],settings.value("hudETpid").toList())
             settings.endGroup()
             settings.beginGroup("Sound")
             self.soundflag = settings.value("Beep",self.soundflag).toInt()[0]
@@ -6022,6 +6055,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("minieventsflag",self.minieventsflag)
             settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
             settings.setValue("etypes",self.qmc.etypes)
+            settings.setValue("eventsshowflag",aw.qmc.eventsshowflag)
             settings.endGroup()            
             #save delay
             settings.setValue("Delay",self.qmc.delay)
@@ -6064,6 +6098,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETtarget",self.qmc.ETtarget)
             settings.setValue("BTtarget",self.qmc.BTtarget)
             settings.setValue("Mode",self.HUDfunction)
+            settings.setValue("hudETpid",self.qmc.hudETpid)
             settings.endGroup()
             settings.beginGroup("Sound")
             settings.setValue("Beep",self.soundflag)
@@ -7017,40 +7052,48 @@ $cupping_notes
         else:
             text2 =  QApplication.translate("Scope Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(unicode(self.qmc.BTtarget) + self.qmc.mode)
 
+        ####   ET pid    ######
+        error = self.qmc.ETtarget - self.qmc.temp1[-1]
+        differror = error - self.qmc.pidpreviouserror
+        difftime = self.qmc.timex[-1] - self.qmc.timex[-2]
+        if not difftime: difftime = 0.01
+        proportionalterm = self.qmc.hudETpid[0]*error
+        integralterm = self.qmc.hudETpid[1]*differror*difftime
+        derivativeterm = self.qmc.hudETpid[2]*differror/difftime
+        self.qmc.pidpreviouserror = error
+        MV = proportionalterm + integralterm + derivativeterm   # Manipulated Variable
+        if MV > 100.:MV = 100.
+        elif MV < 0.:MV = 0.
+        MVV = int(round(MV))
+        pidstring = "ET pid = %i "%MVV
+        ##### end of ET pid
+        
         img = QPixmap().grabWidget(self.qmc)
 
         Wwidth = self.qmc.size().width()
         Wheight = self.qmc.size().height()
-        
+
+        #Draw begins               
         p = QPainter(img)        
         #chose font
         font = QFont('Utopia', 14, -1)
         p.setFont(font)
-        #Draw begins
-        #p.begin(self)
-        p.setOpacity(0.2)
-        p.setBrush(QBrush(QColor("grey")))
-        p.drawRect(0,                       #p(x,)
-                   Wheight - Wheight/4,     #p(,y)  
-                   Wwidth,                  #size x
-                   Wheight/4)               #size y
-        
         p.setOpacity(0.6)
-        p.setPen(QColor(self.qmc.palette["et"]))
+        p.setPen(QColor("slategrey"))
+        #p.setPen(QColor(self.qmc.palette["text"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),QString(text1))
         
-        p.setPen(QColor(self.qmc.palette["bt"]))
+        #p.setPen(QColor(self.qmc.palette["bt"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8),QString(text2))
-        
-        p.setPen(QColor(self.qmc.palette["text"]))
-        delta = QApplication.translate("Scope Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]))
-        p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/6),QString(delta))        
 
-        p.setOpacity(1.)
-        p.setBrush(0) 
-        p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
-        p.drawRect(10,10, Wwidth-20, Wheight-20)
-    
+        p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/8),QString(pidstring))
+        
+        delta = QApplication.translate("Scope Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]))
+        p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/6),QString(delta))
+
+        p.drawRect(Wwidth/2+140, Wheight - Wheight/8 -12, 100, 12)
+        p.fillRect(Wwidth/2+140, Wheight - Wheight/8 - 12, MVV, 12, QColor("pink"))
+  
         p.end()
         self.HUD.setPixmap(img)
        
@@ -7059,10 +7102,7 @@ $cupping_notes
         p = QPainter(img)
         Wwidth= aw.qmc.size().width()
         Wheight = aw.qmc.size().height()
-
-        p.setOpacity(0.05)
-        p.fillRect(0,0, aw.qmc.size().width(), aw.qmc.size().height(),QColor("blue"))
-        
+       
         p.setOpacity(1)
         p.setPen(QColor(96,255,237)) #color the rectangle the same as HUD button
         p.drawRect(10,10, Wwidth - 20, Wheight - 20)
@@ -7205,7 +7245,11 @@ class HUDDlg(QDialog):
         BTLabel.setAlignment(Qt.AlignRight)        
         modeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
         modeLabel.setAlignment(Qt.AlignRight)
-
+        ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d",None, QApplication.UnicodeUTF8))
+        pidhelpButton = QPushButton(QApplication.translate("Button","pid Help",None, QApplication.UnicodeUTF8))
+        pidhelpButton.setMaximumWidth(60)
+        self.connect(pidhelpButton,SIGNAL("clicked()"),self.showpidhelp)
+    
         #delta ET    
         self.DeltaET = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None, QApplication.UnicodeUTF8))
         if aw.qmc.DeltaETflag == True:
@@ -7263,6 +7307,18 @@ class HUDDlg(QDialog):
         self.BTlineEdit = QLineEdit(str(aw.qmc.BTtarget))
         self.ETlineEdit.setValidator(QIntValidator(0, 1000, self.ETlineEdit))
         self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
+        self.ETlineEdit.setMaximumWidth(60)
+        self.BTlineEdit.setMaximumWidth(60)
+
+        self.ETpidP = QLineEdit(str(aw.qmc.hudETpid[0]))
+        self.ETpidI = QLineEdit(str(aw.qmc.hudETpid[1]))
+        self.ETpidD = QLineEdit(str(aw.qmc.hudETpid[2]))
+        self.ETpidP.setValidator(QIntValidator(0, 1000, self.ETpidP))
+        self.ETpidI.setValidator(QIntValidator(0, 1000, self.ETpidI))
+        self.ETpidD.setValidator(QIntValidator(0, 1000, self.ETpidD))
+        self.ETpidP.setMaximumWidth(60)
+        self.ETpidI.setMaximumWidth(60)
+        self.ETpidD.setMaximumWidth(60)
 
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))   
@@ -7273,10 +7329,15 @@ class HUDDlg(QDialog):
         hudLayout = QGridLayout()
         hudLayout.addWidget(ETLabel,0,0)
         hudLayout.addWidget(self.ETlineEdit,0,1)
-        hudLayout.addWidget(BTLabel,1,0)
-        hudLayout.addWidget(self.BTlineEdit,1,1)
+        hudLayout.addWidget(BTLabel,0,2)
+        hudLayout.addWidget(self.BTlineEdit,0,3)
+        hudLayout.addWidget(ETPIDLabel,1,0)
+        hudLayout.addWidget(self.ETpidP,1,1)
+        hudLayout.addWidget(self.ETpidI,1,2)
+        hudLayout.addWidget(self.ETpidD,1,3)
         hudLayout.addWidget(modeLabel,2,0)
         hudLayout.addWidget(self.modeComboBox,2,1)
+        hudLayout.addWidget(pidhelpButton,2,3)
         
         rorLayout = QGridLayout()
         rorLayout.addWidget(self.projectCheck,0,0)
@@ -7519,6 +7580,9 @@ class HUDDlg(QDialog):
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
 
         self.setLayout(Slayout)
+
+    def showpidhelp(self):
+        QDesktopServices.openUrl(QUrl(u"http://en.wikipedia.org/wiki/PID_controller", QUrl.TolerantMode))        
 
     def changedpi(self):
         try:
@@ -7799,6 +7863,10 @@ class HUDDlg(QDialog):
             aw.HUDfunction = 1
         aw.qmc.ETtarget = int(self.ETlineEdit.text())
         aw.qmc.BTtarget = int(self.BTlineEdit.text())
+
+        aw.qmc.hudETpid[0] = int(self.ETpidP.text())
+        aw.qmc.hudETpid[1] = int(self.ETpidI.text())
+        aw.qmc.hudETpid[2] = int(self.ETpidD.text())
 
         string = QApplication.translate("Message Area","[ET target = %1] [BT target =   (%2]", None, QApplication.UnicodeUTF8).arg(unicode(aw.qmc.ETtarget)).arg(unicode(aw.qmc.BTtarget))
         aw.sendmessage(string)
@@ -9340,6 +9408,14 @@ class EventsDlg(QDialog):
         else:
             self.eventsbuttonflag.setChecked(False)
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)  
+
+        self.eventsshowflagbox = QCheckBox(QApplication.translate("CheckBox","Show",None, QApplication.UnicodeUTF8))
+        if aw.qmc.eventsshowflag:
+            self.eventsshowflagbox.setChecked(True)
+        else:
+            self.eventsshowflagbox.setChecked(False)
+        self.connect(self.eventsshowflagbox,SIGNAL("stateChanged(int)"),self.eventsshowflagChanged)  
+
         
         self.minieventsflag = QCheckBox(QApplication.translate("CheckBox","Mini Editor",None, QApplication.UnicodeUTF8))
         self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event",None, QApplication.UnicodeUTF8))
@@ -9443,6 +9519,7 @@ class EventsDlg(QDialog):
 
         FlagsLayout = QHBoxLayout()
         FlagsLayout.addWidget(self.eventsbuttonflag)
+        FlagsLayout.addWidget(self.eventsshowflagbox)
         FlagsLayout.addWidget(self.minieventsflag)
         FlagsLayout.addWidget(self.eventsGraphflag)
 
@@ -9631,6 +9708,13 @@ class EventsDlg(QDialog):
             aw.button_11.setVisible(False)            
             aw.eventsbuttonflag = 0
             self.minieventsflag.setChecked(False)
+
+    def eventsshowflagChanged(self):
+        if self.eventsshowflagbox.isChecked():
+            aw.qmc.eventsshowflag = 1
+        else:
+            aw.qmc.eventsshowflag = 0
+        aw.qmc.redraw()        
             
     def minieventsflagChanged(self):
         if self.minieventsflag.isChecked():
@@ -9901,7 +9985,7 @@ class flavorDlg(QDialog):
 
         defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia"])
+        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","Istituto Internazionale Assaggiatori Caffe"])
         self.defaultcombobox.setCurrentIndex(0)
         self.connect(self.defaultcombobox, SIGNAL("currentIndexChanged(int)"),self.setdefault)
 
@@ -10062,6 +10146,9 @@ class flavorDlg(QDialog):
             aw.qmc.flavorstartangle = 90
         elif dindex == 8:
             aw.qmc.flavorlabels = list(aw.qmc.Intelligentsiaflavordefaultlabels)
+            aw.qmc.flavorstartangle = 90
+        elif dindex == 9:
+            aw.qmc.flavorlabels = list(aw.qmc.IstitutoInternazionaleAssaggiatoriCaffe)
             aw.qmc.flavorstartangle = 90
             
         else:
