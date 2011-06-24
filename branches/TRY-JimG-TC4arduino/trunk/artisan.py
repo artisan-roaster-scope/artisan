@@ -3507,15 +3507,13 @@ class VMToolbar(NavigationToolbar):
 ########################################################################################
     
 class SampleThread(QThread):
+    trigger = 0
     def _init_(self,parent = None):
         super(SampleThread,self)._init_(parent)
 
     # sample devices at interval self.delay miliseconds.  
     def sample(self):
-        try:
-            
-            #apply sampling interval here                
-            libtime.sleep(aw.qmc.delay/1000.)
+        try:      
 
             #avoid sampling while redrawing. synchronization.
             count = 0
@@ -3525,6 +3523,17 @@ class SampleThread(QThread):
                 if count == 100:
                     return
                 
+            #apply sampling interval here                
+            dly = 0.001 * aw.qmc.delay
+            # trap the liklihood of clock() > trigger on first call
+            while libtime.clock() >= SampleThread.trigger:
+                SampleThread.trigger += dly
+            # loop waits until next sample trigger is reached
+            while libtime.clock() < SampleThread.trigger:
+                continue
+            # increment the trigger for the next sample
+            SampleThread.trigger += dly
+
             aw.qmc.samplingflag = True
             
             #if using a meter (thermocouple device)
