@@ -3507,16 +3507,22 @@ class VMToolbar(NavigationToolbar):
 ########################################################################################
     
 class SampleThread(QThread):
-    trigger = libtime.time() + 3.0
-    def _init_(self,parent = None):
-        super(SampleThread,self)._init_(parent)
-        SampleThread.trigger = libtime.time() + 1.0
-
+    
+    # static class variables
+    tzero = libtime.time() # used to determine elapsed time
+    trigger = 0.0  # this gets incremented after each sample
+    
+    def __init__(self,parent = None):
+        super(SampleThread,self).__init__(parent)
+        
+    def elapsed(self):
+        return libtime.time() - SampleThread.tzero
+    
     # sample devices at interval self.delay miliseconds.  
     def sample(self):
         try:      
-
             #avoid sampling while redrawing. synchronization.
+            # FIXME Is this necessary??
             count = 0
             while aw.qmc.samplingflag:
                 libtime.sleep(.05)
@@ -3526,18 +3532,12 @@ class SampleThread(QThread):
                 
             #apply sampling interval here                
             dly = 0.001 * aw.qmc.delay
-            # trap the liklihood of clock() > trigger on first call
-            cnt = 0
-            while libtime.time() >= SampleThread.trigger:
+            # trap the condition of elapsed() > trigger
+            while self.elapsed() >= SampleThread.trigger:
                 SampleThread.trigger += dly
-                cnt += 1
-                print "first loop, ",cnt, libtime.time(), SampleThread.trigger
             # loop waits until next sample trigger is reached
-            cnt = 0
-            while libtime.time() < SampleThread.trigger:
-                cnt += 1
-                print "second loop, ",cnt, libtime.time(), SampleThread.trigger              
-                libtime.sleep(0.020) # 20 ms
+            while self.elapsed() < SampleThread.trigger:
+                libtime.sleep(0.050) # 50 ms
             # increment the trigger for the next sample
             SampleThread.trigger += dly
 
@@ -3701,8 +3701,8 @@ class SampleThread(QThread):
 
 
 class Athreadserver(QWidget):
-    def _init_(self,parent = None):
-        super(Athreadserver,self)._init_(parent)
+    def __init__(self,parent = None):
+        super(Athreadserver,self).__init__(parent)
 
     def createSampleThread(self):
         if aw.qmc.flagon == False:
