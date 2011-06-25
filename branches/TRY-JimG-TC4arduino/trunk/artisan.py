@@ -3507,9 +3507,10 @@ class VMToolbar(NavigationToolbar):
 ########################################################################################
     
 class SampleThread(QThread):
-    trigger = 0
+    trigger = libtime.time() + 3.0
     def _init_(self,parent = None):
         super(SampleThread,self)._init_(parent)
+        SampleThread.trigger = libtime.time() + 1.0
 
     # sample devices at interval self.delay miliseconds.  
     def sample(self):
@@ -3526,10 +3527,16 @@ class SampleThread(QThread):
             #apply sampling interval here                
             dly = 0.001 * aw.qmc.delay
             # trap the liklihood of clock() > trigger on first call
-            while libtime.clock() >= SampleThread.trigger:
+            cnt = 0
+            while libtime.time() >= SampleThread.trigger:
                 SampleThread.trigger += dly
+                cnt += 1
+                print "first loop, ",cnt, libtime.time(), SampleThread.trigger
             # loop waits until next sample trigger is reached
-            while libtime.clock() < SampleThread.trigger:
+            cnt = 0
+            while libtime.time() < SampleThread.trigger:
+                cnt += 1
+                print "second loop, ",cnt, libtime.time(), SampleThread.trigger              
                 libtime.sleep(0.020) # 20 ms
             # increment the trigger for the next sample
             SampleThread.trigger += dly
