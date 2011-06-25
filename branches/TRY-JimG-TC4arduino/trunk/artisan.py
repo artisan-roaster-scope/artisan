@@ -3665,7 +3665,7 @@ class SampleThread(QThread):
             
         except Exception,e:
             aw.qmc.flagon = False
-            #aw.qmc.samplingflag = False
+            aw.qmc.samplingflag = False
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
         
