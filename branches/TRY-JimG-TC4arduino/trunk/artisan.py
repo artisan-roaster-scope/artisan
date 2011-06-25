@@ -3530,7 +3530,7 @@ class SampleThread(QThread):
                 SampleThread.trigger += dly
             # loop waits until next sample trigger is reached
             while libtime.clock() < SampleThread.trigger:
-                continue
+                libtime.sleep(0.020) # 20 ms
             # increment the trigger for the next sample
             SampleThread.trigger += dly
 
@@ -3665,7 +3665,7 @@ class SampleThread(QThread):
             
         except Exception,e:
             aw.qmc.flagon = False
-            aw.qmc.samplingflag = False
+            #aw.qmc.samplingflag = False
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
         
@@ -3674,7 +3674,7 @@ class SampleThread(QThread):
      
               
     def run(self):
-        timedelay = aw.qmc.delay/1000.
+        #timedelay = aw.qmc.delay/1000.
         if not aw.qmc.flagon:
             return
         while True:
@@ -11710,17 +11710,18 @@ class serialport(object):
             
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(3)
+                #libtime.sleep(3)
 
                 #Reinitialize Arduino in case communication was interupted
                 self.ArduinoIsInitialized = 0
                 self.ArduinoUnit = ""
                 
             if self.SP.isOpen():
-
-                if not self.ArduinoIsInitialized:
+                count = 0
+                while (not self.ArduinoIsInitialized) and count < 10:
                     self.SP.flushInput()
                     self.SP.flushOutput()
+                    libtime.sleep(0.500) # wait 500 ms
 
                     command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + "00\n"  
                     self.SP.write(command)
@@ -11728,8 +11729,8 @@ class serialport(object):
                     try:
                         result = ""
                         result = self.SP.readline()
-
-                        if (not result == "" and not result.startswith("#")):
+                        count += 1
+                        if count == 10:
                             raise
                         elif result.startswith("#"):
                             self.ArduinoIsInitialized = 1
