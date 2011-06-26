@@ -3522,7 +3522,6 @@ class SampleThread(QThread):
     def sample(self):
         try:      
             #avoid sampling while redrawing. synchronization.
-            # FIXME Is this necessary??
             count = 0
             while aw.qmc.samplingflag:
                 libtime.sleep(.05)
