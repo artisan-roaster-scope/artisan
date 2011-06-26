@@ -16,7 +16,7 @@ import sys, os
 from setuptools import setup
 
 # current version of Artisan
-VERSION = '0.5.0'
+VERSION = '0.5.2'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
@@ -44,7 +44,7 @@ OPTIONS = {
     'argv_emulation': False,
     'semi_standalone': False,
     'site_packages': True,
-    'packages':['matplotlib'],
+    'packages':[],
     'optimize':  2,
     'compressed':True,
     'iconfile': 'artisan.icns',
@@ -81,8 +81,14 @@ setup(
     setup_requires=['py2app'],
 )
 
+            
+os.system(r'cp README.txt dist')
+os.system(r'cp LICENSE.txt dist')
+os.chdir('./dist')
+os.system(r'macdeployqt Artisan.app -verbose=0')
+
 print '*** Removing Qt debug libs ***'
-for root, dirs, files in os.walk('./dist'):
+for root, dirs, files in os.walk('.'):
     for file in files:
         if 'debug' in file:
             print 'Deleting', file
@@ -96,12 +102,35 @@ for root, dirs, files in os.walk('./dist'):
         elif '.pyc' in file:
             print 'Deleting', file
             os.remove(os.path.join(root,file))
+        # remove also all .h .in .cpp .cc .html files 
+        elif '.h' in file:
+            print 'Deleting', file
+            os.remove(os.path.join(root,file))
+        elif '.in' in file:
+            print 'Deleting', file
+            os.remove(os.path.join(root,file))
+        elif '.cpp' in file:
+            print 'Deleting', file
+            os.remove(os.path.join(root,file))
+        elif '.cc' in file:
+            print 'Deleting', file
+            os.remove(os.path.join(root,file))
+        # removing some frameworks that are not needed but added by macdeployqt
+        elif file in ['QtDeclarative','QtNetwork','QtScript','QtXmlPatterns','QtSql']:
+            print 'Deleting', file
+            os.remove(os.path.join(root,file))
+        # removing some plugins that are not needed but added by macdeployqt
+        elif file in ['libqtaccessiblewidgets.dylib',
+                'libqgenericbearer.dylib',
+                'libqcncodecs.dylib',
+                'libqjpcodecs.dylib',
+                'libqkrcodecs.dylib',
+                'libqtwcodecs.dylib',
+                'libqtracegraphicssystem.dylib',
+                'libtcpserver.dylib']:
+            print 'Deleting', file
+            os.remove(os.path.join(root,file))
             
-os.system(r'cp README.txt dist')
-os.system(r'cp LICENSE.txt dist')
-os.chdir('./dist')
-#os.system(r'macdeployqt Artisan.app -dmg -verbose=0')
-os.system(r'macdeployqt Artisan.app -verbose=0')
 os.chdir('..')
 os.system(r"rm artisan-mac-" + VERSION + r".dmg")
 os.system(r'hdiutil create artisan-mac-' + VERSION + r'.dmg -volname "Artisan" -fs HFS+ -srcfolder "dist"')
