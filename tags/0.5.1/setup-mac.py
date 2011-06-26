@@ -16,7 +16,7 @@ import sys, os
 from setuptools import setup
 
 # current version of Artisan
-VERSION = '0.5.0'
+VERSION = '0.5.1'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
