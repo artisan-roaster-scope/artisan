@@ -527,7 +527,8 @@ class tgraphcanvas(FigureCanvas):
         # add legend to plot.
         handles = [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2]
         labels = [QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)]
-        self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+        if self.legendloc:
+            self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
         #Create x axis labels in minutes:seconds instead of seconds
         self.xaxistosm()
@@ -1338,7 +1339,8 @@ class tgraphcanvas(FigureCanvas):
                     labels.append(self.extraname2[i])
                     
             #write legend
-            self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+            if self.legendloc:
+                self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
             if not self.designerflag:    
                 #Add markers for CHARGE           
@@ -8932,7 +8934,8 @@ class WindowsDlg(QDialog):
 
         self.legendComboBox = QComboBox()
         self.legendComboBox.setMaximumWidth(160)
-        legendlocs = [QApplication.translate("ComboBox", "upper right",None, QApplication.UnicodeUTF8),
+        legendlocs = [QApplication.translate("ComboBox", "none",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox", "upper right",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "upper left",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "lower left",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "lower right",None, QApplication.UnicodeUTF8),
@@ -8943,7 +8946,7 @@ class WindowsDlg(QDialog):
                       QApplication.translate("ComboBox", "upper center",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "center",None, QApplication.UnicodeUTF8)]
         self.legendComboBox.addItems(legendlocs)
-        self.legendComboBox.setCurrentIndex(aw.qmc.legendloc-1)
+        self.legendComboBox.setCurrentIndex(aw.qmc.legendloc)
         self.connect(self.legendComboBox,SIGNAL("currentIndexChanged(int)"),self.changelegendloc)
 
         self.timeflag = QCheckBox(QApplication.translate("CheckBox", "Keep Max time after RESET",None, QApplication.UnicodeUTF8))
@@ -9082,7 +9085,7 @@ class WindowsDlg(QDialog):
         aw.qmc.redraw()
 
     def changelegendloc(self):
-        aw.qmc.legendloc = self.legendComboBox.currentIndex() + 1
+        aw.qmc.legendloc = self.legendComboBox.currentIndex()
         aw.qmc.redraw()
 
     def xaxislenloc(self):
