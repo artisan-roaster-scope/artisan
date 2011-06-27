@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.5.1"
+__version__ = u"0.5.2"
 
 
 # ABOUT
@@ -2430,9 +2430,21 @@ class tgraphcanvas(FigureCanvas):
             #calculate the positions for the statistics elements
             ydist = self.ylimit - self.ylimit_min
             statisticsbarheight = ydist/80
-            statisticsheight = self.ylimit - (0.13 * ydist)
+
+            if aw.qmc.legendloc in [1,2,9]:
+                # legend on top
+                if len(aw.qmc.extradevices) == 0:
+                    # no extra devices
+                    statisticsheight = self.ylimit - (0.12 * ydist) # standard positioning
+                else:
+                    # extra devices
+                    statisticsheight = self.ylimit - (0.19 * ydist) # standard positioning
+            else:
+                # legend not on top
+                statisticsheight = self.ylimit - (0.08 * ydist) 
+            
             statisticsupper = statisticsheight + statisticsbarheight + 2
-            statisticslower = statisticsheight - statisticsbarheight - ydist / 50.
+            statisticslower = statisticsheight - statisticsbarheight - ydist / 35.
             
             if self.statisticsflags[1]:
                 
@@ -9707,7 +9719,6 @@ class EventsDlg(QDialog):
         else:
             aw.button_11.setVisible(False)            
             aw.eventsbuttonflag = 0
-            self.minieventsflag.setChecked(False)
 
     def eventsshowflagChanged(self):
         if self.eventsshowflagbox.isChecked():
