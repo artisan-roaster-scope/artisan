@@ -83,9 +83,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
                          QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox )
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
-                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QMutex)
-from PyQt4.QtNetwork import (QHostAddress, QTcpServer, QTcpSocket)
-
+                          QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QSemaphore)
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
@@ -602,8 +600,8 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color of lines
 
-        self.samplingflag = False
-
+        self.samplingsemaphore = QSemaphore(1)
+        
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()        
     #################################    FUNCTIONS    ###################################
     #####################################################################################
@@ -1075,7 +1073,8 @@ class tgraphcanvas(FigureCanvas):
         #reset cupping flavor values
         self.flavors = [5.]*len(self.flavorlabels)
 
-        self.samplingflag = False
+        if self.samplingsemaphore.available() < 1:
+            self.samplingsemaphore.release(1)
 
         self.redraw()
         aw.soundpop()
@@ -1083,16 +1082,8 @@ class tgraphcanvas(FigureCanvas):
     #Redraws data   
     def redraw(self):
         try:
-            
-            #avoid redrawing in middle of sampling
-            count = 0
-            while self.samplingflag:
-                libtime.sleep(.05)
-                count += 1
-                if count == 150:
-                    self.samplingflag = False
-
-            self.samplingflag = True
+            # lock resources
+            self.samplingsemaphore.acquire(1)
             
             self.fig.clf()   #wipe out figure
             self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
@@ -1557,16 +1548,14 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.lines = self.ax.lines[2:]
                 if len(self.timex):
                     self.redrawdesigner()
-                    
-            self.samplingflag = False
-            
+
+            self.samplingsemaphore.release(1)
+
         except Exception,e:
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)
+                
             self.adderror(QApplication.translate("Error Message","Exception Error: redraw() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
-            return
-
-        finally:
-            self.samplingflag = False
-
 
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
@@ -3527,20 +3516,12 @@ class SampleThread(QThread):
     # sample devices at interval self.delay miliseconds.  
     def sample(self):
         try:
-            
             #apply sampling interval here                
             libtime.sleep(aw.qmc.delay/1000.)
 
-            #avoid sampling while redrawing. synchronization.
-            count = 0
-            while aw.qmc.samplingflag:
-                libtime.sleep(.05)
-                count += 1
-                if count == 100:
-                    return
-                
-            aw.qmc.samplingflag = True
-            
+            # lock resources
+            aw.qmc.samplingsemaphore.acquire(1)
+
             #if using a meter (thermocouple device)
             if aw.qmc.device != 18:
                 #read time, ET (t1) and BT (t2) TEMPERATURE
@@ -3663,20 +3644,20 @@ class SampleThread(QThread):
                 #add to plot a vertical time line
                 aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
                 
-            aw.qmc.samplingflag = False
 
             #update screen in main GUI thread
             self.emit(SIGNAL("updategraphics"))
+
+            aw.qmc.samplingsemaphore.release(1)
             
         except Exception,e:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
+                
             aw.qmc.flagon = False
-            aw.qmc.samplingflag = False
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
-        
-        finally:
-            aw.qmc.samplingflag = False
-     
+            
               
     def run(self):
         timedelay = aw.qmc.delay/1000.
@@ -3705,28 +3686,15 @@ class Athreadserver(QWidget):
     def createSampleThread(self):
         if aw.qmc.flagon == False:
             aw.qmc.flagon = True
-            thread = SampleThread(self)
-            QApplication.processEvents()
+            sthread = SampleThread(self)
+            #QApplication.processEvents()
 
             #delete when finished to save memory 
-            self.connect(thread,SIGNAL("finished"),thread,SLOT("deleteLater()"))
-            #self.connect(thread,SIGNAL("terminated()"),thread,SLOT("deleteLater()"))            
+            self.connect(sthread,SIGNAL("finished"),sthread,SLOT("deleteLater()"))
             #connect graphics to GUI thread
-            self.connect(thread, SIGNAL("updategraphics"),aw.qmc.updategraphics)
-            thread.start()
-            thread.wait(300)    #needed in some Win OS
-
-    def createTCPserver(self):
-        pass
-
-
-##################################################################################################################
-###   TCP server for remote operation
-##################################################################################################################
-
-            
-
-
+            self.connect(sthread, SIGNAL("updategraphics"),aw.qmc.updategraphics)
+            sthread.start()
+            sthread.wait(300)    #needed in some Win OS
 
 
 ########################################################################################                            
@@ -3776,9 +3744,11 @@ class ApplicationWindow(QMainWindow):
         #resolution
         self.dpi = 80
         self.qmc = tgraphcanvas(self.main_widget)
+        self.qmc.setAttribute(Qt.WA_NoSystemBackground)
 
         ####    HUD   
         self.HUD = QLabel()  #main canvas for hud widget
+
         #This is a list of different HUD functions. 
         self.showHUD = [self.showHUDmetrics, self.showHUDthermal]
         #this holds the index of the HUD functions above
@@ -4555,6 +4525,9 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addWidget(self.EventsGroupLayout)
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
+    def starttcpserver(self):
+        self.qmc.threadserver.createTCPserver()
+        
     def setdpi(self,dpi):
         if aw:
             self.qmc.fig.set_dpi(dpi)
@@ -7081,9 +7054,9 @@ $cupping_notes
         MVV = int(round(MV))
         pidstring = "ET pid = %i "%MVV
         ##### end of ET pid
-        
+                
         img = QPixmap().grabWidget(self.qmc)
-
+        
         Wwidth = self.qmc.size().width()
         Wheight = self.qmc.size().height()
 
@@ -7092,25 +7065,23 @@ $cupping_notes
         #chose font
         font = QFont('Utopia', 14, -1)
         p.setFont(font)
-        p.setOpacity(0.6)
+        p.setOpacity(0.7)
         p.setPen(QColor("slategrey"))
+        
         #p.setPen(QColor(self.qmc.palette["text"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),QString(text1))
-        
         #p.setPen(QColor(self.qmc.palette["bt"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8),QString(text2))
-
         p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/8),QString(pidstring))
-        
+    
         delta = QApplication.translate("Scope Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]))
         p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/6),QString(delta))
-
         p.drawRect(Wwidth/2+140, Wheight - Wheight/8 -12, 100, 12)
         p.fillRect(Wwidth/2+140, Wheight - Wheight/8 - 12, MVV, 12, QColor("pink"))
-  
         p.end()
+
         self.HUD.setPixmap(img)
-       
+
     def showHUDthermal(self): 
         img = QPixmap().grabWidget(aw.qmc)        
         p = QPainter(img)
@@ -10929,7 +10900,6 @@ class serialport(object):
     """ this class handles the communications with all the devices"""
     
     def __init__(self):
-        self.mutex = QMutex()
         
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = u"COM4"      #NOTE: this string should not be translated. It is an argument for lib Pyserial
@@ -11265,7 +11235,6 @@ class serialport(object):
     # function used by Fuji PIDs
     def sendFUJIcommand(self,binstring,nbytes):
         try:
-            self.mutex.lock()            
             if not self.SP.isOpen():
                 self.openport()                   
             if self.SP.isOpen():
@@ -11315,13 +11284,10 @@ class serialport(object):
             aw.qmc.errorlog.append(timez + " " + error)
             return "0"
         
-        finally:
-            self.mutex.unlock()
             
      #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
         try:
-            self.mutex.lock()
             
             if not self.SP.isOpen():
                 self.openport()
@@ -11366,9 +11332,6 @@ class serialport(object):
             else:
                 return -1,-1                                    
 
-        finally:
-            self.mutex.unlock()
-            
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
     def HH506RAtemperature(self):
@@ -11380,7 +11343,6 @@ class serialport(object):
                 return -1,-1
            
         try:
-            self.mutex.lock()
             
             if not self.SP.isOpen():
                 self.openport()                    
@@ -11420,14 +11382,11 @@ class serialport(object):
             else:
                 return -1,-1
             
-        finally:
-            self.mutex.unlock()
-            
+
     #reads once the id of the HH506RA meter and stores it in the serial variable self.HH506RAid. Marko Luther.
-    def HH506RAGetID(self):   
+    def HH506RAGetID(self):
+        
         try:
-            self.mutex.lock()
-            
             if not self.SP.isOpen():
                 self.openport()                    
                 
@@ -11456,12 +11415,9 @@ class serialport(object):
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
             
-        finally:
-            self.mutex.unlock()
             
     def CENTER306temperature(self):
         try:
-            self.mutex.lock()
             
             if not self.SP.isOpen():
                 self.openport()                    
@@ -11537,9 +11493,7 @@ class serialport(object):
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1
-            
-        finally:
-            self.mutex.unlock()
+
             
     def NONE(self):
         dialogx = nonedevDlg( )
@@ -11554,7 +11508,6 @@ class serialport(object):
             
     def CENTER303temperature(self):
         try:
-            self.mutex.lock()
             
             if not self.SP.isOpen():
                 self.openport()                    
@@ -11631,9 +11584,6 @@ class serialport(object):
             else:
                 return -1,-1
             
-        finally:
-            self.mutex.unlock()
-            
     def CENTER309temperature(self):
         ##    command = "\x4B" returns 4 bytes . Model number.
         ##    command = "\x48" simulates HOLD button
@@ -11660,8 +11610,7 @@ class serialport(object):
         ##                                        THIS ONLY WORKS WHEN TEMPERATURE < 200. If T >= 200 r[43] changes
 
         try:
-            self.mutex.lock()
-            
+
             if not self.SP.isOpen():
                 self.openport()
                 
@@ -11706,13 +11655,9 @@ class serialport(object):
             else:
                 return -1,-1
 
-        finally:
-            self.mutex.unlock()
-            
     def ARDUINOTC4temperature(self):
         try:
-            self.mutex.lock()
-            
+
             if not self.SP.isOpen():
                 self.openport()
                 libtime.sleep(3)
@@ -11802,9 +11747,7 @@ class serialport(object):
             else:
                 return -1,-1
             
-        finally:
-            self.mutex.unlock()
-            
+           
     def TEVA18Bconvert(self, seg):
         if seg == 0x7D:
             return 0
@@ -11831,8 +11774,7 @@ class serialport(object):
 
     def TEVA18Btemperature(self):
         try:
-            self.mutex.lock()
-            
+
             run = 1
             counter = 0
             
@@ -12017,9 +11959,6 @@ class serialport(object):
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1 
-
-        finally:
-            self.mutex.unlock()
             
     def HHM28multimeter(self):
         # This meter sends a continuos frame byte by byte. It only transmits data. It does not receive commands.
@@ -12031,7 +11970,6 @@ class serialport(object):
         # Bytes 1,10,11,12,13 carry data bits that represent other symbols like F (for Farad), u (for micro), M (for Mega), etc, of the meter display
 
         try:
-            self.mutex.lock()
             
             if not self.SP.isOpen():
                 self.openport()                    
@@ -12145,14 +12083,11 @@ class serialport(object):
             aw.qmc.errorlog.append(timez + " " + error)
             return "0",""
         
-        finally:
-            self.mutex.unlock()
 
     #sends a command to the ET/BT device
     def sendTXcommand(self,command):
         try:
-            self.mutex.lock()
-            
+
             if not self.SP.isOpen():
                 self.openport()
                 libtime.sleep(3)
@@ -12175,16 +12110,13 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-        
-        finally:
-            self.mutex.unlock()
 
     #Example function
     #NOT USED YET, maybe FUTURE Arduino?
     #sends a command to the ET/BT device and receives data of length nbytes 
     def sendTXRXcommand(self,command,nbytes):
         try:
-            self.mutex.lock()
+
             self.SP.write(command)
             r = self.SP.read(nbytes)            
             if len(r) == nbytes:
@@ -12199,9 +12131,7 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-        
-        finally:
-            self.mutex.unlock()
+
             
 #########################################################################
 #############  DESIGNER CONFIG DIALOG ###################################                                   
