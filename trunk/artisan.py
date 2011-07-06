@@ -610,34 +610,35 @@ class tgraphcanvas(FigureCanvas):
     #runs from GUI thread     
     def updategraphics(self):
         try:
-            if len(self.timex):        
-                aw.lcd2.display("%.1f"%self.temp1[-1])            # ET
-                aw.lcd3.display("%.1f"%self.temp2[-1])            # BT
-                aw.lcd4.display("%.1f"%self.rateofchange1)        # rate of change MET (degress per minute)
-                aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
-                
-                if self.device == 0:                              #extra LCDs for pid  
-                    aw.lcd6.display(aw.ser.currentpidsv)
-                    aw.lcd7.display(aw.ser.dutycycle)
+            if self.flagon:
+                if len(self.timex):        
+                    aw.lcd2.display("%.1f"%self.temp1[-1])            # ET
+                    aw.lcd3.display("%.1f"%self.temp2[-1])            # BT
+                    aw.lcd4.display("%.1f"%self.rateofchange1)        # rate of change MET (degress per minute)
+                    aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
+                    
+                    if self.device == 0:                              #extra LCDs for pid  
+                        aw.lcd6.display(aw.ser.currentpidsv)
+                        aw.lcd7.display(aw.ser.dutycycle)
 
-            #display new-updated canvas
-            self.fig.canvas.draw()
+                #display new-updated canvas
+                self.fig.canvas.draw()
 
-            #check if HUD is ON
-            if self.HUDflag:
-                aw.showHUD[aw.HUDfunction]() 
+                #check if HUD is ON
+                if self.HUDflag:
+                    aw.showHUD[aw.HUDfunction]() 
 
-            #check alarms
-            if self.device != 18:
-                for i in range(len(self.alarmflag)):
-                    #if alarm on, and not triggered, and time is after set time:
-                    if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
-                        if self.alarmsource[i] == 0:                        #check ET
-                            if self.temp1[-1] > self.alarmtemperature[i]:
-                                self.setalarm(i)
-                        elif self.alarmsource[i] == 1:                      #check BT
-                            if self.temp2[-1] > self.alarmtemperature[i]:
-                                self.setalarm(i)
+                #check alarms
+                if self.device != 18:
+                    for i in range(len(self.alarmflag)):
+                        #if alarm on, and not triggered, and time is after set time:
+                        if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
+                            if self.alarmsource[i] == 0:                        #check ET
+                                if self.temp1[-1] > self.alarmtemperature[i]:
+                                    self.setalarm(i)
+                            elif self.alarmsource[i] == 1:                      #check BT
+                                if self.temp2[-1] > self.alarmtemperature[i]:
+                                    self.setalarm(i)
 
         except Exception,e:
             self.flagon = False
@@ -963,6 +964,11 @@ class tgraphcanvas(FigureCanvas):
         
     #Resets graph. Called from reset button. Deletes all data
     def reset(self):
+        #### lock shared resources #####
+        self.samplingsemaphore.acquire(1)
+        
+        self.flagon = False
+        
         #prevents deleting accidentally a finished roast
         if self.safesaveflag== True:
             string = QApplication.translate("MessageBox","Do you want to save the profile?", None, QApplication.UnicodeUTF8)
@@ -984,7 +990,6 @@ class tgraphcanvas(FigureCanvas):
         self.ax.set_title(self.title,size=20,color=self.palette["title"])  
         
         #reset all variables that need to be reset
-        self.flagon = False
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
         self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
@@ -1073,8 +1078,7 @@ class tgraphcanvas(FigureCanvas):
         #reset cupping flavor values
         self.flavors = [5.]*len(self.flavorlabels)
 
-        if self.samplingsemaphore.available() < 1:
-            self.samplingsemaphore.release(1)
+        self.samplingsemaphore.release(1)
 
         self.redraw()
         aw.soundpop()
@@ -1082,7 +1086,7 @@ class tgraphcanvas(FigureCanvas):
     #Redraws data   
     def redraw(self):
         try:
-            # lock resources
+            #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
             
             self.fig.clf()   #wipe out figure
@@ -3516,12 +3520,10 @@ class SampleThread(QThread):
     # sample devices at interval self.delay miliseconds.  
     def sample(self):
         try:
+            
             #apply sampling interval here                
             libtime.sleep(aw.qmc.delay/1000.)
-
-            # lock resources
-            aw.qmc.samplingsemaphore.acquire(1)
-
+            
             #if using a meter (thermocouple device)
             if aw.qmc.device != 18:
                 #read time, ET (t1) and BT (t2) TEMPERATURE
@@ -3530,6 +3532,9 @@ class SampleThread(QThread):
                     t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
                 if len(aw.qmc.BTfunction):
                     t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
+
+                ##### lock resources  #########
+                aw.qmc.samplingsemaphore.acquire(1)
 
                 #filter droputs 
                 if aw.qmc.mode == "C":
@@ -3593,7 +3598,6 @@ class SampleThread(QThread):
                     aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
 
                 # append new data to the rateofchange
-
                 aw.qmc.delta1.append(rateofchange1plot)
                 aw.qmc.delta2.append(rateofchange2plot)
                                            
@@ -3634,7 +3638,11 @@ class SampleThread(QThread):
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()        
             else:
-                tx = int(aw.qmc.timeclock.elapsed()/1000.) 
+                tx = int(aw.qmc.timeclock.elapsed()/1000.)
+                
+                #### lock resources  ############
+                aw.qmc.samplingsemaphore.acquire(1)
+
                 #readjust xlimit of plot if needed
                 if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds  
                     aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
@@ -3643,13 +3651,13 @@ class SampleThread(QThread):
                 aw.qmc.resetlines()
                 #add to plot a vertical time line
                 aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
-                
+
+            ##### release resources  #########    
+            aw.qmc.samplingsemaphore.release(1)
 
             #update screen in main GUI thread
             self.emit(SIGNAL("updategraphics"))
 
-            aw.qmc.samplingsemaphore.release(1)
-            
         except Exception,e:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -3657,8 +3665,7 @@ class SampleThread(QThread):
             aw.qmc.flagon = False
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
-            
-              
+                      
     def run(self):
         timedelay = aw.qmc.delay/1000.
         if not aw.qmc.flagon:
@@ -3669,9 +3676,9 @@ class SampleThread(QThread):
                 self.sample()
             else:
                 if aw.ser.SP.isOpen():
-                    aw.ser.closeport()            
-                self.quit()
+                    aw.ser.closeport()
                 QApplication.processEvents()
+                self.quit()
                 break  #thread ends
 
 #########################################################################################################
@@ -11121,7 +11128,7 @@ class serialport(object):
          return aw.ser.extra309TX,aw.ser.extra309T3,aw.ser.extra309T4 
 
     def VOLTCRAFTK202(self):
-        
+
          t2,t1 = self.CENTER306temperature()
          tx = aw.qmc.timeclock.elapsed()/1000.
          
@@ -15293,8 +15300,8 @@ class PXRpidDlgControl(QDialog):
         BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
-        self.thermotypes = ["J","K","R","B","S","T","E","N"]
-        conversiontoindex = [2,3,4,5,6,7,8,12]  #converts fuji PID types to indexes
+        self.thermotypes = ["JPT 100","PT 100","J","K","R","B","S","T","E","N"]
+        conversiontoindex = [0,1,2,3,4,5,6,7,8,12]  #converts fuji PID types to indexes
         self.ETthermocombobox.addItems(self.thermotypes)
         self.BTthermocombobox.addItems(self.thermotypes)
         self.ETthermocombobox.setCurrentIndex(conversiontoindex.index(aw.pid.PXG4["pvinputtype"][0]))
@@ -16394,8 +16401,8 @@ class PXG4pidDlgControl(QDialog):
         BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
-        self.thermotypes = ["J","K","R","B","S","T","E","N"]
-        conversiontoindex = [2,3,4,5,6,7,8,12]  #converts fuji PID types to indexes
+        self.thermotypes = ["JPT 100","PT 100","J","K","R","B","S","T","E","N"]
+        conversiontoindex = [0,1,2,3,4,5,6,7,8,12]  #converts fuji PID types to indexes
         self.ETthermocombobox.addItems(self.thermotypes)
         self.BTthermocombobox.addItems(self.thermotypes)
         self.ETthermocombobox.setCurrentIndex(conversiontoindex.index(aw.pid.PXG4["pvinputtype"][0]))
