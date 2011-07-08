@@ -1,5 +1,5 @@
 Current Versions
-o Python 2.7.1
+o Python 2.7.2
 o QT 4.7.3
 o Numpy 1.6.0
 o SIP 4.12.3
@@ -8,9 +8,13 @@ o matplotlib 1.0.1
 o scipy 0.9.0
 o elixir 0.7.1 (for Green)
 o pyaudio
-o py2app 0.5.2
+o py2app 0.6.3
 
 Upgrade History
+- 2011-06-30: Upgraded
+ . py2app 0.5.2 => 0.6.3
+- 2011-06-28: Upgraded
+ . Python 2.7.1 => 2.7.2
 - 2011-05-12: Upgraded 
  . Qt 4.7.2 => Qt 4.7.3
  . Numpy 1.5.1 => 1.6.0
@@ -70,13 +74,13 @@ sudo ln -s /usr/bin/g++-4.2 /usr/bin/g++
 
 Install universal binary (PPC/Intel) setup on Snow Leopard 10.6.5 (with support for 10.4.x)
 
-0) Install Python 2.6.6 / 2.7.1
+0) Install Python 2.6.6 / 2.7.2
 
 download and install:
 
 http://www.python.org/ftp/python/2.6.6/python-2.6.6-macosx10.3.dmg
 or
-http://www.python.org/ftp/python/2.7.1/python-2.7.1-macosx10.3.dmg
+http://www.python.org/ftp/python/2.7.2/python-2.7.2-macosx10.3.dmg
 
 set default to 32bit:
 # defaults write com.apple.versioner.python Prefer-32-Bit -bool yes
@@ -342,16 +346,18 @@ fetch modulegraph 0.8.2 from repository:
 # python setup.py build
 # python setup.py install
 
-9) py2app (0.5.2 from Dist)
+9) py2app (0.6.3 from Dist)
 
 do the following in a folder that does not contain any py2app elements
 # curl -O http://peak.telecommunity.com/dist/ez_setup.py
 # sudo python ez_setup.py -U setuptools
-for the latest version (note: 0.6.0-0.6.1 has an issue ignoring OPTIONS and data_files)
+for the latest version (note: 0.5.3, and 0.6.0-0.6.1 has an issue ignoring OPTIONS and data_files)
 # sudo easy_install -U py2app
 for installing a specific version
-# sudo easy_install -U "py2app==0.5.2"
+# sudo easy_install -U "py2app==0.6.3"
 
+0.5.2 works as expected but hangs if it cannot find a file in setup-mac.py/DATA_FILES
+0.6.3 seems to work as expected
 
 NOTE:
 
