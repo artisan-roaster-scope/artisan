@@ -15,16 +15,17 @@ sysconfig.parse_makefile = my_parse_makefile
 import sys, os
 from setuptools import setup
 
+import string
+
 # current version of Artisan
 VERSION = '0.5.2'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
 
-APP = ['artisan.py']
+APP = ['loader.py']
 
 DATA_FILES = [
-    "index.html",
     "LICENSE.txt",
     ("../PlugIns/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
     ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
@@ -37,6 +38,7 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_fr.qm"]),
     ("../translations", [r"translations/artisan_it.qm"]),
     ("../translations", [r"translations/artisan_sv.qm"]),
+    ("../Resources", [r"qt.conf"]),
   ]
   
 OPTIONS = {
@@ -85,7 +87,8 @@ setup(
 os.system(r'cp README.txt dist')
 os.system(r'cp LICENSE.txt dist')
 os.chdir('./dist')
-os.system(r'macdeployqt Artisan.app -verbose=0')
+#the following is not needed anymore, however, one has to ensure that there is a proper Content/Resources/qt.conf in the bundle
+#os.system(r'macdeployqt Artisan.app -verbose=0')
 
 print '*** Removing Qt debug libs ***'
 for root, dirs, files in os.walk('.'):
@@ -99,35 +102,20 @@ for root, dirs, files in os.walk('.'):
         elif '_tests' in file:
             print 'Deleting', file
             os.remove(os.path.join(root,file))
-        elif '.pyc' in file:
+        elif file.endswith('.pyc') and file != "site.pyc":
             print 'Deleting', file
             os.remove(os.path.join(root,file))
         # remove also all .h .in .cpp .cc .html files 
-        elif '.h' in file:
+        elif file.endswith('.h'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
-        elif '.in' in file:
+        elif file.endswith('.in'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
-        elif '.cpp' in file:
+        elif file.endswith('.cpp'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
-        elif '.cc' in file:
-            print 'Deleting', file
-            os.remove(os.path.join(root,file))
-        # removing some frameworks that are not needed but added by macdeployqt
-        elif file in ['QtDeclarative','QtNetwork','QtScript','QtXmlPatterns','QtSql']:
-            print 'Deleting', file
-            os.remove(os.path.join(root,file))
-        # removing some plugins that are not needed but added by macdeployqt
-        elif file in ['libqtaccessiblewidgets.dylib',
-                'libqgenericbearer.dylib',
-                'libqcncodecs.dylib',
-                'libqjpcodecs.dylib',
-                'libqkrcodecs.dylib',
-                'libqtwcodecs.dylib',
-                'libqtracegraphicssystem.dylib',
-                'libtcpserver.dylib']:
+        elif file.endswith('.cc'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
             
