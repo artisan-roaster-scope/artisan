@@ -13391,19 +13391,26 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.extramathexpression2.pop(x)
             
             #pop serial port settings
-            aw.extracomport.pop(x)
-            aw.extrabaudrate.pop(x)
-            aw.extrabytesize.pop(x)
-            aw.extraparity.pop(x)
-            aw.extrastopbits.pop(x)
-            aw.extratimeout.pop(x)
-            if aw.extraser[x].SP.isOpen():
-                aw.extraser[x].SP.close()
-            aw.extraser.pop(x)
+            if len(aw.extracomport) > x:
+                aw.extracomport.pop(x)
+            if len(aw.extrabaudrate) > x:
+                aw.extrabaudrate.pop(x)
+            if len(aw.extrabytesize) > x:
+                aw.extrabytesize.pop(x)
+            if len(aw.extraparity) > x:
+                aw.extraparity.pop(x)
+            if len(aw.extrastopbits) > x:
+                aw.extrastopbits.pop(x)
+            if len(aw.extratimeout) > x:
+                aw.extratimeout.pop(x)
+            if len(aw.extraser) > x:
+                if aw.extraser[x].SP.isOpen():
+                    aw.extraser[x].SP.close()
+                aw.extraser.pop(x)
             self.createDeviceTable()
             aw.qmc.redraw()
-        except Exception,e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "delextradevice(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+        except Exception,e:         
+            aw.qmc.adderror(QApplication.translate("Error Message", "delextradevice(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
     def savedevicetable(self):
         try:
@@ -13761,11 +13768,26 @@ class DeviceAssignmentDLG(QDialog):
                 #init serial settings of extra devices
                 for i in range(len(aw.qmc.extradevices)):
                     dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
-                    aw.extrabaudrate[i] = dsettings[0]
-                    aw.extrabytesize[i] = dsettings[1]
-                    aw.extraparity[i] = dsettings[2]
-                    aw.extrastopbits[i] = dsettings[3]
-                    aw.extratimeout[i] = dsettings[4]  
+                    if len(aw.extrabaudrate) < i:
+                        aw.extrabaudrate[i] = dsettings[0]
+                    else:
+                        aw.extrabaudrate.append(dsettings[0])
+                    if len(aw.extrabytesize) < i:
+                        aw.extrabytesize[i] = dsettings[1]
+                    else:
+                        aw.extrabytesize.append(dsettings[1])
+                    if len(aw.extraparity) < i: 
+                        aw.extraparity[i] = dsettings[2]
+                    else:
+                        aw.extraparity.append(dsettings[2])
+                    if len(aw.extrastopbits) < i:
+                        aw.extrastopbits[i] = dsettings[3]
+                    else:
+                        aw.extrastopbits.append(dsettings[3])
+                    if len(aw.extratimeout) < i:
+                        aw.extratimeout[i] = dsettings[4]  
+                    else:
+                        aw.extratimeout.append(dsettings[4])
                     
                 aw.button_10.setVisible(False)
                 aw.button_12.setVisible(False)
@@ -13797,7 +13819,7 @@ class DeviceAssignmentDLG(QDialog):
             self.close()
 
         except Exception,e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "device accept((): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            aw.qmc.adderror(QApplication.translate("Error Message", "device accept(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
 ############################################################
 #######################  CUSTOM COLOR DIALOG  ##############
