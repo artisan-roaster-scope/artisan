@@ -318,10 +318,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.patch.set_facecolor(self.backcolor)
         self.fig.patch.set_edgecolor(self.backcolor)
         
-        #self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
-        self.sp = Subplot(self.fig, 111)
-        self.sp.axis["right"].set_visible(False)
-        self.ax = self.fig.add_subplot(self.sp)
+        self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
         self.delta_ax = self.ax.twinx()        
         
         #legend location
@@ -506,6 +503,7 @@ class tgraphcanvas(FigureCanvas):
 
         # disable figure autoscale
         self.ax.set_autoscale_on(False)
+        self.delta_ax.set_autoscale_on(False)
 
         #set grid + axle labels + title
         self.ax.grid(True,color=self.palette["grid"],linestyle = self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
@@ -516,9 +514,9 @@ class tgraphcanvas(FigureCanvas):
         self.ax.set_title(self.title,size=20,color=self.palette["title"])
         
         
-        #put a right tick on the graph
-        for tick in self.ax.yaxis.get_major_ticks():
-            tick.label2On = True
+##        #put a right tick on the graph
+##        for tick in self.ax.yaxis.get_major_ticks():
+##            tick.label2On = True
 
         #change label colors
         for label in self.ax.yaxis.get_ticklabels():
@@ -957,6 +955,8 @@ class tgraphcanvas(FigureCanvas):
         for label in self.ax.xaxis.get_ticklabels():
             label.set_rotation(self.xrotation)
 
+
+
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -1021,10 +1021,9 @@ class tgraphcanvas(FigureCanvas):
         if self.HUDflag:
             self.toggleHUD()
             
-        self.sp = Subplot(self.fig, 111)
-        self.sp.axis["right"].set_visible(False)
-#        self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
-        self.ax = self.fig.add_subplot(self.sp)
+
+        self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
+        self.delta_ax = self.ax.twinx()        
             
         self.ax.set_title(self.title,size=20,color=self.palette["title"])  
         
@@ -1129,12 +1128,7 @@ class tgraphcanvas(FigureCanvas):
             self.samplingsemaphore.acquire(1)
             
             self.fig.clf()   #wipe out figure
-            self.sp = Subplot(self.fig, 111)
-            self.sp.axis["right"].set_visible(False)
-            #self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])            
-            self.ax = self.fig.add_subplot(self.sp)
-            self.delta_ax = self.ax.twinx()
-            self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
+            self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])            
             
             #Set axes same as in __init__
             if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
@@ -1146,14 +1140,17 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"])
             self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
             self.ax.set_title(self.title,size=20,color=self.palette["title"])
-            for tick in self.ax.yaxis.get_major_ticks():
-                tick.label2On = True
-            self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
-                
-            self.delta_ax.set_xlim(self.startofx, self.endofx)
-            #self.delta_ax.set_autoscale_on(False)
+
+            #create a second set of axes in the same position as self.ax	
+            self.delta_ax = self.ax.twinx()
+            self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
             self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
-                
+            deltamajorlocator = ticker.MultipleLocator(self.zgrid)
+            self.delta_ax.yaxis.set_major_locator(deltamajorlocator)
+##            #put a right tick on the graph
+##            for tick in self.delta_ax.yaxis.get_major_ticks():
+##                tick.label2On = True
+
             #draw water marks for dry phase region, mid phase region, and finish phase region
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
             rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
@@ -1363,20 +1360,13 @@ class tgraphcanvas(FigureCanvas):
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag:
                     self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,color=self.palette["deltaet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
-                if self.DeltaBTflag:
-                    self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
-                
-                
-                #add Rate of Change if flags are True
-                if  self.DeltaETflag:
                     handles.append(self.l_delta1)
                     labels.append(unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                     
-                if  self.DeltaBTflag:
+                if self.DeltaBTflag:
+                    self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
                     handles.append(self.l_delta2)
                     labels.append(unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
-
-
 
             ndevices = len(self.extradevices)
             if ndevices:
@@ -11389,6 +11379,7 @@ class serialport(object):
             
      #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
+        #init command = "#0A0000RA6\r\n"
         try:
             
             if not self.SP.isOpen():
@@ -12168,13 +12159,13 @@ class serialport(object):
                 if len(aw.qmc.temp1):
                     return str(aw.qmc.temp1[-1]),str(aw.qmc.temp2[-1])
                 else:
-                    return "0",""
+                    return "0","0"
             else:
                 index = aw.qmc.extradevices.index(23)
                 if len(aw.qmc.extratemp1[i]):
                     return str(aw.qmc.extratemp1[index][-1]),str(aw.qmc.temp2[index][-1])
                 else:
-                    return "0",""
+                    return "0","0"
         
         except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
