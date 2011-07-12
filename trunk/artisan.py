@@ -291,7 +291,8 @@ class tgraphcanvas(FigureCanvas):
                        "+FUJI DUTY %",
                        "Omega HHM28[6]",
                        "+204_34",
-                       "+Virtual" 
+                       "+Virtual",
+                       "DTA" 
                        ]
 
         #extra devices
@@ -1147,9 +1148,6 @@ class tgraphcanvas(FigureCanvas):
             self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
             deltamajorlocator = ticker.MultipleLocator(self.zgrid)
             self.delta_ax.yaxis.set_major_locator(deltamajorlocator)
-##            #put a right tick on the graph
-##            for tick in self.delta_ax.yaxis.get_major_ticks():
-##                tick.label2On = True
 
             #draw water marks for dry phase region, mid phase region, and finish phase region
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
@@ -1384,14 +1382,13 @@ class tgraphcanvas(FigureCanvas):
                 #Add markers for CHARGE           
                 if self.timeindex[0] != -1:
                     #anotate temperature
-
                     self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
                                     xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]+self.ystep),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
                                      xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]-self.ystep),
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #Add Dry End markers            
                 if self.timeindex[1]:
                     self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
@@ -1399,11 +1396,11 @@ class tgraphcanvas(FigureCanvas):
                     #anotate temperature
                     self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
                                     xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] + self.ystep), 
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
                                     xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] - self.ystep),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
                 #Add 1Cs markers
                 if self.timeindex[2]:
                     if self.timeindex[1]: #if dryend
@@ -1414,11 +1411,11 @@ class tgraphcanvas(FigureCanvas):
                     #anotate temperature
                     self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
                                     xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] + self.ystep), 
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
                                     xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] - self.ystep),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #Add 1Ce markers
                 if self.timeindex[3]:
                     self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
@@ -1426,11 +1423,11 @@ class tgraphcanvas(FigureCanvas):
                     #anotate temperature
                     self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
                                     xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]] + self.ystep),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
                                     xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #add a water mark if FCs
                     if self.timeindex[2]:
                         self.ax.axvspan(self.timex[self.timeindex[2]],self.timex[self.timeindex[3]], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -1444,10 +1441,10 @@ class tgraphcanvas(FigureCanvas):
                     st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(unicode(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
                     self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
                                     xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]] + self.ystep),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
                                      xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #Add 2Ce markers
                 if self.timeindex[5]:
                     self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
@@ -1455,11 +1452,11 @@ class tgraphcanvas(FigureCanvas):
                     #anotate temperature
                     self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
                                     xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] + self.ystep),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
                                     xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] - self.ystep),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #do water mark if SCs
                     if self.timeindex[4]:
                         self.ax.axvspan(self.timex[self.timeindex[4]],self.timex[self.timeindex[5]], facecolor=self.palette["watermarks"], alpha=0.2)
@@ -1483,11 +1480,11 @@ class tgraphcanvas(FigureCanvas):
                     #anotate temperature
                     self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
                                     xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] + self.ystep),
-                                    color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
                                      xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] - self.ystep),
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     
                     self.writestatistics()
 
@@ -1738,10 +1735,17 @@ class tgraphcanvas(FigureCanvas):
                             if self.device != 18:
                                 self.delta1[i] = self.fromCtoF(self.delta1[i])  #Delta ET
                                 self.delta2[i] = self.fromCtoF(self.delta2[i])  #Delta BT
-
+                            #extra devices curves
+                            nextra = len(aw.qmc.extratemp1)   
+                            if nextra:
+                                for e in range(nextra):
+                                    aw.qmc.extratemp1[e][i] = self.fromCtoF(aw.qmc.extratemp1[e][i])
+                                    aw.qmc.extratemp2[e][i] = self.fromCtoF(aw.qmc.extratemp2[e][i])
+                                    
                         self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
                         self.bag_humidity[1] = self.fromCtoF(self.bag_humidity[1]) #bag humidity temperature
 
+                        #background
                         for i in range(len(self.timeB)):
                             self.temp1B[i] = self.fromCtoF(self.temp1B[i])
                             self.temp2B[i] = self.fromCtoF(self.temp2B[i])
@@ -1773,6 +1777,12 @@ class tgraphcanvas(FigureCanvas):
                             if self.device != 18:
                                 self.delta1[i] = self.fromFtoC(self.delta1[i])  #Delta ET
                                 self.delta2[i] = self.fromFtoC(self.delta2[i])  #Delta BT
+                            #extra devices curves
+                            nextra = len(aw.qmc.extratemp1)    
+                            if nextra:
+                                for e in range(nextra):
+                                    aw.qmc.extratemp1[e][i] = self.fromFtoC(aw.qmc.extratemp1[e][i])
+                                    aw.qmc.extratemp2[e][i] = self.fromFtoC(aw.qmc.extratemp2[e][i])
 
                         self.ambientTemp = self.fromFtoC(self.ambientTemp)  #ambient temperature
                         self.bag_humidity[1] = self.fromFtoC(self.bag_humidity[1])  #bag humidity temperature                        
@@ -11056,7 +11066,8 @@ class serialport(object):
                                    self.fujidutycycle,      #22
                                    self.HHM28,              #23
                                    self.K204_34,            #24
-                                   self.virtual             #25
+                                   self.virtual,            #25
+                                   self.DTA                 #26
                                    ]
 
         #temporary storage to pass values. Holds extra T3 and T4 values for center 309
@@ -11100,7 +11111,6 @@ class serialport(object):
             aw.qmc.fujiETBT = 0.
         
         return tx,t1,t2
-
 
     def virtual(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -11284,6 +11294,13 @@ class serialport(object):
             ### not finished
         else:
             return tx, 0., float(val)   #send a 0. as second reading because the meter only returns one reading
+
+    def DTA(self):
+        t1 = self.DTAPIDtemperature()
+        tx = aw.qmc.timeclock.elapsed()/1000.
+
+        return tx,t1,0.
+    
 ############################################################################        
         
     def openport(self):
@@ -11703,7 +11720,6 @@ class serialport(object):
         ##                                        THIS ONLY WORKS WHEN TEMPERATURE < 200. If T >= 200 r[43] changes
 
         try:
-
             if not self.SP.isOpen():
                 self.openport()
                 
@@ -12219,6 +12235,68 @@ class serialport(object):
 
         except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXRXcommand() ",None, QApplication.UnicodeUTF8)
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)
+
+            
+    def DTACalcChecksum(self,string, length):
+        def tobin(x, count=8):
+            return "".join(map(lambda y:str((x>>y)&1), range(count-1, -1, -1)))
+        def twoscomp(num_str):
+            return tobin(-int(num_str,2),len(num_str))
+
+        # start at index 1 because of heading ':' cmd
+        count = 1
+        val = 0x00
+        while count < length:
+            val = val + int(string[count] + string[count + 1], 16)
+            count = count + 2
+        
+        h_bs = bin(val)[2:]
+    #    print "val:", val, h_bs
+        h2comp = twoscomp(h_bs)
+    #    print "2comp(val):", twoscomp(h_bs), hex(int(h2comp,2))
+        rval = int(h2comp,2)
+    #    print "val:", rval
+        if (val & 0x80) == 0:
+            rval = rval | 0x80
+    #    print "comp:", rval
+
+        return rval
+
+    def DTAPIDtemperature(self):
+        try:
+            if not self.SP.isOpen():
+                self.openport()
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                #first we have to build the cmd
+                GetTempCmd = ":010347000001"
+                #GetTempCmd = ":010347000002"
+                checksum = self.DTACalcChecksum(GetTempCmd, len(GetTempCmd))
+                command = "{0}{1:x}{2}".format(GetTempCmd, checksum, "\r\n").upper()
+                self.SP.write(command)
+
+                #read answer        
+                r = self.SP.read(15)
+                if len(r) == 15:
+                    t1 = float(int(r[7:7+4], 16))*0.1                    
+                    return t1                    
+                else:
+                    nbytes = len(r)
+                    aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): %1 bytes received but 15 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                    if len(aw.qmc.timex) > 2:                           
+                        return aw.qmc.temp1[-1]       
+                    else:
+                        return -1.
+                    
+        except serial.SerialException:
+            error  = QApplication.translate("Error Message","Serial Exception: ser.DTAtemperature() ",None, QApplication.UnicodeUTF8)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
@@ -13732,7 +13810,6 @@ class DeviceAssignmentDLG(QDialog):
 
                 elif meter == "+204_34":
                     aw.qmc.device = 24
-                    #aw.ser.comport = "COM4"
                     aw.ser.baudrate = 9600
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
@@ -13742,7 +13819,6 @@ class DeviceAssignmentDLG(QDialog):
 
                 elif meter == "+Virtual":
                     aw.qmc.device = 25
-                    #aw.ser.comport = "COM4"
                     aw.ser.baudrate = 9600
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
@@ -13750,10 +13826,20 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.timeout=1
                     message = ""  #empty message especial device
 
+                elif meter == "DTA":
+                    aw.qmc.device = 26
+                    aw.ser.baudrate = 2400
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = ""  #empty message especial device
+
+                #extra devices serial config    
                 #set of different serial settings modes options
                 ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],[19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1]]
-                #map device index to a setting mode
-                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3]  #0-25
+                #map device index to a setting mode (chose the one that matches the device)
+                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6]  #0-26
                     
                 self.savedevicetable()
                 #init serial settings of extra devices
