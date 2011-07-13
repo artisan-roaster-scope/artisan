@@ -95,7 +95,7 @@ import matplotlib.ticker as ticker
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 import matplotlib as mpl
-from mpl_toolkits.axes_grid.axislines import Subplot
+#from mpl_toolkits.axes_grid.axislines import Subplot
 	
 platf = unicode(platform.system())
 
