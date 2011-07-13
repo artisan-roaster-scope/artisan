@@ -11113,10 +11113,11 @@ class serialport(object):
         #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
         tx = aw.qmc.timeclock.elapsed()/1000.
 
-        #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None)
-        if self.readBTpid[0] != 2:                    
-            # get the temperature for BT. aw.fujipid.gettemperature(unitID)
+        #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
+        if self.readBTpid[0] < 2:                    
             t2 = aw.fujipid.gettemperature(self.readBTpid[1])/10.
+        elif self.readBTpid[0] == 3:
+            t2 = self.DTAPIDtemperature(self.readBTpid[1])
         else:
             t2 = 0.
 
@@ -11128,6 +11129,19 @@ class serialport(object):
         else:
             aw.qmc.fujiETBT = 0.
         
+        return tx,t1,t2
+
+    def DTAtemperature(self):
+        t1 = self.DTAPIDtemperature(self.controlETpid[1])
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
+        if self.readBTpid[0] < 2:                    
+            t2 = aw.fujipid.gettemperature(self.readBTpid[1])/10.
+        elif self.readBTpid[0] == 3:
+            t2 = self.DTAPIDtemperature(self.readBTpid[1])
+        else:
+            t2 = 0.
+
         return tx,t1,t2
 
     def virtual(self):
@@ -11313,11 +11327,7 @@ class serialport(object):
         else:
             return tx, 0., float(val)   #send a 0. as second reading because the meter only returns one reading
 
-    def DTAtemperature(self):
-        t1 = self.DTAPIDtemperature()
-        tx = aw.qmc.timeclock.elapsed()/1000.
 
-        return tx,t1,0.
     
 ############################################################################        
         
@@ -12260,7 +12270,7 @@ class serialport(object):
             aw.qmc.errorlog.append(timez + " " + error)
 
 
-    def DTAPIDtemperature(self):
+    def DTAPIDtemperature(self,unitID):
         try:
             if not self.SP.isOpen():
                 self.openport()
@@ -12269,8 +12279,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 #first we have to build the cmd
-                #aw.DtaPID.message2send(self,unitID,FUNCTION,ADDRESS, NDATA)
-                command = aw.dtapid.message2send(self.controlETpid[1],3,4700,1)
+                #aw.DtaPID.message2send(unitID,FUNCTION,ADDRESS, NDATA)
+                command = aw.dtapid.message2send(unitID,3,4700,1)
                 self.SP.write(command)
 
                 #read answer        
