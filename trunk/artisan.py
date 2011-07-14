@@ -533,9 +533,6 @@ class tgraphcanvas(FigureCanvas):
         if self.legendloc:
             self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
-        #Create x axis labels in minutes:seconds instead of seconds
-        self.xaxistosm()
-
         ###########################  TIME  CLOCK     ##########################        
         # create an object time to measure and record time (in miliseconds) 
     
@@ -1133,13 +1130,17 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_title(self.title,size=20,color=self.palette["title"])
 
             #second axes breaks mouse pick event (choses second axis) in Designer  	
-            if not self.designerflag:
+            if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax	
                 self.delta_ax = self.ax.twinx()
                 self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 deltamajorlocator = ticker.MultipleLocator(self.zgrid)
                 self.delta_ax.yaxis.set_major_locator(deltamajorlocator)
+            else:
+                #put a right tick on the graph
+                for tick in self.ax.yaxis.get_major_ticks():
+                    tick.label2On = True 
 
             #draw water marks for dry phase region, mid phase region, and finish phase region
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
