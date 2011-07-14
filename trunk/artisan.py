@@ -95,7 +95,6 @@ import matplotlib.ticker as ticker
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 import matplotlib as mpl
-#from mpl_toolkits.axes_grid.axislines import Subplot
 	
 platf = unicode(platform.system())
 
@@ -500,10 +499,10 @@ class tgraphcanvas(FigureCanvas):
         
         self.delta_ax.set_xlim(self.startofx, self.endofx)
         self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+        self.delta_ax.set_autoscale_on(False)
 
         # disable figure autoscale
         self.ax.set_autoscale_on(False)
-        self.delta_ax.set_autoscale_on(False)
 
         #set grid + axle labels + title
         self.ax.grid(True,color=self.palette["grid"],linestyle = self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
@@ -513,10 +512,6 @@ class tgraphcanvas(FigureCanvas):
         self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"])
         
-        
-##        #put a right tick on the graph
-##        for tick in self.ax.yaxis.get_major_ticks():
-##            tick.label2On = True
 
         #change label colors
         for label in self.ax.yaxis.get_ticklabels():
@@ -1019,11 +1014,7 @@ class tgraphcanvas(FigureCanvas):
                 return
             
         if self.HUDflag:
-            self.toggleHUD()
-            
-
-        self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
-        self.delta_ax = self.ax.twinx()        
+            self.toggleHUD()       
             
         self.ax.set_title(self.title,size=20,color=self.palette["title"])  
         
@@ -1116,7 +1107,7 @@ class tgraphcanvas(FigureCanvas):
         #reset cupping flavor values
         self.flavors = [5.]*len(self.flavorlabels)
 
-        self.samplingsemaphore.release(1)
+        self.samplingsemaphore.release(1) #do it before redraw()
 
         self.redraw()
         aw.soundpop()
@@ -1127,9 +1118,9 @@ class tgraphcanvas(FigureCanvas):
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
             
-            self.fig.clf()   #wipe out figure
-            self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])            
-            
+            self.fig.clf(keep_observers=False)   #wipe out figure           
+            self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
+
             #Set axes same as in __init__
             if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
                 self.endofx = 60
@@ -1141,12 +1132,14 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
             self.ax.set_title(self.title,size=20,color=self.palette["title"])
 
-            #create a second set of axes in the same position as self.ax	
-            self.delta_ax = self.ax.twinx()
-            self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
-            self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
-            deltamajorlocator = ticker.MultipleLocator(self.zgrid)
-            self.delta_ax.yaxis.set_major_locator(deltamajorlocator)
+            #second axes breaks mouse pick event (choses second axis) in Designer  	
+            if not self.designerflag:
+                #create a second set of axes in the same position as self.ax	
+                self.delta_ax = self.ax.twinx()
+                self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
+                self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
+                deltamajorlocator = ticker.MultipleLocator(self.zgrid)
+                self.delta_ax.yaxis.set_major_locator(deltamajorlocator)
 
             #draw water marks for dry phase region, mid phase region, and finish phase region
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
@@ -2901,7 +2894,7 @@ class tgraphcanvas(FigureCanvas):
 
     ####################  PROFILE DESIGNER   ###################################################################################
     #launches designer	
-    def designer(self):       
+    def designer(self):
         if len(self.timex):
             reply = QMessageBox.question(self,QApplication.translate("MessageBox Caption","Designer Start",None, QApplication.UnicodeUTF8),
                                          QApplication.translate("MessageBox","Importing a profile in to Designer will decimate\nall data except the main [points].\nContinue?",None, QApplication.UnicodeUTF8),
@@ -3053,9 +3046,9 @@ class tgraphcanvas(FigureCanvas):
        
     #CONTEXT MENU  = Right click
     def on_press(self,event):
-        if event.inaxes != self.ax: return
+        if str(event.inaxes) != str(self.ax): return
         if event.button != 3: return   #select right click only
-        
+
         self.releaseMouse()
         self.mousepress = False
         self.setCursor(Qt.OpenHandCursor)
@@ -3118,7 +3111,7 @@ class tgraphcanvas(FigureCanvas):
     #handler for moving point
     def on_motion(self,event):
         if not event.inaxes: return
-        try:                
+        try:
             if self.mousepress:                                 #if mouse clicked
                 self.timex[self.indexpoint] = event.xdata
                 if self.workingline == 1:
@@ -3441,10 +3434,10 @@ class tgraphcanvas(FigureCanvas):
             self.mousepress = None
             #create mouse events. Note: keeping the ids inside a list helps protect against extrange python behaviour.
             self.designerconnections = [0,0,0,0]
-            self.designerconnections[0] = self.fig.canvas.mpl_connect('pick_event', self.on_pick)
+            self.designerconnections[0] = self.fig.canvas.mpl_connect('pick_event', self.on_pick) 
             self.designerconnections[1] = self.fig.canvas.mpl_connect('button_release_event', self.on_release)
             self.designerconnections[2] = self.fig.canvas.mpl_connect('motion_notify_event', self.on_motion)
-            self.designerconnections[3] = self.fig.canvas.mpl_connect('button_press_event', self.on_press)
+            self.designerconnections[3] = self.fig.canvas.mpl_connect('button_press_event', self.on_press) #right click
             #this is needed to prevent complaints from inter.UnivariateSpline() -used in redraw()- in extreme cases of difficulty
             warnings.simplefilter('ignore', UserWarning)
 
@@ -4612,10 +4605,7 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addSpacing(10)
         mainlayout.addWidget(self.EventsGroupLayout)
 
-###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
-    def starttcpserver(self):
-        self.qmc.threadserver.createTCPserver()
-        
+###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################        
     def setdpi(self,dpi):
         if aw:
             self.qmc.fig.set_dpi(dpi)
@@ -11100,7 +11090,72 @@ class serialport(object):
         self.fujiETBT = 0.
         self.currentpidsv = 0.
 
-#################################################
+        #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
+        self.COMsemaphore = QSemaphore(1)
+
+#####################  FUNCTIONS  ############################
+    ######### functions used by Fuji PIDs
+    def sendFUJIcommand(self,binstring,nbytes):
+        try:
+            ###  lock resources ##
+            self.COMsemaphore.adquiere(1)
+            
+            if not self.SP.isOpen():
+                self.openport()                   
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write(binstring)
+                r = self.SP.read(nbytes)
+
+                ###  release resources  ###
+                self.COMsemaphore.release(1)
+                
+                #serTX.close()
+                libtime.sleep(0.035)                     #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                lenstring = len(r)
+                if lenstring:
+                    # CHECK FOR RECEIVED ERROR CODES
+                    if ord(r[1]) == 128:
+                            if ord(r[2]) == 1:
+                                 errorcode = QApplication.translate("Error Message"," F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. ",None, QApplication.UnicodeUTF8)
+                                 errorcode += QApplication.translate("Error Message","SendFUJIcommand(): ERROR 1 Illegal Function in unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(command[0]))
+                                 aw.qmc.adderror(errorcode)
+                            if ord(r[2]) == 2:
+                                 errorcode = QApplication.translate("Error Message","F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code. ",None, QApplication.UnicodeUTF8)
+                                 errorcode += QApplication.translate("Error Message","SendFUJIcommand() ERROR 2 Illegal Address for unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(command[0]))
+                                 aw.qmc.adderror(errorcode)
+                            if ord(r[2]) == 3:
+                                 errorcode = QApplication.translate("Error Message","F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers.",None, QApplication.UnicodeUTF8)
+                                 errorcode += QApplication.translate("Error Message","sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(command[0]))
+                                 aw.qmc.adderror(errorcode)
+                    else:
+                        #Check crc16
+                        crcRx =  int(binascii.hexlify(r[-1]+r[-2]),16)
+                        crcCal1 = aw.fujipid.fujiCrc16(r[:-2]) 
+                        if crcCal1 == crcRx:  
+                            return r           #OK. Return r after it has been checked for errors
+                        else:
+                            aw.qmc.adderror(QApplication.translate("Error Message","Crc16 data corruption ERROR. TX does not match RX. Check wiring ",None, QApplication.UnicodeUTF8))
+                            return "0"
+                else:
+                    if aw.qmc.COMsemaphore.available() < 1:
+                        aw.qmc.COMsemaphore.release(1)
+                    aw.qmc.adderror(QApplication.translate("Error Message","No RX data received ",None, QApplication.UnicodeUTF8))
+                    return u"0"
+            else:
+                return u"0"                                    
+                
+        except serial.SerialException,e:
+            if aw.qmc.COMsemaphore.available() < 1:
+                aw.qmc.COMsemaphore.release(1)
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("Error Message","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8)
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)
+            return "0"
         
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
     def fujitemperature(self):
@@ -11123,6 +11178,7 @@ class serialport(object):
 
         #get current duty cycle and update LCD 7
         self.dutycycle = aw.fujipid.readdutycycle()
+        
         self.dutycycleTX = tx
         if t2:
             aw.qmc.fujiETBT = t1-t2
@@ -11130,6 +11186,11 @@ class serialport(object):
             aw.qmc.fujiETBT = 0.
         
         return tx,t1,t2
+
+    #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
+    def fujidutycycle(self):
+        #return saved readings from device 0
+        return aw.ser.dutycycleTX, aw.ser.dutycycle, aw.ser.fujiETBT   
 
     def DTAtemperature(self):
         t1 = self.DTAPIDtemperature(self.controlETpid[1])
@@ -11147,11 +11208,6 @@ class serialport(object):
     def virtual(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         return tx,1.,1.
-
-    #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
-    def fujidutycycle(self):
-        #return saved readings from device 0
-        return aw.ser.dutycycleTX, aw.ser.dutycycle, aw.ser.fujiETBT   
 
     def HH506RA(self):
         
@@ -11367,60 +11423,7 @@ class serialport(object):
         try:        
            self.closeport() 
         except serial.SerialException,e:
-            pass
-        
-    # function used by Fuji PIDs
-    def sendFUJIcommand(self,binstring,nbytes):
-        try:
-            if not self.SP.isOpen():
-                self.openport()                   
-            if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
-                self.SP.write(binstring)
-                r = self.SP.read(nbytes)
-                #serTX.close()
-                libtime.sleep(0.035)                     #this gurantees a minimum of 35 miliseconds between readings (for all Fujis)
-                lenstring = len(r)
-                if lenstring:
-                    # CHECK FOR RECEIVED ERROR CODES
-                    if ord(r[1]) == 128:
-                            if ord(r[2]) == 1:
-                                 errorcode = QApplication.translate("Error Message"," F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. ",None, QApplication.UnicodeUTF8)
-                                 errorcode += QApplication.translate("Error Message","SendFUJIcommand(): ERROR 1 Illegal Function in unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(command[0]))
-                                 aw.qmc.adderror(errorcode)
-                            if ord(r[2]) == 2:
-                                 errorcode = QApplication.translate("Error Message","F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code. ",None, QApplication.UnicodeUTF8)
-                                 errorcode += QApplication.translate("Error Message","SendFUJIcommand() ERROR 2 Illegal Address for unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(command[0]))
-                                 aw.qmc.adderror(errorcode)
-                            if ord(r[2]) == 3:
-                                 errorcode = QApplication.translate("Error Message","F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers.",None, QApplication.UnicodeUTF8)
-                                 errorcode += QApplication.translate("Error Message","sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(command[0]))
-                                 aw.qmc.adderror(errorcode)
-                    else:
-                        #Check crc16
-                        crcRx =  int(binascii.hexlify(r[-1]+r[-2]),16)
-                        crcCal1 = aw.fujipid.fujiCrc16(r[:-2]) 
-                        if crcCal1 == crcRx:  
-                            return r           #OK. Return r after it has been checked for errors
-                        else:
-                            aw.qmc.adderror(QApplication.translate("Error Message","Crc16 data corruption ERROR. TX does not match RX. Check wiring ",None, QApplication.UnicodeUTF8))
-                            return "0"
-                else:
-                    aw.qmc.adderror(QApplication.translate("Error Message","No RX data received ",None, QApplication.UnicodeUTF8))
-                    return u"0"
-            else:
-                return u"0"                                    
-                
-        except serial.SerialException,e:
-            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8)
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
-            return "0"
-        
+            pass        
             
      #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
@@ -11435,9 +11438,9 @@ class serialport(object):
                 self.SP.flushOutput()
                 command = "#0A0000NA2\r\n"  #"#0A0101NA4\r\n"
                 self.SP.write(command)
-                r = self.SP.read(14) 
+                r = self.SP.read(16) 
 
-                if len(r) == 14:
+                if len(r) == 16:
                     #convert to binary to hex string
                     s1 = binascii.hexlify(r[5] + r[6])
                     s2 = binascii.hexlify(r[10]+ r[11])
