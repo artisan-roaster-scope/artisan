@@ -601,6 +601,7 @@ class tgraphcanvas(FigureCanvas):
         self.wheeledge = .02                        #overlaping decorative edge
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color of lines
+        self.wheelconnection = 0
 
         self.samplingsemaphore = QSemaphore(1)
         
@@ -985,11 +986,8 @@ class tgraphcanvas(FigureCanvas):
             else:
                 return '-%d'%m
             
-    def reset_and_redraw(self):
-        self.reset()
-        self.redraw()
-        
-    #Resets graph. Called from reset button. Deletes all data
+
+    #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     def reset(self):
         #### lock shared resources #####
         self.samplingsemaphore.acquire(1)
@@ -1127,9 +1125,7 @@ class tgraphcanvas(FigureCanvas):
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
             self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"])
             self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
-            self.ax.set_title(self.title,size=20,color=self.palette["title"])
-
-            #second axes breaks mouse pick event (choses second axis) in Designer  	
+            self.ax.set_title(self.title,size=20,color=self.palette["title"])          #second axes breaks mouse pick event (choses second axis) in Designer  	
             if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax	
                 self.delta_ax = self.ax.twinx()
@@ -1961,7 +1957,23 @@ class tgraphcanvas(FigureCanvas):
             return t
         else:
             return 180.+t
-       
+
+    def wheel_pick(self,event):
+        rect =  event.artist
+        loc = rect.get_url().split("-")
+        x = int(loc[0])
+        z = int(loc[1])
+        aw.sendmessage(self.wheelnames[x][z])
+        self.segmentsalpha[x][z] += .1
+        self.drawWheel()
+
+    def connectWheel(self):
+        self.setCursor(Qt.PointingHandCursor)
+        self.wheelconnection = self.fig.canvas.mpl_connect('pick_event', self.wheel_pick)
+
+    def disconnectWheel(self):
+        self.setCursor(Qt.ArrowCursor)        
+        self.fig.canvas.mpl_disconnect(self.wheelconnection)
 
     def drawWheel(self):
         try:
@@ -2038,13 +2050,15 @@ class tgraphcanvas(FigureCanvas):
                     theta.append(count)
                     count += div*self.segmentlengths[z][i]
                     segmentwidth.append(div*self.segmentlengths[z][i])                
-                    radii.append(Wradii[z])                                
-                bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,linewidth=self.wheellinewidth))
+                    radii.append(Wradii[z])
+                bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,
+                                        linewidth=self.wheellinewidth,picker=1))
                 count = 0
                 #set color, alpha, and text
                 for r,bar[z] in zip(radii, bar[z]):
                     bar[z].set_facecolor(self.wheelcolor[z][count])
                     bar[z].set_alpha(self.segmentsalpha[z][count])
+                    bar[z].set_url(str(z) + "-" + str(count))
                     self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
                         rotation=textangles[z][count],horizontalalignment="center",verticalalignment="center",fontsize=self.wheeltextsize[z])
                     count += 1  
@@ -2908,7 +2922,7 @@ class tgraphcanvas(FigureCanvas):
                 return #exit
 
         #if no profile found
-        self.reset()
+        self.reset()            # reset calls redraw() at the end
         self.connect_designer()
         self.designerinit()       
         
@@ -4232,7 +4246,7 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
         self.button_7.setMaximumSize(90, 45)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Resets Graph and Time", None, QApplication.UnicodeUTF8))
-        self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset_and_redraw)
+        self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset)
 
         #create CHARGE button
         self.button_8 = QPushButton(QApplication.translate("Scope Button", "CHARGE", None, QApplication.UnicodeUTF8))
@@ -4514,7 +4528,7 @@ class ApplicationWindow(QMainWindow):
         self.setCentralWidget(self.main_widget)   
         
         #list of functions to chose from (using left-right keyboard arrow)
-        self.keyboardmove  = [self.qmc.reset_and_redraw,self.qmc.toggleHUD,self.qmc.OnMonitor,self.qmc.markCharge,self.qmc.markDryEnd,self.qmc.mark1Cstart,self.qmc.mark1Cend,
+        self.keyboardmove  = [self.qmc.reset,self.qmc.toggleHUD,self.qmc.OnMonitor,self.qmc.markCharge,self.qmc.markDryEnd,self.qmc.mark1Cstart,self.qmc.mark1Cend,
                              self.qmc.mark2Cstart,self.qmc.mark2Cend,self.qmc.markDrop,self.qmc.EventRecord]
         
         #current function above
@@ -4646,7 +4660,7 @@ class ApplicationWindow(QMainWindow):
                     except Exception,e:
                         self.qmc.adderror(QApplication.translate("Error Message","Exception Error: recordextraevent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
                 elif aw.extraeventsactions[ee] == 3:
-                    events = aw.extraeventsactionstrings[ee].split(",")
+                    events = aw.extraeventsactionstrings[ee]
                     for i in range(len(events)):
                         buttonnumber = int(events[i])-1
                         if aw.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
@@ -5184,7 +5198,7 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message Area","Empty path or box unchecked in Autosave", None, QApplication.UnicodeUTF8))
                 self.autosaveconf()
                 return
-            self.qmc.reset_and_redraw()
+            self.qmc.reset()
             #start new roast
             self.qmc.OnMonitor()
 
@@ -14516,7 +14530,7 @@ class graphColorDlg(QDialog):
 class WheelDlg(QDialog):
     def __init__(self, parent = None):
         super(WheelDlg,self).__init__(parent)
-        self.setModal(True)
+        self.setModal(False)
         self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None, QApplication.UnicodeUTF8))
 
         aw.lowerbuttondialog.setVisible(False)
@@ -14623,6 +14637,7 @@ class WheelDlg(QDialog):
         #closeButton.setMaximumWidth(100)
         self.connect(closeButton, SIGNAL("clicked()"),self.close)
 
+        aw.qmc.connectWheel()
         aw.qmc.drawWheel()
 
         label1layout = QVBoxLayout()
@@ -15080,7 +15095,8 @@ class WheelDlg(QDialog):
         self.createdatatable()
         aw.qmc.drawWheel()
 
-    def closeEvent(self, event):    
+    def closeEvent(self, event):
+        aw.qmc.disconnectWheel()
         aw.qmc.redraw()
         aw.lowerbuttondialog.setVisible(True)
         if aw.minieventsflag:
