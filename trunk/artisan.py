@@ -5130,7 +5130,42 @@ class ApplicationWindow(QMainWindow):
         action = self.sender()
         if action:
             self.loadFile(action.data().toString())
- 
+            
+        # to test CHARGE/DROP autodetection:
+#        TP_index = aw.findTP()
+#        if aw.qmc.timeindex[1]:
+#            #manual dryend available
+#            dryEndIndex = aw.qmc.timeindex[1]
+#        else:
+#            #find when dry phase ends 
+#            dryEndIndex = aw.findDryEnd(TP_index)
+#            
+#        CHARGE_idx = aw.findBTbreak(0,dryEndIndex)
+#        print "CHARGE: ", CHARGE_idx,aw.qmc.stringfromseconds(int(aw.qmc.timex[CHARGE_idx])),aw.qmc.temp2[CHARGE_idx] 
+#        DROP_idx = aw.findBTbreak(dryEndIndex)
+#        print "DROP: ", DROP_idx,aw.qmc.stringfromseconds(int(aw.qmc.timex[DROP_idx]) - int(aw.qmc.timex[CHARGE_idx])),aw.qmc.temp2[DROP_idx] 
+            
+    # this can be used to find the CHARGE index as well as the DROP index by using
+    # 0 or the DRY index as start index, respectively
+    def getBTbreak(self,start_index=0,end_index=0):
+        result = 0        
+        # determine average deltaBT wrt. the two previous measurements
+        # the deltaBT values wrt. the next two measurements must by twice as high and negative
+        # then our current measurement is the one of CHARGE
+        for i in range(start_index,len(aw.qmc.timex)):
+            if end_index and i > end_index:
+                break
+            if i>4:
+                d1 = aw.qmc.temp2[i-4] - aw.qmc.temp2[i-3]
+                d2 = aw.qmc.temp2[i-3] - aw.qmc.temp2[i-2]
+                d3 = aw.qmc.temp2[i-1] - aw.qmc.temp2[i-2]
+                d4 = aw.qmc.temp2[i] - aw.qmc.temp2[i-1]
+                d = (abs(d1) + abs(d2)) / 2.0
+                if d3 < 0 and d4 < 0 and ((abs(d3) + abs(d4)) / 2.0) > 2.0*d:
+                    result = i -2
+                    break
+        return result
+        
     def getDefaultPath(self):
         userprofilepath_dir = QDir()
         userprofilepath_dir.setPath(self.userprofilepath)
@@ -5684,8 +5719,8 @@ class ApplicationWindow(QMainWindow):
         if "phases" in profile:
             self.qmc.phases = profile["phases"]
         if "zmax" in profile:
-            self.qmc.zLimit = int(profile["Zmax"])
-        if "Zmin" in profile:
+            self.qmc.zLimit = int(profile["zmax"])
+        if "zmin" in profile:
             self.qmc.Zlimit_min = int(profile["zmin"])
         if "ymax" in profile:
             self.qmc.ylimit = int(profile["ymax"])
@@ -6756,6 +6791,28 @@ $cupping_notes
                  sd = nsd
                  index = i
         return index
+    
+    
+    # this can be used to find the CHARGE index as well as the DROP index by using
+    # 0 or the DRY index as start index, respectively
+    def findBTbreak(self,start_index=0,end_index=0):
+        result = 0        
+        # determine average deltaBT wrt. the two previous measurements
+        # the deltaBT values wrt. the next two measurements must by twice as high and negative
+        # then our current measurement is the one of CHARGE/DROP
+        for i in range(start_index,len(aw.qmc.timex)):
+            if end_index and i > end_index:
+                break
+            if i>4:
+                d1 = aw.qmc.temp2[i-4] - aw.qmc.temp2[i-3]
+                d2 = aw.qmc.temp2[i-3] - aw.qmc.temp2[i-2]
+                d3 = aw.qmc.temp2[i-1] - aw.qmc.temp2[i-2]
+                d4 = aw.qmc.temp2[i] - aw.qmc.temp2[i-1]
+                d = (abs(d1) + abs(d2)) / 2.0
+                if d3 < 0 and d4 < 0 and ((abs(d3) + abs(d4)) / 2.0) > 2.0*d:
+                    result = i -2
+                    break
+        return result
       
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
     #Note: For the dryphase, the RoR for the dryphase is calculated for the segment starting from TP ending at DE
@@ -6788,7 +6845,7 @@ $cupping_notes
         coredevelopers = u"<br>Rafael Cobo <br> Marko Luther <br> Sebastien Delgrande"
         contributors =  u"<br>" + QApplication.translate(u"About", u"%1, linux binary",None, QApplication.UnicodeUTF8).arg(u"Lukas Kolbe")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, documentation",None, QApplication.UnicodeUTF8).arg(u"Rich Helms")
-        contributors += u"<br>" + QApplication.translate(u"About", u"%1, TEVA18B support",None, QApplication.UnicodeUTF8).arg(u"Markus Wagner")
+        contributors += u"<br>" + QApplication.translate(u"About", u"%1, TEVA18B, DTA support",None, QApplication.UnicodeUTF8).arg(u"Markus Wagner")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Swedish localization",None, QApplication.UnicodeUTF8).arg(u"Martin Kral")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Spanish localization",None, QApplication.UnicodeUTF8).arg(u"Bluequijote")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg(u"Jim G.")
