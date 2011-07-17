@@ -1129,6 +1129,7 @@ class tgraphcanvas(FigureCanvas):
             if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax	
                 self.delta_ax = self.ax.twinx()
+                self.fig.patch.set_facecolor(self.palette["background"])                
                 self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax
                 self.ax.patch.set_visible(False)
                 self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
@@ -1144,13 +1145,13 @@ class tgraphcanvas(FigureCanvas):
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
             rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
                                       transform=trans, color=self.palette["rect1"],alpha=0.3)
-            self.ax.add_patch(rect1)
+            self.delta_ax.add_patch(rect1)
             rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2]-self.phases[1]),
                                       transform=trans, color=self.palette["rect2"],alpha=0.3)
-            self.ax.add_patch(rect2)
+            self.delta_ax.add_patch(rect2)
             rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
                                       transform=trans, color=self.palette["rect3"],alpha=0.3)
-            self.ax.add_patch(rect3)
+            self.delta_ax.add_patch(rect3)
 
             if self.eventsGraphflag:
                 # make blended transformations to help identify EVENT types
@@ -1163,7 +1164,7 @@ class tgraphcanvas(FigureCanvas):
                 jump = 20
                 for i in range(len(self.etypes)):
                     rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
-                    self.ax.add_patch(rectEvent)
+                    self.delta_ax.add_patch(rectEvent)
                     if self.mode == "C":
                         jump -= 10
                     else:
