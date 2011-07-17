@@ -1130,6 +1130,7 @@ class tgraphcanvas(FigureCanvas):
                 #create a second set of axes in the same position as self.ax	
                 self.delta_ax = self.ax.twinx()
                 self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax
+                self.ax.patch.set_visible(False)
                 self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 deltamajorlocator = ticker.MultipleLocator(self.zgrid)
