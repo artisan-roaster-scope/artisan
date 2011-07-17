@@ -1129,6 +1129,7 @@ class tgraphcanvas(FigureCanvas):
             if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax	
                 self.delta_ax = self.ax.twinx()
+                self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax
                 self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 deltamajorlocator = ticker.MultipleLocator(self.zgrid)
@@ -2041,7 +2042,7 @@ class tgraphcanvas(FigureCanvas):
                 Wradii[i] += self.wheeledge    	    	    	        #create extra color edge between wheels by overlaping wheels
             #Generate Wheel graph    
             bar = []                                        	#holds bar-graphs (wheels)
-            div = 2*pi/100.
+            div = 2.*pi/100.
             for z in range(len(n)):            
                 #create wheel
                 theta,segmentwidth,radii,colors = [],[],[],[]
