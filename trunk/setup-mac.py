@@ -106,7 +106,7 @@ for root, dirs, files in os.walk('.'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
         # remove also all .h .in .cpp .cc .html files 
-        elif file.endswith('.h'):
+        elif file.endswith('.h') and file != "pyconfig.h":
             print 'Deleting', file
             os.remove(os.path.join(root,file))
         elif file.endswith('.in'):
