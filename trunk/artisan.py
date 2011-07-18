@@ -1190,7 +1190,7 @@ class tgraphcanvas(FigureCanvas):
 
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
-            for i in range(len(self.extratimex)):
+            for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
                 self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
                 self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
 
@@ -1374,7 +1374,7 @@ class tgraphcanvas(FigureCanvas):
 
             ndevices = len(self.extradevices)
             if ndevices:
-                for i in range(ndevices):
+                for i in range(min(ndevices,len(self.extratemp1lines),len(self.extratemp2lines),len(self.extraname2),len(self.extraname2))):
                     handles.append(self.extratemp1lines[i])
                     handles.append(self.extratemp2lines[i])
                     labels.append(self.extraname1[i])
@@ -1602,6 +1602,8 @@ class tgraphcanvas(FigureCanvas):
             self.samplingsemaphore.release(1)
 
         except Exception,e:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
                 
@@ -5218,42 +5220,7 @@ class ApplicationWindow(QMainWindow):
         action = self.sender()
         if action:
             self.loadFile(action.data().toString())
-            
-        # to test CHARGE/DROP autodetection:
-#        TP_index = aw.findTP()
-#        if aw.qmc.timeindex[1]:
-#            #manual dryend available
-#            dryEndIndex = aw.qmc.timeindex[1]
-#        else:
-#            #find when dry phase ends 
-#            dryEndIndex = aw.findDryEnd(TP_index)
-#            
-#        CHARGE_idx = aw.findBTbreak(0,dryEndIndex)
-#        print "CHARGE: ", CHARGE_idx,aw.qmc.stringfromseconds(int(aw.qmc.timex[CHARGE_idx])),aw.qmc.temp2[CHARGE_idx] 
-#        DROP_idx = aw.findBTbreak(dryEndIndex)
-#        print "DROP: ", DROP_idx,aw.qmc.stringfromseconds(int(aw.qmc.timex[DROP_idx]) - int(aw.qmc.timex[CHARGE_idx])),aw.qmc.temp2[DROP_idx] 
-            
-    # this can be used to find the CHARGE index as well as the DROP index by using
-    # 0 or the DRY index as start index, respectively
-    def getBTbreak(self,start_index=0,end_index=0):
-        result = 0        
-        # determine average deltaBT wrt. the two previous measurements
-        # the deltaBT values wrt. the next two measurements must by twice as high and negative
-        # then our current measurement is the one of CHARGE
-        for i in range(start_index,len(aw.qmc.timex)):
-            if end_index and i > end_index:
-                break
-            if i>4:
-                d1 = aw.qmc.temp2[i-4] - aw.qmc.temp2[i-3]
-                d2 = aw.qmc.temp2[i-3] - aw.qmc.temp2[i-2]
-                d3 = aw.qmc.temp2[i-1] - aw.qmc.temp2[i-2]
-                d4 = aw.qmc.temp2[i] - aw.qmc.temp2[i-1]
-                d = (abs(d1) + abs(d2)) / 2.0
-                if d3 < 0 and d4 < 0 and ((abs(d3) + abs(d4)) / 2.0) > 2.0*d:
-                    result = i -2
-                    break
-        return result
-        
+                    
     def getDefaultPath(self):
         userprofilepath_dir = QDir()
         userprofilepath_dir.setPath(self.userprofilepath)
@@ -6891,14 +6858,17 @@ $cupping_notes
         for i in range(start_index,len(aw.qmc.timex)):
             if end_index and i > end_index:
                 break
-            if i>4:
+            if i>3:
                 d1 = aw.qmc.temp2[i-4] - aw.qmc.temp2[i-3]
                 d2 = aw.qmc.temp2[i-3] - aw.qmc.temp2[i-2]
                 d3 = aw.qmc.temp2[i-1] - aw.qmc.temp2[i-2]
                 d4 = aw.qmc.temp2[i] - aw.qmc.temp2[i-1]
                 d = (abs(d1) + abs(d2)) / 2.0
                 if d3 < 0 and d4 < 0 and ((abs(d3) + abs(d4)) / 2.0) > 2.0*d:
-                    result = i -2
+                    result = i - 2                    
+#                    for x in range(max(0,i-6),i):
+#                        print x,aw.qmc.temp2[x]
+#                    print i-2,d1,d2,d3,d4,d                    
                     break
         return result
       
@@ -8137,6 +8107,28 @@ class editGraphDlg(QDialog):
         self.chargeedit.setMaximumWidth(50)
         self.chargeedit.setMinimumWidth(50)
         chargelabel.setBuddy(self.chargeedit)
+        
+        self.charge_idx = 0
+        self.drop_idx = 0
+        charge_str = ""
+        drop_str = ""
+        if len(aw.qmc.timex):
+            TP_index = aw.findTP()
+            if aw.qmc.timeindex[1]:
+                #manual dryend available
+                dryEndIndex = aw.qmc.timeindex[1]
+            else:
+                #find when dry phase ends 
+                dryEndIndex = aw.findDryEnd(TP_index)
+            self.charge_idx = aw.findBTbreak(0,dryEndIndex)
+            self.drop_idx = aw.findBTbreak(dryEndIndex)
+            if self.charge_idx != 0 and self.charge_idx != aw.qmc.timeindex[0]:
+                charge_str = aw.qmc.stringfromseconds(int(aw.qmc.timex[self.charge_idx]))
+            if self.drop_idx != 0 and self.drop_idx != aw.qmc.timeindex[6]:
+                drop_str = aw.qmc.stringfromseconds(int(aw.qmc.timex[self.drop_idx]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+        self.chargeestimate = QLabel(charge_str)
+        self.chargeestimate.setMaximumWidth(50)
+        self.chargeestimate.setMinimumWidth(50)
 
         drylabel  = QLabel("<b>" + QApplication.translate("Label", "DRY END",None, QApplication.UnicodeUTF8) + "</b>")
         drylabel.setStyleSheet("background-color:'orange';")
@@ -8216,6 +8208,10 @@ class editGraphDlg(QDialog):
         self.dropedit.setMaximumWidth(50)
         self.dropedit.setMinimumWidth(50)
         droplabel.setBuddy(self.dropedit)
+        
+        self.dropestimate = QLabel(drop_str)
+        self.dropestimate.setMaximumWidth(50)
+        self.dropestimate.setMinimumWidth(50)
 
         self.roastproperties = QCheckBox(QApplication.translate("CheckBox","Delete Roast properties on Reset", None, QApplication.UnicodeUTF8))
         if aw.qmc.roastpropertiesflag:
@@ -8460,6 +8456,8 @@ class editGraphDlg(QDialog):
         timeLayout.addWidget(self.CCstartedit,1,4)
         timeLayout.addWidget(self.CCendedit,1,5)
         timeLayout.addWidget(self.dropedit,1,6)
+        timeLayout.addWidget(self.chargeestimate,2,0)
+        timeLayout.addWidget(self.dropestimate,2,6)
         
         textLayout = QGridLayout()
         textLayout.addWidget(datelabel1,0,0)
