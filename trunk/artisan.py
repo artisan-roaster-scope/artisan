@@ -314,8 +314,10 @@ class tgraphcanvas(FigureCanvas):
             self.backcolor ="#EEEEEE"
         else:
             self.backcolor = "white"
-        self.fig.patch.set_facecolor(self.backcolor)
-        self.fig.patch.set_edgecolor(self.backcolor)
+#        self.fig.patch.set_facecolor(self.backcolor)
+#        self.fig.patch.set_edgecolor(self.backcolor)        
+        self.fig.patch.set_facecolor(self.palette["background"])  
+        self.fig.patch.set_edgecolor(self.palette["background"])  
         
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
         self.delta_ax = self.ax.twinx()        
@@ -1114,7 +1116,10 @@ class tgraphcanvas(FigureCanvas):
             self.samplingsemaphore.acquire(1)
             
             self.fig.clf(keep_observers=False)   #wipe out figure           
+            self.fig.patch.set_facecolor(self.palette["background"])  
+            self.fig.patch.set_edgecolor(self.palette["background"])  
             self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
+
 
             #Set axes same as in __init__
             if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
@@ -1128,8 +1133,7 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_title(self.title,size=20,color=self.palette["title"])          #second axes breaks mouse pick event (choses second axis) in Designer  	
             if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax	
-                self.delta_ax = self.ax.twinx()
-                self.fig.patch.set_facecolor(self.palette["background"])                
+                self.delta_ax = self.ax.twinx()              
                 self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax
                 self.ax.patch.set_visible(False)
                 self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
@@ -1145,13 +1149,18 @@ class tgraphcanvas(FigureCanvas):
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
             rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
                                       transform=trans, color=self.palette["rect1"],alpha=0.3)
-            self.delta_ax.add_patch(rect1)
             rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2]-self.phases[1]),
                                       transform=trans, color=self.palette["rect2"],alpha=0.3)
-            self.delta_ax.add_patch(rect2)
             rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
                                       transform=trans, color=self.palette["rect3"],alpha=0.3)
-            self.delta_ax.add_patch(rect3)
+            if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:     
+                self.delta_ax.add_patch(rect1)  
+                self.delta_ax.add_patch(rect2)                   
+                self.delta_ax.add_patch(rect3)
+            else:     
+                self.ax.add_patch(rect1)  
+                self.ax.add_patch(rect2)                   
+                self.ax.add_patch(rect3)
 
             if self.eventsGraphflag:
                 # make blended transformations to help identify EVENT types
@@ -1163,8 +1172,11 @@ class tgraphcanvas(FigureCanvas):
                     start = 60
                 jump = 20
                 for i in range(len(self.etypes)):
-                    rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
-                    self.delta_ax.add_patch(rectEvent)
+                    rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)                    
+                    if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:     
+                        self.delta_ax.add_patch(rectEvent)
+                    else:
+                        self.ax.add_patch(rectEvent)
                     if self.mode == "C":
                         jump -= 10
                     else:
@@ -10172,9 +10184,10 @@ class flavorDlg(QDialog):
         aw.lowerbuttondialog.setVisible(False)
         aw.EventsGroupLayout.setVisible(False)
 
-        defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
+        defaultlabel = QLabel(QApplication.translate("Label","Schema",None, QApplication.UnicodeUTF8))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","Istituto Internazionale Assaggiatori Caffe"])
+        #self.defaultcombobox.setMaximumWidth(90)
+        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC"])
         self.defaultcombobox.setCurrentIndex(0)
         self.connect(self.defaultcombobox, SIGNAL("currentIndexChanged(int)"),self.setdefault)
 
@@ -10194,11 +10207,11 @@ class flavorDlg(QDialog):
         addButton.setFocusPolicy(Qt.NoFocus)
         self.connect(addButton, SIGNAL("clicked()"),self.addlabel)
 
-        delButton = QPushButton(QApplication.translate("Button","Del",None, QApplication.UnicodeUTF8))
+        delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
         delButton.setFocusPolicy(Qt.NoFocus)
         self.connect(delButton, SIGNAL("clicked()"),self.poplabel)
         
-        saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None, QApplication.UnicodeUTF8))
+        saveImgButton = QPushButton(QApplication.translate("Button","Save",None, QApplication.UnicodeUTF8))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
@@ -10210,19 +10223,33 @@ class flavorDlg(QDialog):
             self.backgroundCheck.setChecked(True)
         self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.showbackground)
         
-        flavorLayout = QHBoxLayout()
-        flavorLayout.addWidget(self.flavortable)     
+        flavorButtons = QHBoxLayout()
+        flavorButtons.addStretch()
+        flavorButtons.addWidget(addButton)
+        flavorButtons.addWidget(delButton)
+        flavorButtons.addStretch()
         
-        buttonsLayout = QGridLayout()
-        buttonsLayout.addWidget(addButton,0,0)
-        buttonsLayout.addWidget(delButton,0,1)        
-        buttonsLayout.addWidget(defaultlabel,1,0)
-        buttonsLayout.addWidget(self.defaultcombobox,1,1)
-        buttonsLayout.addWidget(leftButton,2,0)
-        buttonsLayout.addWidget(rightButton,2,1)
-        buttonsLayout.addWidget(self.backgroundCheck,3,0)
-        buttonsLayout.addWidget(saveImgButton,4,0)
-        buttonsLayout.addWidget(backButton,4,1)
+        schemaLayout = QHBoxLayout()
+        schemaLayout.addWidget(defaultlabel)
+        schemaLayout.addWidget(self.defaultcombobox) 
+        schemaLayout.addStretch()
+        
+        turnLayout = QHBoxLayout()
+        turnLayout.addWidget(self.backgroundCheck)
+        turnLayout.addStretch()
+        turnLayout.addWidget(leftButton)
+        turnLayout.addWidget(rightButton)
+        
+        flavorLayout = QVBoxLayout()
+        flavorLayout.addWidget(self.flavortable) 
+        flavorLayout.addLayout(flavorButtons)
+        flavorLayout.addLayout(schemaLayout)   
+        flavorLayout.addLayout(turnLayout)
+                
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addWidget(saveImgButton)
+        buttonsLayout.addStretch()
+        buttonsLayout.addWidget(backButton)
             
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(flavorLayout)
