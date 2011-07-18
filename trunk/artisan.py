@@ -603,8 +603,9 @@ class tgraphcanvas(FigureCanvas):
         self.wheeledge = .02                        #overlaping decorative edge
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color of lines
-        self.wheelconnection = 0
-
+        self.wheelconnections = [0,0]
+        self.wheelx,self.wheelz = 0,0               #temp variables to pass values
+        
         self.samplingsemaphore = QSemaphore(1)
         
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()        
@@ -1181,6 +1182,7 @@ class tgraphcanvas(FigureCanvas):
                         jump -= 10
                     else:
                         jump -= 20
+                        
                         
             ##### ET,BT curves
             self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
@@ -1973,22 +1975,77 @@ class tgraphcanvas(FigureCanvas):
         else:
             return 180.+t
 
+    def loadselectorwheel(self,path):
+        string = u"Wheels" + u"\\" + path
+        direct = QDir()
+        pathDir = direct.toNativeSeparators(QString(string))
+        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Open Wheel Graph",None, QApplication.UnicodeUTF8),path=pathDir,ext="*.wg")
+        if filename:
+            self.connectWheel()
+            aw.loadWheel(filename)
+            self.drawWheel()
+            
+    def addTocuppingnotes(self):
+        descriptor =  unicode(self.wheelnames[self.wheelx][self.wheelz]) 
+        self.cuppingnotes += u"\n" + descriptor 
+        string = QApplication.translate("MessageBox Caption", u" added to cupping notes",None, QApplication.UnicodeUTF8)
+        aw.sendmessage(descriptor + string)
+
+    def addToroastingnotes(self):
+        descriptor =  unicode(self.wheelnames[self.wheelx][self.wheelz]) + u" "
+        self.roastingnotes +=  u"\n" + descriptor + u" "
+        string = QApplication.translate("MessageBox Caption", u" added to roasting notes",None, QApplication.UnicodeUTF8)
+        aw.sendmessage(descriptor + string)
+
     def wheel_pick(self,event):
         rect =  event.artist
         loc = rect.get_url().split("-")
         x = int(loc[0])
         z = int(loc[1])
+        self.wheelx = x
+        self.wheelz = z
         aw.sendmessage(self.wheelnames[x][z])
         self.segmentsalpha[x][z] += .1
         self.drawWheel()
 
+    def wheel_menu(self,event):
+        #mouse event
+        if event.button != 3: return #if not right click return
+
+        designermenu = QMenu(self)
+        cuppingAction = QAction(QApplication.translate("Contextual Menu", "Add to Cupping Notes",None, QApplication.UnicodeUTF8),self)
+        self.connect(cuppingAction,SIGNAL("triggered()"),self.addTocuppingnotes)
+        designermenu.addAction(cuppingAction)
+
+        roastingAction = QAction(QApplication.translate("Contextual Menu", "Add to Roasting Notes",None, QApplication.UnicodeUTF8),self)
+        self.connect(roastingAction,SIGNAL("triggered()"),self.addToroastingnotes)
+        designermenu.addAction(roastingAction)
+
+        editAction = QAction(QApplication.translate("Contextual Menu", "Edit",None, QApplication.UnicodeUTF8),self)
+        self.connect(editAction,SIGNAL("triggered()"),aw.graphwheel)
+        designermenu.addAction(editAction)
+
+        exitAction = QAction(QApplication.translate("Contextual Menu", "Exit",None, QApplication.UnicodeUTF8),self)
+        self.connect(exitAction,SIGNAL("triggered()"),self.disconnectWheel)
+        designermenu.addAction(exitAction)
+        
+        designermenu.exec_(QCursor.pos())        
+        
     def connectWheel(self):
+        aw.lowerbuttondialog.setVisible(False)
+        aw.EventsGroupLayout.setVisible(False)
         self.setCursor(Qt.PointingHandCursor)
-        self.wheelconnection = self.fig.canvas.mpl_connect('pick_event', self.wheel_pick)
+        self.wheelconnections[0] = self.fig.canvas.mpl_connect('pick_event', self.wheel_pick)
+        self.wheelconnections[1] = self.fig.canvas.mpl_connect('button_press_event', self.wheel_menu) #right click
 
     def disconnectWheel(self):
         self.setCursor(Qt.ArrowCursor)        
-        self.fig.canvas.mpl_disconnect(self.wheelconnection)
+        self.fig.canvas.mpl_disconnect(self.wheelconnections[0])
+        self.fig.canvas.mpl_disconnect(self.wheelconnections[1])
+        self.redraw()
+        aw.lowerbuttondialog.setVisible(True)
+        if aw.minieventsflag:
+            aw.EventsGroupLayout.setVisible(True)
 
     def drawWheel(self):
         try:
@@ -2056,12 +2113,18 @@ class tgraphcanvas(FigureCanvas):
                 Wradii[i] += self.wheeledge    	    	    	        #create extra color edge between wheels by overlaping wheels
             #Generate Wheel graph    
             bar = []                                        	#holds bar-graphs (wheels)
+            threesixty = 2.*pi
             div = 2.*pi/100.
             for z in range(len(n)):            
                 #create wheel
                 theta,segmentwidth,radii,colors = [],[],[],[]
                 count = startangle[z]
                 for i in range(n[z]):
+                    #negative number affect eventpicker
+                    if count > threesixty:
+                        count %= threesixty
+                    elif count < 0.:
+                        count += threesixty
                     theta.append(count)
                     count += div*self.segmentlengths[z][i]
                     segmentwidth.append(div*self.segmentlengths[z][i])                
@@ -4159,9 +4222,19 @@ class ApplicationWindow(QMainWindow):
         self.connect(calculatorAction,SIGNAL("triggered()"),self.calculator)
         self.ToolkitMenu.addAction(calculatorAction)   
 
-        wheelAction = QAction(UIconst.TOOLKIT_MENU_WHEELGRAPH,self)
-        self.connect(wheelAction,SIGNAL("triggered()"),self.graphwheel)
-        self.ToolkitMenu.addAction(wheelAction)   
+        wheelmenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_WHEELGRAPH)
+
+        wheeleditorAction = QAction(QApplication.translate("Menu", "Editor",None, QApplication.UnicodeUTF8),self)
+        self.connect(wheeleditorAction,SIGNAL("triggered()"),self.graphwheel)
+        wheelmenu.addAction(wheeleditorAction)
+
+        wheelcuppingAction = QAction(QApplication.translate("Menu", "Cupping Descriptors",None, QApplication.UnicodeUTF8),self)
+        self.connect(wheelcuppingAction,SIGNAL("triggered()"),lambda folder="Cupping":self.qmc.loadselectorwheel(folder))
+        wheelmenu.addAction(wheelcuppingAction)
+
+        wheelroastingAction = QAction(QApplication.translate("Menu", "Roasting Descriptors",None, QApplication.UnicodeUTF8),self)
+        self.connect(wheelroastingAction,SIGNAL("triggered()"),lambda folder="Roasting":self.qmc.loadselectorwheel(folder))
+        wheelmenu.addAction(wheelroastingAction)        
 
         hudAction = QAction(UIconst.TOOLKIT_MENU_EXTRAS,self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
@@ -6980,8 +7053,8 @@ $cupping_notes
         self.qmc.reset()
         
     def editgraph(self):
-        dialog = editGraphDlg(self)
-        dialog.show()
+        self.editgraphdialog = editGraphDlg(self)
+        self.editgraphdialog.show()
 
     def editphases(self):
         dialog = phasesGraphDlg(self)
@@ -8354,7 +8427,6 @@ class editGraphDlg(QDialog):
         cuppinglabel = QLabel("<b>" + QApplication.translate("Label", "Cupping Notes",None, QApplication.UnicodeUTF8) + "</b>")
         self.cuppingeditor =  QTextEdit()
         self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
-        
 
         # Save button
         saveButton = QPushButton(QApplication.translate("Button", "OK",None, QApplication.UnicodeUTF8))
@@ -14724,7 +14796,6 @@ class WheelDlg(QDialog):
         #closeButton.setMaximumWidth(100)
         self.connect(closeButton, SIGNAL("clicked()"),self.close)
 
-        aw.qmc.connectWheel()
         aw.qmc.drawWheel()
 
         label1layout = QVBoxLayout()
@@ -15177,7 +15248,7 @@ class WheelDlg(QDialog):
             return
 
     def loadWheel(self):        
-        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Open Wheel Graph",None, QApplication.UnicodeUTF8),ext="*.wg")
+        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Open Wheel Graph",None, QApplication.UnicodeUTF8),path = "Wheels",ext="*.wg")
         aw.loadWheel(filename)
         self.createdatatable()
         aw.qmc.drawWheel()
