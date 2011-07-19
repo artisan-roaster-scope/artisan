@@ -603,7 +603,7 @@ class tgraphcanvas(FigureCanvas):
         self.wheellinecolor = u"black"               #initial color of lines
         self.wheelconnections = [0,0,0]
         self.wheelx,self.wheelz = 0,0                   #temp variables to pass index values
-        self.wheellocationx,self.wheellocationz = 0.,0  #temp vars to pass mouse location 
+        self.wheellocationx,self.wheellocationz = 0.,0.  #temp vars to pass mouse location (angleX+radiusZ)
         
         self.samplingsemaphore = QSemaphore(1)
         
@@ -3501,7 +3501,7 @@ class tgraphcanvas(FigureCanvas):
             designermenu.addAction(roastingAction)
 
             editAction = QAction(QApplication.translate("Contextual Menu", "Edit Graph",None, QApplication.UnicodeUTF8),self)
-            self.connect(editAction,SIGNAL("triggered()"),aw.graphwheel)
+            self.connect(editAction,SIGNAL("triggered()"),self.editmode)
             designermenu.addAction(editAction)
 
             exitAction = QAction(QApplication.translate("Contextual Menu", "Exit",None, QApplication.UnicodeUTF8),self)
@@ -3509,6 +3509,10 @@ class tgraphcanvas(FigureCanvas):
             designermenu.addAction(exitAction)
             
             designermenu.exec_(QCursor.pos())
+
+    def editmode(self):
+        self.disconnectWheel()
+        aw.graphwheel()
         
     def connectWheel(self):
         aw.lowerbuttondialog.setVisible(False)
@@ -3538,7 +3542,7 @@ class tgraphcanvas(FigureCanvas):
             div = threesixty/100.
             rad = 360./threesixty
             ########################
-            
+            # same as redraw but using different axes
             self.fig.clf()
             #create a new name ax1 instead of ax
             self.ax2 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor)
@@ -3606,7 +3610,6 @@ class tgraphcanvas(FigureCanvas):
                 theta,segmentwidth,radii,colors = [],[],[],[]
                 count = startangle[z]
                 for i in range(n[z]):
-                    #negative number affect eventpicker
                     #negative number affect eventpicker
                     if count > threesixty:
                         count %= threesixty
@@ -14834,6 +14837,11 @@ class WheelDlg(QDialog):
         #saveImgButton.setMaximumWidth(100)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
+        viewModeButton = QPushButton(QApplication.translate("Button","View Mode",None, QApplication.UnicodeUTF8))
+        viewModeButton.setToolTip(QApplication.translate("Tooltip","Sets Wheel graph to view mode",None, QApplication.UnicodeUTF8))
+        #saveImgButton.setMaximumWidth(100)
+        self.connect(viewModeButton, SIGNAL("clicked()"),self.viewmode)
+
         openButton = QPushButton(QApplication.translate("Button","Open",None, QApplication.UnicodeUTF8))
         openButton.setToolTip(QApplication.translate("Tooltip","open graph file.wg",None, QApplication.UnicodeUTF8))
         #openButton.setMaximumWidth(100)
@@ -14861,6 +14869,7 @@ class WheelDlg(QDialog):
         buttonlayout.addWidget(openButton)
         buttonlayout.addWidget(saveButton)
         buttonlayout.addWidget(saveImgButton)
+        buttonlayout.addWidget(viewModeButton)
         buttonlayout.addWidget(closeButton)
 
         configlayout =  QHBoxLayout()
@@ -14948,7 +14957,6 @@ class WheelDlg(QDialog):
                 self.labeltable.setCellWidget(i,2,labelwidthSpinBox)
                 self.labeltable.setCellWidget(i,3,colorButton)
                 self.labeltable.setCellWidget(i,4,alphaSpinBox)
-
 
     def setsegmentcolor(self,x,i):
         colorf = QColorDialog.getColor(QColor(aw.qmc.wheelcolor[x][i]),self)
@@ -15307,6 +15315,11 @@ class WheelDlg(QDialog):
         aw.lowerbuttondialog.setVisible(True)
         if aw.minieventsflag:
             aw.EventsGroupLayout.setVisible(True)
+
+    def viewmode(self):
+        self.close()
+        aw.qmc.connectWheel()
+        aw.qmc.drawWheel()
            
 ############################################################
 #######################  ALARM DIALOG  #####################
