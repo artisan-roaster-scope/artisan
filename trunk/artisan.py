@@ -3936,6 +3936,7 @@ class ApplicationWindow(QMainWindow):
         self.recentFileActs = []
         self.applicationDirectory =  QDir().current().absolutePath()
         super(ApplicationWindow, self).__init__(parent)
+        
 
         #flag to reset Qsettings
         self.resetqsettings = 0
@@ -7317,11 +7318,15 @@ $cupping_notes
         
         if ETreachTime > 0 and BTreachTime < 5940:
             text1 =  QApplication.translate("Scope Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(unicode(self.qmc.ETtarget) + self.qmc.mode)
+            if self.qmc.timeindex[0]:
+                text1 = text1 + QApplication.translate("Scope Label"," at %1", None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(int(aw.qmc.timex[self.qmc.timeindex[0]])+int(ETreachTime)))
         else:
             text1 =  QApplication.translate("Scope Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(unicode(self.qmc.ETtarget) + self.qmc.mode)
             
         if BTreachTime > 0 and BTreachTime < 5940:    
             text2 =  QApplication.translate("Scope Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(unicode(self.qmc.BTtarget) + self.qmc.mode)
+            if self.qmc.timeindex[0]:
+                text2 = text2 + QApplication.translate("Scope Label"," at %1", None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(int(aw.qmc.timex[self.qmc.timeindex[0]])+int(BTreachTime)))
         else:
             text2 =  QApplication.translate("Scope Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(unicode(self.qmc.BTtarget) + self.qmc.mode)
 
