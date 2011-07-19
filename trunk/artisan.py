@@ -314,10 +314,8 @@ class tgraphcanvas(FigureCanvas):
             self.backcolor ="#EEEEEE"
         else:
             self.backcolor = "white"
-#        self.fig.patch.set_facecolor(self.backcolor)
-#        self.fig.patch.set_edgecolor(self.backcolor)        
-        self.fig.patch.set_facecolor(self.palette["background"])  
-        self.fig.patch.set_edgecolor(self.palette["background"])  
+        self.fig.patch.set_facecolor(self.backcolor)
+        self.fig.patch.set_edgecolor(self.backcolor)
         
         self.ax = self.fig.add_subplot(111, axisbg= self.palette["background"])
         self.delta_ax = self.ax.twinx()        
@@ -603,8 +601,9 @@ class tgraphcanvas(FigureCanvas):
         self.wheeledge = .02                        #overlaping decorative edge
         self.wheellinewidth = 1
         self.wheellinecolor = u"black"               #initial color of lines
-        self.wheelconnections = [0,0]
-        self.wheelx,self.wheelz = 0,0               #temp variables to pass values
+        self.wheelconnections = [0,0,0]
+        self.wheelx,self.wheelz = 0,0                   #temp variables to pass index values
+        self.wheellocationx,self.wheellocationz = 0.,0  #temp vars to pass mouse location 
         
         self.samplingsemaphore = QSemaphore(1)
         
@@ -1117,10 +1116,7 @@ class tgraphcanvas(FigureCanvas):
             self.samplingsemaphore.acquire(1)
             
             self.fig.clf(keep_observers=False)   #wipe out figure           
-            self.fig.patch.set_facecolor(self.palette["background"])  
-            self.fig.patch.set_edgecolor(self.palette["background"])  
             self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
-
 
             #Set axes same as in __init__
             if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
@@ -1134,7 +1130,8 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_title(self.title,size=20,color=self.palette["title"])          #second axes breaks mouse pick event (choses second axis) in Designer  	
             if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax	
-                self.delta_ax = self.ax.twinx()              
+                self.delta_ax = self.ax.twinx()
+                self.fig.patch.set_facecolor(self.palette["background"])                
                 self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax
                 self.ax.patch.set_visible(False)
                 self.delta_ax.set_ylabel(unicode(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
@@ -1950,275 +1947,6 @@ class tgraphcanvas(FigureCanvas):
             self.ax1.fill_between(angles,0,plotf, facecolor='green', alpha=0.1, interpolate=True)
 
         self.fig.canvas.draw()
-
-
-    def findCenterWheelTextAngle(self,t):
-        if t > 360 or t < 0:
-            p,t = divmod(t,360)
-
-        if t == 360. or t == 0.:
-            return 270.
-        #check cuadrants
-        elif t < 90. and t > 0. or t > 360.:                #cuadrant 1
-             return 270.+t
-        elif t <= 180. and t >= 90.:            #cuadrant 2
-             return t-90.
-        elif t < 270. and t > 180.:             #cuadrant 3
-             return t+90.
-        else:                                 #cuadrant 4
-            return t-270.
-
-    def findRadialWheelTextAngle(self,t):
-        if t > 360 or t < 0:
-            p,t = divmod(t,360)
-            
-        if t <= 90. and t > 0. or t > 270.:    
-            return t
-        else:
-            return 180.+t
-
-    def loadselectorwheel(self,path):
-        string = u"Wheels" + u"\\" + path
-        direct = QDir()
-        pathDir = direct.toNativeSeparators(QString(string))
-        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Open Wheel Graph",None, QApplication.UnicodeUTF8),path=pathDir,ext="*.wg")
-        if filename:
-            self.connectWheel()
-            aw.loadWheel(filename)
-            self.drawWheel()
-            
-    def addTocuppingnotes(self):
-        descriptor =  unicode(self.wheelnames[self.wheelx][self.wheelz]) 
-        self.cuppingnotes += u"\n" + descriptor 
-        string = QApplication.translate("MessageBox Caption", u" added to cupping notes",None, QApplication.UnicodeUTF8)
-        aw.sendmessage(descriptor + string)
-
-    def addToroastingnotes(self):
-        descriptor =  unicode(self.wheelnames[self.wheelx][self.wheelz]) + u" "
-        self.roastingnotes +=  u"\n" + descriptor + u" "
-        string = QApplication.translate("MessageBox Caption", u" added to roasting notes",None, QApplication.UnicodeUTF8)
-        aw.sendmessage(descriptor + string)
-
-    def wheel_pick(self,event):
-        rect =  event.artist
-        loc = rect.get_url().split("-")
-        x = int(loc[0])
-        z = int(loc[1])
-        self.wheelx = x
-        self.wheelz = z
-        aw.sendmessage(self.wheelnames[x][z])
-        self.segmentsalpha[x][z] += .1
-        self.drawWheel()
-
-    def wheel_menu(self,event):
-        #mouse event
-        if event.button != 3: return #if not right click return
-
-        designermenu = QMenu(self)
-        cuppingAction = QAction(QApplication.translate("Contextual Menu", "Add to Cupping Notes",None, QApplication.UnicodeUTF8),self)
-        self.connect(cuppingAction,SIGNAL("triggered()"),self.addTocuppingnotes)
-        designermenu.addAction(cuppingAction)
-
-        roastingAction = QAction(QApplication.translate("Contextual Menu", "Add to Roasting Notes",None, QApplication.UnicodeUTF8),self)
-        self.connect(roastingAction,SIGNAL("triggered()"),self.addToroastingnotes)
-        designermenu.addAction(roastingAction)
-
-        editAction = QAction(QApplication.translate("Contextual Menu", "Edit",None, QApplication.UnicodeUTF8),self)
-        self.connect(editAction,SIGNAL("triggered()"),aw.graphwheel)
-        designermenu.addAction(editAction)
-
-        exitAction = QAction(QApplication.translate("Contextual Menu", "Exit",None, QApplication.UnicodeUTF8),self)
-        self.connect(exitAction,SIGNAL("triggered()"),self.disconnectWheel)
-        designermenu.addAction(exitAction)
-        
-        designermenu.exec_(QCursor.pos())        
-        
-    def connectWheel(self):
-        aw.lowerbuttondialog.setVisible(False)
-        aw.EventsGroupLayout.setVisible(False)
-        self.setCursor(Qt.PointingHandCursor)
-        self.wheelconnections[0] = self.fig.canvas.mpl_connect('pick_event', self.wheel_pick)
-        self.wheelconnections[1] = self.fig.canvas.mpl_connect('button_press_event', self.wheel_menu) #right click
-
-    def disconnectWheel(self):
-        self.setCursor(Qt.ArrowCursor)        
-        self.fig.canvas.mpl_disconnect(self.wheelconnections[0])
-        self.fig.canvas.mpl_disconnect(self.wheelconnections[1])
-        self.redraw()
-        aw.lowerbuttondialog.setVisible(True)
-        if aw.minieventsflag:
-            aw.EventsGroupLayout.setVisible(True)
-
-    def drawWheel(self):
-        try:
-            pi = numpy.pi
-            rad = 360./(2*pi)
-            self.fig.clf()
-            #create a new name ax1 instead of ax
-            self.ax2 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor)
-            self.ax2.set_rmax(1.)
-            self.ax2.set_autoscale_on(True)
-            self.ax2.grid(False)
-
-            #delete degrees ticks to anotate flavor characteristics 
-            for tick in self.ax2.xaxis.get_major_ticks():
-                tick.label1On = False
-            #delete yaxis 
-            locs = self.ax2.get_yticks()
-            labels = [""]*len(locs)           
-            self.ax2.set_yticklabels(labels)
-
-            names = self.wheelnames[:]
-            Wradii = self.wradii[:]
-            startangle = self.startangle[:]
-            projection = self.projection[:]
-
-            #calculate text orientation
-            wheels = len(names)
-
-            if not wheels:
-                self.fig.canvas.draw()
-                return
-            
-            n,textangles,textloc = [],[],[]
-            for i in range(wheels):
-                l,tloc = [],[]
-                count = self.startangle[i]
-                #calculate text orientation
-                for p in range(len(names[i])):
-                    if projection[i] == 0:
-                        l.append(0)
-                    elif projection[i] == 1:
-                        l.append(self.findCenterWheelTextAngle(3.6*self.segmentlengths[i][p]/2. + count))
-                    elif projection[i] == 2:
-                        l.append(self.findRadialWheelTextAngle(3.6*self.segmentlengths[i][p]/2. + count))
-                    tloc.append((3.6*self.segmentlengths[i][p]/2. + count)/rad)
-                    count += self.segmentlengths[i][p]*3.6
-
-                textloc.append(tloc) 	    
-                textangles.append(l)                   
-                Wradii[i] = float(Wradii[i])/100.                   #convert radii to float between 0-1 range
-                startangle[i] = startangle[i]/rad                 #convert angles to radians
-                n.append(len(names[i]))                             #store the number of names for each wheel 
-
-            
-            #store the absolute len-radius origin of each circle
-            lbottom = [0.]
-            count = 0.
-            for i in range(wheels-1):
-                count += Wradii[i]
-                lbottom.append(count)
-         
-            Wradiitext = [Wradii[0]/2.]
-            for i in range(wheels-1):
-                Wradiitext.append(lbottom[i+1] + Wradii[i+1]/2.)     #store absolute len-radius for text in each circle
-                Wradii[i] += self.wheeledge    	    	    	        #create extra color edge between wheels by overlaping wheels
-            #Generate Wheel graph    
-            bar = []                                        	#holds bar-graphs (wheels)
-            threesixty = 2.*pi
-            div = 2.*pi/100.
-            for z in range(len(n)):            
-                #create wheel
-                theta,segmentwidth,radii,colors = [],[],[],[]
-                count = startangle[z]
-                for i in range(n[z]):
-                    #negative number affect eventpicker
-                    if count > threesixty:
-                        count %= threesixty
-                    elif count < 0.:
-                        count += threesixty
-                    theta.append(count)
-                    count += div*self.segmentlengths[z][i]
-                    segmentwidth.append(div*self.segmentlengths[z][i])                
-                    radii.append(Wradii[z])
-                bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,
-                                        linewidth=self.wheellinewidth,picker=1))
-                count = 0
-                #set color, alpha, and text
-                for r,bar[z] in zip(radii, bar[z]):
-                    bar[z].set_facecolor(self.wheelcolor[z][count])
-                    bar[z].set_alpha(self.segmentsalpha[z][count])
-                    bar[z].set_url(str(z) + "-" + str(count))
-                    self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
-                        rotation=textangles[z][count],horizontalalignment="center",verticalalignment="center",fontsize=self.wheeltextsize[z])
-                    count += 1  
-            self.fig.canvas.draw()            
-
-        except ValueError,e:
-            self.adderror(QApplication.translate("Error Message", "Value Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
-            return
-
-        except Exception,e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
-            return
-
-    def makewheelcolorpattern(self): 
-        for x in range(len(self.wheelcolor)):
-            wlen = len(self.wheelcolor[x])
-            for i in range(wlen):
-                color = QColor()
-                color.setHsv((360/wlen)*i*self.wheelcolorpattern,255,255,255)
-                self.wheelcolor[x][i] = unicode(color.name())
-        
-    # sets parent and corrects segment lengths so that child fits inside parent (multiple children can be set to same parent)
-    # input: z = index of parent in previus wheel    # x = wheel number    # i = index of element in wheel x
-    def setwheelchild(self,z,x,i):
-        #set same start angle
-        self.startangle[x] = self.startangle[x-1]
-        self.wheellabelparent[x][i] = z
-
-        #adjust lengths
-        for x in range(1,len(self.segmentlengths)):
-            nsegments = len(self.segmentlengths[x])        
-            parentanglecount = 0
-            for i in range(nsegments):
-                if  self.wheellabelparent[x][i]:                                                  #if parent selected (otherwise 0) 
-                    parentindex = self.wheellabelparent[x][i]                                     #parent index
-                    if self.wheellabelparent[x][i] == parentindex:                                #if match
-                        parentangle = self.segmentlengths[x-1][self.wheellabelparent[x][i]-1]     #find parent angle (in %)
-                        #find number of labels with same parent
-                        count = self.wheellabelparent[x].count(parentindex)                       #count number of labels with same parent
-                        self.segmentlengths[x][i] = parentangle/count                             #divide parent angle between children
-
-                        #calculate last total angle
-                        if i < nsegments-1:
-                            parentanglecount += self.segmentlengths[x][i]
-
-                        #adjust rest of angles to get 100 % coverage
-                        for a in range(i+1,nsegments):
-                            self.segmentlengths[x][a] = (100-parentanglecount)/(nsegments-(i+1))
-
-    #adjusts size of all segements of the graph based on child parent relation
-    #expects all segments to have a parent except in the first wheel
-    def setWheelHierarchy(self):
-        #check for not stablished relashionships (will cause graph plotting problems) and give warning
-        for x in range(1,len(self.wheellabelparent)):
-            for i in range(len(self.wheellabelparent[x])):
-                if self.wheellabelparent[x][i] == 0:
-                    QMessageBox.information(self,u"Wheel Hierarchy Problem",
-                    "Please assign a  a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
-                    return        
-        
-        #adjust top wheel and make all segments equal
-        for i in range(len(self.segmentlengths[-1])):
-            self.segmentlengths[-1][i] = 100./len(self.segmentlengths[-1])
-
-        #adjust lower wheels based on previous wheels
-        for p in range(len(self.wheellabelparent)-1,0,-1):
-            nsegments = len(self.wheellabelparent[p])
-            nparentsegments = len(self.wheellabelparent[p-1])
-            angles = [0]*nparentsegments
-            for x in range(nparentsegments):
-                for i in range(nsegments):
-                    if self.wheellabelparent[p][i]-1 == x:
-                        angles[x] += self.segmentlengths[p][i]
-
-            #adjust angle length of parents proportionaly          
-            for i in range(nparentsegments):
-                self.segmentlengths[p-1][i] = angles[i]
-
-        self.drawWheel() 
-##########################################################################################################################                                   
 
 
     #Turns ON/OFF flag self.flagon to read and plot. Called from push button_1. 
@@ -3655,6 +3383,327 @@ class tgraphcanvas(FigureCanvas):
         if target:
            self.clean_old_pid_commands() 
 
+
+
+    ###################################      WHEEL GRAPH  ####################################################
+        
+    def findCenterWheelTextAngle(self,t):
+        if t > 360. or t < 0.:
+            p,t = divmod(t,360.)
+
+        if t == 360. or t == 0.:
+            return 270.
+        #check cuadrants
+        elif t < 90. and t > 0. or t > 360.:        #cuadrant 1
+             return 270.+t
+        elif t <= 180. and t >= 90.:                #cuadrant 2
+             return t-90.
+        elif t < 270. and t > 180.:                 #cuadrant 3
+             return t+90.
+        else:                                       #cuadrant 4
+            return t-270.
+
+    def findRadialWheelTextAngle(self,t):
+        if t > 360. or t < 0.:
+            p,t = divmod(t,360.)
+            
+        if t <= 90. and t > 0. or t > 270.:    
+            return t
+        else:
+            return 180.+t
+
+    def loadselectorwheel(self,path):
+        string = u"Wheels" + u"\\" + path
+        direct = QDir()
+        pathDir = direct.toNativeSeparators(QString(string))
+        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Open Wheel Graph",None, QApplication.UnicodeUTF8),path=pathDir,ext="*.wg")
+        if filename:
+            self.connectWheel()
+            aw.loadWheel(filename)
+            self.drawWheel()
+            
+    def addTocuppingnotes(self):
+        descriptor =  unicode(self.wheelnames[self.wheelx][self.wheelz]) 
+        self.cuppingnotes += u"\n" + descriptor 
+        string = QApplication.translate("MessageBox Caption", u" added to cupping notes",None, QApplication.UnicodeUTF8)
+        aw.sendmessage(descriptor + string)
+
+    def addToroastingnotes(self):
+        descriptor =  unicode(self.wheelnames[self.wheelx][self.wheelz]) + u" "
+        self.roastingnotes +=  u"\n" + descriptor + u" "
+        string = QApplication.translate("MessageBox Caption", u" added to roasting notes",None, QApplication.UnicodeUTF8)
+        aw.sendmessage(descriptor + string)
+
+    def wheel_pick(self,event):
+        rect =  event.artist
+        loc = rect.get_url().split("-")
+        x = int(loc[0])
+        z = int(loc[1])
+        self.wheelx = x
+        self.wheelz = z
+        aw.sendmessage(self.wheelnames[x][z])
+        self.segmentsalpha[x][z] += .1
+        self.drawWheel()
+
+    def wheel_release(self,event):
+        newlocz = event.xdata
+        if newlocz:
+            if newlocz != self.wheellocationz:
+                diff = math.degrees(self.wheellocationx - newlocz)
+                for i in range(len(self.startangle)):
+                    self.startangle[i] -= diff
+                self.drawWheel()       
+##
+##    def findwheelindex(self,x,z):
+##        #find wheel
+##        x = math.degrees(x)
+##        z *= 100.
+##        r = 0
+##        for i in range(len(self.wradii)):
+##            r += self.wradii[i]
+##            if r > z:
+##                break
+##
+##        #find element in wheel
+##        init = self.startangle[i]
+##        if init > 360.:
+##            init %= 360.
+##        elif init < 0.:
+##            init += 360.
+##        diff = 360.
+##        ind = -1
+##        for p in range(len(self.segmentlengths[i])):
+##            checkdiff = abs(init - x)
+##            if checkdiff < diff:
+##                diff = checkdiff
+##                ind = p
+##            init += self.segmentlengths[i][p]*3.60
+##            if init > 360.:
+##                init %= 360.
+##
+##        return i,ind
+##        
+                
+    def wheel_menu(self,event):
+        if str(event.inaxes) != str(self.ax2): return
+        if event.button == 1:                    #if left click
+            self.wheellocationx = event.xdata
+            self.wheellocationz = event.ydata
+                
+        elif event.button == 3:                  #if right click 
+            designermenu = QMenu(self)
+            cuppingAction = QAction(QApplication.translate("Contextual Menu", "Add to Cupping Notes",None, QApplication.UnicodeUTF8),self)
+            self.connect(cuppingAction,SIGNAL("triggered()"),self.addTocuppingnotes)
+            designermenu.addAction(cuppingAction)
+
+            roastingAction = QAction(QApplication.translate("Contextual Menu", "Add to Roasting Notes",None, QApplication.UnicodeUTF8),self)
+            self.connect(roastingAction,SIGNAL("triggered()"),self.addToroastingnotes)
+            designermenu.addAction(roastingAction)
+
+            editAction = QAction(QApplication.translate("Contextual Menu", "Edit Graph",None, QApplication.UnicodeUTF8),self)
+            self.connect(editAction,SIGNAL("triggered()"),aw.graphwheel)
+            designermenu.addAction(editAction)
+
+            exitAction = QAction(QApplication.translate("Contextual Menu", "Exit",None, QApplication.UnicodeUTF8),self)
+            self.connect(exitAction,SIGNAL("triggered()"),self.disconnectWheel)
+            designermenu.addAction(exitAction)
+            
+            designermenu.exec_(QCursor.pos())
+        
+    def connectWheel(self):
+        aw.lowerbuttondialog.setVisible(False)
+        aw.EventsGroupLayout.setVisible(False)
+        self.setCursor(Qt.PointingHandCursor)
+        self.wheelconnections[0] = self.fig.canvas.mpl_connect('pick_event', self.wheel_pick)
+        self.wheelconnections[1] = self.fig.canvas.mpl_connect('button_press_event', self.wheel_menu)           #right click menu context
+        self.wheelconnections[2] = self.fig.canvas.mpl_connect('button_release_event', self.wheel_release)
+
+    def disconnectWheel(self):
+        self.setCursor(Qt.ArrowCursor)        
+        self.fig.canvas.mpl_disconnect(self.wheelconnections[0])
+        self.fig.canvas.mpl_disconnect(self.wheelconnections[1])
+        self.fig.canvas.mpl_disconnect(self.wheelconnections[2])
+
+        self.redraw()
+        aw.lowerbuttondialog.setVisible(True)
+        if aw.minieventsflag:
+            aw.EventsGroupLayout.setVisible(True)
+
+
+    def drawWheel(self):
+        try:
+            ### var constants  #####
+            pi = numpy.pi
+            threesixty = 2.*pi
+            div = threesixty/100.
+            rad = 360./threesixty
+            ########################
+            
+            self.fig.clf()
+            #create a new name ax1 instead of ax
+            self.ax2 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor)
+            self.ax2.set_rmax(1.)
+            self.ax2.set_autoscale_on(True)
+            self.ax2.grid(False)
+
+            #delete degrees ticks to anotate flavor characteristics 
+            for tick in self.ax2.xaxis.get_major_ticks():
+                tick.label1On = False
+            #delete yaxis 
+            locs = self.ax2.get_yticks()
+            labels = [""]*len(locs)           
+            self.ax2.set_yticklabels(labels)
+
+            names = self.wheelnames[:]
+            Wradii = self.wradii[:]
+            startangle = self.startangle[:]
+            projection = self.projection[:]
+
+            #calculate text orientation
+            wheels = len(names)
+
+            if not wheels:
+                self.fig.canvas.draw()
+                return
+            
+            n,textangles,textloc = [],[],[]
+            for i in range(wheels):
+                l,tloc = [],[]
+                count = self.startangle[i]
+                #calculate text orientation
+                for p in range(len(names[i])):
+                    if projection[i] == 0:
+                        l.append(0)
+                    elif projection[i] == 1:
+                        l.append(self.findCenterWheelTextAngle(3.6*self.segmentlengths[i][p]/2. + count))
+                    elif projection[i] == 2:
+                        l.append(self.findRadialWheelTextAngle(3.6*self.segmentlengths[i][p]/2. + count))
+                    tloc.append((3.6*self.segmentlengths[i][p]/2. + count)/rad)
+                    count += self.segmentlengths[i][p]*3.6
+
+                textloc.append(tloc) 	    
+                textangles.append(l)                   
+                Wradii[i] = float(Wradii[i])/100.                   #convert radii to float between 0-1 range
+                startangle[i] = startangle[i]/rad                   #convert angles to radians
+                n.append(len(names[i]))                             #store the number of names for each wheel 
+
+            
+            #store the absolute len-radius origin of each circle
+            lbottom = [0.]
+            count = 0.
+            for i in range(wheels-1):
+                count += Wradii[i]
+                lbottom.append(count)
+         
+            Wradiitext = [Wradii[0]/2.]
+            for i in range(wheels-1):
+                Wradiitext.append(lbottom[i+1] + Wradii[i+1]/2.)     #store absolute len-radius for text in each circle
+                Wradii[i] += self.wheeledge    	    	    	        #create extra color edge between wheels by overlaping wheels
+            #Generate Wheel graph    
+            bar = []                                        	#holds bar-graphs (wheels)
+            for z in range(len(n)):            
+                #create wheel
+                theta,segmentwidth,radii,colors = [],[],[],[]
+                count = startangle[z]
+                for i in range(n[z]):
+                    #negative number affect eventpicker
+                    #negative number affect eventpicker
+                    if count > threesixty:
+                        count %= threesixty
+                    elif count < 0.:
+                        count += threesixty
+                    theta.append(count)
+                    count += div*self.segmentlengths[z][i]
+                    segmentwidth.append(div*self.segmentlengths[z][i])                
+                    radii.append(Wradii[z])
+                bar.append(self.ax2.bar(theta, radii, width=segmentwidth, bottom=lbottom[z],edgecolor=self.wheellinecolor,
+                                        linewidth=self.wheellinewidth,picker=1))
+                count = 0
+                #set color, alpha, and text
+                for r,bar[z] in zip(radii, bar[z]):
+                    bar[z].set_facecolor(self.wheelcolor[z][count])
+                    bar[z].set_alpha(self.segmentsalpha[z][count])
+                    bar[z].set_url(str(z) + "-" + str(count))
+                    self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
+                        rotation=textangles[z][count],horizontalalignment="center",verticalalignment="center",fontsize=self.wheeltextsize[z])
+                    count += 1  
+            self.fig.canvas.draw()            
+
+        except ValueError,e:
+            self.adderror(QApplication.translate("Error Message", "Value Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
+
+    def makewheelcolorpattern(self): 
+        for x in range(len(self.wheelcolor)):
+            wlen = len(self.wheelcolor[x])
+            for i in range(wlen):
+                color = QColor()
+                color.setHsv((360/wlen)*i*self.wheelcolorpattern,255,255,255)
+                self.wheelcolor[x][i] = unicode(color.name())
+        
+    # sets parent and corrects segment lengths so that child fits inside parent (multiple children can be set to same parent)
+    # input: z = index of parent in previus wheel    # x = wheel number    # i = index of element in wheel x
+    def setwheelchild(self,z,x,i):
+        #set same start angle
+        self.startangle[x] = self.startangle[x-1]
+        self.wheellabelparent[x][i] = z
+
+        #adjust lengths
+        for x in range(1,len(self.segmentlengths)):
+            nsegments = len(self.segmentlengths[x])        
+            parentanglecount = 0
+            for i in range(nsegments):
+                if  self.wheellabelparent[x][i]:                                                  #if parent selected (otherwise 0) 
+                    parentindex = self.wheellabelparent[x][i]                                     #parent index
+                    if self.wheellabelparent[x][i] == parentindex:                                #if match
+                        parentangle = self.segmentlengths[x-1][self.wheellabelparent[x][i]-1]     #find parent angle (in %)
+                        #find number of labels with same parent
+                        count = self.wheellabelparent[x].count(parentindex)                       #count number of labels with same parent
+                        self.segmentlengths[x][i] = parentangle/count                             #divide parent angle between children
+
+                        #calculate last total angle
+                        if i < nsegments-1:
+                            parentanglecount += self.segmentlengths[x][i]
+
+                        #adjust rest of angles to get 100 % coverage
+                        for a in range(i+1,nsegments):
+                            self.segmentlengths[x][a] = (100-parentanglecount)/(nsegments-(i+1))
+
+    #adjusts size of all segements of the graph based on child parent relation
+    #expects all segments to have a parent except in the first wheel
+    def setWheelHierarchy(self):
+        #check for not stablished relashionships (will cause graph plotting problems) and give warning
+        for x in range(1,len(self.wheellabelparent)):
+            for i in range(len(self.wheellabelparent[x])):
+                if self.wheellabelparent[x][i] == 0:
+                    QMessageBox.information(self,u"Wheel Hierarchy Problem",
+                    "Please assign a  a parent to wheel #%i element#%i: \n\n%s"%(x+1,i+1,self.wheelnames[x][i]))
+                    return        
+        
+        #adjust top wheel and make all segments equal
+        for i in range(len(self.segmentlengths[-1])):
+            self.segmentlengths[-1][i] = 100./len(self.segmentlengths[-1])
+
+        #adjust lower wheels based on previous wheels
+        for p in range(len(self.wheellabelparent)-1,0,-1):
+            nsegments = len(self.wheellabelparent[p])
+            nparentsegments = len(self.wheellabelparent[p-1])
+            angles = [0]*nparentsegments
+            for x in range(nparentsegments):
+                for i in range(nsegments):
+                    if self.wheellabelparent[p][i]-1 == x:
+                        angles[x] += self.segmentlengths[p][i]
+
+            #adjust angle length of parents proportionaly          
+            for i in range(nparentsegments):
+                self.segmentlengths[p-1][i] = angles[i]
+
+        self.drawWheel() 
+##########################################################################################################################                                   
 
                 
 #######################################################################################
@@ -7435,6 +7484,46 @@ $cupping_notes
             if f:
                 f.close()
 
+    def showSymbolicHelp(self):
+
+        string1  = "<UL><LI><b>abs(x)</b> " +  QApplication.translate("MessageBox","Return the absolute value of x.",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>acos(x)</b> " +     QApplication.translate("MessageBox","Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8)   
+        string1 += "<LI><b>asin(x)</b> " +     QApplication.translate("MessageBox","Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>atan(x)</b> " +     QApplication.translate("MessageBox","Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>cos(x)</b> "  +     QApplication.translate("MessageBox","Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>degrees(x)</b> " +  QApplication.translate("MessageBox", "Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>exp(x)</b> " +     QApplication.translate("MessageBox", "Return e raised to the power of x.",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>log(x[, base])</b> "+ QApplication.translate("MessageBox", "Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>log10(x)</b> " +   QApplication.translate("MessageBox", "Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>pow(x, y)</b> " +   QApplication.translate("MessageBox", "Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>radians(x)</b> " +  QApplication.translate("MessageBox", "Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>sin(x)</b> " +      QApplication.translate("MessageBox", "Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8)
+        string1 += "<LI><b>sqrt(x)</b> " +     QApplication.translate("MessageBox", "Return the square root of x.",None, QApplication.UnicodeUTF8) 
+        string1 += "<LI><b>tan(x)</b> " +      QApplication.translate("MessageBox", "Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8) 
+        string1 += "</UL>"
+
+        string2 = "<UL><LI><b>x</b>"
+        string2 += "<LI><b>Y1</b> " + QApplication.translate("MessageBox", "ET curve value",None, QApplication.UnicodeUTF8) 
+        string2 += "<LI><b>Y2</b> " +  QApplication.translate("MessageBox", "BT curve value",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y3</b> " +  QApplication.translate("MessageBox", "Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) 
+        string2 += "<LI><b>Y4</b> " +  QApplication.translate("MessageBox", "Extra devices #1 curve 2",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y5</b> " +  QApplication.translate("MessageBox", "Extra devices #2 curve 1",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y6</b> " +  QApplication.translate("MessageBox", "Extra devices #2 curve 2",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>...</b> "
+        
+        string2 += "</UL>"
+
+        #format help
+        string3 = "<TABLE  WIDTH=550><TR><TH>"
+        string3 += QApplication.translate("MessageBox",  "MATHEMATICAL FUNCTIONS",None, QApplication.UnicodeUTF8)
+        string3 += "</TH><TH>"
+        string3 += QApplication.translate("MessageBox",  "SYMBOLIC VARIABLES",None, QApplication.UnicodeUTF8)
+        string3 += "</TH></TR><TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD></TR></TABLE>"
+
+        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Symbolic Functions",None, QApplication.UnicodeUTF8),string3)
+
+
+
 ##########################################################################
 #####################     HUD  EDIT DLG     ##############################
 ##########################################################################
@@ -7621,7 +7710,7 @@ class HUDDlg(QDialog):
 
         helpcurveButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
         helpcurveButton.setFocusPolicy(Qt.NoFocus)
-        self.connect(helpcurveButton, SIGNAL("clicked()"),self.showcurvehelp)
+        self.connect(helpcurveButton, SIGNAL("clicked()"),aw.showSymbolicHelp)
         
         curveLayout = QGridLayout()
         curveLayout.addWidget(self.equedit1,0,0)
@@ -7803,43 +7892,6 @@ class HUDDlg(QDialog):
     def setdefaultres(self):
         self.resolutionSpinBox.setValue(80)
         self.changedpi()
-
-    def showcurvehelp(self):
-
-        string1  = "<UL><LI><b>abs(x)</b> " +  QApplication.translate("MessageBox","Return the absolute value of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>acos(x)</b> " +     QApplication.translate("MessageBox","Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8)   
-        string1 += "<LI><b>asin(x)</b> " +     QApplication.translate("MessageBox","Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>atan(x)</b> " +     QApplication.translate("MessageBox","Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8) 
-        string1 += "<LI><b>cos(x)</b> "  +     QApplication.translate("MessageBox","Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>degrees(x)</b> " +  QApplication.translate("MessageBox", "Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8) 
-        string1 += "<LI><b>exp(x)</b> " +     QApplication.translate("MessageBox", "Return e raised to the power of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>log(x[, base])</b> "+ QApplication.translate("MessageBox", "Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8) 
-        string1 += "<LI><b>log10(x)</b> " +   QApplication.translate("MessageBox", "Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8) 
-        string1 += "<LI><b>pow(x, y)</b> " +   QApplication.translate("MessageBox", "Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>radians(x)</b> " +  QApplication.translate("MessageBox", "Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8) 
-        string1 += "<LI><b>sin(x)</b> " +      QApplication.translate("MessageBox", "Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>sqrt(x)</b> " +     QApplication.translate("MessageBox", "Return the square root of x.",None, QApplication.UnicodeUTF8) 
-        string1 += "<LI><b>tan(x)</b> " +      QApplication.translate("MessageBox", "Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8) 
-        string1 += "</UL>"
-
-        string2 = "<UL><LI><b>x</b>" 
-        string2 += "<LI><b>Y1</b> " + QApplication.translate("MessageBox", "ET curve",None, QApplication.UnicodeUTF8) 
-        string2 += "<LI><b>Y2</b> " +  QApplication.translate("MessageBox", "BT curve",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y3</b> " +  QApplication.translate("MessageBox", "Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) 
-        string2 += "<LI><b>Y4</b> " +  QApplication.translate("MessageBox", "Extra devices #1 curve 2",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y5</b> " +  QApplication.translate("MessageBox", "Extra devices #2 curve 1",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y6</b> " +  QApplication.translate("MessageBox", "Extra devices #2 curve 2",None, QApplication.UnicodeUTF8)
-        string2 += "</UL>"
-
-        #format help
-        string3 = "<TABLE  WIDTH=550><TR><TH>"
-        string3 += QApplication.translate("MessageBox",  "MATHEMATICAL FUNCTIONS",None, QApplication.UnicodeUTF8)
-        string3 += "</TH><TH>"
-        string3 += QApplication.translate("MessageBox",  "SYMBOLIC VARIABLES",None, QApplication.UnicodeUTF8)
-        string3 += "</TH></TR><TR><TD NOWRAP>" + string1 + "</TD><TD>" + string2 + "</TD></TR></TABLE>"
-
-        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Plotter Functions",None, QApplication.UnicodeUTF8),string3)
-
 
     def setcurvecolor(self,x):
         try:
@@ -10254,10 +10306,9 @@ class flavorDlg(QDialog):
         aw.lowerbuttondialog.setVisible(False)
         aw.EventsGroupLayout.setVisible(False)
 
-        defaultlabel = QLabel(QApplication.translate("Label","Schema",None, QApplication.UnicodeUTF8))
+        defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
         self.defaultcombobox = QComboBox()
-        #self.defaultcombobox.setMaximumWidth(90)
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC"])
+        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","Istituto Internazionale Assaggiatori Caffe"])
         self.defaultcombobox.setCurrentIndex(0)
         self.connect(self.defaultcombobox, SIGNAL("currentIndexChanged(int)"),self.setdefault)
 
@@ -10277,11 +10328,11 @@ class flavorDlg(QDialog):
         addButton.setFocusPolicy(Qt.NoFocus)
         self.connect(addButton, SIGNAL("clicked()"),self.addlabel)
 
-        delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
+        delButton = QPushButton(QApplication.translate("Button","Del",None, QApplication.UnicodeUTF8))
         delButton.setFocusPolicy(Qt.NoFocus)
         self.connect(delButton, SIGNAL("clicked()"),self.poplabel)
         
-        saveImgButton = QPushButton(QApplication.translate("Button","Save",None, QApplication.UnicodeUTF8))
+        saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None, QApplication.UnicodeUTF8))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
         self.connect(saveImgButton, SIGNAL("clicked()"),lambda x=0,i=1:aw.resize(x,i))
 
@@ -10293,33 +10344,19 @@ class flavorDlg(QDialog):
             self.backgroundCheck.setChecked(True)
         self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.showbackground)
         
-        flavorButtons = QHBoxLayout()
-        flavorButtons.addStretch()
-        flavorButtons.addWidget(addButton)
-        flavorButtons.addWidget(delButton)
-        flavorButtons.addStretch()
+        flavorLayout = QHBoxLayout()
+        flavorLayout.addWidget(self.flavortable)     
         
-        schemaLayout = QHBoxLayout()
-        schemaLayout.addWidget(defaultlabel)
-        schemaLayout.addWidget(self.defaultcombobox) 
-        schemaLayout.addStretch()
-        
-        turnLayout = QHBoxLayout()
-        turnLayout.addWidget(self.backgroundCheck)
-        turnLayout.addStretch()
-        turnLayout.addWidget(leftButton)
-        turnLayout.addWidget(rightButton)
-        
-        flavorLayout = QVBoxLayout()
-        flavorLayout.addWidget(self.flavortable) 
-        flavorLayout.addLayout(flavorButtons)
-        flavorLayout.addLayout(schemaLayout)   
-        flavorLayout.addLayout(turnLayout)
-                
-        buttonsLayout = QHBoxLayout()
-        buttonsLayout.addWidget(saveImgButton)
-        buttonsLayout.addStretch()
-        buttonsLayout.addWidget(backButton)
+        buttonsLayout = QGridLayout()
+        buttonsLayout.addWidget(addButton,0,0)
+        buttonsLayout.addWidget(delButton,0,1)        
+        buttonsLayout.addWidget(defaultlabel,1,0)
+        buttonsLayout.addWidget(self.defaultcombobox,1,1)
+        buttonsLayout.addWidget(leftButton,2,0)
+        buttonsLayout.addWidget(rightButton,2,1)
+        buttonsLayout.addWidget(self.backgroundCheck,3,0)
+        buttonsLayout.addWidget(saveImgButton,4,0)
+        buttonsLayout.addWidget(backButton,4,1)
             
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(flavorLayout)
@@ -13318,12 +13355,14 @@ class DeviceAssignmentDLG(QDialog):
         self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","Arduino TC4", None, QApplication.UnicodeUTF8))
 
         #As a main device, don't show the devices that start with a "+"
-        dev = aw.qmc.devices[:]
+        # devices with a first letter "+" are extra devices an depend on another device
+        # each device provides 2 curves
+        dev = aw.qmc.devices[:]             #deep copy
         limit = len(dev)
         for k in range(limit):
             for i in range(len(dev)):
                 if dev[i][0] == "+":
-                    dev.pop(i)              #pop() will make the list smaller 
+                    dev.pop(i)              #note: pop() makes the list smaller 
                     break 
                 
         sorted_devices = sorted(dev)
@@ -13368,12 +13407,12 @@ class DeviceAssignmentDLG(QDialog):
         self.arduinoBTComboBox.addItems(arduinoChannels)
 
         #check previous settings for radio button
-        if aw.qmc.device == 0:
+        if aw.qmc.device == 0 or aw.qmc.device == 26:   #if Fuji pid or DTA pid
             self.pidButton.setChecked(True)
-        elif aw.qmc.device == 19:
+        elif aw.qmc.device == 19:                       #if arduino
             self.arduinoButton.setChecked(True)
         else:
-            self.nonpidButton.setChecked(True)
+            self.nonpidButton.setChecked(True)          #else 
             selected_device_index = 0
             try:
                 selected_device_index = sorted_devices.index(aw.qmc.devices[aw.qmc.device - 1])            
@@ -13390,6 +13429,15 @@ class DeviceAssignmentDLG(QDialog):
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))        
 
+        labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None, QApplication.UnicodeUTF8)) 
+        labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None, QApplication.UnicodeUTF8)) 
+        self.ETfunctionedit = QLineEdit(unicode(aw.qmc.ETfunction))            
+        self.BTfunctionedit = QLineEdit(unicode(aw.qmc.BTfunction))
+
+        symbolicHelpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
+        symbolicHelpButton.setMaximumSize(symbolicHelpButton.sizeHint())
+        symbolicHelpButton.setMinimumSize(symbolicHelpButton.minimumSizeHint())
+        self.connect(symbolicHelpButton, SIGNAL("clicked()"),aw.showSymbolicHelp)
 
         ##########################    TAB 2  WIDGETS   "EXTRA DEVICES"
         #table for showing data
@@ -13413,12 +13461,7 @@ class DeviceAssignmentDLG(QDialog):
         delButton.setFocusPolicy(Qt.NoFocus)
         delButton.setMinimumWidth(100)
         delButton.setMaximumWidth(100)
-        self.connect(delButton, SIGNAL("clicked()"),self.deldevice)               
-
-        labelETadvanced = QLabel(QApplication.translate("Label", "ET Y(x)",None, QApplication.UnicodeUTF8)) 
-        labelBTadvanced = QLabel(QApplication.translate("Label", "BT Y(x)",None, QApplication.UnicodeUTF8)) 
-        self.ETfunctionedit = QLineEdit(unicode(aw.qmc.ETfunction))            
-        self.BTfunctionedit = QLineEdit(unicode(aw.qmc.BTfunction))            
+        self.connect(delButton, SIGNAL("clicked()"),self.deldevice)                           
 
         ##########     LAYOUTS
         # create pid box
@@ -13454,6 +13497,16 @@ class DeviceAssignmentDLG(QDialog):
         arduinoGroupBox = QGroupBox(QApplication.translate("GroupBox","Arduino TC4",None, QApplication.UnicodeUTF8))
         arduinoGroupBox.setLayout(arduinoBox)        
 
+        #ET BT symbolic adjustments/assignments Box
+        adjustmentGroupBox = QGroupBox(QApplication.translate("GroupBox","Symbolic Assignments",None, QApplication.UnicodeUTF8))
+        adjustmentsLayout = QVBoxLayout()
+        adjustmentsLayout.addWidget(labelETadvanced)
+        adjustmentsLayout.addWidget(self.ETfunctionedit)
+        adjustmentsLayout.addWidget(labelBTadvanced)
+        adjustmentsLayout.addWidget(self.BTfunctionedit)
+        adjustmentsLayout.addWidget(symbolicHelpButton)
+        adjustmentGroupBox.setLayout(adjustmentsLayout)
+
         #LAYOUT TAB 1
         grid = QGridLayout()
         grid.addWidget(self.nonpidButton,0,0)
@@ -13475,10 +13528,7 @@ class DeviceAssignmentDLG(QDialog):
         
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(gridBoxLayout)
-        tab1Layout.addWidget(labelETadvanced)
-        tab1Layout.addWidget(self.ETfunctionedit)
-        tab1Layout.addWidget(labelBTadvanced)
-        tab1Layout.addWidget(self.BTfunctionedit)
+        tab1Layout.addWidget(adjustmentGroupBox)
         
         tab1Layout.addStretch()  
 
