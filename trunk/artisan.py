@@ -609,6 +609,10 @@ class tgraphcanvas(FigureCanvas):
         self.wheellocationx,self.wheellocationz = 0.,0.  #temp vars to pass mouse location (angleX+radiusZ)
         
         self.samplingsemaphore = QSemaphore(1)
+
+        #flag to plot cross lines from mouse
+        self.crossmarker = False
+        self.crossmouseid = 0
         
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()        
     #################################    FUNCTIONS    ###################################
@@ -1108,6 +1112,10 @@ class tgraphcanvas(FigureCanvas):
 
         self.redraw()
         aw.soundpop()
+        aw.lowerbuttondialog.setVisible(True)
+        if aw.minieventsflag:
+            aw.EventsGroupLayout.setVisible(True)
+
         
     #Redraws data   
     def redraw(self, recomputeAllDeltas=True):
@@ -1125,9 +1133,9 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_ylim(self.ylimit_min, self.ylimit)
             self.ax.set_autoscale_on(False)
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
-            self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"])
+            self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"],rotation=0)
             self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
-            self.ax.set_title(self.title,size=20,color=self.palette["title"])          #second axes breaks mouse pick event (choses second axis) in Designer  	
+            self.ax.set_title(self.title,size=20,color=self.palette["title"])  	
             if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax	
                 self.delta_ax = self.ax.twinx()
@@ -1138,11 +1146,22 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 deltamajorlocator = ticker.MultipleLocator(self.zgrid)
                 self.delta_ax.yaxis.set_major_locator(deltamajorlocator)
+                self.delta_ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
+                for i in self.delta_ax.get_yticklines():
+                    i.set_markersize(10)
+                self.delta_ax.yaxis.set_minor_locator(ticker.MultipleLocator(1))
+                for i in self.delta_ax.yaxis.get_minorticklines():
+                    i.set_markersize(5)
             else:
                 #put a right tick on the graph
                 for tick in self.ax.yaxis.get_major_ticks():
-                    tick.label2On = True 
-
+                    tick.label2On = True
+                self.ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
+                for i in self.ax.get_yticklines():
+                    i.set_markersize(10)
+                for i in self.ax.yaxis.get_minorticklines():
+                    i.set_markersize(5)
+                    
             #draw water marks for dry phase region, mid phase region, and finish phase region
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
             rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
@@ -2728,6 +2747,10 @@ class tgraphcanvas(FigureCanvas):
     ####################  PROFILE DESIGNER   ###################################################################################
     #launches designer	
     def designer(self):
+        #disconnect mouse cross if ON
+        if self.crossmarker:
+            self.togglecrosslines()
+            
         if len(self.timex):
             reply = QMessageBox.question(self,QApplication.translate("MessageBox Caption","Designer Start",None, QApplication.UnicodeUTF8),
                                          QApplication.translate("MessageBox","Importing a profile in to Designer will decimate\nall data except the main [points].\nContinue?",None, QApplication.UnicodeUTF8),
@@ -2742,7 +2765,7 @@ class tgraphcanvas(FigureCanvas):
         #if no profile found
         self.reset()            # reset calls redraw() at the end
         self.connect_designer()
-        self.designerinit()       
+        self.designerinit()
         
     #used to start designer from scracth (not from a loaded profile)	
     def designerinit(self):
@@ -2879,7 +2902,7 @@ class tgraphcanvas(FigureCanvas):
        
     #CONTEXT MENU  = Right click
     def on_press(self,event):
-        if str(event.inaxes) != str(self.ax): return
+        if event.inaxes != self.ax: return
         if event.button != 3: return   #select right click only
 
         self.releaseMouse()
@@ -3727,8 +3750,36 @@ class tgraphcanvas(FigureCanvas):
             for i in range(nparentsegments):
                 self.segmentlengths[p-1][i] = angles[i]
 
-        self.drawWheel() 
-##########################################################################################################################                                   
+        self.drawWheel()
+        
+#############################     MOUSE CROSS     #############################
+
+    def togglecrosslines(self):
+        if self.crossmarker == False:
+            if not self.designerflag:
+                #turn ON
+                self.crossmarker = True
+                message = QApplication.translate("Message", "Mouse cross ON",None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)
+                self.crossmouseid = self.fig.canvas.mpl_connect('motion_notify_event', self.drawcross)
+        else:
+            #turn OFF
+            self.crossmarker = False
+            self.resetlines()
+            self.fig.canvas.draw()            
+            message = QApplication.translate("Message", "Mouse cross OFF",None, QApplication.UnicodeUTF8)
+            aw.sendmessage(message)
+            self.fig.canvas.mpl_disconnect(self.crossmouseid)
+
+    def drawcross(self,event):
+        if event.inaxes !=self.ax: return
+        x =  event.xdata 
+        y = event.ydata
+        if x and y:
+            self.resetlines()
+            self.ax.plot([self.startofx,self.endofx*2], [y,y],color =  self.palette["text"],linestyle = '-', linewidth= 1, alpha=1.0)            
+            self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color =  self.palette["text"],linestyle = '-', linewidth= 1, alpha = 1.0)
+            self.fig.canvas.draw()            
 
                 
 #######################################################################################
@@ -4919,6 +4970,8 @@ class ApplicationWindow(QMainWindow):
     def keyPressEvent(self,event):    
         key = int(event.key())
         #uncomment next line to find the integer value of a key
+        #print key
+        
         #keyboard move keys
         if key == 32:                       #SELECTS ACTIVE BUTTON
             self.moveKbutton("space")
@@ -4931,8 +4984,10 @@ class ApplicationWindow(QMainWindow):
             self.moveKbutton("left")
         elif key == 16777236:               #MOVES CURRENT BUTTON RIGHT
             self.moveKbutton("right")
-        elif key == 83:                     #letter S (future automatic save)
-            self.automaticsave()          
+        elif key == 83:                     #letter S (automatic save)
+            self.automaticsave()
+        elif key == 84:                     #letter T (mouse cross)
+            self.qmc.togglecrosslines()        
         else:
             QWidget.keyPressEvent(self, event)
 
@@ -5183,6 +5238,7 @@ class ApplicationWindow(QMainWindow):
         string += QApplication.translate("MessageBox", "<b>[RIGHT]</b> = Move to the right",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[s]</b> = Autosave",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8) + "<br><br>"
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
             
