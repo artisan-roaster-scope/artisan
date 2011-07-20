@@ -626,7 +626,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.lcd6.display(aw.ser.currentpidsv)
                         aw.lcd7.display(aw.ser.dutycycle)
 
-                #display new-updated canvas
+                #updated canvas
                 self.fig.canvas.draw()
 
                 #check if HUD is ON
@@ -710,11 +710,8 @@ class tgraphcanvas(FigureCanvas):
         self.redraw()
         
     def resetlines(self):
-        linecount = 2  + 2*len(self.extradevices)       #ET + BT + extradevices
-        if self.DeltaETflag:  #delta ET
-            linecount += 1
-        if self.DeltaBTflag: #delta BT
-            linecount += 1
+        #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
+        linecount = 2  + 2*len(self.extradevices)       #(ET + BT) + extradevices (2 per extradevice)
         if self.background:
             linecount += 2   #background ET + background BT = 2
         self.ax.lines = self.ax.lines[0:linecount]
