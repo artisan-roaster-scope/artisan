@@ -419,6 +419,9 @@ class tgraphcanvas(FigureCanvas):
         
         #flag to activate the automatic marking of the CHARGE and DROP events
         self.autoChargeDropFlag = False
+        #autodetected CHARGE and DROP index
+        self.autoChargeIdx = 0
+        self.autoDropIdx = 0
 
         # projection variables of change of rate
         self.projectionconstant = 1
@@ -639,7 +642,13 @@ class tgraphcanvas(FigureCanvas):
                 #check if HUD is ON
                 if self.HUDflag:
                     aw.showHUD[aw.HUDfunction]() 
-
+                    
+                #auto mark CHARGE/DROP
+                if self.autoChargeIdx:
+                    self.markCharge()
+                if self.autoDropIdx:
+                    self.markDrop()
+                    
                 #check alarms
                 if self.device != 18:
                     for i in range(len(self.alarmflag)):
@@ -1997,11 +2006,11 @@ class tgraphcanvas(FigureCanvas):
 
 
     #Records charge (put beans in) marker. called from push button 'Charge'
-    def markCharge(self, i=0):
+    def markCharge(self):
         if self.flagon:
             if self.device != 18:
-                if i:
-                    self.timeindex[0] = i
+                if self.autoChargeIdx:
+                    self.timeindex[0] = self.autoChargeIdx
                 else:
                     if len(self.timex) >= 3:
                         self.timeindex[0] = len(self.timex)-1
@@ -2017,8 +2026,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     return
             
-            if i == 0:    
-                self.xaxistosm()    
+            self.xaxistosm()    
             
             message = QApplication.translate("Message Area","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(unicode(self.temp2[self.timeindex[0]]) + self.mode)
             aw.sendmessage(message) 
@@ -2183,11 +2191,11 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(message)            
 
     #record end of roast (drop of beans). Called from push button 'Drop'
-    def markDrop(self, i=0):
+    def markDrop(self):
         if self.flagon:
             if self.device != 18:
-                if i:
-                    self.timeindex[6] = i
+                if self.autoDropIdx:
+                    self.timeindex[6] = self.autoDropIdx
                 else:        
                     self.timeindex[6] = len(self.timex)-1
             else:
@@ -2207,8 +2215,7 @@ class tgraphcanvas(FigureCanvas):
             message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)
             aw.soundpop()
-            if i==0:
-                self.redraw(recomputeAllDeltas=False)
+            self.redraw(recomputeAllDeltas=False)
             
             #prevents accidentally deleting a finished roast
             self.safesaveflag = True
@@ -3913,12 +3920,12 @@ class SampleThread(QThread):
                 if aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and len(aw.qmc.timex) >= 5:
                     if aw.BTbreak(len(aw.qmc.timex) - 1):
                         # we found a BT break at the current index minus 2
-                        aw.qmc.markCharge(len(aw.qmc.timex) - 3)
+                        aw.qmc.autoChargeIdx = len(aw.qmc.timex) - 3
                 # autodetect DROP event
                 elif aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and len(aw.qmc.timex) >= 5:
                     if aw.BTbreak(len(aw.qmc.timex) - 1):
                         # we found a BT break at the current index minus 2
-                        aw.qmc.markDrop(len(aw.qmc.timex) - 3)
+                        aw.qmc.autoDropIdx = len(aw.qmc.timex) - 3
 
                 ##############  if using more than one device
                 ndevices = len(aw.qmc.extradevices)
