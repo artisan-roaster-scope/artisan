@@ -416,6 +416,9 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaETflag = False
         self.DeltaBTflag = False
         self.deltafilter = 5
+        
+        #flag to activate the automatic marking of the CHARGE and DROP events
+        self.autoChargeDropFlag = False
 
         # projection variables of change of rate
         self.projectionconstant = 1
@@ -1092,7 +1095,7 @@ class tgraphcanvas(FigureCanvas):
         self.setCursor(Qt.ArrowCursor)
 
         #extra devices
-        for i in range(len(self.extradevices)):            
+        for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2))):            
             self.extratimex[i],self.extratemp1[i],self.extratemp2[i] = [],[],[]
         
         #reset alarms that have been triggered
@@ -1107,7 +1110,7 @@ class tgraphcanvas(FigureCanvas):
         aw.soundpop()
         
     #Redraws data   
-    def redraw(self):
+    def redraw(self, recomputeAllDeltas=True):
         try:
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
@@ -1304,43 +1307,44 @@ class tgraphcanvas(FigureCanvas):
     
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             if self.DeltaETflag or self.DeltaBTflag:
-                d1,d2,d3,d4=[],[],[],[]
-                delta1, delta2 = 0.,0.
-                for i in range(len(self.timex)-1):
-                    timed = self.timex[i+1] - self.timex[i]
-                    if timed:
-                        delta1 = 60.*((self.temp1[i+1] - self.temp1[i]) / float(timed)) #degrees pre minute
-                        delta2 = 60.*((self.temp2[i+1] - self.temp2[i]) / float(timed))
+                if (True or recomputeAllDeltas):
+                    d1,d2,d3,d4=[],[],[],[]
+                    delta1, delta2 = 0.,0.
+                    for i in range(len(self.timex)-1):
+                        timed = self.timex[i+1] - self.timex[i]
+                        if timed:
+                            delta1 = 60.*((self.temp1[i+1] - self.temp1[i]) / float(timed)) #degrees pre minute
+                            delta2 = 60.*((self.temp2[i+1] - self.temp2[i]) / float(timed))
     
-                        #inputs
-                        d1.append(delta1)
-                        d2.append(delta2)
+                            #inputs
+                            d1.append(delta1)
+                            d2.append(delta2)
                         
-                        if self.deltafilter:
-                            if i > (self.deltafilter-1):
-                                #smooth DeltaBT/DeltaET by using FIR filter of X pads.
-                                #d1 and d2 are inputs, while d3 and d4 are outputs  
-                                #Use only current and past input values. Don't feed parts of outputs d3 d4 to filter
-                                a1,a2 = 0.,0.
-                                for k in range(self.deltafilter):
-                                    a1 += d1[-(k+1)]
-                                    a2 += d2[-(k+1)]
-                                #outputs
-                                d3.append(a1/float(self.deltafilter))
-                                d4.append(a2/float(self.deltafilter))
-                            else:
-                                d3.append(0.) 
-                                d4.append(0.)
+                            if self.deltafilter:
+                                if i > (self.deltafilter-1):
+                                    #smooth DeltaBT/DeltaET by using FIR filter of X pads.
+                                    #d1 and d2 are inputs, while d3 and d4 are outputs  
+                                    #Use only current and past input values. Don't feed parts of outputs d3 d4 to filter
+                                    a1,a2 = 0.,0.
+                                    for k in range(self.deltafilter):
+                                        a1 += d1[-(k+1)]
+                                        a2 += d2[-(k+1)]
+                                    #outputs
+                                    d3.append(a1/float(self.deltafilter))
+                                    d4.append(a2/float(self.deltafilter))
+                                else:
+                                    d3.append(0.) 
+                                    d4.append(0.)
                                    
-                if self.deltafilter:
-                    self.delta1 = d3
-                    self.delta2 = d4
-                else:
-                    self.delta1 = d1
-                    self.delta2 = d2
+                    if self.deltafilter:
+                        self.delta1 = d3
+                        self.delta2 = d4
+                    else:
+                        self.delta1 = d1
+                        self.delta2 = d2
                         
                 #this is needed because DeltaBT and DeltaET need 2 values of timex (difference) but they also need same dimension in order to plot
-                #equalize dimensions if needed
+                #equalize dimensions if needed                    
                 lt,ld =  len(self.timex),len(self.delta2)
                 if lt != ld:
                     if lt > ld:
@@ -1974,13 +1978,16 @@ class tgraphcanvas(FigureCanvas):
 
 
     #Records charge (put beans in) marker. called from push button 'Charge'
-    def markCharge(self):
+    def markCharge(self, i=0):
         if self.flagon:
             if self.device != 18:
-                if len(self.timex) >= 3:
-                    self.timeindex[0] = len(self.timex)-1
+                if i:
+                    self.timeindex[0] = i
                 else:
-                    message = QApplication.translate("Message Area","Not enough variables collected yet. Try again in a few seconds", None, QApplication.UnicodeUTF8)
+                    if len(self.timex) >= 3:
+                        self.timeindex[0] = len(self.timex)-1
+                    else:
+                        message = QApplication.translate("Message Area","Not enough variables collected yet. Try again in a few seconds", None, QApplication.UnicodeUTF8)
             #device 18  = manual mode        
             else:
                 tx = self.timeclock.elapsed()/1000.
@@ -1990,8 +1997,9 @@ class tgraphcanvas(FigureCanvas):
                     self.timeindex[0] = len(self.timex)-1
                 else:
                     return
-                
-            self.xaxistosm()    
+            
+            if i == 0:    
+                self.xaxistosm()    
             
             message = QApplication.translate("Message Area","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(unicode(self.temp2[self.timeindex[0]]) + self.mode)
             aw.sendmessage(message) 
@@ -1999,7 +2007,7 @@ class tgraphcanvas(FigureCanvas):
             aw.button_8.setFlat(True)            
 
             aw.soundpop()
-            self.redraw()
+            self.redraw(recomputeAllDeltas=False)
             
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -2030,7 +2038,7 @@ class tgraphcanvas(FigureCanvas):
             #set message at bottom
             aw.sendmessage(message)
             aw.soundpop()
-            self.redraw()
+            self.redraw(recomputeAllDeltas=False)
                         
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -2062,7 +2070,7 @@ class tgraphcanvas(FigureCanvas):
             message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)            
             aw.sendmessage(message)
             aw.soundpop()
-            self.redraw()
+            self.redraw(recomputeAllDeltas=False)
             
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -2091,7 +2099,7 @@ class tgraphcanvas(FigureCanvas):
             message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)
             aw.soundpop()
-            self.redraw()
+            self.redraw(recomputeAllDeltas=False)
             
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -2119,7 +2127,7 @@ class tgraphcanvas(FigureCanvas):
             message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)
             aw.soundpop()
-            self.redraw()
+            self.redraw(recomputeAllDeltas=False)
             
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -2148,17 +2156,20 @@ class tgraphcanvas(FigureCanvas):
             message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)            
             aw.soundpop()
-            self.redraw()
+            self.redraw(recomputeAllDeltas=False)
             
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
             aw.sendmessage(message)            
 
     #record end of roast (drop of beans). Called from push button 'Drop'
-    def markDrop(self):
+    def markDrop(self, i=0):
         if self.flagon:
-            if self.device != 18:        
-                self.timeindex[6] = len(self.timex)-1
+            if self.device != 18:
+                if i:
+                    self.timeindex[6] = i
+                else:        
+                    self.timeindex[6] = len(self.timex)-1
             else:
                 tx = self.timeclock.elapsed()/1000.
                 et,bt = aw.ser.NONE()
@@ -2176,7 +2187,7 @@ class tgraphcanvas(FigureCanvas):
             message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)
             aw.soundpop()
-            self.redraw()
+            self.redraw(recomputeAllDeltas=False)
             
             #prevents accidentally deleting a finished roast
             self.safesaveflag = True
@@ -2224,7 +2235,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
                     aw.lineEvent.setText(self.specialeventsStrings[Nevents])
                     
-                self.redraw()     
+                self.redraw(recomputeAllDeltas=False)     
                 aw.soundpop()
 
             else:
@@ -2260,7 +2271,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
                     aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
                     aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                self.redraw()
+                self.redraw(recomputeAllDeltas=False)
 
     # Writes information about the finished profile in the graph
     def writestatistics(self):
@@ -3537,7 +3548,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.mpl_disconnect(self.wheelconnections[1])
         self.fig.canvas.mpl_disconnect(self.wheelconnections[2])
 
-        self.redraw()
+        self.redraw(recomputeAllDeltas=False)
         aw.lowerbuttondialog.setVisible(True)
         if aw.minieventsflag:
             aw.EventsGroupLayout.setVisible(True)
@@ -3844,6 +3855,17 @@ class SampleThread(QThread):
                     aw.qmc.viewProjection()                   
                 if aw.qmc.background and aw.qmc.backgroundReproduce:
                     aw.qmc.playbackevent()
+                    
+                # autodetect CHARGE event
+                if aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and len(aw.qmc.timex) >= 5:
+                    if aw.BTbreak(len(aw.qmc.timex) - 1):
+                        # we found a BT break at the current index minus 2
+                        aw.qmc.markCharge(len(aw.qmc.timex) - 3)
+                # autodetect DROP event
+                elif aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and len(aw.qmc.timex) >= 5:
+                    if aw.BTbreak(len(aw.qmc.timex) - 1):
+                        # we found a BT break at the current index minus 2
+                        aw.qmc.markDrop(len(aw.qmc.timex) - 3)
 
                 ##############  if using more than one device
                 ndevices = len(aw.qmc.extradevices)
@@ -4795,7 +4817,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.specialeventsStrings[-1] = self.extraeventsdescriptions[ee]
             
             self.setminieditor2lastevent()
-            self.qmc.redraw()
+            self.qmc.redraw(recomputeAllDeltas=False)
             
             if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event
                 if self.extraeventsactions[ee] == 1:                    
@@ -5221,7 +5243,7 @@ class ApplicationWindow(QMainWindow):
             self.eNumberSpinBox.clearFocus()
             self.etimeline.clearFocus()                        
 
-            self.qmc.redraw()
+            self.qmc.redraw(recomputeAllDeltas=False)
             
             #plot highest ET or BT (sometimes only BT is plot (et is zero))
             etimeindex = self.qmc.specialevents[lenevents-1]
@@ -5418,8 +5440,8 @@ class ApplicationWindow(QMainWindow):
             return
 
         except Exception,e:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadFile() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
         
@@ -6034,6 +6056,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phases = map(lambda x:x.toInt()[0],settings.value("Phases").toList())
             if settings.contains("phasesbuttonflag"):
                 self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]   
+                
             #restore Events settings
             settings.beginGroup("events")
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
@@ -6043,6 +6066,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.etypes = settings.value("etypes",self.qmc.etypes).toStringList()
             if settings.contains("eventsshowflag"):
                 aw.qmc.eventsshowflag  = settings.value("eventsshowflag",int(self.qmc.eventsshowflag)).toInt()[0]
+            if settings.contains("autoChargeDrop"):
+                self.qmc.autoChargeDropFlag = settings.value("autoChargeDrop",self.qmc.autoChargeDropFlag).toBool()
             settings.endGroup()
             
     	    #restore statistics
@@ -6310,6 +6335,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
             settings.setValue("etypes",self.qmc.etypes)
             settings.setValue("eventsshowflag",aw.qmc.eventsshowflag)
+            settings.setValue("autoChargeDrop",self.qmc.autoChargeDropFlag)
             settings.endGroup()            
             #save delay
             settings.setValue("Delay",self.qmc.delay)
@@ -6626,7 +6652,7 @@ $cupping_notes
             else:
                 DRY_time_idx = 0
         evaluations = aw.defect_estimation()        
-        self.qmc.redraw()   
+        self.qmc.redraw(recomputeAllDeltas=False)   
         if platf == u'Darwin':
             graph_image = "artisan-graph.svg"
             aw.qmc.fig.savefig(graph_image)
@@ -6656,7 +6682,7 @@ $cupping_notes
         weight_loss = aw.weight_loss(self.qmc.weight[0],self.qmc.weight[1])
         volume_gain = aw.weight_loss(self.qmc.volume[1],self.qmc.volume[0])
         #return screen to GRAPH profile mode
-        self.qmc.redraw()
+        self.qmc.redraw(recomputeAllDeltas=False)
         html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             title=cgi.escape(unicode(self.qmc.title)),
             datetime=unicode(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
@@ -6915,7 +6941,22 @@ $cupping_notes
                  index = i
         return index
     
-    
+    # returns True if a BT break at i-2 is detected
+    def BTbreak(self,i):
+        if len(aw.qmc.timex)>4 and i < len(aw.qmc.timex):
+            d1 = aw.qmc.temp2[i-4] - aw.qmc.temp2[i-3]
+            d2 = aw.qmc.temp2[i-3] - aw.qmc.temp2[i-2]
+            d3 = aw.qmc.temp2[i-1] - aw.qmc.temp2[i-2]
+            d4 = aw.qmc.temp2[i] - aw.qmc.temp2[i-1]
+            d = (abs(d1) + abs(d2)) / 2.0
+            if d3 < 0 and d4 < 0 and ((abs(d3) + abs(d4)) / 2.0) > 2.0*d:
+                return True
+            else:
+                return False
+        else:
+            return False
+            
+        
     # this can be used to find the CHARGE index as well as the DROP index by using
     # 0 or the DRY index as start index, respectively
     def findBTbreak(self,start_index=0,end_index=0):
@@ -6927,16 +6968,8 @@ $cupping_notes
             if end_index and i > end_index:
                 break
             if i>3:
-                d1 = aw.qmc.temp2[i-4] - aw.qmc.temp2[i-3]
-                d2 = aw.qmc.temp2[i-3] - aw.qmc.temp2[i-2]
-                d3 = aw.qmc.temp2[i-1] - aw.qmc.temp2[i-2]
-                d4 = aw.qmc.temp2[i] - aw.qmc.temp2[i-1]
-                d = (abs(d1) + abs(d2)) / 2.0
-                if d3 < 0 and d4 < 0 and ((abs(d3) + abs(d4)) / 2.0) > 2.0*d:
-                    result = i - 2                    
-#                    for x in range(max(0,i-6),i):
-#                        print x,aw.qmc.temp2[x]
-#                    print i-2,d1,d2,d3,d4,d                    
+                if self.BTbreak(i):
+                    result = i - 2                              
                     break
         return result
       
@@ -7944,7 +7977,7 @@ class HUDDlg(QDialog):
             aw.qmc.temp1B = y_range[:]
             aw.qmc.temp2B = [-100]*len(x_range) 
             aw.qmc.background = True
-            aw.qmc.redraw()        
+            aw.qmc.redraw(recomputeAllDeltas=False)        
         except Exception,e:
             aw.qmc.adderror(QApplication.translate("Error Message", "setbackgroundequ1(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
@@ -8065,7 +8098,7 @@ class HUDDlg(QDialog):
                 self.univarCheck.setChecked(False)               
         else:
             aw.qmc.resetlines()
-            aw.qmc.redraw()                
+            aw.qmc.redraw(recomputeAllDeltas=False)                
 
     def interpolation(self,i):
         mode = unicode(self.interpComboBox.currentText())
@@ -8079,7 +8112,7 @@ class HUDDlg(QDialog):
                 
         else:
             aw.qmc.resetlines()
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
 
     def soundset(self,i):
         if aw.soundflag == 0:
@@ -8092,18 +8125,18 @@ class HUDDlg(QDialog):
 
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
 
     def changeDeltaFilter(self,i):
         try:
             aw.qmc.deltafilter = self.DeltaFilter.value()
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception,e:
             aw.qmc.adderror(QApplication.translate("Error Message", "changeDeltaFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
     def changeDeltaBT(self,i):
         aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         
     def changeProjection(self,i):
         aw.qmc.projectFlag = not aw.qmc.projectFlag
@@ -8116,7 +8149,7 @@ class HUDDlg(QDialog):
 
     def changeInterpolationMode(self,i):
         aw.qmc.resetlines()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         self.interpolation(i)
 
     #cancel button
@@ -8126,7 +8159,7 @@ class HUDDlg(QDialog):
         aw.qmc.DeltaBTflag = self.org_DeltaBT
         aw.qmc.projectFlag = self.org_Projection
         aw.qmc.resetlines()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         self.accept()
 
     #button OK
@@ -8146,7 +8179,7 @@ class HUDDlg(QDialog):
         string = QApplication.translate("Message Area","[ET target = %1] [BT target =   (%2]", None, QApplication.UnicodeUTF8).arg(unicode(aw.qmc.ETtarget)).arg(unicode(aw.qmc.BTtarget))
         aw.sendmessage(string)
         aw.qmc.resetlines()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         self.accept()
 
     #closing dialog
@@ -8154,7 +8187,7 @@ class HUDDlg(QDialog):
         self.close()
         self.accept()
         aw.qmc.resetlines()
-        aw.qmc.redraw()        
+        aw.qmc.redraw(recomputeAllDeltas=False)        
         aw.stack.setCurrentIndex(0)
         
 ########################################################################################            
@@ -8531,8 +8564,9 @@ class editGraphDlg(QDialog):
         timeLayout.addWidget(self.CCstartedit,1,4)
         timeLayout.addWidget(self.CCendedit,1,5)
         timeLayout.addWidget(self.dropedit,1,6)
-        timeLayout.addWidget(self.chargeestimate,2,0)
-        timeLayout.addWidget(self.dropestimate,2,6)
+        if charge_str != "" or drop_str != "":
+            timeLayout.addWidget(self.chargeestimate,2,0)
+            timeLayout.addWidget(self.dropestimate,2,6)
         
         textLayout = QGridLayout()
         textLayout.addWidget(datelabel1,0,0)
@@ -8847,7 +8881,7 @@ class editGraphDlg(QDialog):
             aw.qmc.specialeventsStrings.append(str(len(aw.qmc.specialevents)))
             aw.qmc.specialeventsvalue.append(0)
             self.createEventTable()
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
 
             message = QApplication.translate("Message Area","Event #%1 added", None, QApplication.UnicodeUTF8).arg(str(len(aw.qmc.specialevents))) 
             aw.sendmessage(message)
@@ -8863,7 +8897,7 @@ class editGraphDlg(QDialog):
             aw.qmc.specialeventsStrings.pop()
             aw.qmc.specialeventsvalue.pop()
             self.createEventTable()
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
              
             message = QApplication.translate("Message Area"," Event #%1 deleted", None, QApplication.UnicodeUTF8).arg(str(len(aw.qmc.specialevents)+1))
             aw.sendmessage(message)
@@ -9044,7 +9078,7 @@ class editGraphDlg(QDialog):
         aw.qmc.cuppingnotes = unicode(self.cuppingeditor.toPlainText())
            
         aw.sendmessage(QApplication.translate("Message Area","Roast properties updated but profile not saved to disk", None, QApplication.UnicodeUTF8))            
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         self.close()
 
 
@@ -9392,36 +9426,36 @@ class WindowsDlg(QDialog):
     def changexrotation(self):
         aw.qmc.xrotation = self.xrotationSpinBox.value()
         aw.qmc.xaxistosm()       
-        aw.qmc.redraw()    	
+        aw.qmc.redraw(recomputeAllDeltas=False)    	
 
     def changegridalpha(self):
         aw.qmc.gridalpha = self.gridalphaSpinBox.value()/10.
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         
     def changegridwidth(self):
         aw.qmc.gridthickness = self.gridwidthSpinBox.value()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         
     def changegridstyle(self):
         aw.qmc.gridlinestyle = self.gridstylecombobox.currentIndex()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
 
     def changelegendloc(self):
         aw.qmc.legendloc = self.legendComboBox.currentIndex()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
 
     def xaxislenloc(self):
         aw.qmc.xgrid = self.timeconversion[self.xaxislencombobox.currentIndex()]
         aw.qmc.xaxistosm()       
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
 
     def changeygrid(self):
         aw.qmc.ygrid = self.ygridSpinBox.value()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
 
     def changezgrid(self):
         aw.qmc.zgrid = self.zgridSpinBox.value()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
                                
     def updatewindow(self):
         aw.qmc.ylimit = int(self.ylimitEdit.text())
@@ -9435,7 +9469,7 @@ class WindowsDlg(QDialog):
         else:
             aw.qmc.keeptimeflag = 0
 
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         
         string = QApplication.translate("Message Area","xlimit = (%3,%4) ylimit = (%1,%2) zlimit = (%5,%6)",None, QApplication.UnicodeUTF8).arg(unicode(self.ylimitEdit_min.text())).arg(unicode(self.ylimitEdit.text())).arg(unicode(self.xlimitEdit_min.text())).arg(unicode(self.xlimitEdit.text())).arg(unicode(self.zlimitEdit_min.text())).arg(unicode(self.zlimitEdit.text()))                                   
         aw.sendmessage(string)
@@ -9789,6 +9823,12 @@ class EventsDlg(QDialog):
         self.etype2 = QLineEdit(aw.qmc.etypes[2])
         self.etype3 = QLineEdit(aw.qmc.etypes[3])
         
+        self.autoChargeDrop = QCheckBox(QApplication.translate("CheckBox","Automatic CHARGE/DROP",None, QApplication.UnicodeUTF8))
+        if aw.qmc.autoChargeDropFlag:
+            self.autoChargeDrop.setChecked(True)
+        else:
+            self.autoChargeDrop.setChecked(False)
+        
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
@@ -9873,6 +9913,7 @@ class EventsDlg(QDialog):
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(FlagsLayout)
         tab1layout.addWidget(TypeGroupLayout)
+        tab1layout.addWidget(self.autoChargeDrop)
 
         ### tab2 layout
         tab2layout = QVBoxLayout()
@@ -10060,7 +10101,7 @@ class EventsDlg(QDialog):
             aw.qmc.eventsshowflag = 1
         else:
             aw.qmc.eventsshowflag = 0
-        aw.qmc.redraw()        
+        aw.qmc.redraw(recomputeAllDeltas=False)        
             
     def minieventsflagChanged(self):
         if self.minieventsflag.isChecked():
@@ -10081,10 +10122,10 @@ class EventsDlg(QDialog):
             if   aw.qmc.ylimit_min > lim:
                 aw.qmc.ylimit_min = lim
                 
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
         else:
             aw.qmc.eventsGraphflag = 0
-            aw.qmc.redraw()            
+            aw.qmc.redraw(recomputeAllDeltas=False)            
           
     def updatetypes(self):
         if len(unicode(self.etype0.text())) and len(unicode(self.etype1.text())) and len(unicode(self.etype2.text())) and len(unicode(self.etype3.text())):
@@ -10096,8 +10137,11 @@ class EventsDlg(QDialog):
             #update mini editor
             aw.etypeComboBox.clear()
             aw.etypeComboBox.addItems(aw.qmc.etypes)
+            
+            #update autoChargeDrop flag
+            aw.qmc.autoChargeDropFlag = self.autoChargeDrop.isChecked()
         
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
             self.savetableextraeventbutton()
             aw.sendmessage(QApplication.translate("Message Area","Event configuration saved", None, QApplication.UnicodeUTF8))
             self.close()
@@ -10241,7 +10285,7 @@ class phasesGraphDlg(QDialog):
         mainLayout.setSizeConstraint(QLayout.SetFixedSize)
 
         self.setLayout(mainLayout)
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         
     def savePhasesSettings(self):
         if not aw.qmc.phasesbuttonflag:
@@ -10266,7 +10310,7 @@ class phasesGraphDlg(QDialog):
             aw.qmc.phasesbuttonflag = 1
             self.events2phases()
             self.getphases()
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
         else:
             aw.qmc.phasesbuttonflag = 0
             self.enddry.setEnabled(True)
@@ -10283,13 +10327,13 @@ class phasesGraphDlg(QDialog):
             aw.qmc.phasesbuttonflag = 1
         else:
             aw.qmc.phasesbuttonflag = 0
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         self.savePhasesSettings()
         self.close()
         
     def cancel(self):
         aw.qmc.phases = list(self.phases)
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         self.savePhasesSettings()
         self.close()
         
@@ -10308,7 +10352,7 @@ class phasesGraphDlg(QDialog):
         self.getphases()
 
         aw.sendmessage(QApplication.translate("Message Area","Phases changed to %1 default: %2)",None, QApplication.UnicodeUTF8).arg(aw.qmc.mode).arg(unicode(aw.qmc.phases)))
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
 
 ############################################################################        
 #####################   FLAVOR STAR PROPERTIES DIALOG   ####################
@@ -10519,7 +10563,7 @@ class flavorDlg(QDialog):
 
     def closeEvent(self, event):
         self.accept()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         aw.lowerbuttondialog.setVisible(True)
         aw.update_minieventline_visibility()
         
@@ -10528,7 +10572,7 @@ class flavorDlg(QDialog):
         aw.lowerbuttondialog.setVisible(True)
         aw.update_minieventline_visibility()
         self.accept()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
 
 #################################################################
 #################### BACKGROUND DIALOG  #########################
@@ -10811,7 +10855,7 @@ class backgroundDLG(QDialog):
         #block button
         self.styleComboBox.setDisabled(True) 
         aw.qmc.backgroundstyle = unicode(self.styleComboBox.currentText())
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         #reactivate button
         self.styleComboBox.setDisabled(False)
         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)         
@@ -10839,7 +10883,7 @@ class backgroundDLG(QDialog):
             else:
                 aw.qmc.backgroundbtcolor = color
 
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         self.btcolorComboBox.setDisabled(False)
         self.metcolorComboBox.setDisabled(False)
         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000) 
@@ -10850,7 +10894,7 @@ class backgroundDLG(QDialog):
         #block button
         self.widthSpinBox.setDisabled(True)
         aw.qmc.backgroundwidth = self.widthSpinBox.value()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         #reactivate button
         self.widthSpinBox.setDisabled(False)
         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)        
@@ -10861,7 +10905,7 @@ class backgroundDLG(QDialog):
         #block button
         self.intensitySpinBox.setDisabled(True)
         aw.qmc.backgroundalpha = self.intensitySpinBox.value()/10.
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         #reactivate button
         self.intensitySpinBox.setDisabled(False)
         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)   
@@ -10885,7 +10929,7 @@ class backgroundDLG(QDialog):
         aw.qmc.backgroundDetails = False
         aw.qmc.backgroundeventsflag = False
         aw.qmc.backmoveflag = 1
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         
         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)   
         
@@ -10906,7 +10950,7 @@ class backgroundDLG(QDialog):
          self.createEventTable()
          self.createDataTable()
          
-         aw.qmc.redraw()
+         aw.qmc.redraw(recomputeAllDeltas=False)
          #activate button
          if m == "up":
              self.upButton.setDisabled(False)
@@ -10936,7 +10980,7 @@ class backgroundDLG(QDialog):
         else:
             aw.qmc.backgroundeventsflag = False            
             
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)   
         
 
@@ -11179,7 +11223,7 @@ class StatisticsDLG(QDialog):
         
     def changeStatisticsflag(self,value,i):
         aw.qmc.statisticsflags[i] = value
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
 
             
     def initialsettings(self):
@@ -11224,7 +11268,7 @@ class StatisticsDLG(QDialog):
             else:
                 aw.qmc.statisticsflags[3] = 0
 
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
             self.close()
         else:
             pass
@@ -13460,6 +13504,7 @@ class DeviceAssignmentDLG(QDialog):
         symbolicHelpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
         symbolicHelpButton.setMaximumSize(symbolicHelpButton.sizeHint())
         symbolicHelpButton.setMinimumSize(symbolicHelpButton.minimumSizeHint())
+        symbolicHelpButton.setFocusPolicy(Qt.NoFocus)
         self.connect(symbolicHelpButton, SIGNAL("clicked()"),aw.showSymbolicHelp)
 
         ##########################    TAB 2  WIDGETS   "EXTRA DEVICES"
@@ -13651,7 +13696,7 @@ class DeviceAssignmentDLG(QDialog):
             #addDevice() is located in aw so that the same function can be used in init after dynamically loading settings
             aw.addDevice()
             self.createDeviceTable()
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception,e:
              aw.qmc.adderror(QApplication.translate("Error Message", "adddevice(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
@@ -13681,7 +13726,7 @@ class DeviceAssignmentDLG(QDialog):
             #EXTRA COMM PORTS VARIABLES
             aw.ser.extracomport,aw.ser.extrabaudrate,aw.ser.extrabytesize,aw.ser.extraparity,aw.ser.extrastopbits,aw.ser.extratimeout = [],[],[],[],[],[]
             self.createDeviceTable()
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
             
         except Exception,e:
              aw.qmc.adderror(QApplication.translate("Error Message", "resetextradevices(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -13719,7 +13764,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.extraser[x].SP.close()
                 aw.extraser.pop(x)
             self.createDeviceTable()
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception,e:         
             aw.qmc.adderror(QApplication.translate("Error Message", "delextradevice(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
@@ -13739,7 +13784,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.qmc.extramathexpression2[i] = unicode(mexpr2edit.text())       
             
             #update legend
-            aw.qmc.redraw()
+            aw.qmc.redraw(recomputeAllDeltas=False)
 
         except Exception,e:
              aw.qmc.adderror(QApplication.translate("Error Message", "savedevicetable(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -14749,7 +14794,7 @@ class graphColorDlg(QDialog):
             var.setText(colorf.name())
             var.setPalette(QPalette(colorf))
             var.setAutoFillBackground(True)            
-            aw.qmc.fig.canvas.redraw()
+            aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
             aw.sendmessage(QApplication.translate("Message Area","Color of %1 set to %2", None, QApplication.UnicodeUTF8).arg(title).arg(str(aw.qmc.palette[color])))
 
 
@@ -15331,7 +15376,7 @@ class WheelDlg(QDialog):
 
     def closeEvent(self, event):
         aw.qmc.disconnectWheel()
-        aw.qmc.redraw()
+        aw.qmc.redraw(recomputeAllDeltas=False)
         aw.lowerbuttondialog.setVisible(True)
         if aw.minieventsflag:
             aw.EventsGroupLayout.setVisible(True)
