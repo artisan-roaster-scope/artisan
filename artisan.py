@@ -622,7 +622,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.lcd4.display("%.1f"%self.rateofchange1)        # rate of change MET (degress per minute)
                     aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
                     
-                    if self.device == 0:                              #extra LCDs for pid  
+                    if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid  
                         aw.lcd6.display(aw.ser.currentpidsv)
                         aw.lcd7.display(aw.ser.dutycycle)
 
@@ -3380,8 +3380,6 @@ class tgraphcanvas(FigureCanvas):
         if target:
            self.clean_old_pid_commands() 
 
-
-
     ###################################      WHEEL GRAPH  ####################################################
         
     def findCenterWheelTextAngle(self,t):
@@ -3439,7 +3437,7 @@ class tgraphcanvas(FigureCanvas):
         self.wheelx = x
         self.wheelz = z
         aw.sendmessage(self.wheelnames[x][z])
-        self.segmentsalpha[x][z] += .1
+        self.segmentsalpha[x][z] += .3
         self.drawWheel()
 
     def wheel_release(self,event):
@@ -3449,6 +3447,7 @@ class tgraphcanvas(FigureCanvas):
                 diff = math.degrees(self.wheellocationx - newlocz)
                 for i in range(len(self.startangle)):
                     self.startangle[i] -= diff
+                self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
                 self.drawWheel()       
 ##
 ##    def findwheelindex(self,x,z):
@@ -3497,19 +3496,32 @@ class tgraphcanvas(FigureCanvas):
             self.connect(roastingAction,SIGNAL("triggered()"),self.addToroastingnotes)
             designermenu.addAction(roastingAction)
 
+            cancelwheelAction = QAction(QApplication.translate("Contextual Menu", "Cancel selection",None, QApplication.UnicodeUTF8),self)
+            self.connect(cancelwheelAction,SIGNAL("triggered()"),self.cancelwheelselection)
+            designermenu.addAction(cancelwheelAction)
+
             editAction = QAction(QApplication.translate("Contextual Menu", "Edit Graph",None, QApplication.UnicodeUTF8),self)
             self.connect(editAction,SIGNAL("triggered()"),self.editmode)
             designermenu.addAction(editAction)
 
             exitAction = QAction(QApplication.translate("Contextual Menu", "Exit",None, QApplication.UnicodeUTF8),self)
-            self.connect(exitAction,SIGNAL("triggered()"),self.disconnectWheel)
+            self.connect(exitAction,SIGNAL("triggered()"),self.exitviewmode)
             designermenu.addAction(exitAction)
             
             designermenu.exec_(QCursor.pos())
 
+    def cancelwheelselection(self):
+        self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
+        self.drawWheel()        
+
     def editmode(self):
+        self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
         self.disconnectWheel()
         aw.graphwheel()
+
+    def exitviewmode(self):
+        self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
+        self.disconnectWheel()
         
     def connectWheel(self):
         aw.lowerbuttondialog.setVisible(False)
@@ -4280,6 +4292,8 @@ class ApplicationWindow(QMainWindow):
         self.connect(wheeleditorAction,SIGNAL("triggered()"),self.graphwheel)
         wheelmenu.addAction(wheeleditorAction)
 
+        wheelmenu.addSeparator()
+
         wheelcuppingAction = QAction(QApplication.translate("Menu", "Cupping Descriptors",None, QApplication.UnicodeUTF8),self)
         self.connect(wheelcuppingAction,SIGNAL("triggered()"),lambda folder="Cupping":self.qmc.loadselectorwheel(folder))
         wheelmenu.addAction(wheelcuppingAction)
@@ -4287,6 +4301,10 @@ class ApplicationWindow(QMainWindow):
         wheelroastingAction = QAction(QApplication.translate("Menu", "Roasting Descriptors",None, QApplication.UnicodeUTF8),self)
         self.connect(wheelroastingAction,SIGNAL("triggered()"),lambda folder="Roasting":self.qmc.loadselectorwheel(folder))
         wheelmenu.addAction(wheelroastingAction)        
+
+        wheelotherAction = QAction(QApplication.translate("Menu", "Other Descriptors",None, QApplication.UnicodeUTF8),self)
+        self.connect(wheelotherAction,SIGNAL("triggered()"),lambda folder="Other":self.qmc.loadselectorwheel(folder))
+        wheelmenu.addAction(wheelotherAction) 
 
         hudAction = QAction(UIconst.TOOLKIT_MENU_EXTRAS,self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
