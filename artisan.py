@@ -3775,7 +3775,7 @@ class tgraphcanvas(FigureCanvas):
 #############################     MOUSE CROSS     #############################
 
     def togglecrosslines(self):
-        if self.crossmarker == False and self.projectFlag == False:  #if not projection flag
+        if self.crossmarker == False:  #if not projection flag
             if not self.designerflag:
                 #turn ON
                 self.crossmarker = True
@@ -7502,12 +7502,16 @@ $cupping_notes
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),QString(text1))
         #p.setPen(QColor(self.qmc.palette["bt"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8),QString(text2))
-        p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/8),QString(pidstring))
-    
+
+        #draw pid
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3),QString(pidstring))
+        p.drawRect(Wwidth/7+140, Wheight - Wheight/3-12, 100, 12)
+        p.fillRect(Wwidth/7+140, Wheight - Wheight/3-12, MVV, 12, QColor("pink"))
+        
         delta = QApplication.translate("Scope Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]))
-        p.drawText(QPoint(Wwidth/2+20,Wheight - Wheight/6),QString(delta))
-        p.drawRect(Wwidth/2+140, Wheight - Wheight/8 -12, 100, 12)
-        p.fillRect(Wwidth/2+140, Wheight - Wheight/8 - 12, MVV, 12, QColor("pink"))
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3.5),QString(delta))
+        
+
         p.end()
 
         self.HUD.setPixmap(img)
