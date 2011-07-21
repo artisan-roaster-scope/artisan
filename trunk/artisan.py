@@ -347,6 +347,7 @@ class tgraphcanvas(FigureCanvas):
         self.roastpropertiesflag = 1  #resets roast properties if not zero
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
         self.ambientTemp = 0.
+        self.ambient_humidity = 0.
         #relative humidity percentage [0], corresponding temperature [1], temperature unit [2]
         self.bag_humidity = [0.,0.]
 
@@ -1073,6 +1074,7 @@ class tgraphcanvas(FigureCanvas):
             self.weight = [0,0,u"g"]
             self.volume = [0,0,u"l"]
             self.ambientTemp = 0.
+            self.ambient_humidity = 0.
             
         self.roastdate = QDate.currentDate()            
         self.errorlog = []
@@ -1348,7 +1350,7 @@ class tgraphcanvas(FigureCanvas):
     
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             if self.DeltaETflag or self.DeltaBTflag:
-                if (True or recomputeAllDeltas):
+                if recomputeAllDeltas:
                     d1,d2,d3,d4=[],[],[],[]
                     delta1, delta2 = 0.,0.
                     for i in range(len(self.timex)-1):
@@ -5971,7 +5973,9 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.timex:
                 self.qmc.endofx = self.qmc.timex[-1] + 40         
         if "ambientTemp" in profile:
-            self.qmc.ambientTemp = profile["ambientTemp"]
+            self.qmc.ambientTemp = profile["ambientTemp"]    
+        if "ambient_humidity" in profile:
+            self.qmc.ambientTemp = profile["ambient_humidity"]
 
         if "bag_humidity" in profile:
             self.qmc.bag_humidity = profile["bag_humidity"]   
@@ -6039,6 +6043,7 @@ class ApplicationWindow(QMainWindow):
         profile["xmin"] = self.qmc.startofx
         profile["xmax"] = self.qmc.endofx       
         profile["ambientTemp"] = self.qmc.ambientTemp
+        profile["ambient_humidity"] = self.qmc.ambient_humidity
         profile["bag_humidity"] = self.qmc.bag_humidity
         profile["extradevices"] = self.qmc.extradevices
         profile["extraname1"] = self.qmc.extraname1        
@@ -8584,7 +8589,7 @@ class editGraphDlg(QDialog):
 
 
         #bag humidity
-        bag_humidity_label = QLabel("<b>" + QApplication.translate("Label", "Storage Humidity",None, QApplication.UnicodeUTF8) + "</b>")
+        bag_humidity_label = QLabel("<b>" + QApplication.translate("Label", "Storage Humidity/Temperature",None, QApplication.UnicodeUTF8) + "</b>")
         bag_humidity_unitslabel = QLabel(aw.qmc.mode)
         bag_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
         self.humidity_edit = QLineEdit()
@@ -8602,8 +8607,14 @@ class editGraphDlg(QDialog):
         
 
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>" + QApplication.translate("Label", "Ambient Temperature",None, QApplication.UnicodeUTF8) + "</b>")
+        ambientlabel = QLabel("<b>" + QApplication.translate("Label", "Ambient Humidity/Temperature",None, QApplication.UnicodeUTF8) + "</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
+        ambient_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
+        self.ambient_humidity_edit = QLineEdit()
+        self.ambient_humidity_edit.setText(unicode(aw.qmc.ambient_humidity))
+        self.ambient_humidity_edit.setMaximumWidth(50)
+        self.ambient_humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.ambient_humidity_edit))   
+        ambient_humidity_at_label = QLabel(QApplication.translate("Label", "at",None, QApplication.UnicodeUTF8))     
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(unicode( aw.qmc.ambientTemp))
         self.ambientedit.setMaximumWidth(50)
@@ -8730,6 +8741,7 @@ class editGraphDlg(QDialog):
         
         humidityLayout = QHBoxLayout()
         humidityLayout.addWidget(bag_humidity_label)
+        humidityLayout.addSpacing(5)
         humidityLayout.addWidget(self.humidity_edit)
         humidityLayout.addWidget(bag_humidity_unit_label)
         humidityLayout.addSpacing(15)
@@ -8741,6 +8753,11 @@ class editGraphDlg(QDialog):
         
         ambientLayout = QHBoxLayout()
         ambientLayout.addWidget(ambientlabel)
+        ambientLayout.addWidget(self.ambient_humidity_edit)
+        ambientLayout.addWidget(ambient_humidity_unit_label)
+        ambientLayout.addSpacing(15)
+        ambientLayout.addWidget(ambient_humidity_at_label)
+        ambientLayout.addSpacing(15)
         ambientLayout.addWidget(self.ambientedit)
         ambientLayout.addWidget(ambientunitslabel)
         ambientLayout.addStretch()
@@ -9165,6 +9182,12 @@ class editGraphDlg(QDialog):
             aw.qmc.ambientTemp = float(unicode(self.ambientedit.text()))
         except:
             aw.qmc.ambientTemp = 0
+
+    	#update ambient humidity
+        try:
+            aw.qmc.ambient_humidity = float(unicode(self.ambient_humidity_edit.text()))
+        except:
+            aw.qmc.ambient_humidity = 0
          
         #update notes
         aw.qmc.roastertype = unicode(self.roaster.text())
