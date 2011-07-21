@@ -469,6 +469,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmtemperature = []  # set temperature number (example 500)
         self.alarmaction = []       # 0 = open a window; 1 = call program with a filepath equal to alarmstring
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
+        self.temporaryalarmflag = -1 #holds temporary index value of triggered alarm in updategraphics()
         
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 750
@@ -622,7 +623,9 @@ class tgraphcanvas(FigureCanvas):
     #####################################################################################
         
 
-    #runs from GUI thread     
+    # runs from GUI thread.
+    # this function is called by a signal at the end of the thread sample()
+    # during sample, updates to GUI widgets or anything GUI must be done here (never from thread)
     def updategraphics(self):
         try:
             if self.flagon:
@@ -639,28 +642,22 @@ class tgraphcanvas(FigureCanvas):
                 #updated canvas
                 self.fig.canvas.draw()
 
-                #check if HUD is ON
+                #check if HUD is ON (done after self.fig.canvas.draw())
                 if self.HUDflag:
                     aw.showHUD[aw.HUDfunction]() 
                     
                 #auto mark CHARGE/DROP
                 if self.autoChargeIdx:
                     self.markCharge()
-                if self.autoDropIdx:
+                elif self.autoDropIdx:
                     self.markDrop()
-                    
-                #check alarms
-                if self.device != 18:
-                    for i in range(len(self.alarmflag)):
-                        #if alarm on, and not triggered, and time is after set time:
-                        if self.alarmflag[i] and not self.alarmstate[i] and self.timeindex[self.alarmtime[i]]:    
-                            if self.alarmsource[i] == 0:                        #check ET
-                                if self.temp1[-1] > self.alarmtemperature[i]:
-                                    self.setalarm(i)
-                            elif self.alarmsource[i] == 1:                      #check BT
-                                if self.temp2[-1] > self.alarmtemperature[i]:
-                                    self.setalarm(i)
 
+                #check triggered alarms
+                if self.temporaryalarmflag > -1:
+                    i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
+                    self.temporaryalarmflag = -1 # self.setalarm(i) can take longer to run than the sampling interval 
+                    self.setalarm(i)
+                    
         except Exception,e:
             self.flagon = False
             self.adderror(QApplication.translate("Error Message","Exception Error: updategraphics() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -921,15 +918,15 @@ class tgraphcanvas(FigureCanvas):
             self.adderror(QApplication.translate("Error Message", "Exception: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return 0
 
-    #creates X axis labels ticks in mm:ss instead of seconds     
+    #format X axis labels    
     def xaxistosm(self):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
             starttime = self.timex[self.timeindex[0]]
         else:
             starttime = 0
           
-        #majorlocator = ticker.IndexLocator(self.xgrid, starttime)          	        #IndexLocator does not work righ when updating (new value)self.endofx
-        #majorlocator = ticker.MultipleLocator(self.xgrid)      	    	    	#MultipleLocator does not provide an offset for startime
+        #majorlocator = ticker.IndexLocator(self.xgrid, starttime)  #IndexLocator does not work righ when updating (new value)self.endofx
+        #majorlocator = ticker.MultipleLocator(self.xgrid)          #MultipleLocator does not provide an offset for startime
             
         if self.xgrid == 0:
             self.xgrid = 60
@@ -957,12 +954,14 @@ class tgraphcanvas(FigureCanvas):
             i.set_markersize(10)
             #i.set_markeredgewidth(2)   #adjust the width
 
+        #adjust the length of the minor ticks
         for i in self.ax.xaxis.get_minorticklines() + self.ax.yaxis.get_minorticklines():
             i.set_markersize(5)        
-                
-        for label in self.ax.xaxis.get_ticklabels():
-            label.set_rotation(self.xrotation)
 
+        # check x labels rotation
+        if self.xrotation:     
+            for label in self.ax.xaxis.get_ticklabels():
+                label.set_rotation(self.xrotation)
 
 
     #used by xaxistosm(). Provides also negative time
@@ -1107,6 +1106,8 @@ class tgraphcanvas(FigureCanvas):
         self.disconnect_designer()  #sets designer flag false
         self.setCursor(Qt.ArrowCursor)
 
+        self.temporaryalarmflag = -1
+
         #extra devices
         for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2))):            
             self.extratimex[i],self.extratemp1[i],self.extratemp2[i] = [],[],[]
@@ -1117,15 +1118,27 @@ class tgraphcanvas(FigureCanvas):
         #reset cupping flavor values
         self.flavors = [5.]*len(self.flavorlabels)
 
-        self.samplingsemaphore.release(1) #do it before redraw()
+        #autodetected CHARGE and DROP index
+        self.autoChargeIdx = 0
+        self.autoDropIdx = 0
 
+        self.samplingsemaphore.release(1) #note: do it before redraw()
+
+        ### REDRAW  ##
         self.redraw()
-        aw.soundpop()
-        aw.lowerbuttondialog.setVisible(True)
-        if aw.minieventsflag:
-            aw.EventsGroupLayout.setVisible(True)
 
-        
+        aw.soundpop()
+
+        #posible condition using WheelGraphs in view-mode and pressing reset button
+        if not aw.lowerbuttondialog.isVisible(): 
+            aw.lowerbuttondialog.setVisible(True)
+            if aw.minieventsflag:
+                aw.EventsGroupLayout.setVisible(True)
+
+        #check and turn off mouse cross marker
+        if self.crossmarker:
+            self.togglecrosslines()            
+
     #Redraws data   
     def redraw(self, recomputeAllDeltas=True):
         try:
@@ -3766,7 +3779,7 @@ class tgraphcanvas(FigureCanvas):
             if not self.designerflag:
                 #turn ON
                 self.crossmarker = True
-                message = QApplication.translate("Message", "Mouse cross ON",None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message", "Mouse Cross ON: move mouse around",None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
                 self.crossmouseid = self.fig.canvas.mpl_connect('motion_notify_event', self.drawcross)
         else:
@@ -3832,6 +3845,9 @@ class SampleThread(QThread):
                 if len(aw.qmc.BTfunction):
                     t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
 
+                #save repeated constants to speed up thread 
+                length_of_qmc_timex = len(aw.qmc.timex)
+
                 ##### lock resources  #########
                 aw.qmc.samplingsemaphore.acquire(1)
 
@@ -3841,19 +3857,19 @@ class SampleThread(QThread):
                 else:
                     limit = 800.
                 if  t1 < 1. or t1 > limit:
-                    if len(aw.qmc.timex) > 2:
+                    if length_of_qmc_timex > 2:
                         t1 = aw.qmc.temp1[-1]
                     else:
                         t1 = -1.
                 if t2 < 1. or t2 > limit:
-                    if len(aw.qmc.timex) > 2:
+                    if length_of_qmc_timex > 2:
                         t2 = aw.qmc.temp2[-1]
                     else:
                         t2 = -1.       
                                                         
                 #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
                 #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
-                if len(aw.qmc.timex) > 2 and t1 == aw.qmc.temp2[-1] and t2 == aw.qmc.temp1[-1]:
+                if length_of_qmc_timex > 2 and t1 == aw.qmc.temp2[-1] and t2 == aw.qmc.temp1[-1]:
                     #let's better swap the readings (also they are just repeating the previous ones)
                     aw.qmc.temp2.append(t1)
                     aw.qmc.temp1.append(t2)
@@ -3869,7 +3885,7 @@ class SampleThread(QThread):
                 aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
                 
                 #we need a minimum of two readings to calculate rate of change
-                if len(aw.qmc.timex) > 2:
+                if length_of_qmc_timex > 2:
                     timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
                     #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                     aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
@@ -3880,7 +3896,7 @@ class SampleThread(QThread):
                         
                     #######   filter deltaBT deltaET
                     if aw.qmc.deltafilter:
-                        if len(aw.qmc.timex) > aw.qmc.deltafilter:   #detafilter is an int = number of pads
+                        if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
                             a1,a2 = 0.,0.
                             for k in range(aw.qmc.deltafilter):
                                 a1 += aw.qmc.unfiltereddelta1[-(k+1)]
@@ -3917,15 +3933,15 @@ class SampleThread(QThread):
                     aw.qmc.playbackevent()
                     
                 # autodetect CHARGE event
-                if aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and len(aw.qmc.timex) >= 5:
-                    if aw.BTbreak(len(aw.qmc.timex) - 1):
+                if aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and length_of_qmc_timex >= 5:
+                    if aw.BTbreak(length_of_qmc_timex - 1):
                         # we found a BT break at the current index minus 2
-                        aw.qmc.autoChargeIdx = len(aw.qmc.timex) - 3
+                        aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                 # autodetect DROP event
-                elif aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and len(aw.qmc.timex) >= 5:
-                    if aw.BTbreak(len(aw.qmc.timex) - 1):
+                elif aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and length_of_qmc_timex >= 5:
+                    if aw.BTbreak(length_of_qmc_timex - 1):
                         # we found a BT break at the current index minus 2
-                        aw.qmc.autoDropIdx = len(aw.qmc.timex) - 3
+                        aw.qmc.autoDropIdx = length_of_qmc_timex - 3
 
                 ##############  if using more than one device
                 ndevices = len(aw.qmc.extradevices)
@@ -3944,6 +3960,16 @@ class SampleThread(QThread):
                             aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
                             aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
 
+                #check alarms 
+                for i in range(len(aw.qmc.alarmflag)):
+                    #if alarm on, and not triggered, and time is after set time:
+                    if aw.qmc.alarmflag[i] and not aw.qmc.alarmstate[i] and aw.qmc.timeindex[aw.qmc.alarmtime[i]]:    
+                        if aw.qmc.alarmsource[i] == 0:                        #check ET
+                            if aw.qmc.temp1[-1] > aw.qmc.alarmtemperature[i]:
+                                aw.qmc.temporaryalarmflag = i
+                        elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                            if aw.qmc.temp2[-1] > aw.qmc.alarmtemperature[i]:
+                                aw.qmc.temporaryalarmflag = i
          
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()        
@@ -13505,12 +13531,12 @@ class DeviceAssignmentDLG(QDialog):
         # PID
         controllabel =QLabel(QApplication.translate("Label", "Control ET",None, QApplication.UnicodeUTF8))                            
         self.controlpidtypeComboBox = QComboBox()
-        self.controlpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","DTA"])
+        self.controlpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","Delta DTA"])
         self.controlpidtypeComboBox.setCurrentIndex(aw.ser.controlETpid[0])  #pid type is index 0
 
         btlabel =QLabel(QApplication.translate("Label", "Read BT",None, QApplication.UnicodeUTF8))                          
         self.btpidtypeComboBox = QComboBox()
-        self.btpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","None","DTA"])
+        self.btpidtypeComboBox.addItems(["Fuji PXG","Fuji PXR","None","Delta DTA"])
         self.btpidtypeComboBox.setCurrentIndex(aw.ser.readBTpid[0]) #pid type is index 0
 
         label1 = QLabel(QApplication.translate("Label", "Type",None, QApplication.UnicodeUTF8)) 
@@ -13539,7 +13565,7 @@ class DeviceAssignmentDLG(QDialog):
         self.arduinoBTComboBox.addItems(arduinoChannels)
 
         #check previous settings for radio button
-        if aw.qmc.device == 0 or aw.qmc.device == 26:   #if Fuji pid or DTA pid
+        if aw.qmc.device == 0 or aw.qmc.device == 26:   #if Fuji pid or Delta DTA pid
             self.pidButton.setChecked(True)
         elif aw.qmc.device == 19:                       #if arduino
             self.arduinoButton.setChecked(True)
@@ -13890,9 +13916,9 @@ class DeviceAssignmentDLG(QDialog):
                 elif str(self.controlpidtypeComboBox.currentText()) == "Fuji PXR":
                     aw.ser.controlETpid[0] = 1
                     str1 = "Fuji PXR"
-                elif str(self.controlpidtypeComboBox.currentText()) == "DTA":
+                elif str(self.controlpidtypeComboBox.currentText()) == "Delta DTA":
                     aw.ser.controlETpid[0] = 2
-                    str1 = "DTA"
+                    str1 = "Delta DTA"
     
                 aw.ser.controlETpid[1] =  int(str(self.controlpidunitidComboBox.currentText()))
 
@@ -13905,9 +13931,9 @@ class DeviceAssignmentDLG(QDialog):
                 elif str(self.btpidtypeComboBox.currentText()) == "None":
                     aw.ser.readBTpid[0] = 2
                     str2 = "None"
-                elif str(self.btpidtypeComboBox.currentText()) == "DTA":
+                elif str(self.btpidtypeComboBox.currentText()) == "Delta DTA":
                     aw.ser.readBTpid[0] = 3
-                    str2 = "DTA"
+                    str2 = "Delta DTA"
                     
                 aw.ser.readBTpid[1] =  int(str(self.btpidunitidComboBox.currentText()))
 
@@ -18778,7 +18804,7 @@ class DTApidDlgControl(QDialog):
     def __init__(self, parent = None):
         super(DTApidDlgControl,self).__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","DTA PID Control",None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Delta DTA PID Control",None, QApplication.UnicodeUTF8))
 
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
