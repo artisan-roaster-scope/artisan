@@ -3775,7 +3775,7 @@ class tgraphcanvas(FigureCanvas):
 #############################     MOUSE CROSS     #############################
 
     def togglecrosslines(self):
-        if self.crossmarker == False:
+        if self.crossmarker == False and self.projectFlag == False:  #if not projection flag
             if not self.designerflag:
                 #turn ON
                 self.crossmarker = True
@@ -3845,9 +3845,6 @@ class SampleThread(QThread):
                 if len(aw.qmc.BTfunction):
                     t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
 
-                #save repeated constants to speed up thread 
-                length_of_qmc_timex = len(aw.qmc.timex)
-
                 ##### lock resources  #########
                 aw.qmc.samplingsemaphore.acquire(1)
 
@@ -3869,7 +3866,7 @@ class SampleThread(QThread):
                                                         
                 #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
                 #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
-                if length_of_qmc_timex > 2 and t1 == aw.qmc.temp2[-1] and t2 == aw.qmc.temp1[-1]:
+                if len(aw.qmc.timex) > 2 and t1 == aw.qmc.temp2[-1] and t2 == aw.qmc.temp1[-1]:
                     #let's better swap the readings (also they are just repeating the previous ones)
                     aw.qmc.temp2.append(t1)
                     aw.qmc.temp1.append(t2)
@@ -3879,6 +3876,9 @@ class SampleThread(QThread):
                     aw.qmc.temp1.append(t1)
 
                 aw.qmc.timex.append(tx)
+
+                #save repeated constants to speed up thread 
+                length_of_qmc_timex = len(aw.qmc.timex)
 
                 # update lines data using the lists with new data
                 aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
