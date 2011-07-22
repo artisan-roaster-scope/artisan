@@ -1351,6 +1351,7 @@ class tgraphcanvas(FigureCanvas):
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             if self.DeltaETflag or self.DeltaBTflag:
                 if recomputeAllDeltas:
+                #if (True or recomputeAllDeltas):
                     d1,d2,d3,d4=[],[],[],[]
                     delta1, delta2 = 0.,0.
                     for i in range(len(self.timex)-1):
@@ -8225,18 +8226,18 @@ class HUDDlg(QDialog):
 
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
-        aw.qmc.redraw(recomputeAllDeltas=False)
+        aw.qmc.redraw(recomputeAllDeltas=True)
 
     def changeDeltaFilter(self,i):
         try:
             aw.qmc.deltafilter = self.DeltaFilter.value()
-            aw.qmc.redraw(recomputeAllDeltas=False)
+            aw.qmc.redraw(recomputeAllDeltas=True)
         except Exception,e:
             aw.qmc.adderror(QApplication.translate("Error Message", "changeDeltaFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
         
     def changeDeltaBT(self,i):
         aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
-        aw.qmc.redraw(recomputeAllDeltas=False)
+        aw.qmc.redraw(recomputeAllDeltas=True)
         
     def changeProjection(self,i):
         aw.qmc.projectFlag = not aw.qmc.projectFlag
