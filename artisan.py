@@ -480,7 +480,7 @@ class tgraphcanvas(FigureCanvas):
         self.endofx = 60
         self.startofx = 0
         self.keeptimeflag = 1
-        self.xgrid = 120   #initial time separation; 120 = 2 minutes        
+        self.xgrid = 60   #initial time separation; 60 = 1 minute        
         self.ygrid = 50    #initial temperature separation
         self.zgrid = 50    #initial RoR separation
         self.gridstyles =    ["-","--","-.",":"," "]  #solid,dashed,dash-dot,dotted,None
@@ -964,6 +964,7 @@ class tgraphcanvas(FigureCanvas):
             for label in self.ax.xaxis.get_ticklabels():
                 label.set_rotation(self.xrotation)
 
+        self.ax.set_xlim(self.startofx, self.endofx)
 
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
@@ -1153,7 +1154,6 @@ class tgraphcanvas(FigureCanvas):
             #Set axes same as in __init__
             if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
                 self.endofx = 60
-            self.ax.set_xlim(self.startofx, self.endofx)
             self.ax.set_ylim(self.ylimit_min, self.ylimit)
             self.ax.set_autoscale_on(False)
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
