@@ -7102,6 +7102,7 @@ $cupping_notes
         contributors =  u"<br>" + QApplication.translate(u"About", u"%1, linux binary",None, QApplication.UnicodeUTF8).arg(u"Lukas Kolbe")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, documentation",None, QApplication.UnicodeUTF8).arg(u"Rich Helms")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, TEVA18B, DTA support",None, QApplication.UnicodeUTF8).arg(u"Markus Wagner")
+        contributors += u"<br>" + QApplication.translate(u"About", u"%1, DTA support",None, QApplication.UnicodeUTF8).arg(u"Markus Mayr-Svec")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Swedish localization",None, QApplication.UnicodeUTF8).arg(u"Martin Kral")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Spanish localization",None, QApplication.UnicodeUTF8).arg(u"Bluequijote")
         contributors += u"<br>" + QApplication.translate(u"About", u"%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg(u"Jim G.")

@@ -1,7 +1,7 @@
 Current Versions
 o Python 2.7.2
 o QT 4.7.3
-o Numpy 1.6.0
+o Numpy 1.6.1
 o SIP 4.12.3
 o PyQt 4.8.4 
 o matplotlib 1.0.1
@@ -10,7 +10,10 @@ o elixir 0.7.1 (for Green)
 o pyaudio
 o py2app 0.6.3
 
-Upgrade History
+Upgrade History:
+
+- 2011-07-22: Upgraded
+ . Numpy 1.6.0 => 1.6.1 
 - 2011-06-30: Upgraded
  . py2app 0.5.2 => 0.6.3
 - 2011-06-28: Upgraded

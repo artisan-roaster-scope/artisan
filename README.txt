@@ -1,4 +1,4 @@
-﻿readme.txt
+readme.txt
 
 Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
 
@@ -126,6 +126,17 @@ Artisan uses the following libraries in unmodified forms:
 
 
 VERSION HISTORY
+
+v0.5.2 (23.8.2011)
+- added Delta DTA PID support
+- added automatic CHARGE/DROP event detection
+- added separate RoR axis
+- added cross lines locator
+- smaller Mac OS builds with faster startup
+- optimized legend and statistics layout
+- improved Wheel Graph editor
+- performance improvements
+- bug fixes
 
 v0.5.1 (18.6.2011)
 - bug fixes
