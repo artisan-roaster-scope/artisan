@@ -4405,15 +4405,15 @@ class ApplicationWindow(QMainWindow):
 
         wheelmenu.addSeparator()
 
-        wheelcuppingAction = QAction(QApplication.translate("Menu", "Cupping Descriptors",None, QApplication.UnicodeUTF8),self)
+        wheelcuppingAction = QAction(QApplication.translate("Menu", "Cupping Descriptors...",None, QApplication.UnicodeUTF8),self)
         self.connect(wheelcuppingAction,SIGNAL("triggered()"),lambda folder="Cupping":self.qmc.loadselectorwheel(folder))
         wheelmenu.addAction(wheelcuppingAction)
 
-        wheelroastingAction = QAction(QApplication.translate("Menu", "Roasting Descriptors",None, QApplication.UnicodeUTF8),self)
+        wheelroastingAction = QAction(QApplication.translate("Menu", "Roasting Descriptors...",None, QApplication.UnicodeUTF8),self)
         self.connect(wheelroastingAction,SIGNAL("triggered()"),lambda folder="Roasting":self.qmc.loadselectorwheel(folder))
         wheelmenu.addAction(wheelroastingAction)        
 
-        wheelotherAction = QAction(QApplication.translate("Menu", "Other Descriptors",None, QApplication.UnicodeUTF8),self)
+        wheelotherAction = QAction(QApplication.translate("Menu", "Other Descriptors...",None, QApplication.UnicodeUTF8),self)
         self.connect(wheelotherAction,SIGNAL("triggered()"),lambda folder="Other":self.qmc.loadselectorwheel(folder))
         wheelmenu.addAction(wheelotherAction) 
 
