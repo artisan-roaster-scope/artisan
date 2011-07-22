@@ -86,7 +86,13 @@ setup(
             
 os.system(r'cp README.txt dist')
 os.system(r'cp LICENSE.txt dist')
-os.system(r'cp Wheels dist')
+os.system(r'mkdir dist/Wheels')
+os.system(r'mkdir dist/Wheels/Cupping')
+os.system(r'mkdir dist/Wheels/Other')
+os.system(r'mkdir dist/Wheels/Roasting')
+os.system(r'cp Wheels/Cupping/* dist/Wheels/Cupping')
+os.system(r'cp Wheels/Other/* dist/Wheels/Other')
+os.system(r'cp Wheels/Roasting/* dist/Wheels/Roasting')
 os.chdir('./dist')
 #the following is not needed anymore, however, one has to ensure that there is a proper Content/Resources/qt.conf in the bundle
 #os.system(r'macdeployqt Artisan.app -verbose=0')
