@@ -650,8 +650,10 @@ class tgraphcanvas(FigureCanvas):
                 #auto mark CHARGE/DROP
                 if self.autoChargeIdx:
                     self.markCharge()
+                    self.autoChargeIdx = 0 #otherwise it keep calling CHARGE forever
                 elif self.autoDropIdx:
                     self.markDrop()
+                    self.autoDropIdx = 0
 
                 #check triggered alarms
                 if self.temporaryalarmflag > -1:
@@ -1414,9 +1416,9 @@ class tgraphcanvas(FigureCanvas):
                     handles.append(self.l_delta2)
                     labels.append(unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
-            ndevices = len(self.extradevices)
-            if ndevices:
-                for i in range(min(ndevices,len(self.extratemp1lines),len(self.extratemp2lines),len(self.extraname2),len(self.extraname2))):
+            nrdevices = len(self.extradevices)
+            if nrdevices:
+                for i in range(min(nrdevices,len(self.extratemp1lines),len(self.extratemp2lines),len(self.extraname2),len(self.extraname2))):
                     handles.append(self.extratemp1lines[i])
                     handles.append(self.extratemp2lines[i])
                     labels.append(self.extraname1[i])
@@ -3851,6 +3853,7 @@ class SampleThread(QThread):
                 ##### lock resources  #########
                 aw.qmc.samplingsemaphore.acquire(1)
 
+                length_of_qmc_timex = len(aw.qmc.timex)
                 #filter droputs 
                 if aw.qmc.mode == "C":
                     limit = 500.
@@ -3879,9 +3882,7 @@ class SampleThread(QThread):
                     aw.qmc.temp1.append(t1)
 
                 aw.qmc.timex.append(tx)
-
-                #save repeated constants to speed up thread 
-                length_of_qmc_timex = len(aw.qmc.timex)
+                length_of_qmc_timex += 1
 
                 # update lines data using the lists with new data
                 aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
@@ -3947,10 +3948,10 @@ class SampleThread(QThread):
                         aw.qmc.autoDropIdx = length_of_qmc_timex - 3
 
                 ##############  if using more than one device
-                ndevices = len(aw.qmc.extradevices)
-                if ndevices:
+                nxdevices = len(aw.qmc.extradevices)
+                if nxdevices:
                     if len(aw.extraser) == len(aw.qmc.extradevices) == len(aw.qmc.extratemp1) == len(aw.qmc.extratemp1lines):
-                        for i in range(ndevices):
+                        for i in range(nxdevices):
                             extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
                             if len(aw.qmc.extramathexpression1[i]):
                                 extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
@@ -11488,7 +11489,7 @@ class serialport(object):
     def sendFUJIcommand(self,binstring,nbytes):
         try:
             ###  lock resources ##
-            self.COMsemaphore.adquiere(1)
+            self.COMsemaphore.acquire(1)
             
             if not self.SP.isOpen():
                 self.openport()                   
@@ -12509,21 +12510,20 @@ class serialport(object):
                 self.SP.flushOutput()
 
             r, r2 = "",""
-
             #keep reading till the first byte of next frame (till we read an actual 1 in 1A )
             for i in range(28):  #any number > 14 will be OK                
                 r = self.SP.read(1)
-##                if len(r):
-##                    fb = (ord(r[0]) & 0xf0) >> 4
-##                    if fb == 1:
-##                        r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
-##                        break
-##                else:
-##                    raise ValueError, unicode("No Data received")
+                if len(r):
+                    fb = (ord(r[0]) & 0xf0) >> 4
+                    if fb == 1:
+                        r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
+                        break
+                else:
+                    raise ValueError, unicode("No Data received")
                     
-                if (ord(r[0]) & 0xf0) >> 4 == 1:
-                    r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
-                    break
+##                if (ord(r[0]) & 0xf0) >> 4 == 1:
+##                    r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
+##                    break
     
             frame = r + r2
             
@@ -13303,9 +13303,9 @@ class comportDlg(QDialog):
     def createserialTable(self):
         try:
             self.serialtable.clear()        
-            ndevices = len(aw.qmc.extradevices)
-            if ndevices:    
-                self.serialtable.setRowCount(ndevices)
+            nssdevices = len(aw.qmc.extradevices)
+            if nssdevices:    
+                self.serialtable.setRowCount(nssdevices)
                 self.serialtable.setColumnCount(7)
                 self.serialtable.setHorizontalHeaderLabels([QApplication.translate("Table","Device",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table","Comm Port",None, QApplication.UnicodeUTF8),
@@ -13320,7 +13320,7 @@ class comportDlg(QDialog):
                 self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
                 self.serialtable.setShowGrid(True)
 
-                for i in range(ndevices):
+                for i in range(nssdevices):
                     device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]-1])    #type identification of the device. Non editable
 
                     comportComboBox =  QComboBox()
@@ -13367,9 +13367,10 @@ class comportDlg(QDialog):
     def saveserialtable(self):
         try:
             
-            ndevices = len(aw.qmc.extradevices)
-            for i in range(ndevices):
-                
+            ser_ports = len(aw.qmc.extradevices)
+
+            for i in range(ser_ports):
+
                 comportComboBox =  self.serialtable.cellWidget(i,1)
                 aw.extracomport[i] = unicode(comportComboBox.currentText())
 
@@ -13390,11 +13391,11 @@ class comportDlg(QDialog):
 
             #create serial ports for each extra device
             nserial = len(aw.extraser)
-            if ndevices != nserial:
-                aw.extraser = [serialport()]*ndevices
+            if ser_ports != nserial:
+                aw.extraser = [serialport()]*ser_ports
 
             #load the settings for the extra serial ports found
-            for i in range(ndevices):
+            for i in range(ser_ports):
                 aw.extraser[i].SP.setPort(unicode(aw.extracomport[i]))
                 aw.extraser[i].SP.setBaudrate(aw.extrabaudrate[i])
                 aw.extraser[i].SP.setByteSize(aw.extrabytesize[i])
@@ -13749,11 +13750,10 @@ class DeviceAssignmentDLG(QDialog):
 
     def createDeviceTable(self):
         try:
-
             self.devicetable.clear()        
-            ndevices = len(aw.qmc.extradevices)
-            if ndevices:    
-                self.devicetable.setRowCount(ndevices)
+            nddevices = len(aw.qmc.extradevices)
+            if nddevices:    
+                self.devicetable.setRowCount(nddevices)
                 self.devicetable.setColumnCount(7)
                 self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "Color 1",None, QApplication.UnicodeUTF8),
@@ -13773,7 +13773,7 @@ class DeviceAssignmentDLG(QDialog):
                 devices = aw.qmc.devices[:]  
                 devices = sorted(devices)
                 #devices.insert(0,"")         #add empty space for PID
-                for i in range(ndevices):
+                for i in range(nddevices):
                     typeComboBox =  QComboBox()
                     typeComboBox.addItems(sorted(devices))
                     typeComboBox.setCurrentIndex(devices.index(aw.qmc.devices[aw.qmc.extradevices[i]-1]))
