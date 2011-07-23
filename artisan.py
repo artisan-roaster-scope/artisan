@@ -964,7 +964,11 @@ class tgraphcanvas(FigureCanvas):
             for label in self.ax.xaxis.get_ticklabels():
                 label.set_rotation(self.xrotation)
 
-        self.ax.set_xlim(self.startofx, self.endofx)
+        if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
+            plustime = self.timex[self.timeindex[0]]
+        else:
+            plustime = 0
+        self.ax.set_xlim(self.startofx, self.endofx + plustime)
 
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
@@ -9828,13 +9832,7 @@ class calculatorDlg(QDialog):
             
             self.result1.setText(string1)        
             self.result2.setText(string2)
-
-##            #plot visual line
-##            if aw.qmc.designerflag == False:
-##                aw.qmc.resetlines()
-##                aw.qmc.ax.plot([aw.qmc.timex[startindex],aw.qmc.timex[endindex]],[aw.qmc.temp2[startindex],aw.qmc.temp2[endindex]],
-##                                color = aw.qmc.palette["grid"],marker = "^",linestyle="--",markersize=8, linewidth=3, alpha = .7)
-##                aw.qmc.fig.canvas.draw()            
+         
         else:
             self.result1.setText(QApplication.translate("Label", "No profile found",None, QApplication.UnicodeUTF8))  
             self.result2.setText("")
@@ -12515,17 +12513,21 @@ class serialport(object):
                 self.SP.flushOutput()
 
             r, r2 = "",""
+
             #keep reading till the first byte of next frame (till we read an actual 1 in 1A )
-            for i in range(28):  #any number > 14 will be OK     
+            for i in range(28):  #any number > 14 will be OK                
                 r = self.SP.read(1)
-                if len(r):
-                    fb = (ord(r[0]) & 0xf0) >> 4
-                    if fb == 1:
-                        r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
-                        break
-                else:
-                    raise ValueError, unicode("No Data received")
+##                if len(r):
+##                    fb = (ord(r[0]) & 0xf0) >> 4
+##                    if fb == 1:
+##                        r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
+##                        break
+##                else:
+##                    raise ValueError, unicode("No Data received")
                     
+                if (ord(r[0]) & 0xf0) >> 4 == 1:
+                    r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
+                    break
     
             frame = r + r2
             
