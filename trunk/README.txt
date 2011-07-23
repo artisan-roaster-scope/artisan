@@ -21,6 +21,7 @@ FEATURES
 o runs on Mac OS X 10.4/10.5/10.6, PPC, Windows, and Linux
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
+ - Delta DTA PID
  - Omega HH309, HH506RA, HH802U, HH806AU, HHM28
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
  - VOLTCRAFT K202, K204, 300K, 302KJ
@@ -50,6 +51,9 @@ o wheel graph editor
 o mathematical plotter
 o localizations (partial translations for German, French, Spanish, Swedish, Italian)
 o multi-core CPU performance enhancement support
+o template/background reproduction playback aid
+o alarms with programmable outputs
+o automatic CHARGE/DROP event detection
 
 
 INSTALLATION
