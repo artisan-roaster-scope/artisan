@@ -964,11 +964,7 @@ class tgraphcanvas(FigureCanvas):
             for label in self.ax.xaxis.get_ticklabels():
                 label.set_rotation(self.xrotation)
 
-        if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
-            plustime = self.timex[self.timeindex[0]]
-        else:
-            plustime = 0
-        self.ax.set_xlim(self.startofx, self.endofx + plustime)
+        self.ax.set_xlim(self.startofx, self.endofx + starttime)
 
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
