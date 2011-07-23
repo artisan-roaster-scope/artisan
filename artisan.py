@@ -650,7 +650,7 @@ class tgraphcanvas(FigureCanvas):
                 #auto mark CHARGE/DROP
                 if self.autoChargeIdx:
                     self.markCharge()
-                    self.autoChargeIdx = 0 #otherwise it keep calling CHARGE forever
+                    self.autoChargeIdx = 0 #otherwise it keep calling CHARGE 
                 elif self.autoDropIdx:
                     self.markDrop()
                     self.autoDropIdx = 0
@@ -5040,9 +5040,9 @@ class ApplicationWindow(QMainWindow):
             self.valueComboBox.clearFocus()
             self.etimeline.clearFocus()
 
-    def moveKbutton(self,command):
+    def moveKbutton(self,kcommand):
         #"Enter" toggles ON/OFF keyboard    
-        if command =="enter":
+        if kcommand =="enter":
             if self.keyboardmoveflag == 0:                                     
                 #turn on
                 self.keyboardmoveflag = 1
@@ -5075,7 +5075,7 @@ class ApplicationWindow(QMainWindow):
 
         #if moves on              
         if self.keyboardmoveflag:       
-            if command == "space":
+            if kcommand == "space":
                 self.keyboardmove[self.keyboardmoveindex]()   #apply button command
                 #behaviour rules after pressing a button
                 #if RESET is pressed jump to ON     
@@ -5096,11 +5096,11 @@ class ApplicationWindow(QMainWindow):
                 #Check current index (location)
                 #location in button RESET    
                 if self.keyboardmoveindex == 0:
-                    if command == "left":
+                    if kcommand == "left":
                         self.button_18.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
                         self.keyboardmoveindex = 1
-                    if command == "right":
+                    if kcommand == "right":
                         if self.eventsbuttonflag:
                             self.button_11.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                             self.keyboardmoveindex = 10
@@ -5110,14 +5110,14 @@ class ApplicationWindow(QMainWindow):
                     self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
                 #location in button HUD    
                 elif self.keyboardmoveindex == 1:   
-                    if command == "left":
+                    if kcommand == "left":
                         self.keyboardmoveindex = 2
                         if self.qmc.HUDflag:
                             self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_ON"])
                         else:    
                             self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])
                         self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
-                    elif command == "right":
+                    elif kcommand == "right":
                         self.button_7.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 0 
                         if self.qmc.HUDflag:
@@ -5127,14 +5127,14 @@ class ApplicationWindow(QMainWindow):
                 
                 #location in button ON/OFF
                 elif self.keyboardmoveindex == 2:
-                    if command == "right":
+                    if kcommand == "right":
                         self.button_8.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 3                        
                         if self.qmc.flagon:    
                             self.button_1.setStyleSheet(self.pushbuttonstyles["ON"])
                         else:
                             self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])                        
-                    elif command == "left": #jump to HUD (close circle)
+                    elif kcommand == "left": #jump to HUD (close circle)
                         self.keyboardmoveindex = 1
                         self.button_18.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         if self.qmc.flagon:    
@@ -5143,74 +5143,74 @@ class ApplicationWindow(QMainWindow):
                             self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])                        
                 #location in button CHARGE
                 elif self.keyboardmoveindex == 3:
-                    if command == "right":
+                    if kcommand == "right":
                         self.button_19.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 4
-                    elif command == "left":
+                    elif kcommand == "left":
                         self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 2
                     self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
                     
                 #location in button DRY END    
                 elif self.keyboardmoveindex == 4:
-                    if command == "right":
+                    if kcommand == "right":
                         self.button_3.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 5
-                    elif command == "left":
+                    elif kcommand == "left":
                         self.button_8.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 3
                     self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
                     
                 #location in button FC START    
                 elif self.keyboardmoveindex == 5:
-                    if command == "right":
+                    if kcommand == "right":
                         self.button_4.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 6
-                    elif command == "left":
+                    elif kcommand == "left":
                         self.button_19.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 4
                     self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
                    
                 #location in button FC END        
                 elif self.keyboardmoveindex == 6:    
-                    if command == "right":
+                    if kcommand == "right":
                         self.button_5.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 7
-                    elif command == "left":
+                    elif kcommand == "left":
                         self.button_3.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 5
                     self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
                         
                 #location in button SC START        
                 elif self.keyboardmoveindex == 7:
-                    if command == "right":
+                    if kcommand == "right":
                         self.button_6.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 8
-                    elif command == "left":
+                    elif kcommand == "left":
                         self.button_4.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 6
                     self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
                        
                 #location in button SC END    
                 elif self.keyboardmoveindex == 8:
-                    if command == "right":
+                    if kcommand == "right":
                         self.button_9.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 9
-                    elif command == "left":
+                    elif kcommand == "left":
                         self.button_5.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 7
                     self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
                         
                 #location in button DROP    
                 elif self.keyboardmoveindex == 9:
-                    if command == "right":
+                    if kcommand == "right":
                         if self.eventsbuttonflag:
                             self.button_11.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                             self.keyboardmoveindex = 10                            
                         else:
                             self.button_7.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                             self.keyboardmoveindex = 0
-                    elif command == "left":
+                    elif kcommand == "left":
                         self.button_6.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.keyboardmoveindex = 8
                         
@@ -5218,11 +5218,11 @@ class ApplicationWindow(QMainWindow):
                     
                 #location in button EVENT    
                 elif self.keyboardmoveindex == 10:
-                    if command == "right":
+                    if kcommand == "right":
                             self.button_7.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                             self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
                             self.keyboardmoveindex = 0                            
-                    if command == "left":
+                    if kcommand == "left":
                         self.button_9.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
                         self.keyboardmoveindex = 9
@@ -11530,16 +11530,16 @@ class serialport(object):
                             aw.qmc.adderror(QApplication.translate("Error Message","Crc16 data corruption ERROR. TX does not match RX. Check wiring ",None, QApplication.UnicodeUTF8))
                             return "0"
                 else:
-                    if aw.qmc.COMsemaphore.available() < 1:
-                        aw.qmc.COMsemaphore.release(1)
+                    if self.COMsemaphore.available() < 1:
+                        self.COMsemaphore.release(1)
                     aw.qmc.adderror(QApplication.translate("Error Message","No RX data received ",None, QApplication.UnicodeUTF8))
                     return u"0"
             else:
                 return u"0"                                    
                 
         except serial.SerialException,e:
-            if aw.qmc.COMsemaphore.available() < 1:
-                aw.qmc.COMsemaphore.release(1)
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
@@ -11553,7 +11553,6 @@ class serialport(object):
         
         #update ET SV LCD 6
         self.currentpidsv = aw.fujipid.readcurrentsv()
-
         # get the temperature for ET. aw.fujipid.gettemperature(unitID)
         t1 = aw.fujipid.gettemperature(self.controlETpid[1])/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
         #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
@@ -13965,7 +13964,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.readBTpid[1] =  int(str(self.btpidunitidComboBox.currentText()))
 
                 #If fuji pid
-                if str1 != "DTA":
+                if str1 != "Delta DTA":
                     aw.qmc.device = 0
                     self.comport = "COM4"
                     self.baudrate = 9600
@@ -18440,12 +18439,14 @@ class FujiPID(object):
                 aw.button_17.setVisible(True)
                 
     def readcurrentsv(self):
+        command = ""
         #if control pid is fuji PXG4
         if aw.ser.controlETpid[0] == 0:        
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["sv?"][1],1)
         #or if control pid is fuji PXR
         elif aw.ser.controlETpid[0] == 1:
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXR["sv?"][1],1)
+            
         val = self.readoneword(command)/10.
         if val != -0.1:
             return val
@@ -18453,6 +18454,7 @@ class FujiPID(object):
             return -1
  
     def readdutycycle(self):
+        command = ""
         #if control pid is fuji PXG4
         if aw.ser.controlETpid[0] == 0:        
             command = self.message2send(aw.ser.controlETpid[1],4,self.PXG4["mv1"][1],1)
@@ -18470,6 +18472,7 @@ class FujiPID(object):
     #flag =0 OFF, flag = 1 ON, flag = 2 hold
     #A ramp soak pattern defines a whole profile. They have a minimum of 4 segments.       
     def setrampsoak(self,flag):
+        command = ""
         #Fuji PXG 
         if aw.ser.controlETpid[0] == 0:         
             command = self.message2send(aw.ser.controlETpid[1],6,self.PXG4["rampsoak"][1],flag)
@@ -18492,6 +18495,7 @@ class FujiPID(object):
            
     #sets a new sv value              
     def setsv(self,value):
+        command = ""
         #Fuji PXG 
         if aw.ser.controlETpid[0] == 0: 
             #send command to the current sv (1-7)
