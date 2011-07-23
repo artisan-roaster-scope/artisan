@@ -2225,7 +2225,7 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     return
                 
-            aw.button_9.setDisabled(True)
+            #aw.button_9.setDisabled(True)
             aw.button_9.setFlat(True)
             
             st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
@@ -3937,17 +3937,22 @@ class SampleThread(QThread):
                     aw.qmc.playbackevent()
                     
                 # autodetect CHARGE event
-                if aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and length_of_qmc_timex >= 5:
+                # only if BT > 150C / 300F                
+                if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and length_of_qmc_timex >= 5 and \
+                    ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 150) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 300)):
                     if aw.BTbreak(length_of_qmc_timex - 1):
                         # we found a BT break at the current index minus 2
                         aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                 # autodetect DROP event
-                elif aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and length_of_qmc_timex >= 5:
+                # only if 9min into roast and BT>190C/374F                  
+                elif not aw.qmc.autoChargeDropFlag and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                    length_of_qmc_timex >= 5 ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 374)) and \
+                    (aw.qmc.timeindex[aw.qmc.timeindex[0]] - aw.qmc.timex[-1] > 540):
                     if aw.BTbreak(length_of_qmc_timex - 1):
                         # we found a BT break at the current index minus 2
                         aw.qmc.autoDropIdx = length_of_qmc_timex - 3
 
-                ##############  if using more than one device
+                ##############  if using more than one device                
                 nxdevices = len(aw.qmc.extradevices)
                 if nxdevices:
                     if len(aw.extraser) == len(aw.qmc.extradevices) == len(aw.qmc.extratemp1) == len(aw.qmc.extratemp1lines):
@@ -7047,7 +7052,7 @@ $cupping_notes
             d3 = aw.qmc.temp2[i-1] - aw.qmc.temp2[i-2]
             d4 = aw.qmc.temp2[i] - aw.qmc.temp2[i-1]
             d = (abs(d1) + abs(d2)) / 2.0
-            if d3 < 0 and d4 < 0 and ((abs(d3) + abs(d4)) / 2.0) > 2.0*d:
+            if d > 0 and d3 < 0 and d4 < 0 and ((abs(d3) + abs(d4)) / 2.0) > 2.0*d:
                 return True
             else:
                 return False
