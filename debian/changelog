@@ -1,3 +1,19 @@
+artisan (0.5.2-0) maverick; urgency=low
+
+  * new upstream release
+  * changes since 0.5.0:
+   - added Delta DTA PID support
+   - added automatic CHARGE/DROP event detection
+   - added separate RoR axis
+   - added cross lines locator
+   - smaller Mac OS builds with faster startup
+   - optimized legend and statistics layout
+   - improved Wheel Graph editor
+   - performance improvements
+   - bug fixes
+
+ --  <lukas@einfachkaffee.de>  Sun, 24 Jul 2011 19:32:14 +0200
+
 artisan (0.5.0-0) maverick; urgency=low
 
   * new upstream release
