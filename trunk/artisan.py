@@ -923,21 +923,26 @@ class tgraphcanvas(FigureCanvas):
 
     #format X axis labels    
     def xaxistosm(self):
+        
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
             starttime = self.timex[self.timeindex[0]]
         else:
             starttime = 0
+
+        endtime = self.endofx + starttime
+        self.ax.set_xlim(self.startofx,endtime)
           
         #majorlocator = ticker.IndexLocator(self.xgrid, starttime)  #IndexLocator does not work righ when updating (new value)self.endofx
         #majorlocator = ticker.MultipleLocator(self.xgrid)          #MultipleLocator does not provide an offset for startime
             
-        if self.xgrid == 0:
-            self.xgrid = 60
+        if not self.xgrid:
+            self.xgrid = 60.
+            
         mfactor1 =  float(2. + int(starttime)/int(self.xgrid))
         mfactor2 =  float(2. + int(self.endofx)/int(self.xgrid))
 
-        majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),  starttime+(self.xgrid*mfactor2), self.xgrid)
-        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),  starttime+(self.xgrid*mfactor2), self.xgrid/6.)
+        majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
+        minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid/6.)
         
         map(round,majorloc)
         map(round,minorloc)
@@ -965,8 +970,6 @@ class tgraphcanvas(FigureCanvas):
         if self.xrotation:     
             for label in self.ax.xaxis.get_ticklabels():
                 label.set_rotation(self.xrotation)
-
-        self.ax.set_xlim(self.startofx, self.endofx + starttime)
 
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
@@ -1187,6 +1190,9 @@ class tgraphcanvas(FigureCanvas):
                     i.set_markersize(10)
                 for i in self.ax.yaxis.get_minorticklines():
                     i.set_markersize(5)
+                    
+            #update X ticks, labels, and colors        
+            self.xaxistosm()
                     
             #draw water marks for dry phase region, mid phase region, and finish phase region
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
@@ -1630,9 +1636,6 @@ class tgraphcanvas(FigureCanvas):
             for label in self.ax.yaxis.get_ticklabels():
                 label.set_color(self.palette["ylabel"])
 
-            #update X ticks, labels, and colors        
-            self.xaxistosm()
-
             #ready to plot    
             self.fig.canvas.draw()     
 
@@ -2043,16 +2046,14 @@ class tgraphcanvas(FigureCanvas):
                     self.timeindex[0] = len(self.timex)-1
                 else:
                     return
-            
-            self.xaxistosm()    
-            
+                        
             message = QApplication.translate("Message Area","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(unicode(self.temp2[self.timeindex[0]]) + self.mode)
             aw.sendmessage(message) 
             aw.button_8.setDisabled(True)
             aw.button_8.setFlat(True)            
 
             aw.soundpop()
-            self.redraw(recomputeAllDeltas=False)
+            self.redraw(recomputeAllDeltas=False)  #redraw() calls xaxistosm() and updates x times axis
             
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
@@ -2386,7 +2387,7 @@ class tgraphcanvas(FigureCanvas):
             
             statisticsupper = statisticsheight + statisticsbarheight + 2
             statisticslower = statisticsheight - statisticsbarheight - ydist / 35.
-            
+
             if self.statisticsflags[1]:
                 
                 if self.timeindex[2]: # only if FCs exists
@@ -2406,7 +2407,6 @@ class tgraphcanvas(FigureCanvas):
                                           color = self.palette["rect1"],alpha=0.5)
                 self.ax.add_patch(rect)
 
-            
             dryphaseP = dryphasetime*100/totaltime
             midphaseP = midphasetime*100/totaltime
             finishphaseP = finishphasetime*100/totaltime
@@ -2416,11 +2416,12 @@ class tgraphcanvas(FigureCanvas):
             if TP_index >= 0:
                 LP = self.temp2[TP_index]
 
+
             if self.statisticsflags[0]:            
-                self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/3,statisticsupper,st1 + u" "+ unicode(int(dryphaseP))+u"%",color=self.palette["text"])
+                self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/3.,statisticsupper,st1 + u" "+ unicode(int(dryphaseP))+u"%",color=self.palette["text"])
                 if self.timeindex[2]: # only if FCs exists
-                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/3,statisticsupper,st2+ " " + unicode(int(midphaseP))+u"%",color=self.palette["text"])
-                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/3,statisticsupper,st3 + u" " + unicode(int(finishphaseP))+ u"%",color=self.palette["text"])
+                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/3.,statisticsupper,st2+ " " + unicode(int(midphaseP))+u"%",color=self.palette["text"])
+                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/3.,statisticsupper,st3 + u" " + unicode(int(finishphaseP))+ u"%",color=self.palette["text"])
 
             if self.statisticsflags[2]:
                 (st1,st2,st3) = aw.defect_estimation()
@@ -2432,11 +2433,10 @@ class tgraphcanvas(FigureCanvas):
                 st3 = st3 + " (%.1f "%rates_of_changes[2]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"
         
                 #Write flavor estimation
-                self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2-len(st1)*8/2,statisticslower,st1,color=self.palette["text"],fontsize=11)
+                self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.-len(st1)*4.,statisticslower,st1,color=self.palette["text"],fontsize=11)
                 if self.timeindex[2]: # only if FCs exists
-                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2-len(st2)*8/2,statisticslower,st2,color=self.palette["text"],fontsize=11)
-                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2-len(st3)*8/2,statisticslower,st3,color=self.palette["text"],fontsize=11)
-
+                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.-len(st2)*4,statisticslower,st2,color=self.palette["text"],fontsize=11)
+                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.-len(st3)*4,statisticslower,st3,color=self.palette["text"],fontsize=11)
             if self.statisticsflags[3]:
                 #calculate AREA under BT and ET
                 AccBT = 0.0
@@ -2476,7 +2476,7 @@ class tgraphcanvas(FigureCanvas):
                 #alternative
                 #factor = (aw.qmc.ylimit - aw.qmc.ylimit_min) / 10.8
                 #self.ax.text(0,aw.qmc.ylimit_min - factor, strline,color = self.palette["text"],fontsize=11)
-                
+
                 # even better: use xlabel
                 self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
             else:
@@ -7087,12 +7087,18 @@ $cupping_notes
             BTdrycross = aw.qmc.temp2[dryEndIndex]
         if BTdrycross and TP_index < 1000 and TP_index > -1 and dryEndIndex and TP_index < len(aw.qmc.temp2):
             LP = aw.qmc.temp2[TP_index]
-            rc1 = ((BTdrycross - LP) / (aw.qmc.timex[dryEndIndex] - aw.qmc.timex[TP_index]))*60.
+            #avoid dividing by zero
+            divisor = aw.qmc.timex[dryEndIndex] - aw.qmc.timex[TP_index]
+            if divisor:   
+                rc1 = ((BTdrycross - LP) / divisor)*60.
+            else:
+                rc1 = 0
         if aw.qmc.timeindex[2]:
             if midphasetime and BTdrycross:
                 rc2 = ((aw.qmc.temp2[aw.qmc.timeindex[2]] - BTdrycross)/midphasetime)*60.
             if finishphasetime:
                 rc3 = ((aw.qmc.temp2[aw.qmc.timeindex[6]]- aw.qmc.temp2[aw.qmc.timeindex[2]])/finishphasetime)*60.
+
         return (rc1,rc2,rc3)    
         
     def viewErrorLog(self):
@@ -18765,7 +18771,7 @@ class FujiPID(object):
             aw.qmc.adderror(errorcode)            
             return -1
 
-    #FUJICRC16 function calculates the CRC16 of the data. It expects a binary string as input and returns and int
+    #FUJICRC16 function calculates the CRC16 of the data. It expects a binary string as input and returns an int
     def fujiCrc16(self,string):  
         crc16tab = (0x0000,
                     0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241, 0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
