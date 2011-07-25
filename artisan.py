@@ -1153,7 +1153,7 @@ class tgraphcanvas(FigureCanvas):
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
             
-            self.fig.clf(keep_observers=False)   #wipe out figure           
+            self.fig.clf()   #wipe out figure. keep_observers=False           
             self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
 
             #Set axes same as in __init__
