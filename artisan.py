@@ -6146,8 +6146,7 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("controlETpid"):
                 self.ser.controlETpid = map(lambda x:x.toInt()[0],settings.value("controlETpid").toList())
             if settings.contains("readBTpid"):
-                self.ser.readBTpid = map(lambda x:x.toInt()[0],settings.value("readBTpid").toList())
-                
+                self.ser.readBTpid = map(lambda x:x.toInt()[0],settings.value("readBTpid").toList())                
             if settings.contains("arduinoETChannel"):
                 self.ser.arduinoETChannel = settings.value("arduinoETChannel").toString()[0]
             if settings.contains("arduinoBTChannel"):
@@ -6235,6 +6234,14 @@ class ApplicationWindow(QMainWindow):
                 elif type(self.fujipid.PXG4[key][0]) == type(int()):
                     self.fujipid.PXG4[key][0] = settings.value(key,self.fujipid.PXG4[key][0]).toInt()[0]
             settings.endGroup()
+            if settings.contains("deltaDTA"):
+                settings.beginGroup("deltaDTA")
+                for key in self.dtapid.dtamem.keys():                    
+                    if type(self.dtapid.dtamem[key][0]) == type(float()):
+                        self.dtapid.dtamem[key][0] = settings.value(key,self.dtapid.dtamem[key][0]).toDouble()[0]
+                    elif type(self.dtapid.dtamem[key][0]) == type(int()):
+                        self.dtapid.dtamem[key][0] = settings.value(key,self.dtapid.dtamem[key][0]).toInt()[0]                
+                settings.endGroup()
             settings.beginGroup("RoC")
             self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
@@ -6416,7 +6423,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Device")
             settings.setValue("id",self.qmc.device)
             settings.setValue("controlETpid",self.ser.controlETpid)
-            settings.setValue("readBTpid",self.ser.readBTpid)
+            settings.setValue("readBTpid",self.ser.readBTpid)            
             settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)
             settings.setValue("arduinoBTChannel",self.ser.arduinoBTChannel)
             settings.endGroup()
@@ -6468,6 +6475,10 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("PXG4")
             for key in self.fujipid.PXG4.keys():            
                 settings.setValue(key,self.fujipid.PXG4[key][0])
+            settings.endGroup()
+            settings.beginGroup("deltaDTA")
+            for key in self.dtapid.dtamem.keys():            
+                settings.setValue(key,self.dtapid.dtamem[key][0])
             settings.endGroup()
             settings.beginGroup("RoC")
             settings.setValue("DeltaET",self.qmc.DeltaETflag)
@@ -11546,8 +11557,9 @@ class serialport(object):
                     aw.qmc.adderror(QApplication.translate("Error Message","No RX data received ",None, QApplication.UnicodeUTF8))
                     return u"0"
             else:
-                return u"0"                                    
-                
+                return u"0"
+            
+
         except serial.SerialException,e:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -11558,6 +11570,10 @@ class serialport(object):
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
             return "0"
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+                        
         
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
     def fujitemperature(self):
@@ -11594,7 +11610,35 @@ class serialport(object):
         return aw.ser.dutycycleTX, aw.ser.dutycycle, aw.ser.fujiETBT   
 
     def DTAtemperature(self):
-        t1 = self.DTAPIDtemperature(self.controlETpid[1])
+        ###########################################################
+        ### arguments to create command to read SV value
+        unitID = self.controlETpid[1]
+        function = 3
+        address = aw.dtapid.dtamem["sv"][1]  #ascii string with sv address (index 1)
+        ndata = 1
+        ### create command
+        command = aw.dtapid.message2send(unitID,function,address,ndata)
+        
+        #read sv
+        self.currentpidsv = self.sendDTAcommand(command)
+        #update SV value 
+        aw.dtapid.dtamem["sv"][0] = self.currentpidsv    #index 0
+        #sv LCD is updated in qmc.updadegraphics()            
+        #give some time to rest
+        libtime.sleep(.1)
+        ###########################################################
+        
+        ##############################################################
+        ### arguments to create command to READ TEMPERATURE
+        unitID = self.controlETpid[1]
+        function = 3
+        address = aw.dtapid.dtamem["pv"][1]  #index 1; ascii string
+        ndata = 1
+        ### create command
+        command = aw.dtapid.message2send(unitID,function,address,ndata)
+        
+        #read 
+        t1 = self.sendDTAcommand(command)
         tx = aw.qmc.timeclock.elapsed()/1000.
         #if Fuji for BT is not None (0= PXG, 1 = PXR, 2 = None 3 = DTA)
         if self.readBTpid[0] < 2:                    
@@ -11603,8 +11647,53 @@ class serialport(object):
             t2 = self.DTAPIDtemperature(self.readBTpid[1])
         else:
             t2 = 0.
+        ################################################################    
 
         return tx,t1,t2
+
+    def sendDTAcommand(self,command):
+        try:
+            ###  lock resources ##
+            self.COMsemaphore.acquire(1)
+
+            if not self.SP.isOpen():
+                self.openport()
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write(command)
+
+                #read answer        
+                r = self.SP.read(15)
+
+                ###  release resources  ###
+                self.COMsemaphore.release(1)
+
+                
+                if len(r) == 15:
+                    t1 = float(int(r[7:7+4], 16))*0.1                    
+                    return t1                    
+                else:
+                    nbytes = len(r)
+                    aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): %1 bytes received but 15 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                    if len(aw.qmc.timex) > 2:                           
+                        return aw.qmc.temp1[-1]       
+                    else:
+                        return -1.
+                                        
+        except serial.SerialException:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)
+            error  = QApplication.translate("Error Message","Serial Exception: ser.sendDTAcommand() ",None, QApplication.UnicodeUTF8)
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)
+        finally:
+            if self.COMsemaphore.available() < 1:
+                self.COMsemaphore.release(1)        
 
     def virtual(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -12670,41 +12759,6 @@ class serialport(object):
 
         except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXRXcommand() ",None, QApplication.UnicodeUTF8)
-            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
-
-
-    def DTAPIDtemperature(self,unitID):
-        try:
-            if not self.SP.isOpen():
-                self.openport()
-                
-            if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
-                #first we have to build the cmd
-                #aw.DtaPID.message2send(unitID,FUNCTION,ADDRESS, NDATA)
-                command = aw.dtapid.message2send(unitID,3,4700,1)
-                self.SP.write(command)
-
-                #read answer        
-                r = self.SP.read(15)
-                if len(r) == 15:
-                    t1 = float(int(r[7:7+4], 16))*0.1                    
-                    return t1                    
-                else:
-                    nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): %1 bytes received but 15 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
-                    if len(aw.qmc.timex) > 2:                           
-                        return aw.qmc.temp1[-1]       
-                    else:
-                        return -1.
-                    
-        except serial.SerialException:
-            error  = QApplication.translate("Error Message","Serial Exception: ser.DTAtemperature() ",None, QApplication.UnicodeUTF8)
             timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
             if len(aw.qmc.errorlog) > 499:
@@ -18306,7 +18360,7 @@ class FujiPID(object):
                   #integration time i0 (0 to 3200.0 sec)
                   "i": [240,41007],
                   #differential time d0 (0.0 to 999.9 sec)
-                  "d": [600,41008],
+                  "d": [60,41008],
 
                    ############ CH3 These are 7 pid storage locations
                   "sv1": [300.0,41241], "p1": [5,41242], "i1": [240,41243], "d1": [60,41244],
@@ -18397,9 +18451,9 @@ class FujiPID(object):
                     "sv0":[0,41003],
                     # run standby 0=RUN 1=STANDBY
                     "runstandby": [0,41004],
-                    "p":[0,41006],
-                    "i":[0,41007],
-                    "d":[0,41008],
+                    "p":[5,41006],
+                    "i":[240,41007],
+                    "d":[60,41008],
                     "decimalposition": [1,41020],
                     "svlowerlimit":[0,41031],
                     "svupperlimit":[0,41032],
@@ -18892,15 +18946,34 @@ class ArduinoTC4(object):
 # http://www.deltaww.hu/homersekletszabalyozok/DTA_series_temperature_controller_instruction_sheet_English.pdf
 class DtaPID(object):
     def __init__(self):
-        #add here a dictionary of memory addreses
-        pass        
-
+        #refer to Delta instruction manual for more information
+        #dictionary "KEY": [VALUE,ASCII_MEMORY_ADDRESS]  note: address contains hex alpha characters
+        self.dtamem={
+                  "pv": [0,"4700"],             # process value (temperature reading)
+                  "sv": [100,"4701"],           # set point
+                  "p": [5,"4708"],              # p value 0-9999
+                  "i": [240,"4709"],            # i value 0-9999
+                  "d": [60,"470A"],             # d value 0-9999
+                  "sensortype": [0,"4710"],     # 0 = K type1; 1 = K type2; 2 = J type1; 3 = J type2
+                                                # 4 = T type1; 5 = T type2; 6 = E ; 7 = N; 8 = R; 9 = S; 10 = B
+                                                # 11 = JPT100 type1; 12 = JPT100 type2; 13 = PT100 type1; 14 = PT100 type2
+                                                # 15 = PT100 type3; 16 = L ; 17 = U; 18 = Txk
+                  "controlmethod":[0,"4711"],   # 0 = pid; 1 = ON/OFF; 2 = manual
+                  "units":[1,"4717"],           # units C = 1; F = 2
+                  "controlsetting":[1,"4719"],  # 1=Run; 0 = Stop  
+                  "error":[0,"472B"]            # note: read only memory. Values:
+                                                # 0 = Normal,1 = Initial process; 2 = Initial status;
+                                                # 3 = sensor not connected; 4 = sensor input error
+                                                # 5 = Exceeds max temperature; 6 = Number Internal error
+                                                # 7 EEPROM error
+                  }
+        
     #command  string = ID (ADR)+ FUNCTION (CMD) + ADDRESS + NDATA + LRC_CHK 
     def message2send(self,unitID,FUNCTION,ADDRESS, NDATA):
         #compose command
         string_unitID = str(unitID).zfill(2)
         string_FUNCTION = str(FUNCTION).zfill(2)
-        string_ADDRESS = str(ADDRESS).zfill(4)
+        string_ADDRESS = ADDRESS                 #ADDRESS is a 4 char string
         string_NDATA = str(NDATA).zfill(4)
         cmd = string_unitID + string_FUNCTION + string_ADDRESS + string_NDATA
         checksum = hex(self.DTACalcChecksum(cmd))[2:].zfill(2).upper()
