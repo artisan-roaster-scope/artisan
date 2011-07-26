@@ -10,7 +10,7 @@ __version__ = u"0.5.2"
 # This program or module is free software: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation, either version 2 of the License, or
-# version 3 of the License, or (at your option) any later version. It is
+# version 3 of the License, or (at your option) any later versiSon. It is
 # provided for educational purposes and is distributed in the hope that 
 # it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 # warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
@@ -240,7 +240,8 @@ class tgraphcanvas(FigureCanvas):
         #Initial flavor parameters. 
         self.flavors = [5.,5.,5.,5.,5.,5.,5.,5.,5.]
         self.flavorstartangle = 90
-
+        self.flavoraspect = 1.0  #aspect ratio
+        
         #F = Fahrenheit; C = Celsius
         self.mode = u"F"
         self.errorlog = []
@@ -612,6 +613,7 @@ class tgraphcanvas(FigureCanvas):
         self.wheelconnections = [0,0,0]
         self.wheelx,self.wheelz = 0,0                   #temp variables to pass index values
         self.wheellocationx,self.wheellocationz = 0.,0.  #temp vars to pass mouse location (angleX+radiusZ)
+        self.wheelaspect = 1.0
         
         self.samplingsemaphore = QSemaphore(1)
 
@@ -1916,6 +1918,7 @@ class tgraphcanvas(FigureCanvas):
         #create a new name ax1 instead of ax (ax is used when plotting profiles)
         
         self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
+        self.ax1.set_aspect(self.flavoraspect)
 
         #find number of divisions
         nflavors = len(self.flavors)      #last value of nflavors is used to close circle (same as flavors[0])
@@ -2661,28 +2664,6 @@ class tgraphcanvas(FigureCanvas):
             self.adderror(QApplication.translate("Error Message","Exception: drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return        
 
-    # predicate that returns true if the given temperature reading is out of range
-    def outOfRange(self,t):
-        if self.mode == "C":
-            return t < 1. or t > 500.
-        else:
-            return t < 1. or t > 800.
-        
-    # return -1 for probes not connected with output outside of range: -25 to 700 or 
-    # the previous values if available
-    def filterDropOuts(self,t1,t2):
-        if self.outOfRange(t1):
-            if len(self.timex) > 2:
-                t1 = self.temp1[-1]
-            else:
-                t1 = -1
-        if self.outOfRange(t2):
-            if len(self.timex) > 2:
-                t2 = self.temp2[-1]
-            else:
-                t2 = -1
-                
-        return t1,t2
 
     #selects closest time INDEX in self.timex from a given input float seconds
     def time2index(self,seconds):
@@ -3560,7 +3541,7 @@ class tgraphcanvas(FigureCanvas):
             self.connect(cancelwheelAction,SIGNAL("triggered()"),self.cancelwheelselection)
             designermenu.addAction(cancelwheelAction)
 
-            editAction = QAction(QApplication.translate("Contextual Menu", "Edit Graph",None, QApplication.UnicodeUTF8),self)
+            editAction = QAction(QApplication.translate("Contextual Menu", "Edit Mode",None, QApplication.UnicodeUTF8),self)
             self.connect(editAction,SIGNAL("triggered()"),self.editmode)
             designermenu.addAction(editAction)
 
@@ -3616,6 +3597,7 @@ class tgraphcanvas(FigureCanvas):
             #create a new name ax1 instead of ax
             self.ax2 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor)
             self.ax2.set_rmax(1.)
+            self.ax2.set_aspect(self.wheelaspect)
             self.ax2.set_autoscale_on(True)
             self.ax2.grid(False)
 
@@ -5896,6 +5878,11 @@ class ApplicationWindow(QMainWindow):
 
         if "flavorstartangle" in profile:
             self.qmc.flavorstartangle = int(profile["flavorstartangle"])
+
+        if "flavoraspect" in profile:
+            self.qmc.flavoraspect = float(profile["flavoraspect"])
+        else:
+            self.qmc.flavoraspect = 1.
             
         if "title" in profile:
             self.qmc.title = unicode(profile["title"])
@@ -6023,6 +6010,7 @@ class ApplicationWindow(QMainWindow):
         profile["flavors"] = self.qmc.flavors
         profile["flavorlabels"] = [unicode(fl) for fl in self.qmc.flavorlabels]
         profile["flavorstartangle"] = self.qmc.flavorstartangle
+        profile["flavoraspect"] = self.qmc.flavoraspect
         profile["title"] = unicode(self.qmc.title)
         profile["beans"] = unicode(self.qmc.beans)
         profile["weight"] = self.qmc.weight
@@ -7617,6 +7605,7 @@ $cupping_notes
         wheel["wheeledge"] = self.qmc.wheeledge
         wheel["wheellinewidth"] = self.qmc.wheellinewidth
         wheel["wheellinecolor"] = self.qmc.wheellinecolor
+        wheel["wheelaspect"] = self.qmc.wheelaspect
         return wheel  
 
     def loadWheel(self,filename):         
@@ -7641,6 +7630,10 @@ $cupping_notes
                 self.qmc.wheeledge = wheel["wheeledge"]
                 self.qmc.wheellinewidth = wheel["wheellinewidth"]
                 self.qmc.wheellinecolor = wheel["wheellinecolor"]
+                if "wheelaspect" in wheel:
+                    self.qmc.wheelaspect = wheel["wheelaspect"]
+                else:
+                    self.qmc.wheelaspect = 1.0   
             else:
                 message = QApplication.translate("Message Area","Invalid Wheel graph format", None, QApplication.UnicodeUTF8)
                 self.sendmessage(message)
@@ -10546,9 +10539,22 @@ class flavorDlg(QDialog):
         if aw.qmc.flavorbackgroundflag:
             self.backgroundCheck.setChecked(True)
         self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.showbackground)
+
+        aspectlabel = QLabel(QApplication.translate("Label","Aspect Ratio",None, QApplication.UnicodeUTF8))
+        self.aspectSpinBox = QDoubleSpinBox()
+        self.aspectSpinBox.setToolTip(QApplication.translate("Tooltip","Aspect Ratio",None, QApplication.UnicodeUTF8))
+        self.aspectSpinBox.setRange(0.,2.)
+        self.aspectSpinBox.setSingleStep(.1)
+        self.aspectSpinBox.setValue(aw.qmc.flavoraspect)
+        self.connect(self.aspectSpinBox, SIGNAL("valueChanged(double)"),self.setaspect)
         
         flavorLayout = QHBoxLayout()
-        flavorLayout.addWidget(self.flavortable)     
+        flavorLayout.addWidget(self.flavortable)
+
+        extralayout = QHBoxLayout()
+        extralayout.addWidget(self.backgroundCheck)
+        extralayout.addWidget(aspectlabel)
+        extralayout.addWidget(self.aspectSpinBox)
         
         buttonsLayout = QGridLayout()
         buttonsLayout.addWidget(addButton,0,0)
@@ -10557,18 +10563,22 @@ class flavorDlg(QDialog):
         buttonsLayout.addWidget(self.defaultcombobox,1,1)
         buttonsLayout.addWidget(leftButton,2,0)
         buttonsLayout.addWidget(rightButton,2,1)
-        buttonsLayout.addWidget(self.backgroundCheck,3,0)
-        buttonsLayout.addWidget(saveImgButton,4,0)
-        buttonsLayout.addWidget(backButton,4,1)
+        buttonsLayout.addWidget(saveImgButton,3,0)
+        buttonsLayout.addWidget(backButton,3,1)
             
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(flavorLayout)
+        mainLayout.addLayout(extralayout)
         mainLayout.addLayout(buttonsLayout)
         
         self.setLayout(mainLayout)
 
         #draw
         aw.qmc.flavorchart()
+
+    def setaspect(self):
+        aw.qmc.flavoraspect = self.aspectSpinBox.value()
+        aw.qmc.flavorchart()        
         
     def createFlavorTable(self):
 
@@ -11663,16 +11673,42 @@ class serialport(object):
                 self.SP.flushOutput()
                 self.SP.write(command)
 
+                #if if is a read command (function 3) then expect 19 bytes back. default.
+                nrxbytes = 19
+                if command[4] == "4":   #but if it is a write command (function "4"), then expect 17 bytes back
+                    nrxbytes = 17  
+
                 #read answer        
-                r = self.SP.read(15)
+                r = self.SP.read(nrxbytes)
 
                 ###  release resources  ###
-                self.COMsemaphore.release(1)
-
+                self.COMsemaphore.release(1) 
                 
-                if len(r) == 15:
-                    t1 = float(int(r[7:7+4], 16))*0.1                    
-                    return t1                    
+                if len(r) == nrxbytes:
+                    #treat REAd and WRITE commands different
+                    
+                    #READ command
+                    if command[4] == "3":
+                        CRCreceived = r[15:16]
+                        CRCcalculated = aw.dtapid.DTACalcChecksum(r[0:14])
+                        if CRCreceived == CRCcalculated:                    
+                            t1 = float(int(r[7:11], 16))*0.1                    
+                            return t1
+                        else:
+                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                            if len(aw.qmc.timex) > 2:                           
+                                return aw.qmc.temp1[-1]       
+                            else:
+                                return -1.
+                    #WRITE COMMAND. Under Test
+                    if command[4] == "4":
+                        #received  data is equal to sent command
+                        if r == command:
+                            print "Write operation OK"
+                            return 1
+                        else:
+                            print "Write operation BAD"
+                            return 0                            
                 else:
                     nbytes = len(r)
                     aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): %1 bytes received but 15 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
@@ -15017,6 +15053,14 @@ class WheelDlg(QDialog):
         self.labeltable.setVisible(False)        
         self.labelCloseButton.setVisible(False)
         self.labelResetButton.setVisible(False)
+
+        aspectlabel = QLabel(QApplication.translate("Label","Ratio",None, QApplication.UnicodeUTF8))
+        self.aspectSpinBox = QDoubleSpinBox()
+        self.aspectSpinBox.setToolTip(QApplication.translate("Tooltip","Aspect Ratio",None, QApplication.UnicodeUTF8))
+        self.aspectSpinBox.setRange(0.,2.)
+        self.aspectSpinBox.setSingleStep(.1)
+        self.aspectSpinBox.setValue(aw.qmc.wheelaspect)
+        self.connect(self.aspectSpinBox, SIGNAL("valueChanged(double)"),self.setaspect)
         
         txtlabel = QLabel(QApplication.translate("Label","Text",None, QApplication.UnicodeUTF8))
         txtButtonplus = QPushButton(QApplication.translate("Button","+",None, QApplication.UnicodeUTF8))
@@ -15121,15 +15165,19 @@ class WheelDlg(QDialog):
         configlayout =  QHBoxLayout()
         configlayout.addWidget(colorlabel)
         configlayout.addWidget(self.colorSpinBox)        
-        configlayout.addWidget(txtlabel)
-        configlayout.addWidget(txtButtonplus)
-        configlayout.addWidget(txtButtonminus)
 
+
+        configlayout.addWidget(aspectlabel)
+        configlayout.addWidget(self.aspectSpinBox)
         configlayout.addWidget(edgelabel)
         configlayout.addWidget(self.edgeSpinBox)
         configlayout.addWidget(linewidthlabel)
         configlayout.addWidget(self.linewidthSpinBox)
         configlayout.addWidget(linecolor)
+
+        configlayout.addWidget(txtlabel)
+        configlayout.addWidget(txtButtonplus)
+        configlayout.addWidget(txtButtonminus)
 
         controlLayout = QHBoxLayout()
         controlLayout.addWidget(addButton)
@@ -15293,6 +15341,10 @@ class WheelDlg(QDialog):
             
         aw.qmc.drawWheel()
         self.createlabeltable(x)
+
+    def setaspect(self):
+        aw.qmc.wheelaspect = self.aspectSpinBox.value()
+        aw.qmc.drawWheel()        
 
     #adjust decorative edge between wheels
     def setedge(self):
@@ -18280,7 +18332,6 @@ class PXG4pidDlgControl(QDialog):
             soakedit  = QLineEdit(unicode(aw.qmc.stringfromseconds(aw.fujipid.PXG4[soakkey][0])))
             soakedit.setValidator(QRegExpValidator(regextime,self))    
             setButton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
-            self.connect(setButton,SIGNAL("clicked()"),lambda i =i:self.setsegment(i))
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
             self.segmenttable.setCellWidget(i,1,rampedit)
@@ -18905,13 +18956,24 @@ class DTApidDlgControl(QDialog):
         self.status.setSizeGripEnabled(False)
         self.status.showMessage(QApplication.translate("StatusBar","Work on Progress",None, QApplication.UnicodeUTF8),5000)
 
-        hello1label = QLabel("Hello 1")
+        svlabel = QLabel(QApplication.translate("sv label", "SV", None, QApplication.UnicodeUTF8))  
+        self.svedit = QLineEdit(unicode(aw.dtapid.dtamem["sv"][0]))
+        self.svedit.setValidator(QIntValidator(0, 999, self.svedit))
+        readsvbutton = QPushButton(QApplication.translate("sv Button","Read", None, QApplication.UnicodeUTF8))
+        writesvbutton = QPushButton(QApplication.translate("sv Button","Write", None, QApplication.UnicodeUTF8))
+        self.connect(readsvbutton,SIGNAL("clicked()"),self.readsv)
+        self.connect(writesvbutton,SIGNAL("clicked()"),self.writesv)
+        
         hello2label = QLabel("Hello 2")
 
         tab1Layout = QGridLayout() 
         tab2Layout = QGridLayout()
 
-        tab1Layout.addWidget(hello1label,0,0)
+        tab1Layout.addWidget(svlabel,0,0)
+        tab1Layout.addWidget(self.svedit,0,1)
+        tab1Layout.addWidget(readsvbutton,0,2)
+        tab1Layout.addWidget(writesvbutton,0,3)
+
         tab2Layout.addWidget(hello2label,0,0)
         
         ############################
@@ -18930,6 +18992,31 @@ class DTApidDlgControl(QDialog):
         mainlayout.addWidget(TabWidget,1)
         self.setLayout(mainlayout)
 
+
+    def readsv(self):
+        ### create command message2send(unitID,function,address,ndata)
+        command = aw.dtapid.message2send(aw.ser.controlETpid[1],3,aw.dtapid.dtamem["sv"][1],1)
+        #read sv
+        sv = aw.ser.sendDTAcommand(command)
+        #update SV value 
+        aw.dtapid.dtamem["sv"][0] = sv
+        #update svedit
+        self.svedit.setText(QString(sv)) 
+        #update sv LCD
+        aw.lcd6.display(sv)
+        #update status
+        message = QApplication.translate("StatusBar","SV = %s"%(str(sv)),None, QApplication.UnicodeUTF8)
+        self.status.showMessage(message,5000)
+
+    #write uses function = 6
+    def writesv(self):
+        newsv = hex(int(str(self.svedit.text())))[2:]   
+        ### create command message2send(unitID,function,address,ndata)
+        command = aw.dtapid.message2send(aw.ser.controlETpid[1],6,aw.dtapid.dtamem["sv"][1],newsv)
+        #read sv
+        r = aw.ser.sendDTAcommand(command)
+
+        
 ###################################################################################
 ##########################  ARDUINO CLASS DEFINITION  ############################
 ###################################################################################
@@ -18976,9 +19063,8 @@ class DtaPID(object):
         string_NDATA = str(NDATA).zfill(4)
         cmd = string_unitID + string_FUNCTION + string_ADDRESS + string_NDATA
         checksum = hex(self.DTACalcChecksum(cmd))[2:].zfill(2).upper()
-        command = ":" + cmd + checksum
-        if FUNCTION == 3:
-            command += "\r\n"
+        command = ":" + cmd + checksum + "\r\n"
+
         return command
 
     def DTACalcChecksum(self,string):
