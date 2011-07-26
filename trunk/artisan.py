@@ -2202,8 +2202,7 @@ class tgraphcanvas(FigureCanvas):
             message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
             aw.sendmessage(message)            
             aw.soundpop()
-            if i == 0:
-                self.redraw(recomputeAllDeltas=False)
+            self.redraw(recomputeAllDeltas=False)
             
         else:
             message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
