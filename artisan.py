@@ -2023,227 +2023,406 @@ class tgraphcanvas(FigureCanvas):
         else:
             self.flagon = False
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
+
+            self.redraw()
+            
             aw.soundpop()
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
             aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8))
-            libtime.sleep(.5)  #give time for thread to close
 
 
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
-        if self.flagon:
-            if self.device != 18:
-                if self.autoChargeIdx:
-                    self.timeindex[0] = self.autoChargeIdx
+        try:
+            if self.flagon:
+                if self.device != 18:
+                    if self.autoChargeIdx:
+                        self.timeindex[0] = self.autoChargeIdx
+                    else:
+                        if len(self.timex) >= 3:
+                            self.timeindex[0] = len(self.timex)-1
+                        else:
+                            message = QApplication.translate("Message Area","Not enough variables collected yet. Try again in a few seconds", None, QApplication.UnicodeUTF8)
+                #device 18  = manual mode        
                 else:
-                    if len(self.timex) >= 3:
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if bt != 1 and et != -1:  #cancel
+                        self.drawmanual(et,bt,tx)
                         self.timeindex[0] = len(self.timex)-1
                     else:
-                        message = QApplication.translate("Message Area","Not enough variables collected yet. Try again in a few seconds", None, QApplication.UnicodeUTF8)
-            #device 18  = manual mode        
-            else:
-                tx = self.timeclock.elapsed()/1000.
-                et,bt = aw.ser.NONE()
-                if bt != 1 and et != -1:  #cancel
-                    self.drawmanual(et,bt,tx)
-                    self.timeindex[0] = len(self.timex)-1
-                else:
-                    return
-                        
-            message = QApplication.translate("Message Area","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(unicode(self.temp2[self.timeindex[0]]) + self.mode)
-            aw.sendmessage(message) 
-            aw.button_8.setDisabled(True)
-            aw.button_8.setFlat(True)            
+                        return
+                            
+                aw.button_8.setDisabled(True)
+                aw.button_8.setFlat(True)            
 
-            aw.soundpop()
-            self.redraw(recomputeAllDeltas=False)  #redraw() calls xaxistosm() and updates x times axis
-            
-        else:
-            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            aw.sendmessage(message)
+                aw.soundpop()
+                #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
+                                 xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] +  self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(u"Start 00:00", xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
+                                 xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] - self.ystep),
+                                color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+                self.xaxistosm()
+
+                self.samplingsemaphore.acquire(1)
+                self.fig.canvas.draw()
+                self.samplingsemaphore.release(1)
+
+                message = QApplication.translate("Message Area","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(unicode(self.temp2[self.timeindex[0]]) + self.mode)
+                aw.sendmessage(message) 
+                
+            else:
+                message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markCharge() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)            
 
     def markDryEnd(self):
-        if self.flagon:
-            if self.device != 18:
-                self.timeindex[1] = len(self.timex)-1
-            else:
-                tx = self.timeclock.elapsed()/1000.
-                et,bt = aw.ser.NONE()
-                if et != -1 and bt != -1:
-                    self.drawmanual(et,bt,tx)
+        try:
+            if self.flagon:
+                if self.device != 18:
                     self.timeindex[1] = len(self.timex)-1
                 else:
-                    return
-                
-            if aw.qmc.phasesbuttonflag:     
-                self.phases[1] = int(round(self.temp2[self.timeindex[1]]))                
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)
+                        self.timeindex[1] = len(self.timex)-1
+                    else:
+                        return
+                    
+                if aw.qmc.phasesbuttonflag:     
+                    self.phases[1] = int(round(self.temp2[self.timeindex[1]]))                
 
-            aw.button_19.setDisabled(True)
-            aw.button_19.setFlat(True)
-            
-            st1 = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
-            st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
-            message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-            #set message at bottom
-            aw.sendmessage(message)
-            aw.soundpop()
-            self.redraw(recomputeAllDeltas=False)
-                        
-        else:
-            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            aw.sendmessage(message)
+                aw.button_19.setDisabled(True)
+                aw.button_19.setFlat(True)
+
+                #calculate time elapsed since charge time
+                st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]))
+                #anotate temperature
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
+                                 xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]+self.ystep), color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
+                                 xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]-self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+                self.samplingsemaphore.acquire(1)
+                self.fig.canvas.draw()
+                self.samplingsemaphore.release(1)
+
+                st1 = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
+                st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
+                message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                #set message at bottom
+                aw.sendmessage(message)
+                
+                aw.soundpop()
+                
+            else:
+                message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markDryEnd() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)            
 
     #redord 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
-        if self.flagon:
-            # record 1Cs only if Charge mark has been done
-            if self.device != 18:                
-                self.timeindex[2] = len(self.timex)-1
-            else:
-                tx = self.timeclock.elapsed()/1000.
-                et,bt = aw.ser.NONE()
-                if et != -1 and bt != -1:
-                    self.drawmanual(et,bt,tx)                               
+        try:
+            if self.flagon:
+                # record 1Cs only if Charge mark has been done
+                if self.device != 18:                
                     self.timeindex[2] = len(self.timex)-1
                 else:
-                    return
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)                               
+                        self.timeindex[2] = len(self.timex)-1
+                    else:
+                        return
 
-            if aw.qmc.phasesbuttonflag:     
-                self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
+                if aw.qmc.phasesbuttonflag:     
+                    self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
+                
+                aw.button_3.setDisabled(True)
+                aw.button_3.setFlat(True)
+
+                #calculate time elapsed since charge time
+                st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
+                #anotate temperature
+                if self.timeindex[1]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
+                else:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])                
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
+                                 xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]+ self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
+                                 xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]-self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
+
+                self.samplingsemaphore.acquire(1)
+                self.fig.canvas.draw()
+                self.samplingsemaphore.release(1)
+
+                st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
+                st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
+                message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)            
+                aw.sendmessage(message)
+                
+                aw.soundpop()
+                
+            else:
+                message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)            
             
-            aw.button_3.setDisabled(True)
-            aw.button_3.setFlat(True)
-            
-            st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
-            st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
-            message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)            
-            aw.sendmessage(message)
-            aw.soundpop()
-            self.redraw(recomputeAllDeltas=False)
-            
-        else:
-            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            aw.sendmessage(message)
-        
     #record 1C end markers of BT. called from button_4 of application window
     def mark1Cend(self):
-        if self.flagon:
- 
-            if self.device != 18:
-                self.timeindex[3] = len(self.timex)-1
-            else:
-                tx = self.timeclock.elapsed()/1000.
-                et,bt = aw.ser.NONE()
-                if et != -1 and bt != -1:
-                    self.drawmanual(et,bt,tx)                           
+        try:
+            if self.flagon:
+     
+                if self.device != 18:
                     self.timeindex[3] = len(self.timex)-1
                 else:
-                    return                    
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)                           
+                        self.timeindex[3] = len(self.timex)-1
+                    else:
+                        return                    
 
-            aw.button_4.setDisabled(True)
-            aw.button_4.setFlat(True)
-            
-            st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])                           
-            st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
-            message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-            aw.sendmessage(message)
-            aw.soundpop()
-            self.redraw(recomputeAllDeltas=False)
-            
-        else:
-            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            aw.sendmessage(message)
+                aw.button_4.setDisabled(True)
+                aw.button_4.setFlat(True)
+
+                #calculate time elapsed since charge time
+                st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
+                #anotate temperature
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
+                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]+self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
+                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                
+                self.samplingsemaphore.acquire(1)
+                self.fig.canvas.draw()
+                self.samplingsemaphore.release(1)
+
+                st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])                           
+                st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
+                message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                aw.sendmessage(message)
+
+                aw.soundpop()
+                
+            else:
+                message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cend() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)            
 
     #record 2C start markers of BT. Called from button_5 of application window
     def mark2Cstart(self):
-        if self.flagon:
-            if self.device != 18:
-                self.timeindex[4] = len(self.timex)-1
-            else:
-                tx = self.timeclock.elapsed()/1000.
-                et,bt = aw.ser.NONE()
-                if et != -1 and bt != -1:
-                    self.drawmanual(et,bt,tx)                           
+        try:
+            if self.flagon:
+                if self.device != 18:
                     self.timeindex[4] = len(self.timex)-1
                 else:
-                    return              
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)                           
+                        self.timeindex[4] = len(self.timex)-1
+                    else:
+                        return              
 
-            aw.button_5.setDisabled(True)
-            aw.button_5.setFlat(True)
+                aw.button_5.setDisabled(True)
+                aw.button_5.setFlat(True)
 
-            st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
-            st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode            
-            message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-            aw.sendmessage(message)
-            aw.soundpop()
-            self.redraw(recomputeAllDeltas=False)
-            
-        else:
-            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            aw.sendmessage(message)            
-       
+                st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
+                if self.timeindex[3]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
+                else:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])            
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
+                                 xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]+self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                 
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
+                                 xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+                self.samplingsemaphore.acquire(1)
+                self.fig.canvas.draw()
+                self.samplingsemaphore.release(1)
+
+                st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
+                st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode            
+                message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                aw.sendmessage(message)
+                
+                aw.soundpop()
+                
+            else:
+                message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)            
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)            
+           
     #record 2C end markers of BT. Called from button_6  of application window
     def mark2Cend(self):
-        if self.flagon:
-            
-            if self.device != 18:                
-                self.timeindex[5] = len(self.timex)-1
-            else:
-                tx = self.timeclock.elapsed()/1000.
-                et,bt = aw.ser.NONE()
-                if et != -1 and bt != -1:
-                    self.drawmanual(et,bt,tx)                           
+        try:
+            if self.flagon:
+                
+                if self.device != 18:                
                     self.timeindex[5] = len(self.timex)-1
                 else:
-                    return
-                
-            aw.button_6.setDisabled(True)
-            aw.button_6.setFlat(True)
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)                           
+                        self.timeindex[5] = len(self.timex)-1
+                    else:
+                        return
+                    
+                aw.button_6.setDisabled(True)
+                aw.button_6.setFlat(True)
 
-            st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
-            st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
-            message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-            aw.sendmessage(message)            
-            aw.soundpop()
-            self.redraw(recomputeAllDeltas=False)
-            
-        else:
-            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            aw.sendmessage(message)            
+                st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
+                #anotate temperature
+                self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
+                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]+self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
+                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]-self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+                self.samplingsemaphore.acquire(1)
+                self.fig.canvas.draw()
+                self.samplingsemaphore.release(1)
+
+                st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
+                st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
+                message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                aw.sendmessage(message)            
+                aw.soundpop()
+                
+            else:
+                message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)            
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cend() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)            
+
 
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
-        if self.flagon:
-            if self.device != 18:
-                if self.autoDropIdx:
-                    self.timeindex[6] = self.autoDropIdx
-                else:        
-                    self.timeindex[6] = len(self.timex)-1
-            else:
-                tx = self.timeclock.elapsed()/1000.
-                et,bt = aw.ser.NONE()
-                if et != -1 and bt != -1:
-                    self.drawmanual(et,bt,tx)
-                    self.timeindex[6] = len(self.timex)-1
+        try:
+            if self.flagon:
+                if self.device != 18:
+                    if self.autoDropIdx:
+                        self.timeindex[6] = self.autoDropIdx
+                    else:        
+                        self.timeindex[6] = len(self.timex)-1
                 else:
-                    return
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)
+                        self.timeindex[6] = len(self.timex)-1
+                    else:
+                        return
+                    
+                #aw.button_9.setDisabled(True)
+                aw.button_9.setFlat(True)
+
+                st1 = QApplication.translate("Scope Annotation","End %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
+                #anotate temperature
+                if self.timeindex[5]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
+                elif self.timeindex[4]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]])
+                elif self.timeindex[3]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]])
+                elif self.timeindex[2]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]])
+                elif self.timeindex[1]:
+                    self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]])
+                                
+                self.ax.annotate(u"%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
+                                 xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]+self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
+                                 xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]-self.ystep),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 
-            #aw.button_9.setDisabled(True)
-            aw.button_9.setFlat(True)
-            
-            st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
-            st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
-            message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-            aw.sendmessage(message)
-            aw.soundpop()
-            self.redraw(recomputeAllDeltas=False)
-            
-            #prevents accidentally deleting a finished roast
-            self.safesaveflag = True
-        else:
-            message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
-            aw.sendmessage(message)
-            
+                self.samplingsemaphore.acquire(1)
+                self.fig.canvas.draw()
+                self.samplingsemaphore.release(1)
+                
+                st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
+                st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
+                message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                aw.sendmessage(message)
+                
+                aw.soundpop()
+                
+                #prevents accidentally deleting a finished roast
+                self.safesaveflag = True
+            else:
+                message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)
+
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markDrop() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)            
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time           
@@ -2283,8 +2462,27 @@ class tgraphcanvas(FigureCanvas):
                     aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
                     aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
                     aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                    
-                self.redraw(recomputeAllDeltas=False)     
+                
+                if self.eventsshowflag:
+                    firstletter = self.etypes[self.specialeventstype[-1]][0]
+                    secondletter = self.eventsvalues[self.specialeventsvalue[-1]]                    
+                    if self.mode == "F":
+                        height = 50
+                    else:
+                        height = 20
+                    #some times ET is not drawn (ET = 0) when using device NONE
+                    if self.temp1[int(self.specialevents[-1])] > self.temp2[int(self.specialevents[-1])]:
+                        temp = self.temp1[int(self.specialevents[-1])]
+                    else:
+                        temp = self.temp2[int(self.specialevents[-1])]
+                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[-1])], temp),
+                                     xytext=(self.timex[int(self.specialevents[-1])],temp+height),alpha=0.9,
+                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+
+                self.samplingsemaphore.acquire(1)
+                self.fig.canvas.draw()
+                self.samplingsemaphore.release(1)
+                                
                 aw.soundpop()
 
             else:
@@ -2293,35 +2491,65 @@ class tgraphcanvas(FigureCanvas):
         except Exception,e:
             self.adderror(QApplication.translate("Error Message", "Exception Error: EventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)            
 
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
     def DeviceEventRecord(self,command):
-        if self.flagon:
-            #number of events
-            Nevents = len(self.specialevents)
-            #index number            
-            i = len(self.timex)-1
-            if i > 0:
-                self.specialevents.append(i)                                     # store absolute time index
-                self.specialeventstype.append(0)                                 # set type (to the first index 0)          
-                self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
-                self.specialeventsvalue.append(0)                                # empty
-                temp = unicode(self.temp2[i])
-                if self.timeindex[0] != -1:
-                    start = self.timex[self.timeindex[0]]
-                else:
-                    start = 0
-                timed = self.stringfromseconds(self.timex[i]-start)
-                message = QApplication.translate("Message Area","Computer Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
-                aw.sendmessage(message)
-                #write label in mini recorder if flag checked
-                if aw.minieventsflag:
-                    aw.eNumberSpinBox.setValue(Nevents+1)
-                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                    aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                self.redraw(recomputeAllDeltas=False)
+        try:
+            if self.flagon:
+                #number of events
+                Nevents = len(self.specialevents)
+                #index number            
+                i = len(self.timex)-1
+                if i > 0:
+                    self.specialevents.append(i)                                     # store absolute time index
+                    self.specialeventstype.append(0)                                 # set type (to the first index 0)          
+                    self.specialeventsStrings.append(command)                        # store the command in the string section of events (not a binary string)   
+                    self.specialeventsvalue.append(0)                                # empty
+                    temp = unicode(self.temp2[i])
+                    if self.timeindex[0] != -1:
+                        start = self.timex[self.timeindex[0]]
+                    else:
+                        start = 0
+                    timed = self.stringfromseconds(self.timex[i]-start)
+                    message = QApplication.translate("Message Area","Computer Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
+                    aw.sendmessage(message)
+                    #write label in mini recorder if flag checked
+                    if aw.minieventsflag:
+                        aw.eNumberSpinBox.setValue(Nevents+1)
+                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                        aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                        aw.lineEvent.setText(self.specialeventsStrings[Nevents])
 
+                    if self.eventsshowflag:
+                        firstletter = self.etypes[self.specialeventstype[-1]][0]
+                        secondletter = self.eventsvalues[self.specialeventsvalue[-1]]                    
+
+                        if self.mode == "F":
+                            height = 50
+                        else:
+                            height = 20
+                        #some times ET is not drawn (ET = 0) when using device NONE
+                        if self.temp1[int(self.specialevents[-1])] > self.temp2[int(self.specialevents[-1])]:
+                            temp = self.temp1[int(self.specialevents[-1])]
+                        else:
+                            temp = self.temp2[int(self.specialevents[-1])]
+                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[-1])], temp),
+                                         xytext=(self.timex[int(self.specialevents[-1])],temp+height),alpha=0.9,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+
+                    self.samplingsemaphore.acquire(1)
+                    self.fig.canvas.draw()
+                    self.samplingsemaphore.release(1)
+                    
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: DeviceEventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)            
+                                
     # Writes information about the finished profile in the graph
     def writestatistics(self):
         
