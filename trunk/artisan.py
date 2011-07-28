@@ -400,6 +400,7 @@ class tgraphcanvas(FigureCanvas):
         
         # projection variables of change of rate
         self.HUDflag = 0
+        self.hudresizeflag = False
         self.ETtarget = 350
         self.BTtarget = 250
         self.hudETpid = [20,60,13]    # HUD pid: p = 20, i = 60, d = 13
@@ -1033,7 +1034,8 @@ class tgraphcanvas(FigureCanvas):
             
         if self.HUDflag:
             self.toggleHUD()       
-            
+        self.hudresizeflag = False
+    
         self.ax.set_title(self.title,size=20,color=self.palette["title"])  
         
         #reset all variables that need to be reset
@@ -1086,6 +1088,7 @@ class tgraphcanvas(FigureCanvas):
             
         self.roastdate = QDate.currentDate()            
         self.errorlog = []
+        aw.seriallog = []
 
         self.specialevents = []
         self.specialeventstype = [] 
@@ -4385,7 +4388,7 @@ class ApplicationWindow(QMainWindow):
         #resolution
         self.dpi = 80
         self.qmc = tgraphcanvas(self.main_widget)
-        self.qmc.setAttribute(Qt.WA_NoSystemBackground)
+        #self.qmc.setAttribute(Qt.WA_NoSystemBackground)
 
         ####    HUD   
         self.HUD = QLabel()  #main canvas for hud widget
@@ -4436,6 +4439,9 @@ class ApplicationWindow(QMainWindow):
                     QAction(self, visible=False,
                             triggered=self.openRecentFile))
 
+        #records serial comm (Help menu)    
+        self.seriallogflag = False
+        self.seriallog = []
 
         #######################    MENUS SECTION ##################################################
         ###############  create Top MENUS 
@@ -4736,6 +4742,10 @@ class ApplicationWindow(QMainWindow):
         messageAction = QAction(UIconst.HELP_MENU_MESSAGES,self)
         self.connect(messageAction,SIGNAL("triggered()"),self.viewMessageLog)
         self.helpMenu.addAction(messageAction)
+
+        serialAction = QAction(UIconst.HELP_MENU_SERIAL,self)
+        self.connect(serialAction,SIGNAL("triggered()"),self.viewSerialLog)
+        self.helpMenu.addAction(serialAction)
 
         resetAction = QAction(UIconst.HELP_MENU_RESET,self)
         self.connect(resetAction,SIGNAL("triggered()"),self.resetApplication)
@@ -5183,7 +5193,20 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addSpacing(10)
         mainlayout.addWidget(self.EventsGroupLayout)
 
-###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################        
+###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
+    #adds errors
+    def addserial(self,serialstring):
+        timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+        #keep a max of 1000 comm strings
+        if len(self.seriallog) > 999:
+            self.seriallog = self.seriallog[1:]
+        self.seriallog.append(timez + " " + serialstring)
+
+    def resizeEvent(self, event):
+        #if HUD is ON when resizing application. No drawing should be done inside this handler
+        if self.qmc.HUDflag:
+            self.qmc.hudresizeflag = True
+            
     def setdpi(self,dpi):
         if aw:
             self.qmc.fig.set_dpi(dpi)
@@ -7396,6 +7419,11 @@ $cupping_notes
         error = errorDlg(self)
         error.show()
 
+    def viewSerialLog(self):
+        serialDLG = serialLogDlg(self)
+        serialDLG.show()
+        
+
     def viewMessageLog(self):
         message = messageDlg(self)
         message.show()        
@@ -7763,6 +7791,14 @@ $cupping_notes
         hudDl.show()        
         
     def showHUDmetrics(self):
+
+        if self.qmc.hudresizeflag:
+            #turn off
+            self.qmc.toggleHUD()            
+            #turn back ON to adquire new size
+            self.qmc.toggleHUD()
+            self.qmc.hudresizeflag = False
+            
         ETreachTime,BTreachTime = self.qmc.getTargetTime()
         
         if ETreachTime > 0 and BTreachTime < 5940:
@@ -9510,8 +9546,47 @@ class editGraphDlg(QDialog):
         self.close()
 
 
+##########################################################################
+#####################  VIEW SERIAL LOG DLG  ##############################
+##########################################################################
 
 
+class serialLogDlg(QDialog):
+    def __init__(self, parent = None):
+        super(serialLogDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Form Caption","Serial Log", None, QApplication.UnicodeUTF8))
+
+        self.serialcheckbox = QCheckBox(QApplication.translate("CheckBox","Serial Log ON/OFF", None, QApplication.UnicodeUTF8))
+        self.serialcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF logs serial communication",None, QApplication.UnicodeUTF8))
+        
+        if aw.seriallogflag:
+            self.serialcheckbox.setChecked(True)
+        else:
+            self.serialcheckbox.setChecked(False)
+        self.connect(self.serialcheckbox,SIGNAL("stateChanged(int)"),self.serialcheckboxChanged)
+
+        #convert list of serial comm an html string
+        htmlserial = "version = " +__version__ +"<br><br>"
+        lenl = len(aw.seriallog)
+        for i in range(len(aw.seriallog)):
+            htmlserial += "<b>" + str(lenl-i) + "</b> " + aw.seriallog[-i-1] + "<br><br>"
+
+        serialEdit = QTextEdit()
+        serialEdit.setHtml(htmlserial)
+        serialEdit.setReadOnly(True)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.serialcheckbox,0)
+        layout.addWidget(serialEdit,1)
+                               
+        self.setLayout(layout)
+
+    def serialcheckboxChanged(self):
+        if self.serialcheckbox.isChecked():
+            aw.seriallogflag = True
+        else:
+            aw.seriallogflag = False
+            
 ##########################################################################
 #####################  VIEW ERROR LOG DLG  ###############################
 ##########################################################################
@@ -9524,8 +9599,9 @@ class errorDlg(QDialog):
 
         #convert list of errors to an html string
         htmlerr = "version = " +__version__ +"<br><br>"
+        lenl = len(aw.qmc.errorlog)
         for i in range(len(aw.qmc.errorlog)):
-            htmlerr += "<b>" + str(len(aw.qmc.errorlog)-i) + "</b> <i>" + aw.qmc.errorlog[-i-1] + "</i><br><br>"
+            htmlerr += "<b>" + str(lenl-i) + "</b> <i>" + aw.qmc.errorlog[-i-1] + "</i><br><br>"
 
         enumber = len(aw.qmc.errorlog)
     
@@ -11875,6 +11951,10 @@ class serialport(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("Fuji :" + settings + " || Tx = " + binascii.hexlify(binstring) + " || Rx = " + binascii.hexlify(r))
                         
         
     #finds time, ET and BT when using Fuji PID. Updates sv (set value) LCD. Finds power duty cycle
@@ -11962,16 +12042,18 @@ class serialport(object):
                 self.openport()
                 
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
-                self.SP.write(command)
-
                 #if if is a read command (function 3) then expect 19 bytes back. default.
                 nrxbytes = 19
                 if command[4] == "4":   #but if it is a write command (function "4"), then expect 17 bytes back
                     nrxbytes = 17  
 
-                #read answer        
+                #clear
+                self.SP.flushInput()
+                self.SP.flushOutput()
+
+                #SEND (tx)
+                self.SP.write(command)
+                #READ n bytes(rx)        
                 r = self.SP.read(nrxbytes)
 
                 ###  release resources  ###
@@ -11984,23 +12066,23 @@ class serialport(object):
                     if command[4] == "3":
                         CRCreceived = r[15:16]
                         CRCcalculated = aw.dtapid.DTACalcChecksum(r[0:14])
-                        if CRCreceived == CRCcalculated:                    
-                            t1 = float(int(r[7:11], 16))*0.1                    
-                            return t1
-                        else:
-                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8).arg(nbytes))            
-                            if len(aw.qmc.timex) > 2:                           
-                                return aw.qmc.temp1[-1]       
-                            else:
-                                return -1.
+                        #if CRCreceived == CRCcalculated:                    
+                        t1 = float(int(r[7:11], 16))*0.1                   #convert ascii string from bytes 8-12 to a float 
+                        return t1
+##                        else:
+##                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8).arg(nbytes))            
+##                            if len(aw.qmc.timex) > 2:                           
+##                                return aw.qmc.temp1[-1]       
+##                            else:
+##                                return 0
                     #WRITE COMMAND. Under Test
                     if command[4] == "4":
                         #received  data is equal to sent command
                         if r == command:
-                            print "Write operation OK"
+                            aw.sendmessage("Write operation OK")
                             return 1
                         else:
-                            print "Write operation BAD"
+                            aw.sendmessage("Write operation BAD")
                             return 0                            
                 else:
                     nbytes = len(r)
@@ -12022,6 +12104,9 @@ class serialport(object):
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)        
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("DElta DTA:" + settings + " || Tx = " + command + " || Rx = " + r)
 
     def virtual(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -12291,6 +12376,12 @@ class serialport(object):
             else:
                 return -1,-1                                    
 
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("H806 :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
+
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
     def HH506RAtemperature(self):
@@ -12341,6 +12432,12 @@ class serialport(object):
             else:
                 return -1,-1
             
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("H506 :" + settings + " || Tx = " + command + " || Rx = " + r)
+            
 
     #reads once the id of the HH506RA meter and stores it in the serial variable self.HH506RAid. Marko Luther.
     def HH506RAGetID(self):
@@ -12373,6 +12470,12 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
+
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("H506 :" + settings + " || Tx = " + command + " || Rx = " + r)
             
             
     def CENTER306temperature(self):
@@ -12452,6 +12555,12 @@ class serialport(object):
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1
+
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("CENTER306 :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
 
             
     def NONE(self):
@@ -12542,6 +12651,13 @@ class serialport(object):
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1
+
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("CENTER303 :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
+
             
     def CENTER309temperature(self):
         ##    command = "\x4B" returns 4 bytes . Model number.
@@ -12612,6 +12728,11 @@ class serialport(object):
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("CENTER309 :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
 
     def ARDUINOTC4temperature(self):
         try:
@@ -12704,6 +12825,11 @@ class serialport(object):
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + command + " || Rx = " + res)
             
            
     def TEVA18Bconvert(self, seg):
@@ -12917,6 +13043,13 @@ class serialport(object):
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
                 return -1,-1 
+
+        finally:
+            #note: logged chars should not be binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("TEVA18B :" + settings + " || Tx = " + "No command" + " || Rx = " + binascii.hexlify(r))
+
             
     def HHM28multimeter(self):
         # This meter sends a continuos frame byte by byte. It only transmits data. It does not receive commands.
@@ -13045,7 +13178,7 @@ class serialport(object):
             return "0",""
         
 
-    #sends a command to the ET/BT device
+    #sends a command to the ET/BT device. Arduino.
     def sendTXcommand(self,command):
         try:
 
@@ -13072,6 +13205,13 @@ class serialport(object):
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
 
+        finally:
+            #note: logged chars should not be binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("Arduinocommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
+
+
     #Example function
     #NOT USED YET, maybe FUTURE Arduino?
     #sends a command to the ET/BT device and receives data of length nbytes 
@@ -13092,6 +13232,12 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
+
+        finally:
+            #note: logged chars should not be binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("FutureArduinocommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
 
             
 #########################################################################
@@ -19251,7 +19397,7 @@ class DTApidDlgControl(QDialog):
 
         svlabel = QLabel(QApplication.translate("sv label", "SV", None, QApplication.UnicodeUTF8))  
         self.svedit = QLineEdit(unicode(aw.dtapid.dtamem["sv"][0]))
-        self.svedit.setValidator(QIntValidator(0, 999, self.svedit))
+        self.svedit.setValidator(QDoubleValidator(0., 999.,1, self.svedit))
         readsvbutton = QPushButton(QApplication.translate("sv Button","Read", None, QApplication.UnicodeUTF8))
         writesvbutton = QPushButton(QApplication.translate("sv Button","Write", None, QApplication.UnicodeUTF8))
         self.connect(readsvbutton,SIGNAL("clicked()"),self.readsv)
@@ -19303,7 +19449,7 @@ class DTApidDlgControl(QDialog):
 
     #write uses function = 6
     def writesv(self):
-        newsv = hex(int(str(self.svedit.text())))[2:]   
+        newsv = hex(int(float(unicode(self.svedit.text()))*10.))[2:]
         ### create command message2send(unitID,function,address,ndata)
         command = aw.dtapid.message2send(aw.ser.controlETpid[1],6,aw.dtapid.dtamem["sv"][1],newsv)
         #read sv
@@ -19329,7 +19475,7 @@ class DtaPID(object):
         #dictionary "KEY": [VALUE,ASCII_MEMORY_ADDRESS]  note: address contains hex alpha characters
         self.dtamem={
                   "pv": [0,"4700"],             # process value (temperature reading)
-                  "sv": [100,"4701"],           # set point
+                  "sv": [100.0,"4701"],           # set point
                   "p": [5,"4708"],              # p value 0-9999
                   "i": [240,"4709"],            # i value 0-9999
                   "d": [60,"470A"],             # d value 0-9999
