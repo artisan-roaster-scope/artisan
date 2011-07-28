@@ -2035,6 +2035,8 @@ class tgraphcanvas(FigureCanvas):
     def markCharge(self):
         try:
             if self.flagon:
+                self.samplingsemaphore.acquire(1)
+
                 if self.device != 18:
                     if self.autoChargeIdx:
                         self.timeindex[0] = self.autoChargeIdx
@@ -2068,7 +2070,6 @@ class tgraphcanvas(FigureCanvas):
 
                 self.xaxistosm()
 
-                self.samplingsemaphore.acquire(1)
                 self.fig.canvas.draw()
                 self.samplingsemaphore.release(1)
 
@@ -2089,6 +2090,8 @@ class tgraphcanvas(FigureCanvas):
     def markDryEnd(self):
         try:
             if self.flagon:
+                self.samplingsemaphore.acquire(1)
+
                 if self.device != 18:
                     self.timeindex[1] = len(self.timex)-1
                 else:
@@ -2118,12 +2121,13 @@ class tgraphcanvas(FigureCanvas):
                                  xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]-self.ystep),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
-                self.samplingsemaphore.acquire(1)
                 self.fig.canvas.draw()
-                self.samplingsemaphore.release(1)
 
                 st1 = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
+
+                self.samplingsemaphore.release(1)
+                
                 message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 #set message at bottom
                 aw.sendmessage(message)
@@ -2145,6 +2149,8 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cstart(self):
         try:
             if self.flagon:
+                self.samplingsemaphore.acquire(1)
+                
                 # record 1Cs only if Charge mark has been done
                 if self.device != 18:                
                     self.timeindex[2] = len(self.timex)-1
@@ -2178,12 +2184,13 @@ class tgraphcanvas(FigureCanvas):
                                  xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]-self.ystep),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
 
-                self.samplingsemaphore.acquire(1)
                 self.fig.canvas.draw()
-                self.samplingsemaphore.release(1)
 
                 st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
+
+                self.samplingsemaphore.release(1)
+
                 message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)            
                 aw.sendmessage(message)
                 
@@ -2204,7 +2211,9 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cend(self):
         try:
             if self.flagon:
-     
+
+                self.samplingsemaphore.acquire(1)
+
                 if self.device != 18:
                     self.timeindex[3] = len(self.timex)-1
                 else:
@@ -2231,12 +2240,13 @@ class tgraphcanvas(FigureCanvas):
                                  xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 
-                self.samplingsemaphore.acquire(1)
                 self.fig.canvas.draw()
-                self.samplingsemaphore.release(1)
 
                 st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])                           
                 st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
+                
+                self.samplingsemaphore.release(1)
+                
                 message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 aw.sendmessage(message)
 
@@ -2257,6 +2267,8 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cstart(self):
         try:
             if self.flagon:
+                self.samplingsemaphore.acquire(1)
+
                 if self.device != 18:
                     self.timeindex[4] = len(self.timex)-1
                 else:
@@ -2284,12 +2296,13 @@ class tgraphcanvas(FigureCanvas):
                                  xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
-                self.samplingsemaphore.acquire(1)
                 self.fig.canvas.draw()
-                self.samplingsemaphore.release(1)
 
                 st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
-                st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode            
+                st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
+
+                self.samplingsemaphore.release(1)
+
                 message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 aw.sendmessage(message)
                 
@@ -2310,6 +2323,7 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cend(self):
         try:
             if self.flagon:
+                self.samplingsemaphore.acquire(1)
                 
                 if self.device != 18:                
                     self.timeindex[5] = len(self.timex)-1
@@ -2336,12 +2350,13 @@ class tgraphcanvas(FigureCanvas):
                                  xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]-self.ystep),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
-                self.samplingsemaphore.acquire(1)
                 self.fig.canvas.draw()
-                self.samplingsemaphore.release(1)
 
                 st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
+
+                self.samplingsemaphore.release(1)
+
                 message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 aw.sendmessage(message)            
                 aw.soundpop()
@@ -2362,6 +2377,8 @@ class tgraphcanvas(FigureCanvas):
     def markDrop(self):
         try:
             if self.flagon:
+                self.samplingsemaphore.acquire(1)
+
                 if self.device != 18:
                     if self.autoDropIdx:
                         self.timeindex[6] = self.autoDropIdx
@@ -2400,12 +2417,13 @@ class tgraphcanvas(FigureCanvas):
                                  xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]-self.ystep),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 
-                self.samplingsemaphore.acquire(1)
                 self.fig.canvas.draw()
-                self.samplingsemaphore.release(1)
                 
                 st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
+
+                self.samplingsemaphore.release(1)
+                
                 message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 aw.sendmessage(message)
                 
@@ -2425,8 +2443,9 @@ class tgraphcanvas(FigureCanvas):
                 self.samplingsemaphore.release(1)            
 
     #Marks location in graph of special events. For example change a fan setting.
-    #Uses the position of the time index (variable self.timex) as location in time           
-    def EventRecord(self):
+    #Uses the position of the time index (variable self.timex) as location in time
+    # extraevent is given when called from aw.recordextraevent() from an extra Event Button
+    def EventRecord(self,extraevent=None):
         try:
             if self.flagon:
                 #[EVENT] push button feedback
@@ -2435,6 +2454,9 @@ class tgraphcanvas(FigureCanvas):
                 QTimer.singleShot(2000, self.restorebutton_11)
                 
                 Nevents = len(self.specialevents)
+                
+                self.samplingsemaphore.acquire(1)
+
                 #if in manual mode record first the last point in self.timex[]
                 if self.device == 18:
                     tx = self.timeclock.elapsed()/1000.
@@ -2442,46 +2464,79 @@ class tgraphcanvas(FigureCanvas):
                     if bt != 1 and et != -1:              
                         self.drawmanual(et,bt,tx)                        
                     else:
+                        self.samplingsemaphore.release(1)
                         return
+                    
                 #i = index number of the event (current length of the time list)           
                 i = len(self.timex)-1
 
                 self.specialevents.append(i)
                 self.specialeventstype.append(0)            
                 self.specialeventsStrings.append(str(Nevents+1))
-                self.specialeventsvalue.append(0)               
-                
-                temp = unicode(self.temp2[i])
-                timed = self.stringfromseconds(self.timex[i])
+                self.specialeventsvalue.append(0)
 
-                message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
-                aw.sendmessage(message)
+                #if event was initiated by an Extra Event Button then change the type,value,and string 
+                if extraevent != None:
+                    self.specialeventstype[-1] = aw.extraeventstypes[extraevent]    
+                    self.specialeventsvalue[-1] = aw.extraeventsvalues[extraevent]
+                    self.specialeventsStrings[-1] = aw.extraeventsdescriptions[extraevent]
+
                 #write label in mini recorder if flag checked
                 if aw.minieventsflag:
                     aw.eNumberSpinBox.setValue(Nevents+1)
                     aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
                     aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
                     aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                
-                if self.eventsshowflag:
-                    firstletter = self.etypes[self.specialeventstype[-1]][0]
-                    secondletter = self.eventsvalues[self.specialeventsvalue[-1]]                    
-                    if self.mode == "F":
-                        height = 50
-                    else:
-                        height = 20
-                    #some times ET is not drawn (ET = 0) when using device NONE
-                    if self.temp1[int(self.specialevents[-1])] > self.temp2[int(self.specialevents[-1])]:
-                        temp = self.temp1[int(self.specialevents[-1])]
-                    else:
-                        temp = self.temp2[int(self.specialevents[-1])]
-                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[-1])], temp),
-                                     xytext=(self.timex[int(self.specialevents[-1])],temp+height),alpha=0.9,
-                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
-                self.samplingsemaphore.acquire(1)
+                #if Event show flag
+                if self.eventsshowflag:
+                    if self.mode == "F":
+                        lim = self.phases[0]-80
+                    else:
+                        lim = self.phases[0]-40
+                    index = self.specialevents[-1]                    
+                    firstletter = self.etypes[self.specialeventstype[-1]][0]
+                    secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
+                    #if Event Type-Bars flag
+                    if self.eventsGraphflag and self.ylimit_min <= lim:
+                        char1 = self.etypes[0][0]
+                        char2 = self.etypes[1][0]
+                        char3 = self.etypes[2][0]
+                        char4 = self.etypes[3][0]
+                        if self.mode == "F":
+                            row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                        else:
+                            row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                        #some times ET is not drawn (ET = 0) when using device NONE
+                        if self.temp1[index] >= self.temp2[index]:
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
+                        else:
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+
+                    else:                    
+                        if self.mode == "F":
+                            height = 50
+                        else:
+                            height = 20
+                        #some times ET is not drawn (ET = 0) when using device NONE
+                        if self.temp1[index] > self.temp2[index]:
+                            temp = self.temp1[index]
+                        else:
+                            temp = self.temp2[index]
+                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+
                 self.fig.canvas.draw()
+
+                temp = "%.1f "%self.temp2[i]
+                timed = self.stringfromseconds(self.timex[i])
+
                 self.samplingsemaphore.release(1)
+
+                message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(unicode(Nevents+1)).arg(temp).arg(timed)
+                aw.sendmessage(message)
                                 
                 aw.soundpop()
 
@@ -2499,6 +2554,7 @@ class tgraphcanvas(FigureCanvas):
     def DeviceEventRecord(self,command):
         try:
             if self.flagon:
+                self.samplingsemaphore.acquire(1)
                 #number of events
                 Nevents = len(self.specialevents)
                 #index number            
@@ -2523,24 +2579,47 @@ class tgraphcanvas(FigureCanvas):
                         aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
                         aw.lineEvent.setText(self.specialeventsStrings[Nevents])
 
-                    if self.eventsshowflag:
-                        firstletter = self.etypes[self.specialeventstype[-1]][0]
-                        secondletter = self.eventsvalues[self.specialeventsvalue[-1]]                    
 
+                #if Event show flag
+                if self.eventsshowflag:
+                    if self.mode == "F":
+                        lim = self.phases[0]-80
+                    else:
+                        lim = self.phases[0]-40
+                    index = self.specialevents[-1]                    
+                    firstletter = self.etypes[self.specialeventstype[-1]][0]
+                    secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
+                    #if Event Type-Bars flag
+                    if self.eventsGraphflag and self.ylimit_min <= lim:
+                        char1 = self.etypes[0][0]
+                        char2 = self.etypes[1][0]
+                        char3 = self.etypes[2][0]
+                        char4 = self.etypes[3][0]
+                        if self.mode == "F":
+                            row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                        else:
+                            row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                        #some times ET is not drawn (ET = 0) when using device NONE
+                        if self.temp1[index] >= self.temp2[index]:
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
+                        else:
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+
+                    else:                    
                         if self.mode == "F":
                             height = 50
                         else:
                             height = 20
                         #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[int(self.specialevents[-1])] > self.temp2[int(self.specialevents[-1])]:
-                            temp = self.temp1[int(self.specialevents[-1])]
+                        if self.temp1[index] > self.temp2[index]:
+                            temp = self.temp1[index]
                         else:
-                            temp = self.temp2[int(self.specialevents[-1])]
-                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[-1])], temp),
-                                         xytext=(self.timex[int(self.specialevents[-1])],temp+height),alpha=0.9,
+                            temp = self.temp2[index]
+                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
-                    self.samplingsemaphore.acquire(1)
                     self.fig.canvas.draw()
                     self.samplingsemaphore.release(1)
                     
@@ -5115,14 +5194,9 @@ class ApplicationWindow(QMainWindow):
     #call from user configured event buttons    
     def recordextraevent(self,ee):
         if self.qmc.flagon:
-            self.qmc.EventRecord()
-            self.qmc.specialeventstype[-1] = self.extraeventstypes[ee]    
-            self.qmc.specialeventsvalue[-1] = self.extraeventsvalues[ee]
-            self.qmc.specialeventsStrings[-1] = self.extraeventsdescriptions[ee]
             
-            self.setminieditor2lastevent()
-            self.qmc.redraw(recomputeAllDeltas=False)
-            
+            self.qmc.EventRecord(extraevent = ee)
+       
             if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event
                 if self.extraeventsactions[ee] == 1:                    
                     aw.extraeventsactionstrings[ee] = str(aw.extraeventsactionstrings[ee])                        
@@ -5492,15 +5566,6 @@ class ApplicationWindow(QMainWindow):
         string += QApplication.translate("MessageBox", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8) + "<br><br>"
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
-            
-
-    #sets minieditor 2 last event	
-    def setminieditor2lastevent(self):
-       self.lineEvent.setText(self.qmc.specialeventsStrings[-1])
-       self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[-1])
-       self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[-1])
-       timez = self.qmc.stringfromseconds(int(self.qmc.timex[aw.qmc.specialevents[-1]]-self.qmc.timex[aw.qmc.timeindex[0]]))       
-       self.etimeline.setText(timez)
 
     #moves events in minieditor         	
     def changeEventNumber(self):
