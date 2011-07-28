@@ -102,8 +102,8 @@ HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None, 
 HELP_MENU_KEYBOARDSHORTCUTS = QApplication.translate("Menu", "Keyboard Shortcuts", None, QApplication.UnicodeUTF8)
 HELP_MENU_ERRORS = QApplication.translate("Menu", "Errors", None, QApplication.UnicodeUTF8)
 HELP_MENU_MESSAGES = QApplication.translate("Menu", "Messages", None, QApplication.UnicodeUTF8)
+HELP_MENU_SERIAL = QApplication.translate("Menu", "Serial", None, QApplication.UnicodeUTF8)
 HELP_MENU_RESET = QApplication.translate("Menu", "Factory Reset", None, QApplication.UnicodeUTF8)
- 
   
 #######################################################################################
 #################### DIALOG STRINGS  ##################################################
