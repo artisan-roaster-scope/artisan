@@ -292,6 +292,7 @@ class tgraphcanvas(FigureCanvas):
                        "Omega HHM28[6]",
                        "+204_34",
                        "+Virtual",
+                       "Program"
                        ]
 
         #extra devices
@@ -6289,7 +6290,11 @@ class ApplicationWindow(QMainWindow):
         if "bag_humidity" in profile:
             self.qmc.bag_humidity = profile["bag_humidity"]   
         else:
-            self.qmc.bag_humidity = [0.,0.]            
+            self.qmc.bag_humidity = [0.,0.]
+
+        if "externalprogram" in profile:
+            aw.ser.externalprogram = unicode(profile["externalprogram"])
+        
         if "timeindex" in profile:
             self.qmc.timeindex = profile["timeindex"]
         else:
@@ -6365,6 +6370,7 @@ class ApplicationWindow(QMainWindow):
         profile["extratemp2"] = self.qmc.extratemp2
         profile["extradevicecolor1"] = self.qmc.extradevicecolor1
         profile["extradevicecolor2"] = self.qmc.extradevicecolor2
+        profile["externalprogram"] = aw.ser.externalprogram
         
         return profile
     
@@ -11867,7 +11873,8 @@ class serialport(object):
                                    self.HHM28,              #23
                                    self.K204_34,            #24
                                    self.virtual,            #25
-                                   self.DTAtemperature      #26
+                                   self.DTAtemperature,     #26
+                                   self.callprogram         #27
                                    ]
 
         #temporary storage to pass values. Holds extra T3 and T4 values for center 309
@@ -11883,6 +11890,10 @@ class serialport(object):
 
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
+
+        #string with the name of the program for device #27
+        self.externalprogram = "test.py"
+
 
 #####################  FUNCTIONS  ############################
     ######### functions used by Fuji PIDs
@@ -12042,10 +12053,8 @@ class serialport(object):
                 self.openport()
                 
             if self.SP.isOpen():
-                #if if is a read command (function 3) then expect 19 bytes back. default.
-                nrxbytes = 19
-                if command[4] == "4":   #but if it is a write command (function "4"), then expect 17 bytes back
-                    nrxbytes = 17  
+
+                nrxbytes = 15
 
                 #clear
                 self.SP.flushInput()
@@ -12108,8 +12117,22 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("DElta DTA:" + settings + " || Tx = " + command + " || Rx = " + r)
 
+    def callprogram(self):
+        try:
+            output = os.popen(self.externalprogram,"r").readline()
+            tx = aw.qmc.timeclock.elapsed()/1000.
+            if "," in output:
+                parts = output.split(",")
+                return tx,float(parts[0]),float(parts[1])
+            else:
+                return tx,0.,float(output)
+            
+        except Exception,e:
+             tx = aw.qmc.timeclock.elapsed()/1000.
+             aw.qmc.adderror(QApplication.translate("Error Message", "callprogram(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+             return tx,0.,0.
+
     def virtual(self):
-        tx = aw.qmc.timeclock.elapsed()/1000.
         return tx,1.,1.
 
     def HH506RA(self):
@@ -14077,6 +14100,7 @@ class DeviceAssignmentDLG(QDialog):
         self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Device", None, QApplication.UnicodeUTF8))
         self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None, QApplication.UnicodeUTF8))
         self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","Arduino TC4", None, QApplication.UnicodeUTF8))
+        self.programButton = QRadioButton(QApplication.translate("Radio Button","Program", None, QApplication.UnicodeUTF8))
 
         #As a main device, don't show the devices that start with a "+"
         # devices with a first letter "+" are extra devices an depend on another device
@@ -14093,6 +14117,14 @@ class DeviceAssignmentDLG(QDialog):
         self.devicetypeComboBox = QComboBox()
         self.devicetypeComboBox.addItems(sorted_devices)
 
+        self.programedit = QLineEdit(aw.ser.externalprogram)
+        selectprogrambutton =  QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
+        selectprogrambutton.setFocusPolicy(Qt.NoFocus)
+        self.connect(selectprogrambutton, SIGNAL("clicked()"),self.loadprogramname)
+        
+        helpprogrambutton =  QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
+        helpprogrambutton.setFocusPolicy(Qt.NoFocus)
+        self.connect(helpprogrambutton, SIGNAL("clicked()"),self.showhelpprogram)        
         ###################################################
         # PID
         controllabel =QLabel(QApplication.translate("Label", "Control ET",None, QApplication.UnicodeUTF8))                            
@@ -14135,6 +14167,8 @@ class DeviceAssignmentDLG(QDialog):
             self.pidButton.setChecked(True)
         elif aw.qmc.device == 19:                       #if arduino
             self.arduinoButton.setChecked(True)
+        elif aw.qmc.device == 27:                       #if program
+            self.programButton.setChecked(True)            
         else:
             self.nonpidButton.setChecked(True)          #else 
             selected_device_index = 0
@@ -14222,6 +14256,14 @@ class DeviceAssignmentDLG(QDialog):
         arduinoGroupBox = QGroupBox(QApplication.translate("GroupBox","Arduino TC4",None, QApplication.UnicodeUTF8))
         arduinoGroupBox.setLayout(arduinoBox)        
 
+        #create program Box
+        programlayout = QHBoxLayout()
+        programlayout.addWidget(helpprogrambutton)
+        programlayout.addWidget(selectprogrambutton)
+        programlayout.addWidget(self.programedit)
+        programGroupBox = QGroupBox(QApplication.translate("GroupBox","External Program",None, QApplication.UnicodeUTF8))
+        programGroupBox.setLayout(programlayout)
+        
         #ET BT symbolic adjustments/assignments Box
         adjustmentGroupBox = QGroupBox(QApplication.translate("GroupBox","Symbolic Assignments",None, QApplication.UnicodeUTF8))
         adjustmentsLayout = QVBoxLayout()
@@ -14243,6 +14285,9 @@ class DeviceAssignmentDLG(QDialog):
         grid.addWidget(self.arduinoButton,2,0)        
         grid.addWidget(arduinoGroupBox,2,1)
 
+        grid.addWidget(self.programButton,3,0)        
+        grid.addWidget(programGroupBox,3,1)
+
         gridBoxLayout = QHBoxLayout()
         gridBoxLayout.addLayout(grid)
         
@@ -14253,7 +14298,7 @@ class DeviceAssignmentDLG(QDialog):
         
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(gridBoxLayout)
-        tab1Layout.addWidget(adjustmentGroupBox)
+        #tab1Layout.addWidget(adjustmentGroupBox)
         
         tab1Layout.addStretch()  
 
@@ -14269,6 +14314,10 @@ class DeviceAssignmentDLG(QDialog):
         tab2Layout.addWidget(self.devicetable)
         tab2Layout.addLayout(bLayout)
 
+        #LAYOUT TAB 3
+        tab3Layout = QVBoxLayout()
+        tab3Layout.addWidget(adjustmentGroupBox)
+        
         #main tab widget
         TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -14278,6 +14327,11 @@ class DeviceAssignmentDLG(QDialog):
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra Devices",None, QApplication.UnicodeUTF8))
+
+        C3Widget = QWidget()
+        C3Widget.setLayout(tab3Layout)
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Symb ET/BT",None, QApplication.UnicodeUTF8))
+
 
         #incorporate layouts
         Mlayout = QVBoxLayout()
@@ -14345,6 +14399,24 @@ class DeviceAssignmentDLG(QDialog):
              aw.qmc.adderror(QApplication.translate("Error Message", "createDeviceTable(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
 
+    def showhelpprogram(self):
+        string = "<b>Allows to link to external programs that print temperature when called</b><br><br>"
+        string += "The output of the program must be to Stdout (like when using print statements)<br><br>"
+        string += "this allows to connect meters that use any programming language <br><br>"
+        string += "Example of output needed from program for single temperature (BT)<br><br> \"100.4\" (note: \"\" not needed) <br><br>"
+        string += "Example of output needed from program for double temperature (ET,BT)<br><br> \"200.4,100.4\" (note: temperatures are separated by a comma \"ET,BT\")<br><br>"
+        string += "Example of a file written in python language called test.py:<br>"
+        string += "#comment: print a string with two numbers separated by a comma<br><br>"
+        string += "#!/usr/bin/env python<br>"
+        string += "print (\"237.1,100.4\")"
+
+        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "External program",None, QApplication.UnicodeUTF8),string)
+
+    def loadprogramname(self):
+        fileName = aw.ArtisanOpenFileDialog()
+        if fileName:
+            self.programedit.setText(fileName)
+            
     #adds extra device
     def adddevice(self):
         try:
@@ -14545,6 +14617,12 @@ class DeviceAssignmentDLG(QDialog):
                 message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 aw.button_10.setVisible(True)
 
+            if self.programButton.isChecked():
+                meter = unicode(self.programedit.text())
+                aw.ser.externalprogram = meter
+                aw.qmc.device = 27
+                message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+                
             if self.nonpidButton.isChecked():
                 meter = str(self.devicetypeComboBox.currentText())
                 message = QApplication.translate("Error Message","device err",None,QApplication.UnicodeUTF8)
@@ -14791,11 +14869,16 @@ class DeviceAssignmentDLG(QDialog):
                 ####  DEVICE 26 is DTA pid
                 ##########################
 
+                ##########################
+                ####  DEVICE 27 is an external program
+                ##########################
+
+
                 #extra devices serial config    
                 #set of different serial settings modes options
                 ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],[19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1]]
                 #map device index to a setting mode (chose the one that matches the device)
-                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6]  #0-26
+                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3]  #0-27
                     
                 self.savedevicetable()
                 #init serial settings of extra devices
@@ -14843,11 +14926,9 @@ class DeviceAssignmentDLG(QDialog):
             aw.sendmessage(message)
 
             #open serial conf Dialog        
-            if (self.nonpidButton.isChecked() or self.arduinoButton.isChecked()):
-                if meter != "NONE":
-                    aw.setcommport()
-            else:
-                aw.setcommport()
+            #if device is not None or not external-program (don't need serial settings config)
+            if aw.qmc.device != 18 and aw.qmc.device != 27:
+                aw.setcommport()  
 
             self.close()
 
