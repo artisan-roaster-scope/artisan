@@ -1,4 +1,4 @@
-readme.txt
+﻿readme.txt
 
 Artisan helps coffee roasters record, analyze, and control roast profiles. With the help of a thermocouple data logger, or a proportional–integral–derivative controller (PID controller), this software offers roasting metrics to help make decisions that influence the final coffee flavor.
 
@@ -31,6 +31,7 @@ o ET/BT logging and PID control supporting the following devices
  - HHM28 multimeter
  - virtual devices (symbolic devices)
  - device None (no device)
+ - external program 
 o unlimited number of devices/curves running at the same time
 o symbolic manipulation of device outputs
 o Fahrenheit and Celsius display and conversion
@@ -131,7 +132,13 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
-v0.5.2 (23.8.2011)
+v0.5.3 (30.7.2011)
+- improves performance of push buttons
+- adds device external-program
+- adds trouble shooting serial log
+- fixes Linux Ubuntu and other bugs
+
+v0.5.2 (23.7.2011)
 - added Delta DTA PID support
 - added automatic CHARGE/DROP event detection
 - added separate RoR axis
