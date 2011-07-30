@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.5.2"
+__version__ = u"0.5.3"
 
 
 # ABOUT
@@ -404,7 +404,7 @@ class tgraphcanvas(FigureCanvas):
         self.hudresizeflag = False
         self.ETtarget = 350
         self.BTtarget = 250
-        self.hudETpid = [20,60,13]    # HUD pid: p = 20, i = 60, d = 13
+        self.hudETpid = [5,240,60]    # HUD pid: p = 20, i = 60, d = 13
         self.pidpreviouserror = 0  # temporary storage of pid error
 
         #General notes. Accessible through "edit graph properties" of graph menu. WYSIWYG viewer/editor.
@@ -821,10 +821,15 @@ class tgraphcanvas(FigureCanvas):
 
         self.resetlines()
 
+        if self.timeindex[0] != -1:
+            starttime = self.timex[self.timeindex[0]]
+        else:
+            starttime = 0
+
         if self.projectionmode == 0:
             #calculate the temperature endpoint at endofx acording to the latest rate of change
-            BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ 120)/60.
-            ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ 120)/60.
+            BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ starttime)/60.
+            ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ starttime)/60.
             #plot projections
             self.ax.plot([self.timex[-1],self.endofx + 120 ], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
                              linestyle = '-.', linewidth= 8, alpha = .3)
@@ -11982,7 +11987,14 @@ class serialport(object):
         if self.readBTpid[0] < 2:                    
             t2 = aw.fujipid.gettemperature(self.readBTpid[1])/10.
         elif self.readBTpid[0] == 3:
-            t2 = self.DTAPIDtemperature(self.readBTpid[1])
+            ### arguments to create command to READ TEMPERATURE
+            unitID = self.readBTpid[1]
+            function = 3
+            address = aw.dtapid.dtamem["pv"][1]  #index 1; ascii string
+            ndata = 1
+            ### create command
+            command = aw.dtapid.message2send(unitID,function,address,ndata)            
+            t2 = self.sendDTAcommand(command)
         else:
             t2 = 0.
 
@@ -12004,14 +12016,8 @@ class serialport(object):
 
     def DTAtemperature(self):
         ###########################################################
-        ### arguments to create command to read SV value
-        unitID = self.controlETpid[1]
-        function = 3
-        address = aw.dtapid.dtamem["sv"][1]  #ascii string with sv address (index 1)
-        ndata = 1
         ### create command
-        command = aw.dtapid.message2send(unitID,function,address,ndata)
-        
+        command = aw.dtapid.message2send(self.controlETpid[1],3,aw.dtapid.dtamem["sv"][1],1)        
         #read sv
         self.currentpidsv = self.sendDTAcommand(command)
         #update SV value 
@@ -12022,14 +12028,8 @@ class serialport(object):
         ###########################################################
         
         ##############################################################
-        ### arguments to create command to READ TEMPERATURE
-        unitID = self.controlETpid[1]
-        function = 3
-        address = aw.dtapid.dtamem["pv"][1]  #index 1; ascii string
-        ndata = 1
         ### create command
-        command = aw.dtapid.message2send(unitID,function,address,ndata)
-        
+        command = aw.dtapid.message2send(self.controlETpid[1],3,aw.dtapid.dtamem["pv"][1],1)
         #read 
         t1 = self.sendDTAcommand(command)
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -12037,9 +12037,11 @@ class serialport(object):
         if self.readBTpid[0] < 2:                    
             t2 = aw.fujipid.gettemperature(self.readBTpid[1])/10.
         elif self.readBTpid[0] == 3:
-            t2 = self.DTAPIDtemperature(self.readBTpid[1])
+            ### create command
+            command = aw.dtapid.message2send(self.readBTpid[1],3,aw.dtapid.dtamem["pv"][1],1)            
+            t2 = self.sendDTAcommand(command)
         else:
-            t2 = 0.
+            t2 = self.currentpidsv  #return 
         ################################################################    
 
         return tx,t1,t2
@@ -12072,9 +12074,10 @@ class serialport(object):
                     #treat REAd and WRITE commands different
                     
                     #READ command
+                    print command[4]
                     if command[4] == "3":
-                        CRCreceived = r[15:16]
-                        CRCcalculated = aw.dtapid.DTACalcChecksum(r[0:14])
+##                        CRCreceived = r[15:16]
+##                        CRCcalculated = aw.dtapid.DTACalcChecksum(r[0:12])
                         #if CRCreceived == CRCcalculated:                    
                         t1 = float(int(r[7:11], 16))*0.1                   #convert ascii string from bytes 8-12 to a float 
                         return t1
@@ -19521,7 +19524,7 @@ class DTApidDlgControl(QDialog):
         #update SV value 
         aw.dtapid.dtamem["sv"][0] = sv
         #update svedit
-        self.svedit.setText(QString(sv)) 
+        self.svedit.setText(unicode(sv)) 
         #update sv LCD
         aw.lcd6.display(sv)
         #update status
@@ -19530,7 +19533,7 @@ class DTApidDlgControl(QDialog):
 
     #write uses function = 6
     def writesv(self):
-        newsv = hex(int(float(unicode(self.svedit.text()))*10.))[2:]
+        newsv = hex(int(abs(float(unicode(self.svedit.text())))*10.))[2:].upper()
         ### create command message2send(unitID,function,address,ndata)
         command = aw.dtapid.message2send(aw.ser.controlETpid[1],6,aw.dtapid.dtamem["sv"][1],newsv)
         #read sv
