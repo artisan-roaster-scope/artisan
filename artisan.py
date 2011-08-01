@@ -1151,6 +1151,10 @@ class tgraphcanvas(FigureCanvas):
         #posible condition using WheelGraphs in view-mode and pressing reset button
         if not aw.lowerbuttondialog.isVisible(): 
             aw.lowerbuttondialog.setVisible(True)
+            aw.e1buttondialog.setVisible(True)
+            aw.e2buttondialog.setVisible(True)
+            aw.e3buttondialog.setVisible(True)
+            aw.e4buttondialog.setVisible(True)
             if aw.minieventsflag:
                 aw.EventsGroupLayout.setVisible(True)
 
@@ -3882,6 +3886,10 @@ class tgraphcanvas(FigureCanvas):
         
     def connectWheel(self):
         aw.lowerbuttondialog.setVisible(False)
+        aw.e1buttondialog.setVisible(False)
+        aw.e2buttondialog.setVisible(False)
+        aw.e3buttondialog.setVisible(False)
+        aw.e4buttondialog.setVisible(False)
         aw.EventsGroupLayout.setVisible(False)
         self.setCursor(Qt.PointingHandCursor)
         self.wheelconnections[0] = self.fig.canvas.mpl_connect('pick_event', self.wheel_pick)
@@ -3896,6 +3904,10 @@ class tgraphcanvas(FigureCanvas):
 
         self.redraw(recomputeAllDeltas=False)
         aw.lowerbuttondialog.setVisible(True)
+        aw.e1buttondialog.setVisible(True)
+        aw.e2buttondialog.setVisible(True)
+        aw.e3buttondialog.setVisible(True)
+        aw.e4buttondialog.setVisible(True)
         if aw.minieventsflag:
             aw.EventsGroupLayout.setVisible(True)
 
@@ -5085,6 +5097,7 @@ class ApplicationWindow(QMainWindow):
 
         #### CUSTOM events buttons
         self.buttonlist = []
+        self.buttonlistmaxlen = 10
         
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
@@ -5099,6 +5112,16 @@ class ApplicationWindow(QMainWindow):
         self.lowerbuttondialog.addButton(self.button_6,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_9,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_11,QDialogButtonBox.ActionRole)
+
+        self.e1buttondialog = QDialogButtonBox(Qt.Horizontal)
+        self.e1buttondialog.setCenterButtons(True)
+        self.e2buttondialog = QDialogButtonBox(Qt.Horizontal)
+        self.e2buttondialog.setCenterButtons(True)
+        self.e3buttondialog = QDialogButtonBox(Qt.Horizontal)
+        self.e3buttondialog.setCenterButtons(True)
+        self.e4buttondialog = QDialogButtonBox(Qt.Horizontal)
+        self.e4buttondialog.setCenterButtons(True)
+        
 
         # set the focus on the main widget
         self.main_widget.setFocus()
@@ -5196,6 +5219,10 @@ class ApplicationWindow(QMainWindow):
         mainlayout.addWidget(self.messagelabel)
         mainlayout.addLayout(level3layout)
         mainlayout.addWidget(self.lowerbuttondialog)
+        mainlayout.addWidget(self.e1buttondialog)
+        mainlayout.addWidget(self.e2buttondialog)
+        mainlayout.addWidget(self.e3buttondialog)
+        mainlayout.addWidget(self.e4buttondialog)
         mainlayout.addSpacing(10)
         mainlayout.addWidget(self.EventsGroupLayout)
 
@@ -6662,6 +6689,8 @@ class ApplicationWindow(QMainWindow):
 
             settings.beginGroup("ExtraEventButtons")                    
             if settings.contains("extraeventsactions"):
+                if settings.contains("buttonlistmaxlen"):
+                    self.buttonlistmaxlen = settings.value("buttonlistmaxlen",self.buttonlistmaxlen).toInt()[0]
                 self.extraeventstypes = map(lambda x:x.toInt()[0],settings.value("extraeventstypes").toList())
                 self.extraeventsvalues = map(lambda x:x.toInt()[0],settings.value("extraeventsvalues").toList())
                 self.extraeventsactions = map(lambda x:x.toInt()[0],settings.value("extraeventsactions").toList())
@@ -6682,7 +6711,18 @@ class ApplicationWindow(QMainWindow):
                     self.buttonlist[i].setMinimumHeight(50)
                     self.buttonlist[i].setText(self.extraeventslabels[i])
                     self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
-                    self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                    #add button to row                    
+                    if len(self.lowerbuttondialog.buttons()) < self.buttonlistmaxlen:
+                        self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                    elif len(self.e1buttondialog.buttons()) < self.buttonlistmaxlen:
+                        self.e1buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                    elif len(self.e2buttondialog.buttons()) < self.buttonlistmaxlen:
+                        self.e2buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                    elif len(self.e3buttondialog.buttons()) < self.buttonlistmaxlen:
+                        self.e3buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                    else:
+                        self.e4buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                        
                 self.update_extraeventbuttons_visibility()
             settings.endGroup()
             
@@ -6865,6 +6905,7 @@ class ApplicationWindow(QMainWindow):
             
             #custom event buttons
             settings.beginGroup("ExtraEventButtons")
+            settings.setValue("buttonlistmaxlen",self.buttonlistmaxlen)
             settings.setValue("extraeventstypes",self.extraeventstypes)
             settings.setValue("extraeventsvalues",self.extraeventsvalues)
             settings.setValue("extraeventsactionstrings",self.extraeventsactionstrings)
@@ -8036,6 +8077,36 @@ $cupping_notes
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Symbolic Functions",None, QApplication.UnicodeUTF8),string3)
 
 
+    def realignbuttons(self):
+        #clear buttons
+        mainbuttunslen = len(self.lowerbuttondialog.buttons())
+        diff = mainbuttunslen - 9
+        for i in range(diff):
+            self.lowerbuttondialog.removeButton(self.buttonlist[i])
+
+        self.e1buttondialog.clear()
+        self.e2buttondialog.clear()
+        self.e3buttondialog.clear()
+        self.e4buttondialog.clear()
+        self.buttonlist = []
+        for i in range(len(self.extraeventstypes)):
+            self.buttonlist.append(QPushButton())
+            self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
+            self.buttonlist[i].setStyleSheet(self.pushbuttonstyles["EVENT"]) 
+            self.buttonlist[i].setMinimumHeight(50)
+            self.buttonlist[i].setText(self.extraeventslabels[i])
+            self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
+            #add button to row                    
+            if len(self.lowerbuttondialog.buttons()) < self.buttonlistmaxlen:
+                self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+            elif len(self.e1buttondialog.buttons()) < self.buttonlistmaxlen:
+                self.e1buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+            elif len(self.e2buttondialog.buttons()) < self.buttonlistmaxlen:
+                self.e2buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+            elif len(self.e3buttondialog.buttons()) < self.buttonlistmaxlen:
+                self.e3buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+            else:
+                self.e4buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
 
 ##########################################################################
 #####################     HUD  EDIT DLG     ##############################
@@ -10380,6 +10451,15 @@ class EventsDlg(QDialog):
         #helpButton.setMaximumWidth(100)
         helpButton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpButton, SIGNAL("clicked()"),self.showEventbuttonhelp)
+
+        #buttons per row: 
+        self.nbuttonslabel = QLabel(QApplication.translate("Label","Number of Buttons per row", None, QApplication.UnicodeUTF8))
+        self.nbuttonsSpinBox = QSpinBox()
+        self.nbuttonsSpinBox.setMaximumWidth(100)
+        self.nbuttonsSpinBox.setAlignment(Qt.AlignCenter)
+        self.nbuttonsSpinBox.setRange(9,30)
+        self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
+        self.connect(self.nbuttonsSpinBox, SIGNAL("valueChanged(int)"),self.realignbuttons)
                 
         #### tab1 layout
         typeLayout0 = QHBoxLayout()
@@ -10424,15 +10504,21 @@ class EventsDlg(QDialog):
         tab1layout.addWidget(TypeGroupLayout)
         tab1layout.addWidget(self.autoChargeDrop)
 
-        ### tab2 layout
-        tab2layout = QVBoxLayout()
-        tab2layout.addWidget(self.eventbuttontable)
+        nbuttonslayout = QHBoxLayout()
+        nbuttonslayout.addWidget(self.nbuttonslabel)
+        nbuttonslayout.addWidget(self.nbuttonsSpinBox)        
+
         tab2buttonlayout = QHBoxLayout()    
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(delButton)
         tab2buttonlayout.addStretch()
         tab2buttonlayout.addWidget(savetableButton)
-        tab2buttonlayout.addWidget(helpButton)        
+        tab2buttonlayout.addWidget(helpButton) 
+
+        ### tab2 layout
+        tab2layout = QVBoxLayout()
+        tab2layout.addWidget(self.eventbuttontable)
+        tab2layout.addLayout(nbuttonslayout)       
         tab2layout.addLayout(tab2buttonlayout)  
         
 ###########################################
@@ -10455,6 +10541,10 @@ class EventsDlg(QDialog):
         mainLayout.setMargin(0)      
 
         self.setLayout(mainLayout)
+
+    def realignbuttons(self):
+        aw.buttonlistmaxlen = self.nbuttonsSpinBox.value()
+        aw.realignbuttons()
 
     def createEventbuttonTable(self):
         self.eventbuttontable.clear()
@@ -10569,11 +10659,24 @@ class EventsDlg(QDialog):
             aw.extraeventsvisibility.pop(bindex)
             
             self.createEventbuttonTable()  #update table
-            aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
+
+            if len(aw.e1buttondialog.buttons()):
+                aw.e4buttondialog.removeButton(aw.buttonlist[bindex])
+            elif len(aw.e1buttondialog.buttons()):
+                aw.e3buttondialog.removeButton(aw.buttonlist[bindex])
+            elif len(aw.e2buttondialog.buttons()):
+                aw.e2buttondialog.removeButton(aw.buttonlist[bindex])
+            elif len(aw.e3buttondialog.buttons()):
+                aw.e1buttondialog.removeButton(aw.buttonlist[bindex])
+            elif len(aw.lowerbuttondialog.buttons()):
+                aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
+            
             aw.buttonlist.pop(bindex)        
         aw.update_extraeventbuttons_visibility()
 
     def insertextraeventbutton(self):
+        if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
+            return
         aw.extraeventsdescriptions.append("")
         aw.extraeventstypes.append(0)
         aw.extraeventsvalues.append(1)
@@ -10592,9 +10695,21 @@ class EventsDlg(QDialog):
         aw.buttonlist[bindex].setMaximumSize(90, 50)
         aw.buttonlist[bindex].setMinimumHeight(50)
         aw.buttonlist[bindex].setText(initialtext)        
-        aw.connect(aw.buttonlist[bindex], SIGNAL("clicked()"), lambda ee=bindex:aw.recordextraevent(ee))        
-        aw.lowerbuttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+        aw.connect(aw.buttonlist[bindex], SIGNAL("clicked()"), lambda ee=bindex:aw.recordextraevent(ee))
 
+        #add button to row
+        blen = len(aw.buttonlist)
+        if len(aw.lowerbuttondialog.buttons()) < aw.buttonlistmaxlen:
+            aw.lowerbuttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+        elif len(aw.e1buttondialog.buttons()) < aw.buttonlistmaxlen:
+            aw.e1buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+        elif len(aw.e2buttondialog.buttons()) < aw.buttonlistmaxlen:
+            aw.e2buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+        elif len(aw.e3buttondialog.buttons()) < aw.buttonlistmaxlen:
+            aw.e3buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+        else:
+            aw.e4buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+                
         aw.update_extraeventbuttons_visibility()
 
     def eventsbuttonflagChanged(self):
@@ -10880,6 +10995,10 @@ class flavorDlg(QDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None, QApplication.UnicodeUTF8))        
         self.setModal(True)
         aw.lowerbuttondialog.setVisible(False)
+        aw.e1buttondialog.setVisible(False)
+        aw.e2buttondialog.setVisible(False)
+        aw.e3buttondialog.setVisible(False)
+        aw.e4buttondialog.setVisible(False)
         aw.EventsGroupLayout.setVisible(False)
 
         defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
@@ -11091,11 +11210,19 @@ class flavorDlg(QDialog):
         self.accept()
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.lowerbuttondialog.setVisible(True)
+        aw.e1buttondialog.setVisible(True)
+        aw.e2buttondialog.setVisible(True)
+        aw.e3buttondialog.setVisible(True)
+        aw.e4buttondialog.setVisible(True)
         aw.update_minieventline_visibility()
         
     def close(self):
         self.savetable()
         aw.lowerbuttondialog.setVisible(True)
+        aw.e1buttondialog.setVisible(True)
+        aw.e2buttondialog.setVisible(True)
+        aw.e3buttondialog.setVisible(True)
+        aw.e4buttondialog.setVisible(True)
         aw.update_minieventline_visibility()
         self.accept()
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -14413,7 +14540,8 @@ class DeviceAssignmentDLG(QDialog):
         string += "#!/usr/bin/env python<br>"
         string += "print (\"237.1,100.4\")"
 
-        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "External program",None, QApplication.UnicodeUTF8),string)
+        translatedstring = QApplication.translate("MessageBox",string,None, QApplication.UnicodeUTF8)
+        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "External program",None, QApplication.UnicodeUTF8),translatedstring)
 
     def loadprogramname(self):
         fileName = aw.ArtisanOpenFileDialog()
@@ -15549,6 +15677,10 @@ class WheelDlg(QDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None, QApplication.UnicodeUTF8))
 
         aw.lowerbuttondialog.setVisible(False)
+        aw.e1buttondialog.setVisible(False)
+        aw.e2buttondialog.setVisible(False)
+        aw.e3buttondialog.setVisible(False)
+        aw.e4buttondialog.setVisible(False)
         aw.EventsGroupLayout.setVisible(False)
     	
         #table for alarms
@@ -16134,6 +16266,10 @@ class WheelDlg(QDialog):
         aw.qmc.disconnectWheel()
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.lowerbuttondialog.setVisible(True)
+        aw.e1buttondialog.setVisible(True)
+        aw.e2buttondialog.setVisible(True)
+        aw.e3buttondialog.setVisible(True)
+        aw.e4buttondialog.setVisible(True)
         if aw.minieventsflag:
             aw.EventsGroupLayout.setVisible(True)
 
