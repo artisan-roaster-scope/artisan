@@ -103,6 +103,8 @@ HELP_MENU_KEYBOARDSHORTCUTS = QApplication.translate("Menu", "Keyboard Shortcuts
 HELP_MENU_ERRORS = QApplication.translate("Menu", "Errors", None, QApplication.UnicodeUTF8)
 HELP_MENU_MESSAGES = QApplication.translate("Menu", "Messages", None, QApplication.UnicodeUTF8)
 HELP_MENU_SERIAL = QApplication.translate("Menu", "Serial", None, QApplication.UnicodeUTF8)
+HELP_MENU_SETTINGS = QApplication.translate("Menu", "Settings", None, QApplication.UnicodeUTF8)
+HELP_MENU_PLATFORM = QApplication.translate("Menu", "Platform", None, QApplication.UnicodeUTF8)
 HELP_MENU_RESET = QApplication.translate("Menu", "Factory Reset", None, QApplication.UnicodeUTF8)
   
 #######################################################################################
