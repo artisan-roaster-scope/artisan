@@ -23,7 +23,7 @@ LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
 
-APP = ['loader.py']
+APP = ['artisan.py']
 
 DATA_FILES = [
     "LICENSE.txt",
@@ -107,8 +107,8 @@ for root, dirs, files in os.walk('.'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
         elif '_tests' in file:
-            print 'Deleting', file
-            os.remove(os.path.join(root,file))
+            print 'Deleting', file            
+            os.remove(os.path.join(root,file))            
         elif file.endswith('.pyc') and file != "site.pyc":
             print 'Deleting', file
             os.remove(os.path.join(root,file))
