@@ -4770,6 +4770,10 @@ class ApplicationWindow(QMainWindow):
         self.connect(settingsAction,SIGNAL("triggered()"),self.viewartisansettings)
         self.helpMenu.addAction(settingsAction)
 
+        platformAction = QAction(UIconst.HELP_MENU_PLATFORM,self)
+        self.connect(platformAction,SIGNAL("triggered()"),self.viewplatform)
+        self.helpMenu.addAction(platformAction)
+
         resetAction = QAction(UIconst.HELP_MENU_RESET,self)
         self.connect(resetAction,SIGNAL("triggered()"),self.resetApplication)
         self.helpMenu.addAction(resetAction)
@@ -7606,6 +7610,10 @@ $cupping_notes
         settingsDLG = artisansettingsDlg(self)
         settingsDLG.show()        
 
+    def viewplatform(self):
+        platformDLG = platformDlg(self)
+        platformDLG.show()              
+
     def viewMessageLog(self):
         message = messageDlg(self)
         message.show()        
@@ -9760,6 +9768,56 @@ class editGraphDlg(QDialog):
         self.close()
 
 
+##########################################################################
+#####################  VIEW PLATFORM      ################################
+##########################################################################
+
+class platformDlg(QDialog):
+    def __init__(self, parent = None):
+        super(platformDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Platform", None, QApplication.UnicodeUTF8))
+
+        platformdic = {}
+    
+        platformdic["Architecture"] = unicode(platform.architecture())
+        platformdic["Machine"] = unicode(platform.machine())
+        platformdic["Platform name"] =  unicode(platform.platform())
+        platformdic["Processor"] = unicode(platform.processor())
+        platformdic["Python Build"] = unicode(platform.python_build())
+        platformdic["Python Compiler"] = unicode(platform.python_compiler())
+        platformdic["Python Branch"] = unicode(platform.python_branch())
+        platformdic["Python Implementation"] = unicode(platform.python_implementation())
+        platformdic["Python Revision"] = unicode(platform.python_revision())
+        platformdic["Release"] = unicode(platform.release())
+        platformdic["System"] = unicode(platform.system())
+        platformdic["Version"] = unicode(platform.version())
+        #platformdic["Alias"] = unicode(platform.system_alias(platform.system(),platform.release(),platform.version()))
+        
+        platformdic["Python version"] = unicode(platform.python_version())
+
+        system = unicode(platform.system())
+        if system == u"Windows":
+            platformdic["Win32"] = unicode(platform.win32_ver())
+        elif system == u"Darwin":
+            platformdic["Mac"] = unicode(platform.mac_ver())
+        elif system == u"Linux":
+            platformdic["Linux"] = unicode(platform.linux_distribution())
+            platformdic["Libc"] = unicode(platform.libc_ver())
+
+        htmlplatform = "version = " +__version__ +"<br><br>"
+        for key in sorted(platformdic):        
+            htmlplatform += "<b>" + key + " = </b> <i>" + platformdic[key] + "</i><br><br>"
+    
+        platformEdit = QTextEdit()
+        platformEdit.setHtml(htmlplatform)
+        platformEdit.setReadOnly(True)
+
+        layout = QVBoxLayout()
+        layout.addWidget(platformEdit)
+                               
+        self.setLayout(layout)
+            
+        
 
 ##########################################################################
 #####################  VIEW ATISAN SETTINGS ##############################
@@ -9770,7 +9828,6 @@ class artisansettingsDlg(QDialog):
         super(artisansettingsDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Artisan Settings", None, QApplication.UnicodeUTF8))
 
-        #convert list of errors to an html string
         htmlsettings = "version = " +__version__ +"<br><br>"
 
         settingsdict = aw.readartisansettings()
