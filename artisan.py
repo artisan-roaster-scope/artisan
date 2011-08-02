@@ -2084,6 +2084,7 @@ class tgraphcanvas(FigureCanvas):
                 self.xaxistosm()
 
                 self.fig.canvas.draw()
+                
                 self.samplingsemaphore.release(1)
 
                 message = QApplication.translate("Message Area","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(unicode(self.temp2[self.timeindex[0]]) + self.mode)
@@ -4765,6 +4766,10 @@ class ApplicationWindow(QMainWindow):
         self.connect(serialAction,SIGNAL("triggered()"),self.viewSerialLog)
         self.helpMenu.addAction(serialAction)
 
+        settingsAction = QAction(UIconst.HELP_MENU_SETTINGS,self)
+        self.connect(settingsAction,SIGNAL("triggered()"),self.viewartisansettings)
+        self.helpMenu.addAction(settingsAction)
+
         resetAction = QAction(UIconst.HELP_MENU_RESET,self)
         self.connect(resetAction,SIGNAL("triggered()"),self.resetApplication)
         self.helpMenu.addAction(resetAction)
@@ -6710,6 +6715,8 @@ class ApplicationWindow(QMainWindow):
                     self.buttonlist[i].setStyleSheet(self.pushbuttonstyles["EVENT"]) 
                     self.buttonlist[i].setMinimumHeight(50)
                     self.buttonlist[i].setText(self.extraeventslabels[i])
+                    tip = unicode(self.extraeventsdescriptions[i]) + u"\n" + unicode(self.extraeventstypes[i]) + u"\n" + unicode(self.extraeventsvalues[i]) + u"\n" + unicode(self.extraeventsactionstrings[i])
+                    self.buttonlist[i].setToolTip(tip)
                     self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
                     #add button to row                    
                     if len(self.lowerbuttondialog.buttons()) < self.buttonlistmaxlen:
@@ -6930,6 +6937,126 @@ class ApplicationWindow(QMainWindow):
            
         except Exception,e:
             self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))            
+
+
+    #used for trouble shooting.
+    def readartisansettings(self):
+            settings = {}
+            #read window geometry
+            rect = self.geometry()
+            height = unicode(rect.height())
+            width = unicode(rect.width())
+            settings["Geometry"] = height + u"x" + width                #custom made string
+            settings["Mode"] = unicode(self.qmc.mode)
+            settings["id"] = unicode(self.qmc.device)
+            settings["controlETpid"] = unicode(self.ser.controlETpid)
+            settings["readBTpid"] = unicode(self.ser.readBTpid)            
+            settings["arduinoETChannel"] = unicode(self.ser.arduinoETChannel)
+            settings["arduinoBTChannel"] = unicode(self.ser.arduinoBTChannel)
+            settings["Phases"] = unicode(aw.qmc.phases)
+            settings["phasesbuttonflag"] = unicode(self.qmc.phasesbuttonflag)
+            settings["Statistics"] = unicode(self.qmc.statisticsflags)
+            settings["StatisticsConds"] = unicode(self.qmc.statisticsconditions)
+            settings["eventsbuttonflag"] = unicode(self.eventsbuttonflag)
+            settings["minieventsflag"] = unicode(self.minieventsflag)
+            settings["eventsGraphflag"] = unicode(self.qmc.eventsGraphflag)
+            settings["etypes"] = unicode(self.qmc.etypes)
+            settings["eventsshowflag"] = unicode(aw.qmc.eventsshowflag)
+            settings["autoChargeDrop"] = unicode(self.qmc.autoChargeDropFlag)
+            settings["Delay"] = unicode(self.qmc.delay)
+            settings["Colors"] = unicode(self.qmc.palette)
+            settings["LCDColors"] = unicode(self.lcdpaletteB)
+            settings["LEDColors"] = unicode(self.lcdpaletteF)
+            flavors= []
+            for i in range(len(self.qmc.flavorlabels)):
+                 flavors.append(unicode(self.qmc.flavorlabels[i]))          
+            settings["Flavors"] = unicode(flavors)
+            settings["flavorstartangle"] = unicode(self.qmc.flavorstartangle)
+            settings["sound"]= unicode(self.soundflag)
+            settings["comport"] = unicode(self.ser.comport)
+            settings["baudrate"] = unicode(self.ser.baudrate)
+            settings["bytesize"]= unicode(self.ser.bytesize)
+            settings["stopbits"]= unicode(self.ser.stopbits)
+            settings["parity"]= unicode(self.ser.parity)
+            settings["timeout"]= unicode(self.ser.timeout)            
+            for key in self.fujipid.PXR.keys():
+                settings[u"PXR:" + key] = unicode(self.fujipid.PXR[key][0])   # key modified
+            for key in self.fujipid.PXG4.keys():            
+                settings[u"PXG:" + key] = unicode(self.fujipid.PXG4[key][0])  # key modified
+            for key in self.dtapid.dtamem.keys():            
+                settings[u"DTA:" + key] = unicode(self.dtapid.dtamem[key][0]) # key modified
+            settings["DeltaET"]= unicode(self.qmc.DeltaETflag)
+            settings["DeltaBT"]= unicode(self.qmc.DeltaBTflag)
+            settings["deltafilter"]= unicode(self.qmc.deltafilter)
+            settings["Projection"]= unicode(self.qmc.projectFlag)
+            settings["ProjectionMode"]= unicode(self.qmc.projectionmode)
+            settings["ETtarget"]= unicode(self.qmc.ETtarget)
+            settings["BTtarget"]= unicode(self.qmc.BTtarget)
+            settings["HUDMode"]= unicode(self.HUDfunction)                      # key modified
+            settings["hudETpid"]= unicode(self.qmc.hudETpid)
+            settings["Beep"]= unicode(self.soundflag)
+            settings["xmin"]= unicode(self.qmc.startofx)
+            settings["xmax"]= unicode(self.qmc.endofx)
+            settings["ymax"]= unicode(self.qmc.ylimit)
+            settings["ymin"]= unicode(self.qmc.ylimit_min)
+            settings["zmax"]= unicode(self.qmc.zlimit)
+            settings["zmin"]= unicode(self.qmc.zlimit_min)
+            settings["keepTimeLimit"] = unicode(self.qmc.keeptimeflag)
+            settings["legendloc"] = unicode(self.qmc.legendloc )
+            
+            settings["operator"]= unicode(self.qmc.operator)
+            settings["roastertype"] = unicode(self.qmc.roastertype)
+            settings["densitySampleVolume"] = unicode(self.qmc.density[2])
+            settings["densitySampleVolumeUnit"]= unicode(self.qmc.density[3])
+            settings["alarmtime"]= unicode(self.qmc.alarmtime)                                                                
+            settings["alarmflag"]= unicode(self.qmc.alarmflag)            
+            settings["alarmsource"]= unicode(self.qmc.alarmsource)
+            settings["alarmtemperature"]= unicode(self.qmc.alarmtemperature)
+            settings["alarmaction"]= unicode(self.qmc.alarmaction)
+            settings["alarmstrings"]= unicode(self.qmc.alarmstrings)
+            settings["profilepath"]= unicode(self.userprofilepath)
+            #save extra devices
+            settings["extradevices"]= unicode(self.qmc.extradevices)                
+            settings["extradevicecolor1"]= unicode(self.qmc.extradevicecolor1)                                                                
+            settings["extradevicecolor2"]= unicode(self.qmc.extradevicecolor2)
+            settings["extraname1"]= unicode(self.qmc.extraname1)
+            settings["extraname2"]= unicode(self.qmc.extraname2)
+            settings["extramathexpression1"]= unicode(self.qmc.extramathexpression1)
+            settings["extramathexpression2"]= unicode(self.qmc.extramathexpression2)
+            #save extra serial comm ports settings
+            settings["extracomport"]= unicode(self.extracomport)                                                                
+            settings["extrabaudrate"]= unicode(self.extrabaudrate)                                                                
+            settings["extrabytesize"]= unicode(self.extrabytesize)                                                                
+            settings["extraparity"]= unicode(self.extraparity)                                                                
+            settings["extrastopbits"]= unicode(self.extrastopbits)                                                                
+            settings["extratimeout"]= unicode(self.extratimeout)
+            settings["BTfunction"]= unicode(self.qmc.BTfunction)                                                                
+            settings["ETfunction"]= unicode(self.qmc.ETfunction)
+            
+            settings["resetqsettings"]= unicode(self.resetqsettings)
+            settings["plotcurves"]= unicode(self.qmc.plotcurves)                                                                
+            settings["plotcurvecolor"]= unicode(self.qmc.plotcurvecolor)
+            
+            #custom event buttons
+            settings["buttonlistmaxlen"]= unicode(self.buttonlistmaxlen)
+            settings["extraeventstypes"]= unicode(self.extraeventstypes)
+            settings["extraeventsvalues"]= unicode(self.extraeventsvalues)
+            settings["extraeventsactionstrings"]= unicode(self.extraeventsactionstrings)
+            settings["extraeventsactions"]= unicode(self.extraeventsactions)
+            settings["extraeventsdescriptions"]= unicode(self.extraeventsdescriptions)
+            settings["extraeventsvisibility"]= unicode(self.extraeventsvisibility)
+            settings["extraeventslabels"]= unicode(self.extraeventslabels)
+            
+            settings["xgrid"]= unicode(self.qmc.xgrid)
+            settings["ygrid"]= unicode(self.qmc.ygrid)
+            settings["zgrid"]= unicode(self.qmc.zgrid)
+            settings["gridlinestyle"]= unicode(self.qmc.gridlinestyle)
+            settings["gridthickness"]= unicode(self.qmc.gridthickness)
+            settings["gridalpha"]= unicode(self.qmc.gridalpha)
+            settings["xrotation"]= unicode(self.qmc.xrotation)
+
+            return settings
+
 
     def filePrint(self):
 
@@ -7475,6 +7602,9 @@ $cupping_notes
         serialDLG = serialLogDlg(self)
         serialDLG.show()
         
+    def viewartisansettings(self):
+        settingsDLG = artisansettingsDlg(self)
+        settingsDLG.show()        
 
     def viewMessageLog(self):
         message = messageDlg(self)
@@ -8095,6 +8225,8 @@ $cupping_notes
             self.buttonlist[i].setStyleSheet(self.pushbuttonstyles["EVENT"]) 
             self.buttonlist[i].setMinimumHeight(50)
             self.buttonlist[i].setText(self.extraeventslabels[i])
+            tip = unicode(self.extraeventsdescriptions[i]) + u"\n" + unicode(self.extraeventstypes[i]) + u"\n" + unicode(self.extraeventsvalues[i]) + u"\n" + unicode(self.extraeventsactionstrings[i])
+            self.buttonlist[i].setToolTip(tip)
             self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
             #add button to row                    
             if len(self.lowerbuttondialog.buttons()) < self.buttonlistmaxlen:
@@ -9628,10 +9760,36 @@ class editGraphDlg(QDialog):
         self.close()
 
 
+
+##########################################################################
+#####################  VIEW ATISAN SETTINGS ##############################
+##########################################################################
+
+class artisansettingsDlg(QDialog):
+    def __init__(self, parent = None):
+        super(artisansettingsDlg,self).__init__(parent)
+        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Settings", None, QApplication.UnicodeUTF8))
+
+        #convert list of errors to an html string
+        htmlsettings = "version = " +__version__ +"<br><br>"
+
+        settingsdict = aw.readartisansettings()
+
+        for key in sorted(settingsdict):        
+            htmlsettings += "<b>" + key + " = </b> <i>" + settingsdict[key] + "</i><br><br>"
+    
+        settingsEdit = QTextEdit()
+        settingsEdit.setHtml(htmlsettings)
+        settingsEdit.setReadOnly(True)
+
+        layout = QVBoxLayout()
+        layout.addWidget(settingsEdit)
+                               
+        self.setLayout(layout)
+        
 ##########################################################################
 #####################  VIEW SERIAL LOG DLG  ##############################
 ##########################################################################
-
 
 class serialLogDlg(QDialog):
     def __init__(self, parent = None):
@@ -10615,6 +10773,8 @@ class EventsDlg(QDialog):
                 label = chr(10).join(parts)
             aw.extraeventslabels[i] = label
             aw.buttonlist[i].setText(aw.extraeventslabels[i])
+            tip = unicode(aw.extraeventsdescriptions[i]) + u"\n" + unicode(aw.extraeventstypes[i]) + u"\n" + unicode(aw.extraeventsvalues[i]) + u"\n" + unicode(aw.extraeventsactionstrings[i])
+            aw.buttonlist[i].setToolTip(tip)
             
             descriptionedit = self.eventbuttontable.cellWidget(i,1)
             aw.extraeventsdescriptions[i] = unicode(descriptionedit.text())
@@ -10675,6 +10835,9 @@ class EventsDlg(QDialog):
         aw.update_extraeventbuttons_visibility()
 
     def insertextraeventbutton(self):
+        #save preious changes
+        self.savetableextraeventbutton()
+        
         if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
             return
         aw.extraeventsdescriptions.append("")
@@ -10694,7 +10857,7 @@ class EventsDlg(QDialog):
         aw.buttonlist[bindex].setStyleSheet("font-size: 10pt; font-weight: bold; color: black; background-color: yellow ") 
         aw.buttonlist[bindex].setMaximumSize(90, 50)
         aw.buttonlist[bindex].setMinimumHeight(50)
-        aw.buttonlist[bindex].setText(initialtext)        
+        aw.buttonlist[bindex].setText(initialtext)
         aw.connect(aw.buttonlist[bindex], SIGNAL("clicked()"), lambda ee=bindex:aw.recordextraevent(ee))
 
         #add button to row
@@ -12201,19 +12364,18 @@ class serialport(object):
                     #treat REAd and WRITE commands different
                     
                     #READ command
-                    print command[4]
                     if command[4] == "3":
-##                        CRCreceived = r[15:16]
-##                        CRCcalculated = aw.dtapid.DTACalcChecksum(r[0:12])
-                        #if CRCreceived == CRCcalculated:                    
-                        t1 = float(int(r[7:11], 16))*0.1                   #convert ascii string from bytes 8-12 to a float 
-                        return t1
-##                        else:
-##                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8).arg(nbytes))            
-##                            if len(aw.qmc.timex) > 2:                           
-##                                return aw.qmc.temp1[-1]       
-##                            else:
-##                                return 0
+                        CRCreceived = r[13:14]
+                        CRCcalculated = hex(aw.dtapid.DTACalcChecksum(r[1:13]))[2:].upper()
+                        if CRCreceived == CRCcalculated:                                                                       
+                            t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float 
+                            return t1
+                        else:
+                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                            if len(aw.qmc.timex) > 2:                           
+                                return aw.qmc.temp1[-1]       
+                            else:
+                                return 0.
                     #WRITE COMMAND. Under Test
                     if command[4] == "4":
                         #received  data is equal to sent command
