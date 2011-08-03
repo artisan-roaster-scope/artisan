@@ -4448,6 +4448,7 @@ class ApplicationWindow(QMainWindow):
 
     	#user defined event buttons
         self.extraeventslabels,self.extraeventsdescriptions, self.extraeventstypes,self.extraeventsvalues = [],[],[],[]  #hold string,string,index,index
+        self.extraeventbuttoncolor,self.extraeventbuttontextcolor = [],[]
         self.extraeventsactionstrings,self.extraeventsactions,self.extraeventsvisibility = [],[],[] #hold string,index,index
 
         # set window title
@@ -6707,16 +6708,26 @@ class ApplicationWindow(QMainWindow):
                 self.extraeventsactionstrings = list(settings.value("extraeventsactionstrings",self.extraeventsactionstrings).toStringList())
                 self.extraeventslabels = list(settings.value("extraeventslabels",self.extraeventslabels).toStringList())
                 self.extraeventsdescriptions= list(settings.value("extraeventsdescriptions",self.extraeventsdescriptions).toStringList())
-                
+                if settings.contains("extraeventbuttoncolor"):
+                    self.extraeventbuttoncolor = list(settings.value("extraeventbuttoncolor",self.extraeventbuttoncolor).toStringList())
+                    self.extraeventbuttontextcolor = list(settings.value("extraeventbuttontextcolor",self.extraeventbuttontextcolor).toStringList())
+                else:
+                    self.extraeventbuttoncolor = ["yellow"]*len(self.extraeventstypes)                                        
+                    self.extraeventbuttontextcolor = ["black"]*len(self.extraeventstypes)
+                    
                 for i in range(len(self.extraeventsactionstrings)):
                     self.extraeventsactionstrings[i] = unicode(self.extraeventsactionstrings[i])
                     self.extraeventslabels[i] = unicode(self.extraeventslabels[i])
                     self.extraeventsdescriptions[i] = unicode(self.extraeventsdescriptions[i])
+                    self.extraeventbuttoncolor[i] = unicode(self.extraeventbuttoncolor[i])
+                    self.extraeventbuttontextcolor[i] = unicode(self.extraeventbuttontextcolor[i])
+                    
                 #create buttons                    
                 for i in range(len(self.extraeventstypes)):
                     self.buttonlist.append(QPushButton())
                     self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
-                    self.buttonlist[i].setStyleSheet(self.pushbuttonstyles["EVENT"]) 
+                    style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttontextcolor[i],self.extraeventbuttoncolor[i])
+                    self.buttonlist[i].setStyleSheet(style)
                     self.buttonlist[i].setMinimumHeight(50)
                     self.buttonlist[i].setText(self.extraeventslabels[i])
                     tip = unicode(self.extraeventsdescriptions[i]) + u"\n" + unicode(self.extraeventstypes[i]) + u"\n" + unicode(self.extraeventsvalues[i]) + u"\n" + unicode(self.extraeventsactionstrings[i])
@@ -6924,6 +6935,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraeventsdescriptions",self.extraeventsdescriptions)
             settings.setValue("extraeventsvisibility",self.extraeventsvisibility)
             settings.setValue("extraeventslabels",self.extraeventslabels)
+            settings.setValue("extraeventbuttoncolor",self.extraeventbuttoncolor)
+            settings.setValue("extraeventbuttontextcolor",self.extraeventbuttontextcolor)            
             settings.endGroup()
             
             settings.beginGroup("grid")
@@ -7050,6 +7063,8 @@ class ApplicationWindow(QMainWindow):
             settings["extraeventsdescriptions"]= unicode(self.extraeventsdescriptions)
             settings["extraeventsvisibility"]= unicode(self.extraeventsvisibility)
             settings["extraeventslabels"]= unicode(self.extraeventslabels)
+            settings["extraeventbuttoncolor"]= unicode(self.extraeventbuttoncolor)
+            settings["extraeventbuttontextcolor"]= unicode(self.extraeventbuttontextcolor)
             
             settings["xgrid"]= unicode(self.qmc.xgrid)
             settings["ygrid"]= unicode(self.qmc.ygrid)
@@ -8230,7 +8245,8 @@ $cupping_notes
         for i in range(len(self.extraeventstypes)):
             self.buttonlist.append(QPushButton())
             self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
-            self.buttonlist[i].setStyleSheet(self.pushbuttonstyles["EVENT"]) 
+            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[i],aw.extraeventbuttoncolor[i])
+            aw.buttonlist[i].setStyleSheet(style)
             self.buttonlist[i].setMinimumHeight(50)
             self.buttonlist[i].setText(self.extraeventslabels[i])
             tip = unicode(self.extraeventsdescriptions[i]) + u"\n" + unicode(self.extraeventstypes[i]) + u"\n" + unicode(self.extraeventsvalues[i]) + u"\n" + unicode(self.extraeventsactionstrings[i])
@@ -10766,14 +10782,16 @@ class EventsDlg(QDialog):
         nbuttons = len(aw.extraeventstypes) 
         if nbuttons:
             self.eventbuttontable.setRowCount(nbuttons)
-            self.eventbuttontable.setColumnCount(7)
+            self.eventbuttontable.setColumnCount(9)
             self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None, QApplication.UnicodeUTF8),
                                                              QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8),
                                                              QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
                                                              QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8),
                                                              QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
                                                              QApplication.translate("Table","Documentation",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Visibility",None, QApplication.UnicodeUTF8)])
+                                                             QApplication.translate("Table","Visibility",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Color",None, QApplication.UnicodeUTF8),
+                                                             QApplication.translate("Table","Text Color",None, QApplication.UnicodeUTF8)])
             self.eventbuttontable.setAlternatingRowColors(True)
             self.eventbuttontable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -10810,7 +10828,15 @@ class EventsDlg(QDialog):
                 visibilityComboBox =  QComboBox()
                 visibilityComboBox.addItems(visibility)
                 visibilityComboBox.setCurrentIndex(aw.extraeventsvisibility[i])
-                self.connect(visibilityComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setvisibilitytyeventbutton(z,i))                
+                self.connect(visibilityComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setvisibilitytyeventbutton(z,i))
+                
+                #Color
+                colorButton = QPushButton("Color")
+                self.connect(colorButton, SIGNAL("clicked()"),lambda i=i: self.setbuttoncolor(i))
+
+                #Text Color
+                colorTextButton = QPushButton("Color")
+                self.connect(colorTextButton, SIGNAL("clicked()"),lambda i=i: self.setbuttontextcolor(i))
                 
                 #add widgets to the table
                 self.eventbuttontable.setCellWidget(i,0,labeledit)                
@@ -10820,7 +10846,25 @@ class EventsDlg(QDialog):
                 self.eventbuttontable.setCellWidget(i,4,actionComboBox)
                 self.eventbuttontable.setCellWidget(i,5,actiondescriptionedit)
                 self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
+                self.eventbuttontable.setCellWidget(i,7,colorButton)
+                self.eventbuttontable.setCellWidget(i,8,colorTextButton)
 
+    def setbuttoncolor(self,x):
+        colorf = QColorDialog.getColor(QColor(aw.extraeventbuttoncolor[x]),self)
+        if colorf.isValid():
+            colorname = unicode(colorf.name())
+            aw.extraeventbuttoncolor[x] = colorname
+            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
+            aw.buttonlist[x].setStyleSheet(style)
+            
+    def setbuttontextcolor(self,x):
+        colorf = QColorDialog.getColor(QColor(aw.extraeventbuttontextcolor[x]),self)
+        if colorf.isValid():
+            colorname = unicode(colorf.name())
+            aw.extraeventbuttontextcolor[x] = colorname 
+            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[x],aw.extraeventbuttoncolor[x])
+            aw.buttonlist[x].setStyleSheet(style)
+            
     def savetableextraeventbutton(self):
         for i in range(len(aw.extraeventstypes)):            
             labeledit = self.eventbuttontable.cellWidget(i,0)
@@ -10874,7 +10918,8 @@ class EventsDlg(QDialog):
             aw.extraeventsactions.pop(bindex)
             aw.extraeventsactionstrings.pop(bindex)
             aw.extraeventsvisibility.pop(bindex)
-            
+            aw.extraeventbuttoncolor.pop(bindex)
+            aw.extraeventbuttontextcolor.pop(bindex)
             self.createEventbuttonTable()  #update table
 
             if len(aw.e1buttondialog.buttons()):
@@ -10903,6 +10948,8 @@ class EventsDlg(QDialog):
         aw.extraeventsactions.append(0)
         aw.extraeventsactionstrings.append(u"")
         aw.extraeventsvisibility.append(1)
+        aw.extraeventbuttoncolor.append("yellow")
+        aw.extraeventbuttontextcolor.append("black")
         initialtext = unicode(aw.qmc.etypes[aw.extraeventstypes[-1]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[-1]])
         aw.extraeventslabels.append(initialtext)
 
@@ -12416,19 +12463,18 @@ class serialport(object):
 
                 ###  release resources  ###
                 self.COMsemaphore.release(1) 
-                
+
                 if len(r) == nrxbytes:
                     #treat REAd and WRITE commands different
-                    
                     #READ command
                     if command[4] == "3":
-                        CRCreceived = r[13:14]
-                        CRCcalculated = hex(aw.dtapid.DTACalcChecksum(r[1:13]))[2:].upper()
+                        CRCreceived = int(r[13:15],16)
+                        CRCcalculated = aw.dtapid.DTACalcChecksum(r[1:13])
                         if CRCreceived == CRCcalculated:                                                                       
-                            t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float 
+                            t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float
                             return t1
                         else:
-                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8))            
                             if len(aw.qmc.timex) > 2:                           
                                 return aw.qmc.temp1[-1]       
                             else:
