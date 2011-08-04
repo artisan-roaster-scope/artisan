@@ -352,6 +352,7 @@ class tgraphcanvas(FigureCanvas):
         self.ambient_humidity = 0.
         #relative humidity percentage [0], corresponding temperature [1], temperature unit [2]
         self.bag_humidity = [0.,0.]
+        self.beansize = 6.0
 
         #list to store the time of each reading. Most IMPORTANT variable.
         self.timex = []
@@ -1151,10 +1152,16 @@ class tgraphcanvas(FigureCanvas):
         #posible condition using WheelGraphs in view-mode and pressing reset button
         if not aw.lowerbuttondialog.isVisible(): 
             aw.lowerbuttondialog.setVisible(True)
-            aw.e1buttondialog.setVisible(True)
-            aw.e2buttondialog.setVisible(True)
-            aw.e3buttondialog.setVisible(True)
+        if aw.extraeventsbuttonsflag:
+            aw.e1buttondialog.setVisible(True) 
+            aw.e2buttondialog.setVisible(True) 
+            aw.e3buttondialog.setVisible(True) 
             aw.e4buttondialog.setVisible(True)
+        else:
+            aw.e1buttondialog.setVisible(False) 
+            aw.e2buttondialog.setVisible(False) 
+            aw.e3buttondialog.setVisible(False) 
+            aw.e4buttondialog.setVisible(False)
             if aw.minieventsflag:
                 aw.EventsGroupLayout.setVisible(True)
 
@@ -3905,10 +3912,16 @@ class tgraphcanvas(FigureCanvas):
 
         self.redraw(recomputeAllDeltas=False)
         aw.lowerbuttondialog.setVisible(True)
-        aw.e1buttondialog.setVisible(True)
-        aw.e2buttondialog.setVisible(True)
-        aw.e3buttondialog.setVisible(True)
-        aw.e4buttondialog.setVisible(True)
+        if aw.extraeventsbuttonsflag:
+            aw.e1buttondialog.setVisible(True) 
+            aw.e2buttondialog.setVisible(True) 
+            aw.e3buttondialog.setVisible(True) 
+            aw.e4buttondialog.setVisible(True)
+        else:
+            aw.e1buttondialog.setVisible(False) 
+            aw.e2buttondialog.setVisible(False) 
+            aw.e3buttondialog.setVisible(False) 
+            aw.e4buttondialog.setVisible(False)
         if aw.minieventsflag:
             aw.EventsGroupLayout.setVisible(True)
 
@@ -4447,6 +4460,7 @@ class ApplicationWindow(QMainWindow):
         self.lcdpaletteF = { "timer":u'white',"et":'white',"bt":'white',"deltaet":'white',"deltabt":'white',"sv":'white'}
 
     	#user defined event buttons
+        self.extraeventsbuttonsflag = 1  #shows/hides rows of buttons  0/1
         self.extraeventslabels,self.extraeventsdescriptions, self.extraeventstypes,self.extraeventsvalues = [],[],[],[]  #hold string,string,index,index
         self.extraeventbuttoncolor,self.extraeventbuttontextcolor = [],[]
         self.extraeventsactionstrings,self.extraeventsactions,self.extraeventsvisibility = [],[],[] #hold string,index,index
@@ -4737,6 +4751,8 @@ class ApplicationWindow(QMainWindow):
         self.connect(wheelotherAction,SIGNAL("triggered()"),lambda folder="Other":self.qmc.loadselectorwheel(folder))
         wheelmenu.addAction(wheelotherAction) 
 
+        self.ToolkitMenu.addSeparator()
+
         hudAction = QAction(UIconst.TOOLKIT_MENU_EXTRAS,self)
         self.connect(hudAction,SIGNAL("triggered()"),self.hudset)
         self.ToolkitMenu.addAction(hudAction)
@@ -4754,6 +4770,8 @@ class ApplicationWindow(QMainWindow):
         KshortCAction = QAction(UIconst.HELP_MENU_KEYBOARDSHORTCUTS,self)
         self.connect(KshortCAction,SIGNAL("triggered()"),self.viewKshortcuts)
         self.helpMenu.addAction(KshortCAction)
+
+        self.helpMenu.addSeparator()
 
         errorAction = QAction(UIconst.HELP_MENU_ERRORS,self)
         self.connect(errorAction,SIGNAL("triggered()"),self.viewErrorLog)
@@ -4774,6 +4792,8 @@ class ApplicationWindow(QMainWindow):
         platformAction = QAction(UIconst.HELP_MENU_PLATFORM,self)
         self.connect(platformAction,SIGNAL("triggered()"),self.viewplatform)
         self.helpMenu.addAction(platformAction)
+
+        self.helpMenu.addSeparator()
 
         resetAction = QAction(UIconst.HELP_MENU_RESET,self)
         self.connect(resetAction,SIGNAL("triggered()"),self.resetApplication)
@@ -5329,13 +5349,6 @@ class ApplicationWindow(QMainWindow):
         timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz ")))    #zzz = miliseconds
         self.messagehist.append(timez + message)
         self.messagelabel.setText(message)
-
-    def update_extraeventbuttons_visibility(self):
-        for i in range(len(self.buttonlist)):
-            if self.extraeventsvisibility[i]:
-                self.buttonlist[i].setVisible(True)
-            else:
-                self.buttonlist[i].setVisible(False)
     
     def update_minieventline_visibility(self):
         if self.minieventsflag:
@@ -5378,7 +5391,9 @@ class ApplicationWindow(QMainWindow):
         elif key == 83:                     #letter S (automatic save)
             self.automaticsave()
         elif key == 84:                     #letter T (mouse cross)
-            self.qmc.togglecrosslines()        
+            self.qmc.togglecrosslines()
+        elif key == 66:                     #letter B hides/shows extra rows of event buttons
+            self.toggleextraeventrows()      
         else:
             QWidget.keyPressEvent(self, event)
 
@@ -5595,6 +5610,27 @@ class ApplicationWindow(QMainWindow):
             stream.write(array.array('f',(.25 * math.sin(i / 10.) for i in range(44100))))
             stream.close()
             p.terminate()
+
+    def toggleextraeventrows(self):
+        if self.extraeventsbuttonsflag:
+            self.e1buttondialog.setVisible(False) 
+            self.e2buttondialog.setVisible(False) 
+            self.e3buttondialog.setVisible(False) 
+            self.e4buttondialog.setVisible(False) 
+            self.extraeventsbuttonsflag = 0
+        else:
+            self.e1buttondialog.setVisible(True) 
+            self.e2buttondialog.setVisible(True) 
+            self.e3buttondialog.setVisible(True) 
+            self.e4buttondialog.setVisible(True) 
+            self.extraeventsbuttonsflag = 1
+
+    def update_extraeventbuttons_visibility(self):
+        for i in range(len(self.buttonlist)):
+            if self.extraeventsvisibility[i]:
+                self.buttonlist[i].setVisible(True)
+            else:
+                self.buttonlist[i].setVisible(False)
             
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting. 
     def automaticsave(self):
@@ -5630,6 +5666,7 @@ class ApplicationWindow(QMainWindow):
         string += QApplication.translate("MessageBox", "<b>[s]</b> = Autosave",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8) + "<br><br>"
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
 
@@ -6271,6 +6308,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.operator = unicode(profile["operator"])
         else:
             self.qmc.operator = u""
+        if "beansize" in profile:
+            self.qmc.beansize = unicode(profile["beansize"])
+        else:
+            self.qmc.beansize = 6.0
         if "roastdate" in profile:
             self.qmc.roastdate = QDate.fromString(profile["roastdate"])
         if "specialevents" in profile:
@@ -6382,6 +6423,7 @@ class ApplicationWindow(QMainWindow):
         profile["roastertype"] = unicode(self.qmc.roastertype)
         profile["operator"] = unicode(self.qmc.operator)
         profile["roastdate"] = unicode(self.qmc.roastdate.toString())
+        profile["beansize"] = unicode(self.qmc.beansize)
         profile["specialevents"] = self.qmc.specialevents
         profile["specialeventstype"] = self.qmc.specialeventstype
         profile["specialeventsvalue"] = self.qmc.specialeventsvalue
@@ -6630,6 +6672,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.roastertype = unicode(settings.value("roastertype",self.qmc.roastertype).toString())
             self.qmc.density[2] = settings.value("densitySampleVolume",self.qmc.density[2]).toInt()[0]
             self.qmc.density[3] = unicode(settings.value("densitySampleVolumeUnit",self.qmc.density[3]).toString())
+            if settings.contains("beansize"):
+                self.qmc.beansize = settings.value("beansize",self.qmc.beansize).toDouble()[0]
             settings.endGroup()
             self.userprofilepath = unicode(settings.value("profilepath",self.userprofilepath).toString())
  
@@ -6701,6 +6745,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("extraeventsactions"):
                 if settings.contains("buttonlistmaxlen"):
                     self.buttonlistmaxlen = settings.value("buttonlistmaxlen",self.buttonlistmaxlen).toInt()[0]
+                if settings.contains("extraeventsbuttonsflag"):
+                    self.extraeventsbuttonsflag = settings.value("extraeventsbuttonsflag",self.extraeventsbuttonsflag).toInt()[0]
                 self.extraeventstypes = map(lambda x:x.toInt()[0],settings.value("extraeventstypes").toList())
                 self.extraeventsvalues = map(lambda x:x.toInt()[0],settings.value("extraeventsvalues").toList())
                 self.extraeventsactions = map(lambda x:x.toInt()[0],settings.value("extraeventsactions").toList())
@@ -6744,8 +6790,21 @@ class ApplicationWindow(QMainWindow):
                         self.e3buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
                     else:
                         self.e4buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-                        
+
+                #update individual visibility of each buttons        
                 self.update_extraeventbuttons_visibility()
+                #update visibility of button rows
+                if self.extraeventsbuttonsflag:
+                    self.e1buttondialog.setVisible(True) 
+                    self.e2buttondialog.setVisible(True) 
+                    self.e3buttondialog.setVisible(True) 
+                    self.e4buttondialog.setVisible(True)
+                else:
+                    self.e1buttondialog.setVisible(False) 
+                    self.e2buttondialog.setVisible(False) 
+                    self.e3buttondialog.setVisible(False) 
+                    self.e4buttondialog.setVisible(False)
+                    
             settings.endGroup()
             
             settings.beginGroup("grid")             
@@ -6885,6 +6944,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoastProperties")
             settings.setValue("operator",self.qmc.operator)
             settings.setValue("roastertype",self.qmc.roastertype)
+            settings.setValue("beansize",self.qmc.beansize)
             settings.setValue("densitySampleVolume",self.qmc.density[2])
             settings.setValue("densitySampleVolumeUnit",self.qmc.density[3])
             settings.endGroup()
@@ -6936,7 +6996,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraeventsvisibility",self.extraeventsvisibility)
             settings.setValue("extraeventslabels",self.extraeventslabels)
             settings.setValue("extraeventbuttoncolor",self.extraeventbuttoncolor)
-            settings.setValue("extraeventbuttontextcolor",self.extraeventbuttontextcolor)            
+            settings.setValue("extraeventbuttontextcolor",self.extraeventbuttontextcolor)
+            settings.setValue("extraeventsbuttonsflag",self.extraeventsbuttonsflag)
             settings.endGroup()
             
             settings.beginGroup("grid")
@@ -7025,6 +7086,8 @@ class ApplicationWindow(QMainWindow):
             settings["roastertype"] = unicode(self.qmc.roastertype)
             settings["densitySampleVolume"] = unicode(self.qmc.density[2])
             settings["densitySampleVolumeUnit"]= unicode(self.qmc.density[3])
+            settings["beansize"]= unicode(self.qmc.beansize)
+            
             settings["alarmtime"]= unicode(self.qmc.alarmtime)                                                                
             settings["alarmflag"]= unicode(self.qmc.alarmflag)            
             settings["alarmsource"]= unicode(self.qmc.alarmsource)
@@ -7065,7 +7128,7 @@ class ApplicationWindow(QMainWindow):
             settings["extraeventslabels"]= unicode(self.extraeventslabels)
             settings["extraeventbuttoncolor"]= unicode(self.extraeventbuttoncolor)
             settings["extraeventbuttontextcolor"]= unicode(self.extraeventbuttontextcolor)
-            
+            settings["extraeventsbuttonsflag"]= unicode(self.extraeventsbuttonsflag)
             settings["xgrid"]= unicode(self.qmc.xgrid)
             settings["ygrid"]= unicode(self.qmc.ygrid)
             settings["zgrid"]= unicode(self.qmc.zgrid)
@@ -9171,6 +9234,12 @@ class editGraphDlg(QDialog):
         self.connect(self.bean_density_volume_edit,SIGNAL("editingFinished()"),self.standard_density)
         self.connect(self.bean_density_weight_edit,SIGNAL("editingFinished()"),self.standard_density)
 
+        #bean size
+        bean_size_label = QLabel("<b>" + QApplication.translate("Label", "Bean Size (mm)",None, QApplication.UnicodeUTF8) + "</b>")
+        self.bean_size_edit = QLineEdit(str(aw.qmc.beansize))
+        self.bean_size_edit.setValidator(QDoubleValidator(0., 10., 1,self.bean_density_weight_edit))
+        self.bean_size_edit.setMinimumWidth(55)
+        self.bean_size_edit.setMaximumWidth(55)
 
         #bag humidity
         bag_humidity_label = QLabel("<b>" + QApplication.translate("Label", "Storage Humidity/Temperature",None, QApplication.UnicodeUTF8) + "</b>")
@@ -9322,6 +9391,13 @@ class editGraphDlg(QDialog):
         densityLayout.addSpacing(20)
         densityLayout.addWidget(self.standarddensitylabel)
         densityLayout.addStretch()  
+
+        beansizeLayout = QHBoxLayout()
+        beansizeLayout.setSpacing(0)
+        beansizeLayout.addWidget(bean_size_label)
+        beansizeLayout.addSpacing(15)
+        beansizeLayout.addWidget(self.bean_size_edit)
+        beansizeLayout.addStretch()  
         
         humidityLayout = QHBoxLayout()
         humidityLayout.addWidget(bag_humidity_label)
@@ -9380,6 +9456,7 @@ class editGraphDlg(QDialog):
         self.tab1aLayout.addLayout(weightLayout)
         self.tab1aLayout.addLayout(volumeLayout)
         self.tab1aLayout.addLayout(densityLayout)
+        self.tab1aLayout.addLayout(beansizeLayout)
         tab1bLayout = QVBoxLayout()
         tab1bLayout.addLayout(humidityLayout)
         tab1bLayout.addLayout(ambientLayout)
@@ -9751,6 +9828,12 @@ class editGraphDlg(QDialog):
             aw.qmc.density[2] = 0
         aw.qmc.density[3] = unicode(self.bean_density_volumeUnitsComboBox.currentText())
 
+        #update bean size
+        try:
+            aw.qmc.beansize = float(self.bean_size_edit.text())
+        except:
+            aw.qmc.beansize = 6.0
+            
         #update humidity
         try:
             aw.qmc.bag_humidity[0] = float(self.humidity_edit.text())
@@ -9842,7 +9925,7 @@ class platformDlg(QDialog):
 class artisansettingsDlg(QDialog):
     def __init__(self, parent = None):
         super(artisansettingsDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Settings", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Program Variables", None, QApplication.UnicodeUTF8))
 
         htmlsettings = "version = " +__version__ +"<br><br>"
 
@@ -10683,8 +10766,16 @@ class EventsDlg(QDialog):
         helpButton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpButton, SIGNAL("clicked()"),self.showEventbuttonhelp)
 
+        #hide/show extra rows of buttons
+        self.extrabuttonsshowCheck = QCheckBox(QApplication.translate("CheckBox","Show Rows",None, QApplication.UnicodeUTF8))
+        if aw.extraeventsbuttonsflag:
+            self.extrabuttonsshowCheck.setChecked(True)
+        else:
+            self.extrabuttonsshowCheck.setChecked(False)
+        self.connect(self.extrabuttonsshowCheck,SIGNAL("stateChanged(int)"),aw.toggleextraeventrows)
+
         #buttons per row: 
-        self.nbuttonslabel = QLabel(QApplication.translate("Label","Number of Buttons per row", None, QApplication.UnicodeUTF8))
+        self.nbuttonslabel = QLabel(QApplication.translate("Label","Max buttons per row", None, QApplication.UnicodeUTF8))
         self.nbuttonsSpinBox = QSpinBox()
         self.nbuttonsSpinBox.setMaximumWidth(100)
         self.nbuttonsSpinBox.setAlignment(Qt.AlignCenter)
@@ -10736,6 +10827,7 @@ class EventsDlg(QDialog):
         tab1layout.addWidget(self.autoChargeDrop)
 
         nbuttonslayout = QHBoxLayout()
+        nbuttonslayout.addWidget(self.extrabuttonsshowCheck)
         nbuttonslayout.addWidget(self.nbuttonslabel)
         nbuttonslayout.addWidget(self.nbuttonsSpinBox)        
 
@@ -11056,7 +11148,9 @@ class EventsDlg(QDialog):
         string += QApplication.translate("MessageBox", "Serial command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Call program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Button Visibility</b> Hides/shows button",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8) + "<br><br>"
+        
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
         
 ##########################################################################
@@ -11477,19 +11571,31 @@ class flavorDlg(QDialog):
         self.accept()
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.lowerbuttondialog.setVisible(True)
-        aw.e1buttondialog.setVisible(True)
-        aw.e2buttondialog.setVisible(True)
-        aw.e3buttondialog.setVisible(True)
-        aw.e4buttondialog.setVisible(True)
+        if aw.extraeventsbuttonsflag:
+            aw.e1buttondialog.setVisible(True) 
+            aw.e2buttondialog.setVisible(True) 
+            aw.e3buttondialog.setVisible(True) 
+            aw.e4buttondialog.setVisible(True)
+        else:
+            aw.e1buttondialog.setVisible(False) 
+            aw.e2buttondialog.setVisible(False) 
+            aw.e3buttondialog.setVisible(False) 
+            aw.e4buttondialog.setVisible(False)        
         aw.update_minieventline_visibility()
         
     def close(self):
         self.savetable()
         aw.lowerbuttondialog.setVisible(True)
-        aw.e1buttondialog.setVisible(True)
-        aw.e2buttondialog.setVisible(True)
-        aw.e3buttondialog.setVisible(True)
-        aw.e4buttondialog.setVisible(True)
+        if aw.extraeventsbuttonsflag:
+            aw.e1buttondialog.setVisible(True) 
+            aw.e2buttondialog.setVisible(True) 
+            aw.e3buttondialog.setVisible(True) 
+            aw.e4buttondialog.setVisible(True)
+        else:
+            aw.e1buttondialog.setVisible(False) 
+            aw.e2buttondialog.setVisible(False) 
+            aw.e3buttondialog.setVisible(False) 
+            aw.e4buttondialog.setVisible(False)        
         aw.update_minieventline_visibility()
         self.accept()
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -12464,12 +12570,16 @@ class serialport(object):
                 ###  release resources  ###
                 self.COMsemaphore.release(1) 
 
+##
+##                command = ":010347000001B4"
+##                r =       ":01030401900067"
                 if len(r) == nrxbytes:
-                    #treat REAd and WRITE commands different
+                    #REAd and WRITE commands are different
                     #READ command
                     if command[4] == "3":
-                        CRCreceived = int(r[13:15],16)
-                        CRCcalculated = aw.dtapid.DTACalcChecksum(r[1:13])
+                        CRCreceived = int(r[13:15],16)  #bytes 14&15
+                        CRCcalculated = aw.dtapid.DTACalcChecksum(r[1:11]) #bytes 1-10
+
                         if CRCreceived == CRCcalculated:                                                                       
                             t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float
                             return t1
@@ -16531,10 +16641,16 @@ class WheelDlg(QDialog):
         aw.qmc.disconnectWheel()
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.lowerbuttondialog.setVisible(True)
-        aw.e1buttondialog.setVisible(True)
-        aw.e2buttondialog.setVisible(True)
-        aw.e3buttondialog.setVisible(True)
-        aw.e4buttondialog.setVisible(True)
+        if aw.extraeventsbuttonsflag:
+            aw.e1buttondialog.setVisible(True) 
+            aw.e2buttondialog.setVisible(True) 
+            aw.e3buttondialog.setVisible(True) 
+            aw.e4buttondialog.setVisible(True)
+        else:
+            aw.e1buttondialog.setVisible(False) 
+            aw.e2buttondialog.setVisible(False) 
+            aw.e3buttondialog.setVisible(False) 
+            aw.e4buttondialog.setVisible(False)
         if aw.minieventsflag:
             aw.EventsGroupLayout.setVisible(True)
 
