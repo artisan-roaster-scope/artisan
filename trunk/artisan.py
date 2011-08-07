@@ -85,6 +85,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QSemaphore)
 
+#from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
 import matplotlib.patches as patches
@@ -92,6 +93,7 @@ import matplotlib.transforms as transforms
 import matplotlib.font_manager as font_manager
 import matplotlib.path as mpath
 import matplotlib.ticker as ticker
+
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 import matplotlib as mpl
@@ -1175,8 +1177,9 @@ class tgraphcanvas(FigureCanvas):
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
             
-            self.fig.clf()   #wipe out figure. keep_observers=False           
-            self.ax = self.fig.add_subplot(111, axisbg=self.palette["background"])
+            self.fig.clf()   #wipe out figure. keep_observers=False
+
+            self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
 
             #Set axes same as in __init__
             if self.endofx == 0:            #fixes possible condition of endofx being ZERO when application starts (after aw.settingsload)
@@ -1809,8 +1812,9 @@ class tgraphcanvas(FigureCanvas):
                         for i in range(profilelength):
                             self.temp1[i] = self.fromCtoF(self.temp1[i])    #ET
                             self.temp2[i] = self.fromCtoF(self.temp2[i])    #BT
-                            if self.device != 18:
+                            if len(self.delta1):
                                 self.delta1[i] = self.fromCtoF(self.delta1[i])  #Delta ET
+                            if len(self.delta2):
                                 self.delta2[i] = self.fromCtoF(self.delta2[i])  #Delta BT
                             #extra devices curves
                             nextra = len(aw.qmc.extratemp1)   
@@ -1937,7 +1941,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.clf()
         #create a new name ax1 instead of ax (ax is used when plotting profiles)
         
-        self.ax1 = self.fig.add_subplot(111, projection='polar', axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
+        self.ax1 = self.fig.add_subplot(111,projection='polar', axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
         self.ax1.set_aspect(self.flavoraspect)
 
         #find number of divisions
@@ -11109,8 +11113,10 @@ class EventsDlg(QDialog):
         else:
             aw.qmc.eventsGraphflag = 0
             aw.qmc.redraw(recomputeAllDeltas=False)            
-          
+
+    #called from OK button      
     def updatetypes(self):
+        self.savetableextraeventbutton()
         if len(unicode(self.etype0.text())) and len(unicode(self.etype1.text())) and len(unicode(self.etype2.text())) and len(unicode(self.etype3.text())):
             aw.qmc.etypes[0] = unicode(self.etype0.text())
             aw.qmc.etypes[1] = unicode(self.etype1.text())
@@ -12638,6 +12644,7 @@ class serialport(object):
              return tx,0.,0.
 
     def virtual(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.        
         return tx,1.,1.
 
     def HH506RA(self):
