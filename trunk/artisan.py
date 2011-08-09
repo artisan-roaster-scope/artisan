@@ -85,7 +85,6 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QSemaphore)
 
-#from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
 import matplotlib.patches as patches
@@ -3594,6 +3593,14 @@ class tgraphcanvas(FigureCanvas):
                 self.specialeventsStrings = self.specialeventsStringscopy[:]
                 self.specialeventsvalue = self.specialeventsvaluecopy[:]
                 self.specialeventstype = self.specialeventstypecopy[:]
+
+            #check for extra devices
+            num = len(self.timex)
+            for i in range(len(self.extradevices)):                
+                self.extratemp1[i] = [-1.]*num
+                self.extratemp2[i] = [-1.]*num                       
+                self.extratimex[i] = self.timex[:]
+
                 
             self.disconnect_designer()           
 
@@ -4254,8 +4261,7 @@ class SampleThread(QThread):
 
                 #readjust xlimit of plot if needed
                 if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
-                    aw.qmc.endofx = int(aw.qmc.timex[-1] + 180)         # increase x limit by 3 minutes
-                    aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
+                    aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
                     aw.qmc.xaxistosm()
                 
                 if aw.qmc.projectFlag:
