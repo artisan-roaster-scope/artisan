@@ -550,13 +550,9 @@ class tgraphcanvas(FigureCanvas):
         self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltaet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
         self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
-        self.l_eventtype1, = self.ax.plot(self.E1timex, self.E1values,color=self.EvalueColor[0],linewidth=1,label=self.etypes[0])
         self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
-        self.l_eventtype2, = self.ax.plot(self.E2timex, self.E2values,color=self.EvalueColor[1],linewidth=1,label=self.etypes[1])
         self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
-        self.l_eventtype3, = self.ax.plot(self.E3timex, self.E3values,color=self.EvalueColor[2],linewidth=1,label=self.etypes[2])
         self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2])
-        self.l_eventtype4, = self.ax.plot(self.E4timex, self.E4values,color=self.EvalueColor[3],linewidth=1,label=self.etypes[3])
         self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3])
 
         ###########################  TIME  CLOCK     ##########################        
@@ -750,7 +746,7 @@ class tgraphcanvas(FigureCanvas):
         if self.background:
             linecount += 2   #background ET + background BT = 2
         if self.eventsGraphflag == 2:
-            linecount += 8
+            linecount += 4
         self.ax.lines = self.ax.lines[0:linecount]
         
     def setalarm(self,alarmnumber):
@@ -1695,16 +1691,12 @@ class tgraphcanvas(FigureCanvas):
                             self.E4timex.append(self.timex[self.specialevents[i]])
                             self.E4values.append(self.eventpositionbars[self.specialeventsvalue[i]])
 
-                    self.l_eventtype1, = self.ax.plot(self.E1timex, self.E1values,color=self.EvalueColor[0],linewidth=1,label=self.etypes[0])
                     self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
-                    self.l_eventtype2, = self.ax.plot(self.E2timex, self.E2values,color=self.EvalueColor[1],linewidth=1,label=self.etypes[1])
                     self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
-                    self.l_eventtype3, = self.ax.plot(self.E3timex, self.E3values,color=self.EvalueColor[2],linewidth=1,label=self.etypes[2])
                     self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2])
-                    self.l_eventtype4, = self.ax.plot(self.E4timex, self.E4values,color=self.EvalueColor[3],linewidth=1,label=self.etypes[3])
                     self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3])
 
-                    handles.extend([self.l_eventtype1,self.l_eventtype2,self.l_eventtype3,self.l_eventtype4])
+                    handles.extend([self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots])
                     labels.extend([self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]])
 
                 #if recorder on        
