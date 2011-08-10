@@ -4278,7 +4278,7 @@ class SampleThread(QThread):
                         aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                 # autodetect DROP event
                 # only if 9min into roast and BT>190C/374F                  
-                elif not aw.qmc.autoChargeDropFlag and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
                     length_of_qmc_timex >= 5 ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 374)) and \
                     (aw.qmc.timeindex[aw.qmc.timeindex[0]] - aw.qmc.timex[-1] > 540):
                     if aw.BTbreak(length_of_qmc_timex - 1):
@@ -8082,14 +8082,14 @@ $cupping_notes
         if ETreachTime > 0 and BTreachTime < 5940:
             text1 =  QApplication.translate("Scope Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(unicode(self.qmc.ETtarget) + self.qmc.mode)
             if self.qmc.timeindex[0]:
-                text1 = text1 + QApplication.translate("Scope Label"," at %1", None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(int(aw.qmc.timex[self.qmc.timeindex[0]])+int(ETreachTime)))
+                text1 = text1 + QApplication.translate("Scope Label"," at %1", None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(int(aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]+ETreachTime)))
         else:
             text1 =  QApplication.translate("Scope Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(unicode(self.qmc.ETtarget) + self.qmc.mode)
             
         if BTreachTime > 0 and BTreachTime < 5940:    
             text2 =  QApplication.translate("Scope Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(unicode(self.qmc.BTtarget) + self.qmc.mode)
             if self.qmc.timeindex[0]:
-                text2 = text2 + QApplication.translate("Scope Label"," at %1", None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(int(aw.qmc.timex[self.qmc.timeindex[0]])+int(BTreachTime)))
+                text2 = text2 + QApplication.translate("Scope Label"," at %1", None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(int(aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]+BTreachTime)))
         else:
             text2 =  QApplication.translate("Scope Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(unicode(self.qmc.BTtarget) + self.qmc.mode)
 
