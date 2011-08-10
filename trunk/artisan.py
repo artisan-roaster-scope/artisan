@@ -85,6 +85,9 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QSemaphore)
 
+import matplotlib as mpl
+mpl.use('qt4agg')
+
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
 import matplotlib.patches as patches
@@ -95,7 +98,6 @@ import matplotlib.ticker as ticker
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
-import matplotlib as mpl
 	
 platf = unicode(platform.system())
 
@@ -462,9 +464,17 @@ class tgraphcanvas(FigureCanvas):
         #stores the value for each event
         self.specialeventsvalue = []
         #flag that makes the events location type bars (horizontal bars) appear on the plot. flag read on redraw()
-        self.eventsGraphflag = 1
+        # 1 = type bars (4 bars); 2 = value bars (10 bars)
+        self.eventsGraphflag = 2
         #flag that shows events in the graph
         self.eventsshowflag = 1
+        #plot events by value                    
+        self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
+        self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
+        self.EvalueColor = [u"brown",u"blue",u"purple",u"grey"]
+        self.EvalueMarker = ["o","s","h","D"]
+        #the event value position bars are calculated at redraw()
+        self.eventpositionbars = [0.]*12
 
         #Temperature Alarms lists. Data is writen in  alarmDlg 
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
@@ -540,11 +550,14 @@ class tgraphcanvas(FigureCanvas):
         self.l_delta1, = self.ax.plot(self.timex, self.delta1,color=self.palette["deltaet"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8)))
         self.l_delta2, = self.ax.plot(self.timex, self.delta2,color=self.palette["deltabt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
-        # add legend to plot.
-        handles = [self.l_temp1,self.l_temp2,self.l_delta1,self.l_delta2]
-        labels = [QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "DeltaET", None, QApplication.UnicodeUTF8),QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)]
-        if self.legendloc:
-            self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+        self.l_eventtype1, = self.ax.plot(self.E1timex, self.E1values,color=self.EvalueColor[0],linewidth=1,label=self.etypes[0])
+        self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
+        self.l_eventtype2, = self.ax.plot(self.E2timex, self.E2values,color=self.EvalueColor[1],linewidth=1,label=self.etypes[1])
+        self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
+        self.l_eventtype3, = self.ax.plot(self.E3timex, self.E3values,color=self.EvalueColor[2],linewidth=1,label=self.etypes[2])
+        self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2])
+        self.l_eventtype4, = self.ax.plot(self.E4timex, self.E4values,color=self.EvalueColor[3],linewidth=1,label=self.etypes[3])
+        self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3])
 
         ###########################  TIME  CLOCK     ##########################        
         # create an object time to measure and record time (in miliseconds) 
@@ -736,6 +749,8 @@ class tgraphcanvas(FigureCanvas):
         linecount = 2  + 2*len(self.extradevices)       #(ET + BT) + extradevices (2 per extradevice)
         if self.background:
             linecount += 2   #background ET + background BT = 2
+        if self.eventsGraphflag == 2:
+            linecount += 8
         self.ax.lines = self.ax.lines[0:linecount]
         
     def setalarm(self,alarmnumber):
@@ -1101,7 +1116,9 @@ class tgraphcanvas(FigureCanvas):
         self.specialevents = []
         self.specialeventstype = [] 
         self.specialeventsStrings = []        
-        self.specialeventsvalue = []
+        self.specialeventsvalue = []                    
+        self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
+        self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
         aw.eNumberSpinBox.setValue(0)
         aw.lineEvent.setText("")      
         aw.etypeComboBox.setCurrentIndex(0)
@@ -1235,7 +1252,9 @@ class tgraphcanvas(FigureCanvas):
                 self.ax.add_patch(rect2)                   
                 self.ax.add_patch(rect3)
 
-            if self.eventsGraphflag:
+            #if self.eventsGraphflag == 0 then that means don't plot event bars
+                
+            if self.eventsGraphflag == 1: #plot event bars by type
                 # make blended transformations to help identify EVENT types
                 if self.mode == "C":
                     step = 5
@@ -1246,16 +1265,38 @@ class tgraphcanvas(FigureCanvas):
                 jump = 20
                 for i in range(len(self.etypes)):
                     rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)                    
-                    if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:     
-                        self.delta_ax.add_patch(rectEvent)
-                    else:
-                        self.ax.add_patch(rectEvent)
+                    self.ax.add_patch(rectEvent)
                     if self.mode == "C":
                         jump -= 10
                     else:
                         jump -= 20
                         
-                        
+            #plot events bars by value
+            elif self.eventsGraphflag == 2:
+                # make blended transformations to help identify EVENT types
+                if self.mode == "C":
+                    step = 2
+                    start = 40
+                else:
+                    step = 5
+                    start = 100
+                jump = 20
+                for i in range(12):
+                    barposition = self.phases[0]-start-jump
+                    if i == 0:
+                        bcolor = "yellow"
+                    elif i == 1:
+                        bcolor = "grey"
+                    else:
+                        bcolor = self.palette["rect1"]       
+                    rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=bcolor,alpha=.3)
+                    self.ax.add_patch(rectEvent)
+                    self.eventpositionbars[i] =  barposition
+                    if self.mode == "C":
+                        jump -= 5
+                    else:
+                        jump -= 10                
+                
             ##### ET,BT curves
             self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
             self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
@@ -1446,6 +1487,7 @@ class tgraphcanvas(FigureCanvas):
                     handles.append(self.l_delta2)
                     labels.append(unicode(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
+
             nrdevices = len(self.extradevices)
             if nrdevices:
                 for i in range(min(nrdevices,len(self.extratemp1lines),len(self.extratemp2lines),len(self.extraname2),len(self.extraname2))):
@@ -1454,10 +1496,6 @@ class tgraphcanvas(FigureCanvas):
                     labels.append(self.extraname1[i])
                     labels.append(self.extraname2[i])
                     
-            #write legend
-            if self.legendloc:
-                self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
-
             if not self.designerflag:    
                 #Add markers for CHARGE           
                 if self.timeindex[0] != -1:
@@ -1570,17 +1608,29 @@ class tgraphcanvas(FigureCanvas):
 
             if self.eventsshowflag:
                 Nevents = len(self.specialevents)                    
-                #write events
-                if self.mode == "F":
-                    lim = self.phases[0]-80
-                else:
-                    lim = self.phases[0]-40
-                    
-                #two modes of drawing events. The first mode aligns the events annotations to a bar height so that they can be visually identified by type. 
-                # the second mode places the events without height order.
-                
-                #Check eventsGraphflag and self.ylimit_min to see if there is enough height room           
-                if self.eventsGraphflag and self.ylimit_min <= lim:
+                #three modes of drawing events.
+                # the first mode just places annotations. They are text annotations.
+                # The second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
+                # the third mode plots the events by value. They are not annotations but actual lines.
+            
+                if self.eventsGraphflag == 0 and Nevents:
+                    for i in range(Nevents):
+                        firstletter = self.etypes[self.specialeventstype[i]][0]                
+                        secondletter = self.eventsvalues[self.specialeventsvalue[i]]
+                        if self.mode == "F":
+                            height = 50
+                        else:
+                            height = 20
+                        #some times ET is not drawn (ET = 0) when using device NONE
+                        if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
+                            temp = self.temp1[int(self.specialevents[i])]
+                        else:
+                            temp = self.temp2[int(self.specialevents[i])]
+                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                         xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                          
+                elif self.eventsGraphflag == 1 and Nevents:
                     char1 = self.etypes[0][0]
                     char2 = self.etypes[1][0]
                     char3 = self.etypes[2][0]
@@ -1626,24 +1676,36 @@ class tgraphcanvas(FigureCanvas):
                             self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
                                          xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                                
-                # Second mode: old style mode (just attached the events to the graph without ordering height by type)   
-                else:
+
+                elif self.eventsGraphflag == 2:
+                    self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
+                    self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                     for i in range(Nevents):
-                        firstletter = self.etypes[self.specialeventstype[i]][0]                
-                        secondletter = self.eventsvalues[self.specialeventsvalue[i]]
-                        if self.mode == "F":
-                            height = 50
-                        else:
-                            height = 20
-                        #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
-                            temp = self.temp1[int(self.specialevents[i])]
-                        else:
-                            temp = self.temp2[int(self.specialevents[i])]
-                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                         xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                        #self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
+                        if self.specialeventstype[i] == 0:
+                            self.E1timex.append(self.timex[self.specialevents[i]])
+                            self.E1values.append(self.eventpositionbars[self.specialeventsvalue[i]])             
+                        elif self.specialeventstype[i] == 1:
+                            self.E2timex.append(self.timex[self.specialevents[i]])
+                            self.E2values.append(self.eventpositionbars[self.specialeventsvalue[i]])
+                        elif self.specialeventstype[i] == 2:
+                            self.E3timex.append(self.timex[self.specialevents[i]])
+                            self.E3values.append(self.eventpositionbars[self.specialeventsvalue[i]])
+                        elif self.specialeventstype[i] == 3:
+                            self.E4timex.append(self.timex[self.specialevents[i]])
+                            self.E4values.append(self.eventpositionbars[self.specialeventsvalue[i]])
+
+                    self.l_eventtype1, = self.ax.plot(self.E1timex, self.E1values,color=self.EvalueColor[0],linewidth=1,label=self.etypes[0])
+                    self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
+                    self.l_eventtype2, = self.ax.plot(self.E2timex, self.E2values,color=self.EvalueColor[1],linewidth=1,label=self.etypes[1])
+                    self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
+                    self.l_eventtype3, = self.ax.plot(self.E3timex, self.E3values,color=self.EvalueColor[2],linewidth=1,label=self.etypes[2])
+                    self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2])
+                    self.l_eventtype4, = self.ax.plot(self.E4timex, self.E4values,color=self.EvalueColor[3],linewidth=1,label=self.etypes[3])
+                    self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3])
+
+                    handles.extend([self.l_eventtype1,self.l_eventtype2,self.l_eventtype3,self.l_eventtype4])
+                    labels.extend([self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]])
 
                 #if recorder on        
                 if self.flagon:             
@@ -1660,8 +1722,13 @@ class tgraphcanvas(FigureCanvas):
             for label in self.ax.yaxis.get_ticklabels():
                 label.set_color(self.palette["ylabel"])
 
-            #ready to plot    
+            #write legend
+            if self.legendloc:
+                self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+
+            ############  ready to plot############    
             self.fig.canvas.draw()     
+            #######################################
 
             # if designer ON
             if self.designerflag:
@@ -2498,13 +2565,26 @@ class tgraphcanvas(FigureCanvas):
                 self.specialeventstype.append(0)            
                 self.specialeventsStrings.append(str(Nevents+1))
                 self.specialeventsvalue.append(0)
-
                 #if event was initiated by an Extra Event Button then change the type,value,and string 
                 if extraevent != None:
                     self.specialeventstype[-1] = aw.extraeventstypes[extraevent]    
                     self.specialeventsvalue[-1] = aw.extraeventsvalues[extraevent]
                     self.specialeventsStrings[-1] = aw.extraeventsdescriptions[extraevent]
 
+                etype = self.specialeventstype[-1]
+                if etype == 0:
+                    self.E1timex.append(self.timex[self.specialevents[-1]])
+                    self.E1values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                elif etype == 1:
+                    self.E2timex.append(self.timex[self.specialevents[-1]])
+                    self.E2values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                elif etype == 2:
+                    self.E3timex.append(self.timex[self.specialevents[-1]])
+                    self.E3values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                elif etype == 3:
+                    self.E4timex.append(self.timex[self.specialevents[-1]])
+                    self.E4values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                    
                 #write label in mini recorder if flag checked
                 if aw.minieventsflag:
                     aw.eNumberSpinBox.setValue(Nevents+1)
@@ -2514,15 +2594,25 @@ class tgraphcanvas(FigureCanvas):
 
                 #if Event show flag
                 if self.eventsshowflag:
-                    if self.mode == "F":
-                        lim = self.phases[0]-80
-                    else:
-                        lim = self.phases[0]-40
                     index = self.specialevents[-1]                    
                     firstletter = self.etypes[self.specialeventstype[-1]][0]
                     secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
+
+                    if self.eventsGraphflag == 0:                    
+                        if self.mode == "F":
+                            height = 50
+                        else:
+                            height = 20
+                        #some times ET is not drawn (ET = 0) when using device NONE
+                        if self.temp1[index] > self.temp2[index]:
+                            temp = self.temp1[index]
+                        else:
+                            temp = self.temp2[index]
+                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+
                     #if Event Type-Bars flag
-                    if self.eventsGraphflag and self.ylimit_min <= lim:
+                    if self.eventsGraphflag == 1:
                         char1 = self.etypes[0][0]
                         char2 = self.etypes[1][0]
                         char3 = self.etypes[2][0]
@@ -2539,18 +2629,20 @@ class tgraphcanvas(FigureCanvas):
                             self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
-                    else:                    
-                        if self.mode == "F":
-                            height = 50
-                        else:
-                            height = 20
-                        #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[index] > self.temp2[index]:
-                            temp = self.temp1[index]
-                        else:
-                            temp = self.temp2[index]
-                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                    if self.eventsGraphflag == 2:
+                        # update lines data using the lists with new data
+                        if etype == 0:
+                            self.l_eventtype1.set_data(self.E1timex, self.E1values)
+                            self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
+                        elif etype == 1:
+                            self.l_eventtype2.set_data(self.E2timex, self.E2values)
+                            self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
+                        elif etype == 2:
+                            self.l_eventtype3.set_data(self.E3timex, self.E3values)
+                            self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
+                        elif etype == 3:
+                            self.l_eventtype4.set_data(self.E4timex, self.E4values)
+                            self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
 
                 self.fig.canvas.draw()
 
@@ -2606,15 +2698,25 @@ class tgraphcanvas(FigureCanvas):
 
                 #if Event show flag
                 if self.eventsshowflag:
-                    if self.mode == "F":
-                        lim = self.phases[0]-80
-                    else:
-                        lim = self.phases[0]-40
                     index = self.specialevents[-1]                    
                     firstletter = self.etypes[self.specialeventstype[-1]][0]
                     secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
+
+                    if self.eventsGraphflag == 0:                 
+                        if self.mode == "F":
+                            height = 50
+                        else:
+                            height = 20
+                        #some times ET is not drawn (ET = 0) when using device NONE
+                        if self.temp1[index] > self.temp2[index]:
+                            temp = self.temp1[index]
+                        else:
+                            temp = self.temp2[index]
+                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+
                     #if Event Type-Bars flag
-                    if self.eventsGraphflag and self.ylimit_min <= lim:
+                    if self.eventsGraphflag == 1:
                         char1 = self.etypes[0][0]
                         char2 = self.etypes[1][0]
                         char3 = self.etypes[2][0]
@@ -2631,18 +2733,20 @@ class tgraphcanvas(FigureCanvas):
                             self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
-                    else:                    
-                        if self.mode == "F":
-                            height = 50
-                        else:
-                            height = 20
-                        #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[index] > self.temp2[index]:
-                            temp = self.temp1[index]
-                        else:
-                            temp = self.temp2[index]
-                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                    if self.eventsGraphflag == 2:
+                        # update lines data using the lists with new data
+                        if etype == 0:
+                            self.l_eventtype1.set_data(self.E1timex, self.E1values)
+                            self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
+                        elif etype == 1:
+                            self.l_eventtype2.set_data(self.E2timex, self.E2values)
+                            self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
+                        elif etype == 2:
+                            self.l_eventtype3.set_data(self.E3timex, self.E3values)
+                            self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
+                        elif etype == 3:
+                            self.l_eventtype4.set_data(self.E4timex, self.E4values)
+                            self.l_eventtype4dots.set_data(self.E4timex, self.E4values)                        
 
                     self.fig.canvas.draw()
                     self.samplingsemaphore.release(1)
@@ -3601,7 +3705,6 @@ class tgraphcanvas(FigureCanvas):
                 self.extratemp2[i] = [-1.]*num                       
                 self.extratimex[i] = self.timex[:]
 
-                
             self.disconnect_designer()           
 
             #create playback events
@@ -6573,6 +6676,12 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.eventsshowflag  = settings.value("eventsshowflag",int(self.qmc.eventsshowflag)).toInt()[0]
             if settings.contains("autoChargeDrop"):
                 self.qmc.autoChargeDropFlag = settings.value("autoChargeDrop",self.qmc.autoChargeDropFlag).toBool()
+            if settings.contains("EvalueColor"):
+                self.qmc.EvalueColor = list(settings.value("EvalueColor",self.qmc.EvalueColor).toStringList())
+                self.qmc.EvalueMarker = list(settings.value("EvalueMarker",self.qmc.EvalueMarker).toStringList())
+                for i in range(len(self.qmc.EvalueColor)):
+                    self.qmc.EvalueColor[i] = unicode(self.qmc.EvalueColor[i])          
+                    self.qmc.EvalueMarker[i] = unicode(self.qmc.EvalueMarker[i])          
             settings.endGroup()
             
     	    #restore statistics
@@ -6891,6 +7000,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("etypes",self.qmc.etypes)
             settings.setValue("eventsshowflag",aw.qmc.eventsshowflag)
             settings.setValue("autoChargeDrop",self.qmc.autoChargeDropFlag)
+            settings.setValue("EvalueColor",self.qmc.EvalueColor)
+            settings.setValue("EvalueMarker",self.qmc.EvalueMarker)
             settings.endGroup()            
             #save delay
             settings.setValue("Delay",self.qmc.delay)
@@ -10709,13 +10820,17 @@ class EventsDlg(QDialog):
         else:
             self.minieventsflag.setChecked(False)
         self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)
-        
-        self.eventsGraphflag = QCheckBox(QApplication.translate("CheckBox","Type Bars",None, QApplication.UnicodeUTF8))
-        if aw.qmc.eventsGraphflag:
-            self.eventsGraphflag.setChecked(True)
-        else:
-            self.eventsGraphflag.setChecked(False)
-        self.connect(self.eventsGraphflag,SIGNAL("stateChanged(int)"),self.eventsGraphflagChanged)
+
+        barstylelabel = QLabel(QApplication.translate("barlabel","Bars",None, QApplication.UnicodeUTF8))
+        barstyles = [QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("ComboBox","Type",None, QApplication.UnicodeUTF8),
+                    QApplication.translate("ComboBox","Value",None, QApplication.UnicodeUTF8)]
+        self.bartypeComboBox =  QComboBox()
+        self.bartypeComboBox.setMaximumWidth(80)
+        self.bartypeComboBox.addItems(barstyles)
+        self.bartypeComboBox.setCurrentIndex(aw.qmc.eventsGraphflag)
+        self.connect(self.bartypeComboBox,SIGNAL("currentIndexChanged(int)"),self.eventsGraphTypeflagChanged)
+
 
         typelabel1 = QLabel(QApplication.translate("Label", "1",None, QApplication.UnicodeUTF8))
         typelabel2 = QLabel(QApplication.translate("Label", "2",None, QApplication.UnicodeUTF8))
@@ -10726,7 +10841,43 @@ class EventsDlg(QDialog):
         self.etype1 = QLineEdit(aw.qmc.etypes[1])
         self.etype2 = QLineEdit(aw.qmc.etypes[2])
         self.etype3 = QLineEdit(aw.qmc.etypes[3])
-        
+
+
+        E1colorButton = QPushButton(QApplication.translate("Button","E1 Color",None, QApplication.UnicodeUTF8))  
+        E2colorButton = QPushButton(QApplication.translate("Button","E2 Color",None, QApplication.UnicodeUTF8))  
+        E3colorButton = QPushButton(QApplication.translate("Button","E3 Color",None, QApplication.UnicodeUTF8))  
+        E4colorButton = QPushButton(QApplication.translate("Button","E4 Color",None, QApplication.UnicodeUTF8))  
+        self.connect(E1colorButton,SIGNAL("clicked()"),lambda b=0:self.setcoloreventline(b))
+        self.connect(E2colorButton,SIGNAL("clicked()"),lambda b=1:self.setcoloreventline(b))
+        self.connect(E3colorButton,SIGNAL("clicked()"),lambda b=2:self.setcoloreventline(b))
+        self.connect(E4colorButton,SIGNAL("clicked()"),lambda b=3:self.setcoloreventline(b))
+
+        self.markers = ["circle","triangle_down","triangle_up","triangle_left","triangle_right","tri_down","tri_up","tri_left","tri_right","square","pentagon","star","hexagon1","hexagon2","plus","x","diamond",
+                        "thin_diamond","vline","hline","tickleft","tickright","tickup","tickdown","caretleft","caretright","caretup","caretdown","nothing"]
+        self.markervals = ["o","v","^","<",">","1","2","3","4","s","p","*","h","H","+","x","D","d","|","_","TICKLEFT","TICKRIGHT","TICKUP","TICKDOWN","CARETLEFT",
+                           "CARETRIGHT","CARETUP","CARETDOWN","None"]
+
+        #Marker type
+        self.marker1typeComboBox =  QComboBox()
+        self.marker1typeComboBox.addItems(self.markers )
+        self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
+        self.connect(self.marker1typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=0:self.seteventmarker(x,m))                      
+
+        self.marker2typeComboBox =  QComboBox()
+        self.marker2typeComboBox.addItems(self.markers )
+        self.marker2typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[1]))
+        self.connect(self.marker2typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=1:self.seteventmarker(x,m))
+                                            
+        self.marker3typeComboBox =  QComboBox()
+        self.marker3typeComboBox.addItems(self.markers )
+        self.marker3typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[2]))
+        self.connect(self.marker3typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=2:self.seteventmarker(x,m)) 
+
+        self.marker4typeComboBox =  QComboBox()
+        self.marker4typeComboBox.addItems(self.markers )
+        self.marker4typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[3]))
+        self.connect(self.marker4typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=3:self.seteventmarker(x,m)) 
+                                            
         self.autoChargeDrop = QCheckBox(QApplication.translate("CheckBox","Automatic CHARGE/DROP",None, QApplication.UnicodeUTF8))
         if aw.qmc.autoChargeDropFlag:
             self.autoChargeDrop.setChecked(True)
@@ -10794,21 +10945,37 @@ class EventsDlg(QDialog):
         self.connect(self.nbuttonsSpinBox, SIGNAL("valueChanged(int)"),self.realignbuttons)
                 
         #### tab1 layout
+        FlagsLayout = QHBoxLayout()
+        FlagsLayout.addWidget(self.eventsbuttonflag)
+        FlagsLayout.addWidget(self.eventsshowflagbox)
+        FlagsLayout.addWidget(self.minieventsflag)
+        FlagsLayout.addSpacing(10)
+        FlagsLayout.addWidget(barstylelabel)
+        FlagsLayout.addWidget(self.bartypeComboBox,Qt.AlignLeft)
+        
         typeLayout0 = QHBoxLayout()
         typeLayout0.addWidget(typelabel1)
         typeLayout0.addWidget(self.etype0)
+        typeLayout0.addWidget(E1colorButton)
+        typeLayout0.addWidget(self.marker1typeComboBox)
         
         typeLayout1 = QHBoxLayout()
         typeLayout1.addWidget(typelabel2)
         typeLayout1.addWidget(self.etype1)
+        typeLayout1.addWidget(E2colorButton)
+        typeLayout1.addWidget(self.marker2typeComboBox)
         
         typeLayout2 = QHBoxLayout()
         typeLayout2.addWidget(typelabel3)
         typeLayout2.addWidget(self.etype2)
+        typeLayout2.addWidget(E3colorButton)
+        typeLayout2.addWidget(self.marker3typeComboBox)
         
         typeLayout3 = QHBoxLayout()
         typeLayout3.addWidget(typelabel4)
         typeLayout3.addWidget(self.etype3)
+        typeLayout3.addWidget(E4colorButton)
+        typeLayout3.addWidget(self.marker4typeComboBox)
 
         typelayout = QGridLayout()
         typelayout.addLayout(typeLayout0,0,0)
@@ -10825,13 +10992,8 @@ class EventsDlg(QDialog):
         TypeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Event Types",None, QApplication.UnicodeUTF8))
         TypeGroupLayout.setLayout(typelayout)
 
-        FlagsLayout = QHBoxLayout()
-        FlagsLayout.addWidget(self.eventsbuttonflag)
-        FlagsLayout.addWidget(self.eventsshowflagbox)
-        FlagsLayout.addWidget(self.minieventsflag)
-        FlagsLayout.addWidget(self.eventsGraphflag)
-
         tab1layout = QVBoxLayout()
+        tab1layout.setSpacing(0)
         tab1layout.addLayout(FlagsLayout)
         tab1layout.addWidget(TypeGroupLayout)
         tab1layout.addWidget(self.autoChargeDrop)
@@ -10875,6 +11037,24 @@ class EventsDlg(QDialog):
 
         self.setLayout(mainLayout)
 
+    def seteventmarker(self,x,m):
+        if m == 0:
+            aw.qmc.EvalueMarker[m] = unicode(self.markervals[self.marker1typeComboBox.currentIndex()])
+        if m == 1:
+            aw.qmc.EvalueMarker[m] = unicode(self.markervals[self.marker2typeComboBox.currentIndex()])
+        if m == 2:
+            aw.qmc.EvalueMarker[m] = unicode(self.markervals[self.marker3typeComboBox.currentIndex()])
+        if m == 3:
+            aw.qmc.EvalueMarker[m] = unicode(self.markervals[self.marker4typeComboBox.currentIndex()])
+        aw.qmc.redraw()
+
+    def setcoloreventline(self,b):
+        colorf = QColorDialog.getColor(QColor(aw.qmc.EvalueColor[b]),self)
+        if colorf.isValid():
+            colorname = unicode(colorf.name())
+            aw.qmc.EvalueColor[b] = colorname
+            aw.qmc.redraw()
+        
     def realignbuttons(self):
         aw.buttonlistmaxlen = self.nbuttonsSpinBox.value()
         aw.realignbuttons()
@@ -11103,22 +11283,9 @@ class EventsDlg(QDialog):
             aw.minieventsflag = 0
         aw.update_minieventline_visibility()
 
-    def eventsGraphflagChanged(self):
-        if self.eventsGraphflag.isChecked():
-            aw.qmc.eventsGraphflag = 1
-            #check limits and adjust bottom part if needed
-            if aw.qmc.mode == "F":
-                lim = aw.qmc.phases[0]-80
-            else:
-                lim = aw.qmc.phases[0]-40
-                
-            if   aw.qmc.ylimit_min > lim:
-                aw.qmc.ylimit_min = lim
-                
-            aw.qmc.redraw(recomputeAllDeltas=False)
-        else:
-            aw.qmc.eventsGraphflag = 0
-            aw.qmc.redraw(recomputeAllDeltas=False)            
+    def eventsGraphTypeflagChanged(self):
+        aw.qmc.eventsGraphflag = self.bartypeComboBox.currentIndex()
+        aw.qmc.redraw(recomputeAllDeltas=False)            
 
     #called from OK button      
     def updatetypes(self):
