@@ -2,16 +2,23 @@ Current Versions
 o Python 2.7.2
 o QT 4.7.3
 o Numpy 1.6.1
-o SIP 4.12.3
-o PyQt 4.8.4 
+o SIP 4.12.4
+o PyQt 4.8.5
 o matplotlib 1.0.1
 o scipy 0.9.0
 o elixir 0.7.1 (for Green)
 o pyaudio
 o py2app 0.6.3
+o Mercurial 1.9.1
+o modulegraph 0.9.2
 
 Upgrade History:
 
+- 2011-08-07: Moved to OS X 10.7 and Upgraded
+ . PyQt 4.8.4 => 4.8.5
+ . SIP 4.12.3 => 4.12.4
+ . Mercurial 1.7.3 => 1.9.1
+ . modulegraph 0.8.2 => 0.9.2
 - 2011-07-22: Upgraded
  . Numpy 1.6.0 => 1.6.1 
 - 2011-06-30: Upgraded
@@ -30,6 +37,10 @@ X) before any installation (for 10.4 PPC compatibility if XCode 4 is installed!)
 
 Install XCode3+XCode4:
 1) Install XCode3 without System Tools or Unix Development packages. Choose /Xcode3 as installation folder!
+NOTE: to install XCode 3.x on OS X Lion:
+ o Open Terminal
+ o Enter the command: export COMMAND_LINE_INSTALL=1
+ o Enter the command: open “/Volumes/Xcode and iOS SDK/Xcode and iOS SDK.mpkg”
 2) Install XCode4 with System Tools and Unix Development packages
 3) Restoring 10.4/10.5 SDK Support
 # cd /Developer/SDKs
@@ -77,12 +88,10 @@ sudo ln -s /usr/bin/g++-4.2 /usr/bin/g++
 
 Install universal binary (PPC/Intel) setup on Snow Leopard 10.6.5 (with support for 10.4.x)
 
-0) Install Python 2.6.6 / 2.7.2
+0) Install Python 2.7.2
 
 download and install:
 
-http://www.python.org/ftp/python/2.6.6/python-2.6.6-macosx10.3.dmg
-or
 http://www.python.org/ftp/python/2.7.2/python-2.7.2-macosx10.3.dmg
 
 set default to 32bit:
@@ -92,10 +101,10 @@ set default to 32bit:
 
 download and install:
 
-http://get.qt.nokia.com/qt/source/qt-mac-carbon-opensource-4.7.2.dmg (Carbon)
+http://get.qt.nokia.com/qt/source/qt-mac-carbon-opensource-4.7.3.dmg (Carbon)
+
 
 2) Install pyserial 
-
 
 download latest source (pyserial-2.5.tar.gz) from http://pypi.python.org/pypi/pyserial
 
@@ -118,7 +127,7 @@ def my_parse_makefile(filename, g):
 sysconfig.parse_makefile = my_parse_makefile
 
 # python setup.py build
-# python setup.py install
+# sudo python setup.py install
 
 
 *) freetype 2.4.4
@@ -144,7 +153,7 @@ from Source:
 get latest source from http://sourceforge.net/projects/numpy/files/
 
 export MACOSX_DEPLOYMENT_TARGET=10.4
-export CFLAGS="-arch i386 -arch ppc -I/usr/local/include -isysroot /Developer/SDKs/MacOSX10.4u.sdk”"
+export CFLAGS="-arch i386 -arch ppc -I/usr/local/include -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
 export FFLAGS="-m32 -arch i386 -arch ppc"
 export LDFLAGS="-lgfortran -shared -Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc -L/usr/local/lib -syslibroot /Developer/SDKs/MacOSX10.4u.sdk -Xlinker -headerpad_max_install_names"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
@@ -231,8 +240,8 @@ export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2
 export CC=/usr/bin/gcc-4.0
 
 
-# cd sip-4.12.3
-# python configure.py -n --deployment-target=10.4 --arch i386 --arch ppc --sdk MacOSX10.4u.sdk -d/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages -b /usr/local/bin -e /usr/local/include -v /usr/local/share/sip 
+# cd sip-4.12.4
+# python configure.py -n --deployment-target=10.4 --arch i386 --arch ppc --sdk MacOSX10.4u.sdk -d/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages -b /usr/local/bin -e /usr/local/include -v /usr/local/share/sip --deployment-target=10.4
 # make
 # sudo make install
 
@@ -240,13 +249,14 @@ export CC=/usr/bin/gcc-4.0
 5) Install PyQt
 
 export MACOSX_DEPLOYMENT_TARGET=10.4
-export CFLAGS="-arch i386 -arch ppc"
-export FFLAGS="-m32"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc -Xlinker -headerpad_max_install_names"
+export CFLAGS="-arch i386 -arch ppc -I/usr/local/include -isysroot /Developer/SDKs/MacOSX10.4u.sdk"
+export FFLAGS="-m32 -arch i386 -arch ppc"
+export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch ppc -Xlinker -headerpad_max_install_names  -L/usr/local/lib -syslibroot /Developer/SDKs/MacOSX10.4u.sdk"
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
+export SUBLIBS="-L/Developer/SDKs/MacOSX10.4u.sdk/usr/lib/system -L/Developer/SDKs/MacOSX10.4u.sdk/usr/lib"
 export CC=/usr/bin/gcc-4.0
-# tar xzf PyQt-mac-gpl-4.8.3.tar.gz 
-# cd PyQt-mac-gpl-4.8.4
+# tar xzf PyQt-mac-gpl-4.8.5.tar.gz 
+# cd PyQt-mac-gpl-4.8.5
 
 ensure that the sip configuration file generated in the previous step is found
 # export PYTHONPATH=/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages:/Library/Frameworks/Python.framework/Versions/2.7/lib/:$PYTHONPATH
@@ -260,6 +270,8 @@ i386 ppc
 # python configure.py --use-arch i386 -d/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages  -b /usr/local/bin
 # make
 # sudo make install
+
+
 
 
 6) Install matplotlib
@@ -346,6 +358,7 @@ from http://mercurial.berkwood.com/
 fetch modulegraph 0.8.2 from repository:
 
 # hg clone https://bitbucket.org/ronaldoussoren/modulegraph
+# cd modulegraph
 # python setup.py build
 # python setup.py install
 
@@ -424,291 +437,3 @@ http://people.csail.mit.edu/hubert/pyaudio/
 
 download pyaudio for Mac OS X
 http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.4.dmg
-
-
---- 64bit 10.6.x Snow Leopard Cocoa only Setup (OUTDATED!):
-
-Install universal binary setup on Snow Leopard 10.6.5  (with support for 10.5.x)
-
-0) Install Python 2.6.6
-
-download and install:
-
-http://pub.jbhannah.net/python/2.6/python-2.6.6-macosx10.6.dmg
-
-additional information on Python 2.6.6:
-
-universal:
-# /usr/local/bin/python-all
-
-32bit:
-# /usr/local/bin/python
-# /usr/local/bin/python-32
-Python 2.6.6 (r266:84292, Sep  8 2010, 16:19:33) 
-[GCC 4.2.1 (Apple Inc. build 5664)] on darwin
-Type "help", "copyright", "credits" or "license" for more information.
->>> import sys
->>> sys.maxint
-2147483647
-
-64bit:
-# /usr/local/bin/python-64
-Python 2.6.6 (r266:84292, Sep  8 2010, 16:19:33) 
-[GCC 4.2.1 (Apple Inc. build 5664)] on darwin
-Type "help", "copyright", "credits" or "license" for more information.
->>> import sys
->>> sys.maxint
-9223372036854775807
-
-
-set default to 32bit:
-# defaults write com.apple.versioner.python Prefer-32-Bit -bool yes
-or
-# export VERSIONER_PYTHON_PREFER_32_BIT=yes
-
-1) Install QT
-
-download and install:
-
-http://get.qt.nokia.com/qt/source/qt-mac-opensource-4.7.1.dmg (Cocoa)
-
-2) Install pyserial for Python 2.6
-
-download latest source (pyserial-2.5.tar.gz) from http://pypi.python.org/pypi/pyserial
-
-# tar xzf pyserial-2.5.tar.gz
-# cd pyserial-2.5
-# python setup.py build
-# python setup.py install
-
-3) Install Numpy
-
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386 -arch x86_64"
-export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 "
-export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
-# cd numpy-1.6.0b2
-# cp site.cfg.example site.cfg
-
-add the following lines on the head of the setup.py file
-# vi setup.py
-from distutils import sysconfig
-their_parse_makefile = sysconfig.parse_makefile
-def my_parse_makefile(filename, g):
-    their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.5'
-sysconfig.parse_makefile = my_parse_makefile
-
-# python setup.py build
-# python setup.py install
-
-test
-# unset MACOSX_DEPLOYMENT_TARGET
-# easy_install nose
-# python -c 'import numpy; numpy.test()'
-
-4) Install SIP
-
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386 -arch x86_64"
-export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
-export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
-# cd sip-4.12
-# python configure.py -n --arch i386 --arch x86_64 --sdk MacOSX10.5.sdk -d/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages -s MacOSX10.5.sdk
-# make
-# sudo make install
-
-5) Install PyQt
-
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386 -arch x86_64"
-export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
-export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
-# tar xzf PyQt-mac-gpl-4.8.2.tar.gz 
-# cd PyQt-mac-gpl-4.8.2
-# python configure.py --use-arch i386 
-# make
-# sudo make install
-
-
-
-6) Install matplotlib
-
-download from http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.0.1/
-
-# tar xzf matplotlib-1.0.1.tar.gz
-# cd matplotlib-1.0.1
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386 -arch x86_64"
-export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
-export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
-
-add the following lines on the head of the setup.py file
-# vi setup.py
-from distutils import sysconfig
-their_parse_makefile = sysconfig.parse_makefile
-def my_parse_makefile(filename, g):
-    their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.5'
-sysconfig.parse_makefile = my_parse_makefile
-
-replace add_base_flags
-# vi setupext.py
-def add_base_flags(module):
-    incdirs = filter(os.path.exists,
-                     [os.path.join(p, 'include') for p in basedirlist ])
-    libdirs = filter(os.path.exists,
-                     [os.path.join(p, 'lib')     for p in basedirlist ]+
-                     [os.path.join(p, 'lib64')     for p in basedirlist ] )
-
-    module.include_dirs.extend(incdirs)
-    module.include_dirs.append('.')
-    module.library_dirs.extend(libdirs)
-=>
-def add_base_flags(module):
-    incdirs = filter(os.path.exists,
-                     [os.path.join(p, 'include') for p in basedirlist ])
-    libdirs = filter(os.path.exists,
-                     [os.path.join(p, 'lib')     for p in basedirlist ]+
-                     [os.path.join(p, 'lib64')     for p in basedirlist ] )
-
-    module.include_dirs.extend(incdirs)
-    module.include_dirs.append('.')
-    module.include_dirs.append('/usr/local/include')
-    module.include_dirs.append('/usr/local/include/freetype2')
-    module.library_dirs.extend(libdirs)
-
-
-# python setup.py build
-# python setup.py install
-
-
-
-7) Install Mercurial
-
-install Mercurial 1.7.3 binary Mercurial-1.7.3-py2.6-macosx10.6.zip
-from http://mercurial.berkwood.com/
-
-8) Install modulegraph
-
-fetch modulegraph 0.8.2 from repository:
-
-# hg clone https://bitbucket.org/ronaldoussoren/modulegraph
-# python setup.py build
-# python setup.py install
-
-9) py2app (0.5.3 from Repository)
-
-fetch source from repository
-# hg clone https://bitbucket.org/ronaldoussoren/py2app
-# cd py2app
-# export MACOSX_DEPLOYMENT_TARGET=10.5
-
-add the following lines on the head of the setup.py file
-# vi setup.py
-from distutils import sysconfig
-their_parse_makefile = sysconfig.parse_makefile
-def my_parse_makefile(filename, g):
-    their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.5'
-sysconfig.parse_makefile = my_parse_makefile
-
-# python steup.py build
-# python setup.py install
-
-
-
-
-
-
-
-____________________________________________
-
-Extra Packages
-
-*) Java javacomm
-
-http://www.xpl4java.org/xPL4Java/javacomm.html
-http://blog.iharder.net/2009/08/18/rxtx-java-6-and-librxtxserial-jnilib-on-intel-mac-os-x/
-
-RXTX v2.0 (compatible with javax.comm.*)
-
-the following libs are installed:
-
-/Library/Java/Extensions/librxtxSerial.jnilib
-/Library/Java/Extensions/RXTXcomm.jar
-
-there is also
-/usr/lib/java/libjdns_sd.jnilib (nothing to do with serial)
-
-
-however the communication seems to work also without those!?
-
-
-one might need to create the directories: /var/lock and /var/spool/uucp
-however, this one does not exist on my machine
-# sudo mkdir /var/spool/uucp
-# sudo mkdir /var/lock
-# sudo chmod 775 /var/spool/uucp
-# sudo chmod 775 /var/lock
-# sudo chgrp uucp /var/spool/uucp
-# sudo chgrp uucp /var/lock
-
-*) zlib 1.2.5
-
-download from http://sourceforge.net/projects/libpng/files/zlib/1.2.5/zlib-1.2.5.tar.gz/download
-# tar xfz zlib-1.2.5.tar.gz 
-# cd zlib-1.2.5/
-
-
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386 -arch x86_64"
-export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
-# ./configure
-# make
-
-
-
-*) libpng 1.4.5
-
-install binary from http://ethan.tira-thompson.org/Mac_OS_X_Ports.html
-
-=> don't install this as this overwrites the systems version 1.2.x!
-you will get a
-[CPC385:/Users/luther/Desktop/Private/LG3/hh506/doc/Artisan/Repository/trunk] python artisan.pyw 
-libpng warning: Application was compiled with png.h from libpng-1.4.5
-libpng warning: Application  is  running with png.c from libpng-1.2.39
-libpng error: Incompatible libpng version in application and library
-Traceback (most recent call last):
-
-cause by matplotlib
-
-
-
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386 -arch x86_64"
-export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
-
-one could install 
-
-
-*) freetype 2.4.4
-
-download freetype-2.4.4.tar.gz from http://download.savannah.gnu.org/releases/freetype/
-# tar xzf freetype-2.4.4.tar.gz 
-# cd freetype-2.4.4
-export MACOSX_DEPLOYMENT_TARGET=10.5
-export CFLAGS="-arch i386 -arch x86_64"
-export FFLAGS="-m32 -m64"
-export LDFLAGS="-Wall -undefined dynamic_lookup -bundle -arch i386 -arch x86_64 -Xlinker -headerpad_max_install_names"
-# ./configure --host i386-apple-darwin10.5.0
-# make
-# sudo make install
-
-
