@@ -2724,16 +2724,12 @@ class tgraphcanvas(FigureCanvas):
                     if self.eventsGraphflag == 2:
                         # update lines data using the lists with new data
                         if etype == 0:
-                            self.l_eventtype1.set_data(self.E1timex, self.E1values)
                             self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
                         elif etype == 1:
-                            self.l_eventtype2.set_data(self.E2timex, self.E2values)
                             self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
                         elif etype == 2:
-                            self.l_eventtype3.set_data(self.E3timex, self.E3values)
                             self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
                         elif etype == 3:
-                            self.l_eventtype4.set_data(self.E4timex, self.E4values)
                             self.l_eventtype4dots.set_data(self.E4timex, self.E4values)                        
 
                     self.fig.canvas.draw()
@@ -5713,26 +5709,7 @@ class ApplicationWindow(QMainWindow):
             stream.close()
             p.terminate()
 
-    def toggleextraeventrows(self):
-        if self.extraeventsbuttonsflag:
-            self.e1buttondialog.setVisible(False) 
-            self.e2buttondialog.setVisible(False) 
-            self.e3buttondialog.setVisible(False) 
-            self.e4buttondialog.setVisible(False) 
-            self.extraeventsbuttonsflag = 0
-        else:
-            self.e1buttondialog.setVisible(True) 
-            self.e2buttondialog.setVisible(True) 
-            self.e3buttondialog.setVisible(True) 
-            self.e4buttondialog.setVisible(True) 
-            self.extraeventsbuttonsflag = 1
 
-    def update_extraeventbuttons_visibility(self):
-        for i in range(len(self.buttonlist)):
-            if self.extraeventsvisibility[i]:
-                self.buttonlist[i].setVisible(True)
-            else:
-                self.buttonlist[i].setVisible(False)
             
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting. 
     def automaticsave(self):
@@ -6875,28 +6852,6 @@ class ApplicationWindow(QMainWindow):
                     self.extraeventsdescriptions[i] = unicode(self.extraeventsdescriptions[i])
                     self.extraeventbuttoncolor[i] = unicode(self.extraeventbuttoncolor[i])
                     self.extraeventbuttontextcolor[i] = unicode(self.extraeventbuttontextcolor[i])
-##                #create buttons                    
-##                for i in range(len(self.extraeventstypes)):
-##                    self.buttonlist.append(QPushButton())
-##                    self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
-##                    style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttontextcolor[i],self.extraeventbuttoncolor[i])
-##                    self.buttonlist[i].setStyleSheet(style)
-##                    self.buttonlist[i].setMinimumHeight(50)
-##                    self.buttonlist[i].setText(self.extraeventslabels[i])
-##                    tip = unicode(self.extraeventsdescriptions[i]) + u"\n" + unicode(self.qmc.etypes[self.extraeventstypes[i]]) + u"\n" + unicode(self.extraeventsvalues[i]-1) + u"\n" + unicode(self.extraeventsactionstrings[i])
-##                    self.buttonlist[i].setToolTip(tip)
-##                    self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
-##                    #add button to row                    
-##                    if len(self.lowerbuttondialog.buttons()) < self.buttonlistmaxlen:
-##                        self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-##                    elif len(self.e1buttondialog.buttons()) < self.buttonlistmaxlen:
-##                        self.e1buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-##                    elif len(self.e2buttondialog.buttons()) < self.buttonlistmaxlen:
-##                        self.e2buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-##                    elif len(self.e3buttondialog.buttons()) < self.buttonlistmaxlen:
-##                        self.e3buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
-##                    else:
-##                        self.e4buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
 
                 #update individual visibility of each buttons        
                 self.update_extraeventbuttons_visibility()
@@ -8403,14 +8358,27 @@ $cupping_notes
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Symbolic Functions",None, QApplication.UnicodeUTF8),string3)
 
+    def toggleextraeventrows(self):
+        if self.extraeventsbuttonsflag:
+            self.e1buttondialog.setVisible(False) 
+            self.e2buttondialog.setVisible(False) 
+            self.e3buttondialog.setVisible(False) 
+            self.e4buttondialog.setVisible(False) 
+            self.extraeventsbuttonsflag = 0
+        else:
+            self.e1buttondialog.setVisible(True) 
+            self.e2buttondialog.setVisible(True) 
+            self.e3buttondialog.setVisible(True) 
+            self.e4buttondialog.setVisible(True) 
+            self.extraeventsbuttonsflag = 1
 
+    #orders extra event buttons based on max number of buttons
     def realignbuttons(self):
         #clear buttons
         mainbuttunslen = len(self.lowerbuttondialog.buttons())
         diff = mainbuttunslen - 9
         for i in range(diff):
             self.lowerbuttondialog.removeButton(self.buttonlist[i])
-
         self.e1buttondialog.clear()
         self.e2buttondialog.clear()
         self.e3buttondialog.clear()
@@ -8419,15 +8387,10 @@ $cupping_notes
         for i in range(len(self.extraeventstypes)):
             self.buttonlist.append(QPushButton())
             #self.buttonlist[i].setAttribute(Qt.WA_DeleteOnClose)
-            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[i],aw.extraeventbuttoncolor[i])
-            aw.buttonlist[i].setStyleSheet(style)
+            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(self.extraeventbuttontextcolor[i],self.extraeventbuttoncolor[i])
+            self.buttonlist[i].setStyleSheet(style)
             self.buttonlist[i].setMinimumHeight(50)
             self.buttonlist[i].setText(self.extraeventslabels[i])
-            tip = unicode(QApplication.translate("tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8) + self.extraeventsdescriptions[i]) + u"\n" 
-            tip += QApplication.translate("tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8) + unicode(self.qmc.etypes[self.extraeventstypes[i]]) + u"\n" 
-            tip += QApplication.translate("tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8) + unicode(self.extraeventsvalues[i]-1) + u"\n" 
-            tip += QApplication.translate("tooltip","<b>Text </b>= ", None, QApplication.UnicodeUTF8) + unicode(self.extraeventsactionstrings[i])
-            self.buttonlist[i].setToolTip(tip)
             self.buttonlist[i].setFocusPolicy(Qt.NoFocus)
             self.connect(self.buttonlist[i], SIGNAL("clicked()"), lambda ee=i:self.recordextraevent(ee))
             #add button to row                    
@@ -8441,11 +8404,33 @@ $cupping_notes
                 self.e3buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
             else:
                 self.e4buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+        
+        self.settooltip()
+        self.update_extraeventbuttons_visibility()
+        
+    #assigns tooltips to extra event buttons
+    def settooltip(self):
+        for i in range(len(self.buttonlist)):
+            tip = unicode(QApplication.translate("tooltip","<b>Label</b>= ", None, QApplication.UnicodeUTF8)) + unicode(self.extraeventslabels[i]) + u"<br>"             
+            tip += unicode(QApplication.translate("tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8)) + unicode(self.extraeventsdescriptions[i]) + u"<br>" 
+            tip += unicode(QApplication.translate("tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8)) + unicode(self.qmc.etypes[self.extraeventstypes[i]]) + u"<br>" 
+            tip += unicode(QApplication.translate("tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8)) + unicode(self.extraeventsvalues[i]-1) + u"<br>" 
+            tip += unicode(QApplication.translate("tooltip","<b>Documentation </b>= ", None, QApplication.UnicodeUTF8)) + unicode(self.extraeventsactionstrings[i]) + u"<br>"
+            tip += unicode(QApplication.translate("tooltip","<b>Button# </b>= ", None, QApplication.UnicodeUTF8)) + unicode(i+1)
+            self.buttonlist[i].setToolTip(tip) 
 
+    def update_extraeventbuttons_visibility(self):
+        for i in range(len(self.buttonlist)):
+            if self.extraeventsvisibility[i]:
+                self.buttonlist[i].setVisible(True)
+            else:
+                self.buttonlist[i].setVisible(False)
+                
 ##########################################################################
 #####################     HUD  EDIT DLG     ##############################
 ##########################################################################
         
+
 class HUDDlg(QDialog):
     def __init__(self, parent = None):
         super(HUDDlg,self).__init__(parent)
@@ -10835,6 +10820,10 @@ class EventsDlg(QDialog):
         self.etype1 = QLineEdit(aw.qmc.etypes[1])
         self.etype2 = QLineEdit(aw.qmc.etypes[2])
         self.etype3 = QLineEdit(aw.qmc.etypes[3])
+        self.etype0.setMaximumWidth(100)
+        self.etype1.setMaximumWidth(100)
+        self.etype2.setMaximumWidth(100)
+        self.etype3.setMaximumWidth(100)
 
 
         E1colorButton = QPushButton(QApplication.translate("Button","E1 Color",None, QApplication.UnicodeUTF8))  
@@ -10878,18 +10867,20 @@ class EventsDlg(QDialog):
         else:
             self.autoChargeDrop.setChecked(False)
         
-        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))  
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
-        okButton.setMaximumWidth(100)
-        #closeButton.setMaximumWidth(100)
-        #defaultButton.setMaximumWidth(100)
+        defaultButton.setMaximumWidth(90)
+        autoButton = QPushButton(QApplication.translate("Button","B Defaults",None, QApplication.UnicodeUTF8))
+        autoButton.setToolTip(QApplication.translate("Tooltip","Generates buttons by event type/value",None, QApplication.UnicodeUTF8))
+
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
-        
+        autoButton.setFocusPolicy(Qt.NoFocus)
         self.connect(closeButton,SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(okButton,SIGNAL("clicked()"),self.updatetypes)
         self.connect(defaultButton,SIGNAL("clicked()"),self.settypedefault)
+        self.connect(autoButton,SIGNAL("clicked()"),self.autogenerate)
 
         ###  TAB 2
         #table for showing events
@@ -10995,11 +10986,14 @@ class EventsDlg(QDialog):
         nbuttonslayout = QHBoxLayout()
         nbuttonslayout.addWidget(self.extrabuttonsshowCheck)
         nbuttonslayout.addWidget(self.nbuttonslabel)
-        nbuttonslayout.addWidget(self.nbuttonsSpinBox)        
+        nbuttonslayout.addWidget(self.nbuttonsSpinBox)
+        nbuttonslayout.addStretch()
 
         tab2buttonlayout = QHBoxLayout()    
         tab2buttonlayout.addWidget(addButton)
         tab2buttonlayout.addWidget(delButton)
+        tab2buttonlayout.addWidget(autoButton)
+
         tab2buttonlayout.addStretch()
         tab2buttonlayout.addWidget(savetableButton)
         tab2buttonlayout.addWidget(helpButton) 
@@ -11026,10 +11020,74 @@ class EventsDlg(QDialog):
         mainLayout.addWidget(TabWidget)
         mainLayout.addLayout(buttonLayout)
 
-        
         mainLayout.setMargin(0)      
 
         self.setLayout(mainLayout)
+
+    #creates buttons with all ranges types and values
+    def autogenerate(self):
+        string = QApplication.translate("Auto Button Generator","In order auto generate buttons,\n the extra event button configuration needs to be changed.\n Continue?", None, QApplication.UnicodeUTF8)
+        reply = QMessageBox.question(self,QApplication.translate("Auto Button Generator", "Auto Button Generator",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
+        if reply == QMessageBox.Yes:
+            pass
+        else:
+            return
+
+        ####  BUILD VARIABLES ######
+        #types (aw.extraeventstypes)
+        types = [0]*3
+        for i in range(4):
+            types.extend([i]*12) 
+        #values (aw.extraeventsvalues)
+        values = [0]*3
+        values.extend([0,1,2,3,4,5,6,7,8,9,10,11]*4) 
+        #actions (aw.extraeventsactions)
+        actions = [0]*51  
+        #visibility (aw.extraeventsvisibility)
+        visibility = [0]*3   
+        visibility.extend([1]*48)
+        #Documentation (aw.extraeventsactionstrings)
+        documentation = [u""]*51
+        #Button Labels (aw.extraeventslabels)
+        blabels = [u"1",u"2",u"3"]
+        for i in range(4):
+            for f in range(12):
+                if f:
+                    blabels.append(unicode(aw.qmc.etypes[i][0]) + unicode(f-1))
+                else:
+                    blabels.append(unicode(aw.qmc.etypes[i][0]))
+        #descriptions (aw.extraeventsdescriptions)
+        description = [u""]*51
+        #button background colors (aw.extraeventbuttoncolor)
+        bcolor = [u"lightgrey",u"lightgrey","lightgrey"]
+        step = 40
+        for i in range(4):
+            for f in range(230,50,-15):
+                color = QColor()    
+                color.setHsv(step,255,f,255)
+                bcolor.append(unicode(color.name()))
+            step += 80
+        #text color (aw.extraeventbuttontextcolor)
+        tcolor = [u"yellow"]*51
+
+        #### ASSIGN VARIABLES
+        aw.extraeventstypes = types[:]
+        aw.extraeventsvalues = values[:]
+        aw.extraeventsactions = actions[:]
+        aw.extraeventsvisibility = visibility[:]
+        aw.extraeventsactionstrings = documentation[:]
+        aw.extraeventslabels = blabels[:]
+        aw.extraeventsdescriptions = description[:]
+        aw.extraeventbuttoncolor = bcolor[:]
+        aw.extraeventbuttontextcolor = tcolor[:]
+        
+        aw.buttonlistmaxlen = 12
+        aw.realignbuttons()
+        self.createEventbuttonTable()        
+
+        #check visibility
+        if not aw.extraeventsbuttonsflag:
+            self.extrabuttonsshowCheck.setChecked(True)
 
     def seteventmarker(self,x,m):
         if m == 0:
@@ -11152,21 +11210,23 @@ class EventsDlg(QDialog):
             aw.buttonlist[i].setText(aw.extraeventslabels[i])
             descriptionedit = self.eventbuttontable.cellWidget(i,1)
             aw.extraeventsdescriptions[i] = unicode(descriptionedit.text())
+
+            typecombobox = self.eventbuttontable.cellWidget(i,2)
+            aw.extraeventstypes[i] = typecombobox.currentIndex()
+
+            valuecombobox = self.eventbuttontable.cellWidget(i,3)
+            aw.extraeventsvalues[i] = valuecombobox.currentIndex()
+
+            actioncombobox = self.eventbuttontable.cellWidget(i,4)
+            aw.extraeventsactions[i] = actioncombobox.currentIndex()
             
             actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
             ades = unicode(actiondescriptionedit.text())
             aw.extraeventsactionstrings[i] = ades
 
-            aw.sendmessage(QApplication.translate("Message Area","Custom Event buttons configuration saved", None, QApplication.UnicodeUTF8))        
+            aw.update_extraeventbuttons_visibility()
 
-    def settooltip(self):
-        for i in range(len(aw.extraeventstypes)):        
-            tip = unicode(QApplication.translate("tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8) + aw.extraeventsdescriptions[i]) + u"\n"
-            tip += QApplication.translate("tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8) + unicode(aw.qmc.etypes[aw.extraeventstypes[i]]) + u"\n" 
-            tip += QApplication.translate("tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8) + unicode(aw.extraeventsvalues[i]-1) + u"\n" 
-            tip += QApplication.translate("tooltip","<b>Text </b>= ", None, QApplication.UnicodeUTF8) + unicode(aw.extraeventsactionstrings[i])
-            
-            aw.buttonlist[i].setToolTip(tip) 
+            aw.sendmessage(QApplication.translate("Message Area","Custom Event buttons configuration saved", None, QApplication.UnicodeUTF8))        
 
     def setvisibilitytyeventbutton(self,z,i):
         actioncombobox = self.eventbuttontable.cellWidget(i,6)
@@ -11176,19 +11236,19 @@ class EventsDlg(QDialog):
     def setactioneventbutton(self,z,i):
         actioncombobox = self.eventbuttontable.cellWidget(i,4)
         aw.extraeventsactions[i] = actioncombobox.currentIndex()
+        aw.settooltip()
     	
     def setvalueeventbutton(self,z,i):
         valuecombobox = self.eventbuttontable.cellWidget(i,3)
         aw.extraeventsvalues[i] = valuecombobox.currentIndex()
         aw.buttonlist[i].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[i]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[i]]))        
-        self.settooltip()
+        aw.settooltip()
 
     def settypeeventbutton(self,z,i):
         typecombobox = self.eventbuttontable.cellWidget(i,2)
         aw.extraeventstypes[i] = typecombobox.currentIndex()
         aw.buttonlist[i].setText(unicode(aw.qmc.etypes[aw.extraeventstypes[i]][0])+unicode(aw.qmc.eventsvalues[aw.extraeventsvalues[i]]))        
-        self.settooltip()
-
+        aw.settooltip()
 
     def delextraeventbutton(self):
         bindex = len(aw.extraeventstypes)-1
@@ -11263,7 +11323,7 @@ class EventsDlg(QDialog):
             aw.e4buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
                 
         aw.update_extraeventbuttons_visibility()
-        self.settooltip()
+        aw.settooltip()
         
     def eventsbuttonflagChanged(self):
         if self.eventsbuttonflag.isChecked():
@@ -11307,8 +11367,11 @@ class EventsDlg(QDialog):
             #update autoChargeDrop flag
             aw.qmc.autoChargeDropFlag = self.autoChargeDrop.isChecked()
         
-            aw.qmc.redraw(recomputeAllDeltas=False)
             self.savetableextraeventbutton()
+            aw.realignbuttons()
+
+            aw.qmc.redraw(recomputeAllDeltas=False)
+
             aw.sendmessage(QApplication.translate("Message Area","Event configuration saved", None, QApplication.UnicodeUTF8))
             self.close()
         else:
@@ -11320,6 +11383,7 @@ class EventsDlg(QDialog):
         self.etype1.setText(aw.qmc.etypesdefault[1])
         self.etype2.setText(aw.qmc.etypesdefault[2])
         self.etype3.setText(aw.qmc.etypesdefault[3])
+        aw.settooltip()
 
     def showEventbuttonhelp(self):
         string  = QApplication.translate("MessageBox", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None, QApplication.UnicodeUTF8) + "<br><br>"
