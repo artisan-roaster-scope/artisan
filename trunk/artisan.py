@@ -633,6 +633,18 @@ class tgraphcanvas(FigureCanvas):
         #flag to plot cross lines from mouse
         self.crossmarker = False
         self.crossmouseid = 0
+
+        #########  temporary serial variables
+        #temporary storage to pass values. Holds extra T3 and T4 values for center 309
+        self.extra309T3 = 0.
+        self.extra309T4 = 0.
+        self.extra309TX = 0.
+
+        #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT      
+        self.dutycycle = 0.
+        self.dutycycleTX = 0.
+        self.fujiETBT = 0.
+        self.currentpidsv = 0.
         
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()        
     #################################    FUNCTIONS    ###################################
@@ -12593,7 +12605,6 @@ class serialport(object):
         self.ArduinoIsInitialized = 0
         self.ArduinoUnit = ""
 
-
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
         # device 1 (with index 1 bellow) is Omega HH806
@@ -12628,17 +12639,6 @@ class serialport(object):
                                    self.DTAtemperature,     #26
                                    self.callprogram         #27
                                    ]
-
-        #temporary storage to pass values. Holds extra T3 and T4 values for center 309
-        self.extra309T3 = 0.
-        self.extra309T4 = 0.
-        self.extra309TX = 0.
-
-        #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT      
-        self.dutycycle = 0.
-        self.dutycycleTX = 0.
-        self.fujiETBT = 0.
-        self.currentpidsv = 0.
 
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -12746,9 +12746,9 @@ class serialport(object):
             t2 = 0.
 
         #get current duty cycle and update LCD 7
-        self.dutycycle = aw.fujipid.readdutycycle()
+        aw.qmc.dutycycle = aw.fujipid.readdutycycle()
+        aw.qmc.dutycycleTX = tx
         
-        self.dutycycleTX = tx
         if t2:
             aw.qmc.fujiETBT = t1-t2
         else:
@@ -12759,7 +12759,7 @@ class serialport(object):
     #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
     def fujidutycycle(self):
         #return saved readings from device 0
-        return aw.ser.dutycycleTX, aw.ser.dutycycle, aw.ser.fujiETBT   
+        return aw.qmc.dutycycleTX, aw.qmc.dutycycle, aw.qmc.fujiETBT   
 
     def DTAtemperature(self):
         ###########################################################
@@ -12925,7 +12925,7 @@ class serialport(object):
     #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
     def CENTER309_34(self):
          #return saved readings collected at self.CENTER309temperature()
-         return aw.ser.extra309TX,aw.ser.extra309T3,aw.ser.extra309T4 
+         return aw.qmc.extra309TX,aw.qmc.extra309T3,aw.qmc.extra309T4 
 
     def CENTER306(self):
 
@@ -12987,7 +12987,7 @@ class serialport(object):
     #especial function that collects extra T3 and T4 from Vol K204 while keeping compatibility
     def K204_34(self):
          #return saved readings collected at self.CENTER309temperature()
-         return aw.ser.extra309TX,aw.ser.extra309T3,aw.ser.extra309T4 
+         return aw.qmc.extra309TX,aw.qmc.extra309T3,aw.qmc.extra309T4 
 
     def VOLTCRAFTK202(self):
 
@@ -13475,9 +13475,9 @@ class serialport(object):
                     T1 = int(binascii.hexlify(r[7] + r[8]),16)/10.
                     T2 = int(binascii.hexlify(r[9] + r[10]),16)/10.
                     #save these variables if using T3 and T4
-                    self.extra309T3 = int(binascii.hexlify(r[11] + r[12]),16)/10.
-                    self.extra309T4 = int(binascii.hexlify(r[13] + r[14]),16)/10.
-                    self.extra309TX = aw.qmc.timeclock.elapsed()/1000.
+                    aw.qmc.extra309T3 = int(binascii.hexlify(r[11] + r[12]),16)/10.
+                    aw.qmc.extra309T4 = int(binascii.hexlify(r[13] + r[14]),16)/10.
+                    aw.qmc.extra309TX = aw.qmc.timeclock.elapsed()/1000.
                     return T1,T2
                 
                 else:
