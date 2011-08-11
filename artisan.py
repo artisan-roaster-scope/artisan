@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.5.3"
+__version__ = u"0.5.4"
 
 
 # ABOUT
@@ -10839,9 +10839,13 @@ class EventsDlg(QDialog):
 
 
         E1colorButton = QPushButton(QApplication.translate("Button","E1 Color",None, QApplication.UnicodeUTF8))  
+        E1colorButton.setFocusPolicy(Qt.NoFocus)
         E2colorButton = QPushButton(QApplication.translate("Button","E2 Color",None, QApplication.UnicodeUTF8))  
+        E2colorButton.setFocusPolicy(Qt.NoFocus)
         E3colorButton = QPushButton(QApplication.translate("Button","E3 Color",None, QApplication.UnicodeUTF8))  
+        E3colorButton.setFocusPolicy(Qt.NoFocus)
         E4colorButton = QPushButton(QApplication.translate("Button","E4 Color",None, QApplication.UnicodeUTF8))  
+        E4colorButton.setFocusPolicy(Qt.NoFocus)
         self.connect(E1colorButton,SIGNAL("clicked()"),lambda b=0:self.setcoloreventline(b))
         self.connect(E2colorButton,SIGNAL("clicked()"),lambda b=1:self.setcoloreventline(b))
         self.connect(E3colorButton,SIGNAL("clicked()"),lambda b=2:self.setcoloreventline(b))
