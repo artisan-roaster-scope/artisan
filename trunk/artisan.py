@@ -4627,6 +4627,10 @@ class ApplicationWindow(QMainWindow):
         importK202Action = QAction(QApplication.translate("Menu", "K202...",None, QApplication.UnicodeUTF8),self)
         self.connect(importK202Action,SIGNAL("triggered()"),self.importK202)
         importMenu.addAction(importK202Action)
+
+        importK204Action = QAction(QApplication.translate("Menu", "K204...",None, QApplication.UnicodeUTF8),self)
+        self.connect(importK204Action,SIGNAL("triggered()"),self.importK204)
+        importMenu.addAction(importK204Action)
         
         self.fileMenu.addMenu(importMenu)    
         
@@ -8014,6 +8018,87 @@ $cupping_notes
             self.qmc.adderror(QApplication.translate("Error Message","Value Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
 
+    def importK204(self):
+        try:
+            filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Import K204 CSV",None, QApplication.UnicodeUTF8))
+            if  filename == "":
+                return
+            self.qmc.reset()
+            f = QFile(filename)
+            if not f.open(QIODevice.ReadOnly):
+                raise IOError, unicode(f.errorString())
+                return
+            import csv
+            csvFile = file(filename,"rb")
+            csvReader = csv.DictReader(csvFile,["Date","Time","T1","T2","T3","T4"],delimiter='\t')            
+            zero_t = None
+            roastdate = None
+            unit = None
+            for item in csvReader:
+                try:
+                    #set date
+                    if not roastdate:
+                        roastdate = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                        self.qmc.roastdate = roastdate
+                    #set zero
+                    if not zero_t:
+                        date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                        zero = QDateTime()
+                        zero.setDate(date)
+                        zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                        zero_t = zero.toTime_t()
+# The K204 export does not contain a trace of the temperature mode.
+# We have to assume here that the mode was set correctly before the import.
+#                    #set temperature mode
+#                    if not unit:
+#                        unit = item['T1unit']
+#                        if unit == u"F" and self.qmc.mode == u"C":
+#                            self.qmc.fahrenheitMode()
+#                        if unit == u"C" and self.qmc.mode == u"F":
+#                            self.qmc.celsiusMode()
+                    #add one measurement
+                    dt = QDateTime()
+                    dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
+                    dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                    tx = float(dt.toTime_t() - zero_t)
+                    self.qmc.timex.append(tx)
+                    t1 = float(item['T1'].replace(',','.'))
+                    if t1 > 800 or t1 < 0.0:
+                        t1 = 0.0
+                    self.qmc.temp1.append(t1)
+                    t2 = float(item['T2'].replace(',','.'))
+                    if t2 > 800 or t2 < 0.0:
+                        t2 = 0.0
+                    self.qmc.temp2.append(t2)
+                    if len(aw.qmc.extradevices) > 0:
+                        aw.qmc.extratimex[0].append(tx)
+                        t3 = float(item['T3'].replace(',','.'))
+                        if t3 > 800 or t3 < 0.0:
+                            t3 = 0.0
+                        aw.qmc.extratemp1[0].append(t3)
+                        t4 = float(item['T4'].replace(',','.'))
+                        if t4 > 800 or t4 < 0.0:
+                            t2 = 0.0
+                        aw.qmc.extratemp2[0].append(t4)
+                except ValueError:
+                    pass
+            csvFile.close()
+            #swap temperature curves if needed such that BT is the lower and ET the upper one
+            if (reduce (lambda x,y:x + y, self.qmc.temp2)) > reduce (lambda x,y:x + y, self.qmc.temp1):
+                tmp = self.qmc.temp1
+                self.qmc.temp1 = self.qmc.temp2
+                self.qmc.temp2 = tmp
+            self.qmc.endofx = self.qmc.timex[-1]
+            self.sendmessage(QApplication.translate("Message Area","K204 file loaded successfully", None, QApplication.UnicodeUTF8))
+            self.qmc.redraw()
+ 
+        except IOError,e:
+            self.qmc.adderror(QApplication.translate("Error Message","IO Error: importK204(): %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return            
+
+        except ValueError,e:
+            self.qmc.adderror(QApplication.translate("Error Message","Value Error: importK204(): %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
             
     def importHH506RA(self):
         try:
