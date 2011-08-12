@@ -288,7 +288,7 @@ class tgraphcanvas(FigureCanvas):
                        "Omega HH802U",
                        "Omega HH309",
                        "NONE",
-                       "+ArduinoTC4",
+                       #"+ArduinoTC4",
                        "TE VA18B",
                        "+309_34",
                        "+FUJI DUTY %",
@@ -5242,6 +5242,9 @@ class ApplicationWindow(QMainWindow):
         #### CUSTOM events buttons
         self.buttonlist = []
         self.buttonlistmaxlen = 10
+        #10 palettes of buttons
+        self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]]
+        self.buttonpalettemaxlen = [0]*10  #keeps max len of each palette
         
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
@@ -5507,7 +5510,28 @@ class ApplicationWindow(QMainWindow):
         elif key == 84:                     #letter T (mouse cross)
             self.qmc.togglecrosslines()
         elif key == 66:                     #letter B hides/shows extra rows of event buttons
-            self.toggleextraeventrows()      
+            self.toggleextraeventrows()
+        #Extra event buttons palette
+        elif key == 48:                     
+            self.setbuttonsfrom(0)
+        elif key == 49:                     
+            self.setbuttonsfrom(1)
+        elif key == 50:                     
+            self.setbuttonsfrom(2)
+        elif key == 51:                    
+            self.setbuttonsfrom(3)
+        elif key == 52:                     
+            self.setbuttonsfrom(4)
+        elif key == 53:                  
+            self.setbuttonsfrom(5)
+        elif key == 54:                 
+            self.setbuttonsfrom(6)
+        elif key == 55:                   
+            self.setbuttonsfrom(7)
+        elif key == 56:                     
+            self.setbuttonsfrom(8)
+        elif key == 57:                 
+            self.setbuttonsfrom(9)
         else:
             QWidget.keyPressEvent(self, event)
 
@@ -6659,11 +6683,8 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("autoChargeDrop"):
                 self.qmc.autoChargeDropFlag = settings.value("autoChargeDrop",self.qmc.autoChargeDropFlag).toBool()
             if settings.contains("EvalueColor"):
-                self.qmc.EvalueColor = list(settings.value("EvalueColor",self.qmc.EvalueColor).toStringList())
-                self.qmc.EvalueMarker = list(settings.value("EvalueMarker",self.qmc.EvalueMarker).toStringList())
-                for i in range(len(self.qmc.EvalueColor)):
-                    self.qmc.EvalueColor[i] = unicode(self.qmc.EvalueColor[i])          
-                    self.qmc.EvalueMarker[i] = unicode(self.qmc.EvalueMarker[i])          
+                self.qmc.EvalueColor = map(unicode,list(settings.value("EvalueColor",self.qmc.EvalueColor).toStringList()))
+                self.qmc.EvalueMarker = map(unicode,list(settings.value("EvalueMarker",self.qmc.EvalueMarker).toStringList()))         
             settings.endGroup()
             
     	    #restore statistics
@@ -6781,21 +6802,12 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
                 self.qmc.extradevices = map(lambda x:x.toInt()[0],settings.value("extradevices").toList())
-                self.qmc.extraname1 = list(settings.value("extraname1",self.qmc.extraname1).toStringList())
-                self.qmc.extraname2 = list(settings.value("extraname2",self.qmc.extraname2).toStringList())
-                self.qmc.extramathexpression1 = list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList())
-                self.qmc.extramathexpression2 = list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList())
-                self.qmc.extradevicecolor1 = list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList())
-                self.qmc.extradevicecolor2 = list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())
-                #convert Qstrings to unicode
-                for i in range(len(self.qmc.extradevicecolor1)):
-                    self.qmc.extraname1[i] = unicode(self.qmc.extraname1[i])
-                    self.qmc.extraname2[i] = unicode(self.qmc.extraname2[i])
-                    self.qmc.extramathexpression1[i] = unicode(self.qmc.extramathexpression1[i])
-                    self.qmc.extramathexpression2[i] = unicode(self.qmc.extramathexpression2[i])
-                    self.qmc.extradevicecolor1[i] = unicode(self.qmc.extradevicecolor1[i])
-                    self.qmc.extradevicecolor2[i] = unicode(self.qmc.extradevicecolor2[i])                    
-            
+                self.qmc.extraname1 = map(unicode,list(settings.value("extraname1",self.qmc.extraname1).toStringList()))
+                self.qmc.extraname2 = map(unicode,list(settings.value("extraname2",self.qmc.extraname2).toStringList()))
+                self.qmc.extramathexpression1 = map(unicode,list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList()))
+                self.qmc.extramathexpression2 = map(unicode,list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList()))
+                self.qmc.extradevicecolor1 = map(unicode,list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList()))
+                self.qmc.extradevicecolor2 = map(unicode,list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList()))                 
             #create empty containers
             for i in range(len(self.qmc.extradevices)):
                 self.qmc.extratemp1.append([])
@@ -6809,16 +6821,14 @@ class ApplicationWindow(QMainWindow):
             # Extra com ports
             settings.beginGroup("ExtraComm")
             if settings.contains("extracomport"):
-                self.extracomport = list(settings.value("extracomport",self.extracomport).toStringList())
+                self.extracomport = map(unicode,list(settings.value("extracomport",self.extracomport).toStringList()))
                 self.extrabaudrate = map(lambda x:x.toInt()[0],settings.value("extrabaudrate").toList())
                 self.extrabytesize = map(lambda x:x.toInt()[0],settings.value("extrabytesize").toList())
-                self.extraparity = list(settings.value("extraparity",self.extraparity).toStringList())
+                self.extraparity = map(unicode,list(settings.value("extraparity",self.extraparity).toStringList()))
                 self.extrastopbits = map(lambda x:x.toInt()[0],settings.value("extrastopbits").toList())
                 self.extratimeout = map(lambda x:x.toInt()[0],settings.value("extratimeout").toList())
                 #convert Qstrings to unicode                
                 for i in range(len(self.extracomport)):                
-                    self.extracomport[i] = unicode(self.extracomport[i])
-                    self.extraparity[i] = unicode(self.extraparity[i])
                     #create serial port objects
                     self.extraser.append(serialport())                    
                 #configure extra com ports 
@@ -6861,14 +6871,28 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.extraeventbuttoncolor = ["yellow"]*len(self.extraeventstypes)                                        
                     self.extraeventbuttontextcolor = ["black"]*len(self.extraeventstypes)
-                    
+                if settings.contains("buttonpalette"):
+                    self.buttonpalettemaxlen = map(lambda x:x.toInt()[0],settings.value("buttonpalettemaxlen").toList())
+                    mlist = map(lambda x:x.toList(),settings.value("buttonpalette").toList())
+                    for i in range(len(mlist)):
+                        if len(mlist[i]) == 9:
+                            self.buttonpalette[i].append(map(lambda x:x.toInt()[0],mlist[i][0].toList()))              #types
+                            self.buttonpalette[i].append(map(lambda x:x.toInt()[0],mlist[i][1].toList()))              #values
+                            self.buttonpalette[i].append(map(lambda x:x.toInt()[0],mlist[i][2].toList()))              #actions
+                            self.buttonpalette[i].append(map(lambda x:x.toInt()[0],mlist[i][3].toList()))              #visibility
+                            self.buttonpalette[i].append(map(unicode,map(lambda x:x.toString(),mlist[i][4].toList()))) #strings                            
+                            self.buttonpalette[i].append(map(unicode,map(lambda x:x.toString(),mlist[i][5].toList()))) #labels
+                            self.buttonpalette[i].append(map(unicode,map(lambda x:x.toString(),mlist[i][6].toList()))) #descriptions
+                            self.buttonpalette[i].append(map(unicode,map(lambda x:x.toString(),mlist[i][7].toList()))) #color
+                            self.buttonpalette[i].append(map(unicode,map(lambda x:x.toString(),mlist[i][8].toList()))) #textcolor
+                        else:
+                            self.buttonpalette[i].extend([[],[],[],[],[],[],[],[],[]])
                 for i in range(len(self.extraeventsactionstrings)):
                     self.extraeventsactionstrings[i] = unicode(self.extraeventsactionstrings[i])
                     self.extraeventslabels[i] = unicode(self.extraeventslabels[i])
                     self.extraeventsdescriptions[i] = unicode(self.extraeventsdescriptions[i])
                     self.extraeventbuttoncolor[i] = unicode(self.extraeventbuttoncolor[i])
                     self.extraeventbuttontextcolor[i] = unicode(self.extraeventbuttontextcolor[i])
-
                 #update individual visibility of each buttons        
                 self.update_extraeventbuttons_visibility()
                 self.realignbuttons()                    
@@ -6883,8 +6907,7 @@ class ApplicationWindow(QMainWindow):
                     self.e1buttondialog.setVisible(False) 
                     self.e2buttondialog.setVisible(False) 
                     self.e3buttondialog.setVisible(False) 
-                    self.e4buttondialog.setVisible(False)
-                    
+                    self.e4buttondialog.setVisible(False)    
             settings.endGroup()
             
             settings.beginGroup("grid")             
@@ -7080,6 +7103,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraeventbuttoncolor",self.extraeventbuttoncolor)
             settings.setValue("extraeventbuttontextcolor",self.extraeventbuttontextcolor)
             settings.setValue("extraeventsbuttonsflag",self.extraeventsbuttonsflag)
+            settings.setValue("buttonpalette",self.buttonpalette)
+            settings.setValue("buttonpalettemaxlen",self.buttonpalettemaxlen)
             settings.endGroup()
             
             settings.beginGroup("grid")
@@ -7211,6 +7236,8 @@ class ApplicationWindow(QMainWindow):
             settings["extraeventbuttoncolor"]= unicode(self.extraeventbuttoncolor)
             settings["extraeventbuttontextcolor"]= unicode(self.extraeventbuttontextcolor)
             settings["extraeventsbuttonsflag"]= unicode(self.extraeventsbuttonsflag)
+            settings["buttonpalettemaxlen"]= unicode(self.buttonpalettemaxlen)
+            settings["buttonpalette"]= unicode(self.buttonpalette)
             settings["xgrid"]= unicode(self.qmc.xgrid)
             settings["ygrid"]= unicode(self.qmc.ygrid)
             settings["zgrid"]= unicode(self.qmc.zgrid)
@@ -8522,6 +8549,48 @@ $cupping_notes
                 self.buttonlist[i].setVisible(True)
             else:
                 self.buttonlist[i].setVisible(False)
+
+    def transferbuttonsto(self,pindex):
+        copy = []
+        copy.append(self.extraeventstypes[:])
+        copy.append(self.extraeventsvalues[:])
+        copy.append(self.extraeventsactions[:])
+        copy.append(self.extraeventsvisibility[:])
+        copy.append(self.extraeventsactionstrings[:])
+        copy.append(self.extraeventslabels[:])
+        copy.append(self.extraeventsdescriptions[:])
+        copy.append(self.extraeventbuttoncolor[:])
+        copy.append(self.extraeventbuttontextcolor[:])
+        self.buttonpalette[pindex] = copy[:] 
+        self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
+
+        self.sendmessage(QApplication.translate("Message Area","Buttons copied to Palette #%i"%(pindex), None, QApplication.UnicodeUTF8))
+        
+    def setbuttonsfrom(self,pindex):
+        copy = self.buttonpalette[pindex][:]
+        if len(copy):
+            self.extraeventstypes = copy[0][:]
+            self.extraeventsvalues = copy[1][:]
+            self.extraeventsactions = copy[2][:]
+            self.extraeventsvisibility = copy[3][:]
+            self.extraeventsactionstrings = copy[4][:]
+            self.extraeventslabels = copy[5][:]
+            self.extraeventsdescriptions = copy[6][:]
+            self.extraeventbuttoncolor = copy[7][:]
+            self.extraeventbuttontextcolor = copy[8][:]
+
+            self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
+            self.realignbuttons()
+            self.sendmessage(QApplication.translate("Message Area","Palette #%i restored"%(pindex), None, QApplication.UnicodeUTF8))
+            return 1  #success
+        else:
+            self.sendmessage(QApplication.translate("Message Area","Palette #%i empty"%(pindex), None, QApplication.UnicodeUTF8))
+            return 0  #failed
+
+    def backuppaletteeventbuttons(self):
+        self.sendmessage(u"Work on progress")
+    def restorepaletteeventbutons(self):
+        self.sendmessage(u"Work on progress")
                 
 ##########################################################################
 #####################     HUD  EDIT DLG     ##############################
@@ -10936,14 +11005,23 @@ class EventsDlg(QDialog):
         self.connect(E3colorButton,SIGNAL("clicked()"),lambda b=2:self.setcoloreventline(b))
         self.connect(E4colorButton,SIGNAL("clicked()"),lambda b=3:self.setcoloreventline(b))
 
-        self.markers = ["circle","triangle_down","triangle_up","triangle_left","triangle_right","tri_down","tri_up","tri_left","tri_right","square","pentagon","star","hexagon1","hexagon2","plus","x","diamond",
-                        "thin_diamond","vline","hline","tickleft","tickright","tickup","tickdown","caretleft","caretright","caretup","caretdown","nothing"]
-        self.markervals = ["o","v","^","<",">","1","2","3","4","s","p","*","h","H","+","x","D","d","|","_","TICKLEFT","TICKRIGHT","TICKUP","TICKDOWN","CARETLEFT",
-                           "CARETRIGHT","CARETUP","CARETDOWN","None"]
+        #marker selection for comboboxes
+        self.markers = [QApplication.translate("marker","Circle",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("marker","Square",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("marker","Pentagon",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("marker","Diamond",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("marker","Star",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("marker","Hexagon 1",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("marker","Hexagon 2",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("marker","+",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("marker","x",None, QApplication.UnicodeUTF8),
+                        QApplication.translate("marker","None",None, QApplication.UnicodeUTF8)]
+        #keys interpreted by matplotlib. Must match order of self.markers 
+        self.markervals = ["o","s","p","D","*","h","H","+","x","None"]  
 
         #Marker type
         self.marker1typeComboBox =  QComboBox()
-        self.marker1typeComboBox.addItems(self.markers )
+        self.marker1typeComboBox.addItems(self.markers)
         self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
         self.connect(self.marker1typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=0:self.seteventmarker(x,m))                      
 
@@ -11021,7 +11099,7 @@ class EventsDlg(QDialog):
             self.extrabuttonsshowCheck.setChecked(False)
         self.connect(self.extrabuttonsshowCheck,SIGNAL("stateChanged(int)"),aw.toggleextraeventrows)
 
-        #buttons per row: 
+        #number of buttons per row
         self.nbuttonslabel = QLabel(QApplication.translate("Label","Max buttons per row", None, QApplication.UnicodeUTF8))
         self.nbuttonsSpinBox = QSpinBox()
         self.nbuttonsSpinBox.setMaximumWidth(100)
@@ -11029,6 +11107,50 @@ class EventsDlg(QDialog):
         self.nbuttonsSpinBox.setRange(9,30)
         self.nbuttonsSpinBox.setValue(aw.buttonlistmaxlen)
         self.connect(self.nbuttonsSpinBox, SIGNAL("valueChanged(int)"),self.realignbuttons)
+
+        #color patterns
+        #flag that prevents changing colors too fast
+        self.changingcolorflag = False
+        colorpatternlabel = QLabel(QApplication.translate("Label","Color Pattern", None, QApplication.UnicodeUTF8))
+        self.colorSpinBox = QSpinBox()
+        self.colorSpinBox.setWrapping(True)
+        self.colorSpinBox.setMaximumWidth(100)
+        self.colorSpinBox.setAlignment(Qt.AlignCenter)
+        self.colorSpinBox.setRange(0,359)
+        self.connect(self.colorSpinBox, SIGNAL("valueChanged(int)"),self.colorizebuttons)
+
+
+        ## tab3
+        #aw.buttonpalette
+        transferpalettebutton = QPushButton(QApplication.translate("button","Transfer Buttons to", None, QApplication.UnicodeUTF8))
+        setpalettebutton = QPushButton(QApplication.translate("button","Restore Buttons from", None, QApplication.UnicodeUTF8))
+        palette = QApplication.translate("Label","palette #", None, QApplication.UnicodeUTF8)
+        palettelist = []
+        for i in range(10):
+            palettelist.append(palette + str(i))
+        self.transferpalettecombobox = QComboBox()
+        self.transferpalettecombobox.setMaximumWidth(120)
+        self.transferpalettecombobox.addItems(palettelist)
+                   
+        self.setpalettecombobox = QComboBox()
+        self.setpalettecombobox.setMaximumWidth(120)
+        self.setpalettecombobox.addItems(palettelist)
+        self.connect(transferpalettebutton, SIGNAL("clicked()"),self.transferbuttonsto)
+        self.connect(setpalettebutton, SIGNAL("clicked()"),self.setbuttonsfrom)
+        transferpalettebutton.setMaximumWidth(160)
+        setpalettebutton.setMaximumWidth(160)
+
+
+        backupbutton = QPushButton(QApplication.translate("button","Backup palette", None, QApplication.UnicodeUTF8))
+        restorebutton = QPushButton(QApplication.translate("button","Restore Palette", None, QApplication.UnicodeUTF8))
+        backupbutton.setToolTip(QApplication.translate("Tooltip","Backup all palettes to a text file",None, QApplication.UnicodeUTF8))
+        restorebutton.setToolTip(QApplication.translate("Tooltip","Restore all palettes from a text",None, QApplication.UnicodeUTF8))
+        backupbutton.setMaximumWidth(140)
+        restorebutton.setMaximumWidth(140)
+        self.connect(backupbutton, SIGNAL("clicked()"),aw.backuppaletteeventbuttons)
+        self.connect(restorebutton, SIGNAL("clicked()"),aw.restorepaletteeventbutons)
+        
+        ### LAYOUTS
                 
         #### tab1 layout
         FlagsLayout = QHBoxLayout()
@@ -11088,6 +11210,9 @@ class EventsDlg(QDialog):
         nbuttonslayout.addWidget(self.extrabuttonsshowCheck)
         nbuttonslayout.addWidget(self.nbuttonslabel)
         nbuttonslayout.addWidget(self.nbuttonsSpinBox)
+        nbuttonslayout.addWidget(colorpatternlabel)
+        nbuttonslayout.addWidget(self.colorSpinBox)
+        
         nbuttonslayout.addStretch()
 
         tab2buttonlayout = QHBoxLayout()    
@@ -11104,7 +11229,16 @@ class EventsDlg(QDialog):
         tab2layout.addWidget(self.eventbuttontable)
         tab2layout.addLayout(nbuttonslayout)       
         tab2layout.addLayout(tab2buttonlayout)  
-        
+
+        ### tab3 layout
+        tab3layout = QGridLayout()
+        tab3layout.addWidget(transferpalettebutton,0,0)
+        tab3layout.addWidget(self.transferpalettecombobox,0,1)
+        tab3layout.addWidget(setpalettebutton,1,0)
+        tab3layout.addWidget(self.setpalettecombobox,1,1)
+        tab3layout.addWidget(backupbutton,2,0)
+        tab3layout.addWidget(restorebutton,2,1)
+
 ###########################################
         #tab layout
         TabWidget = QTabWidget()
@@ -11116,6 +11250,11 @@ class EventsDlg(QDialog):
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
         TabWidget.addTab(C2Widget,QApplication.translate("Tab","Buttons",None, QApplication.UnicodeUTF8))        
+
+        C3Widget = QWidget()
+        C3Widget.setLayout(tab3layout)
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Palette",None, QApplication.UnicodeUTF8))        
+
         
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(TabWidget)
@@ -11124,6 +11263,60 @@ class EventsDlg(QDialog):
         mainLayout.setMargin(0)      
 
         self.setLayout(mainLayout)
+
+    def transferbuttonsto(self):
+        pindex  = self.transferpalettecombobox.currentIndex()
+        aw.transferbuttonsto(pindex)
+        
+    def setbuttonsfrom(self):
+        pindex = self.setpalettecombobox.currentIndex()
+        answer = aw.setbuttonsfrom(pindex)
+        if answer:
+            self.createEventbuttonTable()        
+
+    #applys a pattern of colors 
+    def colorizebuttons(self,pattern=None):
+        if self.changingcolorflag:
+            n = self.colorSpinBox.value()
+            self.colorSpinBox.setValue(n-1)
+            return
+        self.changingcolorflag = True
+        if not pattern:
+            pattern = self.colorSpinBox.value()
+            
+        ncolumns = aw.buttonlistmaxlen
+        nbuttons = len(aw.buttonlist)
+        initbuttons = ncolumns - 9
+        nrows,extra  = divmod((nbuttons-initbuttons),ncolumns)
+
+        #button background colors (aw.extraeventbuttoncolor)
+        bcolor = ["lightgrey"]*initbuttons
+
+        step = pattern
+        if extra:
+            nrows += 1
+        for i in range(nrows):
+            for f in range(230,50,-15):
+                color = QColor()    
+                color.setHsv(step,255,f,255)
+                bcolor.append(unicode(color.name()))
+            step += pattern*2
+           
+        #text color (aw.extraeventbuttontextcolor)
+        tcolor = [u"yellow"]*nbuttons
+
+        aw.extraeventbuttoncolor = bcolor[:nbuttons]
+        aw.extraeventbuttontextcolor = tcolor[:]
+
+        for i in range(nbuttons):
+            style = "QPushButton {font-size: 10pt; font-weight: bold; color: %s; background-color: %s}"%(aw.extraeventbuttontextcolor[i],aw.extraeventbuttoncolor[i])
+            aw.buttonlist[i].setStyleSheet(style)
+        self.createEventbuttonTable()        
+
+        #check visibility
+        if not aw.extraeventsbuttonsflag:
+            self.extrabuttonsshowCheck.setChecked(True)        
+        self.changingcolorflag = False
 
     #creates buttons with all ranges types and values
     def autogenerate(self):
@@ -11159,17 +11352,6 @@ class EventsDlg(QDialog):
                     blabels.append(unicode(aw.qmc.etypes[i][0]))
         #descriptions (aw.extraeventsdescriptions)
         description = [u""]*51
-        #button background colors (aw.extraeventbuttoncolor)
-        bcolor = [u"lightgrey",u"lightgrey","lightgrey"]
-        step = 40
-        for i in range(4):
-            for f in range(230,50,-15):
-                color = QColor()    
-                color.setHsv(step,255,f,255)
-                bcolor.append(unicode(color.name()))
-            step += 80
-        #text color (aw.extraeventbuttontextcolor)
-        tcolor = [u"yellow"]*51
 
         #### ASSIGN VARIABLES
         aw.extraeventstypes = types[:]
@@ -11179,11 +11361,14 @@ class EventsDlg(QDialog):
         aw.extraeventsactionstrings = documentation[:]
         aw.extraeventslabels = blabels[:]
         aw.extraeventsdescriptions = description[:]
-        aw.extraeventbuttoncolor = bcolor[:]
-        aw.extraeventbuttontextcolor = tcolor[:]
+
+        aw.extraeventbuttoncolor = ["blue"]*51
+        aw.extraeventbuttontextcolor = ["yellow"]*51
         
         aw.buttonlistmaxlen = 12
         aw.realignbuttons()
+        self.colorizebuttons(pattern = 177) #change colors
+
         self.createEventbuttonTable()        
 
         #check visibility
