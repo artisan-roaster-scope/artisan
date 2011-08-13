@@ -664,8 +664,8 @@ class tgraphcanvas(FigureCanvas):
                     aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
                     
                     if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid  
-                        aw.lcd6.display(aw.ser.currentpidsv)
-                        aw.lcd7.display(aw.ser.dutycycle)
+                        aw.lcd6.display(aw.qmc.currentpidsv)
+                        aw.lcd7.display(aw.qmc.dutycycle)
 
                 #updated canvas
                 self.fig.canvas.draw()
