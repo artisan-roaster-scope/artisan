@@ -10094,6 +10094,11 @@ class editGraphDlg(QDialog):
                     startindex = aw.qmc.time2index( aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
                     aw.qmc.timeindex[0] = startindex
                     aw.qmc.xaxistosm()
+                elif aw.qmc.timeindex[0] != -1:
+                    absolutetime = aw.qmc.timex[aw.qmc.timeindex[0]]-abs(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
+                    startindex = aw.qmc.time2index(absolutetime)
+                    aw.qmc.timeindex[0] = startindex
+                    aw.qmc.xaxistosm()                    
             if self.dryeditcopy != unicode(self.dryedit.text()):
                 if aw.qmc.stringtoseconds(unicode(self.dryedit.text())) > 0:
                     dryindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.dryedit.text())))
@@ -11367,15 +11372,15 @@ class EventsDlg(QDialog):
         initbuttons = ncolumns - 9
         nrows,extra  = divmod((nbuttons-initbuttons),ncolumns)
 
-        print nrows, extra
         #button background colors (aw.extraeventbuttoncolor)
         bcolor = ["lightgrey"]*initbuttons
 
         step = pattern
         if extra:
             nrows += 1
+        gap = -1*(230-50)/ncolumns
         for i in range(nrows):
-            for f in range(230,50,-15):
+            for f in range(230,50,gap):
                 color = QColor()    
                 color.setHsv(step,255,f,255)
                 bcolor.append(unicode(color.name()))
