@@ -1289,15 +1289,16 @@ class tgraphcanvas(FigureCanvas):
                     step = 5
                     start = 100
                 jump = 20
+
                 for i in range(12):
-                    barposition = self.phases[0]-start-jump
                     if i == 0:
-                        bcolor = "yellow"
-                    elif i == 1:
-                        bcolor = "grey"
+                        color = "grey"
+                    elif i%2:
+                        color = self.palette["rect3"]
                     else:
-                        bcolor = self.palette["rect1"]       
-                    rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=bcolor,alpha=.3)
+                        color = self.palette["rect1"]                        
+                    barposition = self.phases[0]-start-jump    
+                    rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.3)
                     self.ax.add_patch(rectEvent)
                     self.eventpositionbars[i] =  barposition
                     if self.mode == "C":
@@ -1691,22 +1692,35 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(Nevents):
                         #self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
                         if self.specialeventstype[i] == 0:
+                            if len(self.E1timex):
+                                self.E1timex.append(self.timex[self.specialevents[i]])
+                                self.E1values.append(self.E1values[-1])             
                             self.E1timex.append(self.timex[self.specialevents[i]])
                             self.E1values.append(self.eventpositionbars[self.specialeventsvalue[i]])             
                         elif self.specialeventstype[i] == 1:
+                            if len(self.E2timex):
+                                self.E2timex.append(self.timex[self.specialevents[i]])
+                                self.E2values.append(self.E2values[-1])
                             self.E2timex.append(self.timex[self.specialevents[i]])
                             self.E2values.append(self.eventpositionbars[self.specialeventsvalue[i]])
                         elif self.specialeventstype[i] == 2:
+                            if len(self.E3timex):
+                                self.E3timex.append(self.timex[self.specialevents[i]])
+                                self.E3values.append(self.E3values[-1])
                             self.E3timex.append(self.timex[self.specialevents[i]])
                             self.E3values.append(self.eventpositionbars[self.specialeventsvalue[i]])
                         elif self.specialeventstype[i] == 3:
+                            if len(self.E4timex):
+                                self.E4timex.append(self.timex[self.specialevents[i]])
+                                self.E4values.append(self.E4values[-1])
                             self.E4timex.append(self.timex[self.specialevents[i]])
                             self.E4values.append(self.eventpositionbars[self.specialeventsvalue[i]])
 
-                    self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
-                    self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
-                    self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2])
-                    self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3])
+                        
+                    self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],linewidth = 2,alpha = .8)
+                    self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],linewidth = 2,alpha = .8)
+                    self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],linewidth = 2,alpha = .8)
+                    self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],linewidth = 2,alpha = .8)
 
                     handles.extend([self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots])
                     labels.extend([self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]])
@@ -2577,15 +2591,27 @@ class tgraphcanvas(FigureCanvas):
 
                 etype = self.specialeventstype[-1]
                 if etype == 0:
+                    if len(self.E1timex):
+                        self.E1timex.append(self.timex[self.specialevents[-1]])
+                        self.E1values.append(self.E1values[-1])   
                     self.E1timex.append(self.timex[self.specialevents[-1]])
                     self.E1values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
                 elif etype == 1:
+                    if len(self.E2timex):
+                        self.E2timex.append(self.timex[self.specialevents[-1]])
+                        self.E2values.append(self.E2values[-1])
                     self.E2timex.append(self.timex[self.specialevents[-1]])
                     self.E2values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
                 elif etype == 2:
+                    if len(self.E3timex):
+                        self.E3timex.append(self.timex[self.specialevents[-1]])
+                        self.E3values.append(self.E3values[-1])
                     self.E3timex.append(self.timex[self.specialevents[-1]])
                     self.E3values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
                 elif etype == 3:
+                    if len(self.E4timex):
+                        self.E4timex.append(self.timex[self.specialevents[-1]])
+                        self.E4values.append(self.E4values[-1])
                     self.E4timex.append(self.timex[self.specialevents[-1]])
                     self.E4values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
                     
@@ -5786,6 +5812,7 @@ class ApplicationWindow(QMainWindow):
         string += QApplication.translate("MessageBox", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8) + "<br><br>"
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
 
@@ -8550,6 +8577,7 @@ $cupping_notes
             else:
                 self.buttonlist[i].setVisible(False)
 
+    #transfers a palette number to current buttons
     def transferbuttonsto(self,pindex):
         copy = []
         copy.append(self.extraeventstypes[:])
@@ -8565,7 +8593,8 @@ $cupping_notes
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
 
         self.sendmessage(QApplication.translate("Message Area","Buttons copied to Palette #%i"%(pindex), None, QApplication.UnicodeUTF8))
-        
+
+    #stores a palette number from current buttons
     def setbuttonsfrom(self,pindex):
         copy = self.buttonpalette[pindex][:]
         if len(copy):
@@ -8588,9 +8617,58 @@ $cupping_notes
             return 0  #failed
 
     def backuppaletteeventbuttons(self):
-        self.sendmessage(u"Work on progress")
+        palette = {}
+        #convert labels to unicode
+        for i in range(len(self.buttonpalette)):
+            key = str(i)
+            palette[key]  = self.buttonpalette[i]
+        palette[u"maxlen"] = self.buttonpalettemaxlen
+        try:
+            filename = aw.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption","Save Button Palette",None, QApplication.UnicodeUTF8),ext="*.bp")
+            if filename:
+                #write
+                aw.serialize(filename,palette)
+                aw.sendmessage(QApplication.translate("Message Area","Button Palette successfully saved",None, QApplication.UnicodeUTF8))
+        except IOError,e:
+            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: backuppaletteeventbuttons(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
+
     def restorepaletteeventbutons(self):
-        self.sendmessage(u"Work on progress")
+        filename = aw.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Restore Button Palette",None, QApplication.UnicodeUTF8),path=self.profilepath,ext="*.bp")
+        try:
+            f = QFile(unicode(filename))
+            if not f.open(QIODevice.ReadOnly):
+                raise IOError, unicode(f.errorString())
+            stream = QTextStream(f)
+            firstChar = stream.read(1)
+            if firstChar == "{":            
+                f.close()
+                palette = aw.deserialize(filename)
+                self.buttonpalettemaxlen = map(int,palette["maxlen"])
+                for i in range(10):  #10 palettes (0-9)
+                    key = str(i)
+                    nextpalette = [[], [], [], [], [], [], [], [], []] 
+                    if len(palette[key]):
+                        for x in range(9):
+                            if x < 4:
+                                nextpalette[x] = map(int,palette[key][x])     #  type int
+                            else:
+                                nextpalette[x] = map(unicode,palette[key][x]) #  type unicode
+                    self.buttonpalette[i] = nextpalette[:]     
+            else:
+                message = QApplication.translate("Message Area","Invalid Button Palette format", None, QApplication.UnicodeUTF8)
+                self.sendmessage(message)
+                return
+            message =QApplication.translate("Message Area","Button palette succesfully restored", None, QApplication.UnicodeUTF8)
+            self.sendmessage(message)
+
+        except IOError,e:
+            self.qmc.adderror(QApplication.translate("Error Message","IO Error: restorepaletteeventbutons() %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
+
+        except Exception,e:
+            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: restorepaletteeventbutons() %1 ", None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            return
                 
 ##########################################################################
 #####################     HUD  EDIT DLG     ##############################
@@ -11289,6 +11367,7 @@ class EventsDlg(QDialog):
         initbuttons = ncolumns - 9
         nrows,extra  = divmod((nbuttons-initbuttons),ncolumns)
 
+        print nrows, extra
         #button background colors (aw.extraeventbuttoncolor)
         bcolor = ["lightgrey"]*initbuttons
 
