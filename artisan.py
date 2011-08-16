@@ -10083,13 +10083,13 @@ class editGraphDlg(QDialog):
                     startindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]] + aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
                     aw.qmc.timeindex[0] = startindex
                     aw.qmc.xaxistosm()
-                #if there is a CHARGE recorded and the time entered is positive. Use relative time
+                #if there is a CHARGE recorded and the time entered is negative. Use relative time
                 elif aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) < 0 and aw.qmc.timeindex[0] != -1:                    
                     relativetime = aw.qmc.timex[aw.qmc.timeindex[0]]-abs(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
                     startindex = aw.qmc.time2index(relativetime)
                     aw.qmc.timeindex[0] = startindex
                     aw.qmc.xaxistosm()
-                #if there is _no_ CHARGE recorded and the time entered is positive. Use absoulte time 
+                #if there is _no_ CHARGE recorded and the time entered is positive. Use absolute time 
                 elif aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0 and aw.qmc.timeindex[0] == -1:
                     startindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
                     aw.qmc.timeindex[0] = startindex
