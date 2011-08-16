@@ -250,7 +250,7 @@ class tgraphcanvas(FigureCanvas):
         self.errorlog = []
 
         # default delay between readings in miliseconds
-        self.delay = 1000
+        self.delay = 3000
 
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases_fahrenheit_defaults = [200,300,390,450]
@@ -269,33 +269,40 @@ class tgraphcanvas(FigureCanvas):
         #DEVICES
         self.device = 18                                    # default device selected to None (18). Calls appropiate function
 
-        #menu of thremocouple devices different than pids
-        self.devices = ["Omega HH806AU",                    # device labels (used in Dialog config)
-                       "Omega HH506RA",
-                       "CENTER 309",
-                       "CENTER 306",
-                       "CENTER 305",
-                       "CENTER 304",
-                       "CENTER 303",
-                       "CENTER 302",
-                       "CENTER 301",
-                       "CENTER 300",
-                       "VOLTCRAFT K204",
-                       "VOLTCRAFT K202",
-                       "VOLTCRAFT 300K",
-                       "VOLTCRAFT 302KJ",
-                       "EXTECH 421509",
-                       "Omega HH802U",
-                       "Omega HH309",
-                       "NONE",
-                       #"+ArduinoTC4",
-                       "TE VA18B",
-                       "+309_34",
-                       "+FUJI DUTY %",
-                       "Omega HHM28[6]",
-                       "+204_34",
-                       "+Virtual",
-                       "Program"
+        #menu of thermocouple devices
+        #device with first letter + only shows in extra device tab
+        #device with first letter - does not show in any tab (but its position in the list is important)
+        # device labels (used in Dialog config).
+        
+        self.devices = [#Fuji PID               #0
+                       "Omega HH806AU",         #1               
+                       "Omega HH506RA",         #2
+                       "CENTER 309",            #3
+                       "CENTER 306",            #4
+                       "CENTER 305",            #5
+                       "CENTER 304",            #6
+                       "CENTER 303",            #7
+                       "CENTER 302",            #8
+                       "CENTER 301",            #9
+                       "CENTER 300",            #10
+                       "VOLTCRAFT K204",        #11
+                       "VOLTCRAFT K202",        #12
+                       "VOLTCRAFT 300K",        #13
+                       "VOLTCRAFT 302KJ",       #14
+                       "EXTECH 421509",         #15
+                       "Omega HH802U",          #16
+                       "Omega HH309",           #17
+                       "NONE",                  #18
+                       "-ARDUINOTC4",           #19
+                       "TE VA18B",              #20
+                       "+309_34",               #21    
+                       "+FUJI DUTY %",          #22
+                       "Omega HHM28[6]",        #23
+                       "+204_34",               #24
+                       "+Virtual",              #25
+                       "-DTAtemperature",       #26   
+                       "Program",               #27
+                       "+ArduinoTC4_XX"         #28
                        ]
 
         #extra devices
@@ -473,8 +480,11 @@ class tgraphcanvas(FigureCanvas):
         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
         self.EvalueColor = [u"brown",u"blue",u"purple",u"grey"]
         self.EvalueMarker = ["o","s","h","D"]
+        self.Evaluelinethickness = [2,2,2,2]
+        self.Evaluealpha = [.8,.8,.8,.8]
         #the event value position bars are calculated at redraw()
         self.eventpositionbars = [0.]*12
+
 
         #Temperature Alarms lists. Data is writen in  alarmDlg 
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
@@ -1292,9 +1302,9 @@ class tgraphcanvas(FigureCanvas):
 
                 for i in range(12):
                     if i == 0:
-                        color = "grey"
-                    elif i%2:
                         color = self.palette["rect3"]
+                    elif i%2:
+                        color = self.palette["rect2"]
                     else:
                         color = self.palette["rect1"]                        
                     barposition = self.phases[0]-start-jump    
@@ -1365,7 +1375,7 @@ class tgraphcanvas(FigureCanvas):
                         st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[0]] - startB))
                         self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[0]]), xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
                                          xytext=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]] + 50),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                         
                         self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
                                          xytext=(self.timeB[self.timeindexB[0]]+5,self.temp2B[self.timeindexB[0]] - 100),fontsize=10,color=self.palette["text"],
@@ -1384,46 +1394,46 @@ class tgraphcanvas(FigureCanvas):
                             st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[2]]-startB))
                             self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[2]]), xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
                                              xytext=(self.timeB[self.timeindexB[2]]-5,self.temp2B[self.timeindexB[2]]+50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                             self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
                                              xytext=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]-50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                             
                         if self.timeindexB[3]:
                             st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[3]]-startB))          
                             self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[3]]), xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
                                              xytext=(self.timeB[self.timeindexB[3]]-5,self.temp2B[self.timeindexB[3]]+70),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
                             self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
                                              xytext=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]-80),fontsize=10, color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                             
                         if self.timeindexB[4]:
                             st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[4]]-startB))
                             self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[4]]), xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
                                              xytext=(self.timeB[self.timeindexB[4]]-5,self.temp2B[self.timeindexB[4]]+90),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
                             self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
                                              xytext=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]-110),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                             
                         if self.timeindexB[5]:
                             st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[5]]-startB))
                             self.ax.annotate(u"%.1f"%(self.timeB[self.timeindexB[5]]), xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
                                              xytext=(self.timeB[self.timeindexB[5]]-5,self.temp2B[self.timeindexB[5]]+50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
                             self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
                                              xytext=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]-40),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                             
                         if self.timeindexB[6]:
                             st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[6]]-startB))
                             self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[6]]), xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
                                              xytext=(self.timeB[self.timeindexB[6]]-5,self.temp2B[self.timeindexB[6]]+70),color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
                             self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
                                              xytext=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]-80),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
 
                 #END of Background
                
@@ -1691,36 +1701,27 @@ class tgraphcanvas(FigureCanvas):
                     self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
                     for i in range(Nevents):
                         #self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
-                        if self.specialeventstype[i] == 0:
-                            if len(self.E1timex):
-                                self.E1timex.append(self.timex[self.specialevents[i]])
-                                self.E1values.append(self.E1values[-1])             
+                        if self.specialeventstype[i] == 0:           
                             self.E1timex.append(self.timex[self.specialevents[i]])
                             self.E1values.append(self.eventpositionbars[self.specialeventsvalue[i]])             
                         elif self.specialeventstype[i] == 1:
-                            if len(self.E2timex):
-                                self.E2timex.append(self.timex[self.specialevents[i]])
-                                self.E2values.append(self.E2values[-1])
                             self.E2timex.append(self.timex[self.specialevents[i]])
                             self.E2values.append(self.eventpositionbars[self.specialeventsvalue[i]])
                         elif self.specialeventstype[i] == 2:
-                            if len(self.E3timex):
-                                self.E3timex.append(self.timex[self.specialevents[i]])
-                                self.E3values.append(self.E3values[-1])
                             self.E3timex.append(self.timex[self.specialevents[i]])
                             self.E3values.append(self.eventpositionbars[self.specialeventsvalue[i]])
                         elif self.specialeventstype[i] == 3:
-                            if len(self.E4timex):
-                                self.E4timex.append(self.timex[self.specialevents[i]])
-                                self.E4values.append(self.E4values[-1])
                             self.E4timex.append(self.timex[self.specialevents[i]])
                             self.E4values.append(self.eventpositionbars[self.specialeventsvalue[i]])
 
-                        
-                    self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],linewidth = 2,alpha = .8)
-                    self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],linewidth = 2,alpha = .8)
-                    self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],linewidth = 2,alpha = .8)
-                    self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],linewidth = 2,alpha = .8)
+                    self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0])
+                    self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1])
+                    self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2])
+                    self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3])
 
                     handles.extend([self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots])
                     labels.extend([self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]])
@@ -2024,7 +2025,7 @@ class tgraphcanvas(FigureCanvas):
         pi = math.pi
         self.fig.clf()
         #create a new name ax1 instead of ax (ax is used when plotting profiles)
-        
+
         self.ax1 = self.fig.add_subplot(111,projection='polar', axisbg=self.backcolor) #) radar green axisbg='#d5de9c'
         self.ax1.set_aspect(self.flavoraspect)
 
@@ -2035,7 +2036,7 @@ class tgraphcanvas(FigureCanvas):
         self.ax1.set_thetagrids(g_angle)
         self.ax1.set_rmax(1.)
         self.ax1.set_autoscale_on(False)
-        self.ax1.grid(True,linewidth=1.,color='black')
+        self.ax1.grid(True,linewidth=1.,color='green',linestyle = "-",alpha=.3)
 
 
         #create water marks 6-7 anf 8-9
@@ -2591,27 +2592,15 @@ class tgraphcanvas(FigureCanvas):
 
                 etype = self.specialeventstype[-1]
                 if etype == 0:
-                    if len(self.E1timex):
-                        self.E1timex.append(self.timex[self.specialevents[-1]])
-                        self.E1values.append(self.E1values[-1])   
                     self.E1timex.append(self.timex[self.specialevents[-1]])
                     self.E1values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
                 elif etype == 1:
-                    if len(self.E2timex):
-                        self.E2timex.append(self.timex[self.specialevents[-1]])
-                        self.E2values.append(self.E2values[-1])
                     self.E2timex.append(self.timex[self.specialevents[-1]])
                     self.E2values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
                 elif etype == 2:
-                    if len(self.E3timex):
-                        self.E3timex.append(self.timex[self.specialevents[-1]])
-                        self.E3values.append(self.E3values[-1])
                     self.E3timex.append(self.timex[self.specialevents[-1]])
                     self.E3values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
                 elif etype == 3:
-                    if len(self.E4timex):
-                        self.E4timex.append(self.timex[self.specialevents[-1]])
-                        self.E4values.append(self.E4values[-1])
                     self.E4timex.append(self.timex[self.specialevents[-1]])
                     self.E4values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
                     
@@ -4577,9 +4566,9 @@ class ApplicationWindow(QMainWindow):
         self.eventsbuttonflag = 1
         self.minieventsflag = 1   #minieditor flag
        
-        #create a serial port object
+        #create a serial port object (main ET BT device)
         self.ser = serialport()
-        #list with extra serial ports
+        #list with extra serial ports (extra devices)
         self.extraser = []
         #extra comm port settings 
         self.extracomport,self.extrabaudrate,self.extrabytesize,self.extraparity,self.extrastopbits,self.extratimeout = [],[],[],[],[],[]
@@ -6687,9 +6676,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("readBTpid"):
                 self.ser.readBTpid = map(lambda x:x.toInt()[0],settings.value("readBTpid").toList())                
             if settings.contains("arduinoETChannel"):
-                self.ser.arduinoETChannel = settings.value("arduinoETChannel").toString()[0]
+                self.ser.arduinoETChannel = unicode(settings.value("arduinoETChannel").toString())
             if settings.contains("arduinoBTChannel"):
-                self.ser.arduinoBTChannel = settings.value("arduinoBTChannel").toString()[0]
+                self.ser.arduinoBTChannel = unicode(settings.value("arduinoBTChannel").toString())
             settings.endGroup()
 
             #restore phases
@@ -6711,7 +6700,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.autoChargeDropFlag = settings.value("autoChargeDrop",self.qmc.autoChargeDropFlag).toBool()
             if settings.contains("EvalueColor"):
                 self.qmc.EvalueColor = map(unicode,list(settings.value("EvalueColor",self.qmc.EvalueColor).toStringList()))
-                self.qmc.EvalueMarker = map(unicode,list(settings.value("EvalueMarker",self.qmc.EvalueMarker).toStringList()))         
+                self.qmc.EvalueMarker = map(unicode,list(settings.value("EvalueMarker",self.qmc.EvalueMarker).toStringList()))
+            if settings.contains("Evaluelinethickness"):
+                self.qmc.Evaluelinethickness = map(lambda x:x.toInt()[0],settings.value("Evaluelinethickness").toList())
+                self.qmc.Evaluealpha = map(lambda x:x.toDouble()[0],settings.value("Evaluealpha").toList())
             settings.endGroup()
             
     	    #restore statistics
@@ -7013,6 +7005,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("autoChargeDrop",self.qmc.autoChargeDropFlag)
             settings.setValue("EvalueColor",self.qmc.EvalueColor)
             settings.setValue("EvalueMarker",self.qmc.EvalueMarker)
+            settings.setValue("Evaluelinethickness",self.qmc.Evaluelinethickness)
+            settings.setValue("Evaluealpha",self.qmc.Evaluealpha)
             settings.endGroup()            
             #save delay
             settings.setValue("Delay",self.qmc.delay)
@@ -10082,23 +10076,37 @@ class editGraphDlg(QDialog):
     def accept(self):
         #check for graph
         if len(aw.qmc.timex):   
+
+            if self.chargeeditcopy != unicode(self.chargeedit.text()):
+                #if there is a CHARGE recorded and the time entered is positive. Use relative time
+                if aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0 and aw.qmc.timeindex[0] != -1:
+                    startindex = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]] + aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
+                    aw.qmc.timeindex[0] = startindex
+                    aw.qmc.xaxistosm()
+                #if there is a CHARGE recorded and the time entered is positive. Use relative time
+                elif aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) < 0 and aw.qmc.timeindex[0] != -1:                    
+                    relativetime = aw.qmc.timex[aw.qmc.timeindex[0]]-abs(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
+                    startindex = aw.qmc.time2index(relativetime)
+                    aw.qmc.timeindex[0] = startindex
+                    aw.qmc.xaxistosm()
+                #if there is _no_ CHARGE recorded and the time entered is positive. Use absoulte time 
+                elif aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0 and aw.qmc.timeindex[0] == -1:
+                    startindex = aw.qmc.time2index(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
+                    aw.qmc.timeindex[0] = startindex
+                    aw.qmc.xaxistosm()
+                #if there is _no_ CHARGE recorded and the time entered is negative. ERROR
+                elif aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) < 0 and aw.qmc.timeindex[0] == -1:
+                    aw.qmc.adderror(QApplication.translate("Error Message", "Unable to move CHARGE to a value that does not exist",None, QApplication.UnicodeUTF8))
+                    return
+
             # check CHARGE (with index aw.qmc.timeindex[0])
             if aw.qmc.timeindex[0] == -1:
                 aw.qmc.timeindex[0] = 0
                 start = 0                   #relative start time
             else:
                 start = aw.qmc.timex[aw.qmc.timeindex[0]]
-            
-            if self.chargeeditcopy != unicode(self.chargeedit.text()):
-                if aw.qmc.stringtoseconds(unicode(self.chargeedit.text())) > 0:
-                    startindex = aw.qmc.time2index( aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
-                    aw.qmc.timeindex[0] = startindex
-                    aw.qmc.xaxistosm()
-                elif aw.qmc.timeindex[0] != -1:
-                    absolutetime = aw.qmc.timex[aw.qmc.timeindex[0]]-abs(aw.qmc.stringtoseconds(unicode(self.chargeedit.text())))
-                    startindex = aw.qmc.time2index(absolutetime)
-                    aw.qmc.timeindex[0] = startindex
-                    aw.qmc.xaxistosm()                    
+
+                    
             if self.dryeditcopy != unicode(self.dryedit.text()):
                 if aw.qmc.stringtoseconds(unicode(self.dryedit.text())) > 0:
                     dryindex = aw.qmc.time2index( start + aw.qmc.stringtoseconds(unicode(self.dryedit.text())))
@@ -11122,6 +11130,55 @@ class EventsDlg(QDialog):
         self.marker4typeComboBox.addItems(self.markers )
         self.marker4typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[3]))
         self.connect(self.marker4typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=3:self.seteventmarker(x,m)) 
+
+        valuecolorlabel = QLabel(QApplication.translate("label","Color",None, QApplication.UnicodeUTF8))
+        valuesymbollabel = QLabel(QApplication.translate("label","Symbol",None, QApplication.UnicodeUTF8))
+        valuethicknesslabel = QLabel(QApplication.translate("label","Line Thickness",None, QApplication.UnicodeUTF8))
+        valuealphalabel = QLabel(QApplication.translate("label","Opacity",None, QApplication.UnicodeUTF8))
+
+        self.E1thicknessSpinBox = QSpinBox()
+        self.E1thicknessSpinBox.setRange(1,10)
+        self.E1thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[0])
+        self.connect(self.E1thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1, x=0:self.setElinethickness(w,x)) 
+
+        self.E2thicknessSpinBox = QSpinBox()
+        self.E2thicknessSpinBox.setRange(1,10)
+        self.E2thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[1])
+        self.connect(self.E2thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w =1,x=1:self.setElinethickness(w,x))
+        
+        self.E3thicknessSpinBox = QSpinBox()
+        self.E3thicknessSpinBox.setRange(1,10)
+        self.E3thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[2])
+        self.connect(self.E3thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=2:self.setElinethickness(w,x)) 
+
+        self.E4thicknessSpinBox = QSpinBox()
+        self.E4thicknessSpinBox.setRange(1,10)
+        self.E4thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[3])
+        self.connect(self.E4thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=0:self.setElinethickness(w,x)) 
+
+        self.E1alphaSpinBox = QDoubleSpinBox()
+        self.E1alphaSpinBox.setRange(.1,1.)
+        self.E1alphaSpinBox.setSingleStep(.1)
+        self.E1alphaSpinBox.setValue(aw.qmc.Evaluealpha[0])
+        self.connect(self.E1alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=0:self.setElinealpha(w,x)) 
+
+        self.E2alphaSpinBox = QDoubleSpinBox()
+        self.E2alphaSpinBox.setRange(.1,1.)
+        self.E2alphaSpinBox.setSingleStep(.1)
+        self.E2alphaSpinBox.setValue(aw.qmc.Evaluealpha[1])
+        self.connect(self.E1alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=1:self.setElinealpha(w,x)) 
+
+        self.E3alphaSpinBox = QDoubleSpinBox()
+        self.E3alphaSpinBox.setRange(.1,1.)
+        self.E3alphaSpinBox.setSingleStep(.1)
+        self.E3alphaSpinBox.setValue(aw.qmc.Evaluealpha[2])
+        self.connect(self.E3alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=2:self.setElinealpha(w,x)) 
+
+        self.E4alphaSpinBox = QDoubleSpinBox()
+        self.E4alphaSpinBox.setRange(.1,1.)
+        self.E4alphaSpinBox.setSingleStep(.1)
+        self.E4alphaSpinBox.setValue(aw.qmc.Evaluealpha[3])
+        self.connect(self.E4alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1, x=3:self.setElinealpha(w,x)) 
                                             
         self.autoChargeDrop = QCheckBox(QApplication.translate("CheckBox","Automatic CHARGE/DROP",None, QApplication.UnicodeUTF8))
         if aw.qmc.autoChargeDropFlag:
@@ -11243,37 +11300,17 @@ class EventsDlg(QDialog):
         FlagsLayout.addSpacing(10)
         FlagsLayout.addWidget(barstylelabel)
         FlagsLayout.addWidget(self.bartypeComboBox,Qt.AlignLeft)
-        
-        typeLayout0 = QHBoxLayout()
-        typeLayout0.addWidget(typelabel1)
-        typeLayout0.addWidget(self.etype0)
-        typeLayout0.addWidget(E1colorButton)
-        typeLayout0.addWidget(self.marker1typeComboBox)
-        
-        typeLayout1 = QHBoxLayout()
-        typeLayout1.addWidget(typelabel2)
-        typeLayout1.addWidget(self.etype1)
-        typeLayout1.addWidget(E2colorButton)
-        typeLayout1.addWidget(self.marker2typeComboBox)
-        
-        typeLayout2 = QHBoxLayout()
-        typeLayout2.addWidget(typelabel3)
-        typeLayout2.addWidget(self.etype2)
-        typeLayout2.addWidget(E3colorButton)
-        typeLayout2.addWidget(self.marker3typeComboBox)
-        
-        typeLayout3 = QHBoxLayout()
-        typeLayout3.addWidget(typelabel4)
-        typeLayout3.addWidget(self.etype3)
-        typeLayout3.addWidget(E4colorButton)
-        typeLayout3.addWidget(self.marker4typeComboBox)
 
-        typelayout = QGridLayout()
-        typelayout.addLayout(typeLayout0,0,0)
-        typelayout.addLayout(typeLayout1,0,1)
-        typelayout.addLayout(typeLayout2,1,0)
-        typelayout.addLayout(typeLayout3,1,1)
-        typelayout.addWidget(defaultButton,2,0)
+        typeLayout = QGridLayout()
+        typeLayout.addWidget(typelabel1,0,0)
+        typeLayout.addWidget(self.etype0,0,1)
+        typeLayout.addWidget(typelabel2,0,2)
+        typeLayout.addWidget(self.etype1,0,3)
+        typeLayout.addWidget(typelabel3,1,0)
+        typeLayout.addWidget(self.etype2,1,1)
+        typeLayout.addWidget(typelabel4,1,2)
+        typeLayout.addWidget(self.etype3,1,3)
+        typeLayout.addWidget(defaultButton,2,1)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -11281,12 +11318,12 @@ class EventsDlg(QDialog):
         buttonLayout.addWidget(okButton)
 
         TypeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Event Types",None, QApplication.UnicodeUTF8))
-        TypeGroupLayout.setLayout(typelayout)
+        TypeGroupLayout.setLayout(typeLayout)
 
         tab1layout = QVBoxLayout()
-        tab1layout.setSpacing(0)
+        #tab1layout.setSpacing(0)
         tab1layout.addLayout(FlagsLayout)
-        tab1layout.addWidget(TypeGroupLayout)
+        tab1layout.addWidget(TypeGroupLayout )
         tab1layout.addWidget(self.autoChargeDrop)
 
         nbuttonslayout = QHBoxLayout()
@@ -11322,6 +11359,33 @@ class EventsDlg(QDialog):
         tab3layout.addWidget(backupbutton,2,0)
         tab3layout.addWidget(restorebutton,2,1)
 
+        ### tab4 layout
+        valueLayout = QGridLayout()
+        valueLayout.addWidget(valuecolorlabel,0,0)
+        valueLayout.addWidget(valuesymbollabel,0,1)
+        valueLayout.addWidget(valuethicknesslabel,0,2)
+        valueLayout.addWidget(valuealphalabel,0,3)
+        
+        valueLayout.addWidget(E1colorButton,1,0)
+        valueLayout.addWidget(self.marker1typeComboBox,1,1)
+        valueLayout.addWidget(self.E1thicknessSpinBox,1,2)
+        valueLayout.addWidget(self.E1alphaSpinBox,1,3)
+
+        valueLayout.addWidget(E2colorButton,2,0)
+        valueLayout.addWidget(self.marker2typeComboBox,2,1)
+        valueLayout.addWidget(self.E2thicknessSpinBox,2,2)
+        valueLayout.addWidget(self.E2alphaSpinBox,2,3)
+
+        valueLayout.addWidget(E3colorButton,3,0)
+        valueLayout.addWidget(self.marker3typeComboBox,3,1)
+        valueLayout.addWidget(self.E3thicknessSpinBox,3,2)
+        valueLayout.addWidget(self.E3alphaSpinBox,3,3)
+
+        valueLayout.addWidget(E4colorButton,4,0)
+        valueLayout.addWidget(self.marker4typeComboBox,4,1)
+        valueLayout.addWidget(self.E4thicknessSpinBox,4,2)
+        valueLayout.addWidget(self.E4alphaSpinBox,4,3)
+
 ###########################################
         #tab layout
         TabWidget = QTabWidget()
@@ -11338,7 +11402,11 @@ class EventsDlg(QDialog):
         C3Widget.setLayout(tab3layout)
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","Palette",None, QApplication.UnicodeUTF8))        
 
-        
+
+        C4Widget = QWidget()
+        C4Widget.setLayout(valueLayout)
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Events by Value",None, QApplication.UnicodeUTF8))        
+
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(TabWidget)
         mainLayout.addLayout(buttonLayout)
@@ -11347,6 +11415,30 @@ class EventsDlg(QDialog):
 
         self.setLayout(mainLayout)
 
+    def setElinethickness(self,x,val):
+        if val == 0:
+            aw.qmc.Evaluelinethickness[0] = self.E1thicknessSpinBox.value()
+        if val == 1:
+            aw.qmc.Evaluelinethickness[1] = self.E2thicknessSpinBox.value()
+        if val == 2:
+            aw.qmc.Evaluelinethickness[2] = self.E3thicknessSpinBox.value()
+        if val == 3:
+            aw.qmc.Evaluelinethickness[3] = self.E4thicknessSpinBox.value()
+
+        aw.qmc.redraw()
+        
+    def setElinealpha(self,x,val):
+        if val == 0:
+            aw.qmc.Evaluealpha[0] = self.E1alphaSpinBox.value()
+        if val == 1:
+            aw.qmc.Evaluealpha[1] = self.E2alphaSpinBox.value()
+        if val == 2:
+            aw.qmc.Evaluealpha[2] = self.E3alphaSpinBox.value()
+        if val == 3:
+            aw.qmc.Evaluealpha[3] = self.E4alphaSpinBox.value()
+
+        aw.qmc.redraw()
+        
     def transferbuttonsto(self):
         pindex  = self.transferpalettecombobox.currentIndex()
         aw.transferbuttonsto(pindex)
@@ -12995,7 +13087,8 @@ class serialport(object):
                                    self.K204_34,            #24
                                    self.virtual,            #25
                                    self.DTAtemperature,     #26
-                                   self.callprogram         #27
+                                   self.callprogram,        #27
+                                   self.ARDUINOTC4_34       #28
                                    ]
 
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
@@ -13385,6 +13478,27 @@ class serialport(object):
         t2,t1 = self.ARDUINOTC4temperature()
         tx = aw.qmc.timeclock.elapsed()/1000.
 
+        return tx,t2,t1
+
+    def ARDUINOTC4_34(self):
+        if self.arduinoETChannel == None or self.arduinoBTChannel == None:
+            tx = aw.qmc.timeclock.elapsed()/1000.
+            return tx,0.,0.
+        
+        vals = ["1","2","3","4"]
+        vals.pop(vals.index(self.arduinoETChannel))
+        vals.pop(vals.index(self.arduinoBTChannel))
+        oldETchan = self.arduinoETChannel
+        oldBTchan = self.arduinoBTChannel
+        aw.ser.arduinoETChannel = vals[0]
+        aw.ser.arduinoETChannel = vals[1]
+                 
+        t2,t1 = aw.ser.ARDUINOTC4temperature()
+        tx = aw.qmc.timeclock.elapsed()/1000.
+                 
+        aw.ser.arduinoETChannel = oldETchan         
+        aw.ser.arduinoBTChannel = oldBTchan
+                 
         return tx,t2,t1
 
     def TEVA18B(self):
@@ -15220,7 +15334,7 @@ class DeviceAssignmentDLG(QDialog):
         limit = len(dev)
         for k in range(limit):
             for i in range(len(dev)):
-                if dev[i][0] == "+":
+                if dev[i][0] == "+" or dev[i][0] == "-":
                     dev.pop(i)              #note: pop() makes the list smaller 
                     break 
                 
@@ -15472,9 +15586,14 @@ class DeviceAssignmentDLG(QDialog):
                 self.devicetable.setSelectionMode(QTableWidget.SingleSelection)
                 self.devicetable.setShowGrid(True)
 
-                #populate table
-                devices = aw.qmc.devices[:]  
-                devices = sorted(devices)
+                dev = aw.qmc.devices[:]             #deep copy
+                limit = len(dev)
+                for k in range(limit):
+                    for i in range(len(dev)):
+                        if dev[i][0] == "-":
+                            dev.pop(i)              #note: pop() makes the list smaller 
+                            break 
+                devices = sorted(dev)
                 #devices.insert(0,"")         #add empty space for PID
                 for i in range(nddevices):
                     typeComboBox =  QComboBox()
@@ -15985,12 +16104,22 @@ class DeviceAssignmentDLG(QDialog):
                 ####  DEVICE 27 is an external program
                 ##########################
 
+                elif meter == "+ArduinoTC4_34":
+                    aw.qmc.device = 28
+                    aw.ser.baudrate = 19200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    aw.ser.timeout=1
+                    message = ""  #empty message especial device
+
 
                 #extra devices serial config    
                 #set of different serial settings modes options
                 ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],[19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1]]
                 #map device index to a setting mode (chose the one that matches the device)
-                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3]  #0-27
+                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4]  #0-28
                     
                 self.savedevicetable()
                 #init serial settings of extra devices
