@@ -341,6 +341,9 @@ class tgraphcanvas(FigureCanvas):
             left=0.067, # the left side of the subplots of the figure (default: 0.125)
             right=.925) # the right side of the subplots of the figure (default: 0.9
         FigureCanvas.__init__(self, self.fig)
+        
+        #ML:
+        cid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
 
         # set the parent widget
         self.setParent(parent)
@@ -660,6 +663,41 @@ class tgraphcanvas(FigureCanvas):
     #################################    FUNCTIONS    ###################################
     #####################################################################################
         
+    # ML:
+    def onclick(self,event):
+        if event.button==3 and event.inaxes:
+            timex = self.time2index(event.xdata)
+            if timex:
+                if (self.temp2[timex] < event.ydata + 20) and (self.temp2[timex] > event.ydata - 20):
+                    count = 0
+                    menu = QMenu(self) 
+                    # populate menu
+                    ac = QAction(menu)
+                    ac.setText("at " + self.stringfromseconds(event.xdata - + self.timex[self.timeindex[0]]))
+                    ac.setEnabled(False)
+                    menu.addAction(ac)
+                    for k in [("CHARGE",0),("DRY END",1),("FC START",2),("FC END",3),("SC START",4),("SC END",5),("DROP",6)]:
+                        idx_before = idx_after = 0
+                        for i in range(k[1]):
+                            if self.timeindex[i]:
+                                idx_before = self.timeindex[i]
+                        for i in range(6,k[1],-1) :
+                            if self.timeindex[i]:
+                                idx_after = self.timeindex[i]
+                        if ((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after):
+                            ac = QAction(menu)
+                            ac.key = (k[1],timex)
+                            ac.setText(" " + k[0] + " ")
+                            menu.addAction(ac)
+                            count = count + 1
+                    # show menu
+                    if count > 0:
+                        menu.triggered.connect(self.event_popup_action)
+                        menu.popup(QCursor.pos()) 
+            
+    def event_popup_action(self,action):
+        self.timeindex[action.key[0]] = action.key[1]
+        self.redraw()
 
     # runs from GUI thread.
     # this function is called by a signal at the end of the thread sample()
