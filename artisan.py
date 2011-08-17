@@ -412,6 +412,13 @@ class tgraphcanvas(FigureCanvas):
                         QApplication.translate("Scope Annotation", "Fan",None, QApplication.UnicodeUTF8)]
         self.backgroundFlavors = []
         self.flavorbackgroundflag = False
+        #background by value
+        self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
+        self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
+        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color="grey")
+        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="darkgrey")
+        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="slategrey")
+        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="slateblue")
         
         # projection variables of change of rate
         self.HUDflag = 0
@@ -665,7 +672,7 @@ class tgraphcanvas(FigureCanvas):
         
     # ML:
     def onclick(self,event):
-        if event.button==3 and event.inaxes:
+        if event.button==3 and event.inaxes and not self.designerflag:
             timex = self.time2index(event.xdata)
             if timex:
                 if (self.temp2[timex] < event.ydata + 20) and (self.temp2[timex] > event.ydata - 20):
@@ -1181,6 +1188,7 @@ class tgraphcanvas(FigureCanvas):
         aw.valueComboBox.setCurrentIndex(0)    
         aw.curFile = None                 #current file name
         self.ystep = 45     	    	  #used to find length of arms in annotations  
+        self.startofx = 0
 
         #Designer variables
         self.indexpoint = 0
@@ -1346,7 +1354,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         color = self.palette["rect1"]                        
                     barposition = self.phases[0]-start-jump    
-                    rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.3)
+                    rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.2)
                     self.ax.add_patch(rectEvent)
                     self.eventpositionbars[i] =  barposition
                     if self.mode == "C":
@@ -1385,20 +1393,49 @@ class tgraphcanvas(FigureCanvas):
 
                 #check backgroundevents flag	
                 if self.backgroundeventsflag:
-                    if self.mode == "F":
-                        height = 50
-                    else:
-                        height = 20
-                    for p in range(len(self.backgroundEvents)):
-                        st1 = unicode(self.Betypes[self.backgroundEtypes[p]][0] + self.eventsvalues[self.backgroundEvalues[p]])                   
-                        if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
-                            temp = self.temp1B[self.backgroundEvents[p]]
+                    if self.eventsGraphflag != 2:
+                        if self.mode == "F":
+                            height = 50
                         else:
-                            temp = self.temp2B[self.backgroundEvents[p]]
-                        self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),
-                                            xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
-                                            fontsize=10,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
-                                            alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)                        
+                            height = 20
+                        
+                        for p in range(len(self.backgroundEvents)):
+                            st1 = unicode(self.Betypes[self.backgroundEtypes[p]][0] + self.eventsvalues[self.backgroundEvalues[p]])                   
+                            if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
+                                temp = self.temp1B[self.backgroundEvents[p]]
+                            else:
+                                temp = self.temp2B[self.backgroundEvents[p]]
+                            self.ax.annotate(st1, xy=(self.timeB[self.backgroundEvents[p]], temp),
+                                                xytext=(self.timeB[self.backgroundEvents[p]], temp+height),
+                                                fontsize=10,color=self.palette["text"],arrowprops=dict(arrowstyle='wedge',color="yellow",
+                                                alpha=self.backgroundalpha,relpos=(0,0)),alpha=self.backgroundalpha)                        
+                    #background events by value
+                    else:
+                        self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
+                        self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
+                        for i in range(len(self.backgroundEvents)):
+                            #self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
+                            if self.backgroundEtypes[i] == 0:           
+                                self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
+                                self.E1backgroundvalues.append(self.eventpositionbars[self.backgroundEvalues[i]])             
+                            elif self.backgroundEtypes[i] == 1:
+                                self.E2backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
+                                self.E2backgroundvalues.append(self.eventpositionbars[self.backgroundEvalues[i]])
+                            elif self.backgroundEtypes[i] == 2:
+                                self.E3backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
+                                self.E3backgroundvalues.append(self.eventpositionbars[self.backgroundEvalues[i]])
+                            elif self.backgroundEtypes[i] == 3:
+                                self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
+                                self.E4backgroundvalues.append(self.eventpositionbars[self.backgroundEvalues[i]])
+
+                        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color="slateblue", marker=self.EvalueMarker[0],
+                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0])
+                        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="slategrey", marker=self.EvalueMarker[1],
+                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1])
+                        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="grey", marker=self.EvalueMarker[2],
+                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2])
+                        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="darkgrey", marker=self.EvalueMarker[3],
+                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3])
 
                 #check backgroundDetails flag
                 if self.backgroundDetails:
@@ -1472,8 +1509,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
                                              xytext=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]-80),fontsize=10,color=self.palette["text"],
                                              arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-
-                #END of Background
+                        #END of Background
                
             handles = [self.l_temp1,self.l_temp2]
             labels = [unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)),unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))]
@@ -7201,12 +7237,16 @@ class ApplicationWindow(QMainWindow):
             settings["phasesbuttonflag"] = unicode(self.qmc.phasesbuttonflag)
             settings["Statistics"] = unicode(self.qmc.statisticsflags)
             settings["StatisticsConds"] = unicode(self.qmc.statisticsconditions)
-            settings["eventsbuttonflag"] = unicode(self.eventsbuttonflag)
+            settings["eventsbuttonflag"] = unicode(self.eventsbuttonflag)            
             settings["minieventsflag"] = unicode(self.minieventsflag)
             settings["eventsGraphflag"] = unicode(self.qmc.eventsGraphflag)
             settings["etypes"] = unicode(self.qmc.etypes)
             settings["eventsshowflag"] = unicode(aw.qmc.eventsshowflag)
             settings["autoChargeDrop"] = unicode(self.qmc.autoChargeDropFlag)
+            settings["EvalueColor"] = unicode(self.qmc.EvalueColor)
+            settings["EvalueMarker"] = unicode(self.qmc.EvalueMarker)
+            settings["Evaluelinethickness"] = unicode(self.qmc.Evaluelinethickness)
+            settings["Evaluealpha"] = unicode(self.qmc.Evaluealpha)
             settings["Delay"] = unicode(self.qmc.delay)
             settings["Colors"] = unicode(self.qmc.palette)
             settings["LCDColors"] = unicode(self.lcdpaletteB)
@@ -10528,8 +10568,8 @@ class WindowsDlg(QDialog):
         self.xlimitEdit = QLineEdit()
         self.xlimitEdit.setMaximumWidth(100)        
         self.xlimitEdit_min = QLineEdit()
-        self.xlimitEdit_min.setMaximumWidth(100)  
-        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$") 
+        self.xlimitEdit_min.setMaximumWidth(100)
+        regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
         self.xlimitEdit.setValidator(QRegExpValidator(regextime,self))
         self.xlimitEdit_min.setValidator(QRegExpValidator(regextime,self))
         
@@ -10548,8 +10588,12 @@ class WindowsDlg(QDialog):
         self.zlimitEdit_min.setValidator(QIntValidator(-1000, 1000, self.zlimitEdit_min))
 
         self.xlimitEdit.setText(aw.qmc.stringfromseconds(aw.qmc.endofx))
-        self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx))
-        
+
+        if aw.qmc.timeindex[0] != -1:
+            self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx - aw.qmc.timex[aw.qmc.timeindex[0]]))             
+        else:
+            self.xlimitEdit_min.setText(aw.qmc.stringfromseconds(aw.qmc.startofx))
+       
         self.ylimitEdit.setText(unicode(aw.qmc.ylimit))
         self.ylimitEdit_min.setText(unicode(aw.qmc.ylimit_min))
 
@@ -10757,8 +10801,19 @@ class WindowsDlg(QDialog):
         aw.qmc.ylimit_min = int(self.ylimitEdit_min.text())
         aw.qmc.zlimit = int(self.zlimitEdit.text())
         aw.qmc.zlimit_min = int(self.zlimitEdit_min.text())
-        aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))     
-        aw.qmc.startofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit_min.text()))
+        aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))
+        
+        starteditime = aw.qmc.stringtoseconds(unicode(self.xlimitEdit_min.text()))
+        
+        if starteditime > 0 and aw.qmc.timeindex[0] != -1:
+            aw.qmc.startofx = aw.qmc.timex[aw.qmc.timeindex[0]] + starteditime
+        elif starteditime > 0 and aw.qmc.timeindex[0] == -1:                                           
+            aw.qmc.startofx = starteditime
+        elif starteditime < 0 and aw.qmc.timeindex[0] != -1:                                           
+            aw.qmc.startofx = aw.qmc.timex[aw.qmc.timeindex[0]]-abs(starteditime)
+        else:                                          
+            aw.qmc.startofx = starteditime
+            
         if self.timeflag.isChecked():
             aw.qmc.keeptimeflag = 1
         else:
