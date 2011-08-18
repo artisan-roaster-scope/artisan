@@ -342,7 +342,6 @@ class tgraphcanvas(FigureCanvas):
             right=.925) # the right side of the subplots of the figure (default: 0.9
         FigureCanvas.__init__(self, self.fig)
         
-        #ML:
         cid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
 
         # set the parent widget
@@ -671,7 +670,6 @@ class tgraphcanvas(FigureCanvas):
     #################################    FUNCTIONS    ###################################
     #####################################################################################
         
-    # ML:
     def onclick(self,event):
         if event.button==3 and event.inaxes and not self.designerflag:
             timex = self.time2index(event.xdata)
@@ -4467,7 +4465,7 @@ class SampleThread(QThread):
                 # autodetect DROP event
                 # only if 9min into roast and BT>190C/374F                  
                 elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
-                    length_of_qmc_timex >= 5 ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 374)) and \
+                    length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 374)) and \
                     (aw.qmc.timeindex[aw.qmc.timeindex[0]] - aw.qmc.timex[-1] > 540):
                     if aw.BTbreak(length_of_qmc_timex - 1):
                         # we found a BT break at the current index minus 2
@@ -4479,18 +4477,21 @@ class SampleThread(QThread):
                     les,led,let,letl =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1),len(aw.qmc.extratemp1lines)
                     if les == led == let == letl:
                         for i in range(nxdevices):
-                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                            if len(aw.qmc.extramathexpression1[i]):
-                                extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                            if len(aw.qmc.extramathexpression2[i]):
-                                extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                            aw.qmc.extratemp1[i].append(extrat1)
-                            aw.qmc.extratemp2[i].append(extrat2)                        
-                            aw.qmc.extratimex[i].append(extratx)
-                            #print extrat1,extrat2,extratx
-                            # update extra lines 
-                            aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
-                            aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                            try:
+                                extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                                if len(aw.qmc.extramathexpression1[i]):
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                                if len(aw.qmc.extramathexpression2[i]):
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                                aw.qmc.extratemp1[i].append(extrat1)
+                                aw.qmc.extratemp2[i].append(extrat2)                        
+                                aw.qmc.extratimex[i].append(extratx)
+                                #print extrat1,extrat2,extratx
+                                # update extra lines 
+                                aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                                aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                            except Exception,e:
+                                pass
                     #ERROR
                     else:
                         lengths = [les,led,let,letl]
@@ -4548,6 +4549,9 @@ class SampleThread(QThread):
             self.emit(SIGNAL("updategraphics"))
 
         except Exception,e:
+            import traceback
+            traceback.print_exc(file=sys.stdout)
+
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
                 
@@ -6318,6 +6322,15 @@ class ApplicationWindow(QMainWindow):
         self.sendmessage(QApplication.translate("Message Area","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
         self.qmc.redraw()
         
+    def addSerialPort(self):                                 
+        self.extraser.append(serialport()) 
+        self.extracomport.append("COM1")
+        self.extrabaudrate.append(9600)
+        self.extrabytesize.append(8)
+        self.extraparity.append("E")
+        self.extrastopbits.append(1)
+        self.extratimeout.append(1)
+        
     def addDevice(self):
         aw.qmc.extradevices.append(1)
         aw.qmc.extradevicecolor1.append(u"black") #init color to black
@@ -6327,15 +6340,9 @@ class ApplicationWindow(QMainWindow):
         aw.qmc.extramathexpression1.append(u"")
         aw.qmc.extramathexpression2.append(u"")
         
-        #create new serial port (but don't open it yet). Store initial settings                                   
-        self.extraser.append(serialport()) 
-        self.extracomport.append("COM1")
-        self.extrabaudrate.append(9600)
-        self.extrabytesize.append(8)
-        self.extraparity.append("E")
-        self.extrastopbits.append(1)
-        self.extratimeout.append(1)
-
+        #create new serial port (but don't open it yet). Store initial settings  
+        self.addSerialPort()
+        
     	#add new line variables
         aw.qmc.extratimex.append([])        
         aw.qmc.extratemp1.append([])
@@ -6461,6 +6468,20 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.extradevices = profile["extradevices"]
                     else:
                         return
+                        
+            # adjust extra serial device table
+            # a) remove superfluous extra serial settings
+            self.extraser = self.extraser[:len(self.qmc.extradevices)]
+            self.extracomport = self.extracomport[:len(self.qmc.extradevices)]
+            self.extrabaudrate = self.extrabaudrate[:len(self.qmc.extradevices)]
+            self.extrabytesize = self.extrabytesize[:len(self.qmc.extradevices)]
+            self.extraparity = self.extraparity[:len(self.qmc.extradevices)]
+            self.extrastopbits = self.extrastopbits[:len(self.qmc.extradevices)]
+            self.extratimeout = self.extratimeout[:len(self.qmc.extradevices)]
+            # b) add missing extra serial settings
+            for i in range(len(self.qmc.extradevices) - len(self.extraser)):
+                self.addSerialPort()
+                
             self.qmc.extratimex = profile["extratimex"]     
             if "extratemp1" in profile:       
                 self.qmc.extratemp1 = profile["extratemp1"]
@@ -7050,7 +7071,6 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.button_11.setVisible(False)
 
-            
             #update display
             self.qmc.redraw()
 
