@@ -8160,6 +8160,9 @@ $cupping_notes
             zero_t = None
             roastdate = None
             unit = None
+            # we add an extra device if needed
+            if len(aw.qmc.extradevices) == 0:
+                aw.addDevice()            
             for item in csvReader:
                 try:
                     #set date
@@ -8918,9 +8921,12 @@ class HUDDlg(QDialog):
         equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None, QApplication.UnicodeUTF8))
         equdrawbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equdrawbutton,SIGNAL("clicked()"),self.plotequ)
-        equbackgroundbutton = QPushButton(QApplication.translate("Button","Set Plot 1 as background",None, QApplication.UnicodeUTF8))
+        equbackgroundbutton = QPushButton(QApplication.translate("Button","Set plot 1 as background",None, QApplication.UnicodeUTF8))
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equbackgroundbutton ,SIGNAL("clicked()"),self.setbackgroundequ1)
+        equvdevicebutton = QPushButton(QApplication.translate("Button","Add plot 1 and 2 as virtual devices",None, QApplication.UnicodeUTF8))
+        equvdevicebutton.setFocusPolicy(Qt.NoFocus)
+        self.connect(equvdevicebutton ,SIGNAL("clicked()"),self.setvdevice)
         
         saveImgButton = QPushButton(QApplication.translate("Button","Save Image",None, QApplication.UnicodeUTF8))
         saveImgButton.setFocusPolicy(Qt.NoFocus)
@@ -8955,6 +8961,7 @@ class HUDDlg(QDialog):
         tab2Layout.addLayout(curveLayout)
         tab2Layout.addLayout(curvebuttonlayout)
         tab2Layout.addWidget(equbackgroundbutton)
+        tab2Layout.addWidget(equvdevicebutton)
 
         ##### TAB 3
         self.interpCheck = QCheckBox(QApplication.translate("CheckBox","Interpolation",None, QApplication.UnicodeUTF8))
@@ -9123,6 +9130,34 @@ class HUDDlg(QDialog):
         except Exception,e:
             aw.qmc.adderror(QApplication.translate("Error Message", "setcurvecolor(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
+    def setvdevice(self):
+        # compute values
+        EQU = [unicode(self.equedit1.text()),unicode(self.equedit2.text())]  
+        for e in range(2):
+            #create y range
+            y_range = []            
+            for i in range(len(aw.qmc.timex)):
+                y_range.append(self.eval_curve_expression(EQU[e],i))
+            if e:
+                extratemp2 = y_range
+            else:
+                extratemp1 = y_range                
+        # add device
+        aw.addDevice() 
+        aw.qmc.extradevices[-1] = 25
+        # set colors
+        aw.qmc.extradevicecolor1[-1] = aw.qmc.plotcurvecolor[0]
+        aw.qmc.extradevicecolor2[-1] = aw.qmc.plotcurvecolor[1]
+        # set expressions
+        aw.qmc.extramathexpression1[-1] = unicode(self.equedit1.text())
+        aw.qmc.extramathexpression2[-1] = unicode(self.equedit2.text())
+        # set values       
+        aw.qmc.extratemp1[-1] = extratemp1
+        aw.qmc.extratemp2[-1] = extratemp2
+        aw.qmc.extratimex[-1] = aw.qmc.timex[:]  
+        # redraw
+        aw.qmc.redraw(recomputeAllDeltas=False)
+        
     def setbackgroundequ1(self):
         try:
             equ = unicode(self.equedit1.text())
