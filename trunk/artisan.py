@@ -2634,11 +2634,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_11.setFlat(True)
                 aw.button_11.setDisabled(True)
                 QTimer.singleShot(2000, self.restorebutton_11)
+
+                self.samplingsemaphore.acquire(1)
                 
                 Nevents = len(self.specialevents)
                 
-                self.samplingsemaphore.acquire(1)
-
                 #if in manual mode record first the last point in self.timex[]
                 if self.device == 18:
                     tx = self.timeclock.elapsed()/1000.
@@ -2703,7 +2703,7 @@ class tgraphcanvas(FigureCanvas):
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
                     #if Event Type-Bars flag
-                    if self.eventsGraphflag == 1:
+                    elif self.eventsGraphflag == 1:
                         char1 = self.etypes[0][0]
                         char2 = self.etypes[1][0]
                         char3 = self.etypes[2][0]
@@ -2720,7 +2720,7 @@ class tgraphcanvas(FigureCanvas):
                             self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
-                    if self.eventsGraphflag == 2:
+                    elif self.eventsGraphflag == 2:
                         # update lines data using the lists with new data
                         if etype == 0:
                             self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
@@ -4701,6 +4701,10 @@ class ApplicationWindow(QMainWindow):
         #records serial comm (Help menu)    
         self.seriallogflag = False
         self.seriallog = []
+
+
+        #temp variable for text searches in Help menu artisan seetings
+        self.searchtextartisansettings = ""
 
         #######################    MENUS SECTION ##################################################
         ###############  create Top MENUS 
@@ -10445,21 +10449,36 @@ class artisansettingsDlg(QDialog):
         super(artisansettingsDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Artisan Program Variables", None, QApplication.UnicodeUTF8))
 
-        htmlsettings = "version = " +__version__ +"<br><br>"
+        self.htmlsettings = "version = " +__version__ +"<br><br>"
 
         settingsdict = aw.readartisansettings()
 
         for key in sorted(settingsdict):        
-            htmlsettings += "<b>" + key + " = </b> <i>" + settingsdict[key] + "</i><br><br>"
-    
-        settingsEdit = QTextEdit()
-        settingsEdit.setHtml(htmlsettings)
-        settingsEdit.setReadOnly(True)
+            self.htmlsettings += "<b>" + key + " = </b> <i>" + settingsdict[key] + "</i><br><br>"
+
+        self.settingsEdit = QTextEdit()
+        self.settingsEdit.setHtml(self.htmlsettings)
+        self.settingsEdit.setReadOnly(True)
+
+        searchButton = QPushButton(QApplication.translate("Button","Search", None, QApplication.UnicodeUTF8))
+        searchButton.setMaximumWidth(150)
+        self.connect(searchButton,SIGNAL("clicked()"),self.findtext)
+        self.searchbox = QLineEdit(aw.searchtextartisansettings)
+
+        searchlayout = QHBoxLayout()
+        searchlayout.addWidget(searchButton)
+        searchlayout.addWidget(self.searchbox)
 
         layout = QVBoxLayout()
-        layout.addWidget(settingsEdit)
+        layout.addLayout(searchlayout)
+        layout.addWidget(self.settingsEdit)
                                
         self.setLayout(layout)
+
+    def findtext(self):
+        aw.searchtextartisansettings = unicode(self.searchbox.text())
+        self.settingsEdit.find(self.searchbox.text())
+        
         
 ##########################################################################
 #####################  VIEW SERIAL LOG DLG  ##############################
