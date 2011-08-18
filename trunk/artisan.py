@@ -10449,21 +10449,20 @@ class artisansettingsDlg(QDialog):
         super(artisansettingsDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Artisan Program Variables", None, QApplication.UnicodeUTF8))
 
-        self.htmlsettings = "version = " +__version__ +"<br><br>"
-
-        settingsdict = aw.readartisansettings()
-
-        for key in sorted(settingsdict):        
-            self.htmlsettings += "<b>" + key + " = </b> <i>" + settingsdict[key] + "</i><br><br>"
+        self.htmlsettings = ""
 
         self.settingsEdit = QTextEdit()
-        self.settingsEdit.setHtml(self.htmlsettings)
-        self.settingsEdit.setReadOnly(True)
+
+        self.getstring()
 
         searchButton = QPushButton(QApplication.translate("Button","Search", None, QApplication.UnicodeUTF8))
         searchButton.setMaximumWidth(150)
         self.connect(searchButton,SIGNAL("clicked()"),self.findtext)
         self.searchbox = QLineEdit(aw.searchtextartisansettings)
+
+        updateButton = QPushButton(QApplication.translate("Button","Update", None, QApplication.UnicodeUTF8))
+        updateButton.setMaximumWidth(150)
+        self.connect(updateButton,SIGNAL("clicked()"),self.getstring)
 
         searchlayout = QHBoxLayout()
         searchlayout.addWidget(searchButton)
@@ -10472,13 +10471,23 @@ class artisansettingsDlg(QDialog):
         layout = QVBoxLayout()
         layout.addLayout(searchlayout)
         layout.addWidget(self.settingsEdit)
+        layout.addWidget(updateButton)        
                                
         self.setLayout(layout)
 
     def findtext(self):
         aw.searchtextartisansettings = unicode(self.searchbox.text())
         self.settingsEdit.find(self.searchbox.text())
-        
+
+    def getstring(self):
+        self.htmlsettings = "version = " +__version__ +"<br><br>"
+        settingsdict = aw.readartisansettings()
+        for key in sorted(settingsdict):        
+            self.htmlsettings += "<b>" + key + " = </b> <i>" + settingsdict[key] + "</i><br><br>"
+        self.settingsEdit.setHtml(self.htmlsettings)
+
+
+                
         
 ##########################################################################
 #####################  VIEW SERIAL LOG DLG  ##############################
