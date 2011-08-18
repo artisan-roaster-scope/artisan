@@ -490,6 +490,7 @@ class tgraphcanvas(FigureCanvas):
         self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
         self.EvalueColor = [u"brown",u"blue",u"purple",u"grey"]
         self.EvalueMarker = ["o","s","h","D"]
+        self.EvalueMarkerSize = [8,8,8,8]
         self.Evaluelinethickness = [2,2,2,2]
         self.Evaluealpha = [.8,.8,.8,.8]
         #the event value position bars are calculated at redraw()
@@ -813,7 +814,7 @@ class tgraphcanvas(FigureCanvas):
         if self.background:
             linecount += 2   #background ET + background BT = 2
         if self.eventsGraphflag == 2:
-            linecount += 4
+            linecount += 4 
         self.ax.lines = self.ax.lines[0:linecount]
         
     def setalarm(self,alarmnumber):
@@ -1360,8 +1361,8 @@ class tgraphcanvas(FigureCanvas):
                     if self.mode == "C":
                         jump -= 5
                     else:
-                        jump -= 10                
-                
+                        jump -= 10
+                    
             ##### ET,BT curves
             self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
             self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=unicode(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
@@ -1414,7 +1415,6 @@ class tgraphcanvas(FigureCanvas):
                         self.E1backgroundtimex,self.E2backgroundtimex,self.E3backgroundtimex,self.E4backgroundtimex = [],[],[],[]
                         self.E1backgroundvalues,self.E2backgroundvalues,self.E3backgroundvalues,self.E4backgroundvalues = [],[],[],[]
                         for i in range(len(self.backgroundEvents)):
-                            #self.eventsvalues =  [u"",u"0",u"1",u"2",u"3",u"4",u"5",u"6",u"7",u"8",u"9",u"10"]
                             if self.backgroundEtypes[i] == 0:           
                                 self.E1backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                 self.E1backgroundvalues.append(self.eventpositionbars[self.backgroundEvalues[i]])             
@@ -1428,13 +1428,13 @@ class tgraphcanvas(FigureCanvas):
                                 self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                 self.E4backgroundvalues.append(self.eventpositionbars[self.backgroundEvalues[i]])
 
-                        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color="slateblue", marker=self.EvalueMarker[0],
+                        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color="slateblue", marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                                         linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0])
-                        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="slategrey", marker=self.EvalueMarker[1],
+                        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="slategrey", marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                                         linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1])
-                        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="grey", marker=self.EvalueMarker[2],
+                        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="grey", marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                                         linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2])
-                        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="darkgrey", marker=self.EvalueMarker[3],
+                        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="darkgrey", marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                                         linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3])
 
                 #check backgroundDetails flag
@@ -1454,16 +1454,16 @@ class tgraphcanvas(FigureCanvas):
                         
                         self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
                                          xytext=(self.timeB[self.timeindexB[0]]+5,self.temp2B[self.timeindexB[0]] - 100),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
 
                         if self.timeindexB[1]:
                             st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[1]]- startB))
                             self.ax.annotate(u"%.1f"%(self.temp2B[self.timeindexB[1]]), xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
                                              xytext=(self.timeB[self.timeindexB[1]]-5,self.temp2B[self.timeindexB[1]]+50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                             self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
                                              xytext=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]-50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='->',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                             
                         if self.timeindexB[2]:
                             st1 = unicode(self.stringfromseconds(self.timeB[self.timeindexB[2]]-startB))
@@ -1788,13 +1788,13 @@ class tgraphcanvas(FigureCanvas):
                             self.E4timex.append(self.timex[self.specialevents[i]])
                             self.E4values.append(self.eventpositionbars[self.specialeventsvalue[i]])
 
-                    self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],
+                    self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                           linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0])
-                    self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],
+                    self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
                                                           linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1])
-                    self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],
+                    self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
                                                           linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2])
-                    self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],
+                    self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                           linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3])
 
                     handles.extend([self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots])
@@ -4476,7 +4476,8 @@ class SampleThread(QThread):
                 ##############  if using more than one device                
                 nxdevices = len(aw.qmc.extradevices)
                 if nxdevices:
-                    if len(aw.extraser) == len(aw.qmc.extradevices) == len(aw.qmc.extratemp1) == len(aw.qmc.extratemp1lines):
+                    les,led,let,letl =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1),len(aw.qmc.extratemp1lines)
+                    if les == led == let == letl:
                         for i in range(nxdevices):
                             extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
                             if len(aw.qmc.extramathexpression1[i]):
@@ -4490,6 +4491,27 @@ class SampleThread(QThread):
                             # update extra lines 
                             aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
                             aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                    #ERROR
+                    else:
+                        lengths = [les,led,let,letl]
+                        location = [u"Extra-Serial",u"Extra-Devices",u"Extra-Temp",u"Extra-Lines"]
+                        #find error
+                        if (nxdevices-1) in lengths:
+                            indexerror =  lengths.index(nxdevices-1)
+                        elif (nxdevices+1) in lengths:
+                            indexerror =  lengths.index(nxdevices+1)
+                        else:
+                            indexerror = 1000
+                        if indexerror != 1000:
+                            errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
+                            errormessage += "\nPlease Reset: Extra devices"
+                        else:
+                            string  = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
+                            string += location[2] + "= " + str(lengths[2]) + " " + location[3] + "= " + str(lengths[3])                                                                             
+                            errormessage = "ERROR: extra devices lengths don't match: %s"%string
+                            errormessage += "\nPlease Reset: Extra devices"
+                        raise Exception(errormessage)   
+
 
                 #check alarms 
                 for i in range(len(aw.qmc.alarmflag)):
@@ -4650,7 +4672,7 @@ class ApplicationWindow(QMainWindow):
         # create a ET control objects
         self.fujipid = FujiPID()
         self.dtapid = DtaPID()
-        self.arduino = ArduinoTC4()
+##        self.arduino = ArduinoTC4()
         
         self.soundflag = 0
 
@@ -6778,6 +6800,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Evaluelinethickness"):
                 self.qmc.Evaluelinethickness = map(lambda x:x.toInt()[0],settings.value("Evaluelinethickness").toList())
                 self.qmc.Evaluealpha = map(lambda x:x.toDouble()[0],settings.value("Evaluealpha").toList())
+            if settings.contains("EvalueMarkerSize"):
+                self.qmc.EvalueMarkerSize = map(lambda x:x.toInt()[0],settings.value("EvalueMarkerSize").toList())
+
             settings.endGroup()
             
     	    #restore statistics
@@ -6920,12 +6945,10 @@ class ApplicationWindow(QMainWindow):
                 self.extraparity = map(unicode,list(settings.value("extraparity",self.extraparity).toStringList()))
                 self.extrastopbits = map(lambda x:x.toInt()[0],settings.value("extrastopbits").toList())
                 self.extratimeout = map(lambda x:x.toInt()[0],settings.value("extratimeout").toList())
-                #convert Qstrings to unicode                
-                for i in range(len(self.extracomport)):                
-                    #create serial port objects
-                    self.extraser.append(serialport())                    
-                #configure extra com ports 
-                for i in range(len(aw.extraser)):
+                lenextraports = len(self.extracomport)
+                self.extraser = [serialport()]*lenextraports
+                #populate aw.extraser
+                for i in range(lenextraports):
                     aw.extraser[i].comport = unicode(aw.extracomport[i])
                     aw.extraser[i].baudrate = aw.extrabaudrate[i]
                     aw.extraser[i].bytesize = aw.extrabytesize[i]
@@ -7080,6 +7103,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("EvalueColor",self.qmc.EvalueColor)
             settings.setValue("EvalueMarker",self.qmc.EvalueMarker)
             settings.setValue("Evaluelinethickness",self.qmc.Evaluelinethickness)
+            settings.setValue("EvalueMarkerSize",self.qmc.EvalueMarkerSize)
             settings.setValue("Evaluealpha",self.qmc.Evaluealpha)
             settings.endGroup()            
             #save delay
@@ -7168,6 +7192,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extramathexpression1",self.qmc.extramathexpression1)
             settings.setValue("extramathexpression2",self.qmc.extramathexpression2)
             settings.endGroup()
+            
             #save extra serial comm ports settings
             settings.beginGroup("ExtraComm")
             settings.setValue("extracomport",self.extracomport)                                                                
@@ -7177,6 +7202,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extrastopbits",self.extrastopbits)                                                                
             settings.setValue("extratimeout",self.extratimeout)
             settings.endGroup()
+
+            
             settings.setValue("BTfunction",self.qmc.BTfunction)                                                                
             settings.setValue("ETfunction",self.qmc.ETfunction)                                                                
 
@@ -7221,131 +7248,132 @@ class ApplicationWindow(QMainWindow):
 
     #used for trouble shooting.
     def readartisansettings(self):
-            settings = {}
+            settingsx = {}
             #read window geometry
             rect = self.geometry()
             height = unicode(rect.height())
             width = unicode(rect.width())
-            settings["Geometry"] = height + u"x" + width                #custom made string
-            settings["Mode"] = unicode(self.qmc.mode)
-            settings["id"] = unicode(self.qmc.device)
-            settings["controlETpid"] = unicode(self.ser.controlETpid)
-            settings["readBTpid"] = unicode(self.ser.readBTpid)            
-            settings["arduinoETChannel"] = unicode(self.ser.arduinoETChannel)
-            settings["arduinoBTChannel"] = unicode(self.ser.arduinoBTChannel)
-            settings["Phases"] = unicode(aw.qmc.phases)
-            settings["phasesbuttonflag"] = unicode(self.qmc.phasesbuttonflag)
-            settings["Statistics"] = unicode(self.qmc.statisticsflags)
-            settings["StatisticsConds"] = unicode(self.qmc.statisticsconditions)
-            settings["eventsbuttonflag"] = unicode(self.eventsbuttonflag)            
-            settings["minieventsflag"] = unicode(self.minieventsflag)
-            settings["eventsGraphflag"] = unicode(self.qmc.eventsGraphflag)
-            settings["etypes"] = unicode(self.qmc.etypes)
-            settings["eventsshowflag"] = unicode(aw.qmc.eventsshowflag)
-            settings["autoChargeDrop"] = unicode(self.qmc.autoChargeDropFlag)
-            settings["EvalueColor"] = unicode(self.qmc.EvalueColor)
-            settings["EvalueMarker"] = unicode(self.qmc.EvalueMarker)
-            settings["Evaluelinethickness"] = unicode(self.qmc.Evaluelinethickness)
-            settings["Evaluealpha"] = unicode(self.qmc.Evaluealpha)
-            settings["Delay"] = unicode(self.qmc.delay)
-            settings["Colors"] = unicode(self.qmc.palette)
-            settings["LCDColors"] = unicode(self.lcdpaletteB)
-            settings["LEDColors"] = unicode(self.lcdpaletteF)
+            settingsx["Geometry"] = height + u"x" + width                #custom made string
+            settingsx["Mode"] = unicode(self.qmc.mode)
+            settingsx["id"] = unicode(self.qmc.device)
+            settingsx["controlETpid"] = unicode(self.ser.controlETpid)
+            settingsx["readBTpid"] = unicode(self.ser.readBTpid)            
+            settingsx["arduinoETChannel"] = unicode(self.ser.arduinoETChannel)
+            settingsx["arduinoBTChannel"] = unicode(self.ser.arduinoBTChannel)
+            settingsx["Phases"] = unicode(aw.qmc.phases)
+            settingsx["phasesbuttonflag"] = unicode(self.qmc.phasesbuttonflag)
+            settingsx["Statistics"] = unicode(self.qmc.statisticsflags)
+            settingsx["StatisticsConds"] = unicode(self.qmc.statisticsconditions)
+            settingsx["eventsbuttonflag"] = unicode(self.eventsbuttonflag)            
+            settingsx["minieventsflag"] = unicode(self.minieventsflag)
+            settingsx["eventsGraphflag"] = unicode(self.qmc.eventsGraphflag)
+            settingsx["etypes"] = unicode(self.qmc.etypes)
+            settingsx["eventsshowflag"] = unicode(aw.qmc.eventsshowflag)
+            settingsx["autoChargeDrop"] = unicode(self.qmc.autoChargeDropFlag)
+            settingsx["EvalueColor"] = unicode(self.qmc.EvalueColor)
+            settingsx["EvalueMarker"] = unicode(self.qmc.EvalueMarker)
+            settingsx["Evaluelinethickness"] = unicode(self.qmc.Evaluelinethickness)
+            settingsx["Evaluealpha"] = unicode(self.qmc.Evaluealpha)
+            settingsx["Delay"] = unicode(self.qmc.delay)
+            settingsx["Colors"] = unicode(self.qmc.palette)
+            settingsx["LCDColors"] = unicode(self.lcdpaletteB)
+            settingsx["LEDColors"] = unicode(self.lcdpaletteF)
             flavors= []
             for i in range(len(self.qmc.flavorlabels)):
                  flavors.append(unicode(self.qmc.flavorlabels[i]))          
-            settings["Flavors"] = unicode(flavors)
-            settings["flavorstartangle"] = unicode(self.qmc.flavorstartangle)
-            settings["sound"]= unicode(self.soundflag)
-            settings["comport"] = unicode(self.ser.comport)
-            settings["baudrate"] = unicode(self.ser.baudrate)
-            settings["bytesize"]= unicode(self.ser.bytesize)
-            settings["stopbits"]= unicode(self.ser.stopbits)
-            settings["parity"]= unicode(self.ser.parity)
-            settings["timeout"]= unicode(self.ser.timeout)            
+            settingsx["Flavors"] = unicode(flavors)
+            settingsx["flavorstartangle"] = unicode(self.qmc.flavorstartangle)
+            settingsx["sound"]= unicode(self.soundflag)
+            settingsx["comport"] = unicode(self.ser.comport)
+            settingsx["baudrate"] = unicode(self.ser.baudrate)
+            settingsx["bytesize"]= unicode(self.ser.bytesize)
+            settingsx["stopbits"]= unicode(self.ser.stopbits)
+            settingsx["parity"]= unicode(self.ser.parity)
+            settingsx["timeout"]= unicode(self.ser.timeout)            
             for key in self.fujipid.PXR.keys():
-                settings[u"PXR:" + key] = unicode(self.fujipid.PXR[key][0])   # key modified
+                settingsx[u"PXR:" + key] = unicode(self.fujipid.PXR[key][0])   # key modified
             for key in self.fujipid.PXG4.keys():            
-                settings[u"PXG:" + key] = unicode(self.fujipid.PXG4[key][0])  # key modified
+                settingsx[u"PXG:" + key] = unicode(self.fujipid.PXG4[key][0])  # key modified
             for key in self.dtapid.dtamem.keys():            
-                settings[u"DTA:" + key] = unicode(self.dtapid.dtamem[key][0]) # key modified
-            settings["DeltaET"]= unicode(self.qmc.DeltaETflag)
-            settings["DeltaBT"]= unicode(self.qmc.DeltaBTflag)
-            settings["deltafilter"]= unicode(self.qmc.deltafilter)
-            settings["Projection"]= unicode(self.qmc.projectFlag)
-            settings["ProjectionMode"]= unicode(self.qmc.projectionmode)
-            settings["ETtarget"]= unicode(self.qmc.ETtarget)
-            settings["BTtarget"]= unicode(self.qmc.BTtarget)
-            settings["HUDMode"]= unicode(self.HUDfunction)                      # key modified
-            settings["hudETpid"]= unicode(self.qmc.hudETpid)
-            settings["Beep"]= unicode(self.soundflag)
-            settings["xmin"]= unicode(self.qmc.startofx)
-            settings["xmax"]= unicode(self.qmc.endofx)
-            settings["ymax"]= unicode(self.qmc.ylimit)
-            settings["ymin"]= unicode(self.qmc.ylimit_min)
-            settings["zmax"]= unicode(self.qmc.zlimit)
-            settings["zmin"]= unicode(self.qmc.zlimit_min)
-            settings["keepTimeLimit"] = unicode(self.qmc.keeptimeflag)
-            settings["legendloc"] = unicode(self.qmc.legendloc )
+                settingsx[u"DTA:" + key] = unicode(self.dtapid.dtamem[key][0]) # key modified
+            settingsx["DeltaET"]= unicode(self.qmc.DeltaETflag)
+            settingsx["DeltaBT"]= unicode(self.qmc.DeltaBTflag)
+            settingsx["deltafilter"]= unicode(self.qmc.deltafilter)
+            settingsx["Projection"]= unicode(self.qmc.projectFlag)
+            settingsx["ProjectionMode"]= unicode(self.qmc.projectionmode)
+            settingsx["ETtarget"]= unicode(self.qmc.ETtarget)
+            settingsx["BTtarget"]= unicode(self.qmc.BTtarget)
+            settingsx["HUDMode"]= unicode(self.HUDfunction)                      # key modified
+            settingsx["hudETpid"]= unicode(self.qmc.hudETpid)
+            settingsx["Beep"]= unicode(self.soundflag)
+            settingsx["xmin"]= unicode(self.qmc.startofx)
+            settingsx["xmax"]= unicode(self.qmc.endofx)
+            settingsx["ymax"]= unicode(self.qmc.ylimit)
+            settingsx["ymin"]= unicode(self.qmc.ylimit_min)
+            settingsx["zmax"]= unicode(self.qmc.zlimit)
+            settingsx["zmin"]= unicode(self.qmc.zlimit_min)
+            settingsx["keepTimeLimit"] = unicode(self.qmc.keeptimeflag)
+            settingsx["legendloc"] = unicode(self.qmc.legendloc )
             
-            settings["operator"]= unicode(self.qmc.operator)
-            settings["roastertype"] = unicode(self.qmc.roastertype)
-            settings["densitySampleVolume"] = unicode(self.qmc.density[2])
-            settings["densitySampleVolumeUnit"]= unicode(self.qmc.density[3])
-            settings["beansize"]= unicode(self.qmc.beansize)
+            settingsx["operator"]= unicode(self.qmc.operator)
+            settingsx["roastertype"] = unicode(self.qmc.roastertype)
+            settingsx["densitySampleVolume"] = unicode(self.qmc.density[2])
+            settingsx["densitySampleVolumeUnit"]= unicode(self.qmc.density[3])
+            settingsx["beansize"]= unicode(self.qmc.beansize)
             
-            settings["alarmtime"]= unicode(self.qmc.alarmtime)                                                                
-            settings["alarmflag"]= unicode(self.qmc.alarmflag)            
-            settings["alarmsource"]= unicode(self.qmc.alarmsource)
-            settings["alarmtemperature"]= unicode(self.qmc.alarmtemperature)
-            settings["alarmaction"]= unicode(self.qmc.alarmaction)
-            settings["alarmstrings"]= unicode(self.qmc.alarmstrings)
-            settings["profilepath"]= unicode(self.userprofilepath)
+            settingsx["alarmtime"]= unicode(self.qmc.alarmtime)                                                                
+            settingsx["alarmflag"]= unicode(self.qmc.alarmflag)            
+            settingsx["alarmsource"]= unicode(self.qmc.alarmsource)
+            settingsx["alarmtemperature"]= unicode(self.qmc.alarmtemperature)
+            settingsx["alarmaction"]= unicode(self.qmc.alarmaction)
+            settingsx["alarmstrings"]= unicode(self.qmc.alarmstrings)
+            settingsx["profilepath"]= unicode(self.userprofilepath)
             #save extra devices
-            settings["extradevices"]= unicode(self.qmc.extradevices)                
-            settings["extradevicecolor1"]= unicode(self.qmc.extradevicecolor1)                                                                
-            settings["extradevicecolor2"]= unicode(self.qmc.extradevicecolor2)
-            settings["extraname1"]= unicode(self.qmc.extraname1)
-            settings["extraname2"]= unicode(self.qmc.extraname2)
-            settings["extramathexpression1"]= unicode(self.qmc.extramathexpression1)
-            settings["extramathexpression2"]= unicode(self.qmc.extramathexpression2)
-            #save extra serial comm ports settings
-            settings["extracomport"]= unicode(self.extracomport)                                                                
-            settings["extrabaudrate"]= unicode(self.extrabaudrate)                                                                
-            settings["extrabytesize"]= unicode(self.extrabytesize)                                                                
-            settings["extraparity"]= unicode(self.extraparity)                                                                
-            settings["extrastopbits"]= unicode(self.extrastopbits)                                                                
-            settings["extratimeout"]= unicode(self.extratimeout)
-            settings["BTfunction"]= unicode(self.qmc.BTfunction)                                                                
-            settings["ETfunction"]= unicode(self.qmc.ETfunction)
+            settingsx["extradevices"]= unicode(self.qmc.extradevices)                
+            settingsx["extradevicecolor1"]= unicode(self.qmc.extradevicecolor1)                                                                
+            settingsx["extradevicecolor2"]= unicode(self.qmc.extradevicecolor2)
+            settingsx["extraname1"]= unicode(self.qmc.extraname1)
+            settingsx["extraname2"]= unicode(self.qmc.extraname2)
+            settingsx["extramathexpression1"]= unicode(self.qmc.extramathexpression1)
+            settingsx["extramathexpression2"]= unicode(self.qmc.extramathexpression2)
             
-            settings["resetqsettings"]= unicode(self.resetqsettings)
-            settings["plotcurves"]= unicode(self.qmc.plotcurves)                                                                
-            settings["plotcurvecolor"]= unicode(self.qmc.plotcurvecolor)
+            #save extra serial comm ports settings
+            settingsx["extracomport"]= unicode(self.extracomport)                                                                
+            settingsx["extrabaudrate"]= unicode(self.extrabaudrate)                                                                
+            settingsx["extrabytesize"]= unicode(self.extrabytesize)                                                                
+            settingsx["extraparity"]= unicode(self.extraparity)                                                                
+            settingsx["extrastopbits"]= unicode(self.extrastopbits)                                                                
+            settingsx["extratimeout"]= unicode(self.extratimeout)
+            settingsx["BTfunction"]= unicode(self.qmc.BTfunction)                                                                
+            settingsx["ETfunction"]= unicode(self.qmc.ETfunction)
+            
+            settingsx["resetqsettings"]= unicode(self.resetqsettings)
+            settingsx["plotcurves"]= unicode(self.qmc.plotcurves)                                                                
+            settingsx["plotcurvecolor"]= unicode(self.qmc.plotcurvecolor)
             
             #custom event buttons
-            settings["buttonlistmaxlen"]= unicode(self.buttonlistmaxlen)
-            settings["extraeventstypes"]= unicode(self.extraeventstypes)
-            settings["extraeventsvalues"]= unicode(self.extraeventsvalues)
-            settings["extraeventsactionstrings"]= unicode(self.extraeventsactionstrings)
-            settings["extraeventsactions"]= unicode(self.extraeventsactions)
-            settings["extraeventsdescriptions"]= unicode(self.extraeventsdescriptions)
-            settings["extraeventsvisibility"]= unicode(self.extraeventsvisibility)
-            settings["extraeventslabels"]= unicode(self.extraeventslabels)
-            settings["extraeventbuttoncolor"]= unicode(self.extraeventbuttoncolor)
-            settings["extraeventbuttontextcolor"]= unicode(self.extraeventbuttontextcolor)
-            settings["extraeventsbuttonsflag"]= unicode(self.extraeventsbuttonsflag)
-            settings["buttonpalettemaxlen"]= unicode(self.buttonpalettemaxlen)
-            settings["buttonpalette"]= unicode(self.buttonpalette)
-            settings["xgrid"]= unicode(self.qmc.xgrid)
-            settings["ygrid"]= unicode(self.qmc.ygrid)
-            settings["zgrid"]= unicode(self.qmc.zgrid)
-            settings["gridlinestyle"]= unicode(self.qmc.gridlinestyle)
-            settings["gridthickness"]= unicode(self.qmc.gridthickness)
-            settings["gridalpha"]= unicode(self.qmc.gridalpha)
-            settings["xrotation"]= unicode(self.qmc.xrotation)
+            settingsx["buttonlistmaxlen"]= unicode(self.buttonlistmaxlen)
+            settingsx["extraeventstypes"]= unicode(self.extraeventstypes)
+            settingsx["extraeventsvalues"]= unicode(self.extraeventsvalues)
+            settingsx["extraeventsactionstrings"]= unicode(self.extraeventsactionstrings)
+            settingsx["extraeventsactions"]= unicode(self.extraeventsactions)
+            settingsx["extraeventsdescriptions"]= unicode(self.extraeventsdescriptions)
+            settingsx["extraeventsvisibility"]= unicode(self.extraeventsvisibility)
+            settingsx["extraeventslabels"]= unicode(self.extraeventslabels)
+            settingsx["extraeventbuttoncolor"]= unicode(self.extraeventbuttoncolor)
+            settingsx["extraeventbuttontextcolor"]= unicode(self.extraeventbuttontextcolor)
+            settingsx["extraeventsbuttonsflag"]= unicode(self.extraeventsbuttonsflag)
+            settingsx["buttonpalettemaxlen"]= unicode(self.buttonpalettemaxlen)
+            settingsx["buttonpalette"]= unicode(self.buttonpalette)
+            settingsx["xgrid"]= unicode(self.qmc.xgrid)
+            settingsx["ygrid"]= unicode(self.qmc.ygrid)
+            settingsx["zgrid"]= unicode(self.qmc.zgrid)
+            settingsx["gridlinestyle"]= unicode(self.qmc.gridlinestyle)
+            settingsx["gridthickness"]= unicode(self.qmc.gridthickness)
+            settingsx["gridalpha"]= unicode(self.qmc.gridalpha)
+            settingsx["xrotation"]= unicode(self.qmc.xrotation)
 
-            return settings
+            return settingsx
 
 
     def filePrint(self):
@@ -10431,21 +10459,34 @@ class serialLogDlg(QDialog):
             self.serialcheckbox.setChecked(False)
         self.connect(self.serialcheckbox,SIGNAL("stateChanged(int)"),self.serialcheckboxChanged)
 
+        self.serialEdit = QTextEdit()
+        self.serialEdit.setReadOnly(True)
+        self.serialEdit.setHtml(self.getstring())
+
+        updateButton = QPushButton(QApplication.translate("Button","Update", None, QApplication.UnicodeUTF8))
+        updateButton.setMaximumWidth(150)
+        self.connect(updateButton,SIGNAL("clicked()"),self.update)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.serialcheckbox,0)
+        layout.addWidget(self.serialEdit,1)
+        layout.addWidget(updateButton,1)
+                               
+        self.setLayout(layout)
+
+    def getstring(self):
         #convert list of serial comm an html string
         htmlserial = "version = " +__version__ +"<br><br>"
         lenl = len(aw.seriallog)
         for i in range(len(aw.seriallog)):
             htmlserial += "<b>" + str(lenl-i) + "</b> " + aw.seriallog[-i-1] + "<br><br>"
-
-        serialEdit = QTextEdit()
-        serialEdit.setHtml(htmlserial)
-        serialEdit.setReadOnly(True)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.serialcheckbox,0)
-        layout.addWidget(serialEdit,1)
-                               
-        self.setLayout(layout)
+            
+        return htmlserial
+    
+    def update(self):
+        if not aw.seriallogflag:
+            self.serialcheckbox.setChecked(True)
+        self.serialEdit.setText(self.getstring())
 
     def serialcheckboxChanged(self):
         if self.serialcheckbox.isChecked():
@@ -11263,6 +11304,7 @@ class EventsDlg(QDialog):
         valuesymbollabel = QLabel(QApplication.translate("label","Symbol",None, QApplication.UnicodeUTF8))
         valuethicknesslabel = QLabel(QApplication.translate("label","Line Thickness",None, QApplication.UnicodeUTF8))
         valuealphalabel = QLabel(QApplication.translate("label","Opacity",None, QApplication.UnicodeUTF8))
+        valuesizelabel = QLabel(QApplication.translate("label","Marker size",None, QApplication.UnicodeUTF8))
 
         self.E1thicknessSpinBox = QSpinBox()
         self.E1thicknessSpinBox.setRange(1,10)
@@ -11307,6 +11349,27 @@ class EventsDlg(QDialog):
         self.E4alphaSpinBox.setSingleStep(.1)
         self.E4alphaSpinBox.setValue(aw.qmc.Evaluealpha[3])
         self.connect(self.E4alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1, x=3:self.setElinealpha(w,x)) 
+
+        #Marker size
+        self.E1sizeSpinBox = QSpinBox()
+        self.E1sizeSpinBox.setRange(1,14)
+        self.E1sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[0])
+        self.connect(self.E1sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=0:self.setEmarkersize(w,x)) 
+
+        self.E2sizeSpinBox = QSpinBox()
+        self.E2sizeSpinBox.setRange(1,14)
+        self.E2sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[1])
+        self.connect(self.E2sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=1:self.setEmarkersize(w,x)) 
+
+        self.E3sizeSpinBox = QSpinBox()
+        self.E3sizeSpinBox.setRange(1,14)
+        self.E3sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[2])
+        self.connect(self.E3sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=2:self.setEmarkersize(w,x)) 
+
+        self.E4sizeSpinBox = QSpinBox()
+        self.E4sizeSpinBox.setRange(1,14)
+        self.E4sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[3])
+        self.connect(self.E4sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=3:self.setEmarkersize(w,x)) 
                                             
         self.autoChargeDrop = QCheckBox(QApplication.translate("CheckBox","Automatic CHARGE/DROP",None, QApplication.UnicodeUTF8))
         if aw.qmc.autoChargeDropFlag:
@@ -11493,26 +11556,31 @@ class EventsDlg(QDialog):
         valueLayout.addWidget(valuesymbollabel,0,1)
         valueLayout.addWidget(valuethicknesslabel,0,2)
         valueLayout.addWidget(valuealphalabel,0,3)
+        valueLayout.addWidget(valuesizelabel,0,4)
         
         valueLayout.addWidget(E1colorButton,1,0)
         valueLayout.addWidget(self.marker1typeComboBox,1,1)
         valueLayout.addWidget(self.E1thicknessSpinBox,1,2)
         valueLayout.addWidget(self.E1alphaSpinBox,1,3)
+        valueLayout.addWidget(self.E1sizeSpinBox,1,4)
 
         valueLayout.addWidget(E2colorButton,2,0)
         valueLayout.addWidget(self.marker2typeComboBox,2,1)
         valueLayout.addWidget(self.E2thicknessSpinBox,2,2)
         valueLayout.addWidget(self.E2alphaSpinBox,2,3)
+        valueLayout.addWidget(self.E2sizeSpinBox,2,4)
 
         valueLayout.addWidget(E3colorButton,3,0)
         valueLayout.addWidget(self.marker3typeComboBox,3,1)
         valueLayout.addWidget(self.E3thicknessSpinBox,3,2)
         valueLayout.addWidget(self.E3alphaSpinBox,3,3)
+        valueLayout.addWidget(self.E3sizeSpinBox,3,4)
 
         valueLayout.addWidget(E4colorButton,4,0)
         valueLayout.addWidget(self.marker4typeComboBox,4,1)
         valueLayout.addWidget(self.E4thicknessSpinBox,4,2)
         valueLayout.addWidget(self.E4alphaSpinBox,4,3)
+        valueLayout.addWidget(self.E4sizeSpinBox,4,4)
 
 ###########################################
         #tab layout
@@ -11552,6 +11620,18 @@ class EventsDlg(QDialog):
             aw.qmc.Evaluelinethickness[2] = self.E3thicknessSpinBox.value()
         if val == 3:
             aw.qmc.Evaluelinethickness[3] = self.E4thicknessSpinBox.value()
+
+        aw.qmc.redraw()
+
+    def setEmarkersize(self,x,val):
+        if val == 0:
+            aw.qmc.EvalueMarkerSize[0] = self.E1sizeSpinBox.value()
+        if val == 1:
+            aw.qmc.EvalueMarkerSize[1] = self.E2sizeSpinBox.value()
+        if val == 2:
+            aw.qmc.EvalueMarkerSize[2] = self.E3sizeSpinBox.value()
+        if val == 3:
+            aw.qmc.EvalueMarkerSize[3] = self.E4sizeSpinBox.value()
 
         aw.qmc.redraw()
         
@@ -13614,13 +13694,14 @@ class serialport(object):
             return tx,0.,0.
         
         vals = ["1","2","3","4"]
-        vals.pop(vals.index(self.arduinoETChannel))
-        vals.pop(vals.index(self.arduinoBTChannel))
-        oldETchan = self.arduinoETChannel
-        oldBTchan = self.arduinoBTChannel
+        vals.pop(vals.index(aw.ser.arduinoETChannel))
+        vals.pop(vals.index(aw.ser.arduinoBTChannel))
+        oldETchan = aw.ser.arduinoETChannel
+        oldBTchan = aw.ser.arduinoBTChannel
         aw.ser.arduinoETChannel = vals[0]
-        aw.ser.arduinoETChannel = vals[1]
-                 
+        aw.ser.arduinoBTChannel = vals[1]
+
+        #read temp but with different command 
         t2,t1 = aw.ser.ARDUINOTC4temperature()
         tx = aw.qmc.timeclock.elapsed()/1000.
                  
@@ -14112,7 +14193,6 @@ class serialport(object):
 
     def ARDUINOTC4temperature(self):
         try:
-
             if not self.SP.isOpen():
                 self.openport()
                 libtime.sleep(3)
@@ -15216,8 +15296,8 @@ class comportDlg(QDialog):
 
     def createserialTable(self):
         try:
-            self.serialtable.clear()        
-            nssdevices = len(aw.qmc.extradevices)
+            self.serialtable.clear()
+            nssdevices = len(aw.extracomport)
             if nssdevices:    
                 self.serialtable.setRowCount(nssdevices)
                 self.serialtable.setColumnCount(7)
@@ -15236,7 +15316,6 @@ class comportDlg(QDialog):
 
                 for i in range(nssdevices):
                     device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]-1])    #type identification of the device. Non editable
-
                     comportComboBox =  QComboBox()
                     comportComboBox.addItems(aw.extracomport)
                     comportComboBox.setCurrentIndex(i)
@@ -15280,11 +15359,9 @@ class comportDlg(QDialog):
 
     def saveserialtable(self):
         try:
-            
-            ser_ports = len(aw.qmc.extradevices)
-
+            #aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
+            ser_ports = len(aw.extracomport)
             for i in range(ser_ports):
-
                 comportComboBox =  self.serialtable.cellWidget(i,1)
                 aw.extracomport[i] = unicode(comportComboBox.currentText())
 
@@ -15304,9 +15381,10 @@ class comportDlg(QDialog):
                 aw.extratimeout[i] = int(timeoutEdit.text())
 
             #create serial ports for each extra device
-            nserial = len(aw.extraser)
-            if ser_ports != nserial:
-                aw.extraser = [serialport()]*ser_ports
+##            nserial = len(aw.extraser)
+##            if ser_ports != nserial:
+            aw.extraser = []    
+            aw.extraser = [serialport()]*ser_ports
 
             #load the settings for the extra serial ports found
             for i in range(ser_ports):
@@ -15510,10 +15588,12 @@ class DeviceAssignmentDLG(QDialog):
         arduinoETLabel =QLabel(QApplication.translate("Label", "ET Channel",None, QApplication.UnicodeUTF8))                            
         self.arduinoETComboBox = QComboBox()
         self.arduinoETComboBox.addItems(arduinoChannels)
+        self.arduinoETComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoETChannel))
 
         arduinoBTLabel =QLabel(QApplication.translate("Label", "BT Channel",None, QApplication.UnicodeUTF8))                            
         self.arduinoBTComboBox = QComboBox()
         self.arduinoBTComboBox.addItems(arduinoChannels)
+        self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoBTChannel))
 
         #check previous settings for radio button
         if aw.qmc.device == 0 or aw.qmc.device == 26:   #if Fuji pid or Delta DTA pid
@@ -15961,13 +16041,12 @@ class DeviceAssignmentDLG(QDialog):
                 aw.label7.setVisible(True)
                 aw.lcd7.setVisible(True)
 
-            if self.arduinoButton.isChecked():
-                aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
-                aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
+            elif self.arduinoButton.isChecked():
+                aw.ser.arduinoETChannel = unicode(self.arduinoETComboBox.currentText())
+                aw.ser.arduinoBTChannel = unicode(self.arduinoBTComboBox.currentText())
                 
                 meter = "Arduino (TC4)"
                 aw.qmc.device = 19
-                #aw.ser.comport = "/dev/ttyACM0"
                 aw.ser.baudrate = 19200
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
@@ -15976,13 +16055,13 @@ class DeviceAssignmentDLG(QDialog):
                 message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 aw.button_10.setVisible(True)
 
-            if self.programButton.isChecked():
+            elif self.programButton.isChecked():
                 meter = unicode(self.programedit.text())
                 aw.ser.externalprogram = meter
                 aw.qmc.device = 27
                 message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 
-            if self.nonpidButton.isChecked():
+            elif self.nonpidButton.isChecked():
                 meter = str(self.devicetypeComboBox.currentText())
                 message = QApplication.translate("Error Message","device err",None,QApplication.UnicodeUTF8)
 
