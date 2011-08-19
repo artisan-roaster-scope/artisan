@@ -259,8 +259,8 @@ class tgraphcanvas(FigureCanvas):
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
         self.phasesbuttonflag = 0 #0 no change; 1 make the DRY and FC buttons change the phases during roast automatically
 
-        #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area
-        self.statisticsflags = [1,1,1,1]
+        #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min
+        self.statisticsflags = [1,1,1,1,1]
         #conditions to estimate bad flavor:dry[min,max],mid[min,max],finish[min,max] in seconds
         self.statisticsconditions = [180,360,180,600,180,360]
         #records length in seconds of total time [0], dry phase [1],mid phase[2],finish phase[3]
@@ -2945,13 +2945,24 @@ class tgraphcanvas(FigureCanvas):
 
             if self.statisticsflags[2]:
                 (st1,st2,st3) = aw.defect_estimation()
+            else:
+                st1 = st2 = st3 = ""
 
+            if self.statisticsflags[4]:
                 rates_of_changes = aw.RoR(TP_index,dryEndIndex)
-
-                st1 = st1 + " (%.1f "%rates_of_changes[0]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"
-                st2 = st2 + " (%.1f "%rates_of_changes[1]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"
-                st3 = st3 + " (%.1f "%rates_of_changes[2]  + QApplication.translate("Scope Label", "deg/min",None, QApplication.UnicodeUTF8) + ")"
+                if self.statisticsflags[2]:
+                    st1 = st1 + " ("
+                    st2 = st2 + " ("
+                    st3 = st3 + " ("
+                st1 = st1 + "%.1f"%rates_of_changes[0] + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8)
+                st2 = st2 + "%.1f"%rates_of_changes[1] + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8)
+                st3 = st3 + "%.1f"%rates_of_changes[2] + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8)
+                if self.statisticsflags[2]:
+                    st1 = st1 + ")"
+                    st2 = st2 + ")"
+                    st3 = st3 + ")"
         
+            if self.statisticsflags[2] or self.statisticsflags[4]:
                 #Write flavor estimation
                 self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.-len(st1)*4.,statisticslower,st1,color=self.palette["text"],fontsize=11)
                 if self.timeindex[2]: # only if FCs exists
@@ -6833,6 +6844,8 @@ class ApplicationWindow(QMainWindow):
     	    #restore statistics
             if settings.contains("Statistics"):
                 self.qmc.statisticsflags = map(lambda x:x.toInt()[0],settings.value("Statistics").toList())
+                for i in range(5 - len(self.qmc.statisticsflags)):
+                    self.qmc.statisticsflags.append(1)
             if settings.contains("StatisticsConds"):
                 self.qmc.statisticsconditions = map(lambda x:x.toInt()[0],settings.value("StatisticsConds").toList())
 
@@ -13121,6 +13134,7 @@ class StatisticsDLG(QDialog):
 
         self.timez = QCheckBox(QApplication.translate("CheckBox","Time",None, QApplication.UnicodeUTF8))
         self.bar = QCheckBox(QApplication.translate("CheckBox","Bar",None, QApplication.UnicodeUTF8))
+        self.ror = QCheckBox(QApplication.translate("CheckBox","d/m",None, QApplication.UnicodeUTF8))
         self.flavor = QCheckBox(QApplication.translate("CheckBox","Evaluation",None, QApplication.UnicodeUTF8))
         self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None, QApplication.UnicodeUTF8))
                 
@@ -13154,13 +13168,21 @@ class StatisticsDLG(QDialog):
                 self.flavor.setChecked(True)
             if aw.qmc.statisticsflags[3]:
                 self.area.setChecked(True)
+            if aw.qmc.statisticsflags[4]:
+                self.ror.setChecked(True)
         else:
-            aw.qmc.statisticsflags = [1,1,1,1]
+            aw.qmc.statisticsflags = [1,1,1,1,1]
+            self.timez.setChecked(True)
+            self.bar.setChecked(True)
+            self.flavor.setChecked(True)
+            self.area.setChecked(True)
+            self.ror.setChecked(True)
             
         self.connect(self.timez,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,0)) 
         self.connect(self.bar,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,1)) 
         self.connect(self.flavor,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,2)) 
         self.connect(self.area,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,3)) 
+        self.connect(self.ror,SIGNAL("stateChanged(int)"),lambda x=0: self.changeStatisticsflag(x,4)) 
 
 
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
@@ -13171,8 +13193,9 @@ class StatisticsDLG(QDialog):
         flagsLayout = QGridLayout()
         flagsLayout.addWidget(self.timez,0,0)
         flagsLayout.addWidget(self.bar,0,1)
-        flagsLayout.addWidget(self.flavor,0,2)
-        flagsLayout.addWidget(self.area,0,3)
+        flagsLayout.addWidget(self.ror,0,2)
+        flagsLayout.addWidget(self.flavor,0,3)
+        flagsLayout.addWidget(self.area,0,4)
         
         layout = QGridLayout()
         layout.addWidget(minf,0,1)
@@ -13258,6 +13281,11 @@ class StatisticsDLG(QDialog):
                 aw.qmc.statisticsflags[3] = 1
             else:
                 aw.qmc.statisticsflags[3] = 0
+                
+            if self.ror.isChecked(): 
+                aw.qmc.statisticsflags[4] = 1
+            else:
+                aw.qmc.statisticsflags[4] = 0
 
             aw.qmc.redraw(recomputeAllDeltas=False)
             self.close()
