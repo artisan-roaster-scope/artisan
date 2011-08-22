@@ -7383,6 +7383,7 @@ class ApplicationWindow(QMainWindow):
             settingsx["extratimeout"]= unicode(self.extratimeout)
             settingsx["BTfunction"]= unicode(self.qmc.BTfunction)                                                                
             settingsx["ETfunction"]= unicode(self.qmc.ETfunction)
+            settingsx["extraserlength"]= unicode(len(self.extraser))
             
             settingsx["resetqsettings"]= unicode(self.resetqsettings)
             settingsx["plotcurves"]= unicode(self.qmc.plotcurves)                                                                
@@ -10478,8 +10479,8 @@ class artisansettingsDlg(QDialog):
         self.connect(updateButton,SIGNAL("clicked()"),self.getstring)
 
         searchlayout = QHBoxLayout()
-        searchlayout.addWidget(searchButton)
         searchlayout.addWidget(self.searchbox)
+        searchlayout.addWidget(searchButton)
 
         layout = QVBoxLayout()
         layout.addLayout(searchlayout)
@@ -10500,8 +10501,6 @@ class artisansettingsDlg(QDialog):
         self.settingsEdit.setHtml(self.htmlsettings)
 
 
-                
-        
 ##########################################################################
 #####################  VIEW SERIAL LOG DLG  ##############################
 ##########################################################################
@@ -15957,18 +15956,26 @@ class DeviceAssignmentDLG(QDialog):
 
     def resetextradevices(self):
         try:
-            aw.qmc.extradevices = []                                      
+            #delete extra devices
+            aw.qmc.extradevices = []
+
+            #delete extra curves variables
             aw.qmc.extratimex = []                                        
             aw.qmc.extradevicecolor1 = []                                  
             aw.qmc.extradevicecolor2 = []                                
             aw.qmc.extratemp1,aw.qmc.extratemp2 = [],[]                     
             aw.qmc.extratemp1lines,aw.qmc.extratemp2lines = [],[]           
             aw.qmc.extraname1,aw.qmc.extraname2 = [],[]                     
-            aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]           
-            aw.ser.extraSP = []
-            #EXTRA COMM PORTS VARIABLES
-            aw.ser.extracomport,aw.ser.extrabaudrate,aw.ser.extrabytesize,aw.ser.extraparity,aw.ser.extrastopbits,aw.ser.extratimeout = [],[],[],[],[],[]
+            aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]
+            
+            #delete EXTRA COMM PORTS VARIABLES
+            aw.extraser = []
+            aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
+
+            #update table
             self.createDeviceTable()
+
+            #redraw
             aw.qmc.redraw(recomputeAllDeltas=False)
             
         except Exception,e:
