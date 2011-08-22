@@ -718,8 +718,8 @@ class tgraphcanvas(FigureCanvas):
                     aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
                     
                     if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid  
-                        aw.lcd6.display(aw.qmc.currentpidsv)
-                        aw.lcd7.display(aw.qmc.dutycycle)
+                        aw.lcd6.display(self.currentpidsv)
+                        aw.lcd7.display(self.dutycycle)
 
                 #updated canvas
                 self.fig.canvas.draw()
@@ -13458,7 +13458,7 @@ class serialport(object):
     def fujitemperature(self):
         
         #update ET SV LCD 6
-        self.currentpidsv = aw.fujipid.readcurrentsv()
+        aw.qmc.currentpidsv = aw.fujipid.readcurrentsv()
         # get the temperature for ET. aw.fujipid.gettemperature(unitID)
         t1 = aw.fujipid.gettemperature(self.controlETpid[1])/10.  #Need to divide by 10 beacuse using 1 decimal point in Fuji (ie. received 843 = 84.3)
         #get time of temperature reading in seconds from start; .elapsed() returns miliseconds
@@ -13481,7 +13481,7 @@ class serialport(object):
 
         #get current duty cycle and update LCD 7
         aw.qmc.dutycycle = aw.fujipid.readdutycycle()
-        aw.qmc.dutycycleTX = tx
+        aw.qmc.dutycycleTX = aw.qmc.timeclock.elapsed()/1000.
         
         if t2:
             aw.qmc.fujiETBT = t1-t2
@@ -18103,11 +18103,84 @@ class PXRpidDlgControl(QDialog):
         BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
-        self.thermotypes = ["JPT 100","PT 100","J","K","R","B","S","T","E","N"]
-        conversiontoindex = [0,1,2,3,4,5,6,7,8,12]  #converts fuji PID types to indexes
-        self.ETthermocombobox.addItems(self.thermotypes)
-        self.BTthermocombobox.addItems(self.thermotypes)
-        self.ETthermocombobox.setCurrentIndex(conversiontoindex.index(aw.fujipid.PXG4["pvinputtype"][0]))
+
+        ## FUJI PXG input types
+        ##0 (JPT 100'3f)
+        ##1 (PT 100'3f)
+        ##2 (J)
+        ##3 (K)
+        ##4 (R)
+        ##5 (B)
+        ##6 (S)
+        ##7 (T)
+        ##8 (E)
+        ##9 (no function)
+        ##10 (no function)
+        ##11 (no function)
+        ##12 (N)
+        ##13 (PL- 2)
+        ##14 (no function)
+        ##15 (0V to 5V / 0mA to 20mA
+        ##16 (1V to 5V/4mA to 20mA)
+        ##17 (0mV to 10V)
+        ##18 (2V to 10V)
+        ##19 (0mV to 100mV)
+        
+        self.PXGthermotypes = ["JPT 100",#0
+                            "PT 100",    #1
+                            "J",         #2
+                            "K",         #3
+                            "R",         #4
+                            "B",         #5
+                            "S",         #6
+                            "T",         #7
+                            "E",         #8
+                            "N",         #12
+                            "PL-2",      #13
+                            "0V-5V/0mA-20mA", #15
+                            "1V-5V/4mA-20mA", #16
+                            "0mV-10V",   #17
+                            "2V to 10V", #18
+                            "0mV-100mV"  #19
+                            ]
+        self.PXGconversiontoindex = [0,1,2,3,4,5,6,7,8,12,13,15,16,17,18,19]  #converts fuji PID PXG types to indexes
+
+        ## FUJI PXR input types
+        ##1 (PT 100'3f)
+        ##2 (J)
+        ##3 (K)
+        ##4 (R)
+        ##5 (B)
+        ##6 (S)
+        ##7 (T)
+        ##8 (E)
+        ##12 (N)
+        ##13 (PL- 2)
+        ##16 (1V to 5V/4mA to 20mA)
+
+        self.PXRthermotypes = [
+                            "PT 100",   #1
+                            "J",        #2
+                            "K",        #3
+                            "R",        #4
+                            "B",        #5
+                            "S",        #6
+                            "T",        #7
+                            "E",        #8
+                            "N",        #12
+                            "PL-2",    #13
+                            "1V to 5V/4mA to 20mA" #16
+                            ]
+        self.PXRconversiontoindex = [1,2,3,4,5,6,7,8,12,13,16]  #converts fuji PID PXR types to indexes
+                                        
+        self.ETthermocombobox.addItems(self.PXRthermotypes)
+        if aw.ser.readBTpid[0] == 0:        #fuji PXG                    
+            self.BTthermocombobox.addItems(self.PXGthermotypes)
+        else:                               #fuji PXR
+            self.BTthermocombobox.addItems(self.PXRthermotypes)            
+
+        if aw.fujipid.PXR["pvinputtype"][0] in self.PXRconversiontoindex:
+            self.ETthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(aw.fujipid.PXR["pvinputtype"][0]))
         setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
         setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
         getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
@@ -18267,30 +18340,30 @@ class PXRpidDlgControl(QDialog):
             aw.qmc.adderror(QApplication.translate("Error Message", "setpoint(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def setthermocoupletype(self,PID):
-        conversiontoindex = [2,3,4,5,6,7,8,12] #2=J,3=K,4=R,5=B,6=S,7=T,8=E,12=N
         command = ""
         try:
             if PID == "ET":
                 index = self.ETthermocombobox.currentIndex()
-                value = conversiontoindex[index]
+                value = self.PXRconversiontoindex[index]
                 command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["pvinputtype"][1],value)                
             elif PID == "BT":
                 index = self.BTthermocombobox.currentIndex()
-                value = conversiontoindex[index]
                 if aw.ser.readBTpid[0] == 0:
+                    value = self.PXGconversiontoindex[index]
                     command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["pvinputtype"][1],value)                
                 elif aw.ser.readBTpid[0] == 1:
+                    value = self.PXRconversiontoindex[index]                    
                     command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["pvinputtype"][1],value)                
                 
             r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
                 if PID == "ET":   
-                    aw.fujipid.PXG4["pvinputtype"][0] = conversiontoindex[self.ETthermocombobox.currentIndex()]
+                    aw.fujipid.PXG4["pvinputtype"][0] = self.PXRconversiontoindex[self.ETthermocombobox.currentIndex()]
                 elif PID == "BT":
                     pass #this info is not stored
                         
-                message = QApplication.translate("StatusBar","Thermocouple type successfully set",None,QApplication.UnicodeUTF8)
+                message = QApplication.translate("StatusBar","Thermocouple type successfully set to %i"%(value),None,QApplication.UnicodeUTF8)
                 self.status.showMessage(message, 5000)
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None,QApplication.UnicodeUTF8),5000)
@@ -18298,7 +18371,7 @@ class PXRpidDlgControl(QDialog):
             aw.qmc.adderror(QApplication.translate("Error Message", "setthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def readthermocoupletype(self,PID):
-        conversiontoindex = [2,3,4,5,6,7,8,12] #2=J,3=K,4=R,5=B,6=S,7=T,8=E,12=N
+        message = "empty"
         command = ""
         try:
             if PID == "ET":
@@ -18310,19 +18383,25 @@ class PXRpidDlgControl(QDialog):
                     command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXR["pvinputtype"][1],1)
             if command:
                 Thtype = aw.fujipid.readoneword(command)
-                if Thtype in conversiontoindex:      #0-16 range
-                    if PID == "ET":
+                
+                if PID == "ET":
+                    if Thtype in self.PXRconversiontoindex:
                         aw.fujipid.PXR["pvinputtype"][0] = Thtype
-                    elif PID == "BT":
-                        if aw.ser.readBTpid[0] == 0:
-                            aw.fujipid.PXG4["pvinputtype"][0] = Thtype
-                        elif aw.ser.readBTpid[0] == 1:
-                            aw.fujipid.PXR["pvinputtype"][0] = Thtype             
-                    self.status.showMessage(self.thermotypes[conversiontoindex.index(Thtype)],5000)       
-                else:                    
-                    self.status.showMessage(QApplication.translate("StatusBar","Problem reading thermocouple type",None,QApplication.UnicodeUTF8),5000)
+                        message = "ET PXR input type %i: %s"%(Thtype,self.PXRthermotypes[self.PXRconversiontoindex.index(Thtype)])
+                elif PID == "BT":
+                    if aw.ser.readBTpid[0] == 0:
+                        if Thtype in self.PXGconversiontoindex:
+                            self.BTthermocombobox.setCurrentIndex(self.PXGconversiontoindex.index(Thtype))
+                            message = "BT PXG input type %i: %s"%(Thtype,self.PXGthermotypes[self.PXGconversiontoindex.index(Thtype)])
+                    elif aw.ser.readBTpid[0] == 1:
+                        if Thtype in self.PXRconversiontoindex:
+                            self.BTthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(Thtype))
+                            aw.fujipid.PXR["pvinputtype"][0] = Thtype
+                            message = "BT PXR input type %i: %s"%(Thtype,self.PXRthermotypes[self.PXRconversiontoindex.index(Thtype)])
+                self.status.showMessage(message,5000)
+                  
         except Exception,e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             
 
     def paintlabels(self):
@@ -19204,11 +19283,85 @@ class PXG4pidDlgControl(QDialog):
         BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
-        self.thermotypes = ["JPT 100","PT 100","J","K","R","B","S","T","E","N"]
-        conversiontoindex = [0,1,2,3,4,5,6,7,8,12]  #converts fuji PID types to indexes
-        self.ETthermocombobox.addItems(self.thermotypes)
-        self.BTthermocombobox.addItems(self.thermotypes)
-        self.ETthermocombobox.setCurrentIndex(conversiontoindex.index(aw.fujipid.PXG4["pvinputtype"][0]))
+
+        
+        ## FUJI PXG input types
+        ##0 (JPT 100'3f)
+        ##1 (PT 100'3f)
+        ##2 (J)
+        ##3 (K)
+        ##4 (R)
+        ##5 (B)
+        ##6 (S)
+        ##7 (T)
+        ##8 (E)
+        ##9 (no function)
+        ##10 (no function)
+        ##11 (no function)
+        ##12 (N)
+        ##13 (PL- 2)
+        ##14 (no function)
+        ##15 (0V to 5V / 0mA to 20mA
+        ##16 (1V to 5V/4mA to 20mA)
+        ##17 (0mV to 10V)
+        ##18 (2V to 10V)
+        ##19 (0mV to 100mV)
+        
+        self.PXGthermotypes = ["JPT 100",#0
+                            "PT 100",    #1
+                            "J",         #2
+                            "K",         #3
+                            "R",         #4
+                            "B",         #5
+                            "S",         #6
+                            "T",         #7
+                            "E",         #8
+                            "N",         #12
+                            "PL-2",      #13
+                            "0V-5V/0mA-20mA", #15
+                            "1V-5V/4mA-20mA", #16
+                            "0mV-10V",   #17
+                            "2V to 10V", #18
+                            "0mV-100mV"  #19
+                            ]
+        self.PXGconversiontoindex = [0,1,2,3,4,5,6,7,8,12,13,15,16,17,18,19]  #converts fuji PID PXG types to indexes
+
+        ## FUJI PXR input types
+        ##1 (PT 100'3f)
+        ##2 (J)
+        ##3 (K)
+        ##4 (R)
+        ##5 (B)
+        ##6 (S)
+        ##7 (T)
+        ##8 (E)
+        ##12 (N)
+        ##13 (PL- 2)
+        ##16 (1V to 5V/4mA to 20mA)
+
+        self.PXRthermotypes = [
+                            "PT 100",   #1
+                            "J",        #2
+                            "K",        #3
+                            "R",        #4
+                            "B",        #5
+                            "S",        #6
+                            "T",        #7
+                            "E",        #8
+                            "N",        #12
+                            "PL-2",    #13
+                            "1V to 5V/4mA to 20mA" #16
+                            ]
+        self.PXRconversiontoindex = [1,2,3,4,5,6,7,8,12,13,16]  #converts fuji PID PXR types to indexes
+                                        
+        self.ETthermocombobox.addItems(self.PXGthermotypes)
+        if aw.ser.readBTpid[0] == 0:        #fuji PXG                    
+            self.BTthermocombobox.addItems(self.PXGthermotypes)
+        else:                               #fuji PXR
+            self.BTthermocombobox.addItems(self.PXRthermotypes)            
+
+        if aw.fujipid.PXG4["pvinputtype"][0] in self.PXGconversiontoindex:
+            self.ETthermocombobox.setCurrentIndex(self.PXGconversiontoindex.index(aw.fujipid.PXG4["pvinputtype"][0]))
         setETthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
         setBTthermocouplebutton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
         getETthermocouplebutton = QPushButton(QApplication.translate("Button","Read",None, QApplication.UnicodeUTF8))
@@ -19338,6 +19491,8 @@ class PXG4pidDlgControl(QDialog):
         tab3Layoutbutton.addWidget(pidreadallbutton,1,0)
         tab3Layoutbutton.addWidget(cancel3button,1,1)
 
+
+        #tab 4
         tab4layout = QVBoxLayout()
         tab4layout.addWidget(self.segmenttable)
 
@@ -19429,26 +19584,26 @@ class PXG4pidDlgControl(QDialog):
             aw.qmc.adderror(QApplication.translate("Error Message", "setpoint(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def setthermocoupletype(self,PID):
-        conversiontoindex = [2,3,4,5,6,7,8,12] #2=J,3=K,4=R,5=B,6=S,7=T,8=E,12=N
         command = ""
         try:
             if PID == "ET":
                 index = self.ETthermocombobox.currentIndex()
-                value = conversiontoindex[index]
+                value = self.PXGconversiontoindex[index]
                 command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["pvinputtype"][1],value)                
             elif PID == "BT":
                 index = self.BTthermocombobox.currentIndex()
-                value = conversiontoindex[index]
                 if aw.ser.readBTpid[0] == 0:
+                    value = self.PXGconversiontoindex[index]
                     command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXG4["pvinputtype"][1],value)                
                 elif aw.ser.readBTpid[0] == 1:
+                    value = self.PXRconversiontoindex[index]                    
                     command = aw.fujipid.message2send(aw.ser.readBTpid[1],6,aw.fujipid.PXR["pvinputtype"][1],value)                
                 
             r = aw.ser.sendFUJIcommand(command,8)
             #check response from pid and update message on main window
             if r == command:
                 if PID == "ET":   
-                    aw.fujipid.PXG4["pvinputtype"][0] = conversiontoindex[self.ETthermocombobox.currentIndex()]
+                    aw.fujipid.PXG4["pvinputtype"][0] = self.PXGconversiontoindex[self.ETthermocombobox.currentIndex()]
                 elif PID == "BT":
                     pass #this info is not stored
                         
@@ -19459,9 +19614,9 @@ class PXG4pidDlgControl(QDialog):
         except Exception,e:
             aw.qmc.adderror(QApplication.translate("Error Message", "setthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
-    def readthermocoupletype(self,PID):
-        conversiontoindex = [2,3,4,5,6,7,8,12] #2=J,3=K,4=R,5=B,6=S,7=T,8=E,12=N
+    def readthermocoupletype(self,PID):            
         command = ""
+        message = "empty"
         try:
             if PID == "ET":
                 command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["pvinputtype"][1],1)
@@ -19471,20 +19626,24 @@ class PXG4pidDlgControl(QDialog):
                 elif aw.ser.readBTpid[0] == 1:
                     command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXR["pvinputtype"][1],1)  
             if command:
-                Thtype = aw.fujipid.readoneword(command)
-                if Thtype in conversiontoindex:      #0-16 range
-                    if PID == "ET":
+                Thtype = aw.fujipid.readoneword(command)                
+                if PID == "ET":
+                    if Thtype in self.PXGconversiontoindex:
                         aw.fujipid.PXG4["pvinputtype"][0] = Thtype
-                        self.ETthermocombobox.setCurrentIndex(conversiontoindex.index(Thtype))
-                    elif PID == "BT":
-                        if aw.ser.readBTpid[0] == 0:
-                            aw.fujipid.PXG4["pvinputtype"][0] = Thtype
-                        elif aw.ser.readBTpid[0] == 1:
-                            aw.fujipid.PXR["pvinputtype"][0] = Thtype
-                        self.BTthermocombobox.setCurrentIndex(conversiontoindex.index(Thtype))
-                    self.status.showMessage(self.thermotypes[conversiontoindex.index(Thtype)],5000)       
-                else:                    
-                    self.status.showMessage(QApplication.translate("StatusBar","Problem reading thermocouple type",None,QApplication.UnicodeUTF8),5000)
+                        self.ETthermocombobox.setCurrentIndex(self.PXGconversiontoindex.index(Thtype))
+                        message = "ET PXG type %i: %s"%(Thtype,self.PXGthermotypes[self.PXGconversiontoindex.index(Thtype)])
+                elif PID == "BT":
+                    if aw.ser.readBTpid[0] == 0:        #fuji PXG
+                        if Thtype in self.PXGconversiontoindex:
+                            message = "BT PXG type %i: %s"%(Thtype,self.PXGthermotypes[self.PXGconversiontoindex.index(Thtype)])
+                            self.BTthermocombobox.setCurrentIndex(self.PXGconversiontoindex.index(Thtype))
+
+                    elif aw.ser.readBTpid[0] == 1:      #fuji PXR
+                        if Thtype in self.PXRconversiontoindex:                            
+                            message = "BT PXR type %i: %s"%(Thtype,self.PXRthermotypes[self.PXRconversiontoindex.index(Thtype)])
+                            self.BTthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(Thtype))
+                            
+                    self.status.showMessage(message,5000)       
         except Exception,e:
             aw.qmc.adderror(QApplication.translate("Error Message", "readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             
