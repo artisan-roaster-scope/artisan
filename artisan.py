@@ -18386,6 +18386,7 @@ class PXRpidDlgControl(QDialog):
                 
                 if PID == "ET":
                     if Thtype in self.PXRconversiontoindex:
+                        self.ETthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(Thtype))                        
                         aw.fujipid.PXR["pvinputtype"][0] = Thtype
                         message = "ET PXR input type %i: %s"%(Thtype,self.PXRthermotypes[self.PXRconversiontoindex.index(Thtype)])
                 elif PID == "BT":
@@ -19626,12 +19627,14 @@ class PXG4pidDlgControl(QDialog):
                 elif aw.ser.readBTpid[0] == 1:
                     command = aw.fujipid.message2send(aw.ser.readBTpid[1],3,aw.fujipid.PXR["pvinputtype"][1],1)  
             if command:
-                Thtype = aw.fujipid.readoneword(command)                
+                Thtype = aw.fujipid.readoneword(command)
                 if PID == "ET":
                     if Thtype in self.PXGconversiontoindex:
                         aw.fujipid.PXG4["pvinputtype"][0] = Thtype
                         self.ETthermocombobox.setCurrentIndex(self.PXGconversiontoindex.index(Thtype))
                         message = "ET PXG type %i: %s"%(Thtype,self.PXGthermotypes[self.PXGconversiontoindex.index(Thtype)])
+                    else:
+                        message = "ERR"
                 elif PID == "BT":
                     if aw.ser.readBTpid[0] == 0:        #fuji PXG
                         if Thtype in self.PXGconversiontoindex:
@@ -19641,9 +19644,8 @@ class PXG4pidDlgControl(QDialog):
                     elif aw.ser.readBTpid[0] == 1:      #fuji PXR
                         if Thtype in self.PXRconversiontoindex:                            
                             message = "BT PXR type %i: %s"%(Thtype,self.PXRthermotypes[self.PXRconversiontoindex.index(Thtype)])
-                            self.BTthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(Thtype))
-                            
-                    self.status.showMessage(message,5000)       
+                            self.BTthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(Thtype))                            
+                self.status.showMessage(message,5000)       
         except Exception,e:
             aw.qmc.adderror(QApplication.translate("Error Message", "readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             
