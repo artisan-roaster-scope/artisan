@@ -660,6 +660,10 @@ class tgraphcanvas(FigureCanvas):
         self.extra309T4 = 0.
         self.extra309TX = 0.
 
+        #used by extra device +ArduinoTC4_XX to pass values
+        self.extraArduinoT1 = 0.
+        self.extraArduinoT2 = 0.
+
         #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT      
         self.dutycycle = 0.
         self.dutycycleTX = 0.
@@ -8990,7 +8994,7 @@ class HUDDlg(QDialog):
         equbackgroundbutton = QPushButton(QApplication.translate("Button","Set plot 1 as background",None, QApplication.UnicodeUTF8))
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equbackgroundbutton ,SIGNAL("clicked()"),self.setbackgroundequ1)
-        equvdevicebutton = QPushButton(QApplication.translate("Button","Add plot 1 and 2 as virtual devices",None, QApplication.UnicodeUTF8))
+        equvdevicebutton = QPushButton(QApplication.translate("Button","Add plot 1+2 as a virtual device",None, QApplication.UnicodeUTF8))
         equvdevicebutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equvdevicebutton ,SIGNAL("clicked()"),self.setvdevice)
         
@@ -9198,12 +9202,12 @@ class HUDDlg(QDialog):
 
     def setvdevice(self):
         # compute values
-        EQU = [unicode(self.equedit1.text()),unicode(self.equedit2.text())]  
+        EQU = [unicode(self.equedit1.text()),unicode(self.equedit2.text())]
         for e in range(2):
             #create y range
             y_range = []            
             for i in range(len(aw.qmc.timex)):
-                y_range.append(self.eval_curve_expression(EQU[e],i))
+                y_range.append(self.eval_curve_expression(EQU[e],aw.qmc.timex[i]))
             if e:
                 extratemp2 = y_range
             else:
@@ -9211,6 +9215,7 @@ class HUDDlg(QDialog):
         # add device
         aw.addDevice() 
         aw.qmc.extradevices[-1] = 25
+        
         # set colors
         aw.qmc.extradevicecolor1[-1] = aw.qmc.plotcurvecolor[0]
         aw.qmc.extradevicecolor2[-1] = aw.qmc.plotcurvecolor[1]
@@ -9222,8 +9227,8 @@ class HUDDlg(QDialog):
         aw.qmc.extratemp2[-1] = extratemp2
         aw.qmc.extratimex[-1] = aw.qmc.timex[:]  
         # redraw
-        aw.qmc.redraw(recomputeAllDeltas=False)
-        
+        aw.qmc.redraw(recomputeAllDeltas=False)            
+            
     def setbackgroundequ1(self):
         try:
             equ = unicode(self.equedit1.text())
@@ -13336,7 +13341,6 @@ class serialport(object):
         self.arduinoETChannel = "1"
         self.arduinoBTChannel = "2"
         self.ArduinoIsInitialized = 0
-        self.ArduinoUnit = ""
 
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
@@ -13764,25 +13768,10 @@ class serialport(object):
         return tx,t2,t1
 
     def ARDUINOTC4_34(self):
-        if self.arduinoETChannel == None or self.arduinoBTChannel == None:
-            tx = aw.qmc.timeclock.elapsed()/1000.
-            return tx,0.,0.
-        
-        vals = ["1","2","3","4"]
-        vals.pop(vals.index(aw.ser.arduinoETChannel))
-        vals.pop(vals.index(aw.ser.arduinoBTChannel))
-        oldETchan = aw.ser.arduinoETChannel
-        oldBTchan = aw.ser.arduinoBTChannel
-        aw.ser.arduinoETChannel = vals[0]
-        aw.ser.arduinoBTChannel = vals[1]
-
-        #read temp but with different command 
-        t2,t1 = aw.ser.ARDUINOTC4temperature()
+        t1 = aw.qmc.extraArduinoT1
+        t2 = aw.qmc.extraArduinoT2
         tx = aw.qmc.timeclock.elapsed()/1000.
-                 
-        aw.ser.arduinoETChannel = oldETchan         
-        aw.ser.arduinoBTChannel = oldBTchan
-                 
+        
         return tx,t2,t1
 
     def TEVA18B(self):
@@ -14277,72 +14266,71 @@ class serialport(object):
                 self.ArduinoUnit = ""
                 
             if self.SP.isOpen():
-
+                #INITIALIZE (ONLY ONCE)
                 if not self.ArduinoIsInitialized:
                     self.SP.flushInput()
                     self.SP.flushOutput()
 
-                    command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + "00\n"  
-                    self.SP.write(command)
+                    #build initialization command 
+                    #If extra device +ArduinoTC4_XX present. read all 4 Ts
+                    if 28 in aw.qmc.extradevices:
+                        vals = ["1","2","3","4"]
+                        vals.pop(vals.index(aw.ser.arduinoETChannel))
+                        vals.pop(vals.index(aw.ser.arduinoBTChannel))
+                        command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + vals[0] + vals[1] + "\n"
+                    else:
+                    #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
+                        command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + "00\n"
 
-                    try:
+                    self.SP.write(command)       #write
+                    
+                    result = ""
+                    result = self.SP.readline()  #read
+
+                    if (not result == "" and not result.startswith("#")):
+                        raise Exception(QApplication.translate("Error Message","Arduino could not set Channels",None, QApplication.UnicodeUTF8))
+                    
+                    elif result.startswith("#"):
+                        #OK. NOW SET UNITS           
+                        self.SP.flushInput()
+                        self.SP.flushOutput()
+                    
+                        command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
+                        self.SP.write(command)
                         result = ""
                         result = self.SP.readline()
-
                         if (not result == "" and not result.startswith("#")):
-                            raise
-                        elif result.startswith("#"):
+                            raise Exception(QApplication.translate("Arduino could not set temperature UNIT",None, QApplication.UnicodeUTF8))
+                        else:
+                            ### EVERYTHING OK  ###
                             self.ArduinoIsInitialized = 1
-                            self.ArduinoUnit = ""  # For good measure...
-                    except:
-                        aw.qmc.errorlog.append(QApplication.translate("Error Message","Arduino could not set channels: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)) + result
-
-                if not self.ArduinoUnit == aw.qmc.mode:
-                    self.SP.flushInput()
-                    self.SP.flushOutput()
-                
-                    command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
-                    self.ArduinoUnit = aw.qmc.mode
-                    self.SP.write(command)
-
-                    try:
-                        result = ""
-                        result = self.SP.readline()
-                        if (not result == "" and not result.startswith("#")):
-                            raise
-                    except:
-                        aw.qmc.errorlog.append(QApplication.translate("Error Message","Arduino could not set temperature unit: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)) + result
-                        self.ArduinoUnit = ""
-
+                        
+                #READ TEMPERATURE
                 self.SP.flushInput()
                 self.SP.flushOutput()
 
-                command = "READ\n"  #Read command. Will used set channels and units
+                command = "READ\n"  #Read command. 
                 self.SP.write(command)
                                 
-                res = self.SP.readline().rsplit(',')  # a list [t0,t1,t2] with t0 = ambient; t1 = ET; t2 = BT (for now)
-                t0 = 0 
-                if len(aw.qmc.timex) > 2:                           
-                    t1 = aw.qmc.temp1[-1]
-                    t2 = aw.qmc.temp2[-1]     
+                res = self.SP.readline().rsplit(',')  #response: list ["t0","t1","t2"] with t0 = init temp; t1 = ET; t2 = BT
+
+                #if extra device +ArduinoTC4_XX
+                if 28 in aw.qmc.extradevices:
+                    t1 = float(res[0])
+                    t2 = float(res[1])
+                    #set the other values to extra temp variables
+                    aw.qmc.extraArduinoT1 = float(res[2])                  
+                    aw.qmc.extraArduinoT2 = float(res[3])
                 else:
-                    t1 = t2 = -1
-                try:
-                    t0 = float(res[0])
-                except:
-                    pass
-                try:
+                    #no extra device
                     t1 = float(res[1])
-                except:
-                    pass
-                try:
                     t2 = float(res[2])
-                except:
-                    pass
-                if t0 and not self.ArduinoIsInitialized:
-                    aw.qmc.ambientTemp = t0
                     
                 return t1, t2
+            
+        except Exception,e:
+             aw.qmc.adderror(QApplication.translate("Error Message", "Exception: ser.ARDUINOTC4temperature(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+             return -1.,-1.
 
         except serial.SerialException, e:
             error = QApplication.translate("Error Message","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)
@@ -14355,9 +14343,8 @@ class serialport(object):
             if len(aw.qmc.timex) > 2:                           
                 return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
             else:
-                return -1,-1
+                return -1.,-1.
         finally:
-            #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + command + " || Rx = " + res)
@@ -18103,6 +18090,7 @@ class PXRpidDlgControl(QDialog):
         BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
+        self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
 
         ## FUJI PXG input types
         ##0 (JPT 100'3f)
@@ -19284,7 +19272,7 @@ class PXG4pidDlgControl(QDialog):
         BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
-
+        self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
         
         ## FUJI PXG input types
         ##0 (JPT 100'3f)
