@@ -6141,21 +6141,6 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.qmc.reset()
                 self.qmc.OnMonitor()
-
-        #prevents deleting accidentally a finished roast
-        if self.safesaveflag== True:
-            string = QApplication.translate("MessageBox","Do you want to save the profile?", None, QApplication.UnicodeUTF8)
-            reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Profile unsaved", None, QApplication.UnicodeUTF8),string,
-                                QMessageBox.Reset |QMessageBox.Save|QMessageBox.Cancel)
-            if reply == QMessageBox.Reset :
-                self.safesaveflag == False
-            elif reply == QMessageBox.Cancel:            
-                aw.sendmessage(QApplication.translate("Message Area","Reset has been cancelled",None, QApplication.UnicodeUTF8))
-                return
-            elif reply == QMessageBox.Save:
-                aw.fileSave(None)
-                return
-                
             
     def fileLoad(self):
         fileName = self.ArtisanOpenFileDialog()
