@@ -6090,7 +6090,28 @@ class ApplicationWindow(QMainWindow):
         return file
         
     def newRoast(self):
-        #stop current roast (if any)
+        #####################################
+        #IF there is an ongoing roast (if ON):
+        #   (this block allows batch processing using the autosave feature)
+        #   if no CHARGE found:
+        #       return
+        #   if no DROP found:
+        #       use last data point as DROP (mark DROP)
+        #   stop recording
+        #   if there is an autosave path (from autosafe config) AND the autosave flag is ON:
+        #       create filename using the autosavepath and date+time
+        #   else:
+        #       start autosave Dialog to set the name path
+        #       return (nothing saved. Cancell New)
+        #   reset  (delete everything)
+        #   start new roast (ON)
+        #ELSE (if recording is stoped - OFF):
+        #   if no profile present (no data present or profile loaded):
+        #       start new roast (ON)
+        #   else:
+        #       reset (reset offers three options: Save,Continue,Cancell)
+        #       ON
+        #########################################
         if self.qmc.flagon:
             if self.qmc.timeindex[0] == -1:
                 self.sendmessage(QApplication.translate("Message Area","No profile found", None, QApplication.UnicodeUTF8))
@@ -6115,7 +6136,26 @@ class ApplicationWindow(QMainWindow):
 
             self.sendmessage(QApplication.translate("Message Area","%1 has been saved. New roast has started", None, QApplication.UnicodeUTF8).arg(filename))
         else:
-            self.qmc.OnMonitor()
+            if not len(self.qmc.timex):
+                self.qmc.OnMonitor()
+            else:
+                self.qmc.reset()
+                self.qmc.OnMonitor()
+
+        #prevents deleting accidentally a finished roast
+        if self.safesaveflag== True:
+            string = QApplication.translate("MessageBox","Do you want to save the profile?", None, QApplication.UnicodeUTF8)
+            reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Profile unsaved", None, QApplication.UnicodeUTF8),string,
+                                QMessageBox.Reset |QMessageBox.Save|QMessageBox.Cancel)
+            if reply == QMessageBox.Reset :
+                self.safesaveflag == False
+            elif reply == QMessageBox.Cancel:            
+                aw.sendmessage(QApplication.translate("Message Area","Reset has been cancelled",None, QApplication.UnicodeUTF8))
+                return
+            elif reply == QMessageBox.Save:
+                aw.fileSave(None)
+                return
+                
             
     def fileLoad(self):
         fileName = self.ArtisanOpenFileDialog()
