@@ -610,6 +610,7 @@ class tgraphcanvas(FigureCanvas):
         self.reproducedesigner = 0      #flag to add events to help reproduce (replay) the profile: 0 = none; 1 = sv; 2 = ramp
 
         ###########################         wheel graph variables     ################################
+        self.wheelflag = False
         #data containers for wheel
         self.wheelnames,self.segmentlengths,self.segmentsalpha,self.wheellabelparent,self.wheelcolor = [],[],[],[],[]
 
@@ -1249,7 +1250,9 @@ class tgraphcanvas(FigureCanvas):
             aw.e4buttondialog.setVisible(False)
             if aw.minieventsflag:
                 aw.EventsGroupLayout.setVisible(True)
-
+                
+        self.wheelflag = False
+        
         #check and turn off mouse cross marker
         if self.crossmarker:
             self.togglecrosslines()            
@@ -2973,32 +2976,16 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.-len(st2)*4,statisticslower,st2,color=self.palette["text"],fontsize=11)
                     self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.-len(st3)*4,statisticslower,st3,color=self.palette["text"],fontsize=11)
             if self.statisticsflags[3]:
-                #calculate AREA under BT and ET
-                AccBT = 0.0
-                AccMET = 0.0
-
-                #find the index of time when the roasts starts and finish 
-                for i in range(len(self.timex)):
-                    if self.timex[i] > self.timex[self.timeindex[0]]:
-                        break            
-                for j in range(len(self.timex)):
-                    if self.timex[j] > self.timex[self.timeindex[6]]:
-                        break
-
-                for k in range(i,j):
-                    timeD = self.timex[k+1] - self.timex[k]
-                    AccBT += self.temp2[k]*timeD
-                    AccMET += self.temp1[k]*timeD
-                    
-                deltaAcc = int(AccMET) - int(AccBT)
+                deltatemp = u"%.1f"%(self.temp2[self.timeindex[6]]-LP)
                         
                 lowestBT = u"%.1f"%LP
                 #timeLP = unicode(self.stringfromseconds(self.timex[k] - self.timex[self.timeindex[0]]))
                 timez = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
-                #end temperature
+                ror = u"%.2f"%(((self.temp2[self.timeindex[6]]-LP)/(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))*60.)
 
-                strline = QApplication.translate("Scope Label", "[BT = %1 - %2] [ETarea - BTarea = %3] [Time = %4]", None,
-                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.temp2[self.timeindex[6]] + self.mode).arg(unicode(deltaAcc)).arg(timez)                              
+                #end temperature
+                strline = QApplication.translate("Scope Label", "BT = %1 - %2 (%3)   Time = %4   RoR = %5 d/m", None,
+                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.temp2[self.timeindex[6]] + self.mode).arg(deltatemp).arg(timez).arg(ror)                              
                             
                 #text metrics 
                 #if self.mode == u"C":
@@ -4097,14 +4084,16 @@ class tgraphcanvas(FigureCanvas):
 
     def editmode(self):
         self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
-        self.disconnectWheel()
+        self.disconnectWheel(buttomvisibility=False)
         aw.graphwheel()
 
     def exitviewmode(self):
         self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
         self.disconnectWheel()
+        self.redraw(recomputeAllDeltas=False)
         
     def connectWheel(self):
+        self.wheelflag = True
         aw.lowerbuttondialog.setVisible(False)
         aw.e1buttondialog.setVisible(False)
         aw.e2buttondialog.setVisible(False)
@@ -4116,27 +4105,26 @@ class tgraphcanvas(FigureCanvas):
         self.wheelconnections[1] = self.fig.canvas.mpl_connect('button_press_event', self.wheel_menu)           #right click menu context
         self.wheelconnections[2] = self.fig.canvas.mpl_connect('button_release_event', self.wheel_release)
 
-    def disconnectWheel(self):
+    def disconnectWheel(self,buttomvisibility=True):
+        self.wheelflag = False
         self.setCursor(Qt.ArrowCursor)        
         self.fig.canvas.mpl_disconnect(self.wheelconnections[0])
         self.fig.canvas.mpl_disconnect(self.wheelconnections[1])
         self.fig.canvas.mpl_disconnect(self.wheelconnections[2])
-
-        self.redraw(recomputeAllDeltas=False)
-        aw.lowerbuttondialog.setVisible(True)
-        if aw.extraeventsbuttonsflag:
-            aw.e1buttondialog.setVisible(True) 
-            aw.e2buttondialog.setVisible(True) 
-            aw.e3buttondialog.setVisible(True) 
-            aw.e4buttondialog.setVisible(True)
-        else:
-            aw.e1buttondialog.setVisible(False) 
-            aw.e2buttondialog.setVisible(False) 
-            aw.e3buttondialog.setVisible(False) 
-            aw.e4buttondialog.setVisible(False)
-        if aw.minieventsflag:
-            aw.EventsGroupLayout.setVisible(True)
-
+        if buttomvisibility:
+            aw.lowerbuttondialog.setVisible(True)
+            if aw.extraeventsbuttonsflag:
+                aw.e1buttondialog.setVisible(True) 
+                aw.e2buttondialog.setVisible(True) 
+                aw.e3buttondialog.setVisible(True) 
+                aw.e4buttondialog.setVisible(True)
+            else:
+                aw.e1buttondialog.setVisible(False) 
+                aw.e2buttondialog.setVisible(False) 
+                aw.e3buttondialog.setVisible(False) 
+                aw.e4buttondialog.setVisible(False)
+            if aw.minieventsflag:
+                aw.EventsGroupLayout.setVisible(True)
 
     def drawWheel(self):
         try:
@@ -5419,6 +5407,7 @@ class ApplicationWindow(QMainWindow):
         #state flag for above. It is initialized by pressing SPACE or left-right arrows
         self.keyboardmoveflag = 0
 
+
         ####################   APPLICATION WINDOW (AW) LAYOUT  ##############################################
         
         mainlayout = QVBoxLayout(self.main_widget)
@@ -5633,8 +5622,22 @@ class ApplicationWindow(QMainWindow):
         if key == 16777220:                 #TURN ON/OFF KEYBOARD MOVES
             self.releaseminieditor()
             self.moveKbutton("enter")
-        if key == 16777216: 	    	    #ESCAPE 	
-            self.releaseminieditor()          
+        if key == 16777216: 	    	    #ESCAPE
+            #if designer ON
+            if self.qmc.designerflag:
+                string = QApplication.translate("exit designer","Exit Designer??", None, QApplication.UnicodeUTF8)
+                reply = QMessageBox.question(self,QApplication.translate("extradevices", "Designer Mode ON",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
+                if reply == QMessageBox.Yes:
+                    self.stopdesigner()
+                else:
+                    return
+            #if wheel graph ON
+               #NOT finished 
+##            if  self.qmc.wheelflag:
+##                self.qmc.redraw()
+##                self.qmc.disconnectWheel()
+            if self.minieventsflag:                
+                self.releaseminieditor()          
         elif key == 16777234:               #MOVES CURRENT BUTTON LEFT
             self.moveKbutton("left")
         elif key == 16777236:               #MOVES CURRENT BUTTON RIGHT
@@ -5949,16 +5952,13 @@ class ApplicationWindow(QMainWindow):
            self.etimeline.setText(timez)
            self.valueComboBox.setCurrentIndex(self.qmc.specialeventsvalue[currentevent-1])
            self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
-           etimeindex = self.qmc.specialevents[currentevent-1]
-           #plot little dot 
+           #plot little dot lines
            self.qmc.resetlines() #clear old
-           #plot highest ET or BT (sometimes only BT is plot (et is zero))
+           etimeindex = self.qmc.specialevents[currentevent-1]
            if currentevent:
-               if self.qmc.temp1[etimeindex] > self.qmc.temp2[etimeindex]:
-                   self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["et"])
-               else:
-                   self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp2[etimeindex], "o", color = self.qmc.palette["bt"])
-               
+               x = [self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex]]
+               y = [(self.qmc.ylimit_min-100),self.qmc.temp2[etimeindex],self.qmc.temp1[etimeindex],(self.qmc.ylimit+100)]
+               self.qmc.ax.plot(x,y,marker ="o",markersize=12,color ="yellow",linestyle="-",linewidth = 7,alpha=.4)
            self.qmc.fig.canvas.draw()
 
     #updates events from mini edtitor	
@@ -8100,8 +8100,8 @@ $cupping_notes
         dialog.show()
 
     def graphwheel(self):
-        dialog = WheelDlg(self)
-        dialog.show()
+        wheeldialog = WheelDlg(self)
+        wheeldialog.show()
 
     def background(self):
         dialog = backgroundDLG(self)
@@ -11395,6 +11395,12 @@ class EventsDlg(QDialog):
         valuethicknesslabel = QLabel(QApplication.translate("label","Line Thickness",None, QApplication.UnicodeUTF8))
         valuealphalabel = QLabel(QApplication.translate("label","Opacity",None, QApplication.UnicodeUTF8))
         valuesizelabel = QLabel(QApplication.translate("label","Marker size",None, QApplication.UnicodeUTF8))
+
+        valuecolorlabel.setMaximumSize(120,20)
+        valuesymbollabel.setMaximumSize(120,20)
+        valuethicknesslabel.setMaximumSize(120,20)
+        valuealphalabel.setMaximumSize(120,20)
+        valuesizelabel.setMaximumSize(120,20)
 
         self.E1thicknessSpinBox = QSpinBox()
         self.E1thicknessSpinBox.setRange(1,10)
@@ -17087,6 +17093,8 @@ class WheelDlg(QDialog):
         super(WheelDlg,self).__init__(parent)
         self.setModal(False)
         self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None, QApplication.UnicodeUTF8))
+        
+        self.viewmodeflag = False
 
         aw.lowerbuttondialog.setVisible(False)
         aw.e1buttondialog.setVisible(False)
@@ -17675,23 +17683,15 @@ class WheelDlg(QDialog):
         aw.qmc.drawWheel()
 
     def closeEvent(self, event):
-        aw.qmc.disconnectWheel()
-        aw.qmc.redraw(recomputeAllDeltas=False)
-        aw.lowerbuttondialog.setVisible(True)
-        if aw.extraeventsbuttonsflag:
-            aw.e1buttondialog.setVisible(True) 
-            aw.e2buttondialog.setVisible(True) 
-            aw.e3buttondialog.setVisible(True) 
-            aw.e4buttondialog.setVisible(True)
+        #if switcing to View-mode don't redraw() (faster)
+        if not self.viewmodeflag:
+            aw.qmc.disconnectWheel()
+            aw.qmc.redraw(recomputeAllDeltas=False)
         else:
-            aw.e1buttondialog.setVisible(False) 
-            aw.e2buttondialog.setVisible(False) 
-            aw.e3buttondialog.setVisible(False) 
-            aw.e4buttondialog.setVisible(False)
-        if aw.minieventsflag:
-            aw.EventsGroupLayout.setVisible(True)
-
+            aw.qmc.disconnectWheel(buttomvisibility=False)
+    
     def viewmode(self):
+        self.viewmodeflag = True
         self.close()
         aw.qmc.connectWheel()
         aw.qmc.drawWheel()
