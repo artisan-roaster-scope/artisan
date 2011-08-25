@@ -383,7 +383,8 @@ class tgraphcanvas(FigureCanvas):
         #applies a Y(x) function to ET or BT 
         self.ETfunction,self.BTfunction = u"",u""           
 
-        #prevents accidentally deleting a finished profile. Activated at [DROP]
+        #put a "self.safesaveflag = True" whenever there is a change of a profile like at [DROP], edit properties Dialog, etc
+        #prevents accidentally deleting a modified profile. 
         self.safesaveflag = False
 
         #background profile
@@ -1110,18 +1111,21 @@ class tgraphcanvas(FigureCanvas):
         
         #prevents deleting accidentally a finished roast
         if self.safesaveflag== True:
-            string = QApplication.translate("MessageBox","Do you want to save the profile?", None, QApplication.UnicodeUTF8)
+            string = QApplication.translate("MessageBox","Save the profile, Discard the profile (Reset), or Cancel?", None, QApplication.UnicodeUTF8)
             reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Profile unsaved", None, QApplication.UnicodeUTF8),string,
-                                QMessageBox.Reset |QMessageBox.Save|QMessageBox.Cancel)
-            if reply == QMessageBox.Reset :
-                self.safesaveflag == False
+                                QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
+            if reply == QMessageBox.Save:
+                aw.fileSave(None)  #if accepted, makes safesaveflag = False
+                return
+            elif reply == QMessageBox.Discard:
+                pass
             elif reply == QMessageBox.Cancel:            
                 aw.sendmessage(QApplication.translate("Message Area","Reset has been cancelled",None, QApplication.UnicodeUTF8))
                 return
-            elif reply == QMessageBox.Save:
-                aw.fileSave(None)
-                return
-            
+
+        #prevents accidentally deleting a modified profile. 
+        self.safesaveflag = False  #now flag is cleared (OFF)
+        
         if self.HUDflag:
             self.toggleHUD()       
         self.hudresizeflag = False
@@ -1990,6 +1994,9 @@ class tgraphcanvas(FigureCanvas):
                         self.ambientTemp = self.fromCtoF(self.ambientTemp)  #ambient temperature
                         self.bag_humidity[1] = self.fromCtoF(self.bag_humidity[1]) #bag humidity temperature
 
+                        #prevents accidentally deleting a modified profile. 
+                        self.safesaveflag = True
+
                         #background
                         for i in range(len(self.timeB)):
                             self.temp1B[i] = self.fromCtoF(self.temp1B[i])
@@ -2115,8 +2122,7 @@ class tgraphcanvas(FigureCanvas):
         self.ax1.set_thetagrids(g_angle)
         self.ax1.set_rmax(1.)
         self.ax1.set_autoscale_on(False)
-        self.ax1.grid(True,linewidth=1.,color='green',linestyle = "-",alpha=.3)
-
+        self.ax1.grid(True,linewidth=1.,color='green', linestyle = "-",alpha=.3)
 
         #create water marks 6-7 anf 8-9
         self.ax1.bar(.1, .1, width=2.*pi, bottom=.6,color="green",linewidth=0.,alpha = .1)
@@ -2192,6 +2198,7 @@ class tgraphcanvas(FigureCanvas):
 
     #Turns ON/OFF flag self.flagon to read and plot. Called from push button_1. 
     def OnMonitor(self):
+        #turn ON
         if not self.flagon:
             if self.designerflag: return
             
@@ -2207,12 +2214,16 @@ class tgraphcanvas(FigureCanvas):
                 self.updateLCDtime()
             else:
                 self.updateLCDtime()
-                
+        #turn OFF        
         else:
             self.flagon = False
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
 
             self.redraw()
+
+            #prevents accidentally deleting a modified profile.
+            if len(self.timex) > 2:
+                self.safesaveflag = True
             
             aw.soundpop()
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
@@ -2223,6 +2234,9 @@ class tgraphcanvas(FigureCanvas):
     def markCharge(self):
         try:
             if self.flagon:
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
                 self.samplingsemaphore.acquire(1)
 
                 if self.device != 18:
@@ -2279,6 +2293,9 @@ class tgraphcanvas(FigureCanvas):
     def markDryEnd(self):
         try:
             if self.flagon:
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
                 self.samplingsemaphore.acquire(1)
 
                 if self.device != 18:
@@ -2338,6 +2355,9 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cstart(self):
         try:
             if self.flagon:
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
                 self.samplingsemaphore.acquire(1)
                 
                 # record 1Cs only if Charge mark has been done
@@ -2400,7 +2420,9 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cend(self):
         try:
             if self.flagon:
-
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
                 self.samplingsemaphore.acquire(1)
 
                 if self.device != 18:
@@ -2456,6 +2478,9 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cstart(self):
         try:
             if self.flagon:
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
                 self.samplingsemaphore.acquire(1)
 
                 if self.device != 18:
@@ -2512,6 +2537,9 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cend(self):
         try:
             if self.flagon:
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
                 self.samplingsemaphore.acquire(1)
                 
                 if self.device != 18:                
@@ -2566,6 +2594,9 @@ class tgraphcanvas(FigureCanvas):
     def markDrop(self):
         try:
             if self.flagon:
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
                 self.samplingsemaphore.acquire(1)
 
                 if self.device != 18:
@@ -2618,8 +2649,6 @@ class tgraphcanvas(FigureCanvas):
                 
                 aw.soundpop()
                 
-                #prevents accidentally deleting a finished roast
-                self.safesaveflag = True
             else:
                 message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -2637,6 +2666,9 @@ class tgraphcanvas(FigureCanvas):
     def EventRecord(self,extraevent=None):
         try:
             if self.flagon:
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
                 #[EVENT] push button feedback
                 aw.button_11.setFlat(True)
                 aw.button_11.setDisabled(True)
@@ -2764,6 +2796,10 @@ class tgraphcanvas(FigureCanvas):
     def DeviceEventRecord(self,command):
         try:
             if self.flagon:
+
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
                 self.samplingsemaphore.acquire(1)
                 #number of events
                 Nevents = len(self.specialevents)
@@ -3746,6 +3782,9 @@ class tgraphcanvas(FigureCanvas):
     #converts from a designer profile to a normal profile	        
     def convert_designer(self):
         try:
+            #prevents accidentally deleting a modified profile. 
+            self.safesaveflag = True
+            
             #create functions        
             funcBT = inter.UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree )
             funcET = inter.UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree )
@@ -4363,6 +4402,9 @@ class SampleThread(QThread):
             
             #apply sampling interval here                
             libtime.sleep(aw.qmc.delay/1000.)
+
+            ##### lock resources  #########
+            aw.qmc.samplingsemaphore.acquire(1)
             
             #if using a meter (thermocouple device)
             if aw.qmc.device != 18:
@@ -4372,9 +4414,6 @@ class SampleThread(QThread):
                     t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
                 if len(aw.qmc.BTfunction):
                     t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
-
-                ##### lock resources  #########
-                aw.qmc.samplingsemaphore.acquire(1)
 
                 length_of_qmc_timex = len(aw.qmc.timex)
                 #filter droputs 
@@ -4479,22 +4518,19 @@ class SampleThread(QThread):
                 if nxdevices:
                     les,led,let,letl =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1),len(aw.qmc.extratemp1lines)
                     if les == led == let == letl:
-                        for i in range(nxdevices):
-                            try:
-                                extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                                if len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                                if len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                                aw.qmc.extratemp1[i].append(extrat1)
-                                aw.qmc.extratemp2[i].append(extrat2)                        
-                                aw.qmc.extratimex[i].append(extratx)
-                                #print extrat1,extrat2,extratx
-                                # update extra lines 
-                                aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
-                                aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
-                            except Exception,e:
-                                pass
+                        for i in range(nxdevices):                            
+                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                            if len(aw.qmc.extramathexpression1[i]):
+                                extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                            if len(aw.qmc.extramathexpression2[i]):
+                                extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                            aw.qmc.extratemp1[i].append(extrat1)
+                            aw.qmc.extratemp2[i].append(extrat2)                        
+                            aw.qmc.extratimex[i].append(extratx)
+                            # update extra lines 
+                            aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                            aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+
                     #ERROR
                     else:
                         lengths = [les,led,let,letl]
@@ -4532,9 +4568,6 @@ class SampleThread(QThread):
             # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()        
             else:
                 tx = int(aw.qmc.timeclock.elapsed()/1000.)
-                
-                #### lock resources  ############
-                aw.qmc.samplingsemaphore.acquire(1)
 
                 #readjust xlimit of plot if needed
                 if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds  
@@ -4545,7 +4578,7 @@ class SampleThread(QThread):
                 #add to plot a vertical time line
                 aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
 
-            ##### release resources  #########    
+            ##### release semaphore  #########    
             aw.qmc.samplingsemaphore.release(1)
 
             #update screen in main GUI thread
@@ -4561,9 +4594,12 @@ class SampleThread(QThread):
             aw.qmc.flagon = False
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
             return
+
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)            
                       
     def run(self):
-        timedelay = aw.qmc.delay/1000.
         if not aw.qmc.flagon:
             return
         while True:
@@ -5632,10 +5668,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     return
             #if wheel graph ON
-               #NOT finished 
-##            if  self.qmc.wheelflag:
-##                self.qmc.redraw()
-##                self.qmc.disconnectWheel()
+            elif  self.qmc.wheelflag:
+                self.qmc.disconnectWheel()
+                self.qmc.redraw(recomputeAllDeltas=False)
             if self.minieventsflag:                
                 self.releaseminieditor()          
         elif key == 16777234:               #MOVES CURRENT BUTTON LEFT
@@ -5648,31 +5683,21 @@ class ApplicationWindow(QMainWindow):
             self.qmc.togglecrosslines()
         elif key == 66:                     #letter B hides/shows extra rows of event buttons
             self.toggleextraeventrows()
-        #Extra event buttons palette
-        elif key == 48:                     
-            self.setbuttonsfrom(0)
-        elif key == 49:                     
-            self.setbuttonsfrom(1)
-        elif key == 50:                     
-            self.setbuttonsfrom(2)
-        elif key == 51:                    
-            self.setbuttonsfrom(3)
-        elif key == 52:                     
-            self.setbuttonsfrom(4)
-        elif key == 53:                  
-            self.setbuttonsfrom(5)
-        elif key == 54:                 
-            self.setbuttonsfrom(6)
-        elif key == 55:                   
-            self.setbuttonsfrom(7)
-        elif key == 56:                     
-            self.setbuttonsfrom(8)
-        elif key == 57:                 
-            self.setbuttonsfrom(9)
+        #Extra event buttons palette. Numerical keys [0,1,2,3,4,5,6,7,8,9]
+        elif key > 47 and key < 58:
+            button = [48,49,50,51,52,53,54,55,56,57] 
+            palette = button.index(key)
+            string = QApplication.translate("change palette","Changing palettes will delete the present extra event buttons.\nRestore palette %i?"%palette,
+                                            None, QApplication.UnicodeUTF8)
+            reply = QMessageBox.question(self,QApplication.translate("palette", "Extra Event Button Palette",None, QApplication.UnicodeUTF8),
+                                         string,QMessageBox.Yes|QMessageBox.Cancel)
+            if reply == QMessageBox.Yes:
+                self.setbuttonsfrom(button.index(key))
+            else:
+                return            
         else:
             QWidget.keyPressEvent(self, event)
 
-    
     def releaseminieditor(self):
         if self.minieventsflag:
             self.eNumberSpinBox.releaseKeyboard()
@@ -6824,14 +6849,16 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Device")
             self.qmc.device = settings.value("id",self.qmc.device).toInt()[0]
             
-            #only leave operational the control button if the device is Fuji PID
-            #the SV buttons are activated from the PID control panel 
-            if self.qmc.device == 0 or self.qmc.device == 26:
-                self.button_10.setVisible(True)
-                self.label6.setVisible(True)
-                self.lcd6.setVisible(True)
-                self.label7.setVisible(True)
-                self.lcd7.setVisible(True)
+            # activate CONTROL BUTTON
+            if self.qmc.device == 0:
+                self.button_10.setVisible(True) #CONTROL BUTTON
+                self.label6.setVisible(True)    #PID SV LABEL
+                self.lcd6.setVisible(True)      #PID SV LCD
+                self.label7.setVisible(True)    #PID DUTYCYLE LABEL
+                self.lcd7.setVisible(True)      #PID DUTYCYCLE LCD
+            elif self.qmc.device == 26 or self.qmc.device == 19:   #DEVICE 26 = DTA; DEVICE 19 = ARDUINOTC4
+                self.button_10.setVisible(True) #CONTROL BUTTON
+                
             if settings.contains("controlETpid"):
                 self.ser.controlETpid = map(lambda x:x.toInt()[0],settings.value("controlETpid").toList())
             if settings.contains("readBTpid"):
@@ -8517,7 +8544,14 @@ $cupping_notes
 
         self.HUD.setPixmap(img)
 
-    def showHUDthermal(self): 
+    def showHUDthermal(self):
+        if self.qmc.hudresizeflag:
+            #turn off
+            self.qmc.toggleHUD()            
+            #turn back ON to adquire new size
+            self.qmc.toggleHUD()
+            self.qmc.hudresizeflag = False
+        
         img = QPixmap().grabWidget(aw.qmc)        
         p = QPainter(img)
         Wwidth= aw.qmc.size().width()
@@ -10067,6 +10101,13 @@ class editGraphDlg(QDialog):
                
         self.setLayout(totallayout)
 
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
+
     def roastpropertiesChanged(self):
         if self.roastproperties.isChecked():
             aw.qmc.roastpropertiesflag = 1
@@ -10284,7 +10325,10 @@ class editGraphDlg(QDialog):
                 
     def accept(self):
         #check for graph
-        if len(aw.qmc.timex):   
+        if len(aw.qmc.timex):
+            
+            #prevents accidentally deleting a modified profile. 
+            aw.qmc.safesaveflag = True
 
             if self.chargeeditcopy != unicode(self.chargeedit.text()):
                 #if there is a CHARGE recorded and the time entered is positive. Use relative time
@@ -10482,7 +10526,13 @@ class platformDlg(QDialog):
                                
         self.setLayout(layout)
             
-        
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
+
 
 ##########################################################################
 #####################  VIEW ATISAN SETTINGS ##############################
@@ -10530,6 +10580,12 @@ class artisansettingsDlg(QDialog):
             self.htmlsettings += "<b>" + key + " = </b> <i>" + settingsdict[key] + "</i><br><br>"
         self.settingsEdit.setHtml(self.htmlsettings)
 
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
 ##########################################################################
 #####################  VIEW SERIAL LOG DLG  ##############################
@@ -10583,6 +10639,13 @@ class serialLogDlg(QDialog):
             aw.seriallogflag = True
         else:
             aw.seriallogflag = False
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
             
 ##########################################################################
 #####################  VIEW ERROR LOG DLG  ###############################
@@ -10615,6 +10678,14 @@ class errorDlg(QDialog):
                                
         self.setLayout(layout)
 
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
+
+
 ##########################################################################
 #####################  MESSAGE HISTORY DLG  ##############################
 ##########################################################################
@@ -10641,7 +10712,13 @@ class messageDlg(QDialog):
         layout.addWidget(messageEdit,1)
                                
         self.setLayout(layout)
-
+        
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
 ##########################################################################
 #####################  AUTOSAVE DLG  #####################################
@@ -10712,6 +10789,13 @@ class autosaveDlg(QDialog):
             message = QApplication.translate("Message Area","Autosave OFF", None, QApplication.UnicodeUTF8)
             aw.sendmessage(message)            
         self.close()
+        
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
         
 ##########################################################################
 #####################  WINDOW PROPERTIES DLG  ############################
@@ -10927,6 +11011,13 @@ class WindowsDlg(QDialog):
         mainLayout.addLayout(buttonLayout)
         
         self.setLayout(mainLayout)
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     def changexrotation(self):
         aw.qmc.xrotation = self.xrotationSpinBox.value()
@@ -11167,6 +11258,13 @@ class calculatorDlg(QDialog):
         mainlayout.addStretch()  
         
         self.setLayout(mainlayout)
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     def calcEventRC(self):
         nevents = len(aw.qmc.specialevents)
@@ -11706,6 +11804,13 @@ class EventsDlg(QDialog):
         mainLayout.setMargin(0)      
 
         self.setLayout(mainLayout)
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     def setElinethickness(self,x,val):
         if val == 0:
@@ -12284,6 +12389,13 @@ class phasesGraphDlg(QDialog):
 
         self.setLayout(mainLayout)
         aw.qmc.redraw(recomputeAllDeltas=False)
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
         
     def savePhasesSettings(self):
         if not aw.qmc.phasesbuttonflag:
@@ -12448,6 +12560,13 @@ class flavorDlg(QDialog):
 
         #draw
         aw.qmc.flavorchart()
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     def setaspect(self):
         aw.qmc.flavoraspect = self.aspectSpinBox.value()
@@ -12870,6 +12989,13 @@ class backgroundDLG(QDialog):
         mainLayout.setMargin(0)      
 
         self.setLayout(mainLayout)
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     def setreproduce(self):
         if aw.qmc.background:
@@ -13324,10 +13450,14 @@ class StatisticsDLG(QDialog):
 
             aw.qmc.redraw(recomputeAllDeltas=False)
             self.close()
-        else:
-            pass
+        
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
                 
-
 ###########################################################################################
 ##################### SERIAL PORT #########################################################
 ###########################################################################################
@@ -14306,14 +14436,14 @@ class serialport(object):
                     #If extra device +ArduinoTC4_XX present. read all 4 Ts
                     if 28 in aw.qmc.extradevices:
                         vals = ["1","2","3","4"]
-                        vals.pop(vals.index(aw.ser.arduinoETChannel))
-                        vals.pop(vals.index(aw.ser.arduinoBTChannel))
+                        vals.pop(vals.index(self.arduinoETChannel))
+                        vals.pop(vals.index(self.arduinoBTChannel))
                         command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + vals[0] + vals[1] + "\n"
                     else:
                     #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
                         command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + "00\n"
 
-                    self.SP.write(command)       #write
+                    self.SP.write(command)       #send command 
                     
                     result = ""
                     result = self.SP.readline()  #read
@@ -14378,7 +14508,7 @@ class serialport(object):
         finally:
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + command + " || Rx = " + res)
+                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + command + " || Rx = " + res + "|| Ts= %.1f, %.1f, %.1f, %.1f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2))
             
            
     def TEVA18Bconvert(self, seg):
@@ -14964,6 +15094,13 @@ class designerconfigDlg(QDialog):
         
         self.setLayout(mainLayout)
 
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
+
     def changereproducemode(self):
         aw.qmc.reproducedesigner = self.reproduceComboBox.currentIndex()
         
@@ -15386,6 +15523,13 @@ class comportDlg(QDialog):
         Mlayout.addLayout(buttonLayout)
         
         self.setLayout(Mlayout)
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     def createserialTable(self):
         try:
@@ -15865,6 +16009,13 @@ class DeviceAssignmentDLG(QDialog):
         Mlayout.addLayout(buttonLayout)
         
         self.setLayout(Mlayout)
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     def createDeviceTable(self):
         try:
@@ -17083,6 +17234,13 @@ class graphColorDlg(QDialog):
             aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
             aw.sendmessage(QApplication.translate("Message Area","Color of %1 set to %2", None, QApplication.UnicodeUTF8).arg(title).arg(str(aw.qmc.palette[color])))
 
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
+
 
 ############################################################
 #######################  WHEEL GRAPH CONFIG DIALOG  ########
@@ -17267,6 +17425,14 @@ class WheelDlg(QDialog):
         mainlayout.addLayout(configlayout)
         mainlayout.addLayout(buttonlayout)
         self.setLayout(mainlayout)
+
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     #creates config table for wheel with index x
     def createlabeltable(self,x):
@@ -17754,6 +17920,13 @@ class AlarmDlg(QDialog):
 
         self.setLayout(mainlayout)
 
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
+
     def alarmson(self,flag):
         for i in range(len(aw.qmc.alarmflag)):
             if flag == 1:
@@ -17988,6 +18161,12 @@ class soundcrack(FigureCanvas):
         
         return F,amplitude  
 
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
 #########################################################################
 ######################## FUJI PXR CONTROL DIALOG  #######################
@@ -18331,6 +18510,13 @@ class PXRpidDlgControl(QDialog):
         Mlayout.addWidget(self.status,0)
         Mlayout.addWidget(TabWidget,1)
         self.setLayout(Mlayout)
+
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     def setpoint(self,PID):
         command = ""
@@ -19563,6 +19749,12 @@ class PXG4pidDlgControl(QDialog):
         layout.addWidget(TabWidget,1)
         self.setLayout(layout)
 
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
 
     def settimeunits(self):
         try:
@@ -21143,7 +21335,7 @@ class FujiPID(object):
         return cr
 
 ############################################################################
-######################## DTA PID CONTROL DIALOG ######################
+######################## Arduino CONTROL DIALOG ######################
 ############################################################################
     
 class ArduinoDlgControl(QDialog):
@@ -21156,14 +21348,13 @@ class ArduinoDlgControl(QDialog):
         self.status.setSizeGripEnabled(False)
         self.status.showMessage(QApplication.translate("StatusBar","Work on Progress",None, QApplication.UnicodeUTF8),5000)
 
-        hello1label = QLabel("Hello 1")
-        hello2label = QLabel("Hello 2")
+        reinitbutton = QPushButton(QApplication.translate("Button","Reinitialize Arduino", None, QApplication.UnicodeUTF8))
+        self.connect(reinitbutton,SIGNAL("clicked()"),self.initArduino)
 
         tab1Layout = QGridLayout() 
-        tab2Layout = QGridLayout()
 
-        tab1Layout.addWidget(hello1label,0,0)
-        tab2Layout.addWidget(hello2label,0,0)
+        tab1Layout.addWidget(reinitbutton,0,0)
+        
         
         ############################
         TabWidget = QTabWidget()
@@ -21172,15 +21363,25 @@ class ArduinoDlgControl(QDialog):
         C1Widget.setLayout(tab1Layout)
         TabWidget.addTab(C1Widget,QApplication.translate("Tab","tab 1",None, QApplication.UnicodeUTF8))
         
-        C2Widget = QWidget()
-        C2Widget.setLayout(tab2Layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","tab 2",None, QApplication.UnicodeUTF8))
-
         mainlayout = QVBoxLayout()
         mainlayout.addWidget(self.status,0)
         mainlayout.addWidget(TabWidget,1)
         self.setLayout(mainlayout)
 
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
+
+    def initArduino(saelf):
+        aw.ser.ArduinoIsInitialized = 0
+        aw.ser.ArduinoUnit = ""
+        message = QApplication.translate("message","ArduinoTC4 has been reinitialized.",None, QApplication.UnicodeUTF8)
+        aw.sendmessage(message)
+
+        
 ############################################################################
 ######################## DTA PID CONTROL DIALOG ######################
 ############################################################################
@@ -21255,7 +21456,13 @@ class DTApidDlgControl(QDialog):
         #read sv
         r = aw.ser.sendDTAcommand(command)
 
-        
+    def keyPressEvent(self,event):    
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: 	    	    #ESCAPE
+            self.close()
+            
 ###################################################################################
 ##########################  ARDUINO CLASS DEFINITION  ############################
 ###################################################################################
