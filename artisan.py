@@ -515,7 +515,7 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit_min = 0        
         self.endofx = 60
         self.startofx = 0
-        self.keeptimeflag = 1
+        self.resetmaxtime = 15*60  #time when pressing reset
         self.xgrid = 60   #initial time separation; 60 = 1 minute        
         self.ygrid = 50    #initial temperature separation
         self.zgrid = 50    #initial RoR separation
@@ -1139,8 +1139,6 @@ class tgraphcanvas(FigureCanvas):
         self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
         self.timeindex = [-1,0,0,0,0,0,0]
         self.specialevents=[]
-        if not self.keeptimeflag:
-            self.endofx = 60
         aw.lcd1.display("00:00")
         aw.lcd2.display("0.0")
         aw.lcd3.display("0.0")
@@ -1197,6 +1195,9 @@ class tgraphcanvas(FigureCanvas):
         aw.curFile = None                 #current file name
         self.ystep = 45     	    	  #used to find length of arms in annotations  
         self.startofx = 0
+        self.endofx = self.resetmaxtime 
+        if self.endofx < 1:
+            self.endofx = 60
 
         #Designer variables
         self.indexpoint = 0
@@ -1837,6 +1838,7 @@ class tgraphcanvas(FigureCanvas):
                 if self.background:                
                     self.ax.lines = self.ax.lines[2:]
                 if len(self.timex):
+                    self.xaxistosm()
                     self.redrawdesigner()
 
             self.samplingsemaphore.release(1)
@@ -3330,15 +3332,15 @@ class tgraphcanvas(FigureCanvas):
         
     #used to start designer from scracth (not from a loaded profile)	
     def designerinit(self):
-        #init start vars        #CH, DE, Fcs,Fce,Scs,Sce,Drop
-        self.designertimeinit = [50,300,540,570,660,700,800]
+        #init start vars        #CH, DE,      Fcs,      Fce,       Scs,         Sce,         Drop
+        self.designertimeinit = [50,(5*60+50),(8*60+50),(10*60+50),(10.5*60+50),(11.5*60+50),(12*60+50)]
         if self.mode == u"C":
                                       #CH, DE, Fcs,Fce,Scs,Sce,Drop  
             self.designertemp1init = [290.,290.,290.,290.,290.,290.,290.]
-            self.designertemp2init = [200.,150.,200.,210.,220.,225.,240.]   #CHARGE,DRY END,FCs, FCe,SCs,SCe,DROP
+            self.designertemp2init = [230.,150.,190.,210.,220.,225.,230.]   #CHARGE,DRY END,FCs, FCe,SCs,SCe,DROP
         elif self.mode == u"F":
             self.designertemp1init = [500.,500.,500.,500.,500.,500.,500.]
-            self.designertemp2init = [380.,300.,390.,395.,410.,412.,420.]
+            self.designertemp2init = [440.,300.,385.,410.,430.,445.,460.]
 
         #check x limits
         if self.endofx < 960:
@@ -3351,7 +3353,8 @@ class tgraphcanvas(FigureCanvas):
             self.temp1.append(self.designertemp1init[i])
             self.temp2.append(self.designertemp2init[i])
             self.timeindex[i] = i
-
+            
+        self.xaxistosm()
         self.redrawdesigner()
 
     #loads main points from a profile so that they can be edited
@@ -3388,13 +3391,7 @@ class tgraphcanvas(FigureCanvas):
                 t2.append(self.temp2[self.timeindex[i]])    #add temp2
                 timeindexhold[i] =  self.timex[self.timeindex[i]]
 
-
-        #it is possible the user may use the flag to revert to 60 seconds endofx when doing a reset
-        endofxold  = self.endofx               
-        self.reset()                                            #erase profile and screen
-        #restore endofx limit
-        self.endofx = endofxold
-        self.xaxistosm()
+        self.reset()                                            #erase screen
                 
         self.timex,self.temp1,self.temp2 = timez[:],t1[:],t2[:]  #copy lists back after reset() with the main points
 
@@ -3405,7 +3402,8 @@ class tgraphcanvas(FigureCanvas):
             self.currentx = lptime
             self.currenty = lptemp2
             self.addpoint()
-        
+
+        self.xaxistosm()        
         self.redrawdesigner()                                   #redraw the designer screen
         
     #redraws designer
@@ -3433,10 +3431,10 @@ class tgraphcanvas(FigureCanvas):
         self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--") 
         self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--") 
 
-        if self.timex[-1] < self.endofx:
+        if self.timex[-1] > self.endofx:
             self.endofx = self.timex[-1] + 120
             self.xaxistosm()
-
+        
         if self.BTsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
             self.BTsplinedegree = len(self.timex)-1
 
@@ -3474,6 +3472,10 @@ class tgraphcanvas(FigureCanvas):
         self.currenty = event.ydata
         
         designermenu = QMenu(self)
+
+        createAction = QAction(QApplication.translate("Contextual Menu", "Create",None, QApplication.UnicodeUTF8),self)
+        self.connect(createAction,SIGNAL("triggered()"),self.convert_designer)
+        designermenu.addAction(createAction)
         
         configAction = QAction(QApplication.translate("Contextual Menu", "Designer Config...",None, QApplication.UnicodeUTF8),self)
         self.connect(configAction,SIGNAL("triggered()"),self.desconfig)
@@ -3518,7 +3520,6 @@ class tgraphcanvas(FigureCanvas):
             self.workingline = 1
         else:
             self.workingline = 2
-
 
     #handles when releasing mouse   
     def on_release(self,event):
@@ -6998,7 +6999,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.ylimit = settings.value("ymax",self.qmc.ylimit).toInt()[0]
             self.qmc.zlimit_min = settings.value("zmin",self.qmc.zlimit_min).toInt()[0]            
             self.qmc.zlimit = settings.value("zmax",self.qmc.zlimit).toInt()[0]
-            self.qmc.keeptimeflag = settings.value("keepTimeLimit",self.qmc.keeptimeflag).toInt()[0]
+            if settings.contains("resetmaxtime"):
+                self.qmc.resetmaxtime = settings.value("resetmaxtime",self.qmc.resetmaxtime).toInt()[0]
             self.qmc.legendloc = settings.value("legendloc",self.qmc.legendloc).toInt()[0]
             settings.endGroup()
             settings.beginGroup("RoastProperties")
@@ -7255,7 +7257,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ymin",self.qmc.ylimit_min)
             settings.setValue("zmax",self.qmc.zlimit)
             settings.setValue("zmin",self.qmc.zlimit_min)
-            settings.setValue("keepTimeLimit",self.qmc.keeptimeflag)
+            settings.setValue("resetmaxtime",self.qmc.resetmaxtime)
             settings.setValue("legendloc",self.qmc.legendloc )
             settings.endGroup()
             settings.beginGroup("RoastProperties")
@@ -7405,7 +7407,7 @@ class ApplicationWindow(QMainWindow):
             settingsx["ymin"]= unicode(self.qmc.ylimit_min)
             settingsx["zmax"]= unicode(self.qmc.zlimit)
             settingsx["zmin"]= unicode(self.qmc.zlimit_min)
-            settingsx["keepTimeLimit"] = unicode(self.qmc.keeptimeflag)
+            settingsx["resetmaxtime"] = unicode(aw.qmc.stringfromseconds(self.qmc.resetmaxtime))
             settingsx["legendloc"] = unicode(self.qmc.legendloc )
             
             settingsx["operator"]= unicode(self.qmc.operator)
@@ -10875,11 +10877,12 @@ class WindowsDlg(QDialog):
         self.legendComboBox.setCurrentIndex(aw.qmc.legendloc)
         self.connect(self.legendComboBox,SIGNAL("currentIndexChanged(int)"),self.changelegendloc)
 
-        self.timeflag = QCheckBox(QApplication.translate("CheckBox", "Keep Max time after RESET",None, QApplication.UnicodeUTF8))
-        if aw.qmc.keeptimeflag:
-            self.timeflag.setChecked(True)
-        else:
-            self.timeflag.setChecked(False)
+        resettimelabel = QLabel(QApplication.translate("Label", "Reset Time",None, QApplication.UnicodeUTF8))
+        self.resetEdit = QLineEdit()
+        self.resetEdit.setMaximumWidth(100)        
+        regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
+        self.resetEdit.setValidator(QRegExpValidator(regextime,self))
+        self.resetEdit.setText(aw.qmc.stringfromseconds(aw.qmc.resetmaxtime))
 
         timegridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
         self.xaxislencombobox = QComboBox()
@@ -10952,7 +10955,8 @@ class WindowsDlg(QDialog):
         xlayout.addWidget(self.xlimitEdit,0,3)
         xlayout.addWidget(timegridlabel,1,0)
         xlayout.addWidget(self.xaxislencombobox,1,1)
-        xlayout.addWidget(self.timeflag,1,3)
+        xlayout.addWidget(resettimelabel,1,2)
+        xlayout.addWidget(self.resetEdit,1,3)
         xlayout.addWidget(xrotationlabel,2,0)
         xlayout.addWidget( self.xrotationSpinBox,2,1)
         
@@ -11061,6 +11065,7 @@ class WindowsDlg(QDialog):
         aw.qmc.endofx = aw.qmc.stringtoseconds(unicode(self.xlimitEdit.text()))
         
         starteditime = aw.qmc.stringtoseconds(unicode(self.xlimitEdit_min.text()))
+        resettime = aw.qmc.stringtoseconds(unicode(self.resetEdit.text()))
         
         if starteditime > 0 and aw.qmc.timeindex[0] != -1:
             aw.qmc.startofx = aw.qmc.timex[aw.qmc.timeindex[0]] + starteditime
@@ -11071,10 +11076,8 @@ class WindowsDlg(QDialog):
         else:                                          
             aw.qmc.startofx = starteditime
             
-        if self.timeflag.isChecked():
-            aw.qmc.keeptimeflag = 1
-        else:
-            aw.qmc.keeptimeflag = 0
+        if resettime > 0:
+            aw.qmc.resetmaxtime = resettime
 
         aw.qmc.redraw(recomputeAllDeltas=False)
         
@@ -12850,7 +12853,7 @@ class backgroundDLG(QDialog):
         self.rightButton = QPushButton(QApplication.translate("Button","Right",None, QApplication.UnicodeUTF8))
         self.rightButton.setFocusPolicy(Qt.NoFocus)
 
-
+        self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundDetails, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundeventsflag, SIGNAL("clicked()"),self.readChecks)
         self.connect(delButton, SIGNAL("clicked()"),self.delete)
@@ -13134,7 +13137,7 @@ class backgroundDLG(QDialog):
             aw.qmc.background = True
         else:
             aw.qmc.background = False
-            
+
         if  self.backgroundDetails.isChecked():
             aw.qmc.backgroundDetails = True
         else:
@@ -13665,9 +13668,9 @@ class serialport(object):
         ### create command
         command = aw.dtapid.message2send(self.controlETpid[1],3,aw.dtapid.dtamem["sv"][1],1)        
         #read sv
-        self.currentpidsv = self.sendDTAcommand(command)
+        aw.qmc.currentpidsv = self.sendDTAcommand(command)
         #update SV value 
-        aw.dtapid.dtamem["sv"][0] = self.currentpidsv    #index 0
+        aw.dtapid.dtamem["sv"][0] = aw.qmc.currentpidsv    #index 0
         #sv LCD is updated in qmc.updadegraphics()            
         #give some time to rest
         libtime.sleep(.1)
@@ -13687,7 +13690,7 @@ class serialport(object):
             command = aw.dtapid.message2send(self.readBTpid[1],3,aw.dtapid.dtamem["pv"][1],1)            
             t2 = self.sendDTAcommand(command)
         else:
-            t2 = self.currentpidsv  #return 
+            t2 = aw.qmc.currentpidsv  #return 
         ################################################################    
 
         return tx,t1,t2
@@ -13723,27 +13726,27 @@ class serialport(object):
                     #REAd and WRITE commands are different
                     #READ command
                     if command[4] == "3":
-                        CRCreceived = int(r[13:15],16)  #bytes 14&15
-                        CRCcalculated = aw.dtapid.DTACalcChecksum(r[1:11]) #bytes 1-10
+                        #CRCreceived = int(r[13:15],16)  #bytes 14&15
+                        #CRCcalculated = aw.dtapid.DTACalcChecksum(r[1:11]) #bytes 1-10
 
-                        if CRCreceived == CRCcalculated:                                                                       
-                            t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float
-                            return t1
-                        else:
-                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8))            
-                            if len(aw.qmc.timex) > 2:                           
-                                return aw.qmc.temp1[-1]       
-                            else:
-                                return 0.
+                        #if CRCreceived == CRCcalculated:                                                                       
+                        t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float
+                        return t1
+##                        else:
+##                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8))            
+##                            if len(aw.qmc.timex) > 2:                           
+##                                return aw.qmc.temp1[-1]       
+##                            else:
+##                                return 0.
                     #WRITE COMMAND. Under Test
-                    if command[4] == "4":
-                        #received  data is equal to sent command
-                        if r == command:
-                            aw.sendmessage("Write operation OK")
-                            return 1
-                        else:
-                            aw.sendmessage("Write operation BAD")
-                            return 0                            
+##                    if command[4] == "4":
+##                        #received  data is equal to sent command
+##                        if r == command:
+##                            aw.sendmessage("Write operation OK")
+##                            return 1
+##                        else:
+##                            aw.sendmessage("Write operation BAD")
+##                            return 0                            
                 else:
                     nbytes = len(r)
                     aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): %1 bytes received but 15 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
@@ -14928,6 +14931,8 @@ class designerconfigDlg(QDialog):
         super(designerconfigDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Designer Config",None, QApplication.UnicodeUTF8))
 
+        self.setModal(True)
+
         #landmarks
         charge = QLabel(QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8))
         charge.setStyleSheet("background-color: #f07800")
@@ -14947,51 +14952,132 @@ class designerconfigDlg(QDialog):
 
         self.loadconfigflags()
         
-        self.connect(self.dryend, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,1))
-        self.connect(self.fcs, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,2))
-        self.connect(self.fce, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,3))
-        self.connect(self.scs, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,4))
-        self.connect(self.sce, SIGNAL("stateChanged(int)"),lambda x=0: self.changeflags(x,5))
+        self.connect(self.dryend, SIGNAL("clicked()"),lambda x=0: self.changeflags(x,1))
+        self.connect(self.fcs, SIGNAL("clicked()"),lambda x=0: self.changeflags(x,2))
+        self.connect(self.fce, SIGNAL("clicked()"),lambda x=0: self.changeflags(x,3))
+        self.connect(self.scs, SIGNAL("clicked()"),lambda x=0: self.changeflags(x,4))
+        self.connect(self.sce, SIGNAL("clicked()"),lambda x=0: self.changeflags(x,5))
 
         if aw.qmc.timeindex[0] != -1:
             start = aw.qmc.timex[aw.qmc.timeindex[0]]
         else:
             start = 0
 
+        markersettinglabel = QLabel(QApplication.translate("Label", "Marker",None, QApplication.UnicodeUTF8))
+        timesettinglabel = QLabel(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8))
+        btsettinglabel = QLabel(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8))
+        etsettinglabel = QLabel(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
+
         self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))
         self.Edit0.setEnabled(False)
+        self.Edit0bt = QLineEdit(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[0]])      
+        self.Edit0et = QLineEdit(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[0]])      
 
         if aw.qmc.timeindex[1]:
-            self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[1]] - start))      
+            self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[1]] - start))
+            self.Edit1bt = QLineEdit(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[1]])
+            self.Edit1et = QLineEdit(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[1]])      
+            
         else:
-            self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+            self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(0))
+            self.Edit1bt = QLineEdit(u"0.0")      
+            self.Edit1et = QLineEdit(u"0.0")      
+
         if aw.qmc.timeindex[2]:
-            self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[2]] - start))      
+            self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[2]] - start))
+            self.Edit2bt = QLineEdit(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[2]])
+            self.Edit2et = QLineEdit(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[2]])      
+            
         else:
-            self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+            self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(0))
+            self.Edit2bt = QLineEdit(u"0.0")
+            self.Edit2et = QLineEdit(u"0.0")      
+            
         if aw.qmc.timeindex[3]:
-            self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[3]] - start))      
+            self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[3]] - start))
+            self.Edit3bt = QLineEdit(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[3]])
+            self.Edit3et = QLineEdit(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[3]])      
+            
         else:
-            self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+            self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(0))
+            self.Edit3bt = QLineEdit(u"0.0")
+            self.Edit3et = QLineEdit(u"0.0")      
+            
         if aw.qmc.timeindex[4]:
-            self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[4]] - start))      
+            self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[4]] - start))
+            self.Edit4bt = QLineEdit(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[4]])
+            self.Edit4et = QLineEdit(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[4]])      
+            
         else:
-            self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+            self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(0))
+            self.Edit4bt = QLineEdit(u"0.0")
+            self.Edit4et = QLineEdit(u"0.0")      
+            
         if aw.qmc.timeindex[5]:
-            self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[5]] - start))      
+            self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[5]] - start))
+            self.Edit5bt = QLineEdit(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[5]])
+            self.Edit5et = QLineEdit(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[5]])      
+            
         else:
-            self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(0))                                       
+            self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(0))
+            self.Edit5bt = QLineEdit(u"0.0")
+            self.Edit5et = QLineEdit(u"0.0")      
+            
         if aw.qmc.timeindex[6]:
-            self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[6]] - start))      
+            self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[6]] - start))
+            self.Edit6bt = QLineEdit(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[6]])
+            self.Edit6et = QLineEdit(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[6]])      
+            
         else:
             self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(0))
-        self.Edit6.setEnabled(False)
+            self.Edit6bt = QLineEdit(u"0.0")                                         
+            self.Edit6et = QLineEdit(u"0.0")      
+                                   
+        #self.Edit6.setEnabled(False)
+
+        self.Edit0.setMaximumWidth(50)
+        self.Edit1.setMaximumWidth(50)
+        self.Edit2.setMaximumWidth(50)
+        self.Edit3.setMaximumWidth(50)
+        self.Edit4.setMaximumWidth(50)
+        self.Edit5.setMaximumWidth(50)
+        self.Edit6.setMaximumWidth(50)
+        self.Edit0bt.setMaximumWidth(50)
+        self.Edit1bt.setMaximumWidth(50)
+        self.Edit2bt.setMaximumWidth(50)
+        self.Edit3bt.setMaximumWidth(50)
+        self.Edit4bt.setMaximumWidth(50)
+        self.Edit5bt.setMaximumWidth(50)
+        self.Edit6bt.setMaximumWidth(50)
+        self.Edit0et.setMaximumWidth(50)
+        self.Edit1et.setMaximumWidth(50)
+        self.Edit2et.setMaximumWidth(50)
+        self.Edit3et.setMaximumWidth(50)
+        self.Edit4et.setMaximumWidth(50)
+        self.Edit5et.setMaximumWidth(50)
+        self.Edit6et.setMaximumWidth(50)
 
         self.Edit1copy = self.Edit1.text()            
-        self.Edit2copy = self.Edit1.text()            
-        self.Edit3copy = self.Edit1.text()            
-        self.Edit4copy = self.Edit1.text()            
-        self.Edit5copy = self.Edit1.text()                      
+        self.Edit2copy = self.Edit2.text()            
+        self.Edit3copy = self.Edit3.text()            
+        self.Edit4copy = self.Edit4.text()            
+        self.Edit5copy = self.Edit5.text()
+        self.Edit6copy = self.Edit6.text()
+        
+        self.Edit0btcopy = self.Edit0bt.text()            
+        self.Edit1btcopy = self.Edit1bt.text()            
+        self.Edit2btcopy = self.Edit2bt.text()            
+        self.Edit3btcopy = self.Edit3bt.text()            
+        self.Edit4btcopy = self.Edit4bt.text()            
+        self.Edit5btcopy = self.Edit5bt.text()            
+        self.Edit6btcopy = self.Edit6bt.text()            
+        self.Edit0etcopy = self.Edit0et.text()            
+        self.Edit1etcopy = self.Edit1et.text()            
+        self.Edit2etcopy = self.Edit2et.text()            
+        self.Edit3etcopy = self.Edit3et.text()            
+        self.Edit4etcopy = self.Edit4et.text()            
+        self.Edit5etcopy = self.Edit5et.text()            
+        self.Edit6etcopy = self.Edit6et.text()            
        
         regextime = QRegExp(r"^-?[0-5][0-9]:[0-5][0-9]$")
         self.Edit0.setValidator(QRegExpValidator(regextime,self))
@@ -15001,16 +15087,22 @@ class designerconfigDlg(QDialog):
         self.Edit4.setValidator(QRegExpValidator(regextime,self))
         self.Edit5.setValidator(QRegExpValidator(regextime,self))
         self.Edit6.setValidator(QRegExpValidator(regextime,self))
+        self.Edit0bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit0bt))
+        self.Edit1bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit1bt))
+        self.Edit2bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit2bt))
+        self.Edit3bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit3bt))
+        self.Edit4bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit4bt))
+        self.Edit5bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit5bt))
+        self.Edit6bt.setValidator(QDoubleValidator(0., 999., 1, self.Edit6bt))
+        self.Edit0et.setValidator(QDoubleValidator(0., 999., 1, self.Edit0et))
+        self.Edit1et.setValidator(QDoubleValidator(0., 999., 1, self.Edit1et))
+        self.Edit2et.setValidator(QDoubleValidator(0., 999., 1, self.Edit2et))
+        self.Edit3et.setValidator(QDoubleValidator(0., 999., 1, self.Edit3et))
+        self.Edit4et.setValidator(QDoubleValidator(0., 999., 1, self.Edit4et))
+        self.Edit5et.setValidator(QDoubleValidator(0., 999., 1, self.Edit5et))
+        self.Edit6et.setValidator(QDoubleValidator(0., 999., 1, self.Edit6et))
         
-        self.Edit0.setMaximumWidth(50)
-        self.Edit1.setMaximumWidth(50)
-        self.Edit2.setMaximumWidth(50)
-        self.Edit3.setMaximumWidth(50)
-        self.Edit4.setMaximumWidth(50)
-        self.Edit5.setMaximumWidth(50)
-        self.Edit6.setMaximumWidth(50)
-
-        splinelabel = QLabel(QApplication.translate("Label", "Curviness",None, QApplication.UnicodeUTF8))
+        curvinesslabel = QLabel(QApplication.translate("Label", "Curviness",None, QApplication.UnicodeUTF8))
         etcurviness = QLabel(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
         btcurviness = QLabel(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8))
         etcurviness.setAlignment(Qt.AlignRight)
@@ -15038,11 +15130,12 @@ class designerconfigDlg(QDialog):
         self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
         self.connect(self.reproduceComboBox,SIGNAL("currentIndexChanged(int)"), self.changereproducemode)
 
-        saveButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
-        self.connect(saveButton, SIGNAL("clicked()"), self.settimes)
-        #saveButton.setMaximumWidth(50)
+        updateButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
+        self.connect(updateButton, SIGNAL("clicked()"), self.settimes)
+        updateButton.setMaximumWidth(100)
         
         defaultButton = QPushButton(QApplication.translate("Button","Reset",None, QApplication.UnicodeUTF8))
+        defaultButton.setMaximumWidth(100)
         self.connect(defaultButton, SIGNAL("clicked()"), self.reset)
         closeButton = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
         self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("accept()"))
@@ -15051,41 +15144,69 @@ class designerconfigDlg(QDialog):
         self.connect(convertButton, SIGNAL("clicked()"),self.create)
 
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(defaultButton)
         buttonLayout.addWidget(closeButton)
-        buttonLayout.addWidget(convertButton) 
-           
-        marksLayout = QGridLayout()  
-        marksLayout.addWidget(charge,0,0)
-        marksLayout.addWidget(self.Edit0,0,1)
-        marksLayout.addWidget(self.dryend,1,0)
-        marksLayout.addWidget(self.Edit1,1,1)
-        marksLayout.addWidget(self.fcs,2,0)
-        marksLayout.addWidget(self.Edit2,2,1)
-        marksLayout.addWidget(self.fce,3,0)
-        marksLayout.addWidget(self.Edit3,3,1)
-        marksLayout.addWidget(self.scs,4,0)
-        marksLayout.addWidget(self.Edit4,4,1)
-        marksLayout.addWidget(self.sce,5,0)
-        marksLayout.addWidget(self.Edit5,5,1)
-        marksLayout.addWidget(drop,6,0)
-        marksLayout.addWidget(self.Edit6,6,1)
-        marksLayout.addWidget(saveButton,7,1)
+        buttonLayout.addWidget(convertButton)
+        
+        marksLayout = QGridLayout()
+        marksLayout.addWidget(markersettinglabel,0,0)
+        marksLayout.addWidget(timesettinglabel,0,1)
+        marksLayout.addWidget(btsettinglabel,0,2)
+        marksLayout.addWidget(etsettinglabel,0,3)
+        marksLayout.addWidget(charge,1,0)
+        marksLayout.addWidget(self.Edit0,1,1)
+        marksLayout.addWidget(self.Edit0bt,1,2)
+        marksLayout.addWidget(self.Edit0et,1,3)
+        marksLayout.addWidget(self.dryend,2,0)
+        marksLayout.addWidget(self.Edit1,2,1)
+        marksLayout.addWidget(self.Edit1bt,2,2)
+        marksLayout.addWidget(self.Edit1et,2,3)
+        marksLayout.addWidget(self.fcs,3,0)
+        marksLayout.addWidget(self.Edit2,3,1)
+        marksLayout.addWidget(self.Edit2bt,3,2)
+        marksLayout.addWidget(self.Edit2et,3,3)
+        marksLayout.addWidget(self.fce,4,0)
+        marksLayout.addWidget(self.Edit3,4,1)
+        marksLayout.addWidget(self.Edit3bt,4,2)
+        marksLayout.addWidget(self.Edit3et,4,3)
+        marksLayout.addWidget(self.scs,5,0)
+        marksLayout.addWidget(self.Edit4,5,1)
+        marksLayout.addWidget(self.Edit4bt,5,2)
+        marksLayout.addWidget(self.Edit4et,5,3)
+        marksLayout.addWidget(self.sce,6,0)
+        marksLayout.addWidget(self.Edit5,6,1)
+        marksLayout.addWidget(self.Edit5bt,6,2)
+        marksLayout.addWidget(self.Edit5et,6,3)
+        marksLayout.addWidget(drop,7,0)
+        marksLayout.addWidget(self.Edit6,7,1)
+        marksLayout.addWidget(self.Edit6bt,7,2)
+        marksLayout.addWidget(self.Edit6et,7,3)
 
+        updateLayout = QHBoxLayout()
+        updateLayout.addWidget(defaultButton)
+        updateLayout.addWidget(updateButton)
+
+        settingsLayout = QVBoxLayout()
+        settingsLayout.addLayout(marksLayout)
+        settingsLayout.addLayout(updateLayout)
+        
         curvinessLayout = QHBoxLayout()
+        curvinessLayout.addWidget(curvinesslabel)
         curvinessLayout.addWidget(etcurviness)
         curvinessLayout.addWidget(self.ETsplineComboBox)
         curvinessLayout.addWidget(btcurviness)        
         curvinessLayout.addWidget(self.BTsplineComboBox)                                 
 
-        modLayout = QGridLayout()
-        modLayout.addWidget(splinelabel,0,0)
-        modLayout.addLayout(curvinessLayout,0,1)        
-        modLayout.addWidget(reproducelabel,1,0)
-        modLayout.addWidget(self.reproduceComboBox,1,1)
+        reproduceLayout = QHBoxLayout()
+        reproduceLayout.addWidget(reproducelabel)
+        reproduceLayout.addWidget(self.reproduceComboBox)
+
+
+        modLayout = QVBoxLayout()
+        modLayout.addLayout(curvinessLayout)        
+        modLayout.addLayout(reproduceLayout)
         
-        marksGroupLayout = QGroupBox(QApplication.translate("GroupBox","Initial Times",None, QApplication.UnicodeUTF8))
-        marksGroupLayout.setLayout(marksLayout)
+        marksGroupLayout = QGroupBox(QApplication.translate("GroupBox","Initial Settings",None, QApplication.UnicodeUTF8))
+        marksGroupLayout.setLayout(settingsLayout)
         
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(marksGroupLayout)
@@ -15148,41 +15269,71 @@ class designerconfigDlg(QDialog):
             st = QApplication.translate("MessageBox","Times need to be in ascending order. Please recheck %1 time",None, QApplication.UnicodeUTF8).arg(strings[checkvalue+1])
             QMessageBox.information(self,QApplication.translate("MessageBox Caption","Designer Config",None, QApplication.UnicodeUTF8),st)            
             return 1
-        
+
+        if self.Edit0bt.text() != self.Edit0btcopy:
+                aw.qmc.temp2[aw.qmc.timeindex[0]] = float(unicode(self.Edit0bt.text()))
+        if self.Edit0et.text() != self.Edit0etcopy:
+                aw.qmc.temp1[aw.qmc.timeindex[0]] = float(unicode(self.Edit0et.text()))
+    
         if self.dryend.isChecked():
             if self.Edit1.text() != self.Edit1copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit1.text())):
                     timez = aw.qmc.stringtoseconds(unicode(self.Edit1.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[1] = aw.qmc.designerfindindex(timez)
-                    aw.qmc.timex[aw.qmc.timeindex[1]] = timez                
+                    aw.qmc.timex[aw.qmc.timeindex[1]] = timez
+            if self.Edit1bt.text() != self.Edit1btcopy:
+                    aw.qmc.temp2[aw.qmc.timeindex[1]] = float(unicode(self.Edit1bt.text()))
+            if self.Edit1et.text() != self.Edit1etcopy:
+                    aw.qmc.temp1[aw.qmc.timeindex[1]] = float(unicode(self.Edit1et.text()))
         if self.fcs.isChecked():
             if self.Edit2.text() != self.Edit2copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit2.text())):
                     timez = aw.qmc.stringtoseconds(unicode(self.Edit2.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[2] = aw.qmc.designerfindindex(timez)
-                    aw.qmc.timex[aw.qmc.timeindex[2]] = timez 
+                    aw.qmc.timex[aw.qmc.timeindex[2]] = timez
+            if self.Edit2bt.text() != self.Edit2btcopy:
+                    aw.qmc.temp2[aw.qmc.timeindex[2]] = float(unicode(self.Edit2bt.text()))
+            if self.Edit2et.text() != self.Edit2etcopy:
+                    aw.qmc.temp1[aw.qmc.timeindex[2]] = float(unicode(self.Edit2et.text()))
         if self.fce.isChecked():
             if self.Edit3.text() != self.Edit3copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit3.text())):
                     timez = aw.qmc.stringtoseconds(unicode(self.Edit3.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[3] = aw.qmc.designerfindindex(timez)
-                    aw.qmc.timex[aw.qmc.timeindex[3]] = timez 
+                    aw.qmc.timex[aw.qmc.timeindex[3]] = timez
+            if self.Edit3bt.text() != self.Edit3btcopy:
+                    aw.qmc.temp2[aw.qmc.timeindex[3]] = float(unicode(self.Edit3bt.text()))
+            if self.Edit3et.text() != self.Edit3etcopy:
+                    aw.qmc.temp1[aw.qmc.timeindex[3]] = float(unicode(self.Edit3et.text()))
         if self.scs.isChecked():
             if self.Edit4.text() != self.Edit4copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit4.text())):
                     timez = aw.qmc.stringtoseconds(unicode(self.Edit4.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[4] = aw.qmc.designerfindindex(timez)
-                    aw.qmc.timex[aw.qmc.timeindex[4]] = timez 
+                    aw.qmc.timex[aw.qmc.timeindex[4]] = timez
+            if self.Edit4bt.text() != self.Edit4btcopy:
+                    aw.qmc.temp2[aw.qmc.timeindex[4]] = float(unicode(self.Edit4bt.text()))
+            if self.Edit4et.text() != self.Edit4etcopy:
+                    aw.qmc.temp1[aw.qmc.timeindex[4]] = float(unicode(self.Edit4et.text()))
         if self.sce.isChecked():
             if self.Edit5.text() != self.Edit5copy:
                 if aw.qmc.stringtoseconds(unicode(self.Edit5.text())):
                     timez = aw.qmc.stringtoseconds(unicode(self.Edit5.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
-                    aw.qmc.timeindex[5] = aw.qmc.designerfindindex(timez)
-                    aw.qmc.timex[aw.qmc.timeindex[5]] = timez 
+                    aw.qmc.timex[aw.qmc.timeindex[5]] = timez
+            if self.Edit5bt.text() != self.Edit5btcopy:
+                    aw.qmc.temp2[aw.qmc.timeindex[5]] = float(unicode(self.Edit5bt.text()))
+            if self.Edit5et.text() != self.Edit5etcopy:
+                    aw.qmc.temp1[aw.qmc.timeindex[5]] = float(unicode(self.Edit5et.text()))
+
+        if self.Edit6.text() != self.Edit6copy:
+            if aw.qmc.stringtoseconds(unicode(self.Edit6.text())):
+                timez = aw.qmc.stringtoseconds(unicode(self.Edit6.text()))+ aw.qmc.timex[aw.qmc.timeindex[0]]
+                aw.qmc.timex[aw.qmc.timeindex[6]] = timez
+        if self.Edit6bt.text() != self.Edit6btcopy:
+                aw.qmc.temp2[aw.qmc.timeindex[6]] = float(unicode(self.Edit6bt.text()))
+        if self.Edit6et.text() != self.Edit6etcopy:
+                aw.qmc.temp1[aw.qmc.timeindex[6]] = float(unicode(self.Edit6et.text()))
 
         for i in range(1,6): #1-5
             aw.qmc.designertimeinit[i] = aw.qmc.timex[aw.qmc.timeindex[i]]
 
+        aw.qmc.xaxistosm()
         aw.qmc.redrawdesigner()
         return 0
             
@@ -15245,7 +15396,11 @@ class designerconfigDlg(QDialog):
         self.fce.setChecked(True)
         self.scs.setChecked(True)
         self.sce.setChecked(True)
-        aw.qmc.reset_designer()        
+
+        #reset designer
+        aw.qmc.reset_designer()
+
+        #update editboxes
         self.Edit0.setText(aw.qmc.stringfromseconds(0))
         self.Edit1.setText(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[1]))
         self.Edit2.setText(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[2]))
@@ -15253,7 +15408,22 @@ class designerconfigDlg(QDialog):
         self.Edit4.setText(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[4]))
         self.Edit5.setText(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[5]))
         self.Edit6.setText(aw.qmc.stringfromseconds(aw.qmc.designertimeinit[6]))
-        aw.sendmessage(QApplication.translate("Message Area","Designer has been reset",None, QApplication.UnicodeUTF8)).arg()
+        self.Edit0bt.setText(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[0]])
+        self.Edit1bt.setText(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[1]])
+        self.Edit2bt.setText(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[2]])
+        self.Edit3bt.setText(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[3]])
+        self.Edit4bt.setText(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[4]])
+        self.Edit5bt.setText(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[5]])
+        self.Edit6bt.setText(u"%.1f"%aw.qmc.temp2[aw.qmc.timeindex[6]])
+        self.Edit0et.setText(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[0]])
+        self.Edit1et.setText(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[1]])
+        self.Edit2et.setText(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[2]])
+        self.Edit3et.setText(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[3]])
+        self.Edit4et.setText(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[4]])
+        self.Edit5et.setText(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[5]])
+        self.Edit6et.setText(u"%.1f"%aw.qmc.temp1[aw.qmc.timeindex[6]])
+        
+        aw.sendmessage(QApplication.translate("Message Area","Designer has been reset",None, QApplication.UnicodeUTF8))
 
     def loadconfigflags(self):
         if aw.qmc.timeindex[1]:
@@ -15281,16 +15451,22 @@ class designerconfigDlg(QDialog):
     def changeflags(self,x,idi):
         if self.validatetimeorder() != 1000:
             if idi == 1:
-                self.dryend.setChecked(False)
+                if self.dryend.isChecked():
+                    self.dryend.setChecked(False)                   
             elif idi == 2:
-                self.fcs.setChecked(False)
+                if self.fcs.isChecked():
+                    self.fcs.setChecked(False)                   
             elif idi == 3:
-                self.fce.setChecked(False)
+                if self.fce.isChecked():
+                    self.fes.setChecked(False)  
             elif idi == 4:
-                self.scs.setChecked(False)
+                if self.scs.isChecked():
+                    self.scs.setChecked(False) 
             elif idi == 5:
-                self.sce.setChecked(False)
-
+                if self.sce.isChecked():
+                    self.sce.setChecked(False)
+                    
+            #ERROR time from edit boxes is not in ascending order
             strings = [QApplication.translate("MessageBox","CHARGE",None, QApplication.UnicodeUTF8),
                        QApplication.translate("MessageBox","DRY END",None, QApplication.UnicodeUTF8),
                        QApplication.translate("MessageBox","FC START",None, QApplication.UnicodeUTF8),
@@ -15312,22 +15488,34 @@ class designerconfigDlg(QDialog):
             #ADD mark point
             if idi == 1:
                 timez = aw.qmc.stringtoseconds(unicode(self.Edit1.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                bt = float(unicode(self.Edit1bt.text()))
+                et = float(unicode(self.Edit1et.text()))
             if idi == 2:
                 timez = aw.qmc.stringtoseconds(unicode(self.Edit2.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                bt = float(unicode(self.Edit2bt.text()))
+                et = float(unicode(self.Edit2et.text()))
             if idi == 3:
                 timez = aw.qmc.stringtoseconds(unicode(self.Edit3.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                bt = float(unicode(self.Edit3bt.text()))
+                et = float(unicode(self.Edit3et.text()))
             if idi == 4:
                 timez = aw.qmc.stringtoseconds(unicode(self.Edit4.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                bt = float(unicode(self.Edit4bt.text()))
+                et = float(unicode(self.Edit4et.text()))
             if idi == 5:
                 timez = aw.qmc.stringtoseconds(unicode(self.Edit5.text())) + aw.qmc.timex[aw.qmc.timeindex[0]]
+                bt = float(unicode(self.Edit5bt.text()))
+                et = float(unicode(self.Edit5et.text()))
 
-            tempindex = aw.qmc.designerfindindex(timez)
-            temp = aw.qmc.temp2[tempindex]
             aw.qmc.currentx = timez 
-            aw.qmc.currenty = temp
+            aw.qmc.currenty = bt
             newindex = aw.qmc.addpoint()
             aw.qmc.timeindex[idi] = newindex
-       
+            aw.qmc.temp2[aw.qmc.timeindex[idi]] = bt
+            aw.qmc.temp1[aw.qmc.timeindex[idi]] = et
+
+            aw.qmc.xaxistosm()
+            aw.qmc.redrawdesigner()
                
 #########################################################################
 #############  NONE DEVICE DIALOG #######################################                                   
