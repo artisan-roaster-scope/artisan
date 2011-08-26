@@ -15611,7 +15611,7 @@ class comportDlg(QDialog):
         baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
-        self.bauds = ["2400","9600","19200","57600"]
+        self.bauds = ["2400","9600","19200","38400","57600"]
         self.baudrateComboBox.addItems(self.bauds)
         self.baudrateComboBox.setCurrentIndex(self.bauds.index(str(aw.ser.baudrate)))
                    
