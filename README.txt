@@ -34,7 +34,8 @@ o unlimited number of devices/curves running at the same time
 o symbolic manipulation of device outputs
 o Fahrenheit and Celsius display and conversion
 o manual logging of extra events (FCs,FCe,..)
-o custom event buttons
+o custom event buttons supporting up to 10 palettes
+o different plotting modes of events
 o large buttons supporting touch panels
 o live ET/BT rate-of-rise curves
 o metric and thermal head-up-display predicting the ET/BT future during logging
@@ -43,7 +44,7 @@ o background reference profile
 o user defined cup profiles and cup profile graphs
 o HTML report creation
 o CSV export
-o Omega HH506 and K202 CSV import
+o Omega HH506, K202, K204 CSV import
 o PID duty cycle
 o profile designer
 o wheel graph editor
@@ -53,6 +54,7 @@ o multi-core CPU performance enhancement support
 o template/background reproduction playback aid
 o alarms with programmable outputs
 o automatic CHARGE/DROP event detection
+
 
 
 INSTALLATION
@@ -129,6 +131,17 @@ Artisan uses the following libraries in unmodified forms:
 
 
 VERSION HISTORY
+
+v0.5.4 (28.8.2011)
+- adds events by value
+- adds custom event button palettes
+- adds virtual device from plot
+- adds K204 CSV import
+- improves Designer
+- improves Statistics
+- improves Help dialogs
+- improves relative times
+- bug fixes
 
 v0.5.3 (30.7.2011)
 - improves performance of push buttons
