@@ -81,7 +81,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication,QWidget,QMessageBox,QLab
                          QSlider,QDockWidget,QTabWidget,QStackedWidget,QTextEdit,QTextBlock,QPrintDialog,QPrinter,QPalette,QImage,
                          QPixmap,QColor,QColorDialog,QPalette,QFrame,QImageReader,QRadioButton,QCheckBox,QDesktopServices,QIcon,
                          QStatusBar,QRegExpValidator,QDoubleValidator,QIntValidator,QPainter,QImage,QFont,QBrush,QRadialGradient,
-                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox )
+                         QStyleFactory,QTableWidget,QTableWidgetItem,QMenu,QCursor,QDoubleSpinBox,QTextDocument)
 from PyQt4.QtCore import (QLibraryInfo,QTranslator,QLocale,QFileInfo,Qt,PYQT_VERSION_STR, QT_VERSION_STR,SIGNAL,QTime,QTimer,QString,QFile,QIODevice,QTextStream,QSettings,SLOT,
                           QRegExp,QDate,QUrl,QDir,QVariant,Qt,QPoint,QRect,QSize,QStringList,QEvent,QDateTime,QThread,QSemaphore)
 
@@ -4365,8 +4365,10 @@ class tgraphcanvas(FigureCanvas):
         y = event.ydata
         if x and y:
             self.resetlines()
-            self.ax.plot([self.startofx,self.endofx*2], [y,y],color =  self.palette["text"],linestyle = '-', linewidth= 1, alpha=1.0)            
-            self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color =  self.palette["text"],linestyle = '-', linewidth= 1, alpha = 1.0)
+            self.ax.plot([self.startofx,self.endofx*2], [y,y],color =  "orange",linestyle = '--', linewidth= 8, alpha=.2)            
+            self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color =  "orange",linestyle = '--', linewidth= 8, alpha = .2)
+            self.ax.plot([self.startofx,self.endofx*2], [y,y],color =  self.palette["text"],linestyle = '-', linewidth= .5, alpha=1.0)            
+            self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color =  self.palette["text"],linestyle = '-', linewidth= .5, alpha = 1.0)
             self.fig.canvas.draw()            
 
                 
@@ -5695,7 +5697,11 @@ class ApplicationWindow(QMainWindow):
             if reply == QMessageBox.Yes:
                 self.setbuttonsfrom(button.index(key))
             else:
-                return            
+                return
+        elif key == 58:
+            self.desktopscreenshot()
+        elif key == 59:
+            self.applicationscreenshot()            
         else:
             QWidget.keyPressEvent(self, event)
 
@@ -5950,6 +5956,8 @@ class ApplicationWindow(QMainWindow):
         string += QApplication.translate("MessageBox", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[;]</b> = Application ScreenShot",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[:]</b> = Desktop ScreenShot",None, QApplication.UnicodeUTF8) + "<br><br>"
 
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
 
@@ -7343,133 +7351,135 @@ class ApplicationWindow(QMainWindow):
 
     #used for trouble shooting.
     def readartisansettings(self):
-            settingsx = {}
+            general,device,phases,statistics,events,delay,colors,cupping,extras,serial,axes,roast,alarms = {},{},{},{},{},{},{},{},{},{},{},{},{}
             #read window geometry
             rect = self.geometry()
             height = unicode(rect.height())
             width = unicode(rect.width())
-            settingsx["Geometry"] = height + u"x" + width                #custom made string
-            settingsx["Mode"] = unicode(self.qmc.mode)
-            settingsx["id"] = unicode(self.qmc.device)
-            settingsx["controlETpid"] = unicode(self.ser.controlETpid)
-            settingsx["readBTpid"] = unicode(self.ser.readBTpid)            
-            settingsx["arduinoETChannel"] = unicode(self.ser.arduinoETChannel)
-            settingsx["arduinoBTChannel"] = unicode(self.ser.arduinoBTChannel)
-            settingsx["Phases"] = unicode(aw.qmc.phases)
-            settingsx["phasesbuttonflag"] = unicode(self.qmc.phasesbuttonflag)
-            settingsx["Statistics"] = unicode(self.qmc.statisticsflags)
-            settingsx["StatisticsConds"] = unicode(self.qmc.statisticsconditions)
-            settingsx["eventsbuttonflag"] = unicode(self.eventsbuttonflag)            
-            settingsx["minieventsflag"] = unicode(self.minieventsflag)
-            settingsx["eventsGraphflag"] = unicode(self.qmc.eventsGraphflag)
-            settingsx["etypes"] = unicode(self.qmc.etypes)
-            settingsx["eventsshowflag"] = unicode(aw.qmc.eventsshowflag)
-            settingsx["autoChargeDrop"] = unicode(self.qmc.autoChargeDropFlag)
-            settingsx["EvalueColor"] = unicode(self.qmc.EvalueColor)
-            settingsx["EvalueMarker"] = unicode(self.qmc.EvalueMarker)
-            settingsx["Evaluelinethickness"] = unicode(self.qmc.Evaluelinethickness)
-            settingsx["Evaluealpha"] = unicode(self.qmc.Evaluealpha)
-            settingsx["Delay"] = unicode(self.qmc.delay)
-            settingsx["Colors"] = unicode(self.qmc.palette)
-            settingsx["LCDColors"] = unicode(self.lcdpaletteB)
-            settingsx["LEDColors"] = unicode(self.lcdpaletteF)
-            flavors= []
-            for i in range(len(self.qmc.flavorlabels)):
-                 flavors.append(unicode(self.qmc.flavorlabels[i]))          
-            settingsx["Flavors"] = unicode(flavors)
-            settingsx["flavorstartangle"] = unicode(self.qmc.flavorstartangle)
-            settingsx["sound"]= unicode(self.soundflag)
-            settingsx["comport"] = unicode(self.ser.comport)
-            settingsx["baudrate"] = unicode(self.ser.baudrate)
-            settingsx["bytesize"]= unicode(self.ser.bytesize)
-            settingsx["stopbits"]= unicode(self.ser.stopbits)
-            settingsx["parity"]= unicode(self.ser.parity)
-            settingsx["timeout"]= unicode(self.ser.timeout)            
+            general["geometry"] = height + u"x" + width                #custom made string
+            general["mode"] = unicode(self.qmc.mode)
+            device["id"] = unicode(self.qmc.device)
+            device["controlETpid"] = unicode(self.ser.controlETpid)
+            device["readBTpid"] = unicode(self.ser.readBTpid)            
+            device["arduinoETChannel"] = unicode(self.ser.arduinoETChannel)
+            device["arduinoBTChannel"] = unicode(self.ser.arduinoBTChannel)
+            phases["Phases"] = unicode(aw.qmc.phases)
+            phases["phasesbuttonflag"] = unicode(self.qmc.phasesbuttonflag)
+            statistics["Statistics"] = unicode(self.qmc.statisticsflags)
+            statistics["StatisticsConds"] = unicode(self.qmc.statisticsconditions)
+            events["eventsbuttonflag"] = unicode(self.eventsbuttonflag)            
+            events["minieventsflag"] = unicode(self.minieventsflag)
+            events["eventsGraphflag"] = unicode(self.qmc.eventsGraphflag)
+            events["etypes"] = unicode(map(unicode,self.qmc.etypes))
+            events["eventsshowflag"] = unicode(aw.qmc.eventsshowflag)
+            events["autoChargeDrop"] = unicode(self.qmc.autoChargeDropFlag)
+            events["EvalueColor"] = unicode(self.qmc.EvalueColor)
+            events["EvalueMarker"] = unicode(self.qmc.EvalueMarker)
+            events["Evaluelinethickness"] = unicode(self.qmc.Evaluelinethickness)
+            events["Evaluealpha"] = unicode(self.qmc.Evaluealpha)
+            delay["Delay"] = unicode(self.qmc.delay)
+            colors["Colors"] = unicode(self.qmc.palette)
+            colors["LCDColors"] = unicode(self.lcdpaletteB)
+            colors["LEDColors"] = unicode(self.lcdpaletteF)         
+            cupping["Flavors"] = unicode(map(unicode,self.qmc.flavorlabels))
+            cupping["flavorstartangle"] = unicode(self.qmc.flavorstartangle)
+            serial["comport"] = unicode(self.ser.comport)
+            serial["baudrate"] = unicode(self.ser.baudrate)
+            serial["bytesize"]= unicode(self.ser.bytesize)
+            serial["stopbits"]= unicode(self.ser.stopbits)
+            serial["parity"]= unicode(self.ser.parity)
+            serial["timeout"]= unicode(self.ser.timeout)            
             for key in self.fujipid.PXR.keys():
-                settingsx[u"PXR:" + key] = unicode(self.fujipid.PXR[key][0])   # key modified
+                device[u"PXR:" + key] = unicode(self.fujipid.PXR[key][0])   # key modified
             for key in self.fujipid.PXG4.keys():            
-                settingsx[u"PXG:" + key] = unicode(self.fujipid.PXG4[key][0])  # key modified
+                device[u"PXG:" + key] = unicode(self.fujipid.PXG4[key][0])  # key modified
             for key in self.dtapid.dtamem.keys():            
-                settingsx[u"DTA:" + key] = unicode(self.dtapid.dtamem[key][0]) # key modified
-            settingsx["DeltaET"]= unicode(self.qmc.DeltaETflag)
-            settingsx["DeltaBT"]= unicode(self.qmc.DeltaBTflag)
-            settingsx["deltafilter"]= unicode(self.qmc.deltafilter)
-            settingsx["Projection"]= unicode(self.qmc.projectFlag)
-            settingsx["ProjectionMode"]= unicode(self.qmc.projectionmode)
-            settingsx["ETtarget"]= unicode(self.qmc.ETtarget)
-            settingsx["BTtarget"]= unicode(self.qmc.BTtarget)
-            settingsx["HUDMode"]= unicode(self.HUDfunction)                      # key modified
-            settingsx["hudETpid"]= unicode(self.qmc.hudETpid)
-            settingsx["Beep"]= unicode(self.soundflag)
-            settingsx["xmin"]= unicode(self.qmc.startofx)
-            settingsx["xmax"]= unicode(self.qmc.endofx)
-            settingsx["ymax"]= unicode(self.qmc.ylimit)
-            settingsx["ymin"]= unicode(self.qmc.ylimit_min)
-            settingsx["zmax"]= unicode(self.qmc.zlimit)
-            settingsx["zmin"]= unicode(self.qmc.zlimit_min)
-            settingsx["resetmaxtime"] = unicode(aw.qmc.stringfromseconds(self.qmc.resetmaxtime))
-            settingsx["legendloc"] = unicode(self.qmc.legendloc )
+                device[u"DTA:" + key] = unicode(self.dtapid.dtamem[key][0]) # key modified
+            general["sound"]= unicode(self.soundflag)
+            extras["DeltaET"]= unicode(self.qmc.DeltaETflag)
+            extras["DeltaBT"]= unicode(self.qmc.DeltaBTflag)
+            extras["deltafilter"]= unicode(self.qmc.deltafilter)
+            extras["Projection"]= unicode(self.qmc.projectFlag)
+            extras["ProjectionMode"]= unicode(self.qmc.projectionmode)
+            extras["ETtarget"]= unicode(self.qmc.ETtarget)
+            extras["BTtarget"]= unicode(self.qmc.BTtarget)
+            extras["HUDMode"]= unicode(self.HUDfunction)                      # key modified
+            extras["hudETpid"]= unicode(self.qmc.hudETpid)
+            extras["Beep"]= unicode(self.soundflag)
+            axes["xmin"]= unicode(self.qmc.startofx)
+            axes["xmax"]= unicode(self.qmc.endofx)
+            axes["ymax"]= unicode(self.qmc.ylimit)
+            axes["ymin"]= unicode(self.qmc.ylimit_min)
+            axes["zmax"]= unicode(self.qmc.zlimit)
+            axes["zmin"]= unicode(self.qmc.zlimit_min)
+            axes["resetmaxtime"] = unicode(aw.qmc.stringfromseconds(self.qmc.resetmaxtime))
+            axes["legendloc"] = unicode(self.qmc.legendloc )
             
-            settingsx["operator"]= unicode(self.qmc.operator)
-            settingsx["roastertype"] = unicode(self.qmc.roastertype)
-            settingsx["densitySampleVolume"] = unicode(self.qmc.density[2])
-            settingsx["densitySampleVolumeUnit"]= unicode(self.qmc.density[3])
-            settingsx["beansize"]= unicode(self.qmc.beansize)
+            roast["operator"]= unicode(self.qmc.operator)
+            roast["roastertype"] = unicode(self.qmc.roastertype)
+            roast["densitySampleVolume"] = unicode(self.qmc.density[2])
+            roast["densitySampleVolumeUnit"]= unicode(self.qmc.density[3])
+            roast["beansize"]= unicode(self.qmc.beansize)
             
-            settingsx["alarmtime"]= unicode(self.qmc.alarmtime)                                                                
-            settingsx["alarmflag"]= unicode(self.qmc.alarmflag)            
-            settingsx["alarmsource"]= unicode(self.qmc.alarmsource)
-            settingsx["alarmtemperature"]= unicode(self.qmc.alarmtemperature)
-            settingsx["alarmaction"]= unicode(self.qmc.alarmaction)
-            settingsx["alarmstrings"]= unicode(self.qmc.alarmstrings)
-            settingsx["profilepath"]= unicode(self.userprofilepath)
+            alarms["alarmtime"]= unicode(self.qmc.alarmtime)                                                                
+            alarms["alarmflag"]= unicode(self.qmc.alarmflag)            
+            alarms["alarmsource"]= unicode(self.qmc.alarmsource)
+            alarms["alarmtemperature"]= unicode(self.qmc.alarmtemperature)
+            alarms["alarmaction"]= unicode(self.qmc.alarmaction)
+            alarms["alarmstrings"]= unicode(self.qmc.alarmstrings)
+            general["profilepath"]= unicode(self.userprofilepath)
             #save extra devices
-            settingsx["extradevices"]= unicode(self.qmc.extradevices)                
-            settingsx["extradevicecolor1"]= unicode(self.qmc.extradevicecolor1)                                                                
-            settingsx["extradevicecolor2"]= unicode(self.qmc.extradevicecolor2)
-            settingsx["extraname1"]= unicode(self.qmc.extraname1)
-            settingsx["extraname2"]= unicode(self.qmc.extraname2)
-            settingsx["extramathexpression1"]= unicode(self.qmc.extramathexpression1)
-            settingsx["extramathexpression2"]= unicode(self.qmc.extramathexpression2)
+            device["extradevices"]= unicode(self.qmc.extradevices)                
+            device["extradevicecolor1"]= unicode(self.qmc.extradevicecolor1)                                                                
+            device["extradevicecolor2"]= unicode(self.qmc.extradevicecolor2)
+            device["extraname1"]= unicode(self.qmc.extraname1)
+            device["extraname2"]= unicode(self.qmc.extraname2)
+            device["extramathexpression1"]= unicode(self.qmc.extramathexpression1)
+            device["extramathexpression2"]= unicode(self.qmc.extramathexpression2)
             
             #save extra serial comm ports settings
-            settingsx["extracomport"]= unicode(self.extracomport)                                                                
-            settingsx["extrabaudrate"]= unicode(self.extrabaudrate)                                                                
-            settingsx["extrabytesize"]= unicode(self.extrabytesize)                                                                
-            settingsx["extraparity"]= unicode(self.extraparity)                                                                
-            settingsx["extrastopbits"]= unicode(self.extrastopbits)                                                                
-            settingsx["extratimeout"]= unicode(self.extratimeout)
-            settingsx["BTfunction"]= unicode(self.qmc.BTfunction)                                                                
-            settingsx["ETfunction"]= unicode(self.qmc.ETfunction)
-            settingsx["extraserlength"]= unicode(len(self.extraser))
+            serial["extracomport"]= unicode(self.extracomport)                                                                
+            serial["extrabaudrate"]= unicode(self.extrabaudrate)                                                                
+            serial["extrabytesize"]= unicode(self.extrabytesize)                                                                
+            serial["extraparity"]= unicode(self.extraparity)                                                                
+            serial["extrastopbits"]= unicode(self.extrastopbits)                                                                
+            serial["extratimeout"]= unicode(self.extratimeout)
+            device["BTfunction"]= unicode(self.qmc.BTfunction)                                                                
+            device["ETfunction"]= unicode(self.qmc.ETfunction)
+            serial["extraserlength"]= unicode(len(self.extraser))
             
-            settingsx["resetqsettings"]= unicode(self.resetqsettings)
-            settingsx["plotcurves"]= unicode(self.qmc.plotcurves)                                                                
-            settingsx["plotcurvecolor"]= unicode(self.qmc.plotcurvecolor)
+            general["resetqsettings"]= unicode(self.resetqsettings)
+            extras["plotcurves"]= unicode(self.qmc.plotcurves)                                                                
+            extras["plotcurvecolor"]= unicode(self.qmc.plotcurvecolor)
             
             #custom event buttons
-            settingsx["buttonlistmaxlen"]= unicode(self.buttonlistmaxlen)
-            settingsx["extraeventstypes"]= unicode(self.extraeventstypes)
-            settingsx["extraeventsvalues"]= unicode(self.extraeventsvalues)
-            settingsx["extraeventsactionstrings"]= unicode(self.extraeventsactionstrings)
-            settingsx["extraeventsactions"]= unicode(self.extraeventsactions)
-            settingsx["extraeventsdescriptions"]= unicode(self.extraeventsdescriptions)
-            settingsx["extraeventsvisibility"]= unicode(self.extraeventsvisibility)
-            settingsx["extraeventslabels"]= unicode(self.extraeventslabels)
-            settingsx["extraeventbuttoncolor"]= unicode(self.extraeventbuttoncolor)
-            settingsx["extraeventbuttontextcolor"]= unicode(self.extraeventbuttontextcolor)
-            settingsx["extraeventsbuttonsflag"]= unicode(self.extraeventsbuttonsflag)
-            settingsx["buttonpalettemaxlen"]= unicode(self.buttonpalettemaxlen)
-            settingsx["buttonpalette"]= unicode(self.buttonpalette)
-            settingsx["xgrid"]= unicode(self.qmc.xgrid)
-            settingsx["ygrid"]= unicode(self.qmc.ygrid)
-            settingsx["zgrid"]= unicode(self.qmc.zgrid)
-            settingsx["gridlinestyle"]= unicode(self.qmc.gridlinestyle)
-            settingsx["gridthickness"]= unicode(self.qmc.gridthickness)
-            settingsx["gridalpha"]= unicode(self.qmc.gridalpha)
-            settingsx["xrotation"]= unicode(self.qmc.xrotation)
+            events["buttonlistmaxlen"]= unicode(self.buttonlistmaxlen)
+            events["extraeventstypes"]= unicode(self.extraeventstypes)
+            events["extraeventsvalues"]= unicode(self.extraeventsvalues)
+            events["extraeventsactionstrings"]= unicode(self.extraeventsactionstrings)
+            events["extraeventsactions"]= unicode(self.extraeventsactions)
+            events["extraeventsdescriptions"]= unicode(self.extraeventsdescriptions)
+            events["extraeventsvisibility"]= unicode(self.extraeventsvisibility)
+            events["extraeventslabels"]= unicode(self.extraeventslabels)
+            events["extraeventbuttoncolor"]= unicode(self.extraeventbuttoncolor)
+            events["extraeventbuttontextcolor"]= unicode(self.extraeventbuttontextcolor)
+            events["extraeventsbuttonsflag"]= unicode(self.extraeventsbuttonsflag)
+            events["buttonpalettemaxlen"]= unicode(self.buttonpalettemaxlen)
+            events["buttonpalette"]= unicode(self.buttonpalette)
+            axes["xgrid"]= unicode(self.qmc.xgrid)
+            axes["ygrid"]= unicode(self.qmc.ygrid)
+            axes["zgrid"]= unicode(self.qmc.zgrid)
+            axes["gridlinestyle"]= unicode(self.qmc.gridlinestyle)
+            axes["gridthickness"]= unicode(self.qmc.gridthickness)
+            axes["gridalpha"]= unicode(self.qmc.gridalpha)
+            axes["xrotation"]= unicode(self.qmc.xrotation)
 
-            return settingsx
+            settingsx = [general,device,phases,statistics,events,delay,colors,cupping,extras,serial,axes,roast,alarms]
+            #keep same order
+            settingsnames = ["general","device config","phases config","statistics config","events config","sampling interval","colors config",
+                             "cupping config","extras config","serial config","axes config","roast properties","alarms config"]
+
+            return settingsx,settingsnames
 
 
     def filePrint(self):
@@ -8069,6 +8079,26 @@ $cupping_notes
                 
     def helpHelp(self):
         QDesktopServices.openUrl(QUrl(u"http://coffeetroupe.com/artisandocs/", QUrl.TolerantMode))
+
+    def applicationscreenshot(self):
+        imag = QPixmap().grabWidget(self)
+        format = 'png'
+        initialPath = QDir.currentPath() + "/ArtisanScreenshot." + format
+        fileName = QFileDialog.getSaveFileName(self, "Artisan ScreenShot",
+                initialPath,
+                "%s Files (*.%s);;All Files (*)"%(format.upper(),format))
+        if fileName:
+            imag.save(fileName, format)          
+        
+    def desktopscreenshot(self):
+        imag = QPixmap.grabWindow(QApplication.desktop().winId())
+        format = 'png'
+        initialPath = QDir.currentPath() + "/DesktopScreenshot." + format
+        fileName = QFileDialog.getSaveFileName(self, "Desktop ScreenShot",
+                initialPath,
+                "%s Files (*.%s);;All Files (*)"%(format.upper(),format))
+        if fileName:
+            imag.save(fileName, format)          
 
     def calibratedelay(self):
         calSpinBox = QDoubleSpinBox()
@@ -10543,13 +10573,16 @@ class platformDlg(QDialog):
 class artisansettingsDlg(QDialog):
     def __init__(self, parent = None):
         super(artisansettingsDlg,self).__init__(parent)
-        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Program Variables", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Artisan Program Settings Viewer", None, QApplication.UnicodeUTF8))
 
         self.htmlsettings = ""
 
+        self.ncategoriesComboBox = QComboBox()
         self.settingsEdit = QTextEdit()
-
-        self.getstring()
+        self.settingsEdit.setReadOnly(True)
+        names = self.getstring()
+        self.ncategoriesComboBox.addItems(names)
+        self.connect(self.ncategoriesComboBox,SIGNAL("currentIndexChanged(int)"),self.searchstringfromcombobox)
 
         searchButton = QPushButton(QApplication.translate("Button","Search", None, QApplication.UnicodeUTF8))
         searchButton.setMaximumWidth(150)
@@ -10561,6 +10594,7 @@ class artisansettingsDlg(QDialog):
         self.connect(updateButton,SIGNAL("clicked()"),self.getstring)
 
         searchlayout = QHBoxLayout()
+        searchlayout.addWidget(self.ncategoriesComboBox)
         searchlayout.addWidget(self.searchbox)
         searchlayout.addWidget(searchButton)
 
@@ -10573,14 +10607,31 @@ class artisansettingsDlg(QDialog):
 
     def findtext(self):
         aw.searchtextartisansettings = unicode(self.searchbox.text())
-        self.settingsEdit.find(self.searchbox.text())
+        if not self.settingsEdit.find(self.searchbox.text()):
+            self.settingsEdit.find(self.searchbox.text(),QTextDocument.FindBackward)
+
+    def searchstringfromcombobox(self):
+        if not self.settingsEdit.find(self.ncategoriesComboBox.currentText()):
+            self.settingsEdit.find(self.ncategoriesComboBox.currentText(),QTextDocument.FindBackward)
 
     def getstring(self):
-        self.htmlsettings = "version = " +__version__ +"<br><br>"
-        settingsdict = aw.readartisansettings()
-        for key in sorted(settingsdict):        
-            self.htmlsettings += "<b>" + key + " = </b> <i>" + settingsdict[key] + "</i><br><br>"
+        self.htmlsettings = "<body bgcolor=\"black\">"
+        self.htmlsettings += "<font color=\"white\">"
+        self.htmlsettings += "version = " +__version__ +"<br><br>"
+        settingsdictlist,settingsnameslist = aw.readartisansettings()
+
+        pcolors = ["grey","blue"]
+        for n in range(len(settingsnameslist)):
+            self.htmlsettings += "<p><b><font color=\"orange\">%s </font></b></p>"%settingsnameslist[n].upper()
+            self.htmlsettings += "<p style=\"background-color: %s\">"%pcolors[n%2]
+            for keys in sorted(settingsdictlist[n]):
+                self.htmlsettings += "<b>&nbsp;&nbsp;" + keys + " = </b> <i>" + settingsdictlist[n][keys] + "</i><br><br>"
+            self.htmlsettings += "</p>"
+
+        self.htmlsettings += "<\body><\font>"    
         self.settingsEdit.setHtml(self.htmlsettings)
+
+        return settingsnameslist
 
     def keyPressEvent(self,event):    
         key = int(event.key())
