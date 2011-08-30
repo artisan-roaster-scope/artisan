@@ -14531,11 +14531,11 @@ class serialport(object):
 
                 #if extra device +ArduinoTC4_XX
                 if 28 in aw.qmc.extradevices:
-                    t1 = float(res[0])
-                    t2 = float(res[1])
+                    t1 = float(res[1])
+                    t2 = float(res[2])
                     #set the other values to extra temp variables
-                    aw.qmc.extraArduinoT1 = float(res[2])                  
-                    aw.qmc.extraArduinoT2 = float(res[3])
+                    aw.qmc.extraArduinoT1 = float(res[3])                  
+                    aw.qmc.extraArduinoT2 = float(res[4])
                 else:
                     #no extra device
                     t1 = float(res[1])
