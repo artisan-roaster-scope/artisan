@@ -6986,6 +6986,14 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("LEDColors"):
                 for (k, v) in settings.value("LEDColors").toMap().items():
                     self.lcdpaletteF[unicode(k)] = unicode(v.toString())
+            #restore colors
+            self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
+            self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
+            self.lcd3.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["bt"],self.lcdpaletteB["bt"]))
+            self.lcd4.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltaet"],self.lcdpaletteB["deltaet"]))
+            self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
+            self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+            self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
 
             #restore flavors
             self.qmc.flavorlabels = settings.value("Flavors",self.qmc.flavorlabels).toStringList()
