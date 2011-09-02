@@ -302,7 +302,8 @@ class tgraphcanvas(FigureCanvas):
                        "+Virtual",              #25
                        "-DTAtemperature",       #26   
                        "Program",               #27
-                       "+ArduinoTC4_XX"         #28
+                       "+ArduinoTC4_XX",        #28
+                       "Omega HH806W"           #29 NOT WORKING
                        ]
 
         #extra devices
@@ -726,6 +727,12 @@ class tgraphcanvas(FigureCanvas):
                     if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid  
                         aw.lcd6.display(self.currentpidsv)
                         aw.lcd7.display(self.dutycycle)
+
+                    ndev = len(self.extradevices)
+                    for i in range(ndev):
+                        if ndev < 10:
+                            aw.extraLCD1[i].display("%.1f"%self.extratemp1[i][-1])
+                            aw.extraLCD2[i].display("%.1f"%self.extratemp2[i][-1])
 
                 #updated canvas
                 self.fig.canvas.draw()
@@ -2183,13 +2190,13 @@ class tgraphcanvas(FigureCanvas):
                 for i in range(len(backgroundplotf)):
                     backgroundplotf[i] /= 10.
 
-                self.ax1.plot(angles,backgroundplotf,color="orange",alpha=.5)
+                self.ax1.plot(angles,backgroundplotf,color="orange",marker="o",alpha=.5)
                 #needs matplotlib 1.0.0+
                 if mpl.__version__.split(".")[0] == '1':
                     self.ax1.fill_between(angles,0,backgroundplotf, facecolor="yellow", alpha=0.1, interpolate=True)
                 
         #add to plot
-        self.ax1.plot(angles,plotf,color="blue")
+        self.ax1.plot(angles,plotf,color="blue",marker="o")
         
         #needs matplotlib 1.0.0+
         if mpl.__version__.split(".")[0] == '1':
@@ -5261,22 +5268,22 @@ class ApplicationWindow(QMainWindow):
         self.lcd1.setMinimumWidth(100)
         self.lcd2 = QLCDNumber() # Temperature MET
         self.lcd2.setSegmentStyle(2)   
-        self.lcd2.setMinimumHeight(35)
+        self.lcd2.setMinimumWidth(90)
         self.lcd3 = QLCDNumber() # Temperature BT
         self.lcd3.setSegmentStyle(2)
-        self.lcd3.setMinimumHeight(35)
+        self.lcd3.setMinimumWidth(90)
         self.lcd4 = QLCDNumber() # rate of change MET
         self.lcd4.setSegmentStyle(2)
-        self.lcd4.setMinimumHeight(35)
+        self.lcd4.setMinimumWidth(70)
         self.lcd5 = QLCDNumber() # rate of change BT
         self.lcd5.setSegmentStyle(2)
-        self.lcd5.setMinimumHeight(35)
+        self.lcd5.setMinimumWidth(90)
         self.lcd6 = QLCDNumber() # pid sv
         self.lcd6.setSegmentStyle(2)
-        self.lcd6.setMinimumHeight(35) 
+        #self.lcd6.setMinimumHeight(35) 
         self.lcd7 = QLCDNumber() # pid power % duty cycle
         self.lcd7.setSegmentStyle(2)
-        self.lcd7.setMinimumHeight(35)
+        self.lcd7.setMinimumWidth(90)
         #self.lcd1.setStyleSheet("QLCDNumber { }")
 
         self.lcd1.display("00:00")
@@ -5314,33 +5321,68 @@ class ApplicationWindow(QMainWindow):
         #MET
         label2 = QLabel()
         label2.setText("<font color='black'><b>" + QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        label2.setAlignment(Qt.AlignRight)
+        label2.setAlignment(Qt.AlignBottom)
         label2.setIndent(5)
         #BT
         label3 = QLabel()
-        label3.setAlignment(Qt.AlignRight)
+        label3.setAlignment(Qt.AlignBottom)
         label3.setText("<font color='black'><b>" + QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label3.setIndent(5)
         #DELTA MET
         label4 = QLabel()
-        label4.setAlignment(Qt.AlignRight)
+        label4.setAlignment(Qt.AlignBottom)
         label4.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label4.setIndent(5)
         # DELTA BT
         label5 = QLabel()
-        label5.setAlignment(Qt.AlignRight)       
+        label5.setAlignment(Qt.AlignBottom)       
         label5.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b></font>")
         label5.setIndent(5)
         # pid sv
         self.label6 = QLabel()
-        self.label6.setAlignment(Qt.AlignRight)
+        self.label6.setAlignment(Qt.AlignBottom)
         self.label6.setText("<font color='black'><b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.label6.setIndent(5)
         # pid power % duty cycle
         self.label7 = QLabel()
-        self.label7.setAlignment(Qt.AlignRight)
+        self.label7.setAlignment(Qt.AlignBottom)
         self.label7.setText("<font color='black'><b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b></font>")
         self.label7.setIndent(5)
+
+        #extra LCDs
+        nLCDS = 10
+        self.extraLCD1,self.extraLCD2 = [],[]
+        self.extraLCDlabel1,self.extraLCDlabel2 = [],[]
+        self.extraLCDvisibility1,self.extraLCDvisibility2 = [0]*nLCDS,[0]*nLCDS
+        for i in range(nLCDS):
+            #configure LCDs
+            self.extraLCD1.append(QLCDNumber())
+            self.extraLCDlabel1.append(QLabel())
+            self.extraLCD2.append(QLCDNumber())
+            self.extraLCDlabel2.append(QLabel())
+            self.extraLCD1[i].setSegmentStyle(2)
+            self.extraLCD1[i].display("0.0")
+            self.extraLCD2[i].setSegmentStyle(2)
+            self.extraLCD2[i].display("0.0")
+            #self.extraLCD[i].setMinimumHeight(35)
+            self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+            self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+            string1 = QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8)
+            string2 = QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None, QApplication.UnicodeUTF8)
+            self.extraLCD1[i].setMaximumSize(90, 45)
+            self.extraLCD2[i].setMaximumSize(90, 45)
+            #configure Labels
+            self.extraLCDlabel1[i].setText("<b>" + string1 + "</b>")
+            self.extraLCDlabel1[i].setAlignment(Qt.AlignBottom)
+            self.extraLCDlabel1[i].setIndent(5)
+            self.extraLCDlabel2[i].setText("<b>" + string2 + "</b>")
+            self.extraLCDlabel2[i].setAlignment(Qt.AlignBottom)
+            self.extraLCDlabel2[i].setIndent(5)
+            #set initial visiblity (updated at settingsload())
+            self.extraLCD1[i].setVisible(False)
+            self.extraLCDlabel1[i].setVisible(False)
+            self.extraLCD2[i].setVisible(False)
+            self.extraLCDlabel2[i].setVisible(False)
 
         # Stores messages up to 500        
         self.messagehist = []
@@ -5449,10 +5491,6 @@ class ApplicationWindow(QMainWindow):
 
         ####################   APPLICATION WINDOW (AW) LAYOUT  ##############################################
         
-        mainlayout = QVBoxLayout(self.main_widget)
-        mainlayout.setMargin(0)
-        mainlayout.setSpacing(0)
-        
         level1layout = QHBoxLayout()   # matplotlib toolbox + HUD button + reset button + LCD Timer
 
         level3layout = QHBoxLayout()   # PID buttons, graph, temperature LCDs
@@ -5481,25 +5519,32 @@ class ApplicationWindow(QMainWindow):
         self.EventsGroupLayout.setLayout(EventsLayout)
  
         #place control buttons + LCDs inside vertical button layout manager
+        LCDlayout.addSpacing(10)
         LCDlayout.addWidget(label2)
         LCDlayout.addWidget(self.lcd2)
-        LCDlayout.addStretch()   
+        #LCDlayout.addStretch()   
         LCDlayout.addWidget(label3)
         LCDlayout.addWidget(self.lcd3)
-        LCDlayout.addStretch()
+        #LCDlayout.addStretch()
         LCDlayout.addWidget(self.label6)
         LCDlayout.addWidget(self.lcd6)
-        LCDlayout.addStretch()
+        #LCDlayout.addStretch()
         LCDlayout.addWidget(self.label7)
         LCDlayout.addWidget(self.lcd7)
-        LCDlayout.addStretch()
+        #LCDlayout.addStretch()
         LCDlayout.addWidget(label4)
         LCDlayout.addWidget(self.lcd4)
-        LCDlayout.addStretch()   
+        #LCDlayout.addStretch()   
         LCDlayout.addWidget(label5)
         LCDlayout.addWidget(self.lcd5)
-        LCDlayout.addStretch()   
-                      
+        #add extra LCDs
+        for i in range(nLCDS):
+            LCDlayout.addWidget(self.extraLCDlabel1[i])
+            LCDlayout.addWidget(self.extraLCD1[i])
+            LCDlayout.addWidget(self.extraLCDlabel2[i])
+            LCDlayout.addWidget(self.extraLCD2[i])
+        LCDlayout.addStretch()
+            
         #PID Buttons       
         pidbuttonLayout.addWidget(self.button_14)       
         pidbuttonLayout.addWidget(self.button_13)
@@ -5522,18 +5567,28 @@ class ApplicationWindow(QMainWindow):
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
         level3layout.addWidget(self.stack,1)
-        level3layout.addLayout(LCDlayout,2)
+
+        midleftlayout = QVBoxLayout()
+        midleftlayout.setMargin(0)
+        midleftlayout.setSpacing(0)
         
+        midleftlayout.addWidget(self.messagelabel)
+        midleftlayout.addLayout(level3layout)
+        midleftlayout.addWidget(self.lowerbuttondialog)
+        midleftlayout.addWidget(self.e1buttondialog)
+        midleftlayout.addWidget(self.e2buttondialog)
+        midleftlayout.addWidget(self.e3buttondialog)
+        midleftlayout.addWidget(self.e4buttondialog)
+        midleftlayout.addSpacing(10)
+        midleftlayout.addWidget(self.EventsGroupLayout)
+
+        midlayout = QHBoxLayout()
+        midlayout.addLayout(midleftlayout)
+        midlayout.addLayout(LCDlayout)
+
+        mainlayout = QVBoxLayout(self.main_widget)
         mainlayout.addLayout(level1layout)       
-        mainlayout.addWidget(self.messagelabel)
-        mainlayout.addLayout(level3layout)
-        mainlayout.addWidget(self.lowerbuttondialog)
-        mainlayout.addWidget(self.e1buttondialog)
-        mainlayout.addWidget(self.e2buttondialog)
-        mainlayout.addWidget(self.e3buttondialog)
-        mainlayout.addWidget(self.e4buttondialog)
-        mainlayout.addSpacing(10)
-        mainlayout.addWidget(self.EventsGroupLayout)
+        mainlayout.addLayout(midlayout)       
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
     #adds errors
@@ -6410,26 +6465,28 @@ class ApplicationWindow(QMainWindow):
         self.extratimeout.append(1)
         
     def addDevice(self):
-        aw.qmc.extradevices.append(1)
-        aw.qmc.extradevicecolor1.append(u"black") #init color to black
-        aw.qmc.extradevicecolor2.append(u"black")
-        aw.qmc.extraname1.append("Extra 1")
-        aw.qmc.extraname2.append("Extra 2")     
-        aw.qmc.extramathexpression1.append(u"")
-        aw.qmc.extramathexpression2.append(u"")
+        self.qmc.extradevices.append(1)
+        self.qmc.extradevicecolor1.append(u"black") #init color to black
+        self.qmc.extradevicecolor2.append(u"black")
+        self.qmc.extraname1.append("Extra 1")
+        self.qmc.extraname2.append("Extra 2")     
+        self.qmc.extramathexpression1.append(u"")
+        self.qmc.extramathexpression2.append(u"")
         
         #create new serial port (but don't open it yet). Store initial settings  
         self.addSerialPort()
         
     	#add new line variables
-        aw.qmc.extratimex.append([])        
-        aw.qmc.extratemp1.append([])
-        aw.qmc.extratemp2.append([])
+        self.qmc.extratimex.append([])        
+        self.qmc.extratemp1.append([])
+        self.qmc.extratemp2.append([])
 
         #add two extra lines in figure for extra ET and extra BT
         l = len(aw.qmc.extradevices)-1  #new line index
-        aw.qmc.extratemp1lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp1[l],color=aw.qmc.extradevicecolor1[l],linewidth=2,label= aw.qmc.extraname1[l])[0])
-        aw.qmc.extratemp2lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp2[l],color=aw.qmc.extradevicecolor2[l],linewidth=2,label= aw.qmc.extraname2[l])[0])
+        self.qmc.extratemp1lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp1[l],color=aw.qmc.extradevicecolor1[l],linewidth=2,label= aw.qmc.extraname1[l])[0])
+        self.qmc.extratemp2lines.append(aw.qmc.ax.plot(aw.qmc.extratimex[l], aw.qmc.extratemp2[l],color=aw.qmc.extradevicecolor2[l],linewidth=2,label= aw.qmc.extraname2[l])[0])
+
+        self.updateExtraLCDvisibility()
             
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
@@ -6577,6 +6634,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extradevicecolor1 = profile["extradevicecolor1"]
             if "extradevicecolor2" in profile:
                 self.qmc.extradevicecolor2 = profile["extradevicecolor2"]
+
+            self.updateExtraLCDvisibility()
+
 
         old_mode = self.qmc.mode
         if "mode" in profile:
@@ -7029,7 +7089,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extramathexpression1 = map(unicode,list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList()))
                 self.qmc.extramathexpression2 = map(unicode,list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList()))
                 self.qmc.extradevicecolor1 = map(unicode,list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList()))
-                self.qmc.extradevicecolor2 = map(unicode,list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList()))                 
+                self.qmc.extradevicecolor2 = map(unicode,list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList()))
+                if settings.contains("extraLCDvisibility1"):
+                    self.extraLCDvisibility1 = map(lambda x:x.toInt()[0],settings.value("extraLCDvisibility1").toList())
+                    self.extraLCDvisibility2 = map(lambda x:x.toInt()[0],settings.value("extraLCDvisibility2").toList())
             #create empty containers
             for i in range(len(self.qmc.extradevices)):
                 self.qmc.extratemp1.append([])
@@ -7038,6 +7101,8 @@ class ApplicationWindow(QMainWindow):
                 #init empty lines
                 self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp1[i],color="black",linewidth=2,label= self.qmc.extraname1[i])[0])
                 self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp2[i],color="black",linewidth=2,label= self.qmc.extraname1[i])[0])
+                #extra LCDs
+            self.updateExtraLCDvisibility()
             settings.endGroup()
 
             # Extra com ports
@@ -7294,6 +7359,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extraname2",self.qmc.extraname2)
             settings.setValue("extramathexpression1",self.qmc.extramathexpression1)
             settings.setValue("extramathexpression2",self.qmc.extramathexpression2)
+            settings.setValue("extraLCDvisibility1",self.extraLCDvisibility1)
+            settings.setValue("extraLCDvisibility2",self.extraLCDvisibility2)
             settings.endGroup()
             
             #save extra serial comm ports settings
@@ -7474,6 +7541,9 @@ class ApplicationWindow(QMainWindow):
             axes["gridalpha"]= unicode(self.qmc.gridalpha)
             axes["xrotation"]= unicode(self.qmc.xrotation)
 
+            general["extraLCDvisibility1"] = self.extraLCDvisibility1
+            general["extraLCDvisibility2"] = self.extraLCDvisibility2
+
             settingsx = [general,device,phases,statistics,events,delay,colors,cupping,extras,serial,axes,roast,alarms]
             #keep same order
             settingsnames = ["general","device config","phases config","statistics config","events config","sampling interval","colors config",
@@ -7481,6 +7551,34 @@ class ApplicationWindow(QMainWindow):
 
             return settingsx,settingsnames
 
+    def updateExtraLCDvisibility(self):
+        n = len(self.qmc.extradevices)
+        for i in range(n):
+            if i < 10 :
+                if self.extraLCDvisibility1[i]:
+                    if i < len(aw.qmc.extraname1):
+                        self.extraLCDlabel1[i].setText("<b>" + self.qmc.extraname1[i] + "<\b>")
+                    self.extraLCDlabel1[i].setVisible(True)
+                    self.extraLCD1[i].setVisible(True)
+                    self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+                else:
+                    self.extraLCDlabel1[i].setVisible(False)
+                    self.extraLCD1[i].setVisible(False)
+                if self.extraLCDvisibility2[i]:
+                    if i < len(aw.qmc.extraname2):
+                        self.extraLCDlabel2[i].setText("<b>" + self.qmc.extraname2[i] + "<\b>")
+                    self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+                    self.extraLCDlabel2[i].setVisible(True)
+                    self.extraLCD2[i].setVisible(True)
+                else:
+                    self.extraLCDlabel2[i].setVisible(False)
+                    self.extraLCD2[i].setVisible(False)
+        #hide the rest (just in case)
+        for i in range(n,10):
+            self.extraLCDlabel1[i].setVisible(False)
+            self.extraLCD1[i].setVisible(False)            
+            self.extraLCDlabel2[i].setVisible(False)
+            self.extraLCD2[i].setVisible(False)            
 
     def filePrint(self):
 
@@ -13557,6 +13655,8 @@ class serialport(object):
         self.arduinoBTChannel = "2"
         self.ArduinoIsInitialized = 0
 
+        self.HH806Winitflag = 0
+
         #list of functions calls to read temperature for devices.
         # device 0 (with index 0 bellow) is Fuji Pid
         # device 1 (with index 1 bellow) is Omega HH806
@@ -13590,7 +13690,8 @@ class serialport(object):
                                    self.virtual,            #25
                                    self.DTAtemperature,     #26
                                    self.callprogram,        #27
-                                   self.ARDUINOTC4_34       #28
+                                   self.ARDUINOTC4_34,      #28
+                                   self.HH806W               #29
                                    ]
 
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
@@ -13855,6 +13956,13 @@ class serialport(object):
 
          return tx,t2,t1
 
+    def HH806W(self):
+
+         t2,t1 = self.HH806Wtemperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+
     def HH802U(self):
 
          t2,t1 = self.HH806AUtemperature()
@@ -14063,7 +14171,7 @@ class serialport(object):
            self.closeport() 
         except serial.SerialException,e:
             pass        
-            
+
      #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
         #init command = "#0A0000RA6\r\n"
@@ -14117,6 +14225,82 @@ class serialport(object):
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("H806 :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
+
+
+    def HH806Winit(self):
+        try:
+            if not self.SP.isOpen():
+                self.openport()                                    
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write("#0A0000RA6\r\n") 
+                libtime.sleep(.3)
+                self.SP.write("#0A0000RA6\r\n") 
+                libtime.sleep(.3)
+                self.SP.write("\x21\x05\x00\x58\x7E")
+                libtime.sleep(2.)
+                self.HH806Winitflag = 1
+                    
+        except serial.SerialException, e:
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("Error Message","Serial Exception: ser.HH806Winit() ",None, QApplication.UnicodeUTF8)
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)                                    
+
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("H806Winit :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
+                                
+
+    #UNDER WORK 806 wireless meter
+    def HH806Wtemperature(self):
+        if self.HH806Winitflag == 0:                                         
+            self.HH806Winit()                       
+            if self.HH806Winitflag == 0:                 
+                aw.qmc.adderror(QApplication.translate("Error Message","HH806Wtemperature(): Unable to initiate device",None, QApplication.UnicodeUTF8))
+                return -1,-1
+        try:
+            if not self.SP.isOpen():
+                self.openport()
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                for i in range(27):
+                    rcode = self.SP.read(1)
+                    #locate first byte
+                    if rcode == "\x3d":
+                        rleg = self.SP.read(25)
+                        if len(rleg) == 25:
+                            r1 = binascii.hexlify(r[11:12])
+                            r2 = binascii.hexlify(r[19:20])
+                            #GOOD
+                            return int(r1,16)/10.,int(r2,16)/10.
+                #BAD
+                return -1.,-1.
+
+        except serial.SerialException, e:
+            timez = unicode(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("Error Message","Serial Exception: ser.HH806Wtemperature() ",None, QApplication.UnicodeUTF8)
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)                                    
+            if len(aw.qmc.timex) > 2:                           
+                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]        
+            else:
+                return -1,-1  
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("H806Wtemperature: " + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
+                                
 
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
@@ -14806,7 +14990,7 @@ class serialport(object):
             #keep reading till the first byte of next frame (till we read an actual 1 in 1A )
             for i in range(28):  #any number > 14 will be OK                
                 r = self.SP.read(1)
-                if len(r):
+                if r:
                     fb = (ord(r[0]) & 0xf0) >> 4
                     if fb == 1:
                         r2 = self.SP.read(13)   #read the remaining 13 bytes to get 14 bytes
@@ -16262,15 +16446,16 @@ class DeviceAssignmentDLG(QDialog):
             nddevices = len(aw.qmc.extradevices)
             if nddevices:    
                 self.devicetable.setRowCount(nddevices)
-                self.devicetable.setColumnCount(7)
+                self.devicetable.setColumnCount(9)
                 self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "Color 1",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "Color 2",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "Label 1",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "Label 2",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "y1(x)",None, QApplication.UnicodeUTF8),
-                                                            QApplication.translate("Table", "y2(x)",None, QApplication.UnicodeUTF8)])
-                
+                                                            QApplication.translate("Table", "y2(x)",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "LCD 1",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "LCD 2",None, QApplication.UnicodeUTF8)])
                 self.devicetable.setAlternatingRowColors(True)
                 self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
                 self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -16286,6 +16471,7 @@ class DeviceAssignmentDLG(QDialog):
                             break 
                 devices = sorted(dev)
                 #devices.insert(0,"")         #add empty space for PID
+                visibility = ["OFF","ON"]
                 for i in range(nddevices):
                     typeComboBox =  QComboBox()
                     typeComboBox.addItems(sorted(devices))
@@ -16306,7 +16492,17 @@ class DeviceAssignmentDLG(QDialog):
                     mexpr2edit = QLineEdit(unicode(aw.qmc.extramathexpression2[i]))
                     mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None, QApplication.UnicodeUTF8))
                     mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None, QApplication.UnicodeUTF8))
-                    
+
+                    LCD1visibilityComboBox =  QComboBox()
+                    LCD1visibilityComboBox.addItems(visibility)                    
+                    LCD1visibilityComboBox.setCurrentIndex(aw.extraLCDvisibility1[i])
+                    self.connect(LCD1visibilityComboBox, SIGNAL("currentIndexChanged(int)"),lambda x=0,lcd=1, ind=i: self.updateLCDvisibility(x,lcd,ind))
+
+                    LCD2visibilityComboBox =  QComboBox()
+                    LCD2visibilityComboBox.addItems(visibility)                    
+                    LCD2visibilityComboBox.setCurrentIndex(aw.extraLCDvisibility2[i])
+                    self.connect(LCD2visibilityComboBox, SIGNAL("currentIndexChanged(int)"),lambda x=0,lcd=2, ind=i: self.updateLCDvisibility(x,lcd,ind))
+
                     #add widgets to the table
                     self.devicetable.setCellWidget(i,0,typeComboBox)
                     self.devicetable.setCellWidget(i,1,color1Button)
@@ -16315,6 +16511,8 @@ class DeviceAssignmentDLG(QDialog):
                     self.devicetable.setCellWidget(i,4,name2edit)              
                     self.devicetable.setCellWidget(i,5,mexpr1edit)              
                     self.devicetable.setCellWidget(i,6,mexpr2edit)              
+                    self.devicetable.setCellWidget(i,7,LCD1visibilityComboBox)              
+                    self.devicetable.setCellWidget(i,8,LCD2visibilityComboBox)              
 
         except Exception,e:
              aw.qmc.adderror(QApplication.translate("Error Message", "createDeviceTable(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -16358,6 +16556,7 @@ class DeviceAssignmentDLG(QDialog):
                 bindex = selected[0].topRow()
             if bindex >= 0:
                 self.delextradevice(bindex)
+            aw.updateExtraLCDvisibility()
         except Exception,e:
              aw.qmc.adderror(QApplication.translate("Error Message", "deldevice(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
              
@@ -16375,7 +16574,13 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.extratemp1lines,aw.qmc.extratemp2lines = [],[]           
             aw.qmc.extraname1,aw.qmc.extraname2 = [],[]                     
             aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]
-            
+
+            for i in range(len(aw.extraLCDlabel1)):
+                aw.extraLCDlabel1[x].setVisible(False)
+                aw.extraLCD1[x].setVisible(False)
+                aw.extraLCDlabel2[x].setVisible(False)
+                aw.extraLCD2[x].setVisible(False)
+                
             #delete EXTRA COMM PORTS VARIABLES
             aw.extraser = []
             aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
@@ -16403,7 +16608,9 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.extraname2.pop(x)
             aw.qmc.extramathexpression1.pop(x)
             aw.qmc.extramathexpression2.pop(x)
-            
+
+            aw.updateExtraLCDvisibility()
+                
             #pop serial port settings
             if len(aw.extracomport) > x:
                 aw.extracomport.pop(x)
@@ -16434,18 +16641,46 @@ class DeviceAssignmentDLG(QDialog):
                 name2edit = self.devicetable.cellWidget(i,4)
                 mexpr1edit = self.devicetable.cellWidget(i,5)
                 mexpr2edit = self.devicetable.cellWidget(i,6)
+                LCD1visibilityComboBox = self.devicetable.cellWidget(i,7)
+                LCD2visibilityComboBox = self.devicetable.cellWidget(i,8)
                 
                 aw.qmc.extradevices[i] = aw.qmc.devices.index(unicode(typecombobox.currentText())) + 1
                 aw.qmc.extraname1[i] = unicode(name1edit.text())
                 aw.qmc.extraname2[i] = unicode(name2edit.text())
+                aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "<\b>")
+                aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "<\b>")
                 aw.qmc.extramathexpression1[i] = unicode(mexpr1edit.text())
-                aw.qmc.extramathexpression2[i] = unicode(mexpr2edit.text())       
+                aw.qmc.extramathexpression2[i] = unicode(mexpr2edit.text())
+                aw.extraLCDvisibility1[i] = LCD1visibilityComboBox.currentIndex() 
+                aw.extraLCDvisibility2[i] = LCD1visibilityComboBox.currentIndex()
             
             #update legend
             aw.qmc.redraw(recomputeAllDeltas=False)
 
         except Exception,e:
              aw.qmc.adderror(QApplication.translate("Error Message", "savedevicetable(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
+    def updateLCDvisibility(self,x,lcd,ind):
+        if lcd == 1:
+            combobox =  self.devicetable.cellWidget(ind,7)
+            visibilityvalue = combobox.currentIndex()
+            aw.extraLCDvisibility1[ind] = visibilityvalue
+            if visibilityvalue:
+                aw.extraLCDlabel1[ind].setVisible(True)
+                aw.extraLCD1[ind].setVisible(True)
+            else:
+                aw.extraLCDlabel1[ind].setVisible(False)
+                aw.extraLCD1[ind].setVisible(False)
+        elif lcd == 2:
+            combobox =  self.devicetable.cellWidget(ind,8)
+            visibilityvalue = combobox.currentIndex()
+            aw.extraLCDvisibility2[ind] = visibilityvalue
+            if visibilityvalue:
+                aw.extraLCDlabel2[ind].setVisible(True)
+                aw.extraLCD2[ind].setVisible(True)
+            else:
+                aw.extraLCDlabel2[ind].setVisible(False)
+                aw.extraLCD2[ind].setVisible(False)
         
     def setextracolor(self,l,i):
         try:
@@ -16465,7 +16700,10 @@ class DeviceAssignmentDLG(QDialog):
              aw.qmc.adderror(QApplication.translate("Error Message", "setextracolor(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
 
     def accept(self):
-        try:    
+        try:
+            #save any extra devices here
+            self.savedevicetable()
+
             message = "Device left empty"
             
             # by default switch PID buttons/LCDs off
@@ -16812,14 +17050,23 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.timeout=1
                     message = ""  #empty message especial device
 
+                if meter == "Omega HH806W":
+                    aw.qmc.device = 29
+                    #aw.ser.comport = "COM11"
+                    aw.ser.baudrate = 38400
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'E'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout=1
+                    message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 #extra devices serial config    
                 #set of different serial settings modes options
-                ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],[19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1]]
+                ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
+                             [19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1]]
                 #map device index to a setting mode (chose the one that matches the device)
-                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4]  #0-28
+                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,7]  #0-29
                     
-                self.savedevicetable()
                 #init serial settings of extra devices
                 for i in range(len(aw.qmc.extradevices)):
                     dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
@@ -16858,9 +17105,6 @@ class DeviceAssignmentDLG(QDialog):
            
             aw.qmc.ETfunction = unicode(self.ETfunctionedit.text())
             aw.qmc.BTfunction = unicode(self.BTfunctionedit.text())
-
-            #save any extra devices here
-            self.savedevicetable()
             
             aw.sendmessage(message)
 
@@ -17253,7 +17497,7 @@ class graphColorDlg(QDialog):
         LCD5GroupLayout = QGroupBox(QApplication.translate("GroupBox","Delta BT LCD",None, QApplication.UnicodeUTF8))
         LCD5GroupLayout.setLayout(lcd5layout)
         
-        LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","PID SV & POWER % LCD",None, QApplication.UnicodeUTF8))
+        LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV & POWER % LCD",None, QApplication.UnicodeUTF8))
         LCD6GroupLayout.setLayout(lcd6layout)
 
         buttonlayout  = QHBoxLayout()
@@ -17320,6 +17564,7 @@ class graphColorDlg(QDialog):
         aw.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["deltabt"],aw.lcdpaletteB["deltabt"]))
         aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
+        aw.updateExtraLCDvisibility()
         
     def setLED(self,hue,lcd):
         if lcd == 1:
@@ -17408,7 +17653,7 @@ class graphColorDlg(QDialog):
                 aw.lcdpaletteB["sv"] = self.lcdcolors[self.lcd6colorComboBox.currentIndex()]
             aw.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))            
             aw.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))            
-            
+            aw.updateExtraLCDvisibility()
         
     # adds a new event to the Dlg
     def recolor(self, x):
