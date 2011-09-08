@@ -303,7 +303,7 @@ class tgraphcanvas(FigureCanvas):
                        "-DTAtemperature",       #26   
                        "Program",               #27
                        "+ArduinoTC4_XX",        #28
-                       "Omega HH806W"           #29 NOT WORKING
+                       "-Omega HH806W"           #29 NOT WORKING 
                        ]
 
         #extra devices
@@ -4518,7 +4518,7 @@ class SampleThread(QThread):
                 # only if 9min into roast and BT>190C/374F                  
                 elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
                     length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 374)) and \
-                    (aw.qmc.timeindex[aw.qmc.timeindex[0]] - aw.qmc.timex[-1] > 540):
+                    (aw.qmc.timex[aw.qmc.timeindex[0]] - aw.qmc.timex[-1] > 540):
                     if aw.BTbreak(length_of_qmc_timex - 1):
                         # we found a BT break at the current index minus 2
                         aw.qmc.autoDropIdx = length_of_qmc_timex - 3
@@ -5266,25 +5266,19 @@ class ApplicationWindow(QMainWindow):
         self.lcd1.setSegmentStyle(2)
         self.lcd1.setMinimumHeight(40)
         self.lcd1.setMinimumWidth(100)
+        
         self.lcd2 = QLCDNumber() # Temperature MET
         self.lcd2.setSegmentStyle(2)   
-        self.lcd2.setMinimumWidth(90)
         self.lcd3 = QLCDNumber() # Temperature BT
         self.lcd3.setSegmentStyle(2)
-        self.lcd3.setMinimumWidth(90)
         self.lcd4 = QLCDNumber() # rate of change MET
         self.lcd4.setSegmentStyle(2)
-        self.lcd4.setMinimumWidth(70)
         self.lcd5 = QLCDNumber() # rate of change BT
         self.lcd5.setSegmentStyle(2)
-        self.lcd5.setMinimumWidth(90)
         self.lcd6 = QLCDNumber() # pid sv
         self.lcd6.setSegmentStyle(2)
-        #self.lcd6.setMinimumHeight(35) 
         self.lcd7 = QLCDNumber() # pid power % duty cycle
         self.lcd7.setSegmentStyle(2)
-        self.lcd7.setMinimumWidth(90)
-        #self.lcd1.setStyleSheet("QLCDNumber { }")
 
         self.lcd1.display("00:00")
         self.lcd2.display("0.0")
@@ -5302,13 +5296,12 @@ class ApplicationWindow(QMainWindow):
         self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
         self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
         
-        self.lcd1.setMaximumSize(90, 45)
-        self.lcd2.setMaximumSize(90, 45)
-        self.lcd3.setMaximumSize(90, 45)
-        self.lcd4.setMaximumSize(90, 45)
-        self.lcd5.setMaximumSize(90, 45)
-        self.lcd6.setMaximumSize(90, 45)
-        self.lcd7.setMaximumSize(90, 45)
+        self.lcd2.setMinimumSize(80,30)
+        self.lcd3.setMinimumSize(80,30)
+        self.lcd4.setMinimumSize(80,30)
+        self.lcd5.setMinimumSize(80,30)
+        self.lcd6.setMinimumSize(80,30)
+        self.lcd7.setMinimumSize(80,30)
 
         self.lcd1.setToolTip(QApplication.translate("Tooltip", "Timer",None, QApplication.UnicodeUTF8))
         self.lcd2.setToolTip(QApplication.translate("Tooltip", "ET Temperature",None, QApplication.UnicodeUTF8))
@@ -5369,9 +5362,11 @@ class ApplicationWindow(QMainWindow):
             self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             string1 = QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8)
             string2 = QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None, QApplication.UnicodeUTF8)
-            self.extraLCD1[i].setMaximumSize(90, 45)
-            self.extraLCD2[i].setMaximumSize(90, 45)
+            self.extraLCD1[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
+            self.extraLCD2[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
             #configure Labels
+            self.extraLCDlabel1[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
+            self.extraLCDlabel2[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel1[i].setText("<b>" + string1 + "</b>")
             self.extraLCDlabel1[i].setAlignment(Qt.AlignBottom)
             self.extraLCDlabel1[i].setIndent(5)
@@ -6294,7 +6289,6 @@ class ApplicationWindow(QMainWindow):
             if f:
                 f.close()
 
-
     # Loads background profile
     def loadbackground(self,filename):
         try:        
@@ -6616,8 +6610,9 @@ class ApplicationWindow(QMainWindow):
             # b) add missing extra serial settings
             for i in range(len(self.qmc.extradevices) - len(self.extraser)):
                 self.addSerialPort()
-                
-            self.qmc.extratimex = profile["extratimex"]     
+
+            if "extratimex" in profile:    
+                self.qmc.extratimex = profile["extratimex"]     
             if "extratemp1" in profile:       
                 self.qmc.extratemp1 = profile["extratemp1"]
             if "extratemp2" in profile:
@@ -10731,7 +10726,7 @@ class artisansettingsDlg(QDialog):
             self.htmlsettings += "<p><b><font color=\"orange\">%s </font></b></p>"%settingsnameslist[n].upper()
             self.htmlsettings += "<p style=\"background-color: %s\">"%pcolors[n%2]
             for keys in sorted(settingsdictlist[n]):
-                self.htmlsettings += "<b>&nbsp;&nbsp;" + keys + " = </b> <i>" + settingsdictlist[n][keys] + "</i><br><br>"
+                self.htmlsettings += "<b>&nbsp;&nbsp;" + keys + " = </b> <i>" + str(settingsdictlist[n][keys]) + "</i><br><br>"
             self.htmlsettings += "</p>"
 
         self.htmlsettings += "<\body><\font>"    
@@ -22030,10 +22025,10 @@ class DtaPID(object):
     #    print "comp:", rval
 
         return rval
-        
-###########################################################################################################################################
-###########################################################################################################################################
 
+
+###########################################################################################################################################
+###########################################################################################################################################
 aw = None # this is to ensure that the variable aw is already defined during application initialization
 aw = ApplicationWindow()
 aw.settingsLoad()
