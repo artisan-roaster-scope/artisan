@@ -1153,6 +1153,9 @@ class tgraphcanvas(FigureCanvas):
         aw.lcd5.display("0.0")
         aw.lcd6.display("0.0")
         aw.lcd7.display("0.0")
+        for i in range(10):
+            aw.extraLCD1[i].display("0.0")
+            aw.extraLCD2[i].display("0.0")
         aw.sendmessage(QApplication.translate("Message Area","Scope has been reset",None, QApplication.UnicodeUTF8))
         aw.button_3.setDisabled(False)
         aw.button_4.setDisabled(False)
@@ -4420,6 +4423,46 @@ class SampleThread(QThread):
             if aw.qmc.device != 18:
                 #read time, ET (t1) and BT (t2) TEMPERATURE
                 tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+
+                ##############  if using more than one device                
+                nxdevices = len(aw.qmc.extradevices)
+                if nxdevices:
+                    les,led,let,letl =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1),len(aw.qmc.extratemp1lines)
+                    if les == led == let == letl:
+                        for i in range(nxdevices):                            
+                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                            if len(aw.qmc.extramathexpression1[i]):
+                                extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                            if len(aw.qmc.extramathexpression2[i]):
+                                extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                            aw.qmc.extratemp1[i].append(extrat1)
+                            aw.qmc.extratemp2[i].append(extrat2)                        
+                            aw.qmc.extratimex[i].append(extratx)
+                            # update extra lines 
+                            aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                            aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+
+                    #ERROR FOUND
+                    else:
+                        lengths = [les,led,let,letl]
+                        location = [u"Extra-Serial",u"Extra-Devices",u"Extra-Temp",u"Extra-Lines"]
+                        #find error
+                        if (nxdevices-1) in lengths:
+                            indexerror =  lengths.index(nxdevices-1)
+                        elif (nxdevices+1) in lengths:
+                            indexerror =  lengths.index(nxdevices+1)
+                        else:
+                            indexerror = 1000
+                        if indexerror != 1000:
+                            errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
+                            errormessage += "\nPlease Reset: Extra devices"
+                        else:
+                            string  = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
+                            string += location[2] + "= " + str(lengths[2]) + " " + location[3] + "= " + str(lengths[3])                                                                             
+                            errormessage = "ERROR: extra devices lengths don't match: %s"%string
+                            errormessage += "\nPlease Reset: Extra devices"
+                        raise Exception(errormessage)   
+                
                 if len(aw.qmc.ETfunction):
                     t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
                 if len(aw.qmc.BTfunction):
@@ -4522,45 +4565,6 @@ class SampleThread(QThread):
                     if aw.BTbreak(length_of_qmc_timex - 1):
                         # we found a BT break at the current index minus 2
                         aw.qmc.autoDropIdx = length_of_qmc_timex - 3
-
-                ##############  if using more than one device                
-                nxdevices = len(aw.qmc.extradevices)
-                if nxdevices:
-                    les,led,let,letl =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1),len(aw.qmc.extratemp1lines)
-                    if les == led == let == letl:
-                        for i in range(nxdevices):                            
-                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                            if len(aw.qmc.extramathexpression1[i]):
-                                extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                            if len(aw.qmc.extramathexpression2[i]):
-                                extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                            aw.qmc.extratemp1[i].append(extrat1)
-                            aw.qmc.extratemp2[i].append(extrat2)                        
-                            aw.qmc.extratimex[i].append(extratx)
-                            # update extra lines 
-                            aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
-                            aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
-
-                    #ERROR
-                    else:
-                        lengths = [les,led,let,letl]
-                        location = [u"Extra-Serial",u"Extra-Devices",u"Extra-Temp",u"Extra-Lines"]
-                        #find error
-                        if (nxdevices-1) in lengths:
-                            indexerror =  lengths.index(nxdevices-1)
-                        elif (nxdevices+1) in lengths:
-                            indexerror =  lengths.index(nxdevices+1)
-                        else:
-                            indexerror = 1000
-                        if indexerror != 1000:
-                            errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
-                            errormessage += "\nPlease Reset: Extra devices"
-                        else:
-                            string  = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
-                            string += location[2] + "= " + str(lengths[2]) + " " + location[3] + "= " + str(lengths[3])                                                                             
-                            errormessage = "ERROR: extra devices lengths don't match: %s"%string
-                            errormessage += "\nPlease Reset: Extra devices"
-                        raise Exception(errormessage)   
 
 
                 #check alarms 
@@ -6466,7 +6470,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.extraname2.append("Extra 2")     
         self.qmc.extramathexpression1.append(u"")
         self.qmc.extramathexpression2.append(u"")
-        
+       
         #create new serial port (but don't open it yet). Store initial settings  
         self.addSerialPort()
         
@@ -14159,6 +14163,7 @@ class serialport(object):
 
     #loads configuration to ports
     def confport(self):
+        
         self.SP.setPort(self.comport)
         self.SP.setBaudrate(self.baudrate)
         self.SP.setByteSize(self.bytesize)
@@ -14182,11 +14187,11 @@ class serialport(object):
             
             if not self.SP.isOpen():
                 self.openport()
-                
+
+            command = "#0A0000NA2\r\n"  #"#0A0101NA4\r\n"    
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "#0A0000NA2\r\n"  #"#0A0101NA4\r\n"
                 self.SP.write(command)
                 r = self.SP.read(16) 
 
@@ -14206,7 +14211,8 @@ class serialport(object):
                         return -1,-1                                    #return something out of scope to avoid function error (expects two values)
 
             else:
-                if len(aw.qmc.timex) > 2:                           
+                if len(aw.qmc.timex) > 2:
+                    r  = "nothing"
                     return aw.qmc.temp1[-1], aw.qmc.temp2[-1]        
                 else:
                     return -1,-1                                    
@@ -15824,7 +15830,6 @@ class nonedevDlg(QDialog):
         else:
             aw.qmc.manuallogETflag = 0
             self.etEdit.setVisible(False)
-
         
                 
 #########################################################################
@@ -15892,10 +15897,15 @@ class comportDlg(QDialog):
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)        
 
+
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
         self.serialtable = QTableWidget()
         self.serialtable.setTabKeyNavigation(True)
         self.createserialTable()
+
+
+        self.scanforport()
+
 
         #tab1 layout
         buttonLayout = QHBoxLayout()
@@ -16024,6 +16034,7 @@ class comportDlg(QDialog):
         try:
             #aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
             ser_ports = len(aw.extracomport)
+            self.closeserialports()
             for i in range(ser_ports):
                 comportComboBox =  self.serialtable.cellWidget(i,1)
                 aw.extracomport[i] = unicode(comportComboBox.currentText())
@@ -16044,19 +16055,17 @@ class comportDlg(QDialog):
                 aw.extratimeout[i] = int(timeoutEdit.text())
 
             #create serial ports for each extra device
-##            nserial = len(aw.extraser)
-##            if ser_ports != nserial:
             aw.extraser = []    
             aw.extraser = [serialport()]*ser_ports
 
             #load the settings for the extra serial ports found
             for i in range(ser_ports):
-                aw.extraser[i].SP.setPort(unicode(aw.extracomport[i]))
-                aw.extraser[i].SP.setBaudrate(aw.extrabaudrate[i])
-                aw.extraser[i].SP.setByteSize(aw.extrabytesize[i])
-                aw.extraser[i].SP.setParity(unicode(aw.extraparity[i]))
-                aw.extraser[i].SP.setStopbits(aw.extrastopbits[i])
-                aw.extraser[i].SP.setTimeout(aw.extratimeout[i])
+                aw.extraser[i].comport = unicode(aw.extracomport[i])
+                aw.extraser[i].baudrate = aw.extrabaudrate[i]
+                aw.extraser[i].bytesize = aw.extrabytesize[i]
+                aw.extraser[i].parity = unicode(aw.extraparity[i])
+                aw.extraser[i].stopbits = aw.extrastopbits[i]
+                aw.extraser[i].timeout = aw.extratimeout[i]
 
         except Exception,e:
              aw.qmc.adderror(QApplication.translate("Error Message", "saveserialtable(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
@@ -16177,6 +16186,9 @@ class comportDlg(QDialog):
     def closeserialports(self):
         if aw.ser.SP.isOpen():
             aw.ser.SP.close()
+        for i in range(len(aw.extraser)):
+            if aw.extraser[i].SP.isOpen():
+                aw.extraser[i].SP.close()
 
 #################################################################################            
 ##################   Device assignments DIALOG for reading temperature   ########
@@ -16199,12 +16211,13 @@ class DeviceAssignmentDLG(QDialog):
         #As a main device, don't show the devices that start with a "+"
         # devices with a first letter "+" are extra devices an depend on another device
         # each device provides 2 curves
+        #don't show devices with a "-". Devices with a - at front are either a pid, arduino, or an external program
         dev = aw.qmc.devices[:]             #deep copy
         limit = len(dev)
         for k in range(limit):
             for i in range(len(dev)):
                 if dev[i][0] == "+" or dev[i][0] == "-":
-                    dev.pop(i)              #note: pop() makes the list smaller 
+                    dev.pop(i)              #note: pop() makes the list smaller that's why there are 2 FOR statements 
                     break 
                 
         sorted_devices = sorted(dev)
@@ -16640,6 +16653,7 @@ class DeviceAssignmentDLG(QDialog):
         try:
             for i in range(len(aw.qmc.extradevices)):
                 typecombobox = self.devicetable.cellWidget(i,0)
+                #cellWidget(i,1) and cellWidget(i,2) are saved automatically when there is a change. No need to save here.
                 name1edit = self.devicetable.cellWidget(i,3)
                 name2edit = self.devicetable.cellWidget(i,4)
                 mexpr1edit = self.devicetable.cellWidget(i,5)
@@ -16657,7 +16671,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.extraLCDvisibility1[i] = LCD1visibilityComboBox.currentIndex() 
                 aw.extraLCDvisibility2[i] = LCD1visibilityComboBox.currentIndex()
             
-            #update legend
+            #update legend with new curves
             aw.qmc.redraw(recomputeAllDeltas=False)
 
         except Exception,e:
