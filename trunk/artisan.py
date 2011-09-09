@@ -4421,10 +4421,8 @@ class SampleThread(QThread):
             
             #if using a meter (thermocouple device)
             if aw.qmc.device != 18:
-                #read time, ET (t1) and BT (t2) TEMPERATURE
-                tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
 
-                ##############  if using more than one device                
+                ##############  if using Extra devices               
                 nxdevices = len(aw.qmc.extradevices)
                 if nxdevices:
                     les,led,let,letl =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1),len(aw.qmc.extratemp1lines)
@@ -4462,6 +4460,9 @@ class SampleThread(QThread):
                             errormessage = "ERROR: extra devices lengths don't match: %s"%string
                             errormessage += "\nPlease Reset: Extra devices"
                         raise Exception(errormessage)   
+
+                #read time, ET (t1) and BT (t2) TEMPERATURE
+                tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
                 
                 if len(aw.qmc.ETfunction):
                     t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
@@ -4733,9 +4734,9 @@ class ApplicationWindow(QMainWindow):
         
         self.soundflag = 0
 
-        #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv 
+        #lcd1 = time, lcd2 = met, lcd3 = bt, lcd4 = roc et, lcd5 = roc bt, lcd6 = sv (extra devices lcd same as sv seetings)
         self.lcdpaletteB = { "timer":u'black',"et":'black',"bt":'black',"deltaet":'black',"deltabt":'black',"sv":'black'}
-        self.lcdpaletteF = { "timer":u'white',"et":'white',"bt":'white',"deltaet":'white',"deltabt":'white',"sv":'white'}
+        self.lcdpaletteF = { "timer":u'white',"et":'white',"bt":'white',"deltaet":'white',"deltabt":'white',"sv":'yellow'}
 
     	#user defined event buttons
         self.extraeventsbuttonsflag = 1  #shows/hides rows of buttons  0/1
@@ -6470,7 +6471,7 @@ class ApplicationWindow(QMainWindow):
         self.qmc.extraname2.append("Extra 2")     
         self.qmc.extramathexpression1.append(u"")
         self.qmc.extramathexpression2.append(u"")
-       
+
         #create new serial port (but don't open it yet). Store initial settings  
         self.addSerialPort()
         
@@ -9641,7 +9642,7 @@ class HUDDlg(QDialog):
         aw.qmc.hudETpid[1] = int(self.ETpidI.text())
         aw.qmc.hudETpid[2] = int(self.ETpidD.text())
 
-        string = QApplication.translate("Message Area","[ET target = %1] [BT target =   (%2]", None, QApplication.UnicodeUTF8).arg(unicode(aw.qmc.ETtarget)).arg(unicode(aw.qmc.BTtarget))
+        string = QApplication.translate("Message Area","[ET target = %1] [BT target = %2]", None, QApplication.UnicodeUTF8).arg(unicode(aw.qmc.ETtarget)).arg(unicode(aw.qmc.BTtarget))
         aw.sendmessage(string)
         aw.qmc.resetlines()
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -14184,11 +14185,12 @@ class serialport(object):
     def HH806AUtemperature(self):
         #init command = "#0A0000RA6\r\n"
         try:
+            command = "#0A0000NA2\r\n"  #"#0A0101NA4\r\n"
+            r = ""
             
             if not self.SP.isOpen():
                 self.openport()
 
-            command = "#0A0000NA2\r\n"  #"#0A0101NA4\r\n"    
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
@@ -14212,7 +14214,6 @@ class serialport(object):
 
             else:
                 if len(aw.qmc.timex) > 2:
-                    r  = "nothing"
                     return aw.qmc.temp1[-1], aw.qmc.temp2[-1]        
                 else:
                     return -1,-1                                    
@@ -14322,6 +14323,8 @@ class serialport(object):
                 return -1,-1
            
         try:
+            command = "#" + self.HH506RAid + "N\r\n"
+            r = ""
             
             if not self.SP.isOpen():
                 self.openport()                    
@@ -14329,7 +14332,6 @@ class serialport(object):
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "#" + self.HH506RAid + "N\r\n"
                 self.SP.write(command)
                 r = self.SP.read(14)
 
@@ -14372,6 +14374,8 @@ class serialport(object):
     def HH506RAGetID(self):
         
         try:
+            command = ""
+            ID = ""
             if not self.SP.isOpen():
                 self.openport()                    
                 
@@ -14404,19 +14408,20 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H506 :" + settings + " || Tx = " + command + " || Rx = " + r)
+                aw.addserial("H506 :" + settings + " || Tx = " + command + " || Rx = " + ID)
             
             
     def CENTER306temperature(self):
         try:
-            
+            command = "\x41"                 
+            r = ""
+
             if not self.SP.isOpen():
                 self.openport()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "\x41"                 
                 self.SP.write(command)
                 r = self.SP.read(10)                                  #NOTE: different
                 
@@ -14505,14 +14510,15 @@ class serialport(object):
             
     def CENTER303temperature(self):
         try:
-            
+            command = "\x41"                 
+            r = ""
+
             if not self.SP.isOpen():
                 self.openport()                    
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "\x41"                 
                 self.SP.write(command)
                 r = self.SP.read(8)                                   #NOTE: different
                 
@@ -14614,13 +14620,15 @@ class serialport(object):
         ##                                        THIS ONLY WORKS WHEN TEMPERATURE < 200. If T >= 200 r[43] changes
 
         try:
+            command = "\x41"
+            r = ""
+            
             if not self.SP.isOpen():
                 self.openport()
                 
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
-                command = "\x41"
                 self.SP.write(command)
                 r = self.SP.read(45)
 
@@ -14665,6 +14673,11 @@ class serialport(object):
 
     def ARDUINOTC4temperature(self):
         try:
+            command = ""
+            res = ""
+            result = ""
+            t1,t2 = 0.,0.
+            
             if not self.SP.isOpen():
                 self.openport()
                 libtime.sleep(3)
@@ -14690,9 +14703,7 @@ class serialport(object):
                     #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
                         command = "CHAN;" + self.arduinoETChannel + self.arduinoBTChannel + "00\n"
 
-                    self.SP.write(command)       #send command 
-                    
-                    result = ""
+                    self.SP.write(command)       #send command                     
                     result = self.SP.readline()  #read
 
                     if (not result == "" and not result.startswith("#")):
@@ -14705,7 +14716,6 @@ class serialport(object):
                     
                         command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
                         self.SP.write(command)
-                        result = ""
                         result = self.SP.readline()
                         if (not result == "" and not result.startswith("#")):
                             raise Exception(QApplication.translate("Arduino could not set temperature UNIT",None, QApplication.UnicodeUTF8))
@@ -14784,7 +14794,7 @@ class serialport(object):
 
     def TEVA18Btemperature(self):
         try:
-
+            r = ""
             run = 1
             counter = 0
             
@@ -14987,6 +14997,8 @@ class serialport(object):
         # Bytes 1,10,11,12,13 carry data bits that represent other symbols like F (for Farad), u (for micro), M (for Mega), etc, of the meter display
 
         try:
+            r, r2 = "",""
+            frame = ""
             
             if not self.SP.isOpen():
                 self.openport()                    
@@ -14995,7 +15007,6 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
 
-            r, r2 = "",""
             #keep reading till the first byte of next frame (till we read an actual 1 in 1A )
             for i in range(28):  #any number > 14 will be OK                
                 r = self.SP.read(1)
@@ -15102,6 +15113,12 @@ class serialport(object):
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
             return "0",""
+        
+        finally:
+            #note: logged chars should not be binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("HHM28multimeter :" + settings + " || Tx = " + "No command" + " || Rx = " + frame)
         
 
     #sends a command to the ET/BT device. Arduino.
@@ -17087,23 +17104,23 @@ class DeviceAssignmentDLG(QDialog):
                 #init serial settings of extra devices
                 for i in range(len(aw.qmc.extradevices)):
                     dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
-                    if len(aw.extrabaudrate) < i:
+                    if i < len(aw.extrabaudrate):
                         aw.extrabaudrate[i] = dsettings[0]
                     else:
                         aw.extrabaudrate.append(dsettings[0])
-                    if len(aw.extrabytesize) < i:
+                    if i < len(aw.extrabytesize):
                         aw.extrabytesize[i] = dsettings[1]
                     else:
                         aw.extrabytesize.append(dsettings[1])
-                    if len(aw.extraparity) < i: 
+                    if i < len(aw.extraparity): 
                         aw.extraparity[i] = dsettings[2]
                     else:
                         aw.extraparity.append(dsettings[2])
-                    if len(aw.extrastopbits) < i:
+                    if i < len(aw.extrastopbits):
                         aw.extrastopbits[i] = dsettings[3]
                     else:
                         aw.extrastopbits.append(dsettings[3])
-                    if len(aw.extratimeout) < i:
+                    if i < len(aw.extratimeout):
                         aw.extratimeout[i] = dsettings[4]  
                     else:
                         aw.extratimeout.append(dsettings[4])
