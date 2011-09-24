@@ -4559,9 +4559,9 @@ class SampleThread(QThread):
                         # we found a BT break at the current index minus 2
                         aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                 # autodetect DROP event
-                # only if 9min into roast and BT>190C/374F                  
+                # only if 9min into roast and BT>180C/356F                  
                 elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
-                    length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 374)) and \
+                    length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and \
                     ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]])  > 540):
                     if aw.BTbreak(length_of_qmc_timex - 1):
                         # we found a BT break at the current index minus 2
