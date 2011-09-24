@@ -18,7 +18,7 @@ from setuptools import setup
 import string
 
 # current version of Artisan
-VERSION = '0.5.4'
+VERSION = '0.5.5'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'

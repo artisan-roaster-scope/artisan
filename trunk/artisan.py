@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.5.4"
+__version__ = u"0.5.5"
 
 
 # ABOUT
@@ -4562,7 +4562,7 @@ class SampleThread(QThread):
                 # only if 9min into roast and BT>190C/374F                  
                 elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
                     length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 374)) and \
-                    (aw.qmc.timex[aw.qmc.timeindex[0]] - aw.qmc.timex[-1] > 540):
+                    ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]])  > 540):
                     if aw.BTbreak(length_of_qmc_timex - 1):
                         # we found a BT break at the current index minus 2
                         aw.qmc.autoDropIdx = length_of_qmc_timex - 3
@@ -11579,6 +11579,7 @@ class EventsDlg(QDialog):
                     QApplication.translate("ComboBox","Type",None, QApplication.UnicodeUTF8),
                     QApplication.translate("ComboBox","Value",None, QApplication.UnicodeUTF8)]
         self.bartypeComboBox =  QComboBox()
+        self.bartypeComboBox.setFocusPolicy(Qt.NoFocus)
         self.bartypeComboBox.setMaximumWidth(80)
         self.bartypeComboBox.addItems(barstyles)
         self.bartypeComboBox.setCurrentIndex(aw.qmc.eventsGraphflag)
@@ -11591,9 +11592,13 @@ class EventsDlg(QDialog):
         typelabel4 = QLabel(QApplication.translate("Label", "4",None, QApplication.UnicodeUTF8))
         
         self.etype0 = QLineEdit(aw.qmc.etypes[0])
+        self.etype0.setFocusPolicy(Qt.NoFocus)
         self.etype1 = QLineEdit(aw.qmc.etypes[1])
+        self.etype1.setFocusPolicy(Qt.NoFocus)
         self.etype2 = QLineEdit(aw.qmc.etypes[2])
+        self.etype2.setFocusPolicy(Qt.NoFocus)
         self.etype3 = QLineEdit(aw.qmc.etypes[3])
+        self.etype3.setFocusPolicy(Qt.NoFocus)
         self.etype0.setMaximumWidth(100)
         self.etype1.setMaximumWidth(100)
         self.etype2.setMaximumWidth(100)
@@ -11628,22 +11633,26 @@ class EventsDlg(QDialog):
         self.markervals = ["o","s","p","D","*","h","H","+","x","None"]  
 
         #Marker type
-        self.marker1typeComboBox =  QComboBox()
+        self.marker1typeComboBox =  QComboBox()        
+        self.marker1typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker1typeComboBox.addItems(self.markers)
         self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
         self.connect(self.marker1typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=0:self.seteventmarker(x,m))                      
 
         self.marker2typeComboBox =  QComboBox()
+        self.marker2typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker2typeComboBox.addItems(self.markers )
         self.marker2typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[1]))
         self.connect(self.marker2typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=1:self.seteventmarker(x,m))
                                             
         self.marker3typeComboBox =  QComboBox()
+        self.marker3typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker3typeComboBox.addItems(self.markers )
         self.marker3typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[2]))
         self.connect(self.marker3typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=2:self.seteventmarker(x,m)) 
 
         self.marker4typeComboBox =  QComboBox()
+        self.marker4typeComboBox.setFocusPolicy(Qt.NoFocus)
         self.marker4typeComboBox.addItems(self.markers )
         self.marker4typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[3]))
         self.connect(self.marker4typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=3:self.seteventmarker(x,m)) 
@@ -11661,66 +11670,78 @@ class EventsDlg(QDialog):
         valuesizelabel.setMaximumSize(120,20)
 
         self.E1thicknessSpinBox = QSpinBox()
+        self.E1thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1thicknessSpinBox.setRange(1,10)
         self.E1thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[0])
         self.connect(self.E1thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1, x=0:self.setElinethickness(w,x)) 
 
         self.E2thicknessSpinBox = QSpinBox()
+        self.E2thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2thicknessSpinBox.setRange(1,10)
         self.E2thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[1])
         self.connect(self.E2thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w =1,x=1:self.setElinethickness(w,x))
         
         self.E3thicknessSpinBox = QSpinBox()
+        self.E3thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3thicknessSpinBox.setRange(1,10)
         self.E3thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[2])
         self.connect(self.E3thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=2:self.setElinethickness(w,x)) 
 
         self.E4thicknessSpinBox = QSpinBox()
+        self.E4thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4thicknessSpinBox.setRange(1,10)
         self.E4thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[3])
         self.connect(self.E4thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=0:self.setElinethickness(w,x)) 
 
         self.E1alphaSpinBox = QDoubleSpinBox()
+        self.E1alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1alphaSpinBox.setRange(.1,1.)
         self.E1alphaSpinBox.setSingleStep(.1)
         self.E1alphaSpinBox.setValue(aw.qmc.Evaluealpha[0])
         self.connect(self.E1alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=0:self.setElinealpha(w,x)) 
 
         self.E2alphaSpinBox = QDoubleSpinBox()
+        self.E2alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2alphaSpinBox.setRange(.1,1.)
         self.E2alphaSpinBox.setSingleStep(.1)
         self.E2alphaSpinBox.setValue(aw.qmc.Evaluealpha[1])
         self.connect(self.E1alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=1:self.setElinealpha(w,x)) 
 
         self.E3alphaSpinBox = QDoubleSpinBox()
+        self.E3alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3alphaSpinBox.setRange(.1,1.)
         self.E3alphaSpinBox.setSingleStep(.1)
         self.E3alphaSpinBox.setValue(aw.qmc.Evaluealpha[2])
         self.connect(self.E3alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=2:self.setElinealpha(w,x)) 
 
         self.E4alphaSpinBox = QDoubleSpinBox()
+        self.E4alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4alphaSpinBox.setRange(.1,1.)
         self.E4alphaSpinBox.setSingleStep(.1)
         self.E4alphaSpinBox.setValue(aw.qmc.Evaluealpha[3])
         self.connect(self.E4alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1, x=3:self.setElinealpha(w,x)) 
 
         #Marker size
-        self.E1sizeSpinBox = QSpinBox()
+        self.E1sizeSpinBox = QSpinBox()        
+        self.E1sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1sizeSpinBox.setRange(1,14)
         self.E1sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[0])
         self.connect(self.E1sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=0:self.setEmarkersize(w,x)) 
 
         self.E2sizeSpinBox = QSpinBox()
+        self.E2sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2sizeSpinBox.setRange(1,14)
         self.E2sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[1])
         self.connect(self.E2sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=1:self.setEmarkersize(w,x)) 
 
         self.E3sizeSpinBox = QSpinBox()
+        self.E3sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3sizeSpinBox.setRange(1,14)
         self.E3sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[2])
         self.connect(self.E3sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=2:self.setEmarkersize(w,x)) 
 
         self.E4sizeSpinBox = QSpinBox()
+        self.E4sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4sizeSpinBox.setRange(1,14)
         self.E4sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[3])
         self.connect(self.E4sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=3:self.setEmarkersize(w,x)) 
@@ -11735,7 +11756,7 @@ class EventsDlg(QDialog):
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         defaultButton.setMaximumWidth(90)
-        autoButton = QPushButton(QApplication.translate("Button","B Defaults",None, QApplication.UnicodeUTF8))
+        autoButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         autoButton.setToolTip(QApplication.translate("Tooltip","Generates buttons by event type/value",None, QApplication.UnicodeUTF8))
 
         closeButton.setFocusPolicy(Qt.NoFocus)
@@ -11807,17 +11828,21 @@ class EventsDlg(QDialog):
 
         ## tab3
         #aw.buttonpalette
-        transferpalettebutton = QPushButton(QApplication.translate("button","Transfer Buttons to", None, QApplication.UnicodeUTF8))
+        transferpalettebutton = QPushButton(QApplication.translate("button","Transfer Buttons to", None, QApplication.UnicodeUTF8))        
+        transferpalettebutton.setFocusPolicy(Qt.NoFocus)
         setpalettebutton = QPushButton(QApplication.translate("button","Restore Buttons from", None, QApplication.UnicodeUTF8))
+        setpalettebutton.setFocusPolicy(Qt.NoFocus)
         palette = QApplication.translate("Label","palette #", None, QApplication.UnicodeUTF8)
         palettelist = []
         for i in range(10):
             palettelist.append(palette + str(i))
         self.transferpalettecombobox = QComboBox()
+        self.transferpalettecombobox.setFocusPolicy(Qt.NoFocus)
         self.transferpalettecombobox.setMaximumWidth(120)
         self.transferpalettecombobox.addItems(palettelist)
                    
         self.setpalettecombobox = QComboBox()
+        self.setpalettecombobox.setFocusPolicy(Qt.NoFocus)
         self.setpalettecombobox.setMaximumWidth(120)
         self.setpalettecombobox.addItems(palettelist)
         self.connect(transferpalettebutton, SIGNAL("clicked()"),self.transferbuttonsto)
@@ -11827,7 +11852,9 @@ class EventsDlg(QDialog):
 
 
         backupbutton = QPushButton(QApplication.translate("button","Backup palette", None, QApplication.UnicodeUTF8))
+        backupbutton.setFocusPolicy(Qt.NoFocus)
         restorebutton = QPushButton(QApplication.translate("button","Restore Palette", None, QApplication.UnicodeUTF8))
+        restorebutton.setFocusPolicy(Qt.NoFocus)
         backupbutton.setToolTip(QApplication.translate("Tooltip","Backup all palettes to a text file",None, QApplication.UnicodeUTF8))
         restorebutton.setToolTip(QApplication.translate("Tooltip","Restore all palettes from a text",None, QApplication.UnicodeUTF8))
         backupbutton.setMaximumWidth(140)
@@ -11835,7 +11862,7 @@ class EventsDlg(QDialog):
         self.connect(backupbutton, SIGNAL("clicked()"),aw.backuppaletteeventbuttons)
         self.connect(restorebutton, SIGNAL("clicked()"),aw.restorepaletteeventbutons)
         
-        ### LAYOUTS
+        ### LAYOUTS                
                 
         #### tab1 layout
         FlagsLayout = QHBoxLayout()
