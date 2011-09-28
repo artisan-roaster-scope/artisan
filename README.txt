@@ -132,6 +132,11 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.5.5 (28.9.2011)
+- fixes ArdruinoTC4 extra devices
+- fixed autoDrop recognition
+- fixes serial settings for extra devices
+
 v0.5.4 (28.8.2011)
 - adds events by value
 - adds custom event button palettes
