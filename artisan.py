@@ -3025,27 +3025,34 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.-len(st3)*4,statisticslower,st3,color=self.palette["text"],fontsize=11)
             if self.statisticsflags[3]:
                 deltatemp = u"%.1f"%(self.temp2[self.timeindex[6]]-LP)
+                
+                #determine min/max ET:
+                ETmin = 1000
+                ETmax = 0
+                #calculate AREA under BT and ET
+                AccBT = 0.0
+                AccET = 0.0
+                for i in range(self.timeindex[0],self.timeindex[6]+1):
+                    if self.temp1[i] > ETmax:
+                        ETmax = self.temp1[i]
+                    if self.temp1[i] < ETmin:
+                        ETmin = self.temp1[i]
+                    if i != self.timeindex[6]:
+                        timeD = self.timex[i+1] - self.timex[i]
+                        AccBT += self.temp2[i]*timeD
+                        AccET += self.temp1[i]*timeD
+                dET = u"%.1f"%(ETmax-ETmin)
+                deltaAcc = int(AccET) - int(AccBT)
                         
                 lowestBT = u"%.1f"%LP
                 #timeLP = unicode(self.stringfromseconds(self.timex[k] - self.timex[self.timeindex[0]]))
-                timez = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
+                dTime = self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]
+                timez = self.stringfromseconds(dTime)
                 ror = u"%.2f"%(((self.temp2[self.timeindex[6]]-LP)/(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))*60.)
-
-                #end temperature
-                strline = QApplication.translate("Scope Label", "BT = %1 - %2 (%3)   Time = %4   RoR = %5 d/m", None,
-                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.temp2[self.timeindex[6]] + self.mode).arg(deltatemp).arg(timez).arg(ror)                              
-                            
-                #text metrics 
-                #if self.mode == u"C":
-                #    dist = -47
-                #    dist = -100
-                #else:
-                #    dist = -90
-                #self.ax.text(-100,dist, strline,color = self.palette["text"],fontsize=11)
                 
-                #alternative
-                #factor = (aw.qmc.ylimit - aw.qmc.ylimit_min) / 10.8
-                #self.ax.text(0,aw.qmc.ylimit_min - factor, strline,color = self.palette["text"],fontsize=11)
+                #end temperature
+                strline = QApplication.translate("Scope Label", "BT = %1 - %2 (%3)   ET = %4 - %5 (%6)   Time = %7   RoR = %8 d/m   ETBTarea = %9 (%10)", None,
+                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg(u"%.1f"%self.temp2[self.timeindex[6]] + self.mode).arg(deltatemp).arg(u"%.1f"%ETmin + self.mode).arg(u"%.1f"%ETmax + self.mode).arg(dET).arg(timez).arg(ror).arg(deltaAcc).arg(deltaAcc / dTime)
 
                 # even better: use xlabel
                 self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
@@ -4392,13 +4399,18 @@ class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent):
         NavigationToolbar.__init__(self, plotCanvas, parent)
 
-
     def _icon(self, name):
         #dirty hack to use exclusively .png and thus avoid .svg usage
         #because .exe generation is problematic with .svg
         if platf != u'Darwin':
-            name = name.replace('.svg','.png')
-        return QIcon(os.path.join(self.basedir, name))
+            n = name.replace('.svg','.png')
+        else:
+            n = name.replace('.png','.svg')
+        p = os.path.join(self.basedir, n)
+        if os.path.exists(p):
+            return QIcon(p)
+        else:
+            return QIcon(os.path.join(self.basedir, name))
 
 
 ########################################################################################
@@ -5579,7 +5591,7 @@ class ApplicationWindow(QMainWindow):
         midleftlayout.addWidget(self.e2buttondialog)
         midleftlayout.addWidget(self.e3buttondialog)
         midleftlayout.addWidget(self.e4buttondialog)
-        midleftlayout.addSpacing(10)
+        #midleftlayout.addSpacing(10)
         midleftlayout.addWidget(self.EventsGroupLayout)
 
         midlayout = QHBoxLayout()
@@ -5587,6 +5599,7 @@ class ApplicationWindow(QMainWindow):
         midlayout.addLayout(LCDlayout)
 
         mainlayout = QVBoxLayout(self.main_widget)
+        mainlayout.setContentsMargins(0,0,0,0)
         mainlayout.addLayout(level1layout)       
         mainlayout.addLayout(midlayout)       
 
@@ -7895,12 +7908,24 @@ $cupping_notes
                 start = self.qmc.timex[self.qmc.timeindex[0]]
             else:
                 start = 0
+                
+            # sort events by time/index
+            sevents = sorted(self.qmc.specialevents)
+            seventsString = []
+            seventsType = [] 
+            seventsValue = [] 
+            for i in range(len(sevents)):
+                sorted_pos = self.qmc.specialevents.index(sevents[i])
+                seventsString.append(self.qmc.specialeventsStrings[sorted_pos])
+                seventsType.append(self.qmc.specialeventstype[sorted_pos])
+                seventsValue.append(self.qmc.specialeventsvalue[sorted_pos])
+            
             for i in range(len(self.qmc.specialevents)):
                 html += ("<tr>"+
                      "\n<td>" + unicode(i+1) + "</td><td>[" +
-                     self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[i]] - start)) +
-                     "</td><td>at " + "%.1f"%self.qmc.temp2[self.qmc.specialevents[i]] + self.qmc.mode +
-                     "]</td><td>" + self.qmc.specialeventsStrings[i] +"</td></tr>\n")     
+                     self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i]] - start)) +
+                     "</td><td>at " + "%.1f"%self.qmc.temp2[sevents[i]] + self.qmc.mode +
+                     "]</td><td>" + seventsString[i] + "</td><td>(" + self.qmc.etypes[seventsType[i]] + " to " + self.qmc.eventsvalues[seventsValue[i]] + ")</td></tr>\n")     
             html += '</table>\n</center>'
         return html
             
@@ -12676,7 +12701,7 @@ class flavorDlg(QDialog):
 
         defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","Istituto Internazionale Assaggiatori Caffe"])
+        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC"])
         self.defaultcombobox.setCurrentIndex(0)
         self.connect(self.defaultcombobox, SIGNAL("currentIndexChanged(int)"),self.setdefault)
 
@@ -12723,25 +12748,51 @@ class flavorDlg(QDialog):
         flavorLayout = QHBoxLayout()
         flavorLayout.addWidget(self.flavortable)
 
-        extralayout = QHBoxLayout()
-        extralayout.addWidget(self.backgroundCheck)
-        extralayout.addWidget(aspectlabel)
-        extralayout.addWidget(self.aspectSpinBox)
+        comboLayout = QHBoxLayout()
+        comboLayout.addWidget(defaultlabel)
+        comboLayout.addWidget(self.defaultcombobox)
+        comboLayout.addStretch()
         
-        buttonsLayout = QGridLayout()
-        buttonsLayout.addWidget(addButton,0,0)
-        buttonsLayout.addWidget(delButton,0,1)        
-        buttonsLayout.addWidget(defaultlabel,1,0)
-        buttonsLayout.addWidget(self.defaultcombobox,1,1)
-        buttonsLayout.addWidget(leftButton,2,0)
-        buttonsLayout.addWidget(rightButton,2,1)
-        buttonsLayout.addWidget(saveImgButton,3,0)
-        buttonsLayout.addWidget(backButton,3,1)
+        aspectLayout = QHBoxLayout()
+        aspectLayout.addWidget(self.backgroundCheck)
+        aspectLayout.addWidget(aspectlabel)
+        aspectLayout.addWidget(self.aspectSpinBox)
+        aspectLayout.addStretch()
+        
+        blayout1 = QHBoxLayout()
+        blayout1.addStretch()
+        blayout1.addWidget(addButton)
+        blayout1.addWidget(delButton)  
+        blayout1.addStretch()  
+        
+        extralayout = QVBoxLayout()
+        extralayout.addLayout(comboLayout)
+        extralayout.addLayout(aspectLayout)
+
+        extraGroupLayout = QGroupBox()
+        extraGroupLayout.setLayout(extralayout)
+        
+        buttonsLayout = QGridLayout()       
+        
+        blayout = QHBoxLayout()
+        blayout.addStretch()
+        blayout.addWidget(leftButton)
+        blayout.addWidget(rightButton)
+        blayout.addStretch()
+        
+        mainButtonsLayout = QHBoxLayout()
+        mainButtonsLayout.addWidget(saveImgButton)
+        mainButtonsLayout.addStretch()
+        mainButtonsLayout.addWidget(backButton)
             
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(flavorLayout)
-        mainLayout.addLayout(extralayout)
-        mainLayout.addLayout(buttonsLayout)
+        mainLayout.addLayout(blayout1)
+        mainLayout.addWidget(extraGroupLayout)
+        mainLayout.addLayout(blayout)
+        mainLayout.addStretch()
+        mainLayout.addLayout(mainButtonsLayout)
+
         
         self.setLayout(mainLayout)
 
