@@ -9825,6 +9825,12 @@ class editGraphDlg(QDialog):
         self.eventtablecopy = []
         self.createEventTable()
 
+        self.ordereventTableButton = QPushButton(QApplication.translate("Button", "Order",None, QApplication.UnicodeUTF8))
+        self.ordereventTableButton.setFocusPolicy(Qt.NoFocus)
+        self.ordereventTableButton.setMaximumSize(self.ordereventTableButton.sizeHint())
+        self.ordereventTableButton.setMinimumSize(self.ordereventTableButton.minimumSizeHint())
+        self.connect(self.ordereventTableButton,SIGNAL("clicked()"),self.orderEventTable)
+
         self.neweventTableButton = QPushButton(QApplication.translate("Button", "Add",None, QApplication.UnicodeUTF8))
         self.neweventTableButton.setFocusPolicy(Qt.NoFocus)
         self.neweventTableButton.setMaximumSize(self.neweventTableButton.sizeHint())
@@ -10189,7 +10195,8 @@ class editGraphDlg(QDialog):
         timeGroupLayout.setLayout(mainLayout)
 
         eventbuttonLayout = QHBoxLayout()
-        eventbuttonLayout.addStretch()  
+        eventbuttonLayout.addStretch()
+        eventbuttonLayout.addWidget(self.ordereventTableButton)        
         eventbuttonLayout.addWidget(self.deleventTableButton)
         eventbuttonLayout.addWidget(self.neweventTableButton)
 
@@ -10396,6 +10403,33 @@ class editGraphDlg(QDialog):
             aw.qmc.specialeventstype[i] = etype.currentIndex()
             evalue = self.eventtable.cellWidget(i,3)            
             aw.qmc.specialeventsvalue[i] = evalue.currentIndex()
+
+    def orderEventTable(self):
+        nevents = len(aw.qmc.specialevents)
+        if nevents:
+            for i in range(nevents-1):
+                if aw.qmc.specialevents[i] > aw.qmc.specialevents[i+1]:
+                    
+                    itime = aw.qmc.specialevents[i]
+                    itype = aw.qmc.specialeventstype[i]
+                    istring = aw.qmc.specialeventsStrings[i]
+                    ivalue = aw.qmc.specialeventsvalue[i]
+                    
+                    aw.qmc.specialevents[i] = aw.qmc.specialevents[i+1]
+                    aw.qmc.specialeventstype[i] = aw.qmc.specialeventstype[i+1]
+                    aw.qmc.specialeventsStrings[i] = aw.qmc.specialeventsStrings[i+1]
+                    aw.qmc.specialeventsvalue[i] = aw.qmc.specialeventsvalue[i+1]
+                    
+                    aw.qmc.specialevents[i+1] = itime
+                    aw.qmc.specialeventstype[i+1] = itype
+                    aw.qmc.specialeventsStrings[i+1] = istring
+                    aw.qmc.specialeventsvalue[i+1] = ivalue
+                    
+                    self.orderEventTable()
+                    return
+                
+            self.createEventTable()
+            aw.qmc.redraw(recomputeAllDeltas=False)            
 
     def addEventTable(self):
         if len(aw.qmc.timex):
@@ -14341,8 +14375,9 @@ class serialport(object):
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
+                command = "#0A0000RA6\r\n #0A0000RA6\r\n \x21\x05\x00\x58\x7E"
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H806Winit :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
+                aw.addserial("H806Winit :" + settings + " || Tx = " + command + " || Rx = ")
                                 
 
     #UNDER WORK 806 wireless meter
