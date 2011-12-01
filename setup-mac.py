@@ -9,7 +9,7 @@ from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
 def my_parse_makefile(filename, g):
     their_parse_makefile(filename, g)
-    g['MACOSX_DEPLOYMENT_TARGET'] = '10.4'
+    g['MACOSX_DEPLOYMENT_TARGET'] = '10.6'
 sysconfig.parse_makefile = my_parse_makefile
 
 import sys, os
@@ -18,7 +18,7 @@ from setuptools import setup
 import string
 
 # current version of Artisan
-VERSION = '0.5.5'
+VERSION = '0.6.0'
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
@@ -50,9 +50,9 @@ OPTIONS = {
     'optimize':  2,
     'compressed':True,
     'iconfile': 'artisan.icns',
-#    'frameworks' : ['/Developer/SDKs/MacOSX10.4u.sdk/usr/X11R6/lib/libfreetype.dylib'], # cannot be relocated!
     'includes': ['sip',
                  'serial',
+                 "PyQt4._qt",
                  'PyQt4.QtCore',
                  'PyQt4.QtGui',
                  'PyQt4.QtSvg',
@@ -66,7 +66,7 @@ OPTIONS = {
                     'CFBundleIdentifier':'com.google.code.p.Artisan',
                     'CFBundleShortVersionString':VERSION,
                     'CFBundleVersion': 'Artisan ' + VERSION,
-                    'LSMinimumSystemVersion':'10.4',
+                    'LSMinimumSystemVersion':'10.6',
                     'LSMultipleInstancesProhibited':'false',
                     'NSHumanReadableCopyright':LICENSE
                 }}

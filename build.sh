@@ -1,5 +1,5 @@
 #!/bin/sh
-export MACOSX_DEPLOYMENT_TARGET=10.4
+export MACOSX_DEPLOYMENT_TARGET=10.6
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages"
 
 # translations
