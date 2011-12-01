@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__version__ = u"0.5.5"
+__version__ = u"0.6.0"
 
 
 # ABOUT
@@ -98,6 +98,10 @@ import matplotlib.ticker as ticker
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+
+import modbus_tk
+import modbus_tk.defines as cst
+import modbus_tk.modbus_rtu as modbus_rtu
 	
 platf = unicode(platform.system())
 
@@ -2212,6 +2216,7 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         #turn ON
         if not self.flagon:
+            aw.disableSaveActions()
             if self.designerflag: return
             
             self.threadserver.createSampleThread()
@@ -2240,6 +2245,7 @@ class tgraphcanvas(FigureCanvas):
             aw.soundpop()
             aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
             aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8))
+            aw.enableSaveActions()
 
 
     #Records charge (put beans in) marker. called from push button 'Charge'
@@ -4734,6 +4740,8 @@ class ApplicationWindow(QMainWindow):
        
         #create a serial port object (main ET BT device)
         self.ser = serialport()
+        #create a modbus port object (main modbus device)
+        self.modbus = modbusport()
         #list with extra serial ports (extra devices)
         self.extraser = []
         #extra comm port settings 
@@ -4821,14 +4829,14 @@ class ApplicationWindow(QMainWindow):
         
         self.fileMenu.addSeparator()  
 
-        fileSaveAction = QAction(UIconst.FILE_MENU_SAVE,self)
-        fileSaveAction.setShortcut(QKeySequence.Save)
-        self.connect(fileSaveAction,SIGNAL("triggered()"),lambda b=0:self.fileSave(self.curFile))
-        self.fileMenu.addAction(fileSaveAction)    
+        self.fileSaveAction = QAction(UIconst.FILE_MENU_SAVE,self)
+        self.fileSaveAction.setShortcut(QKeySequence.Save)
+        self.connect(self.fileSaveAction,SIGNAL("triggered()"),lambda b=0:self.fileSave(self.curFile))
+        self.fileMenu.addAction(self.fileSaveAction)    
         
-        fileSaveAsAction = QAction(UIconst.FILE_MENU_SAVEAS,self)
-        self.connect(fileSaveAsAction,SIGNAL("triggered()"),lambda b=0:self.fileSave(None))
-        self.fileMenu.addAction(fileSaveAsAction)  
+        self.fileSaveAsAction = QAction(UIconst.FILE_MENU_SAVEAS,self)
+        self.connect(self.fileSaveAsAction,SIGNAL("triggered()"),lambda b=0:self.fileSave(None))
+        self.fileMenu.addAction(self.fileSaveAsAction)  
         
         self.fileMenu.addSeparator()    
         
@@ -5483,7 +5491,6 @@ class ApplicationWindow(QMainWindow):
         self.e3buttondialog.setCenterButtons(True)
         self.e4buttondialog = QDialogButtonBox(Qt.Horizontal)
         self.e4buttondialog.setCenterButtons(True)
-        
 
         # set the focus on the main widget
         self.main_widget.setFocus()
@@ -5527,7 +5534,7 @@ class ApplicationWindow(QMainWindow):
         EventsLayout.addWidget(self.eNumberSpinBox)        
         EventsLayout.addSpacing(5)      
         EventsLayout.addWidget(self.buttonminiEvent)
-        self.EventsGroupLayout = QGroupBox()        
+        self.EventsGroupLayout = QGroupBox()     
         self.EventsGroupLayout.setLayout(EventsLayout)
  
         #place control buttons + LCDs inside vertical button layout manager
@@ -5591,7 +5598,7 @@ class ApplicationWindow(QMainWindow):
         midleftlayout.addWidget(self.e2buttondialog)
         midleftlayout.addWidget(self.e3buttondialog)
         midleftlayout.addWidget(self.e4buttondialog)
-        #midleftlayout.addSpacing(10)
+        midleftlayout.addSpacing(5)
         midleftlayout.addWidget(self.EventsGroupLayout)
 
         midlayout = QHBoxLayout()
@@ -5622,7 +5629,17 @@ class ApplicationWindow(QMainWindow):
             self.qmc.fig.set_dpi(dpi)
             #move widget to update display
             self.showFullScreen()
-            self.showNormal()        
+            self.showNormal()       
+            
+    def enableSaveActions(self):
+        if aw:
+            self.fileSaveAction.setEnabled(True)
+            self.fileSaveAsAction.setEnabled(True) 
+            
+    def disableSaveActions(self):
+        if aw:
+            self.fileSaveAction.setEnabled(False)
+            self.fileSaveAsAction.setEnabled(False) 
 
     #call from user configured event buttons    
     def recordextraevent(self,ee):
@@ -5630,7 +5647,7 @@ class ApplicationWindow(QMainWindow):
             
             self.qmc.EventRecord(extraevent = ee)
        
-            if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event
+            if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command;
                 if self.extraeventsactions[ee] == 1:                    
                     self.extraeventsactionstrings[ee] = str(self.extraeventsactionstrings[ee])                        
                     extraeventsactionstringscopy = ""
@@ -5656,6 +5673,15 @@ class ApplicationWindow(QMainWindow):
                         buttonnumber = int(events[i])-1
                         if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
                             self.recordextraevent(buttonnumber)
+                elif self.extraeventsactions[ee] == 4:
+                    self.extraeventsactionstrings[ee] = str(self.extraeventsactionstrings[ee])
+                    if self.extraeventsactionstrings[ee].startswith('write'):
+                        try:
+                            cmds = eval(self.extraeventsactionstrings[ee][len('write')+1:])
+                            for cmd in cmds:
+                                aw.modbus.writeSingleRegister(*cmd)
+                        except:
+                            pass
                     
         else:
             self.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
@@ -7024,6 +7050,17 @@ class ApplicationWindow(QMainWindow):
             self.ser.timeout = settings.value("timeout",self.ser.timeout).toInt()[0]
             settings.endGroup()
             
+            #restore serial port     
+            settings.beginGroup("Modbus")
+            self.modbus.comport = unicode(settings.value("comport",self.modbus.comport).toString())
+            self.modbus.baudrate = settings.value("baudrate",int(self.modbus.baudrate)).toInt()[0]
+            self.modbus.bytesize = settings.value("bytesize",self.modbus.bytesize).toInt()[0]       
+            self.modbus.stopbits = settings.value("stopbits",self.modbus.stopbits).toInt()[0]
+            self.modbus.parity = unicode(settings.value("parity",self.modbus.parity).toString())
+            self.modbus.timeout = settings.value("timeout",self.modbus.timeout).toInt()[0]
+            settings.endGroup()
+            
+            
             #restore alarms
             settings.beginGroup("Alarms")
             if settings.contains("alarmtime"):
@@ -7314,6 +7351,15 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("stopbits",self.ser.stopbits)
             settings.setValue("parity",self.ser.parity)
             settings.setValue("timeout",self.ser.timeout)            
+            settings.endGroup()
+            #save modbus port
+            settings.beginGroup("Modbus")
+            settings.setValue("comport",self.modbus.comport)
+            settings.setValue("baudrate",self.modbus.baudrate)
+            settings.setValue("bytesize",self.modbus.bytesize)
+            settings.setValue("stopbits",self.modbus.stopbits)
+            settings.setValue("parity",self.modbus.parity)
+            settings.setValue("timeout",self.modbus.timeout)            
             settings.endGroup()
             #save pid settings (only key and value[0])
             settings.beginGroup("PXR")
@@ -8245,12 +8291,20 @@ $cupping_notes
     def setcommport(self):
         dialog = comportDlg(self)
         if dialog.exec_():
+            # set serial port
             self.ser.comport = unicode(dialog.comportEdit.currentText())                #unicode() changes QString to a python string
             self.ser.baudrate = int(dialog.baudrateComboBox.currentText())              #int changes QString to int
             self.ser.bytesize = int(dialog.bytesizeComboBox.currentText())
             self.ser.stopbits = int(dialog.stopbitsComboBox.currentText())
             self.ser.parity = unicode(dialog.parityComboBox.currentText())
             self.ser.timeout = int(dialog.timeoutEdit.text())
+            # set modbus port
+            self.modbus.comport = unicode(dialog.modbus_comportEdit.currentText())                #unicode() changes QString to a python string
+            self.modbus.baudrate = int(dialog.modbus_baudrateComboBox.currentText())              #int changes QString to int
+            self.modbus.bytesize = int(dialog.modbus_bytesizeComboBox.currentText())
+            self.modbus.stopbits = int(dialog.modbus_stopbitsComboBox.currentText())
+            self.modbus.parity = unicode(dialog.modbus_parityComboBox.currentText())
+            self.modbus.timeout = int(dialog.modbus_timeoutEdit.text())
 
     def PIDcontrol(self):
         #pid
@@ -8323,7 +8377,7 @@ $cupping_notes
         
     def eventsconf(self):
         dialog = EventsDlg(self)
-        dialog.show()
+        dialog.exec_()
         
     def alarmconfig(self):
         if self.qmc.device != 18:
@@ -8916,12 +8970,16 @@ $cupping_notes
                 self.lowerbuttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
             elif len(self.e1buttondialog.buttons()) < self.buttonlistmaxlen:
                 self.e1buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                self.e1buttondialog.setContentsMargins(0,10,0,0)
             elif len(self.e2buttondialog.buttons()) < self.buttonlistmaxlen:
                 self.e2buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                self.e2buttondialog.setContentsMargins(0,10,0,0)
             elif len(self.e3buttondialog.buttons()) < self.buttonlistmaxlen:
                 self.e3buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                self.e3buttondialog.setContentsMargins(0,10,0,0)
             else:
                 self.e4buttondialog.addButton(self.buttonlist[i],QDialogButtonBox.ActionRole)
+                self.e4buttondialog.setContentsMargins(0,10,0,0)
         
         self.settooltip()
         self.update_extraeventbuttons_visibility()
@@ -11810,8 +11868,10 @@ class EventsDlg(QDialog):
             self.autoChargeDrop.setChecked(True)
         else:
             self.autoChargeDrop.setChecked(False)
+        self.autoChargeDrop.setFocusPolicy(Qt.NoFocus)
         
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        #okButton.setFocusPolicy(Qt.StrongFocus)
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         defaultButton.setMaximumWidth(90)
@@ -12270,7 +12330,8 @@ class EventsDlg(QDialog):
                 actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
                                     	 QApplication.translate("ComboBox","Serial command",None, QApplication.UnicodeUTF8),
                                          QApplication.translate("ComboBox","Call program",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Multiple Event",None, QApplication.UnicodeUTF8)])
+                                         QApplication.translate("ComboBox","Multiple Event",None, QApplication.UnicodeUTF8),
+                                    	 QApplication.translate("ComboBox","Modbus command",None, QApplication.UnicodeUTF8)])
                 actionComboBox.setCurrentIndex(aw.extraeventsactions[i])
                 self.connect(actionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setactioneventbutton(z,i))
                 #action description
@@ -12283,10 +12344,12 @@ class EventsDlg(QDialog):
                 
                 #Color
                 colorButton = QPushButton("Color")
+                colorButton.setFocusPolicy(Qt.NoFocus)
                 self.connect(colorButton, SIGNAL("clicked()"),lambda i=i: self.setbuttoncolor(i))
 
                 #Text Color
                 colorTextButton = QPushButton("Color")
+                colorTextButton.setFocusPolicy(Qt.NoFocus)
                 self.connect(colorTextButton, SIGNAL("clicked()"),lambda i=i: self.setbuttontextcolor(i))
                 
                 #add widgets to the table
@@ -12299,9 +12362,9 @@ class EventsDlg(QDialog):
                 self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
                 self.eventbuttontable.setCellWidget(i,7,colorButton)
                 self.eventbuttontable.setCellWidget(i,8,colorTextButton)
-
+        
     def setbuttoncolor(self,x):
-        colorf = QColorDialog.getColor(QColor(aw.extraeventbuttoncolor[x]),self)
+        colorf = QColorDialog.getColor(QColor(aw.extraeventbuttoncolor[x]))
         if colorf.isValid():
             colorname = unicode(colorf.name())
             aw.extraeventbuttoncolor[x] = colorname
@@ -12384,14 +12447,22 @@ class EventsDlg(QDialog):
             aw.extraeventbuttontextcolor.pop(bindex)
             self.createEventbuttonTable()  #update table
 
-            if len(aw.e1buttondialog.buttons()):
+            if len(aw.e4buttondialog.buttons()):
                 aw.e4buttondialog.removeButton(aw.buttonlist[bindex])
-            elif len(aw.e1buttondialog.buttons()):
+                if not len(aw.e4buttondialog.buttons()):
+                    aw.e4buttondialog.setContentsMargins(0,0,0,0)
+            elif len(aw.e3buttondialog.buttons()):
                 aw.e3buttondialog.removeButton(aw.buttonlist[bindex])
+                if not len(aw.e3buttondialog.buttons()):
+                    aw.e3buttondialog.setContentsMargins(0,0,0,0)
             elif len(aw.e2buttondialog.buttons()):
                 aw.e2buttondialog.removeButton(aw.buttonlist[bindex])
-            elif len(aw.e3buttondialog.buttons()):
+                if not len(aw.e2buttondialog.buttons()):
+                    aw.e2buttondialog.setContentsMargins(0,0,0,0)
+            elif len(aw.e1buttondialog.buttons()):
                 aw.e1buttondialog.removeButton(aw.buttonlist[bindex])
+                if not len(aw.e1buttondialog.buttons()):
+                    aw.e1buttondialog.setContentsMargins(0,0,0,0)
             elif len(aw.lowerbuttondialog.buttons()):
                 aw.lowerbuttondialog.removeButton(aw.buttonlist[bindex])
             
@@ -12432,12 +12503,16 @@ class EventsDlg(QDialog):
             aw.lowerbuttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
         elif len(aw.e1buttondialog.buttons()) < aw.buttonlistmaxlen:
             aw.e1buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+            aw.e1buttondialog.setContentsMargins(0,10,0,0)
         elif len(aw.e2buttondialog.buttons()) < aw.buttonlistmaxlen:
             aw.e2buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+            aw.e2buttondialog.setContentsMargins(0,10,0,0)
         elif len(aw.e3buttondialog.buttons()) < aw.buttonlistmaxlen:
             aw.e3buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+            aw.e3buttondialog.setContentsMargins(0,10,0,0)
         else:
             aw.e4buttondialog.addButton(aw.buttonlist[bindex],QDialogButtonBox.ActionRole)
+            aw.e4buttondialog.setContentsMargins(0,10,0,0)
                 
         aw.update_extraeventbuttons_visibility()
         aw.settooltip()
@@ -12470,30 +12545,33 @@ class EventsDlg(QDialog):
 
     #called from OK button      
     def updatetypes(self):
-        self.savetableextraeventbutton()
-        if len(unicode(self.etype0.text())) and len(unicode(self.etype1.text())) and len(unicode(self.etype2.text())) and len(unicode(self.etype3.text())):
-            aw.qmc.etypes[0] = unicode(self.etype0.text())
-            aw.qmc.etypes[1] = unicode(self.etype1.text())
-            aw.qmc.etypes[2] = unicode(self.etype2.text())
-            aw.qmc.etypes[3] = unicode(self.etype3.text())
-
-            #update mini editor
-            aw.etypeComboBox.clear()
-            aw.etypeComboBox.addItems(aw.qmc.etypes)
-            
-            #update autoChargeDrop flag
-            aw.qmc.autoChargeDropFlag = self.autoChargeDrop.isChecked()
-        
+        try:
             self.savetableextraeventbutton()
-            aw.realignbuttons()
-
-            aw.qmc.redraw(recomputeAllDeltas=False)
-
-            aw.sendmessage(QApplication.translate("Message Area","Event configuration saved", None, QApplication.UnicodeUTF8))
-            self.close()
-        else:
-            aw.sendmessage(QApplication.translate("Message Area","Found empty event type box", None, QApplication.UnicodeUTF8))    
+            if len(unicode(self.etype0.text())) and len(unicode(self.etype1.text())) and len(unicode(self.etype2.text())) and len(unicode(self.etype3.text())):
+                aw.qmc.etypes[0] = unicode(self.etype0.text())
+                aw.qmc.etypes[1] = unicode(self.etype1.text())
+                aw.qmc.etypes[2] = unicode(self.etype2.text())
+                aw.qmc.etypes[3] = unicode(self.etype3.text())
+    
+                #update mini editor
+                aw.etypeComboBox.clear()
+                aw.etypeComboBox.addItems(aw.qmc.etypes)
+                
+                #update autoChargeDrop flag
+                aw.qmc.autoChargeDropFlag = self.autoChargeDrop.isChecked()
             
+                self.savetableextraeventbutton()
+                aw.realignbuttons()
+    
+                aw.qmc.redraw(recomputeAllDeltas=False)
+    
+                aw.sendmessage(QApplication.translate("Message Area","Event configuration saved", None, QApplication.UnicodeUTF8))
+                self.close()
+            else:
+                aw.sendmessage(QApplication.translate("Message Area","Found empty event type box", None, QApplication.UnicodeUTF8))                    
+        except Exception,e:
+            aw.qmc.adderror(QApplication.translate("Error Message", "event accept(): %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
         self.etype0.setText(aw.qmc.etypesdefault[0])
@@ -12512,6 +12590,7 @@ class EventsDlg(QDialog):
         string += QApplication.translate("MessageBox", "Serial command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Call program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "Modbus command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8) + "<br><br>"
         
@@ -13729,7 +13808,49 @@ class StatisticsDLG(QDialog):
         #print key
         if key == 16777216: 	    	    #ESCAPE
             self.close()
+ 
+###########################################################################################
+##################### MODBUS PORT #########################################################
+###########################################################################################
+ 
+class modbusport(object):
+    """ this class handles the communications with all the modbus devices"""
+    
+    def __init__(self):
+        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        self.comport = u"COM5"      #NOTE: this string should not be translated. 
+        self.baudrate = 115200
+        self.bytesize = 8
+        self.parity= 'N'
+        self.stopbits = 1
+        self.timeout=1
+        self.xonoff=0
+        self.master = None
+        
+    def isConnected(self):
+        return (self.master == None)
+        
+    def connect(self):
+        if self.master == None:
+            self.master = modbus_rtu.RtuMaster(serial.Serial(
+                port=self.comport,
+                baudrate=self.baudrate,
+                bytesize=self.bytesize,
+                parity=self.parity,
+                stopbits=self.stopbits,
+                xonxoff=self.xonoff))
+            master.set_timeout(10.0)
+            master.set_verbose(False)
+        self.master.open()
+           
+    def writeSingeRegister(self,slave,register,value):
+        try:
+            self.connect()
+            self.master.execute(slave,cst.WRITE_SINGLE_REGISTER,register,output_value=value)
+        except Exception,e:
+            self.adderror(QApplication.translate("Error Message","Modbus Error: writeSingleRegister() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))                
                 
+                      
 ###########################################################################################
 ##################### SERIAL PORT #########################################################
 ###########################################################################################
@@ -16015,7 +16136,54 @@ class comportDlg(QDialog):
         self.timeoutEdit.setValidator(QIntValidator(0,5,self.timeoutEdit))
 
 
-        self.messagelabel = QLabel()
+        ##########################    TAB 2  WIDGETS   EXTRA DEVICES
+        self.serialtable = QTableWidget()
+        self.serialtable.setTabKeyNavigation(True)
+        self.createserialTable()
+
+
+        ##########################    TAB 3 WIDGETS   MODBUS
+        modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
+        self.modbus_comportEdit = QComboBox()
+        self.modbus_comportEdit.addItems([aw.ser.comport])
+        self.modbus_comportEdit.setEditable(True)
+        modbus_comportlabel.setBuddy(self.modbus_comportEdit)
+
+        modbus_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
+        self.modbus_baudrateComboBox = QComboBox()
+        modbus_baudratelabel.setBuddy(self.modbus_baudrateComboBox)
+        self.modbus_bauds = ["2400","9600","19200","38400","57600","115200"]
+        self.modbus_baudrateComboBox.addItems(self.modbus_bauds)
+        self.modbus_baudrateComboBox.setCurrentIndex(self.modbus_bauds.index(str(aw.modbus.baudrate)))
+                   
+        modbus_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None, QApplication.UnicodeUTF8))
+        self.modbus_bytesizeComboBox = QComboBox()
+        modbus_bytesizelabel.setBuddy(self.modbus_bytesizeComboBox)
+        self.modbus_bytesizes = ["7","8"]
+        self.modbus_bytesizeComboBox.addItems(self.modbus_bytesizes)
+        self.modbus_bytesizeComboBox.setCurrentIndex(self.modbus_bytesizes.index(str(aw.modbus.bytesize)))
+
+        modbus_paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
+        self.modbus_parityComboBox = QComboBox()
+        modbus_paritylabel.setBuddy(self.modbus_parityComboBox)
+        #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
+        self.modbus_parity = ["O","E","N"]
+        self.modbus_parityComboBox.addItems(self.modbus_parity)
+        self.modbus_parityComboBox.setCurrentIndex(self.modbus_parity.index(aw.modbus.parity))
+
+        modbus_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None, QApplication.UnicodeUTF8))
+        self.modbus_stopbitsComboBox = QComboBox()
+        modbus_stopbitslabel.setBuddy(self.modbus_stopbitsComboBox)
+        self.modbus_stopbits = ["0","1","2"]
+        self.modbus_stopbitsComboBox.addItems(self.stopbits)
+        self.modbus_stopbitsComboBox.setCurrentIndex(aw.modbus.stopbits)
+        
+        modbus_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
+        self.modbus_timeoutEdit = QLineEdit(str(aw.modbus.timeout))
+        self.modbus_timeoutEdit.setValidator(QIntValidator(0,5,self.modbus_timeoutEdit))
+
+
+        #### dialog buttons
         
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
@@ -16025,19 +16193,12 @@ class comportDlg(QDialog):
 
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)        
-
-
-        ##########################    TAB 2  WIDGETS   EXTRA DEVICES
-        self.serialtable = QTableWidget()
-        self.serialtable.setTabKeyNavigation(True)
-        self.createserialTable()
-
-
+        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)   
+        
         self.scanforport()
 
 
-        #tab1 layout
+        #button layout
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(scanButton)
         buttonLayout.addStretch()  
@@ -16045,6 +16206,7 @@ class comportDlg(QDialog):
         buttonLayout.addWidget(okButton)
 
 
+        #LAYOUT TAB 1
         grid = QGridLayout()
         grid.addWidget(comportlabel,0,0,Qt.AlignRight)
         grid.addWidget(self.comportEdit,0,1)
@@ -16058,7 +16220,6 @@ class comportDlg(QDialog):
         grid.addWidget(self.stopbitsComboBox,4,1)
         grid.addWidget(timeoutlabel,5,0,Qt.AlignRight)
         grid.addWidget(self.timeoutEdit,5,1)
-        grid.addWidget(self.messagelabel,6,1)
         
         gridBoxLayout = QHBoxLayout()
         gridBoxLayout.addLayout(grid)
@@ -16072,6 +16233,30 @@ class comportDlg(QDialog):
         #LAYOUT TAB 2
         tab2Layout = QVBoxLayout()
         tab2Layout.addWidget(self.serialtable)
+        
+        #LAYOUT TAB 3
+        modbus_grid = QGridLayout()
+        modbus_grid.addWidget(modbus_comportlabel,0,0,Qt.AlignRight)
+        modbus_grid.addWidget(self.modbus_comportEdit,0,1)
+        modbus_grid.addWidget(modbus_baudratelabel,1,0,Qt.AlignRight)
+        modbus_grid.addWidget(self.modbus_baudrateComboBox,1,1)
+        modbus_grid.addWidget(modbus_bytesizelabel,2,0,Qt.AlignRight)
+        modbus_grid.addWidget(self.modbus_bytesizeComboBox,2,1)
+        modbus_grid.addWidget(modbus_paritylabel,3,0,Qt.AlignRight)
+        modbus_grid.addWidget(self.modbus_parityComboBox,3,1)
+        modbus_grid.addWidget(modbus_stopbitslabel,4,0,Qt.AlignRight)
+        modbus_grid.addWidget(self.modbus_stopbitsComboBox,4,1)
+        modbus_grid.addWidget(modbus_timeoutlabel,5,0,Qt.AlignRight)
+        modbus_grid.addWidget(self.modbus_timeoutEdit,5,1)
+        
+        modbus_gridBoxLayout = QHBoxLayout()
+        modbus_gridBoxLayout.addLayout(modbus_grid)
+        modbus_gridBoxLayout.addStretch()  
+    
+        tab3Layout = QVBoxLayout()
+        tab3Layout.addLayout(modbus_gridBoxLayout)
+        tab3Layout.addStretch()  
+
 
         #tab widget
         TabWidget = QTabWidget()
@@ -16082,6 +16267,10 @@ class comportDlg(QDialog):
         C2Widget = QWidget()
         C2Widget.setLayout(tab2Layout)
         TabWidget.addTab(C2Widget,QApplication.translate("Tab","Extra",None, QApplication.UnicodeUTF8))
+
+        C3Widget = QWidget()
+        C3Widget.setLayout(tab3Layout)
+        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Modbus",None, QApplication.UnicodeUTF8))
 
         #incorporate layouts
         Mlayout = QVBoxLayout()
