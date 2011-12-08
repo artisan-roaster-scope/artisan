@@ -102,6 +102,8 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as Naviga
 import modbus_tk
 import modbus_tk.defines as cst
 import modbus_tk.modbus_rtu as modbus_rtu
+#import logging
+#logger = modbus_tk.utils.create_logger("console")
 	
 platf = unicode(platform.system())
 
@@ -5644,47 +5646,54 @@ class ApplicationWindow(QMainWindow):
     #call from user configured event buttons    
     def recordextraevent(self,ee):
         if self.qmc.flagon:
-            
             self.qmc.EventRecord(extraevent = ee)
-       
-            if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command;
-                if self.extraeventsactions[ee] == 1:                    
-                    self.extraeventsactionstrings[ee] = str(self.extraeventsactionstrings[ee])                        
-                    extraeventsactionstringscopy = ""
-                    #example a2b_uu("Hello") sends Hello in binary format instead of ASCII
-                    if "a2b_uu" in self.extraeventsactionstrings[ee]:
-                        self.extraeventsactionstrings[ee] = self.extraeventsactionstrings[ee][(len("a2b_uu")+1):]  # removes function-name + char ( 
-                        self.extraeventsactionstrings[ee] = self.extraeventsactionstrings[ee][:1]                 # removes )  
-                        extraeventsactionstringscopy = binascii.a2b_uu(self.extraeventsactionstrings[ee])
-                    if extraeventsactionstringscopy:
-                        self.ser.sendTXcommand(extraeventsactionstringscopy)                
-                    else:    
-                        self.ser.sendTXcommand(self.extraeventsactionstrings[ee])
-                                                    
-                elif self.extraeventsactions[ee] == 2:
-                    try:
-                        fname = unicode(self.extraeventsactionstrings[ee])
-                        QDesktopServices.openUrl(QUrl(u"file:///" + unicode(QDir().current().absolutePath()) + u"/" + fname, QUrl.TolerantMode))            
-                    except Exception,e:
-                        self.qmc.adderror(QApplication.translate("Error Message","Exception Error: recordextraevent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
-                elif self.extraeventsactions[ee] == 3:
-                    events = self.extraeventsactionstrings[ee]
-                    for i in range(len(events)):
-                        buttonnumber = int(events[i])-1
-                        if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
-                            self.recordextraevent(buttonnumber)
-                elif self.extraeventsactions[ee] == 4:
-                    self.extraeventsactionstrings[ee] = str(self.extraeventsactionstrings[ee])
-                    if self.extraeventsactionstrings[ee].startswith('write'):
-                        try:
-                            cmds = eval(self.extraeventsactionstrings[ee][len('write')+1:])
-                            for cmd in cmds:
-                                aw.modbus.writeSingleRegister(*cmd)
-                        except:
-                            pass
-                    
         else:
             self.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
+       
+        if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command;
+            if self.extraeventsactions[ee] == 1:                    
+                self.extraeventsactionstrings[ee] = str(self.extraeventsactionstrings[ee])                        
+                extraeventsactionstringscopy = ""
+                #example a2b_uu("Hello") sends Hello in binary format instead of ASCII
+                if "a2b_uu" in self.extraeventsactionstrings[ee]:
+                    self.extraeventsactionstrings[ee] = self.extraeventsactionstrings[ee][(len("a2b_uu")+1):]  # removes function-name + char ( 
+                    self.extraeventsactionstrings[ee] = self.extraeventsactionstrings[ee][:1]                 # removes )  
+                    extraeventsactionstringscopy = binascii.a2b_uu(self.extraeventsactionstrings[ee])
+                if extraeventsactionstringscopy:
+                    self.ser.sendTXcommand(extraeventsactionstringscopy)                
+                else:    
+                    self.ser.sendTXcommand(self.extraeventsactionstrings[ee])
+                                                
+            elif self.extraeventsactions[ee] == 2:
+                try:
+                    fname = unicode(self.extraeventsactionstrings[ee])
+                    QDesktopServices.openUrl(QUrl(u"file:///" + unicode(QDir().current().absolutePath()) + u"/" + fname, QUrl.TolerantMode))            
+                except Exception,e:
+                    self.qmc.adderror(QApplication.translate("Error Message","Exception Error: recordextraevent() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+            elif self.extraeventsactions[ee] == 3:
+                events = self.extraeventsactionstrings[ee]
+                for i in range(len(events)):
+                    buttonnumber = int(events[i])-1
+                    if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
+                        self.recordextraevent(buttonnumber)
+            elif self.extraeventsactions[ee] == 4:
+                self.extraeventsactionstrings[ee] = str(self.extraeventsactionstrings[ee])
+                if self.extraeventsactionstrings[ee].startswith('write'):
+                    try:
+                        cmds = eval(self.extraeventsactionstrings[ee][len('write'):])
+                        if isinstance(cmds,tuple):
+                            if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                # cmd has format "write(s,r,v)"
+                                aw.modbus.writeSingleRegister(*cmds)
+                            # cmd has format "write([s,r,v],..,[s,r,v])"
+                            for cmd in cmds:
+                                aw.modbus.writeSingleRegister(*cmd)
+                        else:
+                            # cmd has format "write([s,r,v])"
+                            aw.modbus.writeSingleRegister(*cmds)
+                    except:
+                        pass
+                    
 
     def resetApplication(self):
         string = QApplication.translate("MessageBox","Do you want to reset all settings?", None, QApplication.UnicodeUTF8)
@@ -13823,7 +13832,7 @@ class modbusport(object):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout=1
+        self.timeout=1.0
         self.xonoff=0
         self.master = None
         
@@ -13832,23 +13841,28 @@ class modbusport(object):
         
     def connect(self):
         if self.master == None:
-            self.master = modbus_rtu.RtuMaster(serial.Serial(
-                port=self.comport,
-                baudrate=self.baudrate,
-                bytesize=self.bytesize,
-                parity=self.parity,
-                stopbits=self.stopbits,
-                xonxoff=self.xonoff))
-            master.set_timeout(10.0)
-            master.set_verbose(False)
-        self.master.open()
+            try:
+                ser = serial.Serial()
+                ser.setPort(self.comport)
+                ser.setBaudrate(self.baudrate)
+                ser.setByteSize(self.bytesize)
+                ser.setParity(self.parity)
+                ser.setStopbits(self.stopbits)
+                ser.setTimeout(self.timeout)
+                self.master = modbus_rtu.RtuMaster(ser)
+                self.master.set_timeout(3.0)
+                self.master.set_verbose(False)
+            except Exception,e:
+                self.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e))) 
            
-    def writeSingeRegister(self,slave,register,value):
+    def writeSingleRegister(self,slave,register,value):
         try:
             self.connect()
-            self.master.execute(slave,cst.WRITE_SINGLE_REGISTER,register,output_value=value)
+            resp = self.master.execute(int(slave),cst.WRITE_SINGLE_REGISTER,int(register),output_value=int(value))
+        except modbus_tk.modbus_rtu.ModbusInvalidResponseError, e:
+            self.master.close()
         except Exception,e:
-            self.adderror(QApplication.translate("Error Message","Modbus Error: writeSingleRegister() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))                
+            pass            
                 
                       
 ###########################################################################################
@@ -16145,7 +16159,7 @@ class comportDlg(QDialog):
         ##########################    TAB 3 WIDGETS   MODBUS
         modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.modbus_comportEdit = QComboBox()
-        self.modbus_comportEdit.addItems([aw.ser.comport])
+        self.modbus_comportEdit.addItems([aw.modbus.comport])
         self.modbus_comportEdit.setEditable(True)
         modbus_comportlabel.setBuddy(self.modbus_comportEdit)
 
@@ -16195,9 +16209,6 @@ class comportDlg(QDialog):
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)   
         
-        self.scanforport()
-
-
         #button layout
         buttonLayout = QHBoxLayout()
         buttonLayout.addWidget(scanButton)
@@ -16483,7 +16494,9 @@ class comportDlg(QDialog):
 
             #set comboBoxes                        
             self.comportEdit.clear()
-            self.comportEdit.addItems(available)
+            self.comportEdit.addItems(available) 
+            self.modbus_comportEdit.clear()
+            self.modbus_comportEdit.addItems(available)
             if len(available):
                 if aw.ser.comport in available:
                     self.comportEdit.setCurrentIndex(available.index(aw.ser.comport))
