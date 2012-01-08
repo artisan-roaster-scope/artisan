@@ -511,7 +511,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmstate = []   # 1=triggered, 0=not triggered. Needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
         self.alarmsource = []   # 0 = ET , 1= BT
         self.alarmtemperature = []  # set temperature number (example 500)
-        self.alarmaction = []       # 0 = open a window; 1 = call program with a filepath equal to alarmstring
+        self.alarmaction = []       # 0 = open a window; 1 = call program with a filepath equal to alarmstring; 2 = activate button with number given in description
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
         self.temporaryalarmflag = -1 #holds temporary index value of triggered alarm in updategraphics()
         
@@ -847,7 +847,15 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(QApplication.translate("Message Area","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(self.alarmstrings[alarmnumber]))
             except Exception,e:
                 self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
-                return  
+                return
+        elif self.alarmaction[alarmnumber] == 2:
+            try:
+                button_number = int(self.alarmstrings[alarmnumber]) - 1 # the event buttons presented to the user are numbered from 1 on
+                if button_number > -1 and button_number < len(aw.buttonlist):
+                    aw.recordextraevent(button_number)
+            except Exception,e:  
+                self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(unicode(e)))
+                return
 
     def playbackevent(self):
         #needed when using device NONE
@@ -12598,8 +12606,8 @@ class EventsDlg(QDialog):
         string += QApplication.translate("MessageBox", "<b>Action description</b> Depends on the Action type:",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Serial command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Call program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("MessageBox", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "Modbus command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
+        string += QApplication.translate("MessageBox", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
+        string += QApplication.translate("MessageBox", "Modbus command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8) + "<br><br>"
         
@@ -18881,7 +18889,8 @@ class AlarmDlg(QDialog):
                 #action
                 actionComboBox = QComboBox()
                 actionComboBox.addItems([QApplication.translate("ComboBox","Pop up window",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Call program",None, QApplication.UnicodeUTF8)])
+                                         QApplication.translate("ComboBox","Call program",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","Event button",None, QApplication.UnicodeUTF8)])
                 actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i])
                     
                 #text description
