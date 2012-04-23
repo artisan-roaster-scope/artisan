@@ -14,15 +14,14 @@ import serial
 import time
 import binascii
 
-
 def main():
     
     print "use CTRL + C to interrupt program\n"
     delay = 1           # set interval of seconds between each reading
     port = '/dev/tty.usbserial-A2001Epn'
     
+    id = HH506RAid(port,delay)
     while True:    
-        id = HH506RAid(port,delay)
         t1,t2 = HH506RAtemperature(port,delay,id)
         print "T1 = " + str(t1) + "    " + "T2 = " +str(t2) + "\n"
         time.sleep(delay)
@@ -33,9 +32,10 @@ def HH506RAid(port,delay):
         ser = serial.Serial(port, baudrate=2400, bytesize=7, parity='E', stopbits=1, timeout=1)	
         sync = None
         while sync != "Err\r\n":
-            ser.write("\r\n")
+            ser.write(b"\r")
             sync = ser.read(5)
             time.sleep(1)
+            print(sync)
         ser.write("%000R")
         id = ser.read(5)[0:3]
         ser.close()

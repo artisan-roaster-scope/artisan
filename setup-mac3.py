@@ -100,7 +100,7 @@ os.chdir('./dist')
 #os.system(r'macdeployqt Artisan.app -verbose=0')
 
 # delete unused Qt.framework files (py2app exclude does not seem to work)
-print '*** Removing unused Qt frameworks ***'
+print('*** Removing unused Qt frameworks ***')
 for fw in [
             'phonon',
             'QtDeclarative',
@@ -116,36 +116,36 @@ for fw in [
             'QtXMLPatterns']:
     for root,dirs,files in os.walk('./Artisan.app/Contents/Frameworks/' + fw + ".framework"):
         for file in files:
-            print 'Deleting', file
+            print('Deleting', file)
             os.remove(os.path.join(root,file))
 
-print '*** Removing Qt debug libs ***'
+print('*** Removing Qt debug libs ***')
 for root, dirs, files in os.walk('.'):
     for file in files:
         if 'debug' in file:
-            print 'Deleting', file
+            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif 'test_' in file:
-            print 'Deleting', file
+            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif '_tests' in file:
-            print 'Deleting', file            
+            print('Deleting', file)            
             os.remove(os.path.join(root,file))            
         elif file.endswith('.pyc') and file != "site.pyc":
-            print 'Deleting', file
+            print('Deleting', file)
             os.remove(os.path.join(root,file))
         # remove also all .h .in .cpp .cc .html files 
         elif file.endswith('.h') and file != "pyconfig.h":
-            print 'Deleting', file
+            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif file.endswith('.in'):
-            print 'Deleting', file
+            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif file.endswith('.cpp'):
-            print 'Deleting', file
+            print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif file.endswith('.cc'):
-            print 'Deleting', file
+            print('Deleting', file)
             os.remove(os.path.join(root,file))
             
 os.chdir('..')

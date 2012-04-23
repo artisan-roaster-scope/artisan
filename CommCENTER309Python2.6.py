@@ -15,6 +15,9 @@
 import serial
 import time
 import binascii
+import platform
+
+platf = str(platform.system())
 
 
 def main():
@@ -54,7 +57,11 @@ def temperature():
     serCENTER = None
     try:
         ##########   CHANGE HERE  "COMx" port to match your computer   ################################
-        serCENTER = serial.Serial("COM13", baudrate=9600, bytesize=8, parity='N', stopbits=1, timeout=1)
+        if platf == 'Windows':
+            port = "COM13"
+        else:
+            port = "/dev/cu.SLAB_USBtoUART"
+        serCENTER = serial.Serial(port, baudrate=9600, bytesize=8, parity='N', stopbits=1, timeout=1)
         
         command = "\x41"                  #this comand makes the meter answer back with 45 bytes
         serCENTER.write(command)
@@ -64,11 +71,13 @@ def temperature():
         if len(r) != 45:
             #Bad RX data
             return 0.,0.,"RX failed"
+            
+        print(r)
 
         #check that T1 and T2 are both plugged in        
-        if int(binascii.hexlify(r[43]),16) != 12:
+        #if int(binascii.hexlify(r[43]),16) != 12:
             #T1 + T2 not plugged in
-            return 0.,0.,"plug T1&T2!"
+        #    return 0.,0.,"plug T1&T2!"
 
         mode = "X"
         checkmode = int(binascii.hexlify(r[1]),16)
