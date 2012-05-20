@@ -4,7 +4,7 @@
 
 # REQUIREMENTS
 # python 2.6.2: http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi
-# pyserial for python 2.6: http://sourceforge.net/projects/pyserial/files/pyserial/2.5/pyserial-2.5-rc1.win32.exe/download
+# pyserial for python 2.6: http://sourceforge.net/projects/pyserial/files/pyserial/2.6
 # javacomm: http://www.xpl4java.org/xPL4Java/javacomm.html
 # Java JDK or JRE:  http://java.sun.com/javase/downloads/index.jsp
 
