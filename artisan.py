@@ -116,19 +116,47 @@ import minimalmodbus
 if sys.version < '3':
     import codecs
     def u(x):
-        return codecs.unicode_escape_decode(x)[0]
-    def hex2int(h):
-        return int(binascii.hexlify(h),16)
+        return unicode(x)
+    def v(x):
+        return x
+    def d(x):
+        if x is not None:
+            return codecs.unicode_escape_decode(x)[0]
+        else:
+            return None
+    def e(x):
+        if x is not None:
+            return codecs.unicode_escape_encode(str(x))[0]
+        else: 
+            return None
+    def hex2int(h1,h2=""):
+        return int(binascii.hexlify(h1+h2),16)
+    def str2cmd(s):
+        return s
 else:
 #    import uprefix
 #    uprefix.register_hook()
     def u(x):
-        return x
-    def hex2int(h):
-        if len(h)>1:
-            return int(h[-2]*256 + h[-1])
+        x
+    def v(x):
+        x
+    def d(x):
+        if x is not None:
+            return codecs.unicode_escape_decode(x)[0]
         else:
-            int(h[0])
+            return None
+    def e(x):
+        if x is not None:
+            return codecs.unicode_escape_encode(str(x))[0].decode("utf8")
+        else:
+            return None
+    def hex2int(h1,h2=None):
+        if h2:
+            return int(h1*256 + h2)
+        else:
+            int(h1)
+    def str2cmd(s):
+        return bytes(s,"ascii")
         
 platf = str(platform.system())
 
@@ -333,7 +361,8 @@ class tgraphcanvas(FigureCanvas):
                        "-DTAtemperature",       #26   
                        "Program",               #27
                        "+ArduinoTC4_XX",        #28
-                       "-Omega HH806W"           #29 NOT WORKING 
+                       "MODBUS",                 #29
+                       "-Omega HH806W"           #30 NOT WORKING 
                        ]
 
         #extra devices
@@ -1428,8 +1457,10 @@ class tgraphcanvas(FigureCanvas):
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
             for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
-                self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
+                if aw.extraCurveVisibility1[i]:
+                    self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
+                if aw.extraCurveVisibility2[i]:
+                    self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
 
             #check BACKGROUND flag
             if self.background: 
@@ -1641,11 +1672,17 @@ class tgraphcanvas(FigureCanvas):
 
             nrdevices = len(self.extradevices)
             if nrdevices:
-                for i in range(min(nrdevices,len(self.extratemp1lines),len(self.extratemp2lines),len(self.extraname2),len(self.extraname2))):
-                    handles.append(self.extratemp1lines[i])
-                    handles.append(self.extratemp2lines[i])
-                    labels.append(self.extraname1[i])
-                    labels.append(self.extraname2[i])
+                nextTempLine1idx = 0
+                nextTempLine2idx = 0
+                for i in range(nrdevices):
+                    if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > nextTempLine1idx:
+                        handles.append(self.extratemp1lines[nextTempLine1idx])
+                        labels.append(self.extraname1[i])
+                        nextTempLine1idx = nextTempLine1idx + 1
+                    if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > nextTempLine2idx:
+                        handles.append(self.extratemp2lines[nextTempLine2idx])
+                        labels.append(self.extraname2[i])
+                        nextTempLine2idx = nextTempLine2idx + 1
                     
             if not self.designerflag:  
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min  
@@ -1673,6 +1710,7 @@ class tgraphcanvas(FigureCanvas):
                                     xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] - self.ystep),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
                 #Add 1Cs markers
+                self.ystep = 45
                 if self.timeindex[2]:
                     if self.timeindex[1]: #if dryend
                         self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
@@ -4455,18 +4493,19 @@ class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent):
         NavigationToolbar.__init__(self, plotCanvas, parent)
 
-    def _icon(self, name):
-        #dirty hack to use exclusively .png and thus avoid .svg usage
-        #because .exe generation is problematic with .svg
-        if platf != 'Darwin':
-            n = name.replace('.svg','.png')
-        else:
-            n = name.replace('.png','.svg')
-        p = os.path.join(self.basedir, n)
-        if os.path.exists(p):
-            return QIcon(p)
-        else:
-            return QIcon(os.path.join(self.basedir, name))
+# SVG icons don't work anymore on QT4.8.1 for an unknown reason
+#    def _icon(self, name):
+#        #dirty hack to use exclusively .png and thus avoid .svg usage
+#        #because .exe generation is problematic with .svg
+#        if platf != 'Darwin':
+#            n = name.replace('.svg','.png')
+#        else:
+#            n = name.replace('.png','.svg')
+#        p = os.path.join(self.basedir, n)
+#        if os.path.exists(p):
+#            return QIcon(p)
+#        else:
+#            return QIcon(os.path.join(self.basedir, name))
 
 
 ########################################################################################
@@ -4488,14 +4527,14 @@ class SampleThread(QThread):
             aw.qmc.samplingsemaphore.acquire(1)
             
             #if using a meter (thermocouple device)
-            if aw.qmc.device != 18:
+            if aw.qmc.device != 18: # not NONE device
 
                 ##############  if using Extra devices               
                 nxdevices = len(aw.qmc.extradevices)
                 if nxdevices:
                     les,led,let,letl =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1),len(aw.qmc.extratemp1lines)
                     if les == led == let == letl:
-                        for i in range(nxdevices):                            
+                        for i in range(nxdevices):   
                             extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
                             if len(aw.qmc.extramathexpression1[i]):
                                 extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
@@ -4528,6 +4567,7 @@ class SampleThread(QThread):
                             errormessage = "ERROR: extra devices lengths don't match: %s"%string
                             errormessage += "\nPlease Reset: Extra devices"
                         raise Exception(errormessage)   
+
 
                 #read time, ET (t1) and BT (t2) TEMPERATURE
                 tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
@@ -4792,6 +4832,8 @@ class ApplicationWindow(QMainWindow):
         self.ser = serialport()
         #create a modbus port object (main modbus device)
         self.modbus = modbusport()
+        #create scale port object
+        self.scale = scaleport()
         #list with extra serial ports (extra devices)
         self.extraser = []
         #extra comm port settings 
@@ -5387,34 +5429,34 @@ class ApplicationWindow(QMainWindow):
         self.lcd7.setToolTip(QApplication.translate("Tooltip", "PID power %",None, QApplication.UnicodeUTF8))
 
         #MET
-        label2 = QLabel()
-        label2.setText("<font color='black'><b>" + QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        label2.setAlignment(Qt.AlignBottom)
-        label2.setIndent(5)
+        self.label2 = QLabel()
+        self.label2.setText(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
+        self.label2.setAlignment(Qt.AlignBottom)
+        self.label2.setIndent(5)
         #BT
-        label3 = QLabel()
-        label3.setAlignment(Qt.AlignBottom)
-        label3.setText("<font color='black'><b>" + QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        label3.setIndent(5)
+        self.label3 = QLabel()
+        self.label3.setAlignment(Qt.AlignBottom)
+        self.label3.setText("<b>" + QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8) + "<\b>")
+        self.label3.setIndent(5)
         #DELTA MET
-        label4 = QLabel()
-        label4.setAlignment(Qt.AlignBottom)
-        label4.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        label4.setIndent(5)
+        self.label4 = QLabel()
+        self.label4.setAlignment(Qt.AlignBottom)
+        self.label4.setText("<b>" + QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b>")
+        self.label4.setIndent(5)
         # DELTA BT
-        label5 = QLabel()
-        label5.setAlignment(Qt.AlignBottom)       
-        label5.setText("<font color='black'><b>" + QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        label5.setIndent(5)
+        self.label5 = QLabel()
+        self.label5.setAlignment(Qt.AlignBottom)       
+        self.label5.setText("<b>" + QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b>")
+        self.label5.setIndent(5)
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.AlignBottom)
-        self.label6.setText("<font color='black'><b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.label6.setText("<b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b>")
         self.label6.setIndent(5)
         # pid power % duty cycle
         self.label7 = QLabel()
         self.label7.setAlignment(Qt.AlignBottom)
-        self.label7.setText("<font color='black'><b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.label7.setText("<b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b>")
         self.label7.setIndent(5)
 
         #extra LCDs
@@ -5422,6 +5464,7 @@ class ApplicationWindow(QMainWindow):
         self.extraLCD1,self.extraLCD2 = [],[]
         self.extraLCDlabel1,self.extraLCDlabel2 = [],[]
         self.extraLCDvisibility1,self.extraLCDvisibility2 = [0]*nLCDS,[0]*nLCDS
+        self.extraCurveVisibility1,self.extraCurveVisibility2 = [0]*nLCDS,[0]*nLCDS
         for i in range(nLCDS):
             #configure LCDs
             self.extraLCD1.append(QLCDNumber())
@@ -5588,29 +5631,48 @@ class ApplicationWindow(QMainWindow):
         self.EventsGroupLayout.setLayout(EventsLayout)
  
         #place control buttons + LCDs inside vertical button layout manager
-        LCDlayout.addSpacing(10)
-        LCDlayout.addWidget(label2)
+        LCDlayout.addWidget(self.label2)
+        LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd2)
-        #LCDlayout.addStretch()   
-        LCDlayout.addWidget(label3)
+        
+        #LCDlayout.addStretch()  
+        LCDlayout.addSpacing(5) 
+        LCDlayout.addWidget(self.label3)
+        LCDlayout.addSpacing(-10)
         LCDlayout.addWidget(self.lcd3)
+        
         #LCDlayout.addStretch()
+        LCDlayout.addSpacing(5) 
         LCDlayout.addWidget(self.label6)
+        #LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd6)
+        
         #LCDlayout.addStretch()
+        LCDlayout.addSpacing(5) 
         LCDlayout.addWidget(self.label7)
+        LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd7)
+        
         #LCDlayout.addStretch()
-        LCDlayout.addWidget(label4)
+        LCDlayout.addSpacing(5) 
+        LCDlayout.addWidget(self.label4)
+        LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd4)
-        #LCDlayout.addStretch()   
-        LCDlayout.addWidget(label5)
+        
+        #LCDlayout.addStretch()  
+        LCDlayout.addSpacing(5)  
+        LCDlayout.addWidget(self.label5)
+        LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd5)
         #add extra LCDs
         for i in range(nLCDS):
+            LCDlayout.addSpacing(10) 
             LCDlayout.addWidget(self.extraLCDlabel1[i])
+            LCDlayout.addSpacing(-10) 
             LCDlayout.addWidget(self.extraLCD1[i])
+            LCDlayout.addSpacing(5) 
             LCDlayout.addWidget(self.extraLCDlabel2[i])
+            LCDlayout.addSpacing(-10) 
             LCDlayout.addWidget(self.extraLCD2[i])
         LCDlayout.addStretch()
             
@@ -5641,8 +5703,10 @@ class ApplicationWindow(QMainWindow):
         midleftlayout.setMargin(0)
         midleftlayout.setSpacing(0)
         
+        midleftlayout.addSpacing(-20)
         midleftlayout.addWidget(self.messagelabel)
         midleftlayout.addLayout(level3layout)
+        midleftlayout.addSpacing(-5)
         midleftlayout.addWidget(self.lowerbuttondialog)
         midleftlayout.addWidget(self.e1buttondialog)
         midleftlayout.addWidget(self.e2buttondialog)
@@ -5658,9 +5722,15 @@ class ApplicationWindow(QMainWindow):
         mainlayout = QVBoxLayout(self.main_widget)
         mainlayout.setContentsMargins(0,0,0,0)
         mainlayout.addLayout(level1layout)       
-        mainlayout.addLayout(midlayout)       
+        mainlayout.addLayout(midlayout)      
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
+
+    def setLabelColor(self,label,color):
+        palette = QPalette(label.palette()) # make a copy of the palette
+        palette.setColor(QPalette.Foreground, color)
+        label.setPalette(palette) # assign new palette
+
     #adds errors
     def addserial(self,serialstring):
         timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -5804,7 +5874,7 @@ class ApplicationWindow(QMainWindow):
     def keyPressEvent(self,event):    
         key = int(event.key())
         #uncomment next line to find the integer value of a key
-        #print key
+        #print(key)
         
         #keyboard move keys
         if key == 32:                       #SELECTS ACTIVE BUTTON
@@ -5852,7 +5922,11 @@ class ApplicationWindow(QMainWindow):
         elif key == 58:
             self.desktopscreenshot()
         elif key == 59:
-            self.applicationscreenshot()            
+            self.applicationscreenshot() 
+        elif key == 73:                     #letter I (get weight in from scale)
+            self.retrieveWeightIn()
+        elif key == 79:                     #letter O (get weight out from scale)
+            self.retrieveWeightOut()
         else:
             QWidget.keyPressEvent(self, event)
 
@@ -6106,6 +6180,8 @@ class ApplicationWindow(QMainWindow):
         string += QApplication.translate("MessageBox", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[i]</b> = Retrieve Weight In from Scale",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[o]</b> = Retrieve Weight Out from Scale",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[;]</b> = Application ScreenShot",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[:]</b> = Desktop ScreenShot",None, QApplication.UnicodeUTF8) + "<br><br>"
@@ -6346,7 +6422,7 @@ class ApplicationWindow(QMainWindow):
 
             firstChar = stream.read(1)
             if firstChar == "{":    
-                f.close()       
+                f.close()     
                 self.setProfile(self.deserialize(filename)) 
             else:      
                 self.sendmessage(QApplication.translate("Message Area","Invalid artisan format", None, QApplication.UnicodeUTF8))
@@ -6557,7 +6633,7 @@ class ApplicationWindow(QMainWindow):
         self.extrabytesize.append(8)
         self.extraparity.append("E")
         self.extrastopbits.append(1)
-        self.extratimeout.append(1)
+        self.extratimeout.append(2)
         
     def addDevice(self):
         self.qmc.extradevices.append(1)
@@ -6681,7 +6757,7 @@ class ApplicationWindow(QMainWindow):
     def deserialize(self,filename):
         obj = None
         if os.path.exists(str(filename)):
-            f = codecs.open(str(filename), 'r', encoding='utf-8')
+            f = codecs.open(str(filename), 'rb', encoding='utf-8')
             obj=eval(f.read())
             f.close()
         return obj
@@ -6727,9 +6803,9 @@ class ApplicationWindow(QMainWindow):
             if "extramathexpression2" in profile:
                 self.qmc.extramathexpression2 = profile["extramathexpression2"]
             if "extradevicecolor1" in profile:
-                self.qmc.extradevicecolor1 = profile["extradevicecolor1"]
+                self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]]
             if "extradevicecolor2" in profile:
-                self.qmc.extradevicecolor2 = profile["extradevicecolor2"]
+                self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]]
 
             self.updateExtraLCDvisibility()
 
@@ -6754,9 +6830,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.flavors = self.qmc.flavors[:(l-1)]
             
         if "flavorlabels" in profile:
-            self.qmc.flavorlabels = QStringList(profile["flavorlabels"])
+            self.qmc.flavorlabels = QStringList([d(x) for x in profile["flavorlabels"]])
         for i in range(len(self.qmc.flavorlabels)):
-            self.qmc.flavorlabels[i] = u(self.qmc.flavorlabels[i])
+            self.qmc.flavorlabels[i] = self.qmc.flavorlabels[i]
 
         if "flavorstartangle" in profile:
             self.qmc.flavorstartangle = int(profile["flavorstartangle"])
@@ -6767,15 +6843,15 @@ class ApplicationWindow(QMainWindow):
             self.qmc.flavoraspect = 1.
             
         if "title" in profile:
-            self.qmc.title = u(profile["title"])
+            self.qmc.title = d(profile["title"])
         else:            
             self.qmc.title = "Roaster Scope"
         if "beans" in profile:
-            self.qmc.beans = u(profile["beans"])
+            self.qmc.beans = d(profile["beans"])
         else:
             self.qmc.beans = ""
         if "weight" in profile:
-            self.qmc.weight = profile["weight"]
+            self.qmc.weight = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
         else:
             self.qmc.weight = [0,0,"g"]
         if "volume" in profile:
@@ -6783,15 +6859,15 @@ class ApplicationWindow(QMainWindow):
         else:
             self.qmc.volume = [0,0,"l"]
         if "density" in profile:
-            self.qmc.density = profile["density"]
+            self.qmc.density = [profile["density"][0],d(profile["density"][1]),profile["density"][2],d(profile["density"][3])]
         else:
             self.qmc.density = [0,"g",0,"l"]
         if "roastertype" in profile:
-            self.qmc.roastertype = u(profile["roastertype"])
+            self.qmc.roastertype = d(profile["roastertype"])
         else:
             self.qmc.roastertype = ""
         if "operator" in profile:
-            self.qmc.operator = u(profile["operator"])
+            self.qmc.operator = d(profile["operator"])
         else:
             self.qmc.operator = ""
         if "beansize" in profile:
@@ -6799,7 +6875,7 @@ class ApplicationWindow(QMainWindow):
         else:
             self.qmc.beansize = 6.0
         if "roastdate" in profile:
-            self.qmc.roastdate = QDate.fromString(profile["roastdate"])
+            self.qmc.roastdate = QDate.fromString(d(profile["roastdate"]))
         if "specialevents" in profile:
             self.qmc.specialevents = profile["specialevents"]
         else:
@@ -6813,18 +6889,18 @@ class ApplicationWindow(QMainWindow):
         else:
             self.qmc.specialeventsvalue = []          
         if "specialeventsStrings" in profile:
-            self.qmc.specialeventsStrings = profile["specialeventsStrings"]
+            self.qmc.specialeventsStrings = [d(x) for x in profile["specialeventsStrings"]]
         else:
             self.qmc.specialeventsStrings = []
         if "etypes" in profile:
-            self.qmc.etypes = profile["etypes"]
+            self.qmc.etypes = [d(x) for x in profile["etypes"]]
             
         if "roastingnotes" in profile:
-            self.qmc.roastingnotes = u(profile["roastingnotes"])
+            self.qmc.roastingnotes = d(profile["roastingnotes"])
         else:
             self.qmc.roastingnotes = ""
         if "cuppingnotes" in profile:
-            self.qmc.cuppingnotes = u(profile["cuppingnotes"])
+            self.qmc.cuppingnotes = d(profile["cuppingnotes"])
         else:
             self.qmc.cuppingnotes = ""
         if "timex" in profile:
@@ -6862,7 +6938,12 @@ class ApplicationWindow(QMainWindow):
             self.qmc.bag_humidity = [0.,0.]
 
         if "externalprogram" in profile:
-            self.ser.externalprogram = u(profile["externalprogram"])
+            self.ser.externalprogram = d(profile["externalprogram"])
+            
+        if "extraname1" in profile:
+            self.qmc.extraname1 = [d(n) for n in profile["extraname1"]]
+        if "extraname2" in profile:
+            self.qmc.extraname2 = [d(n) for n in profile["extraname2"]]
         
         if "timeindex" in profile:
             self.qmc.timeindex = profile["timeindex"]
@@ -6898,25 +6979,25 @@ class ApplicationWindow(QMainWindow):
         profile["mode"] = self.qmc.mode
         profile["timeindex"] = self.qmc.timeindex
         profile["flavors"] = self.qmc.flavors
-        profile["flavorlabels"] = [str(fl) for fl in self.qmc.flavorlabels]
+        profile["flavorlabels"] = [e(fl) for fl in self.qmc.flavorlabels]
         profile["flavorstartangle"] = self.qmc.flavorstartangle
         profile["flavoraspect"] = self.qmc.flavoraspect
-        profile["title"] = str(self.qmc.title)
-        profile["beans"] = str(self.qmc.beans)
-        profile["weight"] = self.qmc.weight
+        profile["title"] = e(self.qmc.title)
+        profile["beans"] = e(self.qmc.beans)
+        profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],e(self.qmc.weight[2])]
         profile["volume"] = self.qmc.volume
-        profile["density"] = self.qmc.density
-        profile["roastertype"] = str(self.qmc.roastertype)
-        profile["operator"] = str(self.qmc.operator)
-        profile["roastdate"] = str(self.qmc.roastdate.toString())
+        profile["density"] = [self.qmc.density[0],e(self.qmc.density[1]),self.qmc.density[2],e(self.qmc.density[3])]
+        profile["roastertype"] = e(self.qmc.roastertype)
+        profile["operator"] = e(self.qmc.operator)
+        profile["roastdate"] = e(self.qmc.roastdate.toString())
         profile["beansize"] = str(self.qmc.beansize)
         profile["specialevents"] = self.qmc.specialevents
         profile["specialeventstype"] = self.qmc.specialeventstype
         profile["specialeventsvalue"] = self.qmc.specialeventsvalue
-        profile["specialeventsStrings"] = [str(ses) for ses in self.qmc.specialeventsStrings]
-        profile["etypes"] = [str(et) for et in self.qmc.etypes]
-        profile["roastingnotes"] = str(self.qmc.roastingnotes)
-        profile["cuppingnotes"] = str(self.qmc.cuppingnotes)
+        profile["specialeventsStrings"] = [e(ses) for ses in self.qmc.specialeventsStrings]
+        profile["etypes"] = [e(et) for et in self.qmc.etypes]
+        profile["roastingnotes"] = e(self.qmc.roastingnotes)
+        profile["cuppingnotes"] = e(self.qmc.cuppingnotes)
         profile["timex"] = self.qmc.timex
         profile["temp1"] = self.qmc.temp1
         profile["temp2"] = self.qmc.temp2
@@ -6931,16 +7012,16 @@ class ApplicationWindow(QMainWindow):
         profile["ambient_humidity"] = self.qmc.ambient_humidity
         profile["bag_humidity"] = self.qmc.bag_humidity
         profile["extradevices"] = self.qmc.extradevices
-        profile["extraname1"] = self.qmc.extraname1        
-        profile["extraname2"] = self.qmc.extraname2 
+        profile["extraname1"] = [e(n) for n in self.qmc.extraname1]
+        profile["extraname2"] = [e(n) for n in self.qmc.extraname2]
         profile["extramathexpression1"] = self.qmc.extramathexpression1
         profile["extramathexpression2"] = self.qmc.extramathexpression2        
         profile["extratimex"] = self.qmc.extratimex
         profile["extratemp1"] = self.qmc.extratemp1
         profile["extratemp2"] = self.qmc.extratemp2
-        profile["extradevicecolor1"] = self.qmc.extradevicecolor1
-        profile["extradevicecolor2"] = self.qmc.extradevicecolor2
-        profile["externalprogram"] = self.ser.externalprogram
+        profile["extradevicecolor1"] = [e(x) for x in self.qmc.extradevicecolor1]
+        profile["extradevicecolor2"] = [e(x) for x in self.qmc.extradevicecolor2]
+        profile["externalprogram"] = e(self.ser.externalprogram)
         
         return profile
     
@@ -7075,6 +7156,16 @@ class ApplicationWindow(QMainWindow):
             #restore colors
             for (k, v) in list(settings.value("Colors").toMap().items()):
                 self.qmc.palette[str(k)] = str(v.toString())
+            
+            if self.qmc.palette["et"]:    
+                self.setLabelColor(aw.label2,QColor(self.qmc.palette["et"]))
+            if self.qmc.palette["bt"]:    
+                self.setLabelColor(aw.label3,QColor(self.qmc.palette["bt"]))
+            if self.qmc.palette["deltaet"]:    
+                self.setLabelColor(aw.label4,QColor(self.qmc.palette["deltaet"]))
+            if self.qmc.palette["deltabt"]:    
+                self.setLabelColor(aw.label5,QColor(self.qmc.palette["deltabt"]))
+
                 
             if settings.contains("LCDColors"):
                 for (k, v) in list(settings.value("LCDColors").toMap().items()):
@@ -7107,7 +7198,7 @@ class ApplicationWindow(QMainWindow):
             self.ser.timeout = settings.value("timeout",self.ser.timeout).toInt()[0]
             settings.endGroup()
             
-            #restore serial port     
+            #restore modbus port     
             settings.beginGroup("Modbus")
             self.modbus.comport = str(settings.value("comport",self.modbus.comport).toString())
             self.modbus.baudrate = settings.value("baudrate",int(self.modbus.baudrate)).toInt()[0]
@@ -7115,6 +7206,21 @@ class ApplicationWindow(QMainWindow):
             self.modbus.stopbits = settings.value("stopbits",self.modbus.stopbits).toInt()[0]
             self.modbus.parity = str(settings.value("parity",self.modbus.parity).toString())
             self.modbus.timeout = settings.value("timeout",self.modbus.timeout).toInt()[0]
+            self.modbus.input1slave = settings.value("input1slave",self.modbus.input1slave).toInt()[0]
+            self.modbus.input1register = settings.value("input1register",self.modbus.input1register).toInt()[0]
+            self.modbus.input2slave = settings.value("input2slave",self.modbus.input2slave).toInt()[0]
+            self.modbus.input2register = settings.value("input2register",self.modbus.input2register).toInt()[0]
+            settings.endGroup()
+            
+            #restore scale port     
+            settings.beginGroup("Scale")
+            self.scale.device = str(settings.value("device",self.scale.device).toString())
+            self.scale.comport = str(settings.value("comport",self.scale.comport).toString())
+            self.scale.baudrate = settings.value("baudrate",int(self.scale.baudrate)).toInt()[0]
+            self.scale.bytesize = settings.value("bytesize",self.scale.bytesize).toInt()[0]       
+            self.scale.stopbits = settings.value("stopbits",self.scale.stopbits).toInt()[0]
+            self.scale.parity = str(settings.value("parity",self.scale.parity).toString())
+            self.scale.timeout = settings.value("timeout",self.scale.timeout).toInt()[0]
             settings.endGroup()
             
             
@@ -7207,7 +7313,12 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extradevicecolor2 = list(map(str,list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())))
                 if settings.contains("extraLCDvisibility1"):
                     self.extraLCDvisibility1 = [x.toInt()[0] for x in settings.value("extraLCDvisibility1").toList()]
+                if settings.contains("extraLCDvisibility2"):
                     self.extraLCDvisibility2 = [x.toInt()[0] for x in settings.value("extraLCDvisibility2").toList()]
+                if settings.contains("extraCurveVisibility1"):
+                    self.extraCurveVisibility1 = [x.toInt()[0] for x in settings.value("extraCurveVisibility1").toList()]
+                if settings.contains("extraCurveVisibility2"):
+                    self.extraCurveVisibility2 = [x.toInt()[0] for x in settings.value("extraCurveVisibility2").toList()]
             #create empty containers
             for i in range(len(self.qmc.extradevices)):
                 self.qmc.extratemp1.append([])
@@ -7219,6 +7330,10 @@ class ApplicationWindow(QMainWindow):
                 #extra LCDs
             self.updateExtraLCDvisibility()
             settings.endGroup()
+            # set extraLCD colors
+            for i in range(len(self.qmc.extradevices)):
+                self.setLabelColor(self.extraLCDlabel1[i],QColor(self.qmc.extradevicecolor1[i]))
+                self.setLabelColor(self.extraLCDlabel2[i],QColor(self.qmc.extradevicecolor2[i])) 
 
             # Extra com ports
             settings.beginGroup("ExtraComm")
@@ -7230,9 +7345,10 @@ class ApplicationWindow(QMainWindow):
                 self.extrastopbits = [x.toInt()[0] for x in settings.value("extrastopbits").toList()]
                 self.extratimeout = [x.toInt()[0] for x in settings.value("extratimeout").toList()]
                 lenextraports = len(self.extracomport)
-                self.extraser = [serialport()]*lenextraports
+                self.extraser = [None]*lenextraports                
                 #populate aw.extraser
                 for i in range(lenextraports):
+                    self.extraser[i] = serialport()
                     self.extraser[i].comport = str(self.extracomport[i])
                     self.extraser[i].baudrate = self.extrabaudrate[i]
                     self.extraser[i].bytesize = self.extrabytesize[i]
@@ -7416,7 +7532,21 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("bytesize",self.modbus.bytesize)
             settings.setValue("stopbits",self.modbus.stopbits)
             settings.setValue("parity",self.modbus.parity)
-            settings.setValue("timeout",self.modbus.timeout)            
+            settings.setValue("timeout",self.modbus.timeout)    
+            settings.setValue("input1slave",self.modbus.input1slave)  
+            settings.setValue("input1register",self.modbus.input1register)    
+            settings.setValue("input2slave",self.modbus.input2slave)
+            settings.setValue("input2register",self.modbus.input2register)
+            settings.endGroup()
+            #save scale port
+            settings.beginGroup("Scale")
+            settings.setValue("device",self.scale.device)
+            settings.setValue("comport",self.scale.comport)
+            settings.setValue("baudrate",self.scale.baudrate)
+            settings.setValue("bytesize",self.scale.bytesize)
+            settings.setValue("stopbits",self.scale.stopbits)
+            settings.setValue("parity",self.scale.parity)
+            settings.setValue("timeout",self.scale.timeout)    
             settings.endGroup()
             #save pid settings (only key and value[0])
             settings.beginGroup("PXR")
@@ -7485,6 +7615,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extramathexpression2",self.qmc.extramathexpression2)
             settings.setValue("extraLCDvisibility1",self.extraLCDvisibility1)
             settings.setValue("extraLCDvisibility2",self.extraLCDvisibility2)
+            settings.setValue("extraCurveVisibility1",self.extraCurveVisibility1)
+            settings.setValue("extraCurveVisibility2",self.extraCurveVisibility2)
             settings.endGroup()
             
             #save extra serial comm ports settings
@@ -7667,6 +7799,9 @@ class ApplicationWindow(QMainWindow):
 
             general["extraLCDvisibility1"] = self.extraLCDvisibility1
             general["extraLCDvisibility2"] = self.extraLCDvisibility2
+            
+            general["extraCurveVisibility1"] = self.extraCurveVisibility1
+            general["extraCurveVisibility2"] = self.extraCurveVisibility2
 
             settingsx = [general,device,phases,statistics,events,delay,colors,cupping,extras,serial,axes,roast,alarms]
             #keep same order
@@ -8322,7 +8457,23 @@ $cupping_notes
                 initialPath,
                 "%s Files (*.%s);;All Files (*)"%(format.upper(),format))
         if fileName:
-            imag.save(fileName, format)          
+            imag.save(fileName, format) 
+            
+    def retrieveWeightIn(self):
+        v = aw.scale.readWeight() # read value from weight in 'g'
+        if v and v > -1:
+            if aw.qmc.weight[2] != 'g':
+                v = v / 1000.0
+            aw.qmc.weight[0] = v
+            aw.qmc.weight[1] = 0
+        
+    def retrieveWeightOut(self):
+        v = aw.scale.readWeight() # read value from weight in 'g'
+        if v and v > -1:
+            if aw.qmc.weight[2] != 'g':
+                v = v / 1000.0
+            if aw.qmc.weight[0] > v:
+                aw.qmc.weight[1] = v
         
     def desktopscreenshot(self):
         imag = QPixmap.grabWindow(QApplication.desktop().winId())
@@ -8362,6 +8513,18 @@ $cupping_notes
             self.modbus.stopbits = int(str(dialog.modbus_stopbitsComboBox.currentText()))
             self.modbus.parity = str(dialog.modbus_parityComboBox.currentText())
             self.modbus.timeout = int(str(dialog.modbus_timeoutEdit.text()))
+            self.modbus.input1slave = int(str(dialog.modbus_input1slaveEdit.text()))
+            self.modbus.input1register = int(str(dialog.modbus_input1registerEdit.text()))
+            self.modbus.input2slave = int(str(dialog.modbus_input2slaveEdit.text()))
+            self.modbus.input2register = int(str(dialog.modbus_input2registerEdit.text()))
+            # set scale port
+            self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
+            self.scale.comport = str(dialog.scale_comportEdit.currentText())                #unicode() changes QString to a python string
+            self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
+            self.scale.bytesize = int(str(dialog.scale_bytesizeComboBox.currentText()))
+            self.scale.stopbits = int(str(dialog.scale_stopbitsComboBox.currentText()))
+            self.scale.parity = str(dialog.scale_parityComboBox.currentText())
+            self.scale.timeout = int(str(dialog.scale_timeoutEdit.text()))
 
     def PIDcontrol(self):
         #pid
@@ -9972,7 +10135,8 @@ class editGraphDlg(QDialog):
         self.beansedit = QTextEdit()
         self.beansedit.setMaximumHeight(100)
 
-        self.beansedit.setPlainText(QString(aw.qmc.beans))
+        if aw.qmc.beans is not None:
+            self.beansedit.setPlainText(QString(aw.qmc.beans))
 
         #roaster
         self.roaster = QLineEdit(aw.qmc.roastertype)
@@ -9991,10 +10155,12 @@ class editGraphDlg(QDialog):
         self.weightinedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightinedit))
         self.weightinedit.setMinimumWidth(55)
         self.weightinedit.setMaximumWidth(55)
+        self.weightinedit.setAlignment(Qt.AlignRight)
         self.weightoutedit = QLineEdit(outw)
         self.weightoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.weightoutedit))
         self.weightoutedit.setMinimumWidth(55)
         self.weightoutedit.setMaximumWidth(55)
+        self.weightoutedit.setAlignment(Qt.AlignRight)
         self.weightpercentlabel = QLabel(QApplication.translate("Label", " %",None, QApplication.UnicodeUTF8))
         self.weightpercentlabel.setMinimumWidth(45)
         self.weightpercentlabel.setMaximumWidth(45)
@@ -10027,10 +10193,12 @@ class editGraphDlg(QDialog):
         self.volumeinedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeinedit))
         self.volumeinedit.setMinimumWidth(55)
         self.volumeinedit.setMaximumWidth(55)
+        self.volumeinedit.setAlignment(Qt.AlignRight)
         self.volumeoutedit = QLineEdit(outv)
         self.volumeoutedit.setValidator(QDoubleValidator(0., 9999., 1, self.volumeoutedit))
         self.volumeoutedit.setMinimumWidth(55)
         self.volumeoutedit.setMaximumWidth(55)
+        self.volumeoutedit.setAlignment(Qt.AlignRight)
         self.volumepercentlabel = QLabel(QApplication.translate("Label", " %",None, QApplication.UnicodeUTF8))
         self.volumepercentlabel.setMinimumWidth(45)
         self.volumepercentlabel.setMaximumWidth(45)
@@ -10063,6 +10231,7 @@ class editGraphDlg(QDialog):
         self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_weight_edit))
         self.bean_density_weight_edit.setMinimumWidth(55)
         self.bean_density_weight_edit.setMaximumWidth(55)
+        self.bean_density_weight_edit.setAlignment(Qt.AlignRight)
         self.bean_density_weightUnitsComboBox = QComboBox()
         self.bean_density_weightUnitsComboBox.setMaximumWidth(60)
         self.bean_density_weightUnitsComboBox.setMinimumWidth(60)
@@ -10077,6 +10246,7 @@ class editGraphDlg(QDialog):
         self.bean_density_volume_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_volume_edit))
         self.bean_density_volume_edit.setMinimumWidth(55)
         self.bean_density_volume_edit.setMaximumWidth(55)
+        self.bean_density_volume_edit.setAlignment(Qt.AlignRight)
         self.bean_density_volumeUnitsComboBox = QComboBox()
         self.bean_density_volumeUnitsComboBox.setMaximumWidth(60)
         self.bean_density_volumeUnitsComboBox.setMinimumWidth(60)
@@ -10098,6 +10268,7 @@ class editGraphDlg(QDialog):
         self.bean_size_edit.setValidator(QDoubleValidator(0., 10., 1,self.bean_density_weight_edit))
         self.bean_size_edit.setMinimumWidth(55)
         self.bean_size_edit.setMaximumWidth(55)
+        self.bean_size_edit.setAlignment(Qt.AlignRight)
 
         #bag humidity
         bag_humidity_label = QLabel("<b>" + QApplication.translate("Label", "Storage Humidity/Temperature",None, QApplication.UnicodeUTF8) + "</b>")
@@ -10107,11 +10278,13 @@ class editGraphDlg(QDialog):
         self.humidity_edit.setText(str(aw.qmc.bag_humidity[0]))
         self.humidity_edit.setMaximumWidth(50)
         self.humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.humidity_edit))
+        self.humidity_edit.setAlignment(Qt.AlignRight)
         bag_humidity_at_label = QLabel(QApplication.translate("Label", "at",None, QApplication.UnicodeUTF8))
         self.bag_temp_edit = QLineEdit( )
         self.bag_temp_edit.setText(str(aw.qmc.bag_humidity[1]))
         self.bag_temp_edit.setMaximumWidth(50)
         self.bag_temp_edit.setValidator(QDoubleValidator(0., 200., 1, self.bag_temp_edit))
+        self.bag_temp_edit.setAlignment(Qt.AlignRight)
         self.bag_humiditity_tempUnitsComboBox = QComboBox()
         self.bag_humiditity_tempUnitsComboBox.setMaximumWidth(60)
         self.bag_humiditity_tempUnitsComboBox.setMinimumWidth(60)
@@ -10124,12 +10297,14 @@ class editGraphDlg(QDialog):
         self.ambient_humidity_edit = QLineEdit()
         self.ambient_humidity_edit.setText(str(aw.qmc.ambient_humidity))
         self.ambient_humidity_edit.setMaximumWidth(50)
-        self.ambient_humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.ambient_humidity_edit))   
+        self.ambient_humidity_edit.setValidator(QDoubleValidator(0., 100., 1, self.ambient_humidity_edit))  
+        self.ambient_humidity_edit.setAlignment(Qt.AlignRight) 
         ambient_humidity_at_label = QLabel(QApplication.translate("Label", "at",None, QApplication.UnicodeUTF8))     
         self.ambientedit = QLineEdit( )
         self.ambientedit.setText(str( aw.qmc.ambientTemp))
         self.ambientedit.setMaximumWidth(50)
-        self.ambientedit.setValidator(QDoubleValidator(0., 200., 1, self.ambientedit))        
+        self.ambientedit.setValidator(QDoubleValidator(0., 200., 1, self.ambientedit))  
+        self.ambientedit.setAlignment(Qt.AlignRight)       
         self.ambientedit_tempUnitsComboBox = QComboBox()
         self.ambientedit_tempUnitsComboBox.setMaximumWidth(60)
         self.ambientedit_tempUnitsComboBox.setMinimumWidth(60)
@@ -10143,11 +10318,13 @@ class editGraphDlg(QDialog):
 
         roastinglabel = QLabel("<b>" + QApplication.translate("Label", "Roasting Notes",None, QApplication.UnicodeUTF8) + "</b>")
         self.roastingeditor = QTextEdit()
-        self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
+        if aw.qmc.roastingnotes is not None:
+            self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
 
         cuppinglabel = QLabel("<b>" + QApplication.translate("Label", "Cupping Notes",None, QApplication.UnicodeUTF8) + "</b>")
         self.cuppingeditor =  QTextEdit()
-        self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
+        if aw.qmc.cuppingnotes is not None:
+            self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
 
         # Save button
         saveButton = QPushButton(QApplication.translate("Button", "OK",None, QApplication.UnicodeUTF8))
@@ -10163,6 +10340,22 @@ class editGraphDlg(QDialog):
         #cancelButton.setMaximumSize(70, 30)
         cancelButton.setMaximumSize(cancelButton.sizeHint())
         cancelButton.setMinimumSize(cancelButton.minimumSize())
+        
+        # in button
+        inButton = QPushButton(QApplication.translate("Button", "in",None, QApplication.UnicodeUTF8))
+        self.connect(inButton, SIGNAL("clicked()"),self.inWeight)
+        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
+        inButton.setMaximumSize(60,35)
+        inButton.setMinimumSize(60,35) 
+        inButton.setFocusPolicy(Qt.NoFocus)
+        
+        # out button
+        outButton = QPushButton(QApplication.translate("Button", "out",None, QApplication.UnicodeUTF8))
+        self.connect(outButton, SIGNAL("clicked()"),self.outWeight)
+        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
+        outButton.setMaximumSize(60,35)
+        outButton.setMinimumSize(60,35) 
+        outButton.setFocusPolicy(Qt.NoFocus)
 
         ##### LAYOUTS
 
@@ -10214,6 +10407,10 @@ class editGraphDlg(QDialog):
         weightLayout.addWidget(self.weightpercentlabel)  
         weightLayout.addSpacing(10)
         weightLayout.addWidget(self.roastdegreelabel)  
+        if aw.scale.device != "None":
+            weightLayout.addWidget(inButton) 
+            weightLayout.addSpacing(10)
+            weightLayout.addWidget(outButton) 
         weightLayout.addStretch()  
 
         volumeLayout = QHBoxLayout()
@@ -10379,6 +10576,18 @@ class editGraphDlg(QDialog):
                
         self.setLayout(totallayout)
 
+
+    def outWeight(self):
+        aw.retrieveWeightOut()
+        self.weightinedit.setText(str(aw.qmc.weight[0]))
+        self.weightoutedit.setText(str(aw.qmc.weight[1]))
+        
+    def inWeight(self):
+        aw.retrieveWeightIn()
+        self.weightinedit.setText(str(aw.qmc.weight[0]))
+        self.weightoutedit.setText(str(aw.qmc.weight[1]))
+        
+        
     def keyPressEvent(self,event):    
         key = int(event.key())
         #uncomment next line to find the integer value of a key
@@ -10706,8 +10915,6 @@ class editGraphDlg(QDialog):
         aw.qmc.title = str(self.titleedit.text())
         # Update beans
         aw.qmc.beans = str(self.beansedit.toPlainText())
-        #update roaster
-        aw.qmc.roaster = str(self.roaster.text())
 
         #update weight
         try:
@@ -10772,10 +10979,10 @@ class editGraphDlg(QDialog):
             aw.qmc.ambient_humidity = 0
          
         #update notes
-        aw.qmc.roastertype = str(self.roaster.text())
-        aw.qmc.operator = str(self.operator.text())
-        aw.qmc.roastingnotes = str(self.roastingeditor.toPlainText())
-        aw.qmc.cuppingnotes = str(self.cuppingeditor.toPlainText())
+        aw.qmc.roastertype = u(self.roaster.text())
+        aw.qmc.operator = u(self.operator.text())
+        aw.qmc.roastingnotes = u(self.roastingeditor.toPlainText())
+        aw.qmc.cuppingnotes = u(self.cuppingeditor.toPlainText())
            
         aw.sendmessage(QApplication.translate("Message Area","Roast properties updated but profile not saved to disk", None, QApplication.UnicodeUTF8))            
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -13916,7 +14123,12 @@ class modbusport(object):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout=1.0
+        self.timeout = 1.0
+        self.input1slave = 0
+        self.input1register = 0
+        self.input2slave = 0
+        self.input2register = 0
+        
         self.xonoff=0
         self.master = None
         
@@ -13955,7 +14167,98 @@ class modbusport(object):
             self.master.slaveaddress = int(slave)
             resp = self.master.write_register(int(register),int(value),0,6)   
         except Exception as e:
-            pass            
+            pass  
+            
+    def readSingleRegister(self,slave,register):
+        try:
+            self.connect()
+            self.master.slaveaddress = int(slave)
+            return self.master.read_register(int(register),0)   
+        except Exception as e:
+            pass           
+    
+    
+    
+class scaleport(object):
+    """ this class handles the communications with the scale"""
+    
+    def __init__(self):
+        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated. 
+        self.baudrate = 19200
+        self.bytesize = 8
+        self.parity= 'N'
+        self.stopbits = 1
+        self.timeout = 2
+        
+        self.devicefunctionlist = {
+            "None" : None,
+            "KERN NDE" : self.readKERN_NDE
+        }
+        self.device = None
+        
+        self.SP = None
+        
+    def isConnected(self):
+        return (self.master == None)
+        
+    def confport(self):        
+        self.SP.setPort(self.comport)
+        self.SP.setBaudrate(self.baudrate)
+        self.SP.setByteSize(self.bytesize)
+        self.SP.setParity(self.parity)
+        self.SP.setStopbits(self.stopbits)
+        self.SP.setTimeout(self.timeout)
+        
+    def openport(self):
+        try:    
+            #self.closeport()
+            self.confport()
+            #open port
+            if not self.SP.isOpen():
+                self.SP.open()
+
+        except serial.SerialException as e:
+            self.SP.close()
+            error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)
+        
+    def closeport(self):
+        self.SP.close()
+        
+    def connect(self):
+        if self.SP == None:
+            try:
+                self.SP = serial.Serial()
+                self.openport()
+ 
+            except Exception as e:
+                self.adderror(QApplication.translate("Error Message","Scale Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e))) 
+           
+    # returns weight as float in g or -1 if something went wrong
+    def readWeight(self):
+        if self.device != "None":
+            return self.devicefunctionlist[self.device]()
+        else:
+            return -1
+        
+    def readKERN_NDE(self):
+        try:
+            self.connect()
+            #self.SP.write(b's') # only stable
+            self.SP.write(b'w') # any weight
+            v = self.SP.readline()
+            sa = v.decode('ascii').split('g')
+            if len(sa) == 2:
+                return int(sa[0])
+            else:
+                return -1 
+        except Exception as e:
+            pass           
     
                       
 ###########################################################################################
@@ -13974,7 +14277,7 @@ class serialport(object):
         self.bytesize = 8
         self.parity= 'O'
         self.stopbits = 1
-        self.timeout=1
+        self.timeout=2
 
         #serial port for ET/BT
         self.SP  = serial.Serial()
@@ -14039,7 +14342,8 @@ class serialport(object):
                                    self.DTAtemperature,     #26
                                    self.callprogram,        #27
                                    self.ARDUINOTC4_34,      #28
-                                   self.HH806W               #29
+                                   self.MODBUS,             #39
+                                   self.HH806W              #30
                                    ]
 
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
@@ -14087,7 +14391,7 @@ class serialport(object):
                                  aw.qmc.adderror(errorcode)
                     else:
                         #Check crc16
-                        crcRx =  hex2int(r[-1]+r[-2])
+                        crcRx =  hex2int(r[-1],r[-2])
                         crcCal1 = aw.fujipid.fujiCrc16(r[:-2]) 
                         if crcCal1 == crcRx:  
                             return r           #OK. Return r after it has been checked for errors
@@ -14311,6 +14615,13 @@ class serialport(object):
 
          return tx,t2,t1
 
+    def MODBUS(self):
+
+         t2,t1 = self.MODBUSread()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+
+         return tx,t2,t1
+
     def HH802U(self):
 
          t2,t1 = self.HH806AUtemperature()
@@ -14503,8 +14814,7 @@ class serialport(object):
             aw.qmc.errorlog.append(timez + " " + error)
 
     #loads configuration to ports
-    def confport(self):
-        
+    def confport(self):        
         self.SP.setPort(self.comport)
         self.SP.setBaudrate(self.baudrate)
         self.SP.setByteSize(self.bytesize)
@@ -14525,7 +14835,7 @@ class serialport(object):
     def HH806AUtemperature(self):
         #init command = "#0A0000RA6\r\n"
         try:
-            command = "#0A0000NA2\r\n"  #"#0A0101NA4\r\n"
+            command = str2cmd("#0A0000NA2\r\n")  #"#0A0101NA4\r\n"
             r = ""
             
             if not self.SP.isOpen():
@@ -14539,8 +14849,8 @@ class serialport(object):
 
                 if len(r) == 16:
                     #convert to binary to hex string
-                    s1 = hex2int(r[5]+r[6])/10.
-                    s2 = hex2int(r[10]+r[11])/10.
+                    s1 = hex2int(r[5],r[6])/10.
+                    s2 = hex2int(r[10],r[11])/10.
 
                     #we convert the strings to integers. Divide by 10.0 (decimal position)
                     return s1,s2
@@ -14628,8 +14938,8 @@ class serialport(object):
                     if rcode == "\x3d":
                         rleg = self.SP.read(25)
                         if len(rleg) == 25:
-                            r1 = hex2int(r[11]+r[12])/10.
-                            r2 = hex2int(r[19]+r[20])/10.
+                            r1 = hex2int(r[11],r[12])/10.
+                            r2 = hex2int(r[19],r[20])/10.
                             #GOOD
                             return r1,r2
                 #BAD
@@ -14650,9 +14960,21 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H806Wtemperature: " + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
+                aw.addserial("H806Wtemperature: " + settings + " || Tx = w" + command + " || Rx = " + binascii.hexlify(r))
                                 
-
+    #returns v1,v2 from a connected MODBUS device
+    def MODBUSread(self):
+        # slave, register
+        if aw.modbus.input1slave:
+            res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register)
+        else:
+            res1 = -1
+        if aw.modbus.input2slave:
+            res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register)
+        else:
+            res2 = -1
+        return res2, res1
+    
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
     def HH506RAtemperature(self):
@@ -14960,12 +15282,12 @@ class serialport(object):
         ##                                        THIS ONLY WORKS WHEN TEMPERATURE < 200. If T >= 200 r[43] changes
 
         try:
-            command = b"\x41"
+            command = str2cmd("\x41")
             r = ""
             
             if not self.SP.isOpen():
                 self.openport()
-                
+
             if self.SP.isOpen():
                 self.SP.flushInput()
                 self.SP.flushOutput()
@@ -14973,11 +15295,11 @@ class serialport(object):
                 r = self.SP.read(45)
 
                 if len(r) == 45:
-                    T1 = hex2int(r[7]+r[8])/10.
-                    T2 = hex2int(r[9]+r[10])/10.
+                    T1 = hex2int(r[7],r[8])/10.
+                    T2 = hex2int(r[9],r[10])/10.
                     #save these variables if using T3 and T4
-                    aw.qmc.extra309T3 = hex2int(r[11]+r[12])/10.
-                    aw.qmc.extra309T4 = hex2int(r[13]+r[14])/10.
+                    aw.qmc.extra309T3 = hex2int(r[11],r[12])/10.
+                    aw.qmc.extra309T4 = hex2int(r[13],r[14])/10.
                     aw.qmc.extra309TX = aw.qmc.timeclock.elapsed()/1000.
                     return T1,T2
                 
@@ -16201,17 +16523,20 @@ class comportDlg(QDialog):
               
         self.setModal(True)
 
+
+        xports = self.portlist()
         ##########################    TAB 1 WIDGETS        
         comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.comportEdit = QComboBox()
-        self.comportEdit.addItems([aw.ser.comport])
+        self.comportEdit.addItems(xports)
+        self.comportEdit.setCurrentIndex(xports.index(aw.ser.comport))
         self.comportEdit.setEditable(True)
         comportlabel.setBuddy(self.comportEdit)
 
         baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.baudrateComboBox = QComboBox()
         baudratelabel.setBuddy(self.baudrateComboBox)
-        self.bauds = ["2400","9600","19200","38400","57600"]
+        self.bauds = ["2400","9600","19200","38400","57600","115200"]
         self.baudrateComboBox.addItems(self.bauds)
         self.baudrateComboBox.setCurrentIndex(self.bauds.index(str(aw.ser.baudrate)))
                    
@@ -16251,7 +16576,8 @@ class comportDlg(QDialog):
         ##########################    TAB 3 WIDGETS   MODBUS
         modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.modbus_comportEdit = QComboBox()
-        self.modbus_comportEdit.addItems([aw.modbus.comport])
+        self.modbus_comportEdit.addItems(xports)
+        self.modbus_comportEdit.setCurrentIndex(xports.index(aw.modbus.comport))
         self.modbus_comportEdit.setEditable(True)
         modbus_comportlabel.setBuddy(self.modbus_comportEdit)
 
@@ -16287,7 +16613,85 @@ class comportDlg(QDialog):
         modbus_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
         self.modbus_timeoutEdit = QLineEdit(str(aw.modbus.timeout))
         self.modbus_timeoutEdit.setValidator(QIntValidator(0,5,self.modbus_timeoutEdit))
+        
+        modbus_input1slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
+        self.modbus_input1slaveEdit = QLineEdit(str(aw.modbus.input1slave))
+        self.modbus_input1slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input1slaveEdit))
+        self.modbus_input1slaveEdit.setFixedWidth(40)
+        self.modbus_input1slaveEdit.setAlignment(Qt.AlignRight)
+        
+        modbus_input1registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
+        self.modbus_input1registerEdit = QLineEdit(str(aw.modbus.input1register))
+        self.modbus_input1registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input1registerEdit))
+        self.modbus_input1registerEdit.setFixedWidth(40)
+        self.modbus_input1registerEdit.setAlignment(Qt.AlignRight)
+        
+        modbus_input2slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
+        self.modbus_input2slaveEdit = QLineEdit(str(aw.modbus.input2slave))
+        self.modbus_input2slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input2slaveEdit))
+        self.modbus_input2slaveEdit.setFixedWidth(40)
+        self.modbus_input2slaveEdit.setAlignment(Qt.AlignRight)
+        
+        modbus_input2registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
+        self.modbus_input2registerEdit = QLineEdit(str(aw.modbus.input2register))
+        self.modbus_input2registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input2registerEdit))
+        self.modbus_input2registerEdit.setFixedWidth(40)
+        self.modbus_input2registerEdit.setAlignment(Qt.AlignRight)
 
+
+        ##########################    TAB 4 WIDGETS   SCALE
+        scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
+        self.scale_deviceEdit = QComboBox()
+        self.scale_deviceEdit.addItems(list(aw.scale.devicefunctionlist.keys()))
+        if aw.scale.device is not None:
+            try:
+                self.scale_deviceEdit.setCurrentIndex(list(aw.scale.devicefunctionlist.keys()).index(aw.scale.device))
+            except:
+                self.scale_deviceEdit.setCurrentIndex(0)                
+        else:
+            self.scale_deviceEdit.setCurrentIndex(0)
+        self.scale_deviceEdit.setEditable(False)
+        scale_devicelabel.setBuddy(self.scale_deviceEdit)
+        
+        scale_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
+        self.scale_comportEdit = QComboBox()
+        self.scale_comportEdit.addItems([aw.scale.comport])
+        self.scale_comportEdit.setEditable(True)
+        scale_comportlabel.setBuddy(self.scale_comportEdit)
+
+        scale_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
+        self.scale_baudrateComboBox = QComboBox()
+        scale_baudratelabel.setBuddy(self.scale_baudrateComboBox)
+        self.scale_bauds = ["1200","2400","4800","9600","19200","38400","57600","115200"]
+        self.scale_baudrateComboBox.addItems(self.scale_bauds)
+        self.scale_baudrateComboBox.setCurrentIndex(self.scale_bauds.index(str(aw.scale.baudrate)))
+                   
+        scale_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None, QApplication.UnicodeUTF8))
+        self.scale_bytesizeComboBox = QComboBox()
+        scale_bytesizelabel.setBuddy(self.scale_bytesizeComboBox)
+        self.scale_bytesizes = ["7","8"]
+        self.scale_bytesizeComboBox.addItems(self.scale_bytesizes)
+        self.scale_bytesizeComboBox.setCurrentIndex(self.scale_bytesizes.index(str(aw.scale.bytesize)))
+
+        scale_paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
+        self.scale_parityComboBox = QComboBox()
+        scale_paritylabel.setBuddy(self.scale_parityComboBox)
+        #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
+        self.scale_parity = ["O","E","N"]
+        self.scale_parityComboBox.addItems(self.scale_parity)
+        self.scale_parityComboBox.setCurrentIndex(self.scale_parity.index(aw.scale.parity))
+
+        scale_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None, QApplication.UnicodeUTF8))
+        self.scale_stopbitsComboBox = QComboBox()
+        scale_stopbitslabel.setBuddy(self.scale_stopbitsComboBox)
+        self.scale_stopbits = ["0","1","2"]
+        self.scale_stopbitsComboBox.addItems(self.stopbits)
+        self.scale_stopbitsComboBox.setCurrentIndex(aw.scale.stopbits)
+        
+        scale_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
+        self.scale_timeoutEdit = QLineEdit(str(aw.scale.timeout))
+        self.scale_timeoutEdit.setValidator(QIntValidator(0,5,self.scale_timeoutEdit))
+ 
 
         #### dialog buttons
         
@@ -16352,14 +16756,65 @@ class comportDlg(QDialog):
         modbus_grid.addWidget(modbus_timeoutlabel,5,0,Qt.AlignRight)
         modbus_grid.addWidget(self.modbus_timeoutEdit,5,1)
         
+        modbus_gridV = QVBoxLayout()
+        modbus_gridV.addStretch()
+        modbus_gridV.addLayout(modbus_grid)
+        modbus_gridV.addStretch()
+        
+        modbus_input1 = QGridLayout()
+        modbus_input1.addWidget(modbus_input1slavelabel,0,0,Qt.AlignRight)
+        modbus_input1.addWidget(self.modbus_input1slaveEdit,0,1)
+        modbus_input1.addWidget(modbus_input1registerlabel,1,0,Qt.AlignRight)
+        modbus_input1.addWidget(self.modbus_input1registerEdit,1,1)        
+        modbus_input1group = QGroupBox(QApplication.translate("GroupBox", "Input 1",None, QApplication.UnicodeUTF8))
+        modbus_input1group.setLayout(modbus_input1)
+
+        modbus_input2 = QGridLayout()
+        modbus_input2.addWidget(modbus_input2slavelabel,0,0,Qt.AlignRight)
+        modbus_input2.addWidget(self.modbus_input2slaveEdit,0,1)
+        modbus_input2.addWidget(modbus_input2registerlabel,1,0,Qt.AlignRight)
+        modbus_input2.addWidget(self.modbus_input2registerEdit,1,1)
+        modbus_input2group = QGroupBox(QApplication.translate("GroupBox", "Input 2",None, QApplication.UnicodeUTF8))
+        modbus_input2group.setLayout(modbus_input2)
+        
+        modbus_inputV = QVBoxLayout()
+        modbus_inputV.addWidget(modbus_input1group)
+        modbus_inputV.addWidget(modbus_input2group)
+        modbus_inputV.addStretch()
+                
         modbus_gridBoxLayout = QHBoxLayout()
-        modbus_gridBoxLayout.addLayout(modbus_grid)
+        modbus_gridBoxLayout.addLayout(modbus_gridV)
+        modbus_gridBoxLayout.addLayout(modbus_inputV)
         modbus_gridBoxLayout.addStretch()  
     
         tab3Layout = QVBoxLayout()
         tab3Layout.addLayout(modbus_gridBoxLayout)
         tab3Layout.addStretch()  
 
+        #LAYOUT TAB 4
+        scale_grid = QGridLayout()
+        scale_grid.addWidget(scale_devicelabel,0,0,Qt.AlignRight)
+        scale_grid.addWidget(self.scale_deviceEdit,0,1)
+        scale_grid.addWidget(scale_comportlabel,1,0,Qt.AlignRight)
+        scale_grid.addWidget(self.scale_comportEdit,1,1)
+        scale_grid.addWidget(scale_baudratelabel,2,0,Qt.AlignRight)
+        scale_grid.addWidget(self.scale_baudrateComboBox,2,1)
+        scale_grid.addWidget(scale_bytesizelabel,3,0,Qt.AlignRight)
+        scale_grid.addWidget(self.scale_bytesizeComboBox,3,1)
+        scale_grid.addWidget(scale_paritylabel,4,0,Qt.AlignRight)
+        scale_grid.addWidget(self.scale_parityComboBox,4,1)
+        scale_grid.addWidget(scale_stopbitslabel,5,0,Qt.AlignRight)
+        scale_grid.addWidget(self.scale_stopbitsComboBox,5,1)
+        scale_grid.addWidget(scale_timeoutlabel,6,0,Qt.AlignRight)
+        scale_grid.addWidget(self.scale_timeoutEdit,6,1)
+        
+        scaleH = QHBoxLayout()
+        scaleH.addLayout(scale_grid)
+        scaleH.addStretch()
+        
+        tab4Layout = QVBoxLayout()
+        tab4Layout.addLayout(scaleH)
+        tab4Layout.addStretch()
 
         #tab widget
         TabWidget = QTabWidget()
@@ -16375,6 +16830,10 @@ class comportDlg(QDialog):
         C3Widget.setLayout(tab3Layout)
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","Modbus",None, QApplication.UnicodeUTF8))
 
+        C4Widget = QWidget()
+        C4Widget.setLayout(tab4Layout)
+        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Scale",None, QApplication.UnicodeUTF8))
+
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
@@ -16389,6 +16848,13 @@ class comportDlg(QDialog):
         if key == 16777216: 	    	    #ESCAPE
             self.close()
 
+    def portlist(self):
+        xports = list(aw.extracomport)
+        xports.append(aw.ser.comport)
+        xports.append(aw.modbus.comport)
+        xports.append(aw.scale.comport)
+        return sorted(list(set(xports)))
+        
     def createserialTable(self):
         try:
             self.serialtable.clear()
@@ -16409,11 +16875,12 @@ class comportDlg(QDialog):
                 self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
                 self.serialtable.setShowGrid(True)
 
+                xports = self.portlist()
                 for i in range(nssdevices):
                     device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]-1])    #type identification of the device. Non editable
                     comportComboBox =  QComboBox()
-                    comportComboBox.addItems(aw.extracomport)
-                    comportComboBox.setCurrentIndex(i)
+                    comportComboBox.addItems(xports)
+                    comportComboBox.setCurrentIndex(xports.index(aw.extracomport[i]))
 
                     baudComboBox =  QComboBox()
                     baudComboBox.addItems(self.bauds)
@@ -16477,11 +16944,11 @@ class comportDlg(QDialog):
                 aw.extratimeout[i] = int(str(timeoutEdit.text()))
 
             #create serial ports for each extra device
-            aw.extraser = []    
-            aw.extraser = [serialport()]*ser_ports
+            aw.extraser = [None]*ser_ports
 
             #load the settings for the extra serial ports found
             for i in range(ser_ports):
+                aw.extraser[i] = serialport()
                 aw.extraser[i].comport = str(aw.extracomport[i])
                 aw.extraser[i].baudrate = aw.extrabaudrate[i]
                 aw.extraser[i].bytesize = aw.extrabytesize[i]
@@ -16887,7 +17354,7 @@ class DeviceAssignmentDLG(QDialog):
             nddevices = len(aw.qmc.extradevices)
             if nddevices:    
                 self.devicetable.setRowCount(nddevices)
-                self.devicetable.setColumnCount(9)
+                self.devicetable.setColumnCount(11)
                 self.devicetable.setHorizontalHeaderLabels([QApplication.translate("Table", "Device",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "Color 1",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "Color 2",None, QApplication.UnicodeUTF8),
@@ -16896,7 +17363,9 @@ class DeviceAssignmentDLG(QDialog):
                                                             QApplication.translate("Table", "y1(x)",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "y2(x)",None, QApplication.UnicodeUTF8),
                                                             QApplication.translate("Table", "LCD 1",None, QApplication.UnicodeUTF8),
-                                                            QApplication.translate("Table", "LCD 2",None, QApplication.UnicodeUTF8)])
+                                                            QApplication.translate("Table", "LCD 2",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "Curve 1",None, QApplication.UnicodeUTF8),
+                                                            QApplication.translate("Table", "Curve 2",None, QApplication.UnicodeUTF8)])
                 self.devicetable.setAlternatingRowColors(True)
                 self.devicetable.setEditTriggers(QTableWidget.NoEditTriggers)
                 self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -16944,6 +17413,16 @@ class DeviceAssignmentDLG(QDialog):
                     LCD2visibilityComboBox.setCurrentIndex(aw.extraLCDvisibility2[i])
                     self.connect(LCD2visibilityComboBox, SIGNAL("currentIndexChanged(int)"),lambda x=0,lcd=2, ind=i: self.updateLCDvisibility(x,lcd,ind))
 
+                    Curve1visibilityComboBox =  QComboBox()
+                    Curve1visibilityComboBox.addItems(visibility)                    
+                    Curve1visibilityComboBox.setCurrentIndex(aw.extraCurveVisibility1[i])
+                    self.connect(Curve1visibilityComboBox, SIGNAL("currentIndexChanged(int)"),lambda x=0,curve=1, ind=i: self.updateCurveVisibility(x,curve,ind))
+
+                    Curve2visibilityComboBox =  QComboBox()
+                    Curve2visibilityComboBox.addItems(visibility)                    
+                    Curve2visibilityComboBox.setCurrentIndex(aw.extraCurveVisibility2[i])
+                    self.connect(Curve2visibilityComboBox, SIGNAL("currentIndexChanged(int)"),lambda x=0,curve=2, ind=i: self.updateCurveVisibility(x,curve,ind))
+
                     #add widgets to the table
                     self.devicetable.setCellWidget(i,0,typeComboBox)
                     self.devicetable.setCellWidget(i,1,color1Button)
@@ -16953,7 +17432,9 @@ class DeviceAssignmentDLG(QDialog):
                     self.devicetable.setCellWidget(i,5,mexpr1edit)              
                     self.devicetable.setCellWidget(i,6,mexpr2edit)              
                     self.devicetable.setCellWidget(i,7,LCD1visibilityComboBox)              
-                    self.devicetable.setCellWidget(i,8,LCD2visibilityComboBox)              
+                    self.devicetable.setCellWidget(i,8,LCD2visibilityComboBox) 
+                    self.devicetable.setCellWidget(i,9,Curve1visibilityComboBox)              
+                    self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)              
 
         except Exception as e:
              aw.qmc.adderror(QApplication.translate("Error Message", "createDeviceTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
@@ -17093,8 +17574,6 @@ class DeviceAssignmentDLG(QDialog):
                 aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "<\b>")
                 aw.qmc.extramathexpression1[i] = str(mexpr1edit.text())
                 aw.qmc.extramathexpression2[i] = str(mexpr2edit.text())
-                aw.extraLCDvisibility1[i] = LCD1visibilityComboBox.currentIndex() 
-                aw.extraLCDvisibility2[i] = LCD1visibilityComboBox.currentIndex()
             
             #update legend with new curves
             aw.qmc.redraw(recomputeAllDeltas=False)
@@ -17104,25 +17583,27 @@ class DeviceAssignmentDLG(QDialog):
 
     def updateLCDvisibility(self,x,lcd,ind):
         if lcd == 1:
-            combobox =  self.devicetable.cellWidget(ind,7)
-            visibilityvalue = combobox.currentIndex()
-            aw.extraLCDvisibility1[ind] = visibilityvalue
-            if visibilityvalue:
+            aw.extraLCDvisibility1[ind] = x
+            if x:
                 aw.extraLCDlabel1[ind].setVisible(True)
                 aw.extraLCD1[ind].setVisible(True)
             else:
                 aw.extraLCDlabel1[ind].setVisible(False)
                 aw.extraLCD1[ind].setVisible(False)
         elif lcd == 2:
-            combobox =  self.devicetable.cellWidget(ind,8)
-            visibilityvalue = combobox.currentIndex()
-            aw.extraLCDvisibility2[ind] = visibilityvalue
-            if visibilityvalue:
+            aw.extraLCDvisibility2[ind] = x
+            if x:
                 aw.extraLCDlabel2[ind].setVisible(True)
                 aw.extraLCD2[ind].setVisible(True)
             else:
                 aw.extraLCDlabel2[ind].setVisible(False)
                 aw.extraLCD2[ind].setVisible(False)
+                
+    def updateCurveVisibility(self,x,curve,ind):
+        if curve == 1:
+            aw.extraCurveVisibility1[ind] = x
+        elif curve == 2:
+            aw.extraCurveVisibility2[ind] = x
         
     def setextracolor(self,l,i):
         try:
@@ -17132,12 +17613,17 @@ class DeviceAssignmentDLG(QDialog):
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor1[i] = colorname
+                    # set LCD label color
+                    aw.setLabelColor(aw.extraLCDlabel1[i],QColor(colorname))
+
             #line 2
             elif l == 2:
                 colorf = QColorDialog.getColor(QColor(aw.qmc.extradevicecolor2[i]),self)
                 if colorf.isValid():
                     colorname = str(colorf.name())
                     aw.qmc.extradevicecolor2[i] = colorname            
+                    # set LCD label color
+                    aw.setLabelColor(aw.extraLCDlabel2[i],QColor(colorname))
         except Exception as e:
              aw.qmc.adderror(QApplication.translate("Error Message", "setextracolor(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
 
@@ -17192,7 +17678,7 @@ class DeviceAssignmentDLG(QDialog):
                     self.bytesize = 8
                     self.parity= 'O'
                     self.stopbits = 1
-                    self.timeout=1
+                    self.timeout = 2
                 #else if DTA pid
                 else:
                     aw.qmc.device = 26
@@ -17201,7 +17687,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1                    
+                    aw.ser.timeout = 2                   
 
                 message = QApplication.translate("Message Area","PID to control ET set to %1 %2" + \
                                                  " ; PID to read BT set to %3 %4", None, QApplication.UnicodeUTF8).arg(str1).arg(str(aw.ser.controlETpid[1])).arg(str2).arg(str(aw.ser.readBTpid[1]))
@@ -17222,7 +17708,7 @@ class DeviceAssignmentDLG(QDialog):
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
-                aw.ser.timeout=1
+                aw.ser.timeout = 2
                 message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 aw.button_10.setVisible(True)
 
@@ -17243,7 +17729,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "Omega HH506RA":
@@ -17253,7 +17739,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 7
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                     
                 elif meter == "CENTER 309":
@@ -17263,7 +17749,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "CENTER 306":
@@ -17273,7 +17759,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1                
+                    aw.ser.timeout=2
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "CENTER 305":
@@ -17283,7 +17769,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                     
                 elif meter == "CENTER 304":
@@ -17293,7 +17779,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "CENTER 303":
@@ -17303,7 +17789,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "CENTER 302":
@@ -17313,7 +17799,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                     
                 elif meter == "CENTER 301":
@@ -17323,7 +17809,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "CENTER 300":
@@ -17333,7 +17819,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                     
                 elif meter == "VOLTCRAFT K204":
@@ -17343,7 +17829,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "VOLTCRAFT K202":
@@ -17353,7 +17839,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "VOLTCRAFT 300K":
@@ -17363,7 +17849,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "VOLTCRAFT 302KJ":
@@ -17373,7 +17859,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "EXTECH 421509":
@@ -17383,7 +17869,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 7
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH506RA. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                                     
                 elif meter == "Omega HH802U":
@@ -17393,7 +17879,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "Omega HH309":
@@ -17403,7 +17889,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 #special device manual mode. No serial settings.    
@@ -17423,7 +17909,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=2
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "+309_34":
@@ -17433,7 +17919,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = ""  #empty message especial device
 
                 elif meter == "+FUJI DUTY%":
@@ -17443,7 +17929,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = ""   #empty message especial device
                     
                 elif meter == "Omega HHM28[6]":
@@ -17453,7 +17939,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
 
                 elif meter == "+204_34":
@@ -17462,7 +17948,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = ""  #empty message especial device
 
                 elif meter == "+Virtual":
@@ -17471,7 +17957,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = ""  #empty message especial device
 
                 ##########################
@@ -17488,8 +17974,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = ""  #empty message especial device
 
                 if meter == "Omega HH806W":
@@ -17499,15 +17984,15 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout=1
+                    aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 #extra devices serial config    
                 #set of different serial settings modes options
-                ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
-                             [19200,8,'N',1,1,],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1]]
+                ssettings = [[9600,8,'O',1,2],[19200,8,'E',1,2],[2400,7,'E',1,2],[9600,8,'N',1,2],
+                             [19200,8,'N',1,2],[2400,8,'N',1,2],[9600,8,'E',1,2],[38400,8,'E',1,2],[115200,8,'N',1,2]]
                 #map device index to a setting mode (chose the one that matches the device)
-                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,7]  #0-29
+                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,7]  #0-29
                     
                 #init serial settings of extra devices
                 for i in range(len(aw.qmc.extradevices)):
@@ -18158,6 +18643,14 @@ class graphColorDlg(QDialog):
             var.setPalette(QPalette(colorf))
             var.setAutoFillBackground(True)            
             aw.qmc.fig.canvas.redraw(recomputeAllDeltas=False)
+            if title == "ET":
+                aw.setLabelColor(aw.label2,QColor(aw.qmc.palette[color]))
+            elif title == "BT":
+                aw.setLabelColor(aw.label3,QColor(aw.qmc.palette[color]))
+            elif title == "DeltaET":
+                aw.setLabelColor(aw.label4,QColor(aw.qmc.palette[color]))
+            elif title == "DeltaBT":
+                aw.setLabelColor(aw.label5,QColor(aw.qmc.palette[color]))
             aw.sendmessage(QApplication.translate("Message Area","Color of %1 set to %2", None, QApplication.UnicodeUTF8).arg(title).arg(str(aw.qmc.palette[color])))
 
     def keyPressEvent(self,event):    
@@ -22224,7 +22717,7 @@ class FujiPID(object):
         r = aw.ser.sendFUJIcommand(command,7)
         if len(r) == 7:      
             # EVERYTHINK OK: convert data part binary string to hex representation
-            s1 = hex2int(r[3]+r[4])
+            s1 = hex2int(r[3],r[4])
             #conversion from hex to dec
             return s1
         else:

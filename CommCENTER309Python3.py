@@ -6,7 +6,7 @@
 # ##################################################################################################
 
 # REQUIREMENTS
-# python 2.6: http://www.python.org/ftp/python/2.6.6/python-2.6.6.msi
+# python 3.x: http://www.python.org/ftp/python/
 # pyserial for python 2.6: http://sourceforge.net/projects/pyserial/files/pyserial/2.6/
 # javacomm: http://www.xpl4java.org/xPL4Java/javacomm.html
 # Java JDK or JRE:  http://java.sun.com/javase/downloads/index.jsp
@@ -26,12 +26,12 @@ def main():
     mode = "F"
     delay = 2            # set time between each reading in seconds
 
-    print "Press <CTRL 'C'> to stop"
+    print("Press <CTRL 'C'> to stop")
     #Read temperature in a forever loop to check operation    
     while True:    
-        T1,T2,T3,T4,mode = temperature()                              # read T1,T2, and mode (C or F)
-        string = "T1 = %.1f%s T2 = %.1f%s T3 = %.1f%s T4 = %.1f%s"%(T1,mode,T2,mode,T3,mode,T4,mode)    # format output string
-        print string
+        T1,T2,mode = temperature()                              # read T1,T2, and mode (C or F)
+        string = "T1 = %.1f%s T2 = %.1f%s"%(T1,mode,T2,mode)    # format output string
+        print(string)
         time.sleep(delay)                    # wait delay before next reading in while loop
 
 
@@ -63,7 +63,7 @@ def temperature():
             port = "/dev/cu.SLAB_USBtoUART"
         serCENTER = serial.Serial(port, baudrate=9600, bytesize=8, parity='N', stopbits=1, timeout=1)
         
-        command = "\x41"                  #this comand makes the meter answer back with 45 bytes
+        command = b"\x41"                  #this comand makes the meter answer back with 45 bytes
         serCENTER.write(command)
         r = serCENTER.read(45)
         serCENTER.close()
@@ -71,29 +71,29 @@ def temperature():
         if len(r) != 45:
             #Bad RX data
             return 0.,0.,"RX failed"
-            
 
-        #check that T1 and T2 are both plugged in        
-        #if int(binascii.hexlify(r[43]),16) != 12:
-            #T1 + T2 not plugged in
+        #check that T1 and T2 are both plugged in 
+        #print(binascii.hexlify(r[43]))       
+        #if int(binascii.hexlify(r[43].encode('utf-8')),16) != 12:
+        #    #T1 + T2 not plugged in
         #    return 0.,0.,"plug T1&T2!"
 
         mode = "X"
-        checkmode = int(binascii.hexlify(r[1]),16)
+        checkmode = int(r[1])
         if checkmode == 128:
             mode = "C"          #Celsius
         elif checkmode == 0:
             mode = "F"          #Farenheit
         
-        T1 = int(binascii.hexlify(r[7] + r[8]),16)
-        T2 = int(binascii.hexlify(r[9] + r[10]),16)
-        T3 = int(binascii.hexlify(r[11] + r[12]),16)        #aditional reference left that shows how to to read T3
-        T4 = int(binascii.hexlify(r[13] + r[14]),16)        #aditional reference left that shows how to to read T4
+        T1 = int(r[7]*256 + r[8])
+        T2 = int(r[9]*256 + r[10])
+        #T3 = int(binascii.hexlify(r[11] + r[12]),16)        #aditional reference left that shows how to to read T3
+        #T4 = int(binascii.hexlify(r[13] + r[14]),16)        #aditional reference left that shows how to to read T4
         
-        return T1/10.,T2/10.,T3/10.,T4/10.,mode
+        return T1/10.,T2/10.,mode
     
-    except serial.SerialException, e:
-        print "Serial port error" + str(e)
+    except serial.SerialException as e:
+        print("Serial port error" + str(e))
         
     finally:
         if serCENTER:

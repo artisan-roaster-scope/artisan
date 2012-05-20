@@ -1,6 +1,6 @@
 Current Versions
-o Python 3.2.3
-o QT 4.8.0
+o Python 3.3a3
+o QT 4.8.1
 o Numpy 1.6.1
 o SIP 4.13.2
 o PyQt 4.9.1
@@ -14,6 +14,11 @@ o modbus_tk 0.4.2
 
 Upgrade History:
 
+- 2012-05-17: Upgrade Python/QT/PyQt/SIP
+ . Python 3.3a1 => 3.3a3
+ . QT 4.8.0 => 4.8.1
+ . PyQt 4.9.1 => snapshot-4.9.2
+ . SIP 4.13.2 => 4.13.3-snapshot
 - 2012-01-09: Upgrade Qt/PyQt/SIP
  . QT 4.7.4 => 4.8.0
  . SIP 4.13 => 4.13.2
@@ -93,6 +98,21 @@ new to v2.6:
 
 
 3) Install Numpy
+
+
+# for XCode 4.3:
+sudo ln -s /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer /Developer 
+
+
+export CC=clang
+export CXX=clang
+export FFLAGS=-ff2c
+export LDSHARED='clang -bundle -undefined dynamic_lookup \ 
+    -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g' 
+
+export CC=gcc-4.2
+export CXX=g++-4.2
+export FFLAGS=-ff2c
 
 # sudo vi /Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/distutils/sysconfig.py
 in "def get_config_vars(*args):"
