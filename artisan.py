@@ -74,7 +74,7 @@ import numpy
 import array
 import struct
 from scipy import fft
-from scipy import interpolate as inter
+#from scipy import interpolate as inter # comment as it does not work on Python 3.3rc1 and numpy 1.7
  
     
 import sip
@@ -113,6 +113,8 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as Naviga
 ##logger = modbus_tk.utils.create_logger("console")
 import minimalmodbus
 
+import json
+
 if sys.version < '3':
     import codecs
     def u(x):
@@ -121,12 +123,15 @@ if sys.version < '3':
         return x
     def d(x):
         if x is not None:
-            return codecs.unicode_escape_decode(x)[0]
+            try:
+                return codecs.unicode_escape_decode(x)[0]
+            except:
+                return x
         else:
             return None
     def e(x):
         if x is not None:
-            return codecs.unicode_escape_encode(str(x))[0]
+            return codecs.unicode_escape_encode(x)[0]
         else: 
             return None
     def hex2int(h1,h2=""):
@@ -415,6 +420,7 @@ class tgraphcanvas(FigureCanvas):
         
         #read and plot on/off flag
         self.flagon = False
+        self.flagstart = False
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
         
@@ -434,11 +440,11 @@ class tgraphcanvas(FigureCanvas):
         self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]        
         self.unfiltereddelta1, self.unfiltereddelta2 = [],[]
         
-        #indexes for START[0],Dryend[1],FCs[2],FCe[3],SCs[4],SCe[5], and DROP[6]
+        #indexes for START[0],DRYe[1],FCs[2],FCe[3],SCs[4],SCe[5],DROP[6] and COOLe[7]
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryEnd
         #Example: Use self.temp2[self.timeindex[4]] to get the BT temperature of SCs
         
-        self.timeindex = [-1,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
+        self.timeindex = [-1,0,0,0,0,0,0,0] #CHARGE index init set to -1 as 0 could be an actal index used
 
         #applies a Y(x) function to ET or BT 
         self.ETfunction,self.BTfunction = "",""           
@@ -453,7 +459,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundeventsflag = False
         self.backgroundpath = ""
         self.temp1B,self.temp2B,self.timeB = [],[],[]
-        self.timeindexB = [-1,0,0,0,0,0,0]
+        self.timeindexB = [-1,0,0,0,0,0,0,0]
         self.backgroundEvents = [] #indexes of background events
         self.backgroundEtypes = []
         self.backgroundEvalues = []
@@ -596,7 +602,8 @@ class tgraphcanvas(FigureCanvas):
         self.autosavepath = ""
         
         #used to place correct height of text to avoid placing text over text (annotations)
-        self.ystep = 45
+        self.ystep_down = 0
+        self.ystep_up = 0
         
         self.ax.set_xlim(self.startofx, self.endofx)
         self.ax.set_ylim(self.ylimit_min,self.ylimit)
@@ -718,8 +725,8 @@ class tgraphcanvas(FigureCanvas):
 
         #########  temporary serial variables
         #temporary storage to pass values. Holds extra T3 and T4 values for center 309
-        self.extra309T3 = 0.
-        self.extra309T4 = 0.
+        self.extra309T3 = -1
+        self.extra309T4 = -1
         self.extra309TX = 0.
 
         #used by extra device +ArduinoTC4_XX to pass values
@@ -778,10 +785,10 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.flagon:
                 if len(self.timex):        
-                    aw.lcd2.display("%.1f"%self.temp1[-1])            # ET
-                    aw.lcd3.display("%.1f"%self.temp2[-1])            # BT
-                    aw.lcd4.display("%.1f"%self.rateofchange1)        # rate of change MET (degress per minute)
-                    aw.lcd5.display("%.1f"%self.rateofchange2)        # rate of change BT (degrees per minute)
+                    aw.lcd2.display("%.1f"%float(self.temp1[-1]))            # ET
+                    aw.lcd3.display("%.1f"%float(self.temp2[-1]))            # BT
+                    aw.lcd4.display("%.1f"%float(self.rateofchange1))        # rate of change MET (degress per minute)
+                    aw.lcd5.display("%.1f"%float(self.rateofchange2))        # rate of change BT (degrees per minute)
                     
                     if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid  
                         aw.lcd6.display(self.currentpidsv)
@@ -790,37 +797,40 @@ class tgraphcanvas(FigureCanvas):
                     ndev = len(self.extradevices)
                     for i in range(ndev):
                         if ndev < 10:
-                            aw.extraLCD1[i].display("%.1f"%self.extratemp1[i][-1])
-                            aw.extraLCD2[i].display("%.1f"%self.extratemp2[i][-1])
+                            aw.extraLCD1[i].display("%.1f"%float(self.extratemp1[i][-1]))
+                            aw.extraLCD2[i].display("%.1f"%float(self.extratemp2[i][-1]))
 
-                #updated canvas
-                self.fig.canvas.draw()
-
-                #check if HUD is ON (done after self.fig.canvas.draw())
-                if self.HUDflag:
-                    aw.showHUD[aw.HUDfunction]() 
-                    
-                #auto mark CHARGE/DROP
-                if self.autoChargeIdx:
-                    self.markCharge()
-                    self.autoChargeIdx = 0 #otherwise it keep calling CHARGE 
-                elif self.autoDropIdx:
-                    self.markDrop()
-                    self.autoDropIdx = 0
-
-                #check triggered alarms
-                if self.temporaryalarmflag > -1:
-                    i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
-                    self.temporaryalarmflag = -1 # self.setalarm(i) can take longer to run than the sampling interval 
-                    self.setalarm(i)
+                if self.flagstart:
+                    #updated canvas
+                    self.fig.canvas.draw()
+    
+                    #check if HUD is ON (done after self.fig.canvas.draw())
+                    if self.HUDflag:
+                        aw.showHUD[aw.HUDfunction]() 
+                        
+                    #auto mark CHARGE/DROP
+                    if self.autoChargeIdx:
+                        self.markCharge()
+                        self.autoChargeIdx = 0 #otherwise it keep calling CHARGE 
+                    elif self.autoDropIdx:
+                        self.markDrop()
+                        self.autoDropIdx = 0
+    
+                    #check triggered alarms
+                    if self.temporaryalarmflag > -1:
+                        i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
+                        self.temporaryalarmflag = -1 # self.setalarm(i) can take longer to run than the sampling interval 
+                        self.setalarm(i)
                     
         except Exception as e:
             self.flagon = False
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             self.adderror(QApplication.translate("Error Message","Exception Error: updategraphics() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
             return
         
     def updateLCDtime(self):
-        if self.flagon:
+        if self.flagon and self.flagstart:
             tx = self.timeclock.elapsed()/1000.
             if self.timeindex[0] != -1:
                 ts = tx - self.timex[self.timeindex[0]]
@@ -1182,6 +1192,10 @@ class tgraphcanvas(FigureCanvas):
         self.samplingsemaphore.acquire(1)
         
         self.flagon = False
+        self.flagstart = False
+        
+        #reset time
+        aw.qmc.timeclock.start()
         
         #prevents deleting accidentally a finished roast
         if self.safesaveflag== True:
@@ -1211,7 +1225,7 @@ class tgraphcanvas(FigureCanvas):
         self.rateofchange2 = 0.0
         self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
         self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
-        self.timeindex = [-1,0,0,0,0,0,0]
+        self.timeindex = [-1,0,0,0,0,0,0,0]
         self.specialevents=[]
         aw.lcd1.display("00:00")
         aw.lcd2.display("0.0")
@@ -1242,6 +1256,8 @@ class tgraphcanvas(FigureCanvas):
         aw.button_19.setFlat(False)
         aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) 
         aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
+        aw.button_2.setText(QApplication.translate("Scope Button", "START",None, QApplication.UnicodeUTF8)) 
+        aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
 
         self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
         aw.setWindowTitle(aw.windowTitle)
@@ -1270,7 +1286,10 @@ class tgraphcanvas(FigureCanvas):
         aw.etypeComboBox.setCurrentIndex(0)
         aw.valueComboBox.setCurrentIndex(0)    
         aw.curFile = None                 #current file name
-        self.ystep = 45     	    	  #used to find length of arms in annotations  
+        #used to find length of arms in annotations  
+        self.ystep_down = 0
+        self.ystep_up = 0
+        
         self.startofx = 0
         self.endofx = self.resetmaxtime 
         if self.endofx < 1:
@@ -1318,8 +1337,6 @@ class tgraphcanvas(FigureCanvas):
         aw.soundpop()
 
         #posible condition using WheelGraphs in view-mode and pressing reset button
-        if not aw.lowerbuttondialog.isVisible(): 
-            aw.lowerbuttondialog.setVisible(True)
         if aw.extraeventsbuttonsflag:
             aw.e1buttondialog.setVisible(True) 
             aw.e2buttondialog.setVisible(True) 
@@ -1332,6 +1349,9 @@ class tgraphcanvas(FigureCanvas):
             aw.e4buttondialog.setVisible(False)
             if aw.minieventsflag:
                 aw.EventsGroupLayout.setVisible(True)
+        
+        aw.lowerbuttondialog.setVisible(False)
+        aw.hideLCDs()
                 
         self.wheelflag = False
         
@@ -1457,10 +1477,8 @@ class tgraphcanvas(FigureCanvas):
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
             for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                if aw.extraCurveVisibility1[i]:
-                    self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
-                if aw.extraCurveVisibility2[i]:
-                    self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
+                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
+                self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
 
             #check BACKGROUND flag
             if self.background: 
@@ -1686,56 +1704,61 @@ class tgraphcanvas(FigureCanvas):
                     
             if not self.designerflag:  
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min  
-                #Add markers for CHARGE           
+                #Add markers for CHARGE 
                 if self.timeindex[0] != -1:
                     #anotate temperature
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[0]],d)
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[0]],d)
                     self.ax.annotate("%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                                    xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]+self.ystep),
+                                    xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]+self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                                     xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]-self.ystep),
+                                     xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]-self.ystep_down),
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #Add Dry End markers            
                 if self.timeindex[1]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
                     st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
                     self.ax.annotate("%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                                    xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] + self.ystep), 
+                                    xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] + self.ystep_up), 
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                                    xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] - self.ystep),
+                                    xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] - self.ystep_down),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
+                                    
+
                 #Add 1Cs markers
-                self.ystep = 45
+            
                 if self.timeindex[2]:
                     if self.timeindex[1]: #if dryend
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
                     else:
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
+                        self.ystep_down = 0
+                        self.ystep_up = 0
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[2]],d)
                     st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
                     self.ax.annotate("%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                                    xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] + self.ystep), 
+                                    xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] + self.ystep_up), 
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                                    xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] - self.ystep),
+                                    xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] - self.ystep_down),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                                    
                 #Add 1Ce markers
                 if self.timeindex[3]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                     st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
                     self.ax.annotate("%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                    xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]] + self.ystep),
+                                    xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]] + self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                    xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),
+                                    xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep_down),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #add a water mark if FCs
                     if self.timeindex[2]:
@@ -1744,27 +1767,27 @@ class tgraphcanvas(FigureCanvas):
                 #Add 2Cs markers
                 if self.timeindex[4]:
                     if self.timeindex[3]:
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
                     else:
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]],d)
                     st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
                     self.ax.annotate("%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                                    xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]] + self.ystep),
+                                    xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]] + self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                                     xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),
+                                     xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep_down),
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #Add 2Ce markers
                 if self.timeindex[5]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                     st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
                     self.ax.annotate("%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                    xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] + self.ystep),
+                                    xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] + self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                    xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] - self.ystep),
+                                    xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] - self.ystep_down),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #do water mark if SCs
                     if self.timeindex[4]:
@@ -1773,26 +1796,26 @@ class tgraphcanvas(FigureCanvas):
                 #Add DROP markers
                 if self.timeindex[6]:
                     if self.timeindex[5]:
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
                     elif self.timeindex[4]:
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]],d)
                     elif self.timeindex[3]:
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]],d)
                     elif self.timeindex[2]:
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
                     elif self.timeindex[1]:
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
                     else:
-                        self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[6]],d)                
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[6]],d)                
                         
                     st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
                     self.ax.annotate("%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                                    xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] + self.ystep),
+                                    xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] + self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                                     xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] - self.ystep),
+                                     xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] - self.ystep_down),
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     
                     self.writestatistics()
@@ -1931,8 +1954,8 @@ class tgraphcanvas(FigureCanvas):
             self.samplingsemaphore.release(1)
 
         except Exception as e:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
                 
@@ -1940,36 +1963,34 @@ class tgraphcanvas(FigureCanvas):
 
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
-    #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep (which changes value in self.redraw())
+    #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep_down (which changes value in self.redraw())
 #    def findtextgap(self,height1,height2):
 #        if self.mode == "F":
 #            init = 44  #was 50  (original values were too high)
 #            gap = 22  #was 30
 #            for i in range(init,110):  # was 90
-#                if abs((height1 + self.ystep) - (height2+i)) > gap and abs((height1-self.ystep) - (height2-i)) > gap:
+#                if abs((height1 + self.ystep_up) - (height2+i)) > gap and abs((height1-self.ystep_down) - (height2-i)) > gap:
 #                    break
 #        else:
 #            init = 20  #was 40
 #            gap = 11   #was 20
 #            for i in range(init,54):  # was 90
-#                if abs((height1 + self.ystep) - (height2+i)) > gap and abs((height1-self.ystep) - (height2-i)) > gap:
+#                if abs((height1 + self.ystep_up) - (height2+i)) > gap and abs((height1-self.ystep_down) - (height2-i)) > gap:
 #                    break
 #        return i  #return height of arm
-    def findtextgap(self,height1,height2,d=0):
+    def findtextgap(self,ystep_down,ystep_up,height1,height2,d=0):
         if d <= 0:
             d = aw.qmc.ylimit - aw.qmc.ylimit_min
-        if self.mode == "F":
-            init = int(d/37.5)
-            gap = int(d/68.2)
-            maxx = int(d/13.9) 
-        else:
-            init = int(d/9)
-            gap = int(d/18.2)
-            maxx = int(d/3.6)       
+        init = int(d/15.0)
+        gap = int(d/20.0)
+        maxx = int(d/3.6)       
         for i in range(init,maxx):
-            if abs((height1 + self.ystep) - (height2+i)) > gap and abs((height1-self.ystep) - (height2-i)) > gap:
+            if abs((height1 + ystep_up) - (height2+i)) > gap:
+                break      
+        for j in range(init,maxx):
+            if abs((height1 - ystep_down) - (height2 - j)) > gap:
                 break
-        return i  #return height of arm
+        return j,i  #return height of arm
                
     # used to convert time from int seconds to string (like in the LCD clock timer). input int, output string xx:xx
     def stringfromseconds(self, seconds):
@@ -2304,7 +2325,9 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         #turn ON
         if not self.flagon:
-            aw.disableSaveActions()
+            self.flagon = True
+            
+            
             if self.designerflag: return
             
             self.threadserver.createSampleThread()
@@ -2312,6 +2335,42 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
             aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
+            
+            aw.soundpop()
+            aw.showLCDs()
+        #turn OFF        
+        else:
+            # stop Recorder if still running
+            if self.flagstart:
+                self.OnRecorder()
+            self.flagon = False
+            if self.flagstart:
+                self.OnRecorder()
+            aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
+            aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                                   
+            
+            aw.lcd1.display("00:00")
+            
+            aw.soundpop()
+            
+            aw.hideLCDs()
+            
+    #Turns START/STOP flag self.flagon to read and plot. Called from push button_2. 
+    def OnRecorder(self):
+        #turn START
+        if not self.flagstart:
+            # start Monitor if not yet running
+            if not self.flagon:
+                self.OnMonitor()
+            self.flagstart = True
+            
+            aw.disableSaveActions()
+            
+            aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
+            aw.button_2.setStyleSheet(aw.pushbuttonstyles["START"])            
+            aw.button_2.setText(QApplication.translate("Scope Button", "STOP",None, QApplication.UnicodeUTF8)) # text means click STOP (it is STARTed)                   
+            aw.button_18.setEnabled(True)
+            aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])  
             aw.soundpop()
             
             if not len(self.timex):
@@ -2319,10 +2378,15 @@ class tgraphcanvas(FigureCanvas):
                 self.updateLCDtime()
             else:
                 self.updateLCDtime()
-        #turn OFF        
+            aw.lowerbuttondialog.setVisible(True)
+        #turn STOP       
         else:
-            self.flagon = False
-            aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
+            self.flagstart = False
+            aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
+            aw.button_18.setEnabled(False)
+            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+
+            self.updateLCDtime()
 
             self.redraw()
 
@@ -2331,9 +2395,10 @@ class tgraphcanvas(FigureCanvas):
                 self.safesaveflag = True
             
             aw.soundpop()
-            aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
-            aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message Area","Scope recording stopped", None, QApplication.UnicodeUTF8))
+            aw.button_2.setText(QApplication.translate("Scope Button", "START",None, QApplication.UnicodeUTF8))
             aw.enableSaveActions()
+            aw.lowerbuttondialog.setVisible(False)
 
 
     #Records charge (put beans in) marker. called from push button 'Charge'
@@ -2369,11 +2434,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
                 #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                                 xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] +  self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] +  self.ystep_down),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate("Start 00:00", xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                                 xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] - self.ystep),
+                                 xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] - self.ystep_down),
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
                 self.xaxistosm()
@@ -2424,13 +2489,13 @@ class tgraphcanvas(FigureCanvas):
                 #calculate time elapsed since charge time
                 st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]))
                 #anotate temperature
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
+                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                                 xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]+self.ystep), color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]+self.ystep_up), color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                                 xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]-self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]-self.ystep_down),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
                 self.fig.canvas.draw()
@@ -2488,15 +2553,15 @@ class tgraphcanvas(FigureCanvas):
                 st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
                 if self.timeindex[1]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
                 else:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])                
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])                
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                                 xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]+ self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]+ self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                                 xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]-self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]-self.ystep_down),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
 
                 self.fig.canvas.draw()
@@ -2548,13 +2613,13 @@ class tgraphcanvas(FigureCanvas):
                 #calculate time elapsed since charge time
                 st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
+                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]+self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]+self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep_down),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 
                 self.fig.canvas.draw()
@@ -2605,15 +2670,15 @@ class tgraphcanvas(FigureCanvas):
 
                 st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
                 if self.timeindex[3]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
                 else:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])            
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])            
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                                 xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]+self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]+self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                  
                 self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                                 xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep_down),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
                 self.fig.canvas.draw()
@@ -2664,13 +2729,13 @@ class tgraphcanvas(FigureCanvas):
 
                 st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
-                self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
+                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]+self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]+self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]-self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]-self.ystep_down),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
                 self.fig.canvas.draw()
@@ -2725,22 +2790,22 @@ class tgraphcanvas(FigureCanvas):
                 st1 = QApplication.translate("Scope Annotation","End %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
                 #anotate temperature
                 if self.timeindex[5]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
                 elif self.timeindex[4]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]])
                 elif self.timeindex[3]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]])
                 elif self.timeindex[2]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]])
                 elif self.timeindex[1]:
-                    self.ystep = self.findtextgap(self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]])
                                 
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                                 xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]+self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]+self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #anotate time
                 self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                                 xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]-self.ystep),color=self.palette["text"],
+                                 xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]-self.ystep_down),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 
                 self.fig.canvas.draw()
@@ -4493,19 +4558,18 @@ class VMToolbar(NavigationToolbar):
     def __init__(self, plotCanvas, parent):
         NavigationToolbar.__init__(self, plotCanvas, parent)
 
-# SVG icons don't work anymore on QT4.8.1 for an unknown reason
-#    def _icon(self, name):
-#        #dirty hack to use exclusively .png and thus avoid .svg usage
-#        #because .exe generation is problematic with .svg
-#        if platf != 'Darwin':
-#            n = name.replace('.svg','.png')
-#        else:
-#            n = name.replace('.png','.svg')
-#        p = os.path.join(self.basedir, n)
-#        if os.path.exists(p):
-#            return QIcon(p)
-#        else:
-#            return QIcon(os.path.join(self.basedir, name))
+    def _icon(self, name):
+        #dirty hack to use exclusively .png and thus avoid .svg usage
+        #because .exe generation is problematic with .svg
+        if platf != 'Darwin':
+            n = name.replace('.svg','.png')
+        else:
+            n = name.replace('.png','.svg')
+        p = os.path.join(self.basedir, n)
+        if os.path.exists(p):
+            return QIcon(p)
+        else:
+            return QIcon(os.path.join(self.basedir, name))
 
 
 ########################################################################################
@@ -4526,6 +4590,10 @@ class SampleThread(QThread):
             ##### lock resources  #########
             aw.qmc.samplingsemaphore.acquire(1)
             
+            # if we are not yet recording, but sampling we keep on reseting the timer
+            if not aw.qmc.flagstart:
+                aw.qmc.timeclock.start()
+                
             #if using a meter (thermocouple device)
             if aw.qmc.device != 18: # not NONE device
 
@@ -4534,18 +4602,46 @@ class SampleThread(QThread):
                 if nxdevices:
                     les,led,let,letl =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1),len(aw.qmc.extratemp1lines)
                     if les == led == let == letl:
+                        xtra_dev_lines1 = 0
+                        xtra_dev_lines2 = 0
                         for i in range(nxdevices):   
                             extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                            # if sampling went wrong we take the last value:
+                            if extrat1 == -1:
+                                if len(aw.qmc.extratemp1[i]) > 0:
+                                    extrat1 = aw.qmc.extratemp1[i][-1]
+                            if extrat2 == -1:
+                                if len(aw.qmc.extratemp2[i]) > 0:
+                                    extrat2 = aw.qmc.extratemp2[i][-1]
                             if len(aw.qmc.extramathexpression1[i]):
                                 extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
                             if len(aw.qmc.extramathexpression2[i]):
                                 extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                            aw.qmc.extratemp1[i].append(extrat1)
-                            aw.qmc.extratemp2[i].append(extrat2)                        
-                            aw.qmc.extratimex[i].append(extratx)
-                            # update extra lines 
-                            aw.qmc.extratemp1lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
-                            aw.qmc.extratemp2lines[i].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                            if aw.qmc.flagstart:
+                                aw.qmc.extratemp1[i].append(float(extrat1))
+                                aw.qmc.extratemp2[i].append(float(extrat2))
+                                aw.qmc.extratimex[i].append(extratx)
+                                # update extra lines
+                                if aw.extraCurveVisibility1[i]:
+                                    aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                if aw.extraCurveVisibility2[i]:
+                                    aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
+                            else:
+                                # we do not record, so we just replace the old last value
+                                if len(aw.qmc.extratemp1[i]) > 0:
+                                    aw.qmc.extratemp1[i][-1] = float(extrat1)
+                                else:
+                                    aw.qmc.extratemp1[i].append(float(extrat1))
+                                if len(aw.qmc.extratemp2[i]) > 0:
+                                    aw.qmc.extratemp2[i][-1] = float(extrat2)
+                                else:
+                                    aw.qmc.extratemp2[i].append(float(extrat2))
+                                if len(aw.qmc.extratimex[i]) > 0:
+                                    aw.qmc.extratimex[i][-1] = extratx
+                                else:
+                                    aw.qmc.extratimex[i].append(extratx)
 
                     #ERROR FOUND
                     else:
@@ -4571,13 +4667,21 @@ class SampleThread(QThread):
 
                 #read time, ET (t1) and BT (t2) TEMPERATURE
                 tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                               
+                if t1 == -1:
+                    if len(aw.qmc.temp1) > 0:
+                        t1 = aw.qmc.temp1[-1]
+                if t2 == -1:
+                    if len(aw.qmc.temp2) > 0:
+                        t2 = aw.qmc.temp2[-1]
+                                    
+                length_of_qmc_timex = len(aw.qmc.timex)
                 
                 if len(aw.qmc.ETfunction):
                     t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
                 if len(aw.qmc.BTfunction):
                     t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
 
-                length_of_qmc_timex = len(aw.qmc.timex)
                 #filter droputs 
                 if aw.qmc.mode == "C":
                     limit = 500.
@@ -4593,27 +4697,47 @@ class SampleThread(QThread):
                         t2 = aw.qmc.temp2[-1]
                     else:
                         t2 = -1.       
-                                                        
+                                               
+                                               
                 #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
                 #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
+                t1_final = t1
+                t2_final = t2         
                 if len(aw.qmc.timex) > 2 and t1 == aw.qmc.temp2[-1] and t2 == aw.qmc.temp1[-1]:
-                    #let's better swap the readings (also they are just repeating the previous ones)
-                    aw.qmc.temp2.append(t1)
-                    aw.qmc.temp1.append(t2)
+                    #let's better swap the readings (also they are just repeating the previous ones)  
+                    t1_final = t2
+                    t1_final = t1
+                if aw.qmc.flagstart:
+                    aw.qmc.temp2.append(t2_final)
+                    aw.qmc.temp1.append(t1_final)
                 else:
-                    #the readings seem to be "in order"
-                    aw.qmc.temp2.append(t2)
-                    aw.qmc.temp1.append(t1)
+                    if len(aw.qmc.temp2) > 0:
+                        aw.qmc.temp2[-1] = t2_final
+                    else:                            
+                        aw.qmc.temp2.append(t2_final)
+                    if len(aw.qmc.temp1) > 0:
+                        aw.qmc.temp1[-1] = t1_final
+                    else:                            
+                        aw.qmc.temp1.append(t1_final)
+                        
 
-                aw.qmc.timex.append(tx)
-                length_of_qmc_timex += 1
+                if aw.qmc.flagstart:
+                    aw.qmc.timex.append(tx)
+                    length_of_qmc_timex += 1
+                else:
+                    if length_of_qmc_timex > 0:
+                        aw.qmc.timex[-1] = tx
+                    else:
+                        aw.qmc.timex.append(tx)
+                        length_of_qmc_timex += 1
 
                 # update lines data using the lists with new data
-                aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
-                aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+                if aw.qmc.flagstart:
+                    aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
+                    aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
                 
                 #we need a minimum of two readings to calculate rate of change
-                if length_of_qmc_timex > 2:
+                if aw.qmc.flagstart and length_of_qmc_timex > 2:
                     timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
                     #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                     aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
@@ -4636,70 +4760,92 @@ class SampleThread(QThread):
                     rateofchange2plot = aw.qmc.rateofchange2
 
                 else:
-                    aw.qmc.unfiltereddelta1.append(0.)
-                    aw.qmc.unfiltereddelta2.append(0.)                    
+                    if aw.qmc.flagstart:
+                        aw.qmc.unfiltereddelta1.append(0.)
+                        aw.qmc.unfiltereddelta2.append(0.)                    
+                    else:
+                        if len(aw.qmc.unfiltereddelta1) > 0:
+                            aw.qmc.unfiltereddelta1[-1] = 0.
+                        else:
+                            aw.qmc.unfiltereddelta1.append(0.)
+                        if len(aw.qmc.unfiltereddelta2) > 0:
+                            aw.qmc.unfiltereddelta2[-1] = 0.
+                        else:
+                            aw.qmc.unfiltereddelta2.append(0.)                        
                     aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
 
                 # append new data to the rateofchange
-                aw.qmc.delta1.append(rateofchange1plot)
-                aw.qmc.delta2.append(rateofchange2plot)
+                if aw.qmc.flagstart:
+                    aw.qmc.delta1.append(rateofchange1plot)
+                    aw.qmc.delta2.append(rateofchange2plot)
+                else:
+                    if len(aw.qmc.delta1) > 0:
+                        aw.qmc.delta1[-1] = rateofchange1plot
+                    else:
+                        aw.qmc.delta1.append(rateofchange1plot)
+                    if len(aw.qmc.delta2) > 0:
+                        aw.qmc.delta2[-1] = rateofchange2plot
+                    else:
+                        aw.qmc.delta2.append(rateofchange2plot)
                                            
-                if aw.qmc.DeltaETflag:
-                    aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
-                if aw.qmc.DeltaBTflag:
-                    aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
+                if aw.qmc.flagstart:
+                    if aw.qmc.DeltaETflag:
+                        aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
+                    if aw.qmc.DeltaBTflag:
+                        aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
 
-                #readjust xlimit of plot if needed
-                if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
-                    aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
-                    aw.qmc.xaxistosm()
-                
-                if aw.qmc.projectFlag:
-                    aw.qmc.viewProjection()                   
-                if aw.qmc.background and aw.qmc.backgroundReproduce:
-                    aw.qmc.playbackevent()
+                if aw.qmc.flagstart:                
+                    #readjust xlimit of plot if needed
+                    if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                        aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
+                        aw.qmc.xaxistosm()
                     
-                # autodetect CHARGE event
-                # only if BT > 150C / 300F                
-                if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and length_of_qmc_timex >= 5 and \
-                    ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 150) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 300)):
-                    if aw.BTbreak(length_of_qmc_timex - 1):
-                        # we found a BT break at the current index minus 2
-                        aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
-                # autodetect DROP event
-                # only if 9min into roast and BT>180C/356F                  
-                elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
-                    length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and \
-                    ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]])  > 540):
-                    if aw.BTbreak(length_of_qmc_timex - 1):
-                        # we found a BT break at the current index minus 2
-                        aw.qmc.autoDropIdx = length_of_qmc_timex - 3
-
-
-                #check alarms 
-                for i in range(len(aw.qmc.alarmflag)):
-                    #if alarm on, and not triggered, and time is after set time:
-                    if aw.qmc.alarmflag[i] and not aw.qmc.alarmstate[i] and aw.qmc.timeindex[aw.qmc.alarmtime[i]]:    
-                        if aw.qmc.alarmsource[i] == 0:                        #check ET
-                            if aw.qmc.temp1[-1] > aw.qmc.alarmtemperature[i]:
-                                aw.qmc.temporaryalarmflag = i
-                        elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                            if aw.qmc.temp2[-1] > aw.qmc.alarmtemperature[i]:
-                                aw.qmc.temporaryalarmflag = i
+                    if aw.qmc.projectFlag:
+                        aw.qmc.viewProjection()                   
+                    if aw.qmc.background and aw.qmc.backgroundReproduce:
+                        aw.qmc.playbackevent()
+                        
+                    # autodetect CHARGE event
+                    # only if BT > 150C / 300F                
+                    if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and length_of_qmc_timex >= 5 and \
+                        ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 150) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 300)):
+                        if aw.BTbreak(length_of_qmc_timex - 1):
+                            # we found a BT break at the current index minus 2
+                            aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
+                    # autodetect DROP event
+                    # only if 9min into roast and BT>180C/356F                  
+                    elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                        length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and \
+                        ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]])  > 540):
+                        if aw.BTbreak(length_of_qmc_timex - 1):
+                            # we found a BT break at the current index minus 2
+                            aw.qmc.autoDropIdx = length_of_qmc_timex - 3
+    
+    
+                    #check alarms 
+                    for i in range(len(aw.qmc.alarmflag)):
+                        #if alarm on, and not triggered, and time is after set time:
+                        if aw.qmc.alarmflag[i] and not aw.qmc.alarmstate[i] and aw.qmc.timeindex[aw.qmc.alarmtime[i]]:    
+                            if aw.qmc.alarmsource[i] == 0:                        #check ET
+                                if aw.qmc.temp1[-1] > aw.qmc.alarmtemperature[i]:
+                                    aw.qmc.temporaryalarmflag = i
+                            elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                                if aw.qmc.temp2[-1] > aw.qmc.alarmtemperature[i]:
+                                    aw.qmc.temporaryalarmflag = i
          
-            #############    if using DEVICE 18 (no device). Manual mode
-            # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()        
-            else:
-                tx = int(aw.qmc.timeclock.elapsed()/1000.)
-
-                #readjust xlimit of plot if needed
-                if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds  
-                    aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
-                    aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
-                    aw.qmc.xaxistosm()   
-                aw.qmc.resetlines()
-                #add to plot a vertical time line
-                aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
+                #############    if using DEVICE 18 (no device). Manual mode
+                # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()        
+                else:
+                    tx = int(aw.qmc.timeclock.elapsed()/1000.)
+    
+                    #readjust xlimit of plot if needed
+                    if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds  
+                        aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
+                        aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
+                        aw.qmc.xaxistosm()   
+                    aw.qmc.resetlines()
+                    #add to plot a vertical time line
+                    aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
 
             ##### release semaphore  #########    
             aw.qmc.samplingsemaphore.release(1)
@@ -4708,13 +4854,14 @@ class SampleThread(QThread):
             self.emit(SIGNAL("updategraphics"))
 
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
 
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
                 
             aw.qmc.flagon = False
+            aw.qmc.flagstart = False            
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
             return
 
@@ -4746,17 +4893,15 @@ class Athreadserver(QWidget):
         super(Athreadserver,self)._init_(parent)
 
     def createSampleThread(self):
-        if aw.qmc.flagon == False:
-            aw.qmc.flagon = True
-            sthread = SampleThread(self)
-            #QApplication.processEvents()
+        sthread = SampleThread(self)
+        #QApplication.processEvents()
 
-            #delete when finished to save memory 
-            self.connect(sthread,SIGNAL("finished"),sthread,SLOT("deleteLater()"))
-            #connect graphics to GUI thread
-            self.connect(sthread, SIGNAL("updategraphics"),aw.qmc.updategraphics)
-            sthread.start()
-            sthread.wait(300)    #needed in some Win OS
+        #delete when finished to save memory 
+        self.connect(sthread,SIGNAL("finished"),sthread,SLOT("deleteLater()"))
+        #connect graphics to GUI thread
+        self.connect(sthread, SIGNAL("updategraphics"),aw.qmc.updategraphics)
+        sthread.start()
+        sthread.wait(300)    #needed in some Win OS
 
 
 ########################################################################################                            
@@ -4901,9 +5046,13 @@ class ApplicationWindow(QMainWindow):
 
         importMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_IMPORT)
 
-        fileImportAction = QAction(QApplication.translate("Menu", "Artisan...",None, QApplication.UnicodeUTF8),self)
-        self.connect(fileImportAction,SIGNAL("triggered()"),self.fileImport)
-        importMenu.addAction(fileImportAction)  
+        fileImportCSVAction = QAction(QApplication.translate("Menu", "CSV...",None, QApplication.UnicodeUTF8),self)
+        self.connect(fileImportCSVAction,SIGNAL("triggered()"),self.fileImportCSV)
+        importMenu.addAction(fileImportCSVAction)  
+
+        fileImportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None, QApplication.UnicodeUTF8),self)
+        self.connect(fileImportJSONAction,SIGNAL("triggered()"),self.fileImportJSON)
+        importMenu.addAction(fileImportJSONAction)  
         
         importHH506RAAction = QAction(QApplication.translate("Menu", "HH506RA...",None, QApplication.UnicodeUTF8),self)
         self.connect(importHH506RAAction,SIGNAL("triggered()"),self.importHH506RA)
@@ -4931,10 +5080,16 @@ class ApplicationWindow(QMainWindow):
         self.fileMenu.addAction(self.fileSaveAsAction)  
         
         self.fileMenu.addSeparator()    
+                
+        exportMenu = self.fileMenu.addMenu(UIconst.FILE_MENU_EXPORT)
         
-        fileExportAction = QAction(UIconst.FILE_MENU_EXPORT,self)
-        self.connect(fileExportAction,SIGNAL("triggered()"),self.fileExport)
-        self.fileMenu.addAction(fileExportAction)  
+        fileExportCSVAction = QAction(QApplication.translate("Menu", "CSV...",None, QApplication.UnicodeUTF8),self)
+        self.connect(fileExportCSVAction,SIGNAL("triggered()"),self.fileExportCSV)
+        exportMenu.addAction(fileExportCSVAction)  
+        
+        fileExportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None, QApplication.UnicodeUTF8),self)
+        self.connect(fileExportJSONAction,SIGNAL("triggered()"),self.fileExportJSON)
+        exportMenu.addAction(fileExportJSONAction)  
 
         
         self.fileMenu.addSeparator()    
@@ -5204,7 +5359,10 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(10)
         
-        self.pushbuttonstyles = {"OFF":"QPushButton {font-size: 16pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+        self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 16pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
+                                 "STOP":"QPushButton {font-size: 16pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                 "START":"QPushButton {font-size: 16pt; font-weight: bold; color: yellow; background-color: red}",
+                                 "OFF":"QPushButton {font-size: 16pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
                                  "ON":"QPushButton {font-size: 16pt; font-weight: bold; color: yellow; background-color: red }",
                                  "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
                                  "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",                                 
@@ -5212,9 +5370,9 @@ class ApplicationWindow(QMainWindow):
                                  "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
                                  "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
                                  "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                 "RESET":"QPushButton {font-size: 10pt; font-weight: bold; color: purple; background-color: white }",
-                                 "HUD_OFF":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #b5baff  }",
-                                 "HUD_ON":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #60ffed   }",                                 
+                                 "RESET":"QPushButton {font-size: 16pt; font-weight: bold; color: black; background-color: white }",
+                                 "HUD_OFF":"QPushButton {font-size: 16pt; font-weight: bold; color: white; background-color: #b5baff  }",
+                                 "HUD_ON":"QPushButton {font-size: 16pt; font-weight: bold; color: white; background-color: #60ffed   }",                                 
                                  "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",                                 
                                  "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
                                  "PID":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF }",
@@ -5223,13 +5381,23 @@ class ApplicationWindow(QMainWindow):
                                  "SELECTED":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
                                  }                                 
                         
-        #create START STOP buttons        
+        #create ON/OFF buttons        
         self.button_1 = QPushButton(QApplication.translate("Scope Button", "ON", None, QApplication.UnicodeUTF8))
         self.button_1.setFocusPolicy(Qt.NoFocus)
-        self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
+        self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts reading", None, QApplication.UnicodeUTF8))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
-        self.button_1.setMinimumHeight(50)
+        #self.button_1.setMinimumHeight(50)
+        self.button_1.setMaximumSize(90, 45)
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.OnMonitor)
+        
+        #create START/STOP buttons
+        self.button_2 = QPushButton(QApplication.translate("Scope Button", "START", None, QApplication.UnicodeUTF8))
+        self.button_2.setFocusPolicy(Qt.NoFocus)
+        self.button_2.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
+        self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
+        #self.button_2.setMinimumHeight(50)
+        self.button_2.setMaximumSize(90, 45)
+        self.connect(self.button_2, SIGNAL("clicked()"), self.qmc.OnRecorder)
 
         #create 1C START, 1C END, 2C START and 2C END buttons
         self.button_3 = QPushButton(QApplication.translate("Scope Button", "FC\nSTART", None, QApplication.UnicodeUTF8))
@@ -5350,11 +5518,12 @@ class ApplicationWindow(QMainWindow):
         #create HUD button
         self.button_18 = QPushButton(QApplication.translate("Scope Button", "HUD", None, QApplication.UnicodeUTF8))
         self.button_18.setFocusPolicy(Qt.NoFocus)
-        self.button_18.setStyleSheet(self.pushbuttonstyles["HUD_OFF"])        
+        self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])        
         self.button_18.setMaximumSize(90, 45)
         self.button_18.setContentsMargins(0,0,0,0)
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
         self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None, QApplication.UnicodeUTF8))
+        self.button_18.setEnabled(False)
 
         #create DRY button
         self.button_19 = QPushButton(QApplication.translate("Scope Button", "DRY\nEND", None, QApplication.UnicodeUTF8))
@@ -5564,9 +5733,10 @@ class ApplicationWindow(QMainWindow):
         
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
         self.lowerbuttondialog = QDialogButtonBox(Qt.Horizontal)
+        self.lowerbuttondialog.setVisible(False)
         self.lowerbuttondialog.setCenterButtons(True)
         #initiate configuration
-        self.lowerbuttondialog.addButton(self.button_1,QDialogButtonBox.ActionRole)
+#        self.lowerbuttondialog.addButton(self.button_1,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_8,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_19,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_3,QDialogButtonBox.ActionRole)
@@ -5692,6 +5862,10 @@ class ApplicationWindow(QMainWindow):
         level1layout.addWidget(self.button_18)
         level1layout.addSpacing(15)
         level1layout.addWidget(self.button_7)
+        level1layout.addSpacing(15)
+        level1layout.addWidget(self.button_1)
+        level1layout.addSpacing(15)
+        level1layout.addWidget(self.button_2)
         level1layout.addSpacing(20)
         level1layout.addWidget(self.lcd1)
 
@@ -5706,7 +5880,6 @@ class ApplicationWindow(QMainWindow):
         midleftlayout.addSpacing(-20)
         midleftlayout.addWidget(self.messagelabel)
         midleftlayout.addLayout(level3layout)
-        midleftlayout.addSpacing(-5)
         midleftlayout.addWidget(self.lowerbuttondialog)
         midleftlayout.addWidget(self.e1buttondialog)
         midleftlayout.addWidget(self.e2buttondialog)
@@ -5850,6 +6023,40 @@ class ApplicationWindow(QMainWindow):
         self.messagehist.append(timez + message)
         self.messagelabel.setText(message)
     
+    def hideLCDs(self):
+        self.updateLCDvisibility(False)
+    
+    def showLCDs(self):
+        self.updateLCDvisibility(True)
+    
+    def updateLCDvisibility(self,visible):
+        ndev = len(aw.qmc.extradevices)
+        for i in range(ndev):
+            if ndev < 10:
+                if not visible or aw.extraLCDvisibility1[i]:
+                    aw.extraLCD1[i].setVisible(visible)
+                    aw.extraLCDlabel1[i].setVisible(visible)
+                    if visible and i < len(aw.qmc.extraname1):
+                        aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "<\b>")
+                if not visible or aw.extraLCDvisibility2[i]:
+                    aw.extraLCD2[i].setVisible(visible)
+                    aw.extraLCDlabel2[i].setVisible(visible)
+                    if visible and i < len(aw.qmc.extraname2):
+                        aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "<\b>")
+        aw.lcd2.setVisible(visible)
+        aw.label2.setVisible(visible)
+        aw.lcd3.setVisible(visible)
+        aw.label3.setVisible(visible)
+        aw.lcd4.setVisible(visible)
+        aw.label4.setVisible(visible)
+        aw.lcd5.setVisible(visible)
+        aw.label5.setVisible(visible)
+        if aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid  
+            aw.lcd6.setVisible(visible)
+            aw.label6.setVisible(visible)
+            aw.lcd7.setVisible(visible)
+            aw.label7.setVisible(visible)
+
     def update_minieventline_visibility(self):
         if self.minieventsflag:
             self.etypeComboBox.setVisible(True)
@@ -5959,7 +6166,11 @@ class ApplicationWindow(QMainWindow):
                 if self.qmc.flagon:    
                     self.button_1.setStyleSheet(self.pushbuttonstyles["ON"])
                 else:
-                    self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])                 
+                    self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])    
+                if self.qmc.flagstart:    
+                    self.button_2.setStyleSheet(self.pushbuttonstyles["START"])
+                else:
+                    self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])              
                 self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
                 self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
                 self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
@@ -6457,8 +6668,8 @@ class ApplicationWindow(QMainWindow):
             return
 
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadFile() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
             return
         
@@ -6513,6 +6724,7 @@ class ApplicationWindow(QMainWindow):
                         times.append(varCB[6])
                         times.append(startendB[2])                    
                         self.qmc.timebackgroundindexupdate(times[:])
+                self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
 
             else:      
                 self.sendmessage(QApplication.translate("Message Area", "Invalid artisan format",None, QApplication.UnicodeUTF8))
@@ -6658,6 +6870,31 @@ class ApplicationWindow(QMainWindow):
         self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[l], self.qmc.extratemp2[l],color=self.qmc.extradevicecolor2[l],linewidth=2,label= self.qmc.extraname2[l])[0])
 
         self.updateExtraLCDvisibility()
+        
+    #Write readings to Artisan JSON file    
+    def exportJSON(self,filename):
+        outfile = open(filename, 'wb')
+        #json.dump(self.getProfile(), outfile, sort_keys=True, indent=4)
+        json.dump(self.getProfile(), outfile)  
+        outfile.write('\n')  
+        outfile.close()
+        
+    def importJSON(self,filename):
+        infile = open(filename, 'rb')
+        obj = json.load(infile)
+        self.setProfile(obj)
+        infile.close()
+        
+        self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+
+        #change Title
+        self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+
+        #update etypes combo box
+        self.etypeComboBox.clear()
+        self.etypeComboBox.addItems(self.qmc.etypes)
+        
+        self.qmc.redraw()
             
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
@@ -6971,6 +7208,8 @@ class ApplicationWindow(QMainWindow):
             times.append(startend[2])
             #convert to new profile
             self.qmc.timeindexupdate(times)
+        # ensure that timeindex has the proper length
+        self.qmc.timeindex = self.qmc.timeindex + [0 for i in range(8-len(self.qmc.timeindex))]
             
     #used by filesave()
     #wrap values in unicode(.) if and only if those are of type string
@@ -7044,11 +7283,11 @@ class ApplicationWindow(QMainWindow):
             self.qmc.adderror(QApplication.translate("Error Message", "IO Error on filesave(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
             return
             
-    def fileExport(self):
+    def fileExport(self,msg,ext,dumper):
         try:         
-            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption", "Export CSV",None, QApplication.UnicodeUTF8),ext="*.csv")
+            filename = self.ArtisanSaveFileDialog(msg=msg,ext=ext)
             if filename:
-                self.exportCSV(filename)
+                dumper(filename)
                 self.sendmessage(QApplication.translate("Message Area","Readings exported", None, QApplication.UnicodeUTF8))
             else:
                 self.sendmessage(QApplication.translate("Message Area","Cancelled", None, QApplication.UnicodeUTF8))
@@ -7056,17 +7295,29 @@ class ApplicationWindow(QMainWindow):
             self.qmc.adderror(QApplication.translate("Error Message", "IO Error on fileExport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
             return
             
-    def fileImport(self):
+    def fileExportCSV(self):
+        self.fileExport(QApplication.translate("MessageBox Caption", "Export CSV",None, QApplication.UnicodeUTF8),"*.csv",self.exportCSV)
+        
+    def fileExportJSON(self):
+        self.fileExport(QApplication.translate("MessageBox Caption", "Export JSON",None, QApplication.UnicodeUTF8),"*.json",self.exportJSON)
+         
+    def fileImport(self,msg,loader):
         try:         
-            filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption", "Import CSV",None, QApplication.UnicodeUTF8))
+            filename = self.ArtisanOpenFileDialog(msg=msg)
             if filename:
-                self.importCSV(filename)
+                loader(filename)
                 self.sendmessage(QApplication.translate("Message Area","Readings imported", None, QApplication.UnicodeUTF8))
             else:
                 self.sendmessage(QApplication.translate("Message Area","Cancelled", None, QApplication.UnicodeUTF8))
         except IOError as e:
             self.qmc.adderror(QApplication.translate("Error Message", "IO Error on fileImport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))        
             return
+               
+    def fileImportCSV(self):
+        self.fileImport(QApplication.translate("MessageBox Caption", "Import CSV",None, QApplication.UnicodeUTF8),self.importCSV)
+                    
+    def fileImportJSON(self):
+        self.fileImport(QApplication.translate("MessageBox Caption", "Import JSON",None, QApplication.UnicodeUTF8),self.importJSON)
 
     #loads the settings at the start of application. See the oppposite closeEvent()
     def settingsLoad(self):
@@ -7153,6 +7404,8 @@ class ApplicationWindow(QMainWindow):
 
             #restore delay
             self.qmc.delay = settings.value("Delay",int(self.qmc.delay)).toInt()[0]
+            if not self.qmc.delay:
+                self.qmc.delay = 3000
             #restore colors
             for (k, v) in list(settings.value("Colors").toMap().items()):
                 self.qmc.palette[str(k)] = str(v.toString())
@@ -7811,33 +8064,36 @@ class ApplicationWindow(QMainWindow):
             return settingsx,settingsnames
 
     def updateExtraLCDvisibility(self):
-        n = len(self.qmc.extradevices)
-        for i in range(n):
-            if i < 10 :
-                if self.extraLCDvisibility1[i]:
-                    if i < len(self.qmc.extraname1):
-                        self.extraLCDlabel1[i].setText("<b>" + self.qmc.extraname1[i] + "<\b>")
-                    self.extraLCDlabel1[i].setVisible(True)
-                    self.extraLCD1[i].setVisible(True)
-                    self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-                else:
-                    self.extraLCDlabel1[i].setVisible(False)
-                    self.extraLCD1[i].setVisible(False)
-                if self.extraLCDvisibility2[i]:
-                    if i < len(self.qmc.extraname2):
-                        self.extraLCDlabel2[i].setText("<b>" + self.qmc.extraname2[i] + "<\b>")
-                    self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-                    self.extraLCDlabel2[i].setVisible(True)
-                    self.extraLCD2[i].setVisible(True)
-                else:
-                    self.extraLCDlabel2[i].setVisible(False)
-                    self.extraLCD2[i].setVisible(False)
-        #hide the rest (just in case)
-        for i in range(n,10):
-            self.extraLCDlabel1[i].setVisible(False)
-            self.extraLCD1[i].setVisible(False)            
-            self.extraLCDlabel2[i].setVisible(False)
-            self.extraLCD2[i].setVisible(False)            
+        if aw.qmc.flagon:
+            n = len(self.qmc.extradevices)
+            for i in range(n):
+                if i < 10 :
+                    if self.extraLCDvisibility1[i]:
+                        if i < len(self.qmc.extraname1):
+                            self.extraLCDlabel1[i].setText("<b>" + self.qmc.extraname1[i] + "<\b>")
+                        self.extraLCDlabel1[i].setVisible(True)
+                        self.extraLCD1[i].setVisible(True)
+                        self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+                    else:
+                        self.extraLCDlabel1[i].setVisible(False)
+                        self.extraLCD1[i].setVisible(False)
+                    if self.extraLCDvisibility2[i]:
+                        if i < len(self.qmc.extraname2):
+                            self.extraLCDlabel2[i].setText("<b>" + self.qmc.extraname2[i] + "<\b>")
+                        self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+                        self.extraLCDlabel2[i].setVisible(True)
+                        self.extraLCD2[i].setVisible(True)
+                    else:
+                        self.extraLCDlabel2[i].setVisible(False)
+                        self.extraLCD2[i].setVisible(False)
+            #hide the rest (just in case)
+            for i in range(n,10):
+                self.extraLCDlabel1[i].setVisible(False)
+                self.extraLCD1[i].setVisible(False)            
+                self.extraLCDlabel2[i].setVisible(False)
+                self.extraLCD2[i].setVisible(False) 
+        else:
+            aw.hideLCDs()           
 
     def filePrint(self):
 
@@ -8028,7 +8284,7 @@ $cupping_notes
                 DRY_time_idx = dryEndIndex      
             else:
                 DRY_time_idx = 0
-        evaluations = self.defect_estimation()        
+        evaluations = self.defect_estimation()
         self.qmc.redraw(recomputeAllDeltas=False)   
         if platf == 'Darwin':
             graph_image = "artisan-graph.svg"
@@ -8061,7 +8317,7 @@ $cupping_notes
         #return screen to GRAPH profile mode
         self.qmc.redraw(recomputeAllDeltas=False)
         html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
-            title=cgi.escape(str(self.qmc.title)),
+            title=cgi.escape(self.qmc.title),
             datetime=str(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
             beans=beans,
             weight=self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[2],weight_loss),
@@ -14857,16 +15113,10 @@ class serialport(object):
                 else:
                     nbytes = len(r)
                     aw.qmc.adderror(QApplication.translate("Error Message","HH806AUtemperature(): %1 bytes received but 14 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
-                    if len(aw.qmc.timex) > 2:                           #if there are at least two completed readings
-                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       # then new reading = last reading (avoid possible single errors) 
-                    else:
-                        return -1,-1                                    #return something out of scope to avoid function error (expects two values)
+                    return -1,-1                                    #return something out of scope to avoid function error (expects two values)
 
             else:
-                if len(aw.qmc.timex) > 2:
-                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]        
-                else:
-                    return -1,-1                                    
+                return -1,-1                                    
                                    
         except serial.SerialException as e:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -14875,10 +15125,7 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-            else:
-                return -1,-1                                    
+            return -1,-1                                    
 
         finally:
             #note: logged chars should be unicode not binary
@@ -14952,10 +15199,7 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)                                    
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]        
-            else:
-                return -1,-1  
+            return -1,-1  
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -14967,10 +15211,14 @@ class serialport(object):
         # slave, register
         if aw.modbus.input1slave:
             res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register)
+            if res1 is None:
+                res1 = -1
         else:
             res1 = -1
         if aw.modbus.input2slave:
             res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register)
+            if res1 is None:
+                res1 = -1
         else:
             res2 = -1
         return res2, res1
@@ -15004,15 +15252,9 @@ class serialport(object):
                 else:
                     nbytes = len(r)
                     aw.qmc.adderror(QApplication.translate("Error Message","HH506RAtemperature(): %1 bytes received but 14 needed",None, QApplication.UnicodeUTF8).arg(nbytes))               
-                    if len(aw.qmc.timex) > 2:                           
-                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-                    else:
-                        return -1,-1 
-            else:
-                if len(aw.qmc.timex) > 2:                           
-                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-                else:
                     return -1,-1 
+            else:
+                return -1,-1 
                 
         except serial.SerialException as e:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -15021,10 +15263,7 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-            else:
-                return -1,-1
+            return -1,-1
             
         finally:
             #note: logged chars should be unicode not binary
@@ -15130,15 +15369,9 @@ class serialport(object):
                     if len(aw.qmc.errorlog) > 499:
                         aw.qmc.errorlog = aw.qmc.errorlog[1:]
                     aw.qmc.errorlog.append(timez + " " + error)                   
-                    if len(aw.qmc.timex) > 2:                           
-                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-                    else:
-                        return -1,-1 
-            else:
-                if len(aw.qmc.timex) > 2:                           
-                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-                else:
                     return -1,-1 
+            else:
+                return -1,-1 
                      
         except serial.SerialException as e:
             error  = QApplication.translate("Error Message","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8)
@@ -15147,10 +15380,7 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-            else:
-                return -1,-1
+            return -1,-1
 
         finally:
             #note: logged chars should be unicode not binary
@@ -15227,15 +15457,9 @@ class serialport(object):
                     if len(aw.qmc.errorlog) > 499:
                         aw.qmc.errorlog = aw.qmc.errorlog[1:]
                     aw.qmc.errorlog.append(timez + " " + error)
-                    if len(aw.qmc.timex) > 2:                           
-                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-                    else:
-                        return -1,-1 
-            else:
-                if len(aw.qmc.timex) > 2:                           
-                    return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-                else:
                     return -1,-1 
+            else:
+                return -1,-1 
             
         except serial.SerialException as e:
             error = QApplication.translate("Error Message","Serial Exception: ser.CENTER303temperature()",None, QApplication.UnicodeUTF8)
@@ -15244,10 +15468,7 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-            else:
-                return -1,-1
+            return -1,-1
 
         finally:
             #note: logged chars should be unicode not binary
@@ -15306,15 +15527,9 @@ class serialport(object):
                 else:
                     nbytes = len(r)
                     aw.qmc.adderror(QApplication.translate("Error Message","ser.CENTER309(): %1 bytes received but 45 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
-                    if len(aw.qmc.timex) > 2:                           
-                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-                    else:
-                        return -1,-1 
+                    return -1,-1 
             else:
-                    if len(aw.qmc.timex) > 2:                           
-                        return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-                    else:
-                        return -1,-1
+                    return -1,-1
                                 
         except serial.SerialException as e:
             error  = QApplication.translate("Error Message","Serial Exception: ser.CENTER309temperature() ",None, QApplication.UnicodeUTF8)
@@ -15323,10 +15538,7 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-            else:
-                return -1,-1
+            return -1,-1
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -15420,10 +15632,7 @@ class serialport(object):
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
 
             aw.qmc.errorlog.append(timez + " " + error)
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-            else:
-                return -1.,-1.
+            return -1.,-1.
         finally:
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
@@ -15625,10 +15834,7 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-            else:
-                return -1,-1 
+            return -1,-1 
         
         except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8)
@@ -15637,10 +15843,7 @@ class serialport(object):
             if len(aw.qmc.errorlog) > 499:
                 aw.qmc.errorlog = aw.qmc.errorlog[1:]
             aw.qmc.errorlog.append(timez + " " + error)
-            if len(aw.qmc.timex) > 2:                           
-                return aw.qmc.temp1[-1], aw.qmc.temp2[-1]       
-            else:
-                return -1,-1 
+            return -1,-1 
 
         finally:
             #note: logged chars should not be binary
@@ -17498,10 +17701,10 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]
 
             for i in range(len(aw.extraLCDlabel1)):
-                aw.extraLCDlabel1[x].setVisible(False)
-                aw.extraLCD1[x].setVisible(False)
-                aw.extraLCDlabel2[x].setVisible(False)
-                aw.extraLCD2[x].setVisible(False)
+                aw.extraLCDlabel1[i].setVisible(False)
+                aw.extraLCD1[i].setVisible(False)
+                aw.extraLCDlabel2[i].setVisible(False)
+                aw.extraLCD2[i].setVisible(False)
                 
             #delete EXTRA COMM PORTS VARIABLES
             aw.extraser = []
