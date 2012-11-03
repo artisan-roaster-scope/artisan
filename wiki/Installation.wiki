@@ -32,7 +32,7 @@ Newer OS like Windows 7 come with this file.
 _NOTE: from v0.5.0 on the Systems 10.4.x/10.5.x/10.6.x (eg. Tiger, Leopard, Snow Leopard)  on PPC and Intel machines are supported _
 
   # Install USB/serial driver
-    ** for Omega HH806AU meters download and run the [http://www.ftdichip.com/Drivers/VCP.htm FTDI VCP OS X installer]
+    ** for Omega HH806AU and HH506RA meters download and run the [http://www.ftdichip.com/Drivers/VCP.htm FTDI VCP OS X installer]
     ** for Omega HH309A meters (with USB cable) download and run the [http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx VCP OS X installer]
     ** for the original Voltkraft USB cable it is the [http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx CP210x driver from Silicon Labs]
   # Download and run the [http://code.google.com/p/artisan/downloads/list artisan OS X installer]
