@@ -16,16 +16,7 @@
 from PyQt4.QtGui import QApplication
 import platform
 
-import sys
-if sys.version < '3':
-    import codecs
-    def u(x):
-        return codecs.unicode_escape_decode(x)[0]
-else:
-    def u(x):
-        return x
-        
-platf = str(platform.system())
+platf = unicode(platform.system())
 
 #######################################################################################
 #################### MENU STRINGS  ####################################################
@@ -33,7 +24,7 @@ platf = str(platform.system())
 
 #File menu items
 FILE_MENU = QApplication.translate("Menu", "File", None, QApplication.UnicodeUTF8)
-if platf != 'Darwin':
+if platf != u'Darwin':
     FILE_MENU = "&" + FILE_MENU
 FILE_MENU_NEW = QApplication.translate("Menu", "New", None, QApplication.UnicodeUTF8)
 FILE_MENU_OPEN = QApplication.translate("Menu", "Open...", None, QApplication.UnicodeUTF8)
@@ -51,7 +42,7 @@ FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None, QApplication.
 
 #Edit menu items
 EDIT_MENU = QApplication.translate("Menu", "Edit", None, QApplication.UnicodeUTF8)
-if platf != 'Darwin':
+if platf != u'Darwin':
     EDIT_MENU = "&" + EDIT_MENU
 EDIT_MENU_CUT = QApplication.translate("Menu", "Cut", None, QApplication.UnicodeUTF8)
 EDIT_MENU_COPY = QApplication.translate("Menu", "Copy", None, QApplication.UnicodeUTF8)
@@ -59,7 +50,7 @@ EDIT_MENU_PASTE = QApplication.translate("Menu", "Paste", None, QApplication.Uni
     
 #Roast menu items
 ROAST_MENU = QApplication.translate("Menu", "Roast", None, QApplication.UnicodeUTF8)
-if platf != 'Darwin':
+if platf != u'Darwin':
     ROAST_MENU = "&" + ROAST_MENU
 ROAST_MENU_PROPERTIES = QApplication.translate("Menu", "Properties...", None, QApplication.UnicodeUTF8)
 ROAST_MENU_BACKGROUND = QApplication.translate("Menu", "Background...", None, QApplication.UnicodeUTF8)
@@ -72,7 +63,7 @@ ROAST_MENU_CELSIUS_MODE = QApplication.translate("Menu", "Celsius Mode", None, Q
 
 #Conf menu items
 CONF_MENU = QApplication.translate("Menu", "Config", None, QApplication.UnicodeUTF8)
-if platf != 'Darwin':
+if platf != u'Darwin':
     CONF_MENU = "&" + CONF_MENU
 CONF_MENU_DEVICE = QApplication.translate("Menu", "Device...", None, QApplication.UnicodeUTF8)
 CONF_MENU_SERIALPORT = QApplication.translate("Menu", "Serial Port...", None, QApplication.UnicodeUTF8)
@@ -85,15 +76,15 @@ CONF_MENU_AXES = QApplication.translate("Menu", "Axes...", None, QApplication.Un
 CONF_MENU_AUTOSAVE = QApplication.translate("Menu", "Autosave...", None, QApplication.UnicodeUTF8)
 CONF_MENU_ALARMS = QApplication.translate("Menu", "Alarms...", None, QApplication.UnicodeUTF8)
 CONF_MENU_LANGUAGE = QApplication.translate("Menu", "Language", None, QApplication.UnicodeUTF8)
-CONF_MENU_FRENCH = u("Fran\u00e7ais") # Do not translate
-CONF_MENU_ENGLISH = u("English") # Do not translate
-CONF_MENU_GERMAN = u("Deutsch")  # Do not translate
-CONF_MENU_SPANISH = u("Espa\u00f1ol") # Do not translate
-CONF_MENU_SWEDISH = u("Svenska") # Do not translate
+CONF_MENU_FRENCH = u"Français" # Do not translate
+CONF_MENU_ENGLISH = u"English" # Do not translate
+CONF_MENU_GERMAN = u"Deutsch"  # Do not translate
+CONF_MENU_SPANISH = u"Español" # Do not translate
+CONF_MENU_SWEDISH = u"Svenska" # Do not translate
 
 #Toolkit menu
 TOOLKIT_MENU = QApplication.translate("Menu", "Tools", None, QApplication.UnicodeUTF8)
-if platf != 'Darwin':
+if platf != u'Darwin':
     TOOLKIT_MENU = "&" + TOOLKIT_MENU
 TOOLKIT_MENU_DESIGNER = QApplication.translate("Menu", "Designer", None, QApplication.UnicodeUTF8)    
 TOOLKIT_MENU_CALCULATOR = QApplication.translate("Menu", "Calculator", None, QApplication.UnicodeUTF8)
@@ -103,7 +94,7 @@ TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None, QApplica
     
 #Help menu items
 HELP_MENU = QApplication.translate("Menu", "Help", None, QApplication.UnicodeUTF8)
-if platf != 'Darwin':
+if platf != u'Darwin':
     HELP_MENU = "&" + HELP_MENU
 #note that the "About" menu item is recognized only if it is named "About", but automatically translated by the Qt standard tranlators
 HELP_MENU_ABOUT = "About" #QApplication.translate("Menu", "About", None, QApplication.UnicodeUTF8)

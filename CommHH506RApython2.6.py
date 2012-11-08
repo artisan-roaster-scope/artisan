@@ -4,7 +4,7 @@
 
 # REQUIREMENTS
 # python 2.6.2: http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi
-# pyserial for python 2.6: http://sourceforge.net/projects/pyserial/files/pyserial/2.6/
+# pyserial for python 2.6: http://sourceforge.net/projects/pyserial/files/pyserial/2.5/pyserial-2.5-rc1.win32.exe/download
 # javacomm: http://www.xpl4java.org/xPL4Java/javacomm.html
 # Java JDK or JRE:  http://java.sun.com/javase/downloads/index.jsp
 
@@ -14,14 +14,15 @@ import serial
 import time
 import binascii
 
+
 def main():
     
     print "use CTRL + C to interrupt program\n"
     delay = 1           # set interval of seconds between each reading
     port = '/dev/tty.usbserial-A2001Epn'
     
-    id = HH506RAid(port,delay)
     while True:    
+        id = HH506RAid(port,delay)
         t1,t2 = HH506RAtemperature(port,delay,id)
         print "T1 = " + str(t1) + "    " + "T2 = " +str(t2) + "\n"
         time.sleep(delay)
@@ -32,10 +33,9 @@ def HH506RAid(port,delay):
         ser = serial.Serial(port, baudrate=2400, bytesize=7, parity='E', stopbits=1, timeout=1)	
         sync = None
         while sync != "Err\r\n":
-            ser.write(b"\r")
+            ser.write("\r\n")
             sync = ser.read(5)
             time.sleep(1)
-            print(sync)
         ser.write("%000R")
         id = ser.read(5)[0:3]
         ser.close()

@@ -16,17 +16,19 @@ Developers: <https://lists.mokelbu.de/listinfo/artisan-devel>
 
 FEATURES
 
-o runs on Mac OS X 10.4/10.5/10.6, PPC, Windows, and Linux
+o runs on Mac OS X 10.4/10.5/10.6/10.7/10.8 Intel/PPC, Windows, and Linux
+(on OS X 10.8 Mountain Lion you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
  - Delta DTA PID
  - Omega HH309, HH506RA, HH802U, HH806AU, HHM28
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
- - VOLTCRAFT K202, K204, 300K, 302KJ
+ - VOLTCRAFT K201, K202, K204, 300K, 302KJ
  - EXTECH 421509
  - Arduino/TC4
  - TE VA18B
  - HHM28 multimeter
+ - non-wireless Amprobe TMD-56 (same as Omega HH806AU)
  - virtual devices (symbolic devices)
  - device None (no device)
  - external program 
@@ -70,7 +72,7 @@ http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A
 If artisan starts when clicling on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything. Newer OS like Windows 7 come with this file.
 
 
-o Mac OS X (10.4.x/10.5.x/10.6x on PPC/Intel)
+o Mac OS X (>10.4.x)
 
 - Install USB/serial driver for your meter
  . for Omega meters download and run the FTDI VCP OS X installer
@@ -131,6 +133,11 @@ Artisan uses the following libraries in unmodified forms:
 
 
 VERSION HISTORY
+
+v0.5.6 (8.11.2012)
+- based on r787 (with modbus support removed)
+- added support for Voltcraft K201 and fixed CENTER 301
+- bug fixes
 
 v0.5.5 (28.9.2011)
 - fixes ArdruinoTC4 extra devices
