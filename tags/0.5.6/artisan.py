@@ -14603,7 +14603,7 @@ class serialport(object):
                     #if bit 5 of byte 3 = 0 then T2 = ###.#
                     
                     #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = binary(ord(r[2]))          #bits string order "[7][6][5][4][3][2][1][0]"
+                    b3bin = self.binary(ord(r[2]))          #bits string order "[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     bit5 = b3bin[2]
                     
@@ -14700,7 +14700,7 @@ class serialport(object):
                     #if bit 5 of byte 3 = 0 then T2 = ###.#
                     
                     #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = binary(ord(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
+                    b3bin = self.binary(ord(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     bit5 = b3bin[2]
                     
