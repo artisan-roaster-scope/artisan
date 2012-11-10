@@ -1,23 +1,40 @@
 Current Versions
-o Python 3.3a3
-o QT 4.8.1
-o Numpy 1.6.1
-o SIP 4.13.2
-o PyQt 4.9.1
+o XCode 4.5.1
+o Python 3.3
+o QT 4.8.3
+o Numpy 1.7.0b2
+o SIP 4.14.1
+o PyQt 4.9.5
+o scipy 0.11.0
 o matplotlib 1.2.0
-o scipy 0.10.1
+o modulegraph 0.10
+o distribute 0.6.29
+o altgraph 0.10
+o macholib 1.5
+o py2app 0.7
 o pyaudio
-o py2app 0.6.5
-o Mercurial 1.9.1
-o modulegraph 0.9.2
-o modbus_tk 0.4.2
+o minimalmodbus 0.4
 
 Upgrade History:
 
+- 2012-11-10:
+ . XCode => 4.5.1
+ . Python 3.3.0a3 => 3.3.0
+ . QT 4.8.1 => 4.8.3
+ . numpy 1.6.1 => 1.7.0b2
+ . SIP 4.13.3-snapshot => 4.14.1
+ . PyQt snapshot-4.9.2 => 4.9.5
+ . scipy 0.10.1 => 0.11.0
+ . modulegraph 0.8.2 => 0.10
+ . altgraph 0.10
+ . distribute 0.6.28 => 0.6.29
+ . macholib 1.5
+ . py2app 0.6.5 => 0.7
+ . minimalmodbus 0.3.2 => 0.4
+ . matplotlib 1.1.0 => 1.2.0
 - 2012-05-17: Upgrade Python/QT/PyQt/SIP
- . Python 3.3a1 => 3.3a3
+ . Python 3.3.0a1 => 3.3.0a3
  . QT 4.8.0 => 4.8.1
- . PyQt 4.9.1 => snapshot-4.9.2
  . SIP 4.13.2 => 4.13.3-snapshot
 - 2012-01-09: Upgrade Qt/PyQt/SIP
  . QT 4.7.4 => 4.8.0
@@ -63,13 +80,20 @@ sudo ln -s /usr/bin/c++-4.2 /usr/bin/c++
 sudo ln -s /usr/bin/g++-4.2 /usr/bin/g++
 
 
-Install universal binary (PPC/Intel) setup on Snow Leopard 10.6.5 (with support for 10.4.x)
 
-0) Install Python 3.2.2
+
+00) Install XCode 4.5.1
+
+
+# sudo ln -s /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer /Developer 
+
+
+
+0) Install Python 3.3.0
 
 download and install:
 
-http://www.python.org/ftp/python/3.2.2/python-3.2.2-macosx10.6.dmg
+http://www.python.org/ftp/python/3.3.0/python-3.3.0-macosx10.6.dmg
 
 set default to 64bit:
 # defaults write com.apple.versioner.python Prefer-32-Bit -bool no
@@ -78,7 +102,7 @@ set default to 64bit:
 
 download and install (only Mac OS X 10.5 - 10.6, 32-bit and 64-bit Intel!!):
 
-qt-mac-opensource-4.8.dmg (Cocoa, 64bit only)
+qt-mac-opensource-4.8.3.dmg (Cocoa, 64bit only)
 
 
 2) Install pyserial 
@@ -100,50 +124,20 @@ new to v2.6:
 3) Install Numpy
 
 
-# for XCode 4.3:
-sudo ln -s /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer /Developer 
+download source
 
-
-export CC=clang
-export CXX=clang
-export FFLAGS=-ff2c
-export LDSHARED='clang -bundle -undefined dynamic_lookup \ 
-    -arch i386 -arch x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g' 
-
-export CC=gcc-4.2
-export CXX=g++-4.2
-export FFLAGS=-ff2c
-
-# sudo vi /Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/distutils/sysconfig.py
-in "def get_config_vars(*args):"
-add after
-
-        if sys.platform == 'darwin':
-            kernel_version = os.uname()[2] # Kernel version (8.4.3)
-            major_version = int(kernel_version.split('.')[0])
-
-and before "if major_version < 8:"
-
-the following lines to get rid of all -isysroot parameters:
-
-            for key in ('LDFLAGS', 'BASECFLAGS',
-                # a number of derived variables. These need to be
-                # patched up as well.
-                'CFLAGS', 'PY_CFLAGS', 'BLDSHARED'):
-                flags = _config_vars[key]
-                flags = re.sub('-isysroot [^ \t]*', ' ', flags)
-                _config_vars[key] = flags
-
-# tar xzf numpy-1.6.1.tar.gz
-# cd numpy-1.6.1
-# ARCHFLAGS="-arch x86_64" python3 setup.py build
+# git clone https://github.com/numpy/numpy.git
+# cd numpy
+# python3 setup.py build
 # sudo python3 setup.py install
+
+worked with latest git repository version on 27.10.2012 (v1.7.0b)
 
 
 4) Install SIP
 
-# tar xzf sip-4.13.2.tar.gz
-# cd sip-4.13.2
+# tar xzf sip-4.14.1.tar.gz
+# cd sip-4.14.1
 # python3 configure.py
 # make
 # sudo make install
@@ -151,30 +145,20 @@ the following lines to get rid of all -isysroot parameters:
 
 5) Install PyQt
 
-# tar xzf PyQt-mac-gpl-4.9.1.tar.gz 
-# cd PyQt-mac-gpl-4.9.1
+# tar xzf PyQt-mac-gpl-4.9.5.tar.gz 
+# cd PyQt-mac-gpl-4.9.5
 # python3 configure.py
 # make
 # sudo make install
 
 
-6) scipy-0.10.1
+6) scipy-0.11.0
 
-Best install binary from http://sourceforge.net/projects/scipy/files/scipy/0.9.0/scipy-0.9.0-py2.7-python.org-macosx10.6.dmg
 
-install gfortran (GNU Fortran) gcc-42-5666.3-darwin11.pkg from http://r.research.att.com/tools/gcc-42-5666.3-darwin11.pkg for XCode 4.2 and higher
-
-# sudo ln -s /usr/bin/gfortran-4.2 /usr/bin/gfortran
-
-# export CC=gcc-4.2
-# export CXX=g++-4.2
-# export FFLAGS=-ff2c
-
-# tar xzf scipy-0.10.1.tar.gz
-# cd scipy-0.10.1
-# ARCHFLAGS="-arch x86_64" python3 setup.py build
-# python3 setup.py install
-
+# tar xzf scipy-0.11.0.tar.gz
+# cd scipy-0.11.0
+# python3 setup.py build
+# sudo python3 setup.py install
 
 
 check installation:
@@ -188,31 +172,16 @@ check installation:
 
 7) Install matplotlib
 
-% ensure proper gcc (not llvm-gcc-4.2!)
-# cd /usr/bin
-# rm gcc
-# sudo ln -s gcc-4.2 gcc
+download matplotlib-1.2.0.tar.gz
 
-# mkdir ~/Desktop/mpl
-# cd matplotlib-1.1.0
+# tar -xzf matplotlib-1.2.0.tar.gz
+# cd matplotlib-1.2.0
+# python3 setup.py build
+# sudo python3 setup.py install
 
-patch make.osx
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/matplotlib/mpl-data/sample_data
 
-# vi make.osx
-remove -isysroot ..  (one occurence)
-
-replace the following part with to fit to the new urllib modules:
-
-fetch:
-	${PYTHON} -c 'import urllib; import urllib.request; urllib.request.urlretrieve("${ZLIBURL}", "${ZLIBFILE}")' &&\
-	${PYTHON} -c 'import urllib; import urllib.request; urllib.request.urlretrieve("${PNGURL}", "${PNGFILE}")' &&\
-	${PYTHON} -c 'import urllib; import urllib.request; urllib.request.urlretrieve("${FREETYPEURL}", "${FREETYPEFILE}")'
-	
-
-make the package:
-
-# sudo make -f make.osx PREFIX=/usr/local/src/mpl PYVERSION=3.2 clean fetch deps mpl_install_std
-
+---
 
 
 check installation:
@@ -220,29 +189,59 @@ check installation:
 # python3
 >> import matplotlib
 >> matplotlib.__version__
-'1.2.x'
+'1.3.x'
 
 
 8) Install modulegraph
 
 
-fetch modulegraph 0.9.1 from
+fetch modulegraph 0.10 from
 http://pypi.python.org/pypi/modulegraph/#downloads
-# cd modulegraph-0.9.1
+# cd modulegraph-0.10
 # python3 setup.py build
-# python3 setup.py install
+# sudo python3 setup.py install
+
+alt
+
+# mkdir modulegraph-0.10
+# cd modulegraph-0.10
+# hg clone https://bitbucket.org/ronaldoussoren/modulegraph
+# cd modulegraph
+# python3 setup.py build
+# sudo python3 setup.py install
+
+9) Install distribute 0.6.29
+
+http://pypi.python.org/packages/source/d/distribute/distribute-0.6.29.tar.gz
+
+# curl -O http://pypi.python.org/packages/source/d/distribute/distribute-0.6.29.tar.gz
+# tar -xzvf distribute-0.6.29.tar.gz
+# cd distribute-0.6.29
+# python3 setup.py build
+# sudo python3 setup.py install
 
 
-9) Install distribute 0.6.25
+10) Install altgraph
 
-http://pypi.python.org/packages/source/d/distribute/distribute-0.6.25.tar.gz#md5=a690874b9964d958a3200485eb827b1d
+# mkdir altgraph-0.10
+# cd altgraph-0.10
+# hg clone https://bitbucket.org/ronaldoussoren/altgraph
+# cd altgraph
+# python3 setup.py build
+# sudo python3 setup.py install
 
-# curl -O http://pypi.python.org/packages/source/d/distribute/distribute-0.6.25.tar.gz
-# tar -xzvf distribute-0.6.25.tar.gz
-# cd distribute-0.6.25
-# sudo python setup.py install
 
-10) py2app (0.6.5 from source)
+11) Install macholib
+
+# mkdir macholib-1.5
+# cd macholib-1.5
+# hg clone https://bitbucket.org/ronaldoussoren/macholib
+# cd macholib
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+12) py2app (0.7.1 from source)
 
 # hg clone https://bitbucket.org/ronaldoussoren/py2app
 # cd py2app
@@ -250,40 +249,48 @@ http://pypi.python.org/packages/source/d/distribute/distribute-0.6.25.tar.gz#md5
 # sudo python3 setup.py install
 
 
-# cp artisan.py artisan.python2
-# 2to3 -w artisan.py
-RefactoringTool: Line 1062: You should use a for loop here
-RefactoringTool: Line 1063: You should use a for loop here
+13) PortAudio
+
+# mkdir PortAudio-19
+# cd PortAudio-19
+# curl -O http://www.portaudio.com/archives/pa_stable_v19_20111121.tgz
+# tar -xzf pa_stable_v19_20111121.tgz
+# cd portaudio
+# ./configure 
+
+# vi Makefile
+all: lib/$(PALIB) all-recursive test examples selftests
+=>
+all: lib/$(PALIB) all-recursive examples selftests
+
+# make 
+# sudo make install
 
 
-11) pyaudio
+14) pyaudio
 
-http://people.csail.mit.edu/hubert/pyaudio/
+# mkdir pyaudio-0.2.7
+# cd pyaudio-0.2.7
+# git clone https://github.com/bastibe/PyAudio.git
+# cd PyAudio
 
-download pyaudio for Mac OS X
-http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.4.dmg
+# cp ../../portaudio/include/pa_mac_core.h src/
+# cp ../../portaudio/include/portaudio.h src/ 
 
+# vi src/pa_mac_core.h
+-#include <AudioUnit/AudioUnit.h>
+-//#include <AudioToolbox/AudioToolbox.h>
++#include <CoreAudio/CoreAudio.h>
 
-
-12) minimalmodbus
-
-downlaod from http://pypi.python.org/pypi/MinimalModbus/
-
-# tar -xzf MinimalModbus-0.3.2.tar.gz
-# cd MinimalModbus-0.3.2
-# sudo python3.2 setup.py install
-
-
-
-14) uprefix to be able to read in u"" string syntax from roasting profiles
-
-# hg clone https://bitbucket.org/vinay.sajip/uprefix
-# cd uprefix
 # python3 setup.py build
 # sudo python3 setup.py install
 
 
-=====
-Issues
-o profiles with u'' syntax don't load in Python 3.2, but Python 3.3
-o numpy, scipy and PyQt do not build on Python 3.3
+15) minimalmodbus (v0.4)
+
+downlaod from http://pypi.python.org/pypi/MinimalModbus/
+
+# tar -xzf MinimalModbus-0.4.tar.gz
+# cd MinimalModbus-0.4
+# python3 setup.py build
+# sudo python3 setup.py install

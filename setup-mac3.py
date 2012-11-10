@@ -5,6 +5,9 @@ Usage:
     python setup.py py2app
 """
 
+# manually remove sample-data mpl subdirectory from Python installation:
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/matplotlib/mpl-data/sample_data
+
 from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
 def my_parse_makefile(filename, g):
@@ -46,11 +49,12 @@ OPTIONS = {
     'argv_emulation': False,
     'semi_standalone': False,
     'site_packages': True,
-    'packages': [],
+    'packages': ['matplotlib'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
+    'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'
     'includes': ['serial',
                  'PyQt4',
                  'PyQt4.QtCore',
@@ -145,6 +149,9 @@ for root, dirs, files in os.walk('.'):
             print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif file.endswith('.cc'):
+            print('Deleting', file)
+            os.remove(os.path.join(root,file))
+        elif file.endswith('.afm'):
             print('Deleting', file)
             os.remove(os.path.join(root,file))
             
