@@ -366,8 +366,9 @@ class tgraphcanvas(FigureCanvas):
                        "-DTAtemperature",       #26   
                        "Program",               #27
                        "+ArduinoTC4_XX",        #28
-                       "MODBUS",                 #29
-                       "-Omega HH806W"           #30 NOT WORKING 
+                       "MODBUS",                #29
+                       "VOLTCRAFT K201",        #30
+                       "-Omega HH806W"          #31 NOT WORKING 
                        ]
 
         #extra devices
@@ -743,6 +744,7 @@ class tgraphcanvas(FigureCanvas):
     #################################    FUNCTIONS    ###################################
     #####################################################################################
         
+        
     def onclick(self,event):
         if event.button==3 and event.inaxes and not self.designerflag:
             timex = self.time2index(event.xdata)
@@ -1093,7 +1095,7 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(len(Yval)):
                         mathdictionary["Y"+ Yval[i]] = 0                    
                             
-            return eval(mathexpression,{"__builtins__":None},mathdictionary)
+            return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
             
         except Exception as e:
             self.adderror(QApplication.translate("Error Message", "Exception: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
@@ -1245,7 +1247,8 @@ class tgraphcanvas(FigureCanvas):
         aw.button_7.setDisabled(False)
         aw.button_8.setDisabled(False)
         aw.button_9.setDisabled(False)
-        aw.button_19.setDisabled(False)        
+        aw.button_19.setDisabled(False) 
+        aw.button_20.setDisabled(False)         
         aw.button_3.setFlat(False)
         aw.button_4.setFlat(False)
         aw.button_5.setFlat(False)
@@ -1254,6 +1257,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_8.setFlat(False)
         aw.button_9.setFlat(False)
         aw.button_19.setFlat(False)
+        aw.button_20.setFlat(False)
         aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) 
         aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
         aw.button_2.setText(QApplication.translate("Scope Button", "START",None, QApplication.UnicodeUTF8)) 
@@ -2332,7 +2336,7 @@ class tgraphcanvas(FigureCanvas):
             
             self.threadserver.createSampleThread()
             
-            aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message Area","Scope monitoring...", None, QApplication.UnicodeUTF8))
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
             aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
             
@@ -2433,6 +2437,8 @@ class tgraphcanvas(FigureCanvas):
 
                 aw.soundpop()
                 #anotate(value,xy=arrowtip-coordinates, xytext=text-coordinates, color, type)
+                d = aw.qmc.ylimit - aw.qmc.ylimit_min
+                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[0]],d)
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
                                  xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]] +  self.ystep_down),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -2489,7 +2495,8 @@ class tgraphcanvas(FigureCanvas):
                 #calculate time elapsed since charge time
                 st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]))
                 #anotate temperature
-                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]])
+                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
                                  xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]+self.ystep_up), color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -2522,6 +2529,68 @@ class tgraphcanvas(FigureCanvas):
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)            
 
+    def markCoolEnd(self):
+        try:
+            if self.flagon:
+                #prevents accidentally deleting a modified profile. 
+                self.safesaveflag = True
+                
+                self.samplingsemaphore.acquire(1)
+
+                if self.device != 18:
+                    self.timeindex[7] = len(self.timex)-1
+                else:
+                    tx = self.timeclock.elapsed()/1000.
+                    et,bt = aw.ser.NONE()
+                    if et != -1 and bt != -1:
+                        self.drawmanual(et,bt,tx)
+                        self.timeindex[7] = len(self.timex)-1
+                    else:
+                        return
+                    
+                if aw.qmc.phasesbuttonflag:     
+                    self.phases[1] = int(round(self.temp2[self.timeindex[7]]))                
+
+                aw.button_20.setDisabled(True)
+                aw.button_20.setFlat(True)
+
+                #calculate time elapsed since charge time
+                st1 = QApplication.translate("Scope Annotation","CE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]]))
+                #anotate temperature
+                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
+                self.ax.annotate("%.1f"%(self.temp2[self.timeindex[7]]), xy=(self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]]),
+                                 xytext=(self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]]+self.ystep_up), color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+                #anotate time
+                self.ax.annotate(st1, xy=(self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]]),
+                                 xytext=(self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]]-self.ystep_down),color=self.palette["text"],
+                                 arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+                self.fig.canvas.draw()
+
+                st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
+                st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
+
+                self.samplingsemaphore.release(1)
+                
+                message = QApplication.translate("Message Area","[COOL END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                #set message at bottom
+                aw.sendmessage(message)
+                
+                aw.soundpop()
+                
+            else:
+                message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
+                aw.sendmessage(message)
+
+        except Exception as e:
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markCoolEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)  
+
     #redord 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
         try:
@@ -2551,11 +2620,12 @@ class tgraphcanvas(FigureCanvas):
 
                 #calculate time elapsed since charge time
                 st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
-                #anotate temperature
+                d = aw.qmc.ylimit - aw.qmc.ylimit_min 
                 if self.timeindex[1]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
                 else:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]])                
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)                
+                #anotate temperature
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
                                  xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]+ self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -2612,8 +2682,9 @@ class tgraphcanvas(FigureCanvas):
 
                 #calculate time elapsed since charge time
                 st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
+                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                 #anotate temperature
-                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]])
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
                                  xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]+self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -2669,10 +2740,11 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_5.setFlat(True)
 
                 st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
+                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                 if self.timeindex[3]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
                 else:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]])            
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]],d)            
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
                                  xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]+self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -2728,8 +2800,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_6.setFlat(True)
 
                 st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
+                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                 #anotate temperature
-                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]])
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
                                  xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]+self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -2788,18 +2861,19 @@ class tgraphcanvas(FigureCanvas):
                 aw.button_9.setFlat(True)
 
                 st1 = QApplication.translate("Scope Annotation","End %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
-                #anotate temperature
+                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                 if self.timeindex[5]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
                 elif self.timeindex[4]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]],d)
                 elif self.timeindex[3]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]],d)
                 elif self.timeindex[2]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
                 elif self.timeindex[1]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]])
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
                                 
+                #anotate temperature
                 self.ax.annotate("%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
                                  xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]+self.ystep_up),color=self.palette["text"],
                                  arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
@@ -3475,11 +3549,13 @@ class tgraphcanvas(FigureCanvas):
                 self.timeindexB[i] = 0
 
     #adds errors
-    def adderror(self,error):
+    def adderror(self,error,line=None):
         timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
         #keep a max of 500 errors
         if len(self.errorlog) > 499:
             self.errorlog = self.errorlog[1:]
+        if line:
+            error = error + "@line " + str(line)
         self.errorlog.append(timez + " " + error)
         aw.sendmessage(error)
 
@@ -4638,9 +4714,7 @@ class SampleThread(QThread):
                                     aw.qmc.extratemp2[i][-1] = float(extrat2)
                                 else:
                                     aw.qmc.extratemp2[i].append(float(extrat2))
-                                if len(aw.qmc.extratimex[i]) > 0:
-                                    aw.qmc.extratimex[i][-1] = extratx
-                                else:
+                                if len(aw.qmc.extratimex[i]) <= 0:
                                     aw.qmc.extratimex[i].append(extratx)
 
                     #ERROR FOUND
@@ -4666,14 +4740,7 @@ class SampleThread(QThread):
 
 
                 #read time, ET (t1) and BT (t2) TEMPERATURE
-                tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
-                               
-                if t1 == -1:
-                    if len(aw.qmc.temp1) > 0:
-                        t1 = aw.qmc.temp1[-1]
-                if t2 == -1:
-                    if len(aw.qmc.temp2) > 0:
-                        t2 = aw.qmc.temp2[-1]
+                tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device                               
                                     
                 length_of_qmc_timex = len(aw.qmc.timex)
                 
@@ -4688,25 +4755,27 @@ class SampleThread(QThread):
                 else:
                     limit = 800.
                 if  t1 < 1. or t1 > limit:
-                    if length_of_qmc_timex > 2:
+                    if len(aw.qmc.temp1) > 0:
                         t1 = aw.qmc.temp1[-1]
                     else:
                         t1 = -1.
                 if t2 < 1. or t2 > limit:
-                    if length_of_qmc_timex > 2:
+                    if len(aw.qmc.temp2) > 0:
                         t2 = aw.qmc.temp2[-1]
                     else:
                         t2 = -1.       
-                                               
-                                               
+                                                                                              
+                t1_final = t1
+                t2_final = t2        
+                 
                 #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
                 #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
-                t1_final = t1
-                t2_final = t2         
-                if len(aw.qmc.timex) > 2 and t1 == aw.qmc.temp2[-1] and t2 == aw.qmc.temp1[-1]:
-                    #let's better swap the readings (also they are just repeating the previous ones)  
-                    t1_final = t2
-                    t1_final = t1
+                #if len(aw.qmc.timex) > 2 and t1 == aw.qmc.temp2[-1] and t2 == aw.qmc.temp1[-1]:
+                #    #let's better swap the readings (also they are just repeating the previous ones)  
+                #    t1_final = t2
+                #    t1_final = t1
+                # ML 3.11.2012: deactivated as this should not occur anymore
+                    
                 if aw.qmc.flagstart:
                     aw.qmc.temp2.append(t2_final)
                     aw.qmc.temp1.append(t1_final)
@@ -4725,9 +4794,7 @@ class SampleThread(QThread):
                     aw.qmc.timex.append(tx)
                     length_of_qmc_timex += 1
                 else:
-                    if length_of_qmc_timex > 0:
-                        aw.qmc.timex[-1] = tx
-                    else:
+                    if length_of_qmc_timex <= 0:
                         aw.qmc.timex.append(tx)
                         length_of_qmc_timex += 1
 
@@ -4793,8 +4860,7 @@ class SampleThread(QThread):
                         aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
                     if aw.qmc.DeltaBTflag:
                         aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
-
-                if aw.qmc.flagstart:                
+               
                     #readjust xlimit of plot if needed
                     if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
                         aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
@@ -4861,8 +4927,9 @@ class SampleThread(QThread):
                 aw.qmc.samplingsemaphore.release(1)
                 
             aw.qmc.flagon = False
-            aw.qmc.flagstart = False            
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            aw.qmc.flagstart = False      
+            exc_type, exc_obj, exc_tb = sys.exc_info()      
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         finally:
@@ -5364,6 +5431,7 @@ class ApplicationWindow(QMainWindow):
                                  "START":"QPushButton {font-size: 16pt; font-weight: bold; color: yellow; background-color: red}",
                                  "OFF":"QPushButton {font-size: 16pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
                                  "ON":"QPushButton {font-size: 16pt; font-weight: bold; color: yellow; background-color: red }",
+                                 "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
                                  "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
                                  "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",                                 
                                  "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
@@ -5533,6 +5601,14 @@ class ApplicationWindow(QMainWindow):
         self.button_19.setMinimumHeight(50)
         self.button_19.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Dry phase (DRYEND)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_19, SIGNAL("clicked()"), self.qmc.markDryEnd)
+
+        #create COOLe button
+        self.button_20 = QPushButton(QApplication.translate("Scope Button", "COOL\nEND", None, QApplication.UnicodeUTF8))
+        self.button_20.setFocusPolicy(Qt.NoFocus)
+        self.button_20.setStyleSheet(self.pushbuttonstyles["COOL END"])        
+        self.button_20.setMinimumHeight(50)
+        self.button_20.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Cool phase (COOLEND)", None, QApplication.UnicodeUTF8))
+        self.connect(self.button_20, SIGNAL("clicked()"), self.qmc.markCoolEnd)
  
         #connect PID sv easy buttons
         self.connect(self.button_12, SIGNAL("clicked()"),lambda x=5: self.fujipid.adjustsv(x))
@@ -5726,7 +5802,7 @@ class ApplicationWindow(QMainWindow):
 
         #### CUSTOM events buttons
         self.buttonlist = []
-        self.buttonlistmaxlen = 10
+        self.buttonlistmaxlen = 11
         #10 palettes of buttons
         self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]]
         self.buttonpalettemaxlen = [0]*10  #keeps max len of each palette
@@ -5744,6 +5820,7 @@ class ApplicationWindow(QMainWindow):
         self.lowerbuttondialog.addButton(self.button_5,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_6,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_9,QDialogButtonBox.ActionRole)
+        self.lowerbuttondialog.addButton(self.button_20,QDialogButtonBox.ActionRole)
         self.lowerbuttondialog.addButton(self.button_11,QDialogButtonBox.ActionRole)
 
         self.e1buttondialog = QDialogButtonBox(Qt.Horizontal)
@@ -6173,6 +6250,7 @@ class ApplicationWindow(QMainWindow):
                     self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])              
                 self.button_8.setStyleSheet(self.pushbuttonstyles["CHARGE"])
                 self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
+                self.button_20.setStyleSheet(self.pushbuttonstyles["COOL END"])
                 self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
                 self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
                 self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
@@ -6201,7 +6279,7 @@ class ApplicationWindow(QMainWindow):
                     
             #command left-right: moves button          
             else:
-                # self.button_1 = ON, self.button_8 = CHARGE, self.button_19 = DRYEND, self.button_3 = FC START, self.button_4 = FC END,
+                # self.button_1 = ON, self.button_8 = CHARGE, self.button_19 = DRYEND, self.button_20 = COOLEND, self.button_3 = FC START, self.button_4 = FC END,
                 # self.button_5 = SC START, self.button_6 = SC END, self.button_9 = DROP,self.button_11 = EVENT,
                 # self.button_7 = RESET, self.button_18 = HUD
                 
@@ -6316,28 +6394,37 @@ class ApplicationWindow(QMainWindow):
                 #location in button DROP    
                 elif self.keyboardmoveindex == 9:
                     if kcommand == "right":
+                        self.button_20.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.keyboardmoveindex = 10
+                    elif kcommand == "left":
+                        self.button_6.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.keyboardmoveindex = 8                        
+                    self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
+                    
+                #location in button COOLe    
+                elif self.keyboardmoveindex == 10:
+                    if kcommand == "right":
                         if self.eventsbuttonflag:
                             self.button_11.setStyleSheet(self.pushbuttonstyles["SELECTED"])
-                            self.keyboardmoveindex = 10                            
+                            self.keyboardmoveindex = 11                            
                         else:
                             self.button_7.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                             self.keyboardmoveindex = 0
                     elif kcommand == "left":
-                        self.button_6.setStyleSheet(self.pushbuttonstyles["SELECTED"])
-                        self.keyboardmoveindex = 8
-                        
-                    self.button_9.setStyleSheet(self.pushbuttonstyles["DROP"])
+                        self.button_9.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.keyboardmoveindex = 10
+                    self.button_20.setStyleSheet(self.pushbuttonstyles["COOL END"])                    
                     
                 #location in button EVENT    
-                elif self.keyboardmoveindex == 10:
+                elif self.keyboardmoveindex == 11:
                     if kcommand == "right":
                             self.button_7.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                             self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
                             self.keyboardmoveindex = 0                            
                     if kcommand == "left":
-                        self.button_9.setStyleSheet(self.pushbuttonstyles["SELECTED"])
+                        self.button_20.setStyleSheet(self.pushbuttonstyles["SELECTED"])
                         self.button_11.setStyleSheet(self.pushbuttonstyles["EVENT"])
-                        self.keyboardmoveindex = 9
+                        self.keyboardmoveindex = 10
 
                             
     #sound feedback when pressing a push button
@@ -6834,6 +6921,9 @@ class ApplicationWindow(QMainWindow):
         DROP = self.qmc.stringtoseconds(header[9].split('DROP:')[1])           
         if DROP > 0:
             self.qmc.timeindex[6] = self.time2index(DROP)
+        COOL = self.qmc.stringtoseconds(header[10].split('COOL:')[1])           
+        if COOL > 0:
+            self.qmc.timeindex[7] = self.time2index(COOL)
         self.qmc.endofx = self.qmc.timex[-1]
         self.sendmessage(QApplication.translate("Message Area","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
         self.qmc.redraw()
@@ -6934,6 +7024,10 @@ class ApplicationWindow(QMainWindow):
                 DROP = self.qmc.timex[self.qmc.timeindex[6]]
             else:
                 DROP = 0
+            if self.qmc.timeindex[7]:
+                COOL = self.qmc.timex[self.qmc.timeindex[7]]
+            else:
+                COOL = 0
             events = [     
                 [CHARGE,"Charge",False],
                 [TP,"TP",False],      
@@ -6943,6 +7037,7 @@ class ApplicationWindow(QMainWindow):
                 [SCs,"SCs",False],
                 [SCe,"SCe",False],
                 [DROP, "Drop",False],
+                [COOL, "COOL",False],
                 ]
                 
             import csv
@@ -6958,7 +7053,8 @@ class ApplicationWindow(QMainWindow):
                 "FCe:" + self.eventtime2string(FCe),
                 "SCs:" + self.eventtime2string(SCs),
                 "SCe:" + self.eventtime2string(SCe),
-                "DROP:" + self.eventtime2string(DROP)])     
+                "DROP:" + self.eventtime2string(DROP),
+                "COOL:" + self.eventtime2string(COOL)])     
             writer.writerow(['Time1','Time2','BT','ET','Event'] + reduce(lambda x,y: x + [str(y[0]),str(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))
                 
             last_time = None
@@ -10225,9 +10321,11 @@ class editGraphDlg(QDialog):
 
         #MARKERS
         chargelabel  = QLabel("<b>" + QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8) + "</b>")
+        chargelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         chargelabel.setStyleSheet("background-color:'#f07800';")
 
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
+        self.chargeedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.chargeeditcopy = aw.qmc.stringfromseconds(0)
         self.chargeedit.setValidator(QRegExpValidator(regextime,self))
         self.chargeedit.setMaximumWidth(50)
@@ -10257,6 +10355,7 @@ class editGraphDlg(QDialog):
         self.chargeestimate.setMinimumWidth(50)
 
         drylabel  = QLabel("<b>" + QApplication.translate("Label", "DRY END",None, QApplication.UnicodeUTF8) + "</b>")
+        drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
         
         if aw.qmc.timeindex[1]:
@@ -10264,6 +10363,7 @@ class editGraphDlg(QDialog):
         else:
             t2 = 0
         self.dryedit = QLineEdit(aw.qmc.stringfromseconds(t2))
+        self.dryedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dryeditcopy = aw.qmc.stringfromseconds(t2)
         self.dryedit.setValidator(QRegExpValidator(regextime,self))
         self.dryedit.setMaximumWidth(50)
@@ -10271,12 +10371,14 @@ class editGraphDlg(QDialog):
         drylabel.setBuddy(self.dryedit)
  
         Cstartlabel = QLabel("<b>" + QApplication.translate("Label","FC START",None, QApplication.UnicodeUTF8) + "</b>")
+        Cstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[2]:
             t3 = int(aw.qmc.timex[aw.qmc.timeindex[2]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t3 = 0
         self.Cstartedit = QLineEdit(aw.qmc.stringfromseconds(t3))
+        self.Cstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cstarteditcopy = aw.qmc.stringfromseconds(t3)
         self.Cstartedit.setValidator(QRegExpValidator(regextime,self))
         self.Cstartedit.setMaximumWidth(50)
@@ -10284,12 +10386,14 @@ class editGraphDlg(QDialog):
         Cstartlabel.setBuddy(self.Cstartedit)
         
         Cendlabel = QLabel("<b>" + QApplication.translate("Label","FC END",None, QApplication.UnicodeUTF8) + "</b>")
+        Cendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[3]:
             t4 = int(aw.qmc.timex[aw.qmc.timeindex[3]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t4 = 0
         self.Cendedit = QLineEdit(aw.qmc.stringfromseconds(t4))
+        self.Cendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.Cendeditcopy = aw.qmc.stringfromseconds(t4)
         self.Cendedit.setValidator(QRegExpValidator(regextime,self))
         self.Cendedit.setMaximumWidth(50)
@@ -10297,12 +10401,14 @@ class editGraphDlg(QDialog):
         Cendlabel.setBuddy(self.Cendedit)
    
         CCstartlabel = QLabel("<b>" + QApplication.translate("Label","SC START",None, QApplication.UnicodeUTF8) + "</b>")
+        CCstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[4]:
             t5 = int(aw.qmc.timex[aw.qmc.timeindex[4]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t5 = 0
         self.CCstartedit = QLineEdit(aw.qmc.stringfromseconds(t5))
+        self.CCstartedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCstarteditcopy = aw.qmc.stringfromseconds(t5)
         self.CCstartedit.setValidator(QRegExpValidator(regextime,self))
         self.CCstartedit.setMaximumWidth(50)
@@ -10310,12 +10416,14 @@ class editGraphDlg(QDialog):
         CCstartlabel.setBuddy(self.CCstartedit)
 
         CCendlabel = QLabel("<b>" + QApplication.translate("Label","SC END",None, QApplication.UnicodeUTF8) + "</b>")
+        CCendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[5]:
             t6 = int(aw.qmc.timex[aw.qmc.timeindex[5]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t6 = 0
         self.CCendedit = QLineEdit(aw.qmc.stringfromseconds(t6))
+        self.CCendedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.CCendeditcopy = aw.qmc.stringfromseconds(t6)
         self.CCendedit.setValidator(QRegExpValidator(regextime,self))
         self.CCendedit.setMaximumWidth(50)
@@ -10324,11 +10432,13 @@ class editGraphDlg(QDialog):
         
         droplabel = QLabel("<b>" + QApplication.translate("Label", "DROP",None, QApplication.UnicodeUTF8) + "</b>")
         droplabel.setStyleSheet("background-color:'#f07800';")
+        droplabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         if aw.qmc.timeindex[6]:
             t7 = int(aw.qmc.timex[aw.qmc.timeindex[6]]-aw.qmc.timex[aw.qmc.timeindex[0]])
         else:
             t7 = 0
         self.dropedit = QLineEdit(aw.qmc.stringfromseconds(t7))
+        self.dropedit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.dropeditcopy = aw.qmc.stringfromseconds(t7)
         self.dropedit.setValidator(QRegExpValidator(regextime,self))
         self.dropedit.setMaximumWidth(50)
@@ -10338,6 +10448,21 @@ class editGraphDlg(QDialog):
         self.dropestimate = QLabel(drop_str)
         self.dropestimate.setMaximumWidth(50)
         self.dropestimate.setMinimumWidth(50)
+        
+        coollabel = QLabel("<b>" + QApplication.translate("Label", "COOL",None, QApplication.UnicodeUTF8) + "</b>")
+        coollabel.setStyleSheet("background-color:'#f07800';")
+        coollabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        if aw.qmc.timeindex[7]:
+            t8 = int(aw.qmc.timex[aw.qmc.timeindex[7]]-aw.qmc.timex[aw.qmc.timeindex[0]])
+        else:
+            t8 = 0
+        self.cooledit = QLineEdit(aw.qmc.stringfromseconds(t8))
+        self.cooledit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.cooleditcopy = aw.qmc.stringfromseconds(t8)
+        self.cooledit.setValidator(QRegExpValidator(regextime,self))
+        self.cooledit.setMaximumWidth(50)
+        self.cooledit.setMinimumWidth(50)
+        coollabel.setBuddy(self.cooledit)
 
         self.roastproperties = QCheckBox(QApplication.translate("CheckBox","Delete Roast properties on Reset", None, QApplication.UnicodeUTF8))
         if aw.qmc.roastpropertiesflag:
@@ -10623,13 +10748,15 @@ class editGraphDlg(QDialog):
         timeLayout.addWidget(CCstartlabel,0,4)
         timeLayout.addWidget(CCendlabel,0,5)
         timeLayout.addWidget(droplabel,0,6)
-        timeLayout.addWidget(self.chargeedit,1,0)
-        timeLayout.addWidget(self.dryedit,1,1)
-        timeLayout.addWidget(self.Cstartedit,1,2)
-        timeLayout.addWidget(self.Cendedit,1,3)
-        timeLayout.addWidget(self.CCstartedit,1,4)
-        timeLayout.addWidget(self.CCendedit,1,5)
-        timeLayout.addWidget(self.dropedit,1,6)
+        timeLayout.addWidget(coollabel,0,7)
+        timeLayout.addWidget(self.chargeedit,1,0,Qt.AlignHCenter)
+        timeLayout.addWidget(self.dryedit,1,1,Qt.AlignHCenter)
+        timeLayout.addWidget(self.Cstartedit,1,2,Qt.AlignHCenter)
+        timeLayout.addWidget(self.Cendedit,1,3,Qt.AlignHCenter)
+        timeLayout.addWidget(self.CCstartedit,1,4,Qt.AlignHCenter)
+        timeLayout.addWidget(self.CCendedit,1,5,Qt.AlignHCenter)
+        timeLayout.addWidget(self.dropedit,1,6,Qt.AlignHCenter)
+        timeLayout.addWidget(self.cooledit,1,7,Qt.AlignHCenter)
         if charge_str != "" or drop_str != "":
             timeLayout.addWidget(self.chargeestimate,2,0)
             timeLayout.addWidget(self.dropestimate,2,6)
@@ -10913,6 +11040,10 @@ class editGraphDlg(QDialog):
                 elif i == aw.qmc.timeindex[6]:
                     Rtime.setBackgroundColor(QColor('#f07800'))
                     text = QApplication.translate("Table", "%1 END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
+                    Rtime.setText(text)
+                elif i == aw.qmc.timeindex[7]:
+                    Rtime.setBackgroundColor(QColor('orange'))
+                    text = QApplication.translate("Table", "%1 COOL",None, QApplication.UnicodeUTF8).arg(Rtime.text())
                     Rtime.setText(text)
                     
             if i in aw.qmc.specialevents:
@@ -12769,7 +12900,7 @@ class EventsDlg(QDialog):
         aw.extraeventbuttoncolor = ["blue"]*51
         aw.extraeventbuttontextcolor = ["yellow"]*51
         
-        aw.buttonlistmaxlen = 12
+        aw.buttonlistmaxlen = 13
         aw.realignbuttons()
         self.colorizebuttons(pattern = 177) #change colors
 
@@ -14599,6 +14730,7 @@ class serialport(object):
                                    self.callprogram,        #27
                                    self.ARDUINOTC4_34,      #28
                                    self.MODBUS,             #39
+                                   self.VOLTCRAFTK201,      #31
                                    self.HH806W              #30
                                    ]
 
@@ -14934,7 +15066,7 @@ class serialport(object):
 
     def CENTER302(self):
 
-         t2,t1 = self.CENTER303temperature()
+         t2,t1 = self.CENTER302temperature()
          tx = aw.qmc.timeclock.elapsed()/1000.
 
          return tx,t2,t1  
@@ -14948,7 +15080,7 @@ class serialport(object):
 
     def CENTER300(self):
 
-         t2,t1 = self.CENTER303temperature()
+         t2,t1 = self.CENTER302temperature()
          tx = aw.qmc.timeclock.elapsed()/1000.
 
          return tx,t2,t1  
@@ -14965,6 +15097,13 @@ class serialport(object):
          #return saved readings collected at self.CENTER309temperature()
          return aw.qmc.extra309TX,aw.qmc.extra309T3,aw.qmc.extra309T4 
 
+    def VOLTCRAFTK201(self):
+
+         t2,t1 = self.CENTER302temperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1
+         
     def VOLTCRAFTK202(self):
 
          t2,t1 = self.CENTER306temperature()
@@ -14974,7 +15113,7 @@ class serialport(object):
         
     def VOLTCRAFT300K(self):
         
-         t2,t1 = self.CENTER303temperature()
+         t2,t1 = self.CENTER302temperature()
          tx = aw.qmc.timeclock.elapsed()/1000.
          
          return tx,t2,t1
@@ -15061,13 +15200,9 @@ class serialport(object):
                 self.SP.open()
                
         except serial.SerialException as e:
-            self.SP.close()
-            error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
-            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            self.SP.close()            
+            error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)             
+            aw.qmc.adderror(error)        
 
     #loads configuration to ports
     def confport(self):        
@@ -15085,7 +15220,10 @@ class serialport(object):
         try:        
            self.closeport() 
         except serial.SerialException as e:
-            pass        
+            pass      
+              
+    def binary(self, n, digits=8):
+        return "{0:0>{1}}".format(bin(n)[2:], digits)
 
      #t2 and t1 from Omega HH806 or HH802 meter 
     def HH806AUtemperature(self):
@@ -15314,7 +15452,7 @@ class serialport(object):
             
     def CENTER306temperature(self):
         try:
-            command = "\x41"                 
+            command = str2cmd("\x41")                 
             r = ""
 
             if not self.SP.isOpen():
@@ -15335,23 +15473,15 @@ class serialport(object):
                     #if bit 5 of byte 3 = 0 then T2 = ###.#
                     
                     #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = bin(ord(r[2]))[2:]          #bits string order "[7][6][5][4][3][2][1][0]"
+                    b3bin = self.binary(ord(r[2]))          #bits string order "[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     bit5 = b3bin[2]
                     
                     #extract T1
-                    B34 = binascii.hexlify(r[3]+r[4])
-                    if B34[0].isdigit():
-                        T1 = float(B34)
-                    else:
-                        T1 = float(B34[1:])
-                        
+                    T1 = float(hex2int(r[3],r[4]))
+                                            
                     #extract T2
-                    B78 = binascii.hexlify(r[7]+r[8])
-                    if B78[0].isdigit():
-                        T2 = float(B78)
-                    else:
-                        T2 = float(B78[1:])
+                    T1 = float(hex2int(r[7],r[8]))
 
                     #check decimal point
                     if bit2 == "0":
@@ -15400,9 +15530,63 @@ class serialport(object):
         else:
             return -1,-1
             
+    def CENTER302temperature(self):
+        try:
+            command = str2cmd("\x41")
+            r = ""
+
+            if not self.SP.isOpen():
+                self.openport()                    
+                
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write(command)
+                r = self.SP.read(7)                                   #NOTE: different
+                
+                if len(r) == 7:
+
+                    #DECIMAL POINT
+                    #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
+                    #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
+                    
+                    #extract bit 2, and bit 5 of BYTE 3
+                    b3bin = self.binary(ord(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
+                    bit2 = b3bin[5]
+                    
+                    #extract T1
+                    T1 = float(hex2int(r[3],r[4]))
+
+                    #check decimal point
+                    if bit2 == "0":
+                        T1 /= 10.
+
+                    return T1,-1
+
+                else:
+                    nbytes = len(r)
+                    error = QApplication.translate("Error Message","CENTER302temperature(): %1 bytes received but 7 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+                    #keep a max of 500 errors
+                    if len(aw.qmc.errorlog) > 499:
+                        aw.qmc.errorlog = aw.qmc.errorlog[1:]
+                    aw.qmc.errorlog.append(timez + " " + error)
+                    return -1,-1 
+            else:
+                return -1,-1 
+            
+        except serial.SerialException as e:
+            error = QApplication.translate("Error Message","Serial Exception: ser.CENTER302temperature()",None, QApplication.UnicodeUTF8)
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            #keep a max of 500 errors
+            if len(aw.qmc.errorlog) > 499:
+                aw.qmc.errorlog = aw.qmc.errorlog[1:]
+            aw.qmc.errorlog.append(timez + " " + error)
+            return -1,-1
+            
     def CENTER303temperature(self):
         try:
-            command = "\x41"                 
+            command = str2cmd("\x41")                 
             r = ""
 
             if not self.SP.isOpen():
@@ -15423,23 +15607,15 @@ class serialport(object):
                     #if bit 5 of byte 3 = 0 then T2 = ###.#
                     
                     #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = bin(ord(r[2]))[2:]              #bit"[7][6][5][4][3][2][1][0]"
+                    b3bin = self.binary(ord(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     bit5 = b3bin[2]
                     
                     #extract T1
-                    B34 = binascii.hexlify(r[3]+r[4])
-                    if B34[0].isdigit():
-                        T1 = float(B34)
-                    else:
-                        T1 = float(B34[1:])
+                    T1 = float(hex2int(r[3],r[4]))
                         
                     #extract T2
-                    B56 = binascii.hexlify(r[5]+r[6])
-                    if B56[0].isdigit():
-                        T2 = float(B56)
-                    else:
-                        T2 = float(B56[1:])
+                    T2 = float(hex2int(r[5],r[6]))
 
                     #check decimal point
                     if bit2 == "0":
@@ -15451,7 +15627,7 @@ class serialport(object):
 
                 else:
                     nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER303temperature(): %i bytes received but 8 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    error = QApplication.translate("Error Message","CENTER303temperature(): %1 bytes received but 8 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
                     #keep a max of 500 errors
                     if len(aw.qmc.errorlog) > 499:
@@ -18179,6 +18355,20 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 2
                     message = ""  #empty message especial device
+
+                ##########################
+                ####  DEVICE 29 is MODBUS
+                ##########################
+
+                elif meter == "VOLTCRAFT K201":
+                    aw.qmc.device = 30
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 9600
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 2
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 302. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 if meter == "Omega HH806W":
                     aw.qmc.device = 29
