@@ -1481,8 +1481,10 @@ class tgraphcanvas(FigureCanvas):
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
             for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
-                self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
+                if aw.extraCurveVisibility1[i]:
+                    self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
+                if aw.extraCurveVisibility2[i]:
+                    self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
 
             #check BACKGROUND flag
             if self.background: 
@@ -1694,17 +1696,13 @@ class tgraphcanvas(FigureCanvas):
 
             nrdevices = len(self.extradevices)
             if nrdevices:
-                nextTempLine1idx = 0
-                nextTempLine2idx = 0
                 for i in range(nrdevices):
-                    if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > nextTempLine1idx:
-                        handles.append(self.extratemp1lines[nextTempLine1idx])
+                    if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > i:
+                        handles.append(self.extratemp1lines[i])
                         labels.append(self.extraname1[i])
-                        nextTempLine1idx = nextTempLine1idx + 1
-                    if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > nextTempLine2idx:
-                        handles.append(self.extratemp2lines[nextTempLine2idx])
+                    if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > i:
+                        handles.append(self.extratemp2lines[i])
                         labels.append(self.extraname2[i])
-                        nextTempLine2idx = nextTempLine2idx + 1
                     
             if not self.designerflag:  
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min  
