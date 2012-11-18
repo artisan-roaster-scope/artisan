@@ -142,9 +142,9 @@ else:
 #    import uprefix
 #    uprefix.register_hook()
     def u(x):
-        x
+        return x
     def v(x):
-        x
+        return x
     def d(x):
         if x is not None:
             return codecs.unicode_escape_decode(x)[0]
@@ -159,7 +159,7 @@ else:
         if h2:
             return int(h1*256 + h2)
         else:
-            int(h1)
+            return int(h1)
     def str2cmd(s):
         return bytes(s,"ascii")
         
@@ -1696,12 +1696,16 @@ class tgraphcanvas(FigureCanvas):
 
             nrdevices = len(self.extradevices)
             if nrdevices:
+                xtmpl1idx = 0
+                xtmpl2idx = 0
                 for i in range(nrdevices):
-                    if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > i:
-                        handles.append(self.extratemp1lines[i])
+                    if aw.extraCurveVisibility1[i]:
+                        handles.append(self.extratemp1lines[xtmpl1idx])
+                        xtmpl1idx = xtmpl1idx + 1
                         labels.append(self.extraname1[i])
-                    if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > i:
-                        handles.append(self.extratemp2lines[i])
+                    if aw.extraCurveVisibility2[i]:
+                        handles.append(self.extratemp2lines[xtmpl2idx])
+                        xtmpl2idx = xtmpl2idx + 1
                         labels.append(self.extraname2[i])
                     
             if not self.designerflag:  
@@ -1956,8 +1960,8 @@ class tgraphcanvas(FigureCanvas):
             self.samplingsemaphore.release(1)
 
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
                 
