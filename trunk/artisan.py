@@ -567,13 +567,14 @@ class tgraphcanvas(FigureCanvas):
         #Temperature Alarms lists. Data is writen in  alarmDlg 
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
         self.alarmflag = []    # 0 = OFF; 1 = ON flags
+        self.alarmcond = []    # 0 = falls below; 1 = rises above
         # alarmstate is set to 'not triggered' on reset()
         self.alarmstate = []   # 1=triggered, 0=not triggered. Needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
-        self.alarmsource = []   # 0 = ET , 1= BT
+        self.alarmsource = []   # -2=DeltaET, -1=DeltaBT, 0=ET , 1=BT, 2=extratemp1[0], 3=extratemp2[0], 4=extratemp2[1],....
         self.alarmtemperature = []  # set temperature number (example 500)
         self.alarmaction = []       # 0 = open a window; 1 = call program with a filepath equal to alarmstring; 2 = activate button with number given in description
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
-        self.temporaryalarmflag = -1 #holds temporary index value of triggered alarm in updategraphics()
+        self.temporaryalarmflag = -3 #holds temporary index value of triggered alarm in updategraphics()
         
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 750
@@ -819,9 +820,9 @@ class tgraphcanvas(FigureCanvas):
                         self.autoDropIdx = 0
     
                     #check triggered alarms
-                    if self.temporaryalarmflag > -1:
+                    if self.temporaryalarmflag > -3:
                         i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
-                        self.temporaryalarmflag = -1 # self.setalarm(i) can take longer to run than the sampling interval 
+                        self.temporaryalarmflag = -3 # self.setalarm(i) can take longer to run than the sampling interval 
                         self.setalarm(i)
                     
         except Exception as e:
@@ -900,12 +901,13 @@ class tgraphcanvas(FigureCanvas):
         self.ax.lines = self.ax.lines[0:linecount]
         
     def setalarm(self,alarmnumber):
+        self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
         if self.alarmaction[alarmnumber] == 0:
-            self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
+            # alarm popup message
             QMessageBox.information(self,QApplication.translate("MessageBox", "Alarm notice",None, QApplication.UnicodeUTF8),self.alarmstrings[alarmnumber])
             aw.soundpop()
         elif self.alarmaction[alarmnumber] == 1:
-            self.alarmstate[alarmnumber] = 1 #turn off flag as it has been read
+            # alarm call program
             try:
                 fname = str(self.alarmstrings[alarmnumber])
                 QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
@@ -914,6 +916,7 @@ class tgraphcanvas(FigureCanvas):
                 self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
                 return
         elif self.alarmaction[alarmnumber] == 2:
+            # alarm event button
             try:
                 button_number = int(self.alarmstrings[alarmnumber]) - 1 # the event buttons presented to the user are numbered from 1 on
                 if button_number > -1 and button_number < len(aw.buttonlist):
@@ -2385,6 +2388,8 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.updateLCDtime()
             aw.lowerbuttondialog.setVisible(True)
+            if not aw.extraeventsbuttonsflag:
+                aw.toggleextraeventrows()
         #turn STOP       
         else:
             self.flagstart = False
@@ -2405,6 +2410,8 @@ class tgraphcanvas(FigureCanvas):
             aw.button_2.setText(QApplication.translate("Scope Button", "START",None, QApplication.UnicodeUTF8))
             aw.enableSaveActions()
             aw.lowerbuttondialog.setVisible(False)
+            if aw.extraeventsbuttonsflag:
+                aw.toggleextraeventrows()
 
 
     #Records charge (put beans in) marker. called from push button 'Charge'
@@ -4678,8 +4685,8 @@ class SampleThread(QThread):
                 ##############  if using Extra devices               
                 nxdevices = len(aw.qmc.extradevices)
                 if nxdevices:
-                    les,led,let,letl =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1),len(aw.qmc.extratemp1lines)
-                    if les == led == let == letl:
+                    les,led,let =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1)
+                    if les == led == let:
                         xtra_dev_lines1 = 0
                         xtra_dev_lines2 = 0
                         for i in range(nxdevices):   
@@ -4721,8 +4728,8 @@ class SampleThread(QThread):
 
                     #ERROR FOUND
                     else:
-                        lengths = [les,led,let,letl]
-                        location = ["Extra-Serial","Extra-Devices","Extra-Temp","Extra-Lines"]
+                        lengths = [les,led,let]
+                        location = ["Extra-Serial","Extra-Devices","Extra-Temp"]
                         #find error
                         if (nxdevices-1) in lengths:
                             indexerror =  lengths.index(nxdevices-1)
@@ -4735,7 +4742,7 @@ class SampleThread(QThread):
                             errormessage += "\nPlease Reset: Extra devices"
                         else:
                             string  = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
-                            string += location[2] + "= " + str(lengths[2]) + " " + location[3] + "= " + str(lengths[3])                                                                             
+                            string += location[2] + "= " + str(lengths[2])                                                                      
                             errormessage = "ERROR: extra devices lengths don't match: %s"%string
                             errormessage += "\nPlease Reset: Extra devices"
                         raise Exception(errormessage)   
@@ -4874,9 +4881,9 @@ class SampleThread(QThread):
                         aw.qmc.playbackevent()
                         
                     # autodetect CHARGE event
-                    # only if BT > 150C / 300F                
+                    # only if BT > 203F/95C                
                     if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and length_of_qmc_timex >= 5 and \
-                        ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 150) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 300)):
+                        ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
                         if aw.BTbreak(length_of_qmc_timex - 1):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
@@ -4893,13 +4900,25 @@ class SampleThread(QThread):
                     #check alarms 
                     for i in range(len(aw.qmc.alarmflag)):
                         #if alarm on, and not triggered, and time is after set time:
-                        if aw.qmc.alarmflag[i] and not aw.qmc.alarmstate[i] and aw.qmc.timeindex[aw.qmc.alarmtime[i]]:    
-                            if aw.qmc.alarmsource[i] == 0:                        #check ET
-                                if aw.qmc.temp1[-1] > aw.qmc.alarmtemperature[i]:
-                                    aw.qmc.temporaryalarmflag = i
+                        if aw.qmc.alarmflag[i] and not aw.qmc.alarmstate[i] and aw.qmc.timeindex[aw.qmc.alarmtime[i]]:
+                            alarm_temp = None
+                            if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
+                                alarm_temp = aw.qmc.delta1[-1]
+                            elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
+                                alarm_temp = aw.qmc.delta2[-1]
+                            elif aw.qmc.alarmsource[i] == 0:                      #check ET
+                                alarm_temp = aw.qmc.temp1[-1]
                             elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                if aw.qmc.temp2[-1] > aw.qmc.alarmtemperature[i]:
-                                    aw.qmc.temporaryalarmflag = i
+                                alarm_temp = aw.qmc.temp2[-1]
+                            elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
+                                if (aw.qmc.alarmsource[i])%2==0:
+                                    alarm_temp = aw.qmc.extratemp1[aw.qmc.alarmsource[i] - 2]
+                                else:
+                                    alarm_temp = aw.qmc.extratemp2[aw.qmc.alarmsource[i] - 2]
+                            alarm_limit = aw.qmc.alarmtemperature[i]
+                            if alarm_tmp and ((aw.qmc.alarmcond[i] == 1 and alarm_tmp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_tmp < alarm_limit)):
+                                aw.qmc.temporaryalarmflag = i
+                                    
          
                 #############    if using DEVICE 18 (no device). Manual mode
                 # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()        
@@ -7580,6 +7599,10 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("alarmtime"):
                 self.qmc.alarmtime = [x.toInt()[0] for x in settings.value("alarmtime").toList()]                                                    
                 self.qmc.alarmflag = [x.toInt()[0] for x in settings.value("alarmflag").toList()]
+                self.qmc.alarmcond = [x.toInt()[0] for x in settings.value("alarmcond").toList()]
+                # the following is to ensure smooth transition to the extra alarm attribute cond for users having already alarms
+                if len(self.qmc.alarmcond) < len(self.qmc.alarmtime):
+                    self.qmc.alarmcond = [1]*len(self.qmc.alarmtime)
                 self.qmc.alarmsource = [x.toInt()[0] for x in settings.value("alarmsource").toList()]
                 self.qmc.alarmtemperature = [x.toInt()[0] for x in settings.value("alarmtemperature").toList()]
                 self.qmc.alarmaction = [x.toInt()[0] for x in settings.value("alarmaction").toList()]
@@ -7948,7 +7971,8 @@ class ApplicationWindow(QMainWindow):
             #save alarms
             settings.beginGroup("Alarms")
             settings.setValue("alarmtime",self.qmc.alarmtime)                                                                
-            settings.setValue("alarmflag",self.qmc.alarmflag)            
+            settings.setValue("alarmflag",self.qmc.alarmflag)                                                                
+            settings.setValue("alarmcond",self.qmc.alarmcond)            
             settings.setValue("alarmsource",self.qmc.alarmsource)
             settings.setValue("alarmtemperature",self.qmc.alarmtemperature)
             settings.setValue("alarmaction",self.qmc.alarmaction)
@@ -8096,7 +8120,8 @@ class ApplicationWindow(QMainWindow):
             roast["beansize"]= str(self.qmc.beansize)
             
             alarms["alarmtime"]= str(self.qmc.alarmtime)                                                                
-            alarms["alarmflag"]= str(self.qmc.alarmflag)            
+            alarms["alarmflag"]= str(self.qmc.alarmflag)                                                              
+            alarms["alarmcond"]= str(self.qmc.alarmcond)
             alarms["alarmsource"]= str(self.qmc.alarmsource)
             alarms["alarmtemperature"]= str(self.qmc.alarmtemperature)
             alarms["alarmaction"]= str(self.qmc.alarmaction)
@@ -12357,13 +12382,9 @@ class EventsDlg(QDialog):
         typelabel4 = QLabel(QApplication.translate("Label", "4",None, QApplication.UnicodeUTF8))
         
         self.etype0 = QLineEdit(aw.qmc.etypes[0])
-        self.etype0.setFocusPolicy(Qt.NoFocus)
         self.etype1 = QLineEdit(aw.qmc.etypes[1])
-        self.etype1.setFocusPolicy(Qt.NoFocus)
         self.etype2 = QLineEdit(aw.qmc.etypes[2])
-        self.etype2.setFocusPolicy(Qt.NoFocus)
         self.etype3 = QLineEdit(aw.qmc.etypes[3])
-        self.etype3.setFocusPolicy(Qt.NoFocus)
         self.etype0.setMaximumWidth(100)
         self.etype1.setMaximumWidth(100)
         self.etype2.setMaximumWidth(100)
@@ -12519,6 +12540,7 @@ class EventsDlg(QDialog):
         self.autoChargeDrop.setFocusPolicy(Qt.NoFocus)
         
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        #okButton.setFocus(Qt.TabFocusReason)
         #okButton.setFocusPolicy(Qt.StrongFocus)
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
@@ -19753,6 +19775,7 @@ class AlarmDlg(QDialog):
         #self.savealarms()
         aw.qmc.alarmtime.append(1)
         aw.qmc.alarmflag.append(1)
+        aw.qmc.alarmcond.append(1)
         aw.qmc.alarmsource.append(1)
         aw.qmc.alarmtemperature.append(500)
         aw.qmc.alarmaction.append(0)
@@ -19770,6 +19793,7 @@ class AlarmDlg(QDialog):
                 selected_row = selected[0].topRow()
                 aw.qmc.alarmtime = aw.qmc.alarmtime[0:selected_row] + aw.qmc.alarmtime[selected_row + 1:]
                 aw.qmc.alarmflag = aw.qmc.alarmflag[0:selected_row] + aw.qmc.alarmflag[selected_row + 1:]
+                aw.qmc.alarmcond = aw.qmc.alarmcond[0:selected_row] + aw.qmc.alarmcond[selected_row + 1:]
                 aw.qmc.alarmsource = aw.qmc.alarmsource[0:selected_row] + aw.qmc.alarmsource[selected_row + 1:]
                 aw.qmc.alarmtemperature = aw.qmc.alarmtemperature[0:selected_row] + aw.qmc.alarmtemperature[selected_row + 1:]
                 aw.qmc.alarmaction = aw.qmc.alarmaction[0:selected_row] + aw.qmc.alarmaction[selected_row + 1:]
@@ -19777,7 +19801,8 @@ class AlarmDlg(QDialog):
             else:
                 # nothing selected, we pop the last element
                 aw.qmc.alarmtime.pop()                                                                
-                aw.qmc.alarmflag.pop()            
+                aw.qmc.alarmflag.pop()                                                                 
+                aw.qmc.alarmcond.pop()           
                 aw.qmc.alarmsource.pop()
                 aw.qmc.alarmtemperature.pop()
                 aw.qmc.alarmaction.pop()
@@ -19800,28 +19825,40 @@ class AlarmDlg(QDialog):
             timez =  self.alarmtable.cellWidget(i,0)
             aw.qmc.alarmtime[i] = int(str(timez.currentIndex()))                                       
             flag = self.alarmtable.cellWidget(i,1)
-            aw.qmc.alarmflag[i] = int(str(flag.currentIndex()))
+            aw.qmc.alarmflag[i] = int(flag.isChecked())         
             atype = self.alarmtable.cellWidget(i,2)
-            aw.qmc.alarmsource[i] = int(str(atype.currentIndex()))
-            temp = self.alarmtable.cellWidget(i,3)
+            aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 2                            
+            cond = self.alarmtable.cellWidget(i,3)
+            aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
+            temp = self.alarmtable.cellWidget(i,4)
             aw.qmc.alarmtemperature[i] = int(str(temp.text()))
-            action = self.alarmtable.cellWidget(i,4)
+            action = self.alarmtable.cellWidget(i,5)
             aw.qmc.alarmaction[i] = int(str(action.currentIndex()))
-            description = self.alarmtable.cellWidget(i,5)
+            description = self.alarmtable.cellWidget(i,6)
             aw.qmc.alarmstrings[i] = str(description.text())
 
             aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
 
+    def buildAlarmSourceList(self):
+        extra_names = []
+        for i in range(len(aw.qmc.extradevices)):
+            extra_names.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
+            extra_names.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
+        return [QApplication.translate("ComboBox","DeltaET",None, QApplication.UnicodeUTF8),
+             QApplication.translate("ComboBox","DeltaBT",None, QApplication.UnicodeUTF8),
+             QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8),
+             QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8)] + extra_names
                
     def createalarmtable(self):
         self.alarmtable.clear()        
         nalarms = len(aw.qmc.alarmtemperature)
         if nalarms:    
             self.alarmtable.setRowCount(nalarms)
-            self.alarmtable.setColumnCount(6)
+            self.alarmtable.setColumnCount(7)
             self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Temperature",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8)])
@@ -19843,17 +19880,27 @@ class AlarmDlg(QDialog):
                                        QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8)])
                 timeComboBox.setCurrentIndex(aw.qmc.alarmtime[i])
                                             
-                #flag
-                flagComboBox = QComboBox()
-                flagComboBox.addItems([QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8)])
-                flagComboBox.setCurrentIndex(aw.qmc.alarmflag[i])
-
+                #flag                
+                flagComboBox = QCheckBox()
+                flagComboBox.setText(QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8))
+                if aw.qmc.alarmflag[i]:
+                    flagComboBox.setCheckState(Qt.Checked)
+                else:
+                    flagComboBox.setCheckState(Qt.Unchecked)           
+                             
                 #type
                 typeComboBox = QComboBox()
-                typeComboBox.addItems([QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8)])
-                typeComboBox.setCurrentIndex(aw.qmc.alarmsource[i])
+                typeComboBox.addItems(self.buildAlarmSourceList())
+                if aw.qmc.alarmsource[i] + 2 < len(self.buildAlarmSourceList()):
+                    typeComboBox.setCurrentIndex(aw.qmc.alarmsource[i] + 2)
+                else:
+                    typeComboBox.setCurrentIndex(2)
+                                    
+                #condition
+                condComboBox = QComboBox()
+                condComboBox.addItems([QApplication.translate("ComboBox","falls below",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","rises above",None, QApplication.UnicodeUTF8)])
+                condComboBox.setCurrentIndex(aw.qmc.alarmcond[i])
 
                 #temperature
                 tempedit = QLineEdit(str(aw.qmc.alarmtemperature[i]))
@@ -19873,9 +19920,10 @@ class AlarmDlg(QDialog):
                 self.alarmtable.setCellWidget(i,0,timeComboBox)                
                 self.alarmtable.setCellWidget(i,1,flagComboBox)
                 self.alarmtable.setCellWidget(i,2,typeComboBox)
-                self.alarmtable.setCellWidget(i,3,tempedit)
-                self.alarmtable.setCellWidget(i,4,actionComboBox)                
-                self.alarmtable.setCellWidget(i,5,descriptionedit)
+                self.alarmtable.setCellWidget(i,3,condComboBox)
+                self.alarmtable.setCellWidget(i,4,tempedit)
+                self.alarmtable.setCellWidget(i,5,actionComboBox)                
+                self.alarmtable.setCellWidget(i,6,descriptionedit)
 
 
 
