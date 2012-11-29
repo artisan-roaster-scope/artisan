@@ -290,7 +290,7 @@ all: lib/$(PALIB) all-recursive examples selftests
 
 15) minimalmodbus (v0.4)
 
-downlaod from http://pypi.python.org/pypi/MinimalModbus/
+download from http://pypi.python.org/pypi/MinimalModbus/
 
 # tar -xzf MinimalModbus-0.4.tar.gz
 # cd MinimalModbus-0.4

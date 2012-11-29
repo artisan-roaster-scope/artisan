@@ -420,8 +420,8 @@ class tgraphcanvas(FigureCanvas):
         self.rateofchange2 = 0.0
         
         #read and plot on/off flag
-        self.flagon = False
-        self.flagstart = False
+        self.flagon = False  # Artisan turned on
+        self.flagstart = False # Artisan logging
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
         
@@ -829,7 +829,8 @@ class tgraphcanvas(FigureCanvas):
             self.flagon = False
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.adderror(QApplication.translate("Error Message","Exception Error: updategraphics() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()      
+            self.adderror(QApplication.translate("Error Message","Exception Error: updategraphics() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
         
     def updateLCDtime(self):
@@ -1295,7 +1296,9 @@ class tgraphcanvas(FigureCanvas):
         aw.curFile = None                 #current file name
         #used to find length of arms in annotations  
         self.ystep_down = 0
-        self.ystep_up = 0
+        self.ystep_up = 0 
+        self.ystep_downB = 0
+        self.ystep_upB = 0
         
         self.startofx = 0
         self.endofx = self.resetmaxtime 
@@ -1555,6 +1558,9 @@ class tgraphcanvas(FigureCanvas):
 
                 #check backgroundDetails flag
                 if self.backgroundDetails:
+                    d = aw.qmc.ylimit - aw.qmc.ylimit_min 
+                    d = d - d/5
+                    self.ystep_downB = self.ystep_upB = 0
                     #if there is a profile loaded with CHARGE, then save time to get the relative time
                     if self.timeindex[0] != -1:   #verify it exists before loading it, otherwise the list could go out of index
                         startB = self.timex[self.timeindex[0]]
@@ -1564,68 +1570,125 @@ class tgraphcanvas(FigureCanvas):
                     #if background CHARGE exists
                     if self.timeindexB[0] != -1: 
                         st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[0]] - startB))
+                        self.ystep_downB,self.ystep_upB = self.findtextgap(self.ystep_downB,self.ystep_upB,self.temp2B[self.timeindexB[0]],self.temp2B[self.timeindexB[0]],d)
+                        #anotate temperature
                         self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[0]]), xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
-                                         xytext=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]] + 50),fontsize=10,color=self.palette["text"],
+                                         xytext=(self.timeB[self.timeindexB[0]] + 40,self.temp2B[self.timeindexB[0]] + self.ystep_upB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        #anotate time
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
+                                         xytext=(self.timeB[self.timeindexB[0]] + 40,self.temp2B[self.timeindexB[0]] - self.ystep_downB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    #Add Dry End markers
+                    if self.timeindexB[1]:
+                        self.ystep_downB,self.ystep_upB = self.findtextgap(self.ystep_downB,self.ystep_upB,self.temp2B[self.timeindexB[0]],self.temp2B[self.timeindexB[1]],d)
+                        if self.timeindex[1] and self.timeB[self.timeindexB[1]] < self.timex[self.timeindex[1]]:
+                            e = -80
+                        else:
+                            e = 0
+                        st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[1]]- startB))
+                        #anotate temperature
+                        self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[1]]), xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
+                                         xytext=(self.timeB[self.timeindexB[1]]+e,self.temp2B[self.timeindexB[1]] + self.ystep_upB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        #anotate time
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
+                                         xytext=(self.timeB[self.timeindexB[1]]+e,self.temp2B[self.timeindexB[1]] - self.ystep_downB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    #Add 1Cs markers                        
+                    if self.timeindexB[2]:
+                        if self.timeindexB[1]: #if dryend
+                            self.ystep_downB,self.ystep_upB = self.findtextgap(self.ystep_downB,self.ystep_upB,self.temp2B[self.timeindexB[1]],self.temp2B[self.timeindexB[2]],d)
+                        else:
+                            self.ystep_downB = 0
+                            self.ystep_upB = 0
+                            self.ystep_downB,self.ystep_upB = self.findtextgap(self.ystep_downB,self.ystep_upB,self.temp2B[self.timeindexB[2]],self.temp2B[self.timeindexB[2]],d)
+                        if self.timeindex[2] and self.timeB[self.timeindexB[2]] < self.timex[self.timeindex[2]]:
+                            e = -80
+                        else:
+                            e = 0
+                        st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[2]]-startB))
+                        self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[2]]), xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
+                                         xytext=(self.timeB[self.timeindexB[2]]+e,self.temp2B[self.timeindexB[2]] + self.ystep_upB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
+                                         xytext=(self.timeB[self.timeindexB[2]]+e,self.temp2B[self.timeindexB[2]] - self.ystep_downB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    #Add 1Ce markers                        
+                    if self.timeindexB[3]:
+                        self.ystep_downB,self.ystep_upB = self.findtextgap(self.ystep_downB,self.ystep_upB,self.temp2B[self.timeindexB[2]],self.temp2B[self.timeindexB[3]],d)
+                        if self.timeindex[3] and self.timeB[self.timeindexB[3]] < self.timex[self.timeindex[3]]:
+                            e = -80
+                        else:
+                            e = 0
+                        st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[3]]-startB))          
+                        self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[3]]), xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
+                                         xytext=(self.timeB[self.timeindexB[3]]+e,self.temp2B[self.timeindexB[3]] + self.ystep_upB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
+                                         xytext=(self.timeB[self.timeindexB[3]]+e,self.temp2B[self.timeindexB[3]]-self.ystep_downB),fontsize=10, color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                        
+                    #Add 2Cs markers
+                    if self.timeindexB[4]:
+                        if self.timeindex[4] and self.timeB[self.timeindexB[4]] < self.timex[self.timeindex[4]]:
+                            e = -80
+                        else:
+                            e = 0
+                        if self.timeindexB[3]:
+                            self.ystep_downB,self.ystep_upB = self.findtextgap(self.ystep_downB,self.ystep_upB,self.temp2B[self.timeindexB[3]],self.temp2B[self.timeindexB[4]],d)
+                        else:
+                            self.ystep_downB,self.ystep_upB = self.findtextgap(self.ystep_downB,self.ystep_upB,self.temp2B[self.timeindexB[2]],self.temp2B[self.timeindexB[4]],d)                                                
+                        st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[4]]-startB))
+                        self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[4]]), xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
+                                         xytext=(self.timeB[self.timeindexB[4]]+e,self.temp2B[self.timeindexB[4]] + self.ystep_upB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
+                                         xytext=(self.timeB[self.timeindexB[4]]+e,self.temp2B[self.timeindexB[4]]-self.ystep_downB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                        
+                    #Add 2Ce markers
+                    if self.timeindexB[5]:
+                        if self.timeindex[5] and self.timeB[self.timeindexB[5]] < self.timex[self.timeindex[5]]:
+                            e = -80
+                        else:
+                            e = 0                   
+                        self.ystep_downB,self.ystep_upB = self.findtextgap(self.ystep_downB,self.ystep_upB,self.temp2B[self.timeindexB[4]],self.temp2B[self.timeindexB[5]],d)                    
+                        st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[5]]-startB))
+                        #anotate temperature
+                        self.ax.annotate("%.1f"%(self.timeB[self.timeindexB[5]]), xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
+                                         xytext=(self.timeB[self.timeindexB[5]]+e,self.temp2B[self.timeindexB[5]] + self.ystep_upB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
+                        #anotate time
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
+                                         xytext=(self.timeB[self.timeindexB[5]]+e,self.temp2B[self.timeindexB[5]] - self.ystep_downB),fontsize=10,color=self.palette["text"],
                                          arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                         
-                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[0]],self.temp2B[self.timeindexB[0]]),
-                                         xytext=(self.timeB[self.timeindexB[0]]+5,self.temp2B[self.timeindexB[0]] - 100),fontsize=10,color=self.palette["text"],
-                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-
-                        if self.timeindexB[1]:
-                            st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[1]]- startB))
-                            self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[1]]), xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
-                                             xytext=(self.timeB[self.timeindexB[1]]-5,self.temp2B[self.timeindexB[1]]+50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]),
-                                             xytext=(self.timeB[self.timeindexB[1]],self.temp2B[self.timeindexB[1]]-50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                            
-                        if self.timeindexB[2]:
-                            st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[2]]-startB))
-                            self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[2]]), xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
-                                             xytext=(self.timeB[self.timeindexB[2]]-5,self.temp2B[self.timeindexB[2]]+50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]),
-                                             xytext=(self.timeB[self.timeindexB[2]],self.temp2B[self.timeindexB[2]]-50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                            
-                        if self.timeindexB[3]:
-                            st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[3]]-startB))          
-                            self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[3]]), xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
-                                             xytext=(self.timeB[self.timeindexB[3]]-5,self.temp2B[self.timeindexB[3]]+70),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)              
-                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]),
-                                             xytext=(self.timeB[self.timeindexB[3]],self.temp2B[self.timeindexB[3]]-80),fontsize=10, color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                            
-                        if self.timeindexB[4]:
-                            st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[4]]-startB))
-                            self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[4]]), xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
-                                             xytext=(self.timeB[self.timeindexB[4]]-5,self.temp2B[self.timeindexB[4]]+90),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)      
-                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]),
-                                             xytext=(self.timeB[self.timeindexB[4]],self.temp2B[self.timeindexB[4]]-110),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                            
+                    #Add DROP markers
+                    if self.timeindexB[6]:
+                        if self.timeindex[6] and self.timeB[self.timeindexB[6]] < self.timex[self.timeindex[6]]:
+                            e = -80
+                        else:
+                            e = 0
                         if self.timeindexB[5]:
-                            st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[5]]-startB))
-                            self.ax.annotate("%.1f"%(self.timeB[self.timeindexB[5]]), xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
-                                             xytext=(self.timeB[self.timeindexB[5]]-5,self.temp2B[self.timeindexB[5]]+50),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)                
-                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]),
-                                             xytext=(self.timeB[self.timeindexB[5]],self.temp2B[self.timeindexB[5]]-40),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                            
-                        if self.timeindexB[6]:
-                            st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[6]]-startB))
-                            self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[6]]), xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
-                                             xytext=(self.timeB[self.timeindexB[6]]-5,self.temp2B[self.timeindexB[6]]+70),color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
-                            self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
-                                             xytext=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]-80),fontsize=10,color=self.palette["text"],
-                                             arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
-                        #END of Background
+                            tx = self.timeindexB[5]
+                        elif self.timeindexB[4]:
+                            tx = self.timeindexB[4]
+                        elif self.timeindexB[3]:
+                            tx = self.timeindexB[3]
+                        elif self.timeindexB[2]:
+                            tx = self.timeindexB[2]
+                        elif self.timeindexB[1]:
+                            tx = self.timeindexB[1]
+                        else:
+                            tx = self.timeindexB[0]
+                        self.ystep_downB,self.ystep_upB = self.findtextgap(self.ystep_downB,self.ystep_upB,self.temp2B[tx],self.temp2B[self.timeindexB[6]],d)                 
+                        st1 = str(self.stringfromseconds(self.timeB[self.timeindexB[6]]-startB))
+                        self.ax.annotate("%.1f"%(self.temp2B[self.timeindexB[6]]), xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
+                                         xytext=(self.timeB[self.timeindexB[6]]+e,self.temp2B[self.timeindexB[6]] + self.ystep_upB),color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),fontsize=10,alpha=self.backgroundalpha)
+                        self.ax.annotate(st1, xy=(self.timeB[self.timeindexB[6]],self.temp2B[self.timeindexB[6]]),
+                                         xytext=(self.timeB[self.timeindexB[6]]+e,self.temp2B[self.timeindexB[6]] - self.ystep_downB),fontsize=10,color=self.palette["text"],
+                                         arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
+                    #END of Background
                
             handles = [self.l_temp1,self.l_temp2]
             labels = [str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)),str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))]
@@ -1713,6 +1776,7 @@ class tgraphcanvas(FigureCanvas):
                     
             if not self.designerflag:  
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                self.ystep_down = self.ystep_up = 0
                 #Add markers for CHARGE 
                 if self.timeindex[0] != -1:
                     #anotate temperature
@@ -1738,8 +1802,7 @@ class tgraphcanvas(FigureCanvas):
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
                                     
 
-                #Add 1Cs markers
-            
+                #Add 1Cs markers            
                 if self.timeindex[2]:
                     if self.timeindex[1]: #if dryend
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
@@ -1805,17 +1868,18 @@ class tgraphcanvas(FigureCanvas):
                 #Add DROP markers
                 if self.timeindex[6]:
                     if self.timeindex[5]:
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
+                        tx = self.timeindex[5]
                     elif self.timeindex[4]:
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]],d)
+                        tx = self.timeindex[4]
                     elif self.timeindex[3]:
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]],d)
+                        tx = self.timeindex[3]
                     elif self.timeindex[2]:
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
+                        tx = self.timeindex[2]
                     elif self.timeindex[1]:
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
+                        tx1 = self.timeindex[1]
                     else:
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[6]],d)                
+                        tx = self.timeindex[0]
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[tx],self.temp2[self.timeindex[6]],d)
                         
                     st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
@@ -1972,21 +2036,6 @@ class tgraphcanvas(FigureCanvas):
 
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
-    #oldpoint height1, newpoint height2. The previously used arrow step (length-height of arm) is self.ystep_down (which changes value in self.redraw())
-#    def findtextgap(self,height1,height2):
-#        if self.mode == "F":
-#            init = 44  #was 50  (original values were too high)
-#            gap = 22  #was 30
-#            for i in range(init,110):  # was 90
-#                if abs((height1 + self.ystep_up) - (height2+i)) > gap and abs((height1-self.ystep_down) - (height2-i)) > gap:
-#                    break
-#        else:
-#            init = 20  #was 40
-#            gap = 11   #was 20
-#            for i in range(init,54):  # was 90
-#                if abs((height1 + self.ystep_up) - (height2+i)) > gap and abs((height1-self.ystep_down) - (height2-i)) > gap:
-#                    break
-#        return i  #return height of arm
     def findtextgap(self,ystep_down,ystep_up,height1,height2,d=0):
         if d <= 0:
             d = aw.qmc.ylimit - aw.qmc.ylimit_min
@@ -2345,6 +2394,9 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
             aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                   
             
+            if not aw.extraeventsbuttonsflag:
+                aw.toggleextraeventrows()
+                
             aw.soundpop()
             aw.showLCDs()
         #turn OFF        
@@ -2358,6 +2410,9 @@ class tgraphcanvas(FigureCanvas):
             aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
             aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                                   
             
+            if aw.extraeventsbuttonsflag:
+                aw.toggleextraeventrows()
+                
             aw.lcd1.display("00:00")
             
             aw.soundpop()
@@ -2388,10 +2443,9 @@ class tgraphcanvas(FigureCanvas):
             else:
                 self.updateLCDtime()
             aw.lowerbuttondialog.setVisible(True)
-            if not aw.extraeventsbuttonsflag:
-                aw.toggleextraeventrows()
         #turn STOP       
         else:
+            aw.enableSaveActions()
             self.flagstart = False
             aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
             aw.button_18.setEnabled(False)
@@ -2408,10 +2462,7 @@ class tgraphcanvas(FigureCanvas):
             aw.soundpop()
             aw.sendmessage(QApplication.translate("Message Area","Scope recording stopped", None, QApplication.UnicodeUTF8))
             aw.button_2.setText(QApplication.translate("Scope Button", "START",None, QApplication.UnicodeUTF8))
-            aw.enableSaveActions()
             aw.lowerbuttondialog.setVisible(False)
-            if aw.extraeventsbuttonsflag:
-                aw.toggleextraeventrows()
 
 
     #Records charge (put beans in) marker. called from push button 'Charge'
@@ -2458,6 +2509,8 @@ class tgraphcanvas(FigureCanvas):
 
                 self.xaxistosm()
 
+                aw.qmc.timealign()
+                
                 self.fig.canvas.draw()
                 
                 self.samplingsemaphore.release(1)
@@ -4664,6 +4717,7 @@ class VMToolbar(NavigationToolbar):
 class SampleThread(QThread):
     def _init_(self,parent = None):
         super(SampleThread,self)._init_(parent)
+        self.afterTP = False
 
     # sample devices at interval self.delay miliseconds.  
     def sample(self):
@@ -4900,8 +4954,13 @@ class SampleThread(QThread):
                     #check alarms 
                     for i in range(len(aw.qmc.alarmflag)):
                         #if alarm on, and not triggered, and time is after set time:
-                        if aw.qmc.alarmflag[i] and not aw.qmc.alarmstate[i] and aw.qmc.timeindex[aw.qmc.alarmtime[i]]:
+                        if aw.qmc.alarmflag[i] and not aw.qmc.alarmstate[i] and ((aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > -1) or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
+                                and aw.qmc.timeindex[1] < 1 and self.checkTPalarmtime())):
+                                # only between CHARGE and DRY we check for TP if alarmtime[i]=8
+                            print("testing",aw.qmc.alarmtime[i],aw.qmc.timeindex[aw.qmc.alarmtime[i]])
                             alarm_temp = None
+                            print("alarmsource",aw.qmc.alarmsource[i])
+                            print((aw.qmc.alarmsource[i])%2==0,len(aw.qmc.extratemp1),len(aw.qmc.extratemp2))
                             if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
                                 alarm_temp = aw.qmc.delta1[-1]
                             elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
@@ -4912,11 +4971,11 @@ class SampleThread(QThread):
                                 alarm_temp = aw.qmc.temp2[-1]
                             elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
                                 if (aw.qmc.alarmsource[i])%2==0:
-                                    alarm_temp = aw.qmc.extratemp1[aw.qmc.alarmsource[i] - 2]
+                                    alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
                                 else:
-                                    alarm_temp = aw.qmc.extratemp2[aw.qmc.alarmsource[i] - 2]
+                                    alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
                             alarm_limit = aw.qmc.alarmtemperature[i]
-                            if alarm_tmp and ((aw.qmc.alarmcond[i] == 1 and alarm_tmp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_tmp < alarm_limit)):
+                            if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
                                 aw.qmc.temporaryalarmflag = i
                                     
          
@@ -4955,9 +5014,20 @@ class SampleThread(QThread):
 
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)            
+                aw.qmc.samplingsemaphore.release(1)    
+                
+    # returns true after BT passed the TP
+    def checkTPalarmtime(self):
+        # if v[-1] is the current temperature then check if
+        #   len(BT) > 4
+        # BT[-4] <= BT[-3] <= BT[-2] <= BT[-1] and BT[-4] < BT[-1]
+        if not self.afterTP and len(aw.qmc.temp2) > 4 and aw.qmc.temp2[-4] <= aw.qmc.temp2[-3] <= aw.qmc.temp2[-2] <= aw.qmc.temp2[-1] and aw.qmc.temp2[-4] < aw.qmc.temp2[-1]:
+            self.afterTP = True
+        print("checkTPalarmtime",self.afterTP)
+        return self.afterTP
                       
     def run(self):
+        self.afterTP = False
         if not aw.qmc.flagon:
             return
         while True:
@@ -5100,7 +5170,6 @@ class ApplicationWindow(QMainWindow):
         #records serial comm (Help menu)    
         self.seriallogflag = False
         self.seriallog = []
-
 
         #temp variable for text searches in Help menu artisan seetings
         self.searchtextartisansettings = ""
@@ -6034,12 +6103,12 @@ class ApplicationWindow(QMainWindow):
 
     #call from user configured event buttons    
     def recordextraevent(self,ee):
-        if self.qmc.flagon:
+        if self.qmc.flagstart:
             self.qmc.EventRecord(extraevent = ee)
         else:
-            self.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
+            self.sendmessage(QApplication.translate("Message Area","Recorder is STOPPED", None, QApplication.UnicodeUTF8))
        
-        if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command;
+        if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command
             if self.extraeventsactions[ee] == 1:                    
                 self.extraeventsactionstrings[ee] = str(self.extraeventsactionstrings[ee])                        
                 extraeventsactionstringscopy = ""
@@ -6082,6 +6151,12 @@ class ApplicationWindow(QMainWindow):
                             aw.modbus.writeSingleRegister(*cmds)
                     except:
                         pass
+            elif self.extraeventsactions[ee] == 5:
+                try:
+				    dtacommand = self.extraeventsactionstrings[ee]
+				    self.sendDTAcommand(dtacommand)
+				except:
+				    pass
                     
 
     def resetApplication(self):
@@ -12776,7 +12851,7 @@ class EventsDlg(QDialog):
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(TabWidget)
         mainLayout.addLayout(buttonLayout)  
-
+        
         self.setLayout(mainLayout)
 
     def keyPressEvent(self,event):    
@@ -12999,7 +13074,8 @@ class EventsDlg(QDialog):
                                     	 QApplication.translate("ComboBox","Serial command",None, QApplication.UnicodeUTF8),
                                          QApplication.translate("ComboBox","Call program",None, QApplication.UnicodeUTF8),
                                          QApplication.translate("ComboBox","Multiple Event",None, QApplication.UnicodeUTF8),
-                                    	 QApplication.translate("ComboBox","Modbus command",None, QApplication.UnicodeUTF8)])
+                                    	 QApplication.translate("ComboBox","Modbus command",None, QApplication.UnicodeUTF8),
+                                    	 QApplication.translate("ComboBox","DTA Command",None, QApplication.UnicodeUTF8)])
                 actionComboBox.setCurrentIndex(aw.extraeventsactions[i])
                 self.connect(actionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setactioneventbutton(z,i))
                 #action description
@@ -14181,8 +14257,8 @@ class backgroundDLG(QDialog):
         aw.qmc.backgroundpath = str(self.pathedit.text())
         aw.loadbackground(str(self.pathedit.text()))
         self.backgroundCheck.setChecked(True)
-        self.backgroundDetails.setChecked(True)
-        self.backgroundeventsflag.setChecked(True)
+        self.backgroundDetails.setChecked(False)
+        self.backgroundeventsflag.setChecked(False)
         self.readChecks()
         self.createEventTable()
         self.createDataTable()
@@ -19823,7 +19899,7 @@ class AlarmDlg(QDialog):
         nalarms = self.alarmtable.rowCount()
         for i in range(nalarms):
             timez =  self.alarmtable.cellWidget(i,0)
-            aw.qmc.alarmtime[i] = int(str(timez.currentIndex()))                                       
+            aw.qmc.alarmtime[i] = int(str(timez.currentIndex()))
             flag = self.alarmtable.cellWidget(i,1)
             aw.qmc.alarmflag[i] = int(flag.isChecked())         
             atype = self.alarmtable.cellWidget(i,2)
@@ -19877,7 +19953,10 @@ class AlarmDlg(QDialog):
                                        QApplication.translate("ComboBox","FC START",None, QApplication.UnicodeUTF8),
                                        QApplication.translate("ComboBox","FC END",None, QApplication.UnicodeUTF8),
                                        QApplication.translate("ComboBox","SC START",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8)])
+                                       QApplication.translate("ComboBox","SC END",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","COOL",None, QApplication.UnicodeUTF8),
+                                       QApplication.translate("ComboBox","TP",None, QApplication.UnicodeUTF8)])
                 timeComboBox.setCurrentIndex(aw.qmc.alarmtime[i])
                                             
                 #flag                
