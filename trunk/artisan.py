@@ -6153,10 +6153,10 @@ class ApplicationWindow(QMainWindow):
                         pass
             elif self.extraeventsactions[ee] == 5:
                 try:
-				    dtacommand = self.extraeventsactionstrings[ee]
-				    self.sendDTAcommand(dtacommand)
-				except:
-				    pass
+                    dtacommand = self.extraeventsactionstrings[ee]
+                    self.sendDTAcommand(dtacommand)
+                except:
+                    pass
                     
 
     def resetApplication(self):
