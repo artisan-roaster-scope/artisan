@@ -170,7 +170,22 @@ platf = str(platform.system())
 #################### Main Application  ################################################
 #######################################################################################
 
-app = QApplication(sys.argv)
+
+class Artisan(QApplication):
+    def __init__(self, args):
+        super(Artisan, self).__init__(args)
+        
+    def event(self, event):
+        if event.type() == QEvent.FileOpen:
+            try:
+                aw.loadFile(str(event.file()))
+            except:
+                pass
+            return 1      
+        return super(Artisan, self).event(event)
+
+
+app = Artisan(sys.argv)
 app.setApplicationName("Artisan")                                       #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationName("YourQuest")                                    #needed by QSettings() to store windows geometry in operating system
 app.setOrganizationDomain("p.code.google.com")                          #needed by QSettings() to store windows geometry in operating system 
@@ -566,13 +581,14 @@ class tgraphcanvas(FigureCanvas):
 
         #Temperature Alarms lists. Data is writen in  alarmDlg 
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
+                               # -1 equals None
         self.alarmflag = []    # 0 = OFF; 1 = ON flags
         self.alarmcond = []    # 0 = falls below; 1 = rises above
         # alarmstate is set to 'not triggered' on reset()
         self.alarmstate = []   # 1=triggered, 0=not triggered. Needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
         self.alarmsource = []   # -2=DeltaET, -1=DeltaBT, 0=ET , 1=BT, 2=extratemp1[0], 3=extratemp2[0], 4=extratemp2[1],....
         self.alarmtemperature = []  # set temperature number (example 500)
-        self.alarmaction = []       # 0 = open a window; 1 = call program with a filepath equal to alarmstring; 2 = activate button with number given in description
+        self.alarmaction = []       # -1 = no action; 0 = open a window; 1 = call program with a filepath equal to alarmstring; 2 = activate button with number given in description
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
         self.temporaryalarmflag = -3 #holds temporary index value of triggered alarm in updategraphics()
         
@@ -871,26 +887,31 @@ class tgraphcanvas(FigureCanvas):
 
 
     def timealign(self):
-        if self.timeindex[0] != -1:
-            start = self.timex[self.timeindex[0]]
-        else:
-            start = 0
-
-        if self.timeindexB[0] != -1:
-            startB = self.timeB[self.timeindexB[0]]
-        else:
-            startB = 0
-
-        btime = startB
-        ptime = start
+        try:
+            if self.timeindex[0] != -1:
+                start = self.timex[self.timeindex[0]]
+            else:
+                start = 0
+    
+            if self.timeindexB[0] != -1:
+                startB = self.timeB[self.timeindexB[0]]
+            else:
+                startB = 0
+    
+            btime = startB
+            ptime = start
+            
+            difference = ptime - btime
+            if difference > 0:
+               self.movebackground("right",abs(difference))
+               self.redraw()
+            elif difference < 0:
+               self.movebackground("left",abs(difference))
+               self.redraw()
+        except:
+            pass
         
-        difference = ptime - btime
-        if difference > 0:
-           self.movebackground("right",abs(difference))
-        elif difference < 0:
-           self.movebackground("left",abs(difference))
         
-        self.redraw()
         
     def resetlines(self):
         #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
@@ -1323,7 +1344,7 @@ class tgraphcanvas(FigureCanvas):
         self.disconnect_designer()  #sets designer flag false
         self.setCursor(Qt.ArrowCursor)
 
-        self.temporaryalarmflag = -1
+        self.temporaryalarmflag = -3
 
         #extra devices
         for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2))):            
@@ -1890,6 +1911,11 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
                                      xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] - self.ystep_down),
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
+
+                # add COOL mark                                     
+                if self.timeindex[7]:
+                    self.ax.axvspan(self.timex[self.timeindex[7]-1],self.timex[self.timeindex[7]], facecolor='lightblue', ec='none', alpha=0.8, clip_on=False, clip_path=None, lw=None,lod=True)
+
                     
                     self.writestatistics()
 
@@ -2508,12 +2534,12 @@ class tgraphcanvas(FigureCanvas):
                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
                 self.xaxistosm()
-
-                aw.qmc.timealign()
                 
                 self.fig.canvas.draw()
                 
                 self.samplingsemaphore.release(1)
+
+                aw.qmc.timealign()
 
                 message = QApplication.translate("Message Area","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(str(self.temp2[self.timeindex[0]]) + self.mode)
                 aw.sendmessage(message) 
@@ -4936,7 +4962,7 @@ class SampleThread(QThread):
                         
                     # autodetect CHARGE event
                     # only if BT > 203F/95C                
-                    if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] <= 0 and length_of_qmc_timex >= 5 and \
+                    if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
                         ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
                         if aw.BTbreak(length_of_qmc_timex - 1):
                             # we found a BT break at the current index minus 2
@@ -4954,13 +4980,29 @@ class SampleThread(QThread):
                     #check alarms 
                     for i in range(len(aw.qmc.alarmflag)):
                         #if alarm on, and not triggered, and time is after set time:
-                        if aw.qmc.alarmflag[i] and not aw.qmc.alarmstate[i] and ((aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > -1) or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
+                        # qmc.alarmtime = -1 (None)
+                        # qmc.alarmtime = 0 (CHARGE)
+                        # ..
+                        #print(str(aw.qmc.timeindex),str(aw.qmc.alarmtime[i]))\
+                        # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
+                        # 1) the alarm is ON
+                        # 2) the alarm was not triggered yet
+                        # 3) the alarm From is ON
+                        # 4) the alarm From is CHARGE
+                        # 5) the alarm From is any other event but TP
+                        # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
+                        if aw.qmc.alarmflag[i] \
+                          and not aw.qmc.alarmstate[i] \
+                          and ((aw.qmc.alarmtime[i] < 0) \
+                          or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > -1) \
+                          or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                          or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
                                 and aw.qmc.timeindex[1] < 1 and self.checkTPalarmtime())):
-                                # only between CHARGE and DRY we check for TP if alarmtime[i]=8
-                            print("testing",aw.qmc.alarmtime[i],aw.qmc.timeindex[aw.qmc.alarmtime[i]])
+#                            if aw.qmc.alarmtime[i] < 8:
+#                                print("testing",aw.qmc.alarmtime[i],aw.qmc.timeindex[aw.qmc.alarmtime[i]])
                             alarm_temp = None
-                            print("alarmsource",aw.qmc.alarmsource[i])
-                            print((aw.qmc.alarmsource[i])%2==0,len(aw.qmc.extratemp1),len(aw.qmc.extratemp2))
+#                            print("alarmsource",aw.qmc.alarmsource[i])
+#                            print((aw.qmc.alarmsource[i])%2==0,len(aw.qmc.extratemp1),len(aw.qmc.extratemp2))
                             if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
                                 alarm_temp = aw.qmc.delta1[-1]
                             elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
@@ -4974,6 +5016,7 @@ class SampleThread(QThread):
                                     alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
                                 else:
                                     alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+#                            print("temp: " + str(alarm_temp))
                             alarm_limit = aw.qmc.alarmtemperature[i]
                             if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
                                 aw.qmc.temporaryalarmflag = i
@@ -5021,11 +5064,10 @@ class SampleThread(QThread):
         # if v[-1] is the current temperature then check if
         #   len(BT) > 4
         # BT[-4] <= BT[-3] <= BT[-2] <= BT[-1] and BT[-4] < BT[-1]
-        if not self.afterTP and len(aw.qmc.temp2) > 4 and aw.qmc.temp2[-4] <= aw.qmc.temp2[-3] <= aw.qmc.temp2[-2] <= aw.qmc.temp2[-1] and aw.qmc.temp2[-4] < aw.qmc.temp2[-1]:
+        if not self.afterTP and len(aw.qmc.temp2) > 3 and aw.qmc.temp2[-4] <= aw.qmc.temp2[-3] <= aw.qmc.temp2[-2] <= aw.qmc.temp2[-1] and aw.qmc.temp2[-4] < aw.qmc.temp2[-1]:
             self.afterTP = True
-        print("checkTPalarmtime",self.afterTP)
         return self.afterTP
-                      
+                              
     def run(self):
         self.afterTP = False
         if not aw.qmc.flagon:
@@ -5257,42 +5299,26 @@ class ApplicationWindow(QMainWindow):
         self.connect(fullsizeAction,SIGNAL("triggered()"),lambda x=0,y=1:self.resize(x,y))
         saveGraphMenu.addAction(fullsizeAction)
 
-        saveGraphMenuHB = saveGraphMenu.addMenu(QApplication.translate("Menu", "Home-Barista.com",None, QApplication.UnicodeUTF8))
-        saveGraphMenuCG = saveGraphMenu.addMenu(QApplication.translate("Menu", "CoffeeGeek.com",None, QApplication.UnicodeUTF8))
-        saveGraphMenuPC = saveGraphMenu.addMenu(QApplication.translate("Menu", "PlanetCafe.fr",None, QApplication.UnicodeUTF8))
-        saveGraphMenuRC = saveGraphMenu.addMenu(QApplication.translate("Menu", "RiktigtKaffe.se",None, QApplication.UnicodeUTF8))
+        KaffeeNetzAction = QAction("Kaffee-Netz.de (800x?)...",self)
+        self.connect(KaffeeNetzAction,SIGNAL("triggered()"),lambda x=800,y=1:self.resize(x,y))
+        saveGraphMenu.addAction(KaffeeNetzAction)
 
-        HomeBaristaActionLow = QAction(UIconst.FILE_MENU_SAVEGRAPH_LOW_QUALITY,self)
-        self.connect(HomeBaristaActionLow,SIGNAL("triggered()"),lambda x=700,y=0:self.resize(x,y))
-        saveGraphMenuHB.addAction(HomeBaristaActionLow)
+        HomeBaristaAction = QAction("Home-Barista.com (700x?)...",self)
+        self.connect(HomeBaristaAction,SIGNAL("triggered()"),lambda x=700,y=1:self.resize(x,y))
+        saveGraphMenu.addAction(HomeBaristaAction)
 
-        HomeBaristaActionHigh = QAction(UIconst.FILE_MENU_SAVEGRAPH_HIGH_QUALITY,self)
-        self.connect(HomeBaristaActionHigh,SIGNAL("triggered()"),lambda x=700,y=1:self.resize(x,y))
-        saveGraphMenuHB.addAction(HomeBaristaActionHigh)
+        RiktigtKaffeAction = QAction("RiktigtKaffe.se (620x?)...",self)
+        self.connect(RiktigtKaffeAction,SIGNAL("triggered()"),lambda x=620,y=1:self.resize(x,y))
+        saveGraphMenu.addAction(RiktigtKaffeAction)
+        
+        PlanetCafeAction = QAction("PlanetCafe.fr (600x?)...",self)
+        self.connect(PlanetCafeAction,SIGNAL("triggered()"),lambda x=600,y=1:self.resize(x,y))
+        saveGraphMenu.addAction(PlanetCafeAction)
 
-        CoffeeGeekActionLow = QAction(UIconst.FILE_MENU_SAVEGRAPH_LOW_QUALITY,self)
-        self.connect(CoffeeGeekActionLow,SIGNAL("triggered()"),lambda x=500,y=0:self.resize(x,y))
-        saveGraphMenuCG.addAction(CoffeeGeekActionLow)
+        CoffeeGeekAction = QAction("CoffeeGeek.com (500x?)...",self)
+        self.connect(CoffeeGeekAction,SIGNAL("triggered()"),lambda x=500,y=1:self.resize(x,y))
+        saveGraphMenu.addAction(CoffeeGeekAction)
 
-        CoffeeGeekActionHigh = QAction(UIconst.FILE_MENU_SAVEGRAPH_HIGH_QUALITY,self)
-        self.connect(CoffeeGeekActionHigh,SIGNAL("triggered()"),lambda x=500,y=1:self.resize(x,y))
-        saveGraphMenuCG.addAction(CoffeeGeekActionHigh)
-
-        PlanetCafeActionLow = QAction(UIconst.FILE_MENU_SAVEGRAPH_LOW_QUALITY,self)
-        self.connect(PlanetCafeActionLow,SIGNAL("triggered()"),lambda x=600,y=0:self.resize(x,y))
-        saveGraphMenuPC.addAction(PlanetCafeActionLow)
-
-        PlanetCafeActionHigh = QAction(UIconst.FILE_MENU_SAVEGRAPH_HIGH_QUALITY,self)
-        self.connect(PlanetCafeActionHigh,SIGNAL("triggered()"),lambda x=600,y=1:self.resize(x,y))
-        saveGraphMenuPC.addAction(PlanetCafeActionHigh)
-
-        RiktigtKaffeActionLow = QAction(UIconst.FILE_MENU_SAVEGRAPH_LOW_QUALITY,self)
-        self.connect(RiktigtKaffeActionLow,SIGNAL("triggered()"),lambda x=620,y=0:self.resize(x,y))
-        saveGraphMenuRC.addAction(RiktigtKaffeActionLow)
-
-        RiktigtKaffeActionHigh = QAction(UIconst.FILE_MENU_SAVEGRAPH_HIGH_QUALITY,self)
-        self.connect(RiktigtKaffeActionHigh,SIGNAL("triggered()"),lambda x=620,y=1:self.resize(x,y))
-        saveGraphMenuRC.addAction(RiktigtKaffeActionHigh)
 
         htmlAction = QAction(UIconst.FILE_MENU_HTMLREPORT,self)
         self.connect(htmlAction,SIGNAL("triggered()"),self.htmlReport)
@@ -6062,10 +6088,11 @@ class ApplicationWindow(QMainWindow):
         mainlayout = QVBoxLayout(self.main_widget)
         mainlayout.setContentsMargins(0,0,0,0)
         mainlayout.addLayout(level1layout)       
-        mainlayout.addLayout(midlayout)      
-
+        mainlayout.addLayout(midlayout) 
+        
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
 
+        
     def setLabelColor(self,label,color):
         palette = QPalette(label.palette()) # make a copy of the palette
         palette.setColor(QPalette.Foreground, color)
@@ -6105,8 +6132,6 @@ class ApplicationWindow(QMainWindow):
     def recordextraevent(self,ee):
         if self.qmc.flagstart:
             self.qmc.EventRecord(extraevent = ee)
-        else:
-            self.sendmessage(QApplication.translate("Message Area","Recorder is STOPPED", None, QApplication.UnicodeUTF8))
        
         if self.extraeventsactions[ee]:   	#0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command
             if self.extraeventsactions[ee] == 1:                    
@@ -6154,10 +6179,11 @@ class ApplicationWindow(QMainWindow):
             elif self.extraeventsactions[ee] == 5:
                 try:
                     dtacommand = self.extraeventsactionstrings[ee]
-                    self.sendDTAcommand(dtacommand)
+                    DTAvalue=dtacommand.split(':')[1]
+                    DTAaddress=dtacommand.split(':')[0]
+                    aw.dtapid.writeDTE(DTAvalue,DTAaddress)
                 except:
                     pass
-                    
 
     def resetApplication(self):
         string = QApplication.translate("MessageBox","Do you want to reset all settings?", None, QApplication.UnicodeUTF8)
@@ -6545,7 +6571,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.autosavepath and self.qmc.autosaveflag:
                 filename = self.qmc.autosaveprefix + "-"
                 filename += str(QDateTime.currentDateTime().toString(QString("dd-MM-yy_hhmm")))
-                filename += ".txt"
+                filename += ".alog"
                 oldDir = str(QDir.current())           
                 newdir = QDir.setCurrent(self.qmc.autosavepath)
                 #write
@@ -6728,7 +6754,7 @@ class ApplicationWindow(QMainWindow):
  
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
-    def ArtisanSaveFileDialog(self,msg=QApplication.translate("MessageBox Caption","Save",None, QApplication.UnicodeUTF8),ext="*.txt",path=None):
+    def ArtisanSaveFileDialog(self,msg=QApplication.translate("MessageBox Caption","Save",None, QApplication.UnicodeUTF8),ext="*.alog",path=None):
         if path == None:
             path = self.getDefaultPath() 
         file = str(QFileDialog.getSaveFileName(self,msg,path,ext))
@@ -8295,9 +8321,12 @@ class ApplicationWindow(QMainWindow):
 
     def filePrint(self):
 
-        tempFile = tempfile.TemporaryFile()
-        self.qmc.fig.savefig(tempFile.name)
-        image = QImage(tempFile.name)
+#        tempFile = tempfile.NamedTemporaryFile(delete=True)
+#        tfname = tempFile.name
+#        tempFile.close()
+#        self.qmc.fig.savefig(tfname)
+#        image = QImage(tfname)
+        image = QPixmap.grabWidget(aw.qmc).toImage()
         
         if image.isNull():
             return
@@ -8340,7 +8369,7 @@ th {
 <center>
 <h1>$title</h1>
 
-<table border="1" cellpadding="10">
+<table border="1" cellpadding="10" width="80%">
 <tr>
 <td>
 <center>
@@ -8413,8 +8442,12 @@ th {
 <td>$SCe</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Drop:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + str(QApplication.translate("HTML Report Template", "DROP:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$drop</td>
+</tr>
+<tr>
+<th>""" + str(QApplication.translate("HTML Report Template", "COOL:", None, QApplication.UnicodeUTF8)) + """</th>
+<td>$cool</td>
 </tr>
 </table>
 </td>
@@ -8438,19 +8471,22 @@ th {
 </table>
 </center>
 </td>
+</tr>
+<tr>
+<td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='$graph_image'/></td>
+</tr>
+<tr>
 <td>
 <center><b>""" + str(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
 $roasting_notes
 </td>
 </tr>
+</table>
+<table border="1" cellpadding="10" style="page-break-inside:avoid"  width="80%">
 <tr>
-<td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='$graph_image'/></td>
 <td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'/></td>
 </tr>
 <tr>
-<td><center><b>""" + str(QApplication.translate("HTML Report Template", "Events", None, QApplication.UnicodeUTF8)) + """</b></center><br/>
-$specialevents
-</td>
 <td><center><b>""" + str(QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
 $cupping_notes
 </td>
@@ -8484,32 +8520,54 @@ $cupping_notes
                 DRY_time_idx = 0
         evaluations = self.defect_estimation()
         self.qmc.redraw(recomputeAllDeltas=False)   
+        #graph_image = self.qmc.title + "-graph"
+        graph_image = "roastlog-graph"
         if platf == 'Darwin':
-            graph_image = "artisan-graph.svg"
+            graph_image = graph_image + ".svg"
+            try:
+                os.remove(graph_image)
+            except OSError:
+                pass
             self.qmc.fig.savefig(graph_image)
         else:
-            #resize GRAPH image to 600 pixels width
-            tempFile = tempfile.TemporaryFile()
-            self.qmc.fig.savefig(tempFile.name)
-            image = QImage(tempFile.name)
+            #resize GRAPH image to 650 pixels width
+            #generate a tmp file name
+            tempFile = tempfile.NamedTemporaryFile(delete=True)
+            tfname = tempFile.name
+            tempFile.close() # tmp file is deleted automatically on close
+#            self.qmc.fig.savefig(tfname)
+#            image = QImage(tfname)
+            image = QPixmap.grabWidget(aw.qmc).toImage()
             image = image.scaledToWidth(650,1)
             #save GRAPH image
-            graph_image = "artisan-graph.png"
+            graph_image = graph_image + ".png"
+            try:
+                os.remove(graph_image)
+            except OSError:
+                pass
             image.save(graph_image)
+        #add some random number to force HTML reloading
+        graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
         #obtain flavor chart image
         self.qmc.flavorchart()
+        #flavor_image = self.qmc.title + "-flavor"
+        flavor_image = "roastlog-flavor"
         if platf == 'Darwin':
-            flavor_image = "artisan-flavor.svg"
+            flavor_image = flavor_image + ".svg"
             self.qmc.fig.savefig(flavor_image)
         else:
-            #resize FLAVOR image to 400 pixels width
-            tempFile = tempfile.TemporaryFile()
-            self.qmc.fig.savefig(tempFile.name)
-            image = QImage(tempFile.name)
+            #resize FLAVOR image to 550 pixels width
+            tempFile = tempfile.NamedTemporaryFile(delete=True)
+            tfname = tempFile.name
+            tempFile.close() # tmp file is deleted automatically on close            
+#            self.qmc.fig.savefig(tfname)            
+#            image = QImage(tfname)
+            image = QPixmap.grabWidget(aw.qmc).toImage()
             image = image.scaledToWidth(550,1)
             #save GRAPH image
-            flavor_image = "artisan-flavor.png"
+            flavor_image = flavor_image + ".png"
             image.save(flavor_image)
+        flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
         weight_loss = self.weight_loss(self.qmc.weight[0],self.qmc.weight[1])
         volume_gain = self.weight_loss(self.qmc.volume[1],self.qmc.volume[0])
         #return screen to GRAPH profile mode
@@ -8532,6 +8590,7 @@ $cupping_notes
             SCs=self.event2html(self.qmc.timeindex[4]),
             SCe=self.event2html(self.qmc.timeindex[5]),
             drop=self.event2html(self.qmc.timeindex[6]),
+            cool=self.event2html(self.qmc.timeindex[7],self.qmc.timeindex[6]),
             dry_phase=self.phase2html(self.qmc.statisticstimes[1],rates_of_changes[0],evaluations[0]),
             mid_phase=self.phase2html(self.qmc.statisticstimes[2],rates_of_changes[1],evaluations[1]),
             finish_phase=self.phase2html(self.qmc.statisticstimes[3],rates_of_changes[2],evaluations[2]),
@@ -8541,12 +8600,15 @@ $cupping_notes
             specialevents=self.specialevents2html(),
             cupping_notes=self.note2html(self.qmc.cuppingnotes))
         f = None
-        try:      
-            f = codecs.open("Artisanreport.html", 'w', encoding='utf-8')
+        try:              
+            filename = "Roastlog.html"
+            f = codecs.open(filename, 'w', encoding='utf-8')
             for i in range(len(html)):
                 f.write(html[i])
             f.close()
-            QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/Artisanreport.html", QUrl.TolerantMode))            
+            full_path = "file:///" + str(QDir().current().absolutePath()) + "/" + filename
+            QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
+            
         except IOError as e:
             self.qmc.adderror(QApplication.translate("Error Message", "IO Error: htmlReport() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
             return
@@ -8580,15 +8642,20 @@ $cupping_notes
         else:
             return "--"
             
-    def event2html(self,time_idx):
+    def event2html(self,time_idx,prev_time_idx=None):
         if time_idx:
             timez = self.qmc.timex[time_idx]
-            temp = self.qmc.temp2[time_idx]
             if self.qmc.timeindex[0] != -1:
                 start = self.qmc.timex[self.qmc.timeindex[0]]
             else:
-                start = 0    
-            return self.qmc.stringfromseconds(timez - start)+ " (%.1f"%temp + "&deg;" + self.qmc.mode + ")"
+                start = 0
+            if prev_time_idx:
+                prev = self.qmc.timex[prev_time_idx]
+                m, s = divmod((timez - prev), 60)
+                return self.qmc.stringfromseconds(timez - start)+ " (" + str(round(m)) + ":" + str(round(s)) + " min)"
+            else:
+                temp = self.qmc.temp2[time_idx] 
+                return self.qmc.stringfromseconds(timez - start)+ " (%.1f"%temp + "&deg;" + self.qmc.mode + ")"
         else:
             return "--"
             
@@ -9328,9 +9395,13 @@ $cupping_notes
     #resizes and saves graph to a new width w 
     def resize(self,w,transformationmode):
         try: 
-            tempFile = tempfile.TemporaryFile()
-            self.qmc.fig.savefig(tempFile.name)
-            image = QImage(tempFile.name)
+#            #generate a tmp file name
+#            tempFile = tempfile.NamedTemporaryFile(delete=True)
+#            tfname = tempFile.name
+#            tempFile.close() # tmp file is deleted automatically on close
+#            # use the tmp file name to save and load the pic
+#            self.qmc.fig.savefig(tfname)
+            image = QPixmap.grabWidget(aw.qmc)
 
             if w != 0:        
                 image = image.scaledToWidth(w,transformationmode)
@@ -9813,6 +9884,7 @@ class HUDDlg(QDialog):
         filterlabel = QLabel(QApplication.translate("Label", "Filter",None, QApplication.UnicodeUTF8))
         #DeltaFilter holds the number of pads in filter  
         self.DeltaFilter = QSpinBox()
+        self.DeltaFilter.setSingleStep(1)
         self.DeltaFilter.setRange(0,20)
         self.DeltaFilter.setValue(aw.qmc.deltafilter)
         self.connect(self.DeltaFilter ,SIGNAL("valueChanged(int)"),lambda i=0:self.changeDeltaFilter(i)) 
@@ -13335,6 +13407,7 @@ class EventsDlg(QDialog):
         string += QApplication.translate("MessageBox", "Call program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Modbus command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "DTA command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8) + "<br><br>"
         
@@ -17860,7 +17933,6 @@ class DeviceAssignmentDLG(QDialog):
                             break 
                 devices = sorted(dev)
                 #devices.insert(0,"")         #add empty space for PID
-                visibility = ["OFF","ON"]
                 for i in range(nddevices):
                     typeComboBox =  QComboBox()
                     typeComboBox.addItems(sorted(devices))
@@ -17882,25 +17954,33 @@ class DeviceAssignmentDLG(QDialog):
                     mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None, QApplication.UnicodeUTF8))
                     mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None, QApplication.UnicodeUTF8))
 
-                    LCD1visibilityComboBox =  QComboBox()
-                    LCD1visibilityComboBox.addItems(visibility)                    
-                    LCD1visibilityComboBox.setCurrentIndex(aw.extraLCDvisibility1[i])
-                    self.connect(LCD1visibilityComboBox, SIGNAL("currentIndexChanged(int)"),lambda x=0,lcd=1, ind=i: self.updateLCDvisibility(x,lcd,ind))
+                    LCD1visibilityComboBox =  QCheckBox()
+                    if aw.extraLCDvisibility1[i]:
+                        LCD1visibilityComboBox.setCheckState(Qt.Checked)
+                    else:
+                        LCD1visibilityComboBox.setCheckState(Qt.Unchecked)
+                    self.connect(LCD1visibilityComboBox, SIGNAL("stateChanged(int)"),lambda x=0,lcd=1, ind=i: self.updateLCDvisibility(x,lcd,ind))
 
-                    LCD2visibilityComboBox =  QComboBox()
-                    LCD2visibilityComboBox.addItems(visibility)                    
-                    LCD2visibilityComboBox.setCurrentIndex(aw.extraLCDvisibility2[i])
-                    self.connect(LCD2visibilityComboBox, SIGNAL("currentIndexChanged(int)"),lambda x=0,lcd=2, ind=i: self.updateLCDvisibility(x,lcd,ind))
+                    LCD2visibilityComboBox =  QCheckBox()
+                    if aw.extraLCDvisibility2[i]:
+                        LCD2visibilityComboBox.setCheckState(Qt.Checked)
+                    else:
+                        LCD2visibilityComboBox.setCheckState(Qt.Unchecked)
+                    self.connect(LCD2visibilityComboBox, SIGNAL("stateChanged(int)"),lambda x=0,lcd=2, ind=i: self.updateLCDvisibility(x,lcd,ind))
 
-                    Curve1visibilityComboBox =  QComboBox()
-                    Curve1visibilityComboBox.addItems(visibility)                    
-                    Curve1visibilityComboBox.setCurrentIndex(aw.extraCurveVisibility1[i])
-                    self.connect(Curve1visibilityComboBox, SIGNAL("currentIndexChanged(int)"),lambda x=0,curve=1, ind=i: self.updateCurveVisibility(x,curve,ind))
+                    Curve1visibilityComboBox =  QCheckBox()
+                    if aw.extraCurveVisibility1[i]:
+                        Curve1visibilityComboBox.setCheckState(Qt.Checked)
+                    else:
+                        Curve1visibilityComboBox.setCheckState(Qt.Unchecked)
+                    self.connect(Curve1visibilityComboBox, SIGNAL("stateChanged(int)"),lambda x=0,curve=1, ind=i: self.updateCurveVisibility(x,curve,ind))
 
-                    Curve2visibilityComboBox =  QComboBox()
-                    Curve2visibilityComboBox.addItems(visibility)                    
-                    Curve2visibilityComboBox.setCurrentIndex(aw.extraCurveVisibility2[i])
-                    self.connect(Curve2visibilityComboBox, SIGNAL("currentIndexChanged(int)"),lambda x=0,curve=2, ind=i: self.updateCurveVisibility(x,curve,ind))
+                    Curve2visibilityComboBox =  QCheckBox()     
+                    if aw.extraCurveVisibility2[i]:
+                        Curve2visibilityComboBox.setCheckState(Qt.Checked)
+                    else:
+                        Curve2visibilityComboBox.setCheckState(Qt.Unchecked)              
+                    self.connect(Curve2visibilityComboBox, SIGNAL("stateChanged(int)"),lambda x=0,curve=2, ind=i: self.updateCurveVisibility(x,curve,ind))
 
                     #add widgets to the table
                     self.devicetable.setCellWidget(i,0,typeComboBox)
@@ -17913,7 +17993,7 @@ class DeviceAssignmentDLG(QDialog):
                     self.devicetable.setCellWidget(i,7,LCD1visibilityComboBox)              
                     self.devicetable.setCellWidget(i,8,LCD2visibilityComboBox) 
                     self.devicetable.setCellWidget(i,9,Curve1visibilityComboBox)              
-                    self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)              
+                    self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)            
 
         except Exception as e:
              aw.qmc.adderror(QApplication.translate("Error Message", "createDeviceTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
@@ -18061,22 +18141,23 @@ class DeviceAssignmentDLG(QDialog):
              aw.qmc.adderror(QApplication.translate("Error Message", "savedevicetable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
 
     def updateLCDvisibility(self,x,lcd,ind):
-        if lcd == 1:
-            aw.extraLCDvisibility1[ind] = x
-            if x:
-                aw.extraLCDlabel1[ind].setVisible(True)
-                aw.extraLCD1[ind].setVisible(True)
-            else:
-                aw.extraLCDlabel1[ind].setVisible(False)
-                aw.extraLCD1[ind].setVisible(False)
-        elif lcd == 2:
-            aw.extraLCDvisibility2[ind] = x
-            if x:
-                aw.extraLCDlabel2[ind].setVisible(True)
-                aw.extraLCD2[ind].setVisible(True)
-            else:
-                aw.extraLCDlabel2[ind].setVisible(False)
-                aw.extraLCD2[ind].setVisible(False)
+        if self.flagon:
+            if lcd == 1:
+                aw.extraLCDvisibility1[ind] = x
+                if x:
+                    aw.extraLCDlabel1[ind].setVisible(True)
+                    aw.extraLCD1[ind].setVisible(True)
+                else:
+                    aw.extraLCDlabel1[ind].setVisible(False)
+                    aw.extraLCD1[ind].setVisible(False)
+            elif lcd == 2:
+                aw.extraLCDvisibility2[ind] = x
+                if x:
+                    aw.extraLCDlabel2[ind].setVisible(True)
+                    aw.extraLCD2[ind].setVisible(True)
+                else:
+                    aw.extraLCDlabel2[ind].setVisible(False)
+                    aw.extraLCD2[ind].setVisible(False)
                 
     def updateCurveVisibility(self,x,curve,ind):
         if curve == 1:
@@ -19899,7 +19980,7 @@ class AlarmDlg(QDialog):
         nalarms = self.alarmtable.rowCount()
         for i in range(nalarms):
             timez =  self.alarmtable.cellWidget(i,0)
-            aw.qmc.alarmtime[i] = int(str(timez.currentIndex()))
+            aw.qmc.alarmtime[i] = int(str(timez.currentIndex() - 1))
             flag = self.alarmtable.cellWidget(i,1)
             aw.qmc.alarmflag[i] = int(flag.isChecked())         
             atype = self.alarmtable.cellWidget(i,2)
@@ -19909,7 +19990,7 @@ class AlarmDlg(QDialog):
             temp = self.alarmtable.cellWidget(i,4)
             aw.qmc.alarmtemperature[i] = int(str(temp.text()))
             action = self.alarmtable.cellWidget(i,5)
-            aw.qmc.alarmaction[i] = int(str(action.currentIndex()))
+            aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
             description = self.alarmtable.cellWidget(i,6)
             aw.qmc.alarmstrings[i] = str(description.text())
 
@@ -19948,16 +20029,17 @@ class AlarmDlg(QDialog):
             for i in range(nalarms):
                 #Effective time from
                 timeComboBox = QComboBox()
-                timeComboBox.addItems([QApplication.translate("ComboBox","CHARGE",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","DRY END",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","FC START",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","FC END",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","SC START",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","SC END",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","COOL",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","TP",None, QApplication.UnicodeUTF8)])
-                timeComboBox.setCurrentIndex(aw.qmc.alarmtime[i])
+                timeComboBox.addItems([QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
+                                       QApplication.translate("ComboBox","CHARGE",None, QApplication.UnicodeUTF8), # qmc.alarmtime 0
+                                       QApplication.translate("ComboBox","DRY END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 1
+                                       QApplication.translate("ComboBox","FC START",None, QApplication.UnicodeUTF8), # qmc.alarmtime 2
+                                       QApplication.translate("ComboBox","FC END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 3
+                                       QApplication.translate("ComboBox","SC START",None, QApplication.UnicodeUTF8), # qmc.alarmtime 4
+                                       QApplication.translate("ComboBox","SC END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 5
+                                       QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8), # qmc.alarmtime 6
+                                       QApplication.translate("ComboBox","COOL",None, QApplication.UnicodeUTF8), # qmc.alarmtime 7
+                                       QApplication.translate("ComboBox","TP",None, QApplication.UnicodeUTF8)]) # qmc.alarmtime 8
+                timeComboBox.setCurrentIndex(aw.qmc.alarmtime[i] + 1)
                                             
                 #flag                
                 flagComboBox = QCheckBox()
@@ -19987,10 +20069,11 @@ class AlarmDlg(QDialog):
 
                 #action
                 actionComboBox = QComboBox()
-                actionComboBox.addItems([QApplication.translate("ComboBox","Pop up window",None, QApplication.UnicodeUTF8),
+                actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
+                                         QApplication.translate("ComboBox","Pop up window",None, QApplication.UnicodeUTF8),
                                          QApplication.translate("ComboBox","Call program",None, QApplication.UnicodeUTF8),
                                          QApplication.translate("ComboBox","Event button",None, QApplication.UnicodeUTF8)])
-                actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i])
+                actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i] + 1)
                     
                 #text description
                 descriptionedit = QLineEdit(str(aw.qmc.alarmstrings[i]))
@@ -23443,6 +23526,11 @@ class DtaPID(object):
                   }
         
     #command  string = ID (ADR)+ FUNCTION (CMD) + ADDRESS + NDATA + LRC_CHK 
+    def writeDTE(self,value,DTAaddress):
+        newsv = hex(int(abs(float(str(value)))))[2:].upper()
+        command = aw.dtapid.message2send(aw.ser.controlETpid[1],6,str(DTAaddress),newsv)
+        r = aw.ser.sendDTAcommand(command) 
+		    
     def message2send(self,unitID,FUNCTION,ADDRESS, NDATA):
         #compose command
         string_unitID = str(unitID).zfill(2)
@@ -23487,6 +23575,10 @@ class DtaPID(object):
 aw = None # this is to ensure that the variable aw is already defined during application initialization
 aw = ApplicationWindow()
 aw.settingsLoad()
+try:
+    aw.loadFile(str(sys.argv[1]))
+except:
+    pass
 aw.show()
 #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
 with numpy.errstate(invalid='ignore'):

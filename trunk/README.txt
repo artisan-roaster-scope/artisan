@@ -16,7 +16,7 @@ Developers: <https://lists.mokelbu.de/listinfo/artisan-devel>
 
 FEATURES
 
-o runs on Mac OS X 10.4/10.5/10.6/10.7/10.8 Intel/PPC, Windows, and Linux
+o runs on Mac OS X 10.6/10.7/10.8 on Intel, Windows, and Linux
 (on OS X 10.8 Mountain Lion you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
@@ -72,7 +72,7 @@ http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A
 If artisan starts when clicling on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything. Newer OS like Windows 7 come with this file.
 
 
-o Mac OS X (>10.4.x)
+o Mac OS X (>=10.6.x)
 
 - Install USB/serial driver for your meter
  . for Omega meters download and run the FTDI VCP OS X installer
@@ -111,25 +111,26 @@ LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
 
-- Python 2.7.x and 2.6.X released under the PSF licence http://www.python.org/psf/
+- Python 2.6.x, 2.7.x and 3.3.X released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
-- QT 4.7.x under the Qt GNU GPL v. 3.0 licence
+- QT 4.8.x under the Qt GNU GPL v. 3.0 licence
   http://qt.nokia.com/
-- Numpy 1.6.x and Scipy 0.9.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
+- Numpy 1.7.x and Scipy 0.11.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
 - PyQt 4.8.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
-- SIP 4.12.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
+- SIP 4.14.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/sip/
-- matplotlib 1.0.x, Copyright (c) 2002-2009 John D. Hunter; All Rights Reserved
+- matplotlib 1.2.x, Copyright (c) 2002-2012 John D. Hunter; All Rights Reserved
   http://matplotlib.sourceforge.net
 - pyaudio 0.2.x under the MIT License; Copyright (c) 2006-2010 Hubert Pham
   http://people.csail.mit.edu/hubert/pyaudio/
-- py2app under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
-  Copyright (c) 2010-2011 Ronald Oussoren <ronaldoussoren at mac.com>.
+- py2app 0.7.x under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
+  Copyright (c) 2010-2012 Ronald Oussoren <ronaldoussoren at mac.com>.
   http://packages.python.org/py2app/
 - py2exe, Copyright (c) 2000-2005 Thomas Heller, Mark Hammond, Jimmy Retzlaff
   http://www.py2exe.org/
+- minimalmodbus 0.4 under the Apache License, Version 2.0 by Jonas Berg
 
 
 VERSION HISTORY
