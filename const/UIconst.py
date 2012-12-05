@@ -44,9 +44,7 @@ FILE_MENU_SAVEAS = QApplication.translate("Menu", "Save As...", None, QApplicati
 FILE_MENU_EXPORT = QApplication.translate("Menu", "Export...", None, QApplication.UnicodeUTF8)
 FILE_MENU_SAVEGRAPH = QApplication.translate("Menu", "Save Graph", None, QApplication.UnicodeUTF8)
 FILE_MENU_SAVEGRAPH_FULL_SIZE = QApplication.translate("Menu", "Full Size...", None, QApplication.UnicodeUTF8)
-FILE_MENU_SAVEGRAPH_LOW_QUALITY = QApplication.translate("Menu", "Low Quality...", None, QApplication.UnicodeUTF8)
-FILE_MENU_SAVEGRAPH_HIGH_QUALITY = QApplication.translate("Menu", "High Quality...", None, QApplication.UnicodeUTF8)
-FILE_MENU_HTMLREPORT = QApplication.translate("Menu", "HTML Report", None, QApplication.UnicodeUTF8)
+FILE_MENU_HTMLREPORT = QApplication.translate("Menu", "Roasting Report", None, QApplication.UnicodeUTF8)
 FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None, QApplication.UnicodeUTF8)
 
 #Edit menu items

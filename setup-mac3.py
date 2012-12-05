@@ -19,6 +19,7 @@ import sys, os
 from setuptools import setup
 
 import string
+from plistlib import Plist
 
 # current version of Artisan
 VERSION = '0.6.0'
@@ -42,11 +43,25 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_it.qm"]),
     ("../translations", [r"translations/artisan_sv.qm"]),
     ("../Resources", [r"qt.conf"]),
+    ("../Resources", [r"artisanProfile.icns"]),
   ]
+  
+plist = Plist.fromFile('Info.plist')
+plist.update({ 'CFBundleDisplayName': 'Artisan',
+                    'CFBundleGetInfoString' : 'Artisan, Roast Logger',
+                    'CFBundleIdentifier':'com.google.code.p.Artisan',
+                    'CFBundleShortVersionString':VERSION,
+                    'CFBundleVersion': 'Artisan ' + VERSION,
+                    'LSMinimumSystemVersion':'10.6',
+                    'LSMultipleInstancesProhibited':'false',
+                    'LSPrefersPPC' : False,
+                    'LSArchitecturePriority' : 'x86_64',
+                    'NSHumanReadableCopyright':LICENSE
+                })
   
 OPTIONS = {
     'strip':True,
-    'argv_emulation': False,
+    'argv_emulation': True,
     'semi_standalone': False,
     'site_packages': True,
     'packages': ['matplotlib'],
@@ -65,17 +80,7 @@ OPTIONS = {
                       '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
                       'bsddb','curses','tcl',
                       '_wxagg','_gtagg','_cocoaagg','_wx'],
-    'plist'    : { 'CFBundleDisplayName': 'Artisan',
-                    'CFBundleGetInfoString' : 'Artisan, Roast Logger',
-                    'CFBundleIdentifier':'com.google.code.p.Artisan',
-                    'CFBundleShortVersionString':VERSION,
-                    'CFBundleVersion': 'Artisan ' + VERSION,
-                    'LSMinimumSystemVersion':'10.6',
-                    'LSMultipleInstancesProhibited':'false',
-                    'LSPrefersPPC' : False,
-                    'LSArchitecturePriority' : 'x86_64',
-                    'NSHumanReadableCopyright':LICENSE
-                }}
+    'plist'    : plist}
 
 setup(
     name='Artisan',

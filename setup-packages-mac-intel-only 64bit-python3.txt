@@ -2,7 +2,7 @@ Current Versions
 o XCode 4.5.1
 o Python 3.3
 o QT 4.8.3
-o Numpy 1.7.0b2
+o Numpy >1.7.0b2
 o SIP 4.14.1
 o PyQt 4.9.5
 o scipy 0.11.0
@@ -11,12 +11,15 @@ o modulegraph 0.10
 o distribute 0.6.29
 o altgraph 0.10
 o macholib 1.5
-o py2app 0.7
+o py2app 0.7.1
 o pyaudio
 o minimalmodbus 0.4
 
 Upgrade History:
 
+- 2012-11-30:
+ . py2app 0.7 => 0.7.1
+ . numpy >1.7.0b2 (27.10.2012) => 1.7.0b2 (30.11.2012)
 - 2012-11-10:
  . XCode => 4.5.1
  . Python 3.3.0a3 => 3.3.0
@@ -133,7 +136,11 @@ download source
 # python3 setup.py build
 # sudo python3 setup.py install
 
-worked with latest git repository version on 27.10.2012 (v1.7.0b)
+git repository version on 27.10.2012 (v1.7.0b) fails with 
+AttributeError: incompatible shape for a non-contiguous array
+on "HTML Report" generation
+
+now installed trunk version from 30.11.2012
 
 
 4) Install SIP
@@ -245,8 +252,15 @@ http://pypi.python.org/packages/source/d/distribute/distribute-0.6.29.tar.gz
 
 12) py2app (0.7.1 from source)
 
+from repository
 # hg clone https://bitbucket.org/ronaldoussoren/py2app
 # cd py2app
+# python3 setup.py build
+# sudo python3 setup.py install
+
+from release downloaded from http://pypi.python.org/pypi/py2app/
+# tar -xzf py2app-0.7.1.tar.gz
+# cd py2app-0.7.1
 # python3 setup.py build
 # sudo python3 setup.py install
 
