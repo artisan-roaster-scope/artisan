@@ -1137,14 +1137,12 @@ class tgraphcanvas(FigureCanvas):
         endtime = self.endofx + starttime
         self.ax.set_xlim(self.startofx,endtime)
           
-        #majorlocator = ticker.IndexLocator(self.xgrid, starttime)  #IndexLocator does not work righ when updating (new value)self.endofx
-        #majorlocator = ticker.MultipleLocator(self.xgrid)          #MultipleLocator does not provide an offset for startime
             
         if not self.xgrid:
             self.xgrid = 60.
             
-        mfactor1 =  float(2. + int(starttime)/int(self.xgrid))
-        mfactor2 =  float(2. + int(self.endofx)/int(self.xgrid))
+        mfactor1 =  round(float(2. + int(starttime)/int(self.xgrid)))
+        mfactor2 =  round(float(2. + int(self.endofx)/int(self.xgrid)))
 
         majorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid)
         minorloc = numpy.arange(starttime-(self.xgrid*mfactor1),starttime+(self.xgrid*mfactor2), self.xgrid/6.)
@@ -1152,9 +1150,11 @@ class tgraphcanvas(FigureCanvas):
         list(map(round,majorloc))
         list(map(round,minorloc))
 
-        majorlocator = ticker.FixedLocator(majorloc)        
+        #majorlocator = ticker.IndexLocator(self.xgrid, starttime)  #IndexLocator does not work right when updating (new value)self.endofx
+        #majorlocator = ticker.MultipleLocator(self.xgrid)          #MultipleLocator does not provide an offset for startime
+        majorlocator = ticker.FixedLocator(majorloc)   
         minorlocator = ticker.FixedLocator(minorloc)
-        
+
         self.ax.xaxis.set_minor_locator(minorlocator)      
         self.ax.xaxis.set_major_locator(majorlocator)
         self.ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
