@@ -580,9 +580,10 @@ class tgraphcanvas(FigureCanvas):
 
 
         #Temperature Alarms lists. Data is writen in  alarmDlg 
+        self.alarmflag = []    # 0 = OFF; 1 = ON flags
+        self.alarmguard = []   # points to another alarm by index that has to be triggered before; -1 indicates no guard
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
                                # -1 equals None
-        self.alarmflag = []    # 0 = OFF; 1 = ON flags
         self.alarmcond = []    # 0 = falls below; 1 = rises above
         # alarmstate is set to 'not triggered' on reset()
         self.alarmstate = []   # 1=triggered, 0=not triggered. Needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
@@ -4993,6 +4994,7 @@ class SampleThread(QThread):
                         # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
                         if aw.qmc.alarmflag[i] \
                           and not aw.qmc.alarmstate[i] \
+                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
                           and ((aw.qmc.alarmtime[i] < 0) \
                           or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > -1) \
                           or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
@@ -7697,13 +7699,17 @@ class ApplicationWindow(QMainWindow):
             
             #restore alarms
             settings.beginGroup("Alarms")
-            if settings.contains("alarmtime"):
-                self.qmc.alarmtime = [x.toInt()[0] for x in settings.value("alarmtime").toList()]                                                    
+            if settings.contains("alarmtime"):                                                  
                 self.qmc.alarmflag = [x.toInt()[0] for x in settings.value("alarmflag").toList()]
-                self.qmc.alarmcond = [x.toInt()[0] for x in settings.value("alarmcond").toList()]
-                # the following is to ensure smooth transition to the extra alarm attribute cond for users having already alarms
-                if len(self.qmc.alarmcond) < len(self.qmc.alarmtime):
-                    self.qmc.alarmcond = [1]*len(self.qmc.alarmtime)
+                if settings.contains("alarmguard"):
+                    self.qmc.alarmguard = [x.toInt()[0] for x in settings.value("alarmguard").toList()]
+                else:
+                    self.qmc.alarmguard = [-1]*len(self.qmc.alarmflag)
+                self.qmc.alarmtime = [x.toInt()[0] for x in settings.value("alarmtime").toList()]  
+                if settings.contains("alarmcond"):
+                    self.qmc.alarmcond = [x.toInt()[0] for x in settings.value("alarmcond").toList()]
+                else:
+                    self.qmc.alarmguard = [1]*len(self.qmc.alarmflag)
                 self.qmc.alarmsource = [x.toInt()[0] for x in settings.value("alarmsource").toList()]
                 self.qmc.alarmtemperature = [x.toInt()[0] for x in settings.value("alarmtemperature").toList()]
                 self.qmc.alarmaction = [x.toInt()[0] for x in settings.value("alarmaction").toList()]
@@ -8070,9 +8076,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("densitySampleVolumeUnit",self.qmc.density[3])
             settings.endGroup()
             #save alarms
-            settings.beginGroup("Alarms")
-            settings.setValue("alarmtime",self.qmc.alarmtime)                                                                
-            settings.setValue("alarmflag",self.qmc.alarmflag)                                                                
+            settings.beginGroup("Alarms")                                                               
+            settings.setValue("alarmflag",self.qmc.alarmflag)  
+            settings.setValue("alarmguard",self.qmc.alarmguard)
+            settings.setValue("alarmtime",self.qmc.alarmtime)                                                               
             settings.setValue("alarmcond",self.qmc.alarmcond)            
             settings.setValue("alarmsource",self.qmc.alarmsource)
             settings.setValue("alarmtemperature",self.qmc.alarmtemperature)
@@ -8219,12 +8226,12 @@ class ApplicationWindow(QMainWindow):
             roast["densitySampleVolume"] = str(self.qmc.density[2])
             roast["densitySampleVolumeUnit"]= str(self.qmc.density[3])
             roast["beansize"]= str(self.qmc.beansize)
-            
-            alarms["alarmtime"]= str(self.qmc.alarmtime)                                                                
-            alarms["alarmflag"]= str(self.qmc.alarmflag)                                                              
+                                                                            
+            alarms["alarmflag"]= str(self.qmc.alarmflag) 
+            alarms["alarmguard"]= str(self.qmc.alarmguard)                                                             
+            alarms["alarmtime"]= str(self.qmc.alarmtime)
             alarms["alarmcond"]= str(self.qmc.alarmcond)
             alarms["alarmsource"]= str(self.qmc.alarmsource)
-            alarms["alarmtemperature"]= str(self.qmc.alarmtemperature)
             alarms["alarmaction"]= str(self.qmc.alarmaction)
             alarms["alarmstrings"]= str(self.qmc.alarmstrings)
             general["profilepath"]= str(self.userprofilepath)
@@ -19892,6 +19899,11 @@ class AlarmDlg(QDialog):
 
         saveButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         self.connect(saveButton, SIGNAL("clicked()"),self.closealarms)
+        
+        helpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
+        helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None, QApplication.UnicodeUTF8))
+        helpButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(helpButton, SIGNAL("clicked()"),self.showAlarmbuttonhelp)
 
         tablelayout = QVBoxLayout()
         buttonlayout = QHBoxLayout()
@@ -19904,6 +19916,10 @@ class AlarmDlg(QDialog):
         buttonlayout.addSpacing(10)
         buttonlayout.addWidget(alloffButton)        
         buttonlayout.addWidget(allonButton)
+        buttonlayout.addSpacing(10)
+        buttonlayout.addStretch()
+        buttonlayout.addSpacing(10)       
+        buttonlayout.addWidget(helpButton)
         buttonlayout.addSpacing(10)
         buttonlayout.addStretch()
         buttonlayout.addWidget(saveButton)
@@ -19930,8 +19946,9 @@ class AlarmDlg(QDialog):
 
     def addalarm(self):
         #self.savealarms()
-        aw.qmc.alarmtime.append(1)
         aw.qmc.alarmflag.append(1)
+        aw.qmc.alarmguard.append(-1)
+        aw.qmc.alarmtime.append(1)
         aw.qmc.alarmcond.append(1)
         aw.qmc.alarmsource.append(1)
         aw.qmc.alarmtemperature.append(500)
@@ -19948,8 +19965,9 @@ class AlarmDlg(QDialog):
             selected = self.alarmtable.selectedRanges()
             if selected and len(selected) > 0:
                 selected_row = selected[0].topRow()
-                aw.qmc.alarmtime = aw.qmc.alarmtime[0:selected_row] + aw.qmc.alarmtime[selected_row + 1:]
                 aw.qmc.alarmflag = aw.qmc.alarmflag[0:selected_row] + aw.qmc.alarmflag[selected_row + 1:]
+                aw.qmc.alarmguard = aw.qmc.alarmguard[0:selected_row] + aw.qmc.alarmguard[selected_row + 1:]
+                aw.qmc.alarmtime = aw.qmc.alarmtime[0:selected_row] + aw.qmc.alarmtime[selected_row + 1:]
                 aw.qmc.alarmcond = aw.qmc.alarmcond[0:selected_row] + aw.qmc.alarmcond[selected_row + 1:]
                 aw.qmc.alarmsource = aw.qmc.alarmsource[0:selected_row] + aw.qmc.alarmsource[selected_row + 1:]
                 aw.qmc.alarmtemperature = aw.qmc.alarmtemperature[0:selected_row] + aw.qmc.alarmtemperature[selected_row + 1:]
@@ -19957,8 +19975,9 @@ class AlarmDlg(QDialog):
                 aw.qmc.alarmstrings = aw.qmc.alarmstrings[0:selected_row] + aw.qmc.alarmstrings[selected_row + 1:]
             else:
                 # nothing selected, we pop the last element
-                aw.qmc.alarmtime.pop()                                                                
                 aw.qmc.alarmflag.pop()                                                                 
+                aw.qmc.alarmguard.pop()                                                                 
+                aw.qmc.alarmtime.pop()                                                                
                 aw.qmc.alarmcond.pop()           
                 aw.qmc.alarmsource.pop()
                 aw.qmc.alarmtemperature.pop()
@@ -19976,22 +19995,40 @@ class AlarmDlg(QDialog):
         self.savealarms()
         self.accept()
         
+    def showAlarmbuttonhelp(self):
+        string  = QApplication.translate("MessageBox", "<b>Status:</b> activate or deactive alarm",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>If Alarm:</b> alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.",None, QApplication.UnicodeUTF8) + "<br><br>"  
+        string += QApplication.translate("MessageBox", "<b>From:</b> alarm only triggered after the given event",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Source:</b> the temperature source that is observed",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Condition:</b> alarm is triggered if source rises above or below the specified temperature",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Temperature:</b> the speficied temperature limit",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Action:</b> if all conditions are fulfilled the alarm triggeres the corresponding action",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Description:</b> the text of the popup, the name of the program or the number of the event",None, QApplication.UnicodeUTF8) + "<br><br>"
+        
+        QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
+
     def savealarms(self):
         nalarms = self.alarmtable.rowCount()
         for i in range(nalarms):
-            timez =  self.alarmtable.cellWidget(i,0)
-            aw.qmc.alarmtime[i] = int(str(timez.currentIndex() - 1))
-            flag = self.alarmtable.cellWidget(i,1)
+            flag = self.alarmtable.cellWidget(i,0)
             aw.qmc.alarmflag[i] = int(flag.isChecked())         
-            atype = self.alarmtable.cellWidget(i,2)
+            guard = self.alarmtable.cellWidget(i,1)
+            guard_value = int(str(guard.text())) - 1
+            if guard_value > -1 and guard_value < nalarms:
+                aw.qmc.alarmguard[i] = guard_value
+            else:
+                aw.qmc.alarmguard[i] = -1
+            timez =  self.alarmtable.cellWidget(i,2)
+            aw.qmc.alarmtime[i] = int(str(timez.currentIndex() - 1))
+            atype = self.alarmtable.cellWidget(i,3)
             aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 2                            
-            cond = self.alarmtable.cellWidget(i,3)
+            cond = self.alarmtable.cellWidget(i,4)
             aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
-            temp = self.alarmtable.cellWidget(i,4)
+            temp = self.alarmtable.cellWidget(i,5)
             aw.qmc.alarmtemperature[i] = int(str(temp.text()))
-            action = self.alarmtable.cellWidget(i,5)
+            action = self.alarmtable.cellWidget(i,6)
             aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
-            description = self.alarmtable.cellWidget(i,6)
+            description = self.alarmtable.cellWidget(i,7)
             aw.qmc.alarmstrings[i] = str(description.text())
 
             aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
@@ -20011,9 +20048,10 @@ class AlarmDlg(QDialog):
         nalarms = len(aw.qmc.alarmtemperature)
         if nalarms:    
             self.alarmtable.setRowCount(nalarms)
-            self.alarmtable.setColumnCount(7)
-            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
+            self.alarmtable.setColumnCount(8)
+            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Temperature",None, QApplication.UnicodeUTF8),
@@ -20026,7 +20064,19 @@ class AlarmDlg(QDialog):
             self.alarmtable.setShowGrid(True)
 
             #populate table
-            for i in range(nalarms):
+            for i in range(nalarms):                                            
+                #flag                
+                flagComboBox = QCheckBox()
+                flagComboBox.setText(QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8))
+                if aw.qmc.alarmflag[i]:
+                    flagComboBox.setCheckState(Qt.Checked)
+                else:
+                    flagComboBox.setCheckState(Qt.Unchecked)    
+                    
+                #guarded by alarm
+                guardedit = QLineEdit(str(aw.qmc.alarmguard[i] + 1))
+                guardedit.setValidator(QIntValidator(0, 30,guardedit))
+                    
                 #Effective time from
                 timeComboBox = QComboBox()
                 timeComboBox.addItems([QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
@@ -20039,15 +20089,7 @@ class AlarmDlg(QDialog):
                                        QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8), # qmc.alarmtime 6
                                        QApplication.translate("ComboBox","COOL",None, QApplication.UnicodeUTF8), # qmc.alarmtime 7
                                        QApplication.translate("ComboBox","TP",None, QApplication.UnicodeUTF8)]) # qmc.alarmtime 8
-                timeComboBox.setCurrentIndex(aw.qmc.alarmtime[i] + 1)
-                                            
-                #flag                
-                flagComboBox = QCheckBox()
-                flagComboBox.setText(QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8))
-                if aw.qmc.alarmflag[i]:
-                    flagComboBox.setCheckState(Qt.Checked)
-                else:
-                    flagComboBox.setCheckState(Qt.Unchecked)           
+                timeComboBox.setCurrentIndex(aw.qmc.alarmtime[i] + 1)       
                              
                 #type
                 typeComboBox = QComboBox()
@@ -20078,14 +20120,15 @@ class AlarmDlg(QDialog):
                 #text description
                 descriptionedit = QLineEdit(str(aw.qmc.alarmstrings[i]))
 
-                #add widgets to the table
-                self.alarmtable.setCellWidget(i,0,timeComboBox)                
-                self.alarmtable.setCellWidget(i,1,flagComboBox)
-                self.alarmtable.setCellWidget(i,2,typeComboBox)
-                self.alarmtable.setCellWidget(i,3,condComboBox)
-                self.alarmtable.setCellWidget(i,4,tempedit)
-                self.alarmtable.setCellWidget(i,5,actionComboBox)                
-                self.alarmtable.setCellWidget(i,6,descriptionedit)
+                #add widgets to the table               
+                self.alarmtable.setCellWidget(i,0,flagComboBox)
+                self.alarmtable.setCellWidget(i,1,guardedit)
+                self.alarmtable.setCellWidget(i,2,timeComboBox) 
+                self.alarmtable.setCellWidget(i,3,typeComboBox)
+                self.alarmtable.setCellWidget(i,4,condComboBox)
+                self.alarmtable.setCellWidget(i,5,tempedit)
+                self.alarmtable.setCellWidget(i,6,actionComboBox)                
+                self.alarmtable.setCellWidget(i,7,descriptionedit)
 
 
 

@@ -1,7 +1,7 @@
 Current Versions
 o XCode 4.5.1
 o Python 3.3
-o QT 4.8.3
+o QT 4.8.4
 o Numpy >1.7.0b2
 o SIP 4.14.1
 o PyQt 4.9.5
@@ -17,6 +17,8 @@ o minimalmodbus 0.4
 
 Upgrade History:
 
+- 2012-07-12:
+ . QT 4.8.3 => 4.8.4
 - 2012-11-30:
  . py2app 0.7 => 0.7.1
  . numpy >1.7.0b2 (27.10.2012) => 1.7.0b2 (30.11.2012)
