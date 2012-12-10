@@ -519,9 +519,15 @@ class tgraphcanvas(FigureCanvas):
         self.beans = ""
 
         #flags to show projections, draw Delta ET, and draw Delta BT        
-        self.projectFlag = False
+        self.projectFlag = False        
+        self.ETcurve = True
+        self.BTcurve = True
+        self.ETlcd = True
+        self.BTlcd = True
         self.DeltaETflag = False
         self.DeltaBTflag = False
+        self.DeltaETlcdflag = True
+        self.DeltaBTlcdflag = True
         self.deltafilter = 5
         
         #flag to activate the automatic marking of the CHARGE and DROP events
@@ -1503,8 +1509,10 @@ class tgraphcanvas(FigureCanvas):
                         jump -= 10
                     
             ##### ET,BT curves
-            self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
-            self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
+            if aw.qmc.ETcurve:
+                self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
+            if aw.qmc.BTcurve:
+                self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
 
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
@@ -1711,9 +1719,15 @@ class tgraphcanvas(FigureCanvas):
                                          xytext=(self.timeB[self.timeindexB[6]]+e,self.temp2B[self.timeindexB[6]] - self.ystep_downB),fontsize=10,color=self.palette["text"],
                                          arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=self.backgroundalpha),alpha=self.backgroundalpha)
                     #END of Background
-               
-            handles = [self.l_temp1,self.l_temp2]
-            labels = [str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)),str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8))]
+            
+            handles = []
+            labels = []
+            if aw.qmc.ETcurve:
+                handles.append(self.l_temp1)
+                labels.append(str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
+            if aw.qmc.BTcurve:
+                handles.append(self.l_temp2)
+                labels.append(str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
     
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             if self.DeltaETflag or self.DeltaBTflag:
@@ -1796,7 +1810,7 @@ class tgraphcanvas(FigureCanvas):
                         xtmpl2idx = xtmpl2idx + 1
                         labels.append(self.extraname2[i])
                     
-            if not self.designerflag:  
+            if not self.designerflag and aw.qmc.BTcurve:  
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                 self.ystep_down = self.ystep_up = 0
                 #Add markers for CHARGE 
@@ -2406,7 +2420,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.draw()
 
 
-    #Turns ON/OFF flag self.flagon to read and plot. Called from push button_1. 
+    #Turns ON/OFF flag self.flagon to read and print values. Called from push button_1. 
     def OnMonitor(self):
         #turn ON
         if not self.flagon:
@@ -6244,14 +6258,14 @@ class ApplicationWindow(QMainWindow):
                     aw.extraLCDlabel2[i].setVisible(visible)
                     if visible and i < len(aw.qmc.extraname2):
                         aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "<\b>")
-        aw.lcd2.setVisible(visible)
-        aw.label2.setVisible(visible)
-        aw.lcd3.setVisible(visible)
-        aw.label3.setVisible(visible)
-        aw.lcd4.setVisible(visible)
-        aw.label4.setVisible(visible)
-        aw.lcd5.setVisible(visible)
-        aw.label5.setVisible(visible)
+        aw.lcd2.setVisible(aw.qmc.ETlcd and visible)
+        aw.label2.setVisible(aw.qmc.ETlcd and visible)
+        aw.lcd3.setVisible(aw.qmc.BTlcd and visible)
+        aw.label3.setVisible(aw.qmc.BTlcd and visible)
+        aw.lcd4.setVisible(aw.qmc.DeltaETlcdflag and visible)
+        aw.label4.setVisible(aw.qmc.DeltaETlcdflag and visible)
+        aw.lcd5.setVisible(aw.qmc.DeltaBTlcdflag and visible)
+        aw.label5.setVisible(aw.qmc.DeltaBTlcdflag and visible)
         if aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid  
             aw.lcd6.setVisible(visible)
             aw.label6.setVisible(visible)
@@ -7743,9 +7757,20 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoC")
             self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
-            self.qmc.deltafilter = settings.value("deltafilter",self.qmc.deltafilter).toInt()[0]
-            
+            self.qmc.deltafilter = settings.value("deltafilter",self.qmc.deltafilter).toInt()[0]  
+            if settings.contains("DeltaETlcd"):       
+                self.qmc.DeltaETlcdflag = settings.value("DeltaETlcd",self.qmc.DeltaETlcdflag).toBool()  
+            if settings.contains("DeltaBTlcd"):       
+                self.qmc.DeltaBTlcdflag = settings.value("DeltaBTlcd",self.qmc.DeltaBTlcdflag).toBool() 
             settings.endGroup()
+            if settings.contains("ETcurve"):
+                self.qmc.ETcurve = settings.value("ETcurve",self.qmc.ETcurve).toBool() 
+            if settings.contains("BTcurve"):
+                self.qmc.BTcurve = settings.value("BTcurve",self.qmc.BTcurve).toBool() 
+            if settings.contains("ETlcd"):
+                self.qmc.ETlcd = settings.value("ETlcd",self.qmc.ETlcd).toBool() 
+            if settings.contains("BTlcd"):
+                self.qmc.BTlcd = settings.value("BTlcd",self.qmc.BTlcd).toBool() 
             settings.beginGroup("HUD")
             self.qmc.projectFlag = settings.value("Projection",self.qmc.projectFlag).toBool()
             self.qmc.projectionmode = settings.value("ProjectionMode",self.qmc.projectionmode).toInt()[0]
@@ -8045,8 +8070,14 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("RoC")
             settings.setValue("DeltaET",self.qmc.DeltaETflag)
             settings.setValue("DeltaBT",self.qmc.DeltaBTflag)
+            settings.setValue("DeltaETlcd",self.qmc.DeltaETlcdflag)
+            settings.setValue("DeltaBTlcd",self.qmc.DeltaBTlcdflag)
             settings.setValue("deltafilter",self.qmc.deltafilter)
             settings.endGroup()
+            settings.setValue("ETcurve",self.qmc.ETcurve)
+            settings.setValue("BTcurve",self.qmc.BTcurve)
+            settings.setValue("ETlcd",self.qmc.ETlcd)
+            settings.setValue("BTlcd",self.qmc.BTlcd)
             settings.beginGroup("HUD")
             settings.setValue("Projection",self.qmc.projectFlag)
             settings.setValue("ProjectionMode",self.qmc.projectionmode)
@@ -8204,6 +8235,8 @@ class ApplicationWindow(QMainWindow):
             general["sound"]= str(self.soundflag)
             extras["DeltaET"]= str(self.qmc.DeltaETflag)
             extras["DeltaBT"]= str(self.qmc.DeltaBTflag)
+            extras["DeltaETlcd"]= str(self.qmc.DeltaETlcdflag)
+            extras["DeltaBTlcd"]= str(self.qmc.DeltaBTlcdflag)
             extras["deltafilter"]= str(self.qmc.deltafilter)
             extras["Projection"]= str(self.qmc.projectFlag)
             extras["ProjectionMode"]= str(self.qmc.projectionmode)
@@ -9861,6 +9894,8 @@ class HUDDlg(QDialog):
         # keep old values to be restored on Cancel
         self.org_DeltaET = aw.qmc.DeltaETflag
         self.org_DeltaBT = aw.qmc.DeltaBTflag
+        self.org_DeltaETlcd = aw.qmc.DeltaETlcdflag
+        self.org_DeltaBTlcd = aw.qmc.DeltaBTlcdflag
         self.org_Projection = aw.qmc.projectFlag
         
         ETLabel = QLabel(QApplication.translate("Label", "ET Target",None, QApplication.UnicodeUTF8))
@@ -9967,6 +10002,28 @@ class HUDDlg(QDialog):
         rorBoxLayout.addLayout(rorLayout)
         rorBoxLayout.addStretch()
         
+        self.DeltaETlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaET",None, QApplication.UnicodeUTF8))
+        if aw.qmc.DeltaETlcdflag == True:
+            self.DeltaETlcd.setChecked(True)
+        else:
+            self.DeltaETlcd.setChecked(False)
+
+        self.DeltaBTlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None, QApplication.UnicodeUTF8))
+        if aw.qmc.DeltaBTlcdflag == True:
+            self.DeltaBTlcd.setChecked(True)
+        else:
+            self.DeltaBTlcd.setChecked(False)
+            
+            
+        self.connect(self.DeltaETlcd,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaETlcd(i))         #toggle
+        self.connect(self.DeltaBTlcd,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaBTlcd(i))         #toggle
+            
+        lcdsLayout = QHBoxLayout()
+        lcdsLayout.addWidget(self.DeltaETlcd)
+        lcdsLayout.addSpacing(15)
+        lcdsLayout.addWidget(self.DeltaBTlcd)
+        lcdsLayout.addStretch()
+        
         sensitivityLayout = QHBoxLayout()
         sensitivityLayout.addWidget(filterlabel)
         sensitivityLayout.addWidget(self.DeltaFilter)
@@ -9979,11 +10036,15 @@ class HUDDlg(QDialog):
         rorGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curves",None, QApplication.UnicodeUTF8))        
         rorGroupLayout.setLayout(curvesLayout)
         
+        rorLCDGroupLayout = QGroupBox(QApplication.translate("GroupBox","LCDs",None, QApplication.UnicodeUTF8))        
+        rorLCDGroupLayout.setLayout(lcdsLayout)
+        
         hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","HUD",None, QApplication.UnicodeUTF8))
         hudGroupLayout.setLayout(hudLayout)       
                                
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(rorGroupLayout)
+        tab1Layout.addWidget(rorLCDGroupLayout)
         tab1Layout.addWidget(hudGroupLayout)
 
         #tab2
@@ -10421,6 +10482,22 @@ class HUDDlg(QDialog):
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
         aw.qmc.redraw(recomputeAllDeltas=True)
+        
+    def changeDeltaBT(self,i):
+        aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
+        aw.qmc.redraw(recomputeAllDeltas=True)
+        
+    def changeDeltaETlcd(self,i):
+        aw.qmc.DeltaETlcdflag = not aw.qmc.DeltaETlcdflag
+        if aw.qmc.flagon:
+            aw.lcd4.setVisible(aw.qmc.DeltaETlcdflag)
+            aw.label4.setVisible(aw.qmc.DeltaETlcdflag)
+        
+    def changeDeltaBTlcd(self,i):
+        aw.qmc.DeltaBTlcdflag = not aw.qmc.DeltaBTlcdflag
+        if aw.qmc.flagon:
+            aw.lcd5.setVisible(aw.qmc.DeltaBTlcdflag)
+            aw.label5.setVisible(aw.qmc.DeltaBTlcdflag)
 
     def changeDeltaFilter(self,i):
         try:
@@ -10429,9 +10506,6 @@ class HUDDlg(QDialog):
         except Exception as e:
             aw.qmc.adderror(QApplication.translate("Error Message", "changeDeltaFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
         
-    def changeDeltaBT(self,i):
-        aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
-        aw.qmc.redraw(recomputeAllDeltas=True)
         
     def changeProjection(self,i):
         aw.qmc.projectFlag = not aw.qmc.projectFlag
@@ -10452,6 +10526,13 @@ class HUDDlg(QDialog):
         #restore settings
         aw.qmc.DeltaETflag = self.org_DeltaET
         aw.qmc.DeltaBTflag = self.org_DeltaBT
+        aw.qmc.DeltaETlcdflag = self.org_DeltaETlcd
+        aw.qmc.DeltaBTlcdflag = self.org_DeltaBTlcd
+        if aw.qmc.flagon:
+            aw.lcd4.setVisible(aw.qmc.DeltaETlcdflag)
+            aw.label4.setVisible(aw.qmc.DeltaETlcdflag)
+            aw.lcd5.setVisible(aw.qmc.DeltaBTlcdflag)
+            aw.label5.setVisible(aw.qmc.DeltaBTlcdflag)
         aw.qmc.projectFlag = self.org_Projection
         aw.qmc.resetlines()
         aw.qmc.redraw(recomputeAllDeltas=False)
@@ -11239,6 +11320,7 @@ class editGraphDlg(QDialog):
             self.datatable.setItem(i,3,BT)
             self.datatable.setItem(i,4,deltaBT)
             self.datatable.setItem(i,5,deltaET)
+        self.datatable.resizeColumnsToContents()
             
     def createEventTable(self):
         self.eventtable.clear()
@@ -11275,6 +11357,7 @@ class editGraphDlg(QDialog):
             self.eventtable.setCellWidget(i,1,stringline)
             self.eventtable.setCellWidget(i,2,typeComboBox)
             self.eventtable.setCellWidget(i,3,valueComboBox)
+        self.eventtable.resizeColumnsToContents()
 
     def saveEventTable(self):
         nevents  = self.eventtable.rowCount() 
@@ -13185,6 +13268,7 @@ class EventsDlg(QDialog):
                 self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
                 self.eventbuttontable.setCellWidget(i,7,colorButton)
                 self.eventbuttontable.setCellWidget(i,8,colorTextButton)
+            self.eventbuttontable.resizeColumnsToContents()
         
     def setbuttoncolor(self,x):
         colorf = QColorDialog.getColor(QColor(aw.extraeventbuttoncolor[x]))
@@ -17654,6 +17738,56 @@ class DeviceAssignmentDLG(QDialog):
 
         ################ TAB 1   WIDGETS
         
+        #ETcurve
+        self.ETcurve = QCheckBox(QApplication.translate("CheckBox", "ET",None, QApplication.UnicodeUTF8))
+        if aw.qmc.ETcurve == True:
+            self.ETcurve.setChecked(True)
+        else:
+            self.ETcurve.setChecked(False)
+
+        #BTcurve
+        self.BTcurve = QCheckBox(QApplication.translate("CheckBox", "BT",None, QApplication.UnicodeUTF8))        
+        if aw.qmc.BTcurve == True:
+            self.BTcurve.setChecked(True)
+        else:
+            self.BTcurve.setChecked(False)
+        
+        #ETlcd
+        self.ETlcd = QCheckBox(QApplication.translate("CheckBox", "ET",None, QApplication.UnicodeUTF8))
+        if aw.qmc.ETlcd == True:
+            self.ETlcd.setChecked(True)
+        else:
+            self.ETlcd.setChecked(False)
+
+        #BTlcd
+        self.BTlcd = QCheckBox(QApplication.translate("CheckBox", "BT",None, QApplication.UnicodeUTF8))
+        if aw.qmc.BTlcd == True:
+            self.BTlcd.setChecked(True)
+        else:
+            self.BTlcd.setChecked(False)
+            
+        self.curveHBox = QHBoxLayout()
+        self.curveHBox.addWidget(self.ETcurve)
+        self.curveHBox.addSpacing(10)
+        self.curveHBox.addWidget(self.BTcurve)
+        self.curveHBox.addStretch()
+        
+        self.curves = QGroupBox(QApplication.translate("GroupBox","Curves",None, QApplication.UnicodeUTF8))
+        self.curves.setLayout(self.curveHBox)
+        
+        self.lcdHBox = QHBoxLayout()
+        self.lcdHBox.addWidget(self.ETlcd)
+        self.lcdHBox.addSpacing(10)
+        self.lcdHBox.addWidget(self.BTlcd)
+        self.lcdHBox.addStretch()
+        
+        self.lcds = QGroupBox(QApplication.translate("GroupBox","LCDs",None, QApplication.UnicodeUTF8))
+        self.lcds.setLayout(self.lcdHBox)
+        
+        self.curveBox = QHBoxLayout()
+        self.curveBox.addWidget(self.curves)
+        self.curveBox.addWidget(self.lcds)
+        
         self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Device", None, QApplication.UnicodeUTF8))
         self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None, QApplication.UnicodeUTF8))
         self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","Arduino TC4", None, QApplication.UnicodeUTF8))
@@ -17836,17 +17970,20 @@ class DeviceAssignmentDLG(QDialog):
 
         #LAYOUT TAB 1
         grid = QGridLayout()
-        grid.addWidget(self.nonpidButton,0,0)
-        grid.addWidget(self.devicetypeComboBox,0,1)
-
-        grid.addWidget(self.pidButton,1,0)
-        grid.addWidget(PIDGroupBox,1,1)
         
-        grid.addWidget(self.arduinoButton,2,0)        
-        grid.addWidget(arduinoGroupBox,2,1)
+        grid.addLayout(self.curveBox,0,1)
+        
+        grid.addWidget(self.nonpidButton,1,0)
+        grid.addWidget(self.devicetypeComboBox,1,1)
 
-        grid.addWidget(self.programButton,3,0)        
-        grid.addWidget(programGroupBox,3,1)
+        grid.addWidget(self.pidButton,2,0)
+        grid.addWidget(PIDGroupBox,2,1)
+        
+        grid.addWidget(self.arduinoButton,3,0)        
+        grid.addWidget(arduinoGroupBox,3,1)
+
+        grid.addWidget(self.programButton,4,0)        
+        grid.addWidget(programGroupBox,4,1)
 
         gridBoxLayout = QHBoxLayout()
         gridBoxLayout.addLayout(grid)
@@ -18000,7 +18137,8 @@ class DeviceAssignmentDLG(QDialog):
                     self.devicetable.setCellWidget(i,7,LCD1visibilityComboBox)              
                     self.devicetable.setCellWidget(i,8,LCD2visibilityComboBox) 
                     self.devicetable.setCellWidget(i,9,Curve1visibilityComboBox)              
-                    self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)            
+                    self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)  
+                self.devicetable.resizeColumnsToContents()        
 
         except Exception as e:
              aw.qmc.adderror(QApplication.translate("Error Message", "createDeviceTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
@@ -18090,8 +18228,17 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.extratimex.pop(x)
             aw.qmc.extratemp1.pop(x)
             aw.qmc.extratemp2.pop(x)
-            aw.qmc.extratemp1lines.pop(x)
-            aw.qmc.extratemp2lines.pop(x)
+            # visible courves before this one
+            before1 = before2 = 0
+            for j in range(x):
+                if aw.extraCurveVisibility1[j]:
+                    before1 = before1 + 1
+                if aw.extraCurveVisibility2[j]:
+                    before2 = before2 + 1
+            if aw.extraCurveVisibility1[x]:
+                aw.qmc.extratemp1lines.pop(before1)
+            if aw.extraCurveVisibility2[x]:
+                aw.qmc.extratemp2lines.pop(before2)
             aw.qmc.extraname1.pop(x)
             aw.qmc.extraname2.pop(x)
             aw.qmc.extramathexpression1.pop(x)
@@ -18118,7 +18265,9 @@ class DeviceAssignmentDLG(QDialog):
                 aw.extraser.pop(x)
             self.createDeviceTable()
             aw.qmc.redraw(recomputeAllDeltas=False)
-        except Exception as e:         
+        except Exception as e:     
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             aw.qmc.adderror(QApplication.translate("Error Message", "delextradevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
         
     def savedevicetable(self):
@@ -18613,6 +18762,17 @@ class DeviceAssignmentDLG(QDialog):
            
             aw.qmc.ETfunction = str(self.ETfunctionedit.text())
             aw.qmc.BTfunction = str(self.BTfunctionedit.text())
+            
+            aw.qmc.ETcurve = self.ETcurve.isChecked()
+            aw.qmc.BTcurve = self.BTcurve.isChecked()
+            aw.qmc.ETlcd = self.ETlcd.isChecked()
+            aw.qmc.BTlcd = self.BTlcd.isChecked()
+            if aw.qmc.flagon:
+                aw.lcd2.setVisible(aw.qmc.ETlcd)
+                aw.label2.setVisible(aw.qmc.ETlcd)
+                aw.lcd3.setVisible(aw.qmc.BTlcd)
+                aw.label3.setVisible(aw.qmc.BTlcd)
+            aw.qmc.redraw(recomputeAllDeltas=False)
             
             aw.sendmessage(message)
 
@@ -20129,6 +20289,7 @@ class AlarmDlg(QDialog):
                 self.alarmtable.setCellWidget(i,5,tempedit)
                 self.alarmtable.setCellWidget(i,6,actionComboBox)                
                 self.alarmtable.setCellWidget(i,7,descriptionedit)
+            self.alarmtable.resizeColumnsToContents()
 
 
 
