@@ -3,8 +3,8 @@ o XCode 4.5.1
 o Python 3.3
 o QT 4.8.4
 o Numpy >1.7.0b2
-o SIP 4.14.1
-o PyQt 4.9.5
+o SIP 4.14.2
+o PyQt 4.9.6
 o scipy 0.11.0
 o matplotlib 1.2.0
 o modulegraph 0.10
@@ -17,6 +17,9 @@ o minimalmodbus 0.4
 
 Upgrade History:
 
+- 2012-12-13:
+ . SIP 4.14.1 => 4.14.2
+ . PyQt 4.9.5 => 4.9.6
 - 2012-07-12:
  . QT 4.8.3 => 4.8.4
 - 2012-11-30:
@@ -147,8 +150,8 @@ now installed trunk version from 30.11.2012
 
 4) Install SIP
 
-# tar xzf sip-4.14.1.tar.gz
-# cd sip-4.14.1
+# tar xzf sip-4.14.2.tar.gz
+# cd sip-4.14.2
 # python3 configure.py
 # make
 # sudo make install
@@ -156,8 +159,8 @@ now installed trunk version from 30.11.2012
 
 5) Install PyQt
 
-# tar xzf PyQt-mac-gpl-4.9.5.tar.gz 
-# cd PyQt-mac-gpl-4.9.5
+# tar xzf PyQt-mac-gpl-4.9.6.tar.gz 
+# cd PyQt-mac-gpl-4.9.6
 # python3 configure.py
 # make
 # sudo make install
