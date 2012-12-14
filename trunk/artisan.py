@@ -106,11 +106,11 @@ import matplotlib.ticker as ticker
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 
-#import modbus_tk
-#import modbus_tk.defines as cst
-#import modbus_tk.modbus_rtu as modbus_rtu
-##import logging
-##logger = modbus_tk.utils.create_logger("console")
+try:
+    import matplotlib.backends.qt4_editor.figureoptions as figureoptions
+except ImportError:
+    figureoptions = None
+    
 import minimalmodbus
 
 import json
@@ -392,6 +392,7 @@ class tgraphcanvas(FigureCanvas):
         self.extradevicecolor1 = []                                 # extra line 1 color. list with colors. 
         self.extradevicecolor2 = []                                 # extra line 2 color. list with colors.
         self.extratemp1,self.extratemp2 = [],[]                     # extra temp1, temp2. List of lists
+        self.extrastemp1,self.extrastemp2 = [],[]                   # smoothed extra temp1, temp2. List of lists
         self.extratemp1lines,self.extratemp2lines = [],[]           # lists with extra lines for speed drawing
         self.extraname1,self.extraname2 = [],[]                     # name of labels for line (like ET or BT) - legend
         self.extramathexpression1,self.extramathexpression2 = [],[]           # list with user defined math evaluating strings. Example "2*cos(x)"
@@ -453,8 +454,9 @@ class tgraphcanvas(FigureCanvas):
 
         #lists to store temps and rates of change. Second most IMPORTANT variables. All need same dimension.
         #self.temp1 = ET ; self.temp2 = BT; self.delta1 = deltaMET; self.delta2 = deltaBT
-        self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]        
-        self.unfiltereddelta1, self.unfiltereddelta2 = [],[]
+        self.temp1,self.temp2,self.delta1, self.delta2 = [],[],[],[]    
+        self.stemp1,self.stemp2 = [],[] # smoothed versions of temp1/temp2 usind in redraw()
+        self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # used in sample()
         
         #indexes for START[0],DRYe[1],FCs[2],FCe[3],SCs[4],SCe[5],DROP[6] and COOLe[7]
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryEnd
@@ -1221,7 +1223,7 @@ class tgraphcanvas(FigureCanvas):
             
 
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
-    def reset(self):
+    def reset(self,redraw=True):
         #### lock shared resources #####
         self.samplingsemaphore.acquire(1)
         
@@ -1257,7 +1259,7 @@ class tgraphcanvas(FigureCanvas):
         #reset all variables that need to be reset
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
-        self.temp1, self.temp2, self.delta1, self.delta2, self.timex = [],[],[],[],[]
+        self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2 = [],[],[],[],[],[],[]
         self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
         self.timeindex = [-1,0,0,0,0,0,0,0]
         self.specialevents=[]
@@ -1354,8 +1356,8 @@ class tgraphcanvas(FigureCanvas):
         self.temporaryalarmflag = -3
 
         #extra devices
-        for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2))):            
-            self.extratimex[i],self.extratemp1[i],self.extratemp2[i] = [],[],[]
+        for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):            
+            self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]
         
         #reset alarms that have been triggered
         self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
@@ -1370,7 +1372,8 @@ class tgraphcanvas(FigureCanvas):
         self.samplingsemaphore.release(1) #note: do it before redraw()
 
         ### REDRAW  ##
-        self.redraw()
+        if redraw:
+            self.redraw()
 
         aw.soundpop()
 
@@ -1397,6 +1400,31 @@ class tgraphcanvas(FigureCanvas):
         if self.crossmarker:
             self.togglecrosslines()            
 
+    # smoothes a list of values 'x' at taken at times indicated by the numbers in list 'y'
+    # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
+    # 'flat' results in moving average
+    # window_len should be odd
+    def smooth(self, y, x, window_len=15, window='hanning'):
+        try:
+            if len(y) == len(x) and len(y) > 1:
+                s = numpy.r_[2*x[0]-x[window_len:1:-1],x,2*x[-1]-x[-1:-window_len:-1]]
+                if window == 'flat': #moving average
+                    w = numpy.ones(window_len,'d')
+                else:
+                    w = eval('numpy.'+window+'(window_len)')
+                xs = numpy.convolve(w/w.sum(),s,mode='same')
+                #return (xs[window_len-1:-window_len+1])
+                return (xs[window_len-2:-window_len])
+            else:
+                return x
+        except Exception as e:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            return x
+            
+    def smooth_list(self, a, b, window_len=7, window='hanning'):
+        return self.smooth(numpy.array(a),numpy.array(b),window_len,window='hanning').tolist()
+                    
     #Redraws data   
     def redraw(self, recomputeAllDeltas=True):
         try:
@@ -1415,7 +1443,7 @@ class tgraphcanvas(FigureCanvas):
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
             self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"],rotation=0)
             self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
-            self.ax.set_title(self.title,size=20,color=self.palette["title"])  	
+            self.ax.set_title(self.title,size=20,color=self.palette["title"])
             if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax	
                 self.delta_ax = self.ax.twinx()
@@ -1444,7 +1472,7 @@ class tgraphcanvas(FigureCanvas):
                     
             #update X ticks, labels, and colors        
             self.xaxistosm()
-                    
+                                
             #draw water marks for dry phase region, mid phase region, and finish phase region
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
             rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
@@ -1507,20 +1535,29 @@ class tgraphcanvas(FigureCanvas):
                         jump -= 5
                     else:
                         jump -= 10
+
+            # smooth main curves
+            if recomputeAllDeltas:
+                self.stemp1 = self.smooth_list(self.timex,self.temp1)
+                self.stemp2 = self.smooth_list(self.timex,self.temp2)
                     
             ##### ET,BT curves
             if aw.qmc.ETcurve:
-                self.l_temp1, = self.ax.plot(self.timex, self.temp1,color=self.palette["et"],linewidth=2,label=str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
+                self.l_temp1, = self.ax.plot(self.timex, self.stemp1,color=self.palette["et"],linewidth=2,label=str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
             if aw.qmc.BTcurve:
-                self.l_temp2, = self.ax.plot(self.timex, self.temp2,color=self.palette["bt"],linewidth=2,label=str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
+                self.l_temp2, = self.ax.plot(self.timex, self.stemp2,color=self.palette["bt"],linewidth=2,label=str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
 
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
             for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                # smooth extra curves
+                if recomputeAllDeltas:
+                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i])
+                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i])
                 if aw.extraCurveVisibility1[i]:
-                    self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
+                    self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],linewidth=2,label= self.extraname1[i])[0])
                 if aw.extraCurveVisibility2[i]:
-                    self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
+                    self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],linewidth=2,label= self.extraname2[i])[0])
 
             #check BACKGROUND flag
             if self.background: 
@@ -1730,59 +1767,24 @@ class tgraphcanvas(FigureCanvas):
                 labels.append(str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
     
             #populate delta ET (self.delta1) and delta BT (self.delta2)
+
             if self.DeltaETflag or self.DeltaBTflag:
-                if recomputeAllDeltas:
-                #if (True or recomputeAllDeltas):
-                    d1,d2,d3,d4=[],[],[],[]
-                    delta1, delta2 = 0.,0.
-                    for i in range(len(self.timex)-1):
-                        timed = self.timex[i+1] - self.timex[i]
-                        if timed:
-                            delta1 = 60.*((self.temp1[i+1] - self.temp1[i]) / float(timed)) #degrees pre minute
-                            delta2 = 60.*((self.temp2[i+1] - self.temp2[i]) / float(timed))
-    
-                            #inputs
-                            d1.append(delta1)
-                            d2.append(delta2)
-                        
-                            if self.deltafilter:
-                                if i > (self.deltafilter-1):
-                                    #smooth DeltaBT/DeltaET by using FIR filter of X pads.
-                                    #d1 and d2 are inputs, while d3 and d4 are outputs  
-                                    #Use only current and past input values. Don't feed parts of outputs d3 d4 to filter
-                                    a1,a2 = 0.,0.
-                                    for k in range(self.deltafilter):
-                                        a1 += d1[-(k+1)]
-                                        a2 += d2[-(k+1)]
-                                    #outputs
-                                    d3.append(a1/float(self.deltafilter))
-                                    d4.append(a2/float(self.deltafilter))
-                                else:
-                                    d3.append(0.) 
-                                    d4.append(0.)
-                                   
-                    if self.deltafilter:
-                        self.delta1 = d3
-                        self.delta2 = d4
+                if recomputeAllDeltas:  
+                    tx = numpy.array(self.timex)
+                    dtx = numpy.diff(self.timex) / 60
+                    z1 = numpy.diff(self.stemp1) / dtx
+                    z2 = numpy.diff(self.stemp2) / dtx
+                    lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
+                    if lt > ld1:
+                        z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+                    if lt > ld2:
+                        z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
+                    if self.deltafilter > 2:
+                        self.delta1 = self.smooth(tx,z1,window_len=self.deltafilter).tolist()
+                        self.delta2 = self.smooth(tx,z2,window_len=self.deltafilter).tolist()
                     else:
-                        self.delta1 = d1
-                        self.delta2 = d2
-                        
-                #this is needed because DeltaBT and DeltaET need 2 values of timex (difference) but they also need same dimension in order to plot
-                #equalize dimensions if needed                    
-                lt,ld =  len(self.timex),len(self.delta2)
-                if lt != ld:
-                    if lt > ld:
-                        for x in range(lt - ld):
-                            if ld:
-                                self.delta1.append(self.delta1[-1])
-                                self.delta2.append(self.delta2[-1])
-                            else:
-                                self.delta1.append(0.)
-                                self.delta2.append(0.)                        
-                    if lt < ld:
-                        self.delta1 = self.delta1[:lt]                
-                        self.delta2 = self.delta2[:lt]                
+                        self.delta1 = z1.tolist()
+                        self.delta2 = z2.tolist()
     
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag:
@@ -1816,57 +1818,57 @@ class tgraphcanvas(FigureCanvas):
                 #Add markers for CHARGE 
                 if self.timeindex[0] != -1:
                     #anotate temperature
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[0]],d)
-                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                                    xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]+self.ystep_up),
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.stemp2[self.timeindex[0]],self.stemp2[self.timeindex[0]],d)
+                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[0]]), xy=(self.timex[self.timeindex[0]],self.stemp2[self.timeindex[0]]),
+                                    xytext=(self.timex[self.timeindex[0]],self.stemp2[self.timeindex[0]]+self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
-                    self.ax.annotate(QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8), xy=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]),
-                                     xytext=(self.timex[self.timeindex[0]],self.temp2[self.timeindex[0]]-self.ystep_down),
+                    self.ax.annotate(QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8), xy=(self.timex[self.timeindex[0]],self.stemp2[self.timeindex[0]]),
+                                     xytext=(self.timex[self.timeindex[0]],self.stemp2[self.timeindex[0]]-self.ystep_down),
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #Add Dry End markers            
                 if self.timeindex[1]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.stemp2[self.timeindex[0]],self.stemp2[self.timeindex[1]],d)
                     st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
-                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                                    xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] + self.ystep_up), 
+                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[1]]), xy=(self.timex[self.timeindex[1]],self.stemp2[self.timeindex[1]]),
+                                    xytext=(self.timex[self.timeindex[1]],self.stemp2[self.timeindex[1]] + self.ystep_up), 
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
-                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]]),
-                                    xytext=(self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]] - self.ystep_down),
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[1]],self.stemp2[self.timeindex[1]]),
+                                    xytext=(self.timex[self.timeindex[1]],self.stemp2[self.timeindex[1]] - self.ystep_down),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)            
                                     
 
                 #Add 1Cs markers            
                 if self.timeindex[2]:
                     if self.timeindex[1]: #if dryend
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.stemp2[self.timeindex[1]],self.stemp2[self.timeindex[2]],d)
                     else:
                         self.ystep_down = 0
                         self.ystep_up = 0
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[2]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.stemp2[self.timeindex[2]],self.stemp2[self.timeindex[2]],d)
                     st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
-                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                                    xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] + self.ystep_up), 
+                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[2]]), xy=(self.timex[self.timeindex[2]],self.stemp2[self.timeindex[2]]),
+                                    xytext=(self.timex[self.timeindex[2]],self.stemp2[self.timeindex[2]] + self.ystep_up), 
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
-                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]]),
-                                    xytext=(self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]] - self.ystep_down),
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[2]],self.stemp2[self.timeindex[2]]),
+                                    xytext=(self.timex[self.timeindex[2]],self.stemp2[self.timeindex[2]] - self.ystep_down),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                                     
                 #Add 1Ce markers
                 if self.timeindex[3]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.stemp2[self.timeindex[2]],self.stemp2[self.timeindex[3]],d)
                     st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
-                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                    xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]] + self.ystep_up),
+                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[3]]), xy=(self.timex[self.timeindex[3]],self.stemp2[self.timeindex[3]]),
+                                    xytext=(self.timex[self.timeindex[3]],self.stemp2[self.timeindex[3]] + self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
-                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]),
-                                    xytext=(self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]]-self.ystep_down),
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[3]],self.stemp2[self.timeindex[3]]),
+                                    xytext=(self.timex[self.timeindex[3]],self.stemp2[self.timeindex[3]]-self.ystep_down),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #add a water mark if FCs
                     if self.timeindex[2]:
@@ -1875,27 +1877,27 @@ class tgraphcanvas(FigureCanvas):
                 #Add 2Cs markers
                 if self.timeindex[4]:
                     if self.timeindex[3]:
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.stemp2[self.timeindex[3]],self.stemp2[self.timeindex[4]],d)
                     else:
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[4]],d)
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.stemp2[self.timeindex[2]],self.stemp2[self.timeindex[4]],d)
                     st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
-                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                                    xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]] + self.ystep_up),
+                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[4]]), xy=(self.timex[self.timeindex[4]],self.stemp2[self.timeindex[4]]),
+                                    xytext=(self.timex[self.timeindex[4]],self.stemp2[self.timeindex[4]] + self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)      
-                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]),
-                                     xytext=(self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]]-self.ystep_down),
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[4]],self.stemp2[self.timeindex[4]]),
+                                     xytext=(self.timex[self.timeindex[4]],self.stemp2[self.timeindex[4]]-self.ystep_down),
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                 #Add 2Ce markers
                 if self.timeindex[5]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.stemp2[self.timeindex[4]],self.stemp2[self.timeindex[5]],d)
                     st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
-                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                    xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] + self.ystep_up),
+                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[5]]), xy=(self.timex[self.timeindex[5]],self.stemp2[self.timeindex[5]]),
+                                    xytext=(self.timex[self.timeindex[5]],self.stemp2[self.timeindex[5]] + self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
-                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]]),
-                                    xytext=(self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]] - self.ystep_down),
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[5]],self.stemp2[self.timeindex[5]]),
+                                    xytext=(self.timex[self.timeindex[5]],self.stemp2[self.timeindex[5]] - self.ystep_down),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #do water mark if SCs
                     if self.timeindex[4]:
@@ -1915,16 +1917,16 @@ class tgraphcanvas(FigureCanvas):
                         tx1 = self.timeindex[1]
                     else:
                         tx = self.timeindex[0]
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[tx],self.temp2[self.timeindex[6]],d)
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.stemp2[tx],self.stemp2[self.timeindex[6]],d)
                         
                     st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
                     #anotate temperature
-                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                                    xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] + self.ystep_up),
+                    self.ax.annotate("%.1f"%(self.temp2[self.timeindex[6]]), xy=(self.timex[self.timeindex[6]],self.stemp2[self.timeindex[6]]),
+                                    xytext=(self.timex[self.timeindex[6]],self.stemp2[self.timeindex[6]] + self.ystep_up),
                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
                     #anotate time
-                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]]),
-                                     xytext=(self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]] - self.ystep_down),
+                    self.ax.annotate(st1, xy=(self.timex[self.timeindex[6]],self.stemp2[self.timeindex[6]]),
+                                     xytext=(self.timex[self.timeindex[6]],self.stemp2[self.timeindex[6]] - self.ystep_down),
                                      color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=1.)
 
                 # add COOL mark                                     
@@ -1997,11 +1999,11 @@ class tgraphcanvas(FigureCanvas):
                         secondletter = self.eventsvalues[self.specialeventsvalue[i]]
                         #some times ET is not drawn (ET = 0) when using device NONE
                         if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp1[int(self.specialevents[i])]),
                                              xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
                                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
                         else:
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp2[int(self.specialevents[i])]),
                                          xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
@@ -2023,13 +2025,13 @@ class tgraphcanvas(FigureCanvas):
                             self.E4values.append(self.eventpositionbars[self.specialeventsvalue[i]])
 
                     self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0])
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypes[0])
                     self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1])
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypes[1])
                     self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2])
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypes[2])
                     self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3])
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypes[3])
 
                     handles.extend([self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots])
                     labels.extend([self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]])
@@ -4749,6 +4751,35 @@ class VMToolbar(NavigationToolbar):
             return QIcon(p)
         else:
             return QIcon(os.path.join(self.basedir, name))
+    
+    def edit_parameters(self):
+        allaxes = self.canvas.figure.get_axes()
+        if len(allaxes) == 1:
+            axes = allaxes[0]
+        else:
+            titles = []
+            for axes in allaxes:
+                title = axes.get_title()
+                ylabel = axes.get_ylabel()
+                if title:
+                    fmt = "Curves"
+                    if ylabel:
+                        fmt += " (%(ylabel)s)"
+                elif ylabel:
+                    fmt = "Delta Curves (%(ylabel)s)"
+                else:
+                    fmt = "%(axes_repr)s"
+                titles.append(fmt % dict(title = title,
+                                     ylabel = ylabel,
+                                     axes_repr = repr(axes)))
+            item, ok = QInputDialog.getItem(self, 'Customize',
+                                                  'Select axes:', titles,
+                                                  0, False)
+            if ok:
+                axes = allaxes[titles.index(str(item))]
+            else:
+                return
+        figureoptions.figure_edit(axes, self)
 
 
 ########################################################################################
@@ -4998,7 +5029,6 @@ class SampleThread(QThread):
                         # qmc.alarmtime = -1 (None)
                         # qmc.alarmtime = 0 (CHARGE)
                         # ..
-                        #print(str(aw.qmc.timeindex),str(aw.qmc.alarmtime[i]))\
                         # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
                         # 1) the alarm is ON
                         # 2) the alarm was not triggered yet
@@ -5014,11 +5044,7 @@ class SampleThread(QThread):
                           or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
                           or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
                                 and aw.qmc.timeindex[1] < 1 and self.checkTPalarmtime())):
-#                            if aw.qmc.alarmtime[i] < 8:
-#                                print("testing",aw.qmc.alarmtime[i],aw.qmc.timeindex[aw.qmc.alarmtime[i]])
                             alarm_temp = None
-#                            print("alarmsource",aw.qmc.alarmsource[i])
-#                            print((aw.qmc.alarmsource[i])%2==0,len(aw.qmc.extratemp1),len(aw.qmc.extratemp2))
                             if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
                                 alarm_temp = aw.qmc.delta1[-1]
                             elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
@@ -5032,7 +5058,6 @@ class SampleThread(QThread):
                                     alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
                                 else:
                                     alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
-#                            print("temp: " + str(alarm_temp))
                             alarm_limit = aw.qmc.alarmtemperature[i]
                             if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
                                 aw.qmc.temporaryalarmflag = i
@@ -6854,7 +6879,7 @@ class ApplicationWindow(QMainWindow):
             if not f.open(QIODevice.ReadOnly):
                 raise IOError(str(f.errorString()))    
             stream = QTextStream(f)
-            self.qmc.reset()
+            self.qmc.reset(redraw=False)
 
             firstChar = stream.read(1)
             if firstChar == "{":    
@@ -6915,8 +6940,8 @@ class ApplicationWindow(QMainWindow):
                 f.close()
                 profile = self.deserialize(filename)
                 self.qmc.timeB = profile["timex"]
-                self.qmc.temp1B = profile["temp1"]
-                self.qmc.temp2B = profile["temp2"]
+                self.qmc.temp1B = self.qmc.smooth_list(self.qmc.timeB,profile["temp1"])
+                self.qmc.temp2B = self.qmc.smooth_list(self.qmc.timeB,profile["temp2"])
                 self.qmc.backgroundEvents = profile["specialevents"]
                 self.qmc.backgroundEtypes = profile["specialeventstype"]
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
@@ -7090,7 +7115,9 @@ class ApplicationWindow(QMainWindow):
     	#add new line variables
         self.qmc.extratimex.append([])        
         self.qmc.extratemp1.append([])
-        self.qmc.extratemp2.append([])
+        self.qmc.extratemp2.append([])      
+        self.qmc.extrastemp1.append([])
+        self.qmc.extrastemp2.append([])
 
         #add two extra lines in figure for extra ET and extra BT
         l = len(self.qmc.extradevices)-1  #new line index
@@ -7830,6 +7857,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extratemp1.append([])
                 self.qmc.extratemp2.append([])
                 self.qmc.extratimex.append([])
+                self.qmc.extrastemp1.append([])
+                self.qmc.extrastemp2.append([])
                 #init empty lines
                 self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp1[i],color="black",linewidth=2,label= self.qmc.extraname1[i])[0])
                 self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp2[i],color="black",linewidth=2,label= self.qmc.extraname1[i])[0])
@@ -18196,7 +18225,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.extratimex = []                                        
             aw.qmc.extradevicecolor1 = []                                  
             aw.qmc.extradevicecolor2 = []                                
-            aw.qmc.extratemp1,aw.qmc.extratemp2 = [],[]                     
+            aw.qmc.extratemp1,aw.qmc.extratemp2 = [],[]                 
+            aw.qmc.extrastemp1,aw.qmc.extrastemp2 = [],[]                      
             aw.qmc.extratemp1lines,aw.qmc.extratemp2lines = [],[]           
             aw.qmc.extraname1,aw.qmc.extraname2 = [],[]                     
             aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]
@@ -18228,6 +18258,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.extratimex.pop(x)
             aw.qmc.extratemp1.pop(x)
             aw.qmc.extratemp2.pop(x)
+            aw.qmc.extrastemp1.pop(x)
+            aw.qmc.extrastemp2.pop(x)
             # visible courves before this one
             before1 = before2 = 0
             for j in range(x):
@@ -18266,8 +18298,8 @@ class DeviceAssignmentDLG(QDialog):
             self.createDeviceTable()
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:     
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             aw.qmc.adderror(QApplication.translate("Error Message", "delextradevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
         
     def savedevicetable(self):
