@@ -2,21 +2,25 @@ Current Versions
 o XCode 4.5.1
 o Python 3.3
 o QT 4.8.4
-o Numpy >1.7.0b2
+o Numpy >1.7.0rc1 ++ from repository
 o SIP 4.14.2
 o PyQt 4.9.6
-o scipy 0.11.0
+o scipy 0.12.0 beta from git repository
 o matplotlib 1.2.0
+o pyaudio
+o minimalmodbus 0.4
+
 o modulegraph 0.10
 o distribute 0.6.29
 o altgraph 0.10
 o macholib 1.5
 o py2app 0.7.1
-o pyaudio
-o minimalmodbus 0.4
 
 Upgrade History:
 
+- 2012-01-05:
+ . scipy 0.11.0 => scipy-0.12.0 beta from git repository
+ . numpy 1.7.0b2 => 1.7.0rc1 ++ from repository
 - 2012-12-13:
  . SIP 4.14.1 => 4.14.2
  . PyQt 4.9.5 => 4.9.6
@@ -134,6 +138,7 @@ new to v2.6:
 3) Install Numpy
 
 
+
 download source
 
 # git clone https://github.com/numpy/numpy.git
@@ -166,7 +171,58 @@ now installed trunk version from 30.11.2012
 # sudo make install
 
 
-6) scipy-0.11.0
+6) scipy-0.12.0 beta from git repository
+
+# git clone git://github.com/scipy/scipy.git scipy
+# cd scipy
+
+
+
+----
+To fix an incompatibility between Python 3.3 and scipy install
+
+Cython-0.17.4 from http://cython.org/
+
+# python3 setup.py build
+# sudo python3 setup.py install
+----
+
+# cd scipy
+# mv spatial/ckdtree.c spatial/ckdtree.c.org
+# cython spatial/ckdtree.pyx
+# mv spatial/qhull.c spatial/qhull.c.org
+# cython spatial/qhull.pyx
+# mv stats/_rank.c stats/_rank.c.org
+# cython stats/_rank.pyx
+# mv stats/vonmises_cython.c stats/vonmises_cython.c.org
+# cython stats/vonmises_cython.pyx
+# mv io/matlab/mio5_utils.c io/matlab/mio5_utils.c.org
+# cython io/matlab/mio5_utils.pyx
+# mv io/matlab/mio_utils.c io/matlab/mio_utils.c.org
+# cython io/matlab/mio_utils.pyx
+# mv io/matlab/streams.c io/matlab/streams.c.org
+# cython io/matlab/streams.pyx
+# mv sparse/csgraph/_shortest_path.c sparse/csgraph/_shortest_path.c.org
+# cython sparse/csgraph/_shortest_path.pyx
+# mv sparse/csgraph/_min_spanning_tree.c sparse/csgraph/_min_spanning_tree.c.org
+# cython sparse/csgraph/_min_spanning_tree.pyx
+# mv sparse/csgraph/_tools.c sparse/csgraph/_tools.c.org
+# cython sparse/csgraph/_tools.pyx
+# mv sparse/csgraph/_traversal.c sparse/csgraph/_traversal.c.org
+# cython sparse/csgraph/_traversal.pyx
+
+# cython special/lambertw.pxd
+
+# cd ..
+
+
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+
+REMARK: scipy 0.11.0 had an import problem with the following on Python 3.3 (needed for the Designer)
+from scipy import interpolate as inter
 
 
 # tar xzf scipy-0.11.0.tar.gz
@@ -194,6 +250,22 @@ download matplotlib-1.2.0.tar.gz
 # sudo python3 setup.py install
 
 # sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/matplotlib/mpl-data/sample_data
+
+
+---
+Using matplotlib 1.2 within pyqt on Python 3.3 I receive
+
+formlayout.py", line 343, in get
+value = float(field.text())
+TypeError: float() argument must be a string or a number
+
+That does not happen under Python 2.7.
+Modifying that line in backends/qt4_editor/formlayout.py by wrapping the field.text() into a str() like
+
+value = float(str(field.text()))
+
+solves this.
+
 
 ---
 

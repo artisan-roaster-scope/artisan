@@ -2,8 +2,10 @@
 export MACOSX_DEPLOYMENT_TARGET=10.6
 export PYTHONPATH="/Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages"
 
+export PATH=/Library/Frameworks/Python.framework/Versions/3.3/bin/:$PATH
+
 # translations
-/Library/Frameworks/Python.framework/Versions/3.3/bin/pylupdate4 artisan.pro
+pylupdate4 artisan.pro
 lrelease -verbose artisan.pro
 
 # distribution
