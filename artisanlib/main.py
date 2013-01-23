@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 __version__ = "0.6.0"
 
@@ -74,8 +75,7 @@ import numpy
 import array
 import struct
 from scipy import fft
-if sys.version_info < (3, 0):
-    from scipy import interpolate as inter # comment as it does not work on Python 3.3
+from scipy import interpolate as inter # comment as it does not work on Python 3.3
  
     
 import sip
@@ -140,8 +140,6 @@ if sys.version < '3':
     def str2cmd(s):
         return s
 else:
-#    import uprefix
-#    uprefix.register_hook()
     def u(x):
         return x
     def v(x):
@@ -240,6 +238,9 @@ class tgraphcanvas(FigureCanvas):
                                             QApplication.translate("Textbox", "Balance",None, QApplication.UnicodeUTF8),
                                             QApplication.translate("Textbox", "Body",None, QApplication.UnicodeUTF8)]
 
+        # custom labels are stored in the application settings and can be edited by the user
+        self.customflavorlabels = self.artisanflavordefaultlabels
+        
         self.SCCAflavordefaultlabels = [QApplication.translate("Textbox", "Sour",None, QApplication.UnicodeUTF8),
                                         QApplication.translate("Textbox", "Flavor",None, QApplication.UnicodeUTF8),
                                         QApplication.translate("Textbox", "Critical\nStimulus",None, QApplication.UnicodeUTF8),
@@ -873,7 +874,7 @@ class tgraphcanvas(FigureCanvas):
 
                     ndev = len(self.extradevices)
                     for i in range(ndev):
-                        if ndev < 10:
+                        if i < aw.nLCDS:
                             aw.extraLCD1[i].display("%.1f"%float(self.extratemp1[i][-1]))
                             aw.extraLCD2[i].display("%.1f"%float(self.extratemp2[i][-1]))
 
@@ -1314,7 +1315,7 @@ class tgraphcanvas(FigureCanvas):
         aw.lcd5.display("0.0")
         aw.lcd6.display("0.0")
         aw.lcd7.display("0.0")
-        for i in range(10):
+        for i in range(aw.nLCDS):
             aw.extraLCD1[i].display("0.0")
             aw.extraLCD2[i].display("0.0")
         aw.sendmessage(QApplication.translate("Message Area","Scope has been reset",None, QApplication.UnicodeUTF8))
@@ -1446,6 +1447,7 @@ class tgraphcanvas(FigureCanvas):
         
         aw.lowerbuttondialog.setVisible(False)
         aw.hideLCDs()
+        aw.hideSliders()
                 
         self.wheelflag = False
         
@@ -1616,8 +1618,8 @@ class tgraphcanvas(FigureCanvas):
             pass    
                     
     #Redraws data   
-    # if recomputeAllDeltas, the delta arrays and also the smoothed line arrays are recomputed
-    def redraw(self, recomputeAllDeltas=True, smooth=False):
+    # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
+    def redraw(self, recomputeAllDeltas=True, smooth=False, resmooth=False):
         try:
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
@@ -1726,47 +1728,38 @@ class tgraphcanvas(FigureCanvas):
                         jump -= 5
                     else:
                         jump -= 10
-
-            # smooth main curves
-#            if (smooth or (recomputeAllDeltas and not aw.qmc.flagon)):
-#                self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
-#                self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
                     
             ##### ET,BT curves
             if aw.qmc.ETcurve:
                 if aw.qmc.flagon:
                     self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
                 else:
-                    if len(self.stemp1) != len(self.timex):
+                    if smooth or resmooth or len(self.stemp1) != len(self.timex):
                         self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)                        
                     self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
             if aw.qmc.BTcurve:
                 if aw.qmc.flagon:
                     self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
                 else:
-                    if len(self.stemp2) != len(self.timex):
+                    if smooth or resmooth or len(self.stemp2) != len(self.timex):
                         self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
                     self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
 
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
             for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                # smooth extra curves
-#                if (smooth or (recomputeAllDeltas and not aw.qmc.flagon)):
-#                    self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
-#                    self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
                 if aw.extraCurveVisibility1[i]:
                     if aw.qmc.flagon:
                         self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
                     else:                    
-                        if len(self.extrastemp1[i]) != len(self.extratimex[i]):
+                        if smooth or resmooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
                             self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
                         self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
                 if aw.extraCurveVisibility2[i]:
                     if aw.qmc.flagon:
                         self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
                     else:
-                        if len(self.extrastemp2[i]) != len(self.extratimex[i]):
+                        if smooth or resmooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
                             self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
                         self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
 
@@ -1969,12 +1962,22 @@ class tgraphcanvas(FigureCanvas):
                         firstletter = self.etypes[self.specialeventstype[i]][0]
                         secondletter = self.eventsvalues[self.specialeventsvalue[i]]
                         #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp1[int(self.specialevents[i])]),
+                        if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:                            
+                            if aw.qmc.flagon:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
+                                             xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
+                            else:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp1[int(self.specialevents[i])]),
                                              xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
                                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
                         else:
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp2[int(self.specialevents[i])]),
+                            if aw.qmc.flagon:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                                         xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                            else:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp2[int(self.specialevents[i])]),
                                          xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
@@ -2098,12 +2101,6 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Fahrenheit mode
     def fahrenheitMode(self):
-#        self.ylimit = int(self.fromCtoF(self.ylimit))
-#        self.ylimit_min = int(self.fromCtoF(self.ylimit_min))
-#        self.ygrid = int(self.fromCtoF(self.ygrid)) / 5 * 5
-#        self.zlimit = int(self.fromCtoF(self.zlimit))
-#        self.zlimit_min = int(self.fromCtoF(self.zlimit_min))
-#        self.zgrid = int(self.fromCtoF(self.zgrid)) / 5 * 5
         # just set it to the defaults to avoid strange conversion issues
         self.ylimit = 750
         self.ylimit_min = 0
@@ -2125,12 +2122,6 @@ class tgraphcanvas(FigureCanvas):
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
-#        self.ylimit = int(self.fromFtoC(self.ylimit))
-#        self.ylimit_min = int(self.fromFtoC(self.ylimit_min))
-#        self.ygrid = int(self.fromCtoF(self.ygrid)) / 5 * 5
-#        self.zlimit = int(self.fromFtoC(self.zlimit))
-#        self.zlimit_min = int(self.fromFtoC(self.zlimit_min))
-#        self.zgrid = int(self.fromCtoF(self.zgrid)) / 5 * 5
         self.ylimit = 300
         self.ylimit_min = 0
         self.ygrid = 25
@@ -2249,7 +2240,7 @@ class tgraphcanvas(FigureCanvas):
                     self.celsiusMode()
                     aw.sendmessage(QApplication.translate("Message Area","Profile changed to Celsius", None, QApplication.UnicodeUTF8))
                     
-            self.redraw()
+            self.redraw(recomputeAllDeltas=True,smooth=True)
 
         else:
              QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Convert Profile Scale",None, QApplication.UnicodeUTF8),
@@ -2415,6 +2406,7 @@ class tgraphcanvas(FigureCanvas):
                 
             aw.soundpop()
             aw.showLCDs()
+            aw.showSliders()
         #turn OFF        
         else:
             # stop Recorder if still running
@@ -2434,7 +2426,8 @@ class tgraphcanvas(FigureCanvas):
             aw.soundpop()
             
             aw.hideLCDs()
-            aw.qmc.reset()
+            aw.hideSliders()
+            #aw.qmc.reset()
             
     #Turns START/STOP flag self.flagon to read and plot. Called from push button_2. 
     def OnRecorder(self):
@@ -2460,8 +2453,6 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
             aw.button_2.setEnabled(False)
             aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])  
-#            aw.button_2.setStyleSheet(aw.pushbuttonstyles["START"])   
-#            aw.button_2.setText(QApplication.translate("Scope Button", "STOP",None, QApplication.UnicodeUTF8)) # text means click STOP (it is STARTed)                   
             aw.button_18.setEnabled(True)
             aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])  
             aw.soundpop()
@@ -2523,6 +2514,9 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         return
                             
+                aw.qmc.timealign(redraw=False,recompute=False)
+                self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
+
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
                 st1 = QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8)
                 t2 = self.temp2[self.timeindex[0]]
@@ -2531,8 +2525,6 @@ class tgraphcanvas(FigureCanvas):
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                 self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
 
-                #self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
-                aw.qmc.timealign(redraw=False,recompute=False)
                           
                 self.fig.canvas.draw()
                 # release lock as early as possible if all values are taken, before expensive redraw:
@@ -2888,7 +2880,6 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         return
                     
-                #aw.button_9.setDisabled(True)
                 aw.button_9.setFlat(True)
 
                 st1 = QApplication.translate("Scope Annotation","End %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
@@ -2997,11 +2988,20 @@ class tgraphcanvas(FigureCanvas):
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)  
 
-
+    def EventRecord(self,extraevent=None):
+        if extraevent:
+            self.EventRecordAction(
+                extraevent=extraevent,
+                eventtype=aw.extraeventstypes[extraevent],
+                eventvalue=aw.extraeventsvalues[extraevent],
+                eventdescription=aw.extraeventsdescriptions[extraevent])
+        else:
+            self.EventRecordAction(extraevent=extraevent)
+            
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
     # extraevent is given when called from aw.recordextraevent() from an extra Event Button
-    def EventRecord(self,extraevent=None):
+    def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription=""):
         try:
             if self.flagon:
                 #prevents accidentally deleting a modified profile. 
@@ -3035,9 +3035,9 @@ class tgraphcanvas(FigureCanvas):
                 self.specialeventsvalue.append(0)
                 #if event was initiated by an Extra Event Button then change the type,value,and string 
                 if extraevent != None:
-                    self.specialeventstype[-1] = aw.extraeventstypes[extraevent]    
-                    self.specialeventsvalue[-1] = aw.extraeventsvalues[extraevent]
-                    self.specialeventsStrings[-1] = aw.extraeventsdescriptions[extraevent]
+                    self.specialeventstype[-1] = eventtype    
+                    self.specialeventsvalue[-1] = eventvalue
+                    self.specialeventsStrings[-1] = eventdescription
 
                 etype = self.specialeventstype[-1]
                 if etype == 0:
@@ -3222,8 +3222,7 @@ class tgraphcanvas(FigureCanvas):
                 self.samplingsemaphore.release(1)            
                                 
     # Writes information about the finished profile in the graph
-    def writestatistics(self):
-        
+    def writestatistics(self):        
         TP_index = aw.findTP()
         if self.timeindex[1] and self.phasesbuttonflag:
             #manual dryend available
@@ -3396,8 +3395,8 @@ class tgraphcanvas(FigureCanvas):
                 ror = "%.2f"%(((self.temp2[self.timeindex[6]]-LP)/(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))*60.)
                 
                 #end temperature
-                strline = QApplication.translate("Scope Label", "BT = %1 - %2 (%3)   ET = %4 - %5 (%6)   Time = %7   RoR = %8 d/m   ETBTarea = %9 (%10)", None,
-                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg("%.1f"%self.temp2[self.timeindex[6]] + self.mode).arg(deltatemp).arg("%.1f"%ETmin + self.mode).arg("%.1f"%ETmax + self.mode).arg(dET).arg(timez).arg(ror).arg(deltaAcc).arg(deltaAcc / dTime)
+                strline = QApplication.translate("Scope Label", "BT=%1-%2 (%3)   ET=%4-%5 (%6)   T=%7   RoR=%8d/m   ETa=%9   BTa=%10   ETBTa=%11   ETBTa/s=%12", None,
+                          QApplication.UnicodeUTF8).arg(lowestBT + self.mode).arg("%.1f"%self.temp2[self.timeindex[6]] + self.mode).arg(deltatemp).arg("%.1f"%ETmin + self.mode).arg("%.1f"%ETmax + self.mode).arg(dET).arg(timez).arg(ror).arg(int(AccET)).arg(int(AccBT)).arg(deltaAcc).arg(int(deltaAcc / dTime))
 
                 # even better: use xlabel
                 self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
@@ -3566,8 +3565,7 @@ class tgraphcanvas(FigureCanvas):
             return  
             
     def drawinterp(self,mode):
-        try:
-            
+        try:            
             Xpoints,Ypoints = self.findpoints() #from 0 origin
             func = inter.interp1d(Xpoints, Ypoints, kind=mode)
             newY = func(self.timex)          
@@ -3641,8 +3639,8 @@ class tgraphcanvas(FigureCanvas):
 
     #updates list self.timeindex when found an _OLD_ profile without self.timeindex (new version)
     def timeindexupdate(self,times):
-        #          START            DRYEND          FCs             FCe         SCs         SCe         DROP
-#        times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
+##        #          START            DRYEND          FCs             FCe         SCs         SCe         DROP
+##        times = [self.startend[0],self.dryend[0],self.varC[0],self.varC[2],self.varC[4],self.varC[6],self.startend[2]]
         for i in range(len(times)):               
             if times[i]:
                 self.timeindex[i] = self.time2index(times[i])
@@ -4421,36 +4419,6 @@ class tgraphcanvas(FigureCanvas):
                     self.startangle[i] -= diff
                 self.segmentsalpha[self.wheelx][self.wheelz] -= .3   #restore alpha in mouse selection 
                 self.drawWheel()       
-##
-##    def findwheelindex(self,x,z):
-##        #find wheel
-##        x = math.degrees(x)
-##        z *= 100.
-##        r = 0
-##        for i in range(len(self.wradii)):
-##            r += self.wradii[i]
-##            if r > z:
-##                break
-##
-##        #find element in wheel
-##        init = self.startangle[i]
-##        if init > 360.:
-##            init %= 360.
-##        elif init < 0.:
-##            init += 360.
-##        diff = 360.
-##        ind = -1
-##        for p in range(len(self.segmentlengths[i])):
-##            checkdiff = abs(init - x)
-##            if checkdiff < diff:
-##                diff = checkdiff
-##                ind = p
-##            init += self.segmentlengths[i][p]*3.60
-##            if init > 360.:
-##                init %= 360.
-##
-##        return i,ind
-##        
                 
     def wheel_menu(self,event):
         if str(event.inaxes) != str(self.ax2): return
@@ -5258,7 +5226,7 @@ class ApplicationWindow(QMainWindow):
         self.eventslideractions = [0,0,0,0] # 0: None, 1: Serial Command, 2: Modbus Command, 3: DTA Command
         self.eventslidercommands = ["","","",""]
         self.eventslideroffsets = [0,0,0,0]
-        self.eventsliderfactors = [10,10,10,10]
+        self.eventsliderfactors = [10.0,10.0,10.0,10.0]
 
         # set window title
         self.windowTitle = str(QApplication.translate("Application Title", "Artisan %1",None, QApplication.UnicodeUTF8).arg(str(__version__)))
@@ -5853,40 +5821,40 @@ class ApplicationWindow(QMainWindow):
         self.label2 = QLabel()
         self.label2.setText(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
         self.label2.setAlignment(Qt.AlignBottom)
-        self.label2.setIndent(5)
+#        self.label2.setIndent(5)
         #BT
         self.label3 = QLabel()
         self.label3.setAlignment(Qt.AlignBottom)
         self.label3.setText("<b>" + QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8) + "<\b>")
-        self.label3.setIndent(5)
+#        self.label3.setIndent(5)
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.AlignBottom)
         self.label4.setText("<b>" + QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b>")
-        self.label4.setIndent(5)
+#        self.label4.setIndent(5)
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.AlignBottom)       
         self.label5.setText("<b>" + QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b>")
-        self.label5.setIndent(5)
+#        self.label5.setIndent(5)
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.AlignBottom)
         self.label6.setText("<b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b>")
-        self.label6.setIndent(5)
+#        self.label6.setIndent(5)
         # pid power % duty cycle
         self.label7 = QLabel()
         self.label7.setAlignment(Qt.AlignBottom)
         self.label7.setText("<b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b>")
-        self.label7.setIndent(5)
+#        self.label7.setIndent(5)
 
         #extra LCDs
-        nLCDS = 10
+        self.nLCDS = 10 # maximum number of LCDs and extra devices
         self.extraLCD1,self.extraLCD2 = [],[]
         self.extraLCDlabel1,self.extraLCDlabel2 = [],[]
-        self.extraLCDvisibility1,self.extraLCDvisibility2 = [0]*nLCDS,[0]*nLCDS
-        self.extraCurveVisibility1,self.extraCurveVisibility2 = [0]*nLCDS,[0]*nLCDS
-        for i in range(nLCDS):
+        self.extraLCDvisibility1,self.extraLCDvisibility2 = [0]*self.nLCDS,[0]*self.nLCDS
+        self.extraCurveVisibility1,self.extraCurveVisibility2 = [0]*self.nLCDS,[0]*self.nLCDS
+        for i in range(self.nLCDS):
             #configure LCDs
             self.extraLCD1.append(QLCDNumber())
             self.extraLCDlabel1.append(QLabel())
@@ -5896,22 +5864,23 @@ class ApplicationWindow(QMainWindow):
             self.extraLCD1[i].display("0.0")
             self.extraLCD2[i].setSegmentStyle(2)
             self.extraLCD2[i].display("0.0")
-            #self.extraLCD[i].setMinimumHeight(35)
+            #self.extraLCD1[i].setMinimumHeight(15)
+            #self.extraLCD2[i].setMinimumHeight(15)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             string1 = QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8)
             string2 = QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None, QApplication.UnicodeUTF8)
-            self.extraLCD1[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
-            self.extraLCD2[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
+            #self.extraLCD1[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
+            #self.extraLCD2[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
             #configure Labels
             self.extraLCDlabel1[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel1[i].setText("<b>" + string1 + "</b>")
             self.extraLCDlabel1[i].setAlignment(Qt.AlignBottom)
-            self.extraLCDlabel1[i].setIndent(5)
+#            self.extraLCDlabel1[i].setIndent(5)
             self.extraLCDlabel2[i].setText("<b>" + string2 + "</b>")
             self.extraLCDlabel2[i].setAlignment(Qt.AlignBottom)
-            self.extraLCDlabel2[i].setIndent(5)
+ #           self.extraLCDlabel2[i].setIndent(5)
             #set initial visiblity (updated at settingsload())
             self.extraLCD1[i].setVisible(False)
             self.extraLCDlabel1[i].setVisible(False)
@@ -6054,49 +6023,38 @@ class ApplicationWindow(QMainWindow):
         self.EventsGroupLayout.setLayout(EventsLayout)
  
         #place control buttons + LCDs inside vertical button layout manager 
-        LCDlayout.addSpacing(5) 
         LCDlayout.addWidget(self.label2)
-        LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd2)
         
-        #LCDlayout.addStretch()  
         LCDlayout.addSpacing(5) 
         LCDlayout.addWidget(self.label3)
-        LCDlayout.addSpacing(-10)
         LCDlayout.addWidget(self.lcd3)
         
-        #LCDlayout.addStretch()
         LCDlayout.addSpacing(5) 
         LCDlayout.addWidget(self.label6)
-        #LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd6)
         
-        #LCDlayout.addStretch()
         LCDlayout.addSpacing(5) 
         LCDlayout.addWidget(self.label7)
-        LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd7)
         
-        #LCDlayout.addStretch()
         LCDlayout.addSpacing(5) 
         LCDlayout.addWidget(self.label4)
-        LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd4)
         
-        #LCDlayout.addStretch()  
         LCDlayout.addSpacing(5)  
         LCDlayout.addWidget(self.label5)
-        LCDlayout.addSpacing(-10) 
         LCDlayout.addWidget(self.lcd5)
+        
+        LCDlayout.addSpacing(10) 
+        
         #add extra LCDs
-        for i in range(nLCDS):
+        for i in range(self.nLCDS):
             LCDlayout.addSpacing(10) 
             LCDlayout.addWidget(self.extraLCDlabel1[i])
-            LCDlayout.addSpacing(-10) 
             LCDlayout.addWidget(self.extraLCD1[i])
-            LCDlayout.addSpacing(5) 
+            LCDlayout.addSpacing(10) 
             LCDlayout.addWidget(self.extraLCDlabel2[i])
-            LCDlayout.addSpacing(-10) 
             LCDlayout.addWidget(self.extraLCD2[i])
         LCDlayout.addStretch()
             
@@ -6142,40 +6100,164 @@ class ApplicationWindow(QMainWindow):
         midleftlayout.addWidget(self.e4buttondialog)
         midleftlayout.addSpacing(5)
         midleftlayout.addWidget(self.EventsGroupLayout)
+        
+        self.slider1 = self.slider()
+        self.sliderLCD1 = self.sliderLCD()        
+        self.sliderLCD1.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[0]) 
+        self.sliderLCD1.display(self.slider1.value())
+        sliderGrp1 = QVBoxLayout()
+        sliderGrp1.addWidget(self.sliderLCD1)
+        sliderGrp1.addWidget(self.slider1)
+        sliderGrp1.setAlignment(Qt.AlignCenter)
+        sliderGrp1.setMargin(2)
+        self.sliderGrpBox1 = QGroupBox()        
+        self.sliderGrpBox1.setLayout(sliderGrp1)
+        self.sliderGrpBox1.setAlignment(Qt.AlignCenter)
+        self.sliderGrpBox1.setMinimumWidth(50) 
+        self.sliderGrpBox1.setMaximumWidth(50) 
+        self.connect(self.slider1, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(0,v))  
+        self.connect(self.slider1, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(0))
+
+        self.slider2 = self.slider()
+        self.sliderLCD2 = self.sliderLCD() 
+        self.sliderLCD2.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[1])         
+        self.sliderLCD2.display(self.slider2.value())
+        sliderGrp2 = QVBoxLayout()
+        sliderGrp2.addWidget(self.sliderLCD2)
+        sliderGrp2.addWidget(self.slider2)
+        sliderGrp2.setAlignment(Qt.AlignCenter)
+        sliderGrp2.setMargin(2)
+        self.sliderGrpBox2 = QGroupBox()        
+        self.sliderGrpBox2.setLayout(sliderGrp2)
+        self.sliderGrpBox2.setAlignment(Qt.AlignCenter)
+        self.sliderGrpBox2.setMinimumWidth(50) 
+        self.sliderGrpBox2.setMaximumWidth(50) 
+        self.connect(self.slider2, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(1,v))  
+        self.connect(self.slider2, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(1))      
+
+        self.slider3 = self.slider()
+        self.sliderLCD3 = self.sliderLCD() 
+        self.sliderLCD3.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[2])
+        self.sliderLCD3.display(self.slider3.value())
+        sliderGrp3 = QVBoxLayout()
+        sliderGrp3.addWidget(self.sliderLCD3)
+        sliderGrp3.addWidget(self.slider3)
+        sliderGrp3.setAlignment(Qt.AlignCenter)
+        sliderGrp3.setMargin(2)
+        self.sliderGrpBox3 = QGroupBox()        
+        self.sliderGrpBox3.setLayout(sliderGrp3)
+        self.sliderGrpBox3.setAlignment(Qt.AlignCenter)
+        self.sliderGrpBox3.setMinimumWidth(50) 
+        self.sliderGrpBox3.setMaximumWidth(50) 
+        self.connect(self.slider3, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(2,v)) 
+        self.connect(self.slider3, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(2))       
+
+        self.slider4 = self.slider()
+        self.sliderLCD4 = self.sliderLCD() 
+        self.sliderLCD4.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[3])
+        self.sliderLCD4.display(self.slider4.value())
+        sliderGrp4 = QVBoxLayout()
+        sliderGrp4.addWidget(self.sliderLCD4)
+        sliderGrp4.addWidget(self.slider4)
+        sliderGrp4.setAlignment(Qt.AlignCenter)
+        sliderGrp4.setMargin(2)
+        self.sliderGrpBox4 = QGroupBox()        
+        self.sliderGrpBox4.setLayout(sliderGrp4)
+        self.sliderGrpBox4.setAlignment(Qt.AlignCenter)
+        self.sliderGrpBox4.setMinimumWidth(50) 
+        self.sliderGrpBox4.setMaximumWidth(50) 
+        self.connect(self.slider4, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(3,v))  
+        self.connect(self.slider4, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(3))      
+        
+        sliderGrp12 = QVBoxLayout()
+        sliderGrp12.addWidget(self.sliderGrpBox1)
+        sliderGrp12.addWidget(self.sliderGrpBox2)
+        sliderGrp34 = QVBoxLayout()
+        sliderGrp34.addWidget(self.sliderGrpBox3)
+        sliderGrp34.addWidget(self.sliderGrpBox4)
+        leftlayout = QHBoxLayout()
+        leftlayout.setSpacing(0)
+        leftlayout.setMargin(0)
+        leftlayout.addLayout(sliderGrp12)
+        leftlayout.addLayout(sliderGrp34)
 
         midlayout = QHBoxLayout()
+        midlayout.addLayout(leftlayout)
         midlayout.addLayout(midleftlayout)
-        midlayout.addLayout(LCDlayout)
+        midlayout.addLayout(LCDlayout)        
+        midlayout.setSpacing(0)
         
         mainlayout = QVBoxLayout(self.main_widget)
         mainlayout.setContentsMargins(0,0,0,0)
         mainlayout.addLayout(level1layout)       
         mainlayout.addLayout(midlayout) 
-       
-     
- #       slider = QSlider()
- #       lcd = QLCDNumber()
- #       cont2 = QWidget()
- #       lay2 = QVBoxLayout(cont2)
- #       lay2.addWidget(slider)
- #       lay2.addWidget(lcd)
- #       toolbar = QToolBar()
- #       toolbar.addWidget(cont2)
- #       self.addToolBar(Qt.TopToolBarArea, toolbar)
- #       
-#        slider2 = QSlider()
-#        lcd2 = QLCDNumber()        
-#        dock = QDockWidget()
-#        cont = QWidget()
-#        lay = QVBoxLayout(cont)
-#        lay.addWidget(slider2)
-#        lay.addWidget(lcd2)
-#        dock.setWidget(cont)
-#        self.addDockWidget(Qt.DockWidgetArea(1),dock)
         
         
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
 
+    def sliderReleased(self,n):
+        if n == 0:
+            if self.slider1.value() != self.eventslidervalues[0]:
+                self.eventslidervalues[0] = self.slider1.value()
+                self.recordsliderevent(n)
+        elif n == 1:
+            if self.slider2.value() != self.eventslidervalues[1]:
+                self.eventslidervalues[1] = self.slider2.value()
+                self.recordsliderevent(n)
+        elif n == 2:
+            if self.slider3.value() != self.eventslidervalues[2]:
+                self.eventslidervalues[2] = self.slider3.value()
+                self.recordsliderevent(n)
+        elif n == 3:
+            if self.slider4.value() != self.eventslidervalues[3]:
+                self.eventslidervalues[3] = self.slider4.value()
+                self.recordsliderevent(n)
+           
+    def recordsliderevent(self,n):
+        if self.qmc.flagstart:
+            self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=self.eventslidervalues[n])
+        action = self.eventslideractions[n]
+        if action:
+            try:
+                action = (action+2 if action > 1 else action)
+                value = int(round((self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]))
+                cmd = self.eventslidercommands[n]
+                cmd = cmd.format(value)
+                self.eventaction(action,cmd)
+            except:
+                pass
+        
+    def updateSliderLCD(self,n,v):
+        if n == 0:
+            self.sliderLCD1.display(v)
+        elif n == 1:
+            self.sliderLCD2.display(v)
+        elif n == 2:
+            self.sliderLCD3.display(v)
+        elif n == 3:
+            self.sliderLCD4.display(v)
+        
+    def sliderLCD(self):
+        slcd = QLCDNumber()
+        slcd.setSegmentStyle(2)
+        slcd.setNumDigits(2)
+        slcd.setMinimumHeight(35)
+        slcd.setMinimumWidth(35) 
+        slcd.setMaximumWidth(35)                 
+        slcd.setFrameStyle(QFrame.Panel | QFrame.Sunken)
+        slcd.setLineWidth(0)
+        slcd.setContentsMargins(0,0,0,0)
+        return slcd
+        
+    def slider(self):        
+        s = QSlider()
+        s.setTickPosition(3)
+        s.setMaximum(10)
+        s.setPageStep(1)
+        s.setMinimumWidth(35) 
+        s.setMaximumWidth(35) 
+        s.setContentsMargins(0,0,0,0)
+        return s
         
     def setLabelColor(self,label,color):
         palette = QPalette(label.palette()) # make a copy of the palette
@@ -6262,9 +6344,25 @@ class ApplicationWindow(QMainWindow):
 
     #call from user configured event buttons    
     def recordextraevent(self,ee):
-        if self.qmc.flagstart:
-            self.qmc.EventRecord(extraevent = ee)
-        self.eventaction(self.extraeventsactions[ee],self.extraeventsactionstrings[ee])
+        eventtype = self.extraeventstypes[ee]
+        if eventtype < 4:  ## if eventtype == 4 we have an button event of type "--" that does not add an event
+            if self.qmc.flagstart:
+                self.qmc.EventRecord(extraevent = ee)
+            value = (self.extraeventsvalues[ee] - 1)
+            cmdvalue = int(round((self.eventsliderfactors[eventtype] * value) + self.eventslideroffsets[eventtype]))
+            self.eventaction(self.extraeventsactions[ee],self.extraeventsactionstrings[ee].format(cmdvalue))
+            # move corresponding slider to new value:
+            if eventtype == 0:
+                self.slider1.setValue(value)
+            elif eventtype == 1:
+                self.slider2.setValue(value)
+            elif eventtype == 2:
+                self.slider3.setValue(value)
+            elif eventtype == 3:
+                self.slider4.setValue(value)
+        else:
+            # just issue the eventaction (no cmd substitution here)
+            self.eventaction(self.extraeventsactions[ee],self.extraeventsactionstrings[ee])
 
     def resetApplication(self):
         string = QApplication.translate("MessageBox","Do you want to reset all settings?", None, QApplication.UnicodeUTF8)
@@ -6303,28 +6401,53 @@ class ApplicationWindow(QMainWindow):
         self.messagehist.append(timez + message)
         self.messagelabel.setText(message)
     
+    def updateSliders(self):
+        # update visibility (based on the app state)
+        if self.qmc.flagon:
+            self.showSliders()
+        else:
+            self.hideSliders()
+        
+    def hideSliders(self):
+        self.updateSlidersVisibility(False)
+        
+    def showSliders(self):
+        self.updateSlidersVisibility(True)
+        # update event type names        
+        self.sliderGrpBox1.setTitle(aw.qmc.etypes[0])
+        self.sliderGrpBox2.setTitle(aw.qmc.etypes[1])
+        self.sliderGrpBox3.setTitle(aw.qmc.etypes[2])
+        self.sliderGrpBox4.setTitle(aw.qmc.etypes[3])
+        
+    def updateSlidersVisibility(self,visible):
+        if not visible or aw.eventslidervisibilities[0]:
+            aw.sliderGrpBox1.setVisible(visible)
+        if not visible or aw.eventslidervisibilities[1]:
+            aw.sliderGrpBox2.setVisible(visible)
+        if not visible or aw.eventslidervisibilities[2]:
+            aw.sliderGrpBox3.setVisible(visible)
+        if not visible or aw.eventslidervisibilities[3]:
+            aw.sliderGrpBox4.setVisible(visible)
+        
     def hideLCDs(self):
         self.updateLCDvisibility(False)
-#        self.docWidgetLCD.hide()
     
     def showLCDs(self):
         self.updateLCDvisibility(True)
-#        self.docWidgetLCD.show()
     
     def updateLCDvisibility(self,visible):
         ndev = len(aw.qmc.extradevices)
         for i in range(ndev):
-            if ndev < 10:
-                if not visible or aw.extraLCDvisibility1[i]:
-                    aw.extraLCD1[i].setVisible(visible)
-                    aw.extraLCDlabel1[i].setVisible(visible)
-                    if visible and i < len(aw.qmc.extraname1):
-                        aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "<\b>")
-                if not visible or aw.extraLCDvisibility2[i]:
-                    aw.extraLCD2[i].setVisible(visible)
-                    aw.extraLCDlabel2[i].setVisible(visible)
-                    if visible and i < len(aw.qmc.extraname2):
-                        aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "<\b>")
+            if not visible or aw.extraLCDvisibility1[i]:
+                aw.extraLCD1[i].setVisible(visible)
+                aw.extraLCDlabel1[i].setVisible(visible)
+                if visible and i < len(aw.qmc.extraname1):
+                    aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "<\b>")
+            if not visible or aw.extraLCDvisibility2[i]:
+                aw.extraLCD2[i].setVisible(visible)
+                aw.extraLCDlabel2[i].setVisible(visible)
+                if visible and i < len(aw.qmc.extraname2):
+                    aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "<\b>")
         aw.lcd2.setVisible(aw.qmc.ETlcd and visible)
         aw.label2.setVisible(aw.qmc.ETlcd and visible)
         aw.lcd3.setVisible(aw.qmc.BTlcd and visible)
@@ -7991,10 +8114,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extratimex.append([])
                 self.qmc.extrastemp1.append([])
                 self.qmc.extrastemp2.append([])
-                #init empty lines
-#                self.qmc.extratemp1lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp1[i],markersize=self.qmc.extramarkersizes1[i],marker=self.qmc.extramarkers1[i],linewidth=self.qmc.extralinewidths1[i],linestyle=self.qmc.extralinestyles1[i],drawstyle=self.qmc.extradrawstyles1[i],color="black",label= self.qmc.extraname1[i])[0])
-#                self.qmc.extratemp2lines.append(self.qmc.ax.plot(self.qmc.extratimex[i], self.qmc.extratemp2[i],markersize=self.qmc.extramarkersizes2[i],marker=self.qmc.extramarkers2[i],linewidth=self.qmc.extralinewidths2[i],linestyle=self.qmc.extralinestyles2[i],drawstyle=self.qmc.extradrawstyles2[i],color="black",label= self.qmc.extraname1[i])[0])
-                #extra LCDs
+            #extra LCDs
             self.updateExtraLCDvisibility()
 
             # set extraLCD colors
@@ -8107,6 +8227,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("roastpropertiesflag"):            	
             	self.qmc.roastpropertiesflag = settings.value("roastpropertiesflag",self.qmc.roastpropertiesflag).toInt()[0]
 
+            if settings.contains("customflavorlabels"):            	
+            	self.qmc.customflavorlabels = list(map(str,list(settings.value("customflavorlabels",self.qmc.customflavorlabels).toStringList())))
+
             #restore sliders
             settings.beginGroup("Sliders")
             if settings.contains("slidervisibilities"):                                                  
@@ -8114,7 +8237,7 @@ class ApplicationWindow(QMainWindow):
                 self.eventslideractions = [x.toInt()[0] for x in settings.value("slideractions").toList()]                
                 self.eventslidercommands = list(map(str,list(settings.value("slidercommands",self.eventslidercommands).toStringList())))                
                 self.eventslideroffsets = [x.toInt()[0] for x in settings.value("slideroffsets").toList()]
-                self.eventsliderfactors = [x.toInt()[0] for x in settings.value("sliderfactors").toList()]
+                self.eventsliderfactors = [x.toDouble()[0] for x in settings.value("sliderfactors").toList()]
             settings.endGroup()
 
 #--------------------------------
@@ -8504,6 +8627,7 @@ class ApplicationWindow(QMainWindow):
 
             settings.setValue("roastpropertiesflag",self.qmc.roastpropertiesflag)
          
+            settings.setValue("customflavorlabels",self.qmc.customflavorlabels)
            
         except Exception as e:
             import traceback
@@ -8657,7 +8781,7 @@ class ApplicationWindow(QMainWindow):
         if aw.qmc.flagon:
             n = len(self.qmc.extradevices)
             for i in range(n):
-                if i < 10 :
+                if i < aw.nLCDS:
                     if self.extraLCDvisibility1[i]:
                         if i < len(self.qmc.extraname1):
                             self.extraLCDlabel1[i].setText("<b>" + self.qmc.extraname1[i] + "<\b>")
@@ -8677,21 +8801,16 @@ class ApplicationWindow(QMainWindow):
                         self.extraLCDlabel2[i].setVisible(False)
                         self.extraLCD2[i].setVisible(False)
             #hide the rest (just in case)
-            for i in range(n,10):
+            for i in range(n,aw.nLCDS):
                 self.extraLCDlabel1[i].setVisible(False)
                 self.extraLCD1[i].setVisible(False)            
                 self.extraLCDlabel2[i].setVisible(False)
                 self.extraLCD2[i].setVisible(False) 
         else:
-            aw.hideLCDs()           
+            aw.hideLCDs()
+            aw.hideSliders()         
 
     def filePrint(self):
-
-#        tempFile = tempfile.NamedTemporaryFile(delete=True)
-#        tfname = tempFile.name
-#        tempFile.close()
-#        self.qmc.fig.savefig(tfname)
-#        image = QImage(tfname)
         image = QPixmap.grabWidget(aw.qmc).toImage()
         
         if image.isNull():
@@ -8901,8 +9020,6 @@ $cupping_notes
             tempFile = tempfile.NamedTemporaryFile(delete=True)
             tfname = tempFile.name
             tempFile.close() # tmp file is deleted automatically on close
-#            self.qmc.fig.savefig(tfname)
-#            image = QImage(tfname)
             image = QPixmap.grabWidget(aw.qmc).toImage()
             image = image.scaledToWidth(650,1)
             #save GRAPH image
@@ -8926,8 +9043,6 @@ $cupping_notes
             tempFile = tempfile.NamedTemporaryFile(delete=True)
             tfname = tempFile.name
             tempFile.close() # tmp file is deleted automatically on close            
-#            self.qmc.fig.savefig(tfname)            
-#            image = QImage(tfname)
             image = QPixmap.grabWidget(aw.qmc).toImage()
             image = image.scaledToWidth(550,1)
             #save GRAPH image
@@ -9097,8 +9212,7 @@ $cupping_notes
         return -1
         
     #returns the index of the lowest point in BT; return -1 if no such value found
-    def findTP(self):  
-        
+    def findTP(self):      
         TP  = 1000
         idx = 0
         start = 0
@@ -9760,12 +9874,6 @@ $cupping_notes
     #resizes and saves graph to a new width w 
     def resize(self,w,transformationmode):
         try: 
-#            #generate a tmp file name
-#            tempFile = tempfile.NamedTemporaryFile(delete=True)
-#            tfname = tempFile.name
-#            tempFile.close() # tmp file is deleted automatically on close
-#            # use the tmp file name to save and load the pic
-#            self.qmc.fig.savefig(tfname)
             image = QPixmap.grabWidget(aw.qmc)
 
             if w != 0:        
@@ -9846,9 +9954,7 @@ $cupping_notes
         p.setOpacity(0.7)
         p.setPen(QColor("slategrey"))
         
-        #p.setPen(QColor(self.qmc.palette["text"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),QString(text1))
-        #p.setPen(QColor(self.qmc.palette["bt"]))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8),QString(text2))
 
         #draw pid
@@ -10829,7 +10935,7 @@ class HUDDlg(QDialog):
         try:
             self.Filter.setDisabled(True)
             aw.qmc.curvefilter = self.Filter.value() + 2
-            aw.qmc.redraw(recomputeAllDeltas=True)
+            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True,resmooth=True)
             self.Filter.setDisabled(False)
         except Exception as e:
             aw.qmc.adderror(QApplication.translate("Error Message", "changeFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))   
@@ -13284,17 +13390,21 @@ class EventsDlg(QDialog):
         self.E4offset = QSpinBox()
         self.E4offset.setRange(-999,999)
         self.E4offset.setValue(aw.eventslideroffsets[3])
-        self.E1factor = QSpinBox()
+        self.E1factor = QDoubleSpinBox()
         self.E1factor.setRange(-999,999)
+        self.E1factor.setDecimals(1)
         self.E1factor.setValue(aw.eventsliderfactors[0])
-        self.E2factor = QSpinBox()
+        self.E2factor = QDoubleSpinBox()
         self.E2factor.setRange(-999,999)
+        self.E2factor.setDecimals(1)
         self.E2factor.setValue(aw.eventsliderfactors[1])
-        self.E3factor = QSpinBox()
+        self.E3factor = QDoubleSpinBox()
         self.E3factor.setRange(-999,999)
+        self.E3factor.setDecimals(1)
         self.E3factor.setValue(aw.eventsliderfactors[2])
-        self.E4factor = QSpinBox()
+        self.E4factor = QDoubleSpinBox()
         self.E4factor.setRange(-999,999)
+        self.E4factor.setDecimals(1)
         self.E4factor.setValue(aw.eventsliderfactors[3])
         
         helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
@@ -13592,19 +13702,14 @@ class EventsDlg(QDialog):
         self.setLayout(mainLayout)
 
     def showSliderHelp(self):
-        string  = QApplication.translate("MessageBox", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Event Description</b> Description of the Event to be recorded.",None, QApplication.UnicodeUTF8) + "<br><br>"  
-        string += QApplication.translate("MessageBox", "<b>Event type</b> Type of event to be recorded.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Event value</b> Value of event (1-10) to be recorded",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Action</b> Perform an action at the time of the event",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Action description</b> Depends on the Action type:",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
+        string  = QApplication.translate("MessageBox", "<b>Event</b> hide or show the corresponding slider",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Action</b> Perform an action on slider release",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Command</b> depends on the action type ('{}' is replaced by <i>value</i>*<i>factor</i> + <i>offset</i>)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("MessageBox", "Call Program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("MessageBox", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Offset</b> added as offset to the slider value",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Factor</b> multiplicator of the slider value",None, QApplication.UnicodeUTF8)
         
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
         
@@ -14091,7 +14196,8 @@ class EventsDlg(QDialog):
             aw.eventsliderfactors[0] = self.E1factor.value()
             aw.eventsliderfactors[1] = self.E2factor.value()
             aw.eventsliderfactors[2] = self.E3factor.value()
-            aw.eventsliderfactors[3] = self.E4factor.value()
+            aw.eventsliderfactors[3] = self.E4factor.value()            
+            
             aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
             aw.qmc.buttonactions[2] = self.FCSbuttonActionType.currentIndex()
@@ -14126,6 +14232,9 @@ class EventsDlg(QDialog):
             
                 self.savetableextraeventbutton()
                 aw.realignbuttons()
+                
+                #update slider Widgets
+                aw.updateSliders()
     
                 aw.qmc.redraw(recomputeAllDeltas=False)
     
@@ -14150,7 +14259,7 @@ class EventsDlg(QDialog):
         string += QApplication.translate("MessageBox", "<b>Event type</b> Type of event to be recorded.",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Event value</b> Value of event (1-10) to be recorded",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Action</b> Perform an action at the time of the event",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>Action description</b> Depends on the Action type:",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
+        string += QApplication.translate("MessageBox", "<b>Documentation</b> depends on the action type ('{}' is replaced by the event value):",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Call Program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
         string += QApplication.translate("MessageBox", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
@@ -14355,7 +14464,7 @@ class phasesGraphDlg(QDialog):
 #####################   FLAVOR STAR PROPERTIES DIALOG   ####################
 ############################################################################
         
-class flavorDlg(QDialog):
+class flavorDlg(QDialog):   
     def __init__(self, parent = None):
         super(flavorDlg,self).__init__(parent)
 
@@ -14376,8 +14485,9 @@ class flavorDlg(QDialog):
 
         defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
         self.defaultcombobox = QComboBox()
-        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC"])
+        self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","*CUSTOM*"])
         self.defaultcombobox.setCurrentIndex(0)
+        self.lastcomboboxIndex = 0
         self.connect(self.defaultcombobox, SIGNAL("currentIndexChanged(int)"),self.setdefault)
 
         self.flavortable = QTableWidget()
@@ -14556,6 +14666,9 @@ class flavorDlg(QDialog):
                 
             aw.qmc.flavorlabels[i] = label
             aw.qmc.flavors[i] = valueSpinBox.value()
+        if self.lastcomboboxIndex == 10:
+            # store the current labels as *CUSTOM*
+            aw.qmc.customflavorlabels = aw.qmc.flavorlabels
 
     def setlabel(self,x):
         labeledit = self.flavortable.cellWidget(x,0)
@@ -14565,44 +14678,42 @@ class flavorDlg(QDialog):
     def setvalue(self,z,x):
         valueSpinBox = self.flavortable.cellWidget(x,1)
         aw.qmc.flavors[x] = valueSpinBox.value()
-        aw.qmc.flavorchart()        
+        aw.qmc.flavorchart()  
             
     def setdefault(self):
+        if self.lastcomboboxIndex == 10:
+            # store the current labels as *CUSTOM*
+            aw.qmc.customflavorlabels = aw.qmc.flavorlabels
         dindex =  self.defaultcombobox.currentIndex()
         #["","Artisan","SCCA","CQI","SweetMarias","C","E",coffeegeek,Intelligentsia]
+        if dindex > 0 or dindex < 11:
+            aw.qmc.flavorstartangle = 90
         if dindex == 1:
             aw.qmc.flavorlabels = list(aw.qmc.artisanflavordefaultlabels)
-            aw.qmc.flavorstartangle = 90
         elif dindex == 2:
             aw.qmc.flavorlabels = list(aw.qmc.SCCAflavordefaultlabels)
-            aw.qmc.flavorstartangle = 90
         elif dindex == 3:
             aw.qmc.flavorlabels = list(aw.qmc.CQIflavordefaultlabels)
-            aw.qmc.flavorstartangle = 90
         elif dindex == 4:
             aw.qmc.flavorlabels = list(aw.qmc.SweetMariasflavordefaultlabels)
-            aw.qmc.flavorstartangle = 90
         elif dindex == 5:
             aw.qmc.flavorlabels = list(aw.qmc.Cflavordefaultlabels)
-            aw.qmc.flavorstartangle = 90
         elif dindex == 6:
             aw.qmc.flavorlabels = list(aw.qmc.Eflavordefaultlabels)
-            aw.qmc.flavorstartangle = 90
         elif dindex == 7:
             aw.qmc.flavorlabels = list(aw.qmc.coffeegeekflavordefaultlabels)
-            aw.qmc.flavorstartangle = 90
         elif dindex == 8:
             aw.qmc.flavorlabels = list(aw.qmc.Intelligentsiaflavordefaultlabels)
-            aw.qmc.flavorstartangle = 90
         elif dindex == 9:
-            aw.qmc.flavorlabels = list(aw.qmc.IstitutoInternazionaleAssaggiatoriCaffe)
-            aw.qmc.flavorstartangle = 90
-            
+            aw.qmc.flavorlabels = list(aw.qmc.IstitutoInternazionaleAssaggiatoriCaffe)  
+        elif dindex == 10:
+            aw.qmc.flavorlabels = list(aw.qmc.customflavorlabels)            
         else:
             return
         aw.qmc.flavors = [5.]*len(aw.qmc.flavorlabels)
         self.createFlavorTable()        
         aw.qmc.flavorchart()
+        self.lastcomboboxIndex = dindex
 
     def addlabel(self):
         fn = len(aw.qmc.flavors)
@@ -15767,7 +15878,7 @@ class serialport(object):
 ##                command = ":010347000001B4"
 ##                r =       ":01030401900067"
                 if len(r) == nrxbytes:
-                    #REAd and WRITE commands are different
+                    #READ and WRITE commands are different
                     #READ command
                     if command[4] == "3":
                         #CRCreceived = int(r[13:15],16)  #bytes 14&15
@@ -18459,11 +18570,11 @@ class DeviceAssignmentDLG(QDialog):
         self.devicetable.setTabKeyNavigation(True)
         self.createDeviceTable()
 
-        addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
-        addButton.setFocusPolicy(Qt.NoFocus)
-        addButton.setMinimumWidth(100)
-        addButton.setMaximumWidth(100)
-        self.connect(addButton, SIGNAL("clicked()"),self.adddevice)   
+        self.addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
+        self.addButton.setFocusPolicy(Qt.NoFocus)
+        self.addButton.setMinimumWidth(100)
+        self.addButton.setMaximumWidth(100)
+        self.connect(self.addButton, SIGNAL("clicked()"),self.adddevice)   
         
         resetButton = QPushButton(QApplication.translate("Button","Reset",None, QApplication.UnicodeUTF8))
         resetButton.setFocusPolicy(Qt.NoFocus)
@@ -18471,11 +18582,12 @@ class DeviceAssignmentDLG(QDialog):
         resetButton.setMaximumWidth(100)
         self.connect(resetButton, SIGNAL("clicked()"),self.resetextradevices)
 
-        delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
-        delButton.setFocusPolicy(Qt.NoFocus)
-        delButton.setMinimumWidth(100)
-        delButton.setMaximumWidth(100)
-        self.connect(delButton, SIGNAL("clicked()"),self.deldevice)                           
+        self.delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
+        self.delButton.setFocusPolicy(Qt.NoFocus)
+        self.delButton.setMinimumWidth(100)
+        self.delButton.setMaximumWidth(100)
+        self.connect(self.delButton, SIGNAL("clicked()"),self.deldevice) 
+        self.enableDisableAddDeleteButtons()                        
 
         ##########     LAYOUTS
         # create pid box
@@ -18561,8 +18673,8 @@ class DeviceAssignmentDLG(QDialog):
         tab1Layout.addStretch()  
 
         bLayout = QHBoxLayout()
-        bLayout.addWidget(addButton)
-        bLayout.addWidget(delButton)
+        bLayout.addWidget(self.addButton)
+        bLayout.addWidget(self.delButton)
         bLayout.addStretch()
         bLayout.addSpacing(10)
         bLayout.addWidget(resetButton)
@@ -18724,6 +18836,16 @@ class DeviceAssignmentDLG(QDialog):
         if fileName:
             self.programedit.setText(fileName)
             
+    def enableDisableAddDeleteButtons(self):
+        if len(aw.qmc.extradevices) >= aw.nLCDS:
+            self.addButton.setEnabled(False)
+        else:
+            self.addButton.setEnabled(True)
+        if len(aw.qmc.extradevices) > 0:
+            self.delButton.setEnabled(True)
+        else:
+            self.delButton.setEnabled(False)
+                
     #adds extra device
     def adddevice(self):
         try:
@@ -18731,6 +18853,7 @@ class DeviceAssignmentDLG(QDialog):
             #addDevice() is located in aw so that the same function can be used in init after dynamically loading settings
             aw.addDevice()
             self.createDeviceTable()
+            self.enableDisableAddDeleteButtons()
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
              aw.qmc.adderror(QApplication.translate("Error Message", "adddevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
@@ -18744,6 +18867,7 @@ class DeviceAssignmentDLG(QDialog):
             if bindex >= 0:
                 self.delextradevice(bindex)
             aw.updateExtraLCDvisibility()
+            self.enableDisableAddDeleteButtons()
         except Exception as e:
              aw.qmc.adderror(QApplication.translate("Error Message", "deldevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
              
@@ -18780,6 +18904,9 @@ class DeviceAssignmentDLG(QDialog):
 
             #update table
             self.createDeviceTable()
+            
+            #enable/disable buttons
+            self.enableDisableAddDeleteButtons()
 
             #redraw
             aw.qmc.redraw(recomputeAllDeltas=False)
@@ -20622,9 +20749,33 @@ class AlarmDlg(QDialog):
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Alarms",None, QApplication.UnicodeUTF8))
 
+        #local alarm variables
+        self.alarmflag = aw.qmc.alarmflag
+        self.alarmguard = aw.qmc.alarmguard
+        self.alarmtime = aw.qmc.alarmtime
+        self.alarmcond = aw.qmc.alarmcond
+        self.alarmsource = aw.qmc.alarmsource
+        self.alarmtemperature = aw.qmc.alarmtemperature
+        self.alarmaction = aw.qmc.alarmaction
+        self.alarmstrings = aw.qmc.alarmstrings
+
         #table for alarms
         self.alarmtable = QTableWidget()
         self.alarmtable.setTabKeyNavigation(True)
+        self.alarmtable.setColumnCount(8)
+        self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Temperature",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8)])
+        self.alarmtable.setAlternatingRowColors(True)
+        self.alarmtable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.alarmtable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.alarmtable.setSelectionMode(QTableWidget.SingleSelection)
+        self.alarmtable.setShowGrid(True)
         self.createalarmtable()        
 
         allonButton = QPushButton(QApplication.translate("Button","All On",None, QApplication.UnicodeUTF8))
@@ -20695,51 +20846,48 @@ class AlarmDlg(QDialog):
         self.createalarmtable()
 
     def addalarm(self):
-        #self.savealarms()
-        aw.qmc.alarmflag.append(1)
-        aw.qmc.alarmguard.append(-1)
-        aw.qmc.alarmtime.append(1)
-        aw.qmc.alarmcond.append(1)
-        aw.qmc.alarmsource.append(1)
-        aw.qmc.alarmtemperature.append(500)
-        aw.qmc.alarmaction.append(0)
-        aw.qmc.alarmstrings.append(QApplication.translate("Alarm","Enter description",None, QApplication.UnicodeUTF8))
-        self.createalarmtable()
-
-        aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)   # 0 = not triggered
+        self.alarmflag.append(1)
+        self.alarmguard.append(-1)
+        self.alarmtime.append(1)
+        self.alarmcond.append(1)
+        self.alarmsource.append(1)
+        self.alarmtemperature.append(500)
+        self.alarmaction.append(0)
+        self.alarmstrings.append(QApplication.translate("Alarm","Enter description",None, QApplication.UnicodeUTF8))
+        nalarms = self.alarmtable.rowCount()
+        self.alarmtable.setRowCount(nalarms + 1)
+        self.setalarmtablerow(nalarms)
+        self.alarmtable.resizeColumnsToContents()
+        
         
     def deletealarm(self):        
-        nalarms = len(aw.qmc.alarmflag)
+        nalarms = self.alarmtable.rowCount()
         if nalarms:
             # check for selection            
             selected = self.alarmtable.selectedRanges()
             if selected and len(selected) > 0:
                 selected_row = selected[0].topRow()
-                aw.qmc.alarmflag = aw.qmc.alarmflag[0:selected_row] + aw.qmc.alarmflag[selected_row + 1:]
-                aw.qmc.alarmguard = aw.qmc.alarmguard[0:selected_row] + aw.qmc.alarmguard[selected_row + 1:]
-                aw.qmc.alarmtime = aw.qmc.alarmtime[0:selected_row] + aw.qmc.alarmtime[selected_row + 1:]
-                aw.qmc.alarmcond = aw.qmc.alarmcond[0:selected_row] + aw.qmc.alarmcond[selected_row + 1:]
-                aw.qmc.alarmsource = aw.qmc.alarmsource[0:selected_row] + aw.qmc.alarmsource[selected_row + 1:]
-                aw.qmc.alarmtemperature = aw.qmc.alarmtemperature[0:selected_row] + aw.qmc.alarmtemperature[selected_row + 1:]
-                aw.qmc.alarmaction = aw.qmc.alarmaction[0:selected_row] + aw.qmc.alarmaction[selected_row + 1:]
-                aw.qmc.alarmstrings = aw.qmc.alarmstrings[0:selected_row] + aw.qmc.alarmstrings[selected_row + 1:]
+                self.alarmtable.removeRow(selected_row)
+                self.alarmflag = self.alarmflag[0:selected_row] + self.alarmflag[selected_row + 1:]
+                self.alarmguard = self.alarmguard[0:selected_row] + self.alarmguard[selected_row + 1:]
+                self.alarmtime = self.alarmtime[0:selected_row] + self.alarmtime[selected_row + 1:]
+                self.alarmcond = self.alarmcond[0:selected_row] + self.alarmcond[selected_row + 1:]
+                self.alarmsource = self.alarmsource[0:selected_row] + self.alarmsource[selected_row + 1:]
+                self.alarmtemperature = self.alarmtemperature[0:selected_row] + self.alarmtemperature[selected_row + 1:]
+                self.alarmaction = self.alarmaction[0:selected_row] + self.alarmaction[selected_row + 1:]
+                self.alarmstrings = self.alarmstrings[0:selected_row] + self.alarmstrings[selected_row + 1:]
             else:
+                self.alarmtable.removeRow(self.alarmtable.rowCount() - 1)
                 # nothing selected, we pop the last element
-                aw.qmc.alarmflag.pop()                                                                 
-                aw.qmc.alarmguard.pop()                                                                 
-                aw.qmc.alarmtime.pop()                                                                
-                aw.qmc.alarmcond.pop()           
-                aw.qmc.alarmsource.pop()
-                aw.qmc.alarmtemperature.pop()
-                aw.qmc.alarmaction.pop()
-                aw.qmc.alarmstrings.pop()
-            self.createalarmtable()
-
-            aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
-
-        if not len(aw.qmc.alarmflag):
-            if self.alarmtable.rowCount():
-                self.alarmtable.setRowCount(0)
+                self.alarmflag.pop()                                                                 
+                self.alarmguard.pop()                                                                 
+                self.alarmtime.pop()                                                                
+                self.alarmcond.pop()           
+                self.alarmsource.pop()
+                self.alarmtemperature.pop()
+                self.alarmaction.pop()
+                self.alarmstrings.pop()
+        self.alarmtable.setRowCount(nalarms - 1)
        
     def closealarms(self):
         self.savealarms()
@@ -20759,6 +20907,16 @@ class AlarmDlg(QDialog):
 
     def savealarms(self):
         nalarms = self.alarmtable.rowCount()
+        
+        aw.qmc.alarmflag = [1]*nalarms
+        aw.qmc.alarmguard = [-1]*nalarms
+        aw.qmc.alarmtime = [1]*nalarms
+        aw.qmc.alarmcond = [1]*nalarms
+        aw.qmc.alarmsource = [1]*nalarms
+        aw.qmc.alarmtemperature = [500]*nalarms
+        aw.qmc.alarmaction = [0]*nalarms
+        aw.qmc.alarmstrings = [0]*nalarms
+        
         for i in range(nalarms):
             flag = self.alarmtable.cellWidget(i,0)
             aw.qmc.alarmflag[i] = int(flag.isChecked())         
@@ -20781,7 +20939,7 @@ class AlarmDlg(QDialog):
             description = self.alarmtable.cellWidget(i,7)
             aw.qmc.alarmstrings[i] = str(description.text())
 
-            aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
+        aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
 
     def buildAlarmSourceList(self):
         extra_names = []
@@ -20793,92 +20951,82 @@ class AlarmDlg(QDialog):
              QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8),
              QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8)] + extra_names
                
+       
+    # creates Widget in row i of self.alarmtable and sets them to values from local dialog variables at position i
+    def setalarmtablerow(self,i): 
+        #flag                
+        flagComboBox = QCheckBox()
+        flagComboBox.setText(QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8))
+        if self.alarmflag[i]:
+            flagComboBox.setCheckState(Qt.Checked)
+        else:
+            flagComboBox.setCheckState(Qt.Unchecked)    
+            
+        #guarded by alarm
+        guardedit = QLineEdit(str(self.alarmguard[i] + 1))
+        guardedit.setValidator(QIntValidator(0, 30,guardedit))
+            
+        #Effective time from
+        timeComboBox = QComboBox()
+        timeComboBox.addItems([QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
+                               QApplication.translate("ComboBox","CHARGE",None, QApplication.UnicodeUTF8), # qmc.alarmtime 0
+                               QApplication.translate("ComboBox","DRY END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 1
+                               QApplication.translate("ComboBox","FC START",None, QApplication.UnicodeUTF8), # qmc.alarmtime 2
+                               QApplication.translate("ComboBox","FC END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 3
+                               QApplication.translate("ComboBox","SC START",None, QApplication.UnicodeUTF8), # qmc.alarmtime 4
+                               QApplication.translate("ComboBox","SC END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 5
+                               QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8), # qmc.alarmtime 6
+                               QApplication.translate("ComboBox","COOL",None, QApplication.UnicodeUTF8), # qmc.alarmtime 7
+                               QApplication.translate("ComboBox","TP",None, QApplication.UnicodeUTF8)]) # qmc.alarmtime 8
+        timeComboBox.setCurrentIndex(self.alarmtime[i] + 1)       
+                     
+        #type
+        typeComboBox = QComboBox()
+        typeComboBox.addItems(self.buildAlarmSourceList())
+        if self.alarmsource[i] + 2 < len(self.buildAlarmSourceList()):
+            typeComboBox.setCurrentIndex(self.alarmsource[i] + 2)
+        else:
+            typeComboBox.setCurrentIndex(2)
+                            
+        #condition
+        condComboBox = QComboBox()
+        condComboBox.addItems([QApplication.translate("ComboBox","falls below",None, QApplication.UnicodeUTF8),
+                               QApplication.translate("ComboBox","rises above",None, QApplication.UnicodeUTF8)])
+        condComboBox.setCurrentIndex(self.alarmcond[i])
+
+        #temperature
+        tempedit = QLineEdit(str(self.alarmtemperature[i]))
+        tempedit.setValidator(QIntValidator(0, 1000,tempedit))
+
+        #action
+        actionComboBox = QComboBox()
+        actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
+                                 QApplication.translate("ComboBox","Pop Up window",None, QApplication.UnicodeUTF8),
+                                 QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
+                                 QApplication.translate("ComboBox","Event Button",None, QApplication.UnicodeUTF8)])
+        actionComboBox.setCurrentIndex(self.alarmaction[i] + 1)
+            
+        #text description
+        descriptionedit = QLineEdit(str(self.alarmstrings[i]))
+        
+        self.alarmtable.setCellWidget(i,0,flagComboBox)
+        self.alarmtable.setCellWidget(i,1,guardedit)
+        self.alarmtable.setCellWidget(i,2,timeComboBox) 
+        self.alarmtable.setCellWidget(i,3,typeComboBox)
+        self.alarmtable.setCellWidget(i,4,condComboBox)
+        self.alarmtable.setCellWidget(i,5,tempedit)
+        self.alarmtable.setCellWidget(i,6,actionComboBox)                
+        self.alarmtable.setCellWidget(i,7,descriptionedit)
+        
     def createalarmtable(self):
         self.alarmtable.clear()        
-        nalarms = len(aw.qmc.alarmtemperature)
+        nalarms = len(self.alarmtemperature)
         if nalarms:    
             self.alarmtable.setRowCount(nalarms)
-            self.alarmtable.setColumnCount(8)
-            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Temperature",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8)])
-            self.alarmtable.setAlternatingRowColors(True)
-            self.alarmtable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.alarmtable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.alarmtable.setSelectionMode(QTableWidget.SingleSelection)
-            self.alarmtable.setShowGrid(True)
 
             #populate table
-            for i in range(nalarms):                                            
-                #flag                
-                flagComboBox = QCheckBox()
-                flagComboBox.setText(QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8))
-                if aw.qmc.alarmflag[i]:
-                    flagComboBox.setCheckState(Qt.Checked)
-                else:
-                    flagComboBox.setCheckState(Qt.Unchecked)    
-                    
-                #guarded by alarm
-                guardedit = QLineEdit(str(aw.qmc.alarmguard[i] + 1))
-                guardedit.setValidator(QIntValidator(0, 30,guardedit))
-                    
-                #Effective time from
-                timeComboBox = QComboBox()
-                timeComboBox.addItems([QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
-                                       QApplication.translate("ComboBox","CHARGE",None, QApplication.UnicodeUTF8), # qmc.alarmtime 0
-                                       QApplication.translate("ComboBox","DRY END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 1
-                                       QApplication.translate("ComboBox","FC START",None, QApplication.UnicodeUTF8), # qmc.alarmtime 2
-                                       QApplication.translate("ComboBox","FC END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 3
-                                       QApplication.translate("ComboBox","SC START",None, QApplication.UnicodeUTF8), # qmc.alarmtime 4
-                                       QApplication.translate("ComboBox","SC END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 5
-                                       QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8), # qmc.alarmtime 6
-                                       QApplication.translate("ComboBox","COOL",None, QApplication.UnicodeUTF8), # qmc.alarmtime 7
-                                       QApplication.translate("ComboBox","TP",None, QApplication.UnicodeUTF8)]) # qmc.alarmtime 8
-                timeComboBox.setCurrentIndex(aw.qmc.alarmtime[i] + 1)       
-                             
-                #type
-                typeComboBox = QComboBox()
-                typeComboBox.addItems(self.buildAlarmSourceList())
-                if aw.qmc.alarmsource[i] + 2 < len(self.buildAlarmSourceList()):
-                    typeComboBox.setCurrentIndex(aw.qmc.alarmsource[i] + 2)
-                else:
-                    typeComboBox.setCurrentIndex(2)
-                                    
-                #condition
-                condComboBox = QComboBox()
-                condComboBox.addItems([QApplication.translate("ComboBox","falls below",None, QApplication.UnicodeUTF8),
-                                       QApplication.translate("ComboBox","rises above",None, QApplication.UnicodeUTF8)])
-                condComboBox.setCurrentIndex(aw.qmc.alarmcond[i])
-
-                #temperature
-                tempedit = QLineEdit(str(aw.qmc.alarmtemperature[i]))
-                tempedit.setValidator(QIntValidator(0, 1000,tempedit))
-
-                #action
-                actionComboBox = QComboBox()
-                actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Pop Up window",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Event Button",None, QApplication.UnicodeUTF8)])
-                actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i] + 1)
-                    
-                #text description
-                descriptionedit = QLineEdit(str(aw.qmc.alarmstrings[i]))
-
-                #add widgets to the table               
-                self.alarmtable.setCellWidget(i,0,flagComboBox)
-                self.alarmtable.setCellWidget(i,1,guardedit)
-                self.alarmtable.setCellWidget(i,2,timeComboBox) 
-                self.alarmtable.setCellWidget(i,3,typeComboBox)
-                self.alarmtable.setCellWidget(i,4,condComboBox)
-                self.alarmtable.setCellWidget(i,5,tempedit)
-                self.alarmtable.setCellWidget(i,6,actionComboBox)                
-                self.alarmtable.setCellWidget(i,7,descriptionedit)
+            for i in range(nalarms): 
+                self.setalarmtablerow(i)
             self.alarmtable.resizeColumnsToContents()
 
 
