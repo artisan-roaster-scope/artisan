@@ -1,13 +1,14 @@
 Current Versions
-o XCode 4.5.1
+o XCode 4.5.2 + command line tools
 o Python 3.3
+o pyserial
 o QT 4.8.4
-o Numpy >1.7.0rc1 ++ from repository
 o SIP 4.14.2
 o PyQt 4.9.6
-o scipy 0.12.0 beta from git repository
+o Numpy >1.7.0rc1 ++ from repository (23.1.2012)
+o scipy 0.12.0 beta from git repository (23.1.2012)
 o matplotlib 1.2.0
-o pyaudio
+o pyaudio 0.2.7
 o minimalmodbus 0.4
 
 o modulegraph 0.10
@@ -96,14 +97,15 @@ NOTE: if XCode is updated after a complete setup for Artisan, the SVG icons migh
 
 
 
-00) Install XCode 4.5.1
+1) Install XCode 4.5.2
 
-
+not needed anymore:
 # sudo ln -s /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer /Developer 
 
+install command line tools via Preferences/Downloads/Components
 
 
-0) Install Python 3.3.0
+2) Install Python 3.3.0
 
 download and install:
 
@@ -112,14 +114,8 @@ http://www.python.org/ftp/python/3.3.0/python-3.3.0-macosx10.6.dmg
 set default to 64bit:
 # defaults write com.apple.versioner.python Prefer-32-Bit -bool no
 
-1) Install QT ("Framework Only" without the debug libs and not the "SDK/Complete Component Environment")
 
-download and install (only Mac OS X 10.5 - 10.6, 32-bit and 64-bit Intel!!):
-
-qt-mac-opensource-4.8.3.dmg (Cocoa, 64bit only)
-
-
-2) Install pyserial 
+3) Install pyserial 
 
 download latest source (pyserial-2.6.tar.gz) from http://pypi.python.org/pypi/pyserial
 
@@ -134,26 +130,15 @@ new to v2.6:
 # import serial.tools.list_ports.
 # serial.tools.list_ports.comports()
 
+4) Install QT ("Framework Only" without the debug libs and not the "SDK/Complete Component Environment")
 
-3) Install Numpy
+download and install (only Mac OS X 10.5 - 10.6, 32-bit and 64-bit Intel!!):
 
-
-
-download source
-
-# git clone https://github.com/numpy/numpy.git
-# cd numpy
-# python3 setup.py build
-# sudo python3 setup.py install
-
-git repository version on 27.10.2012 (v1.7.0b) fails with 
-AttributeError: incompatible shape for a non-contiguous array
-on "HTML Report" generation
-
-now installed trunk version from 30.11.2012
+qt-mac-opensource-4.8.3.dmg (Cocoa, 64bit only)
 
 
-4) Install SIP
+
+5) Install SIP
 
 # tar xzf sip-4.14.2.tar.gz
 # cd sip-4.14.2
@@ -162,7 +147,7 @@ now installed trunk version from 30.11.2012
 # sudo make install
 
 
-5) Install PyQt
+6) Install PyQt
 
 # tar xzf PyQt-mac-gpl-4.9.6.tar.gz 
 # cd PyQt-mac-gpl-4.9.6
@@ -171,65 +156,22 @@ now installed trunk version from 30.11.2012
 # sudo make install
 
 
-6) scipy-0.12.0 beta from git repository
+7) Install Numpy
+
+download source
+
+# git clone https://github.com/numpy/numpy.git
+# cd numpy
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+8) scipy-0.12.0 beta from git repository
 
 # git clone git://github.com/scipy/scipy.git scipy
 # cd scipy
-
-
-
-----
-To fix an incompatibility between Python 3.3 and scipy install
-
-Cython-0.17.4 from http://cython.org/
-
 # python3 setup.py build
 # sudo python3 setup.py install
-----
-
-# cd scipy
-# mv spatial/ckdtree.c spatial/ckdtree.c.org
-# cython spatial/ckdtree.pyx
-# mv spatial/qhull.c spatial/qhull.c.org
-# cython spatial/qhull.pyx
-# mv stats/_rank.c stats/_rank.c.org
-# cython stats/_rank.pyx
-# mv stats/vonmises_cython.c stats/vonmises_cython.c.org
-# cython stats/vonmises_cython.pyx
-# mv io/matlab/mio5_utils.c io/matlab/mio5_utils.c.org
-# cython io/matlab/mio5_utils.pyx
-# mv io/matlab/mio_utils.c io/matlab/mio_utils.c.org
-# cython io/matlab/mio_utils.pyx
-# mv io/matlab/streams.c io/matlab/streams.c.org
-# cython io/matlab/streams.pyx
-# mv sparse/csgraph/_shortest_path.c sparse/csgraph/_shortest_path.c.org
-# cython sparse/csgraph/_shortest_path.pyx
-# mv sparse/csgraph/_min_spanning_tree.c sparse/csgraph/_min_spanning_tree.c.org
-# cython sparse/csgraph/_min_spanning_tree.pyx
-# mv sparse/csgraph/_tools.c sparse/csgraph/_tools.c.org
-# cython sparse/csgraph/_tools.pyx
-# mv sparse/csgraph/_traversal.c sparse/csgraph/_traversal.c.org
-# cython sparse/csgraph/_traversal.pyx
-
-# cython special/lambertw.pxd
-
-# cd ..
-
-
-# python3 setup.py build
-# sudo python3 setup.py install
-
-
-
-REMARK: scipy 0.11.0 had an import problem with the following on Python 3.3 (needed for the Designer)
-from scipy import interpolate as inter
-
-
-# tar xzf scipy-0.11.0.tar.gz
-# cd scipy-0.11.0
-# python3 setup.py build
-# sudo python3 setup.py install
-
 
 check installation:
 
@@ -240,7 +182,32 @@ check installation:
 
 
 
-7) Install matplotlib
+9) Install matplotlib
+
+
+9.1) install freetype and libpng dependencies
+
+installed homebrew via
+
+# ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"
+# brew doctor
+
+installed matplotlib dependencies before its compilation via
+# brew install libpng freetype
+
+# sudo mv /usr/local/include/freetype2 freetype2.off
+# sudo mv /usr/local/bin/freetype-config /usr/local/bin/freetype-config.org
+
+# sudo mv /usr/local/share/aclocal/freetype2.m4 /usr/local/share/aclocal/freetype2.m4.org
+# sudo mv /usr/local/lib/pkgconfig/freetype2.pc /usr/local/lib/pkgconfig/freetype2.pc.org
+# sudo mv /usr/local/lib/libfreetype.dylib /usr/local/lib/libfreetype.dylib.org
+# sudo mv /usr/local/lib/libfreetype.a /usr/local/lib/libfreetype.a.org
+# sudo mv /usr/local/lib/libfreetype.6.dylib /usr/local/lib/libfreetype.6.dylib.org
+# brew link freetype
+
+# brew install pkg-config
+
+9.2) Install matplotlib library
 
 download matplotlib-1.2.0.tar.gz
 
@@ -278,71 +245,8 @@ check installation:
 '1.2.0rc2
 
 
-8) Install modulegraph
 
-
-fetch modulegraph 0.10 from
-http://pypi.python.org/pypi/modulegraph/#downloads
-# cd modulegraph-0.10
-# python3 setup.py build
-# sudo python3 setup.py install
-
-alt
-
-# mkdir modulegraph-0.10
-# cd modulegraph-0.10
-# hg clone https://bitbucket.org/ronaldoussoren/modulegraph
-# cd modulegraph
-# python3 setup.py build
-# sudo python3 setup.py install
-
-9) Install distribute 0.6.29
-
-http://pypi.python.org/packages/source/d/distribute/distribute-0.6.29.tar.gz
-
-# curl -O http://pypi.python.org/packages/source/d/distribute/distribute-0.6.29.tar.gz
-# tar -xzvf distribute-0.6.29.tar.gz
-# cd distribute-0.6.29
-# python3 setup.py build
-# sudo python3 setup.py install
-
-
-10) Install altgraph
-
-# mkdir altgraph-0.10
-# cd altgraph-0.10
-# hg clone https://bitbucket.org/ronaldoussoren/altgraph
-# cd altgraph
-# python3 setup.py build
-# sudo python3 setup.py install
-
-
-11) Install macholib
-
-# mkdir macholib-1.5
-# cd macholib-1.5
-# hg clone https://bitbucket.org/ronaldoussoren/macholib
-# cd macholib
-# python3 setup.py build
-# sudo python3 setup.py install
-
-
-12) py2app (0.7.1 from source)
-
-from repository
-# hg clone https://bitbucket.org/ronaldoussoren/py2app
-# cd py2app
-# python3 setup.py build
-# sudo python3 setup.py install
-
-from release downloaded from http://pypi.python.org/pypi/py2app/
-# tar -xzf py2app-0.7.1.tar.gz
-# cd py2app-0.7.1
-# python3 setup.py build
-# sudo python3 setup.py install
-
-
-13) PortAudio
+10) PortAudio
 
 # mkdir PortAudio-19
 # cd PortAudio-19
@@ -360,7 +264,7 @@ all: lib/$(PALIB) all-recursive examples selftests
 # sudo make install
 
 
-14) pyaudio
+11) pyaudio
 
 # mkdir pyaudio-0.2.7
 # cd pyaudio-0.2.7
@@ -379,7 +283,7 @@ all: lib/$(PALIB) all-recursive examples selftests
 # sudo python3 setup.py install
 
 
-15) minimalmodbus (v0.4)
+12) minimalmodbus (v0.4)
 
 download from http://pypi.python.org/pypi/MinimalModbus/
 
@@ -387,3 +291,71 @@ download from http://pypi.python.org/pypi/MinimalModbus/
 # cd MinimalModbus-0.4
 # python3 setup.py build
 # sudo python3 setup.py install
+
+
+
+13) Install modulegraph
+
+
+fetch modulegraph 0.10.2 from
+http://pypi.python.org/pypi/modulegraph/#downloads
+# cd modulegraph-0.10.2
+# python3 setup.py build
+# sudo python3 setup.py install
+
+from source (not needed):
+
+# mkdir modulegraph-0.10
+# cd modulegraph-0.10
+# hg clone https://bitbucket.org/ronaldoussoren/modulegraph
+# cd modulegraph
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+14) Install distribute 0.6.29
+
+http://pypi.python.org/packages/source/d/distribute/distribute-0.6.29.tar.gz
+
+# curl -O http://pypi.python.org/packages/source/d/distribute/distribute-0.6.29.tar.gz
+# tar -xzvf distribute-0.6.29.tar.gz
+# cd distribute-0.6.29
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+15) Install altgraph
+
+# mkdir altgraph-0.10
+# cd altgraph-0.10
+# hg clone https://bitbucket.org/ronaldoussoren/altgraph
+# cd altgraph
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+16) Install macholib
+
+# mkdir macholib-1.5
+# cd macholib-1.5
+# hg clone https://bitbucket.org/ronaldoussoren/macholib
+# cd macholib
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
+17) py2app (0.7.1 from source)
+
+from repository
+# hg clone https://bitbucket.org/ronaldoussoren/py2app
+# cd py2app
+# python3 setup.py build
+# sudo python3 setup.py install
+
+from release downloaded from http://pypi.python.org/pypi/py2app/
+# tar -xzf py2app-0.7.1.tar.gz
+# cd py2app-0.7.1
+# python3 setup.py build
+# sudo python3 setup.py install
+
+
