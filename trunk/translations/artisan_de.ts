@@ -2003,7 +2003,7 @@
     <message>
         <location filename="artisan.py" line="9737"/>
         <source>Axes</source>
-        <translation>Achesen</translation>
+        <translation>Achsen</translation>
     </message>
     <message>
         <location filename="artisan.py" line="19437"/>
