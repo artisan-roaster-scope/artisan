@@ -5,8 +5,8 @@ o pyserial
 o QT 4.8.4
 o SIP 4.14.2
 o PyQt 4.9.6
-o Numpy >1.7.0rc1 ++ from repository (23.1.2012)
-o scipy 0.12.0 beta from git repository (23.1.2012)
+o Numpy >1.7.0rc1 ++ from repository (25.1.2012)
+o scipy 0.12.0 beta from git repository (25.1.2012)
 o matplotlib 1.2.0
 o pyaudio 0.2.7
 o minimalmodbus 0.4

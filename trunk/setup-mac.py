@@ -5,6 +5,9 @@ Usage:
     python setup.py py2app
 """
 
+# manually remove sample-data mpl subdirectory from Python installation:
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/matplotlib/mpl-data/sample_data
+
 from distutils import sysconfig
 their_parse_makefile = sysconfig.parse_makefile
 def my_parse_makefile(filename, g):
@@ -16,6 +19,7 @@ import sys, os
 from setuptools import setup
 
 import string
+from plistlib import Plist
 
 # current version of Artisan
 VERSION = '0.6.0'
@@ -27,8 +31,8 @@ APP = ['artisan.py']
 
 DATA_FILES = [
     "LICENSE.txt",
-    ("../PlugIns/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
+    ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
+    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
     ("../translations", [QTDIR + r'/translations/qt_de.qm']),
     ("../translations", [QTDIR + r'/translations/qt_es.qm']),
     ("../translations", [QTDIR + r'/translations/qt_fr.qm']),
@@ -39,29 +43,11 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_it.qm"]),
     ("../translations", [r"translations/artisan_sv.qm"]),
     ("../Resources", [r"qt.conf"]),
+    ("../Resources", [r"artisanProfile.icns"]),
   ]
   
-OPTIONS = {
-    'strip':True,
-    'argv_emulation': False,
-    'semi_standalone': False,
-    'site_packages': True,
-    'packages': [],
-    'optimize':  2,
-    'compressed': True,
-    'iconfile': 'artisan.icns',
-    'arch': 'x86_64',
-    'includes': ['serial',
-                 'PyQt4',
-                 'PyQt4.QtCore',
-                 'PyQt4.QtGui',
-                 'PyQt4.QtSvg',
-                 'PyQt4.QtXml'],
-    'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
-                      '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
-                      'bsddb','curses','tcl',
-                      '_wxagg','_gtagg','_cocoaagg','_wx'],
-    'plist'    : { 'CFBundleDisplayName': 'Artisan',
+plist = Plist.fromFile('Info.plist')
+plist.update({ 'CFBundleDisplayName': 'Artisan',
                     'CFBundleGetInfoString' : 'Artisan, Roast Logger',
                     'CFBundleIdentifier':'com.google.code.p.Artisan',
                     'CFBundleShortVersionString':VERSION,
@@ -71,7 +57,37 @@ OPTIONS = {
                     'LSPrefersPPC' : False,
                     'LSArchitecturePriority' : 'x86_64',
                     'NSHumanReadableCopyright':LICENSE
-                }}
+                })
+                
+OPTIONS = {
+    'strip':True,
+    'argv_emulation': True,
+#    'qt_plugins': ['iconengines/libqsvgicon.dylib','imageformats/libqsvg.dylib'],
+# copying file /.dbfseventsd -> /Users/luther/Documents/Projects/Artisan/Repository/trunk/dist/Artisan.app/Contents/Resources/qt_plugins/iconengines/.dbfseventsd
+# error: /.dbfseventsd: Operation not supported on socket
+    'semi_standalone': False,
+    'site_packages': True,
+    'packages': ['matplotlib'],
+    'optimize':  2,
+    'compressed': True,
+    'iconfile': 'artisan.icns',
+    'arch': 'x86_64',
+    'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'
+    'includes': ['serial',
+                 'PyQt4',
+                 'PyQt4.QtCore',
+                 'PyQt4.QtGui',
+                 'PyQt4.QtSvg',
+                 'PyQt4.QtXml'],
+    'excludes' :  ['_tkagg','_ps','_fltkagg','Tkinter','Tkconstants',
+                      '_agg','_cairo','_gtk','gtkcairo','pydoc','sqlite3',
+                      'bsddb','curses','tcl',
+                      '_wxagg','_gtagg','_cocoaagg','_wx',
+                    'PyQt4.phonon','PyQt4.QtDBus','PyQt4.QtDeclarative','PyQt4.QtDesigner',
+                    'PyQt4.QtHelp','PyQt4.QtMultimedia','PyQt4.QtNetwork',
+                    'PyQt4.QtOpenGL','PyQt4.QtScript','PyQt4.QtScriptTools',
+                    'PyQt4.QtSql','PyQt4.QtTest','PyQt4.QtXmlPatterns','PyQt4.QtWebKit'],
+    'plist'    : plist}
 
 setup(
     name='Artisan',
@@ -96,8 +112,6 @@ os.system(r'cp Wheels/Cupping/* dist/Wheels/Cupping')
 os.system(r'cp Wheels/Other/* dist/Wheels/Other')
 os.system(r'cp Wheels/Roasting/* dist/Wheels/Roasting')
 os.chdir('./dist')
-#the following is not needed anymore, however, one has to ensure that there is a proper Content/Resources/qt.conf in the bundle
-#os.system(r'macdeployqt Artisan.app -verbose=0')
 
 # delete unused Qt.framework files (py2app exclude does not seem to work)
 print '*** Removing unused Qt frameworks ***'
@@ -111,6 +125,8 @@ for fw in [
             'QtScript',
             'QtScriptTools',
             'QtSql',
+            'QtDBus',
+            'QtDesigner',
             'QtTest',
             'QtWebKit',
             'QtXMLPatterns']:
@@ -125,7 +141,7 @@ for root, dirs, files in os.walk('.'):
         if 'debug' in file:
             print 'Deleting', file
             os.remove(os.path.join(root,file))
-        elif 'test_' in file:
+        elif file.startswith('test_'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
         elif '_tests' in file:
@@ -147,6 +163,16 @@ for root, dirs, files in os.walk('.'):
         elif file.endswith('.cc'):
             print 'Deleting', file
             os.remove(os.path.join(root,file))
+        elif file.endswith('.afm'):
+            print 'Deleting', file
+            os.remove(os.path.join(root,file))
+    # remove test files        
+    for dir in dirs:
+        if 'tests' in dir:
+            for r,d,f in os.walk(os.path.join(root,dir)):
+                for fl in f:
+                    print 'Deleting', os.path.join(r,fl)
+                    os.remove(os.path.join(r,fl))      
             
 os.chdir('..')
 os.system(r"rm artisan-mac-" + VERSION + r".dmg")

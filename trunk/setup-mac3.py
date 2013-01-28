@@ -31,8 +31,8 @@ APP = ['artisan.py']
 
 DATA_FILES = [
     "LICENSE.txt",
-    ("../PlugIns/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
-    ("../PlugIns/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
+    ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
+    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
     ("../translations", [QTDIR + r'/translations/qt_de.qm']),
     ("../translations", [QTDIR + r'/translations/qt_es.qm']),
     ("../translations", [QTDIR + r'/translations/qt_fr.qm']),
@@ -46,7 +46,7 @@ DATA_FILES = [
     ("../Resources", [r"artisanProfile.icns"]),
   ]
   
-plist = Plist.fromFile('Info.plist')
+plist = Plist.fromFile('Info3.plist')
 plist.update({ 'CFBundleDisplayName': 'Artisan',
                     'CFBundleGetInfoString' : 'Artisan, Roast Logger',
                     'CFBundleIdentifier':'com.google.code.p.Artisan',
@@ -105,8 +105,6 @@ os.system(r'cp Wheels/Cupping/* dist/Wheels/Cupping')
 os.system(r'cp Wheels/Other/* dist/Wheels/Other')
 os.system(r'cp Wheels/Roasting/* dist/Wheels/Roasting')
 os.chdir('./dist')
-#the following is not needed anymore, however, one has to ensure that there is a proper Content/Resources/qt.conf in the bundle
-#os.system(r'macdeployqt Artisan.app -verbose=0')
 
 # delete unused Qt.framework files (py2app exclude does not seem to work)
 print('*** Removing unused Qt frameworks ***')
@@ -134,7 +132,7 @@ for root, dirs, files in os.walk('.'):
         if 'debug' in file:
             print('Deleting', file)
             os.remove(os.path.join(root,file))
-        elif 'test_' in file:
+        elif file.startswith('test_'):
             print('Deleting', file)
             os.remove(os.path.join(root,file))
         elif '_tests' in file:
@@ -159,6 +157,13 @@ for root, dirs, files in os.walk('.'):
         elif file.endswith('.afm'):
             print('Deleting', file)
             os.remove(os.path.join(root,file))
+    # remove test files        
+    for dir in dirs:
+        if 'tests' in dir:
+            for r,d,f in os.walk(os.path.join(root,dir)):
+                for fl in f:
+                    print('Deleting', os.path.join(r,fl))
+                    os.remove(os.path.join(r,fl))                
             
 os.chdir('..')
 os.system(r"rm artisan-mac-" + VERSION + r".dmg")

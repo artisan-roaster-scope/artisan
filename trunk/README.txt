@@ -21,6 +21,7 @@ o runs on Mac OS X 10.6/10.7/10.8 on Intel, Windows, and Linux
 o ET/BT logging and PID control supporting the following devices
  - Fuji PXR/PXG 4 & 5 PID
  - Delta DTA PID
+ - Modbus RTU
  - Omega HH309, HH506RA, HH802U, HH806AU, HHM28
  - CENTER 300, 301, 302, 303, 304, 305, 306, 309
  - VOLTCRAFT K201, K202, K204, 300K, 302KJ
@@ -45,7 +46,7 @@ o profile statistics and evaluations based on user configurable roast phases
 o background reference profile
 o user defined cup profiles and cup profile graphs
 o HTML report creation
-o CSV export
+o CSV and JSON export
 o Omega HH506, K202, K204 CSV import
 o PID duty cycle
 o profile designer
@@ -54,8 +55,10 @@ o mathematical plotter
 o localizations (partial translations for German, French, Spanish, Swedish, Italian)
 o multi-core CPU performance enhancement support
 o template/background reproduction playback aid
-o alarms with programmable outputs
+o cascading alarms with programmable outputs
 o automatic CHARGE/DROP event detection
+o support for digital scales (only KERN with serial support for now)
+o event sliders supporting the Hottop Roaster Interface
 
 
 
@@ -79,6 +82,8 @@ o Mac OS X (>=10.6.x)
    http://www.ftdichip.com/Drivers/VCP.htm
  . for Voltkraft meters using the original Voltkraft USB cable it is the CP210x driver from Silicon Labs
    http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx
+ . some other serial2USB dongles use the Prolific PL2303 chips
+   http://prolificusa.com/pl-2303hx-drivers/
 - Download and run the Artisan OS X installer
 - Double click on the dmg file you just downloaded
 - Double click the disk image which appears on your desktop

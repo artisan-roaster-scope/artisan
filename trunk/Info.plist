@@ -2,23 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>alog</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>artisanProfile.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>Artisan Profile</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>NSDocumentClass</key>
-			<string>Document</string>
-		</dict>
-	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
@@ -85,20 +68,21 @@
 		<false/>
 	</dict>
 	<key>PyResourcePackages</key>
-	<array/>
+	<array>
+	</array>
 	<key>PyRuntimeLocations</key>
 	<array>
-		<string>@executable_path/../Frameworks/Python.framework/Versions/3.3/Python</string>
+		<string>@executable_path/../Frameworks/Python.framework/Versions/2.7/Python</string>
 	</array>
 	<key>PythonInfoDict</key>
 	<dict>
 		<key>PythonExecutable</key>
-		<string>/usr/local/bin/python3</string>
+		<string>/Library/Frameworks/Python.framework/Versions/2.7/Resources/Python.app/Contents/MacOS/Python</string>
 		<key>PythonLongVersion</key>
-		<string>3.3.0 (v3.3.0:bd8afb90ebf2, Sep 29 2012, 01:25:11) 
+		<string>2.7.3 (v2.7.3:70274d53c1dd, Apr  9 2012, 20:52:43) 
 [GCC 4.2.1 (Apple Inc. build 5666) (dot 3)]</string>
 		<key>PythonShortVersion</key>
-		<string>3.3</string>
+		<string>2.7</string>
 		<key>py2app</key>
 		<dict>
 			<key>alias</key>
@@ -106,7 +90,7 @@
 			<key>template</key>
 			<string>app</string>
 			<key>version</key>
-			<string>0.7.1</string>
+			<string>0.8</string>
 		</dict>
 	</dict>
 </dict>
