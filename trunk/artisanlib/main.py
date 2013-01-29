@@ -912,11 +912,10 @@ class tgraphcanvas(FigureCanvas):
                     
         except Exception as e:
             self.flagon = False
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             exc_type, exc_obj, exc_tb = sys.exc_info()      
             self.adderror(QApplication.translate("Error Message","Exception Error: updategraphics() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-            return
         
     def updateLCDtime(self):
         if self.flagon and self.flagstart:
@@ -926,6 +925,11 @@ class tgraphcanvas(FigureCanvas):
             else:
                 ts = tx             
             nextreading = 1000. - 1000.*(tx%1.)
+                   
+            # if more than max cool (from statistics) past DROP and not yet COOLend turn the time LCD red:
+            if aw.qmc.timeindex[0]!=-1 and aw.qmc.timeindex[6] and not aw.qmc.timeindex[7] and (tx - aw.qmc.timex[aw.qmc.timeindex[6]]) > aw.qmc.statisticsconditions[7]:
+                aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%("red",aw.lcdpaletteB["timer"]))
+                        
             aw.lcd1.display(QString(self.stringfromseconds(int(ts))))
             QTimer.singleShot(nextreading,self.updateLCDtime)
 
@@ -970,9 +974,11 @@ class tgraphcanvas(FigureCanvas):
                 if redraw:
                     self.redraw(recompute)
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
-            #pass                
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            exc_type, exc_obj, exc_tb = sys.exc_info()      
+            self.adderror(QApplication.translate("Error Message","Exception Error: timealign() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+
         
     def resetlines(self):
         #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
@@ -1466,8 +1472,10 @@ class tgraphcanvas(FigureCanvas):
             else:
                 return x
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            exc_type, exc_obj, exc_tb = sys.exc_info()      
+            self.adderror(QApplication.translate("Error Message","Exception Error: smooth() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return x
             
     def smooth_list(self, a, b, window_len=7, window='hanning'):
@@ -1604,7 +1612,9 @@ class tgraphcanvas(FigureCanvas):
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            pass    
+            exc_type, exc_obj, exc_tb = sys.exc_info()      
+            self.adderror(QApplication.translate("Error Message","Exception Error: place_annotations() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+
                     
     #Redraws data   
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
@@ -1635,7 +1645,6 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax.set_ylabel(str(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])             
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
-#                self.delta_ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
                 self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
                 for i in self.delta_ax.get_yticklines():
                     i.set_markersize(10)
@@ -1646,7 +1655,6 @@ class tgraphcanvas(FigureCanvas):
                 for tick in self.ax.yaxis.get_major_ticks():
                     tick.label2On = True                
             self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
-#            self.ax.yaxis.set_minor_locator(ticker.MultipleLocator(10))
             self.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
             for i in self.ax.get_yticklines():
                 i.set_markersize(10)
@@ -2034,8 +2042,8 @@ class tgraphcanvas(FigureCanvas):
             self.samplingsemaphore.release(1)
 
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
             exc_type, exc_obj, exc_tb = sys.exc_info()    
@@ -2401,7 +2409,9 @@ class tgraphcanvas(FigureCanvas):
         aw.button_7.setEnabled(True)
         aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
         aw.sendmessage(QApplication.translate("Message Area","Scope stopped", None, QApplication.UnicodeUTF8))
-        aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                                               
+        aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)   
+        # reset time LCD color to the default (might have been changed to red due to long cooling!)                                            
+        aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
         aw.lcd1.display("00:00")            
         aw.hideLCDs()
         aw.hideSliders()
@@ -2440,9 +2450,7 @@ class tgraphcanvas(FigureCanvas):
         
         if not len(self.timex):
             self.timeclock.start()   #set time to the current computer time
-            self.updateLCDtime()
-        else:
-            self.updateLCDtime()
+        self.updateLCDtime()
         aw.lowerbuttondialog.setVisible(True)
         aw.update_minieventline_visibility()
     
@@ -3960,6 +3968,13 @@ class tgraphcanvas(FigureCanvas):
                         midramp = self.temp2[self.timeindex[2]] - self.temp2[self.timeindex[1]]
                         finishramp = self.temp2[self.timeindex[6]] - self.temp2[self.timeindex[2]]
 
+                        ts1,ts1e,ts1b = aw.ts(self.timeindex[0],self.timeindex[1])
+                        ts2,ts2e,ts2b = aw.ts(self.timeindex[1],self.timeindex[2])
+                        ts3,ts3e,ts3b = aw.ts(self.timeindex[2],self.timeindex[6])
+                        etbt1 = "%i%sm"%(ts1,self.mode)
+                        etbt2 = "%i%sm"%(ts2,self.mode)
+                        etbt3 = "%i%sm"%(ts3,self.mode)
+
                         if dryphasetime:
                             dryroc = " %.1f d/m"%((dryramp/dryphasetime)*60.)
                         else:
@@ -3976,12 +3991,12 @@ class tgraphcanvas(FigureCanvas):
                             finishroc = 0
                             
                         margin = "&nbsp;&nbsp;&nbsp;"
-                        string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette["rect1"],
-                                  margin,self.stringfromseconds(dryphasetime),margin, dryphaseP, margin,dryroc,margin)
-                        string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette["rect2"],
-                                  margin,self.stringfromseconds(midphasetime),margin,midphaseP,margin,midroc,margin)
-                        string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s</font>"%(self.palette["rect3"],
-                                  margin,self.stringfromseconds(finishphasetime),margin,finishphaseP,margin,finishroc,margin)
+                        string1 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s %s %s</font>"%(self.palette["rect1"],
+                                  margin,self.stringfromseconds(dryphasetime),margin, dryphaseP, margin,dryroc,margin,etbt1,margin)
+                        string2 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s %s %s</font>"%(self.palette["rect2"],
+                                  margin,self.stringfromseconds(midphasetime),margin,midphaseP,margin,midroc,margin,etbt2,margin)
+                        string3 = " <font color = \"white\" style=\"BACKGROUND-COLOR: %s\">%s %s %s %i%% %s %s %s %s %s</font>"%(self.palette["rect3"],
+                                  margin,self.stringfromseconds(finishphasetime),margin,finishphaseP,margin,finishroc,margin,etbt3,margin)
                         aw.messagelabel.setText(string1+string2+string3)
 
         except Exception as e:
@@ -4680,10 +4695,6 @@ class VMToolbar(NavigationToolbar):
             n = name.replace('.png','.svg')
         p = os.path.join(self.basedir, n)
         
-        import syslog
-        syslog.openlog("artisan")
-        syslog.syslog(syslog.LOG_ALERT, str(p))
-
         if os.path.exists(p):
             return QIcon(p)
         else:
@@ -4718,6 +4729,7 @@ class VMToolbar(NavigationToolbar):
                 return
         figureoptions.figure_edit(axes, self)
         aw.fetchCurveStyles()
+        # the redraw is mostly necessary to force a redraw of the legend to reflect the changed colors/styles/labels
         aw.qmc.redraw(recomputeAllDeltas=False)
 
 
@@ -7135,9 +7147,11 @@ class ApplicationWindow(QMainWindow):
             if firstChar == "{":            
                 f.close()
                 profile = self.deserialize(filename)
-                self.qmc.timeB = profile["timex"]
-                self.qmc.temp1B = self.qmc.smooth_list(self.qmc.timeB,profile["temp1"],window_len=self.curvefilter)
-                self.qmc.temp2B = self.qmc.smooth_list(self.qmc.timeB,profile["temp2"],window_len=self.curvefilter)
+                tb = profile["timex"]
+                b1 = self.qmc.smooth_list(tb,profile["temp1"],window_len=self.qmc.curvefilter)
+                b2 = self.qmc.smooth_list(tb,profile["temp2"],window_len=self.qmc.curvefilter)
+                # NOTE: parallel assignment after time intensive smoothing is necessary to avoid redraw failure!
+                self.qmc.temp1B,self.qmc.temp2B,self.qmc.timeB = b1,b2,tb
                 self.qmc.backgroundEvents = profile["specialevents"]
                 self.qmc.backgroundEtypes = profile["specialeventstype"]
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
@@ -7153,7 +7167,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.Betypes = profile["etypes"]
                 if "timeindex" in profile:
                     self.qmc.timeindexB = profile["timeindex"]          #if new profile found with variable timeindex
-                else:                                                   #old profile format
+                else:            
                     if "startend" in profile:
                         startendB = profile["startend"]
                         varCB = profile["cracks"]
@@ -8343,13 +8357,27 @@ class ApplicationWindow(QMainWindow):
             self.qmc.redraw()
 
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),str(e))
             return       
             
     def fetchCurveStyles(self):
         try:
+            # get and set axis y limits
+            yrange = aw.qmc.ax.get_ylim()
+            yl_min = int(yrange[0])
+            yl = int(yrange[1])
+            if yl > yl_min + 10:
+                aw.qmc.ylimit = yl
+                aw.qmc.ylimit_min = yl_min
+            delta_yrange = aw.qmc.delta_ax.get_ylim()
+            zl_min = int(delta_yrange[0])
+            zl = int(delta_yrange[1])
+            if zl > zl_min + 5:
+                aw.qmc.zlimit = zl
+                aw.qmc.zlimit_min = zl_min
+                
             if aw.qmc.l_temp1:
                 self.qmc.ETlinestyle = aw.qmc.l_temp1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -8360,6 +8388,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ETlinewidth = aw.qmc.l_temp1.get_linewidth()
                 self.qmc.ETmarker = aw.qmc.l_temp1.get_marker()
                 self.qmc.ETmarkersize = aw.qmc.l_temp1.get_markersize()
+                self.qmc.palette["et"] = aw.qmc.l_temp1.get_color()
             if aw.qmc.l_temp2:
                 self.qmc.BTlinestyle = aw.qmc.l_temp2.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -8370,6 +8399,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.BTlinewidth = aw.qmc.l_temp2.get_linewidth()
                 self.qmc.BTmarker = aw.qmc.l_temp2.get_marker()
                 self.qmc.BTmarkersize = aw.qmc.l_temp2.get_markersize()
+                self.qmc.palette["bt"] = aw.qmc.l_temp2.get_color()
             if aw.qmc.l_delta1:
                 self.qmc.ETdeltalinestyle = aw.qmc.l_delta1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -8380,6 +8410,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ETdeltalinewidth = aw.qmc.l_delta1.get_linewidth()
                 self.qmc.ETdeltamarker = aw.qmc.l_delta1.get_marker()
                 self.qmc.ETdeltamarkersize = aw.qmc.l_delta1.get_markersize()
+                self.qmc.palette["deltaet"] = aw.qmc.l_delta1.get_color()
             if aw.qmc.l_delta2:
                 self.qmc.BTdeltalinestyle = aw.qmc.l_delta2.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -8389,7 +8420,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTdeltalinewidth = aw.qmc.l_delta2.get_linewidth()
                 self.qmc.BTdeltamarker = aw.qmc.l_delta2.get_marker()
-                self.qmc.BTdeltamarkersize = aw.qmc.l_delta2.get_markersize()                
+                self.qmc.BTdeltamarkersize = aw.qmc.l_delta2.get_markersize()  
+                self.qmc.palette["deltabt"] = aw.qmc.l_delta2.get_color()              
             if aw.qmc.l_back1:
                 self.qmc.ETbacklinestyle = aw.qmc.l_back1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -8422,6 +8454,9 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.extralinewidths1[i] = l1.get_linewidth()
                     self.qmc.extramarkers1[i] = l1.get_marker()
                     self.qmc.extramarkersizes1[i] = l1.get_markersize()
+                    aw.qmc.extradevicecolor1[i] = l1.get_color()
+                    aw.setLabelColor(aw.extraLCDlabel1[i],QColor(l1.get_color()))
+                    aw.qmc.extraname1[i] = l1.get_label()
                     x1 = x1 + 1
                 if aw.extraCurveVisibility2[i]:
                     l2 = aw.qmc.extratemp2lines[x2]
@@ -8432,12 +8467,38 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.extradrawstyles2[i] = self.qmc.linestyle_default  
                     self.qmc.extralinewidths2[i] = l2.get_linewidth()
                     self.qmc.extramarkers2[i] = l2.get_marker()
-                    self.qmc.extramarkersizes2[i] = l2.get_markersize()                
+                    self.qmc.extramarkersizes2[i] = l2.get_markersize()   
+                    aw.qmc.extradevicecolor2[i] = l2.get_color()
+                    aw.setLabelColor(aw.extraLCDlabel2[i],QColor(l2.get_color()))
+                    aw.qmc.extraname2[i] = l2.get_label()
                     x2 = x2 + 1
+                if self.qmc.eventsGraphflag == 2:
+                    self.qmc.EvalueMarker[0] = l_eventtype1dots.get_marker()
+                    self.qmc.EvalueMarker[1] = l_eventtype2dots.get_marker()
+                    self.qmc.EvalueMarker[2] = l_eventtype3dots.get_marker()
+                    self.qmc.EvalueMarker[3] = l_eventtype4dots.get_marker()
+                    self.qmc.EvalueMarkerSize[0] = l_eventtype1dots.get_markersize()
+                    self.qmc.EvalueMarkerSize[1] = l_eventtype2dots.get_markersize()
+                    self.qmc.EvalueMarkerSize[2] = l_eventtype3dots.get_markersize()
+                    self.qmc.EvalueMarkerSize[3] = l_eventtype4dots.get_markersize()
+                    self.qmc.EvalueColor[0] = l_eventtype1dots.get_color()
+                    self.qmc.EvalueColor[1] = l_eventtype2dots.get_color()
+                    self.qmc.EvalueColor[2] = l_eventtype3dots.get_color()
+                    self.qmc.EvalueColor[3] = l_eventtype4dots.get_color()
+                    self.qmc.Evaluelinethickness[0] = l_eventtype1dots.get_linewidth()
+                    self.qmc.Evaluelinethickness[1] = l_eventtype2dots.get_linewidth()
+                    self.qmc.Evaluelinethickness[2] = l_eventtype3dots.get_linewidth()
+                    self.qmc.Evaluelinethickness[3] = l_eventtype4dots.get_linewidth()
+                    self.qmc.etypes[0] = l_eventtype1dots.get_label()
+                    self.qmc.etypes[1] = l_eventtype2dots.get_label()
+                    self.qmc.etypes[2] = l_eventtype3dots.get_label()
+                    self.qmc.etypes[3] = l_eventtype4dots.get_label()
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
-                             
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            exc_type, exc_obj, exc_tb = sys.exc_info()      
+            self.adderror(QApplication.translate("Error Message","Exception Error: fetchCurveStyles() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+        
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
     def closeEvent(self, event):
@@ -8718,9 +8779,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("customflavorlabels",self.qmc.customflavorlabels)
            
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
-            self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))            
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)            
 
 
     #used for trouble shooting.
@@ -9244,7 +9306,7 @@ $cupping_notes
             mid_phase=self.phase2html(self.qmc.statisticstimes[2],rates_of_changes[1],evaluations[1],ts2,ts2e,ts2b),
             finish_phase=self.phase2html(self.qmc.statisticstimes[3],rates_of_changes[2],evaluations[2],ts3,ts3e,ts3b),
             cool_phase=self.qmc.stringfromseconds(self.qmc.statisticstimes[4]) + "<br/>" + evaluations[3],
-            ror= ror + "d/m",
+            ror= ror + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8),
             etbta= "%i%sm [%i-%i]"%(ts,self.qmc.mode,tse,tsb),
             roasting_notes=self.note2html(self.qmc.roastingnotes),
             graph_image=graph_image,
@@ -9548,8 +9610,10 @@ $cupping_notes
                 ET += e * dt
                 BT += b * dt
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            exc_type, exc_obj, exc_tb = sys.exc_info()      
+            self.adderror(QApplication.translate("Error Message","Exception Error: ts() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         return round(delta/60), round(ET/60), round(BT/60)                
     
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
@@ -12886,10 +12950,16 @@ class WindowsDlg(QDialog):
         aw.qmc.redraw(recomputeAllDeltas=False)
                                
     def updatewindow(self):
-        aw.qmc.ylimit = int(str(self.ylimitEdit.text()))
-        aw.qmc.ylimit_min = int(str(self.ylimitEdit_min.text()))
-        aw.qmc.zlimit = int(str(self.zlimitEdit.text()))
-        aw.qmc.zlimit_min = int(str(self.zlimitEdit_min.text()))
+        yl = int(str(self.ylimitEdit.text()))
+        yl_min = int(str(self.ylimitEdit_min.text()))
+        if yl > yl_min + 10:
+            aw.qmc.ylimit = yl
+            aw.qmc.ylimit_min = yl_min
+        zl = int(str(self.zlimitEdit.text()))
+        zl_min = int(str(self.zlimitEdit_min.text()))
+        if zl > zl_min + 5:
+            aw.qmc.zlimit = zl
+            aw.qmc.zlimit_min = zl_min
         aw.qmc.endofx = aw.qmc.stringtoseconds(str(self.xlimitEdit.text()))
         
         starteditime = aw.qmc.stringtoseconds(str(self.xlimitEdit_min.text()))
@@ -13486,9 +13556,9 @@ class EventsDlg(QDialog):
 
         ## tab3
         #aw.buttonpalette
-        transferpalettebutton = QPushButton(QApplication.translate("button","Transfer Buttons to", None, QApplication.UnicodeUTF8))        
+        transferpalettebutton = QPushButton(QApplication.translate("button","Transfer to", None, QApplication.UnicodeUTF8))        
         transferpalettebutton.setFocusPolicy(Qt.NoFocus)
-        setpalettebutton = QPushButton(QApplication.translate("button","Restore Buttons from", None, QApplication.UnicodeUTF8))
+        setpalettebutton = QPushButton(QApplication.translate("button","Restore from", None, QApplication.UnicodeUTF8))
         setpalettebutton.setFocusPolicy(Qt.NoFocus)
         palette = QApplication.translate("Label","palette #", None, QApplication.UnicodeUTF8)
         palettelist = []
@@ -13509,7 +13579,7 @@ class EventsDlg(QDialog):
         setpalettebutton.setMaximumWidth(160)
 
 
-        backupbutton = QPushButton(QApplication.translate("button","Backup palette", None, QApplication.UnicodeUTF8))
+        backupbutton = QPushButton(QApplication.translate("button","Backup Palette", None, QApplication.UnicodeUTF8))
         backupbutton.setFocusPolicy(Qt.NoFocus)
         restorebutton = QPushButton(QApplication.translate("button","Restore Palette", None, QApplication.UnicodeUTF8))
         restorebutton.setFocusPolicy(Qt.NoFocus)
@@ -19198,7 +19268,8 @@ class DeviceAssignmentDLG(QDialog):
         except Exception as e:     
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            aw.qmc.adderror(QApplication.translate("Error Message", "delextradevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()   
+            aw.qmc.adderror(QApplication.translate("Error Message", "delextradevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         
     def savedevicetable(self):
         try:
