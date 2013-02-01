@@ -394,7 +394,8 @@ class tgraphcanvas(FigureCanvas):
                        "+ArduinoTC4_XX",        #28
                        "MODBUS",                #29
                        "VOLTCRAFT K201",        #30
-                       "-Omega HH806W"          #31 NOT WORKING 
+                       "Amprobe TMD-56",        #31
+                       "-Omega HH806W"          #32 NOT WORKING 
                        ]
 
         #extra devices
@@ -885,8 +886,10 @@ class tgraphcanvas(FigureCanvas):
                     ndev = len(self.extradevices)
                     for i in range(ndev):
                         if i < aw.nLCDS:
-                            aw.extraLCD1[i].display("%.1f"%float(self.extratemp1[i][-1]))
-                            aw.extraLCD2[i].display("%.1f"%float(self.extratemp2[i][-1]))
+                            if self.extratemp1[i]:
+                                aw.extraLCD1[i].display("%.1f"%float(self.extratemp1[i][-1]))
+                            if self.extratemp2[i]:
+                                aw.extraLCD2[i].display("%.1f"%float(self.extratemp2[i][-1]))
 
                 if self.flagstart:
                     #updated canvas
@@ -1281,6 +1284,20 @@ class tgraphcanvas(FigureCanvas):
             else:
                 return '-%d'%m
             
+    def checkSaved(self):
+        #prevents deleting accidentally a finished roast
+        if self.safesaveflag== True:
+            string = QApplication.translate("MessageBox","Save the profile, Discard the profile (Reset), or Cancel?", None, QApplication.UnicodeUTF8)
+            reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Profile unsaved", None, QApplication.UnicodeUTF8),string,
+                                QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
+            if reply == QMessageBox.Save:
+                aw.fileSave(None)  #if accepted, makes safesaveflag = False
+                return
+            elif reply == QMessageBox.Discard:
+                pass
+            elif reply == QMessageBox.Cancel:            
+                aw.sendmessage(QApplication.translate("Message Area","Reset has been cancelled",None, QApplication.UnicodeUTF8))
+                return
 
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     def reset(self,redraw=True):
@@ -1295,19 +1312,7 @@ class tgraphcanvas(FigureCanvas):
         #reset time
         aw.qmc.timeclock.start()
         
-        #prevents deleting accidentally a finished roast
-        if self.safesaveflag== True:
-            string = QApplication.translate("MessageBox","Save the profile, Discard the profile (Reset), or Cancel?", None, QApplication.UnicodeUTF8)
-            reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Profile unsaved", None, QApplication.UnicodeUTF8),string,
-                                QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
-            if reply == QMessageBox.Save:
-                aw.fileSave(None)  #if accepted, makes safesaveflag = False
-                return
-            elif reply == QMessageBox.Discard:
-                pass
-            elif reply == QMessageBox.Cancel:            
-                aw.sendmessage(QApplication.translate("Message Area","Reset has been cancelled",None, QApplication.UnicodeUTF8))
-                return
+        self.checkSaved()
 
         #prevents accidentally deleting a modified profile. 
         self.safesaveflag = False  #now flag is cleared (OFF)
@@ -3027,99 +3032,98 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         self.samplingsemaphore.release(1)
                         return
+                
+                if extraevent:
+                    #i = index number of the event (current length of the time list)           
+                    i = len(self.timex)-1
                     
-                #i = index number of the event (current length of the time list)           
-                i = len(self.timex)-1
-
-                self.specialevents.append(i)
-                self.specialeventstype.append(0)            
-                self.specialeventsStrings.append(str(Nevents+1))
-                self.specialeventsvalue.append(0)
-                #if event was initiated by an Extra Event Button then change the type,value,and string 
-                if extraevent != None:
-                    self.specialeventstype[-1] = eventtype    
-                    self.specialeventsvalue[-1] = eventvalue
-                    self.specialeventsStrings[-1] = eventdescription
-
-                etype = self.specialeventstype[-1]
-                if etype == 0:
-                    self.E1timex.append(self.timex[self.specialevents[-1]])
-                    self.E1values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
-                elif etype == 1:
-                    self.E2timex.append(self.timex[self.specialevents[-1]])
-                    self.E2values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
-                elif etype == 2:
-                    self.E3timex.append(self.timex[self.specialevents[-1]])
-                    self.E3values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
-                elif etype == 3:
-                    self.E4timex.append(self.timex[self.specialevents[-1]])
-                    self.E4values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
-                    
-                #write label in mini recorder if flag checked
-                if aw.minieventsflag:
-                    aw.eNumberSpinBox.setValue(Nevents+1)
-                    aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                    aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                    aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-
-                #if Event show flag
-                if self.eventsshowflag:
-                    index = self.specialevents[-1]                    
-                    firstletter = self.etypes[self.specialeventstype[-1]][0]
-                    secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
-
-                    if self.eventsGraphflag == 0:                    
-                        if self.mode == "F":
-                            height = 50
-                        else:
-                            height = 20
-                        #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[index] > self.temp2[index]:
-                            temp = self.temp1[index]
-                        else:
-                            temp = self.temp2[index]
-                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-
-                    #if Event Type-Bars flag
-                    elif self.eventsGraphflag == 1:
-                        char1 = self.etypes[0][0]
-                        char2 = self.etypes[1][0]
-                        char3 = self.etypes[2][0]
-                        char4 = self.etypes[3][0]
-                        if self.mode == "F":
-                            row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
-                        else:
-                            row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-                        #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[index] >= self.temp2[index]:
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
-                        else:
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-
-                    elif self.eventsGraphflag == 2:
-                        # update lines data using the lists with new data
-                        if etype == 0:
-                            self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
-                        elif etype == 1:
-                            self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
-                        elif etype == 2:
-                            self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
-                        elif etype == 3:
-                            self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
-
-                self.fig.canvas.draw()
-
-                temp = "%.1f "%self.temp2[i]
-                timed = self.stringfromseconds(self.timex[i])
+                    self.specialevents.append(i)
+                    self.specialeventstype.append(0)            
+                    self.specialeventsStrings.append(str(Nevents+1))
+                    self.specialeventsvalue.append(0)
+                    #if event was initiated by an Extra Event Button then change the type,value,and string 
+                    if extraevent != None:
+                        self.specialeventstype[-1] = eventtype    
+                        self.specialeventsvalue[-1] = eventvalue
+                        self.specialeventsStrings[-1] = eventdescription
+    
+                    etype = self.specialeventstype[-1]
+                    if etype == 0:
+                        self.E1timex.append(self.timex[self.specialevents[-1]])
+                        self.E1values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                    elif etype == 1:
+                        self.E2timex.append(self.timex[self.specialevents[-1]])
+                        self.E2values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                    elif etype == 2:
+                        self.E3timex.append(self.timex[self.specialevents[-1]])
+                        self.E3values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                    elif etype == 3:
+                        self.E4timex.append(self.timex[self.specialevents[-1]])
+                        self.E4values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                        
+                    #write label in mini recorder if flag checked
+                    if aw.minieventsflag:
+                        aw.eNumberSpinBox.setValue(Nevents+1)
+                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                        aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                        aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+    
+                    #if Event show flag
+                    if self.eventsshowflag:
+                        index = self.specialevents[-1]                    
+                        firstletter = self.etypes[self.specialeventstype[-1]][0]
+                        secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
+    
+                        if self.eventsGraphflag == 0:                    
+                            if self.mode == "F":
+                                height = 50
+                            else:
+                                height = 20
+                            #some times ET is not drawn (ET = 0) when using device NONE
+                            if self.temp1[index] > self.temp2[index]:
+                                temp = self.temp1[index]
+                            else:
+                                temp = self.temp2[index]
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+    
+                        #if Event Type-Bars flag
+                        elif self.eventsGraphflag == 1:
+                            char1 = self.etypes[0][0]
+                            char2 = self.etypes[1][0]
+                            char3 = self.etypes[2][0]
+                            char4 = self.etypes[3][0]
+                            if self.mode == "F":
+                                row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                            else:
+                                row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                            #some times ET is not drawn (ET = 0) when using device NONE
+                            if self.temp1[index] >= self.temp2[index]:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
+                            else:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+    
+                        elif self.eventsGraphflag == 2:
+                            # update lines data using the lists with new data
+                            if etype == 0:
+                                self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
+                            elif etype == 1:
+                                self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
+                            elif etype == 2:
+                                self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
+                            elif etype == 3:
+                                self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
+    
+                    self.fig.canvas.draw()
+    
+                    temp = "%.1f "%self.temp2[i]
+                    timed = self.stringfromseconds(self.timex[i])
+                    message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
+                    aw.sendmessage(message)
 
                 self.samplingsemaphore.release(1)
-
-                message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
-                aw.sendmessage(message)
-                                
 
             else:
                 aw.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
@@ -3550,6 +3554,7 @@ class tgraphcanvas(FigureCanvas):
             
     def drawinterp(self,mode):
         try:            
+            from scipy import interpolate as inter
             Xpoints,Ypoints = self.findpoints() #from 0 origin
             func = inter.interp1d(Xpoints, Ypoints, kind=mode)
             newY = func(self.timex)          
@@ -7356,14 +7361,14 @@ class ApplicationWindow(QMainWindow):
         
     #Write readings to Artisan JSON file    
     def exportJSON(self,filename):
-        outfile = open(filename, 'wb')
+        outfile = open(filename, 'w', encoding='utf-8')
         #json.dump(self.getProfile(), outfile, sort_keys=True, indent=4)
-        json.dump(self.getProfile(), outfile)  
+        json.dump(self.getProfile(), outfile, ensure_ascii=True)  
         outfile.write('\n')  
         outfile.close()
         
     def importJSON(self,filename):
-        infile = open(filename, 'rb')
+        infile = open(filename, 'r', encoding='utf-8')
         obj = json.load(infile)
         self.setProfile(obj)
         infile.close()
@@ -7677,14 +7682,15 @@ class ApplicationWindow(QMainWindow):
             self.qmc.temp2 = profile["temp2"]
         if "phases" in profile:
             self.qmc.phases = profile["phases"]
-        if "zmax" in profile:
-            self.qmc.zlimit = min(int(profile["zmax"]),500)
-        if "zmin" in profile:
-            self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),-200)
-        if "ymax" in profile:
-            self.qmc.ylimit = min(int(profile["ymax"]),850)
-        if "ymin" in profile:
-            self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),-150)
+# don't let the users y/z min/max axis limits be overwritten by loading a profile
+#        if "zmax" in profile:
+#            self.qmc.zlimit = min(int(profile["zmax"]),500)
+#        if "zmin" in profile:
+#            self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),-200)
+#        if "ymax" in profile:
+#            self.qmc.ylimit = min(int(profile["ymax"]),850)
+#        if "ymin" in profile:
+#            self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),-150)
         if "xmin" in profile:
             self.qmc.startofx = int(profile["xmin"])
         if "xmax" in profile:
@@ -7739,7 +7745,195 @@ class ApplicationWindow(QMainWindow):
             self.qmc.timeindexupdate(times)
         # ensure that timeindex has the proper length
         self.qmc.timeindex = self.qmc.timeindex + [0 for i in range(8-len(self.qmc.timeindex))]
+    
+    # the int n specifies the number of digits
+    def float2float(self,f,n=1):
+        if n==0:
+            return int(round(f))
+        else:
+            return float(("%." + str(n) + "f")%f)
+        
+    # returns data that is computed by Artisan out of raw profile data using some formulas 
+    # and displayed to users e.g. as part of the Report to users and stored along profiles to be used by external programs
+    # in case a value cannot be computed the corresponding entry is missing in the resulting dict
+    def computedProfileInformation(self):
+        computedProfile = {}
+
+        if self.qmc.timeindex[0] != -1:
+            start = self.qmc.timex[self.qmc.timeindex[0]]
+            computedProfile["CHARGE_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[0]])
+            computedProfile["CHARGE_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[0]])
+        else:
+            start = 0
+        
+        ######### TP #########
+        # calc TP_time_idx (index of TP; is None if unknown)
+        TP_index = self.findTP() # could return -1
+        if TP_index > 0 and len(self.qmc.timex) > 0:
+            TP_time_idx = TP_index
+        else:
+            TP_time_idx = None
+        if TP_time_idx:
+            computedProfile["TP_time"] = self.float2float(self.qmc.timex[TP_time_idx] - start)
+            computedProfile["TP_ET"] = self.float2float(self.qmc.temp1[TP_time_idx])
+            computedProfile["TP_BT"] = self.float2float(self.qmc.temp2[TP_time_idx])
             
+        ######### DRY #########
+        # calc DRY_time_idx (index of TP; is None if unknown)
+        if self.qmc.timeindex[1]:
+            #manual dryend available
+            DRY_time_idx = self.qmc.timeindex[1]
+        else:
+            dryEndIndex = self.findDryEnd(TP_index)  # use TP_index to avoid recomputation of TP if it failed before
+            #we use the dryEndIndex respecting the dry phase
+            if dryEndIndex > 0 and dryEndIndex < len(self.qmc.timex):
+                DRY_time_idx = dryEndIndex 
+            else:
+                DRY_time_idx = None
+        if DRY_time_idx:
+            computedProfile["DRY_time"] = self.float2float(self.qmc.timex[DRY_time_idx] - start)
+            computedProfile["DRY_ET"] = self.float2float(self.qmc.temp1[DRY_time_idx])
+            computedProfile["DRY_BT"] = self.float2float(self.qmc.temp2[DRY_time_idx])
+            
+        ######### FC #########
+        if self.qmc.timeindex[2]:
+            computedProfile["FCs_time"] = self.float2float(self.qmc.timex[self.qmc.timeindex[2]] - start)
+            computedProfile["FCs_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[2]])
+            computedProfile["FCs_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[2]])
+        if self.qmc.timeindex[3]:
+            computedProfile["FCe_time"] = self.float2float(self.qmc.timex[self.qmc.timeindex[3]] - start)
+            computedProfile["FCe_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[3]])
+            computedProfile["FCe_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[3]])        
+            
+        ######### SC #########
+        if self.qmc.timeindex[4]:
+            computedProfile["SCs_time"] = self.float2float(self.qmc.timex[self.qmc.timeindex[4]] - start)
+            computedProfile["SCs_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[4]])
+            computedProfile["SCs_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[4]])
+        if self.qmc.timeindex[5]:
+            computedProfile["SCe_time"] = self.float2float(self.qmc.timex[self.qmc.timeindex[5]] - start)
+            computedProfile["SCe_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[5]])
+            computedProfile["SCe_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[5]])
+            
+        ######### DROP #########
+        if self.qmc.timeindex[6]:
+            computedProfile["DROP_time"] = self.float2float(self.qmc.timex[self.qmc.timeindex[6]] - start)
+            computedProfile["DROP_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[6]])
+            computedProfile["DROP_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[6]])
+        
+        ######### COOL #########
+        if self.qmc.timeindex[7]:
+            computedProfile["COOL_time"] = self.float2float(self.qmc.timex[self.qmc.timeindex[7]] - start)
+            computedProfile["COOL_ET"] = self.float2float(self.qmc.temp1[self.qmc.timeindex[7]])
+            computedProfile["COOL_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[7]])
+              
+        ######### Phases #########
+        if self.qmc.statisticstimes[0]:
+            computedProfile["totaltime"] = self.qmc.statisticstimes[0]
+        if self.qmc.statisticstimes[1]:
+            computedProfile["dryphasetime"] = self.qmc.statisticstimes[1]
+        if self.qmc.statisticstimes[2]:
+            computedProfile["midphasetime"] = self.qmc.statisticstimes[2]
+        if self.qmc.statisticstimes[3]:
+            computedProfile["finishphasetime"] = self.qmc.statisticstimes[3]
+        if self.qmc.statisticstimes[4]:
+            computedProfile["coolphasetime"] = self.qmc.statisticstimes[4]
+            
+        ######### Evaluations #########
+        evaluations = self.defect_estimation()
+        computedProfile["dryphaseeval"] = evaluations[0]
+        computedProfile["midphaseeval"] = evaluations[1]
+        computedProfile["finishphaseeval"] = evaluations[2]
+        computedProfile["coolphaseeval"] = evaluations[3]
+        
+        ######### RoR ######### 
+        if TP_time_idx and DRY_time_idx:
+            ror = self.RoR(TP_time_idx,DRY_time_idx)
+            computedProfile["dry_phase_ror"] = self.float2float(ror[0])
+            computedProfile["mid_phase_ror"] = self.float2float(ror[1])
+            computedProfile["finish_phase_ror"] = self.float2float(ror[2])
+            if "TP_BT" in computedProfile and "TP_time" in computedProfile and "DROP_BT" in computedProfile and "DROP_time" in computedProfile:
+                computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
+        
+        ######### ETBTarea #########
+        try:
+            ts,tse,tsb = aw.ts(self.qmc.timeindex[0],self.qmc.timeindex[6])
+            computedProfile["total_ts"] = self.float2float(ts,0)
+            computedProfile["total_ts_ET"] = self.float2float(tse,0)
+            computedProfile["total_ts_BT"] = self.float2float(tsb,0)
+        except:
+            pass
+        try:
+            ts1,ts1e,ts1b = aw.ts(self.qmc.timeindex[0],DRY_time_idx)
+            computedProfile["dry_phase_ts"] = self.float2float(ts1,0)
+            computedProfile["dry_phase_ts_ET"] = self.float2float(ts1e,0)
+            computedProfile["dry_phase_ts_BT"] = self.float2float(ts1b,0)
+        except:
+            pass
+        try:
+            ts2,ts2e,ts2b = aw.ts(DRY_time_idx,self.qmc.timeindex[2])
+            computedProfile["mid_phase_ts"] = self.float2float(ts2,0)
+            computedProfile["mid_phase_ts_ET"] = self.float2float(ts2e,0)
+            computedProfile["mid_phase_ts_BT"] = self.float2float(ts2b,0)
+        except:
+            pass
+        try:
+            ts3,ts3e,ts3b = aw.ts(self.qmc.timeindex[2],self.qmc.timeindex[6])
+            computedProfile["finish_phase_ts"] = self.float2float(ts3,0)
+            computedProfile["finish_phase_ts_ET"] = self.float2float(ts3e,0)
+            computedProfile["finish_phase_ts_BT"] = self.float2float(ts3b,0)
+        except:
+            pass
+                    
+        ######### Weight, Volume, Loss, Gain, Density #########            
+        volumein = self.qmc.volume[0]
+        volumeout = self.qmc.volume[1]
+        weightin = self.qmc.weight[0]
+        weightout = self.qmc.weight[1]
+        
+        weight_loss =self.weight_loss(weightin,weightout)
+        volume_gain = self.weight_loss(volumeout,volumein)
+        if weight_loss:
+            computedProfile["weight_loss"] = self.float2float(weight_loss)
+        if volume_gain:
+            computedProfile["volume_gain"] = self.float2float(volume_gain)
+        
+        din = dout = 0
+        if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
+            if self.qmc.volume[2] == "ml" :
+                volumein = volumein / 1000.0
+                volumeout = volumeout / 1000.0      
+            if self.qmc.weight[2] != "g":
+                weightin = weightin * 1000.0
+                weightout = weightout * 1000.0
+            din = (weightin / volumein) 
+            dout = (weightout / volumeout)
+        
+        if din > 1:
+            computedProfile["green_density"] = self.float2float(din)
+        if din > 1:
+            computedProfile["roasted_density"] = self.float2float(dout)
+            
+        if (aw.qmc.density[0] != 0.0 and aw.qmc.density[2] != 0.0):
+            setdensity = aw.qmc.density[0] /  aw.qmc.density[2]
+            if aw.qmc.density[1] != "g":
+                setdensity = setdensity / 1000.0
+            if aw.qmc.density[3] != "l":
+                setdensity = setdensity * 1000.0
+            computedProfile["set_density"] = self.float2float(setdensity)
+                        
+        ######### Humidity #########
+        if aw.qmc.bag_humidity[0] != 0.0:
+            computedProfile["bag_humidity"] = self.float2float(aw.qmc.bag_humidity[0])
+        if aw.qmc.bag_humidity[1] != 0.0:
+            computedProfile["bag_temperature"] = self.float2float(aw.qmc.bag_humidity[1])
+        if aw.qmc.ambient_humidity != 0.0:
+            computedProfile["ambient_humidity"] = self.float2float(aw.qmc.ambient_humidity)
+        if aw.qmc.ambientTemp != 0.0:
+            computedProfile["ambient_temperature"] = self.float2float(aw.qmc.ambientTemp)
+            
+        return computedProfile
+                
     #used by filesave()
     #wrap values in unicode(.) if and only if those are of type string
     def getProfile(self):
@@ -7779,17 +7973,31 @@ class ApplicationWindow(QMainWindow):
         profile["ambientTemp"] = self.qmc.ambientTemp
         profile["ambient_humidity"] = self.qmc.ambient_humidity
         profile["bag_humidity"] = self.qmc.bag_humidity
+        
         profile["extradevices"] = self.qmc.extradevices
         profile["extraname1"] = [e(n) for n in self.qmc.extraname1]
-        profile["extraname2"] = [e(n) for n in self.qmc.extraname2]
-        profile["extramathexpression1"] = self.qmc.extramathexpression1
-        profile["extramathexpression2"] = self.qmc.extramathexpression2        
+        profile["extraname2"] = [e(n) for n in self.qmc.extraname2]      
         profile["extratimex"] = self.qmc.extratimex
         profile["extratemp1"] = self.qmc.extratemp1
-        profile["extratemp2"] = self.qmc.extratemp2
+        profile["extratemp2"] = self.qmc.extratemp2      
+        profile["extramathexpression1"] = self.qmc.extramathexpression1
+        profile["extramathexpression2"] = self.qmc.extramathexpression2  
         profile["extradevicecolor1"] = [e(x) for x in self.qmc.extradevicecolor1]
         profile["extradevicecolor2"] = [e(x) for x in self.qmc.extradevicecolor2]
+        profile["extramarkersizes1"] = [e(x) for x in self.qmc.extramarkersizes1]
+        profile["extramarkersizes2"] = [e(x) for x in self.qmc.extramarkersizes2]
+        profile["extramarkers1"] = [e(x) for x in self.qmc.extramarkers1]
+        profile["extramarkers2"] = [e(x) for x in self.qmc.extramarkers2]
+        profile["extralinewidths1"] = [e(x) for x in self.qmc.extralinewidths1]
+        profile["extralinewidths2"] = [e(x) for x in self.qmc.extralinewidths2]
+        profile["extralinestyles1"] = [e(x) for x in self.qmc.extralinestyles1]
+        profile["extralinestyles2"] = [e(x) for x in self.qmc.extralinestyles2]
+        profile["extradrawstyles1"] = [e(x) for x in self.qmc.extradrawstyles1]
+        profile["extradrawstyles2"] = [e(x) for x in self.qmc.extradrawstyles2]
+                
         profile["externalprogram"] = e(self.ser.externalprogram)
+       
+        profile["computed"] = self.computedProfileInformation()
         
         return profile
     
@@ -8355,6 +8563,9 @@ class ApplicationWindow(QMainWindow):
 
             #update display
             self.qmc.redraw()
+            
+            # set default window appearances (style)
+            aw.defaultAppearance = str(aw.style().objectName()).lower()
 
         except Exception as e:
 #            import traceback
@@ -8499,7 +8710,7 @@ class ApplicationWindow(QMainWindow):
             exc_type, exc_obj, exc_tb = sys.exc_info()      
             self.adderror(QApplication.translate("Error Message","Exception Error: fetchCurveStyles() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         
-
+        
     #Saves the settings when closing application. See the oppposite settingsLoad()
     def closeEvent(self, event):
 
@@ -8509,6 +8720,7 @@ class ApplicationWindow(QMainWindow):
         #many applications (including the KDE applications) use INI text files
         
         try:
+            aw.qmc.checkSaved()
             settings = QSettings()
             #save window geometry
             settings.setValue("Geometry",QVariant(self.saveGeometry()))
@@ -9158,44 +9370,25 @@ $cupping_notes
         beans = cgi.escape(self.qmc.beans)
         if len(beans) > 43:
             beans = beans[:41] + "&hellip;"
-        charge = "--"
-        if self.qmc.timeindex[0] != -1:
-            charge = "BT " + "%.1f"%self.qmc.temp2[self.qmc.timeindex[0]] + "&deg;" + self.qmc.mode  + "<br/>ET " + "%.1f"%self.qmc.temp1[self.qmc.timeindex[0]] + "&deg;" + self.qmc.mode
-        TP_index = self.findTP()
-        TP_time_idx = None
-        if TP_index > 0 and len(self.qmc.timex) > 0:
-            TP_time_idx = TP_index
-        dryEndIndex = self.findDryEnd(TP_index)
-        rates_of_changes = self.RoR(TP_index,dryEndIndex)
+            
+        cp = aw.computedProfileInformation()    
         
-        ts1 = ts1e = ts1b = 0.
-        ts2 = ts2e = ts2b = 0.
-        ts3 = ts3e = ts3b = 0.
-        try:
-            ts1,ts1e,ts1b = aw.ts(self.qmc.timeindex[0],dryEndIndex)
-        except:
-            pass
-        try:
-            ts2,ts2e,ts2b = aw.ts(dryEndIndex,self.qmc.timeindex[2])
-        except:
-            pass
-        try:
-            ts3,ts3e,ts3b = aw.ts(self.qmc.timeindex[2],self.qmc.timeindex[6])
-        except:
-            pass
-                    
-        if self.qmc.timeindex[1]:
-            #manual dryend available
-            DRY_time_idx = self.qmc.timeindex[1]
-        else:
-            #we use the dryEndIndex respecting the dry phase
-            if dryEndIndex < len(self.qmc.timex):
-                DRY_time_idx = dryEndIndex      
+        if "CHARGE_ET" in cp and "CHARGE_BT" in cp:
+            if self.qmc.mode == "F":
+                charge = "BT %.1fF <br/>ET %.1fF"%(cp["CHARGE_BT"],cp["CHARGE_ET"])
             else:
-                DRY_time_idx = 0
-        evaluations = self.defect_estimation()
-        self.qmc.redraw(recomputeAllDeltas=False)   
-        #graph_image = self.qmc.title + "-graph"
+                charge = "BT %.1f&deg;C <br/>ET %.1f&deg;C"%(cp["CHARGE_BT"],cp["CHARGE_ET"])
+        else:
+            charge = "--"
+        dryphase, midphase, finishphase, coolphase = self.phases2html(cp)
+        etbta = "--"
+        if "total_ts" in cp:
+            etbta = "%d %sm"%(cp["total_ts"],self.qmc.mode) 
+            if "total_ts_ET" in cp and "total_ts_BT" in cp:
+                etbta += " [%d-%d]"%(cp["total_ts_ET"],cp["total_ts_BT"])
+        
+# not exactly shure what this extra redraw is needed for:        
+#        self.qmc.redraw(recomputeAllDeltas=False)   
         graph_image = "roastlog-graph"
         if platf == 'Darwin':
             graph_image = graph_image + ".svg"
@@ -9223,7 +9416,6 @@ $cupping_notes
         graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
         #obtain flavor chart image
         self.qmc.flavorchart()
-        #flavor_image = self.qmc.title + "-flavor"
         flavor_image = "roastlog-flavor"
         if platf == 'Darwin':
             flavor_image = flavor_image + ".svg"
@@ -9238,76 +9430,77 @@ $cupping_notes
             #save GRAPH image
             flavor_image = flavor_image + ".png"
             image.save(flavor_image)
-        flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
-        weight_loss = self.weight_loss(self.qmc.weight[0],self.qmc.weight[1])
-        volume_gain = self.weight_loss(self.qmc.volume[1],self.qmc.volume[0])
+        flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))            
         #return screen to GRAPH profile mode
         self.qmc.redraw(recomputeAllDeltas=False)
-        ror = "%.2f"%(((self.qmc.temp2[self.qmc.timeindex[6]]-self.qmc.temp2[TP_time_idx])/(self.qmc.timex[self.qmc.timeindex[6]]-self.qmc.timex[self.qmc.timeindex[0]]))*60.)
-        ts,tse,tsb = aw.ts()
-        din = dout = 0.0
-        volumein = self.qmc.volume[0]
-        volumeout = self.qmc.volume[1]
-        weightin = self.qmc.weight[0]
-        weightout = self.qmc.weight[1]
-        if volumein != 0.0 and volumeout != 0.0 and weightin != 0.0 and weightout != 0.0:
-            if self.qmc.volume[2] == "ml" :
-                volumein = volumein / 1000.0
-                volumeout = volumeout / 1000.0      
-            if self.qmc.weight[2] != "g":
-                weightin = weightin * 1000.0
-                weightout = weightout * 1000.0
-            din = (weightin / volumein) 
-            dout = (weightout / volumeout)
-        if din > 1 and dout > 1 or (aw.qmc.density[0] != 0.0 and aw.qmc.density[2] != 0.0):
-            if (aw.qmc.density[0] != 0.0 and aw.qmc.density[2] != 0.0):
-                setdensity = aw.qmc.density[0] /  aw.qmc.density[2]
-                if aw.qmc.density[1] != "g":
-                    setdensity = setdensity / 1000.0
-                if aw.qmc.density[3] != "l":
-                    setdensity = setdensity * 1000.0
-                if din > 1 and dout > 1:
-                    densitystr = "%.1fg/l (set)<br/>%.1fg/l (green)<br/>%.1fg/l (roasted)"%(setdensity,din,dout)
-                else:
-                    densitystr = "%.1fg/l (set)"%(setdensity)
-            else:
-                densitystr = "%.1fg/l (green)<br/>%.1fg/l (roasted)"%(din,dout)
+        
+        
+        ror = "--"
+        if "total_ror" in cp:
+            ror = "%d%s"%(cp["total_ror"],QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8))
+        
+        
+        if "set_density" in cp:
+            density = "%.1fg/l (set)"%cp["set_density"]
         else:
-            densitystr = "--"
-        bag_humidity = "--"
-        ambient_humidity = "--"
-        if aw.qmc.bag_humidity[0] != 0.0:
-            bag_humidity = "%.1f%% at %.1f%s"%(aw.qmc.bag_humidity[0],aw.qmc.bag_humidity[1],self.qmc.mode)
-        if aw.qmc.ambient_humidity != 0.0:
-            ambient_humidity="%.1f%% at %.1f%s"%(aw.qmc.ambient_humidity,aw.qmc.ambientTemp,self.qmc.mode)
+            density = "--"
+        if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
+            weight = self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],cp["weight_loss"])
+            volume = self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp["volume_gain"])
+            degree = self.roast_degree(cp["weight_loss"])
+            if "set_density" in cp:
+                density = "%.1fg/l (set)<br/>%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["set_density"],cp["green_density"],cp["roasted_density"])
+            else:
+                density = "%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"])
+        else:
+            weight = "--"
+            volume = "--"
+            degree = "--"
+        
+        humidity = ""
+        if "bag_humidity" in cp:
+            humidity = "%d%%"%cp["bag_humidity"]
+            if "bag_temperature" in cp:
+                humidity += " at %d%s"%(cp["bag_temperature"],self.qmc.mode)
+            humidity += " (bag)"
+        if "ambient_humidity" in cp:
+            if humidity != "":
+                humidity += "<br/>"
+            humidity += "%d%%"%cp["ambient_humidity"]
+            if "ambient_temperature" in cp:
+                humidity += " at %d%s"%(cp["ambient_temperature"],self.qmc.mode)
+            humidity += " (ambient)"
+        if humidity == "":
+            humidity == "--"
+            
         html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             title=cgi.escape(self.qmc.title),
             datetime=str(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
             beans=beans,
-            weight=self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],weight_loss),
-            degree=self.roast_degree(weight_loss),
-            volume=self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],volume_gain),
+            weight=weight,
+            degree=degree,
+            volume=volume,
             roaster=cgi.escape(self.qmc.roastertype),
             operator=cgi.escape(self.qmc.operator),
             cup=str(self.cuppingSum()),
             charge=charge,            
             size=("--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm"),
-            density=densitystr,
-            humidity="%s (bag)<br/>%s (ambient)"%(bag_humidity,ambient_humidity),
-            TP=self.event2html(TP_time_idx),
-            DRY=self.event2html(DRY_time_idx),
-            FCs=self.event2html(self.qmc.timeindex[2]),
-            FCe=self.event2html(self.qmc.timeindex[3]),
-            SCs=self.event2html(self.qmc.timeindex[4]),
-            SCe=self.event2html(self.qmc.timeindex[5]),
-            drop=self.event2html(self.qmc.timeindex[6]),
-            cool=self.event2html(self.qmc.timeindex[7],self.qmc.timeindex[6]),
-            dry_phase=self.phase2html(self.qmc.statisticstimes[1],rates_of_changes[0],evaluations[0],ts1,ts1e,ts1b),
-            mid_phase=self.phase2html(self.qmc.statisticstimes[2],rates_of_changes[1],evaluations[1],ts2,ts2e,ts2b),
-            finish_phase=self.phase2html(self.qmc.statisticstimes[3],rates_of_changes[2],evaluations[2],ts3,ts3e,ts3b),
-            cool_phase=self.qmc.stringfromseconds(self.qmc.statisticstimes[4]) + "<br/>" + evaluations[3],
-            ror= ror + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8),
-            etbta= "%i%sm [%i-%i]"%(ts,self.qmc.mode,tse,tsb),
+            density=density,
+            humidity=humidity,
+            TP=self.event2html(cp,"TP_time","TP_BT"),
+            DRY=self.event2html(cp,"DRY_time","DRY_BT"),
+            FCs=self.event2html(cp,"FCs_time","FCs_BT"),
+            FCe=self.event2html(cp,"FCe_time","FCe_BT"),
+            SCs=self.event2html(cp,"SCs_time","SCs_BT"),
+            SCe=self.event2html(cp,"SCe_time","SCe_BT"),
+            drop=self.event2html(cp,"DROP_time","DROP_BT"),
+            cool=self.event2html(cp,"COOL_time",None,"DROP_time"),
+            dry_phase=dryphase,
+            mid_phase=midphase,
+            finish_phase=finishphase,
+            cool_phase=coolphase,
+            ror= ror,
+            etbta=etbta,
             roasting_notes=self.note2html(self.qmc.roastingnotes),
             graph_image=graph_image,
             flavor_image=flavor_image,
@@ -9345,27 +9538,61 @@ $cupping_notes
         else:
             return "--"
                 
-    def phase2html(self,time,RoR,eval,ts,tse,tsb):
-        if self.qmc.statisticstimes[0] > 0 and time and time > 0:
-            return self.qmc.stringfromseconds(time) + " (%.2f" %(time*100./self.qmc.statisticstimes[0])+ "%)<br/>" + "%.1f deg/min"%RoR + "<br/>" + str(ts) + self.qmc.mode + "m [" + str(tse) + "-" + str(tsb) + "]"  + "<br/>" + eval
-        else:
-            return "--"
-            
-    def event2html(self,time_idx,prev_time_idx=None):
-        if time_idx:
-            timez = self.qmc.timex[time_idx]
-            if self.qmc.timeindex[0] != -1:
-                start = self.qmc.timex[self.qmc.timeindex[0]]
-            else:
-                start = 0
-            if prev_time_idx:
-                prev = self.qmc.timex[prev_time_idx]
-                return self.qmc.stringfromseconds(timez - start) + " (" + self.qmc.stringfromseconds(timez - prev) + "m)"
-            else:
-                temp = self.qmc.temp2[time_idx] 
-                return self.qmc.stringfromseconds(timez - start)+ " (%.1f"%temp + "&deg;" + self.qmc.mode + ")"
-        else:
-            return "--"
+    def phases2html(self,cp):
+        dryphase = midphase = finishphase = coolphase = "--"
+        if "totaltime" in cp:
+            totaltime = cp["totaltime"]
+            #dryphase
+            if "dryphasetime" in cp:
+                dryphasetime = cp["dryphasetime"]
+                dryphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["dryphasetime"]),int(round(dryphasetime*100./totaltime)))
+                if "dry_phase_ror" in cp:
+                    dryphase += "<br/>%.1f deg/min"%cp["dry_phase_ror"]
+                if "dry_phase_ts" in cp:
+                    dryphase += "<br/>%d %sm"%(cp["dry_phase_ts"],self.qmc.mode)
+                    if "dry_phase_ts_ET" in cp and "dry_phase_ts_BT" in cp:
+                        dryphase += " [%d-%d]"%(cp["dry_phase_ts_ET"],cp["dry_phase_ts_BT"])
+                    if "dryphaseeval" in cp:
+                        dryphase += "<br/>" + cp["dryphaseeval"]
+            #midphase
+            if "midphasetime" in cp:
+                midphasetime = cp["midphasetime"]
+                midphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["midphasetime"]),int(round(midphasetime*100./totaltime)))
+                if "mid_phase_ror" in cp:
+                    midphase += "<br/>%.1f deg/min"%cp["mid_phase_ror"]
+                if "mid_phase_ts" in cp:
+                    midphase += "<br/>%d %sm"%(cp["mid_phase_ts"],self.qmc.mode)
+                    if "mid_phase_ts_ET" in cp and "mid_phase_ts_BT" in cp:
+                        midphase += " [%d-%d]"%(cp["mid_phase_ts_ET"],cp["mid_phase_ts_BT"])
+                if "midphaseeval" in cp:
+                    midphase += "<br/>" + cp["midphaseeval"]
+            #finishphase
+            if "finishphasetime" in cp:
+                finishphasetime = cp["finishphasetime"]
+                finishphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["finishphasetime"]),int(round(finishphasetime*100./totaltime)))
+                if "finish_phase_ror" in cp:
+                    finishphase += "<br/>%.1f deg/min"%cp["finish_phase_ror"]
+                if "finish_phase_ts" in cp:
+                    finishphase += "<br/>%d %sm"%(cp["finish_phase_ts"],self.qmc.mode)
+                    if "finish_phase_ts_ET" in cp and "finish_phase_ts_BT" in cp:
+                        finishphase += " [%d-%d]"%(cp["finish_phase_ts_ET"],cp["finish_phase_ts_BT"])
+                if "finishphaseeval" in cp:
+                    finishphase += "<br/>" + cp["finishphaseeval"]
+            #coolphase
+            if "coolphasetime" in cp:
+                coolphasetime = cp["coolphasetime"]
+                coolphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["coolphasetime"]),int(round(coolphasetime*100./totaltime)))
+                if "coolphaseeval" in cp:
+                    coolphase += "<br/>" + cp["coolphaseeval"]        
+        return dryphase, midphase, finishphase, coolphase
+        
+    def event2html(self,cp,time_key,BT_key=None,prev_time_key=None):
+        res = "--"
+        if prev_time_key and prev_time_key in cp and time_key in cp:
+            res = self.qmc.stringfromseconds(cp[time_key]) + " (" + self.qmc.stringfromseconds(cp[time_key] - cp[prev_time_key]) + "m)"
+        elif time_key in cp and BT_key in cp:
+            res = self.qmc.stringfromseconds(cp[time_key])+ " (%.1f"%cp[BT_key] + "&deg;" + self.qmc.mode + ")"
+        return res
             
     def specialevents2html(self): 
         html = ""  
@@ -10616,7 +10843,7 @@ class HUDDlg(QDialog):
         #show projection
         self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection",None, QApplication.UnicodeUTF8))
         projectionmodeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
-        self.projectionmodeComboBox = QComboBox()
+        self.projectionmodeComboBox = QComboBox()        
         self.projectionmodeComboBox.addItems([QApplication.translate("ComboBox","linear",None, QApplication.UnicodeUTF8),
                                               QApplication.translate("ComboBox","newton",None, QApplication.UnicodeUTF8)])
         self.projectionmodeComboBox.setCurrentIndex(aw.qmc.projectionmode)
@@ -10721,6 +10948,7 @@ class HUDDlg(QDialog):
         tab1Layout.addWidget(rorGroupLayout)
         tab1Layout.addWidget(rorLCDGroupLayout)
         tab1Layout.addWidget(hudGroupLayout)
+        tab1Layout.addStretch()
 
         #tab2
         #Equation plotter
@@ -10753,10 +10981,10 @@ class HUDDlg(QDialog):
         equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None, QApplication.UnicodeUTF8))
         equdrawbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equdrawbutton,SIGNAL("clicked()"),self.plotequ)
-        equbackgroundbutton = QPushButton(QApplication.translate("Button","Set plot 1 as background",None, QApplication.UnicodeUTF8))
+        equbackgroundbutton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
         equbackgroundbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equbackgroundbutton ,SIGNAL("clicked()"),self.setbackgroundequ1)
-        equvdevicebutton = QPushButton(QApplication.translate("Button","Add plot 1+2 as a virtual device",None, QApplication.UnicodeUTF8))
+        equvdevicebutton = QPushButton(QApplication.translate("Button","Virtual Device",None, QApplication.UnicodeUTF8))
         equvdevicebutton.setFocusPolicy(Qt.NoFocus)
         self.connect(equvdevicebutton ,SIGNAL("clicked()"),self.setvdevice)
         
@@ -10769,34 +10997,43 @@ class HUDDlg(QDialog):
         helpcurveButton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpcurveButton, SIGNAL("clicked()"),aw.showSymbolicHelp)
         
+        curve1Layout = QGridLayout()
+        curve1Layout.addWidget(self.equedit1,0,0)
+        curve1Layout.addWidget(color1Button,0,1)
+        curve1Layout.addWidget(equbackgroundbutton,0,2)
+        curve1Layout.addWidget(self.equedit2,1,0)
+        curve1Layout.addWidget(color2Button,1,1)
+        curve1Layout.addWidget(equvdevicebutton,1,2)
+        plot1GroupBox = QGroupBox()
+        plot1GroupBox.setLayout(curve1Layout)
+        
         curveLayout = QGridLayout()
-        curveLayout.addWidget(self.equedit1,0,0)
-        curveLayout.addWidget(color1Button,0,1)
-        curveLayout.addWidget(self.equedit2,1,0)
-        curveLayout.addWidget(color2Button,1,1)
-        curveLayout.addWidget(self.equedit3,2,0)
-        curveLayout.addWidget(color3Button,2,1)
-        curveLayout.addWidget(self.equedit4,3,0)
-        curveLayout.addWidget(color4Button,3,1)
-        curveLayout.addWidget(self.equedit5,4,0)
-        curveLayout.addWidget(color5Button,4,1)
-        curveLayout.addWidget(self.equedit6,5,0)
-        curveLayout.addWidget(color6Button,5,1)
+        curveLayout.addWidget(self.equedit3,0,0)
+        curveLayout.addWidget(color3Button,0,1)
+        curveLayout.addWidget(self.equedit4,1,0)
+        curveLayout.addWidget(color4Button,1,1)
+        curveLayout.addWidget(self.equedit5,2,0)
+        curveLayout.addWidget(color5Button,2,1)
+        curveLayout.addWidget(self.equedit6,3,0)
+        curveLayout.addWidget(color6Button,3,1)
 
         curvebuttonlayout = QHBoxLayout()
-        curvebuttonlayout.addWidget(equdrawbutton)      
+        curvebuttonlayout.addWidget(equdrawbutton)    
+        curvebuttonlayout.addStretch()  
         curvebuttonlayout.addWidget(saveImgButton)        
+        curvebuttonlayout.addStretch()  
         curvebuttonlayout.addWidget(helpcurveButton)        
         
         tab2Layout = QVBoxLayout()
-        tab2Layout.addWidget(equlabel)      
+        tab2Layout.addWidget(equlabel)  
+        tab2Layout.addWidget(plot1GroupBox)    
         tab2Layout.addLayout(curveLayout)
         tab2Layout.addLayout(curvebuttonlayout)
-        tab2Layout.addWidget(equbackgroundbutton)
-        tab2Layout.addWidget(equvdevicebutton)
+        tab2Layout.addStretch()
 
         ##### TAB 3
-        self.interpCheck = QCheckBox(QApplication.translate("CheckBox","Interpolation",None, QApplication.UnicodeUTF8))
+        self.interpCheck = QCheckBox(QApplication.translate("CheckBox","Show",None, QApplication.UnicodeUTF8))
+        self.interpCheck.setFocusPolicy(Qt.NoFocus)     
         self.connect(self.interpCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.interpolation(i)) #toggle
         
         self.interpComboBox = QComboBox()
@@ -10815,35 +11052,40 @@ class HUDDlg(QDialog):
          'nearest' : take the y value of the nearest point
         """
 
-        self.univarCheck = QCheckBox(QApplication.translate("CheckBox", "Univariate",None, QApplication.UnicodeUTF8))
+        self.univarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None, QApplication.UnicodeUTF8))
         self.connect(self.univarCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.univar(i)) #toggle
 
         univarButton = QPushButton(QApplication.translate("Button","Info",None, QApplication.UnicodeUTF8))
         univarButton.setFocusPolicy(Qt.NoFocus)
-        univarButton.setMaximumSize(50, 30)
+        univarButton.setMaximumSize(univarButton.sizeHint())
+        univarButton.setMinimumSize(univarButton.minimumSizeHint()) 
         self.connect(univarButton,SIGNAL("clicked()"),self.showunivarinfo)
         
         tab3Layout = QVBoxLayout()
-        interLayout = QGridLayout()
-        interLayout.addWidget(self.interpCheck,0,0)
-        interLayout.addWidget(self.interpComboBox,0,1)
+        interLayout = QHBoxLayout()
+        interLayout.addWidget(self.interpCheck)
+        interLayout.addStretch()
+        interLayout.addWidget(self.interpComboBox)
         
         interGroupLayout = QGroupBox(QApplication.translate("GroupBox","Interpolate",None, QApplication.UnicodeUTF8))
         interGroupLayout.setLayout(interLayout)
 
         uniLayout = QHBoxLayout()
-        uniLayout.addWidget(self.univarCheck,0)
-        uniLayout.addWidget(univarButton,1)
+        uniLayout.addWidget(self.univarCheck)
+        uniLayout.addStretch()
+        uniLayout.addWidget(univarButton)
 
         univarGroupLayout = QGroupBox(QApplication.translate("GroupBox","Univariate",None, QApplication.UnicodeUTF8))
         univarGroupLayout.setLayout(uniLayout)
 
         tab3Layout.addWidget(interGroupLayout)
         tab3Layout.addWidget(univarGroupLayout)
+        tab3Layout.addStretch()
 
         ##### TAB 4
         self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None, QApplication.UnicodeUTF8))
         self.soundCheck.setChecked(aw.soundflag) 
+        self.soundCheck.setFocusPolicy(Qt.NoFocus)
         self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
 
         mikeButton = QPushButton(QApplication.translate("Button","Test Mike",None, QApplication.UnicodeUTF8))             
@@ -10852,44 +11094,73 @@ class HUDDlg(QDialog):
 
         self.showsoundflag = 0
         
-        tab4Layout = QHBoxLayout()
-        tab4Layout.addWidget(self.soundCheck)
-        tab4Layout.addWidget(mikeButton)
+        tab4LayoutH = QHBoxLayout()
+        tab4LayoutH.addWidget(self.soundCheck)
+        tab4LayoutH.addStretch()
+        tab4LayoutH.addWidget(mikeButton)
+
+        tab4Layout = QVBoxLayout()
+        tab4Layout.addLayout(tab4LayoutH)
+        tab4Layout.addStretch()
 
     	#### TAB 5
-
         
         self.styleComboBox = QComboBox()
-        available = list(map(QString, list(QStyleFactory.keys())))
-        available = list(map(str,available))
+        available = list(map(str, list(QStyleFactory.keys())))
         self.styleComboBox.addItems(available)
+        self.styleComboBox.setFocusPolicy(Qt.NoFocus)
+        try:
+            self.styleComboBox.setCurrentIndex(list(map(lambda x:x.lower(),available)).index(str(aw.style().objectName()).lower()))
+        except:
+            pass
+        self.connect(self.styleComboBox,SIGNAL("currentIndexChanged(int)"),lambda i:self.setappearance())
         
         styleButton = QPushButton(QApplication.translate("Button","Set style",None, QApplication.UnicodeUTF8))
         styleButton.setFocusPolicy(Qt.NoFocus)   
         styleButton.setMaximumWidth(90)
+        styleButton.setFocusPolicy(Qt.NoFocus)
         self.connect(styleButton,SIGNAL("clicked()"),self.setappearance)
         
         self.resolutionSpinBox = QSpinBox()
         self.resolutionSpinBox.setRange(40,120)
         self.resolutionSpinBox.setSingleStep(5)
         self.resolutionSpinBox.setValue(aw.dpi)
+        self.resolutionSpinBox.setFocusPolicy(Qt.NoFocus)
 
-        resButton = QPushButton(QApplication.translate("Button","Set Resolution",None, QApplication.UnicodeUTF8))
+        resButton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
         resButton.setFocusPolicy(Qt.NoFocus)
         #resButton.setMaximumWidth(120)        
         self.connect(resButton,SIGNAL("clicked()"),self.changedpi)
 
-        defresButton = QPushButton(QApplication.translate("Button","Default Resolution",None, QApplication.UnicodeUTF8))
+        defresButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         defresButton.setFocusPolicy(Qt.NoFocus)
         #defresButton.setMaximumWidth(120)        
-        self.connect(defresButton,SIGNAL("clicked()"),self.setdefaultres)
+        self.connect(defresButton,SIGNAL("clicked()"),self.setdefaults)
                 
+        appLayout = QHBoxLayout()
+        appLayout.addStretch()
+        appLayout.addWidget(self.styleComboBox)
+        appearanceGroupWidget = QGroupBox(QApplication.translate("GroupBox","Appearance",None, QApplication.UnicodeUTF8))
+        appearanceGroupWidget.setLayout(appLayout)  
+
+        setresLayout = QHBoxLayout()
+        setresLayout.addStretch()
+        setresLayout.addWidget(self.resolutionSpinBox)
+        setresLayout.addWidget(resButton)
+        resLayout = QVBoxLayout()
+        resLayout.addLayout(setresLayout)
+        resolutionGroupWidget = QGroupBox(QApplication.translate("GroupBox","Resolution",None, QApplication.UnicodeUTF8))
+        resolutionGroupWidget.setLayout(resLayout)  
+        
+        defresLayout = QHBoxLayout()
+        defresLayout.addStretch()
+        defresLayout.addWidget(defresButton)
+        
         tab5Layout = QVBoxLayout()
-        tab5Layout.addWidget(self.styleComboBox)    	
-        tab5Layout.addWidget(styleButton)
-        tab5Layout.addWidget(self.resolutionSpinBox)
-        tab5Layout.addWidget(resButton)
-        tab5Layout.addWidget(defresButton)
+        tab5Layout.addWidget(appearanceGroupWidget)  
+        tab5Layout.addWidget(resolutionGroupWidget)
+        tab5Layout.addStretch()
+        tab5Layout.addLayout(defresLayout)
 
 
 
@@ -10944,9 +11215,10 @@ class HUDDlg(QDialog):
         except Exception as e:
             aw.qmc.adderror(QApplication.translate("Error Message", "changedpi(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
 
-    def setdefaultres(self):
+    def setdefaults(self):
         self.resolutionSpinBox.setValue(80)
         self.changedpi()
+        app.setStyle(aw.defaultAppearance)
 
     def setcurvecolor(self,x):
         try:
@@ -15985,9 +16257,10 @@ class serialport(object):
                                    self.DTAtemperature,     #26
                                    self.callprogram,        #27
                                    self.ARDUINOTC4_34,      #28
-                                   self.MODBUS,             #39
-                                   self.VOLTCRAFTK201,      #31
-                                   self.HH806W              #30
+                                   self.MODBUS,             #29
+                                   self.VOLTCRAFTK201,      #30
+                                   self.AmprobeTMD56,       #31
+                                   self.HH806W              #32
                                    ]
 
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
@@ -16251,6 +16524,13 @@ class serialport(object):
          tx = aw.qmc.timeclock.elapsed()/1000.
 
          return tx,t2,t1
+        
+    def AmprobeTMD56(self):
+
+         t2,t1 = self.HH806AUtemperature()
+         tx = aw.qmc.timeclock.elapsed()/1000.
+         
+         return tx,t2,t1 
 
     def HH806W(self):
 
@@ -16358,7 +16638,7 @@ class serialport(object):
          t2,t1 = self.CENTER302temperature()
          tx = aw.qmc.timeclock.elapsed()/1000.
          
-         return tx,t2,t1
+         return tx,t2,t1         
          
     def VOLTCRAFTK202(self):
 
@@ -19695,10 +19975,20 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 2
-                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 302. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 302. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)                                        
+
+                elif meter == "Amprobe TMD-56":
+                    aw.qmc.device = 31
+                    #aw.ser.comport = "COM11"
+                    aw.ser.baudrate = 19200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'E'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 2
+                    message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
                 if meter == "Omega HH806W":
-                    aw.qmc.device = 29
+                    aw.qmc.device = 32
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -20102,7 +20392,7 @@ class graphColorDlg(QDialog):
         defaultsLayout.addWidget(defaultsButton)
         defaultsLayout.addWidget(okButton)
         
-        grid.addLayout(defaultsLayout,16,1)
+        grid.addLayout(defaultsLayout,17,1)
 
         graphLayout = QVBoxLayout()
         graphLayout.addLayout(grid)
