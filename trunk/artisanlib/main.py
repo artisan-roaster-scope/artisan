@@ -667,7 +667,7 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit_min = 0        
         self.endofx = 60
         self.startofx = 0
-        self.resetmaxtime = 15*60  #time when pressing reset
+        self.resetmaxtime = 60  #time when pressing reset
         self.xgrid = 60   #initial time separation; 60 = 1 minute        
         self.ygrid = 100    #initial temperature separation
         self.zgrid = 50    #initial RoR separation
@@ -6005,6 +6005,7 @@ class ApplicationWindow(QMainWindow):
         EventsLayout.addWidget(self.buttonminiEvent)
         self.EventsGroupLayout = QGroupBox()     
         self.EventsGroupLayout.setLayout(EventsLayout)
+        self.EventsGroupLayout.setVisible(False)
  
         LCDlayout = QVBoxLayout() 
         LCDlayout.setSpacing(0)
@@ -6075,6 +6076,7 @@ class ApplicationWindow(QMainWindow):
         extrabuttonsLayout.addWidget(self.e4buttondialog)
         self.extrabuttondialogs = QFrame()
         self.extrabuttondialogs.setLayout(extrabuttonsLayout)
+        self.extrabuttondialogs.setVisible(False)
         
         midleftlayout = QVBoxLayout()
         midleftlayout.setSpacing(0)
@@ -6167,9 +6169,11 @@ class ApplicationWindow(QMainWindow):
         
         self.sliderFrame = QFrame()
         self.sliderFrame.setLayout(self.leftlayout)
+        self.sliderFrame.setVisible(False)
         
         self.lcdFrame = QFrame()
         self.lcdFrame.setLayout(LCDlayout)
+        self.lcdFrame.setVisible(False)
 
         self.midlayout = QHBoxLayout()
         self.midlayout.addWidget(self.sliderFrame)
@@ -8497,12 +8501,6 @@ class ApplicationWindow(QMainWindow):
                 #update individual visibility of each buttons        
                 self.update_extraeventbuttons_visibility()
                 self.realignbuttons()                    
-
-                #update visibility of button rows
-                if self.extraeventsbuttonsflag:
-                    aw.showExtraButtons()
-                else:
-                    aw.hideExtraButtons()
             settings.endGroup()
             
             settings.beginGroup("grid")             
@@ -8535,16 +8533,12 @@ class ApplicationWindow(QMainWindow):
 
 #--------------------------------
 
-            # set visibility of mini event line
-            self.update_minieventline_visibility()
-
             #update visibility of main event button
             if self.eventsbuttonflag:
                 self.button_11.setVisible(True)
             else:
                 self.button_11.setVisible(False)
-                
-            
+                            
             #set default button visibility
             aw.button_8.setVisible(aw.qmc.buttonvisibility[0])
             aw.button_19.setVisible(aw.qmc.buttonvisibility[1])
@@ -8555,12 +8549,6 @@ class ApplicationWindow(QMainWindow):
             aw.button_9.setVisible(aw.qmc.buttonvisibility[6])
             aw.button_20.setVisible(aw.qmc.buttonvisibility[7])
                 
-            aw.hideLCDs()
-            aw.hideSliders()
-            aw.hideDefaultButtons()
-            aw.hideExtraButtons()
-            aw.hideEventsMinieditor()
-
             #update display
             self.qmc.redraw()
             
