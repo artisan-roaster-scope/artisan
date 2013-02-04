@@ -63,7 +63,6 @@ import platform
 import serial
 import math
 import binascii
-import tempfile
 import time as libtime
 import glob
 import os
@@ -74,8 +73,6 @@ import codecs
 import numpy
 import array
 import struct
-
-from scipy.interpolate import UnivariateSpline
 
 # write logtrace to Console on OS X:
 #try:
@@ -3014,10 +3011,11 @@ class tgraphcanvas(FigureCanvas):
                 #prevents accidentally deleting a modified profile. 
                 self.safesaveflag = True
                 
-                #[EVENT] push button feedback
-                aw.button_11.setFlat(True)
-                aw.button_11.setDisabled(True)
-                QTimer.singleShot(2000, self.restorebutton_11)
+                if aw.button_11.isVisible():
+                    #[EVENT] push button feedback
+                    aw.button_11.setFlat(True)
+                    aw.button_11.setDisabled(True)
+                    QTimer.singleShot(2000, self.restorebutton_11)
 
                 self.samplingsemaphore.acquire(1)
                 
@@ -3037,92 +3035,95 @@ class tgraphcanvas(FigureCanvas):
                     #i = index number of the event (current length of the time list)           
                     i = len(self.timex)-1
                     
-                    self.specialevents.append(i)
-                    self.specialeventstype.append(0)            
-                    self.specialeventsStrings.append(str(Nevents+1))
-                    self.specialeventsvalue.append(0)
-                    #if event was initiated by an Extra Event Button then change the type,value,and string 
-                    if extraevent != None:
-                        self.specialeventstype[-1] = eventtype    
-                        self.specialeventsvalue[-1] = eventvalue
-                        self.specialeventsStrings[-1] = eventdescription
+                    # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
+                    if not(self.specialeventstyp[-1] == extraevent and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
+                    
+                        self.specialevents.append(i)
+                        self.specialeventstype.append(0)            
+                        self.specialeventsStrings.append(str(Nevents+1))
+                        self.specialeventsvalue.append(0)
+                        #if event was initiated by an Extra Event Button then change the type,value,and string 
+                        if extraevent != None:
+                            self.specialeventstype[-1] = eventtype    
+                            self.specialeventsvalue[-1] = eventvalue
+                            self.specialeventsStrings[-1] = eventdescription
+        
+                        etype = self.specialeventstype[-1]
+                        if etype == 0:
+                            self.E1timex.append(self.timex[self.specialevents[-1]])
+                            self.E1values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                        elif etype == 1:
+                            self.E2timex.append(self.timex[self.specialevents[-1]])
+                            self.E2values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                        elif etype == 2:
+                            self.E3timex.append(self.timex[self.specialevents[-1]])
+                            self.E3values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                        elif etype == 3:
+                            self.E4timex.append(self.timex[self.specialevents[-1]])
+                            self.E4values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
+                            
+                        #write label in mini recorder if flag checked
+                        if aw.minieventsflag:
+                            aw.eNumberSpinBox.setValue(Nevents+1)
+                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                            aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
+                            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+        
+                        #if Event show flag
+                        if self.eventsshowflag:
+                            index = self.specialevents[-1]                    
+                            firstletter = self.etypes[self.specialeventstype[-1]][0]
+                            secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
+        
+                            if self.eventsGraphflag == 0:                    
+                                if self.mode == "F":
+                                    height = 50
+                                else:
+                                    height = 20
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                if self.temp1[index] > self.temp2[index]:
+                                    temp = self.temp1[index]
+                                else:
+                                    temp = self.temp2[index]
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+        
+                            #if Event Type-Bars flag
+                            elif self.eventsGraphflag == 1:
+                                char1 = self.etypes[0][0]
+                                char2 = self.etypes[1][0]
+                                char3 = self.etypes[2][0]
+                                char4 = self.etypes[3][0]
+                                if self.mode == "F":
+                                    row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                                else:
+                                    row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                if self.temp1[index] >= self.temp2[index]:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
+                                else:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+        
+                            elif self.eventsGraphflag == 2:
+                                # update lines data using the lists with new data
+                                if etype == 0:
+                                    self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
+                                elif etype == 1:
+                                    self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
+                                elif etype == 2:
+                                    self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
+                                elif etype == 3:
+                                    self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
+        
+                        self.fig.canvas.draw()
+        
+                        temp = "%.1f "%self.temp2[i]
+                        timed = self.stringfromseconds(self.timex[i])
+                        message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
+                        aw.sendmessage(message)
     
-                    etype = self.specialeventstype[-1]
-                    if etype == 0:
-                        self.E1timex.append(self.timex[self.specialevents[-1]])
-                        self.E1values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
-                    elif etype == 1:
-                        self.E2timex.append(self.timex[self.specialevents[-1]])
-                        self.E2values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
-                    elif etype == 2:
-                        self.E3timex.append(self.timex[self.specialevents[-1]])
-                        self.E3values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
-                    elif etype == 3:
-                        self.E4timex.append(self.timex[self.specialevents[-1]])
-                        self.E4values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
-                        
-                    #write label in mini recorder if flag checked
-                    if aw.minieventsflag:
-                        aw.eNumberSpinBox.setValue(Nevents+1)
-                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                        aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
-                        aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-    
-                    #if Event show flag
-                    if self.eventsshowflag:
-                        index = self.specialevents[-1]                    
-                        firstletter = self.etypes[self.specialeventstype[-1]][0]
-                        secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
-    
-                        if self.eventsGraphflag == 0:                    
-                            if self.mode == "F":
-                                height = 50
-                            else:
-                                height = 20
-                            #some times ET is not drawn (ET = 0) when using device NONE
-                            if self.temp1[index] > self.temp2[index]:
-                                temp = self.temp1[index]
-                            else:
-                                temp = self.temp2[index]
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-    
-                        #if Event Type-Bars flag
-                        elif self.eventsGraphflag == 1:
-                            char1 = self.etypes[0][0]
-                            char2 = self.etypes[1][0]
-                            char3 = self.etypes[2][0]
-                            char4 = self.etypes[3][0]
-                            if self.mode == "F":
-                                row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
-                            else:
-                                row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-                            #some times ET is not drawn (ET = 0) when using device NONE
-                            if self.temp1[index] >= self.temp2[index]:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')                    
-                            else:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-    
-                        elif self.eventsGraphflag == 2:
-                            # update lines data using the lists with new data
-                            if etype == 0:
-                                self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
-                            elif etype == 1:
-                                self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
-                            elif etype == 2:
-                                self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
-                            elif etype == 3:
-                                self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
-    
-                    self.fig.canvas.draw()
-    
-                    temp = "%.1f "%self.temp2[i]
-                    timed = self.stringfromseconds(self.timex[i])
-                    message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
-                    aw.sendmessage(message)
-
                 self.samplingsemaphore.release(1)
 
             else:
@@ -3531,7 +3532,8 @@ class tgraphcanvas(FigureCanvas):
                                    
     #interpolation type        
     def univariate(self):
-        try:           
+        try:
+            from scipy.interpolate import UnivariateSpline           
             Xpoints,Ypoints = self.findpoints()  
             
             func = UnivariateSpline(Xpoints, Ypoints)
@@ -5934,7 +5936,7 @@ class ApplicationWindow(QMainWindow):
         self.buttonlist = []
         self.buttonlistmaxlen = 11
         #10 palettes of buttons
-        self.buttonpalette = [[],[],[],[],[],[],[],[],[],[]]
+        self.buttonpalette = [[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
         self.buttonpalettemaxlen = [0]*10  #keeps max len of each palette
         
         #Create LOWER BUTTONS Widget layout QDialogButtonBox to stack all lower buttons
@@ -7082,9 +7084,17 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ToggleRecorder()
             
     def fileLoad(self):
-        fileName = self.ArtisanOpenFileDialog()
-        if fileName:
-            self.loadFile(fileName)
+        try:
+            fileName = self.ArtisanOpenFileDialog()
+            if fileName:
+                self.loadFile(fileName)
+        except Exception as e:
+            import traceback
+            traceback.print_exc(file=sys.stdout)
+            exc_type, exc_obj, exc_tb = sys.exc_info()      
+            self.adderror(QApplication.translate("Error Message","Exception Error: fileLoad() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+
+        
  
     #loads stored profiles. Called from file menu
     def loadFile(self,filename):
@@ -7845,10 +7855,10 @@ class ApplicationWindow(QMainWindow):
             
         ######### Evaluations #########
         evaluations = self.defect_estimation()
-        computedProfile["dryphaseeval"] = evaluations[0]
-        computedProfile["midphaseeval"] = evaluations[1]
-        computedProfile["finishphaseeval"] = evaluations[2]
-        computedProfile["coolphaseeval"] = evaluations[3]
+        computedProfile["dryphaseeval"] = str(evaluations[0])
+        computedProfile["midphaseeval"] = str(evaluations[1])
+        computedProfile["finishphaseeval"] = str(evaluations[2])
+        computedProfile["coolphaseeval"] = str(evaluations[3])
         
         ######### RoR ######### 
         if TP_time_idx and DRY_time_idx:
@@ -8480,7 +8490,7 @@ class ApplicationWindow(QMainWindow):
                     self.buttonpalettemaxlen = [x.toInt()[0] for x in settings.value("buttonpalettemaxlen").toList()]
                     mlist = [x.toList() for x in settings.value("buttonpalette").toList()]
                     for i in range(len(mlist)):
-                        if len(mlist[i]) == 9:
+                        if len(mlist[i]) == 9 or len(mlist[i]) == 14:
                             self.buttonpalette[i].append([x.toInt()[0] for x in mlist[i][0].toList()])              #types
                             self.buttonpalette[i].append([x.toInt()[0] for x in mlist[i][1].toList()])              #values
                             self.buttonpalette[i].append([x.toInt()[0] for x in mlist[i][2].toList()])              #actions
@@ -8490,8 +8500,17 @@ class ApplicationWindow(QMainWindow):
                             self.buttonpalette[i].append(list(map(str,[x.toString() for x in mlist[i][6].toList()]))) #descriptions
                             self.buttonpalette[i].append(list(map(str,[x.toString() for x in mlist[i][7].toList()]))) #color
                             self.buttonpalette[i].append(list(map(str,[x.toString() for x in mlist[i][8].toList()]))) #textcolor
+                            if len(mlist[i]) == 14:
+                                self.buttonpalette[i].append([x.toInt()[0] for x in mlist[i][9].toList()])            #slider visibility
+                                self.buttonpalette[i].append([x.toInt()[0] for x in mlist[i][10].toList()])            #slider actions
+                                self.buttonpalette[i].append(list(map(str,[x.toString() for x in mlist[i][11].toList()]))) #sider commands 
+                                self.buttonpalette[i].append([x.toInt()[0] for x in mlist[i][12].toList()])            #slider offsets   
+                                self.buttonpalette[i].append([x.toDouble()[0] for x in mlist[i][13].toList()])         #slider factors   
+                                pass
+                            else:
+                                self.buttonpalette[i].extend([[],[],[],[]])
                         else:
-                            self.buttonpalette[i].extend([[],[],[],[],[],[],[],[],[]])
+                            self.buttonpalette[i].extend([[],[],[],[],[],[],[],[],[],[],[],[],[]])
                 for i in range(len(self.extraeventsactionstrings)):
                     self.extraeventsactionstrings[i] = str(self.extraeventsactionstrings[i])
                     self.extraeventslabels[i] = str(self.extraeventslabels[i])
@@ -9229,7 +9248,7 @@ th {
 <td>$weight</td>
 </tr>
 <tr>
-<th></th>
+<th>""" + str(QApplication.translate("HTML Report Template", "Degree:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$degree</td>
 </tr>
 <tr>
@@ -9387,10 +9406,6 @@ $cupping_notes
             self.qmc.fig.savefig(graph_image)
         else:
             #resize GRAPH image to 650 pixels width
-            #generate a tmp file name
-            tempFile = tempfile.NamedTemporaryFile(delete=True)
-            tfname = tempFile.name
-            tempFile.close() # tmp file is deleted automatically on close
             image = QPixmap.grabWidget(aw.qmc).toImage()
             image = image.scaledToWidth(650,1)
             #save GRAPH image
@@ -9409,10 +9424,7 @@ $cupping_notes
             flavor_image = flavor_image + ".svg"
             self.qmc.fig.savefig(flavor_image)
         else:
-            #resize FLAVOR image to 550 pixels width
-            tempFile = tempfile.NamedTemporaryFile(delete=True)
-            tfname = tempFile.name
-            tempFile.close() # tmp file is deleted automatically on close            
+            #resize FLAVOR image to 550 pixels width          
             image = QPixmap.grabWidget(aw.qmc).toImage()
             image = image.scaledToWidth(550,1)
             #save GRAPH image
@@ -9432,17 +9444,21 @@ $cupping_notes
             density = "%.1fg/l (set)"%cp["set_density"]
         else:
             density = "--"
-        if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
+        if  self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
             weight = self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],cp["weight_loss"])
+        else:
+            weight = "--"
+        if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0:
             volume = self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp["volume_gain"])
+        else:
+            volume = "--"
+        if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
             degree = self.roast_degree(cp["weight_loss"])
             if "set_density" in cp:
                 density = "%.1fg/l (set)<br/>%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["set_density"],cp["green_density"],cp["roasted_density"])
             else:
                 density = "%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"])
         else:
-            weight = "--"
-            volume = "--"
             degree = "--"
         
         humidity = ""
@@ -10687,6 +10703,13 @@ $cupping_notes
         copy.append(self.extraeventsdescriptions[:])
         copy.append(self.extraeventbuttoncolor[:])
         copy.append(self.extraeventbuttontextcolor[:])
+        # added slider settings
+        copy.append(self.eventslidervisibilities[:])
+        copy.append(self.eventslideractions[:])
+        copy.append(self.eventslidercommands[:])
+        copy.append(self.eventslideroffsets[:])
+        copy.append(self.eventsliderfactors[:])
+        
         self.buttonpalette[pindex] = copy[:] 
         self.buttonpalettemaxlen[pindex] = self.buttonlistmaxlen
 
@@ -10705,6 +10728,12 @@ $cupping_notes
             self.extraeventsdescriptions = copy[6][:]
             self.extraeventbuttoncolor = copy[7][:]
             self.extraeventbuttontextcolor = copy[8][:]
+            # added slider settings
+            self.eventslidervisibilities = copy[9][:]
+            self.eventslideractions = copy[10][:]
+            self.eventslidercommands = copy[11][:]
+            self.eventslideroffsets = copy[12][:]
+            self.eventsliderfactors = copy[13][:]
 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
@@ -10722,7 +10751,7 @@ $cupping_notes
             palette[key]  = self.buttonpalette[i]
         palette["maxlen"] = self.buttonpalettemaxlen
         try:
-            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption","Save Button Palette",None, QApplication.UnicodeUTF8),ext="*.bp")
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption","Save Button Palette",None, QApplication.UnicodeUTF8),ext="*.bsp")
             if filename:
                 #write
                 self.serialize(filename,palette)
@@ -10731,8 +10760,8 @@ $cupping_notes
             self.qmc.adderror(QApplication.translate("Error Message","IO Error: backuppaletteeventbuttons(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
             return
 
-    def restorepaletteeventbutons(self):
-        filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Restore Button Palette",None, QApplication.UnicodeUTF8),path=self.profilepath,ext="*.bp")
+    def restorepaletteeventbuttons(self):
+        filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Restore Button Palette",None, QApplication.UnicodeUTF8),path=self.profilepath)
         try:
             f = QFile(str(filename))
             if not f.open(QIODevice.ReadOnly):
@@ -10745,13 +10774,21 @@ $cupping_notes
                 self.buttonpalettemaxlen = list(map(int,palette["maxlen"]))
                 for i in range(10):  #10 palettes (0-9)
                     key = str(i)
-                    nextpalette = [[], [], [], [], [], [], [], [], []] 
+                    nextpalette = [[], [], [], [], [], [], [], [], [], [], [], [], [], []] 
                     if len(palette[key]):
                         for x in range(9):
                             if x < 4:
                                 nextpalette[x] = list(map(int,palette[key][x]))     #  type int
                             else:
                                 nextpalette[x] = list(map(str,palette[key][x])) #  type unicode
+                        # read in extended palette data containing slider settings:
+                        if len(palette[key])==14:
+                            nextpalette[9] = list(map(int,palette[key][9]))     #  type int
+                            nextpalette[10] = list(map(int,palette[key][10]))     #  type int
+                            nextpalette[11] = list(map(str,palette[key][11])) #  type unicode
+                            nextpalette[12] = list(map(int,palette[key][12]))     #  type int
+                            nextpalette[13] = list(map(float,palette[key][13]))     #  type double
+                            
                     self.buttonpalette[i] = nextpalette[:]  
             else:
                 message = QApplication.translate("Message Area","Invalid Button Palette format", None, QApplication.UnicodeUTF8)
@@ -10761,11 +10798,11 @@ $cupping_notes
             self.sendmessage(message)
 
         except IOError as e:
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: restorepaletteeventbutons() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
+            self.qmc.adderror(QApplication.translate("Error Message","IO Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
             return
 
         except Exception as e:
-            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: restorepaletteeventbutons() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
+            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
             return
                 
 ##########################################################################
@@ -10812,7 +10849,7 @@ class HUDDlg(QDialog):
         self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None, QApplication.UnicodeUTF8))        
         self.DeltaBT.setChecked(aw.qmc.DeltaBTflag)
             
-        filterlabel = QLabel(QApplication.translate("Label", "DeltaFilter",None, QApplication.UnicodeUTF8))
+        filterlabel = QLabel(QApplication.translate("Label", "Delta Filter",None, QApplication.UnicodeUTF8))
         #DeltaFilter holds the number of pads in filter  
         self.DeltaFilter = QSpinBox()
         self.DeltaFilter.setSingleStep(1)
@@ -13550,9 +13587,15 @@ class calculatorDlg(QDialog):
 class EventsDlg(QDialog):
     def __init__(self, parent = None):
         super(EventsDlg,self).__init__(parent)
+        
+        titlefont = QFont()
+        titlefont.setBold(True)
+        titlefont.setWeight(75)
 
         self.setWindowTitle(QApplication.translate("Form Caption","Events",None, QApplication.UnicodeUTF8))
         self.setModal(True)
+        
+        self.storeState()
 
         ## TAB 1
         self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button",None, QApplication.UnicodeUTF8))
@@ -13590,24 +13633,24 @@ class EventsDlg(QDialog):
         self.etype1 = QLineEdit(aw.qmc.etypes[1])
         self.etype2 = QLineEdit(aw.qmc.etypes[2])
         self.etype3 = QLineEdit(aw.qmc.etypes[3])
-        self.etype0.setMaximumWidth(100)
-        self.etype1.setMaximumWidth(100)
-        self.etype2.setMaximumWidth(100)
-        self.etype3.setMaximumWidth(100)
+        self.etype0.setMaximumWidth(70)
+        self.etype1.setMaximumWidth(70)
+        self.etype2.setMaximumWidth(70)
+        self.etype3.setMaximumWidth(70)
 
 
-        E1colorButton = QPushButton(QApplication.translate("Button","E1 Color",None, QApplication.UnicodeUTF8))  
-        E1colorButton.setFocusPolicy(Qt.NoFocus)
-        E2colorButton = QPushButton(QApplication.translate("Button","E2 Color",None, QApplication.UnicodeUTF8))  
-        E2colorButton.setFocusPolicy(Qt.NoFocus)
-        E3colorButton = QPushButton(QApplication.translate("Button","E3 Color",None, QApplication.UnicodeUTF8))  
-        E3colorButton.setFocusPolicy(Qt.NoFocus)
-        E4colorButton = QPushButton(QApplication.translate("Button","E4 Color",None, QApplication.UnicodeUTF8))  
-        E4colorButton.setFocusPolicy(Qt.NoFocus)
-        self.connect(E1colorButton,SIGNAL("clicked()"),lambda b=0:self.setcoloreventline(b))
-        self.connect(E2colorButton,SIGNAL("clicked()"),lambda b=1:self.setcoloreventline(b))
-        self.connect(E3colorButton,SIGNAL("clicked()"),lambda b=2:self.setcoloreventline(b))
-        self.connect(E4colorButton,SIGNAL("clicked()"),lambda b=3:self.setcoloreventline(b))
+        self.E1colorButton = QPushButton(aw.qmc.etypes[0])  
+        self.E1colorButton.setFocusPolicy(Qt.NoFocus)
+        self.E2colorButton = QPushButton(aw.qmc.etypes[1])
+        self.E2colorButton.setFocusPolicy(Qt.NoFocus)
+        self.E3colorButton = QPushButton(aw.qmc.etypes[2])  
+        self.E3colorButton.setFocusPolicy(Qt.NoFocus)
+        self.E4colorButton = QPushButton(aw.qmc.etypes[3])  
+        self.E4colorButton.setFocusPolicy(Qt.NoFocus)
+        self.connect(self.E1colorButton,SIGNAL("clicked()"),lambda b=0:self.setcoloreventline(b))
+        self.connect(self.E2colorButton,SIGNAL("clicked()"),lambda b=1:self.setcoloreventline(b))
+        self.connect(self.E3colorButton,SIGNAL("clicked()"),lambda b=2:self.setcoloreventline(b))
+        self.connect(self.E4colorButton,SIGNAL("clicked()"),lambda b=3:self.setcoloreventline(b))
 
         #marker selection for comboboxes
         self.markers = [QApplication.translate("marker","Circle",None, QApplication.UnicodeUTF8),
@@ -13649,42 +13692,52 @@ class EventsDlg(QDialog):
         self.connect(self.marker4typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda x=1,m=3:self.seteventmarker(x,m)) 
 
         valuecolorlabel = QLabel(QApplication.translate("label","Color",None, QApplication.UnicodeUTF8))
-        valuesymbollabel = QLabel(QApplication.translate("label","Symbol",None, QApplication.UnicodeUTF8))
-        valuethicknesslabel = QLabel(QApplication.translate("label","Line Thickness",None, QApplication.UnicodeUTF8))
+        valuecolorlabel.setFont(titlefont) 
+        valuesymbollabel = QLabel(QApplication.translate("label","Marker",None, QApplication.UnicodeUTF8))
+        valuesymbollabel.setFont(titlefont) 
+        valuethicknesslabel = QLabel(QApplication.translate("label","Thickness",None, QApplication.UnicodeUTF8))
+        valuethicknesslabel.setFont(titlefont) 
         valuealphalabel = QLabel(QApplication.translate("label","Opacity",None, QApplication.UnicodeUTF8))
-        valuesizelabel = QLabel(QApplication.translate("label","Marker size",None, QApplication.UnicodeUTF8))
+        valuealphalabel.setFont(titlefont) 
+        valuesizelabel = QLabel(QApplication.translate("label","Size",None, QApplication.UnicodeUTF8))
+        valuesizelabel.setFont(titlefont) 
 
-        valuecolorlabel.setMaximumSize(120,20)
-        valuesymbollabel.setMaximumSize(120,20)
-        valuethicknesslabel.setMaximumSize(120,20)
-        valuealphalabel.setMaximumSize(120,20)
-        valuesizelabel.setMaximumSize(120,20)
+        valuecolorlabel.setMaximumSize(80,20)
+        valuesymbollabel.setMaximumSize(70,20)
+        valuethicknesslabel.setMaximumSize(80,20)
+        valuealphalabel.setMaximumSize(80,20)
+        valuesizelabel.setMaximumSize(80,20)
 
         self.E1thicknessSpinBox = QSpinBox()
+        self.E1thicknessSpinBox.setSingleStep(1)
         self.E1thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1thicknessSpinBox.setRange(1,10)
         self.E1thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[0])
         self.connect(self.E1thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1, x=0:self.setElinethickness(w,x)) 
 
         self.E2thicknessSpinBox = QSpinBox()
+        self.E2thicknessSpinBox.setSingleStep(1)
         self.E2thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2thicknessSpinBox.setRange(1,10)
         self.E2thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[1])
         self.connect(self.E2thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w =1,x=1:self.setElinethickness(w,x))
         
         self.E3thicknessSpinBox = QSpinBox()
+        self.E3thicknessSpinBox.setSingleStep(1)
         self.E3thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3thicknessSpinBox.setRange(1,10)
         self.E3thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[2])
         self.connect(self.E3thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=2:self.setElinethickness(w,x)) 
 
         self.E4thicknessSpinBox = QSpinBox()
+        self.E4thicknessSpinBox.setSingleStep(1)
         self.E4thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4thicknessSpinBox.setRange(1,10)
         self.E4thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[3])
         self.connect(self.E4thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=0:self.setElinethickness(w,x)) 
 
         self.E1alphaSpinBox = QDoubleSpinBox()
+        self.E1alphaSpinBox.setSingleStep(1)
         self.E1alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1alphaSpinBox.setRange(.1,1.)
         self.E1alphaSpinBox.setSingleStep(.1)
@@ -13692,6 +13745,7 @@ class EventsDlg(QDialog):
         self.connect(self.E1alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=0:self.setElinealpha(w,x)) 
 
         self.E2alphaSpinBox = QDoubleSpinBox()
+        self.E2alphaSpinBox.setSingleStep(1)
         self.E2alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2alphaSpinBox.setRange(.1,1.)
         self.E2alphaSpinBox.setSingleStep(.1)
@@ -13699,6 +13753,7 @@ class EventsDlg(QDialog):
         self.connect(self.E1alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=1:self.setElinealpha(w,x)) 
 
         self.E3alphaSpinBox = QDoubleSpinBox()
+        self.E3alphaSpinBox.setSingleStep(1)
         self.E3alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3alphaSpinBox.setRange(.1,1.)
         self.E3alphaSpinBox.setSingleStep(.1)
@@ -13706,6 +13761,7 @@ class EventsDlg(QDialog):
         self.connect(self.E3alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=2:self.setElinealpha(w,x)) 
 
         self.E4alphaSpinBox = QDoubleSpinBox()
+        self.E4alphaSpinBox.setSingleStep(1)
         self.E4alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4alphaSpinBox.setRange(.1,1.)
         self.E4alphaSpinBox.setSingleStep(.1)
@@ -13713,25 +13769,29 @@ class EventsDlg(QDialog):
         self.connect(self.E4alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1, x=3:self.setElinealpha(w,x)) 
 
         #Marker size
-        self.E1sizeSpinBox = QSpinBox()        
+        self.E1sizeSpinBox = QSpinBox()    
+        self.E1sizeSpinBox.setSingleStep(1)    
         self.E1sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1sizeSpinBox.setRange(1,14)
         self.E1sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[0])
         self.connect(self.E1sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=0:self.setEmarkersize(w,x)) 
 
         self.E2sizeSpinBox = QSpinBox()
+        self.E2sizeSpinBox.setSingleStep(1)
         self.E2sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2sizeSpinBox.setRange(1,14)
         self.E2sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[1])
         self.connect(self.E2sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=1:self.setEmarkersize(w,x)) 
 
         self.E3sizeSpinBox = QSpinBox()
+        self.E3sizeSpinBox.setSingleStep(1)
         self.E3sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3sizeSpinBox.setRange(1,14)
         self.E3sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[2])
         self.connect(self.E3sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=2:self.setEmarkersize(w,x)) 
 
         self.E4sizeSpinBox = QSpinBox()
+        self.E4sizeSpinBox.setSingleStep(1)
         self.E4sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4sizeSpinBox.setRange(1,14)
         self.E4sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[3])
@@ -13742,8 +13802,6 @@ class EventsDlg(QDialog):
         self.autoChargeDrop.setFocusPolicy(Qt.NoFocus)
         
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        #okButton.setFocus(Qt.TabFocusReason)
-        #okButton.setFocusPolicy(Qt.StrongFocus)
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
         defaultButton.setMaximumWidth(90)
@@ -13753,7 +13811,7 @@ class EventsDlg(QDialog):
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
         autoButton.setFocusPolicy(Qt.NoFocus)
-        self.connect(closeButton,SIGNAL("clicked()"),self, SLOT("reject()"))
+        self.connect(closeButton,SIGNAL("clicked()"),self.restoreState)
         self.connect(okButton,SIGNAL("clicked()"),self.updatetypes)
         self.connect(defaultButton,SIGNAL("clicked()"),self.settypedefault)
         self.connect(autoButton,SIGNAL("clicked()"),self.autogenerate)
@@ -13776,11 +13834,10 @@ class EventsDlg(QDialog):
         delButton.setFocusPolicy(Qt.NoFocus)
         self.connect(delButton, SIGNAL("clicked()"),self.delextraeventbutton)
 
-        savetableButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
-        savetableButton.setToolTip(QApplication.translate("Tooltip","Save table",None, QApplication.UnicodeUTF8))
-        #savetableButton.setMaximumWidth(100)
-        savetableButton.setFocusPolicy(Qt.NoFocus)
-        self.connect(savetableButton, SIGNAL("clicked()"),self.savetableextraeventbutton)
+#        savetableButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
+#        savetableButton.setToolTip(QApplication.translate("Tooltip","Save table",None, QApplication.UnicodeUTF8))
+#        savetableButton.setFocusPolicy(Qt.NoFocus)
+#        self.connect(savetableButton, SIGNAL("clicked()"),self.savetableextraeventbutton)
 
         helpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None, QApplication.UnicodeUTF8))
@@ -13789,9 +13846,9 @@ class EventsDlg(QDialog):
         self.connect(helpButton, SIGNAL("clicked()"),self.showEventbuttonhelp)
 
         #hide/show extra rows of buttons
-        self.extrabuttonsshowCheck = QCheckBox(QApplication.translate("CheckBox","Show Rows",None, QApplication.UnicodeUTF8))
-        self.extrabuttonsshowCheck.setChecked(aw.extraeventsbuttonsflag)
-        self.connect(self.extrabuttonsshowCheck,SIGNAL("stateChanged(int)"),aw.toggleextraeventrows)
+#        self.extrabuttonsshowCheck = QCheckBox(QApplication.translate("CheckBox","Show Rows",None, QApplication.UnicodeUTF8))
+#        self.extrabuttonsshowCheck.setChecked(aw.extraeventsbuttonsflag)
+#        self.connect(self.extrabuttonsshowCheck,SIGNAL("stateChanged(int)"),aw.toggleextraeventrows)
 
         #number of buttons per row
         self.nbuttonslabel = QLabel(QApplication.translate("Label","Max buttons per row", None, QApplication.UnicodeUTF8))
@@ -13814,7 +13871,7 @@ class EventsDlg(QDialog):
         self.connect(self.colorSpinBox, SIGNAL("valueChanged(int)"),self.colorizebuttons)
 
 
-        ## tab3
+        ## tab4
         #aw.buttonpalette
         transferpalettebutton = QPushButton(QApplication.translate("button","Transfer to", None, QApplication.UnicodeUTF8))        
         transferpalettebutton.setFocusPolicy(Qt.NoFocus)
@@ -13828,32 +13885,23 @@ class EventsDlg(QDialog):
         self.transferpalettecombobox.setFocusPolicy(Qt.NoFocus)
         self.transferpalettecombobox.setMaximumWidth(120)
         self.transferpalettecombobox.addItems(palettelist)
-                   
-        self.setpalettecombobox = QComboBox()
-        self.setpalettecombobox.setFocusPolicy(Qt.NoFocus)
-        self.setpalettecombobox.setMaximumWidth(120)
-        self.setpalettecombobox.addItems(palettelist)
         self.connect(transferpalettebutton, SIGNAL("clicked()"),self.transferbuttonsto)
         self.connect(setpalettebutton, SIGNAL("clicked()"),self.setbuttonsfrom)
-        transferpalettebutton.setMaximumWidth(160)
-        setpalettebutton.setMaximumWidth(160)
+#        transferpalettebutton.setMaximumWidth(160)
 
 
-        backupbutton = QPushButton(QApplication.translate("button","Backup Palette", None, QApplication.UnicodeUTF8))
+        backupbutton = QPushButton(QApplication.translate("button","Backup", None, QApplication.UnicodeUTF8))
         backupbutton.setFocusPolicy(Qt.NoFocus)
-        restorebutton = QPushButton(QApplication.translate("button","Restore Palette", None, QApplication.UnicodeUTF8))
+        restorebutton = QPushButton(QApplication.translate("button","Restore", None, QApplication.UnicodeUTF8))
         restorebutton.setFocusPolicy(Qt.NoFocus)
         backupbutton.setToolTip(QApplication.translate("Tooltip","Backup all palettes to a text file",None, QApplication.UnicodeUTF8))
         restorebutton.setToolTip(QApplication.translate("Tooltip","Restore all palettes from a text",None, QApplication.UnicodeUTF8))
         backupbutton.setMaximumWidth(140)
         restorebutton.setMaximumWidth(140)
         self.connect(backupbutton, SIGNAL("clicked()"),aw.backuppaletteeventbuttons)
-        self.connect(restorebutton, SIGNAL("clicked()"),aw.restorepaletteeventbutons)
+        self.connect(restorebutton, SIGNAL("clicked()"),aw.restorepaletteeventbuttons)
         
-        #tab5     
-        titlefont = QFont()
-        titlefont.setBold(True)
-        titlefont.setWeight(75)
+        #tab3   
         eventtitlelabel = QLabel(QApplication.translate("Label","Event", None, QApplication.UnicodeUTF8))
         eventtitlelabel.setFont(titlefont)   
         actiontitlelabel = QLabel(QApplication.translate("Label","Action", None, QApplication.UnicodeUTF8))
@@ -13960,10 +14008,10 @@ class EventsDlg(QDialog):
         typeLayout.addWidget(self.etype0,0,1)
         typeLayout.addWidget(typelabel2,0,2)
         typeLayout.addWidget(self.etype1,0,3)
-        typeLayout.addWidget(typelabel3,1,0)
-        typeLayout.addWidget(self.etype2,1,1)
-        typeLayout.addWidget(typelabel4,1,2)
-        typeLayout.addWidget(self.etype3,1,3)
+        typeLayout.addWidget(typelabel3,0,4)
+        typeLayout.addWidget(self.etype2,0,5)
+        typeLayout.addWidget(typelabel4,0,6)
+        typeLayout.addWidget(self.etype3,0,7)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
@@ -14089,23 +14137,27 @@ class EventsDlg(QDialog):
         defaultButtonsLayout.addWidget(self.COOLbuttonActionType,7,1)
         defaultButtonsLayout.addWidget(self.COOLbuttonActionString,7,2)
         
+        defaultButtonsLayout.setContentsMargins(0,0,0,0)
+        defaultButtonsLayout.setHorizontalSpacing(10)
+        defaultButtonsLayout.setVerticalSpacing(7)
+        
         ButtonGroupLayout = QGroupBox(QApplication.translate("GroupBox","Default Buttons",None, QApplication.UnicodeUTF8))
         ButtonGroupLayout.setLayout(defaultButtonsLayout)
 
         tab1layout = QVBoxLayout()
-        #tab1layout.setSpacing(0)
         tab1layout.addLayout(FlagsLayout)
         tab1layout.addWidget(TypeGroupLayout)
         tab1layout.addWidget(ButtonGroupLayout)
         tab1layout.addWidget(self.autoChargeDrop)
         tab1layout.addStretch()
+        tab1layout.setContentsMargins(0,0,0,0)
 
         nbuttonslayout = QHBoxLayout()
         nbuttonslayout.addWidget(self.nbuttonslabel)
         nbuttonslayout.addWidget(self.nbuttonsSpinBox)
         nbuttonslayout.addWidget(colorpatternlabel)
         nbuttonslayout.addWidget(self.colorSpinBox)
-        nbuttonslayout.addWidget(self.extrabuttonsshowCheck)
+#        nbuttonslayout.addWidget(self.extrabuttonsshowCheck)
         
         nbuttonslayout.addStretch()
 
@@ -14115,7 +14167,7 @@ class EventsDlg(QDialog):
         tab2buttonlayout.addWidget(autoButton)
 
         tab2buttonlayout.addStretch()
-        tab2buttonlayout.addWidget(savetableButton)
+#        tab2buttonlayout.addWidget(savetableButton)
         tab2buttonlayout.addWidget(helpButton) 
 
         ### tab2 layout
@@ -14124,16 +14176,32 @@ class EventsDlg(QDialog):
         tab2layout.addLayout(nbuttonslayout)       
         tab2layout.addLayout(tab2buttonlayout)  
 
-        ### tab3 layout
-        tab3layout = QGridLayout()
-        tab3layout.addWidget(transferpalettebutton,0,0)
-        tab3layout.addWidget(self.transferpalettecombobox,0,1)
-        tab3layout.addWidget(setpalettebutton,1,0)
-        tab3layout.addWidget(self.setpalettecombobox,1,1)
-        tab3layout.addWidget(backupbutton,2,0)
-        tab3layout.addWidget(restorebutton,2,1)
-
         ### tab4 layout
+        
+        paletteGrid = QGridLayout()        
+        paletteGrid.addWidget(transferpalettebutton,0,0)
+        paletteGrid.addWidget(self.transferpalettecombobox,1,1)
+        paletteGrid.addWidget(setpalettebutton,2,0)
+
+        paletteBox = QHBoxLayout()
+        paletteBox.addStretch()
+        paletteBox.addLayout(paletteGrid)
+        paletteBox.addStretch()
+        
+        paletteGroupLayout = QGroupBox(QApplication.translate("GroupBox","Management",None, QApplication.UnicodeUTF8))   
+        paletteGroupLayout.setLayout(paletteBox)
+        
+        paletteButtons = QHBoxLayout()
+        paletteButtons.addStretch()
+        paletteButtons.addWidget(backupbutton)
+        paletteButtons.addWidget(restorebutton)
+        
+        tab3layout = QVBoxLayout()
+        tab3layout.addWidget(paletteGroupLayout)
+        tab3layout.addLayout(paletteButtons)
+        tab3layout.addStretch()
+
+        ### tab5 layout
         valueLayout = QGridLayout()
         valueLayout.addWidget(valuecolorlabel,0,0)
         valueLayout.addWidget(valuesymbollabel,0,1)
@@ -14141,32 +14209,32 @@ class EventsDlg(QDialog):
         valueLayout.addWidget(valuealphalabel,0,3)
         valueLayout.addWidget(valuesizelabel,0,4)
         
-        valueLayout.addWidget(E1colorButton,1,0)
+        valueLayout.addWidget(self.E1colorButton,1,0)
         valueLayout.addWidget(self.marker1typeComboBox,1,1)
         valueLayout.addWidget(self.E1thicknessSpinBox,1,2)
         valueLayout.addWidget(self.E1alphaSpinBox,1,3)
         valueLayout.addWidget(self.E1sizeSpinBox,1,4)
 
-        valueLayout.addWidget(E2colorButton,2,0)
+        valueLayout.addWidget(self.E2colorButton,2,0)
         valueLayout.addWidget(self.marker2typeComboBox,2,1)
         valueLayout.addWidget(self.E2thicknessSpinBox,2,2)
         valueLayout.addWidget(self.E2alphaSpinBox,2,3)
         valueLayout.addWidget(self.E2sizeSpinBox,2,4)
 
-        valueLayout.addWidget(E3colorButton,3,0)
+        valueLayout.addWidget(self.E3colorButton,3,0)
         valueLayout.addWidget(self.marker3typeComboBox,3,1)
         valueLayout.addWidget(self.E3thicknessSpinBox,3,2)
         valueLayout.addWidget(self.E3alphaSpinBox,3,3)
         valueLayout.addWidget(self.E3sizeSpinBox,3,4)
 
-        valueLayout.addWidget(E4colorButton,4,0)
+        valueLayout.addWidget(self.E4colorButton,4,0)
         valueLayout.addWidget(self.marker4typeComboBox,4,1)
         valueLayout.addWidget(self.E4thicknessSpinBox,4,2)
         valueLayout.addWidget(self.E4alphaSpinBox,4,3)
         valueLayout.addWidget(self.E4sizeSpinBox,4,4)
         
                 
-        ### tab5 layout
+        ### tab3 layout
         tab5Layout = QGridLayout()
         tab5Layout.addWidget(eventtitlelabel,0,0)
         tab5Layout.addWidget(actiontitlelabel,0,1)
@@ -14205,32 +14273,37 @@ class EventsDlg(QDialog):
 
 ###########################################
         #tab layout
-        TabWidget = QTabWidget()
+        self.TabWidget = QTabWidget()
         
-        self.connect(TabWidget,SIGNAL("currentChanged(int)"),lambda i=i:self.tabSwitched(i))
+        self.connect(self.TabWidget,SIGNAL("currentChanged(int)"),lambda i=i:self.tabSwitched(i))
         
         C1Widget = QWidget()
         C1Widget.setLayout(tab1layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None, QApplication.UnicodeUTF8))
+        self.TabWidget.addTab(C1Widget,QApplication.translate("Tab","Config",None, QApplication.UnicodeUTF8))
 
         C2Widget = QWidget()
         C2Widget.setLayout(tab2layout)
-        TabWidget.addTab(C2Widget,QApplication.translate("Tab","Buttons",None, QApplication.UnicodeUTF8))  
+        self.TabWidget.addTab(C2Widget,QApplication.translate("Tab","Buttons",None, QApplication.UnicodeUTF8))  
         
         C5Widget = QWidget()
         C5Widget.setLayout(C5VBox)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Sliders",None, QApplication.UnicodeUTF8))         
+        self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Sliders",None, QApplication.UnicodeUTF8))         
 
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
-        TabWidget.addTab(C3Widget,QApplication.translate("Tab","Palette",None, QApplication.UnicodeUTF8))        
+        self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Palettes",None, QApplication.UnicodeUTF8))        
 
+        valueVLayout = QVBoxLayout()
+        valueVLayout.addLayout(valueLayout)
+        valueVLayout.addStretch()
         C4Widget = QWidget()
-        C4Widget.setLayout(valueLayout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Style",None, QApplication.UnicodeUTF8)) 
+        C4Widget.setLayout(valueVLayout)
+        self.TabWidget.addTab(C4Widget,QApplication.translate("Tab","Style",None, QApplication.UnicodeUTF8)) 
 
         mainLayout = QVBoxLayout()
-        mainLayout.addWidget(TabWidget)
+        mainLayout.addWidget(self.TabWidget)
+        mainLayout.setSpacing(5)
+        mainLayout.setContentsMargins(5,15,5,5)
         mainLayout.addLayout(buttonLayout)  
         
         self.setLayout(mainLayout)
@@ -14248,11 +14321,76 @@ class EventsDlg(QDialog):
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
         
     def tabSwitched(self,i):
-        if i == 4:
-            self.E1visibility.setText(self.etype0.text())
-            self.E2visibility.setText(self.etype1.text())
-            self.E3visibility.setText(self.etype2.text())
-            self.E4visibility.setText(self.etype3.text())
+        if i == 1: # switched to Button tab
+            self.createEventbuttonTable()
+        elif i == 2: # switched to Slider tab
+            self.updateSliderTab()
+        elif i==3: # switched to Palette tab
+            # store slider settings from Slider tab to global variables
+            self.saveSliderSettings()
+            # store buttons
+            self.savetableextraeventbutton()
+        elif i == 4: # switched to Style tab
+            self.updateStyleTab()
+            
+    def updateStyleTab(self):
+        # update color button texts
+        self.E1colorButton.setText(self.etype0.text())
+        self.E2colorButton.setText(self.etype1.text())
+        self.E3colorButton.setText(self.etype2.text())  
+        self.E4colorButton.setText(self.etype3.text())  
+        # update markers
+        self.marker1typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[0]))
+        self.marker2typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[1]))
+        self.marker3typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[2]))
+        self.marker4typeComboBox.setCurrentIndex(self.markervals.index(aw.qmc.EvalueMarker[3]))
+        # line thickness
+        self.E1thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[0])
+        self.E2thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[1])
+        self.E3thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[2])
+        self.E4thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[3])
+        # opacity
+        self.E1alphaSpinBox.setValue(aw.qmc.Evaluealpha[0])
+        self.E2alphaSpinBox.setValue(aw.qmc.Evaluealpha[1])
+        self.E3alphaSpinBox.setValue(aw.qmc.Evaluealpha[2])
+        self.E4alphaSpinBox.setValue(aw.qmc.Evaluealpha[3])
+        # marker sizes
+        self.E1sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[0])
+        self.E2sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[1])
+        self.E3sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[2])
+        self.E4sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[3])
+            
+    def updateSliderTab(self):
+        # set event names
+        self.E1visibility.setText(self.etype0.text())
+        self.E2visibility.setText(self.etype1.text())
+        self.E3visibility.setText(self.etype2.text())
+        self.E4visibility.setText(self.etype3.text())
+        # set slider visibility
+        self.E1visibility.setChecked(aw.eventslidervisibilities[0])
+        self.E2visibility.setChecked(aw.eventslidervisibilities[1])
+        self.E3visibility.setChecked(aw.eventslidervisibilities[2])
+        self.E4visibility.setChecked(aw.eventslidervisibilities[3])
+        # set slider action
+        self.E1action.setCurrentIndex(aw.eventslideractions[0])
+        self.E2action.setCurrentIndex(aw.eventslideractions[1])  
+        self.E3action.setCurrentIndex(aw.eventslideractions[2])  
+        self.E4action.setCurrentIndex(aw.eventslideractions[3])  
+        # set slider command
+        self.E1command.setText(aw.eventslidercommands[0])
+        self.E2command.setText(aw.eventslidercommands[1])
+        self.E3command.setText(aw.eventslidercommands[2])
+        self.E4command.setText(aw.eventslidercommands[3])
+        # set slider offset
+        self.E1offset.setValue(aw.eventslideroffsets[0])
+        self.E2offset.setValue(aw.eventslideroffsets[1])
+        self.E3offset.setValue(aw.eventslideroffsets[2])
+        self.E4offset.setValue(aw.eventslideroffsets[3])
+        # set slider factors
+        self.E1factor.setValue(aw.eventsliderfactors[0])
+        self.E2factor.setValue(aw.eventsliderfactors[1])
+        self.E3factor.setValue(aw.eventsliderfactors[2])
+        self.E4factor.setValue(aw.eventsliderfactors[3])
 
     def keyPressEvent(self,event):    
         key = int(event.key())
@@ -14262,6 +14400,10 @@ class EventsDlg(QDialog):
             self.close()
 
     def setElinethickness(self,x,val):
+        self.E1thicknessSpinBox.setDisabled(True)
+        self.E2thicknessSpinBox.setDisabled(True)
+        self.E3thicknessSpinBox.setDisabled(True)
+        self.E4thicknessSpinBox.setDisabled(True)
         if val == 0:
             aw.qmc.Evaluelinethickness[0] = self.E1thicknessSpinBox.value()
         if val == 1:
@@ -14270,10 +14412,18 @@ class EventsDlg(QDialog):
             aw.qmc.Evaluelinethickness[2] = self.E3thicknessSpinBox.value()
         if val == 3:
             aw.qmc.Evaluelinethickness[3] = self.E4thicknessSpinBox.value()
+        self.E1thicknessSpinBox.setDisabled(False)
+        self.E2thicknessSpinBox.setDisabled(False)
+        self.E3thicknessSpinBox.setDisabled(False)
+        self.E4thicknessSpinBox.setDisabled(False)
 
         aw.qmc.redraw()
 
     def setEmarkersize(self,x,val):
+        self.E1sizeSpinBox.setDisabled(True)
+        self.E2sizeSpinBox.setDisabled(True)
+        self.E3sizeSpinBox.setDisabled(True)
+        self.E4sizeSpinBox.setDisabled(True)
         if val == 0:
             aw.qmc.EvalueMarkerSize[0] = self.E1sizeSpinBox.value()
         if val == 1:
@@ -14282,10 +14432,18 @@ class EventsDlg(QDialog):
             aw.qmc.EvalueMarkerSize[2] = self.E3sizeSpinBox.value()
         if val == 3:
             aw.qmc.EvalueMarkerSize[3] = self.E4sizeSpinBox.value()
+        self.E1sizeSpinBox.setDisabled(False)
+        self.E2sizeSpinBox.setDisabled(False)
+        self.E3sizeSpinBox.setDisabled(False)
+        self.E4sizeSpinBox.setDisabled(False)
 
         aw.qmc.redraw()
         
     def setElinealpha(self,x,val):
+        self.E1alphaSpinBox.setDisabled(True)
+        self.E2alphaSpinBox.setDisabled(True)
+        self.E3alphaSpinBox.setDisabled(True)
+        self.E4alphaSpinBox.setDisabled(True)
         if val == 0:
             aw.qmc.Evaluealpha[0] = self.E1alphaSpinBox.value()
         if val == 1:
@@ -14294,6 +14452,10 @@ class EventsDlg(QDialog):
             aw.qmc.Evaluealpha[2] = self.E3alphaSpinBox.value()
         if val == 3:
             aw.qmc.Evaluealpha[3] = self.E4alphaSpinBox.value()
+        self.E1alphaSpinBox.setDisabled(False)
+        self.E2alphaSpinBox.setDisabled(False)
+        self.E3alphaSpinBox.setDisabled(False)
+        self.E4alphaSpinBox.setDisabled(False)
 
         aw.qmc.redraw()
         
@@ -14302,7 +14464,7 @@ class EventsDlg(QDialog):
         aw.transferbuttonsto(pindex)
         
     def setbuttonsfrom(self):
-        pindex = self.setpalettecombobox.currentIndex()
+        pindex = self.transferpalettecombobox.currentIndex()
         answer = aw.setbuttonsfrom(pindex)
         if answer:
             self.createEventbuttonTable()        
@@ -14328,7 +14490,7 @@ class EventsDlg(QDialog):
         step = pattern
         if extra:
             nrows += 1
-        gap = -1*(230-50)/ncolumns
+        gap = int(-1*(230-50)/ncolumns)
         for i in range(nrows):
             for f in range(230,50,gap):
                 color = QColor()    
@@ -14460,7 +14622,7 @@ class EventsDlg(QDialog):
                 descriptionedit = QLineEdit(str(aw.extraeventsdescriptions[i]))
                 #type
                 typeComboBox =  QComboBox()
-                typeComboBox.addItems(aw.qmc.etypes)
+                typeComboBox.addItems([self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()])
                 typeComboBox.setCurrentIndex(aw.extraeventstypes[i])
                 self.connect(typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.settypeeventbutton(z,i))
                 #value    	
@@ -14551,7 +14713,6 @@ class EventsDlg(QDialog):
 
             aw.update_extraeventbuttons_visibility()
 
-            aw.sendmessage(QApplication.translate("Message Area","Custom Event buttons configuration saved", None, QApplication.UnicodeUTF8))        
 
     def setvisibilitytyeventbutton(self,z,i):
         actioncombobox = self.eventbuttontable.cellWidget(i,6)
@@ -14615,7 +14776,7 @@ class EventsDlg(QDialog):
         aw.update_extraeventbuttons_visibility()
 
     def insertextraeventbutton(self):
-        #save preious changes
+        #save previous changes
         self.savetableextraeventbutton()
         
         if len(aw.e4buttondialog.buttons()) >= aw.buttonlistmaxlen:
@@ -14688,6 +14849,102 @@ class EventsDlg(QDialog):
         aw.qmc.eventsGraphflag = self.bartypeComboBox.currentIndex()
         aw.qmc.redraw(recomputeAllDeltas=False)            
 
+    def saveSliderSettings(self):
+        aw.eventslidervisibilities[0] = int(self.E1visibility.isChecked())
+        aw.eventslidervisibilities[1] = int(self.E2visibility.isChecked())
+        aw.eventslidervisibilities[2] = int(self.E3visibility.isChecked())
+        aw.eventslidervisibilities[3] = int(self.E4visibility.isChecked())
+        aw.eventslideractions[0] = int(self.E1action.currentIndex())
+        aw.eventslideractions[1] = int(self.E2action.currentIndex())
+        aw.eventslideractions[2] = int(self.E3action.currentIndex())
+        aw.eventslideractions[3] = int(self.E4action.currentIndex())
+        aw.eventslidercommands[0] = str(self.E1command.text())
+        aw.eventslidercommands[1] = str(self.E2command.text())
+        aw.eventslidercommands[2] = str(self.E3command.text())
+        aw.eventslidercommands[3] = str(self.E4command.text())
+        aw.eventslideroffsets[0] = int(self.E1offset.value())
+        aw.eventslideroffsets[1] = int(self.E2offset.value())
+        aw.eventslideroffsets[2] = int(self.E3offset.value())
+        aw.eventslideroffsets[3] = int(self.E4offset.value())
+        aw.eventsliderfactors[0] = float(self.E1factor.value())
+        aw.eventsliderfactors[1] = float(self.E2factor.value())
+        aw.eventsliderfactors[2] = float(self.E3factor.value())
+        aw.eventsliderfactors[3] = float(self.E4factor.value())
+    
+    #the inverse to restoreState
+    def storeState(self):
+        # event configurations
+        self.eventsbuttonflagstored = aw.eventsbuttonflag
+        self.eventsshowflagstored = aw.qmc.eventsshowflag
+        self.minieventsflagstored = aw.minieventsflag
+        self.eventsGraphflagstored = aw.qmc.eventsGraphflag
+        self.etypesstored = aw.qmc.etypes
+        self.etypeComboBoxstored = aw.etypeComboBox
+        self.autoChargeDropFlagstored = aw.qmc.autoChargeDropFlag
+        # buttons
+        self.extraeventslabels = aw.extraeventslabels
+        self.extraeventsdescriptions = aw.extraeventsdescriptions
+        self.extraeventstypes = aw.extraeventstypes
+        self.extraeventsvalues = aw.extraeventsvalues
+        self.extraeventsactions = aw.extraeventsactions
+        self.extraeventsactionstrings = aw.extraeventsactionstrings
+        self.extraeventsvisibility = aw.extraeventsvisibility
+        self.extraeventbuttoncolor = aw.extraeventbuttoncolor
+        self.extraeventbuttontextcolor = aw.extraeventbuttontextcolor
+        self.buttonlistmaxlen = aw.buttonlistmaxlen
+        # sliders
+        self.eventslidervisibilities = aw.eventslidervisibilities
+        self.eventslideractions = aw.eventslideractions
+        self.eventslidercommands = aw.eventslidercommands
+        self.eventslideroffsets = aw.eventslideroffsets
+        self.eventsliderfactors = aw.eventsliderfactors
+        # palettes
+        self.buttonpalette = aw.buttonpalette
+        # styles
+        self.EvalueColor = aw.qmc.EvalueColor
+        self.EvalueMarker = aw.qmc.EvalueMarker
+        self.Evaluelinethickness = aw.qmc.Evaluelinethickness
+        self.Evaluealpha = aw.qmc.Evaluealpha
+        self.EvalueMarkerSize = aw.qmc.EvalueMarkerSize
+        
+    #called from Cancel button    
+    def restoreState(self):
+        # event configurations
+        aw.eventsbuttonflag = self.eventsbuttonflagstored
+        aw.qmc.eventsshowflag = self.eventsshowflagstored
+        aw.minieventsflag = self.minieventsflagstored
+        aw.qmc.eventsGraphflag = self.eventsGraphflagstored
+        aw.qmc.etypes = self.etypesstored
+        aw.etypeComboBox = self.etypeComboBoxstored
+        aw.qmc.autoChargeDropFlag = self.autoChargeDropFlagstored
+        # buttons
+        aw.extraeventslabels = self.extraeventslabels
+        aw.extraeventsdescriptions = self.extraeventsdescriptions
+        aw.extraeventstypes = self.extraeventstypes
+        aw.extraeventsvalues = self.extraeventsvalues
+        aw.extraeventsactions = self.extraeventsactions
+        aw.extraeventsactionstrings = self.extraeventsactionstrings
+        aw.extraeventsvisibility = self.extraeventsvisibility
+        aw.extraeventbuttoncolor = self.extraeventbuttoncolor
+        aw.extraeventbuttontextcolor = self.extraeventbuttontextcolor
+        aw.buttonlistmaxlen = self.buttonlistmaxlen
+        # sliders
+        aw.eventslidervisibilities = self.eventslidervisibilities
+        aw.eventslideractions = self.eventslideractions
+        aw.eventslidercommands = self.eventslidercommands
+        aw.eventslideroffsets = self.eventslideroffsets
+        aw.eventsliderfactors = self.eventsliderfactors
+        # palettes
+        aw.buttonpalette = self.buttonpalette
+        # styles
+        aw.qmc.EvalueColor = self.EvalueColor
+        aw.qmc.EvalueMarker = self.EvalueMarker
+        aw.qmc.Evaluelinethickness = self.Evaluelinethickness
+        aw.qmc.Evaluealpha = self.Evaluealpha
+        aw.qmc.EvalueMarkerSize = self.EvalueMarkerSize
+        
+        self.accept()
+        
     #called from OK button      
     def updatetypes(self):
         try:
@@ -14710,28 +14967,8 @@ class EventsDlg(QDialog):
             aw.qmc.buttonvisibility[7] = self.COOLbutton.isChecked()
             aw.button_20.setVisible(aw.qmc.buttonvisibility[7])
             
-            #save sliders
-            aw.eventslidervisibilities[0] = self.E1visibility.isChecked()
-            aw.eventslidervisibilities[1] = self.E2visibility.isChecked()
-            aw.eventslidervisibilities[2] = self.E3visibility.isChecked()
-            aw.eventslidervisibilities[3] = self.E4visibility.isChecked()
-            aw.eventslideractions[0] = self.E1action.currentIndex()
-            aw.eventslideractions[1] = self.E2action.currentIndex()
-            aw.eventslideractions[2] = self.E3action.currentIndex()
-            aw.eventslideractions[3] = self.E4action.currentIndex()            
-            aw.eventslidercommands[0] = self.E1command.text()
-            aw.eventslidercommands[1] = self.E2command.text()
-            aw.eventslidercommands[2] = self.E3command.text()
-            aw.eventslidercommands[3] = self.E4command.text()
-            aw.eventslideroffsets[0] = self.E1offset.value()
-            aw.eventslideroffsets[1] = self.E2offset.value()
-            aw.eventslideroffsets[2] = self.E3offset.value()
-            aw.eventslideroffsets[3] = self.E4offset.value()
-            aw.eventsliderfactors[0] = self.E1factor.value()
-            aw.eventsliderfactors[1] = self.E2factor.value()
-            aw.eventsliderfactors[2] = self.E3factor.value()
-            aw.eventsliderfactors[3] = self.E4factor.value()    
-            aw.updateSlidersProperties()      
+            #save sliders   
+            self.saveSliderSettings()
             
             aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
@@ -14778,7 +15015,10 @@ class EventsDlg(QDialog):
             else:
                 aw.sendmessage(QApplication.translate("Message Area","Found empty event type box", None, QApplication.UnicodeUTF8))                    
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "event accept(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            aw.qmc.adderror(QApplication.translate("Error Message", "updatetypes(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
