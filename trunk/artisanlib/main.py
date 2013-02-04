@@ -10729,11 +10729,16 @@ $cupping_notes
             self.extraeventbuttoncolor = copy[7][:]
             self.extraeventbuttontextcolor = copy[8][:]
             # added slider settings
-            self.eventslidervisibilities = copy[9][:]
-            self.eventslideractions = copy[10][:]
-            self.eventslidercommands = copy[11][:]
-            self.eventslideroffsets = copy[12][:]
-            self.eventsliderfactors = copy[13][:]
+            if len(copy[9]) == 4:
+                self.eventslidervisibilities = copy[9][:]
+            if len(copy[10]) == 4:
+                self.eventslideractions = copy[10][:]
+            if len(copy[11]) == 4:
+                self.eventslidercommands = copy[11][:]
+            if len(copy[12]) == 4:
+                self.eventslideroffsets = copy[12][:]
+            if len(copy[13]) == 4:
+                self.eventsliderfactors = copy[13][:]
 
             self.buttonlistmaxlen = self.buttonpalettemaxlen[pindex]
             self.realignbuttons()
@@ -10788,6 +10793,13 @@ $cupping_notes
                             nextpalette[11] = list(map(str,palette[key][11])) #  type unicode
                             nextpalette[12] = list(map(int,palette[key][12]))     #  type int
                             nextpalette[13] = list(map(float,palette[key][13]))     #  type double
+                        else:
+                            nextpalette[9] = self.buttonpalette[9]
+                            nextpalette[10] = self.buttonpalette[10]
+                            nextpalette[11] = self.buttonpalette[11]
+                            nextpalette[12] = self.buttonpalette[12]
+                            nextpalette[13] = self.buttonpalette[13]
+                            
                             
                     self.buttonpalette[i] = nextpalette[:]  
             else:
@@ -10798,11 +10810,13 @@ $cupping_notes
             self.sendmessage(message)
 
         except IOError as e:
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.qmc.adderror(QApplication.translate("Error Message","IO Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
-            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
                 
 ##########################################################################
@@ -14969,6 +14983,7 @@ class EventsDlg(QDialog):
             
             #save sliders   
             self.saveSliderSettings()
+            aw.updateSlidersProperties() # set visibility and event names on slider widgets
             
             aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
@@ -15004,9 +15019,6 @@ class EventsDlg(QDialog):
             
                 self.savetableextraeventbutton()
                 aw.realignbuttons()
-                
-                #update slider Widgets visibility
-                aw.updateSliders()
     
                 aw.qmc.redraw(recomputeAllDeltas=False)
     
