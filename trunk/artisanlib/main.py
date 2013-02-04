@@ -963,6 +963,7 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.timeindex[0] != -1:
                 if self.timeindexB[0] != -1:
+                    ptime = self.time[self.timeindex[0]]
                     btime = self.timeB[self.timeindexB[0]]
                     difference = ptime - btime
                     if difference > 0:
@@ -3036,7 +3037,7 @@ class tgraphcanvas(FigureCanvas):
                     i = len(self.timex)-1
                     
                     # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
-                    if not(self.specialeventstyp[-1] == extraevent and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
+                    if not(self.specialeventstype[-1] == extraevent and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
                     
                         self.specialevents.append(i)
                         self.specialeventstype.append(0)            
