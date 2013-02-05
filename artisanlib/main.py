@@ -336,7 +336,7 @@ class tgraphcanvas(FigureCanvas):
         self.errorlog = []
 
         # default delay between readings in miliseconds
-        self.delay = 3000
+        self.delay = 5000
 
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases_fahrenheit_defaults = [200,300,390,450]
@@ -415,7 +415,8 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=["","","","","",""]
         self.plotcurvecolor = ["black","black","black","black","black","black"]
  
-        self.fig = Figure() 
+        self.fig = Figure(tight_layout=True)
+        # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
             
         #figure back color
         if platf == 'Darwin':
@@ -444,7 +445,9 @@ class tgraphcanvas(FigureCanvas):
         self.setParent(parent)
         # we define the widget as 
         FigureCanvas.setSizePolicy(self,QSizePolicy.Expanding,QSizePolicy.Expanding)
-
+        # notify the system of updated policy
+        FigureCanvas.updateGeometry(self)
+        
         # the rate of chage of temperature
         self.rateofchange1 = 0.0
         self.rateofchange2 = 0.0
@@ -937,7 +940,8 @@ class tgraphcanvas(FigureCanvas):
         aw.soundpop()        
         #OFF
         if self.HUDflag:
-            self.viewProjection()
+            if aw.qmc.projectFlag:
+                self.viewProjection()
             self.HUDflag = False
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.stack.setCurrentIndex(0)
@@ -1003,7 +1007,8 @@ class tgraphcanvas(FigureCanvas):
                 QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
                 aw.sendmessage(QApplication.translate("Message Area","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(self.alarmstrings[alarmnumber]))
             except Exception as e:
-                self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
                 return
         elif self.alarmaction[alarmnumber] == 2:
             # alarm event button
@@ -1014,8 +1019,9 @@ class tgraphcanvas(FigureCanvas):
                 elif button_number == 0:
                     # special case: trigger build-in COOL event
                     aw.qmc.markCoolEnd()
-            except Exception as e:  
-                self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            except Exception as e: 
+                exc_type, exc_obj, exc_tb = sys.exc_info() 
+                self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
                 return
 
     def playbackevent(self):
@@ -1194,7 +1200,8 @@ class tgraphcanvas(FigureCanvas):
             return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
             
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()    
+            self.adderror(QApplication.translate("Error Message", "Exception: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return 0
 
     #format X axis labels    
@@ -1896,10 +1903,13 @@ class tgraphcanvas(FigureCanvas):
                         xtmpl2idx = xtmpl2idx + 1
                         labels.append(self.extraname2[i])
                     
-            if not self.designerflag and aw.qmc.BTcurve:  
-                self.place_annotations(aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2,0)
-                if self.timeindex[6] and not self.flagon:
-                    self.writestatistics()  
+            if not self.designerflag and aw.qmc.BTcurve:
+                if self.flagon: # no smoothed lines in this case, pass normal BT
+                    self.place_annotations(aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2,0)
+                else:
+                    self.place_annotations(aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2,0)
+                    if self.timeindex[6]:
+                        self.writestatistics()  
 
             if self.eventsshowflag:
                 Nevents = len(self.specialevents)                    
@@ -2394,7 +2404,8 @@ class tgraphcanvas(FigureCanvas):
         aw.button_7.setEnabled(False)
         aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"]) 
         aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])            
-        aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)                           
+        aw.button_1.setText(QApplication.translate("Scope Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
+        aw.button_2.setEnabled(True) # ensure that the START button is enabled                           
         aw.showLCDs()
         aw.showSliders()
         aw.disableEditMenus()
@@ -2445,6 +2456,7 @@ class tgraphcanvas(FigureCanvas):
         aw.sendmessage(QApplication.translate("Message Area","Scope recording...", None, QApplication.UnicodeUTF8))
         aw.button_2.setEnabled(False)
         aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"]) 
+        aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
         #disable RESET button:
         aw.button_7.setEnabled(False)
         aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"]) 
@@ -2525,7 +2537,7 @@ class tgraphcanvas(FigureCanvas):
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
                 st1 = QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8)
                 t2 = self.temp2[self.timeindex[0]]
-                tx = self.temp2[self.timeindex[0]]
+                tx = self.timex[self.timeindex[0]]
                 
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                 self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
@@ -2552,7 +2564,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markCharge() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markCharge() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -2615,7 +2628,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markDryEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markDryEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -2680,7 +2694,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -2738,7 +2753,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()    
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -2798,7 +2814,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)            
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -2854,7 +2871,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)            
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -2924,7 +2942,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markDrop() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markDrop() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -2986,21 +3005,26 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markCoolEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()    
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markCoolEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
         finally:            
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)  
 
     def EventRecord(self,extraevent=None):
-        if extraevent:
-            self.EventRecordAction(
-                extraevent=extraevent,
-                eventtype=aw.extraeventstypes[extraevent],
-                eventvalue=aw.extraeventsvalues[extraevent],
-                eventdescription=aw.extraeventsdescriptions[extraevent])
-        else:
-            self.EventRecordAction(extraevent=extraevent)
+        try:
+            if extraevent!=None:
+                self.EventRecordAction(
+                    extraevent=extraevent,
+                    eventtype=aw.extraeventstypes[extraevent],
+                    eventvalue=aw.extraeventsvalues[extraevent],
+                    eventdescription=aw.extraeventsdescriptions[extraevent])
+            else:
+                self.EventRecordAction(extraevent=extraevent)           
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()    
+            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: EventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
@@ -3012,12 +3036,6 @@ class tgraphcanvas(FigureCanvas):
                 #prevents accidentally deleting a modified profile. 
                 self.safesaveflag = True
                 
-                if aw.button_11.isVisible():
-                    #[EVENT] push button feedback
-                    aw.button_11.setFlat(True)
-                    aw.button_11.setDisabled(True)
-                    QTimer.singleShot(2000, self.restorebutton_11)
-
                 self.samplingsemaphore.acquire(1)
                 
                 Nevents = len(self.specialevents)
@@ -3026,18 +3044,18 @@ class tgraphcanvas(FigureCanvas):
                 if self.device == 18:
                     tx = self.timeclock.elapsed()/1000.
                     et,bt = aw.ser.NONE()
-                    if bt != 1 and et != -1:              
+                    if bt != -1 and et != -1:              
                         self.drawmanual(et,bt,tx)                        
                     else:
                         self.samplingsemaphore.release(1)
                         return
                 
-                if extraevent:
+                if extraevent!=None:
                     #i = index number of the event (current length of the time list)           
                     i = len(self.timex)-1
                     
                     # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
-                    if not(self.specialeventstype[-1] == extraevent and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
+                    if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
                     
                         self.specialevents.append(i)
                         self.specialeventstype.append(0)            
@@ -3131,7 +3149,8 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: EventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()     
+            self.adderror(QApplication.translate("Error Message", "Exception Error: EventRecordAction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -3223,7 +3242,8 @@ class tgraphcanvas(FigureCanvas):
                     self.samplingsemaphore.release(1)
                     
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: DeviceEventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception Error: DeviceEventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         finally:            
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)            
@@ -3373,11 +3393,13 @@ class tgraphcanvas(FigureCanvas):
                     self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontsize=11)
                 if self.timeindex[7]: # only if COOL exists
                     self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontsize=11)
-            if self.statisticsflags[3]:
-                BTmin = min(self.temp1[self.timeindex[0]:self.timeindex[6]+1])
-                BTmax = max(self.temp1[self.timeindex[0]:self.timeindex[6]+1])
-                ETmin = min(self.temp2[self.timeindex[0]:self.timeindex[6]+1])
-                ETmax = max(self.temp2[self.timeindex[0]:self.timeindex[6]+1])
+            if self.statisticsflags[3] and self.timeindex[0]>-1 and self.temp1 and self.temp2 and self.temp1[self.timeindex[0]:self.timeindex[6]+1] and self.temp2[self.timeindex[0]:self.timeindex[6]+1]:
+                temp1_values = self.temp1[self.timeindex[0]:self.timeindex[6]+1]
+                temp2_values = self.temp2[self.timeindex[0]:self.timeindex[6]+1]
+                BTmin = min(temp1_values)
+                BTmax = max(temp1_values)
+                ETmin = min(temp2_values)
+                ETmax = max(temp2_values)
                         
                 dTime = self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]
                 timez = self.stringfromseconds(dTime)
@@ -3524,11 +3546,13 @@ class tgraphcanvas(FigureCanvas):
             QMessageBox.information(self,QApplication.translate("MessageBox Caption","Profile information",None, QApplication.UnicodeUTF8),string)
 
         except ValueError as e:
-            self.adderror(QApplication.translate("Error Message","Value Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            self.adderror(QApplication.translate("Error Message","Value Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message","Exception Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            self.adderror(QApplication.translate("Error Message","Exception Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return  
                                    
     #interpolation type        
@@ -3567,11 +3591,13 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
 
         except ValueError as e:
-            self.adderror(QApplication.translate("Error Message","value error in drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            self.adderror(QApplication.translate("Error Message","value error in drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message","Exception: drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            self.adderror(QApplication.translate("Error Message","Exception: drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return        
 
 
@@ -4008,8 +4034,9 @@ class tgraphcanvas(FigureCanvas):
                         aw.messagelabel.setText(string1+string2+string3)
 
         except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception: designer on_motion() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             self.unrarefy_designer()
-            self.adderror(QApplication.translate("Error Message", "Exception: designer on_motion() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
             return                            
 
     #this is used in on_motion() to try to prevent points crossing over points 
@@ -4090,7 +4117,8 @@ class tgraphcanvas(FigureCanvas):
                 return i
             
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception: designer addpoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception: designer addpoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return 
 
     #removes point
@@ -4125,7 +4153,8 @@ class tgraphcanvas(FigureCanvas):
             self.redrawdesigner()
                     
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception: designer removepoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()     
+            self.adderror(QApplication.translate("Error Message", "Exception: designer removepoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return                 
 
     #finds a proper index location for a time that does not exists yet.
@@ -4208,11 +4237,13 @@ class tgraphcanvas(FigureCanvas):
             aw.sendmessage(QApplication.translate("Message Area", "New profile created",None, QApplication.UnicodeUTF8))
             
         except ValueError:
-            self.adderror(QApplication.translate("Error Message", "Value Error: createFromDesigner() ",None, QApplication.UnicodeUTF8))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Value Error: createFromDesigner() ",None, QApplication.UnicodeUTF8),exc_tb.tb_lineno)
             return
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception: createFromDesigner() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception: createFromDesigner() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
     #activates mouse events	
@@ -4578,11 +4609,13 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()            
 
         except ValueError as e:
-            self.adderror(QApplication.translate("Error Message", "Value Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Value Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
-            self.adderror(QApplication.translate("Error Message", "Exception Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.adderror(QApplication.translate("Error Message", "Exception Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
     def makewheelcolorpattern(self): 
@@ -4763,9 +4796,11 @@ class SampleThread(QThread):
             # if we are not yet recording, but sampling we keep on reseting the timer
             if not aw.qmc.flagstart:
                 aw.qmc.timeclock.start()
+                                
                 
             #if using a meter (thermocouple device)
             if aw.qmc.device != 18: # not NONE device
+            
 
                 ##############  if using Extra devices               
                 nxdevices = len(aw.qmc.extradevices)
@@ -4776,44 +4811,36 @@ class SampleThread(QThread):
                         xtra_dev_lines2 = 0
                         for i in range(nxdevices):   
                             extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                            # if sampling went wrong we take the last value:
-                            if extrat1 == -1:
-                                if len(aw.qmc.extratemp1[i]) > 1:
-                                    extrat1 = 2 * aw.qmc.extratemp1[i][-1] - aw.qmc.extratemp1[i][-2]
-                                elif len(aw.qmc.extratemp1[i]) > 0:
-                                    extrat1 = aw.qmc.extratemp1[i][-1]
-                            if extrat2 == -1:
-                                if len(aw.qmc.extratemp2[i]) > 1:
-                                    extrat2 = 2 * aw.qmc.extratemp2[i][-1] - aw.qmc.extratemp2[i][-2]
-                                elif len(aw.qmc.extratemp2[i]) > 0:
-                                    extrat2 = aw.qmc.extratemp2[i][-1]
-                            if len(aw.qmc.extramathexpression1[i]):
-                                extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                            if len(aw.qmc.extramathexpression2[i]):
-                                extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                            if aw.qmc.flagstart:
-                                aw.qmc.extratemp1[i].append(float(extrat1))
-                                aw.qmc.extratemp2[i].append(float(extrat2))
-                                aw.qmc.extratimex[i].append(extratx)
-                                # update extra lines
-                                if aw.extraCurveVisibility1[i]:
-                                    aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
-                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                if aw.extraCurveVisibility2[i]:
-                                    aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
-                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
-                            else:
-                                # we do not record, so we just replace the old last value
-                                if len(aw.qmc.extratemp1[i]) > 0:
-                                    aw.qmc.extratemp1[i][-1] = float(extrat1)
-                                else:
+                            
+                            # ignore reading if either is off, otherwise process them
+                            if extrat2 != -1 or extrat2 != -1:
+                                if len(aw.qmc.extramathexpression1[i]):
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                                if len(aw.qmc.extramathexpression2[i]):
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                                if aw.qmc.flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
-                                if len(aw.qmc.extratemp2[i]) > 0:
-                                    aw.qmc.extratemp2[i][-1] = float(extrat2)
-                                else:
                                     aw.qmc.extratemp2[i].append(float(extrat2))
-                                if len(aw.qmc.extratimex[i]) <= 0:
                                     aw.qmc.extratimex[i].append(extratx)
+                                    # update extra lines
+                                    if aw.extraCurveVisibility1[i]:
+                                        aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                                        xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                    if aw.extraCurveVisibility2[i]:
+                                        aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                                        xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                else:
+                                    # we do not record, so we just replace the old last value
+                                    if len(aw.qmc.extratemp1[i]) > 0:
+                                        aw.qmc.extratemp1[i][-1] = float(extrat1)
+                                    else:
+                                        aw.qmc.extratemp1[i].append(float(extrat1))
+                                    if len(aw.qmc.extratemp2[i]) > 0:
+                                        aw.qmc.extratemp2[i][-1] = float(extrat2)
+                                    else:
+                                        aw.qmc.extratemp2[i].append(float(extrat2))
+                                    if len(aw.qmc.extratimex[i]) <= 0:
+                                        aw.qmc.extratimex[i].append(extratx)
 
                     #ERROR FOUND
                     else:
@@ -4838,158 +4865,138 @@ class SampleThread(QThread):
 
 
                 #read time, ET (t1) and BT (t2) TEMPERATURE
-                tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device                               
+                try:
+                    tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device                               
+                except:
+                    tx = aw.qmc.timeclock.elapsed()/1000
+                    t1 = t2 = -1
                                     
                 length_of_qmc_timex = len(aw.qmc.timex)
+
                 
-                if len(aw.qmc.ETfunction):
-                    t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
-                if len(aw.qmc.BTfunction):
-                    t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
-
-                #filter droputs 
-                if aw.qmc.mode == "C":
-                    limit = 500.
-                else:
-                    limit = 800.
-                if  t1 < 1. or t1 > limit:
-                    if len(aw.qmc.temp1) > 1:
-                        t1 = 2*aw.qmc.temp1[-1] - aw.qmc.temp1[-2]
-                    elif len(aw.qmc.temp1) > 0:
-                        t1 = aw.qmc.temp1[-1]
-                    else:
-                        t1 = -1.
-                if t2 < 1. or t2 > limit:
-                    if len(aw.qmc.temp1) > 1:
-                        t2 = 2*aw.qmc.temp2[-1] - aw.qmc.temp2[-2]
-                    elif len(aw.qmc.temp2) > 0:
-                        t2 = aw.qmc.temp2[-1]
-                    else:
-                        t2 = -1.       
-                                                                                              
-                t1_final = t1
-                t2_final = t2        
-                 
-                #HACK to deal with the issue that sometimes BT and ET values are magically exchanged
-                #check if the readings of t1 and t2 got swapped by some unknown magic, by comparing them to the previous ones
-                #if len(aw.qmc.timex) > 2 and t1 == aw.qmc.temp2[-1] and t2 == aw.qmc.temp1[-1]:
-                #    #let's better swap the readings (also they are just repeating the previous ones)  
-                #    t1_final = t2
-                #    t1_final = t1
-                # ML 3.11.2012: deactivated as this should not occur anymore
-                    
-                if aw.qmc.flagstart:
-                    aw.qmc.temp2.append(t2_final)
-                    aw.qmc.temp1.append(t1_final)
-                else:
-                    if len(aw.qmc.temp2) > 0:
-                        aw.qmc.temp2[-1] = t2_final
-                    else:                            
-                        aw.qmc.temp2.append(t2_final)
-                    if len(aw.qmc.temp1) > 0:
-                        aw.qmc.temp1[-1] = t1_final
-                    else:                            
-                        aw.qmc.temp1.append(t1_final)
+                # ignore reading if either is off, otherwise process them
+                if t1 != -1 and t2 != -1:
+                
+                    if len(aw.qmc.ETfunction):
+                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
+                    if len(aw.qmc.BTfunction):
+                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)     
+                                                                                                  
+                    t1_final = t1
+                    t2_final = t2
                         
-
-                if aw.qmc.flagstart:
-                    aw.qmc.timex.append(tx)
-                    length_of_qmc_timex += 1
-                else:
-                    if length_of_qmc_timex <= 0:
+                    if aw.qmc.flagstart:
+                        aw.qmc.temp2.append(t2_final)
+                        aw.qmc.temp1.append(t1_final)
+                    else:
+                        if len(aw.qmc.temp2) > 0:
+                            aw.qmc.temp2[-1] = t2_final
+                        else:                            
+                            aw.qmc.temp2.append(t2_final)
+                        if len(aw.qmc.temp1) > 0:
+                            aw.qmc.temp1[-1] = t1_final
+                        else:                            
+                            aw.qmc.temp1.append(t1_final)
+                            
+    
+                    if aw.qmc.flagstart:
                         aw.qmc.timex.append(tx)
                         length_of_qmc_timex += 1
-
-                # update lines data using the lists with new data
-                if aw.qmc.flagstart:
-                    aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
-                    aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
-                
-                #we need a minimum of two readings to calculate rate of change
-                if aw.qmc.flagstart and length_of_qmc_timex > 2:
-                    timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
-                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
-                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
-                    
-                    aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
-                    aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
-                        
-                    #######   filter deltaBT deltaET
-                    if aw.qmc.deltafilter:
-                        if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
-                            if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
-                                a1,a2 = 0.,0.
-                                for k in range(aw.qmc.deltafilter):
-                                    a1 += aw.qmc.unfiltereddelta1[-(k+1)]
-                                    a2 += aw.qmc.unfiltereddelta2[-(k+1)]
-                                aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
-                                aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
-                            
-                    rateofchange1plot = aw.qmc.rateofchange1   
-                    rateofchange2plot = aw.qmc.rateofchange2
-
-                else:
-                    if aw.qmc.flagstart:
-                        aw.qmc.unfiltereddelta1.append(0.)
-                        aw.qmc.unfiltereddelta2.append(0.)                    
                     else:
-                        if len(aw.qmc.unfiltereddelta1) > 0:
-                            aw.qmc.unfiltereddelta1[-1] = 0.
-                        else:
-                            aw.qmc.unfiltereddelta1.append(0.)
-                        if len(aw.qmc.unfiltereddelta2) > 0:
-                            aw.qmc.unfiltereddelta2[-1] = 0.
-                        else:
-                            aw.qmc.unfiltereddelta2.append(0.)                        
-                    aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
-
-                # append new data to the rateofchange
-                if aw.qmc.flagstart:
-                    aw.qmc.delta1.append(rateofchange1plot)
-                    aw.qmc.delta2.append(rateofchange2plot)
-                else:
-                    if len(aw.qmc.delta1) > 0:
-                        aw.qmc.delta1[-1] = rateofchange1plot
-                    else:
-                        aw.qmc.delta1.append(rateofchange1plot)
-                    if len(aw.qmc.delta2) > 0:
-                        aw.qmc.delta2[-1] = rateofchange2plot
-                    else:
-                        aw.qmc.delta2.append(rateofchange2plot)
-                                           
-                if aw.qmc.flagstart:
-                    if aw.qmc.DeltaETflag:
-                        aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
-                    if aw.qmc.DeltaBTflag:
-                        aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
-               
-                    #readjust xlimit of plot if needed
-                    if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
-                        aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
-                        aw.qmc.xaxistosm()
-                    
-                    if aw.qmc.projectFlag:
-                        aw.qmc.viewProjection()                   
-                    if aw.qmc.background and aw.qmc.backgroundReproduce:
-                        aw.qmc.playbackevent()
-                        
-                    # autodetect CHARGE event
-                    # only if BT > 203F/95C                
-                    if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
-                        ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
-                        if aw.BTbreak(length_of_qmc_timex - 1):
-                            # we found a BT break at the current index minus 2
-                            aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
-                    # autodetect DROP event
-                    # only if 9min into roast and BT>180C/356F                  
-                    elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
-                        length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and \
-                        ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]])  > 540):
-                        if aw.BTbreak(length_of_qmc_timex - 1):
-                            # we found a BT break at the current index minus 2
-                            aw.qmc.autoDropIdx = length_of_qmc_timex - 3
+                        if length_of_qmc_timex <= 0:
+                            aw.qmc.timex.append(tx)
+                            length_of_qmc_timex += 1
     
+                    # update lines data using the lists with new data
+                    if aw.qmc.flagstart:
+                        aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
+                        aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+                    
+                    #we need a minimum of two readings to calculate rate of change
+                    if aw.qmc.flagstart and length_of_qmc_timex > 2:
+                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
+                        #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                        aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
+                        aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
+                        
+                        aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
+                        aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
+                            
+                        #######   filter deltaBT deltaET
+                        if aw.qmc.deltafilter:
+                            if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
+                                if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
+                                    a1,a2 = 0.,0.
+                                    for k in range(aw.qmc.deltafilter):
+                                        a1 += aw.qmc.unfiltereddelta1[-(k+1)]
+                                        a2 += aw.qmc.unfiltereddelta2[-(k+1)]
+                                    aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
+                                    aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
+                                
+                        rateofchange1plot = aw.qmc.rateofchange1   
+                        rateofchange2plot = aw.qmc.rateofchange2
+    
+                    else:
+                        if aw.qmc.flagstart:
+                            aw.qmc.unfiltereddelta1.append(0.)
+                            aw.qmc.unfiltereddelta2.append(0.)                    
+                        else:
+                            if len(aw.qmc.unfiltereddelta1) > 0:
+                                aw.qmc.unfiltereddelta1[-1] = 0.
+                            else:
+                                aw.qmc.unfiltereddelta1.append(0.)
+                            if len(aw.qmc.unfiltereddelta2) > 0:
+                                aw.qmc.unfiltereddelta2[-1] = 0.
+                            else:
+                                aw.qmc.unfiltereddelta2.append(0.)                        
+                        aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+    
+                    # append new data to the rateofchange
+                    if aw.qmc.flagstart:
+                        aw.qmc.delta1.append(rateofchange1plot)
+                        aw.qmc.delta2.append(rateofchange2plot)
+                    else:
+                        if len(aw.qmc.delta1) > 0:
+                            aw.qmc.delta1[-1] = rateofchange1plot
+                        else:
+                            aw.qmc.delta1.append(rateofchange1plot)
+                        if len(aw.qmc.delta2) > 0:
+                            aw.qmc.delta2[-1] = rateofchange2plot
+                        else:
+                            aw.qmc.delta2.append(rateofchange2plot)
+                                               
+                    if aw.qmc.flagstart:
+                        if aw.qmc.DeltaETflag:
+                            aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
+                        if aw.qmc.DeltaBTflag:
+                            aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
+                   
+                        #readjust xlimit of plot if needed
+                        if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                            aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
+                            aw.qmc.xaxistosm()
+                        
+                        if aw.qmc.projectFlag:
+                            aw.qmc.viewProjection()                   
+                        if aw.qmc.background and aw.qmc.backgroundReproduce:
+                            aw.qmc.playbackevent()
+                            
+                        # autodetect CHARGE event
+                        # only if BT > 203F/95C                
+                        if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
+                            ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
+                            if aw.BTbreak(length_of_qmc_timex - 1):
+                                # we found a BT break at the current index minus 2
+                                aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
+                        # autodetect DROP event
+                        # only if 9min into roast and BT>180C/356F                  
+                        elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and \
+                            ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]])  > 540):
+                            if aw.BTbreak(length_of_qmc_timex - 1):
+                                # we found a BT break at the current index minus 2
+                                aw.qmc.autoDropIdx = length_of_qmc_timex - 3
+        
     
                     #check alarms 
                     for i in range(len(aw.qmc.alarmflag)):
@@ -5046,27 +5053,34 @@ class SampleThread(QThread):
                     aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
 
             ##### release semaphore  #########    
-            aw.qmc.samplingsemaphore.release(1)
+# done in the finally-clause:
+#            aw.qmc.samplingsemaphore.release(1)
 
+# done in the finally-clause:
             #update screen in main GUI thread
-            self.emit(SIGNAL("updategraphics"))
+#            self.emit(SIGNAL("updategraphics"))
 
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
 
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-                
-            aw.qmc.flagon = False
-            aw.qmc.flagstart = False      
+# done in the finally-clause:
+#            if aw.qmc.samplingsemaphore.available() < 1:
+#                aw.qmc.samplingsemaphore.release(1)
+ 
+# no, we do not stop sampling on critical exceptions               
+#            aw.qmc.flagon = False
+#            aw.qmc.flagstart = False      
             exc_type, exc_obj, exc_tb = sys.exc_info()      
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)    
+                aw.qmc.samplingsemaphore.release(1)               
+            #update screen in main GUI thread
+            self.emit(SIGNAL("updategraphics"))
+ 
                 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
@@ -5172,12 +5186,13 @@ class ApplicationWindow(QMainWindow):
         self.HUDfunction = 0
 
         self.sound = soundcrack(QWidget)
-        
         self.stack = QStackedWidget()
         self.stack.addWidget(self.qmc)
         self.stack.addWidget(self.HUD)
         self.stack.addWidget(self.sound)
         self.stack.setCurrentIndex(0)
+        self.stack.setContentsMargins(0,0,0,0)
+        self.qmc.setContentsMargins(0,0,0,0)
         #events config
         self.eventsbuttonflag = 1
         self.minieventsflag = 0   #minieditor flag
@@ -6321,7 +6336,8 @@ class ApplicationWindow(QMainWindow):
                 try:
                     QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))            
                 except Exception as e:
-                    self.qmc.adderror(QApplication.translate("Error Message","Exception Error: eventaction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+                    exc_type, exc_obj, exc_tb = sys.exc_info()    
+                    self.qmc.adderror(QApplication.translate("Error Message","Exception Error: eventaction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             elif action == 3:
                 for i in range(len(cmd_str)):
                     buttonnumber = int(cmd_str[i])-1
@@ -7090,8 +7106,8 @@ class ApplicationWindow(QMainWindow):
             if fileName:
                 self.loadFile(fileName)
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             exc_type, exc_obj, exc_tb = sys.exc_info()      
             self.adderror(QApplication.translate("Error Message","Exception Error: fileLoad() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
@@ -7136,19 +7152,22 @@ class ApplicationWindow(QMainWindow):
         except IOError as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except ValueError as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.qmc.adderror(QApplication.translate("Error Message", "Value Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.qmc.adderror(QApplication.translate("Error Message", "Value Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-            self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadFile() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadFile() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
         
         finally:
@@ -7213,15 +7232,18 @@ class ApplicationWindow(QMainWindow):
             self.sendmessage(message)
 
         except IOError as e:
-            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()   
+            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except ValueError as e:
-            self.qmc.adderror(QApplication.translate("Error Message", "Value Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()   
+            self.qmc.adderror(QApplication.translate("Error Message", "Value Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
-            self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()   
+            self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
         
         finally:
@@ -8162,7 +8184,7 @@ class ApplicationWindow(QMainWindow):
             #restore delay
             self.qmc.delay = settings.value("Delay",int(self.qmc.delay)).toInt()[0]
             if not self.qmc.delay:
-                self.qmc.delay = 3000
+                self.qmc.delay = 5000
             #restore colors
             for (k, v) in list(settings.value("Colors").toMap().items()):
                 self.qmc.palette[str(k)] = str(v.toString())
@@ -8578,7 +8600,8 @@ class ApplicationWindow(QMainWindow):
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),str(e))
+            exc_type, exc_obj, exc_tb = sys.exc_info()    
+            QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),str(e),exc_tb.tb_lineno)
             return       
             
     def fetchCurveStyles(self):
@@ -10572,15 +10595,18 @@ $cupping_notes
             self.sendmessage(message)
 
         except IOError as e:
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.qmc.adderror(QApplication.translate("Error Message","IO Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except ValueError as e:
-            self.qmc.adderror(QApplication.translate("Error Message","Value Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.qmc.adderror(QApplication.translate("Error Message","Value Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
-            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
         
         finally:
@@ -10678,9 +10704,10 @@ $cupping_notes
     def settooltip(self):
         for i in range(len(self.buttonlist)):
             tip = str(QApplication.translate("tooltip","<b>Label</b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventslabels[i]) + "<br>"             
-            tip += str(QApplication.translate("tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventsdescriptions[i]) + "<br>" 
-            tip += str(QApplication.translate("tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8)) + str(self.qmc.etypes[self.extraeventstypes[i]]) + "<br>" 
-            tip += str(QApplication.translate("tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventsvalues[i]-1) + "<br>" 
+            tip += str(QApplication.translate("tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventsdescriptions[i]) + "<br>"
+            if self.extraeventstypes[i] < 4:
+                tip += str(QApplication.translate("tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8)) + str(self.qmc.etypes[self.extraeventstypes[i]]) + "<br>" 
+                tip += str(QApplication.translate("tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventsvalues[i]-1) + "<br>" 
             tip += str(QApplication.translate("tooltip","<b>Documentation </b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventsactionstrings[i]) + "<br>"
             tip += str(QApplication.translate("tooltip","<b>Button# </b>= ", None, QApplication.UnicodeUTF8)) + str(i+1)
             self.buttonlist[i].setToolTip(tip) 
@@ -11253,7 +11280,8 @@ class HUDDlg(QDialog):
             value = self.resolutionSpinBox.value()
             aw.setdpi(value)
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "changedpi(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()   
+            aw.qmc.adderror(QApplication.translate("Error Message", "changedpi(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def setdefaults(self):
         self.resolutionSpinBox.setValue(80)
@@ -11269,7 +11297,8 @@ class HUDDlg(QDialog):
 
             self.plotequ()
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "setcurvecolor(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()   
+            aw.qmc.adderror(QApplication.translate("Error Message", "setcurvecolor(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def setvdevice(self):
         # compute values
@@ -11319,7 +11348,8 @@ class HUDDlg(QDialog):
             aw.qmc.background = True
             aw.qmc.redraw(recomputeAllDeltas=False)        
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "setbackgroundequ1(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()    
+            aw.qmc.adderror(QApplication.translate("Error Message", "setbackgroundequ1(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def plotequ(self):
         try:
@@ -11338,7 +11368,8 @@ class HUDDlg(QDialog):
                 aw.qmc.ax.plot(x_range, y_range, color=aw.qmc.plotcurvecolor[e], linestyle = '-', linewidth=1)
             aw.qmc.fig.canvas.draw()
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "plotequ(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()    
+            aw.qmc.adderror(QApplication.translate("Error Message", "plotequ(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def eval_curve_expression(self,mathexpression,x):
         if len(mathexpression):
@@ -11391,7 +11422,8 @@ class HUDDlg(QDialog):
                 return eval(mathexpression,{"__builtins__":None},mathdictionary)
             
             except Exception as e:
-                aw.qmc.adderror(QApplication.translate("Error Message", "Plotter: %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                aw.qmc.adderror(QApplication.translate("Error Message", "Plotter: %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
                 return 0
         
     def setappearance(self):
@@ -11399,7 +11431,8 @@ class HUDDlg(QDialog):
             aw.style = str(self.styleComboBox.currentText())
             app.setStyle(aw.style)
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "setappearance(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            aw.qmc.adderror(QApplication.translate("Error Message", "setappearance(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         
     def showsound(self):
         try:
@@ -11416,7 +11449,8 @@ class HUDDlg(QDialog):
             aw.sendmessage("")
             warnings.simplefilter('default', Warning)
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "showsound(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()  
+            aw.qmc.adderror(QApplication.translate("Error Message", "showsound(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         
              
     def saveinterp(self):
@@ -11488,7 +11522,8 @@ class HUDDlg(QDialog):
             aw.qmc.redraw(recomputeAllDeltas=True)
             self.DeltaFilter.setDisabled(False)
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "changeDeltaFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))   
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "changeDeltaFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def changeFilter(self,i):
         try:
@@ -11497,7 +11532,8 @@ class HUDDlg(QDialog):
             aw.qmc.redraw(recomputeAllDeltas=True,smooth=True,resmooth=True)
             self.Filter.setDisabled(False)
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "changeFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))   
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "changeFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)   
         
     def changeProjection(self,i):
         aw.qmc.projectFlag = not aw.qmc.projectFlag
@@ -12249,8 +12285,8 @@ class editGraphDlg(QDialog):
                                                   QApplication.translate("Table", "Rel Time",None, QApplication.UnicodeUTF8),
                                                   QApplication.translate("Table", "ET",None, QApplication.UnicodeUTF8),
                                                   QApplication.translate("Table", "BT",None, QApplication.UnicodeUTF8),
-                                                  QApplication.translate("Table", "DeltaBT (d/m)",None, QApplication.UnicodeUTF8),
-                                                  QApplication.translate("Table", "DeltaET (d/m)",None, QApplication.UnicodeUTF8)])
+                                                  QApplication.translate("Table", "DeltaET (d/m)",None, QApplication.UnicodeUTF8),
+                                                  QApplication.translate("Table", "DeltaBT (d/m)",None, QApplication.UnicodeUTF8)])
         self.datatable.setAlternatingRowColors(True)
         self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
@@ -12312,8 +12348,8 @@ class editGraphDlg(QDialog):
             self.datatable.setItem(i,1,Rtime)
             self.datatable.setItem(i,2,ET)
             self.datatable.setItem(i,3,BT)
-            self.datatable.setItem(i,4,deltaBT)
-            self.datatable.setItem(i,5,deltaET)
+            self.datatable.setItem(i,4,deltaET)
+            self.datatable.setItem(i,5,deltaBT)
         self.datatable.resizeColumnsToContents()
             
     def createEventTable(self):
@@ -14338,15 +14374,18 @@ class EventsDlg(QDialog):
     def tabSwitched(self,i):
         if i == 1: # switched to Button tab
             self.createEventbuttonTable()
+            self.saveSliderSettings()
         elif i == 2: # switched to Slider tab
             self.updateSliderTab()
         elif i==3: # switched to Palette tab
             # store slider settings from Slider tab to global variables
+            # store sliders
             self.saveSliderSettings()
             # store buttons
             self.savetableextraeventbutton()
         elif i == 4: # switched to Style tab
             self.updateStyleTab()
+            self.saveSliderSettings()
             
     def updateStyleTab(self):
         # update color button texts
@@ -14637,7 +14676,7 @@ class EventsDlg(QDialog):
                 descriptionedit = QLineEdit(str(aw.extraeventsdescriptions[i]))
                 #type
                 typeComboBox =  QComboBox()
-                typeComboBox.addItems([self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text()])
+                typeComboBox.addItems([self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),"--"])
                 typeComboBox.setCurrentIndex(aw.extraeventstypes[i])
                 self.connect(typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.settypeeventbutton(z,i))
                 #value    	
@@ -14748,7 +14787,10 @@ class EventsDlg(QDialog):
     def settypeeventbutton(self,z,i):
         typecombobox = self.eventbuttontable.cellWidget(i,2)
         aw.extraeventstypes[i] = typecombobox.currentIndex()
-        aw.buttonlist[i].setText(str(aw.qmc.etypes[aw.extraeventstypes[i]][0])+str(aw.qmc.eventsvalues[aw.extraeventsvalues[i]]))        
+        etype_char = ""
+        if aw.extraeventstypes[i] < 4:
+            etype_char = str(aw.qmc.etypes[aw.extraeventstypes[i]][0])
+        aw.buttonlist[i].setText(etype_char+str(aw.qmc.eventsvalues[aw.extraeventsvalues[i]]))        
         aw.settooltip()
 
     def delextraeventbutton(self):
@@ -16315,7 +16357,8 @@ class modbusport(object):
                     self.master.serial.open()  
                 
             except Exception as e:
-                self.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e))) 
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                self.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
            
     def writeSingleRegister(self,slave,register,value):
         try:
@@ -16391,9 +16434,9 @@ class scaleport(object):
             try:
                 self.SP = serial.Serial()
                 self.openport()
- 
             except Exception as e:
-                self.adderror(QApplication.translate("Error Message","Scale Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e))) 
+                exc_type, exc_obj, exc_tb = sys.exc_info()  
+                self.adderror(QApplication.translate("Error Message","Scale Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
            
     # returns weight as float in g or -1 if something went wrong
     def readWeight(self):
@@ -16744,9 +16787,10 @@ class serialport(object):
                 return tx,0.,float(output)
             
         except Exception as e:
-             tx = aw.qmc.timeclock.elapsed()/1000.
-             aw.qmc.adderror(QApplication.translate("Error Message", "callprogram(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
-             return tx,0.,0.
+            tx = aw.qmc.timeclock.elapsed()/1000.
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            aw.qmc.adderror(QApplication.translate("Error Message", "callprogram(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            return tx,0.,0.
 
     def virtual(self):
         tx = aw.qmc.timeclock.elapsed()/1000.        
@@ -17469,11 +17513,26 @@ class serialport(object):
                 r = self.SP.read(45)
 
                 if len(r) == 45:
-                    T1 = hex2int(r[7],r[8])/10.
-                    T2 = hex2int(r[9],r[10])/10.
+                    T1 = T2 = T3 = T3 = -1
+                    try:
+                        T1 = hex2int(r[7],r[8])/10.
+                    except:
+                        pass
+                    try:
+                        T2 = hex2int(r[9],r[10])/10.
+                    except:
+                        pass
+                    try:
+                        T3 = hex2int(r[11],r[12])/10.
+                    except:
+                        pass
+                    try:
+                        T4 = hex2int(r[13],r[14])/10.
+                    except:
+                        pass
                     #save these variables if using T3 and T4
-                    aw.qmc.extra309T3 = hex2int(r[11],r[12])/10.
-                    aw.qmc.extra309T4 = hex2int(r[13],r[14])/10.
+                    aw.qmc.extra309T3 = T3
+                    aw.qmc.extra309T4 = T4
                     aw.qmc.extra309TX = aw.qmc.timeclock.elapsed()/1000.
                     return T1,T2
                 
@@ -17574,8 +17633,9 @@ class serialport(object):
                 return t1, t2
             
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "Exception: ser.ARDUINOTC4temperature(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
-             return -1.,-1.
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: ser.ARDUINOTC4temperature(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            return -1.,-1.
 
         except serial.SerialException as e:
             error = QApplication.translate("Error Message","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)
@@ -19057,7 +19117,8 @@ class comportDlg(QDialog):
                     self.serialtable.setCellWidget(i,5,stopbitsComboBox)              
                     self.serialtable.setCellWidget(i,6,timeoutEdit)              
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "createserialTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "createserialTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
 
     def saveserialtable(self):
@@ -19098,7 +19159,8 @@ class comportDlg(QDialog):
                 aw.extraser[i].timeout = aw.extratimeout[i]
 
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "saveserialtable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            aw.qmc.adderror(QApplication.translate("Error Message", "saveserialtable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
            
     def accept(self):
@@ -19214,7 +19276,8 @@ class comportDlg(QDialog):
                         comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)                
 
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "scanforport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "scanforport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def closeserialports(self):
         if aw.ser.SP.isOpen():
@@ -19446,13 +19509,18 @@ class DeviceAssignmentDLG(QDialog):
         programGroupBox.setLayout(programlayout)
         
         #ET BT symbolic adjustments/assignments Box
+        adjustmentHelp = QHBoxLayout()
+        adjustmentHelp.addStretch()
+        adjustmentHelp.addWidget(symbolicHelpButton)
+        
         adjustmentGroupBox = QGroupBox(QApplication.translate("GroupBox","Symbolic Assignments",None, QApplication.UnicodeUTF8))
         adjustmentsLayout = QVBoxLayout()
         adjustmentsLayout.addWidget(labelETadvanced)
         adjustmentsLayout.addWidget(self.ETfunctionedit)
         adjustmentsLayout.addWidget(labelBTadvanced)
         adjustmentsLayout.addWidget(self.BTfunctionedit)
-        adjustmentsLayout.addWidget(symbolicHelpButton)
+        adjustmentsLayout.addStretch()
+        adjustmentsLayout.addLayout(adjustmentHelp)
         adjustmentGroupBox.setLayout(adjustmentsLayout)
 
         #LAYOUT TAB 1
@@ -19482,7 +19550,8 @@ class DeviceAssignmentDLG(QDialog):
         
         tab1Layout = QVBoxLayout()
         tab1Layout.addLayout(gridBoxLayout)
-        #tab1Layout.addWidget(adjustmentGroupBox)
+        tab1Layout.setSpacing(5)
+        tab1Layout.setContentsMargins(5,10,0,0)
         
         tab1Layout.addStretch()  
 
@@ -19496,6 +19565,8 @@ class DeviceAssignmentDLG(QDialog):
         #LAYOUT TAB 2
         tab2Layout = QVBoxLayout()
         tab2Layout.addWidget(self.devicetable)
+        tab2Layout.setSpacing(5)
+        tab2Layout.setContentsMargins(0,10,0,5)
         tab2Layout.addLayout(bLayout)
 
         #LAYOUT TAB 3
@@ -19629,7 +19700,8 @@ class DeviceAssignmentDLG(QDialog):
                 self.devicetable.resizeColumnsToContents()        
 
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "createDeviceTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "createDeviceTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
 
     def showhelpprogram(self):
@@ -19671,7 +19743,8 @@ class DeviceAssignmentDLG(QDialog):
             self.enableDisableAddDeleteButtons()
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "adddevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "adddevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         
     def deldevice(self):
         try:
@@ -19684,7 +19757,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.updateExtraLCDvisibility()
             self.enableDisableAddDeleteButtons()
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "deldevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "deldevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
              
 
     def resetextradevices(self):
@@ -19727,7 +19801,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
             
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "resetextradevices(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "resetextradevices(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         
     def delextradevice(self,x):
         try:           
@@ -19816,7 +19891,8 @@ class DeviceAssignmentDLG(QDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
 
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "savedevicetable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "savedevicetable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def updateLCDvisibility(self,x,lcd,ind):
         if lcd == 1:
@@ -19852,7 +19928,8 @@ class DeviceAssignmentDLG(QDialog):
                     # set LCD label color
                     aw.setLabelColor(aw.extraLCDlabel2[i],QColor(colorname))
         except Exception as e:
-             aw.qmc.adderror(QApplication.translate("Error Message", "setextracolor(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "setextracolor(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def accept(self):
         try:
@@ -20228,7 +20305,7 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
 
-                if meter == "Omega HH806W":
+                elif meter == "Omega HH806W":
                     aw.qmc.device = 32
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
@@ -20237,6 +20314,11 @@ class DeviceAssignmentDLG(QDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 2
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    
+                # ensure that by selecting a real device, the initial sampling rate is set to 5s
+                if meter != "NONE":
+                    if aw.qmc.delay < 5000:
+                        aw.qmc.delay = 5000
 
                 #extra devices serial config    
                 #set of different serial settings modes options
@@ -20303,7 +20385,8 @@ class DeviceAssignmentDLG(QDialog):
             self.close()
 
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "device accept(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "device accept(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
 ############################################################
 #######################  CUSTOM COLOR DIALOG  ##############
@@ -22310,7 +22393,8 @@ class PXRpidDlgControl(QDialog):
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None,QApplication.UnicodeUTF8),5000)
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "setpoint(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info() 
+            aw.qmc.adderror(QApplication.translate("Error Message", "setpoint(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def setthermocoupletype(self,PID):
         command = ""
@@ -22341,7 +22425,8 @@ class PXRpidDlgControl(QDialog):
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None,QApplication.UnicodeUTF8),5000)
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "setthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "setthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def readthermocoupletype(self,PID):
         message = "empty"
@@ -22375,7 +22460,8 @@ class PXRpidDlgControl(QDialog):
                 self.status.showMessage(message,5000)
                   
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             
 
     def paintlabels(self):
@@ -23541,7 +23627,8 @@ class PXG4pidDlgControl(QDialog):
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting time units",None,QApplication.UnicodeUTF8),5000)    
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "settimeunits(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "settimeunits(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def setpoint(self,PID):
         command = ""
@@ -23561,7 +23648,8 @@ class PXG4pidDlgControl(QDialog):
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None,QApplication.UnicodeUTF8),5000)
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "setpoint(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "setpoint(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def setthermocoupletype(self,PID):
         command = ""
@@ -23592,7 +23680,8 @@ class PXG4pidDlgControl(QDialog):
             else:
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None,QApplication.UnicodeUTF8),5000)
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "setthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "setthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def readthermocoupletype(self,PID):            
         command = ""
@@ -23626,7 +23715,8 @@ class PXG4pidDlgControl(QDialog):
                             self.BTthermocombobox.setCurrentIndex(self.PXRconversiontoindex.index(Thtype))                            
                 self.status.showMessage(message,5000)       
         except Exception as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             
         
     def paintlabels(self):
