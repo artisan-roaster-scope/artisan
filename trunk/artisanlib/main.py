@@ -2066,7 +2066,7 @@ class tgraphcanvas(FigureCanvas):
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
     def findtextgap(self,ystep_down,ystep_up,height1,height2,dd=0):
-        if d <= 0:
+        if dd <= 0:
             d = aw.qmc.ylimit - aw.qmc.ylimit_min
         else:
             d = dd
@@ -8399,7 +8399,8 @@ class ApplicationWindow(QMainWindow):
                 self.eventsliderfactors = [x.toDouble()[0] for x in settings.value("sliderfactors").toList()]
             settings.endGroup()
             self.updateSlidersProperties()
-            #restore buttons            settings.beginGroup("ExtraEventButtons")
+            #restore buttons
+            settings.beginGroup("ExtraEventButtons")
             if settings.contains("extraeventsactions"):
                 if settings.contains("buttonlistmaxlen"):
                     self.buttonlistmaxlen = settings.value("buttonlistmaxlen",self.buttonlistmaxlen).toInt()[0]
@@ -8452,13 +8453,14 @@ class ApplicationWindow(QMainWindow):
                 self.update_extraeventbuttons_visibility()
                 self.realignbuttons()
             settings.endGroup()
+            
         except Exception:
             pass
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            # we don't report errors on settingsLoad
-            #_, _, exc_tb = sys.exc_info()
-            #QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),str(e),exc_tb.tb_lineno)
+#            # we don't report errors on settingsLoad
+#            _, _, exc_tb = sys.exc_info()
+#            QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),str(e),exc_tb.tb_lineno)
 
             
 #--------------------------------
@@ -8484,9 +8486,9 @@ class ApplicationWindow(QMainWindow):
             pass
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            # we don't report errors on settingsLoad
-            #_, _, exc_tb = sys.exc_info()
-            #QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),str(e),exc_tb.tb_lineno)
+#            # we don't report errors on settingsLoad
+#            _, _, exc_tb = sys.exc_info()
+#            QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),str(e),exc_tb.tb_lineno)
 
     def fetchCurveStyles(self):
         try:
