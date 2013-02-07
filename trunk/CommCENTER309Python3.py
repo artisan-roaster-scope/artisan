@@ -14,7 +14,6 @@
 
 import serial
 import time
-import binascii
 import platform
 
 platf = str(platform.system())
