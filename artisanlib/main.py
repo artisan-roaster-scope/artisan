@@ -965,22 +965,22 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.timeindex[0] != -1:
                 if self.timeindexB[0] != -1:
-                    ptime = self.time[self.timeindex[0]]
+                    ptime = self.timex[self.timeindex[0]]
                     btime = self.timeB[self.timeindexB[0]]
                     difference = ptime - btime
                     if difference > 0:
                         self.movebackground("right",abs(difference))
-                        self.redraw(recompute)
+                        if redraw:
+                            self.redraw(recompute)
                     elif difference < 0:
                         self.movebackground("left",abs(difference))
-                        self.redraw(recompute)
-                if redraw:
-                    self.redraw(recompute)
-        except Exception as e:
+                        if redraw:
+                            self.redraw(recompute)
+        except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: timealign() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            self.adderror(QApplication.translate("Error Message","Exception Error: timealign() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
 
     def resetlines(self):
@@ -2533,7 +2533,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         return
 
-                aw.qmc.timealign(redraw=False,recompute=False)
+                aw.qmc.timealign(redraw=True,recompute=False)
                 self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
 
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
@@ -7180,13 +7180,10 @@ class ApplicationWindow(QMainWindow):
                         times.append(startendB[2])
                         self.qmc.timebackgroundindexupdate(times[:])
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
-
+                message =  QApplication.translate("Message Area", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(str(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]])))
+                self.sendmessage(message)
             else:
                 self.sendmessage(QApplication.translate("Message Area", "Invalid artisan format",None, QApplication.UnicodeUTF8))
-
-            message =  QApplication.translate("Message Area", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(str(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]])))
-            self.sendmessage(message)
-
         except IOError as e:
             _, _, exc_tb = sys.exc_info()
             self.qmc.adderror(QApplication.translate("Error Message", "IO Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
@@ -8627,7 +8624,7 @@ class ApplicationWindow(QMainWindow):
             self.adderror(QApplication.translate("Error Message","Exception Error: fetchCurveStyles() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
-    def closeEvent(self, event):
+    def closeEvent(self,event):
         #save window geometry and position. See QSettings documentation.
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
@@ -15647,7 +15644,7 @@ class serialport(object):
                     return "0"
             else:
                 return "0"
-        except serial.SerialException as e:
+        except serial.SerialException:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -15984,7 +15981,7 @@ class serialport(object):
             #open port
             if not self.SP.isOpen():
                 self.SP.open()
-        except serial.SerialException as e:
+        except serial.SerialException:
             self.SP.close()
             error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
             aw.qmc.adderror(error)
@@ -16004,7 +16001,7 @@ class serialport(object):
     def closeEvent(self):
         try:
             self.closeport() 
-        except serial.SerialException as e:
+        except serial.SerialException:
             pass
 
     def binary(self, n, digits=8):
@@ -16035,7 +16032,7 @@ class serialport(object):
                     return -1,-1                                    #return something out of scope to avoid function error (expects two values)
             else:
                 return -1,-1
-        except serial.SerialException as e:
+        except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH806AUtemperature() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
@@ -16063,7 +16060,7 @@ class serialport(object):
                 self.SP.write(str2cmd("\x21\x05\x00\x58\x7E"))
                 libtime.sleep(2.)
                 self.HH806Winitflag = 1
-        except serial.SerialException as e:
+        except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH806Winit() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
@@ -16102,7 +16099,7 @@ class serialport(object):
                             return r1,r2
                 #BAD
                 return -1.,-1.
-        except serial.SerialException as e:
+        except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH806Wtemperature() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
@@ -16162,7 +16159,7 @@ class serialport(object):
                     return -1,-1
             else:
                 return -1,-1
-        except serial.SerialException as e:
+        except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH506RAtemperature() ",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
@@ -16198,7 +16195,7 @@ class serialport(object):
                 else:
                     nbytes = len(ID)
                     aw.qmc.adderror(QApplication.translate("Error Message","HH506RAGetID: %1 bytes received but 5 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
-        except serial.SerialException as e:
+        except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH506RAGetID()",None, QApplication.UnicodeUTF8)
             #keep a max of 500 errors
@@ -16253,7 +16250,7 @@ class serialport(object):
                     return -1,-1
             else:
                 return -1,-1
-        except serial.SerialException as e:
+        except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
@@ -16313,7 +16310,7 @@ class serialport(object):
                     return -1,-1 
             else:
                 return -1,-1 
-        except serial.SerialException as e:
+        except serial.SerialException:
             error = QApplication.translate("Error Message","Serial Exception: ser.CENTER302temperature()",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
@@ -16364,7 +16361,7 @@ class serialport(object):
                     return -1,-1 
             else:
                 return -1,-1 
-        except serial.SerialException as e:
+        except serial.SerialException:
             error = QApplication.translate("Error Message","Serial Exception: ser.CENTER303temperature()",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
@@ -16441,7 +16438,7 @@ class serialport(object):
                     return -1,-1 
             else:
                 return -1,-1
-        except serial.SerialException as e:
+        except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.CENTER309temperature() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
@@ -16796,7 +16793,7 @@ class serialport(object):
                 return (sign + number), symbols
             else:
                 raise ValueError(str("Needed 14 bytes but only received %i"%(len(frame))))
-        except ValueError as e:
+        except ValueError:
             error  = QApplication.translate("Error Message","Value Error: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             #keep a max of 500 errors
