@@ -154,9 +154,10 @@ for root, dirs, files in os.walk('.'):
         elif file.endswith('.cc'):
             print('Deleting', file)
             os.remove(os.path.join(root,file))
-        elif file.endswith('.afm'):
-            print('Deleting', file)
-            os.remove(os.path.join(root,file))
+# .afm files should not be removed as without matplotlib will fail on startup            
+#        elif file.endswith('.afm'):
+#            print('Deleting', file)
+#            os.remove(os.path.join(root,file))
     # remove test files        
     for dir in dirs:
         if 'tests' in dir:
