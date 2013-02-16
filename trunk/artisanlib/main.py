@@ -1317,156 +1317,162 @@ class tgraphcanvas(FigureCanvas):
 
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
     def reset(self,redraw=True):
-        #### lock shared resources #####
-        self.samplingsemaphore.acquire(1)
-
-        aw.soundpop()
-
-        if self.flagon:
-            self.OffMonitor()
-
-        #reset time
-        aw.qmc.timeclock.start()
-
-        self.checkSaved()
-
-        #prevents accidentally deleting a modified profile.
-        self.safesaveflag = False  #now flag is cleared (OFF)
-
-        if self.HUDflag:
-            self.toggleHUD()
-        self.hudresizeflag = False
-
-        self.ax.set_title(self.title,size=20,color=self.palette["title"])
-
-        #reset all variables that need to be reset
-        self.rateofchange1 = 0.0
-        self.rateofchange2 = 0.0
-        self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2 = [],[],[],[],[],[],[]
-        self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
-        self.timeindex = [-1,0,0,0,0,0,0,0]
-        self.specialevents=[]
-        aw.lcd1.display("00:00")
-        aw.lcd2.display("0.0")
-        aw.lcd3.display("0.0")
-        aw.lcd4.display("0.0")
-        aw.lcd5.display("0.0")
-        aw.lcd6.display("0.0")
-        aw.lcd7.display("0.0")
-        for i in range(aw.nLCDS):
-            aw.extraLCD1[i].display("0.0")
-            aw.extraLCD2[i].display("0.0")
-        aw.sendmessage(QApplication.translate("Message Area","Scope has been reset",None, QApplication.UnicodeUTF8))
-        aw.button_3.setDisabled(False)
-        aw.button_4.setDisabled(False)
-        aw.button_5.setDisabled(False)
-        aw.button_6.setDisabled(False)
-        aw.button_7.setDisabled(False)
-        aw.button_8.setDisabled(False)
-        aw.button_9.setDisabled(False)
-        aw.button_19.setDisabled(False)
-        aw.button_20.setDisabled(False)
-
-        aw.button_3.setFlat(False)
-        aw.button_4.setFlat(False)
-        aw.button_5.setFlat(False)
-        aw.button_6.setFlat(False)
-        aw.button_7.setFlat(False)
-        aw.button_8.setFlat(False)
-        aw.button_9.setFlat(False)
-        aw.button_19.setFlat(False)
-        aw.button_20.setFlat(False)
-        aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) 
-        aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
-        aw.button_2.setText(QApplication.translate("Scope Button", "START",None, QApplication.UnicodeUTF8))
-        aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
-
-        self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
-        aw.setWindowTitle(aw.windowTitle)
-
-        if self.roastpropertiesflag:
-            self.roastingnotes = ""
-            self.cuppingnotes = ""
-            self.beans = ""
-            self.weight = [0,0,"g"]
-            self.volume = [0,0,"l"]
-            self.ambientTemp = 0.
-            self.ambient_humidity = 0.
-            self.beansize = 0.
-
-        self.roastdate = QDate.currentDate()
-        self.errorlog = []
-        aw.seriallog = []
-
-        self.specialevents = []
-        self.specialeventstype = [] 
-        self.specialeventsStrings = []
-        self.specialeventsvalue = []
-        self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
-        self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
-        aw.eNumberSpinBox.setValue(0)
-        aw.lineEvent.setText("")
-        aw.etypeComboBox.setCurrentIndex(0)
-        aw.valueComboBox.setCurrentIndex(0)
-        aw.curFile = None                 #current file name
-        #used to find length of arms in annotations
-        self.ystep_down = 0
-        self.ystep_up = 0 
-
-        self.startofx = 0
-        self.endofx = self.resetmaxtime 
-        if self.endofx < 1:
-            self.endofx = 60
-
-        #Designer variables
-        self.indexpoint = 0
-        self.workingline = 2            #selects ET or BT
-        self.currentx = 0               #used to add point when right click
-        self.currenty = 0               #used to add point when right click
-        self.designertemp1init = []
-        self.designertemp2init = []
-        if self.mode == "C":
-#                                     #CH, DE, Fcs,Fce,Scs,Sce,Drop
-            self.designertemp1init = [290,290,290,290,290,290,290]
-            self.designertemp2init = [200,150,200,210,220,225,240]
-        elif self.mode == "F":
-            self.designertemp1init = [500,500,500,500,500,500,500]
-            self.designertemp2init = [380,300,390,395,410,412,420]
-        self.disconnect_designer()  #sets designer flag false
-        self.setCursor(Qt.ArrowCursor)
-
-        self.temporaryalarmflag = -3
-
-        #extra devices
-        for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):
-            self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]
-
-        #reset alarms that have been triggered
-        self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
-
-        #reset cupping flavor values
-        self.flavors = [5.]*len(self.flavorlabels)
-
-        #autodetected CHARGE and DROP index
-        self.autoChargeIdx = 0
-        self.autoDropIdx = 0
-
-        aw.hideDefaultButtons()
-        aw.hideExtraButtons()
-        aw.hideLCDs()
-        aw.hideSliders()
-
-        self.wheelflag = False
-
-        #check and turn off mouse cross marker
-        if self.crossmarker:
-            self.togglecrosslines()
-
-        self.samplingsemaphore.release(1) #note: do it before redraw()
-            
-        ### REDRAW  ##
-        if redraw:
-            self.redraw(False)
+        try:
+            #### lock shared resources #####
+            self.samplingsemaphore.acquire(1)
+    
+            aw.soundpop()
+    
+            if self.flagon:
+                self.OffMonitor()
+    
+            #reset time
+            aw.qmc.timeclock.start()
+    
+            self.checkSaved()
+    
+            #prevents accidentally deleting a modified profile.
+            self.safesaveflag = False  #now flag is cleared (OFF)
+    
+            if self.HUDflag:
+                self.toggleHUD()
+            self.hudresizeflag = False
+    
+            self.ax.set_title(self.title,size=20,color=self.palette["title"])
+    
+            #reset all variables that need to be reset
+            self.rateofchange1 = 0.0
+            self.rateofchange2 = 0.0
+            self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2 = [],[],[],[],[],[],[]
+            self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
+            self.timeindex = [-1,0,0,0,0,0,0,0]
+            self.specialevents=[]
+            aw.lcd1.display("00:00")
+            aw.lcd2.display("0.0")
+            aw.lcd3.display("0.0")
+            aw.lcd4.display("0.0")
+            aw.lcd5.display("0.0")
+            aw.lcd6.display("0.0")
+            aw.lcd7.display("0.0")
+            for i in range(aw.nLCDS):
+                aw.extraLCD1[i].display("0.0")
+                aw.extraLCD2[i].display("0.0")
+            aw.sendmessage(QApplication.translate("Message Area","Scope has been reset",None, QApplication.UnicodeUTF8))
+            aw.button_3.setDisabled(False)
+            aw.button_4.setDisabled(False)
+            aw.button_5.setDisabled(False)
+            aw.button_6.setDisabled(False)
+            aw.button_7.setDisabled(False)
+            aw.button_8.setDisabled(False)
+            aw.button_9.setDisabled(False)
+            aw.button_19.setDisabled(False)
+            aw.button_20.setDisabled(False)
+    
+            aw.button_3.setFlat(False)
+            aw.button_4.setFlat(False)
+            aw.button_5.setFlat(False)
+            aw.button_6.setFlat(False)
+            aw.button_7.setFlat(False)
+            aw.button_8.setFlat(False)
+            aw.button_9.setFlat(False)
+            aw.button_19.setFlat(False)
+            aw.button_20.setFlat(False)
+            aw.button_1.setText(QApplication.translate("Scope Button", "ON",None, QApplication.UnicodeUTF8)) 
+            aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
+            aw.button_2.setText(QApplication.translate("Scope Button", "START",None, QApplication.UnicodeUTF8))
+            aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
+    
+            self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
+            aw.setWindowTitle(aw.windowTitle)
+    
+            if self.roastpropertiesflag:
+                self.roastingnotes = ""
+                self.cuppingnotes = ""
+                self.beans = ""
+                self.weight = [0,0,"g"]
+                self.volume = [0,0,"l"]
+                self.ambientTemp = 0.
+                self.ambient_humidity = 0.
+                self.beansize = 0.
+    
+            self.roastdate = QDate.currentDate()
+            self.errorlog = []
+            aw.seriallog = []
+    
+            self.specialevents = []
+            self.specialeventstype = [] 
+            self.specialeventsStrings = []
+            self.specialeventsvalue = []
+            self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
+            self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
+            aw.eNumberSpinBox.setValue(0)
+            aw.lineEvent.setText("")
+            aw.etypeComboBox.setCurrentIndex(0)
+            aw.valueComboBox.setCurrentIndex(0)
+            aw.curFile = None                 #current file name
+            #used to find length of arms in annotations
+            self.ystep_down = 0
+            self.ystep_up = 0 
+    
+            self.startofx = 0
+            self.endofx = self.resetmaxtime 
+            if self.endofx < 1:
+                self.endofx = 60
+    
+            #Designer variables
+            self.indexpoint = 0
+            self.workingline = 2            #selects ET or BT
+            self.currentx = 0               #used to add point when right click
+            self.currenty = 0               #used to add point when right click
+            self.designertemp1init = []
+            self.designertemp2init = []
+            if self.mode == "C":
+    #                                     #CH, DE, Fcs,Fce,Scs,Sce,Drop
+                self.designertemp1init = [290,290,290,290,290,290,290]
+                self.designertemp2init = [200,150,200,210,220,225,240]
+            elif self.mode == "F":
+                self.designertemp1init = [500,500,500,500,500,500,500]
+                self.designertemp2init = [380,300,390,395,410,412,420]
+            self.disconnect_designer()  #sets designer flag false
+            self.setCursor(Qt.ArrowCursor)
+    
+            self.temporaryalarmflag = -3
+    
+            #extra devices
+            for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):
+                self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]
+    
+            #reset alarms that have been triggered
+            self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
+    
+            #reset cupping flavor values
+            self.flavors = [5.]*len(self.flavorlabels)
+    
+            #autodetected CHARGE and DROP index
+            self.autoChargeIdx = 0
+            self.autoDropIdx = 0
+    
+            aw.hideDefaultButtons()
+            aw.hideExtraButtons()
+            aw.hideLCDs()
+            aw.hideSliders()
+    
+            self.wheelflag = False
+    
+            #check and turn off mouse cross marker
+            if self.crossmarker:
+                self.togglecrosslines()
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            self.adderror(QApplication.translate("Error Message","Exception Error: reset() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
+            ### REDRAW  ##
+            if redraw:
+                self.redraw(False)
 
     # smoothes a list of values 'x' at taken at times indicated by the numbers in list 'y'
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
@@ -1489,11 +1495,11 @@ class tgraphcanvas(FigureCanvas):
                     return res
             else:
                 return x
-        except Exception as e:
+        except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: smooth() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            self.adderror(QApplication.translate("Error Message","Exception Error: smooth() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return x
 
     def smooth_list(self, a, b, window_len=7, window='hanning'):
@@ -2061,15 +2067,14 @@ class tgraphcanvas(FigureCanvas):
                     self.xaxistosm()
                     self.redrawdesigner()
 
-            self.samplingsemaphore.release(1)
-
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-            if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)
             _, _, exc_tb = sys.exc_info()    
             self.adderror(QApplication.translate("Error Message","Exception Error: redraw() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+        finally:            
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)
 
     # adjusts height of annotations
     #supporting function for self.redraw() used to find best height of annotations in graph to avoid annotating over previous annotations (unreadable) when close to each other
@@ -2537,6 +2542,8 @@ class tgraphcanvas(FigureCanvas):
                         self.drawmanual(et,bt,tx)
                         self.timeindex[0] = len(self.timex)-1
                     else:
+                        if self.samplingsemaphore.available() < 1:
+                            self.samplingsemaphore.release(1)
                         return
                 aw.qmc.timealign(redraw=True,recompute=False)
                 self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
@@ -2547,8 +2554,8 @@ class tgraphcanvas(FigureCanvas):
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                 self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
                 self.fig.canvas.draw()
-                # release lock as early as possible if all values are taken, before expensive redraw:
-                self.samplingsemaphore.release(1)
+                if self.samplingsemaphore.available() < 1:
+                    self.samplingsemaphore.release(1)
                 try:
                     a = aw.qmc.buttonactions[0]
                     aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[0])
@@ -2561,11 +2568,9 @@ class tgraphcanvas(FigureCanvas):
             else:
                 message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
-
-        except Exception as e:
+        except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markCharge() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markCharge() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:            
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2577,9 +2582,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
-
                 self.samplingsemaphore.acquire(1)
-
                 if self.device != 18:
                     self.timeindex[1] = len(self.timex)-1
                 else:
@@ -2588,61 +2591,52 @@ class tgraphcanvas(FigureCanvas):
                         self.drawmanual(et,bt,tx)
                         self.timeindex[1] = len(self.timex)-1
                     else:
+                        if self.samplingsemaphore.available() < 1:
+                            self.samplingsemaphore.release(1)
                         return
-
                 if aw.qmc.phasesbuttonflag:
                     self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
-
-                aw.button_19.setDisabled(True)
-                aw.button_19.setFlat(True)
-
                 #calculate time elapsed since charge time
                 st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]))
                 #anotate temperature
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
                 self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
-
                 self.fig.canvas.draw()
-
                 st1 = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
-
-                self.samplingsemaphore.release(1)
-
+                if self.samplingsemaphore.available() < 1:
+                    self.samplingsemaphore.release(1)
+                aw.button_19.setDisabled(True) # deactivate DRY button
+                aw.button_19.setFlat(True)
+                aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                aw.button_8.setFlat(True)
                 try:
                     a = aw.qmc.buttonactions[1]
                     aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[1])
                 except:
                     pass
-
                 message = QApplication.translate("Message Area","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 #set message at bottom
                 aw.sendmessage(message)
-
-
             else:
                 message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
-
-        except Exception as e:
+        except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markDryEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markDryEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
 
-    #redord 1C start markers of BT. called from push button_3 of application window
+    #record 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
         try:
             if self.flagon:
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
-
                 self.samplingsemaphore.acquire(1)
-
                 # record 1Cs only if Charge mark has been done
                 if self.device != 18:                
                     self.timeindex[2] = len(self.timex)-1
@@ -2652,14 +2646,11 @@ class tgraphcanvas(FigureCanvas):
                         self.drawmanual(et,bt,tx)
                         self.timeindex[2] = len(self.timex)-1
                     else:
+                        if self.samplingsemaphore.available() < 1:
+                            self.samplingsemaphore.release(1)
                         return
-
                 if aw.qmc.phasesbuttonflag:
                     self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
-
-                aw.button_3.setDisabled(True)
-                aw.button_3.setFlat(True)
-
                 #calculate time elapsed since charge time
                 st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
@@ -2668,31 +2659,30 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
                 self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
-                
                 self.fig.canvas.draw()
-
                 st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
-
-                self.samplingsemaphore.release(1)
-
+                if self.samplingsemaphore.available() < 1:
+                    self.samplingsemaphore.release(1)
+                aw.button_3.setDisabled(True) # deactivate FCs button
+                aw.button_3.setFlat(True)
+                aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                aw.button_8.setFlat(True)
+                aw.button_19.setDisabled(True) # also deactivate DRY button
+                aw.button_19.setFlat(True)
                 try:
                     a = aw.qmc.buttonactions[2]
                     aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[2])
                 except:
                     pass
-
                 message = QApplication.translate("Message Area","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 aw.sendmessage(message)
-
             else:
                 message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
-
-        except Exception as e:
+        except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2704,9 +2694,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
-
                 self.samplingsemaphore.acquire(1)
-
                 if self.device != 18:
                     self.timeindex[3] = len(self.timex)-1
                 else:
@@ -2715,42 +2703,40 @@ class tgraphcanvas(FigureCanvas):
                         self.drawmanual(et,bt,tx)
                         self.timeindex[3] = len(self.timex)-1
                     else:
+                        if self.samplingsemaphore.available() < 1:
+                            self.samplingsemaphore.release(1)
                         return
-
-                aw.button_4.setDisabled(True)
-                aw.button_4.setFlat(True)
-
                 #calculate time elapsed since charge time
                 st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                 self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
-
                 self.fig.canvas.draw()
-
                 st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
-
-                self.samplingsemaphore.release(1)
-
+                if self.samplingsemaphore.available() < 1:
+                    self.samplingsemaphore.release(1)
+                aw.button_4.setDisabled(True) # deactivate FCe button
+                aw.button_4.setFlat(True)
+                aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                aw.button_8.setFlat(True)
+                aw.button_19.setDisabled(True) # also deactivate DRY button
+                aw.button_19.setFlat(True)
+                aw.button_3.setDisabled(True) # also deactivate FCs button
+                aw.button_3.setFlat(True)
                 try:
                     a = aw.qmc.buttonactions[3]
                     aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[3])
                 except:
                     pass
-
                 message = QApplication.translate("Message Area","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 aw.sendmessage(message)
-
-
             else:
                 message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
-
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2762,9 +2748,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile. 
                 self.safesaveflag = True
-
                 self.samplingsemaphore.acquire(1)
-
                 if self.device != 18:
                     self.timeindex[4] = len(self.timex)-1
                 else:
@@ -2773,11 +2757,9 @@ class tgraphcanvas(FigureCanvas):
                         self.drawmanual(et,bt,tx)
                         self.timeindex[4] = len(self.timex)-1
                     else:
+                        if self.samplingsemaphore.available() < 1:
+                            self.samplingsemaphore.release(1)
                         return
-
-                aw.button_5.setDisabled(True)
-                aw.button_5.setFlat(True)
-
                 st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
                 if self.timeindex[3]:
@@ -2785,32 +2767,34 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
                 self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
-
                 self.fig.canvas.draw()
-
                 st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
-
-                self.samplingsemaphore.release(1)
-
+                if self.samplingsemaphore.available() < 1:
+                    self.samplingsemaphore.release(1)
+                aw.button_5.setDisabled(True) # deactivate SCs button
+                aw.button_5.setFlat(True)
+                aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                aw.button_8.setFlat(True)
+                aw.button_19.setDisabled(True) # also deactivate DRY button
+                aw.button_19.setFlat(True)
+                aw.button_3.setDisabled(True) # also deactivate FCs button
+                aw.button_3.setFlat(True)
+                aw.button_4.setDisabled(True) # also deactivate FCe button
+                aw.button_4.setFlat(True)
                 try:
                     a = aw.qmc.buttonactions[4]
                     aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[4])
                 except:
                     pass
-
                 message = QApplication.translate("Message Area","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 aw.sendmessage(message)
-
-
             else:
                 message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
-
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
-
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2822,9 +2806,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
-
                 self.samplingsemaphore.acquire(1)
-
                 if self.device != 18:
                     self.timeindex[5] = len(self.timex)-1
                 else:
@@ -2833,44 +2815,46 @@ class tgraphcanvas(FigureCanvas):
                         self.drawmanual(et,bt,tx)
                         self.timeindex[5] = len(self.timex)-1
                     else:
+                        if self.samplingsemaphore.available() < 1:
+                            self.samplingsemaphore.release(1)
                         return
-
-                aw.button_6.setDisabled(True)
-                aw.button_6.setFlat(True)
-
                 st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                 self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
-                
                 self.fig.canvas.draw()
-
                 st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
-
-                self.samplingsemaphore.release(1)
-
+                if self.samplingsemaphore.available() < 1:
+                    self.samplingsemaphore.release(1)
+                aw.button_6.setDisabled(True) # deactivate SCe button
+                aw.button_6.setFlat(True)
+                aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                aw.button_8.setFlat(True)
+                aw.button_19.setDisabled(True) # also deactivate DRY button
+                aw.button_19.setFlat(True)
+                aw.button_3.setDisabled(True) # also deactivate FCs button
+                aw.button_3.setFlat(True)
+                aw.button_4.setDisabled(True) # also deactivate FCe button
+                aw.button_4.setFlat(True)
+                aw.button_5.setDisabled(True) # also deactivate SCs button
+                aw.button_5.setFlat(True)
                 try:
                     a = aw.qmc.buttonactions[5]
                     aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[5])
                 except:
                     pass
-
                 message = QApplication.translate("Message Area","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 aw.sendmessage(message)
-                
             else:
                 message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
-
-        except Exception as e:
+        except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-
+            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:            
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
-
 
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
@@ -2879,9 +2863,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
-
                 self.samplingsemaphore.acquire(1)
-
                 if self.device != 18:
                     if self.autoDropIdx:
                         self.timeindex[6] = self.autoDropIdx
@@ -2893,11 +2875,9 @@ class tgraphcanvas(FigureCanvas):
                         self.drawmanual(et,bt,tx)
                         self.timeindex[6] = len(self.timex)-1
                     else:
+                        if self.samplingsemaphore.available() < 1:
+                            self.samplingsemaphore.release(1)
                         return
-
-                aw.button_9.setDisabled(True)
-                aw.button_9.setFlat(True)
-
                 st1 = QApplication.translate("Scope Annotation","End %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                 if self.timeindex[5]:
@@ -2910,34 +2890,39 @@ class tgraphcanvas(FigureCanvas):
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
                 elif self.timeindex[1]:
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
-
                 self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
-
                 self.fig.canvas.draw()
-
                 st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
-
-                self.samplingsemaphore.release(1)
-
+                if self.samplingsemaphore.available() < 1:
+                    self.samplingsemaphore.release(1)
+                aw.button_9.setDisabled(True) # deactivate DROP button
+                aw.button_9.setFlat(True)
+                aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                aw.button_8.setFlat(True)
+                aw.button_19.setDisabled(True) # also deactivate DRY button
+                aw.button_19.setFlat(True)
+                aw.button_3.setDisabled(True) # also deactivate FCs button
+                aw.button_3.setFlat(True)
+                aw.button_4.setDisabled(True) # also deactivate FCe button
+                aw.button_4.setFlat(True)
+                aw.button_5.setDisabled(True) # also deactivate SCs button
+                aw.button_5.setFlat(True)
+                aw.button_6.setDisabled(True) # also deactivate SCe button
+                aw.button_6.setFlat(True)
                 try:
                     a = aw.qmc.buttonactions[6]
                     aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[6])
                 except:
                     pass
-
                 message = QApplication.translate("Message Area","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 aw.sendmessage(message)
-
-
             else:
                 message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
-
-        except Exception as e:
+        except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markDrop() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-
+            self.adderror(QApplication.translate("Error Message", "Exception Error: markDrop() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2948,9 +2933,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
-
                 self.samplingsemaphore.acquire(1)
-
                 if self.device != 18:
                     self.timeindex[7] = len(self.timex)-1
                 else:
@@ -2959,47 +2942,52 @@ class tgraphcanvas(FigureCanvas):
                         self.drawmanual(et,bt,tx)
                         self.timeindex[7] = len(self.timex)-1
                     else:
+                        if self.samplingsemaphore.available() < 1:
+                            self.samplingsemaphore.release(1)
                         return
-
                 if aw.qmc.phasesbuttonflag:
                     self.phases[1] = int(round(self.temp2[self.timeindex[7]]))
-
-                aw.button_20.setDisabled(True)
-                aw.button_20.setFlat(True)
-
                 #calculate time elapsed since charge time
                 st1 = QApplication.translate("Scope Annotation","CE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]]))
                 #anotate temperature
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
                 self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
-
                 self.fig.canvas.draw()
-
                 st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
                 st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
-
-                self.samplingsemaphore.release(1)
-
+                if self.samplingsemaphore.available() < 1:
+                    self.samplingsemaphore.release(1)
+                aw.button_20.setDisabled(True) # deactivate COOL button
+                aw.button_20.setFlat(True)
+                aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                aw.button_8.setFlat(True)
+                aw.button_19.setDisabled(True) # also deactivate DRY button
+                aw.button_19.setFlat(True)
+                aw.button_3.setDisabled(True) # also deactivate FCs button
+                aw.button_3.setFlat(True)
+                aw.button_4.setDisabled(True) # also deactivate FCe button
+                aw.button_4.setFlat(True)
+                aw.button_5.setDisabled(True) # also deactivate SCs button
+                aw.button_5.setFlat(True)
+                aw.button_6.setDisabled(True) # also deactivate SCe button
+                aw.button_6.setFlat(True)
+                aw.button_9.setDisabled(True) # also deactivate DROP button
+                aw.button_9.setFlat(True)
                 try:
                     a = aw.qmc.buttonactions[7]
                     aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[7])
                 except:
                     pass
-
                 message = QApplication.translate("Message Area","[COOL END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
                 #set message at bottom
                 aw.sendmessage(message)
-
-
             else:
                 message = QApplication.translate("Message Area","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
-
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.adderror(QApplication.translate("Error Message", "Exception Error: markCoolEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3027,27 +3015,22 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
-
                 self.samplingsemaphore.acquire(1)
-
                 Nevents = len(self.specialevents)
-
                 #if in manual mode record first the last point in self.timex[]
                 if self.device == 18:
                     tx,et,bt = aw.ser.NONE()
                     if bt != -1 and et != -1:
                         self.drawmanual(et,bt,tx)
                     else:
-                        self.samplingsemaphore.release(1)
+                        if self.samplingsemaphore.available() < 1:
+                            self.samplingsemaphore.release(1)
                         return
-
                 if extraevent!=None:
                     #i = index number of the event (current length of the time list)
                     i = len(self.timex)-1
-
                     # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
                     if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
-
                         self.specialevents.append(i)
                         self.specialeventstype.append(0)
                         self.specialeventsStrings.append(str(Nevents+1))
@@ -3057,7 +3040,6 @@ class tgraphcanvas(FigureCanvas):
                             self.specialeventstype[-1] = eventtype
                             self.specialeventsvalue[-1] = eventvalue
                             self.specialeventsStrings[-1] = eventdescription
-
                         etype = self.specialeventstype[-1]
                         if etype == 0:
                             self.E1timex.append(self.timex[self.specialevents[-1]])
@@ -3071,20 +3053,17 @@ class tgraphcanvas(FigureCanvas):
                         elif etype == 3:
                             self.E4timex.append(self.timex[self.specialevents[-1]])
                             self.E4values.append(self.eventpositionbars[self.specialeventsvalue[-1]])
-                            
                         #write label in mini recorder if flag checked
                         if aw.minieventsflag:
                             aw.eNumberSpinBox.setValue(Nevents+1)
                             aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
                             aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
                             aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-
                         #if Event show flag
                         if self.eventsshowflag:
                             index = self.specialevents[-1]
                             firstletter = self.etypes[self.specialeventstype[-1]][0]
                             secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
-
                             if self.eventsGraphflag == 0:
                                 if self.mode == "F":
                                     height = 50
@@ -3097,7 +3076,6 @@ class tgraphcanvas(FigureCanvas):
                                     temp = self.temp2[index]
                                 self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-
                             #if Event Type-Bars flag
                             elif self.eventsGraphflag == 1:
                                 char1 = self.etypes[0][0]
@@ -3115,7 +3093,6 @@ class tgraphcanvas(FigureCanvas):
                                 else:
                                     self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
                                                  color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-
                             elif self.eventsGraphflag == 2:
                                 # update lines data using the lists with new data
                                 if etype == 0:
@@ -3126,19 +3103,15 @@ class tgraphcanvas(FigureCanvas):
                                     self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
                                 elif etype == 3:
                                     self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
-
                         self.fig.canvas.draw()
-
                         temp = "%.1f "%self.temp2[i]
                         timed = self.stringfromseconds(self.timex[i])
                         message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
                         aw.sendmessage(message)
-
-                self.samplingsemaphore.release(1)
-
+                if self.samplingsemaphore.available() < 1:
+                    self.samplingsemaphore.release(1)
             else:
                 aw.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
-
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.adderror(QApplication.translate("Error Message", "Exception Error: EventRecordAction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
@@ -3177,14 +3150,11 @@ class tgraphcanvas(FigureCanvas):
                         aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
                         aw.valueComboBox.setCurrentIndex(self.specialeventsvalue[Nevents-1])
                         aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-
-
                 #if Event show flag
                 if self.eventsshowflag:
                     index = self.specialevents[-1]
                     firstletter = self.etypes[self.specialeventstype[-1]][0]
                     secondletter = self.eventsvalues[self.specialeventsvalue[-1]]
-
                     if self.eventsGraphflag == 0:
                         if self.mode == "F":
                             height = 50
@@ -3197,7 +3167,6 @@ class tgraphcanvas(FigureCanvas):
                             temp = self.temp2[index]
                         self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-
                     #if Event Type-Bars flag
                     if self.eventsGraphflag == 1:
                         char1 = self.etypes[0][0]
@@ -3215,7 +3184,6 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-
                     if self.eventsGraphflag == 2:
                         # update lines data using the lists with new data
                         etype = self.specialeventstype[-1]
@@ -3227,10 +3195,9 @@ class tgraphcanvas(FigureCanvas):
                             self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
                         elif etype == 3:
                             self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
-
                     self.fig.canvas.draw()
-                    self.samplingsemaphore.release(1)
-
+                    if aw.qmc.samplingsemaphore.available() < 1:
+                        self.samplingsemaphore.release(1)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             self.adderror(QApplication.translate("Error Message", "Exception Error: DeviceEventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
@@ -4776,290 +4743,247 @@ class SampleThread(QThread):
     # sample devices at interval self.delay miliseconds.
     def sample(self):
         try:
-            ##### lock resources  #########
-            aw.qmc.samplingsemaphore.acquire(1)
-
             #apply sampling interval here
             libtime.sleep(aw.qmc.delay/1000.)
-
-
-            # if we are not yet recording, but sampling we keep on reseting the timer
-            if not aw.qmc.flagstart:
-                aw.qmc.timeclock.start()
-
-            #if using a meter (thermocouple device)
-            if aw.qmc.device != 18: # not NONE device
-
-                ##############  if using Extra devices
-                nxdevices = len(aw.qmc.extradevices)
-                if nxdevices:
-                    les,led,let =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1)
-                    if les == led == let:
-                        xtra_dev_lines1 = 0
-                        xtra_dev_lines2 = 0
-                        for i in range(nxdevices):   
-                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                            
-                            # ignore reading if both are off, otherwise process them
-                            if extrat2 != -1 or extrat2 != -1:
-                                if len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                                if len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                                if aw.qmc.flagstart:
-                                    aw.qmc.extratemp1[i].append(float(extrat1))
-                                    aw.qmc.extratemp2[i].append(float(extrat2))
-                                    aw.qmc.extratimex[i].append(extratx)
-                                    # update extra lines
-                                    if aw.extraCurveVisibility1[i]:
-                                        aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
-                                        xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                    if aw.extraCurveVisibility2[i]:
-                                        aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
-                                        xtra_dev_lines2 = xtra_dev_lines2 + 1
-                                else:
-                                    # we do not record, so we just replace the old last value
-                                    if len(aw.qmc.extratemp1[i]) > 0:
-                                        aw.qmc.extratemp1[i][-1] = float(extrat1)
-                                    else:
+            ##### lock resources  #########
+            aw.qmc.samplingsemaphore.acquire(1)
+            if aw.qmc.flagon: # we check again after sleep if the monitor is still on
+                # if we are not yet recording, but sampling we keep on reseting the timer
+                if not aw.qmc.flagstart:
+                    aw.qmc.timeclock.start()
+                #if using a meter (thermocouple device)
+                if aw.qmc.device != 18: # not NONE device
+                    ##############  if using Extra devices
+                    nxdevices = len(aw.qmc.extradevices)
+                    if nxdevices:
+                        les,led,let =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1)
+                        if les == led == let:
+                            xtra_dev_lines1 = 0
+                            xtra_dev_lines2 = 0
+                            for i in range(nxdevices):   
+                                extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                                
+                                # ignore reading if both are off, otherwise process them
+                                if extrat2 != -1 or extrat2 != -1:
+                                    if len(aw.qmc.extramathexpression1[i]):
+                                        extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                                    if len(aw.qmc.extramathexpression2[i]):
+                                        extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                                    if aw.qmc.flagstart:
                                         aw.qmc.extratemp1[i].append(float(extrat1))
-                                    if len(aw.qmc.extratemp2[i]) > 0:
-                                        aw.qmc.extratemp2[i][-1] = float(extrat2)
-                                    else:
                                         aw.qmc.extratemp2[i].append(float(extrat2))
-                                    if len(aw.qmc.extratimex[i]) <= 0:
                                         aw.qmc.extratimex[i].append(extratx)
-
-                    #ERROR FOUND
-                    else:
-                        lengths = [les,led,let]
-                        location = ["Extra-Serial","Extra-Devices","Extra-Temp"]
-                        #find error
-                        if (nxdevices-1) in lengths:
-                            indexerror =  lengths.index(nxdevices-1)
-                        elif (nxdevices+1) in lengths:
-                            indexerror =  lengths.index(nxdevices+1)
+                                        # update extra lines
+                                        if aw.extraCurveVisibility1[i]:
+                                            aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                                            xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                        if aw.extraCurveVisibility2[i]:
+                                            aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                                            xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                    else:
+                                        # we do not record, so we just replace the old last value
+                                        if len(aw.qmc.extratemp1[i]) > 0:
+                                            aw.qmc.extratemp1[i][-1] = float(extrat1)
+                                        else:
+                                            aw.qmc.extratemp1[i].append(float(extrat1))
+                                        if len(aw.qmc.extratemp2[i]) > 0:
+                                            aw.qmc.extratemp2[i][-1] = float(extrat2)
+                                        else:
+                                            aw.qmc.extratemp2[i].append(float(extrat2))
+                                        if len(aw.qmc.extratimex[i]) <= 0:
+                                            aw.qmc.extratimex[i].append(extratx)
+                        #ERROR FOUND
                         else:
-                            indexerror = 1000
-                        if indexerror != 1000:
-                            errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
-                            errormessage += "\nPlease Reset: Extra devices"
-                        else:
-                            string = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
-                            string += location[2] + "= " + str(lengths[2])
-                            errormessage = "ERROR: extra devices lengths don't match: %s"%string
-                            errormessage += "\nPlease Reset: Extra devices"
-                        raise Exception(errormessage)
-
-
-                #read time, ET (t1) and BT (t2) TEMPERATURE
-                try:
-                    tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
-                except:
-                    tx = aw.qmc.timeclock.elapsed()/1000
-                    t1 = t2 = -1
-
-                length_of_qmc_timex = len(aw.qmc.timex)
-
-
-                # ignore reading if both are off, otherwise process them
-                if t1 != -1 or t2 != -1:
-
-                    if len(aw.qmc.ETfunction):
-                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
-                    if len(aw.qmc.BTfunction):
-                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
-
-                    t1_final = t1
-                    t2_final = t2
-
-                    if aw.qmc.flagstart:
-                        aw.qmc.temp2.append(t2_final)
-                        aw.qmc.temp1.append(t1_final)
-                    else:
-                        if len(aw.qmc.temp2) > 0:
-                            aw.qmc.temp2[-1] = t2_final
-                        else:                            
+                            lengths = [les,led,let]
+                            location = ["Extra-Serial","Extra-Devices","Extra-Temp"]
+                            #find error
+                            if (nxdevices-1) in lengths:
+                                indexerror =  lengths.index(nxdevices-1)
+                            elif (nxdevices+1) in lengths:
+                                indexerror =  lengths.index(nxdevices+1)
+                            else:
+                                indexerror = 1000
+                            if indexerror != 1000:
+                                errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
+                                errormessage += "\nPlease Reset: Extra devices"
+                            else:
+                                string = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
+                                string += location[2] + "= " + str(lengths[2])
+                                errormessage = "ERROR: extra devices lengths don't match: %s"%string
+                                errormessage += "\nPlease Reset: Extra devices"
+                            raise Exception(errormessage)
+                    #read time, ET (t1) and BT (t2) TEMPERATURE
+                    try:
+                        tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                    except:
+                        tx = aw.qmc.timeclock.elapsed()/1000
+                        t1 = t2 = -1
+                    length_of_qmc_timex = len(aw.qmc.timex)
+                    # ignore reading if both are off, otherwise process them
+                    if t1 != -1 or t2 != -1:
+                        if len(aw.qmc.ETfunction):
+                            t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
+                        if len(aw.qmc.BTfunction):
+                            t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
+                        t1_final = t1
+                        t2_final = t2
+                        if aw.qmc.flagstart:
                             aw.qmc.temp2.append(t2_final)
-                        if len(aw.qmc.temp1) > 0:
-                            aw.qmc.temp1[-1] = t1_final
-                        else:                            
                             aw.qmc.temp1.append(t1_final)
-
-                    if aw.qmc.flagstart:
-                        aw.qmc.timex.append(tx)
-                        length_of_qmc_timex += 1
-                    else:
-                        if length_of_qmc_timex <= 0:
+                        else:
+                            if len(aw.qmc.temp2) > 0:
+                                aw.qmc.temp2[-1] = t2_final
+                            else:                            
+                                aw.qmc.temp2.append(t2_final)
+                            if len(aw.qmc.temp1) > 0:
+                                aw.qmc.temp1[-1] = t1_final
+                            else:                            
+                                aw.qmc.temp1.append(t1_final)
+                        if aw.qmc.flagstart:
                             aw.qmc.timex.append(tx)
                             length_of_qmc_timex += 1
-
-                    # update lines data using the lists with new data
-                    if aw.qmc.flagstart:
-                        aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
-                        aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
-
-                    #we need a minimum of two readings to calculate rate of change
-                    if aw.qmc.flagstart and length_of_qmc_timex > 2:
-                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
-                        #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                        aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
-                        aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
-                        aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
-                        aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
-                        #######   filter deltaBT deltaET
-                        if aw.qmc.deltafilter:
-                            if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
-                                if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
-                                    a1,a2 = 0.,0.
-                                    for k in range(aw.qmc.deltafilter):
-                                        a1 += aw.qmc.unfiltereddelta1[-(k+1)]
-                                        a2 += aw.qmc.unfiltereddelta2[-(k+1)]
-                                    aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
-                                    aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
-
-                        rateofchange1plot = aw.qmc.rateofchange1
-                        rateofchange2plot = aw.qmc.rateofchange2
-
-                    else:
+                        else:
+                            if length_of_qmc_timex <= 0:
+                                aw.qmc.timex.append(tx)
+                                length_of_qmc_timex += 1
+                        # update lines data using the lists with new data
                         if aw.qmc.flagstart:
-                            aw.qmc.unfiltereddelta1.append(0.)
-                            aw.qmc.unfiltereddelta2.append(0.)
+                            aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
+                            aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+                        #we need a minimum of two readings to calculate rate of change
+                        if aw.qmc.flagstart and length_of_qmc_timex > 2:
+                            timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
+                            #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                            aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
+                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
+                            aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
+                            aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
+                            #######   filter deltaBT deltaET
+                            if aw.qmc.deltafilter:
+                                if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
+                                    if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
+                                        a1,a2 = 0.,0.
+                                        for k in range(aw.qmc.deltafilter):
+                                            a1 += aw.qmc.unfiltereddelta1[-(k+1)]
+                                            a2 += aw.qmc.unfiltereddelta2[-(k+1)]
+                                        aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
+                                        aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
+                            rateofchange1plot = aw.qmc.rateofchange1
+                            rateofchange2plot = aw.qmc.rateofchange2
                         else:
-                            if len(aw.qmc.unfiltereddelta1) > 0:
-                                aw.qmc.unfiltereddelta1[-1] = 0.
-                            else:
+                            if aw.qmc.flagstart:
                                 aw.qmc.unfiltereddelta1.append(0.)
-                            if len(aw.qmc.unfiltereddelta2) > 0:
-                                aw.qmc.unfiltereddelta2[-1] = 0.
-                            else:
                                 aw.qmc.unfiltereddelta2.append(0.)
-                        aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
-
-                    # append new data to the rateofchange
-                    if aw.qmc.flagstart:
-                        aw.qmc.delta1.append(rateofchange1plot)
-                        aw.qmc.delta2.append(rateofchange2plot)
-                    else:
-                        if len(aw.qmc.delta1) > 0:
-                            aw.qmc.delta1[-1] = rateofchange1plot
-                        else:
-                            aw.qmc.delta1.append(rateofchange1plot)
-                        if len(aw.qmc.delta2) > 0:
-                            aw.qmc.delta2[-1] = rateofchange2plot
-                        else:
-                            aw.qmc.delta2.append(rateofchange2plot)
-
-                    if aw.qmc.flagstart:
-                        if aw.qmc.DeltaETflag:
-                            aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
-                        if aw.qmc.DeltaBTflag:
-                            aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
-
-                        #readjust xlimit of plot if needed
-                        if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
-                            aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
-                            aw.qmc.xaxistosm()
-
-                        if aw.qmc.projectFlag:
-                            aw.qmc.viewProjection()
-                        if aw.qmc.background and aw.qmc.backgroundReproduce:
-                            aw.qmc.playbackevent()
-
-                        # autodetect CHARGE event
-                        # only if BT > 203F/95C
-                        if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
-                            ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
-                            if aw.BTbreak(length_of_qmc_timex - 1):
-                                # we found a BT break at the current index minus 2
-                                aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
-                        # autodetect DROP event
-                        # only if 9min into roast and BT>180C/356F
-                        elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
-                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
-                            ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
-                            if aw.BTbreak(length_of_qmc_timex - 1):
-                                # we found a BT break at the current index minus 2
-                                aw.qmc.autoDropIdx = length_of_qmc_timex - 3
-
-                    #check alarms 
-                    for i in range(len(aw.qmc.alarmflag)):
-                        #if alarm on, and not triggered, and time is after set time:
-                        # qmc.alarmtime = -1 (None)
-                        # qmc.alarmtime = 0 (CHARGE)
-                        # ..
-                        # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
-                        # 1) the alarm is ON
-                        # 2) the alarm was not triggered yet
-                        # 3) the alarm From is ON
-                        # 4) the alarm From is CHARGE
-                        # 5) the alarm From is any other event but TP
-                        # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
-                        if aw.qmc.alarmflag[i] \
-                          and not aw.qmc.alarmstate[i] \
-                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
-                          and ((aw.qmc.alarmtime[i] < 0) \
-                          or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > -1) \
-                          or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                          or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
-                                and aw.qmc.timeindex[1] < 1 and self.checkTPalarmtime())):
-                            alarm_temp = None
-                            if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
-                                alarm_temp = aw.qmc.delta1[-1]
-                            elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
-                                alarm_temp = aw.qmc.delta2[-1]
-                            elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                alarm_temp = aw.qmc.temp1[-1]
-                            elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                alarm_temp = aw.qmc.temp2[-1]
-                            elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
-                                if (aw.qmc.alarmsource[i])%2==0:
-                                    alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                            else:
+                                if len(aw.qmc.unfiltereddelta1) > 0:
+                                    aw.qmc.unfiltereddelta1[-1] = 0.
                                 else:
-                                    alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                            alarm_limit = aw.qmc.alarmtemperature[i]
-                            if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
-                                aw.qmc.temporaryalarmflag = i
-
-                #############    if using DEVICE 18 (no device). Manual mode
-                # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
-                else:
-                    tx = int(aw.qmc.timeclock.elapsed()/1000.)
-
-                    #readjust xlimit of plot if needed
-                    if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
-                        aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
-                        aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
-                        aw.qmc.xaxistosm()
-                    aw.qmc.resetlines()
-                    #add to plot a vertical time line
-                    aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
-
-            ##### release semaphore  #########
-# done in the finally-clause:
-#            aw.qmc.samplingsemaphore.release(1)
-
-# done in the finally-clause:
-            #update screen in main GUI thread
-#            self.emit(SIGNAL("updategraphics"))
-
+                                    aw.qmc.unfiltereddelta1.append(0.)
+                                if len(aw.qmc.unfiltereddelta2) > 0:
+                                    aw.qmc.unfiltereddelta2[-1] = 0.
+                                else:
+                                    aw.qmc.unfiltereddelta2.append(0.)
+                            aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+                        # append new data to the rateofchange
+                        if aw.qmc.flagstart:
+                            aw.qmc.delta1.append(rateofchange1plot)
+                            aw.qmc.delta2.append(rateofchange2plot)
+                        else:
+                            if len(aw.qmc.delta1) > 0:
+                                aw.qmc.delta1[-1] = rateofchange1plot
+                            else:
+                                aw.qmc.delta1.append(rateofchange1plot)
+                            if len(aw.qmc.delta2) > 0:
+                                aw.qmc.delta2[-1] = rateofchange2plot
+                            else:
+                                aw.qmc.delta2.append(rateofchange2plot)
+                        if aw.qmc.flagstart:
+                            if aw.qmc.DeltaETflag:
+                                aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
+                            if aw.qmc.DeltaBTflag:
+                                aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
+                            #readjust xlimit of plot if needed
+                            if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                                aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
+                                aw.qmc.xaxistosm()
+                            if aw.qmc.projectFlag:
+                                aw.qmc.viewProjection()
+                            if aw.qmc.background and aw.qmc.backgroundReproduce:
+                                aw.qmc.playbackevent()
+                            # autodetect CHARGE event
+                            # only if BT > 203F/95C
+                            if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
+                                ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
+                                if aw.BTbreak(length_of_qmc_timex - 1):
+                                    # we found a BT break at the current index minus 2
+                                    aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
+                            # autodetect DROP event
+                            # only if 9min into roast and BT>180C/356F
+                            elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                                length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
+                                ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
+                                if aw.BTbreak(length_of_qmc_timex - 1):
+                                    # we found a BT break at the current index minus 2
+                                    aw.qmc.autoDropIdx = length_of_qmc_timex - 3
+                        #check alarms 
+                        for i in range(len(aw.qmc.alarmflag)):
+                            #if alarm on, and not triggered, and time is after set time:
+                            # qmc.alarmtime = -1 (None)
+                            # qmc.alarmtime = 0 (CHARGE)
+                            # ..
+                            # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
+                            # 1) the alarm is ON
+                            # 2) the alarm was not triggered yet
+                            # 3) the alarm From is ON
+                            # 4) the alarm From is CHARGE
+                            # 5) the alarm From is any other event but TP
+                            # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
+                            if aw.qmc.alarmflag[i] \
+                              and not aw.qmc.alarmstate[i] \
+                              and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
+                              and ((aw.qmc.alarmtime[i] < 0) \
+                              or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > -1) \
+                              or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                              or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
+                                    and aw.qmc.timeindex[1] < 1 and self.checkTPalarmtime())):
+                                alarm_temp = None
+                                if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
+                                    alarm_temp = aw.qmc.delta1[-1]
+                                elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
+                                    alarm_temp = aw.qmc.delta2[-1]
+                                elif aw.qmc.alarmsource[i] == 0:                      #check ET
+                                    alarm_temp = aw.qmc.temp1[-1]
+                                elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                                    alarm_temp = aw.qmc.temp2[-1]
+                                elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
+                                    if (aw.qmc.alarmsource[i])%2==0:
+                                        alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    else:
+                                        alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                alarm_limit = aw.qmc.alarmtemperature[i]
+                                if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                                    aw.qmc.temporaryalarmflag = i
+                    #############    if using DEVICE 18 (no device). Manual mode
+                    # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
+                    else:
+                        tx = int(aw.qmc.timeclock.elapsed()/1000.)
+                        #readjust xlimit of plot if needed
+                        if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
+                            aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
+                            aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
+                            aw.qmc.xaxistosm()
+                        aw.qmc.resetlines()
+                        #add to plot a vertical time line
+                        aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
-
-# done in the finally-clause:
-#            if aw.qmc.samplingsemaphore.available() < 1:
-#                aw.qmc.samplingsemaphore.release(1)
-
-# no, we do not stop sampling on critical exceptions
-#            aw.qmc.flagon = False
-#            aw.qmc.flagstart = False
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
-
         finally:
-            aw.qmc.samplingsemaphore.release(1)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
             #update screen in main GUI thread
             self.emit(SIGNAL("updategraphics"))
 
@@ -7916,8 +7840,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.safesaveflag = False
             else:
                 self.sendmessage(QApplication.translate("Message Area","Cancelled", None, QApplication.UnicodeUTF8))
-        except IOError as ex:
-            self.qmc.adderror(QApplication.translate("Error Message", "IO Error on filesave(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
+        except Exception as ex:
+            self.qmc.adderror(QApplication.translate("Error Message", "Error on filesave(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
             return
 
     def fileExport(self,msg,ext,dumper):
@@ -15933,7 +15857,6 @@ class serialport(object):
 ############################################################################
     def openport(self):
         try:
-            #self.closeport()
             self.confport()
             self.ArduinoIsInitialized = 0  # Assume the Arduino has to be reinitialized
             #open port
