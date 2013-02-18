@@ -923,7 +923,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: updategraphics() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: updategraphics() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def updateLCDtime(self):
         if self.flagon and self.flagstart:
@@ -987,7 +987,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: timealign() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: timealign() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
 
     def resetlines(self):
@@ -1013,7 +1013,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(QApplication.translate("Message Area","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(self.alarmstrings[alarmnumber]))
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
-                self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
                 return
         elif self.alarmaction[alarmnumber] == 2:
             # alarm event button
@@ -1026,7 +1026,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.qmc.markCoolEnd()
             except Exception as e: 
                 _, _, exc_tb = sys.exc_info() 
-                self.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
                 return
 
     def playbackevent(self):
@@ -1212,7 +1212,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return 0
 
     #format X axis labels
@@ -1466,7 +1466,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: reset() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: reset() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -1499,7 +1499,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: smooth() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: smooth() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return x
 
     def smooth_list(self, a, b, window_len=7, window='hanning'):
@@ -1638,7 +1638,7 @@ class tgraphcanvas(FigureCanvas):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: place_annotations() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: place_annotations() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
 
     #Redraws data
@@ -2071,7 +2071,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()    
-            self.adderror(QApplication.translate("Error Message","Exception Error: redraw() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: redraw() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:            
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2570,7 +2570,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markCharge() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: markCharge() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:            
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2624,7 +2624,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markDryEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: markDryEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2682,7 +2682,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2736,7 +2736,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2794,7 +2794,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2851,7 +2851,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:            
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2922,7 +2922,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markDrop() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: markDrop() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2987,7 +2987,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: markCoolEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: markCoolEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3004,7 +3004,7 @@ class tgraphcanvas(FigureCanvas):
                 self.EventRecordAction(extraevent=extraevent)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: EventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: EventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
@@ -3114,7 +3114,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(QApplication.translate("Message Area","Timer is OFF", None, QApplication.UnicodeUTF8))
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: EventRecordAction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: EventRecordAction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -3200,7 +3200,7 @@ class tgraphcanvas(FigureCanvas):
                         self.samplingsemaphore.release(1)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: DeviceEventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: DeviceEventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3503,12 +3503,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info() 
-            self.adderror(QApplication.translate("Error Message","Value Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
-            self.adderror(QApplication.translate("Error Message","Exception Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
     #interpolation type
@@ -3529,11 +3529,11 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
 
         except ValueError:
-            self.adderror(QApplication.translate("Error Message","value Error: univariate() ",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","value Error: univariate() ",None, QApplication.UnicodeUTF8))
             return
 
         except Exception:
-            self.adderror(QApplication.translate("Error Message","Exception: univariate() ",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception: univariate() ",None, QApplication.UnicodeUTF8))
             return
 
     def drawinterp(self,mode):
@@ -3550,12 +3550,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info() 
-            self.adderror(QApplication.translate("Error Message","value error in drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","value error in drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception: drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception: drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
 
@@ -3993,7 +3993,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception: designer on_motion() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: designer on_motion() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             self.unrarefy_designer()
             return
 
@@ -4076,7 +4076,7 @@ class tgraphcanvas(FigureCanvas):
             
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception: designer addpoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: designer addpoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return 
 
     #removes point
@@ -4112,7 +4112,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception: designer removepoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: designer removepoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
     #finds a proper index location for a time that does not exists yet.
@@ -4197,12 +4197,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Value Error: createFromDesigner() ",None, QApplication.UnicodeUTF8),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error: createFromDesigner() ",None, QApplication.UnicodeUTF8),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception: createFromDesigner() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: createFromDesigner() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
     #activates mouse events
@@ -4567,12 +4567,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Value Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
     def makewheelcolorpattern(self):
@@ -5191,6 +5191,10 @@ class ApplicationWindow(QMainWindow):
         self.connect(fileImportJSONAction,SIGNAL("triggered()"),self.fileImportJSON)
         self.importMenu.addAction(fileImportJSONAction)
 
+        fileImportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None, QApplication.UnicodeUTF8),self)
+        self.connect(fileImportRoastLoggerAction,SIGNAL("triggered()"),self.fileImportRoastLogger)
+        self.importMenu.addAction(fileImportRoastLoggerAction)
+
         importHH506RAAction = QAction(QApplication.translate("Menu", "HH506RA...",None, QApplication.UnicodeUTF8),self)
         self.connect(importHH506RAAction,SIGNAL("triggered()"),self.importHH506RA)
         self.importMenu.addAction(importHH506RAAction)
@@ -5226,6 +5230,10 @@ class ApplicationWindow(QMainWindow):
         fileExportJSONAction = QAction(QApplication.translate("Menu", "JSON...",None, QApplication.UnicodeUTF8),self)
         self.connect(fileExportJSONAction,SIGNAL("triggered()"),self.fileExportJSON)
         self.exportMenu.addAction(fileExportJSONAction)
+
+        fileExportRoastLoggerAction = QAction(QApplication.translate("Menu", "RoastLogger...",None, QApplication.UnicodeUTF8),self)
+        self.connect(fileExportRoastLoggerAction,SIGNAL("triggered()"),self.fileExportRoastLogger)
+        self.exportMenu.addAction(fileExportRoastLoggerAction)
 
         self.fileMenu.addSeparator()
 
@@ -6251,7 +6259,7 @@ class ApplicationWindow(QMainWindow):
                     QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
                 except Exception as e:
                     _, _, exc_tb = sys.exc_info()
-                    self.qmc.adderror(QApplication.translate("Error Message","Exception Error: eventaction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+                    aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: eventaction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             elif action == 3:
                 for i in range(len(cmd_str)):
                     buttonnumber = int(cmd_str[i])-1
@@ -6692,7 +6700,7 @@ class ApplicationWindow(QMainWindow):
                 self.autosaveconf()
 
         except IOError as e:
-            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: automaticsave() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error: automaticsave() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
 
     def viewKshortcuts(self):
         string = QApplication.translate("MessageBox", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None, QApplication.UnicodeUTF8) + "<br><br>"
@@ -6931,11 +6939,11 @@ class ApplicationWindow(QMainWindow):
             fileName = self.ArtisanOpenFileDialog()
             if fileName:
                 self.loadFile(fileName)
-        except Exception as e:
+        except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: fileLoad() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: fileLoad() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     #loads stored profiles. Called from file menu
     def loadFile(self,filename):
@@ -6963,23 +6971,23 @@ class ApplicationWindow(QMainWindow):
             message =  QApplication.translate("Message Area","%1  loaded ", None, QApplication.UnicodeUTF8).arg(str(filename))
             self.sendmessage(message)
             self.setCurrentFile(filename)
-        except IOError as e:
+        except IOError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return
-        except ValueError as e:
+        except ValueError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            self.qmc.adderror(QApplication.translate("Error Message", "Value Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return
-        except Exception as e:
+        except Exception as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadFile() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadFile() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return
         finally:
             if f:
@@ -7041,17 +7049,17 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message Area", "Invalid artisan format",None, QApplication.UnicodeUTF8))
         except IOError as e:
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror(QApplication.translate("Error Message", "Value Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
         finally:
             if f:
@@ -7065,89 +7073,95 @@ class ApplicationWindow(QMainWindow):
 
     #read Artisan CSV
     def importCSV(self,filename):
-        import csv
-        csvFile = file(filename,"rb")
-        data = csv.reader(csvFile,delimiter='\t')
-        #read file header
-        header = next(data)
-        self.qmc.roastdate = QDate.fromString(header[0].split('Date:')[1],"dd'.'MM'.'yyyy")
-        unit = header[1].split('Unit:')[1]
-        #set temperature mode
-        if unit == "F" and self.qmc.mode == "C":
-            self.qmc.fahrenheitMode()
-        if unit == "C" and self.qmc.mode == "F":
-            self.qmc.celsiusMode()
-        #read column headers
-        fields = next(data) 
-        extra_fields = fields[5:] # colums after 'Event'
-        # add devices if needed
-        for i in range(max(0,(len(extra_fields) / 2) - len(self.qmc.extradevices))):
-            self.addDevice()
-        # set extra device names # NOTE: eventuelly we want to set/change the names only for devices that were just added in the line above!?
-        for i in range(len(extra_fields)):
-            if i % 2 == 1:
-                # odd
-                self.qmc.extraname2[i/2 + 1] = extra_fields[i] 
-            else:
-                # even
-                self.qmc.extraname1[i/2] = extra_fields[i]
-
-        #read data
-        last_time = None
-        for row in data:
-            items = list(zip(fields, row))
-            item = {}
-            for (name, value) in items:
-                item[name] = value.strip()
-            #add one measurement
-            timez = float(self.qmc.stringtoseconds(item['Time1']))
-            if not last_time or last_time < timez:
-                self.qmc.timex.append(timez)
-                self.qmc.temp1.append(float(item['ET']))
-                self.qmc.temp2.append(float(item['BT']))
-                for j in range(len(extra_fields)):
-                    if j % 2 == 1:
-                        # odd
-                        self.qmc.extratemp2[j/2].append(float(item[extra_fields[j]]))
-                    else:
-                        # even
-                        self.qmc.extratimex[j/2].append(timez)
-                        self.qmc.extratemp1[j/2].append(float(item[extra_fields[j]]))
-            last_time = timez
-        csvFile.close()
-        #swap temperature curves if needed such that BT is the lower and ET the upper one
-        if len(self.qmc.temp2) > 0 and len(self.qmc.temp1) > 0 and (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
-            tmp = self.qmc.temp1
-            self.qmc.temp1 = self.qmc.temp2
-            self.qmc.temp2 = tmp
-        #set events
-        CHARGE = self.qmc.stringtoseconds(header[2].split('CHARGE:')[1])
-        if CHARGE > 0:
-            self.qmc.timeindex[0] = self.time2index(CHARGE)
-        DRYe = self.qmc.stringtoseconds(header[4].split('DRYe:')[1])
-        if DRYe > 0:
-            self.qmc.timeindex[1] = self.time2index(DRYe)
-        FCs = self.qmc.stringtoseconds(header[5].split('FCs:')[1])
-        if FCs > 0:
-            self.qmc.timeindex[2] = self.time2index(FCs)
-        FCe = self.qmc.stringtoseconds(header[6].split('FCe:')[1])
-        if FCe > 0:
-            self.qmc.timeindex[3] = self.time2index(FCe)
-        SCs = self.qmc.stringtoseconds(header[7].split('SCs:')[1])
-        if SCs > 0:
-            self.qmc.timeindex[4] = self.time2index(SCs)
-        SCe = self.qmc.stringtoseconds(header[8].split('SCe:')[1])
-        if SCe> 0:
-            self.qmc.timeindex[5] = self.time2index(SCe) 
-        DROP = self.qmc.stringtoseconds(header[9].split('DROP:')[1])
-        if DROP > 0:
-            self.qmc.timeindex[6] = self.time2index(DROP)
-        COOL = self.qmc.stringtoseconds(header[10].split('COOL:')[1])
-        if COOL > 0:
-            self.qmc.timeindex[7] = self.time2index(COOL)
-        self.qmc.endofx = self.qmc.timex[-1]
-        self.sendmessage(QApplication.translate("Message Area","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
-        self.qmc.redraw()
+        try:
+            import csv
+            import io
+            csvFile = io.open(filename, 'r', encoding='utf-8')
+            data = csv.reader(csvFile,delimiter='\t')
+            #read file header
+            header = next(data)
+            self.qmc.roastdate = QDate.fromString(header[0].split('Date:')[1],"dd'.'MM'.'yyyy")
+            unit = header[1].split('Unit:')[1]
+            #set temperature mode
+            if unit == "F" and self.qmc.mode == "C":
+                self.qmc.fahrenheitMode()
+            if unit == "C" and self.qmc.mode == "F":
+                self.qmc.celsiusMode()
+            #read column headers
+            fields = next(data) 
+            extra_fields = fields[5:] # colums after 'Event'
+            # add devices if needed
+            for i in range(max(0,(len(extra_fields) / 2) - len(self.qmc.extradevices))):
+                self.addDevice()
+            # set extra device names # NOTE: eventuelly we want to set/change the names only for devices that were just added in the line above!?
+            for i in range(len(extra_fields)):
+                if i % 2 == 1:
+                    # odd
+                    self.qmc.extraname2[int(i/2)] = extra_fields[i]
+                else:
+                    # even
+                    self.qmc.extraname1[int(i/2)] = extra_fields[i]
+            #read data
+            last_time = None
+            for row in data:
+                items = list(zip(fields, row))
+                item = {}
+                for (name, value) in items:
+                    item[name] = value.strip()
+                #add one measurement
+                timez = float(self.qmc.stringtoseconds(item['Time1']))
+                if not last_time or last_time < timez:
+                    self.qmc.timex.append(timez)
+                    self.qmc.temp1.append(float(item['ET']))
+                    self.qmc.temp2.append(float(item['BT']))
+                    for j in range(len(extra_fields)):
+                        if j % 2 == 1:
+                            # odd
+                            self.qmc.extratemp2[int(j/2)].append(float(item[extra_fields[j]]))
+                        else:
+                            # even
+                            self.qmc.extratimex[int(j/2)].append(timez)
+                            self.qmc.extratemp1[int(j/2)].append(float(item[extra_fields[j]]))
+                last_time = timez
+            csvFile.close()
+            #swap temperature curves if needed such that BT is the lower and ET the upper one
+            if len(self.qmc.temp2) > 0 and len(self.qmc.temp1) > 0 and (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
+                tmp = self.qmc.temp1
+                self.qmc.temp1 = self.qmc.temp2
+                self.qmc.temp2 = tmp
+            #set events
+            CHARGE = self.qmc.stringtoseconds(header[2].split('CHARGE:')[1])
+            if CHARGE > 0:
+                self.qmc.timeindex[0] = self.time2index(CHARGE)
+            DRYe = self.qmc.stringtoseconds(header[4].split('DRYe:')[1])
+            if DRYe > 0:
+                self.qmc.timeindex[1] = self.time2index(DRYe)
+            FCs = self.qmc.stringtoseconds(header[5].split('FCs:')[1])
+            if FCs > 0:
+                self.qmc.timeindex[2] = self.time2index(FCs)
+            FCe = self.qmc.stringtoseconds(header[6].split('FCe:')[1])
+            if FCe > 0:
+                self.qmc.timeindex[3] = self.time2index(FCe)
+            SCs = self.qmc.stringtoseconds(header[7].split('SCs:')[1])
+            if SCs > 0:
+                self.qmc.timeindex[4] = self.time2index(SCs)
+            SCe = self.qmc.stringtoseconds(header[8].split('SCe:')[1])
+            if SCe> 0:
+                self.qmc.timeindex[5] = self.time2index(SCe) 
+            DROP = self.qmc.stringtoseconds(header[9].split('DROP:')[1])
+            if DROP > 0:
+                self.qmc.timeindex[6] = self.time2index(DROP)
+            COOL = self.qmc.stringtoseconds(header[10].split('COOL:')[1])
+            if COOL > 0:
+                self.qmc.timeindex[7] = self.time2index(COOL)
+            self.qmc.endofx = self.qmc.timex[-1]
+            self.sendmessage(QApplication.translate("Message Area","Artisan CSV file loaded successfully", None, QApplication.UnicodeUTF8))
+            self.qmc.redraw()
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importCSV() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     def addSerialPort(self):
         self.extraser.append(serialport()) 
@@ -7203,115 +7217,276 @@ class ApplicationWindow(QMainWindow):
 
     #Write readings to Artisan JSON file
     def exportJSON(self,filename):
-        outfile = open(filename, 'w', encoding='utf-8')
-        #json.dump(self.getProfile(), outfile, sort_keys=True, indent=4)
-        json.dump(self.getProfile(), outfile, ensure_ascii=True)
-        outfile.write('\n')
-        outfile.close()
+        try:
+            outfile = open(filename, 'w')
+            json.dump(self.getProfile(), outfile, ensure_ascii=True)
+            outfile.write('\n')
+            outfile.close()
+        except Exception as ex:
+#            import traceback
+#           traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: exportJSON() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+
+    #Write readings to RoastLogger CSV file
+    def exportRoastLogger(self,filename):
+        outfile = open(filename, 'w')
+        try:
+            p = self.getProfile()
+            outfile.write("Log created at 09:00:00 "+ self.qmc.roastdate.toString("dd'/'MM'/'yyyy") + "\n")
+            outfile.write("Use Options|Set template for new log to modify this template.\n")
+            outfile.write("------------------------------------------------------\n")
+            outfile.write("Bean/Blend name:\n")
+            outfile.write("\n")
+            outfile.write("Profile description:\n")
+            outfile.write("\n")
+            outfile.write("Roast notes:\n")
+            outfile.write("\n")
+            outfile.write("Cupping results:\n")
+            outfile.write("\n")
+            outfile.write("Roast Logger Copyright ? T. R. Coxon (GreenBean TMC).\n")
+            outfile.write("Roast started at 09:00:00 " + self.qmc.roastdate.toString("dd'/'MM'/'yyyy") + "\n")
+            if len(self.qmc.timex) > 0:
+                CHARGE = aw.qmc.timex[aw.qmc.timeindex[0]] 
+            else:
+                CHARGE = 0
+            import csv
+            writer= csv.writer(outfile,delimiter=',')
+            writer.writerow(["Elapsed time "," T1 "," T2 "," Event type"])
+            for i in range(len(aw.qmc.timex)):
+                if i == aw.qmc.timeindex[0]:
+                    kind = "Beans loaded"
+                elif i!=0 and i == aw.qmc.timeindex[2]:
+                    kind = "First crack start"
+                elif i!=0 and i == aw.qmc.timeindex[3]:
+                    kind = "First crack end"
+                elif i!=0 and i == aw.qmc.timeindex[4]:
+                    kind = "Second crack start"
+                elif i!=0 and i == aw.qmc.timeindex[6]:
+                    kind = "Beans ejected"
+                else:
+                    kind = "timer"
+                writer.writerow([aw.qmc.stringfromseconds(aw.qmc.timex[i]-CHARGE),"%.1f"%float(aw.qmc.temp1[i]),"%.1f"%float(aw.qmc.temp2[i]),kind])
+            outfile.write("\n")
+            outfile.write("@actionT1Table\n")
+            outfile.write("120|null|30\n")
+            outfile.write("178|65|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("\n")
+            outfile.write("@actionSecsFCTable\n")
+            outfile.write("60|50|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("null|null|null\n")
+            outfile.write("\n")
+            outfile.write("@actionResetTable\n")
+            outfile.write("100|0\n")
+            outfile.write("\n")
+            outfile.write("@loadBeansTable\n")
+            outfile.write("146\n")
+            outfile.write("\n")
+            outfile.close()
+        except Exception as ex:
+#           import traceback
+#           traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: exportRoastLogger() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            outfile.close()
 
     def importJSON(self,filename):
-        infile = open(filename, 'r', encoding='utf-8')
-        obj = json.load(infile)
-        self.setProfile(obj)
-        infile.close()
-        self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-        #change Title
-        self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
-        #update etypes combo box
-        self.etypeComboBox.clear()
-        self.etypeComboBox.addItems(self.qmc.etypes)
-        self.qmc.redraw()
+        try:
+            import io
+            infile = io.open(filename, 'r', encoding='utf-8')
+            obj = json.load(infile)
+            self.setProfile(obj)
+            infile.close()
+            self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+            #change Title
+            self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+            #update etypes combo box
+            self.etypeComboBox.clear()
+            self.etypeComboBox.addItems(self.qmc.etypes)
+            self.qmc.redraw()
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importJSON() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+
+    def importRoastLogger(self,filename):
+        try:
+            # use io.open instead of open to have encoding support on Python 2
+            import io
+            infile = io.open(filename, 'r', encoding='utf-8')
+            obj = {}
+            obj["mode"] = "C"
+            obj["title"] = str(QFileInfo(filename).fileName())
+            import csv
+            obj["roastdate"] = e(QDate.currentDate().toString())
+            # read roastdate from file
+            while True:
+                l = infile.readline()
+                if l.startswith("Roast started at "):
+                    #extract roast date
+                    roastdate = QDate.fromString(l.split(" ")[-1][0:10],"dd'/'MM'/'yyyy")
+                    if not roastdate.isNull():
+                        obj["roastdate"] = e(roastdate.toString())
+                    break
+                if l == '':
+                    break
+            timeindex = [-1,0,0,0,0,0,0,0]
+            timex = []
+            temp1 = []
+            temp2 = []
+            data = csv.reader(infile,delimiter=',')
+            #read file header
+            next(data) # we do not use the labels
+            #header = list(map(lambda s:s.strip(),next(data)))
+            while True:
+                fields = next(data)
+                if len(fields) == 0:
+                    break
+                else:
+                    timex.append(float(self.qmc.stringtoseconds(fields[0])))
+                    temp1.append(float(fields[1]))
+                    temp2.append(float(fields[2]))
+                    event = fields[3]
+                    if event == "Beans loaded":
+                        timeindex[0] = len(timex) - 1
+                    elif event == "First crack start":
+                        timeindex[2] = len(timex) - 1
+                    elif event == "First crack end":
+                        timeindex[3] = len(timex) - 1
+                    elif event == "Second crack start":
+                        timeindex[4] = len(timex) - 1
+                    elif event == "Beans ejected":
+                        timeindex[6] = len(timex) - 1
+            obj["timeindex"] = timeindex
+            obj["timex"] = timex
+            obj["temp1"] = temp1
+            obj["temp2"] = temp2
+            self.setProfile(obj)
+            infile.close()
+            self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+            #change Title
+            self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+            self.qmc.redraw()
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importRoastLogger() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
-        if len(self.qmc.timex) > 0:
-            CHARGE = self.qmc.timex[self.qmc.timeindex[0]] 
-            TP_index = self.findTP()
-            TP = 0.
-            if TP_index and TP_index < len(self.qmc.timex):
-                TP = self.qmc.timex[TP_index]
-            dryEndIndex = self.findDryEnd(TP_index)
-            if self.qmc.timeindex[1]:
-                #manual dryend available
-                DRYe = self.qmc.timex[self.qmc.timeindex[1]]
-            else:
-                #we use the dryEndIndex respecting the dry phase
-                if dryEndIndex < len(self.qmc.timex):
-                    DRYe = self.qmc.timex[dryEndIndex]
+        try:
+            if len(self.qmc.timex) > 0:
+                CHARGE = self.qmc.timex[self.qmc.timeindex[0]] 
+                TP_index = self.findTP()
+                TP = 0.
+                if TP_index and TP_index < len(self.qmc.timex):
+                    TP = self.qmc.timex[TP_index]
+                dryEndIndex = self.findDryEnd(TP_index)
+                if self.qmc.timeindex[1]:
+                    #manual dryend available
+                    DRYe = self.qmc.timex[self.qmc.timeindex[1]]
                 else:
-                    DRYe = 0.
-            if self.qmc.timeindex[2]:
-                FCs = self.qmc.timex[self.qmc.timeindex[2]]
-            else:
-                FCs = 0
-            if self.qmc.timeindex[3]:
-                FCe = self.qmc.timex[self.qmc.timeindex[3]]
-            else:
-                FCe = 0
-            if self.qmc.timeindex[4]:
-                SCs = self.qmc.timex[self.qmc.timeindex[4]]
-            else:
-                SCs = 0
-            if self.qmc.timeindex[5]:
-                SCe = self.qmc.timex[self.qmc.timeindex[5]]
-            else:
-                SCe = 0
-            if self.qmc.timeindex[6]:
-                DROP = self.qmc.timex[self.qmc.timeindex[6]]
-            else:
-                DROP = 0
-            if self.qmc.timeindex[7]:
-                COOL = self.qmc.timex[self.qmc.timeindex[7]]
-            else:
-                COOL = 0
-            events = [     
-                [CHARGE,"Charge",False],
-                [TP,"TP",False],      
-                [DRYe,"Dry End",False], 
-                [FCs,"FCs",False],
-                [FCe,"FCe",False],
-                [SCs,"SCs",False],
-                [SCe,"SCe",False],
-                [DROP, "Drop",False],
-                [COOL, "COOL",False],
-                ]
-            import csv
-            csvFile= file(filename, "wb")
-            writer= csv.writer(csvFile,delimiter='\t')
-            writer.writerow([
-                "Date:" + self.qmc.roastdate.toString("dd'.'MM'.'yyyy"),
-                "Unit:" + self.qmc.mode,
-                "CHARGE:" + self.eventtime2string(CHARGE),
-                "TP:" + self.eventtime2string(TP),
-                "DRYe:" + self.eventtime2string(DRYe),
-                "FCs:" + self.eventtime2string(FCs),
-                "FCe:" + self.eventtime2string(FCe),
-                "SCs:" + self.eventtime2string(SCs),
-                "SCe:" + self.eventtime2string(SCe),
-                "DROP:" + self.eventtime2string(DROP),
-                "COOL:" + self.eventtime2string(COOL)])     
-            writer.writerow(['Time1','Time2','BT','ET','Event'] + freduce(lambda x,y: x + [str(y[0]),str(y[1])], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))
-            last_time = None
-            for i in range(len(self.qmc.timex)):
-                if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
-                    time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
+                    #we use the dryEndIndex respecting the dry phase
+                    if dryEndIndex < len(self.qmc.timex):
+                        DRYe = self.qmc.timex[dryEndIndex]
+                    else:
+                        DRYe = 0.
+                if self.qmc.timeindex[2]:
+                    FCs = self.qmc.timex[self.qmc.timeindex[2]]
                 else:
-                    time2 = "" 
-                event = ""               
-                for e in range(len(events)):
-                    if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
-                        event = events[e][1]
-                        events[e][2] = True
-                        break
-                time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
-                if not last_time or last_time != time1:
-                    extratemps = []
-                    for j in range(len(self.qmc.extradevices)):
-                        extratemps.append(self.qmc.extratemp1[j][i])
-                        extratemps.append(self.qmc.extratemp2[j][i])
-                    writer.writerow([time1,time2,self.qmc.temp2[i],self.qmc.temp1[i],event] + extratemps)
-                last_time = time1
-            csvFile.close()
+                    FCs = 0
+                if self.qmc.timeindex[3]:
+                    FCe = self.qmc.timex[self.qmc.timeindex[3]]
+                else:
+                    FCe = 0
+                if self.qmc.timeindex[4]:
+                    SCs = self.qmc.timex[self.qmc.timeindex[4]]
+                else:
+                    SCs = 0
+                if self.qmc.timeindex[5]:
+                    SCe = self.qmc.timex[self.qmc.timeindex[5]]
+                else:
+                    SCe = 0
+                if self.qmc.timeindex[6]:
+                    DROP = self.qmc.timex[self.qmc.timeindex[6]]
+                else:
+                    DROP = 0
+                if self.qmc.timeindex[7]:
+                    COOL = self.qmc.timex[self.qmc.timeindex[7]]
+                else:
+                    COOL = 0
+                events = [     
+                    [CHARGE,"Charge",False],
+                    [TP,"TP",False],      
+                    [DRYe,"Dry End",False], 
+                    [FCs,"FCs",False],
+                    [FCe,"FCe",False],
+                    [SCs,"SCs",False],
+                    [SCe,"SCe",False],
+                    [DROP, "Drop",False],
+                    [COOL, "COOL",False],
+                    ]
+                import csv
+                outfile = open(filename, 'w')
+                writer= csv.writer(outfile,delimiter='\t')
+                writer.writerow([
+                    u("Date:" + self.qmc.roastdate.toString("dd'.'MM'.'yyyy")),
+                    u("Unit:" + self.qmc.mode),
+                    u("CHARGE:" + self.eventtime2string(CHARGE)),
+                    u("TP:" + self.eventtime2string(TP)),
+                    u("DRYe:" + self.eventtime2string(DRYe)),
+                    u("FCs:" + self.eventtime2string(FCs)),
+                    u("FCe:" + self.eventtime2string(FCe)),
+                    u("SCs:" + self.eventtime2string(SCs)),
+                    u("SCe:" + self.eventtime2string(SCe)),
+                    u("DROP:" + self.eventtime2string(DROP)),
+                    u("COOL:" + self.eventtime2string(COOL))])
+                writer.writerow([u('Time1'),u('Time2'),u('BT'),u('ET'),u('Event')] + freduce(lambda x,y: x + [u(str(y[0])),u(str(y[1]))], list(zip(self.qmc.extraname1[0:len(self.qmc.extradevices)],self.qmc.extraname2[0:len(self.qmc.extradevices)])),[]))
+                last_time = None
+                for i in range(len(self.qmc.timex)):
+                    if CHARGE > 0. and self.qmc.timex[i] >= CHARGE:
+                        time2 = "%02d:%02d"% divmod(self.qmc.timex[i] - CHARGE, 60)
+                    else:
+                        time2 = "" 
+                    event = ""               
+                    for e in range(len(events)):
+                        if not events[e][2] and int(round(self.qmc.timex[i])) == int(round(events[e][0])):
+                            event = events[e][1]
+                            events[e][2] = True
+                            break
+                    time1 = "%02d:%02d"% divmod(self.qmc.timex[i],60)
+                    if not last_time or last_time != time1:
+                        extratemps = []
+                        for j in range(len(self.qmc.extradevices)):
+                            extratemps.append(u(self.qmc.extratemp1[j][i]))
+                            extratemps.append(u(self.qmc.extratemp2[j][i]))
+                        writer.writerow([u(time1),u(time2),u(self.qmc.temp2[i]),u(self.qmc.temp1[i]),u(event)] + extratemps)
+                    last_time = time1
+                outfile.close()
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: exportCSV() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     #Write object to file
     def serialize(self,filename,obj):
@@ -7644,7 +7819,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["COOL_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[7]])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)        
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)        
         ######### Phases #########
         try:
             if self.qmc.statisticstimes[0]:
@@ -7659,7 +7834,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["coolphasetime"] = self.qmc.statisticstimes[4]
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         ######### Evaluations #########
         try:
             evaluations = self.defect_estimation()
@@ -7669,7 +7844,7 @@ class ApplicationWindow(QMainWindow):
             computedProfile["coolphaseeval"] = str(evaluations[3])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         ######### RoR ######### 
         try:
             if TP_time_idx and DRY_time_idx:
@@ -7681,7 +7856,7 @@ class ApplicationWindow(QMainWindow):
                     computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         ######### ETBTarea #########
         try:
             ts,tse,tsb = aw.ts(self.qmc.timeindex[0],self.qmc.timeindex[6])
@@ -7747,7 +7922,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["set_density"] = self.float2float(setdensity)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)                
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)                
         ######### Humidity #########
         try:
             if aw.qmc.bag_humidity[0] != 0.0:
@@ -7760,71 +7935,76 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["ambient_temperature"] = self.float2float(aw.qmc.ambientTemp)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         return computedProfile
 
     #used by filesave()
     #wrap values in unicode(.) if and only if those are of type string
     def getProfile(self):
-        profile = {}
-        profile["mode"] = self.qmc.mode
-        profile["timeindex"] = self.qmc.timeindex
-        profile["flavors"] = self.qmc.flavors
-        profile["flavorlabels"] = [e(fl) for fl in self.qmc.flavorlabels]
-        profile["flavorstartangle"] = self.qmc.flavorstartangle
-        profile["flavoraspect"] = self.qmc.flavoraspect
-        profile["title"] = e(self.qmc.title)
-        profile["beans"] = e(self.qmc.beans)
-        profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],e(self.qmc.weight[2])]
-        profile["volume"] = self.qmc.volume
-        profile["density"] = [self.qmc.density[0],e(self.qmc.density[1]),self.qmc.density[2],e(self.qmc.density[3])]
-        profile["roastertype"] = e(self.qmc.roastertype)
-        profile["operator"] = e(self.qmc.operator)
-        profile["roastdate"] = e(self.qmc.roastdate.toString())
-        profile["beansize"] = str(self.qmc.beansize)
-        profile["specialevents"] = self.qmc.specialevents
-        profile["specialeventstype"] = self.qmc.specialeventstype
-        profile["specialeventsvalue"] = self.qmc.specialeventsvalue
-        profile["specialeventsStrings"] = [e(ses) for ses in self.qmc.specialeventsStrings]
-        profile["etypes"] = [e(et) for et in self.qmc.etypes]
-        profile["roastingnotes"] = e(self.qmc.roastingnotes)
-        profile["cuppingnotes"] = e(self.qmc.cuppingnotes)
-        profile["timex"] = self.qmc.timex
-        profile["temp1"] = self.qmc.temp1
-        profile["temp2"] = self.qmc.temp2
-        profile["phases"] = self.qmc.phases
-        profile["zmax"] = self.qmc.zlimit
-        profile["zmin"] = self.qmc.zlimit_min
-        profile["ymax"] = self.qmc.ylimit
-        profile["ymin"] = self.qmc.ylimit_min
-        profile["xmin"] = self.qmc.startofx
-        profile["xmax"] = self.qmc.endofx
-        profile["ambientTemp"] = self.qmc.ambientTemp
-        profile["ambient_humidity"] = self.qmc.ambient_humidity
-        profile["bag_humidity"] = self.qmc.bag_humidity
-        profile["extradevices"] = self.qmc.extradevices
-        profile["extraname1"] = [e(n) for n in self.qmc.extraname1]
-        profile["extraname2"] = [e(n) for n in self.qmc.extraname2]
-        profile["extratimex"] = self.qmc.extratimex
-        profile["extratemp1"] = self.qmc.extratemp1
-        profile["extratemp2"] = self.qmc.extratemp2      
-        profile["extramathexpression1"] = self.qmc.extramathexpression1
-        profile["extramathexpression2"] = self.qmc.extramathexpression2  
-        profile["extradevicecolor1"] = [e(x) for x in self.qmc.extradevicecolor1]
-        profile["extradevicecolor2"] = [e(x) for x in self.qmc.extradevicecolor2]
-        profile["extramarkersizes1"] = [e(x) for x in self.qmc.extramarkersizes1]
-        profile["extramarkersizes2"] = [e(x) for x in self.qmc.extramarkersizes2]
-        profile["extramarkers1"] = [e(x) for x in self.qmc.extramarkers1]
-        profile["extramarkers2"] = [e(x) for x in self.qmc.extramarkers2]
-        profile["extralinewidths1"] = [e(x) for x in self.qmc.extralinewidths1]
-        profile["extralinewidths2"] = [e(x) for x in self.qmc.extralinewidths2]
-        profile["extralinestyles1"] = [e(x) for x in self.qmc.extralinestyles1]
-        profile["extralinestyles2"] = [e(x) for x in self.qmc.extralinestyles2]
-        profile["extradrawstyles1"] = [e(x) for x in self.qmc.extradrawstyles1]
-        profile["extradrawstyles2"] = [e(x) for x in self.qmc.extradrawstyles2]
-        profile["externalprogram"] = e(self.ser.externalprogram)
-        profile["computed"] = self.computedProfileInformation()
-        return profile
+        try:
+            profile = {}
+            profile["mode"] = self.qmc.mode
+            profile["timeindex"] = self.qmc.timeindex
+            profile["flavors"] = self.qmc.flavors
+            profile["flavorlabels"] = [e(fl) for fl in self.qmc.flavorlabels]
+            profile["flavorstartangle"] = self.qmc.flavorstartangle
+            profile["flavoraspect"] = self.qmc.flavoraspect
+            profile["title"] = e(self.qmc.title)
+            profile["beans"] = e(self.qmc.beans)
+            profile["weight"] = [self.qmc.weight[0],self.qmc.weight[1],e(self.qmc.weight[2])]
+            profile["volume"] = self.qmc.volume
+            profile["density"] = [self.qmc.density[0],e(self.qmc.density[1]),self.qmc.density[2],e(self.qmc.density[3])]
+            profile["roastertype"] = e(self.qmc.roastertype)
+            profile["operator"] = e(self.qmc.operator)
+            profile["roastdate"] = e(self.qmc.roastdate.toString())
+            profile["beansize"] = str(self.qmc.beansize)
+            profile["specialevents"] = self.qmc.specialevents
+            profile["specialeventstype"] = self.qmc.specialeventstype
+            profile["specialeventsvalue"] = self.qmc.specialeventsvalue
+            profile["specialeventsStrings"] = [e(ses) for ses in self.qmc.specialeventsStrings]
+            profile["etypes"] = [e(et) for et in self.qmc.etypes]
+            profile["roastingnotes"] = e(self.qmc.roastingnotes)
+            profile["cuppingnotes"] = e(self.qmc.cuppingnotes)
+            profile["timex"] = self.qmc.timex
+            profile["temp1"] = self.qmc.temp1
+            profile["temp2"] = self.qmc.temp2
+            profile["phases"] = self.qmc.phases
+            profile["zmax"] = self.qmc.zlimit
+            profile["zmin"] = self.qmc.zlimit_min
+            profile["ymax"] = self.qmc.ylimit
+            profile["ymin"] = self.qmc.ylimit_min
+            profile["xmin"] = self.qmc.startofx
+            profile["xmax"] = self.qmc.endofx
+            profile["ambientTemp"] = self.qmc.ambientTemp
+            profile["ambient_humidity"] = self.qmc.ambient_humidity
+            profile["bag_humidity"] = self.qmc.bag_humidity
+            profile["extradevices"] = self.qmc.extradevices
+            profile["extraname1"] = [e(n) for n in self.qmc.extraname1]
+            profile["extraname2"] = [e(n) for n in self.qmc.extraname2]
+            profile["extratimex"] = self.qmc.extratimex
+            profile["extratemp1"] = self.qmc.extratemp1
+            profile["extratemp2"] = self.qmc.extratemp2      
+            profile["extramathexpression1"] = self.qmc.extramathexpression1
+            profile["extramathexpression2"] = self.qmc.extramathexpression2  
+            profile["extradevicecolor1"] = [e(x) for x in self.qmc.extradevicecolor1]
+            profile["extradevicecolor2"] = [e(x) for x in self.qmc.extradevicecolor2]
+            profile["extramarkersizes1"] = self.qmc.extramarkersizes1
+            profile["extramarkersizes2"] = self.qmc.extramarkersizes2
+            profile["extramarkers1"] = [e(x) for x in self.qmc.extramarkers1]
+            profile["extramarkers2"] = [e(x) for x in self.qmc.extramarkers2]
+            profile["extralinewidths1"] = self.qmc.extralinewidths1
+            profile["extralinewidths2"] = self.qmc.extralinewidths2
+            profile["extralinestyles1"] = [e(x) for x in self.qmc.extralinestyles1]
+            profile["extralinestyles2"] = [e(x) for x in self.qmc.extralinestyles2]
+            profile["extradrawstyles1"] = [e(x) for x in self.qmc.extradrawstyles1]
+            profile["extradrawstyles2"] = [e(x) for x in self.qmc.extradrawstyles2]
+            profile["externalprogram"] = e(self.ser.externalprogram)
+            profile["computed"] = self.computedProfileInformation()
+            return profile
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "Error on getProfile(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+
 
     #saves recorded profile in hard drive. Called from file menu 
     def fileSave(self,fname):
@@ -7841,8 +8021,8 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message Area","Cancelled", None, QApplication.UnicodeUTF8))
         except Exception as ex:
-            self.qmc.adderror(QApplication.translate("Error Message", "Error on filesave(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
-            return
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "Error on filesave(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     def fileExport(self,msg,ext,dumper):
         try:
@@ -7852,8 +8032,8 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message Area","Readings exported", None, QApplication.UnicodeUTF8))
             else:
                 self.sendmessage(QApplication.translate("Message Area","Cancelled", None, QApplication.UnicodeUTF8))
-        except IOError as ex:
-            self.qmc.adderror(QApplication.translate("Error Message", "IO Error on fileExport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
+        except Exception as ex:
+            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error on fileExport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
             return
 
     def fileExportCSV(self):
@@ -7861,6 +8041,9 @@ class ApplicationWindow(QMainWindow):
 
     def fileExportJSON(self):
         self.fileExport(QApplication.translate("MessageBox Caption", "Export JSON",None, QApplication.UnicodeUTF8),"*.json",self.exportJSON)
+
+    def fileExportRoastLogger(self):
+        self.fileExport(QApplication.translate("MessageBox Caption", "Export RoastLogger",None, QApplication.UnicodeUTF8),"*.csv",self.exportRoastLogger)
 
     def fileImport(self,msg,loader):
         try:
@@ -7870,15 +8053,18 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message Area","Readings imported", None, QApplication.UnicodeUTF8))
             else:
                 self.sendmessage(QApplication.translate("Message Area","Cancelled", None, QApplication.UnicodeUTF8))
-        except IOError as ex:
-            self.qmc.adderror(QApplication.translate("Error Message", "IO Error on fileImport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
-            return
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "Error on fileImport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     def fileImportCSV(self):
         self.fileImport(QApplication.translate("MessageBox Caption", "Import CSV",None, QApplication.UnicodeUTF8),self.importCSV)
 
     def fileImportJSON(self):
         self.fileImport(QApplication.translate("MessageBox Caption", "Import JSON",None, QApplication.UnicodeUTF8),self.importJSON)
+
+    def fileImportRoastLogger(self):
+        self.fileImport(QApplication.translate("MessageBox Caption", "Import RoastLogger",None, QApplication.UnicodeUTF8),self.importRoastLogger)
 
     #loads the settings at the start of application. See the oppposite closeEvent()
     def settingsLoad(self):
@@ -8502,7 +8688,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: fetchCurveStyles() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: fetchCurveStyles() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
     def closeEvent(self,event):
@@ -8773,7 +8959,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info() 
-            self.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     #used for trouble shooting.
     def readartisansettings(self):
@@ -9274,7 +9460,7 @@ $cupping_notes
             QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
             
         except IOError as e:
-            self.qmc.adderror(QApplication.translate("Error Message", "IO Error: htmlReport() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error: htmlReport() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
             return
         finally:
             if f:
@@ -9587,7 +9773,7 @@ $cupping_notes
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            self.adderror(QApplication.translate("Error Message","Exception Error: ts() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ts() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
         return round(delta/60), round(ET/60), round(BT/60)                
 
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
@@ -9875,7 +10061,7 @@ $cupping_notes
             if not f.open(QIODevice.ReadOnly):
                 raise IOError(str(f.errorString()))
             import csv
-            csvFile = file(filename,"rb")
+            csvFile = io.open(filename, 'r', encoding='utf-8')
             csvReader = csv.DictReader(csvFile,["Date","Time","T1","T1unit","T2","T2unit"],delimiter='\t')
             zero_t = None
             roastdate = None
@@ -9918,12 +10104,15 @@ $cupping_notes
             self.qmc.endofx = self.qmc.timex[-1]
             self.sendmessage(QApplication.translate("Message Area","K202 file loaded successfully", None, QApplication.UnicodeUTF8))
             self.qmc.redraw()
-        except IOError as e:
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
-            return
-        except ValueError as e:
-            self.qmc.adderror(QApplication.translate("Error Message","Value Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(str(e)))
-            return
+        except IOError as ex:
+            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+        except ValueError as ex:
+            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importK202() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     def importK204(self):
         try:
@@ -9935,7 +10124,7 @@ $cupping_notes
             if not f.open(QIODevice.ReadOnly):
                 raise IOError(str(f.errorString()))
             import csv
-            csvFile = file(filename,"rb")
+            csvFile = io.open(filename, 'r', encoding='utf-8')
             csvReader = csv.DictReader(csvFile,["Date","Time","T1","T2","T3","T4"],delimiter='\t')
             zero_t = None
             roastdate = None
@@ -9993,11 +10182,14 @@ $cupping_notes
             self.sendmessage(QApplication.translate("Message Area","K204 file loaded successfully", None, QApplication.UnicodeUTF8))
             self.qmc.redraw()
         except IOError as ex:
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: importK204(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
-            return
+            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: importK204(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
         except ValueError as ex:
-            self.qmc.adderror(QApplication.translate("Error Message","Value Error: importK204(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
-            return
+            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: importK204(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importK204() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     def importHH506RA(self):
         try:
@@ -10009,7 +10201,8 @@ $cupping_notes
             if not f.open(QIODevice.ReadOnly):
                 raise IOError(str(f.errorString()))
             import csv
-            csvFile = file(filename,"rb")
+            import io
+            csvFile = io.open(filename, 'r', encoding='utf-8')
             data = csv.reader(csvFile,delimiter='\t')
             #read file header
             header = next(data)
@@ -10052,11 +10245,15 @@ $cupping_notes
             self.sendmessage(QApplication.translate("Message Area","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
             self.qmc.redraw()
         except IOError as ex:
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: importHH506RA(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
-            return
+            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: importHH506RA(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
         except ValueError as ex:
-            self.qmc.adderror(QApplication.translate("Error Message","Value Error: importHH506RA(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
-            return
+            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: importHH506RA(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importHH506RA() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            
 
     #checks or creates directory structure
     def dirstruct(self):
@@ -10095,7 +10292,7 @@ $cupping_notes
                 y = image.height()
                 self.sendmessage(QApplication.translate("Message Area","%1  size(%2,%3) saved", None, QApplication.UnicodeUTF8).arg(str(filename)).arg(str(x)).arg(str(y)))
         except IOError as ex:
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: resize() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: resize() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
             return
 
     #displays Dialog for the setting of the HUD
@@ -10266,15 +10463,15 @@ $cupping_notes
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return
         except ValueError as ex:
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror(QApplication.translate("Error Message","Value Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return
         finally:
             if f:
@@ -10448,7 +10645,7 @@ $cupping_notes
                 self.serialize(filename,palette)
                 self.sendmessage(QApplication.translate("Message Area","Button Palette successfully saved",None, QApplication.UnicodeUTF8))
         except IOError as ex:
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: backuppaletteeventbuttons(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: backuppaletteeventbuttons(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
             return
 
     def restorepaletteeventbuttons(self):
@@ -10496,11 +10693,11 @@ $cupping_notes
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()  
-            self.qmc.adderror(QApplication.translate("Error Message","IO Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()  
-            self.qmc.adderror(QApplication.translate("Error Message","Exception Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: restorepaletteeventbuttons() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return
 
 ##########################################################################
@@ -12100,9 +12297,9 @@ class editGraphDlg(ArtisanDialog):
             self.saveEventTable()
         # Update Title
         aw.qmc.ax.set_title(str(self.titleedit.text()),size=20,color=aw.qmc.palette["title"])
-        aw.qmc.title = str(self.titleedit.text())
+        aw.qmc.title = u(self.titleedit.text())
         # Update beans
-        aw.qmc.beans = str(self.beansedit.toPlainText())
+        aw.qmc.beans = u(self.beansedit.toPlainText())
         #update weight
         try:
             aw.qmc.weight[0] = float(str(self.weightinedit.text()))
@@ -15247,7 +15444,7 @@ class StatisticsDlg(ArtisanDialog):
 #                self.master.set_timeout(3.0)
 #                self.master.set_verbose(False)
 #            except Exception as e:
-#                self.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e))) 
+#                aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e))) 
 #           
 #    def writeSingleRegister(self,slave,register,value):
 #        try:
@@ -15359,10 +15556,8 @@ class scaleport(object):
             self.SP.close()
             error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(error,exc_tb.tb_lineno)
 
     def closeport(self):
         self.SP.close()
@@ -15531,10 +15726,8 @@ class serialport(object):
                 self.COMsemaphore.release(1)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8)
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return "0"
         finally:
             if self.COMsemaphore.available() < 1:
@@ -15663,11 +15856,9 @@ class serialport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             error = QApplication.translate("Error Message","Serial Exception: ser.sendDTAcommand() ",None, QApplication.UnicodeUTF8)
-            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds            
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         finally:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
@@ -15916,10 +16107,8 @@ class serialport(object):
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH806AUtemperature() ",None, QApplication.UnicodeUTF8)
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -15944,10 +16133,8 @@ class serialport(object):
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH806Winit() ",None, QApplication.UnicodeUTF8)
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -15983,10 +16170,8 @@ class serialport(object):
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH806Wtemperature() ",None, QApplication.UnicodeUTF8)
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1  
         finally:
             #note: logged chars should be unicode not binary
@@ -16043,10 +16228,8 @@ class serialport(object):
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH506RAtemperature() ",None, QApplication.UnicodeUTF8)
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -16079,10 +16262,8 @@ class serialport(object):
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception: ser.HH506RAGetID()",None, QApplication.UnicodeUTF8)
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -16124,20 +16305,16 @@ class serialport(object):
                     nbytes = len(r)
                     error = QApplication.translate("Error Message","CENTER306temperature(): %1 bytes received but 10 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-                    #keep a max of 500 errors
-                    if len(aw.qmc.errorlog) > 499:
-                        aw.qmc.errorlog = aw.qmc.errorlog[1:]
-                    aw.qmc.errorlog.append(timez + " " + error)
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
                     return -1,-1
             else:
                 return -1,-1
         except serial.SerialException:
             error = QApplication.translate("Error Message","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -16184,20 +16361,16 @@ class serialport(object):
                     nbytes = len(r)
                     error = QApplication.translate("Error Message","CENTER302temperature(): %1 bytes received but 7 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-                    #keep a max of 500 errors
-                    if len(aw.qmc.errorlog) > 499:
-                        aw.qmc.errorlog = aw.qmc.errorlog[1:]
-                    aw.qmc.errorlog.append(timez + " " + error)
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
                     return -1,-1 
             else:
                 return -1,-1 
         except serial.SerialException:
             error = QApplication.translate("Error Message","Serial Exception: ser.CENTER302temperature()",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
 
     def CENTER303temperature(self):
@@ -16235,20 +16408,16 @@ class serialport(object):
                     nbytes = len(r)
                     error = QApplication.translate("Error Message","CENTER303temperature(): %1 bytes received but 8 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-                    #keep a max of 500 errors
-                    if len(aw.qmc.errorlog) > 499:
-                        aw.qmc.errorlog = aw.qmc.errorlog[1:]
-                    aw.qmc.errorlog.append(timez + " " + error)
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
                     return -1,-1 
             else:
                 return -1,-1 
         except serial.SerialException:
             error = QApplication.translate("Error Message","Serial Exception: ser.CENTER303temperature()",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -16322,10 +16491,8 @@ class serialport(object):
         except serial.SerialException:
             error = QApplication.translate("Error Message","Serial Exception: ser.CENTER309temperature() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -16405,10 +16572,8 @@ class serialport(object):
         except serial.SerialException as e:
             error = QApplication.translate("Error Message","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1.,-1.
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -16581,18 +16746,14 @@ class serialport(object):
         except ValueError:
             error = QApplication.translate("Error Message","Value Error: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1 
         except serial.SerialException:
             error = QApplication.translate("Error Message","Serial Exception: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1 
         finally:
             #note: logged chars should not be binary
@@ -16686,10 +16847,8 @@ class serialport(object):
         except ValueError:
             error  = QApplication.translate("Error Message","Value Error: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             #find device index
             if aw.qmc.device == 23:
                 if len(aw.qmc.temp1):
@@ -16705,10 +16864,8 @@ class serialport(object):
         except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return "0",""
         finally:
             #note: logged chars should not be binary
@@ -16732,10 +16889,8 @@ class serialport(object):
         except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXcommand() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         finally:
             #note: logged chars should not be binary
             if aw.seriallogflag:
@@ -16756,10 +16911,8 @@ class serialport(object):
         except serial.SerialException:
             error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXRXcommand() ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            #keep a max of 500 errors
-            if len(aw.qmc.errorlog) > 499:
-                aw.qmc.errorlog = aw.qmc.errorlog[1:]
-            aw.qmc.errorlog.append(timez + " " + error)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         finally:
             #note: logged chars should not be binary
             if aw.seriallogflag:
