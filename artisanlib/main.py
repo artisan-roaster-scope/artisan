@@ -1210,7 +1210,6 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     for i in range(len(Yval)):
                         mathdictionary["Y"+ Yval[i]] = 0
-
             return round(eval(mathexpression,{"__builtins__":None},mathdictionary),3)
 
         except Exception as e:
@@ -4744,6 +4743,26 @@ class SampleThread(QThread):
         super(SampleThread,self).__init__(parent)
         self.afterTP = False
 
+    # a RoR based dropout filter
+    def filterDropOuts(self,tmin,tmax,timex,tempx,time,temp):
+        if temp < tmin or temp > tmax:
+            if len(tempx) > 1 and tempx[-1] != -1 and tempx[-2] != -1:
+                # let's use the last two readings to compute the last RoR and
+                # replace the false reading by a computed one assuming that the
+                # RoR does not change
+                dtemp = tempx[-1] - tempx[-2] # dt is positive if RoR is
+                dtime = timex[-1] - timex[-2] # always positive
+                RoR = dtemp/dtime
+                return tempx[-1] + RoR * (time - timex[-1])
+            elif len(tempx) > 0 and tempx[-1] != -1:
+                # not enough values to compute a RoR, so just repeate last correct reading
+                return tempx[-1]
+            else:
+                # no way to correct this, just mark this
+                return -1
+        else:
+            return temp
+
     # sample devices at interval self.delay miliseconds.
     def sample(self):
         try:
@@ -4755,6 +4774,12 @@ class SampleThread(QThread):
                 # if we are not yet recording, but sampling we keep on reseting the timer
                 if not aw.qmc.flagstart:
                     aw.qmc.timeclock.start()
+                    
+                # max limit for dropout filter
+                if aw.qmc.mode == "C":
+                    limit = 500.
+                else:
+                    limit = 800.
                 #if using a meter (thermocouple device)
                 if aw.qmc.device != 18: # not NONE device
                     ##############  if using Extra devices
@@ -4766,6 +4791,8 @@ class SampleThread(QThread):
                             xtra_dev_lines2 = 0
                             for i in range(nxdevices):   
                                 extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                                extrat1 = self.filterDropOuts(1,limit,aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
+                                extrat2 = self.filterDropOuts(1,limit,aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                 # ignore reading if both are off, otherwise process them
                                 if extrat1 != -1 or extrat2 != -1:
                                     if len(aw.qmc.extramathexpression1[i]):
@@ -4821,6 +4848,8 @@ class SampleThread(QThread):
                     except:
                         tx = aw.qmc.timeclock.elapsed()/1000
                         t1 = t2 = -1
+                    t1 = self.filterDropOuts(1,limit,aw.qmc.timex,aw.qmc.temp1,tx,t1)
+                    t2 = self.filterDropOuts(1,limit,aw.qmc.timex,aw.qmc.temp2,tx,t2)
                     length_of_qmc_timex = len(aw.qmc.timex)
                     # ignore reading if both are off, otherwise process them
                     if t1 != -1 or t2 != -1:
@@ -8694,7 +8723,7 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: fetchCurveStyles() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
-    def closeEvent(self,event):
+    def closeEvent(self,_):
         #save window geometry and position. See QSettings documentation.
         #This information is often stored in the system registry on Windows,
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
@@ -16590,8 +16619,11 @@ class serialport(object):
                     aw.qmc.extraArduinoT2 = float(res[4])
                 if 32 in aw.qmc.extradevices: # +ArduinoTC4_56
                     if aw.qmc.arduino56active:
-                        aw.qmc.extraArduinoT3 = float(res[5])
-                        aw.qmc.extraArduinoT4 = float(res[6])
+                        try:
+                            aw.qmc.extraArduinoT3 = float(res[5])
+                            aw.qmc.extraArduinoT4 = float(res[6])
+                        except:
+                            pass
                     else:
                         aw.qmc.extraArduinoT3 = aw.qmc.extraArduinoT4 = -1
                 return t1, t2
