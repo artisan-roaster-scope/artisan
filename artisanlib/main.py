@@ -5736,26 +5736,26 @@ class ApplicationWindow(QMainWindow):
         #MET
         self.label2 = QLabel()
         self.label2.setText(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
-        self.label2.setAlignment(Qt.AlignBottom)
+        self.label2.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         #BT
         self.label3 = QLabel()
-        self.label3.setAlignment(Qt.AlignBottom)
+        self.label3.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label3.setText("<b>" + QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8) + "<\b>")
         #DELTA MET
         self.label4 = QLabel()
-        self.label4.setAlignment(Qt.AlignBottom)
+        self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label4.setText("<b>" + QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b>")
         # DELTA BT
         self.label5 = QLabel()
-        self.label5.setAlignment(Qt.AlignBottom)
+        self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label5.setText("<b>" + QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b>")
         # pid sv
         self.label6 = QLabel()
-        self.label6.setAlignment(Qt.AlignBottom)
+        self.label6.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label6.setText("<b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b>")
         # pid power % duty cycle
         self.label7 = QLabel()
-        self.label7.setAlignment(Qt.AlignBottom)
+        self.label7.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
         self.label7.setText("<b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b>")
 
         #extra LCDs
@@ -5789,9 +5789,9 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDlabel1[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel1[i].setText("<b>" + string1 + "</b>")
-            self.extraLCDlabel1[i].setAlignment(Qt.AlignBottom)
+            self.extraLCDlabel1[i].setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
             self.extraLCDlabel2[i].setText("<b>" + string2 + "</b>")
-            self.extraLCDlabel2[i].setAlignment(Qt.AlignBottom)
+            self.extraLCDlabel2[i].setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
 
         # Stores messages up to 500
         self.messagehist = []
@@ -7232,7 +7232,6 @@ class ApplicationWindow(QMainWindow):
     def exportRoastLogger(self,filename):
         outfile = open(filename, 'w')
         try:
-            p = self.getProfile()
             outfile.write("Log created at 09:00:00 "+ self.qmc.roastdate.toString("dd'/'MM'/'yyyy") + "\n")
             outfile.write("Use Options|Set template for new log to modify this template.\n")
             outfile.write("------------------------------------------------------\n")
@@ -10061,6 +10060,7 @@ $cupping_notes
             if not f.open(QIODevice.ReadOnly):
                 raise IOError(str(f.errorString()))
             import csv
+            import io
             csvFile = io.open(filename, 'r', encoding='utf-8')
             csvReader = csv.DictReader(csvFile,["Date","Time","T1","T1unit","T2","T2unit"],delimiter='\t')
             zero_t = None
@@ -10124,6 +10124,7 @@ $cupping_notes
             if not f.open(QIODevice.ReadOnly):
                 raise IOError(str(f.errorString()))
             import csv
+            import io
             csvFile = io.open(filename, 'r', encoding='utf-8')
             csvReader = csv.DictReader(csvFile,["Date","Time","T1","T2","T3","T4"],delimiter='\t')
             zero_t = None
@@ -15557,7 +15558,7 @@ class scaleport(object):
             error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(error,exc_tb.tb_lineno)
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
 
     def closeport(self):
         self.SP.close()
@@ -15816,7 +15817,7 @@ class serialport(object):
                 #SEND (tx)
                 self.SP.write(str2cmd(command))
                 #READ n bytes(rx)
-                r = self.SP.read(nrxbytes)
+                r = self.SP.read(nrxbytes).decode('utf-8')
                 ###  release resources  ###
                 self.COMsemaphore.release(1) 
 ##                command = ":010347000001B4"
