@@ -970,22 +970,21 @@ class tgraphcanvas(FigureCanvas):
 
     def timealign(self,redraw=True,recompute=False):
         try:
-            if self.timeindex[0] != -1:
-                if self.timeindexB[0] != -1:
-                    ptime = self.timex[self.timeindex[0]]
-                    btime = self.timeB[self.timeindexB[0]]
-                    difference = ptime - btime
-                    if difference > 0:
-                        self.movebackground("right",abs(difference))
-                        if redraw:
-                            self.redraw(recompute)
-                    elif difference < 0:
-                        self.movebackground("left",abs(difference))
-                        if redraw:
-                            self.redraw(recompute)
+            if self.timeindexB[0] != -1 and self.timeindex[0] != -1:
+                ptime = self.timex[self.timeindex[0]]
+                btime = self.timeB[self.timeindexB[0]]
+                difference = ptime - btime
+                if difference > 0:
+                    self.movebackground("right",abs(difference))
+                    if redraw:
+                        self.redraw(recompute)
+                elif difference < 0:
+                    self.movebackground("left",abs(difference))
+                    if redraw:
+                        self.redraw(recompute)
         except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: timealign() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
@@ -2531,7 +2530,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoChargeIdx:
                         self.timeindex[0] = self.autoChargeIdx
                     else:
-                        if len(self.timex) >= 3:
+                        if len(self.timex) > 0:
                             self.timeindex[0] = len(self.timex)-1
                         else:
                             message = QApplication.translate("Message Area","Not enough variables collected yet. Try again in a few seconds", None, QApplication.UnicodeUTF8)
@@ -2545,7 +2544,6 @@ class tgraphcanvas(FigureCanvas):
                         if self.samplingsemaphore.available() < 1:
                             self.samplingsemaphore.release(1)
                         return
-                aw.qmc.timealign(redraw=True,recompute=False)
                 self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
                 st1 = QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8)
@@ -2556,6 +2554,8 @@ class tgraphcanvas(FigureCanvas):
                 self.fig.canvas.draw()
                 if self.samplingsemaphore.available() < 1:
                     self.samplingsemaphore.release(1)
+                # redraw (within timealign) should not be called if semaphore is hold!
+                aw.qmc.timealign(redraw=True,recompute=False)
                 try:
                     a = aw.qmc.buttonactions[0]
                     aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[0])
@@ -2571,7 +2571,7 @@ class tgraphcanvas(FigureCanvas):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: markCharge() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
-        finally:            
+        finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
 
@@ -4762,9 +4762,8 @@ class SampleThread(QThread):
                             xtra_dev_lines2 = 0
                             for i in range(nxdevices):   
                                 extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                                
                                 # ignore reading if both are off, otherwise process them
-                                if extrat2 != -1 or extrat2 != -1:
+                                if extrat1 != -1 or extrat2 != -1:
                                     if len(aw.qmc.extramathexpression1[i]):
                                         extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
                                     if len(aw.qmc.extramathexpression2[i]):
@@ -15498,25 +15497,27 @@ class modbusport(object):
                 # open port
                 if not self.master.close_port_after_each_call:
                     self.master.serial.open()
-            except Exception as e:
+            except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     def writeSingleRegister(self,slave,register,value):
         try:
             self.connect()
             self.master.slaveaddress = int(slave)
             self.master.write_register(int(register),int(value),0,6)
-        except Exception:
-            pass  
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: writeSingleRegister() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     def readSingleRegister(self,slave,register):
         try:
             self.connect()
             self.master.slaveaddress = int(slave)
-            return self.master.read_register(int(register),0)   
-        except Exception:
-            pass
+            return self.master.read_register(int(register),0)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: readSingleRegister() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
 class scaleport(object):
     """ this class handles the communications with the scale"""
