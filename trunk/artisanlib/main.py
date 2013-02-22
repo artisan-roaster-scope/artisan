@@ -9876,20 +9876,26 @@ $cupping_notes
     #calculate the AREA under BT and ET
     def ts(self,start=None,end=None):
         delta = ET = BT = 0.0
-        try:
-            for i in range((start or self.qmc.timeindex[0]),(end or self.qmc.timeindex[6])):
-                e = (self.qmc.temp1[i] + self.qmc.temp1[i+1]) / 2.0
-                b = (self.qmc.temp2[i] + self.qmc.temp2[i+1]) / 2.0
-                dt = (self.qmc.timex[i+1] - self.qmc.timex[i])
-                delta += (e - b) * dt
-                ET += e * dt
-                BT += b * dt
-        except Exception as e:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ts() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-        return round(delta/60), round(ET/60), round(BT/60)                
+        if start < 0 or (start == 0 and self.qmc.timeindex[0] < 0):
+            return 0,0,0
+        else:
+            try:
+                for i in range((start or self.qmc.timeindex[0]),(end or self.qmc.timeindex[6])):
+                    print((start or self.qmc.timeindex[0]),(end or self.qmc.timeindex[6]))
+                    print(start,self.qmc.timeindex[0])
+                    print(end,self.qmc.timeindex[6])
+                    e = (self.qmc.temp1[i] + self.qmc.temp1[i+1]) / 2.0
+                    b = (self.qmc.temp2[i] + self.qmc.temp2[i+1]) / 2.0
+                    dt = (self.qmc.timex[i+1] - self.qmc.timex[i])
+                    delta += (e - b) * dt
+                    ET += e * dt
+                    BT += b * dt
+            except Exception as e:
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ts() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            return round(delta/60), round(ET/60), round(BT/60)                
 
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
     #Note: For the dryphase, the RoR for the dryphase is calculated for the segment starting from TP ending at DE
