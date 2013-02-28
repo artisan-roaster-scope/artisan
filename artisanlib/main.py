@@ -462,6 +462,8 @@ class tgraphcanvas(FigureCanvas):
         #read and plot on/off flag
         self.flagon = False  # Artisan turned on
         self.flagstart = False # Artisan logging
+        self.flagstopping = False # Artisan got the signal to turn off logging,
+#                                 # switched on by OffMonitor and cleared by sampling thread once sampling stopped
         #log flag that tells to log ET when using device 18 (manual mode)
         self.manuallogETflag = 0
 
@@ -1368,7 +1370,7 @@ class tgraphcanvas(FigureCanvas):
 
     def checkSaved(self):
         #prevents deleting accidentally a finished roast
-        if self.safesaveflag== True:
+        if self.safesaveflag == True:
             string = QApplication.translate("MessageBox","Save the profile, Discard the profile (Reset), or Cancel?", None, QApplication.UnicodeUTF8)
             reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Profile unsaved", None, QApplication.UnicodeUTF8),string,
                                 QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
@@ -1381,37 +1383,19 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(QApplication.translate("Message Area","Reset has been cancelled",None, QApplication.UnicodeUTF8))
                 return
 
-    #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
-    def reset(self,redraw=True):
+    def clearMeasurements(self):
         try:
             #### lock shared resources #####
             self.samplingsemaphore.acquire(1)
-    
-            aw.soundpop()
-    
-            if self.flagon:
-                self.OffMonitor()
-    
-            #reset time
-            aw.qmc.timeclock.start()
-    
-            self.checkSaved()
-    
-            #prevents accidentally deleting a modified profile.
             self.safesaveflag = False  #now flag is cleared (OFF)
-    
-            if self.HUDflag:
-                self.toggleHUD()
-            self.hudresizeflag = False
-    
-            self.ax.set_title(self.title,size=20,color=self.palette["title"])
-    
-            #reset all variables that need to be reset
             self.rateofchange1 = 0.0
             self.rateofchange2 = 0.0
             self.temp1, self.temp2, self.delta1, self.delta2, self.timex, self.stemp1, self.stemp2 = [],[],[],[],[],[],[]
             self.unfiltereddelta1,self.unfiltereddelta2 = [],[]
             self.timeindex = [-1,0,0,0,0,0,0,0]
+            #extra devices
+            for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):
+                self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]            #reset all variables that need to be reset (but for the actually measurements that will be treated separately at the end of this function)
             self.specialevents=[]
             aw.lcd1.display("00:00")
             aw.lcd2.display("0.0")
@@ -1423,6 +1407,39 @@ class tgraphcanvas(FigureCanvas):
             for i in range(aw.nLCDS):
                 aw.extraLCD1[i].display("0.0")
                 aw.extraLCD2[i].display("0.0")
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: reset() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
+
+    #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
+    def reset(self,redraw=True,soundOn=True):
+        try:
+            if soundOn:
+                aw.soundpop()
+            
+            #### lock shared resources #####
+            self.samplingsemaphore.acquire(1)
+ 
+            if self.flagon:
+                self.OffMonitor()
+    
+            #reset time
+            aw.qmc.timeclock.start()
+    
+            self.checkSaved()
+    
+            if self.HUDflag:
+                self.toggleHUD()
+            self.hudresizeflag = False
+    
+            self.ax.set_title(self.title,size=20,color=self.palette["title"])
+    
+
             aw.sendmessage(QApplication.translate("Message Area","Scope has been reset",None, QApplication.UnicodeUTF8))
             aw.button_3.setDisabled(False)
             aw.button_4.setDisabled(False)
@@ -1504,10 +1521,6 @@ class tgraphcanvas(FigureCanvas):
     
             self.temporaryalarmflag = -3
     
-            #extra devices
-            for i in range(min(len(self.extradevices),len(self.extratimex),len(self.extratemp1),len(self.extratemp2),len(self.extrastemp1),len(self.extrastemp2))):
-                self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]
-    
             #reset alarms that have been triggered
             self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
     
@@ -1536,9 +1549,11 @@ class tgraphcanvas(FigureCanvas):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
-            ### REDRAW  ##
-            if redraw:
-                self.redraw(False)
+        # now clear all measurements and redraw
+        self.clearMeasurements()
+        ### REDRAW  ##
+        if redraw:
+            self.redraw(False)
 
     # smoothes a list of values 'x' at taken at times indicated by the numbers in list 'y'
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
@@ -1727,12 +1742,12 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"],rotation=0)
             self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
             self.ax.set_title(self.title,size=20,color=self.palette["title"])
+#            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax
                 self.delta_ax = self.ax.twinx()
-                self.fig.patch.set_facecolor(self.palette["background"])                
-                self.ax.set_zorder(self.delta_ax.get_zorder()+1) # put ax in front of delta_ax
-                self.ax.patch.set_visible(False)
+                self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
+                self.ax.patch.set_visible(True)
                 self.delta_ax.set_ylabel(str(QApplication.translate("Scope Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
@@ -2133,12 +2148,17 @@ class tgraphcanvas(FigureCanvas):
                     self.xaxistosm()
                     self.redrawdesigner()
 
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)
+
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
+            if self.samplingsemaphore.available() < 1:
+                self.samplingsemaphore.release(1)
             _, _, exc_tb = sys.exc_info()    
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: redraw() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
-        finally:            
+        finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
 
@@ -2477,7 +2497,6 @@ class tgraphcanvas(FigureCanvas):
 
         self.fig.canvas.draw()
 
-
     def OnMonitor(self):
         self.flagon = True
         if self.designerflag: return
@@ -2500,6 +2519,13 @@ class tgraphcanvas(FigureCanvas):
         if self.flagstart:
             self.OffRecorder()
         self.flagon = False
+        self.flagstopping = True
+        # now wait until the sampling thread successfully terminates
+        while self.flagstopping:
+            libtime.sleep(.3)
+        # clear data from monitoring-only mode
+        if len(self.timex) == 1:
+            aw.qmc.clearMeasurements()
         #enable RESET button:
         aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
         aw.button_7.setEnabled(True)
@@ -2520,7 +2546,7 @@ class tgraphcanvas(FigureCanvas):
         if not self.flagon:
             aw.soundpop()
             if self.timex != []:
-                aw.qmc.reset()
+                aw.qmc.reset(True,False)
             self.OnMonitor()
         #turn OFF
         else:
@@ -2576,14 +2602,16 @@ class tgraphcanvas(FigureCanvas):
         #turn START
         if not self.flagstart:
             aw.soundpop()
-            if self.timex != []:
-                aw.qmc.reset()
+            if self.flagon and len(self.timex) == 1:
+                # we are already in monitoring mode, we just clear this first measurement and go
+                aw.qmc.clearMeasurements()
+            elif self.timex != []: # there is a profile loaded, we have to reset
+                aw.qmc.reset(True,False)
             self.OnRecorder()
         #turn STOP
         else:
             aw.soundpop()
             self.OffRecorder()
-
 
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
@@ -3087,94 +3115,93 @@ class tgraphcanvas(FigureCanvas):
                 #if in manual mode record first the last point in self.timex[]
                 if self.device == 18:
                     tx,et,bt = aw.ser.NONE()
-                    if bt != -1 and et != -1:
+                    if bt != -1 or et != -1:
                         self.drawmanual(et,bt,tx)
                     else:
                         if self.samplingsemaphore.available() < 1:
                             self.samplingsemaphore.release(1)
                         return
-                if extraevent!=None:
-                    #i = index number of the event (current length of the time list)
-                    i = len(self.timex)-1
-                    # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
-                    if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
-                        self.specialevents.append(i)
-                        self.specialeventstype.append(0)
-                        self.specialeventsStrings.append(str(Nevents+1))
-                        self.specialeventsvalue.append(0)
-                        #if event was initiated by an Extra Event Button then change the type,value,and string 
-                        if extraevent != None:
-                            self.specialeventstype[-1] = eventtype
-                            self.specialeventsvalue[-1] = eventvalue
-                            self.specialeventsStrings[-1] = eventdescription
-                        etype = self.specialeventstype[-1]
-                        if etype == 0:
-                            self.E1timex.append(self.timex[self.specialevents[-1]])
-                            self.E1values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
-                        elif etype == 1:
-                            self.E2timex.append(self.timex[self.specialevents[-1]])
-                            self.E2values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
-                        elif etype == 2:
-                            self.E3timex.append(self.timex[self.specialevents[-1]])
-                            self.E3values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
-                        elif etype == 3:
-                            self.E4timex.append(self.timex[self.specialevents[-1]])
-                            self.E4values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
-                        #write label in mini recorder if flag checked
-                        if aw.minieventsflag:
-                            aw.eNumberSpinBox.setValue(Nevents+1)
-                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
-                            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                        #if Event show flag
-                        if self.eventsshowflag:
-                            index = self.specialevents[-1]
-                            firstletter = self.etypes[self.specialeventstype[-1]][0]
-                            secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
-                            if self.eventsGraphflag == 0:
-                                if self.mode == "F":
-                                    height = 50
-                                else:
-                                    height = 20
-                                #some times ET is not drawn (ET = 0) when using device NONE
-                                if self.temp1[index] > self.temp2[index]:
-                                    temp = self.temp1[index]
-                                else:
-                                    temp = self.temp2[index]
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                            #if Event Type-Bars flag
-                            elif self.eventsGraphflag == 1:
-                                char1 = self.etypes[0][0]
-                                char2 = self.etypes[1][0]
-                                char3 = self.etypes[2][0]
-                                char4 = self.etypes[3][0]
-                                if self.mode == "F":
-                                    row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
-                                else:
-                                    row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-                                #some times ET is not drawn (ET = 0) when using device NONE
-                                if self.temp1[index] >= self.temp2[index]:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                                else:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                            elif self.eventsGraphflag == 2:
-                                # update lines data using the lists with new data
-                                if etype == 0:
-                                    self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
-                                elif etype == 1:
-                                    self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
-                                elif etype == 2:
-                                    self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
-                                elif etype == 3:
-                                    self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
-                        self.fig.canvas.draw()
-                        temp = "%.1f "%self.temp2[i]
-                        timed = self.stringfromseconds(self.timex[i])
-                        message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
-                        aw.sendmessage(message)
+                #i = index number of the event (current length of the time list)
+                i = len(self.timex)-1
+                # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
+                if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
+                    self.specialevents.append(i)
+                    self.specialeventstype.append(0)
+                    self.specialeventsStrings.append(str(Nevents+1))
+                    self.specialeventsvalue.append(0)
+                    #if event was initiated by an Extra Event Button then change the type,value,and string 
+                    if extraevent != None:
+                        self.specialeventstype[-1] = eventtype
+                        self.specialeventsvalue[-1] = eventvalue
+                        self.specialeventsStrings[-1] = eventdescription
+                    etype = self.specialeventstype[-1]
+                    if etype == 0:
+                        self.E1timex.append(self.timex[self.specialevents[-1]])
+                        self.E1values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                    elif etype == 1:
+                        self.E2timex.append(self.timex[self.specialevents[-1]])
+                        self.E2values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                    elif etype == 2:
+                        self.E3timex.append(self.timex[self.specialevents[-1]])
+                        self.E3values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                    elif etype == 3:
+                        self.E4timex.append(self.timex[self.specialevents[-1]])
+                        self.E4values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                    #write label in mini recorder if flag checked
+                    if aw.minieventsflag:
+                        aw.eNumberSpinBox.setValue(Nevents+1)
+                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                        aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
+                        aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+                    #if Event show flag
+                    if self.eventsshowflag:
+                        index = self.specialevents[-1]
+                        firstletter = self.etypes[self.specialeventstype[-1]][0]
+                        secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
+                        if self.eventsGraphflag == 0:
+                            if self.mode == "F":
+                                height = 50
+                            else:
+                                height = 20
+                            #some times ET is not drawn (ET = 0) when using device NONE
+                            if self.temp1[index] > self.temp2[index]:
+                                temp = self.temp1[index]
+                            else:
+                                temp = self.temp2[index]
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                        #if Event Type-Bars flag
+                        elif self.eventsGraphflag == 1:
+                            char1 = self.etypes[0][0]
+                            char2 = self.etypes[1][0]
+                            char3 = self.etypes[2][0]
+                            char4 = self.etypes[3][0]
+                            if self.mode == "F":
+                                row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                            else:
+                                row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                            #some times ET is not drawn (ET = 0) when using device NONE
+                            if self.temp1[index] >= self.temp2[index]:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                            else:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                        elif self.eventsGraphflag == 2:
+                            # update lines data using the lists with new data
+                            if etype == 0:
+                                self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
+                            elif etype == 1:
+                                self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
+                            elif etype == 2:
+                                self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
+                            elif etype == 3:
+                                self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
+                    self.fig.canvas.draw()
+                    temp = "%.1f "%self.temp2[i]
+                    timed = self.stringfromseconds(self.timex[i])
+                    message = QApplication.translate("Message Area","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
+                    aw.sendmessage(message)
                 if self.samplingsemaphore.available() < 1:
                     self.samplingsemaphore.release(1)
             else:
@@ -4810,7 +4837,8 @@ class SampleThread(QThread):
     # a RoR based dropout filter
     def filterDropOuts(self,tmin,tmax,timex,tempx,time,temp):
         if temp < tmin or temp > tmax:
-            if len(tempx) > 1 and tempx[-1] != -1 and tempx[-2] != -1:
+            # don't do the RoR based filter as RoR might be very incorrect for short delta-times
+            if False and len(tempx) > 1 and tempx[-1] != -1 and tempx[-2] != -1 and tempx[-1] != 0 and tempx[-2] != 0:
                 # let's use the last two readings to compute the last RoR and
                 # replace the false reading by a computed one assuming that the
                 # RoR does not change
@@ -4819,11 +4847,14 @@ class SampleThread(QThread):
                 RoR = dtemp/dtime
                 return tempx[-1] + RoR * (time - timex[-1])
             elif len(tempx) > 0 and tempx[-1] != -1:
-                # not enough values to compute a RoR, so just repeate last correct reading
-                return tempx[-1]
+                # not enough values to compute a RoR, so just repeate last correct reading if not done before
+                if len(tempx) > 1 and tempx[-1] == tempx[-2]:
+                    return temp
+                else:
+                    return tempx[-1]
             else:
-                # no way to correct this, just mark this
-                return -1
+                # no way to correct this, just return it
+                return temp
         else:
             return temp
 
@@ -4855,8 +4886,8 @@ class SampleThread(QThread):
                             xtra_dev_lines2 = 0
                             for i in range(nxdevices):   
                                 extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                                extrat1 = self.filterDropOuts(1,limit,aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
-                                extrat2 = self.filterDropOuts(1,limit,aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
+                                extrat1 = self.filterDropOuts(0,limit,aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
+                                extrat2 = self.filterDropOuts(0,limit,aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                 # ignore reading if both are off, otherwise process them
                                 if extrat1 != -1 or extrat2 != -1:
                                     if len(aw.qmc.extramathexpression1[i]):
@@ -4912,8 +4943,8 @@ class SampleThread(QThread):
                     except:
                         tx = aw.qmc.timeclock.elapsed()/1000
                         t1 = t2 = -1
-                    t1 = self.filterDropOuts(1,limit,aw.qmc.timex,aw.qmc.temp1,tx,t1)
-                    t2 = self.filterDropOuts(1,limit,aw.qmc.timex,aw.qmc.temp2,tx,t2)
+                    t1 = self.filterDropOuts(0,limit,aw.qmc.timex,aw.qmc.temp1,tx,t1)
+                    t2 = self.filterDropOuts(0,limit,aw.qmc.timex,aw.qmc.temp2,tx,t2)
                     length_of_qmc_timex = len(aw.qmc.timex)
                     # ignore reading if both are off, otherwise process them
                     if t1 != -1 or t2 != -1:
@@ -4926,6 +4957,8 @@ class SampleThread(QThread):
                         if aw.qmc.flagstart:
                             aw.qmc.temp2.append(t2_final)
                             aw.qmc.temp1.append(t1_final)
+                            aw.qmc.timex.append(tx)
+                            length_of_qmc_timex += 1
                         else:
                             if len(aw.qmc.temp2) > 0:
                                 aw.qmc.temp2[-1] = t2_final
@@ -4935,13 +4968,11 @@ class SampleThread(QThread):
                                 aw.qmc.temp1[-1] = t1_final
                             else:                            
                                 aw.qmc.temp1.append(t1_final)
-                        if aw.qmc.flagstart:
-                            aw.qmc.timex.append(tx)
-                            length_of_qmc_timex += 1
-                        else:
                             if length_of_qmc_timex <= 0:
                                 aw.qmc.timex.append(tx)
                                 length_of_qmc_timex += 1
+                            else:
+                                aw.qmc.timex[-1] = tx
                         # update lines data using the lists with new data
                         if aw.qmc.flagstart:
                             aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
@@ -5059,29 +5090,32 @@ class SampleThread(QThread):
                                 alarm_limit = aw.qmc.alarmtemperature[i]
                                 if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
                                     aw.qmc.temporaryalarmflag = i
-                    #############    if using DEVICE 18 (no device). Manual mode
-                    # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
-                    else:
-                        tx = int(aw.qmc.timeclock.elapsed()/1000.)
-                        #readjust xlimit of plot if needed
-                        if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
-                            aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
-                            aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
-                            aw.qmc.xaxistosm()
-                        aw.qmc.resetlines()
-                        #add to plot a vertical time line
-                        aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
-        except Exception as e:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
-            return
-        finally:
+                #############    if using DEVICE 18 (no device). Manual mode
+                # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
+                else:
+                    tx = int(aw.qmc.timeclock.elapsed()/1000.)
+                    #readjust xlimit of plot if needed
+                    if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
+                        aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
+                        aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
+                        aw.qmc.xaxistosm()
+                    aw.qmc.resetlines()
+                    #add to plot a vertical time line
+                    aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
             #update screen in main GUI thread
             self.emit(SIGNAL("updategraphics"))
+        except Exception as e:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
@@ -5101,9 +5135,13 @@ class SampleThread(QThread):
                 #collect information
                 self.sample()
             else:
-                if aw.ser.SP.isOpen():
-                    aw.ser.closeport()
-                QApplication.processEvents()
+                try:
+                    if aw.ser.SP.isOpen():
+                        aw.ser.closeport()
+                    QApplication.processEvents()
+                except:
+                    pass
+                aw.qmc.flagstopping = False # we signal that we stopped sampling
                 self.quit()
                 break  #thread ends
 
@@ -5871,16 +5909,16 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDlabel2.append(QLabel())
             self.extraLCD1[i].setSegmentStyle(2)
             self.extraLCD1[i].display("0.0")
+            self.extraLCD1[i].setVisible(False)
+            self.extraLCDlabel1[i].setVisible(False)
             self.extraLCD2[i].setSegmentStyle(2)
             self.extraLCD2[i].display("0.0")
-            #self.extraLCD1[i].setMinimumHeight(15)
-            #self.extraLCD2[i].setMinimumHeight(15)
+            self.extraLCD2[i].setVisible(False)
+            self.extraLCDlabel2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             string1 = QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8)
             string2 = QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None, QApplication.UnicodeUTF8)
-            #self.extraLCD1[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
-            #self.extraLCD2[i].setSizePolicy (QSizePolicy.Preferred,QSizePolicy.Preferred)
             #configure Labels
             self.extraLCDlabel1[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
@@ -6135,7 +6173,8 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox1.setLayout(sliderGrp1)
         self.sliderGrpBox1.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox1.setMinimumWidth(55) 
-        self.sliderGrpBox1.setMaximumWidth(55) 
+        self.sliderGrpBox1.setMaximumWidth(55)
+        self.sliderGrpBox1.setVisible(False)
         self.connect(self.slider1, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(0,v))
         self.connect(self.slider1, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(0))
 
@@ -6153,6 +6192,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox2.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox2.setMinimumWidth(55) 
         self.sliderGrpBox2.setMaximumWidth(55) 
+        self.sliderGrpBox2.setVisible(False)
         self.connect(self.slider2, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(1,v))
         self.connect(self.slider2, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(1))
 
@@ -6170,6 +6210,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox3.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox3.setMinimumWidth(55) 
         self.sliderGrpBox3.setMaximumWidth(55) 
+        self.sliderGrpBox3.setVisible(False)
         self.connect(self.slider3, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(2,v))
         self.connect(self.slider3, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(2))
 
@@ -6187,6 +6228,7 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox4.setAlignment(Qt.AlignCenter)
         self.sliderGrpBox4.setMinimumWidth(55) 
         self.sliderGrpBox4.setMaximumWidth(55) 
+        self.sliderGrpBox4.setVisible(False)
         self.connect(self.slider4, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(3,v))
         self.connect(self.slider4, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(3))
 
@@ -6429,7 +6471,7 @@ class ApplicationWindow(QMainWindow):
     def resetApplication(self):
         string = QApplication.translate("MessageBox","Do you want to reset all settings?", None, QApplication.UnicodeUTF8)
         reply = QMessageBox.warning(self,QApplication.translate("MessageBox Caption","Factory Reset", None, QApplication.UnicodeUTF8),string,
-                            QMessageBox.Reset | QMessageBox.Cancel)
+                            QMessageBox.Cancel | QMessageBox.Reset)
         if reply == QMessageBox.Reset :
             #raise flag. Next time app will open, the settings (bad settings) will not be loaded.
             self.resetqsettings = 1
@@ -6487,6 +6529,12 @@ class ApplicationWindow(QMainWindow):
 
     def showSliders(self):
         self.sliderFrame.setVisible(True)
+        
+    def toggleSlidersVisibility(self):
+        if self.sliderFrame.isVisible():
+            self.hideSliders()
+        else:
+            self.showSliders()
 
     def updateSlidersProperties(self):
         # update slider properties
@@ -6601,7 +6649,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     return
             #if wheel graph ON
-            elif  self.qmc.wheelflag:
+            elif self.qmc.wheelflag:
                 self.qmc.disconnectWheel()
                 self.qmc.redraw(recomputeAllDeltas=False)
             if self.minieventsflag:
@@ -6610,8 +6658,10 @@ class ApplicationWindow(QMainWindow):
             self.moveKbutton("left")
         elif key == 16777236:               #MOVES CURRENT BUTTON RIGHT
             self.moveKbutton("right")
-        elif key == 83:                     #letter S (automatic save)
+        elif key == 65:                     #letter A (automatic save)
             self.automaticsave()
+        elif key == 83:                     #letter S (sliders)
+            self.toggleSlidersVisibility()
         elif key == 84:                     #letter T (mouse cross)
             self.qmc.togglecrosslines()
         elif key == 66:                     #letter B hides/shows extra rows of event buttons
@@ -6821,10 +6871,11 @@ class ApplicationWindow(QMainWindow):
         string += QApplication.translate("MessageBox", "<b>[SPACE]</b> = Choses current button",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[LEFT]</b> = Move to the left",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[RIGHT]</b> = Move to the right",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("MessageBox", "<b>[s]</b> = Autosave",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[a]</b> = Autosave",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>[s]</b> = Shows/Hides Event Sliders",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[i]</b> = Retrieve Weight In from Scale",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[o]</b> = Retrieve Weight Out from Scale",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8) + "<br><br>"
@@ -7618,243 +7669,251 @@ class ApplicationWindow(QMainWindow):
 
     #used by fileLoad()
     def setProfile(self,profile):
-        #extra devices load and check   
-        if "extratimex" in profile:   
-            if "extradevices" in profile:
-                if self.qmc.extradevices != profile["extradevices"]:
-                    string = QApplication.translate("extradevices","In order to load and view this profile,\n the extra devices configuration needs to be changed.\n Continue?", None, QApplication.UnicodeUTF8)
-                    reply = QMessageBox.question(self,QApplication.translate("extradevices", "Found a different number of curves",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
-                    if reply == QMessageBox.Yes:
-                        self.qmc.extradevices = profile["extradevices"]
-                    else:
-                        return
-            # adjust extra serial device table
-            # a) remove superfluous extra serial settings
-            self.extraser = self.extraser[:len(self.qmc.extradevices)]
-            self.extracomport = self.extracomport[:len(self.qmc.extradevices)]
-            self.extrabaudrate = self.extrabaudrate[:len(self.qmc.extradevices)]
-            self.extrabytesize = self.extrabytesize[:len(self.qmc.extradevices)]
-            self.extraparity = self.extraparity[:len(self.qmc.extradevices)]
-            self.extrastopbits = self.extrastopbits[:len(self.qmc.extradevices)]
-            self.extratimeout = self.extratimeout[:len(self.qmc.extradevices)]
-            # b) add missing extra serial settings
-            for i in range(len(self.qmc.extradevices) - len(self.extraser)):
-                self.addSerialPort()
-            if "extratimex" in profile:
-                self.qmc.extratimex = profile["extratimex"]
-            if "extratemp1" in profile:
-                self.qmc.extratemp1 = self.qmc.extrastemp1 = profile["extratemp1"]
-            if "extratemp2" in profile:
-                self.qmc.extratemp2 = self.qmc.extrastemp2 = profile["extratemp2"]
+        try:
+            #extra devices load and check   
+            if "extratimex" in profile:   
+                if "extradevices" in profile:
+                    if self.qmc.extradevices != profile["extradevices"]:
+                        string = QApplication.translate("extradevices","In order to load and view this profile,\n the extra devices configuration needs to be changed.\n Continue?", None, QApplication.UnicodeUTF8)
+                        reply = QMessageBox.question(self,QApplication.translate("extradevices", "Found a different number of curves",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
+                        if reply == QMessageBox.Yes:
+                            self.qmc.extradevices = profile["extradevices"]
+                        else:
+                            return
+                        
+                # adjust extra serial device table
+                # a) remove superfluous extra serial settings
+                self.extraser = self.extraser[:len(self.qmc.extradevices)]
+                self.extracomport = self.extracomport[:len(self.qmc.extradevices)]
+                self.extrabaudrate = self.extrabaudrate[:len(self.qmc.extradevices)]
+                self.extrabytesize = self.extrabytesize[:len(self.qmc.extradevices)]
+                self.extraparity = self.extraparity[:len(self.qmc.extradevices)]
+                self.extrastopbits = self.extrastopbits[:len(self.qmc.extradevices)]
+                self.extratimeout = self.extratimeout[:len(self.qmc.extradevices)]
+                # b) add missing extra serial settings
+                for i in range(len(self.qmc.extradevices) - len(self.extraser)):
+                    self.addSerialPort()
+                if "extratimex" in profile:
+                    self.qmc.extratimex = profile["extratimex"]
+                if "extratemp1" in profile:
+                    self.qmc.extratemp1 = self.qmc.extrastemp1 = profile["extratemp1"]
+                if "extratemp2" in profile:
+                    self.qmc.extratemp2 = self.qmc.extrastemp2 = profile["extratemp2"]
+                if "extraname1" in profile:
+                    self.qmc.extraname1 = profile["extraname1"]
+                if "extraname2" in profile:
+                    self.qmc.extraname2 = profile["extraname2"]
+                if "extramathexpression1" in profile:
+                    self.qmc.extramathexpression1 = profile["extramathexpression1"]
+                if "extramathexpression2" in profile:
+                    self.qmc.extramathexpression2 = profile["extramathexpression2"]
+                if "extradevicecolor1" in profile:
+                    self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]]
+                if "extradevicecolor2" in profile:
+                    self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]]
+                if "extramarkersizes1" in profile:
+                    self.qmc.extramarkersizes1 = profile["extramarkersizes1"]
+                else:
+                    self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*len(self.qmc.extratemp1)
+                if "extramarkersizes2" in profile:
+                    self.qmc.extramarkersizes2 = profile["extramarkersizes2"]
+                else:
+                    self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*len(self.qmc.extratemp2)
+                if "extramarkers1" in profile:
+                    self.qmc.extramarkers1 = [d(x) for x in profile["extramarkers1"]]
+                else:
+                    self.qmc.extramarkers1 = [self.qmc.marker_default]*len(self.qmc.extratemp1)
+                if "extramarkers2" in profile:
+                    self.qmc.extramarkers2 = [d(x) for x in profile["extramarkers2"]]
+                else:
+                    self.qmc.extramarkers2 = [self.qmc.marker_default]*len(self.qmc.extratemp2)
+                if "extralinewidths1" in profile:
+                    self.qmc.extralinewidths1 = profile["extralinewidths1"]
+                else:
+                    self.qmc.extralinewidths1 = [self.qmc.linewidth_default]*len(self.qmc.extratemp1)
+                if "extralinewidths2" in profile:
+                    self.qmc.extralinewidths2 = profile["extralinewidths2"]
+                else:
+                    self.qmc.extralinewidths2 = [self.qmc.linewidth_default]*len(self.qmc.extratemp2)
+                if "extralinestyles1" in profile:
+                    self.qmc.extralinestyles1 = [d(x) for x in profile["extralinestyles1"]]
+                else:
+                    self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*len(self.qmc.extratemp1)
+                if "extralinestyles2" in profile:
+                    self.qmc.extralinestyles2 = [d(x) for x in profile["extralinestyles2"]]
+                else:
+                    self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*len(self.qmc.extratemp2)
+                if "extradrawstyles1" in profile:
+                    self.qmc.extradrawstyles1 = [d(x) for x in profile["extradrawstyles1"]]
+                else:
+                    self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp1)
+                if "extradrawstyles2" in profile:
+                    self.qmc.extradrawstyles2 = [d(x) for x in profile["extradrawstyles2"]]
+                else:
+                    self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp2)
+                self.updateExtraLCDvisibility()
+    
+            old_mode = self.qmc.mode
+            if "mode" in profile:
+                self.qmc.mode = str(profile["mode"])
+            #convert modes only if needed comparing the new uploaded mode to the old one.
+            #otherwise it would incorrectly convert the uploaded phases
+            if self.qmc.mode == "F" and old_mode == "C":
+                self.qmc.fahrenheitMode()
+            if self.qmc.mode == "C" and old_mode == "F":
+                self.qmc.celsiusMode()
+            if "flavors" in profile:
+                self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
+            #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
+            if self.qmc.flavors[0] < 1. and self.qmc.flavors[-1] < 1.:
+                l = len(self.qmc.flavors)
+                for i in range(l):
+                    self.qmc.flavors[i] *= 10.
+                self.qmc.flavors = self.qmc.flavors[:(l-1)]
+            if "flavorlabels" in profile:
+                self.qmc.flavorlabels = QStringList([d(x) for x in profile["flavorlabels"]])
+            for i in range(len(self.qmc.flavorlabels)):
+                self.qmc.flavorlabels[i] = self.qmc.flavorlabels[i]
+            if "flavorstartangle" in profile:
+                self.qmc.flavorstartangle = int(profile["flavorstartangle"])
+            if "flavoraspect" in profile:
+                self.qmc.flavoraspect = float(profile["flavoraspect"])
+            else:
+                self.qmc.flavoraspect = 1.
+            if "title" in profile:
+                self.qmc.title = d(profile["title"])
+            else:            
+                self.qmc.title = "Roaster Scope"
+            if "beans" in profile:
+                self.qmc.beans = d(profile["beans"])
+            else:
+                self.qmc.beans = ""
+            if "weight" in profile:
+                self.qmc.weight = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
+            else:
+                self.qmc.weight = [0,0,"g"]
+            if "volume" in profile:
+                self.qmc.volume = profile["volume"]
+            else:
+                self.qmc.volume = [0,0,"l"]
+            if "density" in profile:
+                self.qmc.density = [profile["density"][0],d(profile["density"][1]),profile["density"][2],d(profile["density"][3])]
+            else:
+                self.qmc.density = [0,"g",0,"l"]
+            if "roastertype" in profile:
+                self.qmc.roastertype = d(profile["roastertype"])
+            else:
+                self.qmc.roastertype = ""
+            if "operator" in profile:
+                self.qmc.operator = d(profile["operator"])
+            else:
+                self.qmc.operator = ""
+            if "beansize" in profile:
+                self.qmc.beansize = float(profile["beansize"])
+            else:
+                self.qmc.beansize = 0.0
+            if "roastdate" in profile:
+                self.qmc.roastdate = QDate.fromString(d(profile["roastdate"]))
+            if "specialevents" in profile:
+                self.qmc.specialevents = profile["specialevents"]
+            else:
+                self.qmc.specialevents = []
+            if "specialeventstype" in profile:
+                self.qmc.specialeventstype = profile["specialeventstype"]
+            else:  
+                self.qmc.specialeventstype = []
+            if "specialeventsvalue" in profile:
+                self.qmc.specialeventsvalue = profile["specialeventsvalue"]
+            else:
+                self.qmc.specialeventsvalue = []          
+            if "specialeventsStrings" in profile:
+                self.qmc.specialeventsStrings = [d(x) for x in profile["specialeventsStrings"]]
+            else:
+                self.qmc.specialeventsStrings = []
+            if "etypes" in profile:
+                self.qmc.etypes = [d(x) for x in profile["etypes"]]
+                
+            if "roastingnotes" in profile:
+                self.qmc.roastingnotes = d(profile["roastingnotes"])
+            else:
+                self.qmc.roastingnotes = ""
+            if "cuppingnotes" in profile:
+                self.qmc.cuppingnotes = d(profile["cuppingnotes"])
+            else:
+                self.qmc.cuppingnotes = ""
+            if "timex" in profile:
+                self.qmc.timex = profile["timex"]
+            if "temp1" in profile:
+                self.qmc.temp1 = profile["temp1"]
+            if "temp2" in profile:
+                self.qmc.temp2 = profile["temp2"]
+            if "phases" in profile:
+                self.qmc.phases = profile["phases"]
+    # don't let the users y/z min/max axis limits be overwritten by loading a profile
+    #        if "zmax" in profile:
+    #            self.qmc.zlimit = min(int(profile["zmax"]),500)
+    #        if "zmin" in profile:
+    #            self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),-200)
+    #        if "ymax" in profile:
+    #            self.qmc.ylimit = min(int(profile["ymax"]),850)
+    #        if "ymin" in profile:
+    #            self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),-150)
+            if "xmin" in profile:
+                self.qmc.startofx = int(profile["xmin"])
+            if "xmax" in profile:
+                self.qmc.endofx = int(profile["xmax"])
+            else:
+                #Set the xlimits
+                if self.qmc.timex:
+                    self.qmc.endofx = self.qmc.timex[-1] + 40
+            if "ambientTemp" in profile:
+                self.qmc.ambientTemp = profile["ambientTemp"]    
+            if "ambient_humidity" in profile:
+                self.qmc.ambientTemp = profile["ambient_humidity"]
+            if "bag_humidity" in profile:
+                self.qmc.bag_humidity = profile["bag_humidity"]   
+            else:
+                self.qmc.bag_humidity = [0.,0.]
+            if "externalprogram" in profile:
+                self.ser.externalprogram = d(profile["externalprogram"])
             if "extraname1" in profile:
-                self.qmc.extraname1 = profile["extraname1"]
+                self.qmc.extraname1 = [d(n) for n in profile["extraname1"]]
             if "extraname2" in profile:
-                self.qmc.extraname2 = profile["extraname2"]
-            if "extramathexpression1" in profile:
-                self.qmc.extramathexpression1 = profile["extramathexpression1"]
-            if "extramathexpression2" in profile:
-                self.qmc.extramathexpression2 = profile["extramathexpression2"]
-            if "extradevicecolor1" in profile:
-                self.qmc.extradevicecolor1 = [d(x) for x in profile["extradevicecolor1"]]
-            if "extradevicecolor2" in profile:
-                self.qmc.extradevicecolor2 = [d(x) for x in profile["extradevicecolor2"]]
-            if "extramarkersizes1" in profile:
-                self.qmc.extramarkersizes1 = [d(x) for x in profile["extramarkersizes1"]]
+                self.qmc.extraname2 = [d(n) for n in profile["extraname2"]]
+            if "timeindex" in profile:
+                self.qmc.timeindex = profile["timeindex"]
             else:
-                self.qmc.extramarkersizes1 = [self.qmc.markersize_default]*len(self.qmc.extratemp1)
-            if "extramarkersizes2" in profile:
-                self.qmc.extramarkersizes2 = [d(x) for x in profile["extramarkersizes2"]]
-            else:
-                self.qmc.extramarkersizes2 = [self.qmc.markersize_default]*len(self.qmc.extratemp2)
-            if "extramarkers1" in profile:
-                self.qmc.extramarkers1 = [d(x) for x in profile["extramarkers1"]]
-            else:
-                self.qmc.extramarkers1 = [self.qmc.marker_default]*len(self.qmc.extratemp1)
-            if "extramarkers2" in profile:
-                self.qmc.extramarkers2 = [d(x) for x in profile["extramarkers2"]]
-            else:
-                self.qmc.extramarkers2 = [self.qmc.marker_default]*len(self.qmc.extratemp2)
-            if "extralinewidths1" in profile:
-                self.qmc.extralinewidths1 = [d(x) for x in profile["extralinewidths1"]]
-            else:
-                self.qmc.extralinewidths1 = [self.qmc.linewidth_default]*len(self.qmc.extratemp1)
-            if "extralinewidths2" in profile:
-                self.qmc.extralinewidths2 = [d(x) for x in profile["extralinewidths2"]]
-            else:
-                self.qmc.extralinewidths2 = [self.qmc.linewidth_default]*len(self.qmc.extratemp2)
-            if "extralinestyles1" in profile:
-                self.qmc.extralinestyles1 = [d(x) for x in profile["extralinestyles1"]]
-            else:
-                self.qmc.extralinestyles1 = [self.qmc.linestyle_default]*len(self.qmc.extratemp1)
-            if "extralinestyles2" in profile:
-                self.qmc.extralinestyles2 = [d(x) for x in profile["extralinestyles2"]]
-            else:
-                self.qmc.extralinestyles2 = [self.qmc.linestyle_default]*len(self.qmc.extratemp2)
-            if "extradrawstyles1" in profile:
-                self.qmc.extradrawstyles1 = [d(x) for x in profile["extradrawstyles1"]]
-            else:
-                self.qmc.extradrawstyles1 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp1)
-            if "extradrawstyles2" in profile:
-                self.qmc.extradrawstyles2 = [d(x) for x in profile["extradrawstyles2"]]
-            else:
-                self.qmc.extradrawstyles2 = [self.qmc.drawstyle_default]*len(self.qmc.extratemp2)
-            self.updateExtraLCDvisibility()
-
-        old_mode = self.qmc.mode
-        if "mode" in profile:
-            self.qmc.mode = str(profile["mode"])
-        #convert modes only if needed comparing the new uploaded mode to the old one.
-        #otherwise it would incorrectly convert the uploaded phases
-        if self.qmc.mode == "F" and old_mode == "C":
-            self.qmc.fahrenheitMode()
-        if self.qmc.mode == "C" and old_mode == "F":
-            self.qmc.celsiusMode()
-        if "flavors" in profile:
-            self.qmc.flavors = [float(fl) for fl in profile["flavors"]]
-        #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
-        if self.qmc.flavors[0] < 1. and self.qmc.flavors[-1] < 1.:
-            l = len(self.qmc.flavors)
-            for i in range(l):
-                self.qmc.flavors[i] *= 10.
-            self.qmc.flavors = self.qmc.flavors[:(l-1)]
-        if "flavorlabels" in profile:
-            self.qmc.flavorlabels = QStringList([d(x) for x in profile["flavorlabels"]])
-        for i in range(len(self.qmc.flavorlabels)):
-            self.qmc.flavorlabels[i] = self.qmc.flavorlabels[i]
-        if "flavorstartangle" in profile:
-            self.qmc.flavorstartangle = int(profile["flavorstartangle"])
-        if "flavoraspect" in profile:
-            self.qmc.flavoraspect = float(profile["flavoraspect"])
-        else:
-            self.qmc.flavoraspect = 1.
-        if "title" in profile:
-            self.qmc.title = d(profile["title"])
-        else:            
-            self.qmc.title = "Roaster Scope"
-        if "beans" in profile:
-            self.qmc.beans = d(profile["beans"])
-        else:
-            self.qmc.beans = ""
-        if "weight" in profile:
-            self.qmc.weight = [profile["weight"][0],profile["weight"][1],d(profile["weight"][2])]
-        else:
-            self.qmc.weight = [0,0,"g"]
-        if "volume" in profile:
-            self.qmc.volume = profile["volume"]
-        else:
-            self.qmc.volume = [0,0,"l"]
-        if "density" in profile:
-            self.qmc.density = [profile["density"][0],d(profile["density"][1]),profile["density"][2],d(profile["density"][3])]
-        else:
-            self.qmc.density = [0,"g",0,"l"]
-        if "roastertype" in profile:
-            self.qmc.roastertype = d(profile["roastertype"])
-        else:
-            self.qmc.roastertype = ""
-        if "operator" in profile:
-            self.qmc.operator = d(profile["operator"])
-        else:
-            self.qmc.operator = ""
-        if "beansize" in profile:
-            self.qmc.beansize = float(profile["beansize"])
-        else:
-            self.qmc.beansize = 0.0
-        if "roastdate" in profile:
-            self.qmc.roastdate = QDate.fromString(d(profile["roastdate"]))
-        if "specialevents" in profile:
-            self.qmc.specialevents = profile["specialevents"]
-        else:
-            self.qmc.specialevents = []
-        if "specialeventstype" in profile:
-            self.qmc.specialeventstype = profile["specialeventstype"]
-        else:  
-            self.qmc.specialeventstype = []
-        if "specialeventsvalue" in profile:
-            self.qmc.specialeventsvalue = profile["specialeventsvalue"]
-        else:
-            self.qmc.specialeventsvalue = []          
-        if "specialeventsStrings" in profile:
-            self.qmc.specialeventsStrings = [d(x) for x in profile["specialeventsStrings"]]
-        else:
-            self.qmc.specialeventsStrings = []
-        if "etypes" in profile:
-            self.qmc.etypes = [d(x) for x in profile["etypes"]]
-            
-        if "roastingnotes" in profile:
-            self.qmc.roastingnotes = d(profile["roastingnotes"])
-        else:
-            self.qmc.roastingnotes = ""
-        if "cuppingnotes" in profile:
-            self.qmc.cuppingnotes = d(profile["cuppingnotes"])
-        else:
-            self.qmc.cuppingnotes = ""
-        if "timex" in profile:
-            self.qmc.timex = profile["timex"]
-        if "temp1" in profile:
-            self.qmc.temp1 = profile["temp1"]
-        if "temp2" in profile:
-            self.qmc.temp2 = profile["temp2"]
-        if "phases" in profile:
-            self.qmc.phases = profile["phases"]
-# don't let the users y/z min/max axis limits be overwritten by loading a profile
-#        if "zmax" in profile:
-#            self.qmc.zlimit = min(int(profile["zmax"]),500)
-#        if "zmin" in profile:
-#            self.qmc.zlimit_min = max(min(int(profile["zmin"]),self.qmc.zlimit),-200)
-#        if "ymax" in profile:
-#            self.qmc.ylimit = min(int(profile["ymax"]),850)
-#        if "ymin" in profile:
-#            self.qmc.ylimit_min = max(min(int(profile["ymin"]),self.qmc.ylimit),-150)
-        if "xmin" in profile:
-            self.qmc.startofx = int(profile["xmin"])
-        if "xmax" in profile:
-            self.qmc.endofx = int(profile["xmax"])
-        else:
-            #Set the xlimits
-            if self.qmc.timex:
-                self.qmc.endofx = self.qmc.timex[-1] + 40
-        if "ambientTemp" in profile:
-            self.qmc.ambientTemp = profile["ambientTemp"]    
-        if "ambient_humidity" in profile:
-            self.qmc.ambientTemp = profile["ambient_humidity"]
-        if "bag_humidity" in profile:
-            self.qmc.bag_humidity = profile["bag_humidity"]   
-        else:
-            self.qmc.bag_humidity = [0.,0.]
-        if "externalprogram" in profile:
-            self.ser.externalprogram = d(profile["externalprogram"])
-        if "extraname1" in profile:
-            self.qmc.extraname1 = [d(n) for n in profile["extraname1"]]
-        if "extraname2" in profile:
-            self.qmc.extraname2 = [d(n) for n in profile["extraname2"]]
-        if "timeindex" in profile:
-            self.qmc.timeindex = profile["timeindex"]
-        else:
-            ###########      OLD PROFILE FORMAT
-            if "startend" in profile:
-                startend = [float(fl) for fl in profile["startend"]]  
-            else:
-                startend = [0.,0.,0.,0.]
-            if "dryend" in profile:
-                dryend = profile["dryend"]
-            else:
-                dryend = [0.,0.]
-            if "cracks" in profile:
-                varC = [float(fl) for fl in profile["cracks"]]
-            else:
-                varC = [0.,0.,0.,0.,0.,0.,0.,0.]
-            times = []
-            times.append(startend[0])
-            times.append(dryend[0])
-            times.append(varC[0])
-            times.append(varC[2])
-            times.append(varC[4])
-            times.append(varC[6])
-            times.append(startend[2])
-            #convert to new profile
-            self.qmc.timeindexupdate(times)
-        # ensure that timeindex has the proper length
-        self.qmc.timeindex = self.qmc.timeindex + [0 for i in range(8-len(self.qmc.timeindex))]
+                ###########      OLD PROFILE FORMAT
+                if "startend" in profile:
+                    startend = [float(fl) for fl in profile["startend"]]  
+                else:
+                    startend = [0.,0.,0.,0.]
+                if "dryend" in profile:
+                    dryend = profile["dryend"]
+                else:
+                    dryend = [0.,0.]
+                if "cracks" in profile:
+                    varC = [float(fl) for fl in profile["cracks"]]
+                else:
+                    varC = [0.,0.,0.,0.,0.,0.,0.,0.]
+                times = []
+                times.append(startend[0])
+                times.append(dryend[0])
+                times.append(varC[0])
+                times.append(varC[2])
+                times.append(varC[4])
+                times.append(varC[6])
+                times.append(startend[2])
+                #convert to new profile
+                self.qmc.timeindexupdate(times)
+            # ensure that timeindex has the proper length
+            self.qmc.timeindex = self.qmc.timeindex + [0 for i in range(8-len(self.qmc.timeindex))]
+        except Exception as ex:
+            import traceback
+            traceback.print_exc(file=sys.stdout)
+            # we don't report errors on settingsLoad
+            _, _, exc_tb = sys.exc_info()
+            QMessageBox.information(self,QApplication.translate("Error Message", "Exception: setProfile()",None, QApplication.UnicodeUTF8),str(ex),exc_tb.tb_lineno)
 
     # the int n specifies the number of digits
     def float2float(self,f,n=1):
@@ -9881,9 +9940,6 @@ $cupping_notes
         else:
             try:
                 for i in range((start or self.qmc.timeindex[0]),(end or self.qmc.timeindex[6])):
-                    print((start or self.qmc.timeindex[0]),(end or self.qmc.timeindex[6]))
-                    print(start,self.qmc.timeindex[0])
-                    print(end,self.qmc.timeindex[6])
                     e = (self.qmc.temp1[i] + self.qmc.temp1[i+1]) / 2.0
                     b = (self.qmc.temp2[i] + self.qmc.temp2[i+1]) / 2.0
                     dt = (self.qmc.timex[i+1] - self.qmc.timex[i])
@@ -10869,14 +10925,14 @@ class HUDDlg(QDialog):
         #DeltaFilter holds the number of pads in filter
         self.DeltaFilter = QSpinBox()
         self.DeltaFilter.setSingleStep(1)
-        self.DeltaFilter.setRange(0,20)
+        self.DeltaFilter.setRange(0,40)
         self.DeltaFilter.setValue(aw.qmc.deltafilter - 2)
         self.connect(self.DeltaFilter ,SIGNAL("valueChanged(int)"),self.changeDeltaFilter)
         curvefilterlabel = QLabel(QApplication.translate("Label", "Filter",None, QApplication.UnicodeUTF8))
         #Filter holds the number of pads in filter
         self.Filter = QSpinBox()
         self.Filter.setSingleStep(1)
-        self.Filter.setRange(0,20)
+        self.Filter.setRange(0,40)
         self.Filter.setValue(aw.qmc.curvefilter - 2)
         self.connect(self.Filter ,SIGNAL("valueChanged(int)"),self.changeFilter)
         #show projection
@@ -12690,11 +12746,11 @@ class autosaveDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(autosaveDlg,self).__init__(parent)
         self.setModal(True)
-        self.setWindowTitle(QApplication.translate("Form Caption","Keyboard Autosave [s]", None, QApplication.UnicodeUTF8))
+        self.setWindowTitle(QApplication.translate("Form Caption","Keyboard Autosave [a]", None, QApplication.UnicodeUTF8))
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None, QApplication.UnicodeUTF8))
-        self.autocheckbox = QCheckBox(QApplication.translate("CheckBox","Autosave [s]", None, QApplication.UnicodeUTF8))
-        self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [s]",None, QApplication.UnicodeUTF8))
+        self.autocheckbox = QCheckBox(QApplication.translate("CheckBox","Autosave [a]", None, QApplication.UnicodeUTF8))
+        self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None, QApplication.UnicodeUTF8))
         self.autocheckbox.setChecked(aw.qmc.autosaveflag)
         okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))  
         cancelButton = QPushButton(QApplication.translate("Button","Cancel", None, QApplication.UnicodeUTF8))
@@ -12702,7 +12758,7 @@ class autosaveDlg(ArtisanDialog):
         pathButton = QPushButton(QApplication.translate("Button","Path", None, QApplication.UnicodeUTF8))
         pathButton.setFocusPolicy(Qt.NoFocus)
         self.pathEdit = QLineEdit(str(aw.qmc.autosavepath))
-        self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [s]",None, QApplication.UnicodeUTF8))
+        self.pathEdit.setToolTip(QApplication.translate("Tooltip", "Sets the directory to store batch profiles when using the letter [a]",None, QApplication.UnicodeUTF8))
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.autoChanged)
         self.connect(pathButton,SIGNAL("clicked()"),self.getpath)
@@ -15618,10 +15674,16 @@ class modbusport(object):
         try:
             self.connect()
             self.master.slaveaddress = int(slave)
-            return self.master.read_register(int(register),0)
+            r = self.master.read_register(int(register),0)
+            return r
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: readSingleRegister() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Rx = " + r)
 
 class scaleport(object):
     """ this class handles the communications with the scale"""
@@ -15632,7 +15694,7 @@ class scaleport(object):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 2
+        self.timeout = 1
         self.devicefunctionlist = {
             "None" : None,
             "KERN NDE" : self.readKERN_NDE
@@ -18682,7 +18744,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'O'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                 #else if DTA pid
                 else:
                     aw.qmc.device = 26
@@ -18691,7 +18753,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                 message = QApplication.translate("Message Area","PID to control ET set to %1 %2" + \
                                                  " ; PID to read BT set to %3 %4", None, QApplication.UnicodeUTF8).arg(str1).arg(str(aw.ser.controlETpid[1])).arg(str2).arg(str(aw.ser.readBTpid[1]))
                 aw.button_10.setVisible(True)
@@ -18709,7 +18771,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.bytesize = 8
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
-                aw.ser.timeout = 2
+                aw.ser.timeout = 1
                 message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 aw.button_10.setVisible(True)
             elif self.programButton.isChecked():
@@ -18727,7 +18789,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "Omega HH506RA":
                     aw.qmc.device = 2
@@ -18736,7 +18798,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 7
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "CENTER 309":
                     aw.qmc.device = 3
@@ -18745,7 +18807,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "CENTER 306":
                     aw.qmc.device = 4
@@ -18763,7 +18825,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to CENTER 305, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "CENTER 304":
                     aw.qmc.device = 6
@@ -18772,7 +18834,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "CENTER 303":
                     aw.qmc.device = 7
@@ -18781,7 +18843,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "CENTER 302":
                     aw.qmc.device = 8
@@ -18790,7 +18852,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "CENTER 301":
                     aw.qmc.device = 9
@@ -18799,7 +18861,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "CENTER 300":
                     aw.qmc.device = 10
@@ -18808,7 +18870,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                     
                 elif meter == "VOLTCRAFT K204":
@@ -18818,7 +18880,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 309. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "VOLTCRAFT K202":
                     aw.qmc.device = 12
@@ -18827,7 +18889,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 306. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "VOLTCRAFT 300K":
                     aw.qmc.device = 13
@@ -18836,7 +18898,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "VOLTCRAFT 302KJ":
                     aw.qmc.device = 14
@@ -18845,7 +18907,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "EXTECH 421509":
                     aw.qmc.device = 15
@@ -18854,7 +18916,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 7
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH506RA. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "Omega HH802U":
                     aw.qmc.device = 16
@@ -18863,7 +18925,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "Omega HH309":
                     aw.qmc.device = 17
@@ -18872,7 +18934,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 #special device manual mode. No serial settings.
                 elif meter == "NONE":
@@ -18890,7 +18952,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "+309_34":
                     aw.qmc.device = 21
@@ -18899,7 +18961,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = ""  #empty message especial device
                 elif meter == "+FUJI DUTY%":
                     aw.qmc.device = 22
@@ -18908,7 +18970,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = ""   #empty message especial device
                 elif meter == "Omega HHM28[6]":
                     aw.qmc.device = 23
@@ -18917,7 +18979,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "+204_34":
                     aw.qmc.device = 24
@@ -18925,7 +18987,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = ""  #empty message especial device
                 elif meter == "+Virtual":
                     aw.qmc.device = 25
@@ -18933,7 +18995,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = ""  #empty message especial device
                 ##########################
                 ####  DEVICE 26 is DTA pid
@@ -18947,7 +19009,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = ""  #empty message especial device
                 elif meter == "MODBUS":
                     aw.qmc.device = 29
@@ -18956,7 +19018,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "VOLTCRAFT K201":
                     aw.qmc.device = 30
@@ -18965,7 +19027,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 302. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "Amprobe TMD-56":
                     aw.qmc.device = 31
@@ -18974,7 +19036,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "+ArduinoTC4_56":
                     aw.qmc.device = 32
@@ -18982,7 +19044,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = ""  #empty message especial device
                 elif meter == "Omega HH806W":
                     aw.qmc.device = 33
@@ -18991,7 +19053,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.bytesize = 8
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
-                    aw.ser.timeout = 2
+                    aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 # ensure that by selecting a real device, the initial sampling rate is set to 5s
                 if meter != "NONE":
