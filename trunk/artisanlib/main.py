@@ -3301,169 +3301,175 @@ class tgraphcanvas(FigureCanvas):
 
     # Writes information about the finished profile in the graph
     def writestatistics(self):
-        TP_index = aw.findTP()
-        if self.timeindex[1] and self.phasesbuttonflag:
-            #manual dryend available
-            dryEndIndex = self.timeindex[1]
-        else:
-            #find when dry phase ends 
-            dryEndIndex = aw.findDryEnd(TP_index)
-        dryEndTime = self.timex[dryEndIndex]
-
-        #if DROP
-        if self.timeindex[6] and self.timeindex[2]:
-            totaltime = int(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
-            if totaltime == 0:
-                aw.sendmessage(QApplication.translate("Message Area","Statistics cancelled: need complete profile [CHARGE] + [DROP]", None, QApplication.UnicodeUTF8))
-                return
-
-            self.statisticstimes[0] = totaltime
-            dryphasetime = int(dryEndTime - self.timex[self.timeindex[0]])
-            midphasetime = int(self.timex[self.timeindex[2]] - dryEndTime)
-            finishphasetime = int(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
-
-            if self.timeindex[7]:
-                coolphasetime = int(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]])
+        try:
+            TP_index = aw.findTP()
+            if self.timeindex[1] and self.phasesbuttonflag:
+                #manual dryend available
+                dryEndIndex = self.timeindex[1]
             else:
-                coolphasetime = 0
-
-            self.statisticstimes[1] = dryphasetime
-            self.statisticstimes[2] = midphasetime
-            self.statisticstimes[3] = finishphasetime
-            self.statisticstimes[4] = coolphasetime
-            
-            #dry time string
-            st1 = self.stringfromseconds(dryphasetime)
-
-            #mid time string
-            st2 = self.stringfromseconds(midphasetime)
-
-            #finish time string
-            st3 = self.stringfromseconds(finishphasetime)
-            
-            if coolphasetime:
-                st4 = self.stringfromseconds(coolphasetime)
-            else:
-                st4 = ""
-
-            #calculate the positions for the statistics elements
-            ydist = self.ylimit - self.ylimit_min
-            statisticsbarheight = ydist/80
-
-            if aw.qmc.legendloc in [1,2,9]:
-                # legend on top
-                if len(aw.qmc.extradevices) == 0:
-                    # no extra devices
-                    statisticsheight = self.ylimit - (0.12 * ydist) # standard positioning
-                else:
-                    # extra devices
-                    statisticsheight = self.ylimit - (0.19 * ydist) # standard positioning
-            else:
-                # legend not on top
-                statisticsheight = self.ylimit - (0.08 * ydist) 
-            
-            statisticsupper = statisticsheight + statisticsbarheight + 2
-            statisticslower = statisticsheight - 2.3*statisticsbarheight
-
-            if self.statisticsflags[1]:
-
-                #Draw cool phase rectangle
+                #find when dry phase ends 
+                dryEndIndex = aw.findDryEnd(TP_index)
+            dryEndTime = self.timex[dryEndIndex]
+    
+            #if DROP
+            if self.timeindex[6] and self.timeindex[2]:
+                totaltime = int(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
+                if totaltime == 0:
+                    aw.sendmessage(QApplication.translate("Message Area","Statistics cancelled: need complete profile [CHARGE] + [DROP]", None, QApplication.UnicodeUTF8))
+                    return
+    
+                self.statisticstimes[0] = totaltime
+                dryphasetime = int(dryEndTime - self.timex[self.timeindex[0]])
+                midphasetime = int(self.timex[self.timeindex[2]] - dryEndTime)
+                finishphasetime = int(self.timex[self.timeindex[6]] - self.timex[self.timeindex[2]])
+    
                 if self.timeindex[7]:
-                    rect = patches.Rectangle((self.timex[self.timeindex[6]], statisticsheight), width = coolphasetime, height = statisticsbarheight,
-                                            color = self.palette["rect4"],alpha=0.5)
-                    self.ax.add_patch(rect)
-
-                if self.timeindex[2]: # only if FCs exists
-                    #Draw finish phase rectangle
-                    #check to see if end of 1C exists. If so, use half between start of 1C and end of 1C. Otherwise use only the start of 1C
-                    rect = patches.Rectangle((self.timex[self.timeindex[2]], statisticsheight), width = finishphasetime, height = statisticsbarheight,
-                                            color = self.palette["rect3"],alpha=0.5)
-                    self.ax.add_patch(rect)
-
-                    # Draw mid phase rectangle
-                    rect = patches.Rectangle((self.timex[self.timeindex[0]]+dryphasetime, statisticsheight), width = midphasetime, height = statisticsbarheight,
-                                          color = self.palette["rect2"],alpha=0.5)
-                    self.ax.add_patch(rect)
-
-                # Draw dry phase rectangle
-                rect = patches.Rectangle((self.timex[self.timeindex[0]], statisticsheight), width = dryphasetime, height = statisticsbarheight,
-                                          color = self.palette["rect1"],alpha=0.5)
-                self.ax.add_patch(rect)
-
-            dryphaseP = dryphasetime*100/totaltime
-            midphaseP = midphasetime*100/totaltime
-            finishphaseP = finishphasetime*100/totaltime
-                        
-            #find Lowest Point in BT
-            LP = 1000 
-            if TP_index >= 0:
-                LP = self.temp2[TP_index]
-
-
-            if self.statisticsflags[0]:
-                self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ str(int(dryphaseP))+"%",color=self.palette["text"],ha="center")
-                if self.timeindex[2]: # only if FCs exists
-                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + str(int(midphaseP))+"%",color=self.palette["text"],ha="center")
-                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + str(int(finishphaseP))+ "%",color=self.palette["text"],ha="center")
-                if self.timeindex[7]: # only if COOL exists
-                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+coolphasetime/2.,statisticsupper,st4,color=self.palette["text"],ha="center")
-
-            if self.statisticsflags[2]:
-                (st1,st2,st3,st4) = aw.defect_estimation()
-            else:
-                st1 = st2 = st3 = st4 = ""
-
-            if self.statisticsflags[4] or self.statisticsflags[5]:
-                rates_of_changes = aw.RoR(TP_index,dryEndIndex)
-                if self.statisticsflags[2]:
-                    st1 = st1 + " ("
-                    st2 = st2 + " ("
-                    st3 = st3 + " ("
-                if self.statisticsflags[4]:
-                    st1 = st1 + "%.1f"%rates_of_changes[0] + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8)
-                    st2 = st2 + "%.1f"%rates_of_changes[1] + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8)
-                    st3 = st3 + "%.1f"%rates_of_changes[2] + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8)
+                    coolphasetime = int(self.timex[self.timeindex[7]] - self.timex[self.timeindex[6]])
                 else:
-                    ts1,ts1e,ts1b = aw.ts(self.timeindex[0],dryEndIndex)
-                    ts2,ts2e,ts2b = aw.ts(dryEndIndex,self.timeindex[2])
-                    ts3,ts3e,ts3b = aw.ts(self.timeindex[2],self.timeindex[6])
-                    st1 += str(ts1) + self.mode + "m [" + str(ts1e) + "-" + str(ts1b) + "]"
-                    st2 += str(ts2) + self.mode + "m [" + str(ts2e) + "-" + str(ts2b) + "]"
-                    st3 += str(ts3) + self.mode + "m [" + str(ts3e) + "-" + str(ts3b) + "]"
+                    coolphasetime = 0
+    
+                self.statisticstimes[1] = dryphasetime
+                self.statisticstimes[2] = midphasetime
+                self.statisticstimes[3] = finishphasetime
+                self.statisticstimes[4] = coolphasetime
+                
+                #dry time string
+                st1 = self.stringfromseconds(dryphasetime)
+    
+                #mid time string
+                st2 = self.stringfromseconds(midphasetime)
+    
+                #finish time string
+                st3 = self.stringfromseconds(finishphasetime)
+                
+                if coolphasetime:
+                    st4 = self.stringfromseconds(coolphasetime)
+                else:
+                    st4 = ""
+    
+                #calculate the positions for the statistics elements
+                ydist = self.ylimit - self.ylimit_min
+                statisticsbarheight = ydist/80
+    
+                if aw.qmc.legendloc in [1,2,9]:
+                    # legend on top
+                    if len(aw.qmc.extradevices) == 0:
+                        # no extra devices
+                        statisticsheight = self.ylimit - (0.12 * ydist) # standard positioning
+                    else:
+                        # extra devices
+                        statisticsheight = self.ylimit - (0.19 * ydist) # standard positioning
+                else:
+                    # legend not on top
+                    statisticsheight = self.ylimit - (0.08 * ydist) 
+                
+                statisticsupper = statisticsheight + statisticsbarheight + 2
+                statisticslower = statisticsheight - 2.3*statisticsbarheight
+    
+                if self.statisticsflags[1]:
+    
+                    #Draw cool phase rectangle
+                    if self.timeindex[7]:
+                        rect = patches.Rectangle((self.timex[self.timeindex[6]], statisticsheight), width = coolphasetime, height = statisticsbarheight,
+                                                color = self.palette["rect4"],alpha=0.5)
+                        self.ax.add_patch(rect)
+    
+                    if self.timeindex[2]: # only if FCs exists
+                        #Draw finish phase rectangle
+                        #check to see if end of 1C exists. If so, use half between start of 1C and end of 1C. Otherwise use only the start of 1C
+                        rect = patches.Rectangle((self.timex[self.timeindex[2]], statisticsheight), width = finishphasetime, height = statisticsbarheight,
+                                                color = self.palette["rect3"],alpha=0.5)
+                        self.ax.add_patch(rect)
+    
+                        # Draw mid phase rectangle
+                        rect = patches.Rectangle((self.timex[self.timeindex[0]]+dryphasetime, statisticsheight), width = midphasetime, height = statisticsbarheight,
+                                              color = self.palette["rect2"],alpha=0.5)
+                        self.ax.add_patch(rect)
+    
+                    # Draw dry phase rectangle
+                    rect = patches.Rectangle((self.timex[self.timeindex[0]], statisticsheight), width = dryphasetime, height = statisticsbarheight,
+                                              color = self.palette["rect1"],alpha=0.5)
+                    self.ax.add_patch(rect)
+    
+                dryphaseP = dryphasetime*100/totaltime
+                midphaseP = midphasetime*100/totaltime
+                finishphaseP = finishphasetime*100/totaltime
+                            
+                #find Lowest Point in BT
+                LP = 1000 
+                if TP_index >= 0:
+                    LP = self.temp2[TP_index]
+    
+    
+                if self.statisticsflags[0]:
+                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime/2.,statisticsupper,st1 + "  "+ str(int(dryphaseP))+"%",color=self.palette["text"],ha="center")
+                    if self.timeindex[2]: # only if FCs exists
+                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime/2.,statisticsupper,st2+ "  " + str(int(midphaseP))+"%",color=self.palette["text"],ha="center")
+                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime/2.,statisticsupper,st3 + "  " + str(int(finishphaseP))+ "%",color=self.palette["text"],ha="center")
+                    if self.timeindex[7]: # only if COOL exists
+                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+coolphasetime/2.,statisticsupper,st4,color=self.palette["text"],ha="center")
+    
                 if self.statisticsflags[2]:
-                    st1 = st1 + ")"
-                    st2 = st2 + ")"
-                    st3 = st3 + ")"
-
-            if self.statisticsflags[2] or self.statisticsflags[4] or self.statisticsflags[5]:
-                #Write flavor estimation
-                self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontsize=11)
-                if self.timeindex[2]: # only if FCs exists
-                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontsize=11)
-                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontsize=11)
-                if self.timeindex[7]: # only if COOL exists
-                    self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontsize=11)
-            if self.statisticsflags[3] and self.timeindex[0]>-1 and self.temp1 and self.temp2 and self.temp1[self.timeindex[0]:self.timeindex[6]+1] and self.temp2[self.timeindex[0]:self.timeindex[6]+1]:
-                temp1_values = self.temp1[self.timeindex[0]:self.timeindex[6]+1]
-                temp2_values = self.temp2[self.timeindex[0]:self.timeindex[6]+1]
-                BTmin = min(temp1_values)
-                BTmax = max(temp1_values)
-                ETmin = min(temp2_values)
-                ETmax = max(temp2_values)
-
-                dTime = self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]
-                timez = self.stringfromseconds(dTime)
-                ror = "%.2f"%(((self.temp2[self.timeindex[6]]-LP)/(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))*60.)
-                ts,tse,tsb = aw.ts()
-
-                #end temperature
-                strline = QApplication.translate("Scope Label", "BT=%1-%2 (%3)   ET=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]", None,
-                          QApplication.UnicodeUTF8).arg("%.1f"%BTmin + self.mode).arg("%.1f"%BTmax + self.mode).arg("%.1f"%abs(BTmax - BTmin)).arg("%.1f"%ETmin + self.mode).arg("%.1f"%ETmax + self.mode).arg("%.1f"%abs(ETmax - ETmin)).arg(timez).arg(ror).arg("%d%sm"%(ts,self.mode)).arg(tse).arg(tsb)
-
-                # even better: use xlabel
-                self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
-            else:
-                self.ax.set_xlabel(QApplication.translate("Scope Label", "Time",None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"])
+                    (st1,st2,st3,st4) = aw.defect_estimation()
+                else:
+                    st1 = st2 = st3 = st4 = ""
+    
+                if self.statisticsflags[4] or self.statisticsflags[5]:
+                    rates_of_changes = aw.RoR(TP_index,dryEndIndex)
+                    if self.statisticsflags[2]:
+                        st1 = st1 + " ("
+                        st2 = st2 + " ("
+                        st3 = st3 + " ("
+                    if self.statisticsflags[4]:
+                        st1 = st1 + "%.1f"%rates_of_changes[0] + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8)
+                        st2 = st2 + "%.1f"%rates_of_changes[1] + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8)
+                        st3 = st3 + "%.1f"%rates_of_changes[2] + QApplication.translate("Scope Label", "d/m",None, QApplication.UnicodeUTF8)
+                    else:
+                        ts1,ts1e,ts1b = aw.ts(self.timeindex[0],dryEndIndex)
+                        ts2,ts2e,ts2b = aw.ts(dryEndIndex,self.timeindex[2])
+                        ts3,ts3e,ts3b = aw.ts(self.timeindex[2],self.timeindex[6])
+                        st1 += str(ts1) + self.mode + "m [" + str(ts1e) + "-" + str(ts1b) + "]"
+                        st2 += str(ts2) + self.mode + "m [" + str(ts2e) + "-" + str(ts2b) + "]"
+                        st3 += str(ts3) + self.mode + "m [" + str(ts3e) + "-" + str(ts3b) + "]"
+                    if self.statisticsflags[2]:
+                        st1 = st1 + ")"
+                        st2 = st2 + ")"
+                        st3 = st3 + ")"
+    
+                if self.statisticsflags[2] or self.statisticsflags[4] or self.statisticsflags[5]:
+                    #Write flavor estimation
+                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontsize=11)
+                    if self.timeindex[2]: # only if FCs exists
+                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontsize=11)
+                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontsize=11)
+                    if self.timeindex[7]: # only if COOL exists
+                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontsize=11)
+                if self.statisticsflags[3] and self.timeindex[0]>-1 and self.temp1 and self.temp2 and self.temp1[self.timeindex[0]:self.timeindex[6]+1] and self.temp2[self.timeindex[0]:self.timeindex[6]+1]:
+                    temp1_values = self.temp1[self.timeindex[0]:self.timeindex[6]+1]
+                    temp2_values = self.temp2[self.timeindex[0]:self.timeindex[6]+1]
+                    BTmin = min(temp1_values)
+                    BTmax = max(temp1_values)
+                    ETmin = min(temp2_values)
+                    ETmax = max(temp2_values)
+    
+                    dTime = self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]
+                    timez = self.stringfromseconds(dTime)
+                    ror = "%.2f"%(((self.temp2[self.timeindex[6]]-LP)/(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))*60.)
+                    ts,tse,tsb = aw.ts()
+    
+                    #end temperature
+                    strline = QApplication.translate("Scope Label", "BT=%1-%2 (%3)   ET=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]", None,
+                              QApplication.UnicodeUTF8).arg("%.1f"%BTmin + self.mode).arg("%.1f"%BTmax + self.mode).arg("%.1f"%abs(BTmax - BTmin)).arg("%.1f"%ETmin + self.mode).arg("%.1f"%ETmax + self.mode).arg("%.1f"%abs(ETmax - ETmin)).arg(timez).arg(ror).arg("%d%sm"%(ts,self.mode)).arg(tse).arg(tsb)
+    
+                    # even better: use xlabel
+                    self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
+                else:
+                    self.ax.set_xlabel(QApplication.translate("Scope Label", "Time",None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"])
+        except Exception as ex:
+            import traceback
+            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()    
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: writestatistics() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     #used in EventRecord()
     def restorebutton_11(self):
@@ -3651,61 +3657,37 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Exception: drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
-
+            
+    def timearray2index(self,timearray,seconds):
+        #find where given seconds crosses timearray
+        if len(timearray):                           #check that timearray is not empty just in case
+            #if input seconds longer than available time return last index
+            if  seconds > timearray[-1]:
+                return len(timearray)-1
+            #if given input seconds smaller than first time return first index
+            if seconds < timearray[0]:
+                return 0
+            i = numpy.searchsorted(timearray,seconds,side='left')
+            if i < len(self.timex) - 1:
+                #look around (check if the value of the next index is closer
+                choice1 = abs(self.timex[i] - seconds)
+                choice2 = abs(self.timex[i-1] - seconds)
+                #return closest (smallest) index
+                if choice2 < choice1:
+                    i = i - 1
+            return i         
+        else:
+            return -1
 
     #selects closest time INDEX in self.timex from a given input float seconds
     def time2index(self,seconds):
         #find where given seconds crosses aw.qmc.timex
-        if len(self.timex):                           #check that time is not empty just in case
-            #if input seconds longer than available time return last index
-            if  seconds > self.timex[-1]:
-                return len(self.timex)-1
-
-            #if given input seconds smaller than first time return first index
-            if seconds < self.timex[0]:
-                return 0
+        return self.timearray2index(self.timex,seconds)
             
-            for i in range(len(self.timex)):
-                # first find the index i where seconds crosses timex
-                if self.timex[i] > seconds:
-                    break
-
-            #look around
-            choice1 = abs(self.timex[i] - seconds)
-            choice2 = abs(self.timex[i-1] - seconds)
-
-            #return closest (smallest) index
-            if choice1 <= choice2:  
-                return i
-            elif choice2 < choice1:
-                return i-1
-
     #selects closest time INDEX in self.timeB from a given input float seconds
     def backgroundtime2index(self,seconds):
         #find where given seconds crosses aw.qmc.timex
-        if len(self.timeB):                           #check that time is not empty just in case
-            #if input seconds longer than available time return last index
-            if  seconds > self.timeB[-1]:
-                return len(self.timeB)-1
-
-            #if given input seconds smaller than first time return first index
-            if seconds < self.timeB[0]:
-                return 0
-
-            for i in range(len(self.timeB)):
-                # first find the index i where seconds crosses timex
-                if self.timeB[i] > seconds:
-                    break
-
-            #look around
-            choice1 = abs(self.timeB[i] - seconds)
-            choice2 = abs(self.timeB[i-1] - seconds)
-
-            #return closest (smallest) index
-            if choice1 <= choice2:  
-                return i
-            elif choice2 < choice1:
-                return i-1
+        return self.timearray2index(self.timeB,seconds)
 
     #updates list self.timeindex when found an _OLD_ profile without self.timeindex (new version)
     def timeindexupdate(self,times):
@@ -9935,7 +9917,7 @@ $cupping_notes
     #calculate the AREA under BT and ET
     def ts(self,start=None,end=None):
         delta = ET = BT = 0.0
-        if start < 0 or (start == 0 and self.qmc.timeindex[0] < 0):
+        if start and (start < 0 or (start == 0 and self.qmc.timeindex[0] < 0)):
             return 0,0,0
         else:
             try:
@@ -12434,46 +12416,53 @@ class editGraphDlg(ArtisanDialog):
             else:
                 start = aw.qmc.timex[aw.qmc.timeindex[0]]
             if self.dryeditcopy != str(self.dryedit.text()):
-                if str(self.dryedit.text()) == "00:00":
+                s = aw.qmc.stringtoseconds(str(self.dryedit.text()))
+                if s <= 0:
                     aw.qmc.timeindex[1] = 0
-                elif aw.qmc.stringtoseconds(str(self.dryedit.text())) > 0:
-                    dryindex = aw.qmc.time2index(start + aw.qmc.stringtoseconds(str(self.dryedit.text())))
+                else:
+                    dryindex = aw.qmc.time2index(start + s)
                     aw.qmc.timeindex[1] = dryindex
             if self.Cstarteditcopy != str(self.Cstartedit.text()):
-                if str(self.Cstartedit.text()) == "00:00":
+                s = aw.qmc.stringtoseconds(str(self.Cstartedit.text()))
+                if s <= 0:
                     aw.qmc.timeindex[2] = 0
-                elif aw.qmc.stringtoseconds(str(self.Cstartedit.text())) > 0:
-                    fcsindex = aw.qmc.time2index(start + aw.qmc.stringtoseconds(str(self.Cstartedit.text())))
+                else:
+                    fcsindex = aw.qmc.time2index(start + s)
                     aw.qmc.timeindex[2] = fcsindex
             if self.Cendeditcopy != str(self.Cendedit.text()):
-                if str(self.Cendedit.text()) == "00:00":
+                s = aw.qmc.stringtoseconds(str(self.Cendedit.text()))
+                if s <= 0:
                     aw.qmc.timeindex[3] = 0
-                elif aw.qmc.stringtoseconds(str(self.Cendedit.text())) > 0:
-                    fceindex = aw.qmc.time2index(start + aw.qmc.stringtoseconds(str(self.Cendedit.text())))
+                else:
+                    fceindex = aw.qmc.time2index(start + s)
                     aw.qmc.timeindex[3] = fceindex
             if self.CCstarteditcopy != str(self.CCstartedit.text()):
-                if str(self.CCstartedit.text()) == "00:00":
+                s = aw.qmc.stringtoseconds(str(self.CCstartedit.text()))
+                if s <= 0:
                     aw.qmc.timeindex[4] = 0
-                elif aw.qmc.stringtoseconds(str(self.CCstartedit.text())) > 0:
-                    scsindex = aw.qmc.time2index(start + aw.qmc.stringtoseconds(str(self.CCstartedit.text())))
+                else:
+                    scsindex = aw.qmc.time2index(start + s)
                     aw.qmc.timeindex[4] = scsindex
-            if self.CCendeditcopy != str(self.CCendedit.text()): 
-                if str(self.CCendedit.text()) == "00:00":
+            if self.CCendeditcopy != str(self.CCendedit.text()):
+                s = aw.qmc.stringtoseconds(str(self.CCendedit.text()))
+                if s <= 0:
                     aw.qmc.timeindex[5] = 0
                 elif aw.qmc.stringtoseconds(str(self.CCendedit.text())) > 0:
-                    sceindex = aw.qmc.time2index(start + aw.qmc.stringtoseconds(str(self.CCendedit.text())))
+                    sceindex = aw.qmc.time2index(start + s)
                     aw.qmc.timeindex[5] = sceindex
             if self.dropeditcopy != str(self.dropedit.text()):
-                if str(self.dropedit.text()) == "00:00":
+                s = aw.qmc.stringtoseconds(str(self.dropedit.text()))
+                if s <= 0:
                     aw.qmc.timeindex[6] = 0
-                elif aw.qmc.stringtoseconds(str(self.dropedit.text())) > 0:
-                    dropindex = aw.qmc.time2index(start + aw.qmc.stringtoseconds(str(self.dropedit.text())))
+                else:
+                    dropindex = aw.qmc.time2index(start + s)
                     aw.qmc.timeindex[6] = dropindex
             if self.cooleditcopy != str(self.cooledit.text()):
-                if str(self.cooledit.text()) == "00:00":
+                s = aw.qmc.stringtoseconds(str(self.cooledit.text()))
+                if s <= 0:
                     aw.qmc.timeindex[7] = 0
-                elif aw.qmc.stringtoseconds(str(self.cooledit.text())) > 0:
-                    coolindex = aw.qmc.time2index(start + aw.qmc.stringtoseconds(str(self.cooledit.text())))
+                else:
+                    coolindex = aw.qmc.time2index(start + s)
                     aw.qmc.timeindex[7] = coolindex
             if aw.qmc.phasesbuttonflag:   
                 # adjust phases by DryEnd and FCs events
