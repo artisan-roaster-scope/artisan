@@ -4849,7 +4849,7 @@ class SampleThread(QThread):
             aw.qmc.samplingsemaphore.acquire(1)
             if aw.qmc.flagon: # we check again after sleep if the monitor is still on
                 # if we are not yet recording, but sampling we keep on reseting the timer
-                if not aw.qmc.flagstart:
+                if not aw.qmc.flagstart and not aw.qmc.flagstopping: # while we just turning recording off we don't reset timer yet
                     aw.qmc.timeclock.start()
                     
                 # max limit for dropout filter
@@ -5891,12 +5891,10 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDlabel2.append(QLabel())
             self.extraLCD1[i].setSegmentStyle(2)
             self.extraLCD1[i].display("0.0")
-            self.extraLCD1[i].setVisible(False)
-            self.extraLCDlabel1[i].setVisible(False)
+            self.extraLCDframe1[i].setVisible(False)
             self.extraLCD2[i].setSegmentStyle(2)
             self.extraLCD2[i].display("0.0")
-            self.extraLCD2[i].setVisible(False)
-            self.extraLCDlabel2[i].setVisible(False)
+            self.extraLCDframe2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             string1 = QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8)
@@ -15672,7 +15670,7 @@ class modbusport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Rx = " + r)
+                aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Rx = " + str(r))
 
 class scaleport(object):
     """ this class handles the communications with the scale"""
