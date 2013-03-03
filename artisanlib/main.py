@@ -129,7 +129,9 @@ import minimalmodbus
 import json
 
 if sys.version < '3':
-    def u(x):
+    def b(x): # convert to bytes
+        return x
+    def u(x): # convert to unicode string
         return unicode(x)
     def v(x):
         return x
@@ -151,7 +153,9 @@ if sys.version < '3':
     def str2cmd(s):
         return s
 else:
-    def u(x):
+    def b(x): # convert to bytes
+        return codecs.latin_1_encode(x)[0]
+    def u(x): # convert to unicode string
         return str(x)
     def v(x):
         return x
@@ -7793,7 +7797,19 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.qmc.beansize = 0.0
             if "roastdate" in profile:
-                self.qmc.roastdate = QDate.fromString(d(profile["roastdate"]))
+                # ensure to read roast dates always with en_US locale
+                try:
+                    #  save language and country
+                    language = QLocale.system().language()
+                    country = QLocale.system().country()
+                    #  set locale to en_US
+                    QLocale.setDefault(QtCore.QLocale(31, 255));
+                    #  generate date string in en_US
+                    self.qmc.roastdate = QDate.fromString(d(profile["roastdate"]))           
+                    #  restore locale
+                    QLocale.setDefault(QtCore.QLocale(language, country));
+                except Exception:
+                    pass
             if "specialevents" in profile:
                 self.qmc.specialevents = profile["specialevents"]
             else:
@@ -8108,7 +8124,19 @@ class ApplicationWindow(QMainWindow):
             profile["density"] = [self.qmc.density[0],e(self.qmc.density[1]),self.qmc.density[2],e(self.qmc.density[3])]
             profile["roastertype"] = e(self.qmc.roastertype)
             profile["operator"] = e(self.qmc.operator)
-            profile["roastdate"] = e(self.qmc.roastdate.toString())
+            # ensure to write roast dates always with en_US locale
+            try:
+                #  save language and country
+                language = QLocale.system().language()
+                country = QLocale.system().country()
+                #  set locale to en_US
+                QLocale.setDefault(QtCore.QLocale(31, 255));
+                #  generate date string in en_US
+                profile["roastdate"] = e(self.qmc.roastdate.toString())            
+                #  restore locale
+                QLocale.setDefault(QtCore.QLocale(language, country));
+            except Exception:
+                pass
             profile["beansize"] = str(self.qmc.beansize)
             profile["specialevents"] = self.qmc.specialevents
             profile["specialeventstype"] = self.qmc.specialeventstype
@@ -8794,7 +8822,7 @@ class ApplicationWindow(QMainWindow):
                     if self.qmc.extralinestyles1[i] == self.qmc.linestyle_default:
                         self.qmc.extradrawstyles1[i] = l1.get_drawstyle()
                     else:
-                        self.qmc.extradrawstyles1[i] = self.qmc.linestyle_default
+                        self.qmc.extradrawstyles1[i] = self.qmc.drawstyle_default
                     self.qmc.extralinewidths1[i] = l1.get_linewidth()
                     self.qmc.extramarkers1[i] = l1.get_marker()
                     self.qmc.extramarkersizes1[i] = l1.get_markersize()
@@ -8804,11 +8832,11 @@ class ApplicationWindow(QMainWindow):
                     x1 = x1 + 1
                 if aw.extraCurveVisibility2[i]:
                     l2 = aw.qmc.extratemp2lines[x2]
-                    self.qmc.extralinestyles1[i] = l2.get_linestyle()
+                    self.qmc.extralinestyles2[i] = l2.get_linestyle()
                     if self.qmc.extralinestyles2[i] == self.qmc.linestyle_default:
                         self.qmc.extradrawstyles2[i] = l2.get_drawstyle()
                     else:
-                        self.qmc.extradrawstyles2[i] = self.qmc.linestyle_default
+                        self.qmc.extradrawstyles2[i] = self.qmc.drawstyle_default
                     self.qmc.extralinewidths2[i] = l2.get_linewidth()
                     self.qmc.extramarkers2[i] = l2.get_marker()
                     self.qmc.extramarkersizes2[i] = l2.get_markersize()
@@ -9194,7 +9222,7 @@ class ApplicationWindow(QMainWindow):
         alarms["alarmcond"]= str(self.qmc.alarmcond)
         alarms["alarmsource"]= str(self.qmc.alarmsource)
         alarms["alarmaction"]= str(self.qmc.alarmaction)
-        alarms["alarmstrings"]= str(self.qmc.alarmstrings)
+        alarms["alarmstrings"]= list(map(str,list(self.qmc.alarmstrings)))
         general["profilepath"]= str(self.userprofilepath)
         #save extra devices
         device["extradevices"]= str(self.qmc.extradevices)
@@ -16020,7 +16048,7 @@ class serialport(object):
                 self.COMsemaphore.release(1)
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("DElta DTA:" + settings + " || Tx = " + command + " || Rx = " + r)
+                aw.addserial("DElta DTA:" + settings + " || Tx = " + command + " || Rx = " + str(r))
 
     def callprogram(self):
         try:
@@ -16397,12 +16425,11 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H506 :" + settings + " || Tx = " + command + " || Rx = " + r)
+                aw.addserial("H506 :" + settings + " || Tx = " + command + " || Rx = " + str(r))
 
     #reads once the id of the HH506RA meter and stores it in the serial variable self.HH506RAid. Marko Luther.
     def HH506RAGetID(self):
         try:
-            command = ""
             ID = ""
             if not self.SP.isOpen():
                 self.openport()
@@ -16430,7 +16457,7 @@ class serialport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H506 :" + settings + " || Tx = " + command + " || Rx = " + ID)
+                aw.addserial("H506 :" + settings + " || Rx = " + str(ID))
 
     def CENTER306temperature(self):
         try:
@@ -16453,10 +16480,21 @@ class serialport(object):
                     b3bin = self.binary(ord(r[2]))          #bits string order "[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     bit5 = b3bin[2]
+
                     #extract T1
-                    T1 = float(hex2int(r[3],r[4]))
+                    B34 = binascii.hexlify(b(r[3]+r[4]))
+                    if B34[0].isdigit():
+                        T1 = float(B34)
+                    else:
+                        T1 = float(B34[1:])
+
                     #extract T2
-                    T2 = float(hex2int(r[7],r[8]))
+                    B78 = binascii.hexlify(b(r[7]+r[8]))
+                    if B78[0].isdigit():
+                        T2 = float(B78)
+                    else:
+                        T2 = float(B78[1:])
+
                     #check decimal point
                     if bit2 == "0":
                         T1 /= 10.
@@ -16514,7 +16552,11 @@ class serialport(object):
                     b3bin = self.binary(ord(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     #extract T1
-                    T1 = float(hex2int(r[3],r[4]))
+                    B34 = binascii.hexlify(b(r[3]+r[4]))
+                    if B34[0].isdigit():
+                        T1 = float(B34)
+                    else:
+                        T1 = float(B34[1:])
                     #check decimal point
                     if bit2 == "0":
                         T1 /= 10.
@@ -16557,9 +16599,17 @@ class serialport(object):
                     bit2 = b3bin[5]
                     bit5 = b3bin[2]
                     #extract T1
-                    T1 = float(hex2int(r[3],r[4]))
+                    B34 = binascii.hexlify(b(r[3]+r[4]))
+                    if B34[0].isdigit():
+                        T1 = float(B34)
+                    else:
+                        T1 = float(B34[1:])
                     #extract T2
-                    T2 = float(hex2int(r[5],r[6]))
+                    B56 = binascii.hexlify(b(r[5]+r[6]))
+                    if B56[0].isdigit():
+                        T2 = float(B56)
+                    else:
+                        T2 = float(B56[1:])
                     #check decimal point
                     if bit2 == "0":
                         T1 /= 10.
@@ -16758,7 +16808,7 @@ class serialport(object):
         finally:
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + command + " || Rx = " + res + "|| Ts= %.1f, %.1f, %.1f, %.1f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2))
+                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + command + " || Rx = " + str(res) + "|| Ts= %.1f, %.1f, %.1f, %.1f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2))
 
     def TEVA18Bconvert(self, seg):
         if seg == 0x7D:
@@ -17047,7 +17097,7 @@ class serialport(object):
             #note: logged chars should not be binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("HHM28multimeter :" + settings + " || Tx = " + "No command" + " || Rx = " + frame)
+                aw.addserial("HHM28multimeter :" + settings + " || Tx = " + "No command" + " || Rx = " + str(frame))
 
     #sends a command to the ET/BT device. Arduino.
     def sendTXcommand(self,command):
