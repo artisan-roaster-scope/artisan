@@ -145,7 +145,7 @@ if sys.version < '3':
             return None
     def e(x):
         if x is not None:
-            return codecs.unicode_escape_encode(x)[0]
+            return codecs.unicode_escape_encode(unicode(x))[0]
         else:
             return None
     def hex2int(h1,h2=""):
@@ -1062,14 +1062,14 @@ class tgraphcanvas(FigureCanvas):
                 # alarm call program
                 fname = str(self.alarmstrings[alarmnumber])
                 QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
-                aw.sendmessage(QApplication.translate("Message Area","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(self.alarmstrings[alarmnumber]))
+                aw.sendmessage(QApplication.translate("Message Area","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(str(self.alarmstrings[alarmnumber])))
             elif self.alarmaction[alarmnumber] == 2:
                 # alarm event button
                 button_number = None
                 try:
-                    button_number = int(self.alarmstrings[alarmnumber]) - 1 # the event buttons presented to the user are numbered from 1 on                
+                    button_number = int(str(self.alarmstrings[alarmnumber])) - 1 # the event buttons presented to the user are numbered from 1 on                
                 except:
-                    aw.sendmessage(QApplication.translate("Message Area","Alarm trigger button error, description '%1' not a number",None, QApplication.UnicodeUTF8).arg(self.alarmstrings[alarmnumber]))
+                    aw.sendmessage(QApplication.translate("Message Area","Alarm trigger button error, description '%1' not a number",None, QApplication.UnicodeUTF8).arg(str(self.alarmstrings[alarmnumber])))
                 if button_number:
                     if button_number > -1 and button_number < len(aw.buttonlist):
                         aw.recordextraevent(button_number)
@@ -1080,11 +1080,11 @@ class tgraphcanvas(FigureCanvas):
                 # alarm slider 1-4
                 slidernr = None
                 try:
-                    slidervalue = int(self.alarmstrings[alarmnumber])
+                    slidervalue = int(str(self.alarmstrings[alarmnumber]))
                     if slidervalue < 0 or slidervalue > 100:
                         raise Exception()
                 except:
-                    aw.sendmessage(QApplication.translate("Message Area","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(self.alarmstrings[alarmnumber]))
+                    aw.sendmessage(QApplication.translate("Message Area","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(str(self.alarmstrings[alarmnumber])))
                 if slidervalue:
                     if self.alarmaction[alarmnumber] == 3:
                         slidernr = 0
@@ -7796,18 +7796,16 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.beansize = float(profile["beansize"])
             else:
                 self.qmc.beansize = 0.0
+            # for compatibility with older profiles:
             if "roastdate" in profile:
-                # ensure to read roast dates always with en_US locale
                 try:
-                    #  save language and country
-                    language = QLocale.system().language()
-                    country = QLocale.system().country()
-                    #  set locale to en_US
-                    QLocale.setDefault(QtCore.QLocale(31, 255));
-                    #  generate date string in en_US
-                    self.qmc.roastdate = QDate.fromString(d(profile["roastdate"]))           
-                    #  restore locale
-                    QLocale.setDefault(QtCore.QLocale(language, country));
+                    self.qmc.roastdate = QDate.fromString(d(profile["roastdate"]))
+                except Exception:
+                    pass
+            # the new dates have the locale independent isodate format:
+            if "roastisodate" in profile:
+                try:
+                    self.qmc.roastdate = QDate.fromString(d(profile["roastisodate"],Qt.ISODate))
                 except Exception:
                     pass
             if "specialevents" in profile:
@@ -8111,6 +8109,7 @@ class ApplicationWindow(QMainWindow):
     def getProfile(self):
         try:
             profile = {}
+            profile["version"] = e(__version__)
             profile["mode"] = self.qmc.mode
             profile["timeindex"] = self.qmc.timeindex
             profile["flavors"] = self.qmc.flavors
@@ -8124,19 +8123,16 @@ class ApplicationWindow(QMainWindow):
             profile["density"] = [self.qmc.density[0],e(self.qmc.density[1]),self.qmc.density[2],e(self.qmc.density[3])]
             profile["roastertype"] = e(self.qmc.roastertype)
             profile["operator"] = e(self.qmc.operator)
-            # ensure to write roast dates always with en_US locale
+            # write roastdate that respects locale and potential cannot be read in under a different locale (just for compatibility to older versions)
             try:
-                #  save language and country
-                language = QLocale.system().language()
-                country = QLocale.system().country()
-                #  set locale to en_US
-                QLocale.setDefault(QtCore.QLocale(31, 255));
-                #  generate date string in en_US
-                profile["roastdate"] = e(self.qmc.roastdate.toString())            
-                #  restore locale
-                QLocale.setDefault(QtCore.QLocale(language, country));
-            except Exception:
+                profile["roastdate"] = e(self.qmc.roastdate.toString())
+            except:
                 pass
+            # write roast date 
+            try:
+                profile["roastisodate"] = e(self.qmc.roastdate.toString(Qt.ISODate))
+            except:
+                pass            
             profile["beansize"] = str(self.qmc.beansize)
             profile["specialevents"] = self.qmc.specialevents
             profile["specialeventstype"] = self.qmc.specialeventstype
