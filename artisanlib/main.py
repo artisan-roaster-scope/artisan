@@ -4884,14 +4884,14 @@ class SampleThread(QThread):
                             xtra_dev_lines2 = 0
                             for i in range(nxdevices):   
                                 extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                                extrat1 = self.filterDropOuts(0,limit,aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
-                                extrat2 = self.filterDropOuts(0,limit,aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                 # ignore reading if both are off, otherwise process them
                                 if extrat1 != -1 or extrat2 != -1:
                                     if len(aw.qmc.extramathexpression1[i]):
                                         extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                                        extrat1 = self.filterDropOuts(0,limit,aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
                                     if len(aw.qmc.extramathexpression2[i]):
                                         extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                                        extrat2 = self.filterDropOuts(0,limit,aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                     if aw.qmc.flagstart:
                                         aw.qmc.extratemp1[i].append(float(extrat1))
                                         aw.qmc.extratemp2[i].append(float(extrat2))
@@ -4941,15 +4941,15 @@ class SampleThread(QThread):
                     except:
                         tx = aw.qmc.timeclock.elapsed()/1000
                         t1 = t2 = -1
+                    if len(aw.qmc.ETfunction):
+                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
+                    if len(aw.qmc.BTfunction):
+                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
                     t1 = self.filterDropOuts(0,limit,aw.qmc.timex,aw.qmc.temp1,tx,t1)
                     t2 = self.filterDropOuts(0,limit,aw.qmc.timex,aw.qmc.temp2,tx,t2)
                     length_of_qmc_timex = len(aw.qmc.timex)
                     # ignore reading if both are off, otherwise process them
                     if t1 != -1 or t2 != -1:
-                        if len(aw.qmc.ETfunction):
-                            t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
-                        if len(aw.qmc.BTfunction):
-                            t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
                         t1_final = t1
                         t2_final = t2
                         if aw.qmc.flagstart:
