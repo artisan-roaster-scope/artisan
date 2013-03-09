@@ -129,12 +129,10 @@ import minimalmodbus
 import json
 
 if sys.version < '3':
-    def b(x): # convert to bytes
-        return x
+    def o(x): # converts char to byte
+        return ord(x)
     def u(x): # convert to unicode string
         return unicode(x)
-    def v(x):
-        return x
     def d(x):
         if x is not None:
             try:
@@ -152,13 +150,13 @@ if sys.version < '3':
         return int(binascii.hexlify(h1+h2),16)
     def str2cmd(s):
         return s
+    def cmd2str(c):
+        return c
 else:
-    def b(x): # convert to bytes
-        return codecs.latin_1_encode(x)[0]
+    def o(x): # converts char to byte
+        return x
     def u(x): # convert to unicode string
         return str(x)
-    def v(x):
-        return x
     def d(x):
         if x is not None:
             return codecs.unicode_escape_decode(x)[0]
@@ -176,6 +174,8 @@ else:
             return int(h1)
     def str2cmd(s):
         return bytes(s,"ascii")
+    def cmd2str(c):
+        return str(c,"ascii")
 
 platf = str(platform.system())
 
@@ -370,6 +370,8 @@ class tgraphcanvas(FigureCanvas):
         #device with first letter - does not show in any tab (but its position in the list is important)
         # device labels (used in Dialog config).
 
+        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
+        # - add to self.devices
         self.devices = [#Fuji PID               #0
                        "Omega HH806AU",         #1
                        "Omega HH506RA",         #2
@@ -403,7 +405,8 @@ class tgraphcanvas(FigureCanvas):
                        "VOLTCRAFT K201",        #30
                        "Amprobe TMD-56",        #31
                        "+ArduinoTC4_56",        #32
-                       "-Omega HH806W"          #33 NOT WORKING 
+                       "+MODBU_34",             #33
+                       "-Omega HH806W"          #34 NOT WORKING 
                        ]
 
         #extra devices
@@ -663,6 +666,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmguard = []   # points to another alarm by index that has to be triggered before; -1 indicates no guard
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
 #                              # -1 equals None
+        self.alarmoffset = []  # the for timed alarms, the seconds after alarmtime the alarm is triggered
         self.alarmtime2menuidx = [1,3,4,5,6,7,8,9,2,0] # maps menu idx to self.alarmtime index (to move TP in menu from index 9 to 2)
         self.menuidx2alarmtime = [-1,0,8,1,2,3,4,5,6,7] # inverse of above (note that those two are only inverse in one direction!)
         self.alarmcond = []    # 0 = falls below; 1 = rises above
@@ -674,6 +678,7 @@ class tgraphcanvas(FigureCanvas):
                                     # 3,4,5,6 = move slider with value given in description
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
         self.temporaryalarmflag = -3 #holds temporary index value of triggered alarm in updategraphics()
+        self.TPalarmtimeindex = None # is set to the current  aw.qmc.timeindex by sample(), if alarms are defined and once the TP is detected
 
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 600
@@ -831,6 +836,11 @@ class tgraphcanvas(FigureCanvas):
         self.extra309T3 = -1
         self.extra309T4 = -1
         self.extra309TX = 0.
+        
+        #temporary storage to pass values. Holds extra T3 and T4 values for MODBUS connected devices
+        self.extraMODBUSt3 = -1
+        self.extraMODBUSt4 = -1
+        self.extraMODBUStx = 0.
 
         #used by extra device +ArduinoTC4_XX to pass values
         self.extraArduinoT1 = 0.
@@ -1527,6 +1537,8 @@ class tgraphcanvas(FigureCanvas):
     
             #reset alarms that have been triggered
             self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
+            #reset TPalarmtimeindex to trigger a new TP recognition during alarm processing
+            aw.qmc.TPalarmtimeindex = None
     
             #reset cupping flavor values
             self.flavors = [5.]*len(self.flavorlabels)
@@ -4836,19 +4848,19 @@ class SampleThread(QThread):
                 # not enough values to compute a RoR, so just repeate last correct reading if not done before
                 if len(tempx) > 1 and tempx[-1] == tempx[-2]:
                     return temp
-                else:
+                elif len(tempx) == 1:
                     return tempx[-1]
+                else:
+                    return -1
             else:
                 # no way to correct this, just return it
-                return temp
+                return -1
         else:
             return temp
 
     # sample devices at interval self.delay miliseconds.
     def sample(self):
         try:
-            #apply sampling interval here
-            libtime.sleep(aw.qmc.delay/1000.)
             ##### lock resources  #########
             aw.qmc.samplingsemaphore.acquire(1)
             if aw.qmc.flagon: # we check again after sleep if the monitor is still on
@@ -5038,44 +5050,65 @@ class SampleThread(QThread):
                                 if aw.BTbreak(length_of_qmc_timex - 1):
                                     # we found a BT break at the current index minus 2
                                     aw.qmc.autoDropIdx = length_of_qmc_timex - 3
-                        #check alarms 
-                        for i in range(len(aw.qmc.alarmflag)):
-                            #if alarm on, and not triggered, and time is after set time:
-                            # qmc.alarmtime = -1 (None)
-                            # qmc.alarmtime = 0 (CHARGE)
-                            # ..
-                            # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
-                            # 1) the alarm is ON
-                            # 2) the alarm was not triggered yet
-                            # 3) the alarm From is ON
-                            # 4) the alarm From is CHARGE
-                            # 5) the alarm From is any other event but TP
-                            # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
-                            if aw.qmc.alarmflag[i] \
-                              and not aw.qmc.alarmstate[i] \
-                              and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
-                              and ((aw.qmc.alarmtime[i] < 0) \
-                              or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
-                              or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                              or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
-                                    and aw.qmc.timeindex[1] < 1 and self.checkTPalarmtime())):
-                                alarm_temp = None
-                                if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
-                                    alarm_temp = aw.qmc.delta1[-1]
-                                elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
-                                    alarm_temp = aw.qmc.delta2[-1]
-                                elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                    alarm_temp = aw.qmc.temp1[-1]
-                                elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                    alarm_temp = aw.qmc.temp2[-1]
-                                elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
-                                    if (aw.qmc.alarmsource[i])%2==0:
-                                        alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                    else:
-                                        alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                alarm_limit = aw.qmc.alarmtemperature[i]
-                                if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
-                                    aw.qmc.temporaryalarmflag = i
+                        if aw.qmc.flagstart:
+                            #check alarms 
+                            # check for TP event if already CHARGEed and not yet recognized
+                            if not aw.qmc.TPalarmtimeindex and len(aw.qmc.alarmflag) > 0 and aw.qmc.timeindex[0] > -1 and self.checkTPalarmtime():
+                                aw.qmc.TPalarmtimeindex = len(aw.qmc.timex)-1
+                            #check for each alarm that was not yet triggered
+                            for i in range(len(aw.qmc.alarmflag)):
+                                #if alarm on, and not triggered, and time is after set time:
+                                # qmc.alarmtime = -1 (None == ON)
+                                # qmc.alarmtime = 0 (CHARGE)
+                                # ..
+                                # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
+                                # 1) the alarm is START
+                                # 2) the alarm was not triggered yet
+                                # 3) the alarm From is ON
+                                # 4) the alarm From is CHARGE
+                                # 5) the alarm From is any other event but TP
+                                # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
+                                if aw.qmc.alarmflag[i] \
+                                  and not aw.qmc.alarmstate[i] \
+                                  and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
+                                  and ((aw.qmc.alarmtime[i] < 0) \
+                                  or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
+                                  or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                                  or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
+                                        and aw.qmc.timeindex[1] < 1 and aw.qmc.TPalarmtimeindex)):
+                                    #########
+                                    # check alarmoffset (time after From event):
+                                    if aw.qmc.alarmoffset[i] > 0:
+                                        alarm_time = aw.qmc.timeclock.elapsed()/1000.
+                                        if aw.qmc.alarmtime[i] < 0: # time after START
+                                            pass # the alarm_time is the clock time
+                                        elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
+                                            alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
+                                        elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
+                                            alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
+                                        elif aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
+                                            alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
+                                        if alarm_time >= aw.qmc.alarmoffset[i]:
+                                            aw.qmc.temporaryalarmflag = i
+                                    #########
+                                    # check alarmtemp:
+                                    alarm_temp = None
+                                    if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
+                                        alarm_temp = aw.qmc.delta1[-1]
+                                    elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
+                                        alarm_temp = aw.qmc.delta2[-1]
+                                    elif aw.qmc.alarmsource[i] == 0:                      #check ET
+                                        alarm_temp = aw.qmc.temp1[-1]
+                                    elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                                        alarm_temp = aw.qmc.temp2[-1]
+                                    elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
+                                        if (aw.qmc.alarmsource[i])%2==0:
+                                            alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                        else:
+                                            alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    alarm_limit = aw.qmc.alarmtemperature[i]
+                                    if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                                        aw.qmc.temporaryalarmflag = i
                 #############    if using DEVICE 18 (no device). Manual mode
                 # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
                 else:
@@ -5119,7 +5152,13 @@ class SampleThread(QThread):
         while True:
             if aw.qmc.flagon:
                 #collect information
+                tx = aw.qmc.timeclock.elapsed()
                 self.sample()
+                # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
+                dt = (max(1,(aw.qmc.delay - tx + aw.qmc.timeclock.elapsed()))) /1000.
+                #apply sampling interval here
+                #libtime.sleep(aw.qmc.delay/1000.)
+                libtime.sleep(dt)
             else:
                 try:
                     if aw.ser.SP.isOpen():
@@ -7330,6 +7369,13 @@ class ApplicationWindow(QMainWindow):
             self.qmc.extraname2.append("Extra 2")
             self.qmc.extramathexpression1.append("")
             self.qmc.extramathexpression2.append("")
+            
+            # ensure that the curves and LCDs of the new device are visible:
+            n = len(self.qmc.extradevices)
+            self.extraLCDvisibility1[n-1] = True
+            self.extraLCDvisibility2[n-1] = True
+            self.extraCurveVisibility1[n-1] = True
+            self.extraCurveVisibility2[n-1] = True
 
             #create new serial port (but don't open it yet). Store initial settings
             self.addSerialPort()
@@ -8378,6 +8424,10 @@ class ApplicationWindow(QMainWindow):
             self.modbus.input1register = settings.value("input1register",self.modbus.input1register).toInt()[0]
             self.modbus.input2slave = settings.value("input2slave",self.modbus.input2slave).toInt()[0]
             self.modbus.input2register = settings.value("input2register",self.modbus.input2register).toInt()[0]
+            self.modbus.input3slave = settings.value("input3slave",self.modbus.input3slave).toInt()[0]
+            self.modbus.input3register = settings.value("input3register",self.modbus.input3register).toInt()[0]
+            self.modbus.input4slave = settings.value("input4slave",self.modbus.input4slave).toInt()[0]
+            self.modbus.input4register = settings.value("input4register",self.modbus.input4register).toInt()[0]
             settings.endGroup()
             #restore scale port
             settings.beginGroup("Scale")
@@ -8398,6 +8448,10 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.alarmguard = [-1]*len(self.qmc.alarmflag)
                 self.qmc.alarmtime = [x.toInt()[0] for x in settings.value("alarmtime").toList()]  
+                if settings.contains("alarmoffset"):
+                    self.qmc.alarmoffset = [max(0,x.toInt()[0]) for x in settings.value("alarmoffset").toList()]
+                else:
+                    self.qmc.alarmoffset = [0]*len(self.qmc.alarmflag)
                 if settings.contains("alarmcond"):
                     self.qmc.alarmcond = [x.toInt()[0] for x in settings.value("alarmcond").toList()]
                 else:
@@ -8888,6 +8942,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("readBTpid",self.ser.readBTpid)
             settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)
             settings.setValue("arduinoBTChannel",self.ser.arduinoBTChannel)
+            settings.setValue("arduinoATChannel",self.ser.arduinoATChannel)
             settings.setValue("arduino56active",self.qmc.arduino56active)
             settings.endGroup()
             #save of phases is done in the phases dialog
@@ -8947,6 +9002,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input1register",self.modbus.input1register)
             settings.setValue("input2slave",self.modbus.input2slave)
             settings.setValue("input2register",self.modbus.input2register)
+            settings.setValue("input3slave",self.modbus.input3slave)
+            settings.setValue("input3register",self.modbus.input3register)
+            settings.setValue("input4slave",self.modbus.input4slave)
+            settings.setValue("input4register",self.modbus.input4register)
             settings.endGroup()
             #save scale port
             settings.beginGroup("Scale")
@@ -9021,6 +9080,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("alarmflag",self.qmc.alarmflag)  
             settings.setValue("alarmguard",self.qmc.alarmguard)
             settings.setValue("alarmtime",self.qmc.alarmtime)
+            settings.setValue("alarmoffset",self.qmc.alarmoffset)
             settings.setValue("alarmcond",self.qmc.alarmcond)
             settings.setValue("alarmsource",self.qmc.alarmsource)
             settings.setValue("alarmtemperature",self.qmc.alarmtemperature)
@@ -9153,6 +9213,7 @@ class ApplicationWindow(QMainWindow):
         device["readBTpid"] = str(self.ser.readBTpid)            
         device["arduinoETChannel"] = str(self.ser.arduinoETChannel)
         device["arduinoBTChannel"] = str(self.ser.arduinoBTChannel)
+        device["arduinoATChannel"] = str(self.ser.arduinoATChannel)
         phases["Phases"] = str(self.qmc.phases)
         phases["phasesbuttonflag"] = str(self.qmc.phasesbuttonflag)
         statistics["Statistics"] = str(self.qmc.statisticsflags)
@@ -9215,6 +9276,7 @@ class ApplicationWindow(QMainWindow):
         alarms["alarmflag"]= str(self.qmc.alarmflag) 
         alarms["alarmguard"]= str(self.qmc.alarmguard)
         alarms["alarmtime"]= str(self.qmc.alarmtime)
+        alarms["alarmoffset"]= str(self.qmc.alarmoffset)
         alarms["alarmcond"]= str(self.qmc.alarmcond)
         alarms["alarmsource"]= str(self.qmc.alarmsource)
         alarms["alarmaction"]= str(self.qmc.alarmaction)
@@ -9273,37 +9335,27 @@ class ApplicationWindow(QMainWindow):
         return settingsx,settingsnames
 
     def updateExtraLCDvisibility(self):
-        if aw.qmc.flagon:
-            n = len(self.qmc.extradevices)
-            for i in range(n):
-                if i < aw.nLCDS:
-                    if self.extraLCDvisibility1[i]:
-                        if i < len(self.qmc.extraname1):
-                            self.extraLCDlabel1[i].setText("<b>" + self.qmc.extraname1[i] + "<\b>")
-                        self.extraLCDlabel1[i].setVisible(True)
-                        self.extraLCD1[i].setVisible(True)
-                        self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-                    else:
-                        self.extraLCDlabel1[i].setVisible(False)
-                        self.extraLCD1[i].setVisible(False)
-                    if self.extraLCDvisibility2[i]:
-                        if i < len(self.qmc.extraname2):
-                            self.extraLCDlabel2[i].setText("<b>" + self.qmc.extraname2[i] + "<\b>")
-                        self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-                        self.extraLCDlabel2[i].setVisible(True)
-                        self.extraLCD2[i].setVisible(True)
-                    else:
-                        self.extraLCDlabel2[i].setVisible(False)
-                        self.extraLCD2[i].setVisible(False)
-            #hide the rest (just in case)
-            for i in range(n,aw.nLCDS):
-                self.extraLCDlabel1[i].setVisible(False)
-                self.extraLCD1[i].setVisible(False)
-                self.extraLCDlabel2[i].setVisible(False)
-                self.extraLCD2[i].setVisible(False) 
-        else:
-            aw.hideLCDs()
-            aw.hideSliders()
+        n = len(self.qmc.extradevices)
+        for i in range(n):
+            if i < aw.nLCDS:
+                if self.extraLCDvisibility1[i]:
+                    if i < len(self.qmc.extraname1):
+                        self.extraLCDlabel1[i].setText("<b>" + self.qmc.extraname1[i] + "<\b>")
+                    self.extraLCDframe1[i].setVisible(True)
+                    self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+                else:
+                    self.extraLCDframe1[i].setVisible(False)
+                if self.extraLCDvisibility2[i]:
+                    if i < len(self.qmc.extraname2):
+                        self.extraLCDlabel2[i].setText("<b>" + self.qmc.extraname2[i] + "<\b>")
+                    self.extraLCDframe2[i].setVisible(True)
+                    self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
+                else:
+                    self.extraLCDframe2[i].setVisible(False)
+        #hide the rest (just in case)
+        for i in range(n,aw.nLCDS):
+            self.extraLCDframe1[i].setVisible(False)
+            self.extraLCDframe2[i].setVisible(False)
 
     def filePrint(self):
         image = QPixmap.grabWidget(aw.qmc).toImage()
@@ -10110,6 +10162,10 @@ $cupping_notes
             self.modbus.input1register = int(str(dialog.modbus_input1registerEdit.text()))
             self.modbus.input2slave = int(str(dialog.modbus_input2slaveEdit.text()))
             self.modbus.input2register = int(str(dialog.modbus_input2registerEdit.text()))
+            self.modbus.input3slave = int(str(dialog.modbus_input3slaveEdit.text()))
+            self.modbus.input3register = int(str(dialog.modbus_input3registerEdit.text()))
+            self.modbus.input4slave = int(str(dialog.modbus_input4slaveEdit.text()))
+            self.modbus.input4register = int(str(dialog.modbus_input4registerEdit.text()))
             # set scale port
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
             self.scale.comport = str(dialog.scale_comportEdit.currentText())                #unicode() changes QString to a python string
@@ -15640,6 +15696,10 @@ class modbusport(object):
         self.input1register = 0
         self.input2slave = 0
         self.input2register = 0
+        self.input3slave = 0
+        self.input3register = 0
+        self.input4slave = 0
+        self.input4register = 0
         self.xonoff=0
         self.master = None
 
@@ -15805,6 +15865,7 @@ class serialport(object):
         #Initialization for ARDUINO and TC4 meter
         self.arduinoETChannel = "1"
         self.arduinoBTChannel = "2"
+        self.arduinoATChannel = "None" # the channel the Ambient Temperature of the Arduino TC4 is reported as (this value will overwrite the corresponding real channel)
         self.ArduinoIsInitialized = 0
         self.HH806Winitflag = 0
         #list of functions calls to read temperature for devices.
@@ -15812,6 +15873,8 @@ class serialport(object):
         # device 1 (with index 1 bellow) is Omega HH806
         # device 2 (with index 2 bellow) is omega HH506
         # etc
+        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
+        # - add to self.devicefunctionlist
         self.devicefunctionlist = [self.fujitemperature,    #0
                                    self.HH806AU,            #1
                                    self.HH506RA,            #2
@@ -15845,7 +15908,8 @@ class serialport(object):
                                    self.VOLTCRAFTK201,      #30
                                    self.AmprobeTMD56,       #31
                                    self.ARDUINOTC4_56,      #32
-                                   self.HH806W              #33
+                                   self.MODBUS_34,          #33
+                                   self.HH806W              #34
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -16090,6 +16154,9 @@ class serialport(object):
         t2,t1 = self.MODBUSread()
         return tx,t2,t1
 
+    def MODBUS_34(self):
+        return aw.qmc.extraMODBUStx,aw.qmc.extraMODBUSt4,aw.qmc.extraMODBUSt3
+
     def HH802U(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.HH806AUtemperature()
@@ -16108,7 +16175,7 @@ class serialport(object):
     #especial function that collects extra T3 and T4 from center 309 while keeping compatibility
     def CENTER309_34(self):
         #return saved readings collected at self.CENTER309temperature()
-        return aw.qmc.extra309TX,aw.qmc.extra309T3,aw.qmc.extra309T4 
+        return aw.qmc.extra309TX,aw.qmc.extra309T4,aw.qmc.extra309T3
 
     def CENTER306(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -16153,7 +16220,7 @@ class serialport(object):
     #especial function that collects extra T3 and T4 from Vol K204 while keeping compatibility
     def K204_34(self):
         #return saved readings collected at self.CENTER309temperature()
-        return aw.qmc.extra309TX,aw.qmc.extra309T3,aw.qmc.extra309T4 
+        return aw.qmc.extra309TX,aw.qmc.extra309T4,aw.qmc.extra309T3
 
     def VOLTCRAFTK201(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -16296,6 +16363,10 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH806AUtemperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -16321,6 +16392,10 @@ class serialport(object):
             error = QApplication.translate("Error Message","Serial Exception: ser.HH806Winit() ",None, QApplication.UnicodeUTF8)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH806Winit() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -16358,7 +16433,11 @@ class serialport(object):
             error = QApplication.translate("Error Message","Serial Exception: ser.HH806Wtemperature() ",None, QApplication.UnicodeUTF8)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-            return -1,-1  
+            return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH806Wtemperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -16376,11 +16455,73 @@ class serialport(object):
             res1 = -1
         if aw.modbus.input2slave:
             res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register)
-            if res1 is None:
-                res1 = -1
+            if res2 is None:
+                res2 = -1
         else:
             res2 = -1
+        if aw.modbus.input3slave:
+            res3 = aw.modbus.readSingleRegister(aw.modbus.input3slave,aw.modbus.input3register)
+            if res3 is None:
+                res3 = -1
+        else:
+            res3 = -1
+        if aw.modbus.input4slave:
+            res4 = aw.modbus.readSingleRegister(aw.modbus.input4slave,aw.modbus.input4register)
+            if res4 is None:
+                res4 = -1
+        else:
+            res4 = -1
+        aw.qmc.extraMODBUSt3 = res3
+        aw.qmc.extraMODBUSt4 = res4
+        aw.qmc.extraMODBUStx = aw.qmc.timeclock.elapsed()/1000.
         return res2, res1
+
+    def NONEtmp(self):
+        dialogx = nonedevDlg()
+        if dialogx.exec_():
+            ET = int(str(dialogx.etEdit.text()))
+            BT = int(str(dialogx.btEdit.text()))
+            aw.lcd2.display(ET)
+            aw.lcd3.display(BT)
+            return ET, BT
+        else:
+            return -1, -1
+
+    #reads once the id of the HH506RA meter and stores it in the serial variable self.HH506RAid. Marko Luther.
+    def HH506RAGetID(self):
+        try:
+            ID = ""
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                sync = None
+                while sync != b"Err\r\n":
+                    self.SP.write(b"\r\n")
+                    sync = self.SP.read(5)
+                    libtime.sleep(1)
+                self.SP.write(b"%000R")
+                ID = self.SP.read(5)
+                if len(ID) == 5:
+                    self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
+                else:
+                    nbytes = len(ID)
+                    aw.qmc.adderror(QApplication.translate("Error Message","HH506RAGetID: %1 bytes received but 5 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
+        except serial.SerialException:
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            error = QApplication.translate("Error Message","Serial Exception: ser.HH506RAGetID()",None, QApplication.UnicodeUTF8)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH506RAGetID() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("H506 :" + settings + " || Rx = " + str(ID))
 
     #HH506RA Device
     #returns t1,t2 from Omega HH506 meter. By Marko Luther
@@ -16417,117 +16558,15 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
-        finally:
-            #note: logged chars should be unicode not binary
-            if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H506 :" + settings + " || Tx = " + command + " || Rx = " + str(r))
-
-    #reads once the id of the HH506RA meter and stores it in the serial variable self.HH506RAid. Marko Luther.
-    def HH506RAGetID(self):
-        try:
-            ID = ""
-            if not self.SP.isOpen():
-                self.openport()
-            if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
-                sync = None
-                while sync != b"Err\r\n":
-                    self.SP.write(b"\r\n")
-                    sync = self.SP.read(5)
-                    libtime.sleep(1)
-                self.SP.write(b"%000R")
-                ID = self.SP.read(5)
-                if len(ID) == 5:
-                    self.HH506RAid =  ID[0:3]               # Assign new id to self.HH506RAid
-                else:
-                    nbytes = len(ID)
-                    aw.qmc.adderror(QApplication.translate("Error Message","HH506RAGetID: %1 bytes received but 5 needed",None, QApplication.UnicodeUTF8).arg(nbytes))
-        except serial.SerialException:
-            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception: ser.HH506RAGetID()",None, QApplication.UnicodeUTF8)
+        except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-        finally:
-            #note: logged chars should be unicode not binary
-            if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("H506 :" + settings + " || Rx = " + str(ID))
-
-    def CENTER306temperature(self):
-        try:
-            command = str2cmd("\x41")
-            r = ""
-            if not self.SP.isOpen():
-                self.openport()
-            if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
-                self.SP.write(command)
-                r = self.SP.read(10)                                  #NOTE: different
-                if len(r) == 10:
-                    #DECIMAL POINT
-                    #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
-                    #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
-                    #if bit 5 of byte 3 = 1 then T2 = ####
-                    #if bit 5 of byte 3 = 0 then T2 = ###.#
-                    #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = self.binary(ord(r[2]))          #bits string order "[7][6][5][4][3][2][1][0]"
-                    bit2 = b3bin[5]
-                    bit5 = b3bin[2]
-
-                    #extract T1
-                    B34 = binascii.hexlify(b(r[3]+r[4]))
-                    if B34[0].isdigit():
-                        T1 = float(B34)
-                    else:
-                        T1 = float(B34[1:])
-
-                    #extract T2
-                    B78 = binascii.hexlify(b(r[7]+r[8]))
-                    if B78[0].isdigit():
-                        T2 = float(B78)
-                    else:
-                        T2 = float(B78[1:])
-
-                    #check decimal point
-                    if bit2 == "0":
-                        T1 /= 10.
-                    if bit5 == "0":
-                        T2 /= 10.
-                    return T1,T2
-                else:
-                    nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER306temperature(): %1 bytes received but 10 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
-                    timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-                    return -1,-1
-            else:
-                return -1,-1
-        except serial.SerialException:
-            error = QApplication.translate("Error Message","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8)
-            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH506RAtemperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("CENTER306 :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
-
-    def NONEtmp(self):
-        dialogx = nonedevDlg()
-        if dialogx.exec_():
-            ET = int(str(dialogx.etEdit.text()))
-            BT = int(str(dialogx.btEdit.text()))
-            aw.lcd2.display(ET)
-            aw.lcd3.display(BT)
-            return ET, BT
-        else:
-            return -1, -1
+                aw.addserial("H506 :" + settings + " || Tx = " + cmd2str(command) + " || Rx = " + str(r))
 
     def CENTER302temperature(self):
         try:
@@ -16545,10 +16584,10 @@ class serialport(object):
                     #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
                     #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
                     #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = self.binary(ord(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
+                    b3bin = self.binary(o(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     #extract T1
-                    B34 = binascii.hexlify(b(r[3]+r[4]))
+                    B34 = cmd2str(binascii.hexlify(r[3:5])) # select byte 3 and 4
                     if B34[0].isdigit():
                         T1 = float(B34)
                     else:
@@ -16572,6 +16611,15 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.CENTER302temperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("CENTER302 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def CENTER303temperature(self):
         try:
@@ -16583,7 +16631,7 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                r = self.SP.read(8) #NOTE: different
+                r = self.SP.read(8) #NOTE: different to CENTER306
                 if len(r) == 8:
                     #DECIMAL POINT
                     #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
@@ -16591,21 +16639,21 @@ class serialport(object):
                     #if bit 5 of byte 3 = 1 then T2 = ####
                     #if bit 5 of byte 3 = 0 then T2 = ###.#
                     #extract bit 2, and bit 5 of BYTE 3
-                    b3bin = self.binary(ord(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
+                    b3bin = self.binary(o(r[2]))              #bit"[7][6][5][4][3][2][1][0]"
                     bit2 = b3bin[5]
                     bit5 = b3bin[2]
                     #extract T1
-                    B34 = binascii.hexlify(b(r[3]+r[4]))
+                    B34 = cmd2str(binascii.hexlify(r[3:5])) # select byte 3 and 4
                     if B34[0].isdigit():
                         T1 = float(B34)
                     else:
                         T1 = float(B34[1:])
                     #extract T2
-                    B56 = binascii.hexlify(b(r[5]+r[6]))
+                    B56 = cmd2str(binascii.hexlify(r[5:7])) # select byte 5 and 6; NOTE: different to CENTER303
                     if B56[0].isdigit():
                         T2 = float(B56)
                     else:
-                        T2 = float(B56[1:])
+                        T2 = float(B56[1:])                    
                     #check decimal point
                     if bit2 == "0":
                         T1 /= 10.
@@ -16627,11 +16675,78 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.CENTER303temperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)            
+            return -1,-1
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("CENTER303 :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
+                aw.addserial("CENTER303 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+
+    def CENTER306temperature(self):
+        try:
+            command = str2cmd("\x41")
+            r = ""
+            if not self.SP.isOpen():
+                self.openport()
+            if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
+                self.SP.write(command)
+                r = self.SP.read(10) #NOTE: different to CENTER303
+                if len(r) == 10:
+                    #DECIMAL POINT
+                    #if bit 2 of byte 3 = 1 then T1 = ####      (don't divide by 10)
+                    #if bit 2 of byte 3 = 0 then T1 = ###.#     ( / by 10)
+                    #if bit 5 of byte 3 = 1 then T2 = ####
+                    #if bit 5 of byte 3 = 0 then T2 = ###.#
+                    #extract bit 2, and bit 5 of BYTE 3
+                    b3bin = self.binary(o(r[2]))          #bits string order "[7][6][5][4][3][2][1][0]"
+                    bit2 = b3bin[5]
+                    bit5 = b3bin[2]
+                    #extract T1
+                    B34 = cmd2str(binascii.hexlify(r[3:5])) # select byte 3 and 4
+                    if B34[0].isdigit():
+                        T1 = float(B34)
+                    else:
+                        T1 = float(B34[1:])
+                    #extract T2
+                    B78 = cmd2str(binascii.hexlify(r[7:9])) # select byte 7 and 9; NOTE: different to CENTER303
+                    if B78[0].isdigit():
+                        T2 = float(B78)
+                    else:
+                        T2 = float(B78[1:])
+                    #check decimal point
+                    if bit2 == "0":
+                        T1 /= 10.
+                    if bit5 == "0":
+                        T2 /= 10.
+                    return T1,T2
+                else:
+                    nbytes = len(r)
+                    error = QApplication.translate("Error Message","CENTER306temperature(): %1 bytes received but 10 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+                    return -1,-1
+            else:
+                return -1,-1
+        except serial.SerialException:
+            error = QApplication.translate("Error Message","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8)
+            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.CENTER306temperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("CENTER306 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def CENTER309temperature(self):
         ##    command = "\x4B" returns 4 bytes . Model number.
@@ -16692,7 +16807,7 @@ class serialport(object):
                     return T1,T2
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","ser.CENTER309(): %1 bytes received but 45 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                    aw.qmc.adderror(QApplication.translate("Error Message","ser.CENTER309temperature(): %1 bytes received but 45 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
                     return -1,-1 
             else:
                 return -1,-1
@@ -16702,11 +16817,15 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.CENTER309temperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("CENTER309 :" + settings + " || Tx = " + command + " || Rx = " + binascii.hexlify(r))
+                aw.addserial("CENTER309 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
 
     def ARDUINOTC4temperature(self):
         try:
@@ -16767,7 +16886,7 @@ class serialport(object):
                 command = "READ\n"  #Read command.
                 self.SP.write(str2cmd(command))
                 rl = self.SP.readline().decode('utf-8')[:-2]
-                res = rl.rsplit(',')  #response: list ["t0","t1","t2"] with t0 = init temp; t1 = ET; t2 = BT
+                res = rl.rsplit(',')  #response: list ["t0","t1","t2"] with t0 = internal temp; t1 = ET; t2 = BT
                 if self.arduinoETChannel == "None":
                     t1 = -1
                 else:
@@ -16790,6 +16909,20 @@ class serialport(object):
                             pass
                     else:
                         aw.qmc.extraArduinoT3 = aw.qmc.extraArduinoT4 = -1
+                # overwrite temps by AT internal Ambient Temperature
+                if aw.ser.arduinoATChannel != "None":
+                    if aw.ser.arduinoATChannel == "T1":
+                        t1 = float(res[0])
+                    elif aw.ser.arduinoATChannel == "T2":
+                        t2 = float(res[0])
+                    elif 28 in aw.qmc.extradevices and aw.ser.arduinoATChannel == "T3":
+                        aw.qmc.extraArduinoT1 = float(res[0])
+                    elif 28 in aw.qmc.extradevices and aw.ser.arduinoATChannel == "T4":
+                        aw.qmc.extraArduinoT2 = float(res[0])
+                    elif 32 in aw.qmc.extradevices and aw.ser.arduinoATChannel == "T5":
+                        aw.qmc.extraArduinoT3 = float(res[0])
+                    elif 32 in aw.qmc.extradevices and aw.ser.arduinoATChannel == "T6":
+                        aw.qmc.extraArduinoT4 = float(res[0])
                 return t1, t2
         except serial.SerialException as e:
             error = QApplication.translate("Error Message","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)
@@ -16977,6 +17110,10 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1 
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.TEVA18Btemperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
         finally:
             #note: logged chars should not be binary
             if aw.seriallogflag:
@@ -17089,6 +17226,10 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return "0",""
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HHM28multimeter() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            return "0"""
         finally:
             #note: logged chars should not be binary
             if aw.seriallogflag:
@@ -17113,6 +17254,9 @@ class serialport(object):
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.sendTXcommand() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             #note: logged chars should not be binary
             if aw.seriallogflag:
@@ -17135,6 +17279,9 @@ class serialport(object):
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.sendTXRXcommand() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
         finally:
             #note: logged chars should not be binary
             if aw.seriallogflag:
@@ -17813,6 +17960,26 @@ class comportDlg(ArtisanDialog):
         self.modbus_input2registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input2registerEdit))
         self.modbus_input2registerEdit.setFixedWidth(40)
         self.modbus_input2registerEdit.setAlignment(Qt.AlignRight)
+        modbus_input3slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
+        self.modbus_input3slaveEdit = QLineEdit(str(aw.modbus.input3slave))
+        self.modbus_input3slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input3slaveEdit))
+        self.modbus_input3slaveEdit.setFixedWidth(40)
+        self.modbus_input3slaveEdit.setAlignment(Qt.AlignRight)
+        modbus_input3registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
+        self.modbus_input3registerEdit = QLineEdit(str(aw.modbus.input3register))
+        self.modbus_input3registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input3registerEdit))
+        self.modbus_input3registerEdit.setFixedWidth(40)
+        self.modbus_input3registerEdit.setAlignment(Qt.AlignRight)
+        modbus_input4slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
+        self.modbus_input4slaveEdit = QLineEdit(str(aw.modbus.input4slave))
+        self.modbus_input4slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input4slaveEdit))
+        self.modbus_input4slaveEdit.setFixedWidth(40)
+        self.modbus_input4slaveEdit.setAlignment(Qt.AlignRight)
+        modbus_input4registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
+        self.modbus_input4registerEdit = QLineEdit(str(aw.modbus.input4register))
+        self.modbus_input4registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input4registerEdit))
+        self.modbus_input4registerEdit.setFixedWidth(40)
+        self.modbus_input4registerEdit.setAlignment(Qt.AlignRight)        
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
         self.scale_deviceEdit = QComboBox()
@@ -17929,16 +18096,35 @@ class comportDlg(ArtisanDialog):
         modbus_input2.addWidget(self.modbus_input2registerEdit,1,1)
         modbus_input2group = QGroupBox(QApplication.translate("GroupBox", "Input 2",None, QApplication.UnicodeUTF8))
         modbus_input2group.setLayout(modbus_input2)
+        modbus_input3 = QGridLayout()
+        modbus_input3.addWidget(modbus_input3slavelabel,0,0,Qt.AlignRight)
+        modbus_input3.addWidget(self.modbus_input3slaveEdit,0,1)
+        modbus_input3.addWidget(modbus_input3registerlabel,1,0,Qt.AlignRight)
+        modbus_input3.addWidget(self.modbus_input3registerEdit,1,1)
+        modbus_input3group = QGroupBox(QApplication.translate("GroupBox", "Input 3",None, QApplication.UnicodeUTF8))
+        modbus_input3group.setLayout(modbus_input3)
+        modbus_input4 = QGridLayout()
+        modbus_input4.addWidget(modbus_input4slavelabel,0,0,Qt.AlignRight)
+        modbus_input4.addWidget(self.modbus_input4slaveEdit,0,1)
+        modbus_input4.addWidget(modbus_input4registerlabel,1,0,Qt.AlignRight)
+        modbus_input4.addWidget(self.modbus_input4registerEdit,1,1)
+        modbus_input4group = QGroupBox(QApplication.translate("GroupBox", "Input 4",None, QApplication.UnicodeUTF8))
+        modbus_input4group.setLayout(modbus_input4)
         modbus_inputV = QVBoxLayout()
         modbus_inputV.addWidget(modbus_input1group)
         modbus_inputV.addWidget(modbus_input2group)
         modbus_inputV.addStretch()
+        modbus_inputX = QHBoxLayout()
+        modbus_inputX.addWidget(modbus_input3group)
+        modbus_inputX.addWidget(modbus_input4group)
+        modbus_inputX.addStretch()
         modbus_gridBoxLayout = QHBoxLayout()
         modbus_gridBoxLayout.addLayout(modbus_gridV)
         modbus_gridBoxLayout.addLayout(modbus_inputV)
         modbus_gridBoxLayout.addStretch()
         tab3Layout = QVBoxLayout()
         tab3Layout.addLayout(modbus_gridBoxLayout)
+        tab3Layout.addLayout(modbus_inputX)
         tab3Layout.addStretch()
         #LAYOUT TAB 4
         scale_grid = QGridLayout()
@@ -18273,11 +18459,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         arduinoETLabel =QLabel(QApplication.translate("Label", "ET Channel",None, QApplication.UnicodeUTF8))
         self.arduinoETComboBox = QComboBox()
         self.arduinoETComboBox.addItems(arduinoChannels)
-        self.arduinoETComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoETChannel))
         arduinoBTLabel =QLabel(QApplication.translate("Label", "BT Channel",None, QApplication.UnicodeUTF8))
         self.arduinoBTComboBox = QComboBox()
         self.arduinoBTComboBox.addItems(arduinoChannels)
-        self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoBTChannel))
         self.arduino56 = QCheckBox(QApplication.translate("CheckBox", "TC4_56",None, QApplication.UnicodeUTF8))
         self.arduino56.setChecked(aw.qmc.arduino56active)
         #check previous settings for radio button
@@ -18297,6 +18481,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.devicetypeComboBox.setCurrentIndex(selected_device_index)
         self.arduinoETComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoETChannel))
         self.arduinoBTComboBox.setCurrentIndex(arduinoChannels.index(aw.ser.arduinoBTChannel))
+        arduinoATLabel =QLabel(QApplication.translate("Label", "AT Channel",None, QApplication.UnicodeUTF8))
+        arduinoTemperatures = ["None","T1","T2","T3","T4","T5","T6"]
+        self.arduinoATComboBox = QComboBox()        
+        self.arduinoATComboBox.addItems(arduinoTemperatures)
+        self.arduinoATComboBox.setCurrentIndex(arduinoTemperatures.index(aw.ser.arduinoATChannel))
+        ####################################################
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
@@ -18354,7 +18544,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         arduinogrid.addWidget(self.arduinoETComboBox,1,1)
         arduinogrid.addWidget(arduinoBTLabel,2,0,Qt.AlignRight)
         arduinogrid.addWidget(self.arduinoBTComboBox,2,1)
-        arduinogrid.addWidget(self.arduino56,1,3)
+        arduinogrid.addWidget(self.arduino56,1,4)
+        arduinogrid.addWidget(self.arduinoATComboBox,2,3)
+        arduinogrid.addWidget(arduinoATLabel,2,4)
         arduinoBox = QHBoxLayout()
         arduinoBox.addLayout(arduinogrid)
         arduinoBox.addStretch()
@@ -18597,10 +18789,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.extraname1,aw.qmc.extraname2 = [],[]
             aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]
             for i in range(len(aw.extraLCDlabel1)):
-                aw.extraLCDlabel1[i].setVisible(False)
-                aw.extraLCD1[i].setVisible(False)
-                aw.extraLCDlabel2[i].setVisible(False)
-                aw.extraLCD2[i].setVisible(False)
+                aw.extraLCDframe1[i].setVisible(False)
+                aw.extraLCDframe2[i].setVisible(False)
             #delete EXTRA COMM PORTS VARIABLES
             aw.extraser = []
             aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
@@ -18797,6 +18987,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             elif self.arduinoButton.isChecked():
                 aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
                 aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
+                aw.ser.arduinoATChannel = str(self.arduinoATComboBox.currentText())
                 aw.qmc.arduino56active = bool(self.arduino56.isChecked())
                 meter = "Arduino (TC4)"
                 aw.qmc.device = 19
@@ -18905,7 +19096,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1, which is equivalent to CENTER 303. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-                    
                 elif meter == "VOLTCRAFT K204":
                     aw.qmc.device = 11
                     #aw.ser.comport = "COM4"
@@ -18977,6 +19167,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     if aw.qmc.delay != 1000:
                         aw.qmc.delay = 1000
                         st += ". Sampling rate changed to 1 second"
+                    # ensure that events button is shown
+                    aw.eventsbuttonflag = True
+                    aw.button_11.setVisible(True)
                     message = QApplication.translate("Message Area","Device set to %1%2", None, QApplication.UnicodeUTF8).arg(meter).arg(st)
                 elif meter == "TE VA18B":
                     aw.qmc.device = 20
@@ -19079,8 +19272,17 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = ""  #empty message especial device
-                elif meter == "Omega HH806W":
+                elif meter == "+MODBUS_34":
                     aw.qmc.device = 33
+                    #aw.ser.comport = "COM4"
+                    aw.ser.baudrate = 115200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'N'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1
+                    message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                elif meter == "Omega HH806W":
+                    aw.qmc.device = 34
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -19088,6 +19290,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message Area","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
+        # - add an elif entry above to specify the default serial settings                    
                 # ensure that by selecting a real device, the initial sampling rate is set to 5s
                 if meter != "NONE":
                     if aw.qmc.delay < 3000:
@@ -19097,7 +19301,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ssettings = [[9600,8,'O',1,2],[19200,8,'E',1,2],[2400,7,'E',1,2],[9600,8,'N',1,2],
                              [19200,8,'N',1,2],[2400,8,'N',1,2],[9600,8,'E',1,2],[38400,8,'E',1,2],[115200,8,'N',1,2]]
                 #map device index to a setting mode (chose the one that matches the device)
-                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7]  #0-33
+        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
+        # - add an entry to devsettings below (and potentially to ssettings above)                  
+                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,8]  #0-34
                 #init serial settings of extra devices
                 for i in range(len(aw.qmc.extradevices)):
                     dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
@@ -20209,6 +20415,7 @@ class AlarmDlg(ArtisanDialog):
         self.alarmflag = aw.qmc.alarmflag
         self.alarmguard = aw.qmc.alarmguard
         self.alarmtime = aw.qmc.alarmtime
+        self.alarmoffset = aw.qmc.alarmoffset
         self.alarmcond = aw.qmc.alarmcond
         self.alarmsource = aw.qmc.alarmsource
         self.alarmtemperature = aw.qmc.alarmtemperature
@@ -20272,6 +20479,7 @@ class AlarmDlg(ArtisanDialog):
         self.alarmflag.append(1)
         self.alarmguard.append(-1)
         self.alarmtime.append(-1)
+        self.alarmoffset.append(0)
         self.alarmcond.append(1)
         self.alarmsource.append(1)
         self.alarmtemperature.append(500)
@@ -20293,6 +20501,7 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmflag = self.alarmflag[0:selected_row] + self.alarmflag[selected_row + 1:]
                 self.alarmguard = self.alarmguard[0:selected_row] + self.alarmguard[selected_row + 1:]
                 self.alarmtime = self.alarmtime[0:selected_row] + self.alarmtime[selected_row + 1:]
+                self.alarmoffset = self.alarmoffset[0:selected_row] + self.alarmoffset[selected_row + 1:]
                 self.alarmcond = self.alarmcond[0:selected_row] + self.alarmcond[selected_row + 1:]
                 self.alarmsource = self.alarmsource[0:selected_row] + self.alarmsource[selected_row + 1:]
                 self.alarmtemperature = self.alarmtemperature[0:selected_row] + self.alarmtemperature[selected_row + 1:]
@@ -20304,6 +20513,7 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmflag.pop()
                 self.alarmguard.pop()
                 self.alarmtime.pop()
+                self.alarmoffset.pop()
                 self.alarmcond.pop()
                 self.alarmsource.pop()
                 self.alarmtemperature.pop()
@@ -20319,11 +20529,13 @@ class AlarmDlg(ArtisanDialog):
         string  = QApplication.translate("MessageBox", "<b>Status:</b> activate or deactive alarm",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>If Alarm:</b> alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.",None, QApplication.UnicodeUTF8) + "<br><br>"  
         string += QApplication.translate("MessageBox", "<b>From:</b> alarm only triggered after the given event",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>Time:</b> if not 00:00, alarm is triggered mm:ss after the event 'From' happend",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Source:</b> the temperature source that is observed",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Condition:</b> alarm is triggered if source rises above or below the specified temperature",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Temperature:</b> the speficied temperature limit",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Action:</b> if all conditions are fulfilled the alarm triggeres the corresponding action",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("MessageBox", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button (if 0 the COOL event is triggered ) or the new value of the slider",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("MessageBox", "<b>NOTE:</b> each alarm is only triggered once",None, QApplication.UnicodeUTF8)
         QMessageBox.information(self,QApplication.translate("MessageBox Caption", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
 
     def savealarms(self):
@@ -20331,6 +20543,7 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmflag = [1]*nalarms
         aw.qmc.alarmguard = [-1]*nalarms
         aw.qmc.alarmtime = [-1]*nalarms
+        aw.qmc.alarmoffset = [0]*nalarms
         aw.qmc.alarmcond = [1]*nalarms
         aw.qmc.alarmsource = [1]*nalarms
         aw.qmc.alarmtemperature = [500]*nalarms
@@ -20347,15 +20560,18 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmguard[i] = -1
             timez =  self.alarmtable.cellWidget(i,2)
             aw.qmc.alarmtime[i] = aw.qmc.menuidx2alarmtime[timez.currentIndex()]
-            atype = self.alarmtable.cellWidget(i,3)
+            offset =  self.alarmtable.cellWidget(i,3)
+            if offset and offset != "":
+                aw.qmc.alarmoffset[i] = max(0,aw.qmc.stringtoseconds(str(offset.text())))
+            atype = self.alarmtable.cellWidget(i,4)
             aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 2
-            cond = self.alarmtable.cellWidget(i,4)
+            cond = self.alarmtable.cellWidget(i,5)
             aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
-            temp = self.alarmtable.cellWidget(i,5)
+            temp = self.alarmtable.cellWidget(i,6)
             aw.qmc.alarmtemperature[i] = int(str(temp.text()))
-            action = self.alarmtable.cellWidget(i,6)
+            action = self.alarmtable.cellWidget(i,7)
             aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
-            description = self.alarmtable.cellWidget(i,7)
+            description = self.alarmtable.cellWidget(i,8)
             aw.qmc.alarmstrings[i] = str(description.text())
         aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
 
@@ -20383,7 +20599,7 @@ class AlarmDlg(ArtisanDialog):
         guardedit.setValidator(QIntValidator(0, 30,guardedit))
         #Effective time from
         timeComboBox = QComboBox()
-        timeComboBox.addItems([QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
+        timeComboBox.addItems([QApplication.translate("ComboBox","START",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
                                QApplication.translate("ComboBox","CHARGE",None, QApplication.UnicodeUTF8), # qmc.alarmtime 0
                                QApplication.translate("ComboBox","TP",None, QApplication.UnicodeUTF8), # qmc.alarmtime 8
                                QApplication.translate("ComboBox","DRY END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 1
@@ -20394,6 +20610,10 @@ class AlarmDlg(ArtisanDialog):
                                QApplication.translate("ComboBox","DROP",None, QApplication.UnicodeUTF8), # qmc.alarmtime 6
                                QApplication.translate("ComboBox","COOL",None, QApplication.UnicodeUTF8)]) # qmc.alarmtime 7
         timeComboBox.setCurrentIndex(aw.qmc.alarmtime2menuidx[self.alarmtime[i]])
+        #time after selected event
+        timeoffsetedit = QLineEdit(aw.qmc.stringfromseconds(max(0,self.alarmoffset[i])))
+        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
+        timeoffsetedit.setValidator(QRegExpValidator(regextime,self))
         #type
         typeComboBox = QComboBox()
         typeComboBox.addItems(self.buildAlarmSourceList())
@@ -20424,20 +20644,22 @@ class AlarmDlg(ArtisanDialog):
         descriptionedit = QLineEdit(str(self.alarmstrings[i]))
         self.alarmtable.setCellWidget(i,0,flagComboBox)
         self.alarmtable.setCellWidget(i,1,guardedit)
-        self.alarmtable.setCellWidget(i,2,timeComboBox) 
-        self.alarmtable.setCellWidget(i,3,typeComboBox)
-        self.alarmtable.setCellWidget(i,4,condComboBox)
-        self.alarmtable.setCellWidget(i,5,tempedit)
-        self.alarmtable.setCellWidget(i,6,actionComboBox)
-        self.alarmtable.setCellWidget(i,7,descriptionedit)
+        self.alarmtable.setCellWidget(i,2,timeComboBox)
+        self.alarmtable.setCellWidget(i,3,timeoffsetedit)
+        self.alarmtable.setCellWidget(i,4,typeComboBox)
+        self.alarmtable.setCellWidget(i,5,condComboBox)
+        self.alarmtable.setCellWidget(i,6,tempedit)
+        self.alarmtable.setCellWidget(i,7,actionComboBox)
+        self.alarmtable.setCellWidget(i,8,descriptionedit)
 
     def createalarmtable(self):
         self.alarmtable.clear()
         self.alarmtable.setTabKeyNavigation(True)
-        self.alarmtable.setColumnCount(8)
+        self.alarmtable.setColumnCount(9)
         self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Temperature",None, QApplication.UnicodeUTF8),
