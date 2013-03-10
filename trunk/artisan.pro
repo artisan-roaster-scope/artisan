@@ -13,7 +13,7 @@
 # This file is part of Artisan.
 
 SOURCES = \
-    artisan.py \
+    artisanlib/main.py \
     const/UIconst.py
     
 TRANSLATIONS = \
