@@ -5,7 +5,7 @@ o pyserial
 o QT 4.8.4
 o SIP 4.14.2
 o PyQt 4.9.6
-o Numpy >1.7.0rc1 ++ from repository (25.1.2012)
+o Numpy 1.7.0
 o scipy 0.12.0 beta from git repository (25.1.2012)
 o matplotlib 1.2.0
 o pyaudio 0.2.7
@@ -19,6 +19,8 @@ o py2app 0.7.1
 
 Upgrade History:
 
+- 2013-03-10:
+ . numpy 1.7rc1 => 1.7.0
 - 2012-01-05:
  . scipy 0.11.0 => scipy-0.12.0 beta from git repository
  . numpy 1.7.0b2 => 1.7.0rc1 ++ from repository
@@ -220,7 +222,8 @@ download matplotlib-1.2.0.tar.gz
 
 
 ---
-Using matplotlib 1.2 within pyqt on Python 3.3 I receive
+Using matplotlib 1.2 within pyqt on Python 3.3 I receive (on click on the greenflag button and leaving the dialog with OK)
+
 
 formlayout.py", line 343, in get
 value = float(field.text())
@@ -231,7 +234,9 @@ Modifying that line in backends/qt4_editor/formlayout.py by wrapping the field.t
 
 value = float(str(field.text()))
 
-solves this.
+solves this (change 2x in src folder).
+
+NOTE: to clean build dir use "python3 setup.py clean --all"
 
 
 ---

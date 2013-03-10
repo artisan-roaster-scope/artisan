@@ -13561,7 +13561,7 @@ class EventsDlg(ArtisanDialog):
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
-        defaultButton.setMaximumWidth(90)
+        defaultButton.setMaximumWidth(120)
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
         self.connect(closeButton,SIGNAL("clicked()"),self.restoreState)
@@ -15033,13 +15033,13 @@ class flavorDlg(ArtisanDialog):
         self.createFlavorTable()
         aw.qmc.flavorchart()
 
-    def closeEvent(self):
+    def closeEvent(self,_):
         self.savetable()
         self.accept()
         aw.qmc.redraw(recomputeAllDeltas=False)
 
     def close(self):
-        self.closeEvent()
+        self.closeEvent(None)
 
 #################################################################
 #################### BACKGROUND DIALOG  #########################
@@ -16323,7 +16323,7 @@ class serialport(object):
     def closeport(self):
         self.SP.close()
 
-    def closeEvent(self):
+    def closeEvent(self,_):
         try:
             self.closeport() 
         except serial.SerialException:
