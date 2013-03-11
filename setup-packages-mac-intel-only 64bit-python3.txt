@@ -3,7 +3,7 @@ o XCode 4.5.2 + command line tools
 o Python 3.3
 o pyserial
 o QT 4.8.4
-o SIP 4.14.2
+o SIP 4.14.4
 o PyQt 4.9.6
 o Numpy 1.7.0
 o scipy 0.12.0 beta from git repository (25.1.2012)
@@ -11,15 +11,21 @@ o matplotlib 1.2.0
 o pyaudio 0.2.7
 o minimalmodbus 0.4
 
-o modulegraph 0.10
+o modulegraph 0.10.4
 o distribute 0.6.29
-o altgraph 0.10
+o altgraph 0.10.2
 o macholib 1.5
-o py2app 0.7.1
+o py2app 0.7.3
 
 Upgrade History:
 
 - 2013-03-10:
+ . altgraph => 0.10.0 => 0.10.2
+ . modulegraph 0.10.0 => 0.10.4
+ . py2app 0.7.1 => 0.7.3
+ . Qt 4.8.4 (=> Qt 5.0.1 failed: Qt 5.0.1 crashs on builds)
+ . pyqt 4.9.6 => 4.10.0
+ . sip 4.14.2 => 4.14.4
  . numpy 1.7rc1 => 1.7.0
 - 2012-01-05:
  . scipy 0.11.0 => scipy-0.12.0 beta from git repository
@@ -136,14 +142,15 @@ new to v2.6:
 
 download and install (only Mac OS X 10.5 - 10.6, 32-bit and 64-bit Intel!!):
 
-qt-mac-opensource-4.8.3.dmg (Cocoa, 64bit only)
-
+qt-mac-opensource-4.8.4.dmg (OS X 10.6+, Cocoa, 64bit only)
+or
+qt-mac-opensource-5.0.1-clang-offline.dmg (OS X 10.6+, Cocoa, 64bit only)
 
 
 5) Install SIP
 
-# tar xzf sip-4.14.2.tar.gz
-# cd sip-4.14.2
+# tar xzf sip-4.14.4.tar.gz
+# cd sip-4.14.4
 # python3 configure.py
 # make
 # sudo make install
@@ -154,6 +161,7 @@ qt-mac-opensource-4.8.3.dmg (Cocoa, 64bit only)
 # tar xzf PyQt-mac-gpl-4.9.6.tar.gz 
 # cd PyQt-mac-gpl-4.9.6
 # python3 configure.py
+use: "python3 configure.py -q /Users/<username>/Qt5.0.1/5.0.1/clang_64/bin/qmake"
 # make
 # sudo make install
 
@@ -358,8 +366,8 @@ from repository
 # sudo python3 setup.py install
 
 from release downloaded from http://pypi.python.org/pypi/py2app/
-# tar -xzf py2app-0.7.1.tar.gz
-# cd py2app-0.7.1
+# tar -xzf py2app-0.7.3.tar.gz
+# cd py2app-0.7.3
 # python3 setup.py build
 # sudo python3 setup.py install
 

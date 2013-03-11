@@ -358,7 +358,7 @@ class tgraphcanvas(FigureCanvas):
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
         self.statisticsflags = [1,1,0,1,1,0]
         #conditions to estimate bad flavor:dry[min,max],mid[min,max],finish[min,max] in seconds
-        self.statisticsconditions = [180,360,180,600,180,360,120,240]
+        self.statisticsconditions = [180,360,180,600,180,360,180,300]
         #records length in seconds of total time [0], dry phase [1],mid phase[2],finish phase[3], cool phase[4]
         self.statisticstimes = [0,0,0,0,0]
 
@@ -9913,7 +9913,7 @@ $cupping_notes
         #  => ShortCoolPhase
         #if cool phase is over 4 minutes
         #  => LongCoolPhase
-        st4 = self.defect_estimation_phase(coolphasetime,self.qmc.statisticsconditions[5],self.qmc.statisticsconditions[6],ShortCoolPhase,PerfectCoolPhase,LongCoolPhase)
+        st4 = self.defect_estimation_phase(coolphasetime,self.qmc.statisticsconditions[6],self.qmc.statisticsconditions[7],ShortCoolPhase,PerfectCoolPhase,LongCoolPhase)
         return (st1,st2,st3,st4)
 
     #returns the index of the end of the dry phase (returns -1 if dry end cannot be determined)
