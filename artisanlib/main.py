@@ -13561,7 +13561,6 @@ class EventsDlg(ArtisanDialog):
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
-        defaultButton.setMaximumWidth(120)
         closeButton.setFocusPolicy(Qt.NoFocus)
         defaultButton.setFocusPolicy(Qt.NoFocus)
         self.connect(closeButton,SIGNAL("clicked()"),self.restoreState)
