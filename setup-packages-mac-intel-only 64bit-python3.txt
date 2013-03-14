@@ -6,7 +6,7 @@ o QT 4.8.4
 o SIP 4.14.4
 o PyQt 4.9.6
 o Numpy 1.7.0
-o scipy 0.12.0 beta from git repository (25.1.2012)
+o scipy 0.12.0b1 beta from git repository (25.1.2012)
 o matplotlib 1.2.0
 o pyaudio 0.2.7
 o minimalmodbus 0.4
@@ -19,6 +19,8 @@ o py2app 0.7.3
 
 Upgrade History:
 
+- 2013-03-14:
+ . scipy 0.12.0b beta from git repository (25.1.2012) => 0.12.0b1
 - 2013-03-10:
  . altgraph => 0.10.0 => 0.10.2
  . modulegraph 0.10.0 => 0.10.4

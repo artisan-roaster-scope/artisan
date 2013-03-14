@@ -3,8 +3,6 @@
 
 __version__ = "0.6.0"
 
-#pylint: disable=E0202
-
 # ABOUT
 # This program shows how to plot the temperature and its rate of change from a
 # Fuji PID or a thermocouple meter
@@ -510,6 +508,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundeventsflag = False
         self.backgroundpath = ""
         self.temp1B,self.temp2B,self.timeB = [],[],[]
+        self.delta1B,self.delta2B = [],[]
         self.timeindexB = [-1,0,0,0,0,0,0,0]
         self.backgroundEvents = [] #indexes of background events
         self.backgroundEtypes = []
@@ -518,6 +517,8 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundalpha = 0.3
         self.backgroundmetcolor = self.palette["et"]
         self.backgroundbtcolor = self.palette["bt"]
+        self.backgrounddeltaetcolor = self.palette["deltaet"]
+        self.backgrounddeltabtcolor = self.palette["deltabt"]
         self.backmoveflag = 1
         self.detectBackgroundEventTime = 20 #seconds
         self.backgroundReproduce = False
@@ -534,6 +535,9 @@ class tgraphcanvas(FigureCanvas):
         self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="darkgrey")
         self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="slategrey")
         self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="slateblue")
+        # background Deltas
+        self.DeltaETBflag = False
+        self.DeltaBTBflag = False
 
         # projection variables of change of rate
         self.HUDflag = 0
@@ -659,7 +663,27 @@ class tgraphcanvas(FigureCanvas):
         self.ETbackdrawstyle = self.drawstyle_default
         self.ETbacklinewidth = self.linewidth_default
         self.ETbackmarker = self.marker_default
-        self.ETbackmarkersize = self.markersize_default
+        self.ETbackmarkersize = self.markersize_default        
+        self.BTBdeltalinestyle = self.linestyle_default
+        self.BTBdeltadrawstyle = self.drawstyle_default
+        self.BTBdeltalinewidth = self.linewidth_default
+        self.BTBdeltamarker = self.marker_default
+        self.BTBdeltamarkersize = self.markersize_default
+        self.ETBdeltalinestyle = self.linestyle_default
+        self.ETBdeltadrawstyle = self.drawstyle_default
+        self.ETBdeltalinewidth = self.linewidth_default
+        self.ETBdeltamarker = self.marker_default
+        self.ETBdeltamarkersize = self.markersize_default        
+        self.BTBdeltalinestyle = self.linestyle_default
+        self.BTBdeltadrawstyle = self.drawstyle_default
+        self.BTBdeltalinewidth = self.linewidth_default
+        self.BTBdeltamarker = self.marker_default
+        self.BTBdeltamarkersize = self.markersize_default
+        self.ETBdeltalinestyle = self.linestyle_default
+        self.ETBdeltadrawstyle = self.drawstyle_default
+        self.ETBdeltalinewidth = self.linewidth_default
+        self.ETBdeltamarker = self.marker_default
+        self.ETBdeltamarkersize = self.markersize_default
 
         #Temperature Alarms lists. Data is writen in  alarmDlg 
         self.alarmflag = []    # 0 = OFF; 1 = ON flags
@@ -745,6 +769,8 @@ class tgraphcanvas(FigureCanvas):
         self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=str(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
         self.l_back1 = None
         self.l_back2 = None
+        self.l_deltaB1 = None
+        self.l_deltaB2 = None
 
         self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
         self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
@@ -854,6 +880,9 @@ class tgraphcanvas(FigureCanvas):
         self.dutycycleTX = 0.
         self.fujiETBT = 0.
         self.currentpidsv = 0.
+        
+        self.linecount = None # linecount cache for resetlines(); has to be reseted if visibility of ET/BT or extra lines or background ET/BT changes
+        self.deltalinecount = None # deltalinecoutn cache for resetdeltalines(); has to be reseted if visibility of deltaET/deltaBT or background deltaET/deltaBT
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -1051,16 +1080,42 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: timealign() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
-
+    def lenaxlines(self):
+        active_curves = len(self.extratimex)
+        curves = aw.extraCurveVisibility1[0:active_curves] + aw.extraCurveVisibility2[0:active_curves] + [aw.qmc.ETcurve,aw.qmc.BTcurve]
+        c = curves.count(True)
+        if aw.qmc.background:
+            c += 2
+        return c
+    
+    def lendeltaaxlines(self):
+        linecount = 0 
+        if self.DeltaETflag:
+            linecount += 1
+        if  self.DeltaBTflag:
+            linecount += 1
+        if aw.qmc.background:
+            if self.DeltaETBflag:
+                linecount += 1
+            if self.DeltaBTBflag:
+                linecount += 1
+        return linecount
+        
+    def resetlinecountcaches(self):
+        aw.qmc.linecount = None
+        aw.qmc.deltalinecount = None
+        
     def resetlines(self):
         #note: delta curves are now in self.delta_ax and have been removed from the count of resetlines()
-        linecount = 2 + 2*len(self.extradevices)       #(ET + BT) + extradevices (2 per extradevice)
-        if self.background:
-            linecount += 2   #background ET + background BT = 2
-        if self.eventsGraphflag == 2:
-            linecount += 4 
-        self.ax.lines = self.ax.lines[0:linecount]
+        if self.linecount is None:
+            self.linecount = self.lenaxlines()
+        self.ax.lines = self.ax.lines[0:self.linecount]
         
+    def resetdeltalines(self):
+        if self.deltalinecount is None:
+            self.deltalinecount = self.lendeltaaxlines()
+        self.delta_ax.lines = self.delta_ax.lines[0:self.deltalinecount]
+            
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
         try:
@@ -1759,7 +1814,7 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
             self.ax.set_title(self.title,size=20,color=self.palette["title"])
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
-            if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
+            if (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag:
                 #create a second set of axes in the same position as self.ax
                 self.delta_ax = self.ax.twinx()
                 self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
@@ -1794,7 +1849,7 @@ class tgraphcanvas(FigureCanvas):
                                       transform=trans, color=self.palette["rect2"],alpha=0.3)
             rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
                                       transform=trans, color=self.palette["rect3"],alpha=0.3)
-            if (self.DeltaETflag or self.DeltaBTflag) and not self.designerflag:
+            if (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag:
                 self.delta_ax.add_patch(rect1)
                 self.delta_ax.add_patch(rect2)
                 self.delta_ax.add_patch(rect3)
@@ -1902,6 +1957,26 @@ class tgraphcanvas(FigureCanvas):
                 self.l_back2, = self.ax.plot(self.timeB, self.temp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
                                              alpha=self.backgroundalpha,label=str(QApplication.translate("Scope Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
 
+                #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
+                if self.DeltaETBflag or self.DeltaBTBflag:
+                    if True or recomputeAllDeltas:
+                        tx = numpy.array(self.timeB)
+                        dtx = numpy.diff(self.timeB) / 60.
+                        z1 = numpy.diff(self.temp1B) / dtx
+                        z2 = numpy.diff(self.temp2B) / dtx
+                        lt,ld1,ld2 = len(self.timeB),len(z1),len(z2)
+                        if lt > ld1:
+                            z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
+                        if lt > ld2:
+                            z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
+                        self.delta1B = self.smooth(tx,z1,window_len=self.deltafilter).tolist()
+                        self.delta2B = self.smooth(tx,z2,window_len=self.deltafilter).tolist()
+                    ##### DeltaETB,DeltaBTB curves
+                    if self.DeltaETBflag:
+                        self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=str(QApplication.translate("Scope Label", "BackgroundDeltaET", None, QApplication.UnicodeUTF8)))
+                    if self.DeltaBTBflag:
+                        self.l_delta2B, = self.delta_ax.plot(self.timeB, self.delta2B,markersize=self.BTBdeltamarkersize,marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=str(QApplication.translate("Scope Label", "BackgroundDeltaBT", None, QApplication.UnicodeUTF8)))
+
                 #check backgroundevents flag
                 if self.backgroundeventsflag:
                     if self.eventsGraphflag != 2:
@@ -1970,7 +2045,6 @@ class tgraphcanvas(FigureCanvas):
                 labels.append(str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
 
             #populate delta ET (self.delta1) and delta BT (self.delta2)
-
             if self.DeltaETflag or self.DeltaBTflag:
                 if recomputeAllDeltas:  
                     tx = numpy.array(self.timex)
@@ -3369,15 +3443,10 @@ class tgraphcanvas(FigureCanvas):
     
                 if aw.qmc.legendloc in [1,2,9]:
                     # legend on top
-                    if len(aw.qmc.extradevices) == 0:
-                        # no extra devices
-                        statisticsheight = self.ylimit - (0.12 * ydist) # standard positioning
-                    else:
-                        # extra devices
-                        statisticsheight = self.ylimit - (0.19 * ydist) # standard positioning
+                    statisticsheight = self.ylimit - (0.13 * ydist) # standard positioning
                 else:
                     # legend not on top
-                    statisticsheight = self.ylimit - (0.08 * ydist) 
+                    statisticsheight = self.ylimit - (0.06 * ydist) 
                 
                 statisticsupper = statisticsheight + statisticsbarheight + 2
                 statisticslower = statisticsheight - 2.3*statisticsbarheight
@@ -4747,23 +4816,32 @@ class tgraphcanvas(FigureCanvas):
         else:
             #turn OFF
             self.crossmarker = False
-            self.resetlines()
+            if (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag:
+                self.resetdeltalines()
+            else:
+                self.resetlines()
             self.fig.canvas.draw()
             message = QApplication.translate("Message", "Mouse cross OFF",None, QApplication.UnicodeUTF8)
             aw.sendmessage(message)
             self.fig.canvas.mpl_disconnect(self.crossmouseid)
 
     def drawcross(self,event):
-        if event.inaxes !=self.ax: return
-        x =  event.xdata 
-        y = event.ydata
-        if x and y:
-            self.resetlines()
-            self.ax.plot([self.startofx,self.endofx*2], [y,y],color =  "orange",linestyle = '--', linewidth= 8, alpha=.2)
-            self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color =  "orange",linestyle = '--', linewidth= 8, alpha = .2)
-            self.ax.plot([self.startofx,self.endofx*2], [y,y],color =  self.palette["text"],linestyle = '-', linewidth= .5, alpha=1.0)
-            self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color =  self.palette["text"],linestyle = '-', linewidth= .5, alpha = 1.0)
-            self.fig.canvas.draw()
+        if event.inaxes == self.ax:
+            x = event.xdata 
+            y = event.ydata
+            if x and y:
+                self.resetlines()
+                self.ax.plot([self.startofx,self.endofx*2], [y,y],color = self.palette["text"], linestyle = '-', linewidth= .5, alpha = 1.0)
+                self.ax.plot([x,x], [self.ylimit_min,self.ylimit],color = self.palette["text"], linestyle = '-', linewidth= .5, alpha = 1.0)
+                self.fig.canvas.draw()
+        elif event.inaxes == self.delta_ax:
+            x = event.xdata 
+            y = event.ydata
+            if x and y:
+                self.resetdeltalines()
+                self.delta_ax.plot([self.startofx,self.endofx*2], [y,y], color = self.palette["text"], linestyle = '-', linewidth = .5, alpha = 1.0)
+                self.delta_ax.plot([x,x], [self.ylimit_min,self.ylimit], color = self.palette["text"], linestyle = '-', linewidth = .5, alpha = 1.0)
+                self.fig.canvas.draw()
 
 
 #######################################################################################
@@ -5227,7 +5305,8 @@ class ApplicationWindow(QMainWindow):
         self.userprofilepath = self.profilepath
 
         self.printer = QPrinter()
-        self.printer.setPageSize(QPrinter.Letter)
+#        self.printer.setPageSize(QPrinter.Letter)
+        self.printer.setCreator("Artisan")
 
         self.main_widget = QWidget(self)
         #set a minimum size (main window can be bigger but never smaller)
@@ -7145,20 +7224,22 @@ class ApplicationWindow(QMainWindow):
             firstChar = stream.read(1)
             if firstChar == "{":
                 f.close()
-                self.setProfile(self.deserialize(filename))
+                res = self.setProfile(self.deserialize(filename))
             else:
                 self.sendmessage(QApplication.translate("Message Area","Invalid artisan format", None, QApplication.UnicodeUTF8))
-            self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-            #change Title
-            self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
-            #update etypes combo box
-            self.etypeComboBox.clear()
-            self.etypeComboBox.addItems(self.qmc.etypes)
-            #Plot everything
-            self.qmc.redraw()
-            message =  QApplication.translate("Message Area","%1  loaded ", None, QApplication.UnicodeUTF8).arg(str(filename))
-            self.sendmessage(message)
-            self.setCurrentFile(filename)
+                res = False
+            if res:
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                #change Title
+                self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+                #update etypes combo box
+                self.etypeComboBox.clear()
+                self.etypeComboBox.addItems(self.qmc.etypes)
+                #Plot everything
+                self.qmc.redraw()
+                message =  QApplication.translate("Message Area","%1  loaded ", None, QApplication.UnicodeUTF8).arg(str(filename))
+                self.sendmessage(message)
+                self.setCurrentFile(filename)
         except IOError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -7506,15 +7587,16 @@ class ApplicationWindow(QMainWindow):
             import io
             infile = io.open(filename, 'r', encoding='utf-8')
             obj = json.load(infile)
-            self.setProfile(obj)
+            res = self.setProfile(obj)
             infile.close()
-            self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-            #change Title
-            self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
-            #update etypes combo box
-            self.etypeComboBox.clear()
-            self.etypeComboBox.addItems(self.qmc.etypes)
-            self.qmc.redraw()
+            if res:
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                #change Title
+                self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+                #update etypes combo box
+                self.etypeComboBox.clear()
+                self.etypeComboBox.addItems(self.qmc.etypes)
+                self.qmc.redraw()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -7573,12 +7655,13 @@ class ApplicationWindow(QMainWindow):
             obj["timex"] = timex
             obj["temp1"] = temp1
             obj["temp2"] = temp2
-            self.setProfile(obj)
+            res = self.setProfile(obj)
             infile.close()
-            self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-            #change Title
-            self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
-            self.qmc.redraw()
+            if res:
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                #change Title
+                self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+                self.qmc.redraw()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -7704,12 +7787,13 @@ class ApplicationWindow(QMainWindow):
             if "extratimex" in profile:   
                 if "extradevices" in profile:
                     if self.qmc.extradevices != profile["extradevices"]:
-                        string = QApplication.translate("extradevices","In order to load and view this profile,\n the extra devices configuration needs to be changed.\n Continue?", None, QApplication.UnicodeUTF8)
+                        string = QApplication.translate("extradevices","To load this profile the extra devices configuration needs to be changed.\nContinue?", None, QApplication.UnicodeUTF8)
                         reply = QMessageBox.question(self,QApplication.translate("extradevices", "Found a different number of curves",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
                         if reply == QMessageBox.Yes:
+                            aw.qmc.resetlinecountcaches()
                             self.qmc.extradevices = profile["extradevices"]
                         else:
-                            return
+                            return False
                         
                 # adjust extra serial device table
                 # a) remove superfluous extra serial settings
@@ -7948,6 +8032,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.timeindexupdate(times)
             # ensure that timeindex has the proper length
             self.qmc.timeindex = self.qmc.timeindex + [0 for i in range(8-len(self.qmc.timeindex))]
+            # reset linecount caches
+            aw.qmc.resetlinecountcaches()
+            return True
         except Exception as ex:
             import traceback
             traceback.print_exc(file=sys.stdout)
@@ -8383,7 +8470,14 @@ class ApplicationWindow(QMainWindow):
                 self.setLabelColor(aw.label4,QColor(self.qmc.palette["deltaet"]))
             if self.qmc.palette["deltabt"]:    
                 self.setLabelColor(aw.label5,QColor(self.qmc.palette["deltabt"]))
-
+            if settings.contains("ETBColor"):
+                self.qmc.backgroundmetcolor = str(settings.value("ETBColor",self.qmc.backgroundmetcolor).toString())
+            if settings.contains("BTBColor"):
+                self.qmc.backgroundbtcolor = str(settings.value("BTBColor",self.qmc.backgroundbtcolor).toString())
+            if settings.contains("ETBdeltaColor"):
+                self.qmc.backgrounddeltaetcolor = str(settings.value("ETBdeltaColor",self.qmc.backgrounddeltaetcolor).toString())
+            if settings.contains("BTBdeltaColor"):
+                self.qmc.backgrounddeltabtcolor = str(settings.value("BTBdeltaColor",self.qmc.backgrounddeltabtcolor).toString())
             if settings.contains("LCDColors"):
                 for (k, v) in list(settings.value("LCDColors").toMap().items()):
                     self.lcdpaletteB[str(k)] = str(v.toString())
@@ -8558,13 +8652,13 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extradevicecolor1 = list(map(str,list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList())))
                 self.qmc.extradevicecolor2 = list(map(str,list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())))
                 if settings.contains("extraLCDvisibility1"):
-                    self.extraLCDvisibility1 = [x.toInt()[0] for x in settings.value("extraLCDvisibility1").toList()]
+                    self.extraLCDvisibility1 = [bool(x.toInt()[0]) for x in settings.value("extraLCDvisibility1").toList()]
                 if settings.contains("extraLCDvisibility2"):
-                    self.extraLCDvisibility2 = [x.toInt()[0] for x in settings.value("extraLCDvisibility2").toList()]
+                    self.extraLCDvisibility2 = [bool(x.toInt()[0]) for x in settings.value("extraLCDvisibility2").toList()]
                 if settings.contains("extraCurveVisibility1"):
-                    self.extraCurveVisibility1 = [x.toInt()[0] for x in settings.value("extraCurveVisibility1").toList()]
+                    self.extraCurveVisibility1 = [bool(x.toInt()[0]) for x in settings.value("extraCurveVisibility1").toList()]
                 if settings.contains("extraCurveVisibility2"):
-                    self.extraCurveVisibility2 = [x.toInt()[0] for x in settings.value("extraCurveVisibility2").toList()]
+                    self.extraCurveVisibility2 = [bool(x.toInt()[0]) for x in settings.value("extraCurveVisibility2").toList()]
             #create empty containers
             settings.endGroup()
             #restore curve styles
@@ -8610,6 +8704,16 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extramarkers2 = list(map(str,list(settings.value("extramarkers2",self.qmc.extramarkers2).toStringList())))
                 self.qmc.extramarkersizes1 = [x.toInt()[0] for x in settings.value("extramarkersizes1").toList()]
                 self.qmc.extramarkersizes2 = [x.toInt()[0] for x in settings.value("extramarkersizes2").toList()]
+                self.qmc.BTBdeltalinestyle = str(settings.value("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle).toString())
+                self.qmc.BTBdeltadrawstyle = str(settings.value("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle).toString())
+                self.qmc.BTBdeltalinewidth = settings.value("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth).toInt()[0]
+                self.qmc.BTBdeltamarker = str(settings.value("BTBdeltamarker",self.qmc.BTBdeltamarker).toString())
+                self.qmc.BTBdeltamarkersize = settings.value("BTBdeltamarkersize",self.qmc.BTBdeltamarkersize).toInt()[0]
+                self.qmc.ETBdeltalinestyle = str(settings.value("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle).toString())
+                self.qmc.ETBdeltadrawstyle = str(settings.value("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle).toString())
+                self.qmc.ETBdeltalinewidth = settings.value("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth).toInt()[0]
+                self.qmc.ETBdeltamarker = str(settings.value("ETBdeltamarker",self.qmc.ETBdeltamarker).toString())
+                self.qmc.ETBdeltamarkersize = settings.value("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize).toInt()[0]
             settings.endGroup()
             ndevices = len(self.qmc.extradevices)
             if ndevices != len(self.qmc.extralinestyles1) or \
@@ -8693,6 +8797,14 @@ class ApplicationWindow(QMainWindow):
                 self.eventsliderfactors = [x.toDouble()[0] for x in settings.value("sliderfactors").toList()]
             settings.endGroup()
             self.updateSlidersProperties()
+            #restore background profile settings
+            settings.beginGroup("background")
+            if settings.contains("backgrounddetails"):
+                aw.qmc.backgroundDetails = settings.value("backgrounddetails",aw.qmc.backgroundDetails).toInt()[0]
+                aw.qmc.backgroundeventsflag = settings.value("backgroundevents",aw.qmc.backgroundeventsflag).toInt()[0]
+                aw.qmc.DeltaETBflag = settings.value("DeltaETB",aw.qmc.DeltaETBflag).toInt()[0]
+                aw.qmc.DeltaBTBflag = settings.value("DeltaBTB",aw.qmc.DeltaBTBflag).toInt()[0]
+            settings.endGroup()
             #restore buttons
             settings.beginGroup("ExtraEventButtons")
             if settings.contains("extraeventsactions"):
@@ -8854,6 +8966,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ETbacklinewidth = aw.qmc.l_back1.get_linewidth()
                 self.qmc.ETbackmarker = aw.qmc.l_back1.get_marker()
                 self.qmc.ETbackmarkersize = aw.qmc.l_back1.get_markersize()
+                self.qmc.backgroundmetcolor = aw.qmc.l_back1.get_color()
             if aw.qmc.l_back2:
                 self.qmc.BTbacklinestyle = aw.qmc.l_back2.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -8863,7 +8976,30 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTbacklinewidth = aw.qmc.l_back2.get_linewidth()
                 self.qmc.BTbackmarker = aw.qmc.l_back2.get_marker()
-                self.qmc.BTbackmarkersize = aw.qmc.l_back2.get_markersize() 
+                self.qmc.BTbackmarkersize = aw.qmc.l_back2.get_markersize()
+                self.qmc.backgroundbtcolor = aw.qmc.l_back2.get_color()
+            if aw.qmc.l_delta1B:
+                self.qmc.ETBdeltalinestyle = aw.qmc.l_delta1B.get_linestyle()
+                #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
+                if self.qmc.ETBdeltalinestyle == self.qmc.linestyle_default:
+                    self.qmc.ETBdeltadrawstyle = aw.qmc.l_delta1B.get_drawstyle()
+                else:
+                    self.qmc.ETBdeltadrawstyle = self.qmc.drawstyle_default
+                self.qmc.ETBdeltalinewidth = aw.qmc.l_delta1B.get_linewidth()
+                self.qmc.ETBdeltamarker = aw.qmc.l_delta1B.get_marker()
+                self.qmc.ETBdeltamarkersize = aw.qmc.l_delta1B.get_markersize()
+                self.qmc.backgrounddeltaetcolor = aw.qmc.l_delta1B.get_color()
+            if aw.qmc.l_delta2B:
+                self.qmc.BTBdeltalinestyle = aw.qmc.l_delta2B.get_linestyle()
+                #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
+                if self.qmc.BTBdeltalinestyle == self.qmc.linestyle_default:
+                    self.qmc.BTBdeltadrawstyle = aw.qmc.l_delta2B.get_drawstyle()
+                else:
+                    self.qmc.BTBdeltadrawstyle = self.qmc.drawstyle_default
+                self.qmc.BTBdeltalinewidth = aw.qmc.l_delta2B.get_linewidth()
+                self.qmc.BTBdeltamarker = aw.qmc.l_delta2B.get_marker()
+                self.qmc.BTBdeltamarkersize = aw.qmc.l_delta2B.get_markersize()  
+                self.qmc.backgrounddeltabtcolor = aw.qmc.l_delta2B.get_color()                
             x1 = x2 = 0
             for i in range(len(aw.qmc.extradevices)):
                 if aw.extraCurveVisibility1[i]:
@@ -8976,6 +9112,10 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("Colors",self.qmc.palette)
             settings.setValue("LCDColors",self.lcdpaletteB)
             settings.setValue("LEDColors",self.lcdpaletteF)
+            settings.setValue("ETBColor",self.qmc.backgroundmetcolor)
+            settings.setValue("BTBColor",self.qmc.backgroundbtcolor)
+            settings.setValue("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)
+            settings.setValue("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)            
             #save flavors
             settings.setValue("Flavors",self.qmc.flavorlabels)
             settings.setValue("flavorstartangle",self.qmc.flavorstartangle)
@@ -9148,6 +9288,16 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETbacklinewidth",self.qmc.ETbacklinewidth)
             settings.setValue("ETbackmarker",self.qmc.ETbackmarker)
             settings.setValue("ETbackmarkersize",self.qmc.ETbackmarkersize)
+            settings.setValue("BTBdeltalinestyle",self.qmc.BTBdeltalinestyle)
+            settings.setValue("BTBdeltadrawstyle",self.qmc.BTBdeltadrawstyle)
+            settings.setValue("BTBdeltalinewidth",self.qmc.BTBdeltalinewidth)
+            settings.setValue("BTBdeltamarker",self.qmc.BTBdeltamarker)
+            settings.setValue("BTBdeltamarkersize",self.qmc.BTBdeltamarkersize)
+            settings.setValue("ETBdeltalinestyle",self.qmc.ETBdeltalinestyle)
+            settings.setValue("ETBdeltadrawstyle",self.qmc.ETBdeltadrawstyle)
+            settings.setValue("ETBdeltalinewidth",self.qmc.ETBdeltalinewidth)
+            settings.setValue("ETBdeltamarker",self.qmc.ETBdeltamarker)
+            settings.setValue("ETBdeltamarkersize",self.qmc.ETBdeltamarkersize)
             settings.setValue("extralinestyles1",self.qmc.extralinestyles1)
             settings.setValue("extralinestyles2",self.qmc.extralinestyles2)
             settings.setValue("extradrawstyles1",self.qmc.extradrawstyles1)
@@ -9158,6 +9308,13 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("extramarkers2",self.qmc.extramarkers2)
             settings.setValue("extramarkersizes1",self.qmc.extramarkersizes1)
             settings.setValue("extramarkersizes2",self.qmc.extramarkersizes2)
+            settings.endGroup()
+            #background settings
+            settings.beginGroup("background")
+            settings.setValue("backgrounddetails",aw.qmc.backgroundDetails)
+            settings.setValue("backgroundevents",aw.qmc.backgroundeventsflag)
+            settings.setValue("DeltaETB",aw.qmc.DeltaETBflag)
+            settings.setValue("DeltaBTB",aw.qmc.DeltaBTBflag)
             settings.endGroup()
             #custom event buttons
             settings.beginGroup("ExtraEventButtons")
@@ -10134,6 +10291,7 @@ $cupping_notes
         calSpinBox = QDoubleSpinBox()
         calSpinBox.setRange(1.,30.)
         calSpinBox.setValue(self.qmc.delay/1000.)
+        calSpinBox.setAlignment(Qt.AlignRight)
         secondsdelay, ok = QInputDialog.getDouble(self,
                 QApplication.translate("MessageBox Caption", "Sampling Interval",None, QApplication.UnicodeUTF8),
                 QApplication.translate("MessageBox", "Seconds",None, QApplication.UnicodeUTF8),
@@ -10885,7 +11043,7 @@ $cupping_notes
             palette[key] = self.buttonpalette[i]
         palette["maxlen"] = self.buttonpalettemaxlen
         try:
-            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption","Save Button Palette",None, QApplication.UnicodeUTF8),ext="*.bsp")
+            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("MessageBox Caption","Save Palettes",None, QApplication.UnicodeUTF8),ext="*.apal")
             if filename:
                 #write
                 self.serialize(filename,palette)
@@ -10895,7 +11053,7 @@ $cupping_notes
             return
 
     def restorepaletteeventbuttons(self):
-        filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Restore Button Palette",None, QApplication.UnicodeUTF8),path=self.profilepath)
+        filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("MessageBox Caption","Restore Palettes",None, QApplication.UnicodeUTF8),path=self.profilepath)
         try:
             f = QFile(str(filename))
             if not f.open(QIODevice.ReadOnly):
@@ -10987,14 +11145,16 @@ class HUDDlg(QDialog):
         self.DeltaFilter.setSingleStep(1)
         self.DeltaFilter.setRange(0,40)
         self.DeltaFilter.setValue(aw.qmc.deltafilter - 2)
-        self.connect(self.DeltaFilter ,SIGNAL("valueChanged(int)"),self.changeDeltaFilter)
+#        self.connect(self.DeltaFilter ,SIGNAL("valueChanged(int)"),self.changeDeltaFilter)
+        self.connect(self.DeltaFilter ,SIGNAL("editingFinished()"),lambda x=0:self.changeDeltaFilter(0))
         curvefilterlabel = QLabel(QApplication.translate("Label", "Filter",None, QApplication.UnicodeUTF8))
         #Filter holds the number of pads in filter
         self.Filter = QSpinBox()
         self.Filter.setSingleStep(1)
         self.Filter.setRange(0,40)
         self.Filter.setValue(aw.qmc.curvefilter - 2)
-        self.connect(self.Filter ,SIGNAL("valueChanged(int)"),self.changeFilter)
+#        self.connect(self.Filter ,SIGNAL("valueChanged(int)"),self.changeFilter)
+        self.connect(self.Filter ,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))
         #show projection
         self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection",None, QApplication.UnicodeUTF8))
         self.projectionmodeComboBox = QComboBox()
@@ -11574,6 +11734,8 @@ class HUDDlg(QDialog):
             aw.lcd5.setVisible(aw.qmc.DeltaBTlcdflag)
             aw.label5.setVisible(aw.qmc.DeltaBTlcdflag)
         aw.qmc.projectFlag = self.org_Projection
+        aw.qmc.resetlinecountcaches()
+        aw.qmc.resetdeltalines()
         aw.qmc.resetlines()
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.accept()
@@ -11592,6 +11754,8 @@ class HUDDlg(QDialog):
         aw.qmc.hudETpid[2] = int(str(self.ETpidD.text()))
         string = QApplication.translate("Message Area","[ET target = %1] [BT target = %2]", None, QApplication.UnicodeUTF8).arg(str(aw.qmc.ETtarget)).arg(str(aw.qmc.BTtarget))
         aw.sendmessage(string)
+        aw.qmc.resetlinecountcaches()
+        aw.qmc.resetdeltalines()
         aw.qmc.resetlines()
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.accept()
@@ -11600,6 +11764,8 @@ class HUDDlg(QDialog):
     def closeEvent(self, event):
         self.close()
         self.accept()
+        aw.qmc.resetlinecountcaches()        
+        aw.qmc.resetdeltalines()
         aw.qmc.resetlines()
         aw.qmc.redraw(recomputeAllDeltas=False)
         aw.stack.setCurrentIndex(0)
@@ -12298,9 +12464,11 @@ class editGraphDlg(ArtisanDialog):
                                                    QApplication.translate("Table", "Description", None, QApplication.UnicodeUTF8),
                                                    QApplication.translate("Table", "Type", None, QApplication.UnicodeUTF8),
                                                    QApplication.translate("Table", "Value", None, QApplication.UnicodeUTF8)])
+        self.eventtable.setAlternatingRowColors(True)
         self.eventtable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
+        self.eventtable.setShowGrid(True)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         regexvalue = QRegExp(r"^100|\d?\d?$")
         self.eventtable.setShowGrid(True) 
@@ -12311,9 +12479,11 @@ class editGraphDlg(ArtisanDialog):
             typeComboBox.addItems(aw.qmc.etypes)
             typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
             valueEdit = QLineEdit()
+            valueEdit.setAlignment(Qt.AlignRight)
             valueEdit.setValidator(QRegExpValidator(regexvalue,self))
             valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[i]))
             timeline = QLineEdit()
+            timeline.setAlignment(Qt.AlignRight)
             timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
             self.eventtablecopy.append(str(timez)) 
             timeline.setText(timez)
@@ -12325,6 +12495,10 @@ class editGraphDlg(ArtisanDialog):
             self.eventtable.setCellWidget(i,2,typeComboBox)
             self.eventtable.setCellWidget(i,3,valueEdit)
         self.eventtable.resizeColumnsToContents()
+        # improve width of Time column
+        self.eventtable.setColumnWidth(0,65)
+        self.eventtable.setColumnWidth(1,315)
+        self.eventtable.setColumnWidth(3,65)
 
     def saveEventTable(self):
         nevents = self.eventtable.rowCount() 
@@ -15052,28 +15226,30 @@ class backgroundDlg(ArtisanDialog):
         #TAB 1
         self.pathedit = QLineEdit(aw.qmc.backgroundpath)
         self.pathedit.setStyleSheet("background-color:'lightgrey';")
+        self.pathedit.setReadOnly(True)
         self.filename = ""
         self.backgroundCheck = QCheckBox(QApplication.translate("CheckBox","Show", None, QApplication.UnicodeUTF8))
         self.backgroundDetails = QCheckBox(QApplication.translate("CheckBox","Text", None, QApplication.UnicodeUTF8))
         self.backgroundeventsflag = QCheckBox(QApplication.translate("CheckBox","Events", None, QApplication.UnicodeUTF8))
+        self.backgroundDeltaETflag = QCheckBox(QApplication.translate("CheckBox","DeltaET", None, QApplication.UnicodeUTF8))
+        self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None, QApplication.UnicodeUTF8))
         self.backgroundCheck.setChecked(aw.qmc.background)
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
         self.status.showMessage(QApplication.translate("StatusBar","Ready", None, QApplication.UnicodeUTF8),3000)
         self.backgroundDetails.setChecked(aw.qmc.backgroundDetails)
         self.backgroundeventsflag.setChecked(aw.qmc.backgroundeventsflag)
+        self.backgroundDeltaETflag.setChecked(aw.qmc.DeltaETBflag)
+        self.backgroundDeltaBTflag.setChecked(aw.qmc.DeltaBTBflag)
         loadButton = QPushButton(QApplication.translate("Button","Load", None, QApplication.UnicodeUTF8))
         loadButton.setFocusPolicy(Qt.NoFocus)
         delButton = QPushButton(QApplication.translate("Button","Delete", None, QApplication.UnicodeUTF8))
         delButton.setFocusPolicy(Qt.NoFocus)
         okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))
-        selectButton =QPushButton(QApplication.translate("Button","Select Profile", None, QApplication.UnicodeUTF8))
-        selectButton.setFocusPolicy(Qt.NoFocus)
         alignButton = QPushButton(QApplication.translate("Button","Align", None, QApplication.UnicodeUTF8))
         alignButton.setFocusPolicy(Qt.NoFocus)
         self.connect(loadButton, SIGNAL("clicked()"),self.load)
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        self.connect(selectButton, SIGNAL("clicked()"), self.selectpath)
         self.connect(alignButton, SIGNAL("clicked()"), aw.qmc.timealign)
         self.speedSpinBox = QSpinBox()
         self.speedSpinBox.setRange(10,90)
@@ -15082,6 +15258,7 @@ class backgroundDlg(ArtisanDialog):
         intensitylabel =QLabel(QApplication.translate("Label", "Opaqueness",None, QApplication.UnicodeUTF8))
         intensitylabel.setAlignment(Qt.AlignRight)
         self.intensitySpinBox = QSpinBox()
+        self.intensitySpinBox.setAlignment(Qt.AlignRight)
         self.intensitySpinBox.setRange(1,9)
         self.intensitySpinBox.setSingleStep(1)
         self.intensitySpinBox.setValue(3)
@@ -15089,19 +15266,30 @@ class backgroundDlg(ArtisanDialog):
         for key in cnames:
             colors.append(str(key))
         colors.sort()
-        colors.insert(0,"et")
-        colors.insert(1,"bt")
-        colors.pop(2)
-        btcolorlabel = QLabel(QApplication.translate("Label", "BT Color",None, QApplication.UnicodeUTF8))
-        btcolorlabel.setAlignment(Qt.AlignRight)
-        self.btcolorComboBox = QComboBox()
-        self.btcolorComboBox.addItems(colors)
-        self.btcolorComboBox.setCurrentIndex(1)
+        colors.insert(0,"ET")
+        colors.insert(1,"BT")
+        colors.insert(2,"DeltaET")
+        colors.insert(3,"DeltaBT")
         metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None, QApplication.UnicodeUTF8))
         metcolorlabel.setAlignment(Qt.AlignRight)
         self.metcolorComboBox = QComboBox()
         self.metcolorComboBox.addItems(colors)
         self.metcolorComboBox.setCurrentIndex(0)
+        btcolorlabel = QLabel(QApplication.translate("Label", "BT Color",None, QApplication.UnicodeUTF8))
+        btcolorlabel.setAlignment(Qt.AlignRight)
+        self.btcolorComboBox = QComboBox()
+        self.btcolorComboBox.addItems(colors)
+        self.btcolorComboBox.setCurrentIndex(1)
+        deltaetcolorlabel = QLabel(QApplication.translate("Label", "DeltaET Color",None, QApplication.UnicodeUTF8))
+        deltaetcolorlabel.setAlignment(Qt.AlignRight)
+        self.deltaetcolorComboBox = QComboBox()
+        self.deltaetcolorComboBox.addItems(colors)
+        self.deltaetcolorComboBox.setCurrentIndex(2)
+        deltabtcolorlabel = QLabel(QApplication.translate("Label", "DeltaBT Color",None, QApplication.UnicodeUTF8))
+        deltabtcolorlabel.setAlignment(Qt.AlignRight)
+        self.deltabtcolorComboBox = QComboBox()
+        self.deltabtcolorComboBox.addItems(colors)
+        self.deltabtcolorComboBox.setCurrentIndex(3)
         self.upButton = QPushButton(QApplication.translate("Button","Up",None, QApplication.UnicodeUTF8))
         self.upButton.setFocusPolicy(Qt.NoFocus)
         self.downButton = QPushButton(QApplication.translate("Button","Down",None, QApplication.UnicodeUTF8))
@@ -15113,6 +15301,8 @@ class backgroundDlg(ArtisanDialog):
         self.connect(self.backgroundCheck, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundDetails, SIGNAL("clicked()"),self.readChecks)
         self.connect(self.backgroundeventsflag, SIGNAL("clicked()"),self.readChecks)
+        self.connect(self.backgroundDeltaETflag, SIGNAL("clicked()"),self.readChecks)
+        self.connect(self.backgroundDeltaBTflag, SIGNAL("clicked()"),self.readChecks)
         self.connect(delButton, SIGNAL("clicked()"),self.delete)
         self.connect(self.upButton, SIGNAL("clicked()"), lambda m= "up": self.move(m))
         self.connect(self.downButton, SIGNAL("clicked()"), lambda m="down": self.move(m))
@@ -15121,6 +15311,8 @@ class backgroundDlg(ArtisanDialog):
         self.connect(self.intensitySpinBox, SIGNAL("valueChanged(int)"),self.adjustintensity)
         self.connect(self.btcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color="", curve = "bt": self.adjustcolor(color,curve))
         self.connect(self.metcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color= "", curve = "et": self.adjustcolor(color,curve))
+        self.connect(self.deltabtcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color="", curve = "deltabt": self.adjustcolor(color,curve))
+        self.connect(self.deltaetcolorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda color= "", curve = "deltaet": self.adjustcolor(color,curve))
         #TAB 2 EVENTS
         #table for showing events
         self.eventtable = QTableWidget()
@@ -15132,10 +15324,12 @@ class backgroundDlg(ArtisanDialog):
         self.datatable.setTabKeyNavigation(True)
         self.createDataTable()
         #TAB 4
-        self.backgroundReproduce = QCheckBox(QApplication.translate("CheckBox","Playback Aid Mode",None, QApplication.UnicodeUTF8))
+        self.backgroundReproduce = QCheckBox(QApplication.translate("CheckBox","Playback Aid",None, QApplication.UnicodeUTF8))
         self.backgroundReproduce.setChecked(aw.qmc.backgroundReproduce)
+        self.backgroundReproduce.setFocusPolicy(Qt.NoFocus)
         self.connect(self.backgroundReproduce, SIGNAL("stateChanged(int)"),self.setreproduce)
-        etimelabel =QLabel(QApplication.translate("Label", "Text warning time (seconds)",None, QApplication.UnicodeUTF8))
+        etimelabel =QLabel(QApplication.translate("Label", "Text Warning",None, QApplication.UnicodeUTF8))
+        etimeunit =QLabel(QApplication.translate("Label", "sec",None, QApplication.UnicodeUTF8))
         self.etimeSpinBox = QSpinBox()
         self.etimeSpinBox.setRange(1,60)
         self.etimeSpinBox.setValue(aw.qmc.detectBackgroundEventTime)
@@ -15151,32 +15345,48 @@ class backgroundDlg(ArtisanDialog):
         checkslayout.addWidget(self.backgroundCheck)
         checkslayout.addWidget(self.backgroundDetails)
         checkslayout.addWidget(self.backgroundeventsflag)
+        checkslayout.addWidget(self.backgroundDeltaETflag)
+        checkslayout.addWidget(self.backgroundDeltaBTflag)
         layout = QGridLayout()
-        layout.addWidget(selectButton,0,0)
-        layout.addWidget(self.pathedit,0,1)
-        layout.addWidget(loadButton,1,0)
-        layout.addWidget(delButton,1,1)
-        layout.addWidget(intensitylabel,2,0)
-        layout.addWidget(self.intensitySpinBox,2,1)
-        layout.addWidget(metcolorlabel,3,0)
-        layout.addWidget(self.metcolorComboBox,3,1)
-        layout.addWidget(btcolorlabel,4,0)
-        layout.addWidget(self.btcolorComboBox,4,1)
+        layout.addWidget(intensitylabel,0,0)
+        layout.addWidget(self.intensitySpinBox,0,1)
+        layout.addWidget(metcolorlabel,1,0)
+        layout.addWidget(self.metcolorComboBox,1,1)
+        layout.addWidget(btcolorlabel,2,0)
+        layout.addWidget(self.btcolorComboBox,2,1)
+        layout.addWidget(deltaetcolorlabel,3,0)
+        layout.addWidget(self.deltaetcolorComboBox,3,1)
+        layout.addWidget(deltabtcolorlabel,4,0)
+        layout.addWidget(self.deltabtcolorComboBox,4,1)
+        hlayout = QHBoxLayout()
+        hlayout.addStretch()
+        hlayout.addLayout(layout)
         upperlayout = QVBoxLayout()
         upperlayout.addLayout(movelayout)
         upperlayout.addLayout(checkslayout)
-        upperlayout.addLayout(layout) 
+        upperlayout.addLayout(hlayout) 
         layoutBoxed = QHBoxLayout()
         layoutBoxed.addStretch()
         layoutBoxed.addLayout(upperlayout)
         layoutBoxed.addStretch()
         alignButtonBoxed = QHBoxLayout()
+        alignButtonBoxed.addWidget(loadButton)
+        alignButtonBoxed.addWidget(delButton)        
         alignButtonBoxed.addStretch()
         alignButtonBoxed.addWidget(alignButton)
+        tab4content = QHBoxLayout()
+        tab4content.addWidget(self.backgroundReproduce)
+        tab4content.addStretch()
+        tab4content.addWidget(etimelabel)
+        tab4content.addWidget(self.etimeSpinBox)
+        tab4content.addWidget(etimeunit)
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(layoutBoxed)
         tab1layout.addStretch()
         tab1layout.addLayout(alignButtonBoxed)
+        tab1layout.addSpacing(-10)
+        tab1layout.addWidget(self.pathedit)
+        tab1layout.addLayout(tab4content)
         tab1layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom 
         tab1layout.setMargin(0)
         tab2layout = QVBoxLayout()
@@ -15187,12 +15397,6 @@ class backgroundDlg(ArtisanDialog):
         tab3layout.addWidget(self.datatable)
         tab3layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom 
         tab3layout.setMargin(0)
-        tab4layout = QGridLayout()
-        tab4layout.addWidget(self.backgroundReproduce,0,0)
-        tab4layout.addWidget(etimelabel,1,0)
-        tab4layout.addWidget(self.etimeSpinBox,1,1)
-        tab4layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom
-        tab4layout.setMargin(0)
         #tab layout
         TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -15204,9 +15408,6 @@ class backgroundDlg(ArtisanDialog):
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","Data",None, QApplication.UnicodeUTF8))
-        C4Widget = QWidget()
-        C4Widget.setLayout(tab4layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Playback",None, QApplication.UnicodeUTF8))
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
         buttonLayout.addWidget(okButton)
@@ -15237,23 +15438,27 @@ class backgroundDlg(ArtisanDialog):
         self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         self.btcolorComboBox.setDisabled(True)
         self.metcolorComboBox.setDisabled(True)
+        self.deltabtcolorComboBox.setDisabled(True)
+        self.deltaetcolorComboBox.setDisabled(True)
+        if color == "ET":
+            c = aw.qmc.palette["et"]
+        elif color == "BT":
+            c = aw.qmc.palette["bt"]
+        elif color == "BT":
+            c = aw.qmc.palette["deltaet"]
+        elif color == "BT":
+            c = aw.qmc.palette["deltabt"]
+        else:
+            c = color
         if curve == "et":
-            if color == "et":
-                aw.qmc.backgroundmetcolor = aw.qmc.palette["et"]
-            elif color == "bt":
-                aw.qmc.backgroundmetcolor = aw.qmc.palette["bt"]
-            else:
-                aw.qmc.backgroundmetcolor = color
+            aw.qmc.backgroundmetcolor = c
         elif curve == "bt":
-            if color == "bt":
-                aw.qmc.backgroundbtcolor = aw.qmc.palette["bt"]
-            elif color == "et":
-                aw.qmc.backgroundbtcolor = aw.qmc.palette["et"]
-            else:
-                aw.qmc.backgroundbtcolor = color
+            aw.qmc.backgroundbtcolor = c
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.btcolorComboBox.setDisabled(False)
         self.metcolorComboBox.setDisabled(False)
+        self.deltabtcolorComboBox.setDisabled(False)
+        self.deltaetcolorComboBox.setDisabled(False)
         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
 
     def adjustintensity(self):
@@ -15269,19 +15474,21 @@ class backgroundDlg(ArtisanDialog):
     def delete(self):
         self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         self.pathedit.setText("")
-        self.backgroundDetails.setChecked(False)
-        self.backgroundCheck.setChecked(False)
-        self.backgroundeventsflag.setChecked(False)
+# we should not overwrite the users app settings here, right:
+#        self.backgroundCheck.setChecked(False)
+#        self.backgroundDetails.setChecked(False)
+#        self.backgroundeventsflag.setChecked(False)
+#        aw.qmc.background = False
+#        aw.qmc.backgroundDetails = False
+#        aw.qmc.backgroundeventsflag = False
         aw.qmc.temp1B, aw.qmc.temp2B, aw.qmc.timeB = [],[],[]
         aw.qmc.backgroundEvents, aw.qmc.backgroundEtypes = [],[]
         aw.qmc.backgroundEvalues, aw.qmc.backgroundEStrings,aw.qmc.backgroundFlavors = [],[],[]
         aw.qmc.timeindexB = [-1,0,0,0,0,0,0]
         self.eventtable.clear()
         self.datatable.clear()
-        aw.qmc.background = False
-        aw.qmc.backgroundDetails = False
-        aw.qmc.backgroundeventsflag = False
         aw.qmc.backmoveflag = 1
+        aw.qmc.resetlinecountcaches()
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
 
@@ -15314,36 +15521,25 @@ class backgroundDlg(ArtisanDialog):
 
     def readChecks(self):
         self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
-        if self.backgroundCheck.isChecked():
-            aw.qmc.background = True
-        else:
-            aw.qmc.background = False
-        if  self.backgroundDetails.isChecked():
-            aw.qmc.backgroundDetails = True
-        else:
-            aw.qmc.backgroundDetails = False
-        if self.backgroundeventsflag.isChecked():
-            aw.qmc.backgroundeventsflag = True
-        else:
-            aw.qmc.backgroundeventsflag = False
+        aw.qmc.background = bool(self.backgroundCheck.isChecked())
+        aw.qmc.backgroundDetails = bool(self.backgroundDetails.isChecked())
+        aw.qmc.backgroundeventsflag = bool(self.backgroundeventsflag.isChecked())
+        aw.qmc.DeltaETBflag = bool(self.backgroundDeltaETflag.isChecked())
+        aw.qmc.DeltaBTBflag = bool(self.backgroundDeltaBTflag.isChecked())
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
 
-    def selectpath(self):
-        filename = aw.ArtisanOpenFileDialog()
-        self.pathedit.setText(filename)
-        self.filename = filename
-
     def load(self):
-        if len(str(self.pathedit.text())) == 0:
+        self.filename = aw.ArtisanOpenFileDialog()
+        if len(str(self.filename)) == 0:
             self.status.showMessage(QApplication.translate("StatusBar","Empty file path",None, QApplication.UnicodeUTF8),5000)
             return
         self.status.showMessage(QApplication.translate("StatusBar","Reading file...",None, QApplication.UnicodeUTF8),5000)
-        aw.qmc.backgroundpath = str(self.pathedit.text())
-        aw.loadbackground(str(self.pathedit.text()))
+        aw.qmc.backgroundpath = str(self.filename)
+        aw.qmc.resetlinecountcaches()
+        aw.loadbackground(str(self.filename))
+        self.pathedit.setText(self.filename)
         self.backgroundCheck.setChecked(True)
-        self.backgroundDetails.setChecked(False)
-        self.backgroundeventsflag.setChecked(False)
         self.readChecks()
         self.createEventTable()
         self.createDataTable()
@@ -15370,14 +15566,19 @@ class backgroundDlg(ArtisanDialog):
                 start = 0
             for i in range(ndata):
                 timez = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start)))
+                timez.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
                 etype = QTableWidgetItem(aw.qmc.Betypes[aw.qmc.backgroundEtypes[i]])
-                evalue = QTableWidgetItem(aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[i]))
+                evalue = QTableWidgetItem(aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[i]))                
+                evalue.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 #add widgets to the table
                 self.eventtable.setItem(i,0,timez)
                 self.eventtable.setItem(i,1,description)
                 self.eventtable.setItem(i,2,etype)
                 self.eventtable.setItem(i,3,evalue)
+            self.eventtable.resizeColumnsToContents()
+            # improve width of Time column
+            self.eventtable.setColumnWidth(1,175)
 
     def createDataTable(self):
         self.datatable.clear()
@@ -15401,16 +15602,21 @@ class backgroundDlg(ArtisanDialog):
             self.datatable.setSelectionMode(QTableWidget.SingleSelection)
             self.datatable.setShowGrid(True)
             for i in range(ndata):
-                Atime = QTableWidgetItem("%.03f"%aw.qmc.timeB[i])
+                Atime = QTableWidgetItem("%.03f"%aw.qmc.timeB[i])                
+                Atime.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
                 ET = QTableWidgetItem("%.02f"%aw.qmc.temp1B[i])
+                ET.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 BT = QTableWidgetItem("%.02f"%aw.qmc.temp2B[i])
+                BT.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 if i:
                     deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp1B[i]-aw.qmc.temp1B[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
                     deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp2B[i]-aw.qmc.temp2B[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
                 else:
                     deltaET = QTableWidgetItem("00:00")
-                    deltaBT = QTableWidgetItem("00:00")
+                    deltaBT = QTableWidgetItem("00:00")                
+                deltaET.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+                deltaBT.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 if i:
                     #identify by color and add notation
                     if i == aw.qmc.timeindexB[0] != -1:
@@ -15453,6 +15659,7 @@ class backgroundDlg(ArtisanDialog):
                 self.datatable.setItem(i,3,BT)
                 self.datatable.setItem(i,4,deltaBT)
                 self.datatable.setItem(i,5,deltaET)
+            self.datatable.resizeColumnsToContents()
 
 #############################################################################
 ################  Statistics DIALOG ########################
@@ -18690,13 +18897,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
                         Curve1visibilityComboBox.setCheckState(Qt.Checked)
                     else:
                         Curve1visibilityComboBox.setCheckState(Qt.Unchecked)
-                    self.connect(Curve1visibilityComboBox, SIGNAL("stateChanged(int)"),lambda x=0,curve=1, ind=i: self.updateCurveVisibility(x,curve,ind))
+                    self.connect(Curve1visibilityComboBox, SIGNAL("stateChanged(int)"),lambda x=0,curve=1, ind=i: self.updateCurveVisibility(bool(x),curve,ind))
                     Curve2visibilityComboBox =  QCheckBox()
                     if aw.extraCurveVisibility2[i]:
                         Curve2visibilityComboBox.setCheckState(Qt.Checked)
                     else:
                         Curve2visibilityComboBox.setCheckState(Qt.Unchecked)
-                    self.connect(Curve2visibilityComboBox, SIGNAL("stateChanged(int)"),lambda x=0,curve=2, ind=i: self.updateCurveVisibility(x,curve,ind))
+                    self.connect(Curve2visibilityComboBox, SIGNAL("stateChanged(int)"),lambda x=0,curve=2, ind=i: self.updateCurveVisibility(bool(x),curve,ind))
                     #add widgets to the table
                     self.devicetable.setCellWidget(i,0,typeComboBox)
                     self.devicetable.setCellWidget(i,1,color1Button)
@@ -18750,6 +18957,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.addDevice()
             self.createDeviceTable()
             self.enableDisableAddDeleteButtons()
+            aw.qmc.resetlinecountcaches()
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -18764,6 +18972,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             if bindex >= 0:
                 self.delextradevice(bindex)
             aw.updateExtraLCDvisibility()
+            aw.qmc.resetlinecountcaches()
             self.enableDisableAddDeleteButtons()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
@@ -18797,6 +19006,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.createDeviceTable()
             #enable/disable buttons
             self.enableDisableAddDeleteButtons()
+            aw.qmc.resetlinecountcaches()
             #redraw
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
@@ -18857,6 +19067,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.extraser[x].SP.close()
                 aw.extraser.pop(x)
             self.createDeviceTable()
+            aw.qmc.resetlinecountcaches()
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
             #import traceback
@@ -18895,6 +19106,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.extraLCDframe2[ind].setVisible(bool(x))
 
     def updateCurveVisibility(self,x,curve,ind):
+        aw.qmc.resetlinecountcaches()
         if curve == 1:
             aw.extraCurveVisibility1[ind] = x
         elif curve == 2:
@@ -18933,6 +19145,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.lcd6.setVisible(False)
             aw.label7.setVisible(False)
             aw.lcd7.setVisible(False)
+            aw.qmc.resetlinecountcaches()
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA
                 if str(self.controlpidtypeComboBox.currentText()) == "Fuji PXG":
@@ -20431,19 +20644,26 @@ class AlarmDlg(ArtisanDialog):
         alloffButton.setFocusPolicy(Qt.NoFocus)
         addButton = QPushButton(QApplication.translate("Button","Add",None, QApplication.UnicodeUTF8))
         self.connect(addButton, SIGNAL("clicked()"),self.addalarm)
-        addButton.setMaximumWidth(100)
-        addButton.setMinimumWidth(100)
+        addButton.setMinimumWidth(80)
         addButton.setFocusPolicy(Qt.NoFocus)
         deleteButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
         self.connect(deleteButton, SIGNAL("clicked()"),self.deletealarm)
-        deleteButton.setMaximumWidth(100)
-        deleteButton.setMinimumWidth(100)
+        deleteButton.setMinimumWidth(80)
         deleteButton.setFocusPolicy(Qt.NoFocus)
-        saveButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
-        self.connect(saveButton, SIGNAL("clicked()"),self.closealarms)
+        importButton = QPushButton(QApplication.translate("Button","Load",None, QApplication.UnicodeUTF8))
+        self.connect(importButton, SIGNAL("clicked()"),self.importalarms)
+        importButton.setMinimumWidth(80)
+        importButton.setFocusPolicy(Qt.NoFocus)
+        exportButton = QPushButton(QApplication.translate("Button","Save",None, QApplication.UnicodeUTF8))
+        self.connect(exportButton, SIGNAL("clicked()"),self.exportalarms)
+        exportButton.setMinimumWidth(80)
+        exportButton.setFocusPolicy(Qt.NoFocus)        
+        okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
+        self.connect(okButton, SIGNAL("clicked()"),self.closealarms)
         helpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None, QApplication.UnicodeUTF8))
         helpButton.setFocusPolicy(Qt.NoFocus)
+        helpButton.setMinimumWidth(80)
         self.connect(helpButton, SIGNAL("clicked()"),self.showAlarmbuttonhelp)
         tablelayout = QVBoxLayout()
         buttonlayout = QHBoxLayout()
@@ -20455,13 +20675,16 @@ class AlarmDlg(ArtisanDialog):
         buttonlayout.addSpacing(10)
         buttonlayout.addWidget(alloffButton)
         buttonlayout.addWidget(allonButton)
-        buttonlayout.addSpacing(10)
         buttonlayout.addStretch()
         buttonlayout.addSpacing(10)
+        buttonlayout.addWidget(importButton)
+        buttonlayout.addWidget(exportButton)
+        buttonlayout.addStretch()
+        buttonlayout.addSpacing(15)
         buttonlayout.addWidget(helpButton)
-        buttonlayout.addSpacing(10)
         buttonlayout.addStretch()
-        buttonlayout.addWidget(saveButton)
+        buttonlayout.addSpacing(15)
+        buttonlayout.addWidget(okButton)
         mainlayout.addLayout(tablelayout)
         mainlayout.addLayout(buttonlayout)
         self.setLayout(mainlayout)
@@ -20488,6 +20711,12 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setRowCount(nalarms + 1)
         self.setalarmtablerow(nalarms)
         self.alarmtable.resizeColumnsToContents()
+        if nalarms < 1:            
+            # improve width of Qlineedit columns
+            self.alarmtable.setColumnWidth(1,65)
+            self.alarmtable.setColumnWidth(3,50)
+            self.alarmtable.setColumnWidth(6,100)
+
 
     def deletealarm(self):
         nalarms = self.alarmtable.rowCount()
@@ -20519,6 +20748,54 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmaction.pop()
                 self.alarmstrings.pop()
             self.alarmtable.setRowCount(nalarms - 1)
+
+    def importalarms(self):
+        aw.fileImport(QApplication.translate("MessageBox Caption", "Load Alarms",None, QApplication.UnicodeUTF8),self.importalarmsJSON)
+        
+    def importalarmsJSON(self,filename):
+        try:
+            import io
+            infile = io.open(filename, 'r', encoding='utf-8')
+            alarms = json.load(infile)
+            infile.close()
+            self.alarmflag = alarms["alarmflags"]
+            self.alarmguard = alarms["alarmguards"]
+            self.alarmtime = alarms["alarmtimes"]
+            self.alarmoffset = alarms["alarmoffsets"]
+            self.alarmcond = alarms["alarmconds"]
+            self.alarmsource = alarms["alarmsources"]
+            self.alarmtemperature = alarms["alarmtemperatures"]
+            self.alarmaction = alarms["alarmactions"]
+            self.alarmstrings = alarms["alarmstrings"]
+            self.createalarmtable()
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importalarmsJSON() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+        
+    def exportalarms(self):
+        aw.fileExport(QApplication.translate("MessageBox Caption", "Save Alarms",None, QApplication.UnicodeUTF8),"*.alrm",self.exportalarmsJSON)
+        
+    def exportalarmsJSON(self,filename):
+        try:
+            alarms = {}
+            alarms["alarmflags"] = self.alarmflag
+            alarms["alarmguards"] = self.alarmguard
+            alarms["alarmtimes"] = self.alarmtime
+            alarms["alarmoffsets"] = self.alarmoffset
+            alarms["alarmconds"] = self.alarmcond
+            alarms["alarmsources"] = self.alarmsource
+            alarms["alarmtemperatures"] = self.alarmtemperature
+            alarms["alarmactions"] = self.alarmaction
+            alarms["alarmstrings"] = list(map(lambda s:u(s),self.alarmstrings))
+            outfile = open(filename, 'w')
+            json.dump(alarms, outfile, ensure_ascii=True)
+            outfile.write('\n')
+            outfile.close()
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message", "Error on exportalarmsJSON(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
     def closealarms(self):
         self.savealarms()
@@ -20596,6 +20873,7 @@ class AlarmDlg(ArtisanDialog):
         #guarded by alarm
         guardedit = QLineEdit(str(self.alarmguard[i] + 1))
         guardedit.setValidator(QIntValidator(0, 30,guardedit))
+        guardedit.setAlignment(Qt.AlignRight)
         #Effective time from
         timeComboBox = QComboBox()
         timeComboBox.addItems([QApplication.translate("ComboBox","START",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
@@ -20611,6 +20889,7 @@ class AlarmDlg(ArtisanDialog):
         timeComboBox.setCurrentIndex(aw.qmc.alarmtime2menuidx[self.alarmtime[i]])
         #time after selected event
         timeoffsetedit = QLineEdit(aw.qmc.stringfromseconds(max(0,self.alarmoffset[i])))
+        timeoffsetedit.setAlignment(Qt.AlignRight)
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
         timeoffsetedit.setValidator(QRegExpValidator(regextime,self))
         #type
@@ -20627,17 +20906,19 @@ class AlarmDlg(ArtisanDialog):
         condComboBox.setCurrentIndex(self.alarmcond[i])
         #temperature
         tempedit = QLineEdit(str(self.alarmtemperature[i]))
-        tempedit.setValidator(QIntValidator(0, 1000,tempedit))
+        tempedit.setAlignment(Qt.AlignRight)
+        tempedit.setMaximumWidth(100)
+        tempedit.setValidator(QIntValidator(0, 999,tempedit))
         #action
         actionComboBox = QComboBox()
         actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Pop Up window",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Event Button",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","Move Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[0],
-                                 QApplication.translate("ComboBox","Move Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[1],
-                                 QApplication.translate("ComboBox","Move Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[2],
-                                 QApplication.translate("ComboBox","Move Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[3]])
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[0],
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[1],
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[2],
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[3]])
         actionComboBox.setCurrentIndex(self.alarmaction[i] + 1)
         #text description
         descriptionedit = QLineEdit(str(self.alarmstrings[i]))
@@ -20676,6 +20957,10 @@ class AlarmDlg(ArtisanDialog):
             for i in range(nalarms):
                 self.setalarmtablerow(i)
             self.alarmtable.resizeColumnsToContents()
+            # improve width of Qlineedit columns
+            self.alarmtable.setColumnWidth(1,65)
+            self.alarmtable.setColumnWidth(3,50)
+            self.alarmtable.setColumnWidth(6,100)
 
 # UNDER WORK 
 #######################################################################################
