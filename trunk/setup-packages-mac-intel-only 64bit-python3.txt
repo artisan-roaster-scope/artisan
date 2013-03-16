@@ -20,7 +20,8 @@ o py2app 0.7.3
 Upgrade History:
 
 - 2013-03-14:
- . scipy 0.12.0b beta from git repository (25.1.2012) => 0.12.0b1
+ . nupmpy from trunk
+ . scipy 0.12.0b beta from git repository (25.1.2012) => 0.12.0b from trunk
 - 2013-03-10:
  . altgraph => 0.10.0 => 0.10.2
  . modulegraph 0.10.0 => 0.10.4

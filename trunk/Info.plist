@@ -2,6 +2,51 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>alog</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>artisanProfile.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Artisan Profile</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>Document</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>alrm</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>artisanAlarms.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Artisan Alarms</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>AlarmConfigurations</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>apal</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>artisanPalettes.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Artisan Palettes</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>PaletteConfigurations</string>
+		</dict>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
@@ -9,7 +54,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Artisan</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Artisan, Roast Logger</string>
+	<string>Artisan, Visual Scope for Coffee Roasters</string>
 	<key>CFBundleIconFile</key>
 	<string>artisan.icns</string>
 	<key>CFBundleIdentifier</key>
