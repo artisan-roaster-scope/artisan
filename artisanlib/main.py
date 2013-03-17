@@ -126,6 +126,10 @@ import minimalmodbus
 
 import json
 
+# to make py2exe happy with scipy >0.11
+def dependencies_for_myprogram():
+    from scipy.sparse.csgraph import _validation
+
 if sys.version < '3':
     def o(x): # converts char to byte
         return ord(x)
@@ -1646,6 +1650,7 @@ class tgraphcanvas(FigureCanvas):
             aw.hideSliders()
     
             self.wheelflag = False
+            self.designerflag = False
     
             #check and turn off mouse cross marker
             if self.crossmarker:
@@ -3950,58 +3955,59 @@ class tgraphcanvas(FigureCanvas):
 
     #redraws designer
     def redrawdesigner(self):
-        #pylint: disable=E0611
-        from scipy.interpolate import UnivariateSpline
-        #reset (clear) plot
-        if self.background:
-            self.ax.lines = self.ax.lines[0:4]
-        else:
-            self.ax.lines = []
-
-        #create statistics bar
-        #calculate the positions for the statistics elements
-        ydist = self.ylimit - self.ylimit_min
-        statisticsheight = self.ylimit - (0.13 * ydist)
-
-        #add statistics bar
-        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]],[statisticsheight,statisticsheight],color = self.palette["rect1"],alpha=.5,linewidth=5)
-        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[2]]],[statisticsheight,statisticsheight],color = self.palette["rect2"],alpha=.5,linewidth=5)
-        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[6]]],[statisticsheight,statisticsheight],color = self.palette["rect3"],alpha=.5,linewidth=5)
-
-        #add phase division lines
-        ylist = [self.ylimit,0]
-        self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--")
-        self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--")
-        self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--")
-        self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--")
-
-        if self.timex[-1] > self.endofx:
-            self.endofx = self.timex[-1] + 120
-            self.xaxistosm()
-
-        if self.BTsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
-            self.BTsplinedegree = len(self.timex)-1
-
-        if self.ETsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
-            self.ETsplinedegree = len(self.timex)-1
-
-        func = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
-        func2 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
-        timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
-        #convert all time values to temperature
-        btvals = func(timez).tolist()
-        etvals = func2(timez).tolist()
-
-        #add curves
-        self.ax.plot(timez, btvals, color=self.palette["bt"], linestyle = '-', linewidth=2)
-        self.ax.plot(timez, etvals, color=self.palette["et"], linestyle = '-', linewidth=2)
-
-        #add markers (big circles) '0'
-        self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='',markersize=8)     #picker = 10 means 10 points tolerance
-        self.ax.plot(self.timex,self.temp1,color = self.palette["et"],marker = "o",picker=10,linestyle='',markersize=8)
-
-        #plot
-        self.fig.canvas.draw()
+        if aw.qmc.designerflag:
+            #pylint: disable=E0611
+            from scipy.interpolate import UnivariateSpline
+            #reset (clear) plot
+            if self.background:
+                self.ax.lines = self.ax.lines[0:4]
+            else:
+                self.ax.lines = []
+            
+            #create statistics bar
+            #calculate the positions for the statistics elements
+            ydist = self.ylimit - self.ylimit_min
+            statisticsheight = self.ylimit - (0.13 * ydist)
+            
+            #add statistics bar
+            self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[1]]],[statisticsheight,statisticsheight],color = self.palette["rect1"],alpha=.5,linewidth=5)
+            self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[2]]],[statisticsheight,statisticsheight],color = self.palette["rect2"],alpha=.5,linewidth=5)
+            self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[6]]],[statisticsheight,statisticsheight],color = self.palette["rect3"],alpha=.5,linewidth=5)
+            
+            #add phase division lines
+            ylist = [self.ylimit,0]
+            self.ax.plot([self.timex[self.timeindex[0]],self.timex[self.timeindex[0]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--")
+            self.ax.plot([self.timex[self.timeindex[1]],self.timex[self.timeindex[1]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--")
+            self.ax.plot([self.timex[self.timeindex[2]],self.timex[self.timeindex[2]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--")
+            self.ax.plot([self.timex[self.timeindex[6]],self.timex[self.timeindex[6]]],ylist,color = self.palette["grid"],alpha=.3,linewidth=3,linestyle="--")
+            
+            if self.timex[-1] > self.endofx:
+                self.endofx = self.timex[-1] + 120
+                self.xaxistosm()
+            
+            if self.BTsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
+                self.BTsplinedegree = len(self.timex)-1
+            
+            if self.ETsplinedegree >= len(self.timex):  #max 5 or less. Cannot biger than points
+                self.ETsplinedegree = len(self.timex)-1
+            
+            func = UnivariateSpline(self.timex,self.temp2, k = self.BTsplinedegree)
+            func2 = UnivariateSpline(self.timex,self.temp1, k = self.ETsplinedegree)
+            timez = numpy.arange(self.timex[0],self.timex[-1],1).tolist()
+            #convert all time values to temperature
+            btvals = func(timez).tolist()
+            etvals = func2(timez).tolist()
+            
+            #add curves
+            self.ax.plot(timez, btvals, color=self.palette["bt"], linestyle = '-', linewidth=2)
+            self.ax.plot(timez, etvals, color=self.palette["et"], linestyle = '-', linewidth=2)
+            
+            #add markers (big circles) '0'
+            self.ax.plot(self.timex,self.temp2,color = self.palette["bt"],marker = "o",picker=10,linestyle='',markersize=8)     #picker = 10 means 10 points tolerance
+            self.ax.plot(self.timex,self.temp1,color = self.palette["et"],marker = "o",picker=10,linestyle='',markersize=8)
+            
+            #plot
+            self.fig.canvas.draw()
 
     #CONTEXT MENU  = Right click
     def on_press(self,event):
