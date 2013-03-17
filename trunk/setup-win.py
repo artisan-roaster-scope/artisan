@@ -43,7 +43,7 @@ setup(
                         "compressed": True,
                         "unbuffered": True,
                         "dll_excludes":[
-                            'tcl84.dll','tk84.dll','libgdk-win32-2.0-0.dll',
+                            'MSVCP90.dll','tcl84.dll','tk84.dll','libgdk-win32-2.0-0.dll',
                             'libgdk_pixbuf-2.0-0.dll','libgobject-2.0-0.dll'],
                         "includes" : INCLUDES,
                         "excludes" : EXCLUDES}
