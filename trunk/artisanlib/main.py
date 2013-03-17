@@ -784,8 +784,8 @@ class tgraphcanvas(FigureCanvas):
         self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=str(QApplication.translate("Scope Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
         self.l_back1 = None
         self.l_back2 = None
-        self.l_deltaB1 = None
-        self.l_deltaB2 = None
+        self.l_delta1B = None
+        self.l_delta2B = None
 
         self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
         self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
@@ -5545,13 +5545,12 @@ class ApplicationWindow(QMainWindow):
         self.connect(CoffeeGeekAction,SIGNAL("triggered()"),lambda x=500,y=1:self.resize(x,y))
         self.saveGraphMenu.addAction(CoffeeGeekAction)
         
-        if platf == 'Darwin':
-            SVGAction = QAction("SVG...",self)
-            self.connect(SVGAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".svg"))
-            self.saveGraphMenu.addAction(SVGAction)
-            PDFAction = QAction("PDF...",self)
-            self.connect(PDFAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".pdf"))
-            self.saveGraphMenu.addAction(PDFAction)
+        SVGAction = QAction("SVG...",self)
+        self.connect(SVGAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".svg"))
+        self.saveGraphMenu.addAction(SVGAction)
+        PDFAction = QAction("PDF...",self)
+        self.connect(PDFAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".pdf"))
+        self.saveGraphMenu.addAction(PDFAction)
 
         self.htmlAction = QAction(UIconst.FILE_MENU_HTMLREPORT,self)
         self.connect(self.htmlAction,SIGNAL("triggered()"),self.htmlReport)
@@ -15508,7 +15507,6 @@ class backgroundDlg(ArtisanDialog):
         tab1layout.addLayout(layoutBoxed)
         tab1layout.addStretch()
         tab1layout.addLayout(alignButtonBoxed)
-        tab1layout.addSpacing(-10)
         tab1layout.addWidget(self.pathedit)
         tab1layout.addLayout(tab4content)
         tab1layout.setContentsMargins(5, 0, 5, 0) # left, top, right, bottom 
