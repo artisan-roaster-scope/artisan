@@ -715,7 +715,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmcond = []    # 0 = falls below; 1 = rises above
         # alarmstate is set to 'not triggered' on reset()
         self.alarmstate = []   # 1=triggered, 0=not triggered. Needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
-        self.alarmsource = []   # -2=DeltaET, -1=DeltaBT, 0=ET , 1=BT, 2=extratemp1[0], 3=extratemp2[0], 4=extratemp2[1],....
+        self.alarmsource = []   # -3=None, -2=DeltaET, -1=DeltaBT, 0=ET , 1=BT, 2=extratemp1[0], 3=extratemp2[0], 4=extratemp2[1],....
         self.alarmtemperature = []  # set temperature number (example 500)
         self.alarmaction = []       # -1 = no action; 0 = open a window; 1 = call program with a filepath equal to alarmstring; 2 = activate button with number given in description; 
                                     # 3,4,5,6 = move slider with value given in description
@@ -928,7 +928,6 @@ class tgraphcanvas(FigureCanvas):
         res = aw.qmc.ambientTempSourceAvg()
         if res:
             aw.qmc.ambientTemp = res
-            self.ambientedit.setText(str(aw.qmc.ambientTemp))
 
     # eventsvalues maps the given number v to a string to be displayed to the user as special event value
     # v is expected to be float value of range [0.0-10.0]
@@ -966,10 +965,11 @@ class tgraphcanvas(FigureCanvas):
 
     # the inverse to eventsvalues above (string -> value)
     def str2eventsvalue(self,s):
-        if s == None or len(s) == 0:
+        st = s.strip()
+        if st == None or len(st) == 0:
             return -1
         else:
-            return aw.float2float(float(s)/10 + 1.0)
+            return aw.float2float(float(st)/10 + 1.0)
 
     def onclick(self,event):
         if event.button==3 and event.inaxes and not self.designerflag:
@@ -1190,20 +1190,20 @@ class tgraphcanvas(FigureCanvas):
                     slidervalue = int(str(self.alarmstrings[alarmnumber]))
                     if slidervalue < 0 or slidervalue > 100:
                         raise Exception()
+                    if slidervalue:
+                        if self.alarmaction[alarmnumber] == 3:
+                            slidernr = 0
+                        elif self.alarmaction[alarmnumber] == 4:
+                            slidernr = 1
+                        elif self.alarmaction[alarmnumber] == 5:
+                            slidernr = 2
+                        elif self.alarmaction[alarmnumber] == 6:
+                            slidernr = 3
+                        if slidernr:
+                            aw.moveslider(slidernr,slidervalue)
+                            aw.fireslideraction(slidernr)
                 except:
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(str(self.alarmstrings[alarmnumber])))
-                if slidervalue:
-                    if self.alarmaction[alarmnumber] == 3:
-                        slidernr = 0
-                    elif self.alarmaction[alarmnumber] == 4:
-                        slidernr = 1
-                    elif self.alarmaction[alarmnumber] == 5:
-                        slidernr = 2
-                    elif self.alarmaction[alarmnumber] == 6:
-                        slidernr = 3
-                    if slidernr:
-                        aw.moveslider(slidernr,slidervalue)
-                        aw.fireslideraction(slidernr)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
@@ -2005,8 +2005,9 @@ class tgraphcanvas(FigureCanvas):
                     if True or recomputeAllDeltas:
                         tx = numpy.array(self.timeB)
                         dtx = numpy.diff(self.timeB) / 60.
-                        z1 = numpy.diff(self.temp1B) / dtx
-                        z2 = numpy.diff(self.temp2B) / dtx
+                        with numpy.errstate(divide='ignore'):
+                            z1 = numpy.diff(self.temp1B) / dtx
+                            z2 = numpy.diff(self.temp2B) / dtx
                         lt,ld1,ld2 = len(self.timeB),len(z1),len(z2)
                         if lt > ld1:
                             z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
@@ -2093,11 +2094,15 @@ class tgraphcanvas(FigureCanvas):
                     tx = numpy.array(self.timex)
                     dtx = numpy.diff(self.timex) / 60.
                     if aw.qmc.flagon:
-                        z1 = numpy.diff(self.temp1) / dtx
-                        z2 = numpy.diff(self.temp2) / dtx
+                        with numpy.errstate(divide='ignore'):
+                            z1 = numpy.diff(self.temp1) / dtx
+                        with numpy.errstate(divide='ignore'):
+                            z2 = numpy.diff(self.temp2) / dtx
                     else:
-                        z1 = numpy.diff(self.stemp1) / dtx
-                        z2 = numpy.diff(self.stemp2) / dtx
+                        with numpy.errstate(divide='ignore'):
+                            z1 = numpy.diff(self.stemp1) / dtx
+                        with numpy.errstate(divide='ignore'):
+                            z2 = numpy.diff(self.stemp2) / dtx
                     lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
                     if lt > ld1:
                         z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
@@ -7186,16 +7191,16 @@ class ApplicationWindow(QMainWindow):
     def ArtisanOpenFileDialog(self,msg="Open",ext="*",path=None):
         if path == None:   
             path = self.getDefaultPath() 
-        f = str(QFileDialog.getOpenFileName(self,msg,path,ext))
+        f = u(QFileDialog.getOpenFileName(self,msg,path,ext))
         self.setDefaultPath(f)
-        return str(f)
+        return f
  
     #the central SaveFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
     def ArtisanSaveFileDialog(self,msg=QApplication.translate("Message","Save",None, QApplication.UnicodeUTF8),ext="*.alog",path=None):
         if path == None:
             path = self.getDefaultPath() 
-        f = str(QFileDialog.getSaveFileName(self,msg,path,ext))
+        f = u(QFileDialog.getSaveFileName(self,msg,path,ext))
         self.setDefaultPath(f)
         return f
  
@@ -7204,7 +7209,7 @@ class ApplicationWindow(QMainWindow):
     def ArtisanExistingDirectoryDialog(self,msg=QApplication.translate("Message","Select Directory",None, QApplication.UnicodeUTF8),path=None):
         if path == None:
             path = self.getDefaultPath() 
-        f = str(QFileDialog.getExistingDirectory(self,msg,path))
+        f = u(QFileDialog.getExistingDirectory(self,msg,path))
         self.setDefaultPath(f)
         return f
 
@@ -12528,12 +12533,12 @@ class editGraphDlg(ArtisanDialog):
             Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
             ET = QTableWidgetItem("%.02f"%aw.qmc.temp1[i])
             BT = QTableWidgetItem("%.02f"%aw.qmc.temp2[i])
-            if i > 1 and (aw.qmc.timex[i]-aw.qmc.timex[i-1]):
+            if i > 0 and (aw.qmc.timex[i]-aw.qmc.timex[i-1]):
                 deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp1[i]-aw.qmc.temp1[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
                 deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp2[i]-aw.qmc.temp2[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
             else:
-                deltaET = QTableWidgetItem("00:00")
-                deltaBT = QTableWidgetItem("00:00")
+                deltaET = QTableWidgetItem("--")
+                deltaBT = QTableWidgetItem("--")
             if i:                
                     #identify by color and add notation
                 if i == aw.qmc.timeindex[0]:
@@ -14647,7 +14652,10 @@ class EventsDlg(ArtisanDialog):
     def setvalueeventbutton(self,_,i):
         valueedit = self.eventbuttontable.cellWidget(i,3)
         aw.extraeventsvalues[i] = aw.qmc.str2eventsvalue(str(valueedit.text()))
-        aw.buttonlist[i].setText(str(aw.qmc.etypes[aw.extraeventstypes[i]][0])+str(aw.qmc.eventsvalues(aw.extraeventsvalues[i])))
+        part2 = ""
+        if aw.extraeventsvalues[i] >= 0:
+            part2 = str(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
+        aw.buttonlist[i].setText(str(aw.qmc.etypes[aw.extraeventstypes[i]][0])+part2)
         aw.settooltip()
 
     def settypeeventbutton(self,_,i):
@@ -15738,11 +15746,18 @@ class backgroundDlg(ArtisanDialog):
                 BT = QTableWidgetItem("%.02f"%aw.qmc.temp2B[i])
                 BT.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 if i:
-                    deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp1B[i]-aw.qmc.temp1B[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
-                    deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp2B[i]-aw.qmc.temp2B[i-1])/(aw.qmc.timeB[i]-aw.qmc.timeB[i-1])))
+                    d = (aw.qmc.timeB[i]-aw.qmc.timeB[i-1])
+                    if d == 0:
+                        dET = 0.
+                        dBT = 0.
+                    else:
+                        dET = (60*(aw.qmc.temp1B[i]-aw.qmc.temp1B[i-1])/d)
+                        dBT = (60*(aw.qmc.temp2B[i]-aw.qmc.temp2B[i-1])/d)
+                    deltaET = QTableWidgetItem("%.02f"%dET)
+                    deltaBT = QTableWidgetItem("%.02f"%dBT)
                 else:
-                    deltaET = QTableWidgetItem("00:00")
-                    deltaBT = QTableWidgetItem("00:00")                
+                    deltaET = QTableWidgetItem("--")
+                    deltaBT = QTableWidgetItem("--")                
                 deltaET.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 deltaBT.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 if i:
@@ -20840,7 +20855,7 @@ class AlarmDlg(ArtisanDialog):
             # improve width of Qlineedit columns
             self.alarmtable.setColumnWidth(1,65)
             self.alarmtable.setColumnWidth(3,50)
-            self.alarmtable.setColumnWidth(6,100)
+            self.alarmtable.setColumnWidth(6,50)
 
 
     def deletealarm(self):
@@ -20933,7 +20948,7 @@ class AlarmDlg(ArtisanDialog):
         string += QApplication.translate("Message", "<b>Time:</b> if not 00:00, alarm is triggered mm:ss after the event 'From' happend",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("Message", "<b>Source:</b> the temperature source that is observed",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("Message", "<b>Condition:</b> alarm is triggered if source rises above or below the specified temperature",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Temperature:</b> the speficied temperature limit",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string += QApplication.translate("Message", "<b>Temp:</b> the speficied temperature limit",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("Message", "<b>Action:</b> if all conditions are fulfilled the alarm triggeres the corresponding action",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("Message", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button (if 0 the COOL event is triggered ) or the new value of the slider",None, QApplication.UnicodeUTF8) + "<br><br>"
         string += QApplication.translate("Message", "<b>NOTE:</b> each alarm is only triggered once",None, QApplication.UnicodeUTF8)
@@ -20965,7 +20980,7 @@ class AlarmDlg(ArtisanDialog):
             if offset and offset != "":
                 aw.qmc.alarmoffset[i] = max(0,aw.qmc.stringtoseconds(str(offset.text())))
             atype = self.alarmtable.cellWidget(i,4)
-            aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 2
+            aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3
             cond = self.alarmtable.cellWidget(i,5)
             aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
             temp = self.alarmtable.cellWidget(i,6)
@@ -20981,7 +20996,8 @@ class AlarmDlg(ArtisanDialog):
         for i in range(len(aw.qmc.extradevices)):
             extra_names.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
             extra_names.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
-        return [QApplication.translate("ComboBox","DeltaET",None, QApplication.UnicodeUTF8),
+        return ["",
+             QApplication.translate("ComboBox","DeltaET",None, QApplication.UnicodeUTF8),
              QApplication.translate("ComboBox","DeltaBT",None, QApplication.UnicodeUTF8),
              QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8),
              QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8)] + extra_names
@@ -21019,15 +21035,16 @@ class AlarmDlg(ArtisanDialog):
         timeoffsetedit.setValidator(QRegExpValidator(regextime,self))
         #type
         typeComboBox = QComboBox()
-        typeComboBox.addItems(self.buildAlarmSourceList())
-        if self.alarmsource[i] + 2 < len(self.buildAlarmSourceList()):
-            typeComboBox.setCurrentIndex(self.alarmsource[i] + 2)
+        aitems = self.buildAlarmSourceList()
+        typeComboBox.addItems(aitems)
+        if self.alarmsource[i] + 3 < len(aitems):
+            typeComboBox.setCurrentIndex(self.alarmsource[i] + 3)
         else:
-            typeComboBox.setCurrentIndex(2)
+            typeComboBox.setCurrentIndex(3)
         #condition
         condComboBox = QComboBox()
-        condComboBox.addItems([QApplication.translate("ComboBox","falls below",None, QApplication.UnicodeUTF8),
-                               QApplication.translate("ComboBox","rises above",None, QApplication.UnicodeUTF8)])
+        condComboBox.addItems([QApplication.translate("ComboBox","below",None, QApplication.UnicodeUTF8),
+                               QApplication.translate("ComboBox","above",None, QApplication.UnicodeUTF8)])
         condComboBox.setCurrentIndex(self.alarmcond[i])
         #temperature
         tempedit = QLineEdit(str(self.alarmtemperature[i]))
@@ -21036,8 +21053,8 @@ class AlarmDlg(ArtisanDialog):
         tempedit.setValidator(QIntValidator(0, 999,tempedit))
         #action
         actionComboBox = QComboBox()
-        actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","Pop Up window",None, QApplication.UnicodeUTF8),
+        actionComboBox.addItems(["",
+                                 QApplication.translate("ComboBox","Pop Up",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Event Button",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[0],
@@ -21067,7 +21084,7 @@ class AlarmDlg(ArtisanDialog):
                                                        QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Temperature",None, QApplication.UnicodeUTF8),
+                                                       QApplication.translate("Table","Temp",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
                                                        QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8)])
         self.alarmtable.setAlternatingRowColors(True)
@@ -21085,7 +21102,7 @@ class AlarmDlg(ArtisanDialog):
             # improve width of Qlineedit columns
             self.alarmtable.setColumnWidth(1,65)
             self.alarmtable.setColumnWidth(3,50)
-            self.alarmtable.setColumnWidth(6,100)
+            self.alarmtable.setColumnWidth(6,50)
 
 # UNDER WORK 
 #######################################################################################
