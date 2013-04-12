@@ -1,13 +1,14 @@
-Current Versions
+Current Versions:
+
 o XCode 4.5.2 + command line tools
-o Python 3.3
+o Python 3.3.1
 o pyserial
 o QT 4.8.4
-o SIP 4.14.4
+o SIP 4.14.5
 o PyQt 4.9.6
-o Numpy 1.7.0
-o scipy 0.12.0b1 beta from git repository (25.1.2012)
-o matplotlib 1.2.0
+o numpy 1.7.1
+o scipy 0.12.0
+o matplotlib 1.2.1
 o pyaudio 0.2.7
 o minimalmodbus 0.4
 
@@ -17,8 +18,15 @@ o altgraph 0.10.2
 o macholib 1.5
 o py2app 0.7.3
 
+
 Upgrade History:
 
+- 2013-04-12:
+ . Python 3.3.0 => 3.3.1
+ . numpy 1.7.0 => 1.7.1
+ . scipy 0.12.0b1 => 0.12.0
+ . matplotlib 1.2.0 => 1.2.1
+ . SIP 4.14.4 => 4.14.5
 - 2013-03-14:
  . nupmpy from trunk
  . scipy 0.12.0b beta from git repository (25.1.2012) => 0.12.0b from trunk
@@ -91,6 +99,8 @@ Upgrade History:
  . PyQt 4.8.3 => 4.8.4
 
 
+Installation Instructions:
+
 
 *) ensure to switch back to gcc-4.2 if you have a XCode 3/4 setup
 
@@ -116,11 +126,11 @@ not needed anymore:
 install command line tools via Preferences/Downloads/Components
 
 
-2) Install Python 3.3.0
+2) Install Python 3.3.1
 
 download and install:
 
-http://www.python.org/ftp/python/3.3.0/python-3.3.0-macosx10.6.dmg
+http://www.python.org/ftp/python/3.3.1/python-3.3.1-macosx10.6.dmg
 
 set default to 64bit:
 # defaults write com.apple.versioner.python Prefer-32-Bit -bool no
@@ -179,7 +189,7 @@ download source
 # sudo python3 setup.py install
 
 
-8) scipy-0.12.0 beta from git repository
+8) scipy from git repository
 
 # git clone git://github.com/scipy/scipy.git scipy
 # cd scipy
@@ -192,6 +202,18 @@ check installation:
 >> import scipy
 >> scipy.__version__
 >> scipy.__file__
+
+
+
+  File "/Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/scipy/weave/catalog.py", line 107
+    fname = base + `i`
+                   ^
+SyntaxError: invalid syntax
+
+fix:
+        fname = base + repr(i)
+=>
+        fname = base + str(repr(i))
 
 
 
@@ -229,11 +251,14 @@ download matplotlib-1.2.0.tar.gz
 # python3 setup.py build
 # sudo python3 setup.py install
 
+
+to make builds smaller:
 # sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/matplotlib/mpl-data/sample_data
 
 
 ---
 Using matplotlib 1.2 within pyqt on Python 3.3 I receive (on click on the greenflag button and leaving the dialog with OK)
+NOTE: not fix in Python 3.3.1 either (despite my report)
 
 
 formlayout.py", line 343, in get
@@ -241,7 +266,7 @@ value = float(field.text())
 TypeError: float() argument must be a string or a number
 
 That does not happen under Python 2.7.
-Modifying that line in backends/qt4_editor/formlayout.py by wrapping the field.text() into a str() like
+Modifying that line in lib/matplotlib/backends/qt4_editor/formlayout.py by wrapping the field.text() into a str() like
 
 value = float(str(field.text()))
 
