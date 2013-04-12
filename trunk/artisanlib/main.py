@@ -830,6 +830,29 @@ class tgraphcanvas(FigureCanvas):
         self.ETsplinedegree = 1
         self.reproducedesigner = 0      #flag to add events to help reproduce (replay) the profile: 0 = none; 1 = sv; 2 = ramp
 
+        ###########################         filterDropOut variables     ################################
+
+        # constants
+
+        self.filterDropOut_replaceRoR_period = 3
+        self.filterDropOut_spikeRoR_period = 3
+        
+        # defaults
+        
+        self.filterDropOut_tmin_C_default = 0
+        self.filterDropOut_tmax_C_default = 500.
+        self.filterDropOut_tmin_F_default = 0
+        self.filterDropOut_tmax_F_default = 800.
+        self.filterDropOut_spikeRoR_dRoR_limit_C_default = 5
+        self.filterDropOut_spikeRoR_dRoR_limit_F_default = 7
+        
+        # variables
+        
+        self.filterDoppOuts = True
+        self.filterDropOut_tmin = self.filterDropOut_tmin_F_default
+        self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
+        self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
+        
         ###########################         wheel graph variables     ################################
         self.wheelflag = False
         #data containers for wheel
@@ -953,7 +976,7 @@ class tgraphcanvas(FigureCanvas):
         if value < 0:
             return ""
         else:
-            return str(value)
+            return u(value)
 
     # 10.0 to "10" and 1.1 to "1"
     def eventsvaluesShort(self,v):
@@ -961,7 +984,7 @@ class tgraphcanvas(FigureCanvas):
         if value < 0:
             return ""
         else:
-            return str(value / 10)
+            return u(round(value / 10))
 
     # the inverse to eventsvalues above (string -> value)
     def str2eventsvalue(self,s):
@@ -1167,9 +1190,9 @@ class tgraphcanvas(FigureCanvas):
                 aw.soundpop()
             elif self.alarmaction[alarmnumber] == 1:
                 # alarm call program
-                fname = str(self.alarmstrings[alarmnumber])
-                QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
-                aw.sendmessage(QApplication.translate("Message","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(str(self.alarmstrings[alarmnumber])))
+                fname = u(self.alarmstrings[alarmnumber])
+                QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + fname, QUrl.TolerantMode))
+                aw.sendmessage(QApplication.translate("Message","Alarm is calling: %1",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
             elif self.alarmaction[alarmnumber] == 2:
                 # alarm event button
                 button_number = None
@@ -1479,6 +1502,7 @@ class tgraphcanvas(FigureCanvas):
             else:
                 return '-%d'%m
 
+    # returns True if nothing to save, discard or save was selected and False if canceled by the user
     def checkSaved(self):
         #prevents deleting accidentally a finished roast
         if self.safesaveflag == True:
@@ -1487,12 +1511,15 @@ class tgraphcanvas(FigureCanvas):
                                 QMessageBox.Discard |QMessageBox.Save|QMessageBox.Cancel)
             if reply == QMessageBox.Save:
                 aw.fileSave(None)  #if accepted, makes safesaveflag = False
-                return
+                return True
             elif reply == QMessageBox.Discard:
-                pass
+                return True
             elif reply == QMessageBox.Cancel:
-                aw.sendmessage(QApplication.translate("Message","Reset has been cancelled",None, QApplication.UnicodeUTF8))
-                return
+                aw.sendmessage(QApplication.translate("Message","Action canceled",None, QApplication.UnicodeUTF8))
+                return False
+        else:
+            # nothing to be saved
+            return True
 
     def clearMeasurements(self):
         try:
@@ -1528,146 +1555,149 @@ class tgraphcanvas(FigureCanvas):
                 aw.qmc.samplingsemaphore.release(1)
 
     #Resets graph. Called from reset button. Deletes all data. Calls redraw() at the end
+    # returns False if action was canceled, True otherwise
     def reset(self,redraw=True,soundOn=True):
-        try:
-            if soundOn:
-                aw.soundpop()
-            
-            #### lock shared resources #####
-            self.samplingsemaphore.acquire(1)
- 
-            if self.flagon:
-                self.OffMonitor()
+        if not self.checkSaved():
+            return False
+        else:
+            try:
+                if soundOn:
+                    aw.soundpop()
+                
+                #### lock shared resources #####
+                self.samplingsemaphore.acquire(1)
+                if self.flagon:
+                    self.OffMonitor()
+        
+                #reset time
+                aw.qmc.timeclock.start()
+        
+        
+                if self.HUDflag:
+                    self.toggleHUD()
+                self.hudresizeflag = False
+        
+                self.ax.set_title(self.title,size=20,color=self.palette["title"])
+        
     
-            #reset time
-            aw.qmc.timeclock.start()
-    
-            self.checkSaved()
-    
-            if self.HUDflag:
-                self.toggleHUD()
-            self.hudresizeflag = False
-    
-            self.ax.set_title(self.title,size=20,color=self.palette["title"])
-    
-
-            aw.sendmessage(QApplication.translate("Message","Scope has been reset",None, QApplication.UnicodeUTF8))
-            aw.button_3.setDisabled(False)
-            aw.button_4.setDisabled(False)
-            aw.button_5.setDisabled(False)
-            aw.button_6.setDisabled(False)
-            aw.button_7.setDisabled(False)
-            aw.button_8.setDisabled(False)
-            aw.button_9.setDisabled(False)
-            aw.button_19.setDisabled(False)
-            aw.button_20.setDisabled(False)
-    
-            aw.button_3.setFlat(False)
-            aw.button_4.setFlat(False)
-            aw.button_5.setFlat(False)
-            aw.button_6.setFlat(False)
-            aw.button_7.setFlat(False)
-            aw.button_8.setFlat(False)
-            aw.button_9.setFlat(False)
-            aw.button_19.setFlat(False)
-            aw.button_20.setFlat(False)
-            aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8)) 
-            aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
-            aw.button_2.setText(QApplication.translate("Button", "START",None, QApplication.UnicodeUTF8))
-            aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
-    
-            self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
-            aw.setWindowTitle(aw.windowTitle)
-    
-            if self.roastpropertiesflag:
-                self.roastingnotes = ""
-                self.cuppingnotes = ""
-                self.beans = ""
-                self.weight = [0,0,"g"]
-                self.volume = [0,0,"l"]
-                self.ambientTemp = 0.
-                self.ambient_humidity = 0.
-                self.beansize = 0.
-    
-            self.roastdate = QDate.currentDate()
-            self.errorlog = []
-            aw.seriallog = []
-    
-            self.specialevents = []
-            self.specialeventstype = [] 
-            self.specialeventsStrings = []
-            self.specialeventsvalue = []
-            self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
-            self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
-            aw.eNumberSpinBox.setValue(0)
-            aw.lineEvent.setText("")
-            aw.etypeComboBox.setCurrentIndex(0)
-            aw.valueEdit.setText("")
-            aw.curFile = None                 #current file name
-            #used to find length of arms in annotations
-            self.ystep_down = 0
-            self.ystep_up = 0 
-    
-            self.startofx = 0
-            self.endofx = self.resetmaxtime 
-            if self.endofx < 1:
-                self.endofx = 60
-    
-            #Designer variables
-            self.indexpoint = 0
-            self.workingline = 2            #selects ET or BT
-            self.currentx = 0               #used to add point when right click
-            self.currenty = 0               #used to add point when right click
-            self.designertemp1init = []
-            self.designertemp2init = []
-            if self.mode == "C":
-    #                                     #CH, DE, Fcs,Fce,Scs,Sce,Drop
-                self.designertemp1init = [290,290,290,290,290,290,290]
-                self.designertemp2init = [200,150,200,210,220,225,240]
-            elif self.mode == "F":
-                self.designertemp1init = [500,500,500,500,500,500,500]
-                self.designertemp2init = [380,300,390,395,410,412,420]
-            self.disconnect_designer()  #sets designer flag false
-            self.setCursor(Qt.ArrowCursor)
-    
-            self.temporaryalarmflag = -3
-    
-            #reset alarms that have been triggered
-            self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
-            #reset TPalarmtimeindex to trigger a new TP recognition during alarm processing
-            aw.qmc.TPalarmtimeindex = None
-    
-            #reset cupping flavor values
-            self.flavors = [5.]*len(self.flavorlabels)
-    
-            #autodetected CHARGE and DROP index
-            self.autoChargeIdx = 0
-            self.autoDropIdx = 0
-    
-            aw.hideDefaultButtons()
-            aw.hideExtraButtons()
-            aw.hideLCDs()
-            aw.hideSliders()
-    
-            self.wheelflag = False
-            self.designerflag = False
-    
-            #check and turn off mouse cross marker
-            if self.crossmarker:
-                self.togglecrosslines()
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: reset() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
-        finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
-        # now clear all measurements and redraw
-        self.clearMeasurements()
-        ### REDRAW  ##
-        if redraw:
-            self.redraw(False)
+                aw.sendmessage(QApplication.translate("Message","Scope has been reset",None, QApplication.UnicodeUTF8))
+                aw.button_3.setDisabled(False)
+                aw.button_4.setDisabled(False)
+                aw.button_5.setDisabled(False)
+                aw.button_6.setDisabled(False)
+                aw.button_7.setDisabled(False)
+                aw.button_8.setDisabled(False)
+                aw.button_9.setDisabled(False)
+                aw.button_19.setDisabled(False)
+                aw.button_20.setDisabled(False)
+        
+                aw.button_3.setFlat(False)
+                aw.button_4.setFlat(False)
+                aw.button_5.setFlat(False)
+                aw.button_6.setFlat(False)
+                aw.button_7.setFlat(False)
+                aw.button_8.setFlat(False)
+                aw.button_9.setFlat(False)
+                aw.button_19.setFlat(False)
+                aw.button_20.setFlat(False)
+                aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8)) 
+                aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
+                aw.button_2.setText(QApplication.translate("Button", "START",None, QApplication.UnicodeUTF8))
+                aw.button_2.setStyleSheet(aw.pushbuttonstyles["OFF"])
+        
+                self.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
+                aw.setWindowTitle(aw.windowTitle)
+        
+                if self.roastpropertiesflag:
+                    self.roastingnotes = ""
+                    self.cuppingnotes = ""
+                    self.beans = ""
+                    self.weight = [0,0,"g"]
+                    self.volume = [0,0,"l"]
+                    self.ambientTemp = 0.
+                    self.ambient_humidity = 0.
+                    self.beansize = 0.
+        
+                self.roastdate = QDate.currentDate()
+                self.errorlog = []
+                aw.seriallog = []
+        
+                self.specialevents = []
+                self.specialeventstype = [] 
+                self.specialeventsStrings = []
+                self.specialeventsvalue = []
+                self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
+                self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
+                aw.eNumberSpinBox.setValue(0)
+                aw.lineEvent.setText("")
+                aw.etypeComboBox.setCurrentIndex(0)
+                aw.valueEdit.setText("")
+                aw.curFile = None                 #current file name
+                #used to find length of arms in annotations
+                self.ystep_down = 0
+                self.ystep_up = 0 
+        
+                self.startofx = 0
+                self.endofx = self.resetmaxtime 
+                if self.endofx < 1:
+                    self.endofx = 60
+        
+                #Designer variables
+                self.indexpoint = 0
+                self.workingline = 2            #selects ET or BT
+                self.currentx = 0               #used to add point when right click
+                self.currenty = 0               #used to add point when right click
+                self.designertemp1init = []
+                self.designertemp2init = []
+                if self.mode == "C":
+        #                                     #CH, DE, Fcs,Fce,Scs,Sce,Drop
+                    self.designertemp1init = [290,290,290,290,290,290,290]
+                    self.designertemp2init = [200,150,200,210,220,225,240]
+                elif self.mode == "F":
+                    self.designertemp1init = [500,500,500,500,500,500,500]
+                    self.designertemp2init = [380,300,390,395,410,412,420]
+                self.disconnect_designer()  #sets designer flag false
+                self.setCursor(Qt.ArrowCursor)
+        
+                self.temporaryalarmflag = -3
+        
+                #reset alarms that have been triggered
+                self.alarmstate = [0]*len(self.alarmflag)  #0 = not triggered; 1 = triggered
+                #reset TPalarmtimeindex to trigger a new TP recognition during alarm processing
+                aw.qmc.TPalarmtimeindex = None
+        
+                #reset cupping flavor values
+                self.flavors = [5.]*len(self.flavorlabels)
+        
+                #autodetected CHARGE and DROP index
+                self.autoChargeIdx = 0
+                self.autoDropIdx = 0
+        
+                aw.hideDefaultButtons()
+                aw.hideExtraButtons()
+                aw.hideLCDs()
+                aw.hideSliders()
+        
+                self.wheelflag = False
+                self.designerflag = False
+        
+                #check and turn off mouse cross marker
+                if self.crossmarker:
+                    self.togglecrosslines()
+            except Exception as ex:
+    #            import traceback
+    #            traceback.print_exc(file=sys.stdout)
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: reset() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
+            # now clear all measurements and redraw
+            self.clearMeasurements()
+            ### REDRAW  ##
+            if redraw:
+                self.redraw(False)
+            return True
 
     # smoothes a list of values 'x' at taken at times indicated by the numbers in list 'y'
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
@@ -2161,11 +2191,20 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             height = 20
                         #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])]:
-                            temp = self.temp1[int(self.specialevents[i])]
+                        if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
+                            if aw.qmc.flagon:
+                                temp = self.temp1[int(self.specialevents[i])]
+                            else:
+                                temp = self.stemp1[int(self.specialevents[i])]
+                        elif aw.qmc.BTcurve:
+                            if aw.qmc.flagon:
+                                temp = self.temp2[int(self.specialevents[i])]
+                            else:
+                                temp = self.stemp2[int(self.specialevents[i])]
                         else:
-                            temp = self.temp2[int(self.specialevents[i])]
-                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                            temp = None
+                        if temp:
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
                                          xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
@@ -2359,6 +2398,10 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit = 50
         self.zlimit_min = 0
         self.zgrid = 10
+        # configure dropfilter
+        aw.qmc.filterDropOut_tmin = aw.qmc.filterDropOut_tmin_F_default
+        aw.qmc.filterDropOut_tmax = aw.qmc.filterDropOut_tmax_F_default
+        aw.qmc.filterDropOut_spikeRoR_dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit_F_default
 
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
@@ -2379,6 +2422,11 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit = 50
         self.zlimit_min = 0
         self.zgrid = 10
+        # configure dropfilter
+        aw.qmc.filterDropOut_tmin = aw.qmc.filterDropOut_tmin_C_default
+        aw.qmc.filterDropOut_tmax = aw.qmc.filterDropOut_tmax_C_default
+        aw.qmc.filterDropOut_spikeRoR_dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit_C_default
+        
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
             self.phases[i] = int(round(self.fromFtoC(self.phases[i])))
@@ -2636,6 +2684,7 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.draw()
 
     def OnMonitor(self):
+        self.timeclock.start()   #set time to the current computer time
         self.flagon = True
         if self.designerflag: return
         aw.sendmessage(QApplication.translate("Message","Scope monitoring...", None, QApplication.UnicodeUTF8))
@@ -2653,11 +2702,12 @@ class tgraphcanvas(FigureCanvas):
         self.threadserver.createSampleThread()
 
     def OffMonitor(self):
+        # first activate "Stopping Mode" to ensure that sample() is not reseting the timer now (independent of the flagstart state)
+        self.flagstopping = True
         # stop Recorder if still running
         if self.flagstart:
             self.OffRecorder()
         self.flagon = False
-        self.flagstopping = True
         # now wait until the sampling thread successfully terminates
         while self.flagstopping:
             libtime.sleep(.3)
@@ -2708,9 +2758,6 @@ class tgraphcanvas(FigureCanvas):
         aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
         aw.button_18.setEnabled(True)
         aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
-
-        if not len(self.timex):
-            self.timeclock.start()   #set time to the current computer time
         self.updateLCDtime()
         aw.lowerbuttondialog.setVisible(True)
         aw.update_minieventline_visibility()
@@ -4965,295 +5012,325 @@ class SampleThread(QThread):
         super(SampleThread,self).__init__(parent)
         self.afterTP = False
 
-    # a RoR based dropout filter
-    def filterDropOuts(self,tmin,tmax,timex,tempx,time,temp):
-        if temp < tmin or temp > tmax:
-            # don't do the RoR based filter as RoR might be very incorrect for short delta-times
-            if False and len(tempx) > 1 and tempx[-1] != -1 and tempx[-2] != -1 and tempx[-1] != 0 and tempx[-2] != 0:
-                # let's use the last two readings to compute the last RoR and
-                # replace the false reading by a computed one assuming that the
-                # RoR does not change
-                dtemp = tempx[-1] - tempx[-2] # dt is positive if RoR is
-                dtime = timex[-1] - timex[-2] # always positive
-                RoR = dtemp/dtime
-                return tempx[-1] + RoR * (time - timex[-1])
-            elif len(tempx) > 0 and tempx[-1] != -1:
-                # not enough values to compute a RoR, so just repeate last correct reading if not done before
-                if len(tempx) > 1 and tempx[-1] == tempx[-2]:
+    # dropout filter
+    # if temp (the actual reading) is outside of the interval [tmin,tmax] or
+    # a spike is detected, the previous value is repeated or if that happend already before, -1 is returned
+    def filterDropOuts(self,timex,tempx,time,temp):
+        #########################
+        # a) detect overflows
+        wrong_reading = False
+        if aw.qmc.filterDoppOuts and (temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax):
+            wrong_reading = True
+        #########################
+        # b) detect spikes
+        n = aw.qmc.filterDropOut_spikeRoR_period
+        dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
+        if aw.qmc.filterDoppOuts and not wrong_reading and len(tempx) >= n:
+            # no min/max overflow detected
+            # check if RoR caused by actual measurement is way higher then the previous one
+            # calc previous RoR (pRoR) taking the last n samples into account
+            pdtemp = tempx[-1] - tempx[-n]
+            pdtime = timex[-1] - timex[-n]
+            pRoR = abs(pdtemp/pdtime)
+            dtemp = tempx[-1] - temp
+            dtime = timex[-1] - time
+            RoR = abs(dtemp/dtime)
+            if RoR > pRoR + dRoR_limit:
+                wrong_reading = True
+        #########################
+        # c) handle outliers if it could be detected
+        if wrong_reading:
+            aw.qmc.adderror("Warning: drop filtered")
+            # simple repeat strategy
+            if len(tempx) > 0 and tempx[-1] != -1:
+                # repeate last correct reading if not done before
+                if len(tempx) > 1 and tempx[-1] != tempx[-2]:
                     return temp
                 elif len(tempx) == 1:
                     return tempx[-1]
                 else:
                     return -1
             else:
-                # no way to correct this, just return it
+                # no way to correct this
                 return -1
+                
+            # strategy based on previous RoR assuming a constant RoR
+#            # be careful with this RoR based filter as RoR might be very incorrect for short delta-times
+#            m = aw.qmc.filterDropOut_replaceRoR_period
+#            if len(tempx) >= m and tempx[-1] != -1 and tempx[-m] != -1 and tempx[-1] != 0 and tempx[-m] != 0:
+#                # let's use the last m readings to compute the last RoR and
+#                # replace the false reading by a computed one assuming that the
+#                # RoR does not change
+#                dtemp = tempx[-1] - tempx[-m] # dt is positive if RoR is
+#                dtime = timex[-1] - timex[-m] # always positive
+#                RoR = dtemp/dtime
+#                return tempx[-1] + RoR * (time - timex[-1])
+
         else:
             return temp
 
     # sample devices at interval self.delay miliseconds.
+    # we can assume within the processing of sample() that flagon=True
     def sample(self):
         try:
             ##### lock resources  #########
             aw.qmc.samplingsemaphore.acquire(1)
-            if aw.qmc.flagon: # we check again after sleep if the monitor is still on
-                # if we are not yet recording, but sampling we keep on reseting the timer
-                if not aw.qmc.flagstart and not aw.qmc.flagstopping: # while we just turning recording off we don't reset timer yet
-                    aw.qmc.timeclock.start()
-                    
-                # max limit for dropout filter
-                if aw.qmc.mode == "C":
-                    limit = 500.
-                else:
-                    limit = 800.
-                #if using a meter (thermocouple device)
-                if aw.qmc.device != 18: # not NONE device
-                    ##############  if using Extra devices
-                    nxdevices = len(aw.qmc.extradevices)
-                    if nxdevices:
-                        les,led,let =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1)
-                        if les == led == let:
-                            xtra_dev_lines1 = 0
-                            xtra_dev_lines2 = 0
-                            for i in range(nxdevices):   
-                                extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                                # ignore reading if both are off, otherwise process them
-                                if extrat1 != -1 or extrat2 != -1:
-                                    if len(aw.qmc.extramathexpression1[i]):
-                                        extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                                        extrat1 = self.filterDropOuts(0,limit,aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
-                                    if len(aw.qmc.extramathexpression2[i]):
-                                        extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                                        extrat2 = self.filterDropOuts(0,limit,aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
-                                    if aw.qmc.flagstart:
-                                        aw.qmc.extratemp1[i].append(float(extrat1))
-                                        aw.qmc.extratemp2[i].append(float(extrat2))
-                                        aw.qmc.extratimex[i].append(extratx)
-                                        # update extra lines
-                                        if aw.extraCurveVisibility1[i]:
-                                            aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
-                                            xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                        if aw.extraCurveVisibility2[i]:
-                                            aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
-                                            xtra_dev_lines2 = xtra_dev_lines2 + 1
+            
+            # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
+            local_flagstart = aw.qmc.flagstart
+            
+            # if we are not yet recording, but sampling we keep on reseting the timer (only if not already a profile was recorded)
+            if not local_flagstart and len(aw.qmc.timex) < 2:
+                aw.qmc.timeclock.start()
+                
+            #if using a meter (thermocouple device)
+            if aw.qmc.device != 18: # not NONE device
+                ##############  if using Extra devices
+                nxdevices = len(aw.qmc.extradevices)
+                if nxdevices:
+                    les,led,let =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1)
+                    if les == led == let:
+                        xtra_dev_lines1 = 0
+                        xtra_dev_lines2 = 0
+                        for i in range(nxdevices):   
+                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                            # ignore reading if both are off, otherwise process them
+                            if extrat1 != -1 or extrat2 != -1:
+                                if len(aw.qmc.extramathexpression1[i]):
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                                    extrat1 = self.filterDropOuts(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
+                                if len(aw.qmc.extramathexpression2[i]):
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                                    extrat2 = self.filterDropOuts(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
+                                if local_flagstart:
+                                    aw.qmc.extratemp1[i].append(float(extrat1))
+                                    aw.qmc.extratemp2[i].append(float(extrat2))
+                                    aw.qmc.extratimex[i].append(extratx)
+                                    # update extra lines
+                                    if aw.extraCurveVisibility1[i]:
+                                        aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                                        xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                    if aw.extraCurveVisibility2[i]:
+                                        aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                                        xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                else:
+                                    # we do not record, so we just replace the old last value
+                                    if len(aw.qmc.extratemp1[i]) > 0:
+                                        aw.qmc.extratemp1[i][-1] = float(extrat1)
                                     else:
-                                        # we do not record, so we just replace the old last value
-                                        if len(aw.qmc.extratemp1[i]) > 0:
-                                            aw.qmc.extratemp1[i][-1] = float(extrat1)
-                                        else:
-                                            aw.qmc.extratemp1[i].append(float(extrat1))
-                                        if len(aw.qmc.extratemp2[i]) > 0:
-                                            aw.qmc.extratemp2[i][-1] = float(extrat2)
-                                        else:
-                                            aw.qmc.extratemp2[i].append(float(extrat2))
-                                        if len(aw.qmc.extratimex[i]) <= 0:
-                                            aw.qmc.extratimex[i].append(extratx)
-                        #ERROR FOUND
+                                        aw.qmc.extratemp1[i].append(float(extrat1))
+                                    if len(aw.qmc.extratemp2[i]) > 0:
+                                        aw.qmc.extratemp2[i][-1] = float(extrat2)
+                                    else:
+                                        aw.qmc.extratemp2[i].append(float(extrat2))
+                                    if len(aw.qmc.extratimex[i]) <= 0:
+                                        aw.qmc.extratimex[i].append(extratx)
+                    #ERROR FOUND
+                    else:
+                        lengths = [les,led,let]
+                        location = ["Extra-Serial","Extra-Devices","Extra-Temp"]
+                        #find error
+                        if (nxdevices-1) in lengths:
+                            indexerror =  lengths.index(nxdevices-1)
+                        elif (nxdevices+1) in lengths:
+                            indexerror =  lengths.index(nxdevices+1)
                         else:
-                            lengths = [les,led,let]
-                            location = ["Extra-Serial","Extra-Devices","Extra-Temp"]
-                            #find error
-                            if (nxdevices-1) in lengths:
-                                indexerror =  lengths.index(nxdevices-1)
-                            elif (nxdevices+1) in lengths:
-                                indexerror =  lengths.index(nxdevices+1)
-                            else:
-                                indexerror = 1000
-                            if indexerror != 1000:
-                                errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
-                                errormessage += "\nPlease Reset: Extra devices"
-                            else:
-                                string = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
-                                string += location[2] + "= " + str(lengths[2])
-                                errormessage = "ERROR: extra devices lengths don't match: %s"%string
-                                errormessage += "\nPlease Reset: Extra devices"
-                            raise Exception(errormessage)
-                    #read time, ET (t1) and BT (t2) TEMPERATURE
-                    try:
-                        tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
-                    except:
-                        tx = aw.qmc.timeclock.elapsed()/1000
-                        t1 = t2 = -1
-                    if len(aw.qmc.ETfunction):
-                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
-                    if len(aw.qmc.BTfunction):
-                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
-                    t1 = self.filterDropOuts(0,limit,aw.qmc.timex,aw.qmc.temp1,tx,t1)
-                    t2 = self.filterDropOuts(0,limit,aw.qmc.timex,aw.qmc.temp2,tx,t2)
-                    length_of_qmc_timex = len(aw.qmc.timex)
-                    # ignore reading if both are off, otherwise process them
-                    if t1 != -1 or t2 != -1:
-                        t1_final = t1
-                        t2_final = t2
-                        if aw.qmc.flagstart:
+                            indexerror = 1000
+                        if indexerror != 1000:
+                            errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
+                            errormessage += "\nPlease Reset: Extra devices"
+                        else:
+                            string = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
+                            string += location[2] + "= " + str(lengths[2])
+                            errormessage = "ERROR: extra devices lengths don't match: %s"%string
+                            errormessage += "\nPlease Reset: Extra devices"
+                        raise Exception(errormessage)
+                #read time, ET (t1) and BT (t2) TEMPERATURE
+                try:
+                    tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                except:
+                    tx = aw.qmc.timeclock.elapsed()/1000
+                    t1 = t2 = -1
+                if len(aw.qmc.ETfunction):
+                    t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
+                if len(aw.qmc.BTfunction):
+                    t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
+                t1 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp1,tx,t1)
+                t2 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp2,tx,t2)
+                length_of_qmc_timex = len(aw.qmc.timex)
+                # ignore reading if both are off, otherwise process them
+                if t1 != -1 or t2 != -1:
+                    t1_final = t1
+                    t2_final = t2
+                    if local_flagstart:
+                        aw.qmc.temp2.append(t2_final)
+                        aw.qmc.temp1.append(t1_final)
+                        aw.qmc.timex.append(tx)
+                        length_of_qmc_timex += 1
+                    else:
+                        if len(aw.qmc.temp2) > 0:
+                            aw.qmc.temp2[-1] = t2_final
+                        else:                            
                             aw.qmc.temp2.append(t2_final)
+                        if len(aw.qmc.temp1) > 0:
+                            aw.qmc.temp1[-1] = t1_final
+                        else:                            
                             aw.qmc.temp1.append(t1_final)
+                        if length_of_qmc_timex <= 0:
                             aw.qmc.timex.append(tx)
                             length_of_qmc_timex += 1
                         else:
-                            if len(aw.qmc.temp2) > 0:
-                                aw.qmc.temp2[-1] = t2_final
-                            else:                            
-                                aw.qmc.temp2.append(t2_final)
-                            if len(aw.qmc.temp1) > 0:
-                                aw.qmc.temp1[-1] = t1_final
-                            else:                            
-                                aw.qmc.temp1.append(t1_final)
-                            if length_of_qmc_timex <= 0:
-                                aw.qmc.timex.append(tx)
-                                length_of_qmc_timex += 1
-                            else:
-                                aw.qmc.timex[-1] = tx
-                        # update lines data using the lists with new data
-                        if aw.qmc.flagstart:
-                            aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
-                            aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
-                        #we need a minimum of two readings to calculate rate of change
-                        if aw.qmc.flagstart and length_of_qmc_timex > 2:
-                            timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
-                            #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                            aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
-                            aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
-                            aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
-                            aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
-                            #######   filter deltaBT deltaET
-                            if aw.qmc.deltafilter:
-                                if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
-                                    if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
-                                        a1,a2 = 0.,0.
-                                        for k in range(aw.qmc.deltafilter):
-                                            a1 += aw.qmc.unfiltereddelta1[-(k+1)]
-                                            a2 += aw.qmc.unfiltereddelta2[-(k+1)]
-                                        aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
-                                        aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
-                            rateofchange1plot = aw.qmc.rateofchange1
-                            rateofchange2plot = aw.qmc.rateofchange2
+                            aw.qmc.timex[-1] = tx
+                    # update lines data using the lists with new data
+                    if local_flagstart:
+                        aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
+                        aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+                    #we need a minimum of two readings to calculate rate of change
+                    if local_flagstart and length_of_qmc_timex > 2:
+                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
+                        #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                        aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
+                        aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
+                        aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
+                        aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
+                        #######   filter deltaBT deltaET
+                        if aw.qmc.deltafilter:
+                            if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
+                                if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
+                                    a1,a2 = 0.,0.
+                                    for k in range(aw.qmc.deltafilter):
+                                        a1 += aw.qmc.unfiltereddelta1[-(k+1)]
+                                        a2 += aw.qmc.unfiltereddelta2[-(k+1)]
+                                    aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
+                                    aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
+                        rateofchange1plot = aw.qmc.rateofchange1
+                        rateofchange2plot = aw.qmc.rateofchange2
+                    else:
+                        if local_flagstart:
+                            aw.qmc.unfiltereddelta1.append(0.)
+                            aw.qmc.unfiltereddelta2.append(0.)
                         else:
-                            if aw.qmc.flagstart:
+                            if len(aw.qmc.unfiltereddelta1) > 0:
+                                aw.qmc.unfiltereddelta1[-1] = 0.
+                            else:
                                 aw.qmc.unfiltereddelta1.append(0.)
+                            if len(aw.qmc.unfiltereddelta2) > 0:
+                                aw.qmc.unfiltereddelta2[-1] = 0.
+                            else:
                                 aw.qmc.unfiltereddelta2.append(0.)
-                            else:
-                                if len(aw.qmc.unfiltereddelta1) > 0:
-                                    aw.qmc.unfiltereddelta1[-1] = 0.
-                                else:
-                                    aw.qmc.unfiltereddelta1.append(0.)
-                                if len(aw.qmc.unfiltereddelta2) > 0:
-                                    aw.qmc.unfiltereddelta2[-1] = 0.
-                                else:
-                                    aw.qmc.unfiltereddelta2.append(0.)
-                            aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
-                        # append new data to the rateofchange
-                        if aw.qmc.flagstart:
-                            aw.qmc.delta1.append(rateofchange1plot)
-                            aw.qmc.delta2.append(rateofchange2plot)
+                        aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+                    # append new data to the rateofchange
+                    if local_flagstart:
+                        aw.qmc.delta1.append(rateofchange1plot)
+                        aw.qmc.delta2.append(rateofchange2plot)
+                    else:
+                        if len(aw.qmc.delta1) > 0:
+                            aw.qmc.delta1[-1] = rateofchange1plot
                         else:
-                            if len(aw.qmc.delta1) > 0:
-                                aw.qmc.delta1[-1] = rateofchange1plot
-                            else:
-                                aw.qmc.delta1.append(rateofchange1plot)
-                            if len(aw.qmc.delta2) > 0:
-                                aw.qmc.delta2[-1] = rateofchange2plot
-                            else:
-                                aw.qmc.delta2.append(rateofchange2plot)
-                        if aw.qmc.flagstart:
-                            if aw.qmc.DeltaETflag:
-                                aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
-                            if aw.qmc.DeltaBTflag:
-                                aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
-                            #readjust xlimit of plot if needed
-                            if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
-                                aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
-                                aw.qmc.xaxistosm()
-                            if aw.qmc.projectFlag:
-                                aw.qmc.viewProjection()
-                            if aw.qmc.background and aw.qmc.backgroundReproduce:
-                                aw.qmc.playbackevent()
-                            # autodetect CHARGE event
-                            # only if BT > 203F/95C
-                            if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
-                                ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
-                                if aw.BTbreak(length_of_qmc_timex - 1):
-                                    # we found a BT break at the current index minus 2
-                                    aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
-                            # autodetect DROP event
-                            # only if 9min into roast and BT>180C/356F
-                            elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
-                                length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
-                                ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
-                                if aw.BTbreak(length_of_qmc_timex - 1):
-                                    # we found a BT break at the current index minus 2
-                                    aw.qmc.autoDropIdx = length_of_qmc_timex - 3
-                        if aw.qmc.flagstart:
-                            #check alarms 
-                            # check for TP event if already CHARGEed and not yet recognized
-                            if not aw.qmc.TPalarmtimeindex and len(aw.qmc.alarmflag) > 0 and aw.qmc.timeindex[0] > -1 and self.checkTPalarmtime():
-                                aw.qmc.TPalarmtimeindex = len(aw.qmc.timex)-1
-                            #check for each alarm that was not yet triggered
-                            for i in range(len(aw.qmc.alarmflag)):
-                                #if alarm on, and not triggered, and time is after set time:
-                                # qmc.alarmtime = -1 (None == ON)
-                                # qmc.alarmtime = 0 (CHARGE)
-                                # ..
-                                # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
-                                # 1) the alarm is START
-                                # 2) the alarm was not triggered yet
-                                # 3) the alarm From is ON
-                                # 4) the alarm From is CHARGE
-                                # 5) the alarm From is any other event but TP
-                                # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
-                                if aw.qmc.alarmflag[i] \
-                                  and not aw.qmc.alarmstate[i] \
-                                  and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
-                                  and ((aw.qmc.alarmtime[i] < 0) \
-                                  or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
-                                  or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                                  or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
-                                        and aw.qmc.timeindex[1] < 1 and aw.qmc.TPalarmtimeindex)):
-                                    #########
-                                    # check alarmoffset (time after From event):
-                                    if aw.qmc.alarmoffset[i] > 0:
-                                        alarm_time = aw.qmc.timeclock.elapsed()/1000.
-                                        if aw.qmc.alarmtime[i] < 0: # time after START
-                                            pass # the alarm_time is the clock time
-                                        elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
-                                            alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
-                                        elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
-                                            alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
-                                        elif aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
-                                            alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
-                                        if alarm_time >= aw.qmc.alarmoffset[i]:
-                                            aw.qmc.temporaryalarmflag = i
-                                    #########
-                                    # check alarmtemp:
-                                    alarm_temp = None
-                                    if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
-                                        alarm_temp = aw.qmc.delta1[-1]
-                                    elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
-                                        alarm_temp = aw.qmc.delta2[-1]
-                                    elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                        alarm_temp = aw.qmc.temp1[-1]
-                                    elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                        alarm_temp = aw.qmc.temp2[-1]
-                                    elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
-                                        if (aw.qmc.alarmsource[i])%2==0:
-                                            alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                        else:
-                                            alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                    alarm_limit = aw.qmc.alarmtemperature[i]
-                                    if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                            aw.qmc.delta1.append(rateofchange1plot)
+                        if len(aw.qmc.delta2) > 0:
+                            aw.qmc.delta2[-1] = rateofchange2plot
+                        else:
+                            aw.qmc.delta2.append(rateofchange2plot)
+                    if local_flagstart:
+                        if aw.qmc.DeltaETflag:
+                            aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
+                        if aw.qmc.DeltaBTflag:
+                            aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
+                        #readjust xlimit of plot if needed
+                        if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                            aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
+                            aw.qmc.xaxistosm()
+                        if aw.qmc.projectFlag:
+                            aw.qmc.viewProjection()
+                        if aw.qmc.background and aw.qmc.backgroundReproduce:
+                            aw.qmc.playbackevent()
+                        # autodetect CHARGE event
+                        # only if BT > 203F/95C
+                        if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
+                            ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
+                            if aw.BTbreak(length_of_qmc_timex - 1):
+                                # we found a BT break at the current index minus 2
+                                aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
+                        # autodetect DROP event
+                        # only if 9min into roast and BT>180C/356F
+                        elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
+                            ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
+                            if aw.BTbreak(length_of_qmc_timex - 1):
+                                # we found a BT break at the current index minus 2
+                                aw.qmc.autoDropIdx = length_of_qmc_timex - 3
+                    if local_flagstart:
+                        #check alarms 
+                        # check for TP event if already CHARGEed and not yet recognized
+                        if not aw.qmc.TPalarmtimeindex and len(aw.qmc.alarmflag) > 0 and aw.qmc.timeindex[0] > -1 and self.checkTPalarmtime():
+                            aw.qmc.TPalarmtimeindex = len(aw.qmc.timex)-1
+                        #check for each alarm that was not yet triggered
+                        for i in range(len(aw.qmc.alarmflag)):
+                            #if alarm on, and not triggered, and time is after set time:
+                            # qmc.alarmtime = -1 (None == ON)
+                            # qmc.alarmtime = 0 (CHARGE)
+                            # ..
+                            # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
+                            # 1) the alarm is START
+                            # 2) the alarm was not triggered yet
+                            # 3) the alarm From is ON
+                            # 4) the alarm From is CHARGE
+                            # 5) the alarm From is any other event but TP
+                            # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
+                            if aw.qmc.alarmflag[i] \
+                              and not aw.qmc.alarmstate[i] \
+                              and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
+                              and ((aw.qmc.alarmtime[i] < 0) \
+                              or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
+                              or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                              or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
+                                    and aw.qmc.timeindex[1] < 1 and aw.qmc.TPalarmtimeindex)):
+                                #########
+                                # check alarmoffset (time after From event):
+                                if aw.qmc.alarmoffset[i] > 0:
+                                    alarm_time = aw.qmc.timeclock.elapsed()/1000.
+                                    if aw.qmc.alarmtime[i] < 0: # time after START
+                                        pass # the alarm_time is the clock time
+                                    elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
+                                        alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
+                                    elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
+                                        alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
+                                    elif aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
+                                        alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
+                                    if alarm_time >= aw.qmc.alarmoffset[i]:
                                         aw.qmc.temporaryalarmflag = i
-                #############    if using DEVICE 18 (no device). Manual mode
-                # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
-                else:
-                    tx = int(aw.qmc.timeclock.elapsed()/1000.)
-                    #readjust xlimit of plot if needed
-                    if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
-                        aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
-                        aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
-                        aw.qmc.xaxistosm()
-                    aw.qmc.resetlines()
-                    #add to plot a vertical time line
-                    aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
+                                #########
+                                # check alarmtemp:
+                                alarm_temp = None
+                                if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
+                                    alarm_temp = aw.qmc.delta1[-1]
+                                elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
+                                    alarm_temp = aw.qmc.delta2[-1]
+                                elif aw.qmc.alarmsource[i] == 0:                      #check ET
+                                    alarm_temp = aw.qmc.temp1[-1]
+                                elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                                    alarm_temp = aw.qmc.temp2[-1]
+                                elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
+                                    if (aw.qmc.alarmsource[i])%2==0:
+                                        alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                    else:
+                                        alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                alarm_limit = aw.qmc.alarmtemperature[i]
+                                if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                                    aw.qmc.temporaryalarmflag = i
+            #############    if using DEVICE 18 (no device). Manual mode
+            # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
+            else:
+                tx = int(aw.qmc.timeclock.elapsed()/1000.)
+                #readjust xlimit of plot if needed
+                if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
+                    aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
+                    aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
+                    aw.qmc.xaxistosm()
+                aw.qmc.resetlines()
+                #add to plot a vertical time line
+                aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7)
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
             #update screen in main GUI thread
@@ -5290,7 +5367,6 @@ class SampleThread(QThread):
                 # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
                 dt = (max(1,(aw.qmc.delay - tx + aw.qmc.timeclock.elapsed()))) /1000.
                 #apply sampling interval here
-                #libtime.sleep(aw.qmc.delay/1000.)
                 libtime.sleep(dt)
             else:
                 try:
@@ -5574,6 +5650,12 @@ class ApplicationWindow(QMainWindow):
         self.printAction.setShortcut(QKeySequence.Print)
         self.connect(self.printAction,SIGNAL("triggered()"),self.filePrint)
         self.fileMenu.addAction(self.printAction)
+        
+        self.quitAction = QAction("Quit",self)
+        self.quitAction.setShortcut(QKeySequence.Quit)
+        self.connect(self.quitAction,SIGNAL("triggered()"),self.fileQuit)
+        self.fileMenu.addAction(self.quitAction)
+        
 
         # EDIT menu
         self.cutAction = QAction(UIconst.EDIT_MENU_CUT,self)
@@ -6574,7 +6656,7 @@ class ApplicationWindow(QMainWindow):
                         aw.addserial("Serial Action :" + settings + " || Tx = " + str(cmd_str))
             elif action == 2:
                 try:
-                    QDesktopServices.openUrl(QUrl("file:///" + str(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
+                    QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
                 except Exception as e:
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: eventaction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
@@ -7118,10 +7200,10 @@ class ApplicationWindow(QMainWindow):
             self.sendmessage(message)
         
     def strippedName(self, fullFileName):
-        return str(QFileInfo(fullFileName).fileName())
+        return u(QFileInfo(fullFileName).fileName())
         
     def strippedDir(self, fullFileName):
-        return str(QFileInfo(fullFileName).dir().dirName())
+        return u(QFileInfo(fullFileName).dir().dirName())
 
     def setCurrentFile(self, fileName):
         self.curFile = fileName
@@ -7184,7 +7266,7 @@ class ApplicationWindow(QMainWindow):
             filepath_dir = QDir()
             filepath_dir.setPath(f)
             filepath_elements = filepath_dir.absolutePath().split("/")[:-1] # directories as QStrings (without the filename)
-            self.userprofilepath = str(freduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
+            self.userprofilepath = u(freduce(lambda x,y: x + '/' + y, filepath_elements) + "/")
 
     #the central OpenFileDialog function that should always be called. Besides triggering the file dialog it
     #reads and sets the actual directory
@@ -7254,17 +7336,16 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None, QApplication.UnicodeUTF8))
                 self.autosaveconf()
                 return
-            self.qmc.reset()
-            #start new roast
-            self.qmc.ToggleRecorder()
-
-            self.sendmessage(QApplication.translate("Message","%1 has been saved. New roast has started", None, QApplication.UnicodeUTF8).arg(filename))
+            if self.qmc.reset():
+                #start new roast
+                self.qmc.ToggleRecorder()
+                self.sendmessage(QApplication.translate("Message","%1 has been saved. New roast has started", None, QApplication.UnicodeUTF8).arg(filename))
         else:
             if not len(self.qmc.timex):
                 self.qmc.ToggleRecorder()
             else:
-                self.qmc.reset()
-                self.qmc.ToggleRecorder()
+                if self.qmc.reset():
+                    self.qmc.ToggleRecorder()
 
     def fileLoad(self):
         try:
@@ -7281,30 +7362,30 @@ class ApplicationWindow(QMainWindow):
     def loadFile(self,filename):
         f = None
         try:
-            f = QFile(str(filename))
+            f = QFile(u(filename))
             if not f.open(QIODevice.ReadOnly):
-                raise IOError(str(f.errorString()))
+                raise IOError(u(f.errorString()))
             stream = QTextStream(f)
-            self.qmc.reset(redraw=False)
-            firstChar = stream.read(1)
-            if firstChar == "{":
-                f.close()
-                res = self.setProfile(self.deserialize(filename))
-            else:
-                self.sendmessage(QApplication.translate("Message","Invalid artisan format", None, QApplication.UnicodeUTF8))
-                res = False
-            if res:
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-                #change Title
-                self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
-                #update etypes combo box
-                self.etypeComboBox.clear()
-                self.etypeComboBox.addItems(self.qmc.etypes)
-                #Plot everything
-                self.qmc.redraw()
-                message =  QApplication.translate("Message","%1  loaded ", None, QApplication.UnicodeUTF8).arg(str(filename))
-                self.sendmessage(message)
-                self.setCurrentFile(filename)
+            if self.qmc.reset(redraw=False): # operation not canceled by the user in the save dirty state dialog
+                firstChar = stream.read(1)
+                if firstChar == "{":
+                    f.close()
+                    res = self.setProfile(self.deserialize(filename))
+                else:
+                    self.sendmessage(QApplication.translate("Message","Invalid artisan format", None, QApplication.UnicodeUTF8))
+                    res = False
+                if res:
+                    self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                    #change Title
+                    self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+                    #update etypes combo box
+                    self.etypeComboBox.clear()
+                    self.etypeComboBox.addItems(self.qmc.etypes)
+                    #Plot everything
+                    self.qmc.redraw()
+                    message =  QApplication.translate("Message","%1  loaded ", None, QApplication.UnicodeUTF8).arg(u(filename))
+                    self.sendmessage(message)
+                    self.setCurrentFile(filename)
         except IOError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -7330,9 +7411,9 @@ class ApplicationWindow(QMainWindow):
     # Loads background profile
     def loadbackground(self,filename):
         try:        
-            f = QFile(str(filename))
+            f = QFile(u(filename))
             if not f.open(QIODevice.ReadOnly):
-                raise IOError(str(f.errorString()))
+                raise IOError(u(f.errorString()))
             stream = QTextStream(f)
             
             firstChar = stream.read(1)
@@ -7377,7 +7458,7 @@ class ApplicationWindow(QMainWindow):
                         times.append(startendB[2])
                         self.qmc.timebackgroundindexupdate(times[:])
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
-                message =  QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(str(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]])))
+                message =  QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(u(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]])))
                 self.sendmessage(message)
             else:
                 self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None, QApplication.UnicodeUTF8))
@@ -7675,7 +7756,7 @@ class ApplicationWindow(QMainWindow):
             infile = io.open(filename, 'r', encoding='utf-8')
             obj = {}
             obj["mode"] = "C"
-            obj["title"] = str(QFileInfo(filename).fileName())
+            obj["title"] = u(QFileInfo(filename).fileName())
             import csv
             obj["roastdate"] = e(QDate.currentDate().toString())
             # read roastdate from file
@@ -7832,15 +7913,15 @@ class ApplicationWindow(QMainWindow):
 
     #Write object to file
     def serialize(self,filename,obj):
-        f = codecs.open(str(filename), 'w+', encoding='utf-8')
+        f = codecs.open(u(filename), 'w+', encoding='utf-8')
         f.write(repr(obj))
         f.close()
 
     #Read object from file 
     def deserialize(self,filename):
         obj = None
-        if os.path.exists(str(filename)):
-            f = codecs.open(str(filename), 'rb', encoding='utf-8')
+        if os.path.exists(u(filename)):
+            f = codecs.open(u(filename), 'rb', encoding='utf-8')
             obj=eval(f.read())
             f.close()
         return obj
@@ -8702,14 +8783,14 @@ class ApplicationWindow(QMainWindow):
             self.qmc.legendloc = settings.value("legendloc",self.qmc.legendloc).toInt()[0]
             settings.endGroup()
             settings.beginGroup("RoastProperties")
-            self.qmc.operator = str(settings.value("operator",self.qmc.operator).toString())
-            self.qmc.roastertype = str(settings.value("roastertype",self.qmc.roastertype).toString())
+            self.qmc.operator = u(settings.value("operator",self.qmc.operator).toString())
+            self.qmc.roastertype = u(settings.value("roastertype",self.qmc.roastertype).toString())
             self.qmc.density[2] = settings.value("densitySampleVolume",self.qmc.density[2]).toInt()[0]
             self.qmc.density[3] = str(settings.value("densitySampleVolumeUnit",self.qmc.density[3]).toString())
             if settings.contains("beansize"):
                 self.qmc.beansize = settings.value("beansize",self.qmc.beansize).toDouble()[0]
             settings.endGroup()
-            self.userprofilepath = str(settings.value("profilepath",self.userprofilepath).toString())
+            self.userprofilepath = u(settings.value("profilepath",self.userprofilepath).toString())
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
                 self.qmc.extradevices = [x.toInt()[0] for x in settings.value("extradevices").toList()]
@@ -9125,6 +9206,7 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: fetchCurveStyles() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
+
     #Saves the settings when closing application. See the oppposite settingsLoad()
     def closeEvent(self,_):
         #save window geometry and position. See QSettings documentation.
@@ -9132,7 +9214,6 @@ class ApplicationWindow(QMainWindow):
         #and in XML preferences files on Mac OS X. On Unix systems, in the absence of a standard,
         #many applications (including the KDE applications) use INI text files
         try:
-            aw.qmc.checkSaved()
             settings = QSettings()
             #save window geometry
             settings.setValue("Geometry",QVariant(self.saveGeometry()))
@@ -9584,6 +9665,12 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDframe1[i].setVisible(False)
             self.extraLCDframe2[i].setVisible(False)
 
+    def fileQuit(self):
+        if aw.qmc.checkSaved(): # if not canceled
+            self.closeEvent(None)
+            QApplication.exit()
+        
+
     def filePrint(self):
         image = QPixmap.grabWidget(aw.qmc).toImage()
         
@@ -9611,7 +9698,7 @@ class ApplicationWindow(QMainWindow):
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<title>""" + str(QApplication.translate("HTML Report Template", "Roasting Report", None, QApplication.UnicodeUTF8)) + """</title>
+<title>""" + u(QApplication.translate("HTML Report Template", "Roasting Report", None, QApplication.UnicodeUTF8)) + """</title>
 <style type="text/css">
 td { 
   vertical-align: top;
@@ -9636,47 +9723,47 @@ th {
 <td>
 <table width="230">
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Date:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Date:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$datetime</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Beans:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Beans:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$beans</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Size:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Size:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$size</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Weight:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Weight:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$weight</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Degree:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Degree:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$degree</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Volume:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Volume:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$volume</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Density:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Density:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$density</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Humidity:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Humidity:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$humidity</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Roaster:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Roaster:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$roaster</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Operator:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Operator:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$operator</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Cupping:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Cupping:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$cup</td>
 </tr>
 </table>
@@ -9684,7 +9771,7 @@ th {
 <td>
 <table width="220">
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Charge:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Charge:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$charge</td>
 </tr>
 <tr>
@@ -9692,39 +9779,39 @@ th {
 <td>$TP</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "DRY:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "DRY:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$DRY</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "FCs:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "FCs:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$FCs</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "FCe:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "FCe:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$FCe</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "SCs:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "SCs:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$SCs</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "SCe:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "SCe:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$SCe</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "DROP:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "DROP:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$drop</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "COOL:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "COOL:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$cool</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "RoR:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "RoR:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$ror</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "ETBTa:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "ETBTa:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$etbta</td>
 </tr>
 </table>
@@ -9732,19 +9819,19 @@ th {
 <td>
 <table width="250">
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Dry phase:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Dry phase:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$dry_phase</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Mid phase:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Mid phase:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$mid_phase</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Finish phase:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Finish phase:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$finish_phase</td>
 </tr>
 <tr>
-<th>""" + str(QApplication.translate("HTML Report Template", "Cool phase:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Cool phase:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$cool_phase</td>
 </tr>
 </table>
@@ -9759,7 +9846,7 @@ th {
 </tr>
 <tr>
 <td>
-<center><b>""" + str(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
+<center><b>""" + u(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
 $roasting_notes
 </td>
 </tr>
@@ -9769,7 +9856,7 @@ $roasting_notes
 <td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'/></td>
 </tr>
 <tr>
-<td><center><b>""" + str(QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
+<td><center><b>""" + u(QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
 $cupping_notes
 </td>
 </tr>
@@ -10521,55 +10608,55 @@ $cupping_notes
             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import K202 CSV",None, QApplication.UnicodeUTF8))
             if len(filename) == 0:
                 return
-            self.qmc.reset()
-            f = QFile(filename)
-            if not f.open(QIODevice.ReadOnly):
-                raise IOError(str(f.errorString()))
-            import csv
-            import io
-            csvFile = io.open(filename, 'r', encoding='utf-8')
-            csvReader = csv.DictReader(csvFile,["Date","Time","T1","T1unit","T2","T2unit"],delimiter='\t')
-            zero_t = None
-            roastdate = None
-            unit = None
-            for item in csvReader:
-                try:
-                    #set date
-                    if not roastdate:
-                        roastdate = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
-                        self.qmc.roastdate = roastdate
-                    #set zero
-                    if not zero_t:
-                        date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
-                        zero = QDateTime()
-                        zero.setDate(date)
-                        zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                        zero_t = zero.toTime_t()
-                    #set temperature mode
-                    if not unit:
-                        unit = item['T1unit']
-                        if unit == "F" and self.qmc.mode == "C":
-                            self.qmc.fahrenheitMode()
-                        if unit == "C" and self.qmc.mode == "F":
-                            self.qmc.celsiusMode()
-                    #add one measurement
-                    dt = QDateTime()
-                    dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
-                    dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                    self.qmc.timex.append(float(dt.toTime_t() - zero_t))
-                    self.qmc.temp1.append(float(item['T1'].replace(',','.')))
-                    self.qmc.temp2.append(float(item['T2'].replace(',','.')))
-                except ValueError:
-                    pass
-            csvFile.close()
-            #swap temperature curves if needed such that BT is the lower and ET the upper one
-            if (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
-                tmp = self.qmc.temp1
-                self.qmc.temp1 = self.qmc.temp2
-                self.qmc.temp2 = tmp
-            self.qmc.endofx = self.qmc.timex[-1]
-            self.sendmessage(QApplication.translate("Message","K202 file loaded successfully", None, QApplication.UnicodeUTF8))
-            self.qmc.redraw()
+            if self.qmc.reset():
+                f = QFile(filename)
+                if not f.open(QIODevice.ReadOnly):
+                    raise IOError(str(f.errorString()))
+                import csv
+                import io
+                csvFile = io.open(filename, 'r', encoding='utf-8')
+                csvReader = csv.DictReader(csvFile,["Date","Time","T1","T1unit","T2","T2unit"],delimiter='\t')
+                zero_t = None
+                roastdate = None
+                unit = None
+                for item in csvReader:
+                    try:
+                        #set date
+                        if not roastdate:
+                            roastdate = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                            self.qmc.roastdate = roastdate
+                        #set zero
+                        if not zero_t:
+                            date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                            zero = QDateTime()
+                            zero.setDate(date)
+                            zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                            zero_t = zero.toTime_t()
+                        #set temperature mode
+                        if not unit:
+                            unit = item['T1unit']
+                            if unit == "F" and self.qmc.mode == "C":
+                                self.qmc.fahrenheitMode()
+                            if unit == "C" and self.qmc.mode == "F":
+                                self.qmc.celsiusMode()
+                        #add one measurement
+                        dt = QDateTime()
+                        dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
+                        dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                        self.qmc.timex.append(float(dt.toTime_t() - zero_t))
+                        self.qmc.temp1.append(float(item['T1'].replace(',','.')))
+                        self.qmc.temp2.append(float(item['T2'].replace(',','.')))
+                    except ValueError:
+                        pass
+                csvFile.close()
+                #swap temperature curves if needed such that BT is the lower and ET the upper one
+                if (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
+                    tmp = self.qmc.temp1
+                    self.qmc.temp1 = self.qmc.temp2
+                    self.qmc.temp2 = tmp
+                self.qmc.endofx = self.qmc.timex[-1]
+                self.sendmessage(QApplication.translate("Message","K202 file loaded successfully", None, QApplication.UnicodeUTF8))
+                self.qmc.redraw()
         except IOError as ex:
             aw.qmc.adderror(QApplication.translate("Error Message","IO Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
         except ValueError as ex:
@@ -10585,69 +10672,69 @@ $cupping_notes
             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import K204 CSV",None, QApplication.UnicodeUTF8))
             if len(filename) == 0:
                 return
-            self.qmc.reset()
-            f = QFile(filename)
-            if not f.open(QIODevice.ReadOnly):
-                raise IOError(str(f.errorString()))
-            import csv
-            import io
-            csvFile = io.open(filename, 'r', encoding='utf-8')
-            csvReader = csv.DictReader(csvFile,["Date","Time","T1","T2","T3","T4"],delimiter='\t')
-            zero_t = None
-            roastdate = None
-            # we add an extra device if needed
-            if len(self.qmc.extradevices) == 0:
-                self.addDevice()
-            for item in csvReader:
-                try:
-                    #set date
-                    if not roastdate:
-                        roastdate = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
-                        self.qmc.roastdate = roastdate
-                    #set zero
-                    if not zero_t:
-                        date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
-                        zero = QDateTime()
-                        zero.setDate(date)
-                        zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                        zero_t = zero.toTime_t()
-# The K204 export does not contain a trace of the temperature mode.
-# We have to assume here that the mode was set correctly before the import.
-                    #add one measurement
-                    dt = QDateTime()
-                    dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
-                    dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                    tx = float(dt.toTime_t() - zero_t)
-                    self.qmc.timex.append(tx)
-                    t1 = float(item['T1'].replace(',','.'))
-                    if t1 > 800 or t1 < 0.0:
-                        t1 = 0.0
-                    self.qmc.temp1.append(t1)
-                    t2 = float(item['T2'].replace(',','.'))
-                    if t2 > 800 or t2 < 0.0:
-                        t2 = 0.0
-                    self.qmc.temp2.append(t2)
-                    if len(self.qmc.extradevices) > 0:
-                        self.qmc.extratimex[0].append(tx)
-                        t3 = float(item['T3'].replace(',','.'))
-                        if t3 > 800 or t3 < 0.0:
-                            t3 = 0.0
-                        self.qmc.extratemp1[0].append(t3)
-                        t4 = float(item['T4'].replace(',','.'))
-                        if t4 > 800 or t4 < 0.0:
+            if self.qmc.reset():
+                f = QFile(filename)
+                if not f.open(QIODevice.ReadOnly):
+                    raise IOError(str(f.errorString()))
+                import csv
+                import io
+                csvFile = io.open(filename, 'r', encoding='utf-8')
+                csvReader = csv.DictReader(csvFile,["Date","Time","T1","T2","T3","T4"],delimiter='\t')
+                zero_t = None
+                roastdate = None
+                # we add an extra device if needed
+                if len(self.qmc.extradevices) == 0:
+                    self.addDevice()
+                for item in csvReader:
+                    try:
+                        #set date
+                        if not roastdate:
+                            roastdate = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                            self.qmc.roastdate = roastdate
+                        #set zero
+                        if not zero_t:
+                            date = QDate.fromString(item['Date'],"dd'.'MM'.'yyyy")
+                            zero = QDateTime()
+                            zero.setDate(date)
+                            zero.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                            zero_t = zero.toTime_t()
+    # The K204 export does not contain a trace of the temperature mode.
+    # We have to assume here that the mode was set correctly before the import.
+                        #add one measurement
+                        dt = QDateTime()
+                        dt.setDate(QDate.fromString(item['Date'],"dd'.'MM'.'yyyy"))
+                        dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                        tx = float(dt.toTime_t() - zero_t)
+                        self.qmc.timex.append(tx)
+                        t1 = float(item['T1'].replace(',','.'))
+                        if t1 > 800 or t1 < 0.0:
+                            t1 = 0.0
+                        self.qmc.temp1.append(t1)
+                        t2 = float(item['T2'].replace(',','.'))
+                        if t2 > 800 or t2 < 0.0:
                             t2 = 0.0
-                        self.qmc.extratemp2[0].append(t4)
-                except ValueError:
-                    pass
-            csvFile.close()
-            #swap temperature curves if needed such that BT is the lower and ET the upper one
-            if (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
-                tmp = self.qmc.temp1
-                self.qmc.temp1 = self.qmc.temp2
-                self.qmc.temp2 = tmp
-            self.qmc.endofx = self.qmc.timex[-1]
-            self.sendmessage(QApplication.translate("Message","K204 file loaded successfully", None, QApplication.UnicodeUTF8))
-            self.qmc.redraw()
+                        self.qmc.temp2.append(t2)
+                        if len(self.qmc.extradevices) > 0:
+                            self.qmc.extratimex[0].append(tx)
+                            t3 = float(item['T3'].replace(',','.'))
+                            if t3 > 800 or t3 < 0.0:
+                                t3 = 0.0
+                            self.qmc.extratemp1[0].append(t3)
+                            t4 = float(item['T4'].replace(',','.'))
+                            if t4 > 800 or t4 < 0.0:
+                                t2 = 0.0
+                            self.qmc.extratemp2[0].append(t4)
+                    except ValueError:
+                        pass
+                csvFile.close()
+                #swap temperature curves if needed such that BT is the lower and ET the upper one
+                if (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
+                    tmp = self.qmc.temp1
+                    self.qmc.temp1 = self.qmc.temp2
+                    self.qmc.temp2 = tmp
+                self.qmc.endofx = self.qmc.timex[-1]
+                self.sendmessage(QApplication.translate("Message","K204 file loaded successfully", None, QApplication.UnicodeUTF8))
+                self.qmc.redraw()
         except IOError as ex:
             aw.qmc.adderror(QApplication.translate("Error Message","IO Error: importK204(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
         except ValueError as ex:
@@ -10663,54 +10750,54 @@ $cupping_notes
             filename = self.ArtisanOpenFileDialog(msg=QApplication.translate("Message","Import HH506RA CSV", None, QApplication.UnicodeUTF8))
             if len(filename) == 0:
                 return
-            self.qmc.reset()
-            f = QFile(filename)
-            if not f.open(QIODevice.ReadOnly):
-                raise IOError(str(f.errorString()))
-            import csv
-            import io
-            csvFile = io.open(filename, 'r', encoding='utf-8')
-            data = csv.reader(csvFile,delimiter='\t')
-            #read file header
-            header = next(data)
-            zero = QDateTime()
-            date = QDate.fromString(header[0].split('Date:')[1],"yyyy'/'MM'/'dd")
-            self.qmc.roastdate = date
-            zero.setDate(date)
-            zero.setTime(QTime.fromString(header[1].split('Time:')[1],"hh':'mm':'ss"))
-            zero_t = zero.toTime_t()
-            #read column headers
-            fields = next(data)
-            unit = None
-            #read data
-            for row in data:
-                items = list(zip(fields, row))
-                item = {}
-                for (name, value) in items:
-                    item[name] = value.strip()
-                #set temperature mode
-                if not unit:
-                    unit = item['Unit']
-                    if unit == "F" and self.qmc.mode == "C":
-                        self.qmc.fahrenheitMode()
-                    if unit == "C" and self.qmc.mode == "F":
-                        self.qmc.celsiusMode()
-                #add one measurement
-                dt = QDateTime()
-                dt.setDate(QDate.fromString(item['Date'],"yyyy'/'MM'/'dd"))
-                dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
-                self.qmc.timex.append(float(dt.toTime_t() - zero_t))
-                self.qmc.temp1.append(float(item['T1']))
-                self.qmc.temp2.append(float(item['T2']))
-            csvFile.close()
-            #swap temperature curves if needed such that BT is the lower and ET the upper one
-            if (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
-                tmp = self.qmc.temp1
-                self.qmc.temp1 = self.qmc.temp2
-                self.qmc.temp2 = tmp
-            self.qmc.endofx = self.qmc.timex[-1]
-            self.sendmessage(QApplication.translate("Message","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
-            self.qmc.redraw()
+            if self.qmc.reset():
+                f = QFile(filename)
+                if not f.open(QIODevice.ReadOnly):
+                    raise IOError(str(f.errorString()))
+                import csv
+                import io
+                csvFile = io.open(filename, 'r', encoding='utf-8')
+                data = csv.reader(csvFile,delimiter='\t')
+                #read file header
+                header = next(data)
+                zero = QDateTime()
+                date = QDate.fromString(header[0].split('Date:')[1],"yyyy'/'MM'/'dd")
+                self.qmc.roastdate = date
+                zero.setDate(date)
+                zero.setTime(QTime.fromString(header[1].split('Time:')[1],"hh':'mm':'ss"))
+                zero_t = zero.toTime_t()
+                #read column headers
+                fields = next(data)
+                unit = None
+                #read data
+                for row in data:
+                    items = list(zip(fields, row))
+                    item = {}
+                    for (name, value) in items:
+                        item[name] = value.strip()
+                    #set temperature mode
+                    if not unit:
+                        unit = item['Unit']
+                        if unit == "F" and self.qmc.mode == "C":
+                            self.qmc.fahrenheitMode()
+                        if unit == "C" and self.qmc.mode == "F":
+                            self.qmc.celsiusMode()
+                    #add one measurement
+                    dt = QDateTime()
+                    dt.setDate(QDate.fromString(item['Date'],"yyyy'/'MM'/'dd"))
+                    dt.setTime(QTime.fromString(item['Time'],"hh':'mm':'ss"))
+                    self.qmc.timex.append(float(dt.toTime_t() - zero_t))
+                    self.qmc.temp1.append(float(item['T1']))
+                    self.qmc.temp2.append(float(item['T2']))
+                csvFile.close()
+                #swap temperature curves if needed such that BT is the lower and ET the upper one
+                if (freduce(lambda x,y:x + y, self.qmc.temp2)) > freduce(lambda x,y:x + y, self.qmc.temp1):
+                    tmp = self.qmc.temp1
+                    self.qmc.temp1 = self.qmc.temp2
+                    self.qmc.temp2 = tmp
+                self.qmc.endofx = self.qmc.timex[-1]
+                self.sendmessage(QApplication.translate("Message","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
+                self.qmc.redraw()
         except IOError as ex:
             aw.qmc.adderror(QApplication.translate("Error Message","IO Error: importHH506RA(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
         except ValueError as ex:
@@ -10908,9 +10995,9 @@ $cupping_notes
 
     def loadWheel(self,filename):
         try:
-            f = QFile(str(filename))
+            f = QFile(u(filename))
             if not f.open(QIODevice.ReadOnly):
-                raise IOError(str(f.errorString()))
+                raise IOError(u(f.errorString()))
             stream = QTextStream(f)
             firstChar = stream.read(1)
             if firstChar == "{":
@@ -10970,13 +11057,13 @@ $cupping_notes
         string1 += "<LI><b>sqrt(x)</b> " + QApplication.translate("Message", "Return the square root of x.",None, QApplication.UnicodeUTF8)
         string1 += "<LI><b>tan(x)</b> " + QApplication.translate("Message", "Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8)
         string1 += "</UL>"
-        string2 = "<UL><LI><b>x</b>"
-        string2 += "<LI><b>Y1</b> " + QApplication.translate("Message", "ET curve value",None, QApplication.UnicodeUTF8) 
-        string2 += "<LI><b>Y2</b> " + QApplication.translate("Message", "BT curve value",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y3</b> " + QApplication.translate("Message", "Extra devices #1 curve 1",None, QApplication.UnicodeUTF8) 
-        string2 += "<LI><b>Y4</b> " + QApplication.translate("Message", "Extra devices #1 curve 2",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y5</b> " + QApplication.translate("Message", "Extra devices #2 curve 1",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y6</b> " + QApplication.translate("Message", "Extra devices #2 curve 2",None, QApplication.UnicodeUTF8)
+        string2 = "<UL><LI><b>x current curve value</b>"
+        string2 += "<LI><b>Y1</b> " + QApplication.translate("Message", "previous ET value",None, QApplication.UnicodeUTF8) 
+        string2 += "<LI><b>Y2</b> prev." + QApplication.translate("Message", "previous BT value",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y3</b> prev." + QApplication.translate("Message", "previous Extra #1 T1 value",None, QApplication.UnicodeUTF8) 
+        string2 += "<LI><b>Y4</b> prev." + QApplication.translate("Message", "previous Extra #1 T2 value",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y5</b> prev." + QApplication.translate("Message", "previous Extra #2 T1 value",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y6</b> prev." + QApplication.translate("Message", "previous Extra #2 T2 value",None, QApplication.UnicodeUTF8)
         string2 += "<LI><b>...</b> "
         string2 += "</UL>"
         #format help
@@ -11045,13 +11132,13 @@ $cupping_notes
     #assigns tooltips to extra event buttons
     def settooltip(self):
         for i in range(len(self.buttonlist)):
-            tip = str(QApplication.translate("Tooltip","<b>Label</b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventslabels[i]) + "<br>"
-            tip += str(QApplication.translate("Tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventsdescriptions[i]) + "<br>"
+            tip = u(QApplication.translate("Tooltip","<b>Label</b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventslabels[i]) + "<br>"
+            tip += u(QApplication.translate("Tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsdescriptions[i]) + "<br>"
             if self.extraeventstypes[i] < 4:
-                tip += str(QApplication.translate("Tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8)) + str(self.qmc.etypes[self.extraeventstypes[i]]) + "<br>"
-                tip += str(QApplication.translate("Tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventsvalues[i]-1) + "<br>" 
-            tip += str(QApplication.translate("Tooltip","<b>Documentation </b>= ", None, QApplication.UnicodeUTF8)) + str(self.extraeventsactionstrings[i]) + "<br>"
-            tip += str(QApplication.translate("Tooltip","<b>Button# </b>= ", None, QApplication.UnicodeUTF8)) + str(i+1)
+                tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8)) + u(self.qmc.etypes[self.extraeventstypes[i]]) + "<br>"
+                tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsvalues[i]-1) + "<br>" 
+            tip += u(QApplication.translate("Tooltip","<b>Documentation </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsactionstrings[i]) + "<br>"
+            tip += u(QApplication.translate("Tooltip","<b>Button# </b>= ", None, QApplication.UnicodeUTF8)) + str(i+1)
             self.buttonlist[i].setToolTip(tip) 
 
     def update_extraeventbuttons_visibility(self):
@@ -11134,9 +11221,9 @@ $cupping_notes
 
     def loadPalettes(self,filename):
         try:
-            f = QFile(str(filename))
+            f = QFile(u(filename))
             if not f.open(QIODevice.ReadOnly):
-                raise IOError(str(f.errorString()))
+                raise IOError(u(f.errorString()))
             stream = QTextStream(f)
             firstChar = stream.read(1)
             if firstChar == "{":
@@ -15345,6 +15432,7 @@ class flavorDlg(ArtisanDialog):
 
     def closeEvent(self,_):
         self.savetable()
+        aw.qmc.safesaveflag = True
         self.accept()
         aw.qmc.redraw(recomputeAllDeltas=False)
 
@@ -15667,14 +15755,14 @@ class backgroundDlg(ArtisanDialog):
 
     def load(self):
         self.filename = aw.ArtisanOpenFileDialog()
-        if len(str(self.filename)) == 0:
+        if len(u(self.filename)) == 0:
             self.status.showMessage(QApplication.translate("StatusBar","Empty file path",None, QApplication.UnicodeUTF8),5000)
             return
         self.status.showMessage(QApplication.translate("StatusBar","Reading file...",None, QApplication.UnicodeUTF8),5000)
-        aw.qmc.backgroundpath = str(self.filename)
+        aw.qmc.backgroundpath = u(self.filename)
         aw.qmc.resetlinecountcaches()
-        aw.loadbackground(str(self.filename))
-        self.pathedit.setText(self.filename)
+        aw.loadbackground(u(self.filename))
+        self.pathedit.setText(u(self.filename))
         self.backgroundCheck.setChecked(True)
         self.readChecks()
         self.createEventTable()
@@ -16894,6 +16982,7 @@ class serialport(object):
                 r = self.SP.read(14)
                 if len(r) == 14:
                     #we convert the hex strings to integers. Divide by 10.0 (decimal position)
+                    r = r.replace(' ','0')
                     return int(r[1:5],16)/10., int(r[7:11],16)/10.
                 else:
                     nbytes = len(r)
@@ -18649,20 +18738,20 @@ class comportDlg(ArtisanDialog):
             return
         QDialog.accept(self)
 
-    def scanforport(self):
-        try:
-            aw.ser.closeport()
-            available = []
-            if platf in ('Windows', 'Microsoft'):
-                #scans serial ports in Windows computer
-                for i in range(100):
-                    try:
-                        s = serial.Serial(i)
-                        available.append(s.portstr)
-                        s.close()
-                    except serial.SerialException:
-                        pass
-            elif platf == 'Darwin':
+    # returns a list of strings indicating available serial ports
+    def serialports(self):
+        available = []
+        if platf in ('Windows', 'Microsoft'):
+            #scans serial ports in Windows computer
+            for i in range(100):
+                try:
+                    s = serial.Serial(i)
+                    available.append(s.portstr)
+                    s.close()
+                except serial.SerialException:
+                    pass
+        elif platf == 'Darwin':
+            if float(serial.VERSION) < 2.6:
                 #scans serial ports in Mac computer
                 for name in glob.glob("/dev/cu.*"):
                     if name.upper().rfind("MODEM") < 0:
@@ -18672,7 +18761,11 @@ class comportDlg(ArtisanDialog):
                             available.append(name)
                         except Exception:
                             pass
-            elif platf == 'Linux':
+            else:
+                from serial.tools import list_ports
+                available = list([port[0] for port in list_ports.comports() if not(port[0] in ['/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem'])])
+        elif platf == 'Linux':
+            if float(serial.VERSION) < 2.6:
                 maxnum=9
                 for prefix in ["/dev/ttyS", "/dev/cua", "/dev/ttyUSB","/dev/usb/ttyUSB", "/dev/usb/tts/"]:
                     for num in range(maxnum+1):
@@ -18686,8 +18779,17 @@ class comportDlg(ArtisanDialog):
                         except Exception:
                             pass
             else:
-                self.sendmessage(QApplication.translate("Message","Port scan on this platform not yet supported", None, QApplication.UnicodeUTF8))
-            #set comboBoxes
+                from serial.tools import list_ports
+                available = list([port[0] for port in list_ports.comports()])
+        else:
+            self.sendmessage(QApplication.translate("Message","Port scan on this platform not yet supported", None, QApplication.UnicodeUTF8))
+        return available
+
+
+    def scanforport(self):
+        try:
+            available = self.serialports()
+            aw.ser.closeport()            #set comboBoxes
             self.comportEdit.clear()
             self.comportEdit.addItems(available)
             self.modbus_comportEdit.clear()
@@ -20984,7 +21086,10 @@ class AlarmDlg(ArtisanDialog):
             cond = self.alarmtable.cellWidget(i,5)
             aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
             temp = self.alarmtable.cellWidget(i,6)
-            aw.qmc.alarmtemperature[i] = int(str(temp.text()))
+            try:
+                aw.qmc.alarmtemperature[i] = int(str(temp.text()))
+            except:
+                aw.qmc.alarmtemperature[i] = 0
             action = self.alarmtable.cellWidget(i,7)
             aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
             description = self.alarmtable.cellWidget(i,8)
