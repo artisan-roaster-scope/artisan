@@ -73,7 +73,7 @@ import string as libstring
 import cgi
 import codecs
 import numpy
-import struct
+#import struct
 
 # write logtrace to Console on OS X:
 #try:
@@ -181,6 +181,35 @@ else:
 
 platf = str(platform.system())
 
+#######################################################################################
+#################### minimal modbus monkey patch to support little-endian  ############
+#################### little-endian in addition to big-endian for floats    ############
+#######################################################################################
+
+def littleEndianBytestringToFloat(bytestring, numberOfRegisters=2):
+    """Convert a four-byte string to a float.
+
+    """
+    minimalmodbus._checkString(bytestring, minlength=4, maxlength=8, description='bytestring')
+    minimalmodbus._checkInt(numberOfRegisters, minvalue=2, maxvalue=4, description='number of registers')
+
+    numberOfBytes = minimalmodbus._NUMBER_OF_BYTES_PER_REGISTER * numberOfRegisters
+
+    formatcode = '<'  # Little-endian
+    if numberOfRegisters == 2:
+        formatcode += 'f'  # Float (4 bytes)
+    elif numberOfRegisters == 4:
+        formatcode += 'd'  # Double (8 bytes)
+    else:
+        raise ValueError('Wrong number of registers! Given value is {0!r}'.format(numberOfRegisters))
+
+    if len(bytestring) != numberOfBytes:
+        raise ValueError('Wrong length of the byte string! Given value is {0!r}, and numberOfRegisters is {1!r}.'.\
+            format(bytestring, numberOfRegisters))
+
+    return minimalmodbus._unpack(formatcode, bytestring)
+    
+bigEndianBytestringToFloat = minimalmodbus._bytestringToFloat
 
 #######################################################################################
 #################### Main Application  ################################################
@@ -420,7 +449,7 @@ class tgraphcanvas(FigureCanvas):
                        "VOLTCRAFT K201",        #30
                        "Amprobe TMD-56",        #31
                        "+ArduinoTC4_56",        #32
-                       "+MODBU_34",             #33
+                       "+MODBUS_34",            #33
                        "-Omega HH806W"          #34 NOT WORKING 
                        ]
 
@@ -498,6 +527,23 @@ class tgraphcanvas(FigureCanvas):
         #relative humidity percentage [0], corresponding temperature [1], temperature unit [2]
         self.bag_humidity = [0.,0.]
         self.beansize = 0.0
+        
+        self.whole_color = 0
+        self.ground_color = 0
+        self.color_systems = ["","Moppette","Colorette","ColorTrack","Agtron Gourmet","Agtron Commercial"]
+        self.color_system_idx = 0
+        
+        # roast property flags
+        self.heavyFC_flag = False
+        self.lowFC_flag = False
+        self.lightCut_flag = False
+        self.darkCut_flag = False
+        self.drops_flag = False
+        self.oily_flag = False        
+        self.uneven_flag = False
+        self.tipping_flag = False
+        self.scorching_flag = False
+        self.divots_flag = False
 
         #list to store the time of each reading. Most IMPORTANT variable.
         self.timex = []
@@ -852,7 +898,7 @@ class tgraphcanvas(FigureCanvas):
         self.filterDropOut_tmin = self.filterDropOut_tmin_F_default
         self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
         self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
-        
+
         ###########################         wheel graph variables     ################################
         self.wheelflag = False
         #data containers for wheel
@@ -978,13 +1024,13 @@ class tgraphcanvas(FigureCanvas):
         else:
             return u(value)
 
-    # 10.0 to "10" and 1.1 to "1"
+    # 100.0 to "10" and 10.1 to "1"
     def eventsvaluesShort(self,v):
         value = self.eventsInternal2ExternalValue(v)
         if value < 0:
             return ""
         else:
-            return u(round(value / 10))
+            return u(int(round(value / 10)))
 
     # the inverse to eventsvalues above (string -> value)
     def str2eventsvalue(self,s):
@@ -998,7 +1044,7 @@ class tgraphcanvas(FigureCanvas):
         if event.button==3 and event.inaxes and not self.designerflag:
             timex = self.time2index(event.xdata)
             if timex:
-                if (self.temp2[timex] < event.ydata + 20) and (self.temp2[timex] > event.ydata - 20):
+                if (len(self.temp2) > timex and self.temp2[timex] < event.ydata + 20) and (self.temp2[timex] > event.ydata - 20):
                     count = 0
                     menu = QMenu(self) 
                     # populate menu
@@ -1623,7 +1669,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.seriallog = []
         
                 self.specialevents = []
-                self.specialeventstype = [] 
+                self.specialeventstype = []
                 self.specialeventsStrings = []
                 self.specialeventsvalue = []
                 self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
@@ -1641,6 +1687,22 @@ class tgraphcanvas(FigureCanvas):
                 self.endofx = self.resetmaxtime 
                 if self.endofx < 1:
                     self.endofx = 60
+                    
+                #roast flags
+                aw.qmc.heavyFC_flag = False
+                aw.qmc.lowFC_flag = False
+                aw.qmc.lightCut_flag = False
+                aw.qmc.darkCut_flag = False
+                aw.qmc.drops_flag = False
+                aw.qmc.oily_flag = False
+                aw.qmc.uneven_flag = False
+                aw.qmc.tipping_flag = False
+                aw.qmc.scorching_flag = False
+                aw.qmc.divots_flag = False
+                
+                #color variables
+                aw.qmc.whole_color = 0
+                aw.qmc.ground_color = 0
         
                 #Designer variables
                 self.indexpoint = 0
@@ -1698,28 +1760,54 @@ class tgraphcanvas(FigureCanvas):
             if redraw:
                 self.redraw(False)
             return True
-
-    # smoothes a list of values 'x' at taken at times indicated by the numbers in list 'y'
+            
+    def medfilt(self, x, k):
+        """Apply a length-k median filter to a 1D array x.
+        Boundaries are extended by repeating endpoints.
+        """
+        assert k % 2 == 1, "Median filter length must be odd."
+        assert x.ndim == 1, "Input must be one-dimensional."
+        k2 = (k - 1) // 2
+        y = numpy.zeros ((len (x), k), dtype=x.dtype)
+        y[:,k2] = x
+        for i in range (k2):
+            j = k2 - i
+            y[j:,i] = x[:-j]
+            y[:j,i] = x[0]
+            y[:-j,-(i+1)] = x[j:]
+            y[-j:,-(i+1)] = x[-1]
+        return numpy.median(y, axis=1)
+       
+    # smoothes a list of values 'y' at taken at times indicated by the numbers in list 'x'
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
     # 'flat' results in moving average
     # window_len should be odd
-    def smooth(self, y, x, window_len=15, window='hanning'):
+    # first applies a median filter to remove spikes if filterDoppOuts is True
+    def smooth(self, x, y, window_len=15, window='hanning'):
         try:
-            if window_len > 2 and len(y) == len(x) and len(y) > 1:
-                s = numpy.r_[2*x[0]-x[window_len:1:-1],x,2*x[-1]-x[-1:-window_len:-1]]
-                if window == 'flat': #moving average
-                    w = numpy.ones(window_len,'d')
+            if len(x) == len(y) and len(x) > 1:
+                # filter spikes
+                if aw.qmc.filterDoppOuts:
+                    y = self.medfilt(y,5) # k=3 seems not to catch all spikes in all cases
+                if window_len > 2 and len(x) == len(y) and len(x) > 1:
+                    # smooth curves
+                    s = numpy.r_[2*x[0]-y[window_len:1:-1],y,2*y[-1]-y[-1:-window_len:-1]]
+                    if window == 'flat': #moving average
+                        w = numpy.ones(window_len,'d')
+                    else:
+                        w = eval('numpy.'+window+'(window_len)')
+                    ys = numpy.convolve(w/w.sum(),s,mode='same')
+                    res = (ys[window_len-1:-window_len+1])
+    #                res = (ys[window_len-2:-window_len]) # this one seems to move the curve slightly to the right
+                    res = numpy.concatenate((y[:window_len/2],res[window_len/2:]))
+                    if len(res) != len(y):
+                        return y
+                    else:
+                        return res
                 else:
-                    w = eval('numpy.'+window+'(window_len)')
-                xs = numpy.convolve(w/w.sum(),s,mode='same')
-#                res = (xs[window_len-1:-window_len+1])
-                res = (xs[window_len-2:-window_len])
-                if len(res) != len(x):
-                    return x
-                else:
-                    return res
+                    return y
             else:
-                return x
+                return y
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -1729,7 +1817,11 @@ class tgraphcanvas(FigureCanvas):
 
     def smooth_list(self, a, b, window_len=7, window='hanning'):
         #pylint: disable=E1103
-        return self.smooth(numpy.array(a),numpy.array(b),window_len,window='hanning').tolist()
+        if aw.qmc.timeindex[0] != -1: # if CHARGE is set, filter before and after CHARGE parts separately
+            return numpy.concatenate((self.smooth(numpy.array(a[:aw.qmc.timeindex[0]]),numpy.array(b[:aw.qmc.timeindex[0]]),window_len,window),
+                self.smooth(numpy.array(a[aw.qmc.timeindex[0]:]),numpy.array(b[aw.qmc.timeindex[0]:]),window_len,window))).tolist()
+        else:
+            return self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):
         #annotate temp
@@ -1868,7 +1960,8 @@ class tgraphcanvas(FigureCanvas):
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
-    def redraw(self, recomputeAllDeltas=True, smooth=False, resmooth=False):
+    def redraw(self, recomputeAllDeltas=True, smooth=False):
+#        print("redraw",recomputeAllDeltas,smooth)
         try:
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
@@ -1887,7 +1980,8 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
             self.ax.set_title(self.title,size=20,color=self.palette["title"])
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
-            if (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag:
+            two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag
+            if two_ax_mode:
                 #create a second set of axes in the same position as self.ax
                 self.delta_ax = self.ax.twinx()
                 self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
@@ -1982,14 +2076,14 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.flagon:
                     self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
                 else:
-                    if smooth or resmooth or len(self.stemp1) != len(self.timex):
+                    if smooth or len(self.stemp1) != len(self.timex):
                         self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
                     self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=str(QApplication.translate("Scope Label", "ET", None, QApplication.UnicodeUTF8)))
             if aw.qmc.BTcurve:
                 if aw.qmc.flagon:
                     self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
                 else:
-                    if smooth or resmooth or len(self.stemp2) != len(self.timex):
+                    if smooth or len(self.stemp2) != len(self.timex):
                         self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
                     self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=str(QApplication.translate("Scope Label", "BT", None, QApplication.UnicodeUTF8)))
 
@@ -2000,14 +2094,14 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.flagon:
                         self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
                     else:                    
-                        if smooth or resmooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
+                        if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
                             self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
                         self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
                 if aw.extraCurveVisibility2[i]:
                     if aw.qmc.flagon:
                         self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
                     else:
-                        if smooth or resmooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
+                        if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
                             self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
                         self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
 
@@ -2060,7 +2154,7 @@ class tgraphcanvas(FigureCanvas):
                             height = 20
 
                         for p in range(len(self.backgroundEvents)):
-                            st1 = str(self.Betypes[self.backgroundEtypes[p]][0] + self.eventsvalues(self.backgroundEvalues[p]))
+                            st1 = str(self.Betypes[self.backgroundEtypes[p]][0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
                             if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
                                 temp = self.temp1B[self.backgroundEvents[p]]
                             else:
@@ -2311,7 +2405,10 @@ class tgraphcanvas(FigureCanvas):
 
             #write legend
             if self.legendloc:
-                self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+                if two_ax_mode:
+                    self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+                else:
+                    self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
             ############  ready to plot ############
             self.fig.canvas.draw()
@@ -2398,21 +2495,21 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit = 50
         self.zlimit_min = 0
         self.zgrid = 10
-        # configure dropfilter
-        aw.qmc.filterDropOut_tmin = aw.qmc.filterDropOut_tmin_F_default
-        aw.qmc.filterDropOut_tmax = aw.qmc.filterDropOut_tmax_F_default
-        aw.qmc.filterDropOut_spikeRoR_dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit_F_default
 
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
             self.phases[i] = int(round(self.fromCtoF(self.phases[i])))
         self.ax.set_ylabel("F",size=16,color = self.palette["ylabel"]) #Write "F" on Y axis
         self.mode = "F"
-        if aw: # during initialization aw is still None
+        if aw: # during initialization aw is still None!
             aw.FahrenheitAction.setDisabled(True)
             aw.CelsiusAction.setEnabled(True)
             aw.ConvertToFahrenheitAction.setDisabled(True)
             aw.ConvertToCelsiusAction.setEnabled(True)
+            # configure dropfilter
+            aw.qmc.filterDropOut_tmin = aw.qmc.filterDropOut_tmin_F_default
+            aw.qmc.filterDropOut_tmax = aw.qmc.filterDropOut_tmax_F_default
+            aw.qmc.filterDropOut_spikeRoR_dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit_F_default
 
     #sets the graph display in Celsius mode
     def celsiusMode(self):
@@ -2422,10 +2519,6 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit = 50
         self.zlimit_min = 0
         self.zgrid = 10
-        # configure dropfilter
-        aw.qmc.filterDropOut_tmin = aw.qmc.filterDropOut_tmin_C_default
-        aw.qmc.filterDropOut_tmax = aw.qmc.filterDropOut_tmax_C_default
-        aw.qmc.filterDropOut_spikeRoR_dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit_C_default
         
         #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
         for i in range(4):
@@ -2437,6 +2530,10 @@ class tgraphcanvas(FigureCanvas):
             aw.FahrenheitAction.setEnabled(True)
             aw.ConvertToCelsiusAction.setDisabled(True)
             aw.ConvertToFahrenheitAction.setEnabled(True)
+            # configure dropfilter
+            aw.qmc.filterDropOut_tmin = aw.qmc.filterDropOut_tmin_C_default
+            aw.qmc.filterDropOut_tmax = aw.qmc.filterDropOut_tmax_C_default
+            aw.qmc.filterDropOut_spikeRoR_dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit_C_default
 
     def fahrenheitModeRedraw(self):
         self.fahrenheitMode()
@@ -2703,10 +2800,10 @@ class tgraphcanvas(FigureCanvas):
 
     def OffMonitor(self):
         # first activate "Stopping Mode" to ensure that sample() is not reseting the timer now (independent of the flagstart state)
-        self.flagstopping = True
         # stop Recorder if still running
         if self.flagstart:
             self.OffRecorder()
+        self.flagstopping = True
         self.flagon = False
         # now wait until the sampling thread successfully terminates
         while self.flagstopping:
@@ -5015,58 +5112,74 @@ class SampleThread(QThread):
     # dropout filter
     # if temp (the actual reading) is outside of the interval [tmin,tmax] or
     # a spike is detected, the previous value is repeated or if that happend already before, -1 is returned
+    # note that here we assume that the actual measured temperature time/temp was not already added to the list of previous measurements timex/tempx
     def filterDropOuts(self,timex,tempx,time,temp):
-        #########################
-        # a) detect overflows
-        wrong_reading = False
-        if aw.qmc.filterDoppOuts and (temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax):
-            wrong_reading = True
-        #########################
-        # b) detect spikes
-        n = aw.qmc.filterDropOut_spikeRoR_period
-        dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
-        if aw.qmc.filterDoppOuts and not wrong_reading and len(tempx) >= n:
-            # no min/max overflow detected
-            # check if RoR caused by actual measurement is way higher then the previous one
-            # calc previous RoR (pRoR) taking the last n samples into account
-            pdtemp = tempx[-1] - tempx[-n]
-            pdtime = timex[-1] - timex[-n]
-            pRoR = abs(pdtemp/pdtime)
-            dtemp = tempx[-1] - temp
-            dtime = timex[-1] - time
-            RoR = abs(dtemp/dtime)
-            if RoR > pRoR + dRoR_limit:
-                wrong_reading = True
-        #########################
-        # c) handle outliers if it could be detected
-        if wrong_reading:
-            aw.qmc.adderror("Warning: drop filtered")
-            # simple repeat strategy
-            if len(tempx) > 0 and tempx[-1] != -1:
-                # repeate last correct reading if not done before
-                if len(tempx) > 1 and tempx[-1] != tempx[-2]:
-                    return temp
-                elif len(tempx) == 1:
-                    return tempx[-1]
+        try:
+            #########################
+            # a) detect overflows
+            wrong_reading = 0
+            if temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax:
+                wrong_reading = 1
+            #########################
+            # b) detect spikes
+# NOTE: for now we do the spike outliers removal within the smooth() function without modifying the real data
+#            n = aw.qmc.filterDropOut_spikeRoR_period
+#            dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
+#            if aw.qmc.filterDoppOuts and not wrong_reading and len(tempx) >= n:
+#                # no min/max overflow detected
+#                # check if RoR caused by actual measurement is way higher then the previous one
+#                # calc previous RoR (pRoR) taking the last n samples into account
+#                pdtemp = tempx[-1] - tempx[-n]
+#                pdtime = timex[-1] - timex[-n]
+#                pRoR = abs(pdtemp/pdtime)
+#                dtemp = tempx[-1] - temp
+#                dtime = timex[-1] - time
+#                RoR = abs(dtemp/dtime)
+#                if RoR > pRoR + dRoR_limit:
+#                    wrong_reading = 2
+            #########################
+            # c) handle outliers if it could be detected
+            if wrong_reading:
+                if wrong_reading == 1:
+                    #aw.sendmessage(QApplication.translate("Message","Overflow detected",None, QApplication.UnicodeUTF8))
+                    pass
+                elif wrong_reading == 2:
+                    aw.sendmessage(QApplication.translate("Message","Spike detected",None, QApplication.UnicodeUTF8))
+                # simple repeat strategy
+                if len(tempx) > 0 and tempx[-1] != -1:
+                    # repeate last correct reading if not done before
+                    if len(tempx) > 1 and tempx[-1] != tempx[-2]:
+                        return temp
+                    elif len(tempx) == 1:
+                        return tempx[-1]
+                    else:
+                        return -1
                 else:
+                    # no way to correct this
                     return -1
+                    
+                # strategy based on previous RoR assuming a constant RoR [overly complex!]
+    #            # be careful with this RoR based filter as RoR might be very incorrect for short delta-times
+    #            m = aw.qmc.filterDropOut_replaceRoR_period
+    #            if len(tempx) >= m and tempx[-1] != -1 and tempx[-m] != -1 and tempx[-1] != 0 and tempx[-m] != 0:
+    #                # let's use the last m readings to compute the last RoR and
+    #                # replace the false reading by a computed one assuming that the
+    #                # RoR does not change
+    #                dtemp = tempx[-1] - tempx[-m] # dt is positive if RoR is
+    #                dtime = timex[-1] - timex[-m] # always positive
+    #                RoR = dtemp/dtime
+    #                return tempx[-1] + RoR * (time - timex[-1])
+    
             else:
-                # no way to correct this
-                return -1
-                
-            # strategy based on previous RoR assuming a constant RoR
-#            # be careful with this RoR based filter as RoR might be very incorrect for short delta-times
-#            m = aw.qmc.filterDropOut_replaceRoR_period
-#            if len(tempx) >= m and tempx[-1] != -1 and tempx[-m] != -1 and tempx[-1] != 0 and tempx[-m] != 0:
-#                # let's use the last m readings to compute the last RoR and
-#                # replace the false reading by a computed one assuming that the
-#                # RoR does not change
-#                dtemp = tempx[-1] - tempx[-m] # dt is positive if RoR is
-#                dtime = timex[-1] - timex[-m] # always positive
-#                RoR = dtemp/dtime
-#                return tempx[-1] + RoR * (time - timex[-1])
-
-        else:
+                # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)
+                if len(tempx) > 1 and tempx[-1] == tempx[-2]: # previous reading was a drop and replaced by reading[-2]
+                    tempx[-1] = (tempx[-2] + temp) / 2.0
+                return temp
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: filterDropOuts() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)            
             return temp
 
     # sample devices at interval self.delay miliseconds.
@@ -5369,13 +5482,13 @@ class SampleThread(QThread):
                 #apply sampling interval here
                 libtime.sleep(dt)
             else:
+                aw.qmc.flagstopping = False # we signal that we stopped sampling
                 try:
                     if aw.ser.SP.isOpen():
                         aw.ser.closeport()
                     QApplication.processEvents()
                 except:
                     pass
-                aw.qmc.flagstopping = False # we signal that we stopped sampling
                 self.quit()
                 break  #thread ends
 
@@ -5417,8 +5530,10 @@ class ApplicationWindow(QMainWindow):
         #flag to reset Qsettings
         self.resetqsettings = 0
 
-        # self.profilepath is obteined at dirstruct() and points to profiles/year/month. file-open/save will point to profilepath
+        # self.profilepath is obteined at dirstruct() and points to profiles/year/month file-open/save will point to profilepath
         self.profilepath = ""
+        if platf == 'Darwin':
+            self.profilepath = QDir().homePath().append(QString("/Documents/"))
 
         # on the Mac preferences should be stored outside of applications in the users ~/Library/Preferences path
         if platf == 'Darwin':
@@ -5430,7 +5545,8 @@ class ApplicationWindow(QMainWindow):
             QDir().setCurrent(preference_path)
 
         #checks executable directory. dirstruct() checks or creates: /profile/year/month directory to store profiles
-        self.dirstruct()
+        self.dirstruct()        
+
 
         #defaults the users profile path to the standard profilepath (incl. month/year subdirectories)
         self.userprofilepath = self.profilepath
@@ -5458,16 +5574,16 @@ class ApplicationWindow(QMainWindow):
         #this holds the index of the HUD functions above
         self.HUDfunction = 0
 
-        self.sound = soundcrack(QWidget)
+#        self.sound = soundcrack(QWidget)
         self.stack = QStackedWidget()
         self.stack.addWidget(self.qmc)
         self.stack.addWidget(self.HUD)
-        self.stack.addWidget(self.sound)
+#        self.stack.addWidget(self.sound)
         self.stack.setCurrentIndex(0)
         self.stack.setContentsMargins(0,0,0,0)
         self.qmc.setContentsMargins(0,0,0,0)
         self.HUD.setContentsMargins(0,0,0,0)
-        self.sound.setContentsMargins(0,0,0,0)
+#        self.sound.setContentsMargins(0,0,0,0)
         #events config
         self.eventsbuttonflag = 1
         self.minieventsflag = 0   #minieditor flag
@@ -5792,26 +5908,10 @@ class ApplicationWindow(QMainWindow):
         calculatorAction = QAction(UIconst.TOOLKIT_MENU_CALCULATOR,self)
         self.connect(calculatorAction,SIGNAL("triggered()"),self.calculator)
         self.ToolkitMenu.addAction(calculatorAction)
-
-        self.wheelmenu = self.ToolkitMenu.addMenu(UIconst.TOOLKIT_MENU_WHEELGRAPH)
-
-        wheeleditorAction = QAction(QApplication.translate("Menu", "Editor",None, QApplication.UnicodeUTF8),self)
-        self.connect(wheeleditorAction,SIGNAL("triggered()"),self.graphwheel)
-        self.wheelmenu.addAction(wheeleditorAction)
-
-        self.wheelmenu.addSeparator()
-
-        wheelcuppingAction = QAction(QApplication.translate("Menu", "Cupping Descriptors...",None, QApplication.UnicodeUTF8),self)
-        self.connect(wheelcuppingAction,SIGNAL("triggered()"),lambda folder="Cupping":self.qmc.loadselectorwheel(folder))
-        self.wheelmenu.addAction(wheelcuppingAction)
-
-        wheelroastingAction = QAction(QApplication.translate("Menu", "Roasting Descriptors...",None, QApplication.UnicodeUTF8),self)
-        self.connect(wheelroastingAction,SIGNAL("triggered()"),lambda folder="Roasting":self.qmc.loadselectorwheel(folder))
-        self.wheelmenu.addAction(wheelroastingAction)
-
-        wheelotherAction = QAction(QApplication.translate("Menu", "Other Descriptors...",None, QApplication.UnicodeUTF8),self)
-        self.connect(wheelotherAction,SIGNAL("triggered()"),lambda folder="Other":self.qmc.loadselectorwheel(folder))
-        self.wheelmenu.addAction(wheelotherAction)
+        
+        self.wheeleditorAction = QAction(UIconst.TOOLKIT_MENU_WHEELGRAPH,self)
+        self.connect(self.wheeleditorAction,SIGNAL("triggered()"),self.graphwheel)
+        self.ToolkitMenu.addAction(self.wheeleditorAction)
 
         self.ToolkitMenu.addSeparator()
 
@@ -5912,28 +6012,28 @@ class ApplicationWindow(QMainWindow):
         self.button_3.setFocusPolicy(Qt.NoFocus)
         self.button_3.setStyleSheet(self.pushbuttonstyles["FC START"])
         self.button_3.setMinimumHeight(50)
-        self.button_3.setToolTip(QApplication.translate("Tooltip", "Marks the begining of First Crack (FC)", None, QApplication.UnicodeUTF8))
+        self.button_3.setToolTip(QApplication.translate("Tooltip", "Marks the begining of First Crack (FCs)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_3, SIGNAL("clicked()"), self.qmc.mark1Cstart)
 
         self.button_4 = QPushButton(QApplication.translate("Button", "FC\nEND", None, QApplication.UnicodeUTF8))
         self.button_4.setFocusPolicy(Qt.NoFocus)
         self.button_4.setStyleSheet(self.pushbuttonstyles["FC END"])
         self.button_4.setMinimumHeight(50)
-        self.button_4.setToolTip(QApplication.translate("Tooltip", "Marks the end of First Crack (FC)", None, QApplication.UnicodeUTF8))
+        self.button_4.setToolTip(QApplication.translate("Tooltip", "Marks the end of First Crack (FCs)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_4, SIGNAL("clicked()"), self.qmc.mark1Cend)
 
         self.button_5 = QPushButton(QApplication.translate("Button", "SC\nSTART", None, QApplication.UnicodeUTF8))
         self.button_5.setFocusPolicy(Qt.NoFocus)
         self.button_5.setStyleSheet(self.pushbuttonstyles["SC START"])
         self.button_5.setMinimumHeight(50)
-        self.button_5.setToolTip(QApplication.translate("Tooltip", "Marks the begining of Second Crack (SC)", None, QApplication.UnicodeUTF8))
+        self.button_5.setToolTip(QApplication.translate("Tooltip", "Marks the begining of Second Crack (SCs)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_5, SIGNAL("clicked()"), self.qmc.mark2Cstart)
 
         self.button_6 = QPushButton(QApplication.translate("Button", "SC\nEND", None, QApplication.UnicodeUTF8))
         self.button_6.setFocusPolicy(Qt.NoFocus)
         self.button_6.setStyleSheet(self.pushbuttonstyles["SC END"])
         self.button_6.setMinimumHeight(50)
-        self.button_6.setToolTip(QApplication.translate("Tooltip", "Marks the end of Second Crack (SC)", None, QApplication.UnicodeUTF8))
+        self.button_6.setToolTip(QApplication.translate("Tooltip", "Marks the end of Second Crack (SCe)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_6, SIGNAL("clicked()"), self.qmc.mark2Cend)
 
         #create RESET button
@@ -6850,7 +6950,7 @@ class ApplicationWindow(QMainWindow):
         self.temperatureMenu.setEnabled(True)
         self.languageMenu.setEnabled(True)
         self.designerAction.setEnabled(True)
-        self.wheelmenu.setEnabled(True)
+        self.wheeleditorAction.setEnabled(True)
         self.resetAction.setEnabled(True)
 
     def disableEditMenus(self):
@@ -6867,7 +6967,7 @@ class ApplicationWindow(QMainWindow):
         self.temperatureMenu.setEnabled(False)
         self.languageMenu.setEnabled(False)
         self.designerAction.setEnabled(False)
-        self.wheelmenu.setEnabled(False)
+        self.wheeleditorAction.setEnabled(False)
         self.resetAction.setEnabled(False)
 
     def update_minieventline_visibility(self):
@@ -7257,7 +7357,10 @@ class ApplicationWindow(QMainWindow):
         profilepath_elements = profilepath_dir.absolutePath().split("/")
         #compare profilepath with userprofilepath (modulo the last two segments which are month/year respectively)
         if len(userprofilepath_elements) == len(profilepath_elements) and len(userprofilepath_elements) > 1 and freduce(lambda x,y: x and y, [x[0] == x[1] for x in zip(userprofilepath_elements[:-2],profilepath_elements[:-2])]):
-            return self.profilepath
+            if platf == 'Darwin':
+                return self.userprofilepath
+            else:
+                return self.profilepath
         else:
             return self.userprofilepath
 
@@ -7272,7 +7375,7 @@ class ApplicationWindow(QMainWindow):
     #reads and sets the actual directory
     def ArtisanOpenFileDialog(self,msg="Open",ext="*",path=None):
         if path == None:   
-            path = self.getDefaultPath() 
+            path = self.getDefaultPath()
         f = u(QFileDialog.getOpenFileName(self,msg,path,ext))
         self.setDefaultPath(f)
         return f
@@ -7953,12 +8056,16 @@ class ApplicationWindow(QMainWindow):
                 # b) add missing extra serial settings
                 for i in range(len(self.qmc.extradevices) - len(self.extraser)):
                     self.addSerialPort()
+                # c) set extra temp curves and prepare empty extra smoothed temp curves
                 if "extratimex" in profile:
                     self.qmc.extratimex = profile["extratimex"]
                 if "extratemp1" in profile:
-                    self.qmc.extratemp1 = self.qmc.extrastemp1 = profile["extratemp1"]
+                    self.qmc.extratemp1 = profile["extratemp1"]
+                    self.qmc.extrastemp1 = [[]]*len(self.qmc.extratemp1)
                 if "extratemp2" in profile:
-                    self.qmc.extratemp2 = self.qmc.extrastemp2 = profile["extratemp2"]
+                    self.qmc.extratemp2 = profile["extratemp2"]
+                    self.qmc.extrastemp2 = [[]]*len(self.qmc.extratemp2)
+                # d) set other extra curve attribute lists
                 if "extraname1" in profile:
                     self.qmc.extraname1 = profile["extraname1"]
                 if "extraname2" in profile:
@@ -8072,6 +8179,33 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.beansize = float(profile["beansize"])
             else:
                 self.qmc.beansize = 0.0
+            if "heavyFC" in profile:
+                self.qmc.heavyFC_flag = profile["heavyFC"]
+            if "lowFC" in profile:
+                self.qmc.lowFC_flag = profile["lowFC"]
+            if "lightCut" in profile:
+                self.qmc.lightCut_flag = profile["lightCut"]
+            if "darkCut" in profile:
+                self.qmc.darkCut_flag = profile["darkCut"]
+            if "drops" in profile:
+                self.qmc.drops_flag = profile["drops"]
+            if "oily" in profile:
+                self.qmc.oily_flag = profile["oily"]
+            if "uneven" in profile:
+                self.qmc.uneven_flag = profile["uneven"]
+            if "tipping" in profile:
+                self.qmc.tipping_flag = profile["tipping"]
+            if "scorching" in profile:
+                self.qmc.scorching_flag = profile["scorching"]
+            if "divots" in profile:
+                self.qmc.divots_flag = profile["divots"]
+            # color
+            if "whole_color" in profile:
+                self.qmc.whole_color = profile["whole_color"]
+            if "ground_color" in profile:
+                self.qmc.ground_color = profile["ground_color"]
+            if "color_system" in profile and profile["color_system"] in self.qmc.color_systems:
+                self.qmc.color_system_idx = self.qmc.color_systems.index(profile["color_system"])
             # for compatibility with older profiles:
             if "roastdate" in profile:
                 try:
@@ -8220,7 +8354,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["TP_BT"] = self.float2float(self.qmc.temp2[TP_time_idx])
             ######### DRY #########
             # calc DRY_time_idx (index of TP; is None if unknown)
-            if self.qmc.timeindex[1]:
+            if self.qmc.timeindex[1] and aw.qmc.phasesbuttonflag:
                 #manual dryend available
                 DRY_time_idx = self.qmc.timeindex[1]
             else:
@@ -8402,6 +8536,19 @@ class ApplicationWindow(QMainWindow):
             profile["density"] = [self.qmc.density[0],e(self.qmc.density[1]),self.qmc.density[2],e(self.qmc.density[3])]
             profile["roastertype"] = e(self.qmc.roastertype)
             profile["operator"] = e(self.qmc.operator)
+            profile["heavyFC"] = self.qmc.heavyFC_flag
+            profile["lowFC"] = self.qmc.lowFC_flag
+            profile["lightCut"] = self.qmc.lightCut_flag
+            profile["darkCut"] = self.qmc.darkCut_flag
+            profile["drops"] = self.qmc.drops_flag
+            profile["oily"] = self.qmc.oily_flag
+            profile["uneven"] = self.qmc.uneven_flag
+            profile["tipping"] = self.qmc.tipping_flag
+            profile["scorching"] = self.qmc.scorching_flag
+            profile["divots"] = self.qmc.divots_flag
+            profile["whole_color"] = self.qmc.whole_color
+            profile["ground_color"] = self.qmc.ground_color
+            profile["color_system"] = self.qmc.color_systems[self.qmc.color_system_idx]
             # write roastdate that respects locale and potential cannot be read in under a different locale (just for compatibility to older versions)
             try:
                 profile["roastdate"] = e(self.qmc.roastdate.toString())
@@ -8454,6 +8601,14 @@ class ApplicationWindow(QMainWindow):
             profile["extradrawstyles1"] = [e(x) for x in self.qmc.extradrawstyles1]
             profile["extradrawstyles2"] = [e(x) for x in self.qmc.extradrawstyles2]
             profile["externalprogram"] = e(self.ser.externalprogram)
+            #write only:
+            profile["samplinginterval"] = self.qmc.delay / 1000.
+            try:
+                ds = list(self.qmc.extradevices)
+                ds.insert(0,self.qmc.device)
+                profile["devices"] = [self.qmc.devices[d-1] for d in ds]
+            except Exception as ex:
+                pass
             profile["computed"] = self.computedProfileInformation()
             return profile
         except Exception as ex:
@@ -8646,6 +8801,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.flavors = [5.]*len(self.qmc.flavorlabels)
             if settings.contains("flavorstartangle"):
                 self.qmc.flavorstartangle = settings.value("flavorstartangle",int(self.qmc.flavorstartangle)).toInt()[0]
+            #restore roast color system
+            if settings.contains("colorsystem"):
+                self.qmc.color_system_idx = settings.value("colorsystem",int(self.qmc.color_system_idx)).toInt()[0]
             #restore serial port
             settings.beginGroup("SerialPort")
             self.ser.comport = str(settings.value("comport",self.ser.comport).toString())
@@ -8671,6 +8829,22 @@ class ApplicationWindow(QMainWindow):
             self.modbus.input3register = settings.value("input3register",self.modbus.input3register).toInt()[0]
             self.modbus.input4slave = settings.value("input4slave",self.modbus.input4slave).toInt()[0]
             self.modbus.input4register = settings.value("input4register",self.modbus.input4register).toInt()[0]
+            if settings.contains("input1float"):
+                self.modbus.input1float = settings.value("input1float",self.modbus.input1float).toBool()
+                self.modbus.input1code = settings.value("input1code",self.modbus.input1code).toInt()[0]
+                self.modbus.input2float = settings.value("input2float",self.modbus.input2float).toBool()
+                self.modbus.input2code = settings.value("input2code",self.modbus.input2code).toInt()[0]
+                self.modbus.input3float = settings.value("input3float",self.modbus.input3float).toBool()
+                self.modbus.input3code = settings.value("input3code",self.modbus.input3code).toInt()[0]
+                self.modbus.input4float = settings.value("input4float",self.modbus.input4float).toBool()
+                self.modbus.input4code = settings.value("input4code",self.modbus.input4code).toInt()[0]
+                self.modbus.littleEndianFloats = settings.value("littleEndianFloats",self.modbus.littleEndianFloats).toBool()                
+                # switch to little-endian if needed (HACK!!)
+                if self.modbus.littleEndianFloats:
+                    try:
+                        minimalmodbus._bytestringToFloat = littleEndianBytestringToFloat
+                    except:
+                        pass
             settings.endGroup()
             #restore scale port
             settings.beginGroup("Scale")
@@ -8728,6 +8902,7 @@ class ApplicationWindow(QMainWindow):
                     elif type(self.dtapid.dtamem[key][0]) == type(int()):
                         self.dtapid.dtamem[key][0] = settings.value(key,self.dtapid.dtamem[key][0]).toInt()[0]
                 settings.endGroup()
+            self.qmc.filterDoppOuts = settings.value("filterDoppOuts",self.qmc.filterDoppOuts).toBool()
             settings.beginGroup("RoC")
             self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
@@ -9008,16 +9183,13 @@ class ApplicationWindow(QMainWindow):
                 self.update_extraeventbuttons_visibility()
                 self.realignbuttons()
             settings.endGroup()
-            
+
         except Exception:
-            pass
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-#            # we don't report errors on settingsLoad
-#            _, _, exc_tb = sys.exc_info()
-#            QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),str(e),exc_tb.tb_lineno)
-
-            
+            _, _, exc_tb = sys.exc_info()
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8) + "  @line " + str(exc_tb.tb_lineno))
+   
 #--------------------------------
         try: 
             #update visibility of main event button
@@ -9042,9 +9214,8 @@ class ApplicationWindow(QMainWindow):
             pass
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
-#            # we don't report errors on settingsLoad
-#            _, _, exc_tb = sys.exc_info()
-#            QMessageBox.information(self,QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8),str(e),exc_tb.tb_lineno)
+            _, _, exc_tb = sys.exc_info()
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8) + "  @line " + str(exc_tb.tb_lineno))
 
     def fetchCurveStyles(self):
         try:
@@ -9266,10 +9437,12 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ETBColor",self.qmc.backgroundmetcolor)
             settings.setValue("BTBColor",self.qmc.backgroundbtcolor)
             settings.setValue("ETBdeltaColor",self.qmc.backgrounddeltaetcolor)
-            settings.setValue("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)            
+            settings.setValue("BTBdeltaColor",self.qmc.backgrounddeltabtcolor)      
             #save flavors
             settings.setValue("Flavors",self.qmc.flavorlabels)
             settings.setValue("flavorstartangle",self.qmc.flavorstartangle)
+            #save roast color system
+            settings.setValue("colorsystem",self.qmc.color_system_idx)
             #soundflag
             settings.setValue("sound",self.soundflag)
             #save serial port
@@ -9291,12 +9464,21 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("timeout",self.modbus.timeout)
             settings.setValue("input1slave",self.modbus.input1slave)
             settings.setValue("input1register",self.modbus.input1register)
+            settings.setValue("input1float",self.modbus.input1float)
+            settings.setValue("input1code",self.modbus.input1code)
             settings.setValue("input2slave",self.modbus.input2slave)
             settings.setValue("input2register",self.modbus.input2register)
+            settings.setValue("input2float",self.modbus.input2float)
+            settings.setValue("input2code",self.modbus.input2code)
             settings.setValue("input3slave",self.modbus.input3slave)
             settings.setValue("input3register",self.modbus.input3register)
+            settings.setValue("input3float",self.modbus.input3float)
+            settings.setValue("input3code",self.modbus.input3code)
             settings.setValue("input4slave",self.modbus.input4slave)
             settings.setValue("input4register",self.modbus.input4register)
+            settings.setValue("input4float",self.modbus.input4float)
+            settings.setValue("input4code",self.modbus.input4code)
+            settings.setValue("littleEndianFloats",self.modbus.littleEndianFloats)
             settings.endGroup()
             #save scale port
             settings.beginGroup("Scale")
@@ -9321,6 +9503,7 @@ class ApplicationWindow(QMainWindow):
             for key in list(self.dtapid.dtamem.keys()):
                 settings.setValue(key,self.dtapid.dtamem[key][0])
             settings.endGroup()
+            settings.setValue("filterDoppOuts",self.qmc.filterDoppOuts)
             settings.beginGroup("RoC")
             settings.setValue("DeltaET",self.qmc.DeltaETflag)
             settings.setValue("DeltaBT",self.qmc.DeltaBTflag)
@@ -9501,11 +9684,13 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("roastpropertiesflag",self.qmc.roastpropertiesflag)
             settings.setValue("customflavorlabels",self.qmc.customflavorlabels)
+            
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: closeEvent() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception: closeEvent()",None, QApplication.UnicodeUTF8) + "  @line " + str(exc_tb.tb_lineno))
+
 
     #used for trouble shooting.
     def readartisansettings(self):
@@ -9669,7 +9854,6 @@ class ApplicationWindow(QMainWindow):
         if aw.qmc.checkSaved(): # if not canceled
             self.closeEvent(None)
             QApplication.exit()
-        
 
     def filePrint(self):
         image = QPixmap.grabWidget(aw.qmc).toImage()
@@ -9848,6 +10032,7 @@ th {
 <td>
 <center><b>""" + u(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
 $roasting_notes
+<center><pre>$roast_attributes</pre></center>
 </td>
 </tr>
 </table>
@@ -9989,6 +10174,7 @@ $cupping_notes
             ror= ror,
             etbta=etbta,
             roasting_notes=self.note2html(self.qmc.roastingnotes),
+            roast_attributes=self.roastattributes(),
             graph_image=graph_image,
             flavor_image=flavor_image,
             specialevents=self.specialevents2html(),
@@ -10009,6 +10195,31 @@ $cupping_notes
         finally:
             if f:
                 f.close()
+                
+    # returns a string with all the activated roast attributes
+    def roastattributes(self):
+        res = []
+        if aw.qmc.heavyFC_flag:
+            res.append(u(QApplication.translate("CheckBox","Heavy FC", None, QApplication.UnicodeUTF8)))
+        if aw.qmc.lowFC_flag:
+            res.append(u(QApplication.translate("CheckBox","Low FC", None, QApplication.UnicodeUTF8)))
+        if aw.qmc.lightCut_flag:
+            res.append(u(QApplication.translate("CheckBox","Light Cut", None, QApplication.UnicodeUTF8)))
+        if aw.qmc.darkCut_flag:
+            res.append(u(QApplication.translate("CheckBox","Dark Cut", None, QApplication.UnicodeUTF8)))
+        if aw.qmc.drops_flag:
+            res.append(u(QApplication.translate("CheckBox","Drops", None, QApplication.UnicodeUTF8)))
+        if aw.qmc.oily_flag:
+            res.append(u(QApplication.translate("CheckBox","Oily", None, QApplication.UnicodeUTF8)))
+        if aw.qmc.uneven_flag:
+            res.append(u(QApplication.translate("CheckBox","Uneven", None, QApplication.UnicodeUTF8)))
+        if aw.qmc.tipping_flag:
+            res.append(u(QApplication.translate("CheckBox","Tipping", None, QApplication.UnicodeUTF8)))
+        if aw.qmc.scorching_flag:
+            res.append(u(QApplication.translate("CheckBox","Scorching", None, QApplication.UnicodeUTF8)))
+        if aw.qmc.divots_flag:
+            res.append(u(QApplication.translate("CheckBox","Divots", None, QApplication.UnicodeUTF8)))
+        return ', '.join(res)
 
     def cuppingSum(self):
         score = 0.
@@ -10305,11 +10516,11 @@ $cupping_notes
     #calculate the AREA under BT and ET
     def ts(self,start=None,end=None):
         delta = ET = BT = 0.0
-        if start and (start < 0 or (start == 0 and self.qmc.timeindex[0] < 0)):
+        if (start == 0 and end == 0) or (start and (start < 0 or (start == 0 and self.qmc.timeindex[0] < 0))):
             return 0,0,0
         else:
             try:
-                for i in range((start or self.qmc.timeindex[0]),(end or self.qmc.timeindex[6])):
+                for i in range((start or self.qmc.timeindex[0]),min(len(self.qmc.timex)-1,(end or self.qmc.timeindex[6]))):
                     e = (self.qmc.temp1[i] + self.qmc.temp1[i+1]) / 2.0
                     b = (self.qmc.temp2[i] + self.qmc.temp2[i+1]) / 2.0
                     dt = (self.qmc.timex[i+1] - self.qmc.timex[i])
@@ -10377,7 +10588,7 @@ $cupping_notes
         contributors += "<br>" + QApplication.translate("About", "%1, Spanish localization",None, QApplication.UnicodeUTF8).arg("Bluequijote")
         contributors += "<br>" + QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Jim G.")
         contributors += "<br>" + QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Marcio Carneiro")
-        box = QMessageBox()
+        box = QMessageBox(self)
         #create a html QString
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
@@ -10475,12 +10686,26 @@ $cupping_notes
             self.modbus.timeout = int(str(dialog.modbus_timeoutEdit.text()))
             self.modbus.input1slave = int(str(dialog.modbus_input1slaveEdit.text()))
             self.modbus.input1register = int(str(dialog.modbus_input1registerEdit.text()))
+            self.modbus.input1code = int(str(dialog.modbus_input1code.currentText()))
+            self.modbus.input1float = bool(dialog.modbus_input1float.isChecked())            
             self.modbus.input2slave = int(str(dialog.modbus_input2slaveEdit.text()))
             self.modbus.input2register = int(str(dialog.modbus_input2registerEdit.text()))
+            self.modbus.input2code = int(str(dialog.modbus_input2code.currentText()))
+            self.modbus.input2float = bool(dialog.modbus_input2float.isChecked())     
             self.modbus.input3slave = int(str(dialog.modbus_input3slaveEdit.text()))
             self.modbus.input3register = int(str(dialog.modbus_input3registerEdit.text()))
+            self.modbus.input3code = int(str(dialog.modbus_input3code.currentText()))
+            self.modbus.input3float = bool(dialog.modbus_input3float.isChecked())     
             self.modbus.input4slave = int(str(dialog.modbus_input4slaveEdit.text()))
             self.modbus.input4register = int(str(dialog.modbus_input4registerEdit.text()))
+            self.modbus.input4code = int(str(dialog.modbus_input4code.currentText()))
+            self.modbus.input4float = bool(dialog.modbus_input4float.isChecked())
+            self.modbus.littleEndianFloats = bool(dialog.modbus_littleEndianFloats.isChecked())
+            # switch to little-endian if needed (HACK!!)
+            if self.modbus.littleEndianFloats:
+                minimalmodbus._bytestringToFloat = littleEndianBytestringToFloat
+            else:
+                minimalmodbus._bytestringToFloat = bigEndianBytestringToFloat
             # set scale port
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
             self.scale.comport = str(dialog.scale_comportEdit.currentText())                #unicode() changes QString to a python string
@@ -11300,18 +11525,31 @@ $cupping_notes
             return
 
 
+########################################################################################
+#####################  Artisan QDialog Subclass  #######################################
+########################################################################################
+
+class ArtisanDialog(QDialog):
+    def __init__(self, parent=None):
+        super(ArtisanDialog,self).__init__(parent)
+
+    def keyPressEvent(self,event):
+        key = int(event.key())
+        #uncomment next line to find the integer value of a key
+        #print key
+        if key == 16777216: #ESCAPE
+            self.close()
+
 ##########################################################################
 #####################     HUD  EDIT DLG     ##############################
 ##########################################################################
 
-class HUDDlg(QDialog):
+class HUDDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(HUDDlg,self).__init__(parent)
+        
         self.setWindowTitle(QApplication.translate("Form Caption","Extras", None, QApplication.UnicodeUTF8))
         self.setModal(True)
-        self.status = QStatusBar()
-        self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready", None, QApplication.UnicodeUTF8),1000)
         #### TAB 1
         # keep old values to be restored on Cancel
         self.org_DeltaET = aw.qmc.DeltaETflag
@@ -11335,22 +11573,24 @@ class HUDDlg(QDialog):
         #delta BT   
         self.DeltaBT = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None, QApplication.UnicodeUTF8))
         self.DeltaBT.setChecked(aw.qmc.DeltaBTflag)
-        filterlabel = QLabel(QApplication.translate("Label", "Delta Filter",None, QApplication.UnicodeUTF8))
+        filterlabel = QLabel(QApplication.translate("Label", "Smooth Deltas",None, QApplication.UnicodeUTF8))
         #DeltaFilter holds the number of pads in filter
         self.DeltaFilter = QSpinBox()
         self.DeltaFilter.setSingleStep(1)
         self.DeltaFilter.setRange(0,40)
         self.DeltaFilter.setValue(aw.qmc.deltafilter - 2)
-#        self.connect(self.DeltaFilter ,SIGNAL("valueChanged(int)"),self.changeDeltaFilter)
         self.connect(self.DeltaFilter ,SIGNAL("editingFinished()"),lambda x=0:self.changeDeltaFilter(0))
-        curvefilterlabel = QLabel(QApplication.translate("Label", "Filter",None, QApplication.UnicodeUTF8))
+        curvefilterlabel = QLabel(QApplication.translate("Label", "Smooth Curves",None, QApplication.UnicodeUTF8))
         #Filter holds the number of pads in filter
         self.Filter = QSpinBox()
         self.Filter.setSingleStep(1)
         self.Filter.setRange(0,40)
         self.Filter.setValue(aw.qmc.curvefilter - 2)
-#        self.connect(self.Filter ,SIGNAL("valueChanged(int)"),self.changeFilter)
-        self.connect(self.Filter ,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))
+        self.connect(self.Filter,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))
+        #fitlerspikes
+        self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Filter Spikes",None, QApplication.UnicodeUTF8))
+        self.FilterSpikes.setChecked(aw.qmc.filterDoppOuts)
+        self.connect(self.FilterSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDropFilter(i))
         #show projection
         self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection",None, QApplication.UnicodeUTF8))
         self.projectionmodeComboBox = QComboBox()
@@ -11426,9 +11666,13 @@ class HUDDlg(QDialog):
         sensitivityLayout.addWidget(filterlabel)
         sensitivityLayout.addWidget(self.DeltaFilter)
         sensitivityLayout.addStretch()
+        spikesLayout = QHBoxLayout()
+        spikesLayout.addWidget(self.FilterSpikes)
+        spikesLayout.addStretch()
         curvesLayout = QVBoxLayout()
         curvesLayout.addLayout(rorBoxLayout)
         curvesLayout.addLayout(sensitivityLayout)
+        curvesLayout.addLayout(spikesLayout)
         rorGroupLayout = QGroupBox(QApplication.translate("GroupBox","Curves",None, QApplication.UnicodeUTF8))
         rorGroupLayout.setLayout(curvesLayout)
         rorLCDGroupLayout = QGroupBox(QApplication.translate("GroupBox","LCDs",None, QApplication.UnicodeUTF8))
@@ -11524,11 +11768,13 @@ class HUDDlg(QDialog):
                                       QApplication.translate("ComboBox","cubic",None, QApplication.UnicodeUTF8),
                                       QApplication.translate("ComboBox","nearest",None, QApplication.UnicodeUTF8)])
         self.interpComboBox.setToolTip(QApplication.translate("Tooltip", "linear: linear interpolation\ncubic: 3rd order spline interpolation\nnearest: y value of the nearest point", None, QApplication.UnicodeUTF8))
+        self.interpComboBox.setFocusPolicy(Qt.NoFocus)
         self.connect(self.interpComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.interpComboBox.currentIndex() :self.changeInterpolationMode(i))
 #         'linear'  : linear interpolation
 #         'cubic'   : 3rd order spline interpolation
 #         'nearest' : take the y value of the nearest point
         self.univarCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None, QApplication.UnicodeUTF8))
+        self.univarCheck.setFocusPolicy(Qt.NoFocus)
         self.connect(self.univarCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.univar(i)) #toggle
         univarButton = QPushButton(QApplication.translate("Button","Info",None, QApplication.UnicodeUTF8))
         univarButton.setFocusPolicy(Qt.NoFocus)
@@ -11552,21 +11798,6 @@ class HUDDlg(QDialog):
         tab3Layout.addWidget(univarGroupLayout)
         tab3Layout.addStretch()
         ##### TAB 4
-        self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None, QApplication.UnicodeUTF8))
-        self.soundCheck.setChecked(aw.soundflag) 
-        self.soundCheck.setFocusPolicy(Qt.NoFocus)
-        self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
-        mikeButton = QPushButton(QApplication.translate("Button","Test Mike",None, QApplication.UnicodeUTF8))
-        mikeButton.setFocusPolicy(Qt.NoFocus)
-        self.connect(mikeButton,SIGNAL("clicked()"),self.showsound)
-        self.showsoundflag = 0
-        tab4LayoutH = QHBoxLayout()
-        tab4LayoutH.addWidget(self.soundCheck)
-        tab4LayoutH.addStretch()
-        tab4LayoutH.addWidget(mikeButton)
-        tab4Layout = QVBoxLayout()
-        tab4Layout.addLayout(tab4LayoutH)
-        tab4Layout.addStretch()
         #### TAB 5
         self.styleComboBox = QComboBox()
         available = list(map(str, list(QStyleFactory.keys())))
@@ -11605,9 +11836,19 @@ class HUDDlg(QDialog):
         defresLayout = QHBoxLayout()
         defresLayout.addStretch()
         defresLayout.addWidget(defresButton)
+        self.soundCheck = QCheckBox(QApplication.translate("CheckBox", "Beep",None, QApplication.UnicodeUTF8))
+        self.soundCheck.setChecked(aw.soundflag) 
+        self.soundCheck.setFocusPolicy(Qt.NoFocus)
+        self.connect(self.soundCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.soundset(i)) #toggle
+        sLayout = QHBoxLayout()
+        sLayout.addStretch()
+        sLayout.addWidget(self.soundCheck)
+        soundGroupWidget = QGroupBox(QApplication.translate("GroupBox","Sound",None, QApplication.UnicodeUTF8))
+        soundGroupWidget.setLayout(sLayout)
         tab5Layout = QVBoxLayout()
         tab5Layout.addWidget(appearanceGroupWidget)
         tab5Layout.addWidget(resolutionGroupWidget)
+        tab5Layout.addWidget(soundGroupWidget)
         tab5Layout.addStretch()
         tab5Layout.addLayout(defresLayout)
 
@@ -11622,19 +11863,15 @@ class HUDDlg(QDialog):
         C3Widget = QWidget()
         C3Widget.setLayout(tab3Layout)
         TabWidget.addTab(C3Widget,QApplication.translate("Tab","Math",None, QApplication.UnicodeUTF8))
-        C4Widget = QWidget()
-        C4Widget.setLayout(tab4Layout)
-        TabWidget.addTab(C4Widget,QApplication.translate("Tab","Sound",None, QApplication.UnicodeUTF8))
         C5Widget = QWidget()
         C5Widget.setLayout(tab5Layout)
-        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Style",None, QApplication.UnicodeUTF8))
+        TabWidget.addTab(C5Widget,QApplication.translate("Tab","UI",None, QApplication.UnicodeUTF8))
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(cancelButton)
         buttonsLayout.addWidget(okButton)
         #incorporate layouts
         Slayout = QVBoxLayout()
-        Slayout.addWidget(self.status,0)
         Slayout.addWidget(TabWidget,1)
         Slayout.addStretch()
         Slayout.addLayout(buttonsLayout)
@@ -11797,23 +12034,23 @@ class HUDDlg(QDialog):
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror(QApplication.translate("Error Message", "setappearance(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
-    def showsound(self):
-        try:
-            warnings.simplefilter('ignore', Warning) #for Complex warning 
-            aw.sendmessage(QApplication.translate("Message","Testing Mike...", None, QApplication.UnicodeUTF8))
-            aw.stack.setCurrentIndex(2)
-            aw.sound.opensound()
-            for i in range(80):
-                msg = str(80-i)
-                self.status.showMessage(msg,500)
-                aw.sound.blitsound()
-            aw.stack.setCurrentIndex(0)
-            aw.sound.closesound()
-            aw.sendmessage("")
-            warnings.simplefilter('default', Warning)
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror(QApplication.translate("Error Message", "showsound(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+#    def showsound(self):
+#        try:
+#            warnings.simplefilter('ignore', Warning) #for Complex warning 
+#            aw.sendmessage(QApplication.translate("Message","Testing Mike...", None, QApplication.UnicodeUTF8))
+#            aw.stack.setCurrentIndex(2)
+#            aw.sound.opensound()
+#            for i in range(80):
+#                msg = str(80-i)
+#                self.status.showMessage(msg,500)
+#                aw.sound.blitsound()
+#            aw.stack.setCurrentIndex(0)
+#            aw.sound.closesound()
+#            aw.sendmessage("")
+#            warnings.simplefilter('default', Warning)
+#        except Exception as e:
+#            _, _, exc_tb = sys.exc_info()  
+#            aw.qmc.adderror(QApplication.translate("Error Message", "showsound(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def saveinterp(self):
         pass
@@ -11822,7 +12059,7 @@ class HUDDlg(QDialog):
         if aw.qmc.timeindex[6]:
             aw.qmc.univariateinfo()
         else:
-            self.status.showMessage(QApplication.translate("StatusBar","Need to load a finished profile first", None, QApplication.UnicodeUTF8),5000)
+            aw.sendmessage(QApplication.translate("Univariate: no profile data available", None, QApplication.UnicodeUTF8))
 
     def univar(self,i):
         if self.univarCheck.isChecked():
@@ -11830,7 +12067,7 @@ class HUDDlg(QDialog):
             if aw.qmc.timeindex[6]:
                 aw.qmc.univariate()
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","Need to load a finished profile first", None, QApplication.UnicodeUTF8),5000)
+                aw.sendmessage(QApplication.translate("Univariate: no profile data available", None, QApplication.UnicodeUTF8))
                 self.univarCheck.setChecked(False)
         else:
             aw.qmc.resetlines()
@@ -11843,7 +12080,7 @@ class HUDDlg(QDialog):
             if aw.qmc.timeindex[6]:
                 aw.qmc.drawinterp(mode)
             else:
-                self.status.showMessage(QApplication.translate("StatusBar","Need to load a finished profile first", None, QApplication.UnicodeUTF8),5000)
+                aw.sendmessage(QApplication.translate("Message","Interpolation failed: no profile available", None, QApplication.UnicodeUTF8))
                 self.interpCheck.setChecked(False)
         else:
             aw.qmc.resetlines()
@@ -11878,20 +12115,28 @@ class HUDDlg(QDialog):
 
     def changeDeltaFilter(self,i):
         try:
-            self.DeltaFilter.setDisabled(True)
-            aw.qmc.deltafilter = self.DeltaFilter.value() + 2
-            aw.qmc.redraw(recomputeAllDeltas=True)
-            self.DeltaFilter.setDisabled(False)
+            v = self.DeltaFilter.value() + 2
+            if v != aw.qmc.deltafilter:
+                self.DeltaFilter.setDisabled(True)
+                aw.qmc.deltafilter = v
+                aw.qmc.redraw(recomputeAllDeltas=True)
+                self.DeltaFilter.setDisabled(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message", "changeDeltaFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
+    def changeDropFilter(self,i):
+        aw.qmc.filterDoppOuts = not aw.qmc.filterDoppOuts
+        aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
+        
     def changeFilter(self,i):
         try:
-            self.Filter.setDisabled(True)
-            aw.qmc.curvefilter = self.Filter.value() + 2
-            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True,resmooth=True)
-            self.Filter.setDisabled(False)
+            v = self.Filter.value() + 2
+            if v != aw.qmc.curvefilter:
+                self.Filter.setDisabled(True)
+                aw.qmc.curvefilter = v
+                aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+                self.Filter.setDisabled(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message", "changeFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
@@ -11923,14 +12168,12 @@ class HUDDlg(QDialog):
             aw.lcd5.setVisible(aw.qmc.DeltaBTlcdflag)
             aw.label5.setVisible(aw.qmc.DeltaBTlcdflag)
         aw.qmc.projectFlag = self.org_Projection
-        aw.qmc.resetlinecountcaches()
-        aw.qmc.resetdeltalines()
-        aw.qmc.resetlines()
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.accept()
 
     #button OK
     def updatetargets(self):
+        aw.qmc.filterDoppOuts = self.FilterSpikes.isChecked()
         mode = str(self.modeComboBox.currentText())
         if mode == QApplication.translate("ComboBox","metrics", None, QApplication.UnicodeUTF8):
             aw.HUDfunction = 0
@@ -11949,31 +12192,6 @@ class HUDDlg(QDialog):
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.accept()
 
-    #closing dialog
-    def closeEvent(self, event):
-        self.close()
-        self.accept()
-        aw.qmc.resetlinecountcaches()        
-        aw.qmc.resetdeltalines()
-        aw.qmc.resetlines()
-        aw.qmc.redraw(recomputeAllDeltas=False)
-        aw.stack.setCurrentIndex(0)
-
-
-########################################################################################
-#####################  Artisan QDialog Subclass  #######################################
-########################################################################################
-
-class ArtisanDialog(QDialog):
-    def __init__(self, parent=None):
-        super(ArtisanDialog,self).__init__(parent)
-
-    def keyPressEvent(self,event):
-        key = int(event.key())
-        #uncomment next line to find the integer value of a key
-        #print key
-        if key == 16777216: #ESCAPE
-            self.close()
 
 ########################################################################################
 #####################  ROAST PROPERTIES EDIT GRAPH DLG  ################################
@@ -12159,7 +12377,7 @@ class editGraphDlg(ArtisanDialog):
         #Beans
         beanslabel = QLabel("<b>" + QApplication.translate("Label", "Beans",None, QApplication.UnicodeUTF8) + "</b>")
         self.beansedit = QTextEdit()
-        self.beansedit.setMaximumHeight(100)
+        self.beansedit.setMaximumHeight(60)
         if aw.qmc.beans is not None:
             self.beansedit.setPlainText(QString(aw.qmc.beans))
         #roaster
@@ -12277,10 +12495,27 @@ class editGraphDlg(ArtisanDialog):
         bean_size_label = QLabel("<b>" + QApplication.translate("Label", "Bean Size",None, QApplication.UnicodeUTF8) + "</b>")
         self.bean_size_edit = QLineEdit(str(aw.qmc.beansize))
         self.bean_size_edit.setValidator(QDoubleValidator(0., 10., 1,self.bean_density_weight_edit))
-        self.bean_size_edit.setMinimumWidth(55)
-        self.bean_size_edit.setMaximumWidth(55)
+        self.bean_size_edit.setMinimumWidth(45)
+        self.bean_size_edit.setMaximumWidth(45)
         self.bean_size_edit.setAlignment(Qt.AlignRight)
         bean_size_unit_label = QLabel(QApplication.translate("Label", "mm",None, QApplication.UnicodeUTF8))
+        #bean color
+        whole_color_label = QLabel("<b>" + QApplication.translate("Label", "Whole Color",None, QApplication.UnicodeUTF8) + "</b>")
+        self.whole_color_edit = QLineEdit(str(aw.qmc.whole_color))
+        self.whole_color_edit.setValidator(QIntValidator(0, 1000, self.bean_density_weight_edit))
+        self.whole_color_edit.setMinimumWidth(45)
+        self.whole_color_edit.setMaximumWidth(45)
+        self.whole_color_edit.setAlignment(Qt.AlignRight)
+        ground_color_label = QLabel("<b>" + QApplication.translate("Label", "Ground Color",None, QApplication.UnicodeUTF8) + "</b>")
+        self.ground_color_edit = QLineEdit(str(aw.qmc.ground_color))
+        self.ground_color_edit.setValidator(QIntValidator(0, 1000, self.bean_density_weight_edit))
+        self.ground_color_edit.setMinimumWidth(45)
+        self.ground_color_edit.setMaximumWidth(45)
+        self.ground_color_edit.setAlignment(Qt.AlignRight)
+        self.bean_size_edit.setAlignment(Qt.AlignRight)
+        self.colorSystemComboBox = QComboBox()
+        self.colorSystemComboBox.addItems(aw.qmc.color_systems)
+        self.colorSystemComboBox.setCurrentIndex(aw.qmc.color_system_idx)
         #bag humidity
         bag_humidity_label = QLabel("<b>" + QApplication.translate("Label", "Storage Conditions",None, QApplication.UnicodeUTF8) + "</b>")
         bag_humidity_unitslabel = QLabel(aw.qmc.mode)
@@ -12330,6 +12565,33 @@ class editGraphDlg(ArtisanDialog):
         self.cuppingeditor =  QTextEdit()
         if aw.qmc.cuppingnotes is not None:
             self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
+        # Flags
+        self.heavyFC = QCheckBox(QApplication.translate("CheckBox","Heavy FC", None, QApplication.UnicodeUTF8))
+        self.heavyFC.setChecked(aw.qmc.heavyFC_flag)
+        self.connect(self.heavyFC,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("heavyFC",x))
+        self.lowFC = QCheckBox(QApplication.translate("CheckBox","Low FC", None, QApplication.UnicodeUTF8))
+        self.lowFC.setChecked(aw.qmc.lowFC_flag)
+        self.connect(self.lowFC,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("lowFC",x))
+        self.lightCut = QCheckBox(QApplication.translate("CheckBox","Light Cut", None, QApplication.UnicodeUTF8))
+        self.lightCut.setChecked(aw.qmc.lightCut_flag)
+        self.connect(self.lightCut,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("lightCut",x))
+        self.darkCut = QCheckBox(QApplication.translate("CheckBox","Dark Cut", None, QApplication.UnicodeUTF8))
+        self.darkCut.setChecked(aw.qmc.darkCut_flag)
+        self.connect(self.darkCut,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("darkCut",x))        
+        self.drops = QCheckBox(QApplication.translate("CheckBox","Drops", None, QApplication.UnicodeUTF8))
+        self.drops.setChecked(aw.qmc.drops_flag)
+        self.connect(self.drops,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("drops",x))
+        self.oily = QCheckBox(QApplication.translate("CheckBox","Oily", None, QApplication.UnicodeUTF8))
+        self.oily.setChecked(aw.qmc.oily_flag)
+        self.connect(self.oily,SIGNAL("stateChanged(int)"),lambda x=0: self.roastflagChanged("oily",x))
+        self.uneven = QCheckBox(QApplication.translate("CheckBox","Uneven", None, QApplication.UnicodeUTF8))
+        self.uneven.setChecked(aw.qmc.uneven_flag)
+        self.tipping = QCheckBox(QApplication.translate("CheckBox","Tipping", None, QApplication.UnicodeUTF8))
+        self.tipping.setChecked(aw.qmc.tipping_flag)
+        self.scorching = QCheckBox(QApplication.translate("CheckBox","Scorching", None, QApplication.UnicodeUTF8))
+        self.scorching.setChecked(aw.qmc.scorching_flag)
+        self.divots = QCheckBox(QApplication.translate("CheckBox","Divots", None, QApplication.UnicodeUTF8))
+        self.divots.setChecked(aw.qmc.divots_flag)
         # Save button
         saveButton = QPushButton(QApplication.translate("Button", "OK",None, QApplication.UnicodeUTF8))
         self.connect(saveButton, SIGNAL("clicked()"),self, SLOT("accept()"))
@@ -12460,6 +12722,17 @@ class editGraphDlg(ArtisanDialog):
         beansizeLayout.addSpacing(5)
         beansizeLayout.addWidget(bean_size_unit_label)
         beansizeLayout.addStretch()
+        colorLayout = QHBoxLayout()
+        colorLayout.setSpacing(0)
+        colorLayout.addWidget(whole_color_label)
+        colorLayout.addSpacing(15)
+        colorLayout.addWidget(self.whole_color_edit)
+        colorLayout.addSpacing(25)
+        colorLayout.addWidget(ground_color_label)
+        colorLayout.addSpacing(15)
+        colorLayout.addWidget(self.ground_color_edit)
+        colorLayout.addStretch()
+        colorLayout.addWidget(self.colorSystemComboBox)
         humidityLayout = QHBoxLayout()
         humidityLayout.addWidget(bag_humidity_label)
         humidityLayout.addSpacing(5)
@@ -12483,9 +12756,24 @@ class editGraphDlg(ArtisanDialog):
         ambientLayout.addWidget(ambientunitslabel)
         ambientLayout.addStretch()
         ambientLayout.addWidget(self.ambientComboBox)
+        roastFlagsLayout = QHBoxLayout()
+        roastFlagsGrid = QGridLayout()
+        roastFlagsGrid.addWidget(self.lowFC,0,0)
+        roastFlagsGrid.addWidget(self.heavyFC,1,0)
+        roastFlagsGrid.addWidget(self.lightCut,0,1)
+        roastFlagsGrid.addWidget(self.darkCut,1,1)
+        roastFlagsGrid.addWidget(self.drops,0,2)
+        roastFlagsGrid.addWidget(self.oily,1,2)
+        roastFlagsGrid.addWidget(self.uneven,0,3)
+        roastFlagsGrid.addWidget(self.tipping,0,4)
+        roastFlagsGrid.addWidget(self.scorching,0,5)
+        roastFlagsGrid.addWidget(self.divots,0,6)
+        roastFlagsLayout.addLayout(roastFlagsGrid)
+        roastFlagsLayout.addStretch()
         anotationLayout = QVBoxLayout()
         anotationLayout.addWidget(roastinglabel)
         anotationLayout.addWidget(self.roastingeditor)
+        anotationLayout.addLayout(roastFlagsLayout)
         anotationLayout.addWidget(cuppinglabel)
         anotationLayout.addWidget(self.cuppingeditor)
         okLayout = QHBoxLayout()
@@ -12513,6 +12801,7 @@ class editGraphDlg(ArtisanDialog):
         self.tab1aLayout.addLayout(volumeLayout)
         self.tab1aLayout.addLayout(densityLayout)
         self.tab1aLayout.addLayout(beansizeLayout)
+        self.tab1aLayout.addLayout(colorLayout)
         tab1bLayout = QVBoxLayout()
         tab1bLayout.addLayout(humidityLayout)
         tab1bLayout.addLayout(ambientLayout)
@@ -12566,6 +12855,21 @@ class editGraphDlg(ArtisanDialog):
         #totallayout.addStretch()
         #totallayout.addLayout(buttonsLayout)
         self.setLayout(totallayout)
+        
+    def roastflagChanged(self,flagname,x):
+        if x == Qt.Checked:
+            if flagname == "heavyFC":
+                self.lowFC.setChecked(False)
+            elif flagname == "lowFC":
+                self.heavyFC.setChecked(False)
+            elif flagname == "lightCut":
+                self.darkCut.setChecked(False)
+            elif flagname == "darkCut":
+                self.lightCut.setChecked(False)
+            elif flagname == "drops":
+                self.oily.setChecked(False)
+            elif flagname == "oily":
+                self.drops.setChecked(False)
 
     def ambientComboBoxIndexChanged(self,i):
         aw.qmc.ambientTempSource = i
@@ -12985,7 +13289,21 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.beansize = float(str(self.bean_size_edit.text()))
         except:
             aw.qmc.beansize = 0.0
-            
+        #update roastflags
+        aw.qmc.heavyFC_flag = self.heavyFC.isChecked()
+        aw.qmc.lowFC_flag = self.lowFC.isChecked()
+        aw.qmc.lightCut_flag = self.lightCut.isChecked()
+        aw.qmc.darkCut_flag = self.darkCut.isChecked()
+        aw.qmc.drops_flag = self.drops.isChecked()
+        aw.qmc.oily_flag = self.oily.isChecked()        
+        aw.qmc.uneven_flag = self.uneven.isChecked()
+        aw.qmc.tipping_flag = self.tipping.isChecked()
+        aw.qmc.scorching_flag = self.scorching.isChecked()
+        aw.qmc.divots_flag = self.divots.isChecked()
+        #update color
+        aw.qmc.whole_color = int(str(self.whole_color_edit.text()))
+        aw.qmc.ground_color = int(str(self.ground_color_edit.text()))
+        aw.qmc.color_system_idx = self.colorSystemComboBox.currentIndex()
         #update humidity
         try:
             aw.qmc.bag_humidity[0] = float(str(self.humidity_edit.text()))
@@ -15459,9 +15777,6 @@ class backgroundDlg(ArtisanDialog):
         self.backgroundDeltaETflag = QCheckBox(QApplication.translate("CheckBox","DeltaET", None, QApplication.UnicodeUTF8))
         self.backgroundDeltaBTflag = QCheckBox(QApplication.translate("CheckBox","DeltaBT", None, QApplication.UnicodeUTF8))
         self.backgroundCheck.setChecked(aw.qmc.background)
-        self.status = QStatusBar()
-        self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready", None, QApplication.UnicodeUTF8),3000)
         self.backgroundDetails.setChecked(aw.qmc.backgroundDetails)
         self.backgroundeventsflag.setChecked(aw.qmc.backgroundeventsflag)
         self.backgroundDeltaETflag.setChecked(aw.qmc.DeltaETBflag)
@@ -15477,8 +15792,8 @@ class backgroundDlg(ArtisanDialog):
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("reject()"))
         self.connect(alignButton, SIGNAL("clicked()"), aw.qmc.timealign)
         self.speedSpinBox = QSpinBox()
-        self.speedSpinBox.setRange(10,90)
-        self.speedSpinBox.setSingleStep(10)
+        self.speedSpinBox.setRange(1,90)
+        self.speedSpinBox.setSingleStep(5)
         self.speedSpinBox.setValue(30)
         intensitylabel =QLabel(QApplication.translate("Label", "Opaqueness",None, QApplication.UnicodeUTF8))
         intensitylabel.setAlignment(Qt.AlignRight)
@@ -15636,10 +15951,9 @@ class backgroundDlg(ArtisanDialog):
         buttonLayout.addStretch()
         buttonLayout.addWidget(okButton)
         mainLayout = QVBoxLayout()
-        mainLayout.addWidget(self.status)
         mainLayout.addWidget(TabWidget) 
         mainLayout.addLayout(buttonLayout)
-        mainLayout.setMargin(0)
+        mainLayout.setContentsMargins(5, 15, 5, 10) # left, top, right, bottom 
         self.setLayout(mainLayout)
 
     def setreproduce(self):
@@ -15647,19 +15961,18 @@ class backgroundDlg(ArtisanDialog):
             aw.qmc.detectBackgroundEventTime = self.etimeSpinBox.value()
             if self.backgroundReproduce.isChecked():
                 aw.qmc.backgroundReproduce = True
-                msg = QApplication.translate("StatusBar","Playback Aid set ON at %1 secs",None, QApplication.UnicodeUTF8).arg(str(aw.qmc.detectBackgroundEventTime))
+                msg = QApplication.translate("Message","Playback Aid set ON at %1 secs",None, QApplication.UnicodeUTF8).arg(str(aw.qmc.detectBackgroundEventTime))
             else:
                 aw.qmc.backgroundReproduce = False
                 msg = QApplication.translate("StatusBar","Playback Aid set OFF",None, QApplication.UnicodeUTF8)
                 aw.messagelabel.setStyleSheet("background-color:'transparent';")
-            self.status.showMessage(msg,5000)
+            aw.sendmessage(msg)
         else:
             self.backgroundReproduce.setChecked(False)
-            self.status.showMessage(QApplication.translate("StatusBar","No profile background found",None, QApplication.UnicodeUTF8),5000)
+            aw.sendmessage(QApplication.translate("Message","No profile background found",None, QApplication.UnicodeUTF8))
 
     def adjustcolor(self,color,curve):
         color = str(color)
-        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         self.btcolorComboBox.setDisabled(True)
         self.metcolorComboBox.setDisabled(True)
         self.deltabtcolorComboBox.setDisabled(True)
@@ -15683,20 +15996,16 @@ class backgroundDlg(ArtisanDialog):
         self.metcolorComboBox.setDisabled(False)
         self.deltabtcolorComboBox.setDisabled(False)
         self.deltaetcolorComboBox.setDisabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
 
     def adjustintensity(self):
-        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         #block button
         self.intensitySpinBox.setDisabled(True)
         aw.qmc.backgroundalpha = self.intensitySpinBox.value()/10.
         aw.qmc.redraw(recomputeAllDeltas=False)
         #reactivate button
         self.intensitySpinBox.setDisabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
 
     def delete(self):
-        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         self.pathedit.setText("")
 # we should not overwrite the users app settings here, right:
 #        self.backgroundCheck.setChecked(False)
@@ -15714,10 +16023,8 @@ class backgroundDlg(ArtisanDialog):
         aw.qmc.backmoveflag = 1
         aw.qmc.resetlinecountcaches()
         aw.qmc.redraw(recomputeAllDeltas=False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
 
     def move(self,m):
-        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         #block button
         if m == "up":
             self.upButton.setDisabled(True)
@@ -15741,24 +16048,20 @@ class backgroundDlg(ArtisanDialog):
             self.leftButton.setDisabled(False)
         elif m == "right":
             self.rightButton.setDisabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
 
     def readChecks(self):
-        self.status.showMessage(QApplication.translate("StatusBar","Processing...",None, QApplication.UnicodeUTF8),5000)
         aw.qmc.background = bool(self.backgroundCheck.isChecked())
         aw.qmc.backgroundDetails = bool(self.backgroundDetails.isChecked())
         aw.qmc.backgroundeventsflag = bool(self.backgroundeventsflag.isChecked())
         aw.qmc.DeltaETBflag = bool(self.backgroundDeltaETflag.isChecked())
         aw.qmc.DeltaBTBflag = bool(self.backgroundDeltaBTflag.isChecked())
         aw.qmc.redraw(recomputeAllDeltas=False)
-        self.status.showMessage(QApplication.translate("StatusBar","Ready",None, QApplication.UnicodeUTF8),5000)
 
     def load(self):
         self.filename = aw.ArtisanOpenFileDialog()
         if len(u(self.filename)) == 0:
-            self.status.showMessage(QApplication.translate("StatusBar","Empty file path",None, QApplication.UnicodeUTF8),5000)
             return
-        self.status.showMessage(QApplication.translate("StatusBar","Reading file...",None, QApplication.UnicodeUTF8),5000)
+        aw.sendmessage(QApplication.translate("Message","Reading background profile...",None, QApplication.UnicodeUTF8))
         aw.qmc.backgroundpath = u(self.filename)
         aw.qmc.resetlinecountcaches()
         aw.loadbackground(u(self.filename))
@@ -16131,12 +16434,21 @@ class modbusport(object):
         self.timeout = 1.0
         self.input1slave = 0
         self.input1register = 0
+        self.input1float = False
+        self.input1code = 3
         self.input2slave = 0
         self.input2register = 0
+        self.input2float = False
+        self.input2code = 3
         self.input3slave = 0
         self.input3register = 0
+        self.input3float = False
+        self.input3code = 3
         self.input4slave = 0
         self.input4register = 0
+        self.input4float = False        
+        self.input4code = 3
+        self.littleEndianFloats = False
         self.xonoff=0
         self.master = None
 
@@ -16178,11 +16490,26 @@ class modbusport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: writeSingleRegister() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
 
-    def readSingleRegister(self,slave,register):
+    def readFloat(self,slave,register,code=3):
         try:
             self.connect()
             self.master.slaveaddress = int(slave)
-            r = self.master.read_register(int(register),0)
+            r = self.master.read_float(int(register),int(code),2)
+            return r
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: readFloat() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            #note: logged chars should be unicode not binary
+            if aw.seriallogflag:
+                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+                aw.addserial("MODBUS readFloat :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
+
+    def readSingleRegister(self,slave,register,code=3):
+        try:
+            self.connect()
+            self.master.slaveaddress = int(slave)
+            r = self.master.read_register(int(register),0,int(code))
             return r
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -16191,7 +16518,7 @@ class modbusport(object):
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Rx = " + str(r))
+                aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
 
 class scaleport(object):
     """ this class handles the communications with the scale"""
@@ -16297,8 +16624,6 @@ class serialport(object):
         # Reads BT
         self.readBTpid = [1,2]           # index 0: type: FujiPXG, 1 = FujiPXR3, 2 = None, 3 = DTA 
 #                                        # index 1: RS485 unitID. Can be changed in device menu. 
-        #initial message flag for CENTER 309 meter
-        self.CENTER309flag = 0
         #Initialization for ARDUINO and TC4 meter
         self.arduinoETChannel = "1"
         self.arduinoBTChannel = "2"
@@ -16885,25 +17210,37 @@ class serialport(object):
     def MODBUSread(self):
         # slave, register
         if aw.modbus.input1slave:
-            res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register)
+            if aw.modbus.input1float:
+                res1 = aw.modbus.readFloat(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
+            else:
+                res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
             if res1 is None:
                 res1 = -1
         else:
             res1 = -1
         if aw.modbus.input2slave:
-            res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register)
+            if aw.modbus.input2float:
+                res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
+            else:
+                res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             if res2 is None:
                 res2 = -1
         else:
             res2 = -1
         if aw.modbus.input3slave:
-            res3 = aw.modbus.readSingleRegister(aw.modbus.input3slave,aw.modbus.input3register)
+            if aw.modbus.input3float:
+                res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
+            else:
+                res3 = aw.modbus.readSingleRegister(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             if res3 is None:
                 res3 = -1
         else:
             res3 = -1
         if aw.modbus.input4slave:
-            res4 = aw.modbus.readSingleRegister(aw.modbus.input4slave,aw.modbus.input4register)
+            if aw.modbus.input4float:
+                res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
+            else:
+                res4 = aw.modbus.readSingleRegister(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             if res4 is None:
                 res4 = -1
         else:
@@ -18339,6 +18676,7 @@ class comportDlg(ArtisanDialog):
         timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
         self.timeoutEdit.setValidator(QIntValidator(0,5,self.timeoutEdit))
+        etbt_help_label = QLabel(QApplication.translate("Message", "Communication parameters for non-Modbus devices",None, QApplication.UnicodeUTF8) + "<br>")
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
         self.serialtable = QTableWidget()
         self.serialtable.setTabKeyNavigation(True)
@@ -18381,43 +18719,108 @@ class comportDlg(ArtisanDialog):
         modbus_input1slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
         self.modbus_input1slaveEdit = QLineEdit(str(aw.modbus.input1slave))
         self.modbus_input1slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input1slaveEdit))
-        self.modbus_input1slaveEdit.setFixedWidth(40)
+        self.modbus_input1slaveEdit.setFixedWidth(50)
         self.modbus_input1slaveEdit.setAlignment(Qt.AlignRight)
         modbus_input1registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
         self.modbus_input1registerEdit = QLineEdit(str(aw.modbus.input1register))
         self.modbus_input1registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input1registerEdit))
-        self.modbus_input1registerEdit.setFixedWidth(40)
+        self.modbus_input1registerEdit.setFixedWidth(50)
         self.modbus_input1registerEdit.setAlignment(Qt.AlignRight)
+        modbus_function_codes = ["3","4"]
+        modbus_input1floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
+        modbus_input1codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
+        self.modbus_input1float = QCheckBox()
+        self.modbus_input1float.setChecked(aw.modbus.input1float)
+        self.modbus_input1float.setFocusPolicy(Qt.NoFocus) 
+        self.connect(self.modbus_input1float, SIGNAL("stateChanged(int)"),lambda i=0:self.changeEndianVisibility())       
+        self.modbus_input1code = QComboBox()
+        self.modbus_input1code.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input1code.addItems(modbus_function_codes)
+        self.modbus_input1code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input1code)))
+        self.modbus_input1code.setFixedWidth(50)
         modbus_input2slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
         self.modbus_input2slaveEdit = QLineEdit(str(aw.modbus.input2slave))
         self.modbus_input2slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input2slaveEdit))
-        self.modbus_input2slaveEdit.setFixedWidth(40)
+        self.modbus_input2slaveEdit.setFixedWidth(50)
         self.modbus_input2slaveEdit.setAlignment(Qt.AlignRight)
         modbus_input2registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
         self.modbus_input2registerEdit = QLineEdit(str(aw.modbus.input2register))
         self.modbus_input2registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input2registerEdit))
-        self.modbus_input2registerEdit.setFixedWidth(40)
+        self.modbus_input2registerEdit.setFixedWidth(50)
         self.modbus_input2registerEdit.setAlignment(Qt.AlignRight)
+        modbus_input2floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
+        modbus_input2codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
+        self.modbus_input2float = QCheckBox()
+        self.modbus_input2float.setChecked(aw.modbus.input2float)
+        self.modbus_input2float.setFocusPolicy(Qt.NoFocus)  
+        self.connect(self.modbus_input2float, SIGNAL("stateChanged(int)"),lambda i=0:self.changeEndianVisibility())      
+        self.modbus_input2code = QComboBox()
+        self.modbus_input2code.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input2code.addItems(modbus_function_codes)
+        self.modbus_input2code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input2code)))
+        self.modbus_input2code.setFixedWidth(50)
         modbus_input3slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
         self.modbus_input3slaveEdit = QLineEdit(str(aw.modbus.input3slave))
         self.modbus_input3slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input3slaveEdit))
-        self.modbus_input3slaveEdit.setFixedWidth(40)
+        self.modbus_input3slaveEdit.setFixedWidth(50)
         self.modbus_input3slaveEdit.setAlignment(Qt.AlignRight)
         modbus_input3registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
         self.modbus_input3registerEdit = QLineEdit(str(aw.modbus.input3register))
         self.modbus_input3registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input3registerEdit))
-        self.modbus_input3registerEdit.setFixedWidth(40)
+        self.modbus_input3registerEdit.setFixedWidth(50)
         self.modbus_input3registerEdit.setAlignment(Qt.AlignRight)
+        modbus_input3floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
+        modbus_input3codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
+        self.modbus_input3float = QCheckBox()
+        self.modbus_input3float.setChecked(aw.modbus.input3float)
+        self.modbus_input3float.setFocusPolicy(Qt.NoFocus) 
+        self.connect(self.modbus_input3float, SIGNAL("stateChanged(int)"),lambda i=0:self.changeEndianVisibility())       
+        self.modbus_input3code = QComboBox()
+        self.modbus_input3code.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input3code.addItems(modbus_function_codes)
+        self.modbus_input3code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input3code)))
+        self.modbus_input3code.setFixedWidth(50)
         modbus_input4slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
         self.modbus_input4slaveEdit = QLineEdit(str(aw.modbus.input4slave))
         self.modbus_input4slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input4slaveEdit))
-        self.modbus_input4slaveEdit.setFixedWidth(40)
+        self.modbus_input4slaveEdit.setFixedWidth(50)
         self.modbus_input4slaveEdit.setAlignment(Qt.AlignRight)
         modbus_input4registerlabel = QLabel(QApplication.translate("Label", "Register",None, QApplication.UnicodeUTF8))
         self.modbus_input4registerEdit = QLineEdit(str(aw.modbus.input4register))
         self.modbus_input4registerEdit.setValidator(QIntValidator(0,65025,self.modbus_input4registerEdit))
-        self.modbus_input4registerEdit.setFixedWidth(40)
-        self.modbus_input4registerEdit.setAlignment(Qt.AlignRight)        
+        self.modbus_input4registerEdit.setFixedWidth(50)
+        self.modbus_input4registerEdit.setAlignment(Qt.AlignRight)
+        modbus_input4floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
+        modbus_input4codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
+        self.modbus_input4float = QCheckBox()
+        self.modbus_input4float.setChecked(aw.modbus.input4float)
+        self.modbus_input4float.setFocusPolicy(Qt.NoFocus)
+        self.connect(self.modbus_input4float, SIGNAL("stateChanged(int)"),lambda i=0:self.changeEndianVisibility())
+        self.modbus_input4code = QComboBox()
+        self.modbus_input4code.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input4code.addItems(modbus_function_codes)
+        self.modbus_input4code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input4code)))
+        self.modbus_input4code.setFixedWidth(50)
+        self.modbus_littleEndianFloats = QCheckBox("little-endian floats")
+        self.modbus_littleEndianFloats.setChecked(aw.modbus.littleEndianFloats)
+        self.modbus_littleEndianFloats.setFocusPolicy(Qt.NoFocus)
+        if self.modbus_input1float.isChecked() or self.modbus_input2float.isChecked() or self.modbus_input3float.isChecked() or self.modbus_input4float.isChecked():
+            self.modbus_littleEndianFloats.setEnabled(True)
+        else:
+            self.modbus_littleEndianFloats.setEnabled(False)
+        modbus_help_text = QApplication.translate("Message", "These serial settings are used for all Modbus communication.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "The MODBUS device corresponds to input channels 1 and 2.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "The +MODBUS_34 extra device adds input channels 3 and 4.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Inputs with slave id set to 0 are turned off.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Modbus function 3 'read holding register' is the standard.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Modbus function 4 triggers the use of 'read input register'.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Input registers (fct 4) usually are from the range 30000-39999.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Most devices hold data in 2 byte integer registers.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "A temperature of 145.2C is often send as 1452.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "In that case you have to use the symbolic assignment 'x/10'.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Few devices hold data as 4 byte floats in two registers.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "Tick the Float flag in this case.",None, QApplication.UnicodeUTF8)
+        modbus_help_label = QLabel(modbus_help_text)
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
         self.scale_deviceEdit = QComboBox()
@@ -18497,7 +18900,10 @@ class comportDlg(ArtisanDialog):
         gridBoxLayout.addLayout(grid)
         gridBoxLayout.addStretch()
         tab1Layout = QVBoxLayout()
-        tab1Layout.addLayout(gridBoxLayout)
+        tab1Layout.addWidget(etbt_help_label)
+        devid = aw.qmc.device
+        if devid != 29 and devid != 33: # hide serial confs for MODBUS devices
+            tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
         tab2Layout = QVBoxLayout()
@@ -18525,6 +18931,10 @@ class comportDlg(ArtisanDialog):
         modbus_input1.addWidget(self.modbus_input1slaveEdit,0,1)
         modbus_input1.addWidget(modbus_input1registerlabel,1,0,Qt.AlignRight)
         modbus_input1.addWidget(self.modbus_input1registerEdit,1,1)
+        modbus_input1.addWidget(modbus_input1codelabel,2,0,Qt.AlignRight)
+        modbus_input1.addWidget(self.modbus_input1code,2,1)
+        modbus_input1.addWidget(modbus_input1floatlabel,3,0,Qt.AlignRight)
+        modbus_input1.addWidget(self.modbus_input1float,3,1)
         modbus_input1group = QGroupBox(QApplication.translate("GroupBox", "Input 1",None, QApplication.UnicodeUTF8))
         modbus_input1group.setLayout(modbus_input1)
         modbus_input2 = QGridLayout()
@@ -18532,6 +18942,10 @@ class comportDlg(ArtisanDialog):
         modbus_input2.addWidget(self.modbus_input2slaveEdit,0,1)
         modbus_input2.addWidget(modbus_input2registerlabel,1,0,Qt.AlignRight)
         modbus_input2.addWidget(self.modbus_input2registerEdit,1,1)
+        modbus_input2.addWidget(modbus_input2codelabel,2,0,Qt.AlignRight)
+        modbus_input2.addWidget(self.modbus_input2code,2,1)
+        modbus_input2.addWidget(modbus_input2floatlabel,3,0,Qt.AlignRight)
+        modbus_input2.addWidget(self.modbus_input2float,3,1)        
         modbus_input2group = QGroupBox(QApplication.translate("GroupBox", "Input 2",None, QApplication.UnicodeUTF8))
         modbus_input2group.setLayout(modbus_input2)
         modbus_input3 = QGridLayout()
@@ -18539,6 +18953,10 @@ class comportDlg(ArtisanDialog):
         modbus_input3.addWidget(self.modbus_input3slaveEdit,0,1)
         modbus_input3.addWidget(modbus_input3registerlabel,1,0,Qt.AlignRight)
         modbus_input3.addWidget(self.modbus_input3registerEdit,1,1)
+        modbus_input3.addWidget(modbus_input3codelabel,2,0,Qt.AlignRight)
+        modbus_input3.addWidget(self.modbus_input3code,2,1)
+        modbus_input3.addWidget(modbus_input3floatlabel,3,0,Qt.AlignRight)
+        modbus_input3.addWidget(self.modbus_input3float,3,1)
         modbus_input3group = QGroupBox(QApplication.translate("GroupBox", "Input 3",None, QApplication.UnicodeUTF8))
         modbus_input3group.setLayout(modbus_input3)
         modbus_input4 = QGridLayout()
@@ -18546,23 +18964,29 @@ class comportDlg(ArtisanDialog):
         modbus_input4.addWidget(self.modbus_input4slaveEdit,0,1)
         modbus_input4.addWidget(modbus_input4registerlabel,1,0,Qt.AlignRight)
         modbus_input4.addWidget(self.modbus_input4registerEdit,1,1)
+        modbus_input4.addWidget(modbus_input4codelabel,2,0,Qt.AlignRight)
+        modbus_input4.addWidget(self.modbus_input4code,2,1)
+        modbus_input4.addWidget(modbus_input4floatlabel,3,0,Qt.AlignRight)
+        modbus_input4.addWidget(self.modbus_input4float,3,1)
         modbus_input4group = QGroupBox(QApplication.translate("GroupBox", "Input 4",None, QApplication.UnicodeUTF8))
         modbus_input4group.setLayout(modbus_input4)
-        modbus_inputV = QVBoxLayout()
+        modbus_inputV = QHBoxLayout()
         modbus_inputV.addWidget(modbus_input1group)
+        modbus_inputV.addStretch()
         modbus_inputV.addWidget(modbus_input2group)
         modbus_inputV.addStretch()
-        modbus_inputX = QHBoxLayout()
-        modbus_inputX.addWidget(modbus_input3group)
-        modbus_inputX.addWidget(modbus_input4group)
-        modbus_inputX.addStretch()
-        modbus_gridBoxLayout = QHBoxLayout()
-        modbus_gridBoxLayout.addLayout(modbus_gridV)
-        modbus_gridBoxLayout.addLayout(modbus_inputV)
-        modbus_gridBoxLayout.addStretch()
+        modbus_inputV.addWidget(modbus_input3group)
+        modbus_inputV.addStretch()
+        modbus_inputV.addWidget(modbus_input4group)
+        modbus_inputV.addStretch()
+        modbus_gridVLayout = QHBoxLayout()
+        modbus_gridVLayout.addLayout(modbus_gridV)
+        modbus_gridVLayout.addWidget(modbus_help_label)
+        modbus_gridVLayout.addStretch()
         tab3Layout = QVBoxLayout()
-        tab3Layout.addLayout(modbus_gridBoxLayout)
-        tab3Layout.addLayout(modbus_inputX)
+        tab3Layout.addLayout(modbus_gridVLayout)
+        tab3Layout.addLayout(modbus_inputV)
+        tab3Layout.addWidget(self.modbus_littleEndianFloats)
         tab3Layout.addStretch()
         #LAYOUT TAB 4
         scale_grid = QGridLayout()
@@ -18600,12 +19024,20 @@ class comportDlg(ArtisanDialog):
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
         TabWidget.addTab(C4Widget,QApplication.translate("Tab","Scale",None, QApplication.UnicodeUTF8))
+        if devid == 29: # switch to MODBUS tab if MODBUS device was selected as main device
+            TabWidget.setCurrentIndex(2)
         #incorporate layouts
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(buttonLayout)
         self.setLayout(Mlayout)
 
+    def changeEndianVisibility(self):
+        if self.modbus_input1float.isChecked() or self.modbus_input2float.isChecked() or self.modbus_input3float.isChecked() or self.modbus_input4float.isChecked():
+            self.modbus_littleEndianFloats.setEnabled(True)
+        else:
+            self.modbus_littleEndianFloats.setEnabled(False)
+        
     def portlist(self):
         xports = list(aw.extracomport)
         xports.append(aw.ser.comport)
@@ -18634,37 +19066,44 @@ class comportDlg(ArtisanDialog):
                 self.serialtable.setShowGrid(True)
                 xports = self.portlist()
                 for i in range(nssdevices):
-                    device = QTableWidgetItem(aw.qmc.devices[aw.qmc.extradevices[i]-1])    #type identification of the device. Non editable
-                    comportComboBox =  QComboBox()
-                    comportComboBox.addItems(xports)
-                    comportComboBox.setCurrentIndex(xports.index(aw.extracomport[i]))
-                    baudComboBox =  QComboBox()
-                    baudComboBox.addItems(self.bauds)
-                    if str(aw.extrabaudrate[i]) in self.bauds:
-                        baudComboBox.setCurrentIndex(self.bauds.index(str(aw.extrabaudrate[i])))
-                    byteComboBox =  QComboBox()
-                    byteComboBox.addItems(self.bytesizes)
-                    if str(aw.extrabytesize[i]) in self.bytesizes:
-                        byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.extrabytesize[i])))
-                    parityComboBox =  QComboBox()
-                    parityComboBox.addItems(self.parity)
-                    if aw.extraparity[i] in self.parity:
-                        parityComboBox.setCurrentIndex(self.parity.index(aw.extraparity[i]))
-                    #self.connect(baudComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
-                    stopbitsComboBox =  QComboBox()
-                    stopbitsComboBox.addItems(self.stopbits)
-                    if str(aw.extrastopbits[i]) in self.stopbits:
-                        stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.extrastopbits[i])))
-                    timeoutEdit = QLineEdit(str(aw.extratimeout[i]))
-                    timeoutEdit.setValidator(QIntValidator(1,5,timeoutEdit))
-                    #add widgets to the table
+                    devid = aw.qmc.extradevices[i]
+                    devicename = aw.qmc.devices[devid-1]
+                    device = QTableWidgetItem(devicename)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
-                    self.serialtable.setCellWidget(i,1,comportComboBox)
-                    self.serialtable.setCellWidget(i,2,baudComboBox)
-                    self.serialtable.setCellWidget(i,3,byteComboBox)
-                    self.serialtable.setCellWidget(i,4,parityComboBox)
-                    self.serialtable.setCellWidget(i,5,stopbitsComboBox)
-                    self.serialtable.setCellWidget(i,6,timeoutEdit)
+                    if devid != 29 and devid != 33 and devicename[0] != "+": # hide serial confs for MODBUS and "+X" extra devices
+                        comportComboBox =  QComboBox()
+                        comportComboBox.addItems(xports)
+                        comportComboBox.setCurrentIndex(xports.index(aw.extracomport[i]))
+                        comportComboBox.setFixedWidth(200)
+                        baudComboBox =  QComboBox()
+                        baudComboBox.addItems(self.bauds)
+                        if str(aw.extrabaudrate[i]) in self.bauds:
+                            baudComboBox.setCurrentIndex(self.bauds.index(str(aw.extrabaudrate[i])))
+                        byteComboBox =  QComboBox()
+                        byteComboBox.addItems(self.bytesizes)
+                        if str(aw.extrabytesize[i]) in self.bytesizes:
+                            byteComboBox.setCurrentIndex(self.bytesizes.index(str(aw.extrabytesize[i])))
+                        parityComboBox =  QComboBox()
+                        parityComboBox.addItems(self.parity)
+                        if aw.extraparity[i] in self.parity:
+                            parityComboBox.setCurrentIndex(self.parity.index(aw.extraparity[i]))
+                        #self.connect(baudComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,x=i:self.setextradevice(z,x))
+                        stopbitsComboBox = QComboBox()
+                        stopbitsComboBox.addItems(self.stopbits)
+                        if str(aw.extrastopbits[i]) in self.stopbits:
+                            stopbitsComboBox.setCurrentIndex(self.stopbits.index(str(aw.extrastopbits[i])))
+                        timeoutEdit = QLineEdit(str(aw.extratimeout[i]))
+                        timeoutEdit.setValidator(QIntValidator(1,5,timeoutEdit))
+                        timeoutEdit.setFixedWidth(65)
+                        timeoutEdit.setAlignment(Qt.AlignRight)
+                        #add widgets to the table
+                        self.serialtable.setCellWidget(i,1,comportComboBox)
+                        self.serialtable.setCellWidget(i,2,baudComboBox)
+                        self.serialtable.setCellWidget(i,3,byteComboBox)
+                        self.serialtable.setCellWidget(i,4,parityComboBox)
+                        self.serialtable.setCellWidget(i,5,stopbitsComboBox)
+                        self.serialtable.setCellWidget(i,6,timeoutEdit)
+                self.serialtable.resizeColumnsToContents()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message", "createserialTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
@@ -18675,18 +19114,21 @@ class comportDlg(ArtisanDialog):
             ser_ports = len(aw.extracomport)
             self.closeserialports()
             for i in range(ser_ports):
-                comportComboBox =  self.serialtable.cellWidget(i,1)
-                aw.extracomport[i] = str(comportComboBox.currentText())
-                baudComboBox =  self.serialtable.cellWidget(i,2)
-                aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
-                byteComboBox =  self.serialtable.cellWidget(i,3)
-                aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
-                parityComboBox =  self.serialtable.cellWidget(i,4)
-                aw.extraparity[i] = str(parityComboBox.currentText())
-                stopbitsComboBox =  self.serialtable.cellWidget(i,5)
-                aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
-                timeoutEdit = self.serialtable.cellWidget(i,6)
-                aw.extratimeout[i] = int(str(timeoutEdit.text()))
+                devid = aw.qmc.extradevices[i]
+                devicename = aw.qmc.devices[devid-1]    #type identification of the device. Non editable
+                if devid != 29 and devid != 33 and devicename[0] != "+": # hide serial confs for MODBUS and "+XX" extra devices
+                    comportComboBox =  self.serialtable.cellWidget(i,1)
+                    aw.extracomport[i] = str(comportComboBox.currentText())
+                    baudComboBox =  self.serialtable.cellWidget(i,2)
+                    aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
+                    byteComboBox =  self.serialtable.cellWidget(i,3)
+                    aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
+                    parityComboBox =  self.serialtable.cellWidget(i,4)
+                    aw.extraparity[i] = str(parityComboBox.currentText())
+                    stopbitsComboBox =  self.serialtable.cellWidget(i,5)
+                    aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
+                    timeoutEdit = self.serialtable.cellWidget(i,6)
+                    aw.extratimeout[i] = int(str(timeoutEdit.text()))
             #create serial ports for each extra device
             aw.extraser = [None]*ser_ports
             #load the settings for the extra serial ports found
@@ -18802,12 +19244,13 @@ class comportDlg(ArtisanDialog):
                 aw.ser.commavailable = available[:]
                 for i in range(len(aw.qmc.extradevices)):
                     comportComboBox =  self.serialtable.cellWidget(i,1)
-                    comportComboBox.clear()
-                    comportComboBox.addItems(aw.ser.commavailable)
-                    if aw.extracomport[i] in aw.ser.commavailable:
-                        comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.extracomport[i]))
-                    else:
-                        comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)
+                    if comportComboBox != None:
+                        comportComboBox.clear()
+                        comportComboBox.addItems(aw.ser.commavailable)
+                        if aw.extracomport[i] in aw.ser.commavailable:
+                            comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.extracomport[i]))
+                        else:
+                            comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message", "scanforport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
@@ -18858,7 +19301,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.curveBox = QHBoxLayout()
         self.curveBox.addWidget(self.curves)
         self.curveBox.addWidget(self.lcds)
-        self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Device", None, QApplication.UnicodeUTF8))
+        self.nonpidButton = QRadioButton(QApplication.translate("Radio Button","Meter", None, QApplication.UnicodeUTF8))
         self.pidButton = QRadioButton(QApplication.translate("Radio Button","PID", None, QApplication.UnicodeUTF8))
         self.arduinoButton = QRadioButton(QApplication.translate("Radio Button","Arduino TC4", None, QApplication.UnicodeUTF8))
         self.programButton = QRadioButton(QApplication.translate("Radio Button","Program", None, QApplication.UnicodeUTF8))
@@ -19024,10 +19467,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
         adjustmentsLayout.addLayout(adjustmentHelp)
         adjustmentGroupBox.setLayout(adjustmentsLayout)
         #LAYOUT TAB 1
+        deviceSelector = QHBoxLayout()
+        deviceSelector.addWidget(self.devicetypeComboBox)
+        deviceSelector.addStretch()
         grid = QGridLayout()
         grid.addLayout(self.curveBox,0,1)
         grid.addWidget(self.nonpidButton,1,0)
-        grid.addWidget(self.devicetypeComboBox,1,1)
+        grid.addLayout(deviceSelector,1,1)
         grid.addWidget(self.pidButton,2,0)
         grid.addWidget(PIDGroupBox,2,1)
         grid.addWidget(self.arduinoButton,3,0)
@@ -19383,7 +19829,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         try:
             #save any extra devices here
             self.savedevicetable()
-            message = "Device left empty"
+            message = QApplication.translate("Message","Device not set", None, QApplication.UnicodeUTF8)
             # by default switch PID buttons/LCDs off
             aw.button_10.setVisible(False)
             aw.label6.setVisible(False)
@@ -19453,6 +19899,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.parity= 'N'
                 aw.ser.stopbits = 1
                 aw.ser.timeout = 1
+                aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
                 message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
                 aw.button_10.setVisible(True)
             elif self.programButton.isChecked():
@@ -19462,7 +19909,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
             elif self.nonpidButton.isChecked():
                 meter = str(self.devicetypeComboBox.currentText())
-                message = QApplication.translate("Error Message","device err",None,QApplication.UnicodeUTF8)
+                message = QApplication.translate("Error Message","Device error",None,QApplication.UnicodeUTF8)
                 if meter == "Omega HH806AU":
                     aw.qmc.device = 1
                     #aw.ser.comport = "COM11"
@@ -19480,6 +19927,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
+                    aw.ser.HH506RAid = "X" # ensure the HH506RA gets reinitalized if settings changed
                     message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "CENTER 309":
                     aw.qmc.device = 3
@@ -19637,24 +20085,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
-                elif meter == "+309_34":
-                    aw.qmc.device = 21
-                    #aw.ser.comport = "COM4"
-                    aw.ser.baudrate = 9600
-                    aw.ser.bytesize = 8
-                    aw.ser.parity= 'N'
-                    aw.ser.stopbits = 1
-                    aw.ser.timeout = 1
-                    message = ""  #empty message especial device
-                elif meter == "+FUJI DUTY%":
-                    aw.qmc.device = 22
-                    #aw.ser.comport = "COM4"
-                    aw.ser.baudrate = 9600
-                    aw.ser.bytesize = 8
-                    aw.ser.parity= 'E'
-                    aw.ser.stopbits = 1
-                    aw.ser.timeout = 1
-                    message = ""   #empty message especial device
+                ##########################
+                ####  DEVICE 21 is +309_34 but +DEVICE cannot be set as main device
+                ##########################                    
+                ##########################
+                ####  DEVICE 22 is +FUJI DUTY% but +DEVICE cannot be set as main device
+                ##########################
                 elif meter == "Omega HHM28[6]":
                     aw.qmc.device = 23
                     #aw.ser.comport = "COM1"
@@ -19664,6 +20100,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
+# +DEVICEs cannot be set as main device
                 elif meter == "+204_34":
                     aw.qmc.device = 24
                     aw.ser.baudrate = 9600
@@ -19671,29 +20108,19 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = ""  #empty message especial device
-                elif meter == "+Virtual":
-                    aw.qmc.device = 25
-                    aw.ser.baudrate = 9600
-                    aw.ser.bytesize = 8
-                    aw.ser.parity= 'N'
-                    aw.ser.stopbits = 1
-                    aw.ser.timeout = 1
-                    message = ""  #empty message especial device
+                    message = ""  #empty message especial device                   
+                ##########################
+                ####  DEVICE 25 is +Virtual but +DEVICE cannot be set as main device
+                ##########################
                 ##########################
                 ####  DEVICE 26 is DTA pid
                 ##########################
                 ##########################
                 ####  DEVICE 27 is an external program
+                ##########################                   
                 ##########################
-                elif meter == "+ArduinoTC4_34":
-                    aw.qmc.device = 28
-                    aw.ser.baudrate = 19200
-                    aw.ser.bytesize = 8
-                    aw.ser.parity= 'N'
-                    aw.ser.stopbits = 1
-                    aw.ser.timeout = 1
-                    message = ""  #empty message especial device
+                ####  DEVICE 28 is +ArduinoTC4_34 but +DEVICE cannot be set as main device
+                ##########################
                 elif meter == "MODBUS":
                     aw.qmc.device = 29
                     #aw.ser.comport = "COM4"
@@ -19721,23 +20148,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to %1, which is equivalent to HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-                elif meter == "+ArduinoTC4_56":
-                    aw.qmc.device = 32
-                    aw.ser.baudrate = 19200
-                    aw.ser.bytesize = 8
-                    aw.ser.parity= 'N'
-                    aw.ser.stopbits = 1
-                    aw.ser.timeout = 1
-                    message = ""  #empty message especial device
-                elif meter == "+MODBUS_34":
-                    aw.qmc.device = 33
-                    #aw.ser.comport = "COM4"
-                    aw.ser.baudrate = 115200
-                    aw.ser.bytesize = 8
-                    aw.ser.parity= 'N'
-                    aw.ser.stopbits = 1
-                    aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                ##########################
+                ####  DEVICE 32 is +ArduinoTC4_56 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 33 is +MODBUS_34 but +DEVICE cannot be set as main device
+                ##########################
                 elif meter == "Omega HH806W":
                     aw.qmc.device = 34
                     #aw.ser.comport = "COM11"
@@ -21214,94 +21630,94 @@ class AlarmDlg(ArtisanDialog):
 #################### COFFEE CRACK  DETECTOR PROJECT ###################################
 #######################################################################################
 
-class soundcrack(FigureCanvas):
-    def __init__(self,parent):
-        self.fig = Figure(facecolor='lightgrey')
-        FigureCanvas.__init__(self, self.fig)
-        self.ax = self.fig.add_subplot(111, axisbg="black")
-        self.ax.grid(True,linewidth=2,color="green")
-        self.ax.set_xlim(0,5500)
-        self.ax.set_ylim(-1,1)
-        #make first empty plot of frequency
-        self.Freqline, = self.ax.plot([], [], animated=True, lw=1,color = "#78E800")
-        #make first empty plot of rms amplitude     
-        self.Ampline, = self.ax.plot([], [], animated=True, lw=2,color = "orange")
-        self.N_SAMPLES = 1024
-        self.SAMPLING_RATE = 11025
-        self.amplitudeThreshold = .6
-        self.fig.canvas.draw()
-        self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
-        self.ampsensitivity = 10
-        self.freqs = numpy.fft.fftfreq(self.N_SAMPLES,1./self.SAMPLING_RATE)[:self.N_SAMPLES/2] #X axis
-        self.stream = None
-        self.pa = None
-        self.ON = 0
-
-    def reset(self):
-        self.fig.clf()   #wipe out figure
-        self.ax = self.fig.add_subplot(111, axisbg="black")
-        self.ax.grid(True,linewidth=2,color="green")
-        self.ax.set_xlim(0,5500)
-        self.ax.set_ylim(-1,1)
-        self.fig.canvas.draw()
-        self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
-
-    def crackdetedted(self):
-        pass
-
-    #updates animated display
-    def blitsound(self):   
-        if self.ON:
-            self.fig.canvas.restore_region(self.background)
-            F,amplitude = self.getsound()
-            amplitude *= self.ampsensitivity
-            self.Freqline.set_data(self.freqs,F)
-            self.Ampline.set_data([0,5500],[amplitude,amplitude])
-            self.ax.draw_artist(self.Freqline)
-            self.ax.draw_artist(self.Ampline)
-            self.fig.canvas.blit(self.ax.bbox)
-
-    def opensound(self):
-        try:
-            import pyaudio
-        except ImportError:
-            return False
-        self.reset()
-        self.ON = 1    
-        self.pa = pyaudio.PyAudio()
-        self.stream = self.pa.open(format=pyaudio.paInt16, channels=1, rate=self.SAMPLING_RATE,
-                     input=True, frames_per_buffer=self.N_SAMPLES)
-
-    def closesound(self):
-        self.ON = 0
-        self.stream.close()
-        self.pa.terminate()
-        
-    def getsound(self):
-        #F[m] = m*SAMPLING_RATE/N_SAMPLES   (List with magnitudes of frequencies) Y axis
-        
-        block = self.stream.read(self.N_SAMPLES)
-        
-        count = len(block)/2
-        formatS = "%dh"%(count)    
-        audio_data  = struct.unpack(formatS, block)
-        sum_squares = 0
-        naudio = []
-        for sample in audio_data:
-            n = sample /32768.            #normalize
-            naudio.append(n)
-            sum_squares += n*n
-        from scipy import fft
-        F = fft(naudio)[:self.N_SAMPLES/2]
-        amplitude =  math.sqrt(sum_squares / count)    #rms
-        return F,amplitude
-
-    def keyPressEvent(self,event):
-        key = int(event.key())
-        #uncomment next line to find the integer value of a key
-        #print key
-        if key == 16777216: #ESCAPE
-            self.close()
+#class soundcrack(FigureCanvas):
+#    def __init__(self,parent):
+#        self.fig = Figure(facecolor='lightgrey')
+#        FigureCanvas.__init__(self, self.fig)
+#        self.ax = self.fig.add_subplot(111, axisbg="black")
+#        self.ax.grid(True,linewidth=2,color="green")
+#        self.ax.set_xlim(0,5500)
+#        self.ax.set_ylim(-1,1)
+#        #make first empty plot of frequency
+#        self.Freqline, = self.ax.plot([], [], animated=True, lw=1,color = "#78E800")
+#        #make first empty plot of rms amplitude     
+#        self.Ampline, = self.ax.plot([], [], animated=True, lw=2,color = "orange")
+#        self.N_SAMPLES = 1024
+#        self.SAMPLING_RATE = 11025
+#        self.amplitudeThreshold = .6
+#        self.fig.canvas.draw()
+#        self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
+#        self.ampsensitivity = 10
+#        self.freqs = numpy.fft.fftfreq(self.N_SAMPLES,1./self.SAMPLING_RATE)[:self.N_SAMPLES/2] #X axis
+#        self.stream = None
+#        self.pa = None
+#        self.ON = 0
+#
+#    def reset(self):
+#        self.fig.clf()   #wipe out figure
+#        self.ax = self.fig.add_subplot(111, axisbg="black")
+#        self.ax.grid(True,linewidth=2,color="green")
+#        self.ax.set_xlim(0,5500)
+#        self.ax.set_ylim(-1,1)
+#        self.fig.canvas.draw()
+#        self.background = self.fig.canvas.copy_from_bbox(self.ax.bbox)
+#
+#    def crackdetedted(self):
+#        pass
+#
+#    #updates animated display
+#    def blitsound(self):   
+#        if self.ON:
+#            self.fig.canvas.restore_region(self.background)
+#            F,amplitude = self.getsound()
+#            amplitude *= self.ampsensitivity
+#            self.Freqline.set_data(self.freqs,F)
+#            self.Ampline.set_data([0,5500],[amplitude,amplitude])
+#            self.ax.draw_artist(self.Freqline)
+#            self.ax.draw_artist(self.Ampline)
+#            self.fig.canvas.blit(self.ax.bbox)
+#
+#    def opensound(self):
+#        try:
+#            import pyaudio
+#        except ImportError:
+#            return False
+#        self.reset()
+#        self.ON = 1    
+#        self.pa = pyaudio.PyAudio()
+#        self.stream = self.pa.open(format=pyaudio.paInt16, channels=1, rate=self.SAMPLING_RATE,
+#                     input=True, frames_per_buffer=self.N_SAMPLES)
+#
+#    def closesound(self):
+#        self.ON = 0
+#        self.stream.close()
+#        self.pa.terminate()
+#        
+#    def getsound(self):
+#        #F[m] = m*SAMPLING_RATE/N_SAMPLES   (List with magnitudes of frequencies) Y axis
+#        
+#        block = self.stream.read(self.N_SAMPLES)
+#        
+#        count = len(block)/2
+#        formatS = "%dh"%(count)    
+#        audio_data  = struct.unpack(formatS, block)
+#        sum_squares = 0
+#        naudio = []
+#        for sample in audio_data:
+#            n = sample /32768.            #normalize
+#            naudio.append(n)
+#            sum_squares += n*n
+#        from scipy import fft
+#        F = fft(naudio)[:self.N_SAMPLES/2]
+#        amplitude =  math.sqrt(sum_squares / count)    #rms
+#        return F,amplitude
+#
+#    def keyPressEvent(self,event):
+#        key = int(event.key())
+#        #uncomment next line to find the integer value of a key
+#        #print key
+#        if key == 16777216: #ESCAPE
+#            self.close()
 
 #########################################################################
 ######################## FUJI PXR CONTROL DIALOG  #######################
