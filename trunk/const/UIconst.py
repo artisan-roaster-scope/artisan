@@ -106,6 +106,7 @@ if platf != 'Darwin':
 #note that the "About" menu item is recognized only if it is named "About", but automatically translated by the Qt standard tranlators
 HELP_MENU_ABOUT = "About" #QApplication.translate("Menu", "About", None, QApplication.UnicodeUTF8)
 HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None, QApplication.UnicodeUTF8)
+HELP_MENU_BLOG = QApplication.translate("Menu", "Blog", None, QApplication.UnicodeUTF8)
 HELP_MENU_KEYBOARDSHORTCUTS = QApplication.translate("Menu", "Keyboard Shortcuts", None, QApplication.UnicodeUTF8)
 HELP_MENU_ERRORS = QApplication.translate("Menu", "Errors", None, QApplication.UnicodeUTF8)
 HELP_MENU_MESSAGES = QApplication.translate("Menu", "Messages", None, QApplication.UnicodeUTF8)
