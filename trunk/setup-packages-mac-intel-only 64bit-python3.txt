@@ -12,15 +12,19 @@ o matplotlib 1.2.1
 o pyaudio 0.2.7
 o minimalmodbus 0.4
 
-o modulegraph 0.10.4
-o distribute 0.6.29
+o modulegraph >0.10.4 trunk (21.4.2013)
+o distribute 0.6.36
 o altgraph 0.10.2
-o macholib 1.5
-o py2app 0.7.3
-
+o macholib 1.5.1
+o py2app >0.7.3 trunk (21.4.2013)
 
 Upgrade History:
 
+- 2013-04-21:
+ . distribute 0.6.29 => 0.6.36
+ . macholib 1.5 => 1.5.1
+ . modulegraph 10.4 => trunk (21.4.2013)
+ . py2app 0.7.3 => trunk ((21.4.2013)
 - 2013-04-12:
  . Python 3.3.0 => 3.3.1
  . numpy 1.7.0 => 1.7.1
@@ -188,6 +192,7 @@ download source
 # python3 setup.py build
 # sudo python3 setup.py install
 
+NOTE: always remove the build directory completely before recompiling
 
 8) scipy from git repository
 
@@ -195,6 +200,9 @@ download source
 # cd scipy
 # python3 setup.py build
 # sudo python3 setup.py install
+
+NOTE: always remove the build directory completely before recompiling
+
 
 check installation:
 
@@ -354,13 +362,13 @@ from source (not needed):
 # sudo python3 setup.py install
 
 
-14) Install distribute 0.6.29
+14) Install distribute 0.6.36
 
-http://pypi.python.org/packages/source/d/distribute/distribute-0.6.29.tar.gz
+http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
 
-# curl -O http://pypi.python.org/packages/source/d/distribute/distribute-0.6.29.tar.gz
-# tar -xzvf distribute-0.6.29.tar.gz
-# cd distribute-0.6.29
+# curl -O http://pypi.python.org/packages/source/d/distribute/distribute-0.6.36.tar.gz
+# tar -xzvf distribute-0.6.36.tar.gz
+# cd distribute-0.6.36
 # python3 setup.py build
 # sudo python3 setup.py install
 
