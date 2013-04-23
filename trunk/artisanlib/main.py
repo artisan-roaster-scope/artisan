@@ -530,7 +530,7 @@ class tgraphcanvas(FigureCanvas):
         
         self.whole_color = 0
         self.ground_color = 0
-        self.color_systems = ["","Moppette","Colorette","ColorTrack","Agtron Gourmet","Agtron Commercial"]
+        self.color_systems = ["","Moppette","Colorette","ColorTrack","Agtron"]
         self.color_system_idx = 0
         
         # roast property flags
@@ -894,10 +894,11 @@ class tgraphcanvas(FigureCanvas):
         
         # variables
         
-        self.filterDoppOuts = True
+        self.filterDropOuts = True
         self.filterDropOut_tmin = self.filterDropOut_tmin_F_default
         self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
         self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
+        self.dropSpikes = False
 
         ###########################         wheel graph variables     ################################
         self.wheelflag = False
@@ -1782,12 +1783,12 @@ class tgraphcanvas(FigureCanvas):
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
     # 'flat' results in moving average
     # window_len should be odd
-    # first applies a median filter to remove spikes if filterDoppOuts is True
+    # first applies a median filter to remove spikes if filterDropOuts is True
     def smooth(self, x, y, window_len=15, window='hanning'):
         try:
             if len(x) == len(y) and len(x) > 1:
                 # filter spikes
-                if aw.qmc.filterDoppOuts:
+                if aw.qmc.filterDropOuts:
                     y = self.medfilt(y,5) # k=3 seems not to catch all spikes in all cases
                 if window_len > 2 and len(x) == len(y) and len(x) > 1:
                     # smooth curves
@@ -5122,21 +5123,20 @@ class SampleThread(QThread):
                 wrong_reading = 1
             #########################
             # b) detect spikes
-# NOTE: for now we do the spike outliers removal within the smooth() function without modifying the real data
-#            n = aw.qmc.filterDropOut_spikeRoR_period
-#            dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
-#            if aw.qmc.filterDoppOuts and not wrong_reading and len(tempx) >= n:
-#                # no min/max overflow detected
-#                # check if RoR caused by actual measurement is way higher then the previous one
-#                # calc previous RoR (pRoR) taking the last n samples into account
-#                pdtemp = tempx[-1] - tempx[-n]
-#                pdtime = timex[-1] - timex[-n]
-#                pRoR = abs(pdtemp/pdtime)
-#                dtemp = tempx[-1] - temp
-#                dtime = timex[-1] - time
-#                RoR = abs(dtemp/dtime)
-#                if RoR > pRoR + dRoR_limit:
-#                    wrong_reading = 2
+            n = aw.qmc.filterDropOut_spikeRoR_period
+            dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
+            if aw.qmc.dropSpikes and not wrong_reading and len(tempx) >= n:
+                # no min/max overflow detected
+                # check if RoR caused by actual measurement is way higher then the previous one
+                # calc previous RoR (pRoR) taking the last n samples into account
+                pdtemp = tempx[-1] - tempx[-n]
+                pdtime = timex[-1] - timex[-n]
+                pRoR = abs(pdtemp/pdtime)
+                dtemp = tempx[-1] - temp
+                dtime = timex[-1] - time
+                RoR = abs(dtemp/dtime)
+                if RoR > pRoR + dRoR_limit:
+                    wrong_reading = 2
             #########################
             # c) handle outliers if it could be detected
             if wrong_reading:
@@ -5144,7 +5144,8 @@ class SampleThread(QThread):
                     #aw.sendmessage(QApplication.translate("Message","Overflow detected",None, QApplication.UnicodeUTF8))
                     pass
                 elif wrong_reading == 2:
-                    aw.sendmessage(QApplication.translate("Message","Spike detected",None, QApplication.UnicodeUTF8))
+                    #aw.sendmessage(QApplication.translate("Message","Spike detected",None, QApplication.UnicodeUTF8))
+                    pass
                 # simple repeat strategy
                 if len(tempx) > 0 and tempx[-1] != -1:
                     # repeate last correct reading if not done before
@@ -6245,8 +6246,8 @@ class ApplicationWindow(QMainWindow):
         self.extraLCD1,self.extraLCD2 = [],[]
         self.extraLCDlabel1,self.extraLCDlabel2 = [],[]
         self.extraLCDframe1,self.extraLCDframe2 = [],[]
-        self.extraLCDvisibility1,self.extraLCDvisibility2 = [0]*self.nLCDS,[0]*self.nLCDS
-        self.extraCurveVisibility1,self.extraCurveVisibility2 = [0]*self.nLCDS,[0]*self.nLCDS
+        self.extraLCDvisibility1,self.extraLCDvisibility2 = [True]*self.nLCDS,[True]*self.nLCDS
+        self.extraCurveVisibility1,self.extraCurveVisibility2 = [True]*self.nLCDS,[True]*self.nLCDS
         for i in range(self.nLCDS):
             #configure LCDs
             self.extraLCDframe1.append(QFrame())
@@ -8902,7 +8903,8 @@ class ApplicationWindow(QMainWindow):
                     elif type(self.dtapid.dtamem[key][0]) == type(int()):
                         self.dtapid.dtamem[key][0] = settings.value(key,self.dtapid.dtamem[key][0]).toInt()[0]
                 settings.endGroup()
-            self.qmc.filterDoppOuts = settings.value("filterDoppOuts",self.qmc.filterDoppOuts).toBool()
+            self.qmc.filterDropOuts = settings.value("filterDropOuts",self.qmc.filterDropOuts).toBool()
+            self.qmc.dropSpikes = settings.value("dropSpikes",self.qmc.dropSpikes).toBool()
             settings.beginGroup("RoC")
             self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
@@ -8924,7 +8926,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.BTlcd = settings.value("BTlcd",self.qmc.BTlcd).toBool()
             settings.beginGroup("DefaultButtons")
             if settings.contains("buttonvisibility"):
-                self.qmc.buttonvisibility = [x.toInt()[0] for x in settings.value("buttonvisibility").toList()]
+                self.qmc.buttonvisibility = [x.toBool() for x in settings.value("buttonvisibility").toList()]
             if settings.contains("buttonactions"):
                 self.qmc.buttonactions = [x.toInt()[0] for x in settings.value("buttonactions").toList()]
             if settings.contains("buttonactionstrings"):
@@ -8976,13 +8978,13 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extradevicecolor1 = list(map(str,list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList())))
                 self.qmc.extradevicecolor2 = list(map(str,list(settings.value("extradevicecolor2",self.qmc.extradevicecolor2).toStringList())))
                 if settings.contains("extraLCDvisibility1"):
-                    self.extraLCDvisibility1 = [bool(x.toInt()[0]) for x in settings.value("extraLCDvisibility1").toList()]
+                    self.extraLCDvisibility1 = [x.toBool() for x in settings.value("extraLCDvisibility1").toList()]
                 if settings.contains("extraLCDvisibility2"):
-                    self.extraLCDvisibility2 = [bool(x.toInt()[0]) for x in settings.value("extraLCDvisibility2").toList()]
+                    self.extraLCDvisibility2 = [x.toBool() for x in settings.value("extraLCDvisibility2").toList()]
                 if settings.contains("extraCurveVisibility1"):
-                    self.extraCurveVisibility1 = [bool(x.toInt()[0]) for x in settings.value("extraCurveVisibility1").toList()]
+                    self.extraCurveVisibility1 = [x.toBool() for x in settings.value("extraCurveVisibility1").toList()]
                 if settings.contains("extraCurveVisibility2"):
-                    self.extraCurveVisibility2 = [bool(x.toInt()[0]) for x in settings.value("extraCurveVisibility2").toList()]
+                    self.extraCurveVisibility2 = [x.toBool() for x in settings.value("extraCurveVisibility2").toList()]
             #create empty containers
             settings.endGroup()
             #restore curve styles
@@ -9124,10 +9126,10 @@ class ApplicationWindow(QMainWindow):
             #restore background profile settings
             settings.beginGroup("background")
             if settings.contains("backgrounddetails"):
-                aw.qmc.backgroundDetails = settings.value("backgrounddetails",aw.qmc.backgroundDetails).toInt()[0]
-                aw.qmc.backgroundeventsflag = settings.value("backgroundevents",aw.qmc.backgroundeventsflag).toInt()[0]
-                aw.qmc.DeltaETBflag = settings.value("DeltaETB",aw.qmc.DeltaETBflag).toInt()[0]
-                aw.qmc.DeltaBTBflag = settings.value("DeltaBTB",aw.qmc.DeltaBTBflag).toInt()[0]
+                aw.qmc.backgroundDetails = settings.value("backgrounddetails",aw.qmc.backgroundDetails).toBool()
+                aw.qmc.backgroundeventsflag = settings.value("backgroundevents",aw.qmc.backgroundeventsflag).toBool()
+                aw.qmc.DeltaETBflag = settings.value("DeltaETB",aw.qmc.DeltaETBflag).toBool()
+                aw.qmc.DeltaBTBflag = settings.value("DeltaBTB",aw.qmc.DeltaBTBflag).toBool()
             settings.endGroup()
             #restore buttons
             settings.beginGroup("ExtraEventButtons")
@@ -9198,14 +9200,14 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.button_11.setVisible(False)
             #set default button visibility
-            aw.button_8.setVisible(aw.qmc.buttonvisibility[0])
-            aw.button_19.setVisible(aw.qmc.buttonvisibility[1])
-            aw.button_3.setVisible(aw.qmc.buttonvisibility[2])
-            aw.button_4.setVisible(aw.qmc.buttonvisibility[3])
-            aw.button_5.setVisible(aw.qmc.buttonvisibility[4])
-            aw.button_6.setVisible(aw.qmc.buttonvisibility[5])
-            aw.button_9.setVisible(aw.qmc.buttonvisibility[6])
-            aw.button_20.setVisible(aw.qmc.buttonvisibility[7])
+            aw.button_8.setVisible(bool(aw.qmc.buttonvisibility[0]))
+            aw.button_19.setVisible(bool(aw.qmc.buttonvisibility[1]))
+            aw.button_3.setVisible(bool(aw.qmc.buttonvisibility[2]))
+            aw.button_4.setVisible(bool(aw.qmc.buttonvisibility[3]))
+            aw.button_5.setVisible(bool(aw.qmc.buttonvisibility[4]))
+            aw.button_6.setVisible(bool(aw.qmc.buttonvisibility[5]))
+            aw.button_9.setVisible(bool(aw.qmc.buttonvisibility[6]))
+            aw.button_20.setVisible(bool(aw.qmc.buttonvisibility[7]))
             self.qmc.redraw()
             # set default window appearances (style)
             #pylint: disable=E1102
@@ -9503,7 +9505,8 @@ class ApplicationWindow(QMainWindow):
             for key in list(self.dtapid.dtamem.keys()):
                 settings.setValue(key,self.dtapid.dtamem[key][0])
             settings.endGroup()
-            settings.setValue("filterDoppOuts",self.qmc.filterDoppOuts)
+            settings.setValue("filterDropOuts",self.qmc.filterDropOuts)
+            settings.setValue("dropSpikes",self.qmc.dropSpikes)
             settings.beginGroup("RoC")
             settings.setValue("DeltaET",self.qmc.DeltaETflag)
             settings.setValue("DeltaBT",self.qmc.DeltaBTflag)
@@ -9817,10 +9820,10 @@ class ApplicationWindow(QMainWindow):
         axes["gridthickness"]= str(self.qmc.gridthickness)
         axes["gridalpha"]= str(self.qmc.gridalpha)
         axes["xrotation"]= str(self.qmc.xrotation)
-        general["extraLCDvisibility1"] = self.extraLCDvisibility1
-        general["extraLCDvisibility2"] = self.extraLCDvisibility2
-        general["extraCurveVisibility1"] = self.extraCurveVisibility1
-        general["extraCurveVisibility2"] = self.extraCurveVisibility2
+        general["extraLCDvisibility1"] = str(self.extraLCDvisibility1)
+        general["extraLCDvisibility2"] = str(self.extraLCDvisibility2)
+        general["extraCurveVisibility1"] = str(self.extraCurveVisibility1)
+        general["extraCurveVisibility2"] = str(self.extraCurveVisibility2)
         settingsx = [general,device,phases,statistics,events,delay,colors,cupping,extras,serial,axes,roast,alarms]
         #keep same order
         settingsnames = ["general","device config","phases config","statistics config","events config","sampling interval","colors config",
@@ -9949,6 +9952,10 @@ th {
 <tr>
 <th>""" + u(QApplication.translate("HTML Report Template", "Cupping:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$cup</td>
+</tr>
+<tr>
+<th>""" + u(QApplication.translate("HTML Report Template", "Color:", None, QApplication.UnicodeUTF8)) + """</th>
+<td>$color</td>
 </tr>
 </table>
 </td>
@@ -10144,7 +10151,12 @@ $cupping_notes
             humidity += " (ambient)"
         if len(humidity) == 0:
             humidity = "--"
-            
+        if self.qmc.whole_color or self.qmc.ground_color:
+            color = str(self.qmc.whole_color) + "/" + str(self.qmc.ground_color)
+            if self.qmc.color_system_idx:
+                color = color + " (" + self.qmc.color_systems[self.qmc.color_system_idx] + ")"
+        else:
+            color = "--"
         html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             title=cgi.escape(self.qmc.title),
             datetime=str(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
@@ -10155,6 +10167,7 @@ $cupping_notes
             roaster=cgi.escape(self.qmc.roastertype),
             operator=cgi.escape(self.qmc.operator),
             cup=str(self.cuppingSum()),
+            color=color,
             charge=charge,            
             size=("--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm"),
             density=density,
@@ -11587,10 +11600,14 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setRange(0,40)
         self.Filter.setValue(aw.qmc.curvefilter - 2)
         self.connect(self.Filter,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))
-        #fitlerspikes
+        #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Filter Spikes",None, QApplication.UnicodeUTF8))
-        self.FilterSpikes.setChecked(aw.qmc.filterDoppOuts)
+        self.FilterSpikes.setChecked(aw.qmc.filterDropOuts)
         self.connect(self.FilterSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDropFilter(i))
+        #dropspikes
+        self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None, QApplication.UnicodeUTF8))
+        self.DropSpikes.setChecked(aw.qmc.dropSpikes)
+        self.connect(self.DropSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeSpikeFilter(i))
         #show projection
         self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection",None, QApplication.UnicodeUTF8))
         self.projectionmodeComboBox = QComboBox()
@@ -11668,6 +11685,7 @@ class HUDDlg(ArtisanDialog):
         sensitivityLayout.addStretch()
         spikesLayout = QHBoxLayout()
         spikesLayout.addWidget(self.FilterSpikes)
+        spikesLayout.addWidget(self.DropSpikes)
         spikesLayout.addStretch()
         curvesLayout = QVBoxLayout()
         curvesLayout.addLayout(rorBoxLayout)
@@ -12126,8 +12144,11 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.adderror(QApplication.translate("Error Message", "changeDeltaFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def changeDropFilter(self,i):
-        aw.qmc.filterDoppOuts = not aw.qmc.filterDoppOuts
+        aw.qmc.filterDropOuts = not aw.qmc.filterDropOuts
         aw.qmc.redraw(recomputeAllDeltas=False,smooth=True)
+
+    def changeSpikeFilter(self,i):
+        aw.qmc.dropSpikes = not aw.qmc.dropSpikes
         
     def changeFilter(self,i):
         try:
@@ -12173,7 +12194,8 @@ class HUDDlg(ArtisanDialog):
 
     #button OK
     def updatetargets(self):
-        aw.qmc.filterDoppOuts = self.FilterSpikes.isChecked()
+        aw.qmc.filterDropOuts = self.FilterSpikes.isChecked()
+        aw.qmc.dropSpikes = self.DropSpikes.isChecked()
         mode = str(self.modeComboBox.currentText())
         if mode == QApplication.translate("ComboBox","metrics", None, QApplication.UnicodeUTF8):
             aw.HUDfunction = 0
@@ -12338,7 +12360,7 @@ class editGraphDlg(ArtisanDialog):
         self.cooledit.setMinimumWidth(50)
         coollabel.setBuddy(self.cooledit)
         self.roastproperties = QCheckBox(QApplication.translate("CheckBox","Delete roast properties on RESET", None, QApplication.UnicodeUTF8))
-        self.roastproperties.setChecked(aw.qmc.roastpropertiesflag)
+        self.roastproperties.setChecked(bool(aw.qmc.roastpropertiesflag))
         self.connect(self.roastproperties,SIGNAL("stateChanged(int)"),self.roastpropertiesChanged)
         # EVENTS
         #table for showing events
@@ -12677,7 +12699,7 @@ class editGraphDlg(ArtisanDialog):
         weightLayout.addWidget(self.weightpercentlabel)
         weightLayout.addSpacing(10)
         weightLayout.addWidget(self.roastdegreelabel)
-        if aw.scale.device != "None":
+        if aw.scale.device != None and aw.scale.device != 0:
             weightLayout.addWidget(inButton) 
             weightLayout.addSpacing(10)
             weightLayout.addWidget(outButton) 
@@ -14099,14 +14121,14 @@ class EventsDlg(ArtisanDialog):
         self.storeState()
         ## TAB 1
         self.eventsbuttonflag = QCheckBox(QApplication.translate("CheckBox","Button",None, QApplication.UnicodeUTF8))
-        self.eventsbuttonflag.setChecked(aw.eventsbuttonflag)
+        self.eventsbuttonflag.setChecked(bool(aw.eventsbuttonflag))
         self.connect(self.eventsbuttonflag,SIGNAL("stateChanged(int)"),self.eventsbuttonflagChanged)
         self.eventsshowflagbox = QCheckBox(QApplication.translate("CheckBox","Show",None, QApplication.UnicodeUTF8))
-        self.eventsshowflagbox.setChecked(aw.qmc.eventsshowflag)
+        self.eventsshowflagbox.setChecked(bool(aw.qmc.eventsshowflag))
         self.connect(self.eventsshowflagbox,SIGNAL("stateChanged(int)"),self.eventsshowflagChanged)
         self.minieventsflag = QCheckBox(QApplication.translate("CheckBox","Mini Editor",None, QApplication.UnicodeUTF8))
         self.minieventsflag.setToolTip(QApplication.translate("Tooltip","Allows to enter a description of the last event",None, QApplication.UnicodeUTF8))
-        self.minieventsflag.setChecked(aw.minieventsflag)
+        self.minieventsflag.setChecked(bool(aw.minieventsflag))
         self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)
         barstylelabel = QLabel(QApplication.translate("Label","Bars",None, QApplication.UnicodeUTF8))
         barstyles = [QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
@@ -14355,16 +14377,16 @@ class EventsDlg(ArtisanDialog):
         factortitlelabel.setFont(titlefont)
         self.E1visibility = QCheckBox(aw.qmc.etypes[0])
         self.E1visibility.setFocusPolicy(Qt.NoFocus)
-        self.E1visibility.setChecked(aw.eventslidervisibilities[0])
+        self.E1visibility.setChecked(bool(aw.eventslidervisibilities[0]))
         self.E2visibility = QCheckBox(aw.qmc.etypes[1])
         self.E2visibility.setFocusPolicy(Qt.NoFocus)
-        self.E2visibility.setChecked(aw.eventslidervisibilities[1])
+        self.E2visibility.setChecked(bool(aw.eventslidervisibilities[1]))
         self.E3visibility = QCheckBox(aw.qmc.etypes[2])
         self.E3visibility.setFocusPolicy(Qt.NoFocus)
-        self.E3visibility.setChecked(aw.eventslidervisibilities[2])
+        self.E3visibility.setChecked(bool(aw.eventslidervisibilities[2]))
         self.E4visibility = QCheckBox(aw.qmc.etypes[3])
         self.E4visibility.setFocusPolicy(Qt.NoFocus)
-        self.E4visibility.setChecked(aw.eventslidervisibilities[3])
+        self.E4visibility.setChecked(bool(aw.eventslidervisibilities[3]))
         self.sliderActionTypes = [QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Serial Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
@@ -14462,7 +14484,7 @@ class EventsDlg(ArtisanDialog):
                        QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8)]
         self.CHARGEbutton = QCheckBox(QApplication.translate("CheckBox", "CHARGE",None, QApplication.UnicodeUTF8))
-        self.CHARGEbutton.setChecked(aw.qmc.buttonvisibility[0])
+        self.CHARGEbutton.setChecked(bool(aw.qmc.buttonvisibility[0]))
         self.CHARGEbuttonActionType = QComboBox()
         self.CHARGEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.CHARGEbuttonActionType.setFocusPolicy(Qt.NoFocus)
@@ -14471,7 +14493,7 @@ class EventsDlg(ArtisanDialog):
         self.CHARGEbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[0])
         self.CHARGEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
         self.DRYbutton = QCheckBox(QApplication.translate("CheckBox", "DRY END",None, QApplication.UnicodeUTF8))
-        self.DRYbutton.setChecked(aw.qmc.buttonvisibility[1])
+        self.DRYbutton.setChecked(bool(aw.qmc.buttonvisibility[1]))
         self.DRYbuttonActionType = QComboBox()
         self.DRYbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.DRYbuttonActionType.setFocusPolicy(Qt.NoFocus)
@@ -14480,7 +14502,7 @@ class EventsDlg(ArtisanDialog):
         self.DRYbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[1])
         self.DRYbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
         self.FCSbutton = QCheckBox(QApplication.translate("CheckBox", "FC START",None, QApplication.UnicodeUTF8))
-        self.FCSbutton.setChecked(aw.qmc.buttonvisibility[2])
+        self.FCSbutton.setChecked(bool(aw.qmc.buttonvisibility[2]))
         self.FCSbuttonActionType = QComboBox()
         self.FCSbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.FCSbuttonActionType.setFocusPolicy(Qt.NoFocus)
@@ -14489,7 +14511,7 @@ class EventsDlg(ArtisanDialog):
         self.FCSbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[2])
         self.FCSbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
         self.FCEbutton = QCheckBox(QApplication.translate("CheckBox", "FC END",None, QApplication.UnicodeUTF8))
-        self.FCEbutton.setChecked(aw.qmc.buttonvisibility[3])
+        self.FCEbutton.setChecked(bool(aw.qmc.buttonvisibility[3]))
         self.FCEbuttonActionType = QComboBox()
         self.FCEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.FCEbuttonActionType.setFocusPolicy(Qt.NoFocus)
@@ -14498,7 +14520,7 @@ class EventsDlg(ArtisanDialog):
         self.FCEbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[3])
         self.FCEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
         self.SCSbutton = QCheckBox(QApplication.translate("CheckBox", "SC START",None, QApplication.UnicodeUTF8))
-        self.SCSbutton.setChecked(aw.qmc.buttonvisibility[4])
+        self.SCSbutton.setChecked(bool(aw.qmc.buttonvisibility[4]))
         self.SCSbuttonActionType = QComboBox()
         self.SCSbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.SCSbuttonActionType.setFocusPolicy(Qt.NoFocus)
@@ -14507,7 +14529,7 @@ class EventsDlg(ArtisanDialog):
         self.SCSbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[4])
         self.SCSbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
         self.SCEbutton = QCheckBox(QApplication.translate("CheckBox", "SC END",None, QApplication.UnicodeUTF8))
-        self.SCEbutton.setChecked(aw.qmc.buttonvisibility[5])
+        self.SCEbutton.setChecked(bool(aw.qmc.buttonvisibility[5]))
         self.SCEbuttonActionType = QComboBox()
         self.SCEbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.SCEbuttonActionType.setFocusPolicy(Qt.NoFocus)
@@ -14516,7 +14538,7 @@ class EventsDlg(ArtisanDialog):
         self.SCEbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[5])
         self.SCEbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
         self.DROPbutton = QCheckBox(QApplication.translate("CheckBox", "DROP",None, QApplication.UnicodeUTF8))
-        self.DROPbutton.setChecked(aw.qmc.buttonvisibility[6])
+        self.DROPbutton.setChecked(bool(aw.qmc.buttonvisibility[6]))
         self.DROPbuttonActionType = QComboBox()
         self.DROPbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.DROPbuttonActionType.setFocusPolicy(Qt.NoFocus)
@@ -14525,7 +14547,7 @@ class EventsDlg(ArtisanDialog):
         self.DROPbuttonActionString = QLineEdit(aw.qmc.buttonactionstrings[6])
         self.DROPbuttonActionString.setToolTip(QApplication.translate("Tooltip", "Action String", None, QApplication.UnicodeUTF8))
         self.COOLbutton = QCheckBox(QApplication.translate("CheckBox", "COOL END",None, QApplication.UnicodeUTF8))
-        self.COOLbutton.setChecked(aw.qmc.buttonvisibility[7])
+        self.COOLbutton.setChecked(bool(aw.qmc.buttonvisibility[7]))
         self.COOLbuttonActionType = QComboBox()
         self.COOLbuttonActionType.setToolTip(QApplication.translate("Tooltip", "Action Type", None, QApplication.UnicodeUTF8))
         self.COOLbuttonActionType.setFocusPolicy(Qt.NoFocus)
@@ -14558,7 +14580,7 @@ class EventsDlg(ArtisanDialog):
         defaultButtonsLayout.addWidget(self.COOLbutton,7,0)
         defaultButtonsLayout.addWidget(self.COOLbuttonActionType,7,1)
         defaultButtonsLayout.addWidget(self.COOLbuttonActionString,7,2)
-        defaultButtonsLayout.setContentsMargins(0,0,0,0)
+        defaultButtonsLayout.setContentsMargins(5,5,5,5)
         defaultButtonsLayout.setHorizontalSpacing(10)
         defaultButtonsLayout.setVerticalSpacing(7)
         ButtonGroupLayout = QGroupBox(QApplication.translate("GroupBox","Default Buttons",None, QApplication.UnicodeUTF8))
@@ -14569,7 +14591,7 @@ class EventsDlg(ArtisanDialog):
         tab1layout.addWidget(ButtonGroupLayout)
         tab1layout.addWidget(self.autoChargeDrop)
         tab1layout.addStretch()
-        tab1layout.setContentsMargins(10,0,0,0)
+        tab1layout.setContentsMargins(5,5,5,5)
         nbuttonslayout = QHBoxLayout()
         nbuttonslayout.addWidget(self.nbuttonslabel)
         nbuttonslayout.addWidget(self.nbuttonsSpinBox)
@@ -14762,10 +14784,10 @@ class EventsDlg(ArtisanDialog):
         self.E3visibility.setText(self.etype2.text())
         self.E4visibility.setText(self.etype3.text())
         # set slider visibility
-        self.E1visibility.setChecked(aw.eventslidervisibilities[0])
-        self.E2visibility.setChecked(aw.eventslidervisibilities[1])
-        self.E3visibility.setChecked(aw.eventslidervisibilities[2])
-        self.E4visibility.setChecked(aw.eventslidervisibilities[3])
+        self.E1visibility.setChecked(bool(aw.eventslidervisibilities[0]))
+        self.E2visibility.setChecked(bool(aw.eventslidervisibilities[1]))
+        self.E3visibility.setChecked(bool(aw.eventslidervisibilities[2]))
+        self.E4visibility.setChecked(bool(aw.eventslidervisibilities[3]))
         # set slider action
         self.E1action.setCurrentIndex(aw.eventslideractions[0])
         self.E2action.setCurrentIndex(aw.eventslideractions[1])
@@ -15286,21 +15308,21 @@ class EventsDlg(ArtisanDialog):
             self.savetableextraeventbutton()
             #save default buttons
             aw.qmc.buttonvisibility[0] = self.CHARGEbutton.isChecked()
-            aw.button_8.setVisible(aw.qmc.buttonvisibility[0])
+            aw.button_8.setVisible(bool(aw.qmc.buttonvisibility[0]))
             aw.qmc.buttonvisibility[1] = self.DRYbutton.isChecked()
-            aw.button_19.setVisible(aw.qmc.buttonvisibility[1])
+            aw.button_19.setVisible(bool(aw.qmc.buttonvisibility[1]))
             aw.qmc.buttonvisibility[2] = self.FCSbutton.isChecked()
-            aw.button_3.setVisible(aw.qmc.buttonvisibility[2])
+            aw.button_3.setVisible(bool(aw.qmc.buttonvisibility[2]))
             aw.qmc.buttonvisibility[3] = self.FCEbutton.isChecked()
-            aw.button_4.setVisible(aw.qmc.buttonvisibility[3])
+            aw.button_4.setVisible(bool(aw.qmc.buttonvisibility[3]))
             aw.qmc.buttonvisibility[4] = self.SCSbutton.isChecked()
-            aw.button_5.setVisible(aw.qmc.buttonvisibility[4])
+            aw.button_5.setVisible(bool(aw.qmc.buttonvisibility[4]))
             aw.qmc.buttonvisibility[5] = self.SCEbutton.isChecked()
-            aw.button_6.setVisible(aw.qmc.buttonvisibility[5])
+            aw.button_6.setVisible(bool(aw.qmc.buttonvisibility[5]))
             aw.qmc.buttonvisibility[6] = self.DROPbutton.isChecked()
-            aw.button_9.setVisible(aw.qmc.buttonvisibility[6])
+            aw.button_9.setVisible(bool(aw.qmc.buttonvisibility[6]))
             aw.qmc.buttonvisibility[7] = self.COOLbutton.isChecked()
-            aw.button_20.setVisible(aw.qmc.buttonvisibility[7])
+            aw.button_20.setVisible(bool(aw.qmc.buttonvisibility[7]))
             #save sliders   
             self.saveSliderSettings()
             aw.updateSlidersProperties() # set visibility and event names on slider widgets
@@ -15420,7 +15442,7 @@ class phasesGraphDlg(ArtisanDialog):
         self.connect(self.startfinish,SIGNAL("valueChanged(int)"),self.endmid.setValue)
         self.getphases()
         self.pushbuttonflag = QCheckBox(QApplication.translate("CheckBox","Auto Adjusted",None, QApplication.UnicodeUTF8))
-        self.pushbuttonflag.setChecked(aw.qmc.phasesbuttonflag)
+        self.pushbuttonflag.setChecked(bool(aw.qmc.phasesbuttonflag))
         self.connect(self.pushbuttonflag,SIGNAL("stateChanged(int)"),self.pushbuttonflagChanged)
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
@@ -16431,7 +16453,7 @@ class modbusport(object):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 1.0
+        self.timeout = 1
         self.input1slave = 0
         self.input1register = 0
         self.input1float = False
@@ -19790,18 +19812,18 @@ class DeviceAssignmentDlg(ArtisanDialog):
 
     def updateLCDvisibility(self,x,lcd,ind):
         if lcd == 1:
-            aw.extraLCDvisibility1[ind] = x
+            aw.extraLCDvisibility1[ind] = bool(x)
             aw.extraLCDframe1[ind].setVisible(bool(x))
         elif lcd == 2:
-            aw.extraLCDvisibility2[ind] = x
+            aw.extraLCDvisibility2[ind] = bool(x)
             aw.extraLCDframe2[ind].setVisible(bool(x))
 
     def updateCurveVisibility(self,x,curve,ind):
         aw.qmc.resetlinecountcaches()
         if curve == 1:
-            aw.extraCurveVisibility1[ind] = x
+            aw.extraCurveVisibility1[ind] = bool(x)
         elif curve == 2:
-            aw.extraCurveVisibility2[ind] = x
+            aw.extraCurveVisibility2[ind] = bool(x)
 
     def setextracolor(self,l,i):
         try:
@@ -20073,7 +20095,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                         aw.qmc.delay = 1000
                         st += ". Sampling rate changed to 1 second"
                     # ensure that events button is shown
-                    aw.eventsbuttonflag = True
+                    aw.eventsbuttonflag = 1
                     aw.button_11.setVisible(True)
                     message = QApplication.translate("Message","Device set to %1%2", None, QApplication.UnicodeUTF8).arg(meter).arg(st)
                 elif meter == "TE VA18B":
@@ -24281,7 +24303,12 @@ class FujiPID(object):
     #both PXR3 and PXG4 use the same memory location 31001 (3xxxx = read only)
     def gettemperature(self, stationNo):
         #we compose a message then we send it by using self.readoneword()
-        return  self.readoneword(self.message2send(stationNo,4,31001,1))
+#        import binascii
+#        try:
+#            print(binascii.hexlify(bytes(self.message2send(stationNo,4,31001,1))))
+#        except Exception as ex:
+#            print(ex)
+        return self.readoneword(self.message2send(stationNo,4,31001,1))
 
     #activates the PID SV buttons in the main window to adjust the SV value. Called from the PID control pannels/SV tab
     def activateONOFFeasySV(self,flag):
