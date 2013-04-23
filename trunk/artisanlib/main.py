@@ -885,11 +885,11 @@ class tgraphcanvas(FigureCanvas):
         
         # defaults
         
-        self.filterDropOut_tmin_C_default = 0
-        self.filterDropOut_tmax_C_default = 500.
-        self.filterDropOut_tmin_F_default = 0
-        self.filterDropOut_tmax_F_default = 800.
-        self.filterDropOut_spikeRoR_dRoR_limit_C_default = 5
+        self.filterDropOut_tmin_C_default = 10
+        self.filterDropOut_tmax_C_default = 300.
+        self.filterDropOut_tmin_F_default = 50
+        self.filterDropOut_tmax_F_default = 572.
+        self.filterDropOut_spikeRoR_dRoR_limit_C_default = 4.2
         self.filterDropOut_spikeRoR_dRoR_limit_F_default = 7
         
         # variables
@@ -5138,44 +5138,40 @@ class SampleThread(QThread):
                 if RoR > pRoR + dRoR_limit:
                     wrong_reading = 2
             #########################
-            # c) handle outliers if it could be detected
+           # c) handle outliers if it could be detected
             if wrong_reading:
-                if wrong_reading == 1:
-                    #aw.sendmessage(QApplication.translate("Message","Overflow detected",None, QApplication.UnicodeUTF8))
-                    pass
-                elif wrong_reading == 2:
-                    #aw.sendmessage(QApplication.translate("Message","Spike detected",None, QApplication.UnicodeUTF8))
-                    pass
-                # simple repeat strategy
+#                if wrong_reading == 1:
+#                    aw.sendmessage(QApplication.translate("Message","Overflow detected",None, QApplication.UnicodeUTF8))
+#                    pass
+#                elif wrong_reading == 2:
+#                    aw.sendmessage(QApplication.translate("Message","Spike detected",None, QApplication.UnicodeUTF8))
+               # simple repeat strategy (should alternate between repeat-previous and keep-RoR strategy
+                m = aw.qmc.filterDropOut_replaceRoR_period
                 if len(tempx) > 0 and tempx[-1] != -1:
-                    # repeate last correct reading if not done before
-                    if len(tempx) > 1 and tempx[-1] != tempx[-2]:
-                        return temp
-                    elif len(tempx) == 1:
+                    # repeate last correct reading if not done before (min/max violation are always filtered)
+                    if len(tempx) == 1 or wrong_reading == 1 or (len(tempx) > 1 and tempx[-1] != tempx[-2]):
                         return tempx[-1]
+                    elif len(tempx) >= m and tempx[-1] != -1 and tempx[-m] != -1 and tempx[-1] != 0 and tempx[-m] != 0:
+                    # strategy based on previous RoR assuming a constant RoR [overly complex!]
+                    # be careful with this RoR based filter as RoR might be very incorrect for short delta-times
+                        # let's use the last m readings to compute the last RoR and
+                        # replace the false reading by a computed one assuming that the
+                        # RoR does not change
+                        dtemp = tempx[-1] - tempx[-m] # dt is positive if RoR is
+                        dtime = timex[-1] - timex[-m] # always positive
+                        RoR = dtemp/dtime
+                        return tempx[-1] + RoR * (time - timex[-1])
                     else:
-                        return -1
+                        # no way to correct this
+                        return temp
                 else:
                     # no way to correct this
-                    return -1
-                    
-                # strategy based on previous RoR assuming a constant RoR [overly complex!]
-    #            # be careful with this RoR based filter as RoR might be very incorrect for short delta-times
-    #            m = aw.qmc.filterDropOut_replaceRoR_period
-    #            if len(tempx) >= m and tempx[-1] != -1 and tempx[-m] != -1 and tempx[-1] != 0 and tempx[-m] != 0:
-    #                # let's use the last m readings to compute the last RoR and
-    #                # replace the false reading by a computed one assuming that the
-    #                # RoR does not change
-    #                dtemp = tempx[-1] - tempx[-m] # dt is positive if RoR is
-    #                dtime = timex[-1] - timex[-m] # always positive
-    #                RoR = dtemp/dtime
-    #                return tempx[-1] + RoR * (time - timex[-1])
-    
+                    return temp
             else:
                 # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)
-                if len(tempx) > 1 and tempx[-1] == tempx[-2]: # previous reading was a drop and replaced by reading[-2]
+                if len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-2] != tempx[-3]: # previous reading was a drop and replaced by reading[-2], but -3 reading was different
                     tempx[-1] = (tempx[-2] + temp) / 2.0
-                return temp
+                return temp                
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
