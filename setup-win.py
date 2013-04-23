@@ -9,9 +9,11 @@ from distutils.core import setup
 import matplotlib as mpl
 import py2exe
 
+import os
+
 INCLUDES = [
             "sip",
-            "serial",
+            "serial"
             ]
 
 EXCLUDES = ['_tkagg',
@@ -32,14 +34,16 @@ EXCLUDES = ['_tkagg',
             '_cocoaagg',
             '_wx']
 
+cwd = os.getcwd()
+
 setup(
     name ="Artisan",
     author = "YOU",
-    windows=[{"script" : "C:\\SVN\\trunk\\artisan\\artisan.py"}],
+    windows=[{"script" : cwd + "\\artisan.py"}],
     data_files = mpl.get_py2exe_datafiles(),
     zipfile = "lib\library.zip",
     options={"py2exe" :{
-                        "packages": ['matplotlib','pytz',],
+                        "packages": ['matplotlib','pytz'],
                         "compressed": True,
                         "unbuffered": True,
                         "dll_excludes":[
@@ -50,3 +54,15 @@ setup(
              }
     )
 
+os.system(r'copy README.txt dist')
+os.system(r'copy LICENSE.txt dist')
+os.system(r'mkdir dist\\Wheels')
+os.system(r'mkdir dist\\Wheels\\Cupping')
+os.system(r'mkdir dist\\Wheels\\Other')
+os.system(r'mkdir dist\\Wheels\\Roasting')
+os.system(r'copy Wheels\\Cupping\\* dist\\Wheels\\Cupping')
+os.system(r'copy Wheels\\Other\\* dist\\Wheels\\Other')
+os.system(r'copy Wheels\\Roasting\\* dist\\Wheels\\Roasting')
+os.system(r'mkdir dist\\translations')
+os.system(r'copy translations\\*.qm dist\\translations')
+os.system(r'copy artisan.png dist')

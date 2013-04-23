@@ -252,17 +252,18 @@ installed matplotlib dependencies before its compilation via
 
 9.2) Install matplotlib library
 
-download matplotlib-1.2.0.tar.gz
+download matplotlib-1.2.1.tar.gz
 
-# tar -xzf matplotlib-1.2.0.tar.gz
-# cd matplotlib-1.2.0
+# tar -xzf matplotlib-1.2.1.tar.gz
+# cd matplotlib-1.2.1
 # python3 setup.py build
 # sudo python3 setup.py install
 
 
 to make builds smaller:
 # sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/matplotlib/mpl-data/sample_data
-
+to avoid conflicts with py2app
+# sudo rm -rf /Library/Frameworks/Python.framework/Versions/3.3/lib/python3.3/site-packages/matplotlib/tests
 
 ---
 Using matplotlib 1.2 within pyqt on Python 3.3 I receive (on click on the greenflag button and leaving the dialog with OK)
