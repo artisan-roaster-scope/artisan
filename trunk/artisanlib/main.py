@@ -5137,15 +5137,15 @@ class SampleThread(QThread):
                 RoR = abs(dtemp/dtime)
                 if RoR > pRoR + dRoR_limit:
                     wrong_reading = 2
-            #########################
-           # c) handle outliers if it could be detected
+#            #########################
+#            # c) handle outliers if it could be detected
             if wrong_reading:
 #                if wrong_reading == 1:
 #                    aw.sendmessage(QApplication.translate("Message","Overflow detected",None, QApplication.UnicodeUTF8))
 #                    pass
 #                elif wrong_reading == 2:
 #                    aw.sendmessage(QApplication.translate("Message","Spike detected",None, QApplication.UnicodeUTF8))
-               # simple repeat strategy (should alternate between repeat-previous and keep-RoR strategy
+#                # simple repeat strategy (should alternate between repeat-previous and keep-RoR strategy
                 m = aw.qmc.filterDropOut_replaceRoR_period
                 if len(tempx) > 0 and tempx[-1] != -1:
                     # repeate last correct reading if not done before (min/max violation are always filtered)
@@ -8845,7 +8845,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #restore scale port
             settings.beginGroup("Scale")
-            self.scale.device = str(settings.value("device",self.scale.device).toString())
+#            self.scale.device = str(settings.value("device",self.scale.device).toString())
+            self.scale.device_id = settings.value("device_id",self.scale.device_id).toInt()[0]
             self.scale.comport = str(settings.value("comport",self.scale.comport).toString())
             self.scale.baudrate = settings.value("baudrate",int(self.scale.baudrate)).toInt()[0]
             self.scale.bytesize = settings.value("bytesize",self.scale.bytesize).toInt()[0]
@@ -9480,7 +9481,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #save scale port
             settings.beginGroup("Scale")
-            settings.setValue("device",self.scale.device)
+#            settings.setValue("device",self.scale.device)
+            settings.setValue("device_id",self.scale.device_id)
             settings.setValue("comport",self.scale.comport)
             settings.setValue("baudrate",self.scale.baudrate)
             settings.setValue("bytesize",self.scale.bytesize)
@@ -10717,6 +10719,11 @@ $cupping_notes
                 minimalmodbus._bytestringToFloat = bigEndianBytestringToFloat
             # set scale port
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
+            try:
+                self.scale.device_id = list(aw.scale.devicefunctionlist.keys()).index(self.scale.device)
+            except Exception as ex:
+                print(ex)
+                self.scale.device_id = 0
             self.scale.comport = str(dialog.scale_comportEdit.currentText())                #unicode() changes QString to a python string
             self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
             self.scale.bytesize = int(str(dialog.scale_bytesizeComboBox.currentText()))
@@ -12695,7 +12702,7 @@ class editGraphDlg(ArtisanDialog):
         weightLayout.addWidget(self.weightpercentlabel)
         weightLayout.addSpacing(10)
         weightLayout.addWidget(self.roastdegreelabel)
-        if aw.scale.device != None and aw.scale.device != 0:
+        if aw.scale.device_id != 0:
             weightLayout.addWidget(inButton) 
             weightLayout.addSpacing(10)
             weightLayout.addWidget(outButton) 
@@ -16553,6 +16560,7 @@ class scaleport(object):
             "KERN NDE" : self.readKERN_NDE
         }
         self.device = None
+        self.device_id = 0
         self.SP = None
 
     def isConnected(self):
@@ -18843,12 +18851,9 @@ class comportDlg(ArtisanDialog):
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
         self.scale_deviceEdit = QComboBox()
         self.scale_deviceEdit.addItems(list(aw.scale.devicefunctionlist.keys()))
-        if aw.scale.device is not None:
-            try:
-                self.scale_deviceEdit.setCurrentIndex(list(aw.scale.devicefunctionlist.keys()).index(aw.scale.device))
-            except:
-                self.scale_deviceEdit.setCurrentIndex(0)
-        else:
+        try:
+            self.scale_deviceEdit.setCurrentIndex(aw.scale.device_id)
+        except:
             self.scale_deviceEdit.setCurrentIndex(0)
         self.scale_deviceEdit.setEditable(False)
         scale_devicelabel.setBuddy(self.scale_deviceEdit)
