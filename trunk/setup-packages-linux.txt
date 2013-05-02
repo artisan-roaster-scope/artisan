@@ -1,0 +1,203 @@
+Current Versions:
+
+o Python 2.7.3 (Ubuntu default; 2.7.4 install on CentOS)
+o pyserial 2.6
+o QT 4.8.4
+o SIP 4.14.6
+o PyQt 4.10.1
+o numpy 1.7.1
+o scipy 0.12.0
+o matplotlib 1.2.1
+o MinimalModbus 0.4
+
+o cx_freeze (tip from 2013-03-26)
+o patchelf
+o bbfreeze 1.1.0
+
+
+Upgrade History:
+
+- 2013-05-02: Started
+
+
+Installation Instructions:
+
+
+0) Prepare System
+
+- Ubuntu 12.04
+
+Update system:
+# sudo apt-get update
+# sudo apt-get dist-upgrade
+
+Install required packages:
+# sudo apt-get install build-essential g++
+# sudo apt-get install libfontconfig1-dev libfreetype6-dev libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxrandr-dev libxrender-dev
+# sudo apt-get install python2.7-dev
+# sudo apt-get install libblas-dev liblapack-dev gfortran
+# sudo apt-get install libpng-dev
+# sudo apt-get install subversion
+# sudo apt-get install mercurial meld
+# sudo apt-get install python-setuptools
+
+
+- CentOS 6.4
+
+Update system:
+# yum update
+
+Install required packages:
+# yum groupinstall "Development Tools"
+# yum install libXext-devel blas-devel lapack-devel
+
+
+
+1) Python 2.7 (only on CentOS as Ubuntu comes with v2.7.3)
+(depends on development environment)
+
+# yum install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+
+# wget http://python.org/ftp/python/2.7.4/Python-2.7.4.tar.bz2
+# tar xf Python-2.7.4.tar.bz2
+# cd Python-2.7.4
+# ./configure --prefix=/usr/local
+# make && make altinstall
+
+Download and install distribute for Python 2.7
+# wget http://pypi.python.org/packages/source/d/distribute/distribute-0.6.35.tar.gz
+# tar xf distribute-0.6.35.tar.gz
+# cd distribute-0.6.35
+# python2.7 setup.py install
+
+in the following replace "python" by "python2.7" for CentOS
+
+
+2) pyserial
+
+# python setup.py build
+# sudo python setup.py install
+
+
+3) QT
+(depends on development environment)
+
+Download and extract sources
+
+to avoid the"-fuse-ld=gold' error
+remove the lines:
+linux-g++ {
+... -fuse-ld=gold
+}
+from src/3rdparty/webkit/Source/common.pri
+
+# ./configure -opensource -confirm-license -release -nomake tests -nomake examples -nomake demos
+# make -j3
+# sudo make install
+
+
+Add path to your environment (eg. .bashrc)
+
+PATH=/usr/local/Trolltech/Qt-4.8.4/bin:$PATH
+export PATH
+
+
+4) SIP
+
+# python configure.py
+# make
+# sudo make install
+
+
+5) PyQT
+
+# python configure.py
+# make
+# sudo make install
+
+
+to avoid error: /usr/lib/python2.7/dist-packages/PyQt4/plugins/imageformats: No such file or directory
+
+on Ubuntu:
+# sudo ln -s /usr/lib/i386-linux-gnu/qt4/plugins /usr/lib/python2.7/dist-packages/PyQt4
+
+on CentOS:
+# sudo ln -s /usr/lib/qt4/plugins /usr/local/lib/python2.7/site-packages/PyQt4
+
+
+6) numpy
+
+# python setup.py build
+# sudo python setup.py install
+
+
+7) scipy
+(depends on blas, lapack and gfortran)
+
+
+8) matplotlib
+(depends on libpng)
+
+# python setup.py build
+# sudo python setup.py install
+
+
+to minimize binary builds remove test and sample data
+on Ubuntu:
+# sudo rm -rf /usr/local/lib/python2.7/dist-packages/matplotlib/mpl-data/sample_data
+# sudo rm -rf /usr/local/lib/python2.7/dist-packages/matplotlib/tests
+# sudo rm -rf /usr/local/lib/python2.7/dist-packages/matplotlib/testing
+on Centos:
+# sudo rm -rf /usr/local/lib/python2.7/site-packages/matplotlib/mpl-data/sample_data
+# sudo rm -rf /usr/local/lib/python2.7/site-packages/matplotlib/tests
+# sudo rm -rf /usr/local/lib/python2.7/site-packages/matplotlib/testing
+
+
+9) MinimalModbus
+
+# python setup.py build
+# sudo python setup.py install
+
+
+10) cx_freeze
+
+# python setup.py build
+# python setup.py install
+
+
+11) patchelf
+
+# ./configure
+# make
+# sudo make install
+
+12) bbfreeze
+
+# vi bbfrezze/recipes.py
+comment out the line refering to matplotlib.numerix 
+(as this generates an error on build)
+
+# python setup.py build
+# sudo python setup.py install
+
+
+====
+
+Alternate Installation via apt-get on Ubuntu (receiving outdated packages)
+
+o pyserial (??)
+# apt-get install python-serial
+o SIP/PyQT (SIP 4.13.3 7& PyQT 4.9.3)
+# apt-get install python-sip
+# apt-get install python-qt4
+o numpy (1.6.2)
+# apt-get install python-numpy
+o scipy (0.10.1)
+# apt-get install python-scipy
+o  matplotlib (1.1.1)
+# apt-get install python-matplotlib
+o minimalmodbus (??)
+# apt-get install python-pip
+# pip install -U minimalmodbus
+o bbfreeze (??)
+# sudo easy_install bbfreeze
