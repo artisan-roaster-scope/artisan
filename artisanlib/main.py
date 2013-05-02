@@ -815,7 +815,7 @@ class tgraphcanvas(FigureCanvas):
 
         self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
         self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"])
-        self.delta_ax.set_ylabel(str(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
+        self.delta_ax.set_ylabel(u(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
         self.ax.set_title(self.title,size=20,color=self.palette["title"])
 
 
@@ -828,10 +828,10 @@ class tgraphcanvas(FigureCanvas):
 
 
         # generates first "empty" plot (lists are empty) of temperature and deltaT
-        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=str(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
-        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTlinestyle,color=self.palette["bt"],label=str(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
-        self.l_delta1, = self.ax.plot(self.timex,self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=str(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
-        self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=str(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+        self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+        self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTlinestyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+        self.l_delta1, = self.ax.plot(self.timex,self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=u(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+        self.l_delta2, = self.ax.plot(self.timex,self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=u(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
         self.l_back1 = None
         self.l_back2 = None
         self.l_delta1B = None
@@ -1042,7 +1042,7 @@ class tgraphcanvas(FigureCanvas):
             return aw.float2float(float(st)/10 + 1.0)
 
     def onclick(self,event):
-        if event.button==3 and event.inaxes and not self.designerflag:
+        if event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag:
             timex = self.time2index(event.xdata)
             if timex:
                 if (len(self.temp2) > timex and self.temp2[timex] < event.ydata + 20) and (self.temp2[timex] > event.ydata - 20):
@@ -1461,7 +1461,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return 0
 
     #format X axis labels
@@ -1987,7 +1987,7 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax = self.ax.twinx()
                 self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
                 self.ax.patch.set_visible(True)
-                self.delta_ax.set_ylabel(str(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
+                self.delta_ax.set_ylabel(u(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                 self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -2075,18 +2075,18 @@ class tgraphcanvas(FigureCanvas):
             ##### ET,BT curves
             if aw.qmc.ETcurve:
                 if aw.qmc.flagon:
-                    self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=str(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                    self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
                 else:
                     if smooth or len(self.stemp1) != len(self.timex):
                         self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
-                    self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=str(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                    self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
             if aw.qmc.BTcurve:
                 if aw.qmc.flagon:
-                    self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=str(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                    self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
                 else:
                     if smooth or len(self.stemp2) != len(self.timex):
                         self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
-                    self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=str(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                    self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
 
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
@@ -2121,9 +2121,9 @@ class tgraphcanvas(FigureCanvas):
 
                 #draw background
                 self.l_back1, = self.ax.plot(self.timeB, self.temp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
-                                             alpha=self.backgroundalpha,label=str(QApplication.translate("Label", "BackgroundET", None, QApplication.UnicodeUTF8)))
+                                             alpha=self.backgroundalpha,label=u(QApplication.translate("Label", "BackgroundET", None, QApplication.UnicodeUTF8)))
                 self.l_back2, = self.ax.plot(self.timeB, self.temp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
-                                             alpha=self.backgroundalpha,label=str(QApplication.translate("Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
+                                             alpha=self.backgroundalpha,label=u(QApplication.translate("Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
 
                 #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
                 if self.DeltaETBflag or self.DeltaBTBflag:
@@ -2142,9 +2142,9 @@ class tgraphcanvas(FigureCanvas):
                         self.delta2B = self.smooth(tx,z2,window_len=self.deltafilter).tolist()
                     ##### DeltaETB,DeltaBTB curves
                     if self.DeltaETBflag:
-                        self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=str(QApplication.translate("Label", "BackgroundDeltaET", None, QApplication.UnicodeUTF8)))
+                        self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=u(QApplication.translate("Label", "BackgroundDeltaET", None, QApplication.UnicodeUTF8)))
                     if self.DeltaBTBflag:
-                        self.l_delta2B, = self.delta_ax.plot(self.timeB, self.delta2B,markersize=self.BTBdeltamarkersize,marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=str(QApplication.translate("Label", "BackgroundDeltaBT", None, QApplication.UnicodeUTF8)))
+                        self.l_delta2B, = self.delta_ax.plot(self.timeB, self.delta2B,markersize=self.BTBdeltamarkersize,marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=u(QApplication.translate("Label", "BackgroundDeltaBT", None, QApplication.UnicodeUTF8)))
 
                 #check backgroundevents flag
                 if self.backgroundeventsflag:
@@ -2208,10 +2208,10 @@ class tgraphcanvas(FigureCanvas):
             labels = []
             if aw.qmc.ETcurve:
                 handles.append(self.l_temp1)
-                labels.append(str(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                labels.append(u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
             if aw.qmc.BTcurve:
                 handles.append(self.l_temp2)
-                labels.append(str(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                labels.append(u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
 
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             if self.DeltaETflag or self.DeltaBTflag:
@@ -2238,14 +2238,14 @@ class tgraphcanvas(FigureCanvas):
 
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag:
-                    self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=str(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+                    self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=u(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                     handles.append(self.l_delta1)
-                    labels.append(str(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+                    labels.append(u(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                     
                 if self.DeltaBTflag:
                     self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=str(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
                     handles.append(self.l_delta2)
-                    labels.append(str(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+                    labels.append(u(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
 
             nrdevices = len(self.extradevices)
@@ -3705,16 +3705,16 @@ class tgraphcanvas(FigureCanvas):
                         st2 = st2 + " ("
                         st3 = st3 + " ("
                     if self.statisticsflags[4]:
-                        st1 = st1 + "%.1f"%rates_of_changes[0] + QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8)
-                        st2 = st2 + "%.1f"%rates_of_changes[1] + QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8)
-                        st3 = st3 + "%.1f"%rates_of_changes[2] + QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8)
+                        st1 = st1 + "%.1f"%rates_of_changes[0] + u(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
+                        st2 = st2 + "%.1f"%rates_of_changes[1] + u(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
+                        st3 = st3 + "%.1f"%rates_of_changes[2] + u(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
                     else:
                         ts1,ts1e,ts1b = aw.ts(self.timeindex[0],dryEndIndex)
                         ts2,ts2e,ts2b = aw.ts(dryEndIndex,self.timeindex[2])
                         ts3,ts3e,ts3b = aw.ts(self.timeindex[2],self.timeindex[6])
-                        st1 += str(ts1) + self.mode + "m [" + str(ts1e) + "-" + str(ts1b) + "]"
-                        st2 += str(ts2) + self.mode + "m [" + str(ts2e) + "-" + str(ts2b) + "]"
-                        st3 += str(ts3) + self.mode + "m [" + str(ts3e) + "-" + str(ts3b) + "]"
+                        st1 += u(ts1) + self.mode + "m [" + str(ts1e) + "-" + str(ts1b) + "]"
+                        st2 += u(ts2) + self.mode + "m [" + str(ts2e) + "-" + str(ts2b) + "]"
+                        st3 += u(ts3) + self.mode + "m [" + str(ts3e) + "-" + str(ts3b) + "]"
                     if self.statisticsflags[2]:
                         st1 = st1 + ")"
                         st2 = st2 + ")"
@@ -3870,17 +3870,17 @@ class tgraphcanvas(FigureCanvas):
             #interpretation of coefficients: http://www.sagenb.org/home/pub/1708/
             #spline=[ans[0,i]+(x-xi)*(ans[1,i]+(x-xi)*(ans[2,i]+(x-xi)*ans[3,i]/3)/2) for i,xi in enumerate(a[:-1])]
             
-            string = "<b>" + QApplication.translate("Message","Polynomial coefficients (Horner form):",
-                                                    None, QApplication.UnicodeUTF8) + "</b><br><br>"
+            string = "<b>" + u(QApplication.translate("Message","Polynomial coefficients (Horner form):",
+                                                    None, QApplication.UnicodeUTF8)) + "</b><br><br>"
             string += str(coeffs) + "<br><br>"
-            string += "<b>" + QApplication.translate("Message","Knots:",
-                                                     None, QApplication.UnicodeUTF8) + "</b><br><br>"
+            string += "<b>" + u(QApplication.translate("Message","Knots:",
+                                                     None, QApplication.UnicodeUTF8)) + "</b><br><br>"
             string += str(knots) + "<br><br>"
-            string += "<b>" + QApplication.translate("Message","Residual:",
-                                                     None, QApplication.UnicodeUTF8) + "</b><br><br>"
+            string += "<b>" + u(QApplication.translate("Message","Residual:",
+                                                     None, QApplication.UnicodeUTF8)) + "</b><br><br>"
             string += str(resid) + "<br><br>"      
-            string += "<b>" + QApplication.translate("Message","Roots:",
-                                                     None, QApplication.UnicodeUTF8) + "</b><br><br>"
+            string += "<b>" + u(QApplication.translate("Message","Roots:",
+                                                     None, QApplication.UnicodeUTF8)) + "</b><br><br>"
             string += str(roots)
 
             QMessageBox.information(self,QApplication.translate("Message","Profile information",None, QApplication.UnicodeUTF8),string)
@@ -3913,7 +3913,7 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
 
         except ValueError:
-            aw.qmc.adderror(QApplication.translate("Error Message","value Error: univariate() ",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: univariate() ",None, QApplication.UnicodeUTF8))
             return
 
         except Exception:
@@ -3934,7 +3934,7 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror(QApplication.translate("Error Message","value error in drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message","Value Error in drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
@@ -4272,25 +4272,25 @@ class tgraphcanvas(FigureCanvas):
                             index = self.timeindex.index(i)
                             if index == 0:
                                 timez = self.stringfromseconds(0)
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Message", "[ CHARGE ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + u(QApplication.translate("Message", "[ CHARGE ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
                             elif index == 1:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message", "[ DRY END ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ DRY END ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
                             elif index == 2:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[2]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message", "[ FC START ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ FC START ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
                             elif index == 3:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[3]] - self.timex[self.timeindex[0]])                                
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message", "[ FC END ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ FC END ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
                             elif index == 4:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[4]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message", "[ SC START ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ SC START ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
                             elif index == 5:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[5]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + QApplication.translate("Message", "[ SC END ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: orange\">" + u(QApplication.translate("Message", "[ SC END ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
                             elif index == 6:
                                 timez = self.stringfromseconds(self.timex[self.timeindex[6]] - self.timex[self.timeindex[0]])
-                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + QApplication.translate("Message", "[ DROP ]",None, QApplication.UnicodeUTF8) + "</font> " + timez)
+                                aw.messagelabel.setText("<font style=\"BACKGROUND-COLOR: #f07800\">" + u(QApplication.translate("Message", "[ DROP ]",None, QApplication.UnicodeUTF8)) + "</font> " + timez)
                             break
                         else:
                             if abs(self.temp2[i] - event.ydata) < 10:
@@ -4612,7 +4612,7 @@ class tgraphcanvas(FigureCanvas):
                 difftemp = self.temp2[self.timeindex[i]] - self.temp2[self.timeindex[lastindexused]]
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = QApplication.translate("Label", "BT %1 d/m for %2",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]]))
+                    string = u(QApplication.translate("Label", "BT %1 d/m for %2",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
                     self.specialevents.append(self.timeindex[lastindexused])
                     self.specialeventstype.append(0)
                     self.specialeventsStrings.append(string)
@@ -4628,7 +4628,7 @@ class tgraphcanvas(FigureCanvas):
                 difftemp = self.temp1[self.timeindex[i]] - self.temp1[self.timeindex[lastindexused]]
                 difftime = (self.timex[self.timeindex[i]] - self.timex[self.timeindex[lastindexused]])/60.
                 if difftime:
-                    string = QApplication.translate("Label", "ET %1 d/m for %2",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]]))
+                    string = u(QApplication.translate("Label", "ET %1 d/m for %2",None, QApplication.UnicodeUTF8).arg("%.1f"%(difftemp/difftime)).arg(self.stringfromseconds(self.timex[self.timeindex[i]]-self.timex[self.timeindex[lastindexused]])))
                     self.specialevents.append(self.timeindex[lastindexused])
                     self.specialeventstype.append(0)
                     self.specialeventsStrings.append(string)
@@ -4737,15 +4737,15 @@ class tgraphcanvas(FigureCanvas):
             self.drawWheel()
 
     def addTocuppingnotes(self):
-        descriptor =  str(self.wheelnames[self.wheelx][self.wheelz]) 
+        descriptor =  u(self.wheelnames[self.wheelx][self.wheelz]) 
         self.cuppingnotes += "\n" + descriptor 
-        string = QApplication.translate("Message", " added to cupping notes",None, QApplication.UnicodeUTF8)
+        string = u(QApplication.translate("Message", " added to cupping notes",None, QApplication.UnicodeUTF8))
         aw.sendmessage(descriptor + string)
 
     def addToroastingnotes(self):
-        descriptor =  str(self.wheelnames[self.wheelx][self.wheelz]) + " "
+        descriptor =  u(self.wheelnames[self.wheelx][self.wheelz]) + " "
         self.roastingnotes +=  "\n" + descriptor + " "
-        string = QApplication.translate("Message", " added to roasting notes",None, QApplication.UnicodeUTF8)
+        string = u(QApplication.translate("Message", " added to roasting notes",None, QApplication.UnicodeUTF8))
         aw.sendmessage(descriptor + string)
 
     def wheel_pick(self,event):
@@ -5114,7 +5114,7 @@ class SampleThread(QThread):
     # if temp (the actual reading) is outside of the interval [tmin,tmax] or
     # a spike is detected, the previous value is repeated or if that happend already before, -1 is returned
     # note that here we assume that the actual measured temperature time/temp was not already added to the list of previous measurements timex/tempx
-    def filterDropOuts(self,timex,tempx,time,temp):
+    def filterDropOuts(self,timex,tempx,time,temp,BT=False):
         try:
             #########################
             # a) detect overflows
@@ -5122,10 +5122,10 @@ class SampleThread(QThread):
             if temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax:
                 wrong_reading = 1
             #########################
-            # b) detect spikes
+            # b) detect spikes (on BT only after CHARGE if autoChargeDropFlag=True not to have a conflict here)
             n = aw.qmc.filterDropOut_spikeRoR_period
             dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
-            if aw.qmc.dropSpikes and not wrong_reading and len(tempx) >= n:
+            if aw.qmc.dropSpikes and ((not aw.qmc.autoChargeDropFlag) or (not BT) or (aw.qmc.timeindex[0] != -1 and aw.qmc.timeindex[0] + n > len(timex))) and not wrong_reading and len(tempx) >= n:
                 # no min/max overflow detected
                 # check if RoR caused by actual measurement is way higher then the previous one
                 # calc previous RoR (pRoR) taking the last n samples into account
@@ -5266,7 +5266,7 @@ class SampleThread(QThread):
                 if len(aw.qmc.BTfunction):
                     t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
                 t1 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp1,tx,t1)
-                t2 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp2,tx,t2)
+                t2 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
                 length_of_qmc_timex = len(aw.qmc.timex)
                 # ignore reading if both are off, otherwise process them
                 if t1 != -1 or t2 != -1:
@@ -6219,23 +6219,23 @@ class ApplicationWindow(QMainWindow):
         #BT
         self.label3 = QLabel()
         self.label3.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label3.setText("<b>" + QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8) + "<\b>")
+        self.label3.setText("<b>" + u(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8)) + "<\b>")
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label4.setText("<b>" + QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8) + "<\b>")
+        self.label4.setText("<b>" + u(QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8)) + "<\b>")
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label5.setText("<b>" + QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8) + "<\b>")
+        self.label5.setText("<b>" + u(QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8)) + "<\b>")
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label6.setText("<b>" + QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8) + "<\b>")
+        self.label6.setText("<b>" + u(QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8)) + "<\b>")
         # pid power % duty cycle
         self.label7 = QLabel()
         self.label7.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label7.setText("<b>" + QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8) + "<\b>")
+        self.label7.setText("<b>" + u(QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8)) + "<\b>")
 
         #extra LCDs
         self.nLCDS = 10 # maximum number of LCDs and extra devices
@@ -6260,8 +6260,8 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDframe2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-            string1 = QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8)
-            string2 = QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None, QApplication.UnicodeUTF8)
+            string1 = u(QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8))
+            string2 = u(QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None, QApplication.UnicodeUTF8))
             #configure Labels
             self.extraLCDlabel1[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
@@ -7213,20 +7213,20 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror(QApplication.translate("Error Message", "IO Error: automaticsave() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
 
     def viewKshortcuts(self):
-        string = QApplication.translate("Message", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[SPACE]</b> = Choses current button",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[LEFT]</b> = Move to the left",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[RIGHT]</b> = Move to the right",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[a]</b> = Autosave",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>[:]</b> = Desktop ScreenShot",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string = u(QApplication.translate("Message", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[SPACE]</b> = Choses current button",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[LEFT]</b> = Move to the left",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[RIGHT]</b> = Move to the right",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[a]</b> = Autosave",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[:]</b> = Desktop ScreenShot",None, QApplication.UnicodeUTF8)) + "<br><br>"
 
         QMessageBox.information(self,QApplication.translate("Message", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
 
@@ -7293,7 +7293,7 @@ class ApplicationWindow(QMainWindow):
                 string += self.qmc.specialeventsStrings[lenevents-1][0:5]
                 string += "..."
 
-            message = QApplication.translate("Message","Event #%1:  %2 has been updated", None, QApplication.UnicodeUTF8).arg(str(lenevents)).arg(string)
+            message = u(QApplication.translate("Message","Event #%1:  %2 has been updated", None, QApplication.UnicodeUTF8).arg(str(lenevents)).arg(string))
             self.sendmessage(message)
         
     def strippedName(self, fullFileName):
@@ -7483,7 +7483,7 @@ class ApplicationWindow(QMainWindow):
                     self.etypeComboBox.addItems(self.qmc.etypes)
                     #Plot everything
                     self.qmc.redraw()
-                    message =  QApplication.translate("Message","%1  loaded ", None, QApplication.UnicodeUTF8).arg(u(filename))
+                    message = u(QApplication.translate("Message","%1  loaded ", None, QApplication.UnicodeUTF8).arg(u(filename)))
                     self.sendmessage(message)
                     self.setCurrentFile(filename)
         except IOError as ex:
@@ -7558,7 +7558,7 @@ class ApplicationWindow(QMainWindow):
                         times.append(startendB[2])
                         self.qmc.timebackgroundindexupdate(times[:])
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
-                message =  QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(u(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]])))
+                message =  u(QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(u(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))))
                 self.sendmessage(message)
             else:
                 self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None, QApplication.UnicodeUTF8))
@@ -7787,7 +7787,7 @@ class ApplicationWindow(QMainWindow):
                     kind = "Beans ejected"
                 else:
                     kind = "timer"
-                writer.writerow([aw.qmc.stringfromseconds(aw.qmc.timex[i]-CHARGE),"%.1f"%float(aw.qmc.temp1[i]),"%.1f"%float(aw.qmc.temp2[i]),kind])
+                writer.writerow([aw.qmc.stringfromseconds(aw.qmc.timex[i]-CHARGE),"%.1f"%float(aw.qmc.temp2[i]),"%.1f"%float(aw.qmc.temp1[i]),kind])
             outfile.write("\n")
             outfile.write("@actionT1Table\n")
             outfile.write("120|null|30\n")
@@ -7899,8 +7899,8 @@ class ApplicationWindow(QMainWindow):
                         timeindex[6] = len(timex) - 1
             obj["timeindex"] = timeindex
             obj["timex"] = timex
-            obj["temp1"] = temp1
-            obj["temp2"] = temp2
+            obj["temp1"] = temp2
+            obj["temp2"] = temp1
             res = self.setProfile(obj)
             infile.close()
             if res:
@@ -8033,7 +8033,7 @@ class ApplicationWindow(QMainWindow):
             if "extratimex" in profile:   
                 if "extradevices" in profile:
                     if self.qmc.extradevices != profile["extradevices"]:
-                        string = QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None, QApplication.UnicodeUTF8)
+                        string = u(QApplication.translate("Message","To load this profile the extra devices configuration needs to be changed.\nContinue?", None, QApplication.UnicodeUTF8))
                         reply = QMessageBox.question(self,QApplication.translate("Message", "Found a different number of curves",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
                         if reply == QMessageBox.Yes:
                             aw.qmc.resetlinecountcaches()
@@ -10419,16 +10419,16 @@ $cupping_notes
         midphasetime = self.qmc.statisticstimes[2]
         finishphasetime = self.qmc.statisticstimes[3]
         coolphasetime = self.qmc.statisticstimes[4]
-        PerfectPhase = QApplication.translate("Flavor Scope Label", "OK",None, QApplication.UnicodeUTF8)
-        ShortDryingPhase = QApplication.translate("Flavor Scope Label", "Grassy",None, QApplication.UnicodeUTF8)
-        LongDryingPhase = QApplication.translate("Flavor Scope Label", "Leathery",None, QApplication.UnicodeUTF8)
-        ShortTo1CPhase = QApplication.translate("Flavor Scope Label", "Toasty",None, QApplication.UnicodeUTF8)
-        LongTo1CPhase = QApplication.translate("Flavor Scope Label", "Bready",None, QApplication.UnicodeUTF8)
-        ShortFinishPhase = QApplication.translate("Flavor Scope Label", "Acidic",None, QApplication.UnicodeUTF8)
-        LongFinishPhase = QApplication.translate("Flavor Scope Label", "Flat",None, QApplication.UnicodeUTF8)
-        ShortCoolPhase = QApplication.translate("Flavor Scope Label", "Fracturing",None, QApplication.UnicodeUTF8)
-        PerfectCoolPhase = QApplication.translate("Flavor Scope Label", "Sweet",None, QApplication.UnicodeUTF8)
-        LongCoolPhase = QApplication.translate("Flavor Scope Label", "Less Sweet",None, QApplication.UnicodeUTF8)
+        PerfectPhase = u(QApplication.translate("Flavor Scope Label", "OK",None, QApplication.UnicodeUTF8))
+        ShortDryingPhase = u(QApplication.translate("Flavor Scope Label", "Grassy",None, QApplication.UnicodeUTF8))
+        LongDryingPhase = u(QApplication.translate("Flavor Scope Label", "Leathery",None, QApplication.UnicodeUTF8))
+        ShortTo1CPhase = u(QApplication.translate("Flavor Scope Label", "Toasty",None, QApplication.UnicodeUTF8))
+        LongTo1CPhase = u(QApplication.translate("Flavor Scope Label", "Bready",None, QApplication.UnicodeUTF8))
+        ShortFinishPhase = u(QApplication.translate("Flavor Scope Label", "Acidic",None, QApplication.UnicodeUTF8))
+        LongFinishPhase = u(QApplication.translate("Flavor Scope Label", "Flat",None, QApplication.UnicodeUTF8))
+        ShortCoolPhase = u(QApplication.translate("Flavor Scope Label", "Fracturing",None, QApplication.UnicodeUTF8))
+        PerfectCoolPhase = u(QApplication.translate("Flavor Scope Label", "Sweet",None, QApplication.UnicodeUTF8))
+        LongCoolPhase = u(QApplication.translate("Flavor Scope Label", "Less Sweet",None, QApplication.UnicodeUTF8))
         #CHECK CONDITIONS
         #if dry phase time < 3 mins (180 seconds) or less than 26% of the total time
         #  => ShortDryingPhase
@@ -10591,19 +10591,19 @@ $cupping_notes
 
     def helpAbout(self):
         coredevelopers = "<br>Rafael Cobo <br> Marko Luther <br> Sebastien Delgrande"
-        contributors =  "<br>" + QApplication.translate("About", "%1, linux binary",None, QApplication.UnicodeUTF8).arg("Lukas Kolbe")
-        contributors += "<br>" + QApplication.translate("About", "%1, documentation",None, QApplication.UnicodeUTF8).arg("Rich Helms")
-        contributors += "<br>" + QApplication.translate("About", "%1, TEVA18B, DTA support",None, QApplication.UnicodeUTF8).arg("Markus Wagner")
-        contributors += "<br>" + QApplication.translate("About", "%1, DTA support",None, QApplication.UnicodeUTF8).arg("Markus Mayr-Svec")
-        contributors += "<br>" + QApplication.translate("About", "%1, Swedish localization",None, QApplication.UnicodeUTF8).arg("Martin Kral")
-        contributors += "<br>" + QApplication.translate("About", "%1, Spanish localization",None, QApplication.UnicodeUTF8).arg("Bluequijote")
-        contributors += "<br>" + QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Jim G.")
-        contributors += "<br>" + QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Marcio Carneiro")
+        contributors =  u("<br>") + u(QApplication.translate("About", "%1, linux binary",None, QApplication.UnicodeUTF8).arg("Lukas Kolbe"))
+        contributors += u("<br>") + u(QApplication.translate("About", "%1, documentation",None, QApplication.UnicodeUTF8).arg("Rich Helms"))
+        contributors += u("<br>") + u(QApplication.translate("About", "%1, TEVA18B, DTA support",None, QApplication.UnicodeUTF8).arg("Markus Wagner"))
+        contributors += u("<br>") + u(QApplication.translate("About", "%1, DTA support",None, QApplication.UnicodeUTF8).arg("Markus Mayr-Svec"))
+        contributors += u("<br>") + u(QApplication.translate("About", "%1, Swedish localization",None, QApplication.UnicodeUTF8).arg("Martin Kral"))
+        contributors += u("<br>") + u(QApplication.translate("About", "%1, Spanish localization",None, QApplication.UnicodeUTF8).arg("Bluequijote"))
+        contributors += u("<br>") + u(QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Jim G."))
+        contributors += u("<br>") + u(QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Marcio Carneiro"))
         box = QMessageBox(self)
         #create a html QString
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
-                """<b>{0}</b> {1} 
+                u("""<b>{0}</b> {1} 
                 <p>
                 <b>Python:</b> [ {2} ]
                 <b>Qt:</b> [ {3} ]
@@ -10615,7 +10615,7 @@ $cupping_notes
                 </p>
                 <p>
                 <b>{8}</b> {9}
-                </p>""".format(
+                </p>""").format(
                 QApplication.translate("About", "Version:",None, QApplication.UnicodeUTF8),
                 __version__,
                 platform.python_version(),
@@ -10832,17 +10832,17 @@ $cupping_notes
         if percent < 13.5:
             return ""
         elif percent < 14.5:
-            return QApplication.translate("Label", "City",None, QApplication.UnicodeUTF8)
+            return u(QApplication.translate("Label", "City",None, QApplication.UnicodeUTF8))
         elif percent < 15.5:
-            return QApplication.translate("Label", "City+",None, QApplication.UnicodeUTF8)
+            return u(QApplication.translate("Label", "City+",None, QApplication.UnicodeUTF8))
         elif percent < 16.5:
-            return QApplication.translate("Label", "Full City",None, QApplication.UnicodeUTF8)
+            return u(QApplication.translate("Label", "Full City",None, QApplication.UnicodeUTF8))
         elif percent < 17.5:
-            return QApplication.translate("Label", "Full City+",None, QApplication.UnicodeUTF8)
+            return u(QApplication.translate("Label", "Full City+",None, QApplication.UnicodeUTF8))
         elif percent < 18.5:
-            return QApplication.translate("Label", "Light French",None, QApplication.UnicodeUTF8)
+            return u(QApplication.translate("Label", "Light French",None, QApplication.UnicodeUTF8))
         else:
-            return QApplication.translate("Label", "French",None, QApplication.UnicodeUTF8)
+            return u(QApplication.translate("Label", "French",None, QApplication.UnicodeUTF8))
 
     def importK202(self):
         try:
@@ -11114,18 +11114,17 @@ $cupping_notes
             self.qmc.hudresizeflag = False
         ETreachTime,BTreachTime = self.qmc.getTargetTime()
         if ETreachTime > 0 and BTreachTime < 5940:
-            text1 =  QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode)
+            text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
             if self.qmc.timeindex[0]:
-                text1 = text1 + QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime)))
+                text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
         else:
-            text1 =  QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode)
-            
+            text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
         if BTreachTime > 0 and BTreachTime < 5940:    
-            text2 =  QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode)
+            text2 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
             if self.qmc.timeindex[0]:
-                text2 = text2 + QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime)))
+                text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
         else:
-            text2 =  QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode)
+            text2 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
         ####   ET pid    ######
         error = self.qmc.ETtarget - self.qmc.temp1[-1]
         differror = error - self.qmc.pidpreviouserror
@@ -11157,7 +11156,7 @@ $cupping_notes
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3),QString(pidstring))
         p.drawRect(Wwidth/7+140, Wheight - Wheight/3-12, 100, 12)
         p.fillRect(Wwidth/7+140, Wheight - Wheight/3-12, MVV, 12, QColor("pink"))
-        delta = QApplication.translate("Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1]))
+        delta = u(QApplication.translate("Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3.5),QString(delta))
         p.end()
         self.HUD.setPixmap(img)
@@ -11283,28 +11282,28 @@ $cupping_notes
                 f.close()
 
     def showSymbolicHelp(self):
-        string1 = "<UL><LI><b>abs(x)</b> " + QApplication.translate("Message","Return the absolute value of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>acos(x)</b> " + QApplication.translate("Message","Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>asin(x)</b> " + QApplication.translate("Message","Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>atan(x)</b> " + QApplication.translate("Message","Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>cos(x)</b> " + QApplication.translate("Message","Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>degrees(x)</b> " + QApplication.translate("Message", "Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>exp(x)</b> " + QApplication.translate("Message", "Return e raised to the power of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>log(x[, base])</b> " + QApplication.translate("Message", "Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>log10(x)</b> " + QApplication.translate("Message", "Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>pow(x, y)</b> " + QApplication.translate("Message", "Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>radians(x)</b> " + QApplication.translate("Message", "Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>sin(x)</b> " + QApplication.translate("Message", "Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>sqrt(x)</b> " + QApplication.translate("Message", "Return the square root of x.",None, QApplication.UnicodeUTF8)
-        string1 += "<LI><b>tan(x)</b> " + QApplication.translate("Message", "Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8)
+        string1 = "<UL><LI><b>abs(x)</b> " + u(QApplication.translate("Message","Return the absolute value of x.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>acos(x)</b> " + u(QApplication.translate("Message","Return the arc cosine (measured in radians) of x.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>asin(x)</b> " + u(QApplication.translate("Message","Return the arc sine (measured in radians) of x.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>atan(x)</b> " + u(QApplication.translate("Message","Return the arc tangent (measured in radians) of x.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>cos(x)</b> " + u(QApplication.translate("Message","Return the cosine of x (measured in radians).",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>degrees(x)</b> " + u(QApplication.translate("Message", "Convert angle x from radians to degrees.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>exp(x)</b> " + u(QApplication.translate("Message", "Return e raised to the power of x.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>log(x[, base])</b> " + u(QApplication.translate("Message", "Return the logarithm of x to the given base. ",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>log10(x)</b> " + u(QApplication.translate("Message", "Return the base 10 logarithm of x.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>pow(x, y)</b> " + u(QApplication.translate("Message", "Return x**y (x to the power of y).",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>radians(x)</b> " + u(QApplication.translate("Message", "Convert angle x from degrees to radians.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>sin(x)</b> " + u(QApplication.translate("Message", "Return the sine of x (measured in radians).",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>sqrt(x)</b> " + u(QApplication.translate("Message", "Return the square root of x.",None, QApplication.UnicodeUTF8))
+        string1 += "<LI><b>tan(x)</b> " + u(QApplication.translate("Message", "Return the tangent of x (measured in radians).",None, QApplication.UnicodeUTF8))
         string1 += "</UL>"
         string2 = "<UL><LI><b>x current curve value</b>"
-        string2 += "<LI><b>Y1</b> " + QApplication.translate("Message", "previous ET value",None, QApplication.UnicodeUTF8) 
-        string2 += "<LI><b>Y2</b> prev." + QApplication.translate("Message", "previous BT value",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y3</b> prev." + QApplication.translate("Message", "previous Extra #1 T1 value",None, QApplication.UnicodeUTF8) 
-        string2 += "<LI><b>Y4</b> prev." + QApplication.translate("Message", "previous Extra #1 T2 value",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y5</b> prev." + QApplication.translate("Message", "previous Extra #2 T1 value",None, QApplication.UnicodeUTF8)
-        string2 += "<LI><b>Y6</b> prev." + QApplication.translate("Message", "previous Extra #2 T2 value",None, QApplication.UnicodeUTF8)
+        string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "previous ET value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y2</b> prev." + u(QApplication.translate("Message", "previous BT value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y3</b> prev." + u(QApplication.translate("Message", "previous Extra #1 T1 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y4</b> prev." + u(QApplication.translate("Message", "previous Extra #1 T2 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y5</b> prev." + u(QApplication.translate("Message", "previous Extra #2 T1 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y6</b> prev." + u(QApplication.translate("Message", "previous Extra #2 T2 value",None, QApplication.UnicodeUTF8))
         string2 += "<LI><b>...</b> "
         string2 += "</UL>"
         #format help
@@ -11908,7 +11907,7 @@ class HUDDlg(ArtisanDialog):
             aw.setdpi(value)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()   
-            aw.qmc.adderror(QApplication.translate("Error Message", "changedpi(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: changedpi(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def setdefaults(self):
         self.resolutionSpinBox.setValue(80)
@@ -11924,7 +11923,7 @@ class HUDDlg(ArtisanDialog):
             self.plotequ()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "setcurvecolor(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: setcurvecolor(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
 
     def setvdevice(self):
         # compute values
@@ -12209,7 +12208,7 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.hudETpid[0] = int(str(self.ETpidP.text()))
         aw.qmc.hudETpid[1] = int(str(self.ETpidI.text()))
         aw.qmc.hudETpid[2] = int(str(self.ETpidD.text()))
-        string = QApplication.translate("Message","[ET target = %1] [BT target = %2]", None, QApplication.UnicodeUTF8).arg(str(aw.qmc.ETtarget)).arg(str(aw.qmc.BTtarget))
+        string = u(QApplication.translate("Message","[ET target = %1] [BT target = %2]", None, QApplication.UnicodeUTF8).arg(str(aw.qmc.ETtarget)).arg(str(aw.qmc.BTtarget)))
         aw.sendmessage(string)
         aw.qmc.resetlinecountcaches()
         aw.qmc.resetdeltalines()
@@ -12229,7 +12228,7 @@ class editGraphDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Properties",None, QApplication.UnicodeUTF8))
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #MARKERS
-        chargelabel = QLabel("<b>" + QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8) + "</b>")
+        chargelabel = QLabel("<b>" + u(QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8)) + "</b>")
         chargelabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         chargelabel.setStyleSheet("background-color:'#f07800';")
         self.chargeedit = QLineEdit(aw.qmc.stringfromseconds(0))
@@ -12260,7 +12259,7 @@ class editGraphDlg(ArtisanDialog):
         self.chargeestimate = QLabel(charge_str)
         self.chargeestimate.setMaximumWidth(50)
         self.chargeestimate.setMinimumWidth(50)
-        drylabel = QLabel("<b>" + QApplication.translate("Label", "DRY END",None, QApplication.UnicodeUTF8) + "</b>")
+        drylabel = QLabel("<b>" + u(QApplication.translate("Label", "DRY END",None, QApplication.UnicodeUTF8)) + "</b>")
         drylabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         drylabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[1]:
@@ -12274,7 +12273,7 @@ class editGraphDlg(ArtisanDialog):
         self.dryedit.setMaximumWidth(50)
         self.dryedit.setMinimumWidth(50)
         drylabel.setBuddy(self.dryedit)
-        Cstartlabel = QLabel("<b>" + QApplication.translate("Label","FC START",None, QApplication.UnicodeUTF8) + "</b>")
+        Cstartlabel = QLabel("<b>" + u(QApplication.translate("Label","FC START",None, QApplication.UnicodeUTF8)) + "</b>")
         Cstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[2]:
@@ -12289,7 +12288,7 @@ class editGraphDlg(ArtisanDialog):
         self.Cstartedit.setMinimumWidth(50)
         Cstartlabel.setBuddy(self.Cstartedit)
         
-        Cendlabel = QLabel("<b>" + QApplication.translate("Label","FC END",None, QApplication.UnicodeUTF8) + "</b>")
+        Cendlabel = QLabel("<b>" + u(QApplication.translate("Label","FC END",None, QApplication.UnicodeUTF8)) + "</b>")
         Cendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         Cendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[3]:
@@ -12303,7 +12302,7 @@ class editGraphDlg(ArtisanDialog):
         self.Cendedit.setMaximumWidth(50)
         self.Cendedit.setMinimumWidth(50)
         Cendlabel.setBuddy(self.Cendedit)
-        CCstartlabel = QLabel("<b>" + QApplication.translate("Label","SC START",None, QApplication.UnicodeUTF8) + "</b>")
+        CCstartlabel = QLabel("<b>" + u(QApplication.translate("Label","SC START",None, QApplication.UnicodeUTF8)) + "</b>")
         CCstartlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCstartlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[4]:
@@ -12317,7 +12316,7 @@ class editGraphDlg(ArtisanDialog):
         self.CCstartedit.setMaximumWidth(50)
         self.CCstartedit.setMinimumWidth(50)
         CCstartlabel.setBuddy(self.CCstartedit)
-        CCendlabel = QLabel("<b>" + QApplication.translate("Label","SC END",None, QApplication.UnicodeUTF8) + "</b>")
+        CCendlabel = QLabel("<b>" + u(QApplication.translate("Label","SC END",None, QApplication.UnicodeUTF8)) + "</b>")
         CCendlabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         CCendlabel.setStyleSheet("background-color:'orange';")
         if aw.qmc.timeindex[5]:
@@ -12331,7 +12330,7 @@ class editGraphDlg(ArtisanDialog):
         self.CCendedit.setMaximumWidth(50)
         self.CCendedit.setMinimumWidth(50)
         CCendlabel.setBuddy(self.CCendedit)
-        droplabel = QLabel("<b>" + QApplication.translate("Label", "DROP",None, QApplication.UnicodeUTF8) + "</b>")
+        droplabel = QLabel("<b>" + u(QApplication.translate("Label", "DROP",None, QApplication.UnicodeUTF8)) + "</b>")
         droplabel.setStyleSheet("background-color:'#f07800';")
         droplabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         if aw.qmc.timeindex[6]:
@@ -12348,7 +12347,7 @@ class editGraphDlg(ArtisanDialog):
         self.dropestimate = QLabel(drop_str)
         self.dropestimate.setMaximumWidth(50)
         self.dropestimate.setMinimumWidth(50)
-        coollabel = QLabel("<b>" + QApplication.translate("Label", "COOL",None, QApplication.UnicodeUTF8) + "</b>")
+        coollabel = QLabel("<b>" + u(QApplication.translate("Label", "COOL",None, QApplication.UnicodeUTF8)) + "</b>")
         coollabel.setStyleSheet("background-color:'#6666ff';")
         coollabel.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         if aw.qmc.timeindex[7]:
@@ -12391,16 +12390,16 @@ class editGraphDlg(ArtisanDialog):
         self.datatable.setTabKeyNavigation(True)
         self.createDataTable()        
         #TITLE
-        titlelabel = QLabel("<b>" + QApplication.translate("Label", "Title",None, QApplication.UnicodeUTF8) + "</b>")
+        titlelabel = QLabel("<b>" + u(QApplication.translate("Label", "Title",None, QApplication.UnicodeUTF8)) + "</b>")
         self.titleedit = QLineEdit(aw.qmc.title)
         #Date
-        datelabel1 = QLabel("<b>" + QApplication.translate("Label", "Date",None, QApplication.UnicodeUTF8) + "</b>")
+        datelabel1 = QLabel("<b>" + u(QApplication.translate("Label", "Date",None, QApplication.UnicodeUTF8)) + "</b>")
         date = aw.qmc.roastdate.toString()
         dateedit = QLineEdit(date)
         dateedit.setReadOnly(True)
         dateedit.setStyleSheet("background-color:'lightgrey'")
         #Beans
-        beanslabel = QLabel("<b>" + QApplication.translate("Label", "Beans",None, QApplication.UnicodeUTF8) + "</b>")
+        beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None, QApplication.UnicodeUTF8)) + "</b>")
         self.beansedit = QTextEdit()
         self.beansedit.setMaximumHeight(60)
         if aw.qmc.beans is not None:
@@ -12410,7 +12409,7 @@ class editGraphDlg(ArtisanDialog):
         #operator
         self.operator = QLineEdit(aw.qmc.operator)
         #weight
-        weightlabel = QLabel("<b>" + QApplication.translate("Label", "Weight",None, QApplication.UnicodeUTF8) + "</b>")
+        weightlabel = QLabel("<b>" + u(QApplication.translate("Label", "Weight",None, QApplication.UnicodeUTF8)) + "</b>")
         weightinlabel = QLabel(QApplication.translate("Label", " in",None, QApplication.UnicodeUTF8))
         weightoutlabel = QLabel(QApplication.translate("Label", " out",None, QApplication.UnicodeUTF8))
         inw = str(aw.qmc.weight[0])
@@ -12444,7 +12443,7 @@ class editGraphDlg(ArtisanDialog):
         else:
             self.unitsComboBox.setCurrentIndex(1)
         #volume
-        volumelabel = QLabel("<b>" + QApplication.translate("Label", "Volume",None, QApplication.UnicodeUTF8) + "</b>")
+        volumelabel = QLabel("<b>" + u(QApplication.translate("Label", "Volume",None, QApplication.UnicodeUTF8)) + "</b>")
         volumeinlabel = QLabel(QApplication.translate("Label", " in",None, QApplication.UnicodeUTF8))
         volumeoutlabel = QLabel(QApplication.translate("Label", " out",None, QApplication.UnicodeUTF8))
         inv = str(aw.qmc.volume[0])
@@ -12482,7 +12481,7 @@ class editGraphDlg(ArtisanDialog):
         self.connect(self.volumeUnitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
         self.connect(self.unitsComboBox,SIGNAL("currentIndexChanged(int)"),self.calculated_density)
         #density
-        bean_density_label = QLabel("<b>" + QApplication.translate("Label", "Density",None, QApplication.UnicodeUTF8) + "</b>")
+        bean_density_label = QLabel("<b>" + u(QApplication.translate("Label", "Density",None, QApplication.UnicodeUTF8)) + "</b>")
         self.bean_density_weight_edit = QLineEdit(str(aw.qmc.density[0]))
         self.bean_density_weight_edit.setValidator(QDoubleValidator(0., 9999., 1,self.bean_density_weight_edit))
         self.bean_density_weight_edit.setMinimumWidth(55)
@@ -12517,7 +12516,7 @@ class editGraphDlg(ArtisanDialog):
         self.connect(self.bean_density_volume_edit,SIGNAL("editingFinished()"),self.standard_density)
         self.connect(self.bean_density_weight_edit,SIGNAL("editingFinished()"),self.standard_density)
         #bean size
-        bean_size_label = QLabel("<b>" + QApplication.translate("Label", "Bean Size",None, QApplication.UnicodeUTF8) + "</b>")
+        bean_size_label = QLabel("<b>" + u(QApplication.translate("Label", "Bean Size",None, QApplication.UnicodeUTF8)) + "</b>")
         self.bean_size_edit = QLineEdit(str(aw.qmc.beansize))
         self.bean_size_edit.setValidator(QDoubleValidator(0., 10., 1,self.bean_density_weight_edit))
         self.bean_size_edit.setMinimumWidth(45)
@@ -12525,13 +12524,13 @@ class editGraphDlg(ArtisanDialog):
         self.bean_size_edit.setAlignment(Qt.AlignRight)
         bean_size_unit_label = QLabel(QApplication.translate("Label", "mm",None, QApplication.UnicodeUTF8))
         #bean color
-        whole_color_label = QLabel("<b>" + QApplication.translate("Label", "Whole Color",None, QApplication.UnicodeUTF8) + "</b>")
+        whole_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Whole Color",None, QApplication.UnicodeUTF8)) + "</b>")
         self.whole_color_edit = QLineEdit(str(aw.qmc.whole_color))
         self.whole_color_edit.setValidator(QIntValidator(0, 1000, self.bean_density_weight_edit))
         self.whole_color_edit.setMinimumWidth(45)
         self.whole_color_edit.setMaximumWidth(45)
         self.whole_color_edit.setAlignment(Qt.AlignRight)
-        ground_color_label = QLabel("<b>" + QApplication.translate("Label", "Ground Color",None, QApplication.UnicodeUTF8) + "</b>")
+        ground_color_label = QLabel("<b>" + u(QApplication.translate("Label", "Ground Color",None, QApplication.UnicodeUTF8)) + "</b>")
         self.ground_color_edit = QLineEdit(str(aw.qmc.ground_color))
         self.ground_color_edit.setValidator(QIntValidator(0, 1000, self.bean_density_weight_edit))
         self.ground_color_edit.setMinimumWidth(45)
@@ -12542,7 +12541,7 @@ class editGraphDlg(ArtisanDialog):
         self.colorSystemComboBox.addItems(aw.qmc.color_systems)
         self.colorSystemComboBox.setCurrentIndex(aw.qmc.color_system_idx)
         #bag humidity
-        bag_humidity_label = QLabel("<b>" + QApplication.translate("Label", "Storage Conditions",None, QApplication.UnicodeUTF8) + "</b>")
+        bag_humidity_label = QLabel("<b>" + u(QApplication.translate("Label", "Storage Conditions",None, QApplication.UnicodeUTF8)) + "</b>")
         bag_humidity_unitslabel = QLabel(aw.qmc.mode)
         bag_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
         self.humidity_edit = QLineEdit()
@@ -12560,7 +12559,7 @@ class editGraphDlg(ArtisanDialog):
         self.bag_humiditity_tempUnitsComboBox.setMaximumWidth(60)
         self.bag_humiditity_tempUnitsComboBox.setMinimumWidth(60)
         #Ambient temperature (uses display mode as unit (F or C)
-        ambientlabel = QLabel("<b>" + QApplication.translate("Label", "Ambient Conditions",None, QApplication.UnicodeUTF8) + "</b>")
+        ambientlabel = QLabel("<b>" + u(QApplication.translate("Label", "Ambient Conditions",None, QApplication.UnicodeUTF8)) + "</b>")
         ambientunitslabel = QLabel(aw.qmc.mode)
         ambient_humidity_unit_label = QLabel(QApplication.translate("Label", "%",None, QApplication.UnicodeUTF8))
         self.ambient_humidity_edit = QLineEdit()
@@ -12579,14 +12578,14 @@ class editGraphDlg(ArtisanDialog):
         self.ambientedit_tempUnitsComboBox.setMinimumWidth(60)
         # NOTES
         roastertypelabel = QLabel()
-        roastertypelabel.setText("<b>" + QApplication.translate("Label", "Roaster",None, QApplication.UnicodeUTF8) + "</b>")
+        roastertypelabel.setText("<b>" + u(QApplication.translate("Label", "Roaster",None, QApplication.UnicodeUTF8)) + "</b>")
         operatorlabel = QLabel()
-        operatorlabel.setText("<b>" + QApplication.translate("Label", "Operator",None, QApplication.UnicodeUTF8) + "</b>")
-        roastinglabel = QLabel("<b>" + QApplication.translate("Label", "Roasting Notes",None, QApplication.UnicodeUTF8) + "</b>")
+        operatorlabel.setText("<b>" + u(QApplication.translate("Label", "Operator",None, QApplication.UnicodeUTF8)) + "</b>")
+        roastinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Roasting Notes",None, QApplication.UnicodeUTF8)) + "</b>")
         self.roastingeditor = QTextEdit()
         if aw.qmc.roastingnotes is not None:
             self.roastingeditor.setPlainText(QString(aw.qmc.roastingnotes))
-        cuppinglabel = QLabel("<b>" + QApplication.translate("Label", "Cupping Notes",None, QApplication.UnicodeUTF8) + "</b>")
+        cuppinglabel = QLabel("<b>" + u(QApplication.translate("Label", "Cupping Notes",None, QApplication.UnicodeUTF8)) + "</b>")
         self.cuppingeditor =  QTextEdit()
         if aw.qmc.cuppingnotes is not None:
             self.cuppingeditor.setPlainText(QString(aw.qmc.cuppingnotes))
@@ -14724,14 +14723,14 @@ class EventsDlg(ArtisanDialog):
         self.setLayout(mainLayout)
 
     def showSliderHelp(self):
-        string = QApplication.translate("Message", "<b>Event</b> hide or show the corresponding slider",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Action</b> Perform an action on slider release",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Command</b> depends on the action type ('{}' is replaced by <i>value</i>*<i>factor</i> + <i>offset</i>)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Factor</b> multiplicator of the slider value",None, QApplication.UnicodeUTF8)
+        string = u(QApplication.translate("Message", "<b>Event</b> hide or show the corresponding slider",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Action</b> Perform an action on slider release",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Command</b> depends on the action type ('{}' is replaced by <i>value</i>*<i>factor</i> + <i>offset</i>)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Offset</b> added as offset to the slider value",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Factor</b> multiplicator of the slider value",None, QApplication.UnicodeUTF8))
         QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
 
     def tabSwitched(self,i):
@@ -15375,19 +15374,19 @@ class EventsDlg(ArtisanDialog):
         aw.settooltip()
 
     def showEventbuttonhelp(self):
-        string = QApplication.translate("Message", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Event Description</b> Description of the Event to be recorded.",None, QApplication.UnicodeUTF8) + "<br><br>"  
-        string += QApplication.translate("Message", "<b>Event type</b> Type of event to be recorded.",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Event value</b> Value of event (1-10) to be recorded",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Action</b> Perform an action at the time of the event",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Documentation</b> depends on the action type ('{}' is replaced by the event value):",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("Message", "Call Program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("Message", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8) + "<br><br>&nbsp;&nbsp;"
-        string += QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8) + "<br><br>"
+        string = u(QApplication.translate("Message", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Event Description</b> Description of the Event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br><br>"  
+        string += u(QApplication.translate("Message", "<b>Event type</b> Type of event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Event value</b> Value of event (1-10) to be recorded",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Action</b> Perform an action at the time of the event",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Documentation</b> depends on the action type ('{}' is replaced by the event value):",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Call Program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8)) + "<br><br>"
         QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
 
 ##########################################################################
@@ -21505,16 +21504,16 @@ class AlarmDlg(ArtisanDialog):
         self.accept()
 
     def showAlarmbuttonhelp(self):
-        string  = QApplication.translate("Message", "<b>Status:</b> activate or deactive alarm",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>If Alarm:</b> alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.",None, QApplication.UnicodeUTF8) + "<br><br>"  
-        string += QApplication.translate("Message", "<b>From:</b> alarm only triggered after the given event",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Time:</b> if not 00:00, alarm is triggered mm:ss after the event 'From' happend",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Source:</b> the temperature source that is observed",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Condition:</b> alarm is triggered if source rises above or below the specified temperature",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Temp:</b> the speficied temperature limit",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Action:</b> if all conditions are fulfilled the alarm triggeres the corresponding action",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button (if 0 the COOL event is triggered ) or the new value of the slider",None, QApplication.UnicodeUTF8) + "<br><br>"
-        string += QApplication.translate("Message", "<b>NOTE:</b> each alarm is only triggered once",None, QApplication.UnicodeUTF8)
+        string  = u(QApplication.translate("Message", "<b>Status:</b> activate or deactive alarm",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>If Alarm:</b> alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.",None, QApplication.UnicodeUTF8)) + "<br><br>"  
+        string += u(QApplication.translate("Message", "<b>From:</b> alarm only triggered after the given event",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Time:</b> if not 00:00, alarm is triggered mm:ss after the event 'From' happend",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Source:</b> the temperature source that is observed",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Condition:</b> alarm is triggered if source rises above or below the specified temperature",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Temp:</b> the speficied temperature limit",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Action:</b> if all conditions are fulfilled the alarm triggeres the corresponding action",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button (if 0 the COOL event is triggered ) or the new value of the slider",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>NOTE:</b> each alarm is only triggered once",None, QApplication.UnicodeUTF8))
         QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
 
     def savealarms(self):
@@ -21871,7 +21870,7 @@ class PXRpidDlgControl(ArtisanDialog):
         #****************************   TAB5 WIDGETS
         ETthermolabel = QLabel(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
         BTthermolabel = QLabel(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
-        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
+        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
         self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
