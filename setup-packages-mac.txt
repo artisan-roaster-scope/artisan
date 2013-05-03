@@ -409,3 +409,15 @@ from release downloaded from http://pypi.python.org/pypi/py2app/
 # sudo python3 setup.py install
 
 
+
+XX) cx_freeze
+
+export CC=clang
+export CXX=clang
+export FFLAGS=-ff2c
+export LDSHARED='clang -bundle -undefined dynamic_lookup -arch i386 -arch 
+x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g' 
+
+# python3 setup.py build
+# python3 setup.py install
+
