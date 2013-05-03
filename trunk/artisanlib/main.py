@@ -4000,8 +4000,9 @@ class tgraphcanvas(FigureCanvas):
                 return #exit
 
         #if no profile found
-        self.reset()            # reset calls redraw() at the end
+        self.reset(redraw=False,soundOn=False)
         self.connect_designer()
+        self.redraw(False)
         self.designerinit()
         
     #used to start designer from scratch (not from a loaded profile)
