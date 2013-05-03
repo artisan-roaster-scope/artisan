@@ -1,0 +1,20 @@
+#summary Detailed Release History
+
+|| *Version* || *Date* || *Comment* ||
+|| 0.5.6 || 08.11.2012 || Fixes CENTER 301 and adds Voltcraft K201, other bug fixes ||
+|| 0.5.5 || 28.09.2011 || Bug fixes ||
+|| 0.5.4 || 28.08.2011 || Event handling improvements, K204 CSV import, improvements, bug fixes ||
+|| 0.5.3 || 30.07.2011 || Performance improvements, device external-program, serial log, bug fixes ||
+|| 0.5.2 || 23.07.2011 || Delta DTA PID support, automatic CHARGE/DROP, performance improvements, bug fixes ||
+|| 0.5.1 || 18.06.2011 || Bug fixes ||
+|| 0.5.0 || 10.06.2011 || Mac OS X 10.4, PPC, HHM28, wheel graph editor, math plotter, multiple and virtual devices, symbolic expressions,  custom event buttons ||
+|| 0.4.1 || 13.04.2011 || VA18B fixes, added missing translation to Windows binary, CSV import improvements ||
+|| 0.4.0 || 10.04.2011 || K202 CSV, localization, cut-copy-paste menu, LCD colors, events replay, alarms, profile designer, bug fixes ||
+|| 0.3.4 || 28.02.2011 || Arduino TC4, TE VA18B, improved main window layout, events, roasting properties dialog, delta filter, bug fixes ||
+|| 0.3.3 || 13.02.2011 || Fuji PXR5/PXG5, manual logging, improved serial communication, keyboard shortcuts, Linux binary, bug fixes ||
+|| 0.3.2 || 31.01.2011 || Fixed Center 309, added smaller corrections and improvements ||
+|| 0.3.1 || 12.01.2011 || Fixed bug introduced in v0.3.0 that prevented to loading of the users application preferences ||
+|| 0.3.0 || 11.01.2011 || New profile file format, Mac OS X 10.5 support and bug fixes ||
+|| 0.2.1 || 02.01.2011 || Bug fixes ||
+|| 0.2.0 || 31.12.2010 || Added support for CENTER 300, 301, 302, 303, 304, 305, 306, VOLTCRAFT K202, K204 300K, 302KJ, EXTECH 421509 ||
+|| 0.1.0 || 20.12.2010 || Initial release ||
