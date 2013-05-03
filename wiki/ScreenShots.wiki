@@ -1,3 +1,27 @@
 #summary Artisan running Mac OS, Windows, Ubuntu and CentOS.
 
-== Designer ==
+==Profiles==
+
+ http://artisan.googlecode.com/svn/trunk/screenshots/ubuntu-curves.png
+
+ http://artisan.googlecode.com/svn/trunk/screenshots/mac-curves.png
+
+==Roast Properties==
+
+ http://artisan.googlecode.com/svn/trunk/screenshots/mac-roast-properties.png
+
+==Designer==
+
+ http://artisan.googlecode.com/svn/trunk/screenshots/mac-designer.png
+
+==Sliders==
+
+ http://artisan.googlecode.com/svn/trunk/screenshots/centos-sliders.png
+
+==Cupping Graph==
+
+ http://artisan.googlecode.com/svn/trunk/screenshots/win-cupping.png
+
+==Wheel Graph==
+
+ http://artisan.googlecode.com/svn/trunk/screenshots/win-wheel.png
