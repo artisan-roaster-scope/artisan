@@ -7,7 +7,7 @@ lrelease -verbose artisan.pro
 # distribution
 rm -rf dist
 bbfreeze artisan.py
-cp -R /usr/local/lib/python2.7/dist-packages/matplotlib/mpl-data/ dist
+cp -R /usr/local/lib/python2.7/site-packages/matplotlib/mpl-data/ dist
 cp -R Wheels dist
 cp README.txt dist
 cp LICENSE.txt dist
