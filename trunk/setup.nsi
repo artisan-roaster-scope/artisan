@@ -1,5 +1,5 @@
 !define py2exeOutputDir 'dist'
-!define exe             'artisan.exe'
+!define exe             'Artisan.exe'
 !define icon            'artisan.ico'
 !define compressor      'zlib'  ;one of 'zlib', 'bzip2', 'lzma'
 !define onlyOneInstance
