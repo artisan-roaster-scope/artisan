@@ -10,7 +10,7 @@ o matplotlib 1.2.1
 o minimalmodbus 0.4
 
 o py2exe 0.6.9
-
+o NSIS 2.46
 
 
 Upgrade History:
@@ -75,3 +75,7 @@ download and install MinimalModbus-0.4.win32.exe
 9) py2exe
 
 download and install py2exe-0.6.9.win32-py2.7.exe
+
+10) NSIS 2.46
+
+download and install from http://nsis.sourceforge.net/Download

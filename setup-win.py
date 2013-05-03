@@ -39,19 +39,22 @@ cwd = os.getcwd()
 setup(
     name ="Artisan",
     author = "YOU",
-    windows=[{"script" : cwd + "\\artisan.py"}],
+    windows=[{"script" : cwd + "\\artisan.py",
+            "icon_resources": [(0, cwd + "\\artisan.ico")]
+            }],
     data_files = mpl.get_py2exe_datafiles(),
     zipfile = "lib\library.zip",
     options={"py2exe" :{
                         "packages": ['matplotlib','pytz'],
-                        "compressed": True,
+                        "compressed": False, # faster
                         "unbuffered": True,
+                        'optimize':  2,
                         "dll_excludes":[
                             'MSVCP90.dll','tcl84.dll','tk84.dll','libgdk-win32-2.0-0.dll',
                             'libgdk_pixbuf-2.0-0.dll','libgobject-2.0-0.dll'],
                         "includes" : INCLUDES,
                         "excludes" : EXCLUDES}
-             }
+            }
     )
 
 os.system(r'copy README.txt dist')
@@ -65,4 +68,4 @@ os.system(r'copy Wheels\\Other\\* dist\\Wheels\\Other')
 os.system(r'copy Wheels\\Roasting\\* dist\\Wheels\\Roasting')
 os.system(r'mkdir dist\\translations')
 os.system(r'copy translations\\*.qm dist\\translations')
-os.system(r'copy artisan.png dist')
+#os.system(r'copy artisan.png dist')
