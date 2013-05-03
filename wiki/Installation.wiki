@@ -59,18 +59,13 @@ There is no menu entry yet, this will follow in the next version. You can start 
 
 =Device Configuration=
 
-Once artisan is up, chose your device using the menu *Conf* and then select the *Device* submenu. From version 0.2.0 on, the following devices are supported:
+Once Artisan is up, chose your device using the menu *Conf* and then select the *Device* submenu. RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers (but they need an RS485-RS232 converter). Most common are the following drivers (check your serial2USB device chip to decide which one to install)
 
-  ** Fuji PXR PID (with RS485 mod bus protocol purchase option)
-  ** Fuji PXG PID (with RS485 mod bus protocol purchase option)
-  ** Omega HH506RA, HH802U, HH806AU (Check USB driver here: http://www.ftdichip.com/Drivers/VCP.htm )
-  ** CENTER 300, 301, 302, 303, 304, 305, 306, 309
-  ** VOLTCRAFT K202, K204, 300K, 302KJ
-  ** EXTECH 421509
-    
-RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers (but they need an RS485-RS232 converter).
+  * [[http://www.ftdichip.com/Drivers/VCP.htm VCP from FTDI]]
+  * [http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx CP210x from Silicon Labs]
+  * [[http://prolificusa.com/pl-2303hx-drivers/ PL2303 from Prolific]]
 
-To install a USB driver. Plug the meter in USB port. Let Windows find and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one, or thorugh the manufacturer webpage
+To install a USB driver. Plug the meter in USB port. Let Windows find (for Mac setup see above) and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one, or thorugh the manufacturer webpage
 
 
 =Serial Configuration=
