@@ -1,4 +1,4 @@
-#summary How to setup the artisan software
+#summary Setup Artisan
 
 =Introduction=
 
