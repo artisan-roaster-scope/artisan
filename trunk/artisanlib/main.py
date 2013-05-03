@@ -18,35 +18,6 @@ __version__ = "0.6.0"
 # the GNU General Public License for more details.
 #
 
-# REQUIREMENTS FOR WINDOWS (installation order is important).
-# FOR LINUX and MAC USE THE MATCHING LINUX VERSION FILES
-
-#   OPTIONAL COMPILER TO INSTALL QT FROM SOURCE OR MAKE CHANGES TO QT SOURCE IN FUTURE
-# 1) http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/MinGW%205.1.6/MinGW-5.1.6.exe/download
-#  After installation, edit system variable Path, right click My computer-properties-advanced, to include the bin directory of MinGW.
-#  Example, add to Path ;C:\MINgw\bin     (; is important)
-
-#   QT GRAPHIC INTERFACE
-# 2) http://ftp3.ie.freebsd.org/pub/trolltech/pub/qt/source/qt-win-opensource-4.7.1-mingw.exe
-# add to Path environment variable the bin directory of Qt. Example ;C:\Qt\14.7.1\bin
-
-#   JAVA TO SUPPORT PYSERIAL LIBRARY
-# 3) Java JDK or JRE:  http://java.sun.com/javase/downloads/index.jsp
-# 4) javacomm: http://www.xpl4java.org/xPL4Java/javacomm.html
-# follow the instruction in the README file. Copy and paste files as instructed
-
-#  PYTHON 2.6.6
-# 5) python 2.6: http://www.python.org/ftp/python/2.6.6/python-2.6.6.msi
-# (add to Path the environment variable the bin directory of Python. Example ;E:\Python26
-
-#   EXTRA PYTHON LIBRARIES NEEDED (install after installing python 2.6.6)
-# 6) pyserial for python 2.6: http://sourceforge.net/projects/pyserial/files/pyserial/2.5/pyserial-2.5-rc1.win32.exe/download
-# 7) http://sourceforge.net/projects/numpy/files/NumPy/1.5.1/numpy-1.5.1-win32-superpack-python2.6.exe/download
-# 8) http://sourceforge.net/projects/scipy/files/scipy/0.9.0rc1/scipy-0.9.0rc1-win32-superpack-python2.6.exe/download
-# 9) http://sourceforge.net/projects/matplotlib/files/matplotlib/matplotlib-1.0.1/matplotlib-1.0.1.win32-py2.6.exe/download
-# 10) pyqt4 for python 2.6: http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-Py2.6-x64-gpl-4.8.3-1.exe
-# 11) minimalmodbus 0.4: http://pypi.python.org/pypi/MinimalModbus/
-
 #########################   POLICIES  ###########################################################################
 # 1  STRINGS
 #
@@ -273,6 +244,11 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
     app.installTranslator(appTranslator)
 
 from const import UIconst
+
+if platf == 'Windows':
+    minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=True
+else:
+    minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=False
 
 #######################################################################################
 #################### GRAPH DRAWING WINDOW  ############################################
@@ -7193,7 +7169,7 @@ class ApplicationWindow(QMainWindow):
                 filename = self.qmc.autosaveprefix + "-"
                 filename += str(QDateTime.currentDateTime().toString(QString("dd-MM-yy_hhmm")))
                 filename += ".alog"
-                oldDir = str(QDir.current())
+                oldDir = u(QDir.current())
                 QDir.setCurrent(self.qmc.autosavepath)
                 #write
                 self.serialize(QString(filename),self.getProfile())
@@ -9173,9 +9149,9 @@ class ApplicationWindow(QMainWindow):
                         else:
                             self.buttonpalette[i].extend([[],[],[],[],[],[],[],[],[],[],[],[],[]])
                 for i in range(len(self.extraeventsactionstrings)):
-                    self.extraeventsactionstrings[i] = str(self.extraeventsactionstrings[i])
-                    self.extraeventslabels[i] = str(self.extraeventslabels[i])
-                    self.extraeventsdescriptions[i] = str(self.extraeventsdescriptions[i])
+                    self.extraeventsactionstrings[i] = u(self.extraeventsactionstrings[i])
+                    self.extraeventslabels[i] = u(self.extraeventslabels[i])
+                    self.extraeventsdescriptions[i] = u(self.extraeventsdescriptions[i])
                     self.extraeventbuttoncolor[i] = str(self.extraeventbuttoncolor[i])
                     self.extraeventbuttontextcolor[i] = str(self.extraeventbuttontextcolor[i])
                 #update individual visibility of each buttons
@@ -10157,7 +10133,7 @@ $cupping_notes
             color = "--"
         html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
             title=cgi.escape(self.qmc.title),
-            datetime=str(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
+            datetime=u(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
             beans=beans,
             weight=weight,
             degree=degree,
@@ -10197,7 +10173,7 @@ $cupping_notes
             for i in range(len(html)):
                 f.write(html[i])
             f.close()
-            full_path = "file:///" + str(QDir().current().absolutePath()) + "/" + filename
+            full_path = "file:///" + u(QDir().current().absolutePath()) + "/" + filename
             QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
             
         except IOError as e:
@@ -11216,7 +11192,7 @@ $cupping_notes
         #convert labels to unicode
         for i in range(len(self.qmc.wheelnames)):
             for x in range(len(self.qmc.wheelnames[i])):
-                self.qmc.wheelnames[i][x]= str(self.qmc.wheelnames[i][x])
+                self.qmc.wheelnames[i][x]= u(self.qmc.wheelnames[i][x])
         #two dimension lists        
         wheel["wheelnames"] = self.qmc.wheelnames
         wheel["segmentlengths"] = self.qmc.segmentlengths
@@ -12901,8 +12877,8 @@ class editGraphDlg(ArtisanDialog):
     def buildAmbientTemperatureSourceList(self):
         extra_names = []
         for i in range(len(aw.qmc.extradevices)):
-            extra_names.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
-            extra_names.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
+            extra_names.append(u(i) + "xT1: " + aw.qmc.extraname1[i])
+            extra_names.append(u(i) + "xT2: " + aw.qmc.extraname2[i])
         return ["",
                 QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8),
                 QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8)] + extra_names
@@ -15031,7 +15007,7 @@ class EventsDlg(ArtisanDialog):
     def savetableextraeventbutton(self):
         for i in range(len(aw.extraeventstypes)):
             labeledit = self.eventbuttontable.cellWidget(i,0)
-            label = str(labeledit.text())
+            label = u(labeledit.text())
             if "\\n" in label:              #make multiple line text if "\n" found in label string
                 parts = label.split("\\n")
                 label = chr(10).join(parts)
@@ -16479,10 +16455,6 @@ class modbusport(object):
     def connect(self):
         if self.master == None:
             try:
-                if platf == 'Windows':
-                    minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=True
-                else:
-                    minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=False
                 # as in the following the port is None, no port is opened on creation of the (py)serial object
                 self.master = minimalmodbus.Instrument(None, 1) # port, slaveaddress
                 # configure serial port:
@@ -18054,7 +18026,7 @@ class serialport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("HHM28multimeter :" + settings + " || Tx = " + "No command" + " || Rx = " + str(frame))
 
-    #sends a command to the ET/BT device. Arduino.
+    #sends a command to the ET/BT device. (used by eventaction to send serial command to e.g. Arduino)
     def sendTXcommand(self,command):
         try:
             if not self.SP.isOpen():
