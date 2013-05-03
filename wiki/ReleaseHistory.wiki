@@ -2,9 +2,9 @@
 
 =v0.5.6 (8.11.2012)=
 
-* based on r787 (with modbus support removed)
-* added support for Voltcraft K201 and fixed CENTER 301
-* bug fixes
+ * based on r787 (with modbus support removed)
+ * added support for Voltcraft K201 and fixed CENTER 301
+ * bug fixes
 
 ==v0.5.5== (28.9.2011)==
 
