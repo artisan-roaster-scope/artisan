@@ -10,4 +10,5 @@ TryExec=artisan
 Icon=artisan.png
 Terminal=false
 Categories=Utility;Chart;
-StartupNotify=false
+MimeType=application/x-artisan-alog;application/x-artisan-alrm;application/x-artisan-apal;
+
