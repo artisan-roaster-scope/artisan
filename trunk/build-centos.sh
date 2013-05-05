@@ -8,6 +8,10 @@ lrelease -verbose artisan.pro
 rm -rf dist
 bbfreeze artisan.py
 cp -R /usr/local/lib/python2.7/site-packages/matplotlib/mpl-data/ dist
+cp artisan-alog.xml dist
+cp artisan-alrm.xml dist
+cp artisan-apal.xml dist
+cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist
 cp LICENSE.txt dist

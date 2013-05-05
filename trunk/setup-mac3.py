@@ -44,6 +44,8 @@ DATA_FILES = [
     ("../translations", [r"translations/artisan_sv.qm"]),
     ("../Resources", [r"qt.conf"]),
     ("../Resources", [r"artisanProfile.icns"]),
+    ("../Resources", [r"artisanAlarms.icns"]),
+    ("../Resources", [r"artisanPalettes.icns"]),
   ]
   
 plist = Plist.fromFile('Info3.plist')
