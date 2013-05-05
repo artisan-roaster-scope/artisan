@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# prerm-artisan
+#
+# prepm for installing Artisan
+#
+# Author: Marko Luther
+
+set -e
+
+clear_mime()
+{
+xdg-icon-resource uninstall --size 16  application-x-artisan-alog
+xdg-icon-resource uninstall --size 32  application-x-artisan-alog
+xdg-icon-resource uninstall --size 64  application-x-artisan-alog
+xdg-icon-resource uninstall --size 128 application-x-artisan-alog
+xdg-icon-resource uninstall --size 256 application-x-artisan-alog
+xdg-mime uninstall /usr/share/artisan/artisan-alog.xml
+xdg-icon-resource uninstall --size 16  application-x-artisan-alrm
+xdg-icon-resource uninstall --size 32  application-x-artisan-alrm
+xdg-icon-resource uninstall --size 64  application-x-artisan-alrm
+xdg-icon-resource uninstall --size 128 application-x-artisan-alrm
+xdg-icon-resource uninstall --size 256 application-x-artisan-alrm
+xdg-mime uninstall /usr/share/artisan/artisan-alrm.xml
+xdg-icon-resource uninstall --size 16  application-x-artisan-apal
+xdg-icon-resource uninstall --size 32  application-x-artisan-apal
+xdg-icon-resource uninstall --size 64  application-x-artisan-apal
+xdg-icon-resource uninstall --size 128 application-x-artisan-apal
+xdg-icon-resource uninstall --size 256 application-x-artisan-apal
+xdg-mime uninstall /usr/share/artisan/artisan-apal.xml
+}
+
+case "$1" in
+   remove|upgrade)
+   if dpkg-query -W xdg-utils; 
+       then clear_mime;
+   fi
+   ;;
+
+   *)
+
+   ;;
+esac
+
+exit 0
+
