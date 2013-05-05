@@ -1,5 +1,5 @@
 #!/bin/sh
 
 cd /usr/share/artisan
-exec /usr/bin/env /usr/share/artisan/artisan
+exec /usr/bin/env /usr/share/artisan/artisan $@
 
