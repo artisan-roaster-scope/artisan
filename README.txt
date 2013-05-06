@@ -72,7 +72,7 @@ Microsoft Visual C++ 2008 SP1 Redistributable Package (x86)
 
 http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
 
-If artisan starts when clicling on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything. Newer OS like Windows 7 come with this file.
+If artisan starts when clicking on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything. Newer OS like Windows 7 come with this file.
 
 
 o Mac OS X (>=10.6.x)
@@ -92,8 +92,20 @@ o Mac OS X (>=10.6.x)
 
 o Linux
 
-The Linux package is compatible with Ubuntu Linux 10.10, aka the Maverick Meerkat, and Debian Linux 5.0 "Lenny" as well as 6.0 "Squeeze". For now, we simply offer a .deb Debian package that you have to install manually (see below). For future releases, we plan to have a repository so that you can "apt-get install artisan" and get updates automagically.
+The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually.
 
+Installation on Ubuntu/Debian
+# sudo dpkg -i artisan_<version>.deb
+
+Uninstall on Ubuntu/Debian
+# sudo dpkg -r artisan
+
+
+Installation on CentOS/Redhat
+# sudo rpm -i artisan_<version>.rpm
+
+Uninstall on CentOS/Redhat
+# sudo rpm -e artisan
 
 
 LICENCE
@@ -112,30 +124,29 @@ distribution in the file `LICENSE.txt`. An online version is available at
 <http://www.gnu.org/licenses/>.
 
 
+
 LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
 
-- Python 2.6.x, 2.7.x and 3.3.X released under the PSF licence http://www.python.org/psf/
+- Python 2.6.x, 2.7.x and 3.3.x released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
-- QT 4.8.x under the Qt GNU GPL v. 3.0 licence
-  http://qt.nokia.com/
-- Numpy 1.7.x and Scipy 0.11.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
+- QT 4.10.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
+  http://qt-project.org/products/licensing
+- Numpy 1.7.x and Scipy 0.12.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
-- PyQt 4.8.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
+- PyQt 4.8.x and SIP 4.14.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
-- SIP 4.14.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
-  http://www.riverbankcomputing.co.uk/software/sip/
-- matplotlib 1.2.x, Copyright (c) 2002-2012 John D. Hunter; All Rights Reserved
+- matplotlib 1.2.x, Copyright (c) 2002-2012 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
   http://matplotlib.sourceforge.net
-- pyaudio 0.2.x under the MIT License; Copyright (c) 2006-2010 Hubert Pham
-  http://people.csail.mit.edu/hubert/pyaudio/
 - py2app 0.7.x under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
   Copyright (c) 2010-2012 Ronald Oussoren <ronaldoussoren at mac.com>.
   http://packages.python.org/py2app/
 - py2exe, Copyright (c) 2000-2005 Thomas Heller, Mark Hammond, Jimmy Retzlaff
   http://www.py2exe.org/
+- bbfreeze, Copyright (c) 2007-2012 brainbot technologies AG. Distributed under the zlib/libpng license.
 - minimalmodbus 0.4 under the Apache License, Version 2.0 by Jonas Berg
+
 
 
 VERSION HISTORY

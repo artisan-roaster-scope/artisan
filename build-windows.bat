@@ -1,4 +1,7 @@
 @echo off
+
+C:\Python27\python setup-win.py py2exe
+
 rem #
 rem # Don't make assumptions as to where the 'makensis.exe' is - look in the obvious places
 rem #

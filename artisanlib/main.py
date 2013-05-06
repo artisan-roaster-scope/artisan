@@ -16471,6 +16471,7 @@ class modbusport(object):
                 # open port
                 if not self.master.close_port_after_each_call:
                     self.master.serial.open()
+                    libtime.sleep(.5) # avoid possible hickups on startup
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
