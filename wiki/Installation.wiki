@@ -43,7 +43,7 @@ _NOTE: from v0.5.0 on the Systems 10.4.x/10.5.x/10.6.x (eg. Tiger, Leopard, Snow
 
 =Installation Linux=
 
-The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package that you have to install manually.
+The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually.
 
  * Ubuntu/Debian
   ** install
