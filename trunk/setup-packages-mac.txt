@@ -1,7 +1,7 @@
 Current Versions:
 
 o XCode 4.5.2 + command line tools
-o Python 2.7.4 or 3.3.1 (change "python3" to "python" for python 2.x)
+o Python 2.7.4 or 3.3.1 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial
 o QT 4.8.4
 o SIP 4.14.5
