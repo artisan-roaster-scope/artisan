@@ -62,7 +62,7 @@ sip.setapi('QString', 1)
 sip.setapi('QVariant', 1)
 
 from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
-                         QInputDialog, QGroupBox, QDialog, QLineEdit,
+                         QInputDialog, QGroupBox, QDialog, QLineEdit, 
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
                          QLCDNumber, QKeySequence, QSpinBox, QComboBox,
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton,
@@ -581,10 +581,12 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaBTBflag = False
 
         # projection variables of change of rate
-        self.HUDflag = 0
+        self.HUDflag = False
         self.hudresizeflag = False
-        self.ETtarget = 350
-        self.BTtarget = 250
+        self.ETtarget = 300
+        self.ET2target = 350
+        self.BTtarget = 200
+        self.BT2target = 250
         self.hudETpid = [5,240,60]    # HUD pid: p = 20, i = 60, d = 13
         self.pidpreviouserror = 0  # temporary storage of pid error
 
@@ -862,9 +864,9 @@ class tgraphcanvas(FigureCanvas):
         # defaults
         
         self.filterDropOut_tmin_C_default = 10
-        self.filterDropOut_tmax_C_default = 300.
+        self.filterDropOut_tmax_C_default = 300
         self.filterDropOut_tmin_F_default = 50
-        self.filterDropOut_tmax_F_default = 572.
+        self.filterDropOut_tmax_F_default = 572
         self.filterDropOut_spikeRoR_dRoR_limit_C_default = 4.2
         self.filterDropOut_spikeRoR_dRoR_limit_F_default = 7
         
@@ -874,6 +876,7 @@ class tgraphcanvas(FigureCanvas):
         self.filterDropOut_tmin = self.filterDropOut_tmin_F_default
         self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
         self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
+        self.minmaxLimits = True
         self.dropSpikes = False
 
         ###########################         wheel graph variables     ################################
@@ -1138,6 +1141,7 @@ class tgraphcanvas(FigureCanvas):
             if len(self.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
                 #load
                 img = QPixmap().grabWidget(self)
+#                img = self.grab()
                 aw.HUD.setPixmap(img)
                 
                 self.HUDflag = True
@@ -1373,15 +1377,19 @@ class tgraphcanvas(FigureCanvas):
 
         if self.rateofchange1 > 0:
             ETreachTime = (self.ETtarget - self.temp1[-1])/(self.rateofchange1/60.)
+            ET2reachTime = (self.ET2target - self.temp1[-1])/(self.rateofchange1/60.)
         else:
             ETreachTime = -1
+            ET2reachTime = -1
             
         if self.rateofchange2 > 0:
             BTreachTime = (self.BTtarget - self.temp2[-1])/(self.rateofchange2/60.)
+            BT2reachTime = (self.BT2target - self.temp2[-1])/(self.rateofchange2/60.)
         else:
             BTreachTime = -1
+            BT2reachTime = -1
 
-        return ETreachTime, BTreachTime
+        return ETreachTime, BTreachTime, ET2reachTime, BT2reachTime
 
     #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
     #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
@@ -2777,6 +2785,8 @@ class tgraphcanvas(FigureCanvas):
 
     def OffMonitor(self):
         # first activate "Stopping Mode" to ensure that sample() is not reseting the timer now (independent of the flagstart state)
+        if self.HUDflag:
+            self.toggleHUD()
         # stop Recorder if still running
         if self.flagstart:
             self.OffRecorder()
@@ -2933,46 +2943,47 @@ class tgraphcanvas(FigureCanvas):
     def markDryEnd(self):
         try:
             if self.flagon:
-                aw.soundpop()
-                #prevents accidentally deleting a modified profile.
-                self.safesaveflag = True
-                self.samplingsemaphore.acquire(1)
-                if self.device != 18:
-                    self.timeindex[1] = len(self.timex)-1
-                else:
-                    tx,et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)
+                if len(self.timex) > 0:
+                    aw.soundpop()
+                    #prevents accidentally deleting a modified profile.
+                    self.safesaveflag = True
+                    self.samplingsemaphore.acquire(1)
+                    if self.device != 18:
                         self.timeindex[1] = len(self.timex)-1
                     else:
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1)
-                        return
-                if aw.qmc.phasesbuttonflag:
-                    self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
-                #calculate time elapsed since charge time
-                st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]))
-                #anotate temperature
-                d = aw.qmc.ylimit - aw.qmc.ylimit_min
-                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
-                self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
-                self.fig.canvas.draw()
-                st1 = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
-                st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
-                if self.samplingsemaphore.available() < 1:
-                    self.samplingsemaphore.release(1)
-                aw.button_19.setDisabled(True) # deactivate DRY button
-                aw.button_19.setFlat(True)
-                aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                aw.button_8.setFlat(True)
-                try:
-                    a = aw.qmc.buttonactions[1]
-                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[1])
-                except:
-                    pass
-                message = QApplication.translate("Message","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                #set message at bottom
-                aw.sendmessage(message)
+                        tx,et,bt = aw.ser.NONE()
+                        if et != -1 and bt != -1:
+                            self.drawmanual(et,bt,tx)
+                            self.timeindex[1] = len(self.timex)-1
+                        else:
+                            if self.samplingsemaphore.available() < 1:
+                                self.samplingsemaphore.release(1)
+                            return
+                    if aw.qmc.phasesbuttonflag:
+                        self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
+                    #calculate time elapsed since charge time
+                    st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[1]] - self.timex[self.timeindex[0]]))
+                    #anotate temperature
+                    d = aw.qmc.ylimit - aw.qmc.ylimit_min
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
+                    self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
+                    self.fig.canvas.draw()
+                    st1 = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
+                    st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
+                    if self.samplingsemaphore.available() < 1:
+                        self.samplingsemaphore.release(1)
+                    aw.button_19.setDisabled(True) # deactivate DRY button
+                    aw.button_19.setFlat(True)
+                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                    aw.button_8.setFlat(True)
+                    try:
+                        a = aw.qmc.buttonactions[1]
+                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[1])
+                    except:
+                        pass
+                    message = QApplication.translate("Message","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                    #set message at bottom
+                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -2987,50 +2998,51 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cstart(self):
         try:
             if self.flagon:
-                aw.soundpop()
-                #prevents accidentally deleting a modified profile.
-                self.safesaveflag = True
-                self.samplingsemaphore.acquire(1)
-                # record 1Cs only if Charge mark has been done
-                if self.device != 18:                
-                    self.timeindex[2] = len(self.timex)-1
-                else:
-                    tx,et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)
+                if len(self.timex) > 0:
+                    aw.soundpop()
+                    #prevents accidentally deleting a modified profile.
+                    self.safesaveflag = True
+                    self.samplingsemaphore.acquire(1)
+                    # record 1Cs only if Charge mark has been done
+                    if self.device != 18:                
                         self.timeindex[2] = len(self.timex)-1
                     else:
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1)
-                        return
-                if aw.qmc.phasesbuttonflag:
-                    self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
-                #calculate time elapsed since charge time
-                st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
-                d = aw.qmc.ylimit - aw.qmc.ylimit_min
-                if self.timeindex[1]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
-                else:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
-                self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
-                self.fig.canvas.draw()
-                st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
-                st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
-                if self.samplingsemaphore.available() < 1:
-                    self.samplingsemaphore.release(1)
-                aw.button_3.setDisabled(True) # deactivate FCs button
-                aw.button_3.setFlat(True)
-                aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                aw.button_8.setFlat(True)
-                aw.button_19.setDisabled(True) # also deactivate DRY button
-                aw.button_19.setFlat(True)
-                try:
-                    a = aw.qmc.buttonactions[2]
-                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[2])
-                except:
-                    pass
-                message = QApplication.translate("Message","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                aw.sendmessage(message)
+                        tx,et,bt = aw.ser.NONE()
+                        if et != -1 and bt != -1:
+                            self.drawmanual(et,bt,tx)
+                            self.timeindex[2] = len(self.timex)-1
+                        else:
+                            if self.samplingsemaphore.available() < 1:
+                                self.samplingsemaphore.release(1)
+                            return
+                    if aw.qmc.phasesbuttonflag:
+                        self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
+                    #calculate time elapsed since charge time
+                    st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
+                    d = aw.qmc.ylimit - aw.qmc.ylimit_min
+                    if self.timeindex[1]:
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
+                    else:
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
+                    self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
+                    self.fig.canvas.draw()
+                    st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
+                    st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
+                    if self.samplingsemaphore.available() < 1:
+                        self.samplingsemaphore.release(1)
+                    aw.button_3.setDisabled(True) # deactivate FCs button
+                    aw.button_3.setFlat(True)
+                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setDisabled(True) # also deactivate DRY button
+                    aw.button_19.setFlat(True)
+                    try:
+                        a = aw.qmc.buttonactions[2]
+                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[2])
+                    except:
+                        pass
+                    message = QApplication.translate("Message","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3045,46 +3057,47 @@ class tgraphcanvas(FigureCanvas):
     def mark1Cend(self):
         try:
             if self.flagon:
-                aw.soundpop()
-                #prevents accidentally deleting a modified profile.
-                self.safesaveflag = True
-                self.samplingsemaphore.acquire(1)
-                if self.device != 18:
-                    self.timeindex[3] = len(self.timex)-1
-                else:
-                    tx,et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)
+                if len(self.timex) > 0:
+                    aw.soundpop()
+                    #prevents accidentally deleting a modified profile.
+                    self.safesaveflag = True
+                    self.samplingsemaphore.acquire(1)
+                    if self.device != 18:
                         self.timeindex[3] = len(self.timex)-1
                     else:
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1)
-                        return
-                #calculate time elapsed since charge time
-                st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
-                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
-                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
-                self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
-                self.fig.canvas.draw()
-                st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
-                st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
-                if self.samplingsemaphore.available() < 1:
-                    self.samplingsemaphore.release(1)
-                aw.button_4.setDisabled(True) # deactivate FCe button
-                aw.button_4.setFlat(True)
-                aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                aw.button_8.setFlat(True)
-                aw.button_19.setDisabled(True) # also deactivate DRY button
-                aw.button_19.setFlat(True)
-                aw.button_3.setDisabled(True) # also deactivate FCs button
-                aw.button_3.setFlat(True)
-                try:
-                    a = aw.qmc.buttonactions[3]
-                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[3])
-                except:
-                    pass
-                message = QApplication.translate("Message","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                aw.sendmessage(message)
+                        tx,et,bt = aw.ser.NONE()
+                        if et != -1 and bt != -1:
+                            self.drawmanual(et,bt,tx)
+                            self.timeindex[3] = len(self.timex)-1
+                        else:
+                            if self.samplingsemaphore.available() < 1:
+                                self.samplingsemaphore.release(1)
+                            return
+                    #calculate time elapsed since charge time
+                    st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
+                    d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
+                    self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
+                    self.fig.canvas.draw()
+                    st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
+                    st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
+                    if self.samplingsemaphore.available() < 1:
+                        self.samplingsemaphore.release(1)
+                    aw.button_4.setDisabled(True) # deactivate FCe button
+                    aw.button_4.setFlat(True)
+                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setDisabled(True) # also deactivate DRY button
+                    aw.button_19.setFlat(True)
+                    aw.button_3.setDisabled(True) # also deactivate FCs button
+                    aw.button_3.setFlat(True)
+                    try:
+                        a = aw.qmc.buttonactions[3]
+                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[3])
+                    except:
+                        pass
+                    message = QApplication.translate("Message","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3099,50 +3112,51 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cstart(self):
         try:
             if self.flagon:
-                aw.soundpop()
-                #prevents accidentally deleting a modified profile. 
-                self.safesaveflag = True
-                self.samplingsemaphore.acquire(1)
-                if self.device != 18:
-                    self.timeindex[4] = len(self.timex)-1
-                else:
-                    tx,et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)
+                if len(self.timex) > 0:
+                    aw.soundpop()
+                    #prevents accidentally deleting a modified profile. 
+                    self.safesaveflag = True
+                    self.samplingsemaphore.acquire(1)
+                    if self.device != 18:
                         self.timeindex[4] = len(self.timex)-1
                     else:
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1)
-                        return
-                st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
-                d = aw.qmc.ylimit - aw.qmc.ylimit_min
-                if self.timeindex[3]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
-                else:
-                    self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
-                self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
-                self.fig.canvas.draw()
-                st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
-                st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
-                if self.samplingsemaphore.available() < 1:
-                    self.samplingsemaphore.release(1)
-                aw.button_5.setDisabled(True) # deactivate SCs button
-                aw.button_5.setFlat(True)
-                aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                aw.button_8.setFlat(True)
-                aw.button_19.setDisabled(True) # also deactivate DRY button
-                aw.button_19.setFlat(True)
-                aw.button_3.setDisabled(True) # also deactivate FCs button
-                aw.button_3.setFlat(True)
-                aw.button_4.setDisabled(True) # also deactivate FCe button
-                aw.button_4.setFlat(True)
-                try:
-                    a = aw.qmc.buttonactions[4]
-                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[4])
-                except:
-                    pass
-                message = QApplication.translate("Message","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                aw.sendmessage(message)
+                        tx,et,bt = aw.ser.NONE()
+                        if et != -1 and bt != -1:
+                            self.drawmanual(et,bt,tx)
+                            self.timeindex[4] = len(self.timex)-1
+                        else:
+                            if self.samplingsemaphore.available() < 1:
+                                self.samplingsemaphore.release(1)
+                            return
+                    st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
+                    d = aw.qmc.ylimit - aw.qmc.ylimit_min
+                    if self.timeindex[3]:
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
+                    else:
+                        self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
+                    self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
+                    self.fig.canvas.draw()
+                    st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
+                    st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
+                    if self.samplingsemaphore.available() < 1:
+                        self.samplingsemaphore.release(1)
+                    aw.button_5.setDisabled(True) # deactivate SCs button
+                    aw.button_5.setFlat(True)
+                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setDisabled(True) # also deactivate DRY button
+                    aw.button_19.setFlat(True)
+                    aw.button_3.setDisabled(True) # also deactivate FCs button
+                    aw.button_3.setFlat(True)
+                    aw.button_4.setDisabled(True) # also deactivate FCe button
+                    aw.button_4.setFlat(True)
+                    try:
+                        a = aw.qmc.buttonactions[4]
+                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[4])
+                    except:
+                        pass
+                    message = QApplication.translate("Message","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3157,49 +3171,50 @@ class tgraphcanvas(FigureCanvas):
     def mark2Cend(self):
         try:
             if self.flagon:
-                aw.soundpop()
-                #prevents accidentally deleting a modified profile.
-                self.safesaveflag = True
-                self.samplingsemaphore.acquire(1)
-                if self.device != 18:
-                    self.timeindex[5] = len(self.timex)-1
-                else:
-                    tx,et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)
-                        self.timeindex[5] = len(self.timex)-1
-                    else:
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1)
-                        return
-                st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
-                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
-                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
-                self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
-                self.fig.canvas.draw()
-                st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
-                st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
-                if self.samplingsemaphore.available() < 1:
-                    self.samplingsemaphore.release(1)
-                aw.button_6.setDisabled(True) # deactivate SCe button
-                aw.button_6.setFlat(True)
-                aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                aw.button_8.setFlat(True)
-                aw.button_19.setDisabled(True) # also deactivate DRY button
-                aw.button_19.setFlat(True)
-                aw.button_3.setDisabled(True) # also deactivate FCs button
-                aw.button_3.setFlat(True)
-                aw.button_4.setDisabled(True) # also deactivate FCe button
-                aw.button_4.setFlat(True)
-                aw.button_5.setDisabled(True) # also deactivate SCs button
-                aw.button_5.setFlat(True)
-                try:
-                    a = aw.qmc.buttonactions[5]
-                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[5])
-                except:
-                    pass
-                message = QApplication.translate("Message","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                aw.sendmessage(message)
+                if len(self.timex) > 0:
+                   aw.soundpop()
+                   #prevents accidentally deleting a modified profile.
+                   self.safesaveflag = True
+                   self.samplingsemaphore.acquire(1)
+                   if self.device != 18:
+                       self.timeindex[5] = len(self.timex)-1
+                   else:
+                       tx,et,bt = aw.ser.NONE()
+                       if et != -1 and bt != -1:
+                           self.drawmanual(et,bt,tx)
+                           self.timeindex[5] = len(self.timex)-1
+                       else:
+                           if self.samplingsemaphore.available() < 1:
+                               self.samplingsemaphore.release(1)
+                           return
+                   st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
+                   d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                   self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
+                   self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
+                   self.fig.canvas.draw()
+                   st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
+                   st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
+                   if self.samplingsemaphore.available() < 1:
+                       self.samplingsemaphore.release(1)
+                   aw.button_6.setDisabled(True) # deactivate SCe button
+                   aw.button_6.setFlat(True)
+                   aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                   aw.button_8.setFlat(True)
+                   aw.button_19.setDisabled(True) # also deactivate DRY button
+                   aw.button_19.setFlat(True)
+                   aw.button_3.setDisabled(True) # also deactivate FCs button
+                   aw.button_3.setFlat(True)
+                   aw.button_4.setDisabled(True) # also deactivate FCe button
+                   aw.button_4.setFlat(True)
+                   aw.button_5.setDisabled(True) # also deactivate SCs button
+                   aw.button_5.setFlat(True)
+                   try:
+                       a = aw.qmc.buttonactions[5]
+                       aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[5])
+                   except:
+                       pass
+                   message = QApplication.translate("Message","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                   aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3214,69 +3229,70 @@ class tgraphcanvas(FigureCanvas):
     def markDrop(self):
         try:
             if self.flagon:
-                aw.soundpop()
-                #prevents accidentally deleting a modified profile.
-                self.safesaveflag = True
-                self.samplingsemaphore.acquire(1)
-                if self.device != 18:
-                    if self.autoDropIdx:
-                        self.timeindex[6] = self.autoDropIdx
+                if len(self.timex) > 0:
+                    aw.soundpop()
+                    #prevents accidentally deleting a modified profile.
+                    self.safesaveflag = True
+                    self.samplingsemaphore.acquire(1)
+                    if self.device != 18:
+                        if self.autoDropIdx:
+                            self.timeindex[6] = self.autoDropIdx
+                        else:
+                            self.timeindex[6] = len(self.timex)-1
                     else:
-                        self.timeindex[6] = len(self.timex)-1
-                else:
-                    tx,et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)
-                        self.timeindex[6] = len(self.timex)-1
-                    else:
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1)
-                        return
-                st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
-                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
-                if self.timeindex[5]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
-                elif self.timeindex[4]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]],d)
-                elif self.timeindex[3]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]],d)
-                elif self.timeindex[2]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
-                elif self.timeindex[1]:
-                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
-                self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
-                self.fig.canvas.draw()
-                st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
-                st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
-                if self.samplingsemaphore.available() < 1:
-                    self.samplingsemaphore.release(1)
-                aw.button_9.setDisabled(True) # deactivate DROP button
-                aw.button_9.setFlat(True)
-                aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                aw.button_8.setFlat(True)
-                aw.button_19.setDisabled(True) # also deactivate DRY button
-                aw.button_19.setFlat(True)
-                aw.button_3.setDisabled(True) # also deactivate FCs button
-                aw.button_3.setFlat(True)
-                aw.button_4.setDisabled(True) # also deactivate FCe button
-                aw.button_4.setFlat(True)
-                aw.button_5.setDisabled(True) # also deactivate SCs button
-                aw.button_5.setFlat(True)
-                aw.button_6.setDisabled(True) # also deactivate SCe button
-                aw.button_6.setFlat(True)
-                try:
-                    # update ambient temperature if a ambient temperature source is configured and no value yet established
-                    if aw.qmc.ambientTemp == 0.0:
-                        aw.qmc.updateAmbientTemp()
-                except:
-                    pass
-                try:
-                    a = aw.qmc.buttonactions[6]
-                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[6])
-                except:
-                    pass
-                message = QApplication.translate("Message","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                aw.sendmessage(message)
+                        tx,et,bt = aw.ser.NONE()
+                        if et != -1 and bt != -1:
+                            self.drawmanual(et,bt,tx)
+                            self.timeindex[6] = len(self.timex)-1
+                        else:
+                            if self.samplingsemaphore.available() < 1:
+                                self.samplingsemaphore.release(1)
+                            return
+                    st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
+                    d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                    if self.timeindex[5]:
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
+                    elif self.timeindex[4]:
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[6]],d)
+                    elif self.timeindex[3]:
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[6]],d)
+                    elif self.timeindex[2]:
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[6]],d)
+                    elif self.timeindex[1]:
+                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
+                    self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
+                    self.fig.canvas.draw()
+                    st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
+                    st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
+                    if self.samplingsemaphore.available() < 1:
+                        self.samplingsemaphore.release(1)
+                    aw.button_9.setDisabled(True) # deactivate DROP button
+                    aw.button_9.setFlat(True)
+                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setDisabled(True) # also deactivate DRY button
+                    aw.button_19.setFlat(True)
+                    aw.button_3.setDisabled(True) # also deactivate FCs button
+                    aw.button_3.setFlat(True)
+                    aw.button_4.setDisabled(True) # also deactivate FCe button
+                    aw.button_4.setFlat(True)
+                    aw.button_5.setDisabled(True) # also deactivate SCs button
+                    aw.button_5.setFlat(True)
+                    aw.button_6.setDisabled(True) # also deactivate SCe button
+                    aw.button_6.setFlat(True)
+                    try:
+                        # update ambient temperature if a ambient temperature source is configured and no value yet established
+                        if aw.qmc.ambientTemp == 0.0:
+                            aw.qmc.updateAmbientTemp()
+                    except:
+                        pass
+                    try:
+                        a = aw.qmc.buttonactions[6]
+                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[6])
+                    except:
+                        pass
+                    message = QApplication.translate("Message","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3290,58 +3306,59 @@ class tgraphcanvas(FigureCanvas):
     def markCoolEnd(self):
         try:
             if self.flagon:
-                aw.soundpop()
-                #prevents accidentally deleting a modified profile.
-                self.safesaveflag = True
-                self.samplingsemaphore.acquire(1)
-                if self.device != 18:
-                    self.timeindex[7] = len(self.timex)-1
-                else:
-                    tx,et,bt = aw.ser.NONE()
-                    if et != -1 and bt != -1:
-                        self.drawmanual(et,bt,tx)
+                if len(self.timex) > 0:
+                    aw.soundpop()
+                    #prevents accidentally deleting a modified profile.
+                    self.safesaveflag = True
+                    self.samplingsemaphore.acquire(1)
+                    if self.device != 18:
                         self.timeindex[7] = len(self.timex)-1
                     else:
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1)
-                        return
-                if aw.qmc.phasesbuttonflag:
-                    self.phases[1] = int(round(self.temp2[self.timeindex[7]]))
-                #calculate time elapsed since charge time
-                st1 = QApplication.translate("Scope Annotation","CE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]]))
-                #anotate temperature
-                d = aw.qmc.ylimit - aw.qmc.ylimit_min  
-                self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
-                self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
-                self.fig.canvas.draw()
-                st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
-                st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
-                if self.samplingsemaphore.available() < 1:
-                    self.samplingsemaphore.release(1)
-                aw.button_20.setDisabled(True) # deactivate COOL button
-                aw.button_20.setFlat(True)
-                aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                aw.button_8.setFlat(True)
-                aw.button_19.setDisabled(True) # also deactivate DRY button
-                aw.button_19.setFlat(True)
-                aw.button_3.setDisabled(True) # also deactivate FCs button
-                aw.button_3.setFlat(True)
-                aw.button_4.setDisabled(True) # also deactivate FCe button
-                aw.button_4.setFlat(True)
-                aw.button_5.setDisabled(True) # also deactivate SCs button
-                aw.button_5.setFlat(True)
-                aw.button_6.setDisabled(True) # also deactivate SCe button
-                aw.button_6.setFlat(True)
-                aw.button_9.setDisabled(True) # also deactivate DROP button
-                aw.button_9.setFlat(True)
-                try:
-                    a = aw.qmc.buttonactions[7]
-                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[7])
-                except:
-                    pass
-                message = QApplication.translate("Message","[COOL END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                #set message at bottom
-                aw.sendmessage(message)
+                        tx,et,bt = aw.ser.NONE()
+                        if et != -1 and bt != -1:
+                            self.drawmanual(et,bt,tx)
+                            self.timeindex[7] = len(self.timex)-1
+                        else:
+                            if self.samplingsemaphore.available() < 1:
+                                self.samplingsemaphore.release(1)
+                            return
+                    if aw.qmc.phasesbuttonflag:
+                        self.phases[1] = int(round(self.temp2[self.timeindex[7]]))
+                    #calculate time elapsed since charge time
+                    st1 = QApplication.translate("Scope Annotation","CE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]]))
+                    #anotate temperature
+                    d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
+                    self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
+                    self.fig.canvas.draw()
+                    st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
+                    st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
+                    if self.samplingsemaphore.available() < 1:
+                        self.samplingsemaphore.release(1)
+                    aw.button_20.setDisabled(True) # deactivate COOL button
+                    aw.button_20.setFlat(True)
+                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setDisabled(True) # also deactivate DRY button
+                    aw.button_19.setFlat(True)
+                    aw.button_3.setDisabled(True) # also deactivate FCs button
+                    aw.button_3.setFlat(True)
+                    aw.button_4.setDisabled(True) # also deactivate FCe button
+                    aw.button_4.setFlat(True)
+                    aw.button_5.setDisabled(True) # also deactivate SCs button
+                    aw.button_5.setFlat(True)
+                    aw.button_6.setDisabled(True) # also deactivate SCe button
+                    aw.button_6.setFlat(True)
+                    aw.button_9.setDisabled(True) # also deactivate DROP button
+                    aw.button_9.setFlat(True)
+                    try:
+                        a = aw.qmc.buttonactions[7]
+                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[7])
+                    except:
+                        pass
+                    message = QApplication.translate("Message","[COOL END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                    #set message at bottom
+                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -5096,7 +5113,7 @@ class SampleThread(QThread):
             #########################
             # a) detect overflows
             wrong_reading = 0
-            if temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax:
+            if aw.qmc.minmaxLimits and temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax:
                 wrong_reading = 1
             #########################
             # b) detect spikes (on BT only after CHARGE if autoChargeDropFlag=True not to have a conflict here)
@@ -5125,10 +5142,10 @@ class SampleThread(QThread):
 #                # simple repeat strategy (should alternate between repeat-previous and keep-RoR strategy
                 m = aw.qmc.filterDropOut_replaceRoR_period
                 if len(tempx) > 0 and tempx[-1] != -1:
-                    # repeate last correct reading if not done before (min/max violation are always filtered)
-                    if len(tempx) == 1 or wrong_reading == 1 or (len(tempx) > 1 and tempx[-1] != tempx[-2]):
+                    # repeate last correct reading if not done before in the last two fixes (min/max violation are always filtered)
+                    if len(tempx) == 1 or wrong_reading == 1 or (len(tempx) > 3 and tempx[-1] != tempx[-2] and tempx[-2] != tempx[-3]):
                         return tempx[-1]
-                    elif len(tempx) >= m and tempx[-1] != -1 and tempx[-m] != -1 and tempx[-1] != 0 and tempx[-m] != 0:
+                    elif len(tempx) >= m and tempx[-1] != -1 and tempx[-m] != -1 and tempx[-1] != 0 and tempx[-m] != 0 and (len(tempx) < 4 or tempx[-4] != tempx[-3]):
                     # strategy based on previous RoR assuming a constant RoR [overly complex!]
                     # be careful with this RoR based filter as RoR might be very incorrect for short delta-times
                         # let's use the last m readings to compute the last RoR and
@@ -6113,7 +6130,7 @@ class ApplicationWindow(QMainWindow):
         self.button_19.setStyleSheet(self.pushbuttonstyles["DRY END"])
         #self.button_19.setMaximumSize(90, 50)
         self.button_19.setMinimumHeight(50)
-        self.button_19.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Dry phase (DRYEND)", None, QApplication.UnicodeUTF8))
+        self.button_19.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Drying phase (DRYEND)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_19, SIGNAL("clicked()"), self.qmc.markDryEnd)
 
         #create COOLe button
@@ -6121,7 +6138,7 @@ class ApplicationWindow(QMainWindow):
         self.button_20.setFocusPolicy(Qt.NoFocus)
         self.button_20.setStyleSheet(self.pushbuttonstyles["COOL END"])
         self.button_20.setMinimumHeight(50)
-        self.button_20.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Cool phase (COOLEND)", None, QApplication.UnicodeUTF8))
+        self.button_20.setToolTip(QApplication.translate("Tooltip", "Marks the end of the Cooling phase (COOLEND)", None, QApplication.UnicodeUTF8))
         self.connect(self.button_20, SIGNAL("clicked()"), self.qmc.markCoolEnd)
  
  
@@ -7676,8 +7693,8 @@ class ApplicationWindow(QMainWindow):
             
             # ensure that the curves and LCDs of the new device are visible:
             n = len(self.qmc.extradevices)
-            self.extraLCDvisibility1[n-1] = True
-            self.extraLCDvisibility2[n-1] = True
+            self.extraLCDvisibility1[n-1] = False
+            self.extraLCDvisibility2[n-1] = False
             self.extraCurveVisibility1[n-1] = True
             self.extraCurveVisibility2[n-1] = True
 
@@ -8877,8 +8894,14 @@ class ApplicationWindow(QMainWindow):
                     elif type(self.dtapid.dtamem[key][0]) == type(int()):
                         self.dtapid.dtamem[key][0] = settings.value(key,self.dtapid.dtamem[key][0]).toInt()[0]
                 settings.endGroup()
-            self.qmc.filterDropOuts = settings.value("filterDropOuts",self.qmc.filterDropOuts).toBool()
-            self.qmc.dropSpikes = settings.value("dropSpikes",self.qmc.dropSpikes).toBool()
+            if settings.contains("filterDropOuts"):
+                self.qmc.filterDropOuts = settings.value("filterDropOuts",self.qmc.filterDropOuts).toBool()
+            if settings.contains("dropSpikes"):
+                self.qmc.dropSpikes = settings.value("dropSpikes",self.qmc.dropSpikes).toBool()
+            if settings.contains("minmaxLimits"):
+                self.qmc.minmaxLimits = settings.value("minmaxLimits",self.qmc.minmaxLimits).toBool()
+                self.qmc.filterDropOut_tmin = settings.value("minLimit",self.qmc.filterDropOut_tmin).toInt()[0]
+                self.qmc.filterDropOut_tmax = settings.value("maxLimit",self.qmc.filterDropOut_tmax).toInt()[0]
             settings.beginGroup("RoC")
             self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
@@ -8911,6 +8934,10 @@ class ApplicationWindow(QMainWindow):
             self.qmc.projectionmode = settings.value("ProjectionMode",self.qmc.projectionmode).toInt()[0]
             self.qmc.ETtarget = settings.value("ETtarget",self.qmc.ETtarget).toInt()[0]
             self.qmc.BTtarget = settings.value("BTtarget",self.qmc.BTtarget).toInt()[0]
+            if settings.contains("ET2target"):
+                self.qmc.ET2target = settings.value("ET2target",self.qmc.ET2target).toInt()[0]
+            if settings.contains("BT2target"):
+                self.qmc.BT2target = settings.value("BT2target",self.qmc.BT2target).toInt()[0]
             self.HUDfunction = settings.value("Mode",self.HUDfunction).toInt()[0]
             if settings.contains("hudETpid"):
                 self.qmc.hudETpid = [x.toInt()[0] for x in settings.value("hudETpid").toList()]
@@ -9482,6 +9509,9 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("filterDropOuts",self.qmc.filterDropOuts)
             settings.setValue("dropSpikes",self.qmc.dropSpikes)
+            settings.setValue("minmaxLimits",self.qmc.minmaxLimits)
+            settings.setValue("minLimit",self.qmc.filterDropOut_tmin)
+            settings.setValue("maxLimit",self.qmc.filterDropOut_tmax)
             settings.beginGroup("RoC")
             settings.setValue("DeltaET",self.qmc.DeltaETflag)
             settings.setValue("DeltaBT",self.qmc.DeltaBTflag)
@@ -9504,6 +9534,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("ProjectionMode",self.qmc.projectionmode)
             settings.setValue("ETtarget",self.qmc.ETtarget)
             settings.setValue("BTtarget",self.qmc.BTtarget)
+            settings.setValue("ET2target",self.qmc.ET2target)
+            settings.setValue("BT2target",self.qmc.BT2target)
             settings.setValue("Mode",self.HUDfunction)
             settings.setValue("hudETpid",self.qmc.hudETpid)
             settings.endGroup()
@@ -9728,6 +9760,8 @@ class ApplicationWindow(QMainWindow):
         extras["ProjectionMode"]= str(self.qmc.projectionmode)
         extras["ETtarget"]= str(self.qmc.ETtarget)
         extras["BTtarget"]= str(self.qmc.BTtarget)
+        extras["ET2target"]= str(self.qmc.ET2target)
+        extras["BT2target"]= str(self.qmc.BT2target)
         extras["HUDMode"]= str(self.HUDfunction)                      # key modified
         extras["hudETpid"]= str(self.qmc.hudETpid)
         extras["Beep"]= str(self.soundflag)
@@ -9835,6 +9869,7 @@ class ApplicationWindow(QMainWindow):
 
     def filePrint(self):
         image = QPixmap.grabWidget(aw.qmc).toImage()
+#        image = aw.qmc().grab().toImage()
         
         if image.isNull():
             return
@@ -9985,19 +10020,19 @@ th {
 <td>
 <table width="250">
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Dry phase:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Drying:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$dry_phase</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Mid phase:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Maillard:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$mid_phase</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Finish phase:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Development:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$finish_phase</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Cool phase:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "Cooling:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$cool_phase</td>
 </tr>
 </table>
@@ -10013,8 +10048,7 @@ th {
 <tr>
 <td>
 <center><b>""" + u(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
-$roasting_notes
-<center><pre>$roast_attributes</pre></center>
+$roasting_notes$roast_attributes
 </td>
 </tr>
 </table>
@@ -10062,6 +10096,7 @@ $cupping_notes
         else:
             #resize GRAPH image to 650 pixels width
             image = QPixmap.grabWidget(aw.qmc).toImage()
+#            image = aw.qmc.grab().toImage()
             image = image.scaledToWidth(650,1)
             #save GRAPH image
             graph_image = graph_image + ".png"
@@ -10081,6 +10116,7 @@ $cupping_notes
         else:
             #resize FLAVOR image to 550 pixels width
             image = QPixmap.grabWidget(aw.qmc).toImage()
+#            image = aw.qmc.grab().toImage()
             image = image.scaledToWidth(550,1)
             #save GRAPH image
             flavor_image = flavor_image + ".png"
@@ -10207,7 +10243,10 @@ $cupping_notes
             res.append(u(QApplication.translate("CheckBox","Scorching", None, QApplication.UnicodeUTF8)))
         if aw.qmc.divots_flag:
             res.append(u(QApplication.translate("CheckBox","Divots", None, QApplication.UnicodeUTF8)))
-        return ', '.join(res)
+        if len(res) > 0:
+            return "\n<center><pre>" + ', '.join(res) + "</pre></center>"
+        else:
+            return ""
 
     def cuppingSum(self):
         score = 0.
@@ -10609,6 +10648,7 @@ $cupping_notes
 
     def applicationscreenshot(self):
         imag = QPixmap().grabWidget(self)
+#        imag = self.grab()
         fmt = 'png'
         initialPath = QDir.currentPath() + "/ArtisanScreenshot." + fmt
         fileName = QFileDialog.getSaveFileName(self, "Artisan ScreenShot",
@@ -11053,6 +11093,7 @@ $cupping_notes
     def resize(self,w,transformationmode):
         try: 
             image = QPixmap.grabWidget(aw.qmc)
+#            image = aw.qmc.grab()
             if w != 0:
                 image = image.scaledToWidth(w,transformationmode)
             filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PNG", None, QApplication.UnicodeUTF8),ext="*.png")
@@ -11089,19 +11130,40 @@ $cupping_notes
             #turn back ON to adquire new size
             self.qmc.toggleHUD()
             self.qmc.hudresizeflag = False
-        ETreachTime,BTreachTime = self.qmc.getTargetTime()
-        if ETreachTime > 0 and BTreachTime < 5940:
+        ETreachTime,BTreachTime,ET2reachTime,BT2reachTime = self.qmc.getTargetTime()
+        if ETreachTime > 0 and ETreachTime < 2000:
             text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
             if self.qmc.timeindex[0]:
                 text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
+        elif ET2reachTime > 0 and ET2reachTime < 2000:
+            text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
+            if self.qmc.timeindex[0]:
+                text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
         else:
             text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
-        if BTreachTime > 0 and BTreachTime < 5940:    
+        if BTreachTime > 0 and BTreachTime < 2000:    
             text2 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
             if self.qmc.timeindex[0]:
                 text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
+        elif BT2reachTime > 0 and BT2reachTime < 2000:
+            text2 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
+            if self.qmc.timeindex[0]:
+                text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
         else:
             text2 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
+        ####  Phase Texts #####
+        phasetext1 = u("") # lower textline
+        phasetext2 = u("") # higher textline
+        if self.qmc.timeindex[2]: # after FCs
+            FCs_time = self.qmc.timex[self.qmc.timeindex[2]]
+            afterFCs = self.qmc.timex[-1] - FCs_time
+            phasetext1 = u(QApplication.translate("Label","%1 after FCs", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(afterFCs))))
+        if self.qmc.timeindex[3]: # after FCe
+            FCe_time = self.qmc.timex[self.qmc.timeindex[3]]
+            afterFCe = self.qmc.timex[-1] - FCe_time
+            phasetext2 = u(QApplication.translate("Label","%1 after FCe", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(afterFCe))))
+            if self.qmc.timeindex[2]:
+                phasetext2 = phasetext2 + u(" (") + u(self.qmc.stringfromseconds(int(FCe_time - self.qmc.timex[self.qmc.timeindex[2]]))) + u(" FC)")
         ####   ET pid    ######
         error = self.qmc.ETtarget - self.qmc.temp1[-1]
         differror = error - self.qmc.pidpreviouserror
@@ -11118,6 +11180,7 @@ $cupping_notes
         pidstring = "ET pid = %i "%MVV
         ##### end of ET pid
         img = QPixmap().grabWidget(self.qmc)
+#        img = self.qmc.grab()
         Wwidth = self.qmc.size().width()
         Wheight = self.qmc.size().height()
         #Draw begins
@@ -11125,7 +11188,7 @@ $cupping_notes
         #chose font
         font = QFont('Utopia', 14, -1)
         p.setFont(font)
-        p.setOpacity(0.7)
+        p.setOpacity(0.8)
         p.setPen(QColor("slategrey"))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),QString(text1))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8),QString(text2))
@@ -11135,6 +11198,9 @@ $cupping_notes
         p.fillRect(Wwidth/7+140, Wheight - Wheight/3-12, MVV, 12, QColor("pink"))
         delta = u(QApplication.translate("Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3.5),QString(delta))
+        #draw phase texts
+        p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/6),QString(phasetext1))
+        p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/8),QString(phasetext2))
         p.end()
         self.HUD.setPixmap(img)
 
@@ -11146,6 +11212,7 @@ $cupping_notes
             self.qmc.toggleHUD()
             self.qmc.hudresizeflag = False
         img = QPixmap().grabWidget(self.qmc)
+#        img = self.qmc.grab()
         p = QPainter(img)
         Wwidth= self.qmc.size().width()
         Wheight = self.qmc.size().height()
@@ -11549,13 +11616,17 @@ class HUDDlg(ArtisanDialog):
         self.org_DeltaETlcd = aw.qmc.DeltaETlcdflag
         self.org_DeltaBTlcd = aw.qmc.DeltaBTlcdflag
         self.org_Projection = aw.qmc.projectFlag
-        ETLabel = QLabel(QApplication.translate("Label", "ET Target",None, QApplication.UnicodeUTF8))
+        ETLabel = QLabel(QApplication.translate("Label", "ET Target 1",None, QApplication.UnicodeUTF8))
         ETLabel.setAlignment(Qt.AlignRight)
-        BTLabel = QLabel(QApplication.translate("Label", "BT Target",None, QApplication.UnicodeUTF8))
+        BTLabel = QLabel(QApplication.translate("Label", "BT Target 1",None, QApplication.UnicodeUTF8))
         BTLabel.setAlignment(Qt.AlignRight)        
+        ET2Label = QLabel(QApplication.translate("Label", "ET Target 2",None, QApplication.UnicodeUTF8))
+        ET2Label.setAlignment(Qt.AlignRight)
+        BT2Label = QLabel(QApplication.translate("Label", "BT Target 2",None, QApplication.UnicodeUTF8))
+        BT2Label.setAlignment(Qt.AlignRight)        
         modeLabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
         modeLabel.setAlignment(Qt.AlignRight)
-        ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d",None, QApplication.UnicodeUTF8))
+        ETPIDLabel = QLabel(QApplication.translate("Label", "ET p-i-d 1",None, QApplication.UnicodeUTF8))
         pidhelpButton = QPushButton(QApplication.translate("Button","PID Help",None, QApplication.UnicodeUTF8))
         pidhelpButton.setFocusPolicy(Qt.NoFocus)
         self.connect(pidhelpButton,SIGNAL("clicked()"),self.showpidhelp)
@@ -11580,13 +11651,36 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setValue(aw.qmc.curvefilter - 2)
         self.connect(self.Filter,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))
         #filterspikes
-        self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Filter Spikes",None, QApplication.UnicodeUTF8))
+        self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None, QApplication.UnicodeUTF8))
         self.FilterSpikes.setChecked(aw.qmc.filterDropOuts)
         self.connect(self.FilterSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDropFilter(i))
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None, QApplication.UnicodeUTF8))
         self.DropSpikes.setChecked(aw.qmc.dropSpikes)
         self.connect(self.DropSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeSpikeFilter(i))
+        #min-max-limits
+        self.MinMaxLimits = QCheckBox(QApplication.translate("CheckBox", "Limits",None, QApplication.UnicodeUTF8))
+        self.MinMaxLimits.setChecked(aw.qmc.minmaxLimits)
+        self.connect(self.MinMaxLimits,SIGNAL("stateChanged(int)"),lambda i=0:self.changeMinMaxLimits(i))
+        #limits
+        minlabel = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
+        maxlabel = QLabel(QApplication.translate("Label", "max",None, QApplication.UnicodeUTF8))
+        self.minLimit = QSpinBox()
+        self.minLimit.setRange(0,1000)    #(min,max)
+        self.minLimit.setAlignment(Qt.AlignRight)
+        self.minLimit.setMinimumWidth(80)
+        self.minLimit.setValue(aw.qmc.filterDropOut_tmin)
+        self.maxLimit = QSpinBox()
+        self.maxLimit.setRange(0,1000)
+        self.maxLimit.setAlignment(Qt.AlignRight)
+        self.maxLimit.setMinimumWidth(80)
+        self.maxLimit.setValue(aw.qmc.filterDropOut_tmax)
+        if aw.qmc.mode == "F":
+            self.minLimit.setSuffix(" F")
+            self.maxLimit.setSuffix(" F")
+        elif aw.qmc.mode == "C":
+            self.minLimit.setSuffix(" C")
+            self.maxLimit.setSuffix(" C")
         #show projection
         self.projectCheck = QCheckBox(QApplication.translate("CheckBox", "Projection",None, QApplication.UnicodeUTF8))
         self.projectionmodeComboBox = QComboBox()
@@ -11610,6 +11704,12 @@ class HUDDlg(ArtisanDialog):
         self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
         self.ETlineEdit.setMaximumWidth(60)
         self.BTlineEdit.setMaximumWidth(60)
+        self.ET2lineEdit = QLineEdit(str(aw.qmc.ET2target))
+        self.BT2lineEdit = QLineEdit(str(aw.qmc.BT2target))
+        self.ET2lineEdit.setValidator(QIntValidator(0, 1000, self.ET2lineEdit))
+        self.BT2lineEdit.setValidator(QIntValidator(0, 1000, self.BT2lineEdit))
+        self.ET2lineEdit.setMaximumWidth(60)
+        self.BT2lineEdit.setMaximumWidth(60)
         self.ETpidP = QLineEdit(str(aw.qmc.hudETpid[0]))
         self.ETpidI = QLineEdit(str(aw.qmc.hudETpid[1]))
         self.ETpidD = QLineEdit(str(aw.qmc.hudETpid[2]))
@@ -11629,13 +11729,17 @@ class HUDDlg(ArtisanDialog):
         hudLayout.addWidget(self.ETlineEdit,0,1)
         hudLayout.addWidget(BTLabel,0,2)
         hudLayout.addWidget(self.BTlineEdit,0,3)
-        hudLayout.addWidget(ETPIDLabel,1,0)
-        hudLayout.addWidget(self.ETpidP,1,1)
-        hudLayout.addWidget(self.ETpidI,1,2)
-        hudLayout.addWidget(self.ETpidD,1,3)
-        hudLayout.addWidget(modeLabel,2,0)
-        hudLayout.addWidget(self.modeComboBox,2,1)
-        hudLayout.addWidget(pidhelpButton,2,3)
+        hudLayout.addWidget(ET2Label,1,0)
+        hudLayout.addWidget(self.ET2lineEdit,1,1)
+        hudLayout.addWidget(BT2Label,1,2)
+        hudLayout.addWidget(self.BT2lineEdit,1,3)
+        hudLayout.addWidget(ETPIDLabel,2,0)
+        hudLayout.addWidget(self.ETpidP,2,1)
+        hudLayout.addWidget(self.ETpidI,2,2)
+        hudLayout.addWidget(self.ETpidD,2,3)
+        hudLayout.addWidget(modeLabel,3,0)
+        hudLayout.addWidget(self.modeComboBox,3,1)
+        hudLayout.addWidget(pidhelpButton,3,3)
         rorLayout = QGridLayout()
         rorLayout.addWidget(self.projectCheck,0,0)
         rorLayout.addWidget(self.projectionmodeComboBox,0,1)
@@ -11676,7 +11780,21 @@ class HUDDlg(ArtisanDialog):
         rorLCDGroupLayout.setLayout(lcdsLayout)
         hudGroupLayout = QGroupBox(QApplication.translate("GroupBox","HUD",None, QApplication.UnicodeUTF8))
         hudGroupLayout.setLayout(hudLayout)
+        inputFilterGrid = QGridLayout()
+        inputFilterGrid.setColumnMinimumWidth(3,20)
+        inputFilterGrid.addWidget(self.MinMaxLimits,0,0)
+        inputFilterGrid.addWidget(minlabel,0,1)
+        inputFilterGrid.addWidget(self.minLimit,0,2)
+        inputFilterGrid.addWidget(maxlabel,0,4)
+        inputFilterGrid.addWidget(self.maxLimit,0,5)
+        inputFilterGrid.addWidget(self.DropSpikes,2,0)
+        inputFilterHBox = QHBoxLayout()
+        inputFilterHBox.addLayout(inputFilterGrid)
+        inputFilterHBox.addStretch()
+        inputFilterGroupLayout = QGroupBox(QApplication.translate("GroupBox","Input Filters",None, QApplication.UnicodeUTF8))
+        inputFilterGroupLayout.setLayout(inputFilterHBox)
         tab1Layout = QVBoxLayout()
+        tab1Layout.addWidget(inputFilterGroupLayout)
         tab1Layout.addWidget(rorGroupLayout)
         tab1Layout.addWidget(rorLCDGroupLayout)
         tab1Layout.addWidget(hudGroupLayout)
@@ -12128,6 +12246,9 @@ class HUDDlg(ArtisanDialog):
 
     def changeSpikeFilter(self,i):
         aw.qmc.dropSpikes = not aw.qmc.dropSpikes
+
+    def changeMinMaxLimits(self,i):
+        aw.qmc.minmaxLimits = not aw.qmc.minmaxLimits
         
     def changeFilter(self,i):
         try:
@@ -12175,6 +12296,9 @@ class HUDDlg(ArtisanDialog):
     def updatetargets(self):
         aw.qmc.filterDropOuts = self.FilterSpikes.isChecked()
         aw.qmc.dropSpikes = self.DropSpikes.isChecked()
+        aw.qmc.minmaxLimits = self.MinMaxLimits.isChecked()
+        aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
+        aw.qmc.filterDropOut_tmax = int(self.maxLimit.value())
         mode = str(self.modeComboBox.currentText())
         if mode == QApplication.translate("ComboBox","metrics", None, QApplication.UnicodeUTF8):
             aw.HUDfunction = 0
@@ -12182,10 +12306,18 @@ class HUDDlg(ArtisanDialog):
             aw.HUDfunction = 1
         aw.qmc.ETtarget = int(str(self.ETlineEdit.text()))
         aw.qmc.BTtarget = int(str(self.BTlineEdit.text()))
+        aw.qmc.ET2target = int(str(self.ET2lineEdit.text()))
+        aw.qmc.BT2target = int(str(self.BT2lineEdit.text()))
+        if aw.qmc.ETtarget > aw.qmc.ET2target: # swap such that ETtarget < ET2target
+            aw.qmc.ETtarget = int(str(self.ET2lineEdit.text()))
+            aw.qmc.ET2target = int(str(self.ETlineEdit.text()))
+        if aw.qmc.BTtarget > aw.qmc.BT2target: # swap such that BTtarget < BT2target
+            aw.qmc.BTtarget = int(str(self.BT2lineEdit.text()))
+            aw.qmc.BT2target = int(str(self.BTlineEdit.text()))            
         aw.qmc.hudETpid[0] = int(str(self.ETpidP.text()))
         aw.qmc.hudETpid[1] = int(str(self.ETpidI.text()))
         aw.qmc.hudETpid[2] = int(str(self.ETpidD.text()))
-        string = u(QApplication.translate("Message","[ET target = %1] [BT target = %2]", None, QApplication.UnicodeUTF8).arg(str(aw.qmc.ETtarget)).arg(str(aw.qmc.BTtarget)))
+        string = u(QApplication.translate("Message","[ET target 1 = %1] [BT target 1 = %2] [ET target 2 = %3] [BT target 2 = %4]", None, QApplication.UnicodeUTF8).arg(str(aw.qmc.ETtarget)).arg(str(aw.qmc.BTtarget)).arg(str(aw.qmc.ET2target)).arg(str(aw.qmc.BT2target)))
         aw.sendmessage(string)
         aw.qmc.resetlinecountcaches()
         aw.qmc.resetdeltalines()
@@ -15376,15 +15508,29 @@ class phasesGraphDlg(ArtisanDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Phases",None, QApplication.UnicodeUTF8))
         self.setModal(True)
         self.phases = list(aw.qmc.phases)
-        dryLabel = QLabel(QApplication.translate("Label", "Dry",None, QApplication.UnicodeUTF8))
-        midLabel = QLabel(QApplication.translate("Label", "Mid",None, QApplication.UnicodeUTF8))
-        finishLabel = QLabel(QApplication.translate("Label", "Finish",None, QApplication.UnicodeUTF8))
+        dryLabel = QLabel(QApplication.translate("Label", "Drying",None, QApplication.UnicodeUTF8))
+        midLabel = QLabel(QApplication.translate("Label", "Maillard",None, QApplication.UnicodeUTF8))
+        finishLabel = QLabel(QApplication.translate("Label", "Development",None, QApplication.UnicodeUTF8))
+        minf = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
+        maxf = QLabel(QApplication.translate("Label", "max",None, QApplication.UnicodeUTF8))
         self.startdry = QSpinBox()
+        self.startdry.setAlignment(Qt.AlignRight)
+        self.startdry.setMinimumWidth(80)
         self.enddry = QSpinBox()
+        self.enddry.setAlignment(Qt.AlignRight)
+        self.enddry.setMinimumWidth(80)
         self.startmid = QSpinBox()
+        self.startmid.setAlignment(Qt.AlignRight)
+        self.startmid.setMinimumWidth(80)
         self.endmid = QSpinBox()
+        self.endmid.setAlignment(Qt.AlignRight)
+        self.endmid.setMinimumWidth(80)
         self.startfinish = QSpinBox()
+        self.startfinish.setAlignment(Qt.AlignRight)
+        self.startfinish.setMinimumWidth(80)
         self.endfinish = QSpinBox()
+        self.endfinish.setAlignment(Qt.AlignRight)
+        self.endfinish.setMinimumWidth(80)
         self.events2phases()
         if aw.qmc.mode == "F":
             self.startdry.setSuffix(" F")
@@ -15393,12 +15539,6 @@ class phasesGraphDlg(ArtisanDialog):
             self.endmid.setSuffix(" F")
             self.startfinish.setSuffix(" F")
             self.endfinish.setSuffix(" F")
-            self.startdry.setRange(0,1000)    #(min,max)
-            self.enddry.setRange(0,1000)
-            self.startmid.setRange(0,1000)
-            self.endmid.setRange(0,1000)
-            self.startfinish.setRange(0,1000)
-            self.endfinish.setRange(0,1000)
         elif aw.qmc.mode == "C":
             self.startdry.setSuffix(" C")
             self.enddry.setSuffix(" C")
@@ -15406,12 +15546,12 @@ class phasesGraphDlg(ArtisanDialog):
             self.endmid.setSuffix(" C")
             self.startfinish.setSuffix(" C")
             self.endfinish.setSuffix(" C")
-            self.startdry.setRange(0,1000)    #(min,max)
-            self.enddry.setRange(0,1000)
-            self.startmid.setRange(0,1000)
-            self.endmid.setRange(0,1000)
-            self.startfinish.setRange(0,1000)
-            self.endfinish.setRange(0,1000)
+        self.startdry.setRange(0,1000)    #(min,max)
+        self.enddry.setRange(0,1000)
+        self.startmid.setRange(0,1000)
+        self.endmid.setRange(0,1000)
+        self.startfinish.setRange(0,1000)
+        self.endfinish.setRange(0,1000)
         self.connect(self.enddry,SIGNAL("valueChanged(int)"),self.startmid.setValue)
         self.connect(self.startmid,SIGNAL("valueChanged(int)"),self.enddry.setValue)
         self.connect(self.endmid,SIGNAL("valueChanged(int)"),self.startfinish.setValue)
@@ -15429,15 +15569,17 @@ class phasesGraphDlg(ArtisanDialog):
         self.connect(okButton,SIGNAL("clicked()"),self.updatephases)
         self.connect(setDefaultButton,SIGNAL("clicked()"),self.setdefault)
         phaseLayout = QGridLayout()
-        phaseLayout.addWidget(dryLabel,0,0,Qt.AlignRight)
-        phaseLayout.addWidget(self.startdry,0,1)
-        phaseLayout.addWidget(self.enddry,0,2)
-        phaseLayout.addWidget(midLabel,1,0,Qt.AlignRight)
-        phaseLayout.addWidget(self.startmid,1,1)
-        phaseLayout.addWidget(self.endmid,1,2)
-        phaseLayout.addWidget(finishLabel,2,0,Qt.AlignRight)
-        phaseLayout.addWidget(self.startfinish,2,1)
-        phaseLayout.addWidget(self.endfinish,2,2)
+        phaseLayout.addWidget(minf,0,1,Qt.AlignCenter)
+        phaseLayout.addWidget(maxf,0,2,Qt.AlignCenter)
+        phaseLayout.addWidget(dryLabel,1,0,Qt.AlignRight)
+        phaseLayout.addWidget(self.startdry,1,1)
+        phaseLayout.addWidget(self.enddry,1,2)
+        phaseLayout.addWidget(midLabel,2,0,Qt.AlignRight)
+        phaseLayout.addWidget(self.startmid,2,1)
+        phaseLayout.addWidget(self.endmid,2,2)
+        phaseLayout.addWidget(finishLabel,3,0,Qt.AlignRight)
+        phaseLayout.addWidget(self.startfinish,3,1)
+        phaseLayout.addWidget(self.endfinish,3,2)
         boxedPhaseLayout = QHBoxLayout()
         boxedPhaseLayout.addStretch()
         boxedPhaseLayout.addLayout(phaseLayout)
@@ -16210,13 +16352,37 @@ class StatisticsDlg(ArtisanDialog):
         self.flavor = QCheckBox(QApplication.translate("CheckBox","Evaluation",None, QApplication.UnicodeUTF8))
         self.area = QCheckBox(QApplication.translate("CheckBox","Characteristics",None, QApplication.UnicodeUTF8))
         self.mindryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[0]))
+        self.mindryedit.setAlignment(Qt.AlignRight)
+        self.mindryedit.setMinimumWidth(60)
+        self.mindryedit.setMaximumWidth(60)
         self.maxdryedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[1]))
+        self.maxdryedit.setAlignment(Qt.AlignRight)
+        self.maxdryedit.setMinimumWidth(60)
+        self.maxdryedit.setMaximumWidth(60)
         self.minmidedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[2]))
+        self.minmidedit.setAlignment(Qt.AlignRight)
+        self.minmidedit.setMinimumWidth(60)
+        self.minmidedit.setMaximumWidth(60)
         self.maxmidedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[3]))
+        self.maxmidedit.setAlignment(Qt.AlignRight)
+        self.maxmidedit.setMinimumWidth(60)
+        self.maxmidedit.setMaximumWidth(60)
         self.minfinishedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[4]))
+        self.minfinishedit.setAlignment(Qt.AlignRight)
+        self.minfinishedit.setMinimumWidth(60)
+        self.minfinishedit.setMaximumWidth(60)
         self.maxfinishedit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[5]))
+        self.maxfinishedit.setAlignment(Qt.AlignRight)
+        self.maxfinishedit.setMinimumWidth(60)
+        self.maxfinishedit.setMaximumWidth(60)
         self.mincooledit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[6]))
+        self.mincooledit.setAlignment(Qt.AlignRight)
+        self.mincooledit.setMinimumWidth(60)
+        self.mincooledit.setMaximumWidth(60)
         self.maxcooledit = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.statisticsconditions[7]))
+        self.maxcooledit.setAlignment(Qt.AlignRight)
+        self.maxcooledit.setMinimumWidth(60)
+        self.maxcooledit.setMaximumWidth(60)
         self.mindryedit.setValidator(QRegExpValidator(regextime,self))
         self.maxdryedit.setValidator(QRegExpValidator(regextime,self))
         self.minmidedit.setValidator(QRegExpValidator(regextime,self))
@@ -16225,12 +16391,12 @@ class StatisticsDlg(ArtisanDialog):
         self.maxfinishedit.setValidator(QRegExpValidator(regextime,self))
         self.mincooledit.setValidator(QRegExpValidator(regextime,self))
         self.maxcooledit.setValidator(QRegExpValidator(regextime,self))
-        drylabel =QLabel(QApplication.translate("Label", "Dry",None, QApplication.UnicodeUTF8))
-        midlabel =QLabel(QApplication.translate("Label", "Mid",None, QApplication.UnicodeUTF8))
-        finishlabel =QLabel(QApplication.translate("Label", "Finish",None, QApplication.UnicodeUTF8))
-        coollabel =QLabel(QApplication.translate("Label", "Cool",None, QApplication.UnicodeUTF8))
-        minf = QLabel(QApplication.translate("Label", "Min",None, QApplication.UnicodeUTF8))
-        maxf = QLabel(QApplication.translate("Label", "Max",None, QApplication.UnicodeUTF8))
+        drylabel =QLabel(QApplication.translate("Label", "Drying",None, QApplication.UnicodeUTF8))
+        midlabel =QLabel(QApplication.translate("Label", "Maillard",None, QApplication.UnicodeUTF8))
+        finishlabel =QLabel(QApplication.translate("Label", "Development",None, QApplication.UnicodeUTF8))
+        coollabel =QLabel(QApplication.translate("Label", "Cooling",None, QApplication.UnicodeUTF8))
+        minf = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
+        maxf = QLabel(QApplication.translate("Label", "max",None, QApplication.UnicodeUTF8))
         #temp fix for possible bug aw.qmc.statisticsflags=[] > empty list out of range
         if aw.qmc.statisticsflags:
             if aw.qmc.statisticsflags[0]:
@@ -16274,8 +16440,8 @@ class StatisticsDlg(ArtisanDialog):
         flagsLayout.addWidget(self.flavor,0,4)
         flagsLayout.addWidget(self.area,0,5)
         layout = QGridLayout()
-        layout.addWidget(minf,0,1)
-        layout.addWidget(maxf,0,2)
+        layout.addWidget(minf,0,1,Qt.AlignCenter)
+        layout.addWidget(maxf,0,2,Qt.AlignCenter)
         layout.addWidget(drylabel,1,0,Qt.AlignRight)
         layout.addWidget(self.mindryedit,1,1)
         layout.addWidget(self.maxdryedit,1,2)
@@ -16289,8 +16455,11 @@ class StatisticsDlg(ArtisanDialog):
         layout.addWidget(self.mincooledit,4,1)
         layout.addWidget(self.maxcooledit,4,2)
         resetButton.setFocusPolicy(Qt.NoFocus)
+        layoutHorizontal = QHBoxLayout()
+        layoutHorizontal.addLayout(layout)        
+        layoutHorizontal.addStretch()
         eventsGroupLayout = QGroupBox(QApplication.translate("GroupBox","Evaluation",None, QApplication.UnicodeUTF8))
-        eventsGroupLayout.setLayout(layout)
+        eventsGroupLayout.setLayout(layoutHorizontal)
         displayGroupLayout = QGroupBox(QApplication.translate("GroupBox","Display",None, QApplication.UnicodeUTF8))
         displayGroupLayout.setLayout(flagsLayout)
         buttonsLayout = QHBoxLayout()
@@ -20299,31 +20468,31 @@ class graphColorDlg(ArtisanDialog):
         self.rect1Label =QLabel(aw.qmc.palette["rect1"])
         self.rect1Label.setPalette(QPalette(QColor(aw.qmc.palette["rect1"])))
         self.rect1Label.setAutoFillBackground(True)
-        self.rect1Button = QPushButton(QApplication.translate("Button","Dry Phase", None, QApplication.UnicodeUTF8))
+        self.rect1Button = QPushButton(QApplication.translate("Button","Drying Phase", None, QApplication.UnicodeUTF8))
         self.rect1Button.setFocusPolicy(Qt.NoFocus)
         self.rect1Label.setFrameStyle(frameStyle)
-        self.connect(self.rect1Button, SIGNAL("clicked()"), lambda var=self.rect1Label,color="rect1": self.setColor("Dry Phase",var,color))
+        self.connect(self.rect1Button, SIGNAL("clicked()"), lambda var=self.rect1Label,color="rect1": self.setColor("Drying Phase",var,color))
         self.rect2Label =QLabel(aw.qmc.palette["rect2"])
         self.rect2Label.setPalette(QPalette(QColor(aw.qmc.palette["rect2"])))
         self.rect2Label.setAutoFillBackground(True)
-        self.rect2Button = QPushButton(QApplication.translate("Button","Mid FC Phase", None, QApplication.UnicodeUTF8))
+        self.rect2Button = QPushButton(QApplication.translate("Button","Maillard Phase", None, QApplication.UnicodeUTF8))
         self.rect2Button.setFocusPolicy(Qt.NoFocus)
         self.rect2Label.setFrameStyle(frameStyle)
-        self.connect(self.rect2Button, SIGNAL("clicked()"), lambda var=self.rect2Label,color="rect2": self.setColor("Mid FC Phase",var,color))
+        self.connect(self.rect2Button, SIGNAL("clicked()"), lambda var=self.rect2Label,color="rect2": self.setColor("Maillard Phase",var,color))
         self.rect3Label =QLabel(aw.qmc.palette["rect3"])
         self.rect3Label.setPalette(QPalette(QColor(aw.qmc.palette["rect3"])))
         self.rect3Label.setAutoFillBackground(True)
-        self.rect3Button = QPushButton(QApplication.translate("Button","Finish Phase", None, QApplication.UnicodeUTF8))
+        self.rect3Button = QPushButton(QApplication.translate("Button","Development Phase", None, QApplication.UnicodeUTF8))
         self.rect3Button.setFocusPolicy(Qt.NoFocus)
         self.rect3Label.setFrameStyle(frameStyle)
-        self.connect(self.rect3Button, SIGNAL("clicked()"), lambda var=self.rect3Label,color="rect3": self.setColor("Finish Phase",var,color))
+        self.connect(self.rect3Button, SIGNAL("clicked()"), lambda var=self.rect3Label,color="rect3": self.setColor("Development Phase",var,color))
         self.rect4Label =QLabel(aw.qmc.palette["rect4"])
         self.rect4Label.setPalette(QPalette(QColor(aw.qmc.palette["rect4"])))
         self.rect4Label.setAutoFillBackground(True)
-        self.rect4Button = QPushButton(QApplication.translate("Button","Cool Phase", None, QApplication.UnicodeUTF8))
+        self.rect4Button = QPushButton(QApplication.translate("Button","Cooling Phase", None, QApplication.UnicodeUTF8))
         self.rect4Button.setFocusPolicy(Qt.NoFocus)
         self.rect4Label.setFrameStyle(frameStyle)
-        self.connect(self.rect4Button, SIGNAL("clicked()"), lambda var=self.rect4Label,color="rect4": self.setColor("Cool Phase",var,color))
+        self.connect(self.rect4Button, SIGNAL("clicked()"), lambda var=self.rect4Label,color="rect4": self.setColor("Cooling Phase",var,color))
         self.metLabel =QLabel(aw.qmc.palette["et"])
         self.metLabel.setPalette(QPalette(QColor(aw.qmc.palette["et"])))
         self.metLabel.setAutoFillBackground(True)
