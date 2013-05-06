@@ -64,16 +64,6 @@ The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and C
   # sudo rpm -e artisan
 }}}
 
-==Installation in Ubuntu==
-In your web browser, simply download the .deb-File from the [http://code.google.com/p/artisan/downloads/list download page]. This will start the Ubuntu Software-Center that guides you through the rest of the installation. It will also download all dependencies during the process, like `python-qt4`, `python-matplotlib` and others.
-
-There is no menu entry yet, this will follow in the next version. You can start artisan by simply typing "`artisan`" into a terminal window.
-
-==Installation in Debian==
-Download the .deb from the [http://code.google.com/p/artisan/downloads/list download page]. Become root (either with "`su -`", followed by entering your root-password, or if you have sudo configured with "`sudo -i`") and install the package with "`dpkg -i artisan_VERSION_all.deb`". dpkg will possibly complain about missing dependencies and decline to configure the package. With "`apt-get -f install`" you can automatically install all missing dependencies and dpkg will be happy.
-
-There is no menu entry yet, this will follow in the next version. You can start artisan by simply typing "`artisan`" into a terminal window.
-
 =Device Configuration=
 
 Once Artisan is up, chose your device using the menu *Conf* and then select the *Device* submenu. RS232 meters don't need any drivers but USB meters do. Fuji PIDs don't need any drivers (but they need an RS485-RS232 converter). Most common are the following drivers (check your serial2USB device chip to decide which one to install)
