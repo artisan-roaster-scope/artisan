@@ -7,6 +7,9 @@ lrelease -verbose artisan.pro
 # distribution
 rm -rf dist
 bbfreeze artisan.py
+cp /usr/lib/i386-linux-gnu/libQtSvg.so.4 dist
+cp /usr/lib/libicui18n.so.48 dist
+cp /usr/lib/i386-linux-gnu/pkcs11/gnome-keyring-pkcs11.so dist
 cp -R /usr/local/lib/python2.7/dist-packages/matplotlib/mpl-data/ dist
 cp artisan-alog.xml dist
 cp artisan-alrm.xml dist
