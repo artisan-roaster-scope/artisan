@@ -43,7 +43,7 @@ _NOTE: from v0.5.0 on the Systems 10.4.x/10.5.x/10.6.x (eg. Tiger, Leopard, Snow
 
 =Installation Linux=
 
-The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually.
+The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually. This can be done by either double clicking the package icon from your file viewer or by entering the following commands in a shell.
 
  * Ubuntu/Debian
   ** install
@@ -74,6 +74,24 @@ Once Artisan is up, chose your device using the menu *Conf* and then select the 
 
 To install a USB driver. Plug the meter in USB port. Let Windows find (for Mac setup see above) and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one, or thorugh the manufacturer webpage
 
+==Omega HH806AU / Amprobe TMD-56==
+
+The Omega HH806AU as well as the Amprobe TMD-56 device are supported by Artisan only if they are communicating on channel 0.
+
+===How to check the channel number==
+
+When the meter is off press [C/F] key and [POWER] for 5
+seconds, LCD's main display will show channel number,
+the second display will show ID number.
+
+===How RESET the meter to channel zero ==
+
+To SET CH/ID to 00,00, by pressing "T1-T2" key and
+" " power key for more than 6 seconds with the meter
+powered down. The meter will set channel and ID
+to 00,00 status. The second display will show 00,
+which means that the channel and ID has been set to
+00.
 
 =Serial Configuration=
 
