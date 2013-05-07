@@ -133,7 +133,7 @@ test correct path
 
 to avoid error: /usr/lib/python2.7/dist-packages/PyQt4/plugins/imageformats: No such file or directory
 
-# sudo ln -s /usr/local/TrolltecQt-4.8.4/plugins /usr/local/lib/python2.7/site-packages/PyQt4
+# sudo ln -s /usr/local/Trolltech/Qt-4.8.4/plugins /usr/local/lib/python2.7/site-packages/PyQt4
 
 
 6) numpy

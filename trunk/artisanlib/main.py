@@ -5053,7 +5053,7 @@ class VMToolbar(NavigationToolbar):
     def _icon(self, name):
         #dirty hack to use exclusively .png and thus avoid .svg usage
         #because .exe generation is problematic with .svg
-        if platf != 'Darwin' and platf != 'Linux':
+        if platf != 'Darwin':
             n = name.replace('.svg','.png')
         else:
             n = name.replace('.png','.svg')
