@@ -78,13 +78,13 @@ To install a USB driver. Plug the meter in USB port. Let Windows find (for Mac s
 
 The Omega HH806AU as well as the Amprobe TMD-56 device are supported by Artisan only if they are communicating on channel 0.
 
-===How to check the channel number==
+ * How to check the channel number
 
 When the meter is off press [C/F] key and [POWER] for 5
 seconds, LCD's main display will show channel number,
 the second display will show ID number.
 
-===How RESET the meter to channel zero ==
+ * How RESET the meter to channel zero
 
 To SET CH/ID to 00,00, by pressing "T1-T2" key and
 " " power key for more than 6 seconds with the meter
