@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# postinst-artisan
+#
+# postinst for installing Artisan
+#
+# Author: Marko Luther
+
+set -e
+
+set_mime()
+{
+   xdg-mime install /usr/share/artisan/artisan-alog.xml
+   xdg-icon-resource install --context mimetypes --size 16 /usr/share/artisan/icons/artisanProfile16.png application-x-artisan-alog
+   xdg-icon-resource install --context mimetypes --size 32 /usr/share/artisan/icons/artisanProfile32.png application-x-artisan-alog
+   xdg-icon-resource install --context mimetypes --size 64 /usr/share/artisan/icons/artisanProfile64.png application-x-artisan-alog
+   xdg-icon-resource install --context mimetypes --size 128 /usr/share/artisan/icons/artisanProfile128.png application-x-artisan-alog
+   xdg-icon-resource install --context mimetypes --size 256 /usr/share/artisan/icons/artisanProfile256.png application-x-artisan-alog
+   xdg-mime install /usr/share/artisan/artisan-alrm.xml
+   xdg-icon-resource install --context mimetypes --size 16 /usr/share/artisan/icons/artisanAlarms16.png application-x-artisan-alrm
+   xdg-icon-resource install --context mimetypes --size 32 /usr/share/artisan/icons/artisanAlarms32.png application-x-artisan-alrm
+   xdg-icon-resource install --context mimetypes --size 64 /usr/share/artisan/icons/artisanAlarms64.png application-x-artisan-alrm
+   xdg-icon-resource install --context mimetypes --size 128 /usr/share/artisan/icons/artisanAlarms128.png application-x-artisan-alrm
+   xdg-icon-resource install --context mimetypes --size 256 /usr/share/artisan/icons/artisanAlarms256.png application-x-artisan-alrm
+   xdg-mime install /usr/share/artisan/artisan-apal.xml
+   xdg-icon-resource install --context mimetypes --size 16 /usr/share/artisan/icons/artisanPalettes16.png application-x-artisan-apal
+   xdg-icon-resource install --context mimetypes --size 32 /usr/share/artisan/icons/artisanPalettes32.png application-x-artisan-apal
+   xdg-icon-resource install --context mimetypes --size 64 /usr/share/artisan/icons/artisanPalettes64.png application-x-artisan-apal
+   xdg-icon-resource install --context mimetypes --size 128 /usr/share/artisan/icons/artisanPalettes128.png application-x-artisan-apal
+   xdg-icon-resource install --context mimetypes --size 256 /usr/share/artisan/icons/artisanPalettes256.png application-x-artisan-apal
+   return 0
+}
+
+case "$1" in
+   configure)
+   if dpkg-query -W xdg-utils;
+       then set_mime;
+   fi
+   ;;
+
+   *)
+
+   ;;
+esac
+
+exit 0
