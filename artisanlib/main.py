@@ -100,6 +100,7 @@ import json
 # to make py2exe happy with scipy >0.11
 def dependencies_for_myprogram():
     from scipy.sparse.csgraph import _validation
+    import PyQt4.QtSvg
 
 if sys.version < '3':
     def o(x): # converts char to byte
@@ -5051,7 +5052,7 @@ class VMToolbar(NavigationToolbar):
     def _icon(self, name):
         #dirty hack to use exclusively .png and thus avoid .svg usage
         #because .exe generation is problematic with .svg
-        if platf != 'Darwin':
+        if platf != 'Darwin' and platf != 'Linux':
             n = name.replace('.svg','.png')
         else:
             n = name.replace('.png','.svg')
@@ -6919,7 +6920,7 @@ class ApplicationWindow(QMainWindow):
         aw.LCD2frame.setVisible(aw.qmc.ETlcd)
         aw.LCD3frame.setVisible(aw.qmc.BTlcd)
         aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)
-        aw.LCD4frame.setVisible(aw.qmc.DeltaBTlcdflag)
+        aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
         if aw.qmc.device == 0 or aw.qmc.device == 26:         #extra LCDs for Fuji or DTA pid
             aw.LCD6frame.setVisible(True)
             aw.LCD7frame.setVisible(True)
@@ -12220,13 +12221,11 @@ class HUDDlg(ArtisanDialog):
 
     def changeDeltaETlcd(self,i):
         aw.qmc.DeltaETlcdflag = not aw.qmc.DeltaETlcdflag
-        if aw.qmc.flagon:
-            aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)
+        aw.LCD4frame.setVisible(aw.qmc.DeltaETlcdflag)
 
     def changeDeltaBTlcd(self,i):
         aw.qmc.DeltaBTlcdflag = not aw.qmc.DeltaBTlcdflag
-        if aw.qmc.flagon:
-            aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
+        aw.LCD5frame.setVisible(aw.qmc.DeltaBTlcdflag)
 
     def changeDeltaFilter(self,i):
         try:
