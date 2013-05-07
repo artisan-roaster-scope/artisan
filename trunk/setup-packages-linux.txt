@@ -56,13 +56,20 @@ Install required packages:
 1) Python 2.7 (only on CentOS as Ubuntu comes with v2.7.3)
 (depends on development environment)
 
-# yum install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+On CentOS:
+# sudo yum install wget zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel
+
+On Ubuntu:
+# sudo apt-get install wget libreadline-gplv2-dev libncurses5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
+# sudo apt-get build-dep python2.7
+
 
 # wget http://python.org/ftp/python/2.7.4/Python-2.7.4.tar.bz2
 # tar xf Python-2.7.4.tar.bz2
 # cd Python-2.7.4
 # ./configure --prefix=/usr/local
-# make && make altinstall
+# make
+# sudo make altinstall
 
 Download and install distribute for Python 2.7
 # wget http://pypi.python.org/packages/source/d/distribute/distribute-0.6.35.tar.gz
@@ -71,6 +78,11 @@ Download and install distribute for Python 2.7
 # python2.7 setup.py install
 
 in the following replace "python" by "python2.7" for CentOS
+
+
+--
+
+
 
 
 2) pyserial
@@ -101,6 +113,9 @@ Add path to your environment (eg. .bashrc)
 PATH=/usr/local/Trolltech/Qt-4.8.4/bin:$PATH
 export PATH
 
+test correct path
+# which qmake
+
 
 4) SIP
 
@@ -119,7 +134,7 @@ export PATH
 to avoid error: /usr/lib/python2.7/dist-packages/PyQt4/plugins/imageformats: No such file or directory
 
 on Ubuntu:
-# sudo ln -s /usr/lib/i386-linux-gnu/qt4/plugins /usr/lib/python2.7/dist-packages/PyQt4
+# sudo ln -s /usr/local/TrolltecQt-4.8.4/plugins /usr/local/lib/python2.7/site-packages/PyQt4
 
 on CentOS:
 # sudo ln -s /usr/lib/qt4/plugins /usr/local/lib/python2.7/site-packages/PyQt4
@@ -133,6 +148,9 @@ on CentOS:
 
 7) scipy
 (depends on blas, lapack and gfortran)
+
+# python setup.py build
+# sudo python setup.py install
 
 
 8) matplotlib
