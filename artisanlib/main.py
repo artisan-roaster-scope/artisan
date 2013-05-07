@@ -5525,6 +5525,8 @@ class ApplicationWindow(QMainWindow):
         self.profilepath = ""
         if platf == 'Darwin':
             self.profilepath = QDir().homePath().append(QString("/Documents/"))
+        elif platf == 'Linux':
+            self.profilepath = QDir().homePath()
 
         # on the Mac preferences should be stored outside of applications in the users ~/Library/Preferences path
         if platf == 'Darwin':
