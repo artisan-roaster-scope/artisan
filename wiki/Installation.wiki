@@ -80,18 +80,22 @@ The Omega HH806AU as well as the Amprobe TMD-56 device are supported by Artisan 
 
  * How to check the channel number
 
+{{{
 When the meter is off press [C/F] key and [POWER] for 5
 seconds, LCD's main display will show channel number,
 the second display will show ID number.
+}}}
 
  * How RESET the meter to channel zero
 
+{{{
 To SET CH/ID to 00,00, by pressing "T1-T2" key and
 " " power key for more than 6 seconds with the meter
 powered down. The meter will set channel and ID
 to 00,00 status. The second display will show 00,
 which means that the channel and ID has been set to
 00.
+}}}
 
 =Serial Configuration=
 
