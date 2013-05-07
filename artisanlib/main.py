@@ -101,6 +101,7 @@ import json
 def dependencies_for_myprogram():
     from scipy.sparse.csgraph import _validation
     import PyQt4.QtSvg
+    import PyQt4.QtXml
 
 if sys.version < '3':
     def o(x): # converts char to byte
