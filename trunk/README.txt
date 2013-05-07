@@ -64,6 +64,8 @@ o event sliders supporting the Hottop Roaster Interface
 
 INSTALLATION
 
+(see the Artisan project Wiki at GoogleCode for the latest installation instructions)
+
 o Windows
 
 Artisan for Windows needs a Visual C++ runtime library (file) from Microsoft. If artisan cannot start it will open a window error. This is because your computer is missing this file. If you get a window error when you try to start artisan, install this program:
@@ -92,7 +94,7 @@ o Mac OS X (>=10.6.x)
 
 o Linux
 
-The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually.
+The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually. This can be done by either double clicking the package icon from your file viewer or by entering the following commands in a shell.
 
 Installation on Ubuntu/Debian
 # sudo dpkg -i artisan_<version>.deb
