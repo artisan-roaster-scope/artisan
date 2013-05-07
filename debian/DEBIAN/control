@@ -4,6 +4,7 @@ Version: 0.6.0-0
 Section: unknown
 Priority: extra
 Architecture: i386
+Installed-Size: 67510
 Maintainer: Marko Luther <marko.luther@gmx.net>
 Homepage: http://code.google.com/p/artisan
 Description: Visual Scope for Coffee Roasters
