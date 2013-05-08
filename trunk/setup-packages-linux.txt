@@ -115,6 +115,7 @@ export PATH
 
 test correct path
 # which qmake
+# qmake -v
 
 
 4) SIP

@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__version__ = "0.6.0"
+from artisanlib import __version__
+from artisanlib import __revision__
 
 # ABOUT
 # This program shows how to plot the temperature and its rate of change from a
@@ -375,7 +376,8 @@ class tgraphcanvas(FigureCanvas):
         self.phases_celsius_defaults = [95,150,200,230]
         self.phases = list(self.phases_fahrenheit_defaults)
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
-        self.phasesbuttonflag = 0 #0 no change; 1 make the DRY and FC buttons change the phases during roast automatically
+        self.phasesbuttonflag = False #False no change; True make the DRY and FC buttons change the phases during roast automatically
+        self.watermarksflag = True
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
         self.statisticsflags = [1,1,0,1,1,0]
@@ -565,10 +567,11 @@ class tgraphcanvas(FigureCanvas):
         self.backmoveflag = 1
         self.detectBackgroundEventTime = 20 #seconds
         self.backgroundReproduce = False
-        self.Betypes = [QApplication.translate("Scope Annotation", "None",None, QApplication.UnicodeUTF8),
+        self.Betypes = [QApplication.translate("Scope Annotation", "Speed",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Scope Annotation", "Heater",None, QApplication.UnicodeUTF8),
                         QApplication.translate("Scope Annotation", "Damper",None, QApplication.UnicodeUTF8),
-                        QApplication.translate("Scope Annotation", "Fan",None, QApplication.UnicodeUTF8)]
+                        QApplication.translate("Scope Annotation", "Fan",None, QApplication.UnicodeUTF8),
+                        "--"]
         self.backgroundFlavors = []
         self.flavorbackgroundflag = False
         #background by value
@@ -640,15 +643,17 @@ class tgraphcanvas(FigureCanvas):
         # use self.temp2[self.specialevents[x]] to get the BT temperature of an event.
         self.specialevents = []
         #ComboBox text event types. They can be modified in eventsDlg()
-        self.etypes = [QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
+        self.etypes = [QApplication.translate("ComboBox", "Speed",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Power",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Damper",None, QApplication.UnicodeUTF8),
-                       QApplication.translate("ComboBox", "Fan",None, QApplication.UnicodeUTF8)]
+                       QApplication.translate("ComboBox", "Fan",None, QApplication.UnicodeUTF8),
+                       "--"]
         #default etype settings to restore 
-        self.etypesdefault = [QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
+        self.etypesdefault = [QApplication.translate("ComboBox", "Speed",None, QApplication.UnicodeUTF8),
                               QApplication.translate("ComboBox", "Power",None, QApplication.UnicodeUTF8),
                               QApplication.translate("ComboBox", "Damper",None, QApplication.UnicodeUTF8),
-                              QApplication.translate("ComboBox", "Fan",None, QApplication.UnicodeUTF8)]
+                              QApplication.translate("ComboBox", "Fan",None, QApplication.UnicodeUTF8),
+                              "--"]
         #stores the type of each event as index of self.etypes. None = 0, Power = 1, etc.
         self.specialeventstype = []
         #stores text string descriptions for each event.
@@ -958,6 +963,21 @@ class tgraphcanvas(FigureCanvas):
     #################################    FUNCTIONS    ###################################
     #####################################################################################
 
+    def getetypes(self):
+        if len(self.etypes) == 4:
+            self.etypes.append("--")
+        return self.etypes
+        
+    def etypesf(self, i):
+        if len(self.etypes) == 4:
+            self.etypes.append("--")
+        return self.etypes[i]
+            
+    def Betypesf(self, i):
+        if len(self.Betypes) == 4:
+            self.Betypes.append("--")
+        return self.Betypes[i]
+
     def ambientTempSourceAvg(self):
         res = None
         if self.ambientTempSource:
@@ -1023,18 +1043,23 @@ class tgraphcanvas(FigureCanvas):
             return aw.float2float(float(st)/10 + 1.0)
 
     def onclick(self,event):
-        if event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag:
+        if event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag and not self.flagon:
             timex = self.time2index(event.xdata)
-            if timex:
+            if timex > 0:
                 if (len(self.temp2) > timex and self.temp2[timex] < event.ydata + 20) and (self.temp2[timex] > event.ydata - 20):
-                    count = 0
                     menu = QMenu(self) 
                     # populate menu
                     ac = QAction(menu)
-                    ac.setText("at " + self.stringfromseconds(event.xdata - + self.timex[self.timeindex[0]]))
+                    ac.setText(u(QApplication.translate("Label", "at")) + u(" ") + self.stringfromseconds(event.xdata - + self.timex[self.timeindex[0]]))
                     ac.setEnabled(False)
                     menu.addAction(ac)
-                    for k in [("CHARGE",0),("DRY END",1),("FC START",2),("FC END",3),("SC START",4),("SC END",5),("DROP",6)]:
+                    for k in [(u(QApplication.translate("Label","CHARGE")),0),
+                              (u(QApplication.translate("Label","DRY END")),1),
+                              (u(QApplication.translate("Label","FC START")),2),
+                              (u(QApplication.translate("Label","FC END")),3),
+                              (u(QApplication.translate("Label","SC START")),4),
+                              (u(QApplication.translate("Label","SC END")),5),
+                              (u(QApplication.translate("Label","DROP")),6)]:
                         idx_before = idx_after = 0
                         for i in range(k[1]):
                             if self.timeindex[i]:
@@ -1045,16 +1070,28 @@ class tgraphcanvas(FigureCanvas):
                         if ((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after):
                             ac = QAction(menu)
                             ac.key = (k[1],timex)
-                            ac.setText(" " + k[0] + " ")
+                            ac.setText(" " + k[0])
                             menu.addAction(ac)
-                            count = count + 1
+                    # add user EVENT entry
+                    ac = QAction(menu)
+                    ac.setText(u(" ") + u(QApplication.translate("Label", "EVENT")))
+                    ac.key = (-1,timex)
+                    menu.addAction(ac)
                     # show menu
-                    if count > 0:
-                        menu.triggered.connect(self.event_popup_action)
-                        menu.popup(QCursor.pos()) 
+                    menu.triggered.connect(self.event_popup_action)
+                    menu.popup(QCursor.pos())
 
     def event_popup_action(self,action):
-        self.timeindex[action.key[0]] = action.key[1]
+        print("event pop")
+        if action.key[0] >= 0:
+            self.timeindex[action.key[0]] = action.key[1]
+        else:
+            # add a special event at the current timepoint
+            print("EVENT")
+            self.specialevents.append(action.key[1]) # absolut time index
+            self.specialeventstype.append(4) # "--"
+            self.specialeventsStrings.append("")
+            self.specialeventsvalue.append(0)
         self.redraw()
 
     # runs from GUI thread.
@@ -1269,7 +1306,7 @@ class tgraphcanvas(FigureCanvas):
                 timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)                 
                 if  timed > 0 and timed < self.detectBackgroundEventTime:
                     #write text message
-                    message = "> " +  self.stringfromseconds(timed) + " [" + self.etypes[self.backgroundEtypes[i]] 
+                    message = "> " +  self.stringfromseconds(timed) + " [" + self.Betypesf(self.backgroundEtypes[i])
                     message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " + self.backgroundEStrings[i]
                     #rotate colors to get attention
                     if timed%2:
@@ -1995,22 +2032,24 @@ class tgraphcanvas(FigureCanvas):
             #update X ticks, labels, and colors
             self.xaxistosm()
 
-            #draw water marks for dry phase region, mid phase region, and finish phase region
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
-            rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
-                                      transform=trans, color=self.palette["rect1"],alpha=0.3)
-            rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2]-self.phases[1]),
-                                      transform=trans, color=self.palette["rect2"],alpha=0.3)
-            rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
-                                      transform=trans, color=self.palette["rect3"],alpha=0.3)
-            if (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag:
-                self.delta_ax.add_patch(rect1)
-                self.delta_ax.add_patch(rect2)
-                self.delta_ax.add_patch(rect3)
-            else:
-                self.ax.add_patch(rect1)
-                self.ax.add_patch(rect2)
-                self.ax.add_patch(rect3)
+            
+            #draw water marks for dry phase region, mid phase region, and finish phase region
+            if aw.qmc.watermarksflag:
+                rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
+                                          transform=trans, color=self.palette["rect1"],alpha=0.3)
+                rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2]-self.phases[1]),
+                                          transform=trans, color=self.palette["rect2"],alpha=0.3)
+                rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
+                                          transform=trans, color=self.palette["rect3"],alpha=0.3)
+                if (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag:
+                    self.delta_ax.add_patch(rect1)
+                    self.delta_ax.add_patch(rect2)
+                    self.delta_ax.add_patch(rect3)
+                else:
+                    self.ax.add_patch(rect1)
+                    self.ax.add_patch(rect2)
+                    self.ax.add_patch(rect3)
 
             #if self.eventsGraphflag == 0 then that means don't plot event bars
 
@@ -2023,7 +2062,7 @@ class tgraphcanvas(FigureCanvas):
                     step = 10
                     start = 60
                 jump = 20
-                for i in range(len(self.etypes)):
+                for i in range(4):
                     rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
                     self.ax.add_patch(rectEvent)
                     if self.mode == "C":
@@ -2141,7 +2180,7 @@ class tgraphcanvas(FigureCanvas):
                             height = 20
 
                         for p in range(len(self.backgroundEvents)):
-                            st1 = str(self.Betypes[self.backgroundEtypes[p]][0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
+                            st1 = str(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
                             if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
                                 temp = self.temp1B[self.backgroundEvents[p]]
                             else:
@@ -2263,33 +2302,39 @@ class tgraphcanvas(FigureCanvas):
                 # The second mode aligns the events types to a bar height so that they can be visually identified by type. They are text annotations
                 # the third mode plots the events by value. They are not annotations but actual lines.
 
-                if self.eventsGraphflag == 0 and Nevents:
+                if Nevents:
                     for i in range(Nevents):
-                        firstletter = self.etypes[self.specialeventstype[i]][0]
-                        secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
-                        if self.mode == "F":
-                            height = 50
-                        else:
-                            height = 20
-                        #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
-                            if aw.qmc.flagon:
-                                temp = self.temp1[int(self.specialevents[i])]
+                        if self.specialeventstype[i] == 4 or self.eventsGraphflag == 0:
+                            if self.specialeventstype[i] < 4:
+                                etype = self.etypesf(self.specialeventstype[i])
+                                firstletter = etype[0]
+                                secondletter = etype[i]
                             else:
-                                temp = self.stemp1[int(self.specialevents[i])]
-                        elif aw.qmc.BTcurve:
-                            if aw.qmc.flagon:
-                                temp = self.temp2[int(self.specialevents[i])]
+                                firstletter = "E"
+                                secondletter = ""
+                            if self.mode == "F":
+                                height = 50
                             else:
-                                temp = self.stemp2[int(self.specialevents[i])]
-                        else:
-                            temp = None
-                        if temp:
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
-                                         xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                                height = 20
+                            #some times ET is not drawn (ET = 0) when using device NONE
+                            if self.temp1[int(self.specialevents[i])] > self.temp2[int(self.specialevents[i])] and aw.qmc.ETcurve:
+                                if aw.qmc.flagon:
+                                    temp = self.temp1[int(self.specialevents[i])]
+                                else:
+                                    temp = self.stemp1[int(self.specialevents[i])]
+                            elif aw.qmc.BTcurve:
+                                if aw.qmc.flagon:
+                                    temp = self.temp2[int(self.specialevents[i])]
+                                else:
+                                    temp = self.stemp2[int(self.specialevents[i])]
+                            else:
+                                temp = None
+                            if temp:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], temp),
+                                             xytext=(self.timex[int(self.specialevents[i])],temp+height),alpha=0.9,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
-                elif self.eventsGraphflag == 1 and Nevents:
+                if self.eventsGraphflag == 1 and Nevents:
                     char1 = self.etypes[0][0]
                     char2 = self.etypes[1][0]
                     char3 = self.etypes[2][0]
@@ -2313,7 +2358,7 @@ class tgraphcanvas(FigureCanvas):
                         elif self.specialeventstype[i] == 3:
                             netypes[3].append(self.timex[self.specialevents[i]])
                             
-                    letters = self.etypes[0][0]+self.etypes[1][0]+self.etypes[2][0]+self.etypes[3][0]   #"NPDF" fisrt letter for each type (None, Power, Damper, Fan)
+                    letters = char1+char2+char3+char4   #"NPDF" fisrt letter for each type (None, Power, Damper, Fan)
                     colors = [self.palette["rect2"],self.palette["rect3"]] #rotating colors
                     for p in range(len(letters)):    
                         if len(netypes[p]) > 1:
@@ -2324,27 +2369,31 @@ class tgraphcanvas(FigureCanvas):
 
                     # annotate event
                     for i in range(Nevents):
-                        firstletter = self.etypes[self.specialeventstype[i]][0]
-                        secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
-                        #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:                            
-                            if aw.qmc.flagon:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
-                                             xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                            else:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp1[int(self.specialevents[i])]),
-                                             xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                        if self.specialeventstype[i] > 3:
+                            # a special event of type "--"
+                            pass
                         else:
-                            if aw.qmc.flagon:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
-                                         xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                            firstletter = self.etypes[self.specialeventstype[i]][0]
+                            secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
+                            #some times ET is not drawn (ET = 0) when using device NONE
+                            if self.temp1[int(self.specialevents[i])] >= self.temp2[int(self.specialevents[i])]:                            
+                                if aw.qmc.flagon:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp1[int(self.specialevents[i])]),
+                                                 xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                                else:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp1[int(self.specialevents[i])]),
+                                                 xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
                             else:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp2[int(self.specialevents[i])]),
-                                         xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                                if aw.qmc.flagon:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.temp2[int(self.specialevents[i])]),
+                                             xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                                else:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[int(self.specialevents[i])], self.stemp2[int(self.specialevents[i])]),
+                                             xytext=(self.timex[int(self.specialevents[i])],row[firstletter]),alpha=1.,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
 
                 elif self.eventsGraphflag == 2:
                     self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
@@ -2364,16 +2413,16 @@ class tgraphcanvas(FigureCanvas):
                             self.E4values.append(self.eventpositionbars[int(self.specialeventsvalue[i])])
 
                     self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypes[0])
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
                     self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypes[1])
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1],label=self.etypesf(1))
                     self.l_eventtype3dots, = self.ax.plot(self.E3timex, self.E3values, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypes[2])
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2],label=self.etypesf(2))
                     self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypes[3])
+                                                          linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
 
                     handles.extend([self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots])
-                    labels.extend([self.etypes[0],self.etypes[1],self.etypes[2],self.etypes[3]])
+                    labels.extend([self.etypesf(0),self.etypesf(1),self.etypesf(2),self.etypesf(3)])
 
                 #if recorder on
                 if self.flagon:
@@ -3440,7 +3489,7 @@ class tgraphcanvas(FigureCanvas):
                     #if Event show flag
                     if self.eventsshowflag:
                         index = self.specialevents[-1]
-                        firstletter = self.etypes[self.specialeventstype[-1]][0]
+                        firstletter = self.etypesf(self.specialeventstype[-1])[0]
                         secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
                         if self.eventsGraphflag == 0:
                             if self.mode == "F":
@@ -3456,10 +3505,10 @@ class tgraphcanvas(FigureCanvas):
                                              color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
                         #if Event Type-Bars flag
                         elif self.eventsGraphflag == 1:
-                            char1 = self.etypes[0][0]
-                            char2 = self.etypes[1][0]
-                            char3 = self.etypes[2][0]
-                            char4 = self.etypes[3][0]
+                            char1 = self.etypesf(0)[0]
+                            char2 = self.etypesf(1)[0]
+                            char3 = self.etypesf(2)[0]
+                            char4 = self.etypesf(3)[0]
                             if self.mode == "F":
                                 row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
                             else:
@@ -3531,7 +3580,7 @@ class tgraphcanvas(FigureCanvas):
                 #if Event show flag
                 if self.eventsshowflag:
                     index = self.specialevents[-1]
-                    firstletter = self.etypes[self.specialeventstype[-1]][0]
+                    firstletter = self.etypesf(self.specialeventstype[-1])[0]
                     secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
                     if self.eventsGraphflag == 0:
                         if self.mode == "F":
@@ -3547,10 +3596,10 @@ class tgraphcanvas(FigureCanvas):
                                          color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
                     #if Event Type-Bars flag
                     if self.eventsGraphflag == 1:
-                        char1 = self.etypes[0][0]
-                        char2 = self.etypes[1][0]
-                        char3 = self.etypes[2][0]
-                        char4 = self.etypes[3][0]
+                        char1 = self.etypesf(0)[0]
+                        char2 = self.etypesf(1)[0]
+                        char3 = self.etypesf(2)[0]
+                        char4 = self.etypesf(3)[0]
                         if self.mode == "F":
                             row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
                         else:
@@ -6885,10 +6934,10 @@ class ApplicationWindow(QMainWindow):
         aw.sliderGrpBox3.setVisible(bool(aw.eventslidervisibilities[2]))
         aw.sliderGrpBox4.setVisible(bool(aw.eventslidervisibilities[3]))
         # update event type names
-        aw.sliderGrpBox1.setTitle(aw.qmc.etypes[0])
-        aw.sliderGrpBox2.setTitle(aw.qmc.etypes[1])
-        aw.sliderGrpBox3.setTitle(aw.qmc.etypes[2])
-        aw.sliderGrpBox4.setTitle(aw.qmc.etypes[3])
+        aw.sliderGrpBox1.setTitle(aw.qmc.etypesf(0))
+        aw.sliderGrpBox2.setTitle(aw.qmc.etypesf(1))
+        aw.sliderGrpBox3.setTitle(aw.qmc.etypesf(2))
+        aw.sliderGrpBox4.setTitle(aw.qmc.etypesf(3))
 
     def hideLCDs(self):
         self.lcdFrame.setVisible(False)
@@ -8515,7 +8564,8 @@ class ApplicationWindow(QMainWindow):
     def getProfile(self):
         try:
             profile = {}
-            profile["version"] = e(__version__)
+            profile["version"] = str(__version__)
+            profile["revision"] = str(__revision__)
             profile["mode"] = self.qmc.mode
             profile["timeindex"] = self.qmc.timeindex
             profile["flavors"] = self.qmc.flavors
@@ -8717,7 +8767,9 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("Phases"):
                 self.qmc.phases = [x.toInt()[0] for x in settings.value("Phases").toList()]
             if settings.contains("phasesbuttonflag"):
-                self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toInt()[0]
+                self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toBool()
+            if settings.contains("watermarks"):
+                self.qmc.watermarksflag = settings.value("watermarks",self.qmc.watermarksflag).toBool()
             #restore Events settings
             settings.beginGroup("events")
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
@@ -9414,6 +9466,8 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("Phases",self.qmc.phases)
             #save phasesbuttonflag
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
+            #save phases watermarks flag
+            settings.setValue("watermarks",self.qmc.watermarksflag)
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
             settings.setValue("StatisticsConds",self.qmc.statisticsconditions)
@@ -10344,7 +10398,7 @@ $cupping_notes
                      "\n<td>" + str(i+1) + "</td><td>[" +
                      self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i]] - start)) +
                      "</td><td>at " + "%.1f"%self.qmc.temp2[sevents[i]] + self.qmc.mode +
-                     "]</td><td>" + seventsString[i] + "</td><td>(" + self.qmc.etypes[seventsType[i]] + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")
+                     "]</td><td>" + seventsString[i] + "</td><td>(" + self.qmc.etypesf(seventsType[i]) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")
             html += '</table>\n</center>'
         return html
 
@@ -10619,23 +10673,25 @@ $cupping_notes
         contributors += u("<br>") + u(QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Marcio Carneiro"))
         box = QMessageBox(self)
         #create a html QString
+        print(str(__revision__))
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
-                u("""<b>{0}</b> {1} 
+                u("""<b>{0}</b> {1} ({2})
                 <p>
-                <b>Python:</b> [ {2} ]
-                <b>Qt:</b> [ {3} ]
-                <b>PyQt:</b> [ {4} ]
-                <b>OS:</b/>[ {5} ]
+                <b>Python:</b> [ {3} ]
+                <b>Qt:</b> [ {4} ]
+                <b>PyQt:</b> [ {5} ]
+                <b>OS:</b/>[ {6} ]
                 </p>
                 <p>
-                <b>{6}</b> {7}
+                <b>{7}</b> {8}
                 </p>
                 <p>
-                <b>{8}</b> {9}
+                <b>{9}</b> {10}
                 </p>""").format(
                 QApplication.translate("About", "Version:",None, QApplication.UnicodeUTF8),
-                __version__,
+                str(__version__),
+                str(__revision__),
                 platform.python_version(),
                 QT_VERSION_STR,
                 PYQT_VERSION_STR,
@@ -11421,7 +11477,7 @@ $cupping_notes
             tip = u(QApplication.translate("Tooltip","<b>Label</b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventslabels[i]) + "<br>"
             tip += u(QApplication.translate("Tooltip","<b>Description </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsdescriptions[i]) + "<br>"
             if self.extraeventstypes[i] < 4:
-                tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8)) + u(self.qmc.etypes[self.extraeventstypes[i]]) + "<br>"
+                tip += u(QApplication.translate("Tooltip","<b>Type </b>= ", None, QApplication.UnicodeUTF8)) + u(self.qmc.etypesf(self.extraeventstypes[i])) + "<br>"
                 tip += u(QApplication.translate("Tooltip","<b>Value </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsvalues[i]-1) + "<br>" 
             tip += u(QApplication.translate("Tooltip","<b>Documentation </b>= ", None, QApplication.UnicodeUTF8)) + u(self.extraeventsactionstrings[i]) + "<br>"
             tip += u(QApplication.translate("Tooltip","<b>Button# </b>= ", None, QApplication.UnicodeUTF8)) + str(i+1)
@@ -13101,7 +13157,7 @@ class editGraphDlg(ArtisanDialog):
             if i in aw.qmc.specialevents:
                 Rtime.setBackgroundColor(QColor('yellow'))
                 index = aw.qmc.specialevents.index(i)
-                text = QApplication.translate("Table", "%1 EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(Rtime.text()).arg(str(index+1)).arg(aw.qmc.etypes[aw.qmc.specialeventstype[index]][0]).arg(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[index]))
+                text = QApplication.translate("Table", "%1 EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(Rtime.text()).arg(str(index+1)).arg(aw.qmc.etypesf(aw.qmc.specialeventstype[index])[0]).arg(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[index]))
                 Rtime.setText(text)
             self.datatable.setItem(i,0,Atime) 
             self.datatable.setItem(i,1,Rtime)
@@ -13128,11 +13184,12 @@ class editGraphDlg(ArtisanDialog):
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         regexvalue = QRegExp(r"^100|\d?\d?$")
         self.eventtable.setShowGrid(True) 
+        etypes = aw.qmc.getetypes()
         #populate table
         for i in range(nevents):
             #create widgets
             typeComboBox = QComboBox()
-            typeComboBox.addItems(aw.qmc.etypes)
+            typeComboBox.addItems(etypes)
             typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
             valueEdit = QLineEdit()
             valueEdit.setAlignment(Qt.AlignRight)
@@ -14252,21 +14309,21 @@ class EventsDlg(ArtisanDialog):
         typelabel2 = QLabel("2")
         typelabel3 = QLabel("3")
         typelabel4 = QLabel("4")
-        self.etype0 = QLineEdit(aw.qmc.etypes[0])
-        self.etype1 = QLineEdit(aw.qmc.etypes[1])
-        self.etype2 = QLineEdit(aw.qmc.etypes[2])
-        self.etype3 = QLineEdit(aw.qmc.etypes[3])
+        self.etype0 = QLineEdit(aw.qmc.etypesf(0))
+        self.etype1 = QLineEdit(aw.qmc.etypesf(1))
+        self.etype2 = QLineEdit(aw.qmc.etypesf(2))
+        self.etype3 = QLineEdit(aw.qmc.etypesf(3))
         self.etype0.setMaximumWidth(70)
         self.etype1.setMaximumWidth(70)
         self.etype2.setMaximumWidth(70)
         self.etype3.setMaximumWidth(70)
-        self.E1colorButton = QPushButton(aw.qmc.etypes[0])
+        self.E1colorButton = QPushButton(aw.qmc.etypesf(0))
         self.E1colorButton.setFocusPolicy(Qt.NoFocus)
-        self.E2colorButton = QPushButton(aw.qmc.etypes[1])
+        self.E2colorButton = QPushButton(aw.qmc.etypesf(1))
         self.E2colorButton.setFocusPolicy(Qt.NoFocus)
-        self.E3colorButton = QPushButton(aw.qmc.etypes[2])
+        self.E3colorButton = QPushButton(aw.qmc.etypesf(2))
         self.E3colorButton.setFocusPolicy(Qt.NoFocus)
-        self.E4colorButton = QPushButton(aw.qmc.etypes[3])
+        self.E4colorButton = QPushButton(aw.qmc.etypesf(3))
         self.E4colorButton.setFocusPolicy(Qt.NoFocus)
         self.connect(self.E1colorButton,SIGNAL("clicked()"),lambda b=0:self.setcoloreventline(b))
         self.connect(self.E2colorButton,SIGNAL("clicked()"),lambda b=1:self.setcoloreventline(b))
@@ -14483,16 +14540,16 @@ class EventsDlg(ArtisanDialog):
         offsettitlelabel.setFont(titlefont)
         factortitlelabel = QLabel(QApplication.translate("Label","Factor", None, QApplication.UnicodeUTF8))
         factortitlelabel.setFont(titlefont)
-        self.E1visibility = QCheckBox(aw.qmc.etypes[0])
+        self.E1visibility = QCheckBox(aw.qmc.etypesf(0))
         self.E1visibility.setFocusPolicy(Qt.NoFocus)
         self.E1visibility.setChecked(bool(aw.eventslidervisibilities[0]))
-        self.E2visibility = QCheckBox(aw.qmc.etypes[1])
+        self.E2visibility = QCheckBox(aw.qmc.etypesf(1))
         self.E2visibility.setFocusPolicy(Qt.NoFocus)
         self.E2visibility.setChecked(bool(aw.eventslidervisibilities[1]))
-        self.E3visibility = QCheckBox(aw.qmc.etypes[2])
+        self.E3visibility = QCheckBox(aw.qmc.etypesf(2))
         self.E3visibility.setFocusPolicy(Qt.NoFocus)
         self.E3visibility.setChecked(bool(aw.eventslidervisibilities[2]))
-        self.E4visibility = QCheckBox(aw.qmc.etypes[3])
+        self.E4visibility = QCheckBox(aw.qmc.etypesf(3))
         self.E4visibility.setFocusPolicy(Qt.NoFocus)
         self.E4visibility.setChecked(bool(aw.eventslidervisibilities[3]))
         self.sliderActionTypes = [QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
@@ -15190,7 +15247,7 @@ class EventsDlg(ArtisanDialog):
         part2 = ""
         if aw.extraeventsvalues[i] >= 0:
             part2 = str(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
-        aw.buttonlist[i].setText(str(aw.qmc.etypes[aw.extraeventstypes[i]][0])+part2)
+        aw.buttonlist[i].setText(str(aw.qmc.etypesf(aw.extraeventstypes[i])[0])+part2)
         aw.settooltip()
 
     def settypeeventbutton(self,_,i):
@@ -15198,7 +15255,7 @@ class EventsDlg(ArtisanDialog):
         aw.extraeventstypes[i] = typecombobox.currentIndex()
         etype_char = ""
         if aw.extraeventstypes[i] < 4:
-            etype_char = str(aw.qmc.etypes[aw.extraeventstypes[i]][0])
+            etype_char = str(aw.qmc.etypesf(aw.extraeventstypes[i])[0])
         aw.buttonlist[i].setText(etype_char+str(aw.qmc.eventsvalues(aw.extraeventsvalues[i])))
         aw.settooltip()
 
@@ -15252,7 +15309,7 @@ class EventsDlg(ArtisanDialog):
         aw.extraeventsvisibility.append(1)
         aw.extraeventbuttoncolor.append("yellow")
         aw.extraeventbuttontextcolor.append("black")
-        initialtext = str(aw.qmc.etypes[aw.extraeventstypes[-1]][0])+str(aw.qmc.eventsvalues(aw.extraeventsvalues[-1]))
+        initialtext = str(aw.qmc.etypesf(aw.extraeventstypes[-1])[0])+str(aw.qmc.eventsvalues(aw.extraeventsvalues[-1]))
         aw.extraeventslabels.append(initialtext)
         self.createEventbuttonTable() 
         aw.buttonlist.append(QPushButton())
@@ -15560,6 +15617,9 @@ class phasesGraphDlg(ArtisanDialog):
         self.pushbuttonflag = QCheckBox(QApplication.translate("CheckBox","Auto Adjusted",None, QApplication.UnicodeUTF8))
         self.pushbuttonflag.setChecked(bool(aw.qmc.phasesbuttonflag))
         self.connect(self.pushbuttonflag,SIGNAL("stateChanged(int)"),self.pushbuttonflagChanged)
+        self.watermarksflag = QCheckBox(QApplication.translate("CheckBox","Watermarks",None, QApplication.UnicodeUTF8))
+        self.watermarksflag.setChecked(bool(aw.qmc.watermarksflag))
+        self.connect(self.watermarksflag,SIGNAL("stateChanged(int)"),self.watermarksflagChanged)
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         setDefaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
@@ -15587,6 +15647,7 @@ class phasesGraphDlg(ArtisanDialog):
         boxedPhaseFlagLayout = QHBoxLayout()
         boxedPhaseFlagLayout.addStretch()
         boxedPhaseFlagLayout.addWidget(self.pushbuttonflag)
+        boxedPhaseFlagLayout.addWidget(self.watermarksflag)
         boxedPhaseFlagLayout.addStretch()
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(setDefaultButton)
@@ -15620,14 +15681,19 @@ class phasesGraphDlg(ArtisanDialog):
                 self.endmid.setDisabled(True)
                 self.startfinish.setDisabled(True)
 
+
+    def watermarksflagChanged(self,_):
+        aw.qmc.watermarksflag = not aw.qmc.watermarksflag
+        aw.qmc.redraw(recomputeAllDeltas=False)
+
     def pushbuttonflagChanged(self,i):
         if i:
-            aw.qmc.phasesbuttonflag = 1
+            aw.qmc.phasesbuttonflag = True
             self.events2phases()
             self.getphases()
             aw.qmc.redraw(recomputeAllDeltas=False)
         else:
-            aw.qmc.phasesbuttonflag = 0
+            aw.qmc.phasesbuttonflag = False
             self.enddry.setEnabled(True)
             self.startmid.setEnabled(True)
             self.endmid.setEnabled(True)
@@ -15639,9 +15705,9 @@ class phasesGraphDlg(ArtisanDialog):
         aw.qmc.phases[2] = self.endmid.value()
         aw.qmc.phases[3] = self.endfinish.value()
         if self.pushbuttonflag.isChecked():
-            aw.qmc.phasesbuttonflag = 1
+            aw.qmc.phasesbuttonflag = True
         else:
-            aw.qmc.phasesbuttonflag = 0
+            aw.qmc.phasesbuttonflag = False
         aw.qmc.redraw(recomputeAllDeltas=False)
         self.savePhasesSettings()
         self.close()
@@ -16235,7 +16301,7 @@ class backgroundDlg(ArtisanDialog):
                 timez = QTableWidgetItem(aw.qmc.stringfromseconds(int(aw.qmc.timeB[aw.qmc.backgroundEvents[i]]-start)))
                 timez.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 description = QTableWidgetItem(aw.qmc.backgroundEStrings[i])
-                etype = QTableWidgetItem(aw.qmc.Betypes[aw.qmc.backgroundEtypes[i]])
+                etype = QTableWidgetItem(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[i]))
                 evalue = QTableWidgetItem(aw.qmc.eventsvalues(aw.qmc.backgroundEvalues[i]))                
                 evalue.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 #add widgets to the table
@@ -16325,7 +16391,7 @@ class backgroundDlg(ArtisanDialog):
                     elif i in aw.qmc.backgroundEvents:
                         Rtime.setBackgroundColor(QColor('yellow'))
                         index = aw.qmc.backgroundEvents.index(i)
-                        text = QApplication.translate("Table", "%1 EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(Rtime.text()).arg(str(index+1)).arg(aw.qmc.Betypes[aw.qmc.backgroundEtypes[index]][0]).arg(str(aw.qmc.backgroundEvalues[index]-1))
+                        text = QApplication.translate("Table", "%1 EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(Rtime.text()).arg(str(index+1)).arg(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0]).arg(str(aw.qmc.backgroundEvalues[index]-1))
                         Rtime.setText(text)
                 self.datatable.setItem(i,0,Atime)
                 self.datatable.setItem(i,1,Rtime)
@@ -21765,10 +21831,10 @@ class AlarmDlg(ArtisanDialog):
                                  QApplication.translate("ComboBox","Pop Up",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Event Button",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[0],
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[1],
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[2],
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypes[3]])
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypesf(0),
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypesf(1),
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypesf(2),
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypesf(3)])
         actionComboBox.setCurrentIndex(self.alarmaction[i] + 1)
         #text description
         descriptionedit = QLineEdit(str(self.alarmstrings[i]))
