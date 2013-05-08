@@ -23,8 +23,8 @@ mkdir dist/Resources
 mkdir dist/qt_plugins
 mkdir dist/qt_plugins/imageformats
 mkdir dist/qt_plugins/iconengines
-cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqsvg.so
-cp /usr/local/Trolltech/Qt-4.8.4/plugins/iconengines/libqsvgicon.so
+cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqsvg.so dist/qt_plugins/imageformats
+cp /usr/local/Trolltech/Qt-4.8.4/plugins/iconengines/libqsvgicon.so dist/qt_plugins/iconengines
 cp qt.conf dist
 mkdir dist/translations
 cp translations/*.qm dist/translations
