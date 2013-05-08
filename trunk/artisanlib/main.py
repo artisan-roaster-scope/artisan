@@ -13774,7 +13774,7 @@ class WindowsDlg(ArtisanDialog):
         self.legendComboBox.addItems(legendlocs)
         self.legendComboBox.setCurrentIndex(aw.qmc.legendloc)
         self.connect(self.legendComboBox,SIGNAL("currentIndexChanged(int)"),self.changelegendloc)
-        resettimelabel = QLabel(QApplication.translate("Label", "Max after Reset",None, QApplication.UnicodeUTF8))
+        resettimelabel = QLabel(QApplication.translate("Label", "Initial Max",None, QApplication.UnicodeUTF8))
         self.resetEdit = QLineEdit()
         self.resetEdit.setMaximumWidth(100)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
