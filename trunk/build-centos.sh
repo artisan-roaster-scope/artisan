@@ -19,6 +19,13 @@ cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist
 cp LICENSE.txt dist
+mkdir dist/Resources
+mkdir dist/qt_plugins
+mkdir dist/qt_plugins/imageformats
+mkdir dist/qt_plugins/iconengines
+cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqsvg.so
+cp /usr/local/Trolltech/Qt-4.8.4/plugins/iconengines/libqsvgicon.so
+cp qt.conf dist
 mkdir dist/translations
 cp translations/*.qm dist/translations
 tar -cf dist-centos.tar dist
