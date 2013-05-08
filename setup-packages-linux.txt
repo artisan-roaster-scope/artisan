@@ -136,6 +136,9 @@ to avoid error: /usr/lib/python2.7/dist-packages/PyQt4/plugins/imageformats: No 
 
 # sudo ln -s /usr/local/Trolltech/Qt-4.8.4/plugins /usr/local/lib/python2.7/site-packages/PyQt4
 
+on Ubuntu with  the system Python 2.7.3:
+# sudo ln -s /usr/local/Trolltech/Qt-4.8.4/plugins /usr/lib/python2.7/dist-packages/PyQt4
+
 
 6) numpy
 
