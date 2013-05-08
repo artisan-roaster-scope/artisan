@@ -34,11 +34,19 @@ EXCLUDES = ['_tkagg',
             '_cocoaagg',
             '_wx']
 
+
+# current version of Artisan
+VERSION = '0.6.0'
+LICENSE = 'GNU General Public License (GPL)'
+
 cwd = os.getcwd()
 
 setup(
     name ="Artisan",
-    author = "YOU",
+    version=VERSION,
+    author='YOUcouldbeTOO',
+    author_email='zaub.ERASE.org@yahoo.com',
+    license=LICENSE,
     windows=[{"script" : cwd + "\\artisan.py",
             "icon_resources": [(0, cwd + "\\artisan.ico")]
             }],
@@ -59,6 +67,12 @@ setup(
 
 os.system(r'copy README.txt dist')
 os.system(r'copy LICENSE.txt dist')
+os.system(r'copy qt-win.conf dist\\qt.conf')
+os.system(r'mkdir dist\\plugins')
+os.system(r'mkdir dist\\plugins\\imageformats')
+os.system(r'mkdir dist\\plugins\\iconengines')
+os.system(r'copy C:\Python27\\Lib\\site-packages\\PyQt4\\plugins\imageformats\\qsvg4.dll dist\\plugins\\imageformats\\qsvg4.dll')
+os.system(r'copy C:\Python27\\Lib\\site-packages\\PyQt4\\plugins\iconengines\\qsvg4.dll dist\\plugins\\iconengines\\qsvgicon4.dll')
 os.system(r'mkdir dist\\Wheels')
 os.system(r'mkdir dist\\Wheels\\Cupping')
 os.system(r'mkdir dist\\Wheels\\Other')
@@ -68,4 +82,4 @@ os.system(r'copy Wheels\\Other\\* dist\\Wheels\\Other')
 os.system(r'copy Wheels\\Roasting\\* dist\\Wheels\\Roasting')
 os.system(r'mkdir dist\\translations')
 os.system(r'copy translations\\*.qm dist\\translations')
-#os.system(r'copy artisan.png dist')
+os.system(r'copy artisan.png dist')
