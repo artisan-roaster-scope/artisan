@@ -41,6 +41,16 @@ LICENSE = 'GNU General Public License (GPL)'
 
 cwd = os.getcwd()
 
+DATAFILES = mpl.get_py2exe_datafiles()
+DATAFILES = DATAFILES + 
+    [('imageplugins', [
+            'c:\Python27\lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll',
+            ]),
+      ('iconengines', [
+            'c:\Python27\lib\site-packages\PyQt4\plugins\imageformats\qsvgicon4.dll',
+            ]),
+    ]
+
 setup(
     name ="Artisan",
     version=VERSION,
@@ -67,12 +77,11 @@ setup(
 
 os.system(r'copy README.txt dist')
 os.system(r'copy LICENSE.txt dist')
-os.system(r'copy qt-win.conf dist\\qt.conf')
-os.system(r'mkdir dist\\plugins')
-os.system(r'mkdir dist\\plugins\\imageformats')
-os.system(r'mkdir dist\\plugins\\iconengines')
-os.system(r'copy C:\Python27\\Lib\\site-packages\\PyQt4\\plugins\imageformats\\qsvg4.dll dist\\plugins\\imageformats\\qsvg4.dll')
-os.system(r'copy C:\Python27\\Lib\\site-packages\\PyQt4\\plugins\iconengines\\qsvg4.dll dist\\plugins\\iconengines\\qsvgicon4.dll')
+#os.system(r'copy qt-win.conf dist\\qt.conf')
+#os.system(r'mkdir dist\\imageformats')
+#os.system(r'mkdir dist\\iconengines')
+#os.system(r'copy C:\Python27\\Lib\\site-packages\\PyQt4\\plugins\imageformats\\qsvg4.dll dist\\imageformats\\qsvg4.dll')
+#os.system(r'copy C:\Python27\\Lib\\site-packages\\PyQt4\\plugins\iconengines\\qsvg4.dll dist\\iconengines\\qsvgicon4.dll')
 os.system(r'mkdir dist\\Wheels')
 os.system(r'mkdir dist\\Wheels\\Cupping')
 os.system(r'mkdir dist\\Wheels\\Other')

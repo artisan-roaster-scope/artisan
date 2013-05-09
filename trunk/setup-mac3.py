@@ -33,6 +33,8 @@ DATA_FILES = [
     "LICENSE.txt",
     ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
+# standard QT translation needed to get the Application menu bar and 
+# the standard dialog elements translated
     ("../translations", [QTDIR + r'/translations/qt_de.qm']),
     ("../translations", [QTDIR + r'/translations/qt_es.qm']),
     ("../translations", [QTDIR + r'/translations/qt_fr.qm']),
