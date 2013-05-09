@@ -762,6 +762,7 @@ class tgraphcanvas(FigureCanvas):
         self.endofx = 60
         self.startofx = 0
         self.resetmaxtime = 60  #time when pressing reset
+        self.fixmaxtime = False # if true, do not automatically extend the endofx by 3min if needed because the measurements get out of the x-axis
         self.xgrid = 60   #initial time separation; 60 = 1 minute
         self.ygrid = 100  #initial temperature separation
         self.zgrid = 10   #initial RoR separation
@@ -1082,16 +1083,15 @@ class tgraphcanvas(FigureCanvas):
                     menu.popup(QCursor.pos())
 
     def event_popup_action(self,action):
-        print("event pop")
         if action.key[0] >= 0:
             self.timeindex[action.key[0]] = action.key[1]
         else:
             # add a special event at the current timepoint
-            print("EVENT")
             self.specialevents.append(action.key[1]) # absolut time index
             self.specialeventstype.append(4) # "--"
             self.specialeventsStrings.append("")
             self.specialeventsvalue.append(0)
+        aw.qmc.safesaveflag = True
         self.redraw()
 
     # runs from GUI thread.
@@ -1306,7 +1306,7 @@ class tgraphcanvas(FigureCanvas):
                 timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)                 
                 if  timed > 0 and timed < self.detectBackgroundEventTime:
                     #write text message
-                    message = "> " +  self.stringfromseconds(timed) + " [" + self.Betypesf(self.backgroundEtypes[i])
+                    message = "> " +  self.stringfromseconds(timed) + " [" + u(self.Betypesf(self.backgroundEtypes[i]))
                     message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " + self.backgroundEStrings[i]
                     #rotate colors to get attention
                     if timed%2:
@@ -1463,7 +1463,7 @@ class tgraphcanvas(FigureCanvas):
                         Yval.append(number)
                             
                 #build Ys float values
-                if len(self.timex) > 1:
+                if len(self.timex) > 0:
                     Y = [self.temp1[-1],self.temp2[-1]]
                     for i in range(len(self.extradevices)):
                         try:
@@ -2180,7 +2180,7 @@ class tgraphcanvas(FigureCanvas):
                             height = 20
 
                         for p in range(len(self.backgroundEvents)):
-                            st1 = str(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
+                            st1 = u(self.Betypesf(self.backgroundEtypes[p])[0] + self.eventsvaluesShort(self.backgroundEvalues[p]))
                             if self.temp1B[self.backgroundEvents[p]] > self.temp2B[self.backgroundEvents[p]]:
                                 temp = self.temp1B[self.backgroundEvents[p]]
                             else:
@@ -2826,6 +2826,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
         aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])
         aw.button_1.setText(QApplication.translate("Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
+        aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None, QApplication.UnicodeUTF8))
         aw.button_2.setEnabled(True) # ensure that the START button is enabled
         aw.showLCDs()
         aw.showSliders()
@@ -2853,6 +2854,7 @@ class tgraphcanvas(FigureCanvas):
         aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
         aw.button_7.setEnabled(True)
         aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
+        aw.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None, QApplication.UnicodeUTF8))
         aw.sendmessage(QApplication.translate("Message","Scope stopped", None, QApplication.UnicodeUTF8))
         aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
         # reset time LCD color to the default (might have been changed to red due to long cooling!)
@@ -2887,6 +2889,7 @@ class tgraphcanvas(FigureCanvas):
         aw.sendmessage(QApplication.translate("Message","Scope recording...", None, QApplication.UnicodeUTF8))
         aw.button_2.setEnabled(False)
         aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+        aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None, QApplication.UnicodeUTF8))
         aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
         #disable RESET button:
         aw.button_7.setEnabled(False)
@@ -3440,101 +3443,102 @@ class tgraphcanvas(FigureCanvas):
     def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription=""):
         try:
             if self.flagon:
-                aw.soundpop()
-                #prevents accidentally deleting a modified profile.
-                self.safesaveflag = True
-                self.samplingsemaphore.acquire(1)
-                Nevents = len(self.specialevents)
-                #if in manual mode record first the last point in self.timex[]
-                if self.device == 18:
-                    tx,et,bt = aw.ser.NONE()
-                    if bt != -1 or et != -1:
-                        self.drawmanual(et,bt,tx)
-                    else:
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1)
-                        return
-                #i = index number of the event (current length of the time list)
-                i = len(self.timex)-1
-                # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
-                if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
-                    self.specialevents.append(i)
-                    self.specialeventstype.append(0)
-                    self.specialeventsStrings.append(str(Nevents+1))
-                    self.specialeventsvalue.append(0)
-                    #if event was initiated by an Extra Event Button then change the type,value,and string 
-                    if extraevent != None:
-                        self.specialeventstype[-1] = eventtype
-                        self.specialeventsvalue[-1] = eventvalue
-                        self.specialeventsStrings[-1] = eventdescription
-                    etype = self.specialeventstype[-1]
-                    if etype == 0:
-                        self.E1timex.append(self.timex[self.specialevents[-1]])
-                        self.E1values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
-                    elif etype == 1:
-                        self.E2timex.append(self.timex[self.specialevents[-1]])
-                        self.E2values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
-                    elif etype == 2:
-                        self.E3timex.append(self.timex[self.specialevents[-1]])
-                        self.E3values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
-                    elif etype == 3:
-                        self.E4timex.append(self.timex[self.specialevents[-1]])
-                        self.E4values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
-                    #write label in mini recorder if flag checked
-                    if aw.minieventsflag:
-                        aw.eNumberSpinBox.setValue(Nevents+1)
-                        aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                        aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
-                        aw.lineEvent.setText(self.specialeventsStrings[Nevents])
-                    #if Event show flag
-                    if self.eventsshowflag:
-                        index = self.specialevents[-1]
-                        firstletter = self.etypesf(self.specialeventstype[-1])[0]
-                        secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
-                        if self.eventsGraphflag == 0:
-                            if self.mode == "F":
-                                height = 50
-                            else:
-                                height = 20
-                            #some times ET is not drawn (ET = 0) when using device NONE
-                            if self.temp1[index] > self.temp2[index]:
-                                temp = self.temp1[index]
-                            else:
-                                temp = self.temp2[index]
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                        #if Event Type-Bars flag
-                        elif self.eventsGraphflag == 1:
-                            char1 = self.etypesf(0)[0]
-                            char2 = self.etypesf(1)[0]
-                            char3 = self.etypesf(2)[0]
-                            char4 = self.etypesf(3)[0]
-                            if self.mode == "F":
-                                row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
-                            else:
-                                row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-                            #some times ET is not drawn (ET = 0) when using device NONE
-                            if self.temp1[index] >= self.temp2[index]:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                            else:
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                        elif self.eventsGraphflag == 2:
-                            # update lines data using the lists with new data
-                            if etype == 0:
-                                self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
-                            elif etype == 1:
-                                self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
-                            elif etype == 2:
-                                self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
-                            elif etype == 3:
-                                self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
-                    self.fig.canvas.draw()
-                    temp = "%.1f "%self.temp2[i]
-                    timed = self.stringfromseconds(self.timex[i])
-                    message = QApplication.translate("Message","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
-                    aw.sendmessage(message)
+                if len(self.timex) > 0:
+                    aw.soundpop()
+                    #prevents accidentally deleting a modified profile.
+                    self.safesaveflag = True
+                    self.samplingsemaphore.acquire(1)
+                    Nevents = len(self.specialevents)
+                    #if in manual mode record first the last point in self.timex[]
+                    if self.device == 18:
+                        tx,et,bt = aw.ser.NONE()
+                        if bt != -1 or et != -1:
+                            self.drawmanual(et,bt,tx)
+                        else:
+                            if self.samplingsemaphore.available() < 1:
+                                self.samplingsemaphore.release(1)
+                            return
+                    #i = index number of the event (current length of the time list)
+                    i = len(self.timex)-1
+                    # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
+                    if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
+                        self.specialevents.append(i)
+                        self.specialeventstype.append(0)
+                        self.specialeventsStrings.append(str(Nevents+1))
+                        self.specialeventsvalue.append(0)
+                        #if event was initiated by an Extra Event Button then change the type,value,and string 
+                        if extraevent != None:
+                            self.specialeventstype[-1] = eventtype
+                            self.specialeventsvalue[-1] = eventvalue
+                            self.specialeventsStrings[-1] = eventdescription
+                        etype = self.specialeventstype[-1]
+                        if etype == 0:
+                            self.E1timex.append(self.timex[self.specialevents[-1]])
+                            self.E1values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                        elif etype == 1:
+                            self.E2timex.append(self.timex[self.specialevents[-1]])
+                            self.E2values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                        elif etype == 2:
+                            self.E3timex.append(self.timex[self.specialevents[-1]])
+                            self.E3values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                        elif etype == 3:
+                            self.E4timex.append(self.timex[self.specialevents[-1]])
+                            self.E4values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
+                        #write label in mini recorder if flag checked
+                        if aw.minieventsflag:
+                            aw.eNumberSpinBox.setValue(Nevents+1)
+                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
+                            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+                        #if Event show flag
+                        if self.eventsshowflag:
+                            index = self.specialevents[-1]
+                            firstletter = self.etypesf(self.specialeventstype[-1])[0]
+                            secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
+                            if self.eventsGraphflag == 0:
+                                if self.mode == "F":
+                                    height = 50
+                                else:
+                                    height = 20
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                if self.temp1[index] > self.temp2[index]:
+                                    temp = self.temp1[index]
+                                else:
+                                    temp = self.temp2[index]
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                            #if Event Type-Bars flag
+                            elif self.eventsGraphflag == 1:
+                                char1 = self.etypesf(0)[0]
+                                char2 = self.etypesf(1)[0]
+                                char3 = self.etypesf(2)[0]
+                                char4 = self.etypesf(3)[0]
+                                if self.mode == "F":
+                                    row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                                else:
+                                    row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                if self.temp1[index] >= self.temp2[index]:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                                else:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                            elif self.eventsGraphflag == 2:
+                                # update lines data using the lists with new data
+                                if etype == 0:
+                                    self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
+                                elif etype == 1:
+                                    self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
+                                elif etype == 2:
+                                    self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
+                                elif etype == 3:
+                                    self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
+                        self.fig.canvas.draw()
+                        temp = "%.1f "%self.temp2[i]
+                        timed = self.stringfromseconds(self.timex[i])
+                        message = QApplication.translate("Message","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
+                        aw.sendmessage(message)
                 if self.samplingsemaphore.available() < 1:
                     self.samplingsemaphore.release(1)
             else:
@@ -3745,9 +3749,9 @@ class tgraphcanvas(FigureCanvas):
                 if self.statisticsflags[4] or self.statisticsflags[5]:
                     rates_of_changes = aw.RoR(TP_index,dryEndIndex)
                     if self.statisticsflags[2]:
-                        st1 = st1 + " ("
-                        st2 = st2 + " ("
-                        st3 = st3 + " ("
+                        st1 = st1 + u(" (")
+                        st2 = st2 + u(" (")
+                        st3 = st3 + u(" (")
                     if self.statisticsflags[4]:
                         st1 = st1 + "%.1f"%rates_of_changes[0] + u(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
                         st2 = st2 + "%.1f"%rates_of_changes[1] + u(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
@@ -3756,13 +3760,13 @@ class tgraphcanvas(FigureCanvas):
                         ts1,ts1e,ts1b = aw.ts(self.timeindex[0],dryEndIndex)
                         ts2,ts2e,ts2b = aw.ts(dryEndIndex,self.timeindex[2])
                         ts3,ts3e,ts3b = aw.ts(self.timeindex[2],self.timeindex[6])
-                        st1 += u(ts1) + self.mode + "m [" + str(ts1e) + "-" + str(ts1b) + "]"
-                        st2 += u(ts2) + self.mode + "m [" + str(ts2e) + "-" + str(ts2b) + "]"
-                        st3 += u(ts3) + self.mode + "m [" + str(ts3e) + "-" + str(ts3b) + "]"
+                        st1 += u(ts1) + u(self.mode) + u("m [" + str(ts1e) + "-" + str(ts1b) + "]")
+                        st2 += u(ts2) + u(self.mode) + u("m [" + str(ts2e) + "-" + str(ts2b) + "]")
+                        st3 += u(ts3) + u(self.mode) + u("m [" + str(ts3e) + "-" + str(ts3b) + "]")
                     if self.statisticsflags[2]:
-                        st1 = st1 + ")"
-                        st2 = st2 + ")"
-                        st3 = st3 + ")"
+                        st1 = st1 + u(")")
+                        st2 = st2 + u(")")
+                        st3 = st3 + u(")")
     
                 if self.statisticsflags[2] or self.statisticsflags[4] or self.statisticsflags[5]:
                     #Write flavor estimation
@@ -5393,7 +5397,7 @@ class SampleThread(QThread):
                         if aw.qmc.DeltaBTflag:
                             aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
                         #readjust xlimit of plot if needed
-                        if  aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                        if  not aw.qmc.fixmaxtime and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
                             aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
                             aw.qmc.xaxistosm()
                         if aw.qmc.projectFlag:
@@ -6034,7 +6038,7 @@ class ApplicationWindow(QMainWindow):
         #create ON/OFF buttons
         self.button_1 = QPushButton(QApplication.translate("Button", "ON", None, QApplication.UnicodeUTF8))
         self.button_1.setFocusPolicy(Qt.NoFocus)
-        self.button_1.setToolTip(QApplication.translate("Tooltip", "Starts reading", None, QApplication.UnicodeUTF8))
+        self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None, QApplication.UnicodeUTF8))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
         #self.button_1.setMinimumHeight(50)
         self.button_1.setMaximumSize(90, 45)
@@ -6043,7 +6047,7 @@ class ApplicationWindow(QMainWindow):
         #create START/STOP buttons
         self.button_2 = QPushButton(QApplication.translate("Button", "START", None, QApplication.UnicodeUTF8))
         self.button_2.setFocusPolicy(Qt.NoFocus)
-        self.button_2.setToolTip(QApplication.translate("Tooltip", "Starts recording", None, QApplication.UnicodeUTF8))
+        self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None, QApplication.UnicodeUTF8))
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
         #self.button_2.setMinimumHeight(50)
         self.button_2.setMaximumSize(90, 45)
@@ -6083,7 +6087,7 @@ class ApplicationWindow(QMainWindow):
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
         self.button_7.setMaximumSize(90, 45)
-        self.button_7.setToolTip(QApplication.translate("Tooltip", "Resets Graph and Time", None, QApplication.UnicodeUTF8))
+        self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None, QApplication.UnicodeUTF8))
         self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset)
 
         #create CHARGE button
@@ -7263,7 +7267,7 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<b>[LEFT]</b> = Move to the left",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[RIGHT]</b> = Move to the right",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[a]</b> = Autosave",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + ON",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + START",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None, QApplication.UnicodeUTF8)) + "<br><br>"
@@ -7455,13 +7459,13 @@ class ApplicationWindow(QMainWindow):
         #       start autosave Dialog to set the name path
         #       return (nothing saved. Cancell New)
         #   reset  (delete everything)
-        #   start new roast (ON)
+        #   start new roast (START)
         #ELSE (if recording is stoped - OFF):
         #   if no profile present (no data present or profile loaded):
-        #       start new roast (ON)
+        #       start new roast (START)
         #   else:
         #       reset (reset offers three options: Save,Continue,Cancell)
-        #       ON
+        #       START
         #########################################
         if self.qmc.flagstart:
             if self.qmc.timeindex[0] == -1:
@@ -7471,7 +7475,7 @@ class ApplicationWindow(QMainWindow):
             if self.qmc.timeindex[6] == 0:
                 self.qmc.markDrop()
             #invoke "OFF"
-            self.qmc.OffRecorder()
+            self.qmc.OffMonitor()
             
             #store, reset and redraw
             if self.qmc.autosavepath and self.qmc.autosaveflag:
@@ -8459,10 +8463,10 @@ class ApplicationWindow(QMainWindow):
         ######### Evaluations #########
         try:
             evaluations = self.defect_estimation()
-            computedProfile["dryphaseeval"] = str(evaluations[0])
-            computedProfile["midphaseeval"] = str(evaluations[1])
-            computedProfile["finishphaseeval"] = str(evaluations[2])
-            computedProfile["coolphaseeval"] = str(evaluations[3])
+            computedProfile["dryphaseeval"] = u(evaluations[0])
+            computedProfile["midphaseeval"] = u(evaluations[1])
+            computedProfile["finishphaseeval"] = u(evaluations[2])
+            computedProfile["coolphaseeval"] = u(evaluations[3])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
@@ -8750,8 +8754,9 @@ class ApplicationWindow(QMainWindow):
                 self.lcd6.setVisible(True)      #PID SV LCD
                 self.label7.setVisible(True)    #PID DUTYCYLE LABEL
                 self.lcd7.setVisible(True)      #PID DUTYCYCLE LCD
-            elif self.qmc.device == 26 or self.qmc.device == 19:   #DEVICE 26 = DTA; DEVICE 19 = ARDUINOTC4
-                self.button_10.setVisible(True) #CONTROL BUTTON
+# Control button for Arduino and DTA does not have any useful function yet, so hide it for now                
+#            elif self.qmc.device == 26 or self.qmc.device == 19:   #DEVICE 26 = DTA; DEVICE 19 = ARDUINOTC4
+#                self.button_10.setVisible(True) #CONTROL BUTTON
             if settings.contains("controlETpid"):
                 self.ser.controlETpid = [x.toInt()[0] for x in settings.value("controlETpid").toList()]
             if settings.contains("readBTpid"):
@@ -9012,6 +9017,8 @@ class ApplicationWindow(QMainWindow):
             self.qmc.zlimit_min = max(min(settings.value("zmin",self.qmc.zlimit_min).toInt()[0],self.qmc.zlimit),-200)
             if settings.contains("resetmaxtime"):
                 self.qmc.resetmaxtime = settings.value("resetmaxtime",self.qmc.resetmaxtime).toInt()[0]
+            if settings.contains("lockmax"):
+                self.qmc.fixmaxtime = settings.value("lockmax",self.qmc.fixmaxtime).toBool()
             self.qmc.legendloc = settings.value("legendloc",self.qmc.legendloc).toInt()[0]
             settings.endGroup()
             settings.beginGroup("RoastProperties")
@@ -9606,6 +9613,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("zmax",self.qmc.zlimit)
             settings.setValue("zmin",self.qmc.zlimit_min)
             settings.setValue("resetmaxtime",self.qmc.resetmaxtime)
+            settings.setValue("lockmax",self.qmc.fixmaxtime)
             settings.setValue("legendloc",self.qmc.legendloc)
             settings.endGroup()
             settings.beginGroup("RoastProperties")
@@ -9780,7 +9788,7 @@ class ApplicationWindow(QMainWindow):
         events["eventsbuttonflag"] = str(self.eventsbuttonflag)
         events["minieventsflag"] = str(self.minieventsflag)
         events["eventsGraphflag"] = str(self.qmc.eventsGraphflag)
-        events["etypes"] = str(list(map(str,self.qmc.etypes)))
+        events["etypes"] = u(list(map(u,self.qmc.etypes)))
         events["eventsshowflag"] = str(self.qmc.eventsshowflag)
         events["autoChargeDrop"] = str(self.qmc.autoChargeDropFlag)
         events["EvalueColor"] = str(self.qmc.EvalueColor)
@@ -9791,7 +9799,7 @@ class ApplicationWindow(QMainWindow):
         colors["Colors"] = str(self.qmc.palette)
         colors["LCDColors"] = str(self.lcdpaletteB)
         colors["LEDColors"] = str(self.lcdpaletteF)
-        cupping["Flavors"] = str(list(map(str,self.qmc.flavorlabels)))
+        cupping["Flavors"] = u(list(map(u,self.qmc.flavorlabels)))
         cupping["flavorstartangle"] = str(self.qmc.flavorstartangle)
         serial["comport"] = str(self.ser.comport)
         serial["baudrate"] = str(self.ser.baudrate)
@@ -9829,8 +9837,8 @@ class ApplicationWindow(QMainWindow):
         axes["zmin"]= str(self.qmc.zlimit_min)
         axes["resetmaxtime"] = str(self.qmc.stringfromseconds(self.qmc.resetmaxtime))
         axes["legendloc"] = str(self.qmc.legendloc)
-        roast["operator"]= str(self.qmc.operator)
-        roast["roastertype"] = str(self.qmc.roastertype)
+        roast["operator"]= u(self.qmc.operator)
+        roast["roastertype"] = u(self.qmc.roastertype)
         roast["densitySampleVolume"] = str(self.qmc.density[2])
         roast["densitySampleVolumeUnit"]= str(self.qmc.density[3])
         roast["beansize"]= str(self.qmc.beansize)
@@ -9839,16 +9847,16 @@ class ApplicationWindow(QMainWindow):
         alarms["alarmtime"]= str(self.qmc.alarmtime)
         alarms["alarmoffset"]= str(self.qmc.alarmoffset)
         alarms["alarmcond"]= str(self.qmc.alarmcond)
-        alarms["alarmsource"]= str(self.qmc.alarmsource)
-        alarms["alarmaction"]= str(self.qmc.alarmaction)
-        alarms["alarmstrings"]= list(map(str,list(self.qmc.alarmstrings)))
-        general["profilepath"]= str(self.userprofilepath)
+        alarms["alarmsource"]= u(self.qmc.alarmsource)
+        alarms["alarmaction"]= u(self.qmc.alarmaction)
+        alarms["alarmstrings"]= list(map(u,list(self.qmc.alarmstrings)))
+        general["profilepath"]= u(self.userprofilepath)
         #save extra devices
         device["extradevices"]= str(self.qmc.extradevices)
         device["extradevicecolor1"]= str(self.qmc.extradevicecolor1)
         device["extradevicecolor2"]= str(self.qmc.extradevicecolor2)
-        device["extraname1"]= str(self.qmc.extraname1)
-        device["extraname2"]= str(self.qmc.extraname2)
+        device["extraname1"]= u(self.qmc.extraname1)
+        device["extraname2"]= u(self.qmc.extraname2)
         device["extramathexpression1"]= str(self.qmc.extramathexpression1)
         device["extramathexpression2"]= str(self.qmc.extramathexpression2)
         #save extra serial comm ports settings
@@ -9866,13 +9874,13 @@ class ApplicationWindow(QMainWindow):
         extras["plotcurvecolor"]= str(self.qmc.plotcurvecolor)
         #custom event buttons
         events["buttonlistmaxlen"]= str(self.buttonlistmaxlen)
-        events["extraeventstypes"]= str(self.extraeventstypes)
+        events["extraeventstypes"]= u(self.extraeventstypes)
         events["extraeventsvalues"]= str(self.extraeventsvalues)
         events["extraeventsactionstrings"]= str(self.extraeventsactionstrings)
         events["extraeventsactions"]= str(self.extraeventsactions)
-        events["extraeventsdescriptions"]= str(self.extraeventsdescriptions)
+        events["extraeventsdescriptions"]= u(self.extraeventsdescriptions)
         events["extraeventsvisibility"]= str(self.extraeventsvisibility)
-        events["extraeventslabels"]= str(self.extraeventslabels)
+        events["extraeventslabels"]= u(self.extraeventslabels)
         events["extraeventbuttoncolor"]= str(self.extraeventbuttoncolor)
         events["extraeventbuttontextcolor"]= str(self.extraeventbuttontextcolor)
         events["extraeventsbuttonsflag"]= str(self.extraeventsbuttonsflag)
@@ -10137,7 +10145,7 @@ $cupping_notes
             charge = "--"
         dryphase, midphase, finishphase, coolphase = self.phases2html(cp)
         etbta = "--"
-        if "total_ts" in cp:
+        if "total_ts" in cp and cp["total_ts"] != 0:
             etbta = "%d %sm"%(cp["total_ts"],self.qmc.mode) 
             if "total_ts_ET" in cp and "total_ts_BT" in cp:
                 etbta += " [%d-%d]"%(cp["total_ts_ET"],cp["total_ts_BT"])
@@ -10398,7 +10406,7 @@ $cupping_notes
                      "\n<td>" + str(i+1) + "</td><td>[" +
                      self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i]] - start)) +
                      "</td><td>at " + "%.1f"%self.qmc.temp2[sevents[i]] + self.qmc.mode +
-                     "]</td><td>" + seventsString[i] + "</td><td>(" + self.qmc.etypesf(seventsType[i]) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")
+                     "]</td><td>" + seventsString[i] + "</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")
             html += '</table>\n</center>'
         return html
 
@@ -11193,22 +11201,26 @@ $cupping_notes
             text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
             if self.qmc.timeindex[0]:
                 text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
-        elif ET2reachTime > 0 and ET2reachTime < 2000:
-            text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
-            if self.qmc.timeindex[0]:
-                text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
         else:
             text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
-        if BTreachTime > 0 and BTreachTime < 2000:    
-            text2 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
+        if ET2reachTime > 0 and ET2reachTime < 2000:
+            text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
             if self.qmc.timeindex[0]:
-                text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
-        elif BT2reachTime > 0 and BT2reachTime < 2000:
-            text2 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
-            if self.qmc.timeindex[0]:
-                text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
+                text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
         else:
-            text2 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
+            text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ET2target) + self.qmc.mode))
+        if BTreachTime > 0 and BTreachTime < 2000:    
+            text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
+            if self.qmc.timeindex[0]:
+                text3 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
+        else:
+            text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
+        if BT2reachTime > 0 and BT2reachTime < 2000:
+            text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
+            if self.qmc.timeindex[0]:
+                text4 = text4 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
+        else:
+            text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BT2target) + self.qmc.mode))
         ####  Phase Texts #####
         phasetext1 = u("") # lower textline
         phasetext2 = u("") # higher textline
@@ -11248,8 +11260,10 @@ $cupping_notes
         p.setFont(font)
         p.setOpacity(0.8)
         p.setPen(QColor("slategrey"))
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6),QString(text1))
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8),QString(text2))
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/4.5),QString(text1))
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/5.3),QString(text2))
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6.6),QString(text3))
+        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8.5),QString(text4))
         #draw pid
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3),QString(pidstring))
         p.drawRect(Wwidth/7+140, Wheight - Wheight/3-12, 100, 12)
@@ -11401,11 +11415,11 @@ $cupping_notes
         string1 += "</UL>"
         string2 = "<UL><LI><b>x current curve value</b>"
         string2 += "<LI><b>Y1</b> " + u(QApplication.translate("Message", "previous ET value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y2</b> prev." + u(QApplication.translate("Message", "previous BT value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y3</b> prev." + u(QApplication.translate("Message", "previous Extra #1 T1 value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y4</b> prev." + u(QApplication.translate("Message", "previous Extra #1 T2 value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y5</b> prev." + u(QApplication.translate("Message", "previous Extra #2 T1 value",None, QApplication.UnicodeUTF8))
-        string2 += "<LI><b>Y6</b> prev." + u(QApplication.translate("Message", "previous Extra #2 T2 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y2</b> " + u(QApplication.translate("Message", "previous BT value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y3</b> " + u(QApplication.translate("Message", "previous Extra #1 T1 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y4</b> " + u(QApplication.translate("Message", "previous Extra #1 T2 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "previous Extra #2 T1 value",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "previous Extra #2 T2 value",None, QApplication.UnicodeUTF8))
         string2 += "<LI><b>...</b> "
         string2 += "</UL>"
         #format help
@@ -11783,14 +11797,14 @@ class HUDDlg(ArtisanDialog):
         self.connect(cancelButton,SIGNAL("clicked()"),self.close)
         self.connect(okButton,SIGNAL("clicked()"),self.updatetargets)
         hudLayout = QGridLayout()
-        hudLayout.addWidget(ETLabel,0,0)
-        hudLayout.addWidget(self.ETlineEdit,0,1)
-        hudLayout.addWidget(BTLabel,0,2)
-        hudLayout.addWidget(self.BTlineEdit,0,3)
-        hudLayout.addWidget(ET2Label,1,0)
-        hudLayout.addWidget(self.ET2lineEdit,1,1)
-        hudLayout.addWidget(BT2Label,1,2)
-        hudLayout.addWidget(self.BT2lineEdit,1,3)
+        hudLayout.addWidget(BTLabel,0,0)
+        hudLayout.addWidget(self.BTlineEdit,0,1)
+        hudLayout.addWidget(BT2Label,0,2)
+        hudLayout.addWidget(self.BT2lineEdit,0,3)
+        hudLayout.addWidget(ETLabel,1,0)
+        hudLayout.addWidget(self.ETlineEdit,1,1)
+        hudLayout.addWidget(ET2Label,1,2)
+        hudLayout.addWidget(self.ET2lineEdit,1,3)
         hudLayout.addWidget(ETPIDLabel,2,0)
         hudLayout.addWidget(self.ETpidP,2,1)
         hudLayout.addWidget(self.ETpidI,2,2)
@@ -11866,22 +11880,22 @@ class HUDDlg(ArtisanDialog):
         self.equedit4 = QLineEdit(aw.qmc.plotcurves[3])
         self.equedit5 = QLineEdit(aw.qmc.plotcurves[4])
         self.equedit6 = QLineEdit(aw.qmc.plotcurves[5])
-        color1Button = QPushButton("Color")
+        color1Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
         color1Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color1Button, SIGNAL("clicked()"),lambda x=0: self.setcurvecolor(x))
-        color2Button = QPushButton("Color")
+        color2Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
         color2Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color2Button, SIGNAL("clicked()"),lambda x=1: self.setcurvecolor(x))
-        color3Button = QPushButton("Color")
+        color3Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
         color3Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color3Button, SIGNAL("clicked()"),lambda x=2: self.setcurvecolor(x))
-        color4Button = QPushButton("Color")
+        color4Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
         color4Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color4Button, SIGNAL("clicked()"),lambda x=3: self.setcurvecolor(x))
-        color5Button = QPushButton("Color")
+        color5Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
         color5Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color5Button, SIGNAL("clicked()"),lambda x=4: self.setcurvecolor(x))
-        color6Button = QPushButton("Color")
+        color6Button = QPushButton(QApplication.translate("Button","Color",None, QApplication.UnicodeUTF8))
         color6Button.setFocusPolicy(Qt.NoFocus)
         self.connect(color6Button, SIGNAL("clicked()"),lambda x=5: self.setcurvecolor(x))
         equdrawbutton = QPushButton(QApplication.translate("Button","Plot",None, QApplication.UnicodeUTF8))
@@ -13552,9 +13566,9 @@ class platformDlg(ArtisanDialog):
         elif system == "Linux":
             platformdic["Linux"] = str(platform.linux_distribution())
             platformdic["Libc"] = str(platform.libc_ver())
-        htmlplatform = "version = " +__version__ +"<br><br>"
+        htmlplatform = "<b>version =</b> " + __version__ + " (" + __revision__ + ")<br>"
         for key in sorted(platformdic):
-            htmlplatform += "<b>" + key + " = </b> <i>" + platformdic[key] + "</i><br><br>"
+            htmlplatform += "<b>" + key + " = </b> <i>" + platformdic[key] + "</i><br>"
         platformEdit = QTextEdit()
         platformEdit.setHtml(htmlplatform)
         platformEdit.setReadOnly(True)
@@ -13817,7 +13831,7 @@ class WindowsDlg(ArtisanDialog):
         self.xrotationSpinBox.setMaximumWidth(40)
         self.legendComboBox = QComboBox()
         self.legendComboBox.setMaximumWidth(160)
-        legendlocs = [QApplication.translate("ComboBox", "none",None, QApplication.UnicodeUTF8),
+        legendlocs = ["",#QApplication.translate("ComboBox", "none",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "upper right",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "upper left",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox", "lower left",None, QApplication.UnicodeUTF8),
@@ -13837,6 +13851,10 @@ class WindowsDlg(ArtisanDialog):
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         self.resetEdit.setValidator(QRegExpValidator(regextime,self))
         self.resetEdit.setText(aw.qmc.stringfromseconds(aw.qmc.resetmaxtime))
+        # fixmaxtime flag
+        self.fixmaxtimeFlag = QCheckBox(QApplication.translate("CheckBox", "Lock Max",None, QApplication.UnicodeUTF8))
+        self.fixmaxtimeFlag.setChecked(aw.qmc.fixmaxtime)
+        # time axis steps
         timegridlabel = QLabel(QApplication.translate("Label", "Step",None, QApplication.UnicodeUTF8))
         self.xaxislencombobox = QComboBox()
         timelocs =   [QApplication.translate("ComboBox", "30 seconds",None, QApplication.UnicodeUTF8),
@@ -13905,6 +13923,7 @@ class WindowsDlg(ArtisanDialog):
         xlayout.addWidget(resettimelabel,1,2)
         xlayout.addWidget(self.resetEdit,1,3)
         xlayout.addWidget(xrotationlabel,2,0)
+        xlayout.addWidget(self.fixmaxtimeFlag,2,2)
         xlayout.addWidget(self.xrotationSpinBox,2,1)
         ylayout = QGridLayout()
         ylayout.addWidget(ylimitLabel_min,0,0)
@@ -13988,6 +14007,7 @@ class WindowsDlg(ArtisanDialog):
         aw.qmc.zgrid = self.zgridSpinBox.value()
         aw.qmc.redraw(recomputeAllDeltas=False)
 
+    # exit dialog with OK
     def updatewindow(self):
         yl = int(str(self.ylimitEdit.text()))
         yl_min = int(str(self.ylimitEdit_min.text()))
@@ -14012,6 +14032,7 @@ class WindowsDlg(ArtisanDialog):
             aw.qmc.startofx = starteditime
         if resettime > 0:
             aw.qmc.resetmaxtime = resettime
+        aw.qmc.fixmaxtime = self.fixmaxtimeFlag.isChecked()
         aw.qmc.redraw(recomputeAllDeltas=False)
         string = QApplication.translate("Message","xlimit = (%3,%4) ylimit = (%1,%2) zlimit = (%5,%6)",None, QApplication.UnicodeUTF8).arg(str(self.ylimitEdit_min.text())).arg(str(self.ylimitEdit.text())).arg(str(self.xlimitEdit_min.text())).arg(str(self.xlimitEdit.text())).arg(str(self.zlimitEdit_min.text())).arg(str(self.zlimitEdit.text()))                                   
         aw.sendmessage(string)
@@ -14296,7 +14317,7 @@ class EventsDlg(ArtisanDialog):
         self.minieventsflag.setChecked(bool(aw.minieventsflag))
         self.connect(self.minieventsflag,SIGNAL("stateChanged(int)"),self.minieventsflagChanged)
         barstylelabel = QLabel(QApplication.translate("Label","Bars",None, QApplication.UnicodeUTF8))
-        barstyles = [QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
+        barstyles = ["",
                     QApplication.translate("ComboBox","Type",None, QApplication.UnicodeUTF8),
                     QApplication.translate("ComboBox","Value",None, QApplication.UnicodeUTF8)]
         self.bartypeComboBox =  QComboBox()
@@ -14309,14 +14330,18 @@ class EventsDlg(ArtisanDialog):
         typelabel2 = QLabel("2")
         typelabel3 = QLabel("3")
         typelabel4 = QLabel("4")
-        self.etype0 = QLineEdit(aw.qmc.etypesf(0))
+        self.etype0 = QLineEdit(aw.qmc.etypesf(0))        
+        self.etype0.setCursorPosition(0)
         self.etype1 = QLineEdit(aw.qmc.etypesf(1))
+        self.etype1.setCursorPosition(0)
         self.etype2 = QLineEdit(aw.qmc.etypesf(2))
+        self.etype2.setCursorPosition(0)
         self.etype3 = QLineEdit(aw.qmc.etypesf(3))
-        self.etype0.setMaximumWidth(70)
-        self.etype1.setMaximumWidth(70)
-        self.etype2.setMaximumWidth(70)
-        self.etype3.setMaximumWidth(70)
+        self.etype3.setCursorPosition(0)
+        self.etype0.setMaximumWidth(80)
+        self.etype1.setMaximumWidth(80)
+        self.etype2.setMaximumWidth(80)
+        self.etype3.setMaximumWidth(80)
         self.E1colorButton = QPushButton(aw.qmc.etypesf(0))
         self.E1colorButton.setFocusPolicy(Qt.NoFocus)
         self.E2colorButton = QPushButton(aw.qmc.etypesf(1))
@@ -14379,30 +14404,35 @@ class EventsDlg(ArtisanDialog):
         valuealphalabel.setMaximumSize(80,20)
         valuesizelabel.setMaximumSize(80,20)
         self.E1thicknessSpinBox = QSpinBox()
+        self.E1thicknessSpinBox.setAlignment(Qt.AlignRight)
         self.E1thicknessSpinBox.setSingleStep(1)
         self.E1thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1thicknessSpinBox.setRange(1,10)
         self.E1thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[0])
         self.connect(self.E1thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1, x=0:self.setElinethickness(w,x))
         self.E2thicknessSpinBox = QSpinBox()
+        self.E2thicknessSpinBox.setAlignment(Qt.AlignRight)
         self.E2thicknessSpinBox.setSingleStep(1)
         self.E2thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2thicknessSpinBox.setRange(1,10)
         self.E2thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[1])
         self.connect(self.E2thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w =1,x=1:self.setElinethickness(w,x))
         self.E3thicknessSpinBox = QSpinBox()
+        self.E3thicknessSpinBox.setAlignment(Qt.AlignRight)
         self.E3thicknessSpinBox.setSingleStep(1)
         self.E3thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3thicknessSpinBox.setRange(1,10)
         self.E3thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[2])
         self.connect(self.E3thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=2:self.setElinethickness(w,x))
         self.E4thicknessSpinBox = QSpinBox()
+        self.E4thicknessSpinBox.setAlignment(Qt.AlignRight)
         self.E4thicknessSpinBox.setSingleStep(1)
         self.E4thicknessSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4thicknessSpinBox.setRange(1,10)
         self.E4thicknessSpinBox.setValue(aw.qmc.Evaluelinethickness[3])
         self.connect(self.E4thicknessSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=0:self.setElinethickness(w,x))
         self.E1alphaSpinBox = QDoubleSpinBox()
+        self.E1alphaSpinBox.setAlignment(Qt.AlignRight)
         self.E1alphaSpinBox.setSingleStep(1)
         self.E1alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1alphaSpinBox.setRange(.1,1.)
@@ -14410,6 +14440,7 @@ class EventsDlg(ArtisanDialog):
         self.E1alphaSpinBox.setValue(aw.qmc.Evaluealpha[0])
         self.connect(self.E1alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=0:self.setElinealpha(w,x))
         self.E2alphaSpinBox = QDoubleSpinBox()
+        self.E2alphaSpinBox.setAlignment(Qt.AlignRight)
         self.E2alphaSpinBox.setSingleStep(1)
         self.E2alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2alphaSpinBox.setRange(.1,1.)
@@ -14417,6 +14448,7 @@ class EventsDlg(ArtisanDialog):
         self.E2alphaSpinBox.setValue(aw.qmc.Evaluealpha[1])
         self.connect(self.E1alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=1:self.setElinealpha(w,x))
         self.E3alphaSpinBox = QDoubleSpinBox()
+        self.E3alphaSpinBox.setAlignment(Qt.AlignRight)
         self.E3alphaSpinBox.setSingleStep(1)
         self.E3alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3alphaSpinBox.setRange(.1,1.)
@@ -14424,6 +14456,7 @@ class EventsDlg(ArtisanDialog):
         self.E3alphaSpinBox.setValue(aw.qmc.Evaluealpha[2])
         self.connect(self.E3alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1,x=2:self.setElinealpha(w,x))
         self.E4alphaSpinBox = QDoubleSpinBox()
+        self.E4alphaSpinBox.setAlignment(Qt.AlignRight)
         self.E4alphaSpinBox.setSingleStep(1)
         self.E4alphaSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4alphaSpinBox.setRange(.1,1.)
@@ -14432,24 +14465,28 @@ class EventsDlg(ArtisanDialog):
         self.connect(self.E4alphaSpinBox, SIGNAL("valueChanged(double)"),lambda w=1, x=3:self.setElinealpha(w,x))
         #Marker size
         self.E1sizeSpinBox = QSpinBox()
+        self.E1sizeSpinBox.setAlignment(Qt.AlignRight)
         self.E1sizeSpinBox.setSingleStep(1)
         self.E1sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E1sizeSpinBox.setRange(1,14)
         self.E1sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[0])
         self.connect(self.E1sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=0:self.setEmarkersize(w,x))
         self.E2sizeSpinBox = QSpinBox()
+        self.E2sizeSpinBox.setAlignment(Qt.AlignRight)
         self.E2sizeSpinBox.setSingleStep(1)
         self.E2sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E2sizeSpinBox.setRange(1,14)
         self.E2sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[1])
         self.connect(self.E2sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=1:self.setEmarkersize(w,x))
         self.E3sizeSpinBox = QSpinBox()
+        self.E3sizeSpinBox.setAlignment(Qt.AlignRight)
         self.E3sizeSpinBox.setSingleStep(1)
         self.E3sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E3sizeSpinBox.setRange(1,14)
         self.E3sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[2])
         self.connect(self.E3sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=2:self.setEmarkersize(w,x))
         self.E4sizeSpinBox = QSpinBox()
+        self.E4sizeSpinBox.setAlignment(Qt.AlignRight)
         self.E4sizeSpinBox.setSingleStep(1)
         self.E4sizeSpinBox.setFocusPolicy(Qt.NoFocus)
         self.E4sizeSpinBox.setRange(1,14)
@@ -14483,7 +14520,6 @@ class EventsDlg(ArtisanDialog):
         self.connect(delButton, SIGNAL("clicked()"),self.delextraeventbutton)
         helpButton = QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
         helpButton.setToolTip(QApplication.translate("Tooltip","Show help",None, QApplication.UnicodeUTF8))
-        #helpButton.setMaximumWidth(100)
         helpButton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpButton, SIGNAL("clicked()"),self.showEventbuttonhelp)
         #number of buttons per row
@@ -14552,7 +14588,7 @@ class EventsDlg(ArtisanDialog):
         self.E4visibility = QCheckBox(aw.qmc.etypesf(3))
         self.E4visibility.setFocusPolicy(Qt.NoFocus)
         self.E4visibility.setChecked(bool(aw.eventslidervisibilities[3]))
-        self.sliderActionTypes = [QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
+        self.sliderActionTypes = ["",#QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Serial Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "DTA Command",None, QApplication.UnicodeUTF8)]
@@ -14581,33 +14617,41 @@ class EventsDlg(ArtisanDialog):
         self.E3command = QLineEdit(aw.eventslidercommands[2])
         self.E4command = QLineEdit(aw.eventslidercommands[3])
         self.E1offset = QSpinBox()
+        self.E1offset.setAlignment(Qt.AlignRight)
         self.E1offset.setRange(-999,999)
         self.E1offset.setValue(aw.eventslideroffsets[0])
         self.E2offset = QSpinBox()
+        self.E2offset.setAlignment(Qt.AlignRight)
         self.E2offset.setRange(-999,999)
         self.E2offset.setValue(aw.eventslideroffsets[1])
         self.E3offset = QSpinBox()
+        self.E3offset.setAlignment(Qt.AlignRight)
         self.E3offset.setRange(-999,999)
         self.E3offset.setValue(aw.eventslideroffsets[2])
         self.E4offset = QSpinBox()
+        self.E4offset.setAlignment(Qt.AlignRight)
         self.E4offset.setRange(-999,999)
         self.E4offset.setValue(aw.eventslideroffsets[3])
         self.E1factor = QDoubleSpinBox()
+        self.E1factor.setAlignment(Qt.AlignRight)
         self.E1factor.setRange(-999,999)
         self.E1factor.setDecimals(2)
         self.E1factor.setValue(aw.eventsliderfactors[0])
         self.E1factor.setMaximumWidth(60)
         self.E2factor = QDoubleSpinBox()
+        self.E2factor.setAlignment(Qt.AlignRight)
         self.E2factor.setRange(-999,999)
         self.E2factor.setDecimals(2)
         self.E2factor.setValue(aw.eventsliderfactors[1])
         self.E2factor.setMaximumWidth(60)
         self.E3factor = QDoubleSpinBox()
+        self.E3factor.setAlignment(Qt.AlignRight)
         self.E3factor.setRange(-999,999)
         self.E3factor.setDecimals(2)
         self.E3factor.setValue(aw.eventsliderfactors[2])
         self.E3factor.setMaximumWidth(60)
         self.E4factor = QDoubleSpinBox()
+        self.E4factor.setAlignment(Qt.AlignRight)
         self.E4factor.setRange(-999,999)
         self.E4factor.setDecimals(2)
         self.E4factor.setValue(aw.eventsliderfactors[3])
@@ -14617,13 +14661,20 @@ class EventsDlg(ArtisanDialog):
         self.connect(helpsliderbutton, SIGNAL("clicked()"),self.showSliderHelp)
         ### LAYOUTS
         #### tab1 layout
+        bartypeLayout = QHBoxLayout()
+        bartypeLayout.addWidget(barstylelabel)
+        bartypeLayout.addWidget(self.bartypeComboBox,Qt.AlignLeft)
         FlagsLayout = QHBoxLayout()
+        FlagsLayout.addStretch()
         FlagsLayout.addWidget(self.eventsbuttonflag)
+        FlagsLayout.addStretch()
         FlagsLayout.addWidget(self.eventsshowflagbox)
+        FlagsLayout.addStretch()
         FlagsLayout.addWidget(self.minieventsflag)
+        FlagsLayout.addStretch()
         FlagsLayout.addSpacing(10)
-        FlagsLayout.addWidget(barstylelabel)
-        FlagsLayout.addWidget(self.bartypeComboBox,Qt.AlignLeft)
+        FlagsLayout.addLayout(bartypeLayout)
+        FlagsLayout.addStretch()
         typeLayout = QGridLayout()
         typeLayout.addWidget(typelabel1,0,0)
         typeLayout.addWidget(self.etype0,0,1)
@@ -14643,7 +14694,7 @@ class EventsDlg(ArtisanDialog):
         typeHBox.addWidget(defaultButton)
         TypeGroupLayout = QGroupBox(QApplication.translate("GroupBox","Event Types",None, QApplication.UnicodeUTF8))
         TypeGroupLayout.setLayout(typeHBox)
-        self.buttonActionTypes = [QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
+        self.buttonActionTypes = ["",#QApplication.translate("ComboBox", "None",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Serial Command",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Call Program",None, QApplication.UnicodeUTF8),
                        QApplication.translate("ComboBox", "Modbus Command",None, QApplication.UnicodeUTF8),
@@ -15159,11 +15210,11 @@ class EventsDlg(ArtisanDialog):
                 visibilityComboBox.setCurrentIndex(aw.extraeventsvisibility[i])
                 self.connect(visibilityComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setvisibilitytyeventbutton(z,i))
                 #Color
-                colorButton = QPushButton("Color")
+                colorButton = QPushButton("Select")
                 colorButton.setFocusPolicy(Qt.NoFocus)
                 self.connect(colorButton, SIGNAL("clicked()"),lambda i=i: self.setbuttoncolor(i))
                 #Text Color
-                colorTextButton = QPushButton("Color")
+                colorTextButton = QPushButton("Select")
                 colorTextButton.setFocusPolicy(Qt.NoFocus)
                 self.connect(colorTextButton, SIGNAL("clicked()"),lambda i=i: self.setbuttontextcolor(i))
                 #add widgets to the table
@@ -15247,7 +15298,7 @@ class EventsDlg(ArtisanDialog):
         part2 = ""
         if aw.extraeventsvalues[i] >= 0:
             part2 = str(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
-        aw.buttonlist[i].setText(str(aw.qmc.etypesf(aw.extraeventstypes[i])[0])+part2)
+        aw.buttonlist[i].setText(u(aw.qmc.etypesf(aw.extraeventstypes[i])[0])+part2)
         aw.settooltip()
 
     def settypeeventbutton(self,_,i):
@@ -15309,7 +15360,7 @@ class EventsDlg(ArtisanDialog):
         aw.extraeventsvisibility.append(1)
         aw.extraeventbuttoncolor.append("yellow")
         aw.extraeventbuttontextcolor.append("black")
-        initialtext = str(aw.qmc.etypesf(aw.extraeventstypes[-1])[0])+str(aw.qmc.eventsvalues(aw.extraeventsvalues[-1]))
+        initialtext = u(aw.qmc.etypesf(aw.extraeventstypes[-1])[0])+str(aw.qmc.eventsvalues(aw.extraeventsvalues[-1]))
         aw.extraeventslabels.append(initialtext)
         self.createEventbuttonTable() 
         aw.buttonlist.append(QPushButton())
@@ -15508,11 +15559,11 @@ class EventsDlg(ArtisanDialog):
             aw.qmc.buttonactionstrings[6] = self.DROPbuttonActionString.text()
             aw.qmc.buttonactionstrings[7] = self.COOLbuttonActionString.text()
             #save etypes
-            if len(str(self.etype0.text())) and len(str(self.etype1.text())) and len(str(self.etype2.text())) and len(str(self.etype3.text())):
-                aw.qmc.etypes[0] = str(self.etype0.text())
-                aw.qmc.etypes[1] = str(self.etype1.text())
-                aw.qmc.etypes[2] = str(self.etype2.text())
-                aw.qmc.etypes[3] = str(self.etype3.text())
+            if len(u(self.etype0.text())) and len(u(self.etype1.text())) and len(u(self.etype2.text())) and len(u(self.etype3.text())):
+                aw.qmc.etypes[0] = u(self.etype0.text())
+                aw.qmc.etypes[1] = u(self.etype1.text())
+                aw.qmc.etypes[2] = u(self.etype2.text())
+                aw.qmc.etypes[3] = u(self.etype3.text())
                 #update mini editor
                 aw.etypeComboBox.clear()
                 aw.etypeComboBox.addItems(aw.qmc.etypes)
@@ -15534,25 +15585,29 @@ class EventsDlg(ArtisanDialog):
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
         self.etype0.setText(aw.qmc.etypesdefault[0])
+        self.etype0.setCursorPosition(0)
         self.etype1.setText(aw.qmc.etypesdefault[1])
+        self.etype1.setCursorPosition(0)
         self.etype2.setText(aw.qmc.etypesdefault[2])
+        self.etype2.setCursorPosition(0)
         self.etype3.setText(aw.qmc.etypesdefault[3])
+        self.etype3.setCursorPosition(0)
         aw.settooltip()
 
     def showEventbuttonhelp(self):
-        string = u(QApplication.translate("Message", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Event Description</b> Description of the Event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br><br>"  
-        string += u(QApplication.translate("Message", "<b>Event type</b> Type of event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Event value</b> Value of event (1-10) to be recorded",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Action</b> Perform an action at the time of the event",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Documentation</b> depends on the action type ('{}' is replaced by the event value):",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Call Program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8)) + "<br><br>&nbsp;&nbsp;"
-        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string = u(QApplication.translate("Message", "<b>Button Label</b> Enter \\n to create labels with multiple lines.",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Event Description</b> Description of the Event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br>"  
+        string += u(QApplication.translate("Message", "<b>Event type</b> Type of event to be recorded.",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Event value</b> Value of event (1-10) to be recorded",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Action</b> Perform an action at the time of the event",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Documentation</b> depends on the action type ('{}' is replaced by the event value):",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Serial Command: ASCII serial command or binary a2b_uu(serial command)",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Call Program: A program/script path (absolute or relative)",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Multiple Event: Adds events of other button numbers separated by a comma: 1,2,3, etc.",None, QApplication.UnicodeUTF8)) + "<br>&nbsp;&nbsp;"
+        string += u(QApplication.translate("Message", "Modbus Command: write([slaveId,register,value],..,[slaveId,register,value]) writes values to the registers in slaves specified by the given ids",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "DTA Command: Insert Data address : value, ex. 4701:1000 and sv is 100. always multiply with 10 if value Unit: 0.1 / ex. 4719:0 stops heating",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Button Visibility</b> Hides/shows individual button",None, QApplication.UnicodeUTF8)) + "<br>"
+        string += u(QApplication.translate("Message", "<b>Keyboard Shorcut: </b> [b] Hides/shows Extra Button Rows",None, QApplication.UnicodeUTF8)) + "<br>"        
         QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
 
 ##########################################################################
@@ -15848,6 +15903,7 @@ class flavorDlg(ArtisanDialog):
                 self.connect(labeledit, SIGNAL("textChanged(QString)"),lambda z=1,x=i: self.setlabel(x))
                 valueSpinBox = QDoubleSpinBox()
                 valueSpinBox.setRange(0.,10.)
+                valueSpinBox.setAlignment(Qt.AlignRight)
                 val = aw.qmc.flavors[i]
                 if aw.qmc.flavors[0] < 1. and aw.qmc.flavors[-1] < 1.: # < 0.5.0 version style compatibility
                     val *= 10.
@@ -15856,11 +15912,12 @@ class flavorDlg(ArtisanDialog):
                 #add widgets to the table
                 self.flavortable.setCellWidget(i,0,labeledit)
                 self.flavortable.setCellWidget(i,1,valueSpinBox)
+            self.flavortable.resizeColumnsToContents()
 
     def showbackground(self):
         if self.backgroundCheck.isChecked():
             if not aw.qmc.background:
-                message = QApplication.translate("Message","Background not found", None, QApplication.UnicodeUTF8)
+                message = QApplication.translate("Message","Background profile not found", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
                 self.backgroundCheck.setChecked(False)
             else:
@@ -17958,7 +18015,7 @@ class serialport(object):
         finally:
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + str(comman) + " || Rx = " + str(res) + "|| Ts= %.1f, %.1f, %.1f, %.1f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2))
+                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.1f, %.1f, %.1f, %.1f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2))
 
     def TEVA18Bconvert(self, seg):
         if seg == 0x7D:
@@ -18330,6 +18387,7 @@ class designerconfigDlg(ArtisanDialog):
         self.setModal(True)
         #landmarks
         charge = QLabel(QApplication.translate("Label", "CHARGE",None, QApplication.UnicodeUTF8))
+        charge.setAlignment(Qt.AlignRight)
         charge.setStyleSheet("background-color: #f07800")
         self.dryend = QCheckBox(QApplication.translate("CheckBox","DRY END",None, QApplication.UnicodeUTF8))
         self.dryend.setStyleSheet("background-color: orange")
@@ -18342,6 +18400,7 @@ class designerconfigDlg(ArtisanDialog):
         self.sce = QCheckBox(QApplication.translate("CheckBox","SC END",None, QApplication.UnicodeUTF8))
         self.sce.setStyleSheet("background-color: orange")
         drop = QLabel(QApplication.translate("Label", "DROP",None, QApplication.UnicodeUTF8))
+        drop.setAlignment(Qt.AlignRight)
         drop.setStyleSheet("background-color: #f07800")
         self.loadconfigflags()
         self.connect(self.dryend, SIGNAL("clicked()"),lambda x=0: self.changeflags(x,1))
@@ -18354,13 +18413,20 @@ class designerconfigDlg(ArtisanDialog):
         else:
             start = 0
         markersettinglabel = QLabel(QApplication.translate("Label", "Marker",None, QApplication.UnicodeUTF8))
+        markersettinglabel.setAlignment(Qt.AlignCenter)
         timesettinglabel = QLabel(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8))
+        timesettinglabel.setAlignment(Qt.AlignCenter)
         btsettinglabel = QLabel(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8))
+        btsettinglabel.setAlignment(Qt.AlignCenter)
         etsettinglabel = QLabel(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
+        etsettinglabel.setAlignment(Qt.AlignCenter)
         self.Edit0 = QLineEdit(aw.qmc.stringfromseconds(0))
         self.Edit0.setEnabled(False)
         self.Edit0bt = QLineEdit("%.1f"%aw.qmc.temp2[aw.qmc.timeindex[0]])
         self.Edit0et = QLineEdit("%.1f"%aw.qmc.temp1[aw.qmc.timeindex[0]])
+        self.Edit0.setAlignment(Qt.AlignRight)
+        self.Edit0bt.setAlignment(Qt.AlignRight)
+        self.Edit0et.setAlignment(Qt.AlignRight)
         if aw.qmc.timeindex[1]:
             self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[1]] - start))
             self.Edit1bt = QLineEdit("%.1f"%aw.qmc.temp2[aw.qmc.timeindex[1]])
@@ -18369,6 +18435,9 @@ class designerconfigDlg(ArtisanDialog):
             self.Edit1 = QLineEdit(aw.qmc.stringfromseconds(0))
             self.Edit1bt = QLineEdit("0.0")
             self.Edit1et = QLineEdit("0.0")
+        self.Edit1.setAlignment(Qt.AlignRight)
+        self.Edit1bt.setAlignment(Qt.AlignRight)
+        self.Edit1et.setAlignment(Qt.AlignRight)
         if aw.qmc.timeindex[2]:
             self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[2]] - start))
             self.Edit2bt = QLineEdit("%.1f"%aw.qmc.temp2[aw.qmc.timeindex[2]])
@@ -18377,6 +18446,9 @@ class designerconfigDlg(ArtisanDialog):
             self.Edit2 = QLineEdit(aw.qmc.stringfromseconds(0))
             self.Edit2bt = QLineEdit("0.0")
             self.Edit2et = QLineEdit("0.0")
+        self.Edit2.setAlignment(Qt.AlignRight)
+        self.Edit2bt.setAlignment(Qt.AlignRight)
+        self.Edit2et.setAlignment(Qt.AlignRight)
         if aw.qmc.timeindex[3]:
             self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[3]] - start))
             self.Edit3bt = QLineEdit("%.1f"%aw.qmc.temp2[aw.qmc.timeindex[3]])
@@ -18385,6 +18457,9 @@ class designerconfigDlg(ArtisanDialog):
             self.Edit3 = QLineEdit(aw.qmc.stringfromseconds(0))
             self.Edit3bt = QLineEdit("0.0")
             self.Edit3et = QLineEdit("0.0")
+        self.Edit3.setAlignment(Qt.AlignRight)
+        self.Edit3bt.setAlignment(Qt.AlignRight)
+        self.Edit3et.setAlignment(Qt.AlignRight)
         if aw.qmc.timeindex[4]:
             self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[4]] - start))
             self.Edit4bt = QLineEdit("%.1f"%aw.qmc.temp2[aw.qmc.timeindex[4]])
@@ -18393,6 +18468,9 @@ class designerconfigDlg(ArtisanDialog):
             self.Edit4 = QLineEdit(aw.qmc.stringfromseconds(0))
             self.Edit4bt = QLineEdit("0.0")
             self.Edit4et = QLineEdit("0.0")
+        self.Edit4.setAlignment(Qt.AlignRight)
+        self.Edit4bt.setAlignment(Qt.AlignRight)
+        self.Edit4et.setAlignment(Qt.AlignRight)
         if aw.qmc.timeindex[5]:
             self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[5]] - start))
             self.Edit5bt = QLineEdit("%.1f"%aw.qmc.temp2[aw.qmc.timeindex[5]])
@@ -18401,6 +18479,9 @@ class designerconfigDlg(ArtisanDialog):
             self.Edit5 = QLineEdit(aw.qmc.stringfromseconds(0))
             self.Edit5bt = QLineEdit("0.0")
             self.Edit5et = QLineEdit("0.0")
+        self.Edit5.setAlignment(Qt.AlignRight)
+        self.Edit5bt.setAlignment(Qt.AlignRight)
+        self.Edit5et.setAlignment(Qt.AlignRight)
         if aw.qmc.timeindex[6]:
             self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(aw.qmc.timex[aw.qmc.timeindex[6]] - start))
             self.Edit6bt = QLineEdit("%.1f"%aw.qmc.temp2[aw.qmc.timeindex[6]])
@@ -18409,6 +18490,9 @@ class designerconfigDlg(ArtisanDialog):
             self.Edit6 = QLineEdit(aw.qmc.stringfromseconds(0))
             self.Edit6bt = QLineEdit("0.0")
             self.Edit6et = QLineEdit("0.0")
+        self.Edit6.setAlignment(Qt.AlignRight)
+        self.Edit6bt.setAlignment(Qt.AlignRight)
+        self.Edit6et.setAlignment(Qt.AlignRight)
         self.Edit0.setMaximumWidth(50)
         self.Edit1.setMaximumWidth(50)
         self.Edit2.setMaximumWidth(50)
@@ -18478,18 +18562,18 @@ class designerconfigDlg(ArtisanDialog):
         etcurviness.setAlignment(Qt.AlignRight)
         btcurviness.setAlignment(Qt.AlignRight)
         self.ETsplineComboBox = QComboBox()
-        self.ETsplineComboBox.setMaximumWidth(30)
+#        self.ETsplineComboBox.setMaximumWidth(30)
         self.ETsplineComboBox.addItems(["1","2","3","4","5"])
         self.ETsplineComboBox.setCurrentIndex(aw.qmc.ETsplinedegree - 1)
         self.connect(self.ETsplineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
         self.BTsplineComboBox = QComboBox()
-        self.BTsplineComboBox.setMaximumWidth(30)
+#        self.BTsplineComboBox.setMaximumWidth(30)
         self.BTsplineComboBox.addItems(["1","2","3","4","5"])
         self.BTsplineComboBox.setCurrentIndex(aw.qmc.BTsplinedegree - 1)
         self.connect(self.BTsplineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
         reproducelabel = QLabel(QApplication.translate("Label", "Events Playback",None, QApplication.UnicodeUTF8))
         self.reproduceComboBox = QComboBox()
-        self.reproduceComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
+        self.reproduceComboBox.addItems(["",
                                          QApplication.translate("ComboBox","DeltaBT",None, QApplication.UnicodeUTF8),
                                          QApplication.translate("ComboBox","DeltaET",None, QApplication.UnicodeUTF8),
                                          QApplication.translate("ComboBox","SV Commands",None, QApplication.UnicodeUTF8),
@@ -18497,12 +18581,15 @@ class designerconfigDlg(ArtisanDialog):
         self.reproduceComboBox.setCurrentIndex(aw.qmc.reproducedesigner)
         self.connect(self.reproduceComboBox,SIGNAL("currentIndexChanged(int)"), self.changereproducemode)
         updateButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
+        updateButton.setFocusPolicy(Qt.NoFocus)
         self.connect(updateButton, SIGNAL("clicked()"), self.settimes)
-        updateButton.setMaximumWidth(100)
+        updateButton.setMinimumWidth(100)
         defaultButton = QPushButton(QApplication.translate("Button","Reset",None, QApplication.UnicodeUTF8))
-        defaultButton.setMaximumWidth(100)
+        defaultButton.setFocusPolicy(Qt.NoFocus)
+        defaultButton.setMinimumWidth(100)
         self.connect(defaultButton, SIGNAL("clicked()"), self.reset)
         closeButton = QPushButton(QApplication.translate("Button","Close",None, QApplication.UnicodeUTF8))
+        closeButton.setFocusPolicy(Qt.NoFocus)
         self.connect(closeButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         convertButton = QPushButton(QApplication.translate("Button","Create",None, QApplication.UnicodeUTF8))
         self.connect(convertButton, SIGNAL("clicked()"),self.create)
@@ -18932,7 +19019,7 @@ class comportDlg(ArtisanDialog):
         timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
         self.timeoutEdit = QLineEdit(str(aw.ser.timeout))
         self.timeoutEdit.setValidator(QIntValidator(0,5,self.timeoutEdit))
-        etbt_help_label = QLabel(QApplication.translate("Message", "Communication parameters for non-Modbus devices",None, QApplication.UnicodeUTF8) + "<br>")
+        etbt_help_label = QLabel(QApplication.translate("Label", "Settings for non-Modbus devices",None, QApplication.UnicodeUTF8) + "<br>")
         ##########################    TAB 2  WIDGETS   EXTRA DEVICES
         self.serialtable = QTableWidget()
         self.serialtable.setTabKeyNavigation(True)
@@ -19057,7 +19144,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_input4code.addItems(modbus_function_codes)
         self.modbus_input4code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input4code)))
         self.modbus_input4code.setFixedWidth(50)
-        self.modbus_littleEndianFloats = QCheckBox("little-endian floats")
+        self.modbus_littleEndianFloats = QCheckBox(QApplication.translate("ComboBox","little-endian",None, QApplication.UnicodeUTF8))
         self.modbus_littleEndianFloats.setChecked(aw.modbus.littleEndianFloats)
         self.modbus_littleEndianFloats.setFocusPolicy(Qt.NoFocus)
         if self.modbus_input1float.isChecked() or self.modbus_input2float.isChecked() or self.modbus_input3float.isChecked() or self.modbus_input4float.isChecked():
@@ -19661,7 +19748,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
         resetButton = QPushButton(QApplication.translate("Button","Reset",None, QApplication.UnicodeUTF8))
         resetButton.setFocusPolicy(Qt.NoFocus)
         resetButton.setMinimumWidth(100)
-        resetButton.setMaximumWidth(100)
         self.connect(resetButton, SIGNAL("clicked()"),self.resetextradevices)
         self.delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
         self.delButton.setFocusPolicy(Qt.NoFocus)
@@ -19812,10 +19898,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     typeComboBox =  QComboBox()
                     typeComboBox.addItems(sorted(devices))
                     typeComboBox.setCurrentIndex(devices.index(aw.qmc.devices[aw.qmc.extradevices[i]-1]))
-                    color1Button = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+                    color1Button = QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
                     color1Button.setFocusPolicy(Qt.NoFocus)
                     self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
-                    color2Button = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+                    color2Button = QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
                     color2Button.setFocusPolicy(Qt.NoFocus)
                     self.connect(color2Button, SIGNAL("clicked()"),lambda l = 2, c = i: self.setextracolor(l,c))
                     name1edit = QLineEdit(str(aw.qmc.extraname1[i]))
@@ -20797,7 +20883,7 @@ class graphColorDlg(ArtisanDialog):
         LCD4GroupLayout.setLayout(lcd4layout)
         LCD5GroupLayout = QGroupBox(QApplication.translate("GroupBox","DeltaBT LCD",None, QApplication.UnicodeUTF8))
         LCD5GroupLayout.setLayout(lcd5layout)
-        LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV & POWER % LCD",None, QApplication.UnicodeUTF8))
+        LCD6GroupLayout = QGroupBox(QApplication.translate("GroupBox","Extra Devices / PID SV LCD",None, QApplication.UnicodeUTF8))
         LCD6GroupLayout.setLayout(lcd6layout)
         buttonlayout  = QHBoxLayout()
         buttonlayout.addStretch()
@@ -21325,7 +21411,7 @@ class WheelDlg(ArtisanDialog):
                 labelsedit = QLineEdit(str(",".join(aw.qmc.wheelnames[i])))
                 updateButton = QPushButton(QApplication.translate("Button","Update",None, QApplication.UnicodeUTF8))
                 self.connect(updateButton, SIGNAL("clicked()"),lambda x = i: self.updatelabels(x))
-                setButton = QPushButton(QApplication.translate("Button","Wheel Properties",None, QApplication.UnicodeUTF8))
+                setButton = QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
                 self.connect(setButton, SIGNAL("clicked()"),lambda x = i: self.createlabeltable(x))
                 widthSpinBox = QDoubleSpinBox()
                 widthSpinBox.setRange(1.,100.)
@@ -21780,6 +21866,7 @@ class AlarmDlg(ArtisanDialog):
     def setalarmtablerow(self,i):
         #flag
         flagComboBox = QCheckBox()
+        flagComboBox.setFocusPolicy(Qt.NoFocus)
         flagComboBox.setText(QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8))
         if self.alarmflag[i]:
             flagComboBox.setCheckState(Qt.Checked)
@@ -21831,10 +21918,10 @@ class AlarmDlg(ArtisanDialog):
                                  QApplication.translate("ComboBox","Pop Up",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","Event Button",None, QApplication.UnicodeUTF8),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypesf(0),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypesf(1),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypesf(2),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + aw.qmc.etypesf(3)])
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(0)),
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(1)),
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(2)),
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(3))])
         actionComboBox.setCurrentIndex(self.alarmaction[i] + 1)
         #text description
         descriptionedit = QLineEdit(str(self.alarmstrings[i]))
@@ -21874,7 +21961,7 @@ class AlarmDlg(ArtisanDialog):
                 self.setalarmtablerow(i)
             self.alarmtable.resizeColumnsToContents()
             # improve width of Qlineedit columns
-            self.alarmtable.setColumnWidth(1,65)
+            self.alarmtable.setColumnWidth(1,80)
             self.alarmtable.setColumnWidth(3,50)
             self.alarmtable.setColumnWidth(6,50)
 
