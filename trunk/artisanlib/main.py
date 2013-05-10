@@ -3443,7 +3443,7 @@ class tgraphcanvas(FigureCanvas):
     def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription=""):
         try:
             if self.flagon:
-                if len(self.timex) > 0:
+                if len(self.timex) > 0 or self.device == 18:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
                     self.safesaveflag = True
@@ -3463,7 +3463,7 @@ class tgraphcanvas(FigureCanvas):
                     # if Desciption, Type and Value of the new event equals the last recorded one, we do not record this again!
                     if not(self.specialeventstype) or not(self.specialeventsvalue) or not(self.specialeventsStrings) or not(self.specialeventstype[-1] == eventtype and self.specialeventsvalue[-1] == eventvalue and self.specialeventsStrings[-1] == eventdescription):
                         self.specialevents.append(i)
-                        self.specialeventstype.append(0)
+                        self.specialeventstype.append(4)
                         self.specialeventsStrings.append(str(Nevents+1))
                         self.specialeventsvalue.append(0)
                         #if event was initiated by an Extra Event Button then change the type,value,and string 
@@ -8754,9 +8754,9 @@ class ApplicationWindow(QMainWindow):
                 self.lcd6.setVisible(True)      #PID SV LCD
                 self.label7.setVisible(True)    #PID DUTYCYLE LABEL
                 self.lcd7.setVisible(True)      #PID DUTYCYCLE LCD
-# Control button for Arduino and DTA does not have any useful function yet, so hide it for now                
-#            elif self.qmc.device == 26 or self.qmc.device == 19:   #DEVICE 26 = DTA; DEVICE 19 = ARDUINOTC4
-#                self.button_10.setVisible(True) #CONTROL BUTTON
+# Control button for Arduino does not have any useful function yet, so hide it for now                
+            elif self.qmc.device == 26: # or self.qmc.device == 19:   #DEVICE 26 = DTA; DEVICE 19 = ARDUINOTC4
+                self.button_10.setVisible(True) #CONTROL BUTTON
             if settings.contains("controlETpid"):
                 self.ser.controlETpid = [x.toInt()[0] for x in settings.value("controlETpid").toList()]
             if settings.contains("readBTpid"):
@@ -9273,7 +9273,14 @@ class ApplicationWindow(QMainWindow):
             self.qmc.redraw()
             # set default window appearances (style)
             #pylint: disable=E1102
-            aw.defaultAppearance = str(aw.style().objectName()).lower()
+            #aw.defaultAppearance = str(aw.style().objectName()).lower()
+            try:
+                if settings.contains("appearance"):
+                    available = list(map(str, list(QStyleFactory.keys())))
+                    i = list(map(lambda x:x.lower(),available)).index(str(settings.value("appearance").toString()))
+                    app.setStyle(available[i])
+            except:
+                pass
         except Exception:
             pass
 #            import traceback
@@ -9758,6 +9765,10 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("roastpropertiesflag",self.qmc.roastpropertiesflag)
             settings.setValue("customflavorlabels",self.qmc.customflavorlabels)
+            try:
+                settings.setValue("appearance",str(aw.style().objectName()).lower())
+            except:
+                pass
             
         except Exception as e:
 #            import traceback
@@ -10681,7 +10692,6 @@ $cupping_notes
         contributors += u("<br>") + u(QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Marcio Carneiro"))
         box = QMessageBox(self)
         #create a html QString
-        print(str(__revision__))
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
                 u("""<b>{0}</b> {1} ({2})
@@ -10805,7 +10815,6 @@ $cupping_notes
             try:
                 self.scale.device_id = list(aw.scale.devicefunctionlist.keys()).index(self.scale.device)
             except Exception as ex:
-                print(ex)
                 self.scale.device_id = 0
             self.scale.comport = str(dialog.scale_comportEdit.currentText())                #unicode() changes QString to a python string
             self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
@@ -10826,10 +10835,10 @@ $cupping_notes
             #modeless style dialog 
             dialog.show()
         #arduino
-        elif self.qmc.device == 19:
-            dialog = ArduinoDlgControl(self)
-            #modeless style dialog 
-            dialog.show()
+#        elif self.qmc.device == 19:
+#            dialog = ArduinoDlgControl(self)
+#            #modeless style dialog 
+#            dialog.show()
 
     def deviceassigment(self):
         dialog = DeviceAssignmentDlg(self)
@@ -12215,8 +12224,7 @@ class HUDDlg(ArtisanDialog):
 
     def setappearance(self):
         try:
-            aw.style = str(self.styleComboBox.currentText())
-            app.setStyle(aw.style)
+            app.setStyle(str(self.styleComboBox.currentText()))
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
             aw.qmc.adderror(QApplication.translate("Error Message", "setappearance(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
@@ -12968,9 +12976,9 @@ class editGraphDlg(ArtisanDialog):
         roastFlagsGrid.addWidget(self.drops,0,2)
         roastFlagsGrid.addWidget(self.oily,1,2)
         roastFlagsGrid.addWidget(self.uneven,0,3)
-        roastFlagsGrid.addWidget(self.tipping,0,4)
-        roastFlagsGrid.addWidget(self.scorching,0,5)
-        roastFlagsGrid.addWidget(self.divots,0,6)
+        roastFlagsGrid.addWidget(self.tipping,1,3)
+        roastFlagsGrid.addWidget(self.scorching,0,4)
+        roastFlagsGrid.addWidget(self.divots,1,4)
         roastFlagsLayout.addLayout(roastFlagsGrid)
         roastFlagsLayout.addStretch()
         anotationLayout = QVBoxLayout()
@@ -24977,32 +24985,32 @@ class FujiPID(object):
 ######################## Arduino CONTROL DIALOG ######################
 ############################################################################
 
-class ArduinoDlgControl(ArtisanDialog):
-    def __init__(self, parent = None):
-        super(ArduinoDlgControl,self).__init__(parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowTitle(QApplication.translate("Form Caption","Arduino Control",None, QApplication.UnicodeUTF8))
-        self.status = QStatusBar()
-        self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Work on Progress",None, QApplication.UnicodeUTF8),5000)
-        reinitbutton = QPushButton(QApplication.translate("Button","Reinitialize Arduino", None, QApplication.UnicodeUTF8))
-        self.connect(reinitbutton,SIGNAL("clicked()"),self.initArduino)
-        tab1Layout = QGridLayout()
-        tab1Layout.addWidget(reinitbutton,0,0)
-        ############################
-        TabWidget = QTabWidget()
-        C1Widget = QWidget()
-        C1Widget.setLayout(tab1Layout)
-        TabWidget.addTab(C1Widget,QApplication.translate("Tab","General",None, QApplication.UnicodeUTF8))
-        mainlayout = QVBoxLayout()
-        mainlayout.addWidget(self.status,0)
-        mainlayout.addWidget(TabWidget,1)
-        self.setLayout(mainlayout)
-
-    def initArduino(self):
-        aw.ser.ArduinoIsInitialized = 0
-        message = QApplication.translate("Message","ArduinoTC4 has been reinitialized.",None, QApplication.UnicodeUTF8)
-        aw.sendmessage(message)
+#class ArduinoDlgControl(ArtisanDialog):
+#    def __init__(self, parent = None):
+#        super(ArduinoDlgControl,self).__init__(parent)
+#        self.setAttribute(Qt.WA_DeleteOnClose)
+#        self.setWindowTitle(QApplication.translate("Form Caption","Arduino Control",None, QApplication.UnicodeUTF8))
+#        self.status = QStatusBar()
+#        self.status.setSizeGripEnabled(False)
+#        self.status.showMessage(QApplication.translate("StatusBar","Work in Progress",None, QApplication.UnicodeUTF8),5000)
+#        reinitbutton = QPushButton(QApplication.translate("Button","Reinitialize Arduino", None, QApplication.UnicodeUTF8))
+#        self.connect(reinitbutton,SIGNAL("clicked()"),self.initArduino)
+#        tab1Layout = QGridLayout()
+#        tab1Layout.addWidget(reinitbutton,0,0)
+#        ############################
+#        TabWidget = QTabWidget()
+#        C1Widget = QWidget()
+#        C1Widget.setLayout(tab1Layout)
+#        TabWidget.addTab(C1Widget,QApplication.translate("Tab","General",None, QApplication.UnicodeUTF8))
+#        mainlayout = QVBoxLayout()
+#        mainlayout.addWidget(self.status,0)
+#        mainlayout.addWidget(TabWidget,1)
+#        self.setLayout(mainlayout)
+#
+#    def initArduino(self):
+#        aw.ser.ArduinoIsInitialized = 0
+#        message = QApplication.translate("Message","ArduinoTC4 has been reinitialized.",None, QApplication.UnicodeUTF8)
+#        aw.sendmessage(message)
 
 ############################################################################
 ######################## DTA PID CONTROL DIALOG ######################
@@ -25015,7 +25023,7 @@ class DTApidDlgControl(ArtisanDialog):
         self.setWindowTitle(QApplication.translate("Form Caption","Delta DTA PID Control",None, QApplication.UnicodeUTF8))
         self.status = QStatusBar()
         self.status.setSizeGripEnabled(False)
-        self.status.showMessage(QApplication.translate("StatusBar","Work on Progress",None, QApplication.UnicodeUTF8),5000)
+        self.status.showMessage(QApplication.translate("StatusBar","Work in Progress",None, QApplication.UnicodeUTF8),5000)
         svlabel = QLabel(QApplication.translate("Label", "SV", None, QApplication.UnicodeUTF8))  
         self.svedit = QLineEdit(str(aw.dtapid.dtamem["sv"][0]))
         self.svedit.setValidator(QDoubleValidator(0., 999.,1, self.svedit))
@@ -25143,6 +25151,10 @@ def main():
     global aw
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     aw = ApplicationWindow()
+    try:
+        aw.defaultAppearance = str(aw.style().objectName()).lower()
+    except:
+        pass
     aw.settingsLoad()
     try:
         argv_file = sys.argv[1]
