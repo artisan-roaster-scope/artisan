@@ -5578,8 +5578,8 @@ class ApplicationWindow(QMainWindow):
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month file-open/save will point to profilepath
         self.profilepath = ""
-        if platf == 'Darwin' or platf == 'Linux':
-            self.profilepath = QDir().homePath().append(QString("/Documents/"))
+        #if platf == 'Darwin' or platf == 'Linux':
+        self.profilepath = QDir().homePath().append(QString("/Documents/"))
             
         # on the Mac preferences should be stored outside of applications in the users ~/Library/Preferences path
         if platf == 'Darwin':
@@ -5591,7 +5591,7 @@ class ApplicationWindow(QMainWindow):
             QDir().setCurrent(preference_path)
 
         #checks executable directory. dirstruct() checks or creates: /profile/year/month directory to store profiles
-        self.dirstruct()        
+        #self.dirstruct()        
 
 
         #defaults the users profile path to the standard profilepath (incl. month/year subdirectories)
