@@ -49,42 +49,24 @@
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
-	<key>CFBundleDisplayName</key>
-	<string>Artisan</string>
 	<key>CFBundleExecutable</key>
 	<string>Artisan</string>
-	<key>CFBundleGetInfoString</key>
-	<string>Artisan, Visual Scope for Coffee Roasters</string>
 	<key>CFBundleIconFile</key>
 	<string>artisan.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.google.code.p.Artisan</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
 	<string>Artisan</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>0.6.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>Artisan 0.6.0</string>
-	<key>LSArchitecturePriority</key>
-	<string>x86_64</string>
 	<key>LSHasLocalizedDisplayName</key>
 	<false/>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.6</string>
-	<key>LSMultipleInstancesProhibited</key>
-	<string>false</string>
-	<key>LSPrefersPPC</key>
-	<false/>
 	<key>NSAppleScriptEnabled</key>
 	<false/>
-	<key>NSHumanReadableCopyright</key>
-	<string>GNU General Public License (GPL)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

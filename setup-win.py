@@ -36,7 +36,10 @@ EXCLUDES = ['_tkagg',
 
 
 # current version of Artisan
-VERSION = '0.6.0'
+
+import artisanlib
+
+VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
 cwd = os.getcwd()
