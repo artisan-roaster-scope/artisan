@@ -6291,7 +6291,7 @@ class ApplicationWindow(QMainWindow):
         self.extraLCD1,self.extraLCD2 = [],[]
         self.extraLCDlabel1,self.extraLCDlabel2 = [],[]
         self.extraLCDframe1,self.extraLCDframe2 = [],[]
-        self.extraLCDvisibility1,self.extraLCDvisibility2 = [True]*self.nLCDS,[True]*self.nLCDS
+        self.extraLCDvisibility1,self.extraLCDvisibility2 = [False]*self.nLCDS,[False]*self.nLCDS
         self.extraCurveVisibility1,self.extraCurveVisibility2 = [True]*self.nLCDS,[True]*self.nLCDS
         for i in range(self.nLCDS):
             #configure LCDs
