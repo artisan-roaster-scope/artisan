@@ -200,6 +200,11 @@ comment out the line refering to matplotlib.numerix
 wget http://pypi.python.org/packages/source/b/bbfreeze-loader/bbfreeze-loader-1.1.0.zip
 
 
+13) alien
+
+# sudo apt-get install alien
+
+
 ====
 
 Alternate Installation via apt-get on Ubuntu (receiving outdated packages)
