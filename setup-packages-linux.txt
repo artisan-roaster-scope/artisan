@@ -34,6 +34,7 @@ Update system:
 Install required packages:
 # sudo apt-get install build-essential g++
 # sudo apt-get install libfontconfig1-dev libfreetype6-dev libx11-dev libxcursor-dev libxext-dev libxfixes-dev libxft-dev libxi-dev libxrandr-dev libxrender-dev
+# sudo apt-get install libgtk2.0-dev
 # sudo apt-get install python2.7-dev
 # sudo apt-get install libblas-dev liblapack-dev gfortran
 # sudo apt-get install libpng-dev
@@ -103,7 +104,7 @@ linux-g++ {
 }
 from src/3rdparty/webkit/Source/common.pri
 
-# ./configure -opensource -confirm-license -release -nomake tests -nomake examples -nomake demos
+# ./configure -opensource -confirm-license -release -nomake tests -nomake examples -nomake demos -gtkstyle
 # make -j3
 # sudo make install
 
