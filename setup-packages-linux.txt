@@ -166,6 +166,8 @@ to minimize binary builds remove test and sample data
 # sudo rm -rf /usr/local/lib/python2.7/site-packages/matplotlib/tests
 # sudo rm -rf /usr/local/lib/python2.7/site-packages/matplotlib/testing
 
+NOTE: replace site-packages by dist-packages if using the default Ubuntu python 2.7
+
 
 9) MinimalModbus
 
