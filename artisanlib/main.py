@@ -1145,7 +1145,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: updategraphics() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " updategraphics() %1").arg(str(e)),exc_tb.tb_lineno)
 
     def updateLCDtime(self):
         if self.flagon and self.flagstart:
@@ -1209,7 +1209,7 @@ class tgraphcanvas(FigureCanvas):
             import traceback
             traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: timealign() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " timealign() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def lenaxlines(self):
         active_curves = len(self.extratimex)
@@ -1295,7 +1295,7 @@ class tgraphcanvas(FigureCanvas):
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(str(self.alarmstrings[alarmnumber])))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: setalarm() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setalarm() %1").arg(str(ex)),exc_tb.tb_lineno)
                 
 
     def playbackevent(self):
@@ -1484,7 +1484,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: eval_math_expression() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " eval_math_expression() %1").arg(str(e)),exc_tb.tb_lineno)
             return 0
 
     #format X axis labels
@@ -1619,7 +1619,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: reset() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " reset() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -1774,7 +1774,7 @@ class tgraphcanvas(FigureCanvas):
     #            import traceback
     #            traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: reset() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " reset() %1").arg(str(ex)),exc_tb.tb_lineno)
             finally:
                 if aw.qmc.samplingsemaphore.available() < 1:
                     aw.qmc.samplingsemaphore.release(1)
@@ -1836,7 +1836,7 @@ class tgraphcanvas(FigureCanvas):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: smooth() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
             return x
 
     def smooth_list(self, a, b, window_len=7, window='hanning'):
@@ -1979,7 +1979,7 @@ class tgraphcanvas(FigureCanvas):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: place_annotations() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " place_annotations() %1").arg(str(e)),exc_tb.tb_lineno)
 
 
     #Redraws data
@@ -2467,7 +2467,7 @@ class tgraphcanvas(FigureCanvas):
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
             _, _, exc_tb = sys.exc_info()    
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: redraw() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " redraw() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -2988,7 +2988,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: markCharge() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markCharge() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3043,7 +3043,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: markDryEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markDryEnd() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3102,7 +3102,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark1Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3157,7 +3157,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: mark1Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark1Cend() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3216,7 +3216,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cstart() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark2Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3274,7 +3274,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: mark2Cend() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark2Cend() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:            
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3352,7 +3352,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: markDrop() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markDrop() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3418,7 +3418,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(message)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: markCoolEnd() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markCoolEnd() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3435,7 +3435,7 @@ class tgraphcanvas(FigureCanvas):
                 self.EventRecordAction(extraevent=extraevent)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: EventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " EventRecord() %1").arg(str(e)),exc_tb.tb_lineno)
 
     #Marks location in graph of special events. For example change a fan setting.
     #Uses the position of the time index (variable self.timex) as location in time
@@ -3545,7 +3545,7 @@ class tgraphcanvas(FigureCanvas):
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF", None, QApplication.UnicodeUTF8))
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: EventRecordAction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " EventRecordAction() %1").arg(str(e)),exc_tb.tb_lineno)
             return
         finally:            
             if self.samplingsemaphore.available() < 1:
@@ -3631,7 +3631,7 @@ class tgraphcanvas(FigureCanvas):
                         self.samplingsemaphore.release(1)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: DeviceEventRecord() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " DeviceEventRecord() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
                 self.samplingsemaphore.release(1)
@@ -3801,7 +3801,7 @@ class tgraphcanvas(FigureCanvas):
             import traceback
             traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()    
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: writestatistics() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " writestatistics() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #used in EventRecord()
     def restorebutton_11(self):
@@ -3935,12 +3935,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " univariateinfo() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: univariateinfo() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " univariateinfo() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
     #interpolation type
@@ -3961,11 +3961,11 @@ class tgraphcanvas(FigureCanvas):
             self.fig.canvas.draw()
 
         except ValueError:
-            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: univariate() ",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " univariate()")
             return
 
         except Exception:
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception: univariate() ",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " univariate()")
             return
 
     def drawinterp(self,mode):
@@ -3982,12 +3982,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror(QApplication.translate("Error Message","Value Error in drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " drawinterp() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception: drawinterp() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " drawinterp() %1").arg(str(e)),exc_tb.tb_lineno)
             return
             
     def timearray2index(self,timearray,seconds):
@@ -4403,7 +4403,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: designer on_motion() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " on_motion() %1").arg(str(e)),exc_tb.tb_lineno)
             self.unrarefy_designer()
             return
 
@@ -4486,7 +4486,7 @@ class tgraphcanvas(FigureCanvas):
             
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: designer addpoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " addpoint() %1").arg(str(e)),exc_tb.tb_lineno)
             return 
 
     #removes point
@@ -4522,7 +4522,7 @@ class tgraphcanvas(FigureCanvas):
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: designer removepoint() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " removepoint() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
     #finds a proper index location for a time that does not exists yet.
@@ -4607,12 +4607,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error: createFromDesigner() ",None, QApplication.UnicodeUTF8),exc_tb.tb_lineno)
+            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error:",None, QApplication.UnicodeUTF8) + " createFromDesigner()",exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: createFromDesigner() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " createFromDesigner() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
     #activates mouse events
@@ -4977,12 +4977,12 @@ class tgraphcanvas(FigureCanvas):
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None, QApplication.UnicodeUTF8) + " drawWheel() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: drawWheel() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " drawWheel() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
     def makewheelcolorpattern(self):
@@ -5225,7 +5225,7 @@ class SampleThread(QThread):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: filterDropOuts() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)            
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " filterDropOuts() %1").arg(str(e)),exc_tb.tb_lineno)            
             return temp
 
     # sample devices at interval self.delay miliseconds.
@@ -5500,7 +5500,7 @@ class SampleThread(QThread):
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: sample() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " sample() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -6805,7 +6805,7 @@ class ApplicationWindow(QMainWindow):
                     QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
                 except Exception as e:
                     _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: eventaction() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " eventaction() %1").arg(str(e)),exc_tb.tb_lineno)
             elif action == 3:
                 for i in range(len(cmd_str)):
                     buttonnumber = int(cmd_str[i])-1
@@ -7259,7 +7259,7 @@ class ApplicationWindow(QMainWindow):
                 self.autosaveconf()
 
         except IOError as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error: automaticsave() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " automaticsave() %1").arg(str(e)))
 
     def viewKshortcuts(self):
         string = u(QApplication.translate("Message", "<b>[ENTER]</b> = Turns ON/OFF Keyboard Shortcuts",None, QApplication.UnicodeUTF8)) + "<br><br>"
@@ -7505,7 +7505,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: fileLoad() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " fileLoad() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #loads stored profiles. Called from file menu
     def loadFile(self,filename):
@@ -7539,19 +7539,19 @@ class ApplicationWindow(QMainWindow):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " fileload() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except ValueError as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error: fileload() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None, QApplication.UnicodeUTF8) + " fileload() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except Exception as ex:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadFile() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " loadFile() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         finally:
             if f:
@@ -7613,17 +7613,17 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None, QApplication.UnicodeUTF8))
         except IOError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " loadbackground() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except ValueError as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Value Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Value Error:",None, QApplication.UnicodeUTF8) + " loadbackground() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: loadbackground() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " loadbackground() %1").arg(str(e)),exc_tb.tb_lineno)
             return
         finally:
             if f:
@@ -7725,7 +7725,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importCSV() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importCSV() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def addSerialPort(self):
         self.extraser.append(serialport()) 
@@ -7797,7 +7797,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: exportJSON() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #Write readings to RoastLogger CSV file
     def exportRoastLogger(self,filename):
@@ -7873,7 +7873,7 @@ class ApplicationWindow(QMainWindow):
 #           import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: exportRoastLogger() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportRoastLogger() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             outfile.close()
 
@@ -7896,7 +7896,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importJSON() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def importRoastLogger(self,filename):
         try:
@@ -7961,7 +7961,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importRoastLogger() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importRoastLogger() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
@@ -8058,7 +8058,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: exportCSV() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportCSV() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     #Write object to file
     def serialize(self,filename,obj):
@@ -8366,7 +8366,7 @@ class ApplicationWindow(QMainWindow):
             traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Exception: setProfile()",None, QApplication.UnicodeUTF8),str(ex),exc_tb.tb_lineno)
+            QMessageBox.information(self,QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setProfile()",str(ex),exc_tb.tb_lineno)
 
     # the int n specifies the number of digits
     def float2float(self,f,n=1):
@@ -8444,7 +8444,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["COOL_BT"] = self.float2float(self.qmc.temp2[self.qmc.timeindex[7]])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)        
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)        
         ######### Phases #########
         try:
             if self.qmc.statisticstimes[0]:
@@ -8459,7 +8459,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["coolphasetime"] = self.qmc.statisticstimes[4]
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
         ######### Evaluations #########
         try:
             evaluations = self.defect_estimation()
@@ -8469,7 +8469,7 @@ class ApplicationWindow(QMainWindow):
             computedProfile["coolphaseeval"] = u(evaluations[3])
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
         ######### RoR ######### 
         try:
             if TP_time_idx and DRY_time_idx:
@@ -8481,7 +8481,7 @@ class ApplicationWindow(QMainWindow):
                     computedProfile["total_ror"] = self.float2float(((computedProfile["DROP_BT"]-computedProfile["TP_BT"])/(computedProfile["DROP_time"]-computedProfile["TP_time"]))*60.)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
         ######### ETBTarea #########
         try:
             ts,tse,tsb = aw.ts(self.qmc.timeindex[0],self.qmc.timeindex[6])
@@ -8547,7 +8547,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["set_density"] = self.float2float(setdensity)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)                
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)                
         ######### Humidity #########
         try:
             if aw.qmc.bag_humidity[0] != 0.0:
@@ -8560,7 +8560,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["ambient_temperature"] = self.float2float(aw.qmc.ambientTemp)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: computedProfileInformation() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
         return computedProfile
 
     #used by filesave()
@@ -8660,7 +8660,7 @@ class ApplicationWindow(QMainWindow):
             return profile
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Error on getProfile(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " getProfile(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
 
     #saves recorded profile in hard drive. Called from file menu 
@@ -8679,7 +8679,7 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Error on filesave(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " filesave(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def fileExport(self,msg,ext,dumper):
         try:
@@ -8690,7 +8690,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
         except Exception as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error on fileExport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " fileExport(): %1").arg(str(ex)))
             return
 
     def fileExportCSV(self):
@@ -8712,7 +8712,7 @@ class ApplicationWindow(QMainWindow):
                 self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Error on fileImport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " fileImport(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def fileImportCSV(self):
         self.fileImport(QApplication.translate("Message", "Import CSV",None, QApplication.UnicodeUTF8),self.importCSV)
@@ -9252,7 +9252,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8) + "  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "  settingsLoad()  @line " + str(exc_tb.tb_lineno))
    
 #--------------------------------
         try: 
@@ -9286,7 +9286,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception: settingsLoad()",None, QApplication.UnicodeUTF8) + "  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " settingsLoad()  @line " + str(exc_tb.tb_lineno))
 
     def fetchCurveStyles(self):
         try:
@@ -9446,7 +9446,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: fetchCurveStyles() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " fetchCurveStyles() %1").arg(str(e)),exc_tb.tb_lineno)
 
 
     #Saves the settings when closing application. See the oppposite settingsLoad()
@@ -9774,7 +9774,7 @@ class ApplicationWindow(QMainWindow):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info() 
-            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception: closeEvent()",None, QApplication.UnicodeUTF8) + "  @line " + str(exc_tb.tb_lineno))
+            QMessageBox.information(self,QApplication.translate("Error Message", "Error",None, QApplication.UnicodeUTF8),QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " closeEvent()  @line " + str(exc_tb.tb_lineno))
 
 
     #used for trouble shooting.
@@ -10047,7 +10047,7 @@ th {
 <td>
 <table width="220">
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Charge:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "CHARGE:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$charge</td>
 </tr>
 <tr>
@@ -10289,7 +10289,7 @@ $cupping_notes
             QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
             
         except IOError as e:
-            aw.qmc.adderror(QApplication.translate("Error Message", "IO Error: htmlReport() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " htmlReport() %1").arg(str(e)))
             return
         finally:
             if f:
@@ -10633,7 +10633,7 @@ $cupping_notes
 #                import traceback
 #                traceback.print_exc(file=sys.stdout)
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ts() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ts() %1").arg(str(e)),exc_tb.tb_lineno)
             return round(delta/60), round(ET/60), round(BT/60)                
 
     #Find rate of change of each phase. TP_index (by aw.findTP()) is the index of the TP and dryEndIndex that of the end of drying (by aw.findDryEnd())
@@ -10991,14 +10991,14 @@ $cupping_notes
                 self.sendmessage(QApplication.translate("Message","K202 file loaded successfully", None, QApplication.UnicodeUTF8))
                 self.qmc.redraw()
         except IOError as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " importK202(): %1").arg(str(ex)))
         except ValueError as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: importK202(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None, QApplication.UnicodeUTF8) + " importK202(): %1").arg(str(ex)))
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importK202() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importK202() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def importK204(self):
         try:
@@ -11069,14 +11069,14 @@ $cupping_notes
                 self.sendmessage(QApplication.translate("Message","K204 file loaded successfully", None, QApplication.UnicodeUTF8))
                 self.qmc.redraw()
         except IOError as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: importK204(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " importK204(): %1").arg(str(ex)))
         except ValueError as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: importK204(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None, QApplication.UnicodeUTF8) + " importK204(): %1").arg(str(ex)))
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importK204() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importK204() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def importHH506RA(self):
         try:
@@ -11132,14 +11132,14 @@ $cupping_notes
                 self.sendmessage(QApplication.translate("Message","HH506RA file loaded successfully", None, QApplication.UnicodeUTF8))
                 self.qmc.redraw()
         except IOError as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: importHH506RA(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " importHH506RA(): %1").arg(str(ex)))
         except ValueError as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: importHH506RA(): %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None, QApplication.UnicodeUTF8) + " importHH506RA(): %1").arg(str(ex)))
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importHH506RA() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importHH506RA() %1").arg(str(ex)),exc_tb.tb_lineno)
             
 
     #checks or creates directory structure
@@ -11180,7 +11180,7 @@ $cupping_notes
                 y = image.height()
                 self.sendmessage(QApplication.translate("Message","%1  size(%2,%3) saved", None, QApplication.UnicodeUTF8).arg(str(filename)).arg(str(x)).arg(str(y)))
         except IOError as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: resize() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " resize() %1").arg(str(ex)))
     
     def saveVectorGraph(self,extension=".pdf"):
         try: 
@@ -11191,7 +11191,7 @@ $cupping_notes
                 aw.qmc.fig.savefig(filename)
                 self.sendmessage(QApplication.translate("Message","%1 saved", None, QApplication.UnicodeUTF8).arg(str(filename)))
         except IOError as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: saveVectorGraph() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " saveVectorGraph() %1").arg(str(ex)))
 
     #displays Dialog for the setting of the HUD
     def hudset(self):
@@ -11392,15 +11392,15 @@ $cupping_notes
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " loadWheel() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except ValueError as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Value Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Value Error:", None, QApplication.UnicodeUTF8) + " loadWheel() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: loadWheel() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None, QApplication.UnicodeUTF8) + " loadWheel() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         finally:
             if f:
@@ -11581,7 +11581,7 @@ $cupping_notes
                 self.serialize(filename,palette)
                 self.sendmessage(QApplication.translate("Message","Palettes saved",None, QApplication.UnicodeUTF8))
         except IOError as ex:
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: backuppaletteeventbuttons(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:",None, QApplication.UnicodeUTF8) + " backuppaletteeventbuttons(): %1").arg(str(ex)))
             return
 
     def loadPalettes(self,filename):
@@ -11626,11 +11626,11 @@ $cupping_notes
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: loadPalettes() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " loadPalettes() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: loadPalettes() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None, QApplication.UnicodeUTF8) + " loadPalettes() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
             
     def restorepaletteeventbuttons(self):
@@ -11657,11 +11657,11 @@ $cupping_notes
             self.sendmessage(message)
         except IOError as ex:
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: loadAlarms() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:", None, QApplication.UnicodeUTF8) + " loadAlarms() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()  
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: loadAlarms() %1 ", None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:", None, QApplication.UnicodeUTF8) + " loadAlarms() %1").arg(str(ex)),exc_tb.tb_lineno)
             return
 
 
@@ -12083,7 +12083,7 @@ class HUDDlg(ArtisanDialog):
             aw.setdpi(value)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()   
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: changedpi(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " changedpi(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setdefaults(self):
         self.resolutionSpinBox.setValue(80)
@@ -12099,7 +12099,7 @@ class HUDDlg(ArtisanDialog):
             self.plotequ()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception Error: setcurvecolor(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setcurvecolor(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setvdevice(self):
         # compute values
@@ -12149,7 +12149,7 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "setbackgroundequ1(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setbackgroundequ1(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def plotequ(self):
         try:
@@ -12169,7 +12169,7 @@ class HUDDlg(ArtisanDialog):
             aw.qmc.fig.canvas.draw()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()    
-            aw.qmc.adderror(QApplication.translate("Error Message", "plotequ(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " plotequ(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def eval_curve_expression(self,mathexpression,x):
         if len(mathexpression):
@@ -12219,7 +12219,7 @@ class HUDDlg(ArtisanDialog):
                 return eval(mathexpression,{"__builtins__":None},mathdictionary)
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror(QApplication.translate("Error Message", "Plotter: %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " Plotter: %1").arg(str(e)),exc_tb.tb_lineno)
                 return 0
 
     def setappearance(self):
@@ -12227,7 +12227,7 @@ class HUDDlg(ArtisanDialog):
             app.setStyle(str(self.styleComboBox.currentText()))
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror(QApplication.translate("Error Message", "setappearance(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setappearance(): %1").arg(str(e)),exc_tb.tb_lineno)
 
 #    def showsound(self):
 #        try:
@@ -12316,7 +12316,7 @@ class HUDDlg(ArtisanDialog):
                 self.DeltaFilter.setDisabled(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "changeDeltaFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "changeDeltaFilter(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def changeDropFilter(self,i):
         aw.qmc.filterDropOuts = not aw.qmc.filterDropOuts
@@ -12338,7 +12338,7 @@ class HUDDlg(ArtisanDialog):
                 self.Filter.setDisabled(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "changeFilter(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " changeFilter(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def changeProjection(self,i):
         aw.qmc.projectFlag = not aw.qmc.projectFlag
@@ -15588,7 +15588,7 @@ class EventsDlg(ArtisanDialog):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "updatetypes(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " updatetypes(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def settypedefault(self):
         aw.qmc.etypes = aw.qmc.etypesdefault
@@ -15794,7 +15794,7 @@ class phasesGraphDlg(ArtisanDialog):
             aw.qmc.phases = list(aw.qmc.phases_celsius_defaults)
         self.events2phases()
         self.getphases()
-        aw.sendmessage(QApplication.translate("Message","Phases changed to %1 default: %2)",None, QApplication.UnicodeUTF8).arg(aw.qmc.mode).arg(str(aw.qmc.phases)))
+        aw.sendmessage(QApplication.translate("Message","Phases changed to %1 default: %2",None, QApplication.UnicodeUTF8).arg(aw.qmc.mode).arg(str(aw.qmc.phases)))
         aw.qmc.redraw(recomputeAllDeltas=False)
 
 ############################################################################
@@ -16709,7 +16709,7 @@ class StatisticsDlg(ArtisanDialog):
 #                self.master.set_timeout(1.0)
 #                self.master.set_verbose(False)
 #            except Exception as e:
-#                aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e))) 
+#                aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(e))) 
 #           
 #    def writeSingleRegister(self,slave,register,value):
 #        try:
@@ -16774,7 +16774,7 @@ class modbusport(object):
                     libtime.sleep(.5) # avoid possible hickups on startup
             except Exception as ex:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def writeSingleRegister(self,slave,register,value):
         try:
@@ -16783,7 +16783,7 @@ class modbusport(object):
             self.master.write_register(int(register),int(value),0,6)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: writeSingleRegister() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def readFloat(self,slave,register,code=3):
         try:
@@ -16793,7 +16793,7 @@ class modbusport(object):
             return r
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: readFloat() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " readFloat() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -16808,7 +16808,7 @@ class modbusport(object):
             return r
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Modbus Error: readSingleRegister() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " readSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -16853,10 +16853,10 @@ class scaleport(object):
                 self.SP.open()
         except serial.SerialException:
             self.SP.close()
-            error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            aw.qmc.adderror(timez + " " + error + " Unable to open serial port",exc_tb.tb_lineno)
 
     def closeport(self):
         self.SP.close()
@@ -16868,7 +16868,7 @@ class scaleport(object):
                 self.openport()
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
-                aw.qmc.adderror(QApplication.translate("Error Message","Scale Error: connect() %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+                aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(e)),exc_tb.tb_lineno)
 
     # returns weight as float in g or -1 if something went wrong
     def readWeight(self):
@@ -16996,16 +16996,16 @@ class serialport(object):
                     # CHECK FOR RECEIVED ERROR CODES
                     if ord(r[1]) == 128:
                         if ord(r[2]) == 1:
-                            errorcode = QApplication.translate("Error Message"," F80h, ERROR 1: A nonexistent function code was specified. Please check the function code. ",None, QApplication.UnicodeUTF8)
-                            errorcode += QApplication.translate("Error Message","SendFUJIcommand(): ERROR 1 Illegal Function in unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(binstring[0]))
+                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + " 1: A nonexistent function code was specified. Please check the function code."
+                            errorcode += QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " SendFUJIcommand() 1: Illegal Function in unit %1".arg(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                         if ord(r[2]) == 2:
-                            errorcode = QApplication.translate("Error Message","F80h, ERROR 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code. ",None, QApplication.UnicodeUTF8)
-                            errorcode += QApplication.translate("Error Message","SendFUJIcommand() ERROR 2 Illegal Address for unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(binstring[0]))
+                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + " 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code."
+                            errorcode += QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " SendFUJIcommand() 2 Illegal Address for unit %1".arg(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                         if ord(r[2]) == 3:
-                            errorcode = QApplication.translate("Error Message","F80h, ERROR 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers.",None, QApplication.UnicodeUTF8)
-                            errorcode += QApplication.translate("Error Message","sendFUJIcommand(): ERROR 3 Illegal Data Value for unit %1 ",None, QApplication.UnicodeUTF8).arg(ord(binstring[0]))
+                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + " 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers."
+                            errorcode += QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " SendFUJIcommand() 3 Illegal Data Value for unit %1".arg(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                     else:
                         #Check crc16
@@ -17014,12 +17014,12 @@ class serialport(object):
                         if crcCal1 == crcRx:
                             return r           #OK. Return r after it has been checked for errors
                         else:
-                            aw.qmc.adderror(QApplication.translate("Error Message","Crc16 data corruption ERROR. TX does not match RX. Check wiring ",None, QApplication.UnicodeUTF8))
+                            aw.qmc.adderror(QApplication.translate("Error Message","CRC16 data corruption ERROR. TX does not match RX. Check wiring",None, QApplication.UnicodeUTF8))
                             return "0"
                 else:
                     if self.COMsemaphore.available() < 1:
                         self.COMsemaphore.release(1)
-                    aw.qmc.adderror(QApplication.translate("Error Message","No RX data received ",None, QApplication.UnicodeUTF8))
+                    aw.qmc.adderror(QApplication.translate("Error Message","No RX data received",None, QApplication.UnicodeUTF8))
                     return "0"
             else:
                 return "0"
@@ -17027,7 +17027,7 @@ class serialport(object):
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","SerialException: ser.sendFUJIcommand() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendFUJIcommand()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return "0"
@@ -17133,7 +17133,7 @@ class serialport(object):
                         t1 = float(int(r[7:11], 16))*0.1    #convert ascii string from bytes 8-11 (4 bytes) to a float
                         return t1
 ##                        else:
-##                            aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8))            
+##                            aw.qmc.adderror(QApplication.translate("Error Message","DTAtemperature(): Data corruption. Check wiring",None, QApplication.UnicodeUTF8))            
 ##                            if len(aw.qmc.timex) > 2:
 ##                                return aw.qmc.temp1[-1]
 ##                            else:
@@ -17149,7 +17149,7 @@ class serialport(object):
 ##                            return 0
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","ser.DTAtemperature(): %1 bytes received but 15 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                    aw.qmc.adderror(QApplication.translate("Error Message","DTAcommand(): %1 bytes received but 15 needed",None, QApplication.UnicodeUTF8).arg(nbytes))            
                     if len(aw.qmc.timex) > 2:
                         return aw.qmc.temp1[-1]
                     else:
@@ -17157,7 +17157,7 @@ class serialport(object):
         except serial.SerialException:
             if self.COMsemaphore.available() < 1:
                 self.COMsemaphore.release(1)
-            error = QApplication.translate("Error Message","Serial Exception: ser.sendDTAcommand() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendDTAcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds            
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -17180,7 +17180,7 @@ class serialport(object):
         except Exception as e:
             tx = aw.qmc.timeclock.elapsed()/1000.
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror(QApplication.translate("Error Message", "callprogram(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " callprogram(): %1 ").arg(str(e)),exc_tb.tb_lineno)
             return tx,0.,0.
 
     def virtual(self):
@@ -17367,7 +17367,7 @@ class serialport(object):
                 libtime.sleep(.5) # avoid possible hickups on startup
         except serial.SerialException:
             self.SP.close()
-            error = QApplication.translate("Error Message","Serial Exception: Unable to open serial port ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + QApplication.translate("Error Message","Unable to open serial port",None, QApplication.UnicodeUTF8)
             aw.qmc.adderror(error)
 
     #loads configuration to ports
@@ -17418,13 +17418,13 @@ class serialport(object):
                 return -1,-1
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception: ser.HH806AUtemperature() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806AUtemperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH806AUtemperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806AUtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -17448,12 +17448,12 @@ class serialport(object):
                 self.HH806Winitflag = 1
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception: ser.HH806Winit() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806Winit()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH806Winit() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806Winit() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -17489,13 +17489,13 @@ class serialport(object):
                 return -1.,-1.
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception: ser.HH806Wtemperature() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806Wtemperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH806Wtemperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH806Wtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -17582,13 +17582,13 @@ class serialport(object):
         except serial.SerialException:
             self.closeport()
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception: ser.HH506RAGetID()",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAGetID()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH506RAGetID() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAGetID() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -17629,14 +17629,14 @@ class serialport(object):
         except serial.SerialException:
             self.closeport()
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            error = QApplication.translate("Error Message","Serial Exception: ser.HH506RAtemperature() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAtemperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HH506RAtemperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -17674,7 +17674,7 @@ class serialport(object):
                     return T1,0
                 else:
                     nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER302temperature(): %1 bytes received but 7 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    error = QApplication.translate("Error Message","CENTER302temperature(): %1 bytes received but 7 needed",None, QApplication.UnicodeUTF8).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -17683,7 +17683,7 @@ class serialport(object):
                 return -1,-1 
         except serial.SerialException:
             self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception: ser.CENTER302temperature()",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER302temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -17691,7 +17691,7 @@ class serialport(object):
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.CENTER302temperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER302temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -17740,7 +17740,7 @@ class serialport(object):
                     return T1,T2
                 else:
                     nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER303temperature(): %1 bytes received but 8 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    error = QApplication.translate("Error Message","CENTER303temperature(): %1 bytes received but 8 needed",None, QApplication.UnicodeUTF8).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -17749,7 +17749,7 @@ class serialport(object):
                 return -1,-1 
         except serial.SerialException:
             self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception: ser.CENTER303temperature()",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER303temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -17757,7 +17757,7 @@ class serialport(object):
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.CENTER303temperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)            
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER303temperature() %1").arg(str(ex)),exc_tb.tb_lineno)            
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -17806,7 +17806,7 @@ class serialport(object):
                     return T1,T2
                 else:
                     nbytes = len(r)
-                    error = QApplication.translate("Error Message","CENTER306temperature(): %1 bytes received but 10 needed ",None, QApplication.UnicodeUTF8).arg(nbytes)
+                    error = QApplication.translate("Error Message","CENTER306temperature(): %1 bytes received but 10 needed",None, QApplication.UnicodeUTF8).arg(nbytes)
                     timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -17815,7 +17815,7 @@ class serialport(object):
                 return -1,-1
         except serial.SerialException:
             self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception: ser.CENTER306temperature() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER306temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -17823,7 +17823,7 @@ class serialport(object):
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.CENTER306temperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER306temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             #note: logged chars should be unicode not binary
             if aw.seriallogflag:
@@ -17889,13 +17889,13 @@ class serialport(object):
                     return T1,T2
                 else:
                     nbytes = len(r)
-                    aw.qmc.adderror(QApplication.translate("Error Message","ser.CENTER309temperature(): %1 bytes received but 45 needed ",None, QApplication.UnicodeUTF8).arg(nbytes))            
+                    aw.qmc.adderror(QApplication.translate("Error Message","CENTER309temperature(): %1 bytes received but 45 needed",None, QApplication.UnicodeUTF8).arg(nbytes))            
                     return -1,-1 
             else:
                 return -1,-1
         except serial.SerialException:
             self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception: ser.CENTER309temperature() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER309temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -17903,7 +17903,7 @@ class serialport(object):
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.CENTER309temperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER309temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should be unicode not binary
@@ -17951,7 +17951,7 @@ class serialport(object):
                     self.SP.write(str2cmd(command + "\n"))       #send command
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
-                        raise Exception(QApplication.translate("Error Message","Arduino could not set Channels",None, QApplication.UnicodeUTF8))
+                        raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None, QApplication.UnicodeUTF8))
                     elif result.startswith("#"):
                         #OK. NOW SET UNITS
                         self.SP.flushInput()
@@ -17960,7 +17960,7 @@ class serialport(object):
                         self.SP.write(str2cmd(command))
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
-                            raise Exception(QApplication.translate("Arduino could not set temperature UNIT",None, QApplication.UnicodeUTF8))
+                            raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None, QApplication.UnicodeUTF8))
                         else:
                             ### EVERYTHING OK  ###
                             self.ArduinoIsInitialized = 1
@@ -18010,7 +18010,7 @@ class serialport(object):
                 return t1, t2
         except serial.SerialException as e:
             self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception: ser.ARDUINOTC4temperature() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.ARDUINOTC4temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -18018,7 +18018,7 @@ class serialport(object):
         except Exception as e:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: ser.ARDUINOTC4temperature(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " ser.ARDUINOTC4temperature(): %1").arg(str(e)),exc_tb.tb_lineno)
             return -1.,-1.
         finally:
             if aw.seriallogflag:
@@ -18186,14 +18186,14 @@ class serialport(object):
                 raise ValueError
         except ValueError:
             self.closeport()
-            error = QApplication.translate("Error Message","Value Error: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " ser.TEVA18Btemperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1 
         except serial.SerialException:
             self.closeport()
-            error = QApplication.translate("Error Message","Serial Exception: ser.TEVA18Btemperature() ",None, QApplication.UnicodeUTF8)
+            error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.TEVA18Btemperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -18201,7 +18201,7 @@ class serialport(object):
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.TEVA18Btemperature() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.TEVA18Btemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
         finally:
             #note: logged chars should not be binary
@@ -18294,7 +18294,7 @@ class serialport(object):
                 raise ValueError(str("Needed 14 bytes but only received %i"%(len(frame))))
         except ValueError:
             self.closeport()
-            error  = QApplication.translate("Error Message","Value Error: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
+            error  = QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " ser.HHM28multimeter()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -18312,7 +18312,7 @@ class serialport(object):
                     return "0","0"
         except serial.SerialException:
             self.closeport()
-            error  = QApplication.translate("Error Message","Serial Exception: ser.HHM28multimeter() ",None, QApplication.UnicodeUTF8)
+            error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HHM28multimeter()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
@@ -18320,7 +18320,7 @@ class serialport(object):
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.HHM28multimeter() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HHM28multimeter() %1").arg(str(ex)),exc_tb.tb_lineno)
             return "0"""
         finally:
             #note: logged chars should not be binary
@@ -18343,14 +18343,14 @@ class serialport(object):
                 self.SP.write(str2cmd(command))
         except serial.SerialException:
             self.closeport()
-            error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXcommand() ",None, QApplication.UnicodeUTF8)
+            error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.sendTXcommand() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             #note: logged chars should not be binary
             if aw.seriallogflag:
@@ -18370,14 +18370,14 @@ class serialport(object):
                 return "ERR"
         except serial.SerialException:
             self.closeport()
-            error  = QApplication.translate("Error Message","Serial Exception: ser.sendTXRXcommand() ",None, QApplication.UnicodeUTF8)
+            error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXRXcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         except Exception as ex:
             self.closeport()
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: ser.sendTXRXcommand() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXRXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             #note: logged chars should not be binary
             if aw.seriallogflag:
@@ -18570,12 +18570,10 @@ class designerconfigDlg(ArtisanDialog):
         etcurviness.setAlignment(Qt.AlignRight)
         btcurviness.setAlignment(Qt.AlignRight)
         self.ETsplineComboBox = QComboBox()
-#        self.ETsplineComboBox.setMaximumWidth(30)
         self.ETsplineComboBox.addItems(["1","2","3","4","5"])
         self.ETsplineComboBox.setCurrentIndex(aw.qmc.ETsplinedegree - 1)
         self.connect(self.ETsplineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
         self.BTsplineComboBox = QComboBox()
-#        self.BTsplineComboBox.setMaximumWidth(30)
         self.BTsplineComboBox.addItems(["1","2","3","4","5"])
         self.BTsplineComboBox.setCurrentIndex(aw.qmc.BTsplinedegree - 1)
         self.connect(self.BTsplineComboBox,SIGNAL("currentIndexChanged(int)"), self.redrawcurviness)
@@ -19454,7 +19452,7 @@ class comportDlg(ArtisanDialog):
                 self.serialtable.resizeColumnsToContents()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "createserialTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " createserialTable(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def saveserialtable(self):
         try:
@@ -19490,7 +19488,7 @@ class comportDlg(ArtisanDialog):
                 aw.extraser[i].timeout = aw.extratimeout[i]
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror(QApplication.translate("Error Message", "saveserialtable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " saveserialtable(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def accept(self):
         #validate serial parameter against input errors
@@ -19517,12 +19515,12 @@ class comportDlg(ArtisanDialog):
             #add more checks here
             aw.sendmessage(QApplication.translate("Message","Serial Port Settings: %1, %2, %3, %4, %5, %6", None, QApplication.UnicodeUTF8).arg(comport).arg(baudrate).arg(bytesize).arg(parity).arg(stopbits).arg(timeout))
         except comportError:
-            aw.qmc.adderror(QApplication.translate("Error Message","Comport Error: Invalid Comm entry ", None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Serial Exception: invalid comm port", None, QApplication.UnicodeUTF8))
             self.comportEdit.selectAll()
             self.comportEdit.setFocus()
             return
         except timeoutError:
-            aw.qmc.adderror(QApplication.translate("Error Message","Timeout Error: Invalid Timeout entry ", None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Serial Exception: timeout", None, QApplication.UnicodeUTF8))
             self.timeoutEdit.selectAll()
             self.timeoutEdit.setFocus()
             return
@@ -19601,7 +19599,7 @@ class comportDlg(ArtisanDialog):
                             comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "scanforport(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " scanforport(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def closeserialports(self):
         if aw.ser.SP.isOpen():
@@ -19957,7 +19955,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 self.devicetable.resizeColumnsToContents()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "createDeviceTable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " createDeviceTable(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def showhelpprogram(self):
         string = "<b>Allows to link to external programs that print temperature when called</b><br><br>"
@@ -19999,7 +19997,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "adddevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " adddevice(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def deldevice(self):
         try:
@@ -20014,7 +20012,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.enableDisableAddDeleteButtons()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "deldevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " deldevice(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def resetextradevices(self):
         try:
@@ -20049,7 +20047,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "resetextradevices(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " resetextradevices(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def delextradevice(self,x):
         try:
@@ -20111,7 +20109,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "delextradevice(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "delextradevice(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def savedevicetable(self):
         try:
@@ -20133,7 +20131,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "savedevicetable(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "savedevicetable(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def updateLCDvisibility(self,x,lcd,ind):
         if lcd == 1:
@@ -20170,7 +20168,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.setLabelColor(aw.extraLCDlabel2[i],QColor(colorname))
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "setextracolor(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setextracolor(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def accept(self):
         try:
@@ -20576,7 +20574,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.close()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "device accept(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " device accept(): %1").arg(str(e)),exc_tb.tb_lineno)
 
 ############################################################
 #######################  CUSTOM COLOR DIALOG  ##############
@@ -21596,7 +21594,7 @@ class WheelDlg(ArtisanDialog):
                 aw.serialize(filename,aw.getWheelGraph())
                 aw.sendmessage(QApplication.translate("Message","Wheel Graph saved",None, QApplication.UnicodeUTF8))
         except IOError as e:
-            aw.qmc.adderror(QApplication.translate("Error Message","IO Error: Wheel graph filesave(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)))
+            aw.qmc.adderror((QApplication.translate("Error Message","IO Error:",None, QApplication.UnicodeUTF8) + " Wheel graph filesave(): %1").arg(str(e)))
             return
 
     def loadWheel(self):        
@@ -21777,7 +21775,7 @@ class AlarmDlg(ArtisanDialog):
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception Error: importalarmsJSON() %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importalarmsJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
         
     def exportalarms(self):
         aw.fileExport(QApplication.translate("Message", "Save Alarms",None, QApplication.UnicodeUTF8),"*.alrm",self.exportalarmsJSON)
@@ -21800,7 +21798,7 @@ class AlarmDlg(ArtisanDialog):
             outfile.close()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Error on exportalarmsJSON(): %1 ",None, QApplication.UnicodeUTF8).arg(str(ex)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " exportalarmsJSON(): %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def closealarms(self):
         self.savealarms()
@@ -22385,7 +22383,7 @@ class PXRpidDlgControl(ArtisanDialog):
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None,QApplication.UnicodeUTF8),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info() 
-            aw.qmc.adderror(QApplication.translate("Error Message", "setpoint(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setpoint(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setthermocoupletype(self,PID):
         command = ""
@@ -22415,7 +22413,7 @@ class PXRpidDlgControl(ArtisanDialog):
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None,QApplication.UnicodeUTF8),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "setthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def readthermocoupletype(self,PID):
         message = "empty"
@@ -22449,7 +22447,7 @@ class PXRpidDlgControl(ArtisanDialog):
                 self.status.showMessage(message,5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "Exception: readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " readthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def paintlabels(self):
         str1 = "T = " + str(aw.fujipid.PXR["segment1sv"][0]) + "\nRamp = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment1ramp"][0])) + "\nSoak = " + str(aw.qmc.stringfromseconds(aw.fujipid.PXR["segment1soak"][0]))
@@ -22518,9 +22516,9 @@ class PXRpidDlgControl(ArtisanDialog):
                 aw.fujipid.PXR["autotuning"][0] = 1
                 self.status.showMessage(QApplication.translate("StatusBar","Autotune successfully turned ON",None, QApplication.UnicodeUTF8),5000) 
         else:
-            mssg = QApplication.translate("StatusBar","setONOFFautotune() problem ",None, QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setONOFFautotune()"
             self.status.showMessage(mssg,5000)
-            aw.qmc.adderror(QApplication.translate("Error Message","setONOFFautotune(): bad response",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setONOFFautotune()")
 
     def setONOFFstandby(self,flag):
         #standby ON (pid off) will reset: rampsoak modes/autotuning/self tuning
@@ -22538,7 +22536,7 @@ class PXRpidDlgControl(ArtisanDialog):
                 aw.fujipid.PXR["runstandby"][0] = 0
             self.status.showMessage(message,5000)
         else:
-            mssg = QApplication.translate("StatusBar","setONOFFstandby(): problem ",None, QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setONOFFstandby()"
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
@@ -22548,14 +22546,14 @@ class PXRpidDlgControl(ArtisanDialog):
             command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["sv0"][1],newSVvalue)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
-                message = QApplication.translate("StatusBar"," SV successfully set to %1",None, QApplication.UnicodeUTF8).arg(self.svedit.text())
+                message = QApplication.translate("StatusBar","SV successfully set to %1",None, QApplication.UnicodeUTF8).arg(self.svedit.text())
                 aw.fujipid.PXR["sv0"][0] = float(str(self.svedit.text()))
                 self.status.showMessage(message,5000)
                 #record command as an Event 
                 strcommand = "SETSV::"+ str("%.1f"%(newSVvalue/10.))
                 aw.qmc.DeviceEventRecord(strcommand)
             else:
-                mssg = QApplication.translate("StatusBar","setsv(): unable to set sv",None, QApplication.UnicodeUTF8)
+                mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setsv()"
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)
         else:
@@ -22675,12 +22673,12 @@ class PXRpidDlgControl(ArtisanDialog):
         string =  QApplication.translate("Message","The rampsoak-mode tells how to start and end the ramp/soak",None, QApplication.UnicodeUTF8) + "\n\n"
         string += QApplication.translate("Message","Your rampsoak mode in this pid is:",None, QApplication.UnicodeUTF8) + "\n\n"
         string += QApplication.translate("Message","Mode = %1",None, QApplication.UnicodeUTF8).arg(mode[0]) + "\n"
-        string += QApplication.translate("Message","-----------------------------------------------------------------------",None, QApplication.UnicodeUTF8) + "\n"
+        string += "-----------------------------------------------------------------------\n"
         string += QApplication.translate("Message","Start to run from PV value: %1",None, QApplication.UnicodeUTF8).arg(mode[1]) + "\n"
         string += QApplication.translate("Message","End output status at the end of ramp/soak: %1",None, QApplication.UnicodeUTF8).arg(mode[2]) + "\n"
-        string += QApplication.translate("Message","Output status while ramp/soak opearion set to OFF: %1",None, QApplication.UnicodeUTF8).arg(mode[3]) + "\n"
+        string += QApplication.translate("Message","Output status while ramp/soak operation set to OFF: %1",None, QApplication.UnicodeUTF8).arg(mode[3]) + "\n"
         string += QApplication.translate("Message","\nRepeat Operation at the end: %1",None, QApplication.UnicodeUTF8).arg(mode[4]) + "\n"
-        string += QApplication.translate("Message","-----------------------------------------------------------------------",None, QApplication.UnicodeUTF8) + "\n\n"
+        string += "-----------------------------------------------------------------------\n"
         string += QApplication.translate("Message","Recomended Mode = 0",None, QApplication.UnicodeUTF8) + "\n\n"
         string += QApplication.translate("Message","If you need to change it, change it now and come back later",None, QApplication.UnicodeUTF8) + "\n"
         string += QApplication.translate("Message","Use the Parameter Loader Software by Fuji if you need to\n\n",None, QApplication.UnicodeUTF8) + "\n\n\n"
@@ -22698,7 +22696,7 @@ class PXRpidDlgControl(ArtisanDialog):
             elif check == -1:
                 self.status.showMessage(QApplication.translate("StatusBar","No RX data",None, QApplication.UnicodeUTF8), 5000)
                 
-            self.status.showMessage(QApplication.translate("StatusBar","Setting RS ON...",None, QApplication.UnicodeUTF8),500)
+            self.status.showMessage(QApplication.translate("StatusBar","RS ON",None, QApplication.UnicodeUTF8),500)
             #0 = 1-4
             #1 = 5-8
             #2 = 1-8
@@ -22724,7 +22722,7 @@ class PXRpidDlgControl(ArtisanDialog):
                 r = aw.ser.sendFUJIcommand(command,8)
                 if r == command:
                     #record command as an Event if flag = 1
-                    self.status.showMessage(QApplication.translate("StatusBar","RS ON and running...",None, QApplication.UnicodeUTF8), 5000)
+                    self.status.showMessage(QApplication.translate("StatusBar","RS ON",None, QApplication.UnicodeUTF8), 5000)
                     #ramp soak pattern. 0=executes 1 to 4; 1=executes 5 to 8; 2=executes 1 to 8
                     pattern =[[1,4],[5,8],[1,8]]
                     start = pattern[aw.fujipid.PXR["rampsoakpattern"][0]][0]
@@ -22743,12 +22741,12 @@ class PXRpidDlgControl(ArtisanDialog):
                 else:
                     self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None, QApplication.UnicodeUTF8), 5000)
             else:
-                mssg = QApplication.translate("StatusBar","setONOFFrampsoak(): problem ",None, QApplication.UnicodeUTF8)
+                mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setONOFFrampsoak()"
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)
         #set ramp soak OFF
         elif flag == 0:
-            self.status.showMessage(QApplication.translate("StatusBar","setting RS OFF...",None, QApplication.UnicodeUTF8),500)
+            self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None, QApplication.UnicodeUTF8),500)
             command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXR["rampsoak"][1],flag)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
@@ -22764,7 +22762,7 @@ class PXRpidDlgControl(ArtisanDialog):
         svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[svkey][1],1)
         sv = aw.fujipid.readoneword(svcommand)
         if sv == -1:
-            mssg = QApplication.translate("StatusBar","getsegment(): problem reading sv ",None, QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " getsegment()"
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
@@ -22773,7 +22771,7 @@ class PXRpidDlgControl(ArtisanDialog):
         rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[rampkey][1],1)
         ramp = aw.fujipid.readoneword(rampcommand)
         if ramp == -1:
-            mssg = QApplication.translate("StatusBar","getsegment(): problem reading ramp ",None, QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("StatusBar","getsegment(): problem reading ramp",None, QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
@@ -22782,7 +22780,7 @@ class PXRpidDlgControl(ArtisanDialog):
         soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXR[soakkey][1],1)
         soak = aw.fujipid.readoneword(soakcommand)
         if soak == -1:
-            mssg = QApplication.translate("StatusBar","getsegment(): problem reading soak ",None, QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("StatusBar","getsegment(): problem reading soak",None, QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
             return -1
@@ -22924,9 +22922,9 @@ class PXRpidDlgControl(ArtisanDialog):
             aw.fujipid.PXR[rampkey][0] = ramp
             aw.fujipid.PXR[soakkey][0] = soak
             self.paintlabels()
-            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully writen",None, QApplication.UnicodeUTF8),5000) 
+            self.status.showMessage(QApplication.translate("StatusBar","Ramp/Soak successfully written",None, QApplication.UnicodeUTF8),5000) 
         else:
-            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be writen into PID",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None, QApplication.UnicodeUTF8))
 
 ############################################################################
 ######################## FUJI PXG4 PID CONTROL DIALOG ######################
@@ -23506,7 +23504,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting time units",None,QApplication.UnicodeUTF8),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "settimeunits(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " settimeunits(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setpoint(self,PID):
         command = ""
@@ -23527,7 +23525,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting decimal position",None,QApplication.UnicodeUTF8),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "setpoint(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setpoint(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def setthermocoupletype(self,PID):
         command = ""
@@ -23557,7 +23555,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                 self.status.showMessage(QApplication.translate("StatusBar","Problem setting thermocouple type",None,QApplication.UnicodeUTF8),5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "setthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def readthermocoupletype(self,PID):
         command = ""
@@ -23591,7 +23589,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                 self.status.showMessage(message,5000)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(QApplication.translate("Error Message", "readthermocoupletype(): %1 ",None, QApplication.UnicodeUTF8).arg(str(e)),exc_tb.tb_lineno)
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " readthermocoupletype(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def paintlabels(self):
         #read values of computer variables (not the actual pid values) to place in buttons
@@ -23879,7 +23877,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             strcommand = "SETSV::" + str("%.1f"%(newSVvalue/10.))
             aw.qmc.DeviceEventRecord(strcommand)
         else:
-            mssg = QApplication.translate("StatusBar","setsv(): Unable to set SV ",None,QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("StatusBar","setsv(): Unable to set SV",None,QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
@@ -24060,7 +24058,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                     mssg = pkey + "=" + str(p) + " " + ikey + "=" + str(i) + " " + dkey + "=" + str(dd)
                     self.status.showMessage(mssg,1000)
             else:
-                mssg = QApplication.translate("StatusBar","getallpid(): Unable to read pid values ",None,QApplication.UnicodeUTF8)
+                mssg = QApplication.translate("StatusBar","getallpid(): Unable to read pid values",None,QApplication.UnicodeUTF8)
                 self.status.showMessage(mssg,5000)
                 aw.qmc.adderror(mssg)
                 return
@@ -24086,7 +24084,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             mssg = QApplication.translate("StatusBar","PID is using pid = %1",None,QApplication.UnicodeUTF8).arg(str(N))
             self.status.showMessage(mssg,5000)
         else:
-            mssg = QApplication.translate("StatusBar","getallpid(): Unable to read current sv ",None,QApplication.UnicodeUTF8)
+            mssg = QApplication.translate("StatusBar","getallpid(): Unable to read current sv",None,QApplication.UnicodeUTF8)
             self.status.showMessage(mssg,5000)
             aw.qmc.adderror(mssg)
 
@@ -24281,7 +24279,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                 return
             elif check == -1:
                 self.status.showMessage(QApplication.translate("StatusBar","No RX data",None,QApplication.UnicodeUTF8), 5000)
-            self.status.showMessage(QApplication.translate("StatusBar","Setting RS ON...",None,QApplication.UnicodeUTF8),500)
+            self.status.showMessage(QApplication.translate("StatusBar","RS ON",None,QApplication.UnicodeUTF8),500)
             selectedmode = self.patternComboBox.currentIndex()
             msg = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["rampsoakpattern"][1],1)
             currentmode = aw.fujipid.readoneword(msg)
@@ -24303,7 +24301,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
                 #record command as an Event if flag = 1
-                self.status.showMessage(QApplication.translate("StatusBar","RS ON and running...",None,QApplication.UnicodeUTF8), 5000)
+                self.status.showMessage(QApplication.translate("StatusBar","RS ON",None,QApplication.UnicodeUTF8), 5000)
                 pattern =[[1,4],[5,8],[1,8],[9,12],[13,16],[9,16],[1,16]]
                 start = pattern[aw.fujipid.PXG4["rampsoakpattern"][0]][0]
                 end = pattern[aw.fujipid.PXG4["rampsoakpattern"][0]][1]+1
@@ -24322,7 +24320,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                 self.status.showMessage(QApplication.translate("StatusBar","RampSoak could not be changed",None,QApplication.UnicodeUTF8), 5000)
         #set ramp soak OFF
         elif flag == 0:
-            self.status.showMessage(QApplication.translate("StatusBar","setting RS OFF...",None,QApplication.UnicodeUTF8),500)
+            self.status.showMessage(QApplication.translate("StatusBar","RS OFF",None,QApplication.UnicodeUTF8),500)
             command = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4["rampsoak"][1],flag)
             r = aw.ser.sendFUJIcommand(command,8)
             if r == command:
@@ -24705,7 +24703,7 @@ class FujiPID(object):
         #if OK
         if r == command:
             if flag == 1:
-                aw.sendmessage(QApplication.translate("Message","RS ON and running...", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Message","RS ON", None, QApplication.UnicodeUTF8))
             elif flag == 0:
                 aw.sendmessage(QApplication.translate("Message","RS OFF", None, QApplication.UnicodeUTF8))
             else:
@@ -24733,7 +24731,7 @@ class FujiPID(object):
                 aw.qmc.DeviceEventRecord(strcommand)
                 aw.lcd6.display("%.1f"%float(value))
             else:
-                aw.qmc.adderror(QApplication.translate("Error Message","setPXGsv(): bad response from PID",None, QApplication.UnicodeUTF8))
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setPXGsv()")
                 return -1
         #Fuji PXR
         elif aw.ser.controlETpid[0] == 1:  
@@ -24750,7 +24748,7 @@ class FujiPID(object):
                 aw.qmc.DeviceEventRecord(strcommand)
                 aw.lcd6.display("%.1f"%float(value))
             else:
-                aw.qmc.adderror(QApplication.translate("Error Message","setPXRsv(): bad response from PID",None, QApplication.UnicodeUTF8))
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setPXRsv()")
                 return -1
 
     #used to set up or down SV by diff degrees from current sv setting
@@ -24784,7 +24782,7 @@ class FujiPID(object):
                 command = self.message2send(aw.ser.controlETpid[1],6,self.PXR["sv0"][1],newsv)
                 r = aw.ser.sendFUJIcommand(command,8)
                 if len(r) == 8:
-                    message = QApplication.translate("Message"," SV changed from %1 to %2)",None, QApplication.UnicodeUTF8).arg(str(currentsv)).arg(str(newsv/10.))                           
+                    message = QApplication.translate("Message","SV changed from %1 to %2",None, QApplication.UnicodeUTF8).arg(str(currentsv)).arg(str(newsv/10.))                           
                     aw.sendmessage(message)
                     self.PXR["sv0"][0] = newsv/10
                     #record command as an Event to replay (not binary as it needs to be stored in a text file)
@@ -24839,7 +24837,7 @@ class FujiPID(object):
                 soakkey = "segment" + str(i+1) + "soak"
                 if aw.ser.controlETpid[0] == 0:             #PXG4
                     if not n%4 or n > 16:
-                        aw.qmc.adderror(QApplication.translate("Error Message","PXG4 replaysetrs() Error: Invalid segment count: %1",None, QApplication.UnicodeUTF8).arg(n))
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PXG4 replaysetrs(): %1").arg(n))
                         return
                     if self.PXG4[svkey][0] != float(rs[i][0]):
                         self.PXG4[svkey][0] = float(rs[i][0])
@@ -24855,7 +24853,7 @@ class FujiPID(object):
                         changeflag = 0
                 elif aw.ser.controlETpid[0] == 1:           #PXR
                     if not n%4 or n > 8:
-                        aw.qmc.adderror(QApplication.translate("Error Message","PXR replaysetrs() Error: Invalid segment count: %1",None, QApplication.UnicodeUTF8).arg(n))
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PXR replaysetrs(): %1").arg(n))
                         return
                     if self.PXR[svkey][0] != float(rs[i][0]):
                         self.PXR[svkey][0] = float(rs[i][0])
@@ -24870,7 +24868,7 @@ class FujiPID(object):
                         self.setsegment((i+1), self.PXR[svkey][0], self.PXR[rampkey][0] ,self.PXR[soakkey][0])
                         changeflag = 0
             else:
-                aw.qmc.adderror(QApplication.translate("Error Message","replaysetrs() Error: Need three SETRS values (float,int,int)",None, QApplication.UnicodeUTF8))
+                aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " replaysetrs()")
                 return
         #start ramp soak ON
         self.setrampsoak(1)
@@ -24896,7 +24894,7 @@ class FujiPID(object):
         r3 = aw.ser.sendFUJIcommand(soakcommand,8)
         #check if OK
         if len(r1)!=8 or len(r2)!=8 or len(r3)!=8:
-            aw.qmc.adderror(QApplication.translate("Error Message","pid: Segment values could not be writen into PID",None, QApplication.UnicodeUTF8))
+            aw.qmc.adderror(QApplication.translate("Error Message","Segment values could not be written into PID",None, QApplication.UnicodeUTF8))
 
     def dec2HexRaw(self,decimal):
         # This method converts a decimal to a raw string appropiate for Fuji serial TX
