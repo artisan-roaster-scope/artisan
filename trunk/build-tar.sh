@@ -1,6 +1,7 @@
 #!/bin/sh
 
-NAME=artisan-0.6.0
+VERSION=$(python3 -c 'import artisanlib; print(artisanlib.__version__)')
+NAME=artisan-${VERSION}
 TMPDIR=/tmp/$NAME
 
 # cleanup distribution
@@ -18,7 +19,8 @@ find $TMPDIR -name \*.pyc -exec rm -f {} \; > /dev/null 2>&1
 find $TMPDIR -name \*.DS_Store -exec rm -f {} \; > /dev/null 2>&1
 
 # create tar
-cd /tmp && tar -cf $NAME.tar $NAME && cd -
+cd /tmp && tar -cf $NAME.tar $NAME && cd - > /dev/null 2>&1
 gzip $TMPDIR.tar
-rm $TMPDIR.tar.gz
 cp $TMPDIR.tar.gz .
+rm $TMPDIR.tar.gz
+rm -rf $TMPDIR

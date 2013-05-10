@@ -21,8 +21,10 @@ from setuptools import setup
 import string
 from plistlib import Plist
 
+import artisanlib
+
 # current version of Artisan
-VERSION = '0.6.0'
+VERSION = artisanlib.__version__
 LICENSE = 'GNU General Public License (GPL)'
 
 QTDIR = r'/Developer/Applications/Qt/'
@@ -53,14 +55,14 @@ DATA_FILES = [
 plist = Plist.fromFile('Info.plist')
 plist.update({ 'CFBundleDisplayName': 'Artisan',
                     'CFBundleGetInfoString' : 'Artisan, Roast Logger',
-                    'CFBundleIdentifier':'com.google.code.p.Artisan',
-                    'CFBundleShortVersionString':VERSION,
+                    'CFBundleIdentifier': 'com.google.code.p.Artisan',
+                    'CFBundleShortVersionString': VERSION,
                     'CFBundleVersion': 'Artisan ' + VERSION,
-                    'LSMinimumSystemVersion':'10.6',
+                    'LSMinimumSystemVersion': '10.6',
                     'LSMultipleInstancesProhibited':'false',
-                    'LSPrefersPPC' : False,
-                    'LSArchitecturePriority' : 'x86_64',
-                    'NSHumanReadableCopyright':LICENSE
+                    'LSPrefersPPC': False,
+                    'LSArchitecturePriority': 'x86_64',
+                    'NSHumanReadableCopyright': LICENSE
                 })
                 
 OPTIONS = {
