@@ -3,6 +3,9 @@
 VERSION=$(python -c 'import artisanlib; print(artisanlib.__version__)')
 NAME=artisan-${VERSION}
 
+# fix debian/DEBIAN/control _VERSION_
+sed -e "s/_VERSION_/${VERSION}/g" debian/DEBIAN/control
+
 # build CentOS .rpm
 
 rm -rf debian/usr/share/artisan

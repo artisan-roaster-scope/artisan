@@ -31,6 +31,15 @@ platf = str(platform.system())
 #################### MENU STRINGS  ####################################################
 #######################################################################################
 
+#Fake entries to get translations for the Mac Application Menu
+_mac_services = QApplication.translate("MAC_APPLICATION_MENU", "Services", None, QApplication.UnicodeUTF8)
+_mac_hide = QApplication.translate("MAC_APPLICATION_MENU", "Hide %1", None, QApplication.UnicodeUTF8)
+_mac_hideothers = QApplication.translate("MAC_APPLICATION_MENU", "Hide Others", None, QApplication.UnicodeUTF8)
+_mac_showall = QApplication.translate("MAC_APPLICATION_MENU", "Show All", None, QApplication.UnicodeUTF8)
+_mac_preferences = QApplication.translate("MAC_APPLICATION_MENU", "Preferences...", None, QApplication.UnicodeUTF8)
+_mac_quit = QApplication.translate("MAC_APPLICATION_MENU", "Quit %1", None, QApplication.UnicodeUTF8)
+_mac_about = QApplication.translate("MAC_APPLICATION_MENU", "About %1", None, QApplication.UnicodeUTF8)
+
 #File menu items
 FILE_MENU = QApplication.translate("Menu", "File", None, QApplication.UnicodeUTF8)
 if platf != 'Darwin':
@@ -83,11 +92,26 @@ CONF_MENU_AXES = QApplication.translate("Menu", "Axes...", None, QApplication.Un
 CONF_MENU_AUTOSAVE = QApplication.translate("Menu", "Autosave...", None, QApplication.UnicodeUTF8)
 CONF_MENU_ALARMS = QApplication.translate("Menu", "Alarms...", None, QApplication.UnicodeUTF8)
 CONF_MENU_LANGUAGE = QApplication.translate("Menu", "Language", None, QApplication.UnicodeUTF8)
-CONF_MENU_FRENCH = u("Fran\u00e7ais") # Do not translate
 CONF_MENU_ENGLISH = u("English") # Do not translate
 CONF_MENU_GERMAN = u("Deutsch")  # Do not translate
 CONF_MENU_SPANISH = u("Espa\u00f1ol") # Do not translate
+CONF_MENU_FRENCH = u("Fran\u00e7ais") # Do not translate
 CONF_MENU_SWEDISH = u("Svenska") # Do not translate
+
+CONF_MENU_ITALIAN = u("Italiano") # Do not translate
+CONF_MENU_CHINESE_CN = u("\u7b80\u4f53\u4e2d\u6587\u7248") # Do not translate
+CONF_MENU_CHINESE_TW = u("\u4e2d\u570b\u50b3\u7d71") # Do not translate
+CONF_MENU_GREEK = u("\u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac") # Do not translate
+CONF_MENU_NORWEGIAN = u("Italiano") # Do not translate
+CONF_MENU_DUTCH = u("Nederlands") # Do not translate
+CONF_MENU_KOREAN = u("\ud55c\uad6d\uc758") # Do not translate
+CONF_MENU_PORTUGUESE = u("Portugu\xeas") # Do not translate
+CONF_MENU_RUSSIAN = u("\u0440\u0443\u0441\u0441\u043a\u0438\u0439") # Do not translate
+CONF_MENU_ARABIC = u("\u0627\u0644\u0639\u0631\u0628\u064a\u0629") # Do not translate
+CONF_MENU_FINISH = u("Suomalainen") # Do not translate
+CONF_MENU_TURKISH = u("T\xfcrk") # Do not translate
+CONF_MENU_JAPANESE = u("\u65e5\u672c\u4eba") # Do not translate
+
 
 #Toolkit menu
 TOOLKIT_MENU = QApplication.translate("Menu", "Tools", None, QApplication.UnicodeUTF8)

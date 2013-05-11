@@ -5924,10 +5924,6 @@ class ApplicationWindow(QMainWindow):
 
         self.languageMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_LANGUAGE)
 
-        FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
-        self.connect(FrenchLanguage,SIGNAL("triggered()"),lambda lang="fr":self.changelocale(lang))
-        self.languageMenu.addAction(FrenchLanguage)
-
         EnglishLanguage = QAction(UIconst.CONF_MENU_ENGLISH,self)
         self.connect(EnglishLanguage,SIGNAL("triggered()"),lambda lang="en":self.changelocale(lang))
         self.languageMenu.addAction(EnglishLanguage)
@@ -5936,6 +5932,10 @@ class ApplicationWindow(QMainWindow):
         self.connect(GermanLanguage,SIGNAL("triggered()"),lambda lang="de":self.changelocale(lang))
         self.languageMenu.addAction(GermanLanguage)
 
+        FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
+        self.connect(FrenchLanguage,SIGNAL("triggered()"),lambda lang="fr":self.changelocale(lang))
+        self.languageMenu.addAction(FrenchLanguage)
+
         SpanishLanguage = QAction(UIconst.CONF_MENU_SPANISH,self)
         self.connect(SpanishLanguage,SIGNAL("triggered()"),lambda lang="es":self.changelocale(lang))
         self.languageMenu.addAction(SpanishLanguage) 
@@ -5943,6 +5943,59 @@ class ApplicationWindow(QMainWindow):
         SwedishLanguage = QAction(UIconst.CONF_MENU_SWEDISH,self)
         self.connect(SwedishLanguage,SIGNAL("triggered()"),lambda lang="sv":self.changelocale(lang))
         self.languageMenu.addAction(SwedishLanguage) 
+        
+        ItalianLanguage = QAction(UIconst.CONF_MENU_ITALIAN,self)
+        self.connect(ItalianLanguage,SIGNAL("triggered()"),lambda lang="it":self.changelocale(lang))
+        self.languageMenu.addAction(ItalianLanguage) 
+
+        ChineseChinaLanguage = QAction(UIconst.CONF_MENU_CHINESE_CN,self)
+        self.connect(ChineseChinaLanguage,SIGNAL("triggered()"),lambda lang="zh_CN":self.changelocale(lang))
+        self.languageMenu.addAction(ChineseChinaLanguage) 
+
+        ChineseTaiwanLanguage = QAction(UIconst.CONF_MENU_CHINESE_TW,self)
+        self.connect(ChineseTaiwanLanguage,SIGNAL("triggered()"),lambda lang="zh_TW":self.changelocale(lang))
+        self.languageMenu.addAction(ChineseTaiwanLanguage) 
+
+        GreekLanguage = QAction(UIconst.CONF_MENU_GREEK,self)
+        self.connect(GreekLanguage,SIGNAL("triggered()"),lambda lang="el":self.changelocale(lang))
+        self.languageMenu.addAction(GreekLanguage)
+
+        NorwegianLanguage = QAction(UIconst.CONF_MENU_NORWEGIAN,self)
+        self.connect(NorwegianLanguage,SIGNAL("triggered()"),lambda lang="no":self.changelocale(lang))
+        self.languageMenu.addAction(NorwegianLanguage)
+
+        DutchLanguage = QAction(UIconst.CONF_MENU_DUTCH,self)
+        self.connect(DutchLanguage,SIGNAL("triggered()"),lambda lang="nl":self.changelocale(lang))
+        self.languageMenu.addAction(DutchLanguage)
+
+        KoreanLanguage = QAction(UIconst.CONF_MENU_KOREAN,self)
+        self.connect(KoreanLanguage,SIGNAL("triggered()"),lambda lang="ko":self.changelocale(lang))
+        self.languageMenu.addAction(KoreanLanguage)
+
+        PortugueseLanguage = QAction(UIconst.CONF_MENU_PORTUGUESE,self)
+        self.connect(PortugueseLanguage,SIGNAL("triggered()"),lambda lang="pt":self.changelocale(lang))
+        self.languageMenu.addAction(PortugueseLanguage)
+
+        RussianLanguage = QAction(UIconst.CONF_MENU_RUSSIAN,self)
+        self.connect(RussianLanguage,SIGNAL("triggered()"),lambda lang="ru":self.changelocale(lang))
+        self.languageMenu.addAction(RussianLanguage)
+
+        ArabicLanguage = QAction(UIconst.CONF_MENU_ARABIC,self)
+        self.connect(ArabicLanguage,SIGNAL("triggered()"),lambda lang="ar":self.changelocale(lang))
+        self.languageMenu.addAction(ArabicLanguage)
+
+        FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
+        self.connect(FinishLanguage,SIGNAL("triggered()"),lambda lang="fi":self.changelocale(lang))
+        self.languageMenu.addAction(FinishLanguage)
+
+        TurkishLanguage = QAction(UIconst.CONF_MENU_TURKISH,self)
+        self.connect(TurkishLanguage,SIGNAL("triggered()"),lambda lang="tr":self.changelocale(lang))
+        self.languageMenu.addAction(TurkishLanguage)
+
+        JapaneseLanguage = QAction(UIconst.CONF_MENU_JAPANESE,self)
+        self.connect(JapaneseLanguage,SIGNAL("triggered()"),lambda lang="ja":self.changelocale(lang))
+        self.languageMenu.addAction(JapaneseLanguage)
+        
 
         # TOOLKIT menu
         self.designerAction = QAction(UIconst.TOOLKIT_MENU_DESIGNER,self)
@@ -20492,7 +20545,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
                 ####  DEVICE 32 is +ArduinoTC4_56 but +DEVICE cannot be set as main device
                 ##########################
@@ -24002,7 +24055,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             pkey = "p" + str(k)
             ikey = "i" + str(k)
             dkey = "dd" + str(k)
-            msg = QApplication.translate("StatusBar","sending commands for p%1 i%2 dd%3",None,
+            msg = QApplication.translate("StatusBar","sending commands for p%1 i%2 d%3",None,
                                                    QApplication.UnicodeUTF8).arg(str(k)).arg(str(k)).arg(str(k))
             self.status.showMessage(msg,1000)
             commandp = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[pkey][1],1)
