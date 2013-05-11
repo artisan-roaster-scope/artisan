@@ -21,4 +21,16 @@ TRANSLATIONS = \
 	translations/artisan_es.ts \
 	translations/artisan_fr.ts \
 	translations/artisan_it.ts \
-	translations/artisan_sv.ts
+	translations/artisan_sv.ts \
+	translations/artisan_zh_CN.ts \
+	translations/artisan_zh_TW.ts \
+	translations/artisan_el.ts \
+	translations/artisan_no.ts \
+	translations/artisan_nl.ts \
+	translations/artisan_ko.ts \
+	translations/artisan_pt.ts \
+	translations/artisan_ru.ts \
+	translations/artisan_ar.ts \
+	translations/artisan_fi.ts \
+	translations/artisan_tr.ts \
+	translations/artisan_ja.ts 
