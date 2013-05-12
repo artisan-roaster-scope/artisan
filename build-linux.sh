@@ -26,3 +26,6 @@ mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 rm ${NAME}_i386-glibc2.4.deb
 dpkg --build debian ${NAME}_i386-glibc2.4.deb
+
+# fix debian/DEBIAN/control _VERSION_
+sed -i "s/${VERSION}/_VERSION_/g" debian/DEBIAN/control
