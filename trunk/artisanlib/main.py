@@ -5104,14 +5104,8 @@ class VMToolbar(NavigationToolbar):
         NavigationToolbar.__init__(self, plotCanvas, parent)
 
     def _icon(self, name):
-        #dirty hack to use exclusively .png and thus avoid .svg usage
-        #because .exe generation is problematic with .svg
-        if platf == 'Windows':
-            n = name.replace('.svg','.png')
-        else:
-            n = name.replace('.png','.svg')
-        p = os.path.join(self.basedir, n)
-
+        #dirty hack to prefer .svg over .png Toolbar icons
+        p = os.path.join(self.basedir, name.replace('.png','.svg') )
         if os.path.exists(p):
             return QIcon(p)
         else:
@@ -5578,8 +5572,10 @@ class ApplicationWindow(QMainWindow):
 
         # self.profilepath is obteined at dirstruct() and points to profiles/year/month file-open/save will point to profilepath
         self.profilepath = ""
-        #if platf == 'Darwin' or platf == 'Linux':
-        self.profilepath = QDir().homePath().append(QString("/Documents/"))
+        if platf == 'Darwin' or platf == 'Linux':
+            self.profilepath = QDir().homePath().append(QString("/Documents/"))
+        else:
+            self.profilepath = QDir().homePath()
             
         # on the Mac preferences should be stored outside of applications in the users ~/Library/Preferences path
         if platf == 'Darwin':

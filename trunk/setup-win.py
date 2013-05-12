@@ -45,12 +45,12 @@ LICENSE = 'GNU General Public License (GPL)'
 cwd = os.getcwd()
 
 DATAFILES = mpl.get_py2exe_datafiles()
-DATAFILES = DATAFILES + 
+DATAFILES = DATAFILES + \
     [('imageplugins', [
             'c:\Python27\lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll',
             ]),
       ('iconengines', [
-            'c:\Python27\lib\site-packages\PyQt4\plugins\imageformats\qsvgicon4.dll',
+            'c:\Python27\lib\site-packages\PyQt4\plugins\iconengines\qsvgicon4.dll',
             ]),
     ]
 
@@ -63,7 +63,7 @@ setup(
     windows=[{"script" : cwd + "\\artisan.py",
             "icon_resources": [(0, cwd + "\\artisan.ico")]
             }],
-    data_files = mpl.get_py2exe_datafiles(),
+    data_files = DATAFILES,
     zipfile = "lib\library.zip",
     options={"py2exe" :{
                         "packages": ['matplotlib','pytz'],
@@ -95,3 +95,6 @@ os.system(r'copy Wheels\\Roasting\\* dist\\Wheels\\Roasting')
 os.system(r'mkdir dist\\translations')
 os.system(r'copy translations\\*.qm dist\\translations')
 os.system(r'copy artisan.png dist')
+os.system(r'copy artisanAlarms.ico dist')
+os.system(r'copy artisanProfile.ico dist')
+os.system(r'copy artisanPalettes.ico dist')

@@ -1,4 +1,4 @@
-@echo off
+c:@echo off
 
 C:\Python27\python setup-win.py py2exe
 
@@ -19,4 +19,4 @@ if %ERRORLEVEL% NEQ 0 set NSIS_EXE="makensis.exe"
 rem #
 rem #
 rem #
-%NSIS_EXE% setup.nsi
+%NSIS_EXE% setup-install.nsi
