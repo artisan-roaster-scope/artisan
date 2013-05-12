@@ -16832,7 +16832,7 @@ class modbusport(object):
     def writeSingleRegister(self,slave,register,value):
         try:
             self.connect()
-            self.master.slaveaddress = int(slave)
+            self.master.address = int(slave)
             self.master.write_register(int(register),int(value),0,6)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -16841,7 +16841,7 @@ class modbusport(object):
     def readFloat(self,slave,register,code=3):
         try:
             self.connect()
-            self.master.slaveaddress = int(slave)
+            self.master.address = int(slave)
             r = self.master.read_float(int(register),int(code),2)
             return r
         except Exception as ex:
@@ -16856,7 +16856,7 @@ class modbusport(object):
     def readSingleRegister(self,slave,register,code=3):
         try:
             self.connect()
-            self.master.slaveaddress = int(slave)
+            self.master.address = int(slave)
             r = self.master.read_register(int(register),0,int(code))
             return r
         except Exception as ex:
@@ -24682,7 +24682,7 @@ class FujiPID(object):
         #we compose a message then we send it by using self.readoneword()
 #        import binascii
 #        try:
-#            print(binascii.hexlify(bytes(self.message2send(stationNo,4,31001,1))))
+#            print(binascii.hexlify(bytes(self.message2send(stationNo,4,31001,1),"latin1")))
 #        except Exception as ex:
 #            print(ex)
         return self.readoneword(self.message2send(stationNo,4,31001,1))
