@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="es">
+<!DOCTYPE TS><TS version="2.0" language="es" sourcelanguage="">
 <context>
     <name>About</name>
     <message>
@@ -5310,7 +5309,7 @@ Continuar?</translation>
     <message>
         <location filename="artisanlib/main.py" line="24357"/>
         <source>RS ON</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RS ON</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="24376"/>
