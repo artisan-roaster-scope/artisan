@@ -5608,7 +5608,8 @@ class ApplicationWindow(QMainWindow):
 
         ####      create Matplotlib canvas widget
         #resolution
-        self.dpi = 80
+        self.defaultdpi = 80
+        self.dpi = self.defaultdpi
         self.qmc = tgraphcanvas(self.main_widget)
         #self.qmc.setAttribute(Qt.WA_NoSystemBackground)
 
@@ -6821,6 +6822,7 @@ class ApplicationWindow(QMainWindow):
 
     def setdpi(self,dpi):
         if aw:
+            aw.dpi = dpi
             self.qmc.fig.set_dpi(dpi)
             #move widget to update display
             self.showFullScreen()
@@ -9324,16 +9326,22 @@ class ApplicationWindow(QMainWindow):
             aw.button_9.setVisible(bool(aw.qmc.buttonvisibility[6]))
             aw.button_20.setVisible(bool(aw.qmc.buttonvisibility[7]))
             self.qmc.redraw()
-            # set default window appearances (style)
-            #pylint: disable=E1102
-            #aw.defaultAppearance = str(aw.style().objectName()).lower()
-            try:
-                if settings.contains("appearance"):
+            # set window appearances (style)
+            if settings.contains("appearance"):
+                try:
                     available = list(map(str, list(QStyleFactory.keys())))
                     i = list(map(lambda x:x.lower(),available)).index(str(settings.value("appearance").toString()))
                     app.setStyle(available[i])
-            except:
-                pass
+                except:
+                    pass
+            # set dpi
+            if settings.contains("dpi"):
+                try:
+                    aw.dpi = settings.value("dpi",aw.dpi).toInt()[0]
+                    if aw.dpi != aw.defaultdpi:
+                        aw.setdpi(aw.dpi)
+                except:
+                    pass
         except Exception:
             pass
 #            import traceback
@@ -9822,6 +9830,7 @@ class ApplicationWindow(QMainWindow):
                 settings.setValue("appearance",str(aw.style().objectName()).lower())
             except:
                 pass
+            settings.setValue("dpi",aw.dpi)
             
         except Exception as e:
 #            import traceback
