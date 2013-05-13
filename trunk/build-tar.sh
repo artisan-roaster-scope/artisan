@@ -1,7 +1,7 @@
 #!/bin/sh
 
 VERSION=$(python3 -c 'import artisanlib; print(artisanlib.__version__)')
-NAME=artisan-${VERSION}
+NAME=artisan-src-${VERSION}
 TMPDIR=/tmp/$NAME
 
 # cleanup distribution

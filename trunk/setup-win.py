@@ -80,11 +80,6 @@ setup(
 
 os.system(r'copy README.txt dist')
 os.system(r'copy LICENSE.txt dist')
-#os.system(r'copy qt-win.conf dist\\qt.conf')
-#os.system(r'mkdir dist\\imageformats')
-#os.system(r'mkdir dist\\iconengines')
-#os.system(r'copy C:\Python27\\Lib\\site-packages\\PyQt4\\plugins\imageformats\\qsvg4.dll dist\\imageformats\\qsvg4.dll')
-#os.system(r'copy C:\Python27\\Lib\\site-packages\\PyQt4\\plugins\iconengines\\qsvg4.dll dist\\iconengines\\qsvgicon4.dll')
 os.system(r'mkdir dist\\Wheels')
 os.system(r'mkdir dist\\Wheels\\Cupping')
 os.system(r'mkdir dist\\Wheels\\Other')
