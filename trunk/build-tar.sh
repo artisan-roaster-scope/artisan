@@ -7,8 +7,9 @@ TMPDIR=/tmp/$NAME
 # cleanup distribution
 rm -rf $TMPDIR > /dev/null 2>&1
 mkdir $TMPDIR
-cp -R * $TMPDIR
+cd /tmp && svn co http://artisan.googlecode.com/svn/trunk/ $TMPDIR && cd - > /dev/null 2>&1
 rm -rf $TMPDIR/build $TMPDIR/dist
+rm -f $TMPDIR/screenshots
 rm -f $TMPDIR/*.dmg
 rm -f $TMPDIR/*.tar
 rm -f $TMPDIR/*.tar.gz
