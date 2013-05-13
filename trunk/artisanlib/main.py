@@ -63,7 +63,7 @@ sip.setapi('QString', 1)
 sip.setapi('QVariant', 1)
 
 from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
-                         QInputDialog, QGroupBox, QDialog, QLineEdit, 
+                         QInputDialog, QGroupBox, QDialog, QLineEdit, QFontDatabase,
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
                          QLCDNumber, QKeySequence, QSpinBox, QComboBox,
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton,
@@ -2002,9 +2002,9 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_ylim(self.ylimit_min, self.ylimit)
             self.ax.set_autoscale_on(False)
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
-            self.ax.set_ylabel(self.mode,name=aw.defaultFont,size=16,color =self.palette["ylabel"],rotation=0)
-            self.ax.set_xlabel(QApplication.translate("Label",'Time', None, QApplication.UnicodeUTF8), name=aw.defaultFont,size=16,color = self.palette["xlabel"])
-            self.ax.set_title(self.title,name=aw.defaultFont,size=20,color=self.palette["title"])
+            self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"],rotation=0)
+            self.ax.set_xlabel(QApplication.translate("Label",'Time', None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"])
+            self.ax.set_title(self.title,size=20,color=self.palette["title"])
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag
             if two_ax_mode:
@@ -2012,7 +2012,7 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax = self.ax.twinx()
                 self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
                 self.ax.patch.set_visible(True)
-                self.delta_ax.set_ylabel(u(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),name=aw.defaultFont,size=16,color = self.palette["ylabel"])
+                self.delta_ax.set_ylabel(u(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                 self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -2444,9 +2444,9 @@ class tgraphcanvas(FigureCanvas):
             #write legend
             if self.legendloc:
                 if two_ax_mode:
-                    self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10,family=aw.defaultFont),fancybox=True)
+                    self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
                 else:
-                    self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10,family=aw.defaultFont),fancybox=True)
+                    self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
 
             ############  ready to plot ############
             self.fig.canvas.draw()
@@ -3772,12 +3772,12 @@ class tgraphcanvas(FigureCanvas):
     
                 if self.statisticsflags[2] or self.statisticsflags[4] or self.statisticsflags[5]:
                     #Write flavor estimation
-                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontsize=11,name=aw.defaultFont)
+                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontsize=11)
                     if self.timeindex[2]: # only if FCs exists
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontsize=11,name=aw.defaultFont)
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontsize=11,name=aw.defaultFont)
+                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontsize=11)
+                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontsize=11)
                     if self.timeindex[7]: # only if COOL exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontsize=11,name=aw.defaultFont)
+                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontsize=11)
                 if self.statisticsflags[3] and self.timeindex[0]>-1 and self.temp1 and self.temp2 and self.temp1[self.timeindex[0]:self.timeindex[6]+1] and self.temp2[self.timeindex[0]:self.timeindex[6]+1]:
                     temp1_values = self.temp1[self.timeindex[0]:self.timeindex[6]+1]
                     temp2_values = self.temp2[self.timeindex[0]:self.timeindex[6]+1]
@@ -3796,9 +3796,9 @@ class tgraphcanvas(FigureCanvas):
                               QApplication.UnicodeUTF8).arg("%.1f"%BTmin + self.mode).arg("%.1f"%BTmax + self.mode).arg("%.1f"%abs(BTmax - BTmin)).arg("%.1f"%ETmin + self.mode).arg("%.1f"%ETmax + self.mode).arg("%.1f"%abs(ETmax - ETmin)).arg(timez).arg(ror).arg("%d%sm"%(ts,self.mode)).arg(tse).arg(tsb)
     
                     # even better: use xlabel
-                    self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"],name=aw.defaultFont)
+                    self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
                 else:
-                    self.ax.set_xlabel(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"],name=aw.defaultFont)
+                    self.ax.set_xlabel(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"])
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -5562,7 +5562,7 @@ class ApplicationWindow(QMainWindow):
 
         self.defaultAppearance = None
         # should be a font supporting unicode characters including arabic and which is available on all platforms
-        self.defaultFont = "Arial Unicode MS" # "Arial Unicode MS", "Times New Roman", "Tahoma", "Trebuchet MS"
+        self.defaultFont = "Times New Roman" # "Arial Unicode MS", "Times New Roman", "Tahoma", "Trebuchet MS"
         
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
@@ -10113,7 +10113,7 @@ th {
 <td>$charge</td>
 </tr>
 <tr>
-<th>TP:</th>
+<th>""" + u(QApplication.translate("HTML Report Template", "TP:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$TP</td>
 </tr>
 <tr>
@@ -20808,27 +20808,27 @@ class graphColorDlg(ArtisanDialog):
         self.connect(self.lcd6colorComboBox, SIGNAL("currentIndexChanged(QString)"),lambda text = self.lcd6colorComboBox.currentText(),flag = 2,x=6:self.paintlcds(text,flag,x))
         lcd1backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
         self.connect(lcd1backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=1:self.paintlcds(text,flag,x))
-        lcd2backButton = QPushButton("Background")
+        lcd2backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
         self.connect(lcd2backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=2:self.paintlcds(text,flag,x))
-        lcd3backButton = QPushButton("Background")
+        lcd3backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
         self.connect(lcd3backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=3:self.paintlcds(text,flag,x))
-        lcd4backButton = QPushButton("Background")
+        lcd4backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
         self.connect(lcd4backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=4:self.paintlcds(text,flag,x))
-        lcd5backButton = QPushButton("Background")
+        lcd5backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
         self.connect(lcd5backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=5:self.paintlcds(text,flag,x))
-        lcd6backButton = QPushButton("Background")
+        lcd6backButton = QPushButton(QApplication.translate("Button","Background",None, QApplication.UnicodeUTF8))
         self.connect(lcd6backButton, SIGNAL("clicked()"),lambda text =0,flag=0,x=6:self.paintlcds(text,flag,x))
         lcd1LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
         self.connect(lcd1LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=1:self.paintlcds(text,flag,x))
-        lcd2LEDButton = QPushButton("LED")
+        lcd2LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
         self.connect(lcd2LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=2:self.paintlcds(text,flag,x))
-        lcd3LEDButton = QPushButton("LED")
+        lcd3LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
         self.connect(lcd3LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=3:self.paintlcds(text,flag,x))
-        lcd4LEDButton = QPushButton("LED")
+        lcd4LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
         self.connect(lcd4LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=4:self.paintlcds(text,flag,x))
-        lcd5LEDButton = QPushButton("LED")
+        lcd5LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
         self.connect(lcd5LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=5:self.paintlcds(text,flag,x))
-        lcd6LEDButton = QPushButton("LED")
+        lcd6LEDButton = QPushButton(QApplication.translate("Button","LED",None, QApplication.UnicodeUTF8))
         self.connect(lcd6LEDButton, SIGNAL("clicked()"),lambda text =0,flag=1,x=6:self.paintlcds(text,flag,x))
         self.lcd1spinbox = QSpinBox()
         self.lcd1spinbox.setSingleStep(10)
@@ -25207,16 +25207,26 @@ class DtaPID(object):
 ###########################################################################################################################################
 ###########################################################################################################################################
 
-def main():            
+def main():
     global aw
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     aw = ApplicationWindow()
+    
+#    db = QFontDatabase()
+#    for f in db.families(6):
+#        print(str(f))
+        
+#    md = mpl.font_manager.findSystemFonts()
+    
     try:
         aw.defaultAppearance = str(aw.style().objectName()).lower()
     except:
         pass
     aw.settingsLoad()
     mpl.rcParams['font.family'] = aw.defaultFont # set default font family for the subplot annotations
+    # the following does not work on OS X
+    #mpl.rc('font', **{'sans-serif' : aw.defaultFont,'family' : 'sans-serif'})
+    
     try:
         argv_file = sys.argv[1]
         qfile = QFileInfo(u(argv_file))
