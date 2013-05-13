@@ -46,6 +46,7 @@ DATA_FILES = [
     ("../translations", [QTDIR + r'/translations/qt_ko.qm']),
     ("../translations", [QTDIR + r'/translations/qt_pt.qm']),
     ("../translations", [QTDIR + r'/translations/qt_ru.qm']),
+    ("../translations", [QTDIR + r'/translations/qt_ar.qm']),
     ("../translations", [QTDIR + r'/translations/qt_ja.qm']),
     ("../translations", [r"translations/artisan_de.qm"]),
     ("../translations", [r"translations/artisan_es.qm"]),

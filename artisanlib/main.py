@@ -189,6 +189,7 @@ bigEndianBytestringToFloat = minimalmodbus._bytestringToFloat
 #################### Main Application  ################################################
 #######################################################################################
 
+    
 class Artisan(QApplication):
     def __init__(self, args):
         super(Artisan, self).__init__(args)
@@ -1206,8 +1207,8 @@ class tgraphcanvas(FigureCanvas):
                     if redraw:
                         self.redraw(recompute)
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " timealign() %1").arg(str(ex)),exc_tb.tb_lineno)
 
@@ -1647,7 +1648,7 @@ class tgraphcanvas(FigureCanvas):
                     self.toggleHUD()
                 self.hudresizeflag = False
         
-                self.ax.set_title(self.title,size=20,color=self.palette["title"])
+#                self.ax.set_title(self.title,size=20,color=self.palette["title"])
         
     
                 aw.sendmessage(QApplication.translate("Message","Scope has been reset",None, QApplication.UnicodeUTF8))
@@ -1872,7 +1873,8 @@ class tgraphcanvas(FigureCanvas):
                 else:
                     st1 = QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8)
                     e = 0
-                    a = 1.
+                    a = 1.                
+
                 self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
                 #Add Dry End markers
                 if timeindex[1]:
@@ -2000,9 +2002,9 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_ylim(self.ylimit_min, self.ylimit)
             self.ax.set_autoscale_on(False)
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
-            self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"],rotation=0)
-            self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
-            self.ax.set_title(self.title,size=20,color=self.palette["title"])
+            self.ax.set_ylabel(self.mode,name=aw.defaultFont,size=16,color =self.palette["ylabel"],rotation=0)
+            self.ax.set_xlabel(QApplication.translate("Label",'Time', None, QApplication.UnicodeUTF8), name=aw.defaultFont,size=16,color = self.palette["xlabel"])
+            self.ax.set_title(self.title,name=aw.defaultFont,size=20,color=self.palette["title"])
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag
             if two_ax_mode:
@@ -2010,7 +2012,7 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax = self.ax.twinx()
                 self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
                 self.ax.patch.set_visible(True)
-                self.delta_ax.set_ylabel(u(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
+                self.delta_ax.set_ylabel(u(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),name=aw.defaultFont,size=16,color = self.palette["ylabel"])
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                 self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -2307,8 +2309,8 @@ class tgraphcanvas(FigureCanvas):
                         if self.specialeventstype[i] == 4 or self.eventsGraphflag == 0:
                             if self.specialeventstype[i] < 4:
                                 etype = self.etypesf(self.specialeventstype[i])
-                                firstletter = etype[0]
-                                secondletter = etype[i]
+                                firstletter = u(etype[0])
+                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[i])
                             else:
                                 firstletter = "E"
                                 secondletter = ""
@@ -2442,9 +2444,9 @@ class tgraphcanvas(FigureCanvas):
             #write legend
             if self.legendloc:
                 if two_ax_mode:
-                    self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+                    self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10,family=aw.defaultFont),fancybox=True)
                 else:
-                    self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+                    self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10,family=aw.defaultFont),fancybox=True)
 
             ############  ready to plot ############
             self.fig.canvas.draw()
@@ -3770,12 +3772,12 @@ class tgraphcanvas(FigureCanvas):
     
                 if self.statisticsflags[2] or self.statisticsflags[4] or self.statisticsflags[5]:
                     #Write flavor estimation
-                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontsize=11)
+                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontsize=11,name=aw.defaultFont)
                     if self.timeindex[2]: # only if FCs exists
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontsize=11)
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontsize=11)
+                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontsize=11,name=aw.defaultFont)
+                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontsize=11,name=aw.defaultFont)
                     if self.timeindex[7]: # only if COOL exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontsize=11)
+                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontsize=11,name=aw.defaultFont)
                 if self.statisticsflags[3] and self.timeindex[0]>-1 and self.temp1 and self.temp2 and self.temp1[self.timeindex[0]:self.timeindex[6]+1] and self.temp2[self.timeindex[0]:self.timeindex[6]+1]:
                     temp1_values = self.temp1[self.timeindex[0]:self.timeindex[6]+1]
                     temp2_values = self.temp2[self.timeindex[0]:self.timeindex[6]+1]
@@ -3794,12 +3796,12 @@ class tgraphcanvas(FigureCanvas):
                               QApplication.UnicodeUTF8).arg("%.1f"%BTmin + self.mode).arg("%.1f"%BTmax + self.mode).arg("%.1f"%abs(BTmax - BTmin)).arg("%.1f"%ETmin + self.mode).arg("%.1f"%ETmax + self.mode).arg("%.1f"%abs(ETmax - ETmin)).arg(timez).arg(ror).arg("%d%sm"%(ts,self.mode)).arg(tse).arg(tsb)
     
                     # even better: use xlabel
-                    self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
+                    self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"],name=aw.defaultFont)
                 else:
-                    self.ax.set_xlabel(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"])
+                    self.ax.set_xlabel(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"],name=aw.defaultFont)
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()    
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " writestatistics() %1").arg(str(ex)),exc_tb.tb_lineno)
 
@@ -5559,6 +5561,8 @@ class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
 
         self.defaultAppearance = None
+        # should be a font supporting unicode characters including arabic and which is available on all platforms
+        self.defaultFont = "Arial Unicode MS" # "Arial Unicode MS", "Times New Roman", "Tahoma", "Trebuchet MS"
         
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
@@ -8247,7 +8251,7 @@ class ApplicationWindow(QMainWindow):
             if "title" in profile:
                 self.qmc.title = d(profile["title"])
             else:            
-                self.qmc.title = "Roaster Scope"
+                self.qmc.title = QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8)
             if "beans" in profile:
                 self.qmc.beans = d(profile["beans"])
             else:
@@ -8413,8 +8417,8 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.resetlinecountcaches()
             return True
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             # we don't report errors on settingsLoad
             _, _, exc_tb = sys.exc_info()
             QMessageBox.information(self,QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " setProfile()",str(ex),exc_tb.tb_lineno)
@@ -12435,7 +12439,7 @@ class HUDDlg(ArtisanDialog):
         aw.qmc.minmaxLimits = self.MinMaxLimits.isChecked()
         aw.qmc.filterDropOut_tmin = int(self.minLimit.value())
         aw.qmc.filterDropOut_tmax = int(self.maxLimit.value())
-        mode = str(self.modeComboBox.currentText())
+        mode = u(self.modeComboBox.currentText())
         if mode == QApplication.translate("ComboBox","metrics", None, QApplication.UnicodeUTF8):
             aw.HUDfunction = 0
         elif mode == QApplication.translate("ComboBox","thermal", None, QApplication.UnicodeUTF8):
@@ -13517,7 +13521,7 @@ class editGraphDlg(ArtisanDialog):
                     aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
             self.saveEventTable()
         # Update Title
-        aw.qmc.ax.set_title(str(self.titleedit.text()),size=20,color=aw.qmc.palette["title"])
+        aw.qmc.ax.set_title(u(self.titleedit.text()),size=20,color=aw.qmc.palette["title"])
         aw.qmc.title = u(self.titleedit.text())
         # Update beans
         aw.qmc.beans = u(self.beansedit.toPlainText())
@@ -13532,7 +13536,7 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.weight[1] = float(str(self.weightoutedit.text()))
         except:
             aw.qmc.weight[1] = 0
-        aw.qmc.weight[2] = str(self.unitsComboBox.currentText())
+        aw.qmc.weight[2] =u(self.unitsComboBox.currentText())
         #update volume
         try:
             aw.qmc.volume[0] = float(str(self.volumeinedit.text()))
@@ -13542,7 +13546,7 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.volume[1] = float(str(self.volumeoutedit.text()))
         except:
             aw.qmc.volume[1] = 0
-        aw.qmc.volume[2] = str(self.volumeUnitsComboBox.currentText())
+        aw.qmc.volume[2] = u(self.volumeUnitsComboBox.currentText())
         #update density
         try:
             aw.qmc.density[0] = float(str(self.bean_density_weight_edit.text()))
@@ -25203,7 +25207,7 @@ class DtaPID(object):
 ###########################################################################################################################################
 ###########################################################################################################################################
 
-def main():
+def main():            
     global aw
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     aw = ApplicationWindow()
@@ -25212,6 +25216,7 @@ def main():
     except:
         pass
     aw.settingsLoad()
+    mpl.rcParams['font.family'] = aw.defaultFont # set default font family for the subplot annotations
     try:
         argv_file = sys.argv[1]
         qfile = QFileInfo(u(argv_file))
