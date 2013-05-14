@@ -35,6 +35,8 @@ DATA_FILES = [
     "LICENSE.txt",
     ("../Resources/qt_plugins/iconengines", [QTDIR + r'/plugins/iconengines/libqsvgicon.dylib']),
     ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqsvg.dylib']),
+    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqjpeg.dylib']),
+    ("../Resources/qt_plugins/imageformats", [QTDIR + r'/plugins/imageformats/libqtiff.dylib']),
 # standard QT translation needed to get the Application menu bar and 
 # the standard dialog elements translated
     ("../translations", [QTDIR + r'/translations/qt_de.qm']),
@@ -87,9 +89,6 @@ plist.update({ 'CFBundleDisplayName': 'Artisan',
 OPTIONS = {
     'strip':True,
     'argv_emulation': True,
-#    'qt_plugins': ['iconengines/libqsvgicon.dylib','imageformats/libqsvg.dylib'],
-# copying file /.dbfseventsd -> /Users/luther/Documents/Projects/Artisan/Repository/trunk/dist/Artisan.app/Contents/Resources/qt_plugins/iconengines/.dbfseventsd
-# error: /.dbfseventsd: Operation not supported on socket
     'semi_standalone': False,
     'site_packages': True,
     'packages': ['matplotlib'],
