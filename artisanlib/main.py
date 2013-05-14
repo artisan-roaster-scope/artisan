@@ -9102,7 +9102,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.operator = u(settings.value("operator",self.qmc.operator).toString())
             self.qmc.roastertype = u(settings.value("roastertype",self.qmc.roastertype).toString())
             self.qmc.density[2] = settings.value("densitySampleVolume",self.qmc.density[2]).toInt()[0]
-            self.qmc.density[3] = str(settings.value("densitySampleVolumeUnit",self.qmc.density[3]).toString())
+            self.qmc.density[3] = u(settings.value("densitySampleVolumeUnit",self.qmc.density[3]).toString())
             if settings.contains("beansize"):
                 self.qmc.beansize = settings.value("beansize",self.qmc.beansize).toDouble()[0]
             settings.endGroup()
