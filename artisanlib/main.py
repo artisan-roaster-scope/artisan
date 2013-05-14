@@ -13574,12 +13574,12 @@ class editGraphDlg(ArtisanDialog):
             aw.qmc.density[0] = float(str(self.bean_density_weight_edit.text()))
         except:
             aw.qmc.density[0] = 0
-        aw.qmc.density[1] = str(self.bean_density_weightUnitsComboBox.currentText())
+        aw.qmc.density[1] = u(self.bean_density_weightUnitsComboBox.currentText())
         try:
             aw.qmc.density[2] = float(str(self.bean_density_volume_edit.text()))
         except:
             aw.qmc.density[2] = 0
-        aw.qmc.density[3] = str(self.bean_density_volumeUnitsComboBox.currentText())
+        aw.qmc.density[3] = u(self.bean_density_volumeUnitsComboBox.currentText())
         #update bean size
         try:
             aw.qmc.beansize = float(str(self.bean_size_edit.text()))
