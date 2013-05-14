@@ -45,14 +45,14 @@ LICENSE = 'GNU General Public License (GPL)'
 cwd = os.getcwd()
 
 DATAFILES = mpl.get_py2exe_datafiles()
-DATAFILES = DATAFILES + \
-    [('imageplugins', [
-            'c:\Python27\lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll',
-            ]),
-      ('iconengines', [
-            'c:\Python27\lib\site-packages\PyQt4\plugins\iconengines\qsvgicon4.dll',
-            ]),
-    ]
+#DATAFILES = DATAFILES + \
+#    [('imageformats', [
+#            'c:\Python27\lib\site-packages\PyQt4\plugins\imageformats\qsvg4.dll',
+#            ]),
+#      ('iconengines', [
+#            'c:\Python27\lib\site-packages\PyQt4\plugins\iconengines\qsvgicon4.dll',
+#            ]),
+#    ]
 
 setup(
     name ="Artisan",

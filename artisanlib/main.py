@@ -5107,7 +5107,11 @@ class VMToolbar(NavigationToolbar):
 
     def _icon(self, name):
         #dirty hack to prefer .svg over .png Toolbar icons
-        p = os.path.join(self.basedir, name.replace('.png','.svg') )
+        if platf == 'Windows':
+            n = name.replace('.svg','.png')
+        else:
+            n = name.replace('.png','.svg')
+        p = os.path.join(self.basedir, n)
         if os.path.exists(p):
             return QIcon(p)
         else:
