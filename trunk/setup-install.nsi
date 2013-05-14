@@ -210,8 +210,6 @@ Section Uninstall
   Delete "$DESKTOP\Artisan.lnk"
   Delete "$SMPROGRAMS\Artisan\Artisan.lnk"
   
-  RMDir /r "$INSTDIR\iconengines"
-  RMDir /r "$INSTDIR\imageplugins"
   RMDir /r "$INSTDIR\lib"
   RMDir /r "$INSTDIR\mpl-data"
   RMDir /r "$INSTDIR\translations"
