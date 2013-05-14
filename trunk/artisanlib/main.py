@@ -6738,9 +6738,15 @@ class ApplicationWindow(QMainWindow):
                 else:
                     return u(artisanlib.arabic_reshaper.reshape(st)[::-1])
             else:
-                return s
+                if a:
+                    return u(s.arg(a))
+                else:
+                    return u(s)
         else:
-            return s
+            if a:
+                return u(s.arg(a))
+            else:
+                return u(s)
 
     def makeLCDbox(self,label,lcd,lcdframe):
         LCDbox = QVBoxLayout()
@@ -6847,7 +6853,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.fig.set_dpi(dpi)
             #move widget to update display
             self.showFullScreen()
-            libtime.sleep(0.7)
+            libtime.sleep(0.3)
             self.showNormal()
             
     def enableSaveActions(self):
@@ -25235,9 +25241,10 @@ def main():
     aw = ApplicationWindow()
     
     # in case of Arabic localizations we try to select a unicode font in matplotlib
-    if locale and locale == "ar":
-        if platf == 'Darwin':
-            mpl.rcParams['font.family'] = "Arial Unicode MS"
+    if locale and locale in ["ar", "el"]:
+#        if platf == 'Darwin':
+#            mpl.rcParams['font.family'] = "Arial Unicode MS"
+        mpl.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'DejaVu Sans', 'DajaVu Sans Mono', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', 'Bitstream Vera Sans', 'sans-serif']
             
         #mpl.font_manager.findfont(["Arial Unicode MS","Times New Roman"],fallback_to_default=True))
         #fn = mpl.font_manager.findfont(["Arial Unicode MS","Times New Roman"],fallback_to_default=False)
