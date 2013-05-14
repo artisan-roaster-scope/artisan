@@ -45,7 +45,7 @@ import string as libstring
 import cgi
 import codecs
 import numpy
-#import struct
+import artisanlib.arabic_reshaper
 
 # write logtrace to Console on OS X:
 #try:
@@ -68,7 +68,7 @@ from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, Q
                          QLCDNumber, QKeySequence, QSpinBox, QComboBox,
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton,
                          QPixmap, QColor, QColorDialog, QPalette, QFrame, QCheckBox, QDesktopServices, QIcon,
-                         QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QBrush, QRadialGradient,
+                         QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QFontInfo, QBrush, QRadialGradient,
                          QStyleFactory, QTableWidget, QTableWidgetItem, QMenu, QCursor, QDoubleSpinBox, QTextDocument)
 from PyQt4.QtCore import (QString, QStringList, QLibraryInfo, QTranslator, QLocale, QFileInfo, PYQT_VERSION_STR, 
                           QT_VERSION_STR,SIGNAL, QTime, QTimer, QFile, QIODevice, QTextStream, QSettings, SLOT,
@@ -226,6 +226,7 @@ if platf == 'Windows':
     app.setWindowIcon(QIcon("artisan.png"))
 
 #Localization support
+global locale
 locale = QSettings().value('locale').toString()
 if len(locale) == 0:
     locale = QLocale.system().name()
@@ -800,10 +801,10 @@ class tgraphcanvas(FigureCanvas):
         #set grid + axle labels + title
         self.ax.grid(True,color=self.palette["grid"],linestyle = self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
 
-        self.ax.set_xlabel('Time',size=16,color = self.palette["xlabel"])
-        self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"])
-        self.delta_ax.set_ylabel(u(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
-        self.ax.set_title(self.title,size=20,color=self.palette["title"])
+#        self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"])
+#        self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"])
+#        self.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
+#        self.ax.set_title(aw.arabicReshape(self.title),size=20,color=self.palette["title"])
 
 
         #change label colors
@@ -1648,7 +1649,7 @@ class tgraphcanvas(FigureCanvas):
                     self.toggleHUD()
                 self.hudresizeflag = False
         
-#                self.ax.set_title(self.title,size=20,color=self.palette["title"])
+#                self.ax.set_title(aw.arabicReshape(self.title),size=20,color=self.palette["title"])
         
     
                 aw.sendmessage(QApplication.translate("Message","Scope has been reset",None, QApplication.UnicodeUTF8))
@@ -1871,7 +1872,7 @@ class tgraphcanvas(FigureCanvas):
                     e = 40
                     a = 0.4
                 else:
-                    st1 = QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8)
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8))
                     e = 0
                     a = 1.                
 
@@ -1880,7 +1881,7 @@ class tgraphcanvas(FigureCanvas):
                 if timeindex[1]:
                     tidx = timeindex[1]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[tidx],d)
-                    st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(timex[tidx]-t0)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
                     if timeindex2 and timeindex2[1] and timex[timeindex[1]] < time2[timeindex2[1]]:
                         e = -80
                         a = 0.4
@@ -1895,7 +1896,7 @@ class tgraphcanvas(FigureCanvas):
                         ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[1]],stemp[tidx],d)
                     else:
                         ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
-                    st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(timex[tidx]-t0)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
                     if timeindex2 and timeindex2[2] and timex[timeindex[2]] < time2[timeindex2[2]]:
                         e = -80
                         a = 0.4
@@ -1907,7 +1908,7 @@ class tgraphcanvas(FigureCanvas):
                 if timeindex[3]:
                     tidx = self.timeindex[3]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[self.timeindex[2]],stemp[tidx],d)
-                    st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(timex[tidx]-t0)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
                     if timeindex2 and timeindex2[3] and timex[timeindex[3]] < time2[timeindex2[3]]:
                         e = -80
                         a = 0.4
@@ -1925,7 +1926,7 @@ class tgraphcanvas(FigureCanvas):
                         ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[3]],stemp[tidx],d)
                     else:
                         ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
-                    st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(timex[tidx]-t0)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
                     if timeindex2 and timeindex2[4] and timex[timeindex[4]] < time2[timeindex2[4]]:
                         e = -80
                         a = 0.4
@@ -1937,7 +1938,7 @@ class tgraphcanvas(FigureCanvas):
                 if timeindex[5]:
                     tidx = self.timeindex[5]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[4]],stemp[tidx],d)
-                    st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(timex[tidx]-t0)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
                     if timeindex2 and timeindex2[5] and timex[timeindex[5]] < time2[timeindex2[5]]:
                         e = -80
                         a = 0.4
@@ -1964,7 +1965,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         tx = t0idx
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
-                    st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(str(self.stringfromseconds(timex[tidx]-t0)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8),str(self.stringfromseconds(timex[tidx]-t0)))
                     if timeindex2 and timeindex2[6] and timex[timeindex[6]] < time2[timeindex2[6]]:
                         e = -80
                         a = 0.4
@@ -1978,8 +1979,8 @@ class tgraphcanvas(FigureCanvas):
                     endidx = self.ax.get_xlim()[1] # or timex[-1]
                     self.ax.axvspan(timex[tidx],endidx, facecolor=self.palette["rect4"], ec='none', alpha=0.3, clip_on=False, clip_path=None, lw=None,lod=False)
         except Exception as e:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " place_annotations() %1").arg(str(e)),exc_tb.tb_lineno)
 
@@ -2003,8 +2004,8 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_autoscale_on(False)
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
             self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"],rotation=0)
-            self.ax.set_xlabel(QApplication.translate("Label",'Time', None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"])
-            self.ax.set_title(self.title,size=20,color=self.palette["title"])
+            self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"])
+            self.ax.set_title(aw.arabicReshape(self.title),size=20,color=self.palette["title"])
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag
             if two_ax_mode:
@@ -2012,7 +2013,7 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax = self.ax.twinx()
                 self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
                 self.ax.patch.set_visible(True)
-                self.delta_ax.set_ylabel(u(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
+                self.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                 self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -2102,18 +2103,18 @@ class tgraphcanvas(FigureCanvas):
             ##### ET,BT curves
             if aw.qmc.ETcurve:
                 if aw.qmc.flagon:
-                    self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                    self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
                 else:
                     if smooth or len(self.stemp1) != len(self.timex):
                         self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
-                    self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                    self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
             if aw.qmc.BTcurve:
                 if aw.qmc.flagon:
-                    self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                    self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
                 else:
                     if smooth or len(self.stemp2) != len(self.timex):
                         self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
-                    self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                    self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
 
             ##### Extra devices-curves
             self.extratemp1lines,self.extratemp2lines = [],[]
@@ -2148,9 +2149,9 @@ class tgraphcanvas(FigureCanvas):
 
                 #draw background
                 self.l_back1, = self.ax.plot(self.timeB, self.temp1B,markersize=self.ETbackmarkersize,marker=self.ETbackmarker,linewidth=self.ETbacklinewidth,linestyle=self.ETbacklinestyle,drawstyle=self.ETbackdrawstyle,color=self.backgroundmetcolor,
-                                             alpha=self.backgroundalpha,label=u(QApplication.translate("Label", "BackgroundET", None, QApplication.UnicodeUTF8)))
+                                             alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundET", None, QApplication.UnicodeUTF8)))
                 self.l_back2, = self.ax.plot(self.timeB, self.temp2B,markersize=self.BTbackmarkersize,marker=self.BTbackmarker,linewidth=self.BTbacklinewidth,linestyle=self.BTbacklinestyle,drawstyle=self.BTbackdrawstyle,color=self.backgroundbtcolor,
-                                             alpha=self.backgroundalpha,label=u(QApplication.translate("Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
+                                             alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundBT", None, QApplication.UnicodeUTF8)))
 
                 #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
                 if self.DeltaETBflag or self.DeltaBTBflag:
@@ -2169,9 +2170,9 @@ class tgraphcanvas(FigureCanvas):
                         self.delta2B = self.smooth(tx,z2,window_len=self.deltafilter).tolist()
                     ##### DeltaETB,DeltaBTB curves
                     if self.DeltaETBflag:
-                        self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=u(QApplication.translate("Label", "BackgroundDeltaET", None, QApplication.UnicodeUTF8)))
+                        self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,marker=self.ETBdeltamarker,linewidth=self.ETBdeltalinewidth,linestyle=self.ETBdeltalinestyle,drawstyle=self.ETBdeltadrawstyle,color=self.backgrounddeltaetcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaET", None, QApplication.UnicodeUTF8)))
                     if self.DeltaBTBflag:
-                        self.l_delta2B, = self.delta_ax.plot(self.timeB, self.delta2B,markersize=self.BTBdeltamarkersize,marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=u(QApplication.translate("Label", "BackgroundDeltaBT", None, QApplication.UnicodeUTF8)))
+                        self.l_delta2B, = self.delta_ax.plot(self.timeB, self.delta2B,markersize=self.BTBdeltamarkersize,marker=self.BTBdeltamarker,linewidth=self.BTBdeltalinewidth,linestyle=self.BTBdeltalinestyle,drawstyle=self.BTBdeltadrawstyle,color=self.backgrounddeltabtcolor,alpha=self.backgroundalpha,label=aw.arabicReshape(QApplication.translate("Label", "BackgroundDeltaBT", None, QApplication.UnicodeUTF8)))
 
                 #check backgroundevents flag
                 if self.backgroundeventsflag:
@@ -2235,10 +2236,10 @@ class tgraphcanvas(FigureCanvas):
             labels = []
             if aw.qmc.ETcurve:
                 handles.append(self.l_temp1)
-                labels.append(u(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
             if aw.qmc.BTcurve:
                 handles.append(self.l_temp2)
-                labels.append(u(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                labels.append(aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
 
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             if self.DeltaETflag or self.DeltaBTflag:
@@ -2265,14 +2266,14 @@ class tgraphcanvas(FigureCanvas):
 
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag:
-                    self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=u(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+                    self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                     handles.append(self.l_delta1)
-                    labels.append(u(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                     
                 if self.DeltaBTflag:
-                    self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=str(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+                    self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
                     handles.append(self.l_delta2)
-                    labels.append(u(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
+                    labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
 
 
             nrdevices = len(self.extradevices)
@@ -2283,11 +2284,11 @@ class tgraphcanvas(FigureCanvas):
                     if aw.extraCurveVisibility1[i]:
                         handles.append(self.extratemp1lines[xtmpl1idx])
                         xtmpl1idx = xtmpl1idx + 1
-                        labels.append(self.extraname1[i])
+                        labels.append(aw.arabicReshape(self.extraname1[i]))
                     if aw.extraCurveVisibility2[i]:
                         handles.append(self.extratemp2lines[xtmpl2idx])
                         xtmpl2idx = xtmpl2idx + 1
-                        labels.append(self.extraname2[i])
+                        labels.append(aw.arabicReshape(self.extraname2[i]))
                     
             if not self.designerflag and aw.qmc.BTcurve:
                 if self.flagon: # no smoothed lines in this case, pass normal BT
@@ -2424,7 +2425,7 @@ class tgraphcanvas(FigureCanvas):
                                                           linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
 
                     handles.extend([self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots])
-                    labels.extend([self.etypesf(0),self.etypesf(1),self.etypesf(2),self.etypesf(3)])
+                    labels.extend([aw.arabicReshape(self.etypesf(0)),aw.arabicReshape(self.etypesf(1)),aw.arabicReshape(self.etypesf(2)),aw.arabicReshape(self.etypesf(3))])
 
                 #if recorder on
                 if self.flagon:
@@ -3755,9 +3756,9 @@ class tgraphcanvas(FigureCanvas):
                         st2 = st2 + u(" (")
                         st3 = st3 + u(" (")
                     if self.statisticsflags[4]:
-                        st1 = st1 + "%.1f"%rates_of_changes[0] + u(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
-                        st2 = st2 + "%.1f"%rates_of_changes[1] + u(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
-                        st3 = st3 + "%.1f"%rates_of_changes[2] + u(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
+                        st1 = st1 + "%.1f"%rates_of_changes[0] + aw.arabicReshape(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
+                        st2 = st2 + "%.1f"%rates_of_changes[1] + aw.arabicReshape(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
+                        st3 = st3 + "%.1f"%rates_of_changes[2] + aw.arabicReshape(QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
                     else:
                         ts1,ts1e,ts1b = aw.ts(self.timeindex[0],dryEndIndex)
                         ts2,ts2e,ts2b = aw.ts(dryEndIndex,self.timeindex[2])
@@ -3798,7 +3799,7 @@ class tgraphcanvas(FigureCanvas):
                     # even better: use xlabel
                     self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
                 else:
-                    self.ax.set_xlabel(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8),size=16,color = self.palette["xlabel"])
+                    self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"])
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -6724,6 +6725,22 @@ class ApplicationWindow(QMainWindow):
 
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
+    
+    # trims arabic strings to be rendered correctly with unicode fonts if arabic locale is active
+    # if s is a QString with one %1 placeholder and a is an argument, the argument is reversed, and then the wohle string result is reversed
+    # if it contains any arabic characters
+    def arabicReshape(self,s,a=None):
+        if locale and locale == "ar": 
+            st = u(s)
+            if artisanlib.arabic_reshaper.has_arabic_letters(st):
+                if a: 
+                    return u(artisanlib.arabic_reshaper.reshape(u(s.arg(a[::-1])))[::-1])
+                else:
+                    return u(artisanlib.arabic_reshaper.reshape(st)[::-1])
+            else:
+                return s
+        else:
+            return s
 
     def makeLCDbox(self,label,lcd,lcdframe):
         LCDbox = QVBoxLayout()
@@ -6830,6 +6847,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.fig.set_dpi(dpi)
             #move widget to update display
             self.showFullScreen()
+            libtime.sleep(0.7)
             self.showNormal()
             
     def enableSaveActions(self):
@@ -7585,7 +7603,7 @@ class ApplicationWindow(QMainWindow):
                 if res:
                     self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
                     #change Title
-                    self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+                    self.qmc.ax.set_title(aw.arabicReshape(self.qmc.title), size=20, color= self.qmc.palette["title"])
                     #update etypes combo box
                     self.etypeComboBox.clear()
                     self.etypeComboBox.addItems(self.qmc.etypes)
@@ -7946,7 +7964,7 @@ class ApplicationWindow(QMainWindow):
             if res:
                 self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
                 #change Title
-                self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+                self.qmc.ax.set_title(aw.arabicReshape(self.qmc.title), size=20, color= self.qmc.palette["title"])
                 #update etypes combo box
                 self.etypeComboBox.clear()
                 self.etypeComboBox.addItems(self.qmc.etypes)
@@ -8014,7 +8032,7 @@ class ApplicationWindow(QMainWindow):
             if res:
                 self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
                 #change Title
-                self.qmc.ax.set_title(self.qmc.title, size=20, color= self.qmc.palette["title"])
+                self.qmc.ax.set_title(aw.arabicReshape(self.qmc.title), size=20, color= self.qmc.palette["title"])
                 self.qmc.redraw()
         except Exception as ex:
 #            import traceback
@@ -13525,7 +13543,7 @@ class editGraphDlg(ArtisanDialog):
                     aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
             self.saveEventTable()
         # Update Title
-        aw.qmc.ax.set_title(u(self.titleedit.text()),size=20,color=aw.qmc.palette["title"])
+        aw.qmc.ax.set_title(aw.arabicReshape(u(self.titleedit.text())),size=20,color=aw.qmc.palette["title"])
         aw.qmc.title = u(self.titleedit.text())
         # Update beans
         aw.qmc.beans = u(self.beansedit.toPlainText())
@@ -25216,20 +25234,40 @@ def main():
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     aw = ApplicationWindow()
     
+    # in case of Arabic localizations we try to select a unicode font in matplotlib
+    if locale and locale == "ar":
+        if platf == 'Darwin':
+            mpl.rcParams['font.family'] = "Arial Unicode MS"
+            
+        #mpl.font_manager.findfont(["Arial Unicode MS","Times New Roman"],fallback_to_default=True))
+        #fn = mpl.font_manager.findfont(["Arial Unicode MS","Times New Roman"],fallback_to_default=False)
+        #print(fn)
+        #print(mpl.font_manager.findfont(["Aria"],fallback_to_default=True))
+        #print(mpl.font_manager.FontProperties(fname=fn))
+        #print(mpl.rcParams.keys())
+        #print(mpl.font_manager.OSXInstalledFonts())
+        #print(QFont(fn))
+        #print(QFontInfo(QFont(fn)).family())
+        
+    #font = QFont()
+    #defaultfamily = font.defaultFamily()
+    #print(str(defaultfamily),str(font))
+    
 #    db = QFontDatabase()
 #    for f in db.families(6):
 #        print(str(f))
         
-#    md = mpl.font_manager.findSystemFonts()
+#    md = mpl.font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
+#    from matplotlib.ft2font import FT2Font
+#    for f in md:
+#        print(str(f))
+        
     
     try:
         aw.defaultAppearance = str(aw.style().objectName()).lower()
     except:
         pass
     aw.settingsLoad()
-    mpl.rcParams['font.family'] = aw.defaultFont # set default font family for the subplot annotations
-    # the following does not work on OS X
-    #mpl.rc('font', **{'sans-serif' : aw.defaultFont,'family' : 'sans-serif'})
     
     try:
         argv_file = sys.argv[1]
