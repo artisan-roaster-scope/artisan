@@ -25243,7 +25243,7 @@ def main():
     # try to select an unicode font for matplotlib that contains all the characters for the supported languages (incl. Arabic, Japanese, Chinese, Korean,..)
     mpl.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'DejaVu Sans', 'DajaVu Sans Mono', 'Times New Roman', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', 'Bitstream Vera Sans', 'sans-serif']
 
-    if locale and locale in ["ar", "el"]:
+#    if locale and locale in ["ar", "el"]:
 #        if platf == 'Darwin':
 #            mpl.rcParams['font.family'] = "Arial Unicode MS"
             
