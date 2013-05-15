@@ -25240,11 +25240,12 @@ def main():
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     aw = ApplicationWindow()
     
-    # in case of Arabic localizations we try to select a unicode font in matplotlib
+    # try to select an unicode font for matplotlib that contains all the characters for the supported languages (incl. Arabic, Japanese, Chinese, Korean,..)
+    mpl.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'DejaVu Sans', 'DajaVu Sans Mono', 'Times New Roman', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', 'Bitstream Vera Sans', 'sans-serif']
+
     if locale and locale in ["ar", "el"]:
 #        if platf == 'Darwin':
 #            mpl.rcParams['font.family'] = "Arial Unicode MS"
-        mpl.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'DejaVu Sans', 'DajaVu Sans Mono', 'Lucida Grande', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', 'Bitstream Vera Sans', 'sans-serif']
             
         #mpl.font_manager.findfont(["Arial Unicode MS","Times New Roman"],fallback_to_default=True))
         #fn = mpl.font_manager.findfont(["Arial Unicode MS","Times New Roman"],fallback_to_default=False)
