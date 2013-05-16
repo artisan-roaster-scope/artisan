@@ -148,7 +148,7 @@ Artisan uses the following libraries in unmodified forms:
   http://www.py2exe.org/
 - bbfreeze, Copyright (c) 2007-2012 brainbot technologies AG. Distributed under the zlib/libpng license.
 - minimalmodbus 0.4 under the Apache License, Version 2.0 by Jonas Berg
-
+- arabic_reshaper.py under GPL by Abd Allah Diab (Mpcabd)
 
 
 VERSION HISTORY

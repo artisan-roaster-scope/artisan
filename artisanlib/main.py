@@ -801,12 +801,6 @@ class tgraphcanvas(FigureCanvas):
         #set grid + axle labels + title
         self.ax.grid(True,color=self.palette["grid"],linestyle = self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
 
-#        self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"])
-#        self.ax.set_ylabel(self.mode,size=16,color = self.palette["ylabel"])
-#        self.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
-#        self.ax.set_title(aw.arabicReshape(self.title),size=20,color=self.palette["title"])
-
-
         #change label colors
         for label in self.ax.yaxis.get_ticklabels():
             label.set_color(self.palette["ylabel"])
@@ -1649,8 +1643,6 @@ class tgraphcanvas(FigureCanvas):
                     self.toggleHUD()
                 self.hudresizeflag = False
         
-#                self.ax.set_title(aw.arabicReshape(self.title),size=20,color=self.palette["title"])
-        
     
                 aw.sendmessage(QApplication.translate("Message","Scope has been reset",None, QApplication.UnicodeUTF8))
                 aw.button_3.setDisabled(False)
@@ -1852,10 +1844,10 @@ class tgraphcanvas(FigureCanvas):
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):
         #annotate temp
         self.ax.annotate("%.1f"%(temp), xy=(x,y),xytext=(x+e,y + yup),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=a)
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=a,fontproperties=aw.mpl_fontproperties)
         #anotate time
         self.ax.annotate(time_str,xy=(x,y),xytext=(x+e,y - ydown),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=a)
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize=10,alpha=a,fontproperties=aw.mpl_fontproperties)
 
     def place_annotations(self,d,timex,timeindex,temp,stemp,startB=0,time2=None,timeindex2=None):
         ystep_down = ystep_up = 0
@@ -2004,8 +1996,8 @@ class tgraphcanvas(FigureCanvas):
             self.ax.set_autoscale_on(False)
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
             self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"],rotation=0)
-            self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"])
-            self.ax.set_title(aw.arabicReshape(self.title),size=20,color=self.palette["title"])
+            self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
+            self.ax.set_title(aw.arabicReshape(self.title),size=20,color=self.palette["title"],fontproperties=aw.mpl_fontproperties)
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag
             if two_ax_mode:
@@ -2013,7 +2005,7 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax = self.ax.twinx()
                 self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
                 self.ax.patch.set_visible(True)
-                self.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"])
+                self.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),size=16,color = self.palette["ylabel"],fontproperties=aw.mpl_fontproperties)
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                 self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -2445,9 +2437,9 @@ class tgraphcanvas(FigureCanvas):
             #write legend
             if self.legendloc:
                 if two_ax_mode:
-                    self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+                    self.delta_ax.legend(handles,labels,loc=self.legendloc,ncol=4,fancybox=True,prop=aw.mpl_fontproperties) #prop=font_manager.FontProperties(size=10),
                 else:
-                    self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,prop=font_manager.FontProperties(size=10),fancybox=True)
+                    self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,fancybox=True,prop=aw.mpl_fontproperties) # prop=font_manager.FontProperties(size=10),
 
             ############  ready to plot ############
             self.fig.canvas.draw()
@@ -3773,12 +3765,12 @@ class tgraphcanvas(FigureCanvas):
     
                 if self.statisticsflags[2] or self.statisticsflags[4] or self.statisticsflags[5]:
                     #Write flavor estimation
-                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontsize=11)
+                    self.ax.text(self.timex[self.timeindex[0]] + dryphasetime/2.,statisticslower,st1,color=self.palette["text"],ha="center",fontsize=11,fontproperties=aw.mpl_fontproperties)
                     if self.timeindex[2]: # only if FCs exists
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontsize=11)
-                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontsize=11)
+                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime/2.,statisticslower,st2,color=self.palette["text"],ha="center",fontsize=11,fontproperties=aw.mpl_fontproperties)
+                        self.ax.text(self.timex[self.timeindex[0]] + dryphasetime+midphasetime+finishphasetime/2.,statisticslower,st3,color=self.palette["text"],ha="center",fontsize=11,fontproperties=aw.mpl_fontproperties)
                     if self.timeindex[7]: # only if COOL exists
-                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontsize=11)
+                        self.ax.text(self.timex[self.timeindex[0]]+ dryphasetime+midphasetime+finishphasetime+max(coolphasetime/2.,coolphasetime/3.),statisticslower,st4,color=self.palette["text"],ha="center",fontsize=11,fontproperties=aw.mpl_fontproperties)
                 if self.statisticsflags[3] and self.timeindex[0]>-1 and self.temp1 and self.temp2 and self.temp1[self.timeindex[0]:self.timeindex[6]+1] and self.temp2[self.timeindex[0]:self.timeindex[6]+1]:
                     temp1_values = self.temp1[self.timeindex[0]:self.timeindex[6]+1]
                     temp2_values = self.temp2[self.timeindex[0]:self.timeindex[6]+1]
@@ -3797,9 +3789,9 @@ class tgraphcanvas(FigureCanvas):
                               QApplication.UnicodeUTF8).arg("%.1f"%BTmin + self.mode).arg("%.1f"%BTmax + self.mode).arg("%.1f"%abs(BTmax - BTmin)).arg("%.1f"%ETmin + self.mode).arg("%.1f"%ETmax + self.mode).arg("%.1f"%abs(ETmax - ETmin)).arg(timez).arg(ror).arg("%d%sm"%(ts,self.mode)).arg(tse).arg(tsb)
     
                     # even better: use xlabel
-                    self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"])
+                    self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"],fontproperties=aw.mpl_fontproperties)
                 else:
-                    self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"])
+                    self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -5108,7 +5100,10 @@ class VMToolbar(NavigationToolbar):
 
     def _icon(self, name):
         #dirty hack to prefer .svg over .png Toolbar icons
-        p = os.path.join(self.basedir, name.replace('.png','.svg') )
+        if platf == 'Windows':
+            p = os.path.join(self.basedir, name.replace('.svg','.png'))
+        else:
+            p = os.path.join(self.basedir, name.replace('.png','.svg'))
         if os.path.exists(p):
             return QIcon(p)
         else:
@@ -5562,8 +5557,8 @@ class ApplicationWindow(QMainWindow):
     def __init__(self, parent = None):
 
         self.defaultAppearance = None
-        # should be a font supporting unicode characters including arabic and which is available on all platforms
-        self.defaultFont = "Times New Roman" # "Arial Unicode MS", "Times New Roman", "Tahoma", "Trebuchet MS"
+        # matplotlib font properties:
+        self.mpl_fontproperties = mpl.font_manager.FontProperties()
         
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
@@ -6722,6 +6717,10 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
     
+    def set_mpl_fontproperties(self,fontpath):
+        if os.path.exists(fontpath):
+            self.mpl_fontproperties = mpl.font_manager.FontProperties(fname=fontpath)
+
     # trims arabic strings to be rendered correctly with unicode fonts if arabic locale is active
     # if s is a QString with one %1 placeholder and a is an argument, the argument is reversed, and then the wohle string result is reversed
     # if it contains any arabic characters
@@ -19251,7 +19250,7 @@ class comportDlg(ArtisanDialog):
         modbus_help_text += QApplication.translate("Message", "Modbus function 4 triggers the use of 'read input register'.",None, QApplication.UnicodeUTF8) + "<br>"
         modbus_help_text += QApplication.translate("Message", "Input registers (fct 4) usually are from the range 30000-39999.",None, QApplication.UnicodeUTF8) + "<br>"
         modbus_help_text += QApplication.translate("Message", "Most devices hold data in 2 byte integer registers.",None, QApplication.UnicodeUTF8) + "<br>"
-        modbus_help_text += QApplication.translate("Message", "A temperature of 145.2C is often send as 1452.",None, QApplication.UnicodeUTF8) + "<br>"
+        modbus_help_text += QApplication.translate("Message", "A temperature of 145.2C is often sent as 1452.",None, QApplication.UnicodeUTF8) + "<br>"
         modbus_help_text += QApplication.translate("Message", "In that case you have to use the symbolic assignment 'x/10'.",None, QApplication.UnicodeUTF8) + "<br>"
         modbus_help_text += QApplication.translate("Message", "Few devices hold data as 4 byte floats in two registers.",None, QApplication.UnicodeUTF8) + "<br>"
         modbus_help_text += QApplication.translate("Message", "Tick the Float flag in this case.",None, QApplication.UnicodeUTF8)
@@ -22937,7 +22936,7 @@ class PXRpidDlgControl(ArtisanDialog):
                 return -1
                 
         if len(r) == 8:
-            message = QApplication.translate("StatusBar","%1 successfully send to pid ",None, QApplication.UnicodeUTF8).arg(var)
+            message = QApplication.translate("StatusBar","%1 successfully sent to pid ",None, QApplication.UnicodeUTF8).arg(var)
             self.status.showMessage(message,5000)
             if var == "p":
                 aw.fujipid.PXR["p"][0] = p
@@ -25234,44 +25233,48 @@ class DtaPID(object):
 def main():
     global aw
     aw = None # this is to ensure that the variable aw is already defined during application initialization
+    
     aw = ApplicationWindow()
     
-    # try to select an unicode font for matplotlib that contains all the characters for the supported languages (incl. Arabic, Japanese, Chinese, Korean,..)
-    mpl.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'DejaVu Sans', 'DajaVu Sans Mono', 'Times New Roman', 'Verdana', 'Geneva', 'Lucid', 'Arial', 'Helvetica', 'Avant Garde', 'Bitstream Vera Sans', 'sans-serif']
-
-#    if locale and locale in ["ar", "el"]:
-#        if platf == 'Darwin':
-#            mpl.rcParams['font.family'] = "Arial Unicode MS"
-            
-        #mpl.font_manager.findfont(["Arial Unicode MS","Times New Roman"],fallback_to_default=True))
-        #fn = mpl.font_manager.findfont(["Arial Unicode MS","Times New Roman"],fallback_to_default=False)
-        #print(fn)
-        #print(mpl.font_manager.findfont(["Aria"],fallback_to_default=True))
-        #print(mpl.font_manager.FontProperties(fname=fn))
-        #print(mpl.rcParams.keys())
-        #print(mpl.font_manager.OSXInstalledFonts())
-        #print(QFont(fn))
-        #print(QFontInfo(QFont(fn)).family())
-        
-    #font = QFont()
-    #defaultfamily = font.defaultFamily()
-    #print(str(defaultfamily),str(font))
-    
-#    db = QFontDatabase()
-#    for f in db.families(6):
-#        print(str(f))
-        
-#    md = mpl.font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
-#    from matplotlib.ft2font import FT2Font
-#    for f in md:
-#        print(str(f))
-        
+    # try to select the right font for matplotlib according to the given locale and plattform
+    try:
+        if platf == "Darwin":
+            mpl.rcParams['font.family'] = "Arial Unicode MS"
+        elif platf == "Linux":
+            if locale:
+                if locale == "ar":
+                    mpl.rcParams['font.sans-serif'] = ["DejaVu Sans","DejaVu Sans Mono","Times New Roman"]
+                elif locale == "jp":
+                    mpl.rcParams['font.sans-serif'] = ["TakaoPGothic"]
+                elif locale == "el":
+                    mpl.rcParams['font.sans-serif'] = ["DejaVu Sans","DejaVu Sans Mono"]
+                elif locale == "zh_CN":
+                    mpl.rcParams['font.sans-serif'] = ["NanumGothic","DejaVu Sans Mono"]
+                elif locale == "zh_TW":
+                    mpl.rcParams['font.sans-serif'] = ["NanumGothic","DejaVu Sans Mono"]
+        else: # Windows:
+            # for asian languages on Windows we have to set the parameters directly to *.ttc fonts (mpl supports only *.ttf)
+            if locale == "ja":
+                aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\MSGOTHIC.ttc")
+            elif locale == "zh_CN":
+                aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\simsun.ttc")
+            elif locale == "zh_TW":
+                aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\mingliu.ttc")
+            elif locale == "ko":
+                aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\batang.ttc")
+            elif locale == "en":
+                pass
+            else:
+                mpl.rcParams['font.sans-serif'] = ["Microsoft Sans Serif", "Arial"] # works for Greek and Arabic
+    except:
+        pass
     
     try:
         aw.defaultAppearance = str(aw.style().objectName()).lower()
     except:
         pass
     aw.settingsLoad()
+    
     
     try:
         argv_file = sys.argv[1]
