@@ -203,6 +203,7 @@ Section Uninstall
   Delete "$INSTDIR\artisanAlarms.ico"
   Delete "$INSTDIR\artisanProfile.ico"
   Delete "$INSTDIR\artisanPalettes.ico"
+  Delete "$INSTDIR\qt.conf"
 
   SetShellVarContext all
   Delete "$SMPROGRAMS\Artisan\Uninstall.lnk"
