@@ -80,6 +80,8 @@ RequestExecutionLevel admin
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
+;!define MSVC2008 "http://download.microsoft.com/download/1/1/1/1116b75a-9ec3-481a-a3c8-1777b5381140/vcredist_x86.exe"
+
 Caption "${PRODUCT_NAME} Installer"
 VIProductVersion ${PRODUCT_VERSION}
 VIAddVersionKey ProductName "${PRODUCT_NAME}"
@@ -150,6 +152,46 @@ Section "MainSection" SEC01
   CreateShortCut "$DESKTOP\Artisan.lnk" "$INSTDIR\artisan.exe"
 SectionEnd
 
+; -----------------------------------------------------------------------
+; MSVC Redistributable - required if the user does not already have it
+; Note: if your NSIS generates an error here it means you need to download the latest
+; visual studio redist package from microsoft.  Any redist 2008/SP1 or newer will do.
+;
+; IMPORTANT: Online references for how to detect the presence of the VS2008 redists LIE.
+; None of the methods are reliable, because the registry keys placed by the MSI installer
+; vary depending on operating system *and* MSI installer version (youch).
+;
+;Section -VC++2008Runtime SEC02
+;  SetOutPath $INSTDIR
+;  ; Check if VC++ 2008 runtimes are already installed:
+;;  ReadRegStr $0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}" "DisplayName"
+;  ; If VC++ 2008 runtimes are not installed execute in Quiet mode
+;;  StrCmp $0 "Microsoft Visual C++ 2008 Redistributable - x86 9.0.21022" done
+;  ClearErrors
+;  ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{FF66E9F6-83E7-3A3E-AF14-8DE9A809A6A4}" "Version"
+;  ; if VS 2005+ redist SP1 not installed, install it
+;  IfErrors 0 done  
+;  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "You don't have the 'Microsoft Visual C++ 2008 Redistributable' library installed and it is necessary to run this program.$\n$\nDo you want to download it now?" IDNO end
+;  DetailPrint "Downloading Visual C++ 2008 Redistributable Setup..."
+;  NSISdl::download /TIMEOUT=15000 "${MSVC2008}" "vcredist_x86.exe"
+;  Pop $R0 ;Get the return value
+;  StrCmp $R0 "success" install
+;  MessageBox MB_OK "Could not download Visual Studio 2008 Redist; none of the mirrors appear to be functional."
+;  Goto end
+;  install:
+;    DetailPrint "Running Visual C++ 2008 Redistributable Setup..."
+;    ExecWait '"$INSTDIR\vcredist_x86.exe /qb'
+;    DetailPrint "Finished Visual C++ 2008 Redistributable Setup"
+;    Delete "$INSTDIR\vcredist_x86.exe"
+;  done:
+;    DetailPrint "Runtime MSVC++ 2008 OK."
+;  end:
+;SectionEnd
+
+Section "Microsoft Visual C++ 2008 Redistributable Package (x86)" SEC02
+ExecWait '$INSTDIR\vcredist_x86.exe /q:a /c:"VCREDI~3.EXE /q:a /c:""msiexec /i vcredist.msi /qn"" "'
+SectionEnd
+
 Section -AdditionalIcons
   SetShellVarContext all
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
@@ -204,6 +246,7 @@ Section Uninstall
   Delete "$INSTDIR\artisanProfile.ico"
   Delete "$INSTDIR\artisanPalettes.ico"
   Delete "$INSTDIR\qt.conf"
+  Delete "$INSTDIR\vcredist_x86.exe"
 
   SetShellVarContext all
   Delete "$SMPROGRAMS\Artisan\Uninstall.lnk"
