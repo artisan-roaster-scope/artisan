@@ -3738,6 +3738,10 @@ class tgraphcanvas(FigureCanvas):
     
                 if self.statisticsflags[2]:
                     (st1,st2,st3,st4) = aw.defect_estimation()
+                    st1 = aw.arabicReshape(st1)
+                    st2 = aw.arabicReshape(st2)
+                    st3 = aw.arabicReshape(st3)
+                    st4 = aw.arabicReshape(st4)
                 else:
                     st1 = st2 = st3 = st4 = ""
     
