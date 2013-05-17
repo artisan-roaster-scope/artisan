@@ -5921,77 +5921,131 @@ class ApplicationWindow(QMainWindow):
 
         self.languageMenu = self.ConfMenu.addMenu(UIconst.CONF_MENU_LANGUAGE)
 
-        EnglishLanguage = QAction(UIconst.CONF_MENU_ENGLISH,self)
-        self.connect(EnglishLanguage,SIGNAL("triggered()"),lambda lang="en":self.changelocale(lang))
-        self.languageMenu.addAction(EnglishLanguage)
+        self.EnglishLanguage = QAction(UIconst.CONF_MENU_ENGLISH,self)
+        self.EnglishLanguage.setCheckable(True)
+        self.connect(self.EnglishLanguage,SIGNAL("triggered()"),lambda lang="en":self.changelocale(lang))
+        self.languageMenu.addAction(self.EnglishLanguage)
+        if locale == "en":
+            self.EnglishLanguage.setChecked(True)
 
-        GermanLanguage = QAction(UIconst.CONF_MENU_GERMAN,self)
-        self.connect(GermanLanguage,SIGNAL("triggered()"),lambda lang="de":self.changelocale(lang))
-        self.languageMenu.addAction(GermanLanguage)
+        self.GermanLanguage = QAction(UIconst.CONF_MENU_GERMAN,self)
+        self.GermanLanguage.setCheckable(True)
+        self.connect(self.GermanLanguage,SIGNAL("triggered()"),lambda lang="de":self.changelocale(lang))
+        self.languageMenu.addAction(self.GermanLanguage)
+        if locale == "de":
+            self.GermanLanguage.setChecked(True)
 
-        FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
-        self.connect(FrenchLanguage,SIGNAL("triggered()"),lambda lang="fr":self.changelocale(lang))
-        self.languageMenu.addAction(FrenchLanguage)
+        self.FrenchLanguage = QAction(UIconst.CONF_MENU_FRENCH,self)
+        self.FrenchLanguage.setCheckable(True)
+        self.connect(self.FrenchLanguage,SIGNAL("triggered()"),lambda lang="fr":self.changelocale(lang))
+        self.languageMenu.addAction(self.FrenchLanguage)
+        if locale == "fr":
+            self.FrenchLanguage.setChecked(True)
 
-        SpanishLanguage = QAction(UIconst.CONF_MENU_SPANISH,self)
-        self.connect(SpanishLanguage,SIGNAL("triggered()"),lambda lang="es":self.changelocale(lang))
-        self.languageMenu.addAction(SpanishLanguage) 
+        self.SpanishLanguage = QAction(UIconst.CONF_MENU_SPANISH,self)
+        self.SpanishLanguage.setCheckable(True)
+        self.connect(self.SpanishLanguage,SIGNAL("triggered()"),lambda lang="es":self.changelocale(lang))
+        self.languageMenu.addAction(self.SpanishLanguage) 
+        if locale == "es":
+            self.SpanishLanguage.setChecked(True)
 
-        SwedishLanguage = QAction(UIconst.CONF_MENU_SWEDISH,self)
-        self.connect(SwedishLanguage,SIGNAL("triggered()"),lambda lang="sv":self.changelocale(lang))
-        self.languageMenu.addAction(SwedishLanguage) 
+        self.SwedishLanguage = QAction(UIconst.CONF_MENU_SWEDISH,self)
+        self.SwedishLanguage.setCheckable(True)
+        self.connect(self.SwedishLanguage,SIGNAL("triggered()"),lambda lang="sv":self.changelocale(lang))
+        self.languageMenu.addAction(self.SwedishLanguage) 
+        if locale == "sv":
+            self.SwedishLanguage.setChecked(True)
         
-        ItalianLanguage = QAction(UIconst.CONF_MENU_ITALIAN,self)
-        self.connect(ItalianLanguage,SIGNAL("triggered()"),lambda lang="it":self.changelocale(lang))
-        self.languageMenu.addAction(ItalianLanguage) 
+        self.ItalianLanguage = QAction(UIconst.CONF_MENU_ITALIAN,self)
+        self.ItalianLanguage.setCheckable(True)
+        self.connect(self.ItalianLanguage,SIGNAL("triggered()"),lambda lang="it":self.changelocale(lang))
+        self.languageMenu.addAction(self.ItalianLanguage) 
+        if locale == "it":
+            self.ItalianLanguage.setChecked(True)
 
-        ChineseChinaLanguage = QAction(UIconst.CONF_MENU_CHINESE_CN,self)
-        self.connect(ChineseChinaLanguage,SIGNAL("triggered()"),lambda lang="zh_CN":self.changelocale(lang))
-        self.languageMenu.addAction(ChineseChinaLanguage) 
+        self.ChineseChinaLanguage = QAction(UIconst.CONF_MENU_CHINESE_CN,self)
+        self.ChineseChinaLanguage.setCheckable(True)
+        self.connect(self.ChineseChinaLanguage,SIGNAL("triggered()"),lambda lang="zh_CN":self.changelocale(lang))
+        self.languageMenu.addAction(self.ChineseChinaLanguage) 
+        if locale == "zh_CN":
+            self.ChineseChinaLanguage.setChecked(True)
 
-        ChineseTaiwanLanguage = QAction(UIconst.CONF_MENU_CHINESE_TW,self)
-        self.connect(ChineseTaiwanLanguage,SIGNAL("triggered()"),lambda lang="zh_TW":self.changelocale(lang))
-        self.languageMenu.addAction(ChineseTaiwanLanguage) 
+        self.ChineseTaiwanLanguage = QAction(UIconst.CONF_MENU_CHINESE_TW,self)
+        self.ChineseTaiwanLanguage.setCheckable(True)
+        self.connect(self.ChineseTaiwanLanguage,SIGNAL("triggered()"),lambda lang="zh_TW":self.changelocale(lang))
+        self.languageMenu.addAction(self.ChineseTaiwanLanguage) 
+        if locale == "zh_TW":
+            self.ChineseTaiwanLanguage.setChecked(True)
 
-        GreekLanguage = QAction(UIconst.CONF_MENU_GREEK,self)
-        self.connect(GreekLanguage,SIGNAL("triggered()"),lambda lang="el":self.changelocale(lang))
-        self.languageMenu.addAction(GreekLanguage)
+        self.GreekLanguage = QAction(UIconst.CONF_MENU_GREEK,self)
+        self.GreekLanguage.setCheckable(True)
+        self.connect(self.GreekLanguage,SIGNAL("triggered()"),lambda lang="el":self.changelocale(lang))
+        self.languageMenu.addAction(self.GreekLanguage)
+        if locale == "el":
+            self.GreekLanguage.setChecked(True)
 
-        NorwegianLanguage = QAction(UIconst.CONF_MENU_NORWEGIAN,self)
-        self.connect(NorwegianLanguage,SIGNAL("triggered()"),lambda lang="no":self.changelocale(lang))
-        self.languageMenu.addAction(NorwegianLanguage)
+        self.NorwegianLanguage = QAction(UIconst.CONF_MENU_NORWEGIAN,self)
+        self.NorwegianLanguage.setCheckable(True)
+        self.connect(self.NorwegianLanguage,SIGNAL("triggered()"),lambda lang="no":self.changelocale(lang))
+        self.languageMenu.addAction(self.NorwegianLanguage)
+        if locale == "no":
+            self.NorwegianLanguage.setChecked(True)
 
-        DutchLanguage = QAction(UIconst.CONF_MENU_DUTCH,self)
-        self.connect(DutchLanguage,SIGNAL("triggered()"),lambda lang="nl":self.changelocale(lang))
-        self.languageMenu.addAction(DutchLanguage)
+        self.DutchLanguage = QAction(UIconst.CONF_MENU_DUTCH,self)
+        self.DutchLanguage.setCheckable(True)
+        self.connect(self.DutchLanguage,SIGNAL("triggered()"),lambda lang="nl":self.changelocale(lang))
+        self.languageMenu.addAction(self.DutchLanguage)
+        if locale == "nl":
+            self.DutchLanguage.setChecked(True)
 
-        KoreanLanguage = QAction(UIconst.CONF_MENU_KOREAN,self)
-        self.connect(KoreanLanguage,SIGNAL("triggered()"),lambda lang="ko":self.changelocale(lang))
-        self.languageMenu.addAction(KoreanLanguage)
+        self.KoreanLanguage = QAction(UIconst.CONF_MENU_KOREAN,self)
+        self.KoreanLanguage.setCheckable(True)
+        self.connect(self.KoreanLanguage,SIGNAL("triggered()"),lambda lang="ko":self.changelocale(lang))
+        self.languageMenu.addAction(self.KoreanLanguage)
+        if locale == "ko":
+            self.KoreanLanguage.setChecked(True)
 
-        PortugueseLanguage = QAction(UIconst.CONF_MENU_PORTUGUESE,self)
-        self.connect(PortugueseLanguage,SIGNAL("triggered()"),lambda lang="pt":self.changelocale(lang))
-        self.languageMenu.addAction(PortugueseLanguage)
+        self.PortugueseLanguage = QAction(UIconst.CONF_MENU_PORTUGUESE,self)
+        self.PortugueseLanguage.setCheckable(True)
+        self.connect(self.PortugueseLanguage,SIGNAL("triggered()"),lambda lang="pt":self.changelocale(lang))
+        self.languageMenu.addAction(self.PortugueseLanguage)
+        if locale == "pt":
+            self.PortugueseLanguage.setChecked(True)
 
-        RussianLanguage = QAction(UIconst.CONF_MENU_RUSSIAN,self)
-        self.connect(RussianLanguage,SIGNAL("triggered()"),lambda lang="ru":self.changelocale(lang))
-        self.languageMenu.addAction(RussianLanguage)
+        self.RussianLanguage = QAction(UIconst.CONF_MENU_RUSSIAN,self)
+        self.RussianLanguage.setCheckable(True)
+        self.connect(self.RussianLanguage,SIGNAL("triggered()"),lambda lang="ru":self.changelocale(lang))
+        self.languageMenu.addAction(self.RussianLanguage)
+        if locale == "ru":
+            self.RussianLanguage.setChecked(True)
 
-        ArabicLanguage = QAction(UIconst.CONF_MENU_ARABIC,self)
-        self.connect(ArabicLanguage,SIGNAL("triggered()"),lambda lang="ar":self.changelocale(lang))
-        self.languageMenu.addAction(ArabicLanguage)
+        self.ArabicLanguage = QAction(UIconst.CONF_MENU_ARABIC,self)
+        self.ArabicLanguage.setCheckable(True)
+        self.connect(self.ArabicLanguage,SIGNAL("triggered()"),lambda lang="ar":self.changelocale(lang))
+        self.languageMenu.addAction(self.ArabicLanguage)
+        if locale == "ar":
+            self.ArabicLanguage.setChecked(True)
 
-        FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
-        self.connect(FinishLanguage,SIGNAL("triggered()"),lambda lang="fi":self.changelocale(lang))
-        self.languageMenu.addAction(FinishLanguage)
+        self.FinishLanguage = QAction(UIconst.CONF_MENU_FINISH,self)
+        self.FinishLanguage.setCheckable(True)
+        self.connect(self.FinishLanguage,SIGNAL("triggered()"),lambda lang="fi":self.changelocale(lang))
+        self.languageMenu.addAction(self.FinishLanguage)
+        if locale == "fi":
+            self.FinishLanguage.setChecked(True)
 
-        TurkishLanguage = QAction(UIconst.CONF_MENU_TURKISH,self)
-        self.connect(TurkishLanguage,SIGNAL("triggered()"),lambda lang="tr":self.changelocale(lang))
-        self.languageMenu.addAction(TurkishLanguage)
+        self.TurkishLanguage = QAction(UIconst.CONF_MENU_TURKISH,self)
+        self.TurkishLanguage.setCheckable(True)
+        self.connect(self.TurkishLanguage,SIGNAL("triggered()"),lambda lang="tr":self.changelocale(lang))
+        self.languageMenu.addAction(self.TurkishLanguage)
+        if locale == "tr":
+            self.TurkishLanguage.setChecked(True)
 
-        JapaneseLanguage = QAction(UIconst.CONF_MENU_JAPANESE,self)
-        self.connect(JapaneseLanguage,SIGNAL("triggered()"),lambda lang="ja":self.changelocale(lang))
-        self.languageMenu.addAction(JapaneseLanguage)
+        self.JapaneseLanguage = QAction(UIconst.CONF_MENU_JAPANESE,self)
+        self.JapaneseLanguage.setCheckable(True)
+        self.connect(self.JapaneseLanguage,SIGNAL("triggered()"),lambda lang="ja":self.changelocale(lang))
+        self.languageMenu.addAction(self.JapaneseLanguage)
+        if locale == "ja":
+            self.JapaneseLanguage.setChecked(True)
         
 
         # TOOLKIT menu
@@ -6842,14 +6896,15 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.HUDflag:
             self.qmc.hudresizeflag = True
 
-    def setdpi(self,dpi):
+    def setdpi(self,dpi,moveWindow=True):
         if aw:
             aw.dpi = dpi
             self.qmc.fig.set_dpi(dpi)
             #move widget to update display
-            self.showFullScreen()
-            libtime.sleep(0.3)
-            self.showNormal()
+            if moveWindow:
+                self.showFullScreen()
+                libtime.sleep(0.3)
+                self.showNormal()
             
     def enableSaveActions(self):
         if aw:
@@ -9362,7 +9417,7 @@ class ApplicationWindow(QMainWindow):
                 try:
                     aw.dpi = settings.value("dpi",aw.dpi).toInt()[0]
                     if aw.dpi != aw.defaultdpi:
-                        aw.setdpi(aw.dpi)
+                        aw.setdpi(aw.dpi,moveWindow=False)
                 except:
                     pass
         except Exception:
@@ -10989,11 +11044,56 @@ $cupping_notes
             QMessageBox.information(self,QApplication.translate("Message", "Alarm Config",None, QApplication.UnicodeUTF8),
                                     QApplication.translate("Message", "Alarms are not available for device None",None, QApplication.UnicodeUTF8))
 
+    def switchLanguageFlag(self,locale,value):
+        if locale == "en":
+            self.EnglishLanguage.setChecked(value)
+        elif locale == "de":
+            self.GermanLanguage.setChecked(value)
+        elif locale == "fr":
+            self.FrenchLanguage.setChecked(value)
+        elif locale == "es":
+            self.SpanishLanguage.setChecked(value)
+        elif locale == "sv":
+            self.SwedishLanguage.setChecked(value)
+        elif locale == "it":
+            self.ItalianLanguage.setChecked(value)
+        elif locale == "zh_CH":
+            self.ChineseChinaLanguage.setChecked(value)
+        elif locale == "zh_TW":
+            self.ChineseTaiwanLanguage.setChecked(value)
+        elif locale == "el":
+            self.GreekLanguage.setChecked(value)
+        elif locale == "no":
+            self.NorwegianLanguage.setChecked(value)
+        elif locale == "nl":
+            self.DutchLanguage.setChecked(value)
+        elif locale == "ko":
+            self.KoreanLanguage.setChecked(value)
+        elif locale == "pt":
+            self.PortugueseLanguage.setChecked(value)
+        elif locale == "pt":
+            self.PortugueseLanguage.setChecked(value)
+        elif locale == "ru":
+            self.RussianLanguage.setChecked(value)
+        elif locale == "ar":
+            self.ArabicLanguage.setChecked(value)
+        elif locale == "fi":
+            self.FinishLanguage.setChecked(value)
+        elif locale == "tr":
+            self.TurkishLanguage.setChecked(value)
+        elif locale == "ja":
+            self.JapaneseLanguage.setChecked(value)
+    
     def changelocale(self,languagelocale):
-        settings = QSettings()
-        settings.setValue('locale', languagelocale)
-        QMessageBox.information(self,QApplication.translate("Message", "Switch Language",None, QApplication.UnicodeUTF8),
-                                QApplication.translate("Message","Language successfully changed. Restart the application.",None, QApplication.UnicodeUTF8))
+        if locale != languagelocale:
+            # switch old flag off
+            self.switchLanguageFlag(locale,False)
+            # switch new flag on
+            self.switchLanguageFlag(languagelocale,True)
+            settings = QSettings()
+            settings.setValue('locale', languagelocale)
+            QMessageBox.information(self,QApplication.translate("Message", "Switch Language",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("Message","Language successfully changed. Restart the application.",None, QApplication.UnicodeUTF8))
 
     # takes the weight of the green and roasted coffee as floats and
     # returns the weight loss in percentage as float
