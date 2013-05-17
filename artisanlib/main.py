@@ -25340,6 +25340,11 @@ def main():
     
     aw = ApplicationWindow()
     
+    if locale == "ar":    
+        QApplication.setLayoutDirection(Qt.RightToLeft)
+    else:
+        QApplication.setLayoutDirection(Qt.LeftToRight)
+    
     # try to select the right font for matplotlib according to the given locale and plattform
     try:
         if platf == "Darwin":
