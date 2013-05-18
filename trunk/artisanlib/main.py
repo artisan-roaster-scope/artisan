@@ -6126,35 +6126,64 @@ class ApplicationWindow(QMainWindow):
         self.messagelabel = QLabel()
         self.messagelabel.setIndent(10)
 
-        self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 16pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
-                                 "STOP":"QPushButton {font-size: 16pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
-                                 "START":"QPushButton {font-size: 16pt; font-weight: bold; color: yellow; background-color: red}",
-                                 "OFF":"QPushButton {font-size: 16pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
-                                 "ON":"QPushButton {font-size: 16pt; font-weight: bold; color: yellow; background-color: red }",
-                                 "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                 "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                 "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                 "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
-                                 "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                 "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                 "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
-                                 "RESET":"QPushButton {font-size: 16pt; font-weight: bold; color: black; background-color: white }",
-                                 "HUD_OFF":"QPushButton {font-size: 16pt; font-weight: bold; color: white; background-color: #b5baff  }",
-                                 "HUD_ON":"QPushButton {font-size: 16pt; font-weight: bold; color: white; background-color: #60ffed   }",
-                                 "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
-                                 "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
-                                 "PID":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF }",
-                                 "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
-                                 "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
-                                 "SELECTED":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
-                                 }
+        if locale == "es":
+            self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
+                                     "STOP":"QPushButton {font-size: 12pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                     "START":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red}",
+                                     "OFF":"QPushButton {font-size: 12pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                     "ON":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: red }",
+                                     "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+                                     "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+                                     "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
+                                     "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+                                     "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+                                     "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+                                     "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+                                     "RESET":"QPushButton {font-size: 12pt; font-weight: bold; color: black; background-color: white }",
+                                     "HUD_OFF":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #b5baff  }",
+                                     "HUD_ON":"QPushButton {font-size: 12pt; font-weight: bold; color: white; background-color: #60ffed   }",
+                                     "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
+                                     "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
+                                     "PID":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF }",
+                                     "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
+                                     "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
+                                     "SELECTED":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
+                                     }
+        else:
+            self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 14pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
+                                     "STOP":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                     "START":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red}",
+                                     "OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: lightgrey; background-color: #43d300}",
+                                     "ON":"QPushButton {font-size: 14pt; font-weight: bold; color: yellow; background-color: red }",
+                                     "COOL END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+                                     "DRY END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+                                     "CHARGE":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
+                                     "FC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange  }",
+                                     "FC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+                                     "SC START":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+                                     "SC END":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: orange }",
+                                     "RESET":"QPushButton {font-size: 14pt; font-weight: bold; color: black; background-color: white }",
+                                     "HUD_OFF":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #b5baff  }",
+                                     "HUD_ON":"QPushButton {font-size: 14pt; font-weight: bold; color: white; background-color: #60ffed   }",
+                                     "EVENT":"QPushButton {font-size: 10pt; font-weight: bold; color: black; background-color: yellow }",
+                                     "DROP":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #f07800 }",
+                                     "PID":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #92C3FF }",
+                                     "SV +":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: #ffaaff }",
+                                     "SV -":"QPushButton {font-size: 10pt; font-weight: bold; color: white; background-color: lightblue }",
+                                     "SELECTED":"QPushButton {font-size: 12pt; font-weight: bold; color: yellow; background-color: #6D4824 }"  #keyboard moves
+                                     }
 
         #create ON/OFF buttons
         self.button_1 = QPushButton(QApplication.translate("Button", "ON", None, QApplication.UnicodeUTF8))
         self.button_1.setFocusPolicy(Qt.NoFocus)
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None, QApplication.UnicodeUTF8))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
-        self.button_1.setMaximumSize(90, 45)
+        if locale == "el":
+            self.button_1.setMinimumWidth(120)
+            self.button_1.setMaximumSize(120, 45)
+        else:
+            self.button_1.setMinimumWidth(100)
+            self.button_1.setMaximumSize(100, 45)
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.ToggleMonitor)
 
         #create START/STOP buttons
@@ -6162,7 +6191,12 @@ class ApplicationWindow(QMainWindow):
         self.button_2.setFocusPolicy(Qt.NoFocus)
         self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None, QApplication.UnicodeUTF8))
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
-        self.button_2.setMaximumSize(90, 45)
+        if locale == "el":
+            self.button_2.setMinimumWidth(120)
+            self.button_2.setMaximumSize(120, 45)
+        else:
+            self.button_2.setMinimumWidth(100)
+            self.button_2.setMaximumSize(100, 45)
         self.connect(self.button_2, SIGNAL("clicked()"), self.qmc.ToggleRecorder)
 
         #create 1C START, 1C END, 2C START and 2C END buttons
@@ -6198,7 +6232,12 @@ class ApplicationWindow(QMainWindow):
         self.button_7 = QPushButton(QApplication.translate("Button", "RESET", None, QApplication.UnicodeUTF8))
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
-        self.button_7.setMaximumSize(120, 45)
+        if locale == "el":
+            self.button_7.setMinimumWidth(120)
+            self.button_7.setMaximumSize(120, 45)
+        else:
+            self.button_7.setMinimumWidth(100)
+            self.button_7.setMaximumSize(100, 45)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None, QApplication.UnicodeUTF8))
         self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset)
 
@@ -6285,7 +6324,12 @@ class ApplicationWindow(QMainWindow):
         self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None, QApplication.UnicodeUTF8))
         self.button_18.setFocusPolicy(Qt.NoFocus)
         self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
-        self.button_18.setMaximumSize(120, 45)
+        if locale == "el":
+            self.button_18.setMinimumWidth(120)
+            self.button_18.setMaximumSize(120, 45)
+        else:
+            self.button_18.setMinimumWidth(80)
+            self.button_18.setMaximumSize(80, 45)
         self.button_18.setContentsMargins(0,0,0,0)
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
         self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None, QApplication.UnicodeUTF8))
