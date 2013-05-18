@@ -26,7 +26,7 @@ mkdir dist/Resources/qt_plugins/iconengines
 cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqsvg.so dist/Resources/qt_plugins/imageformats
 cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqgif.so dist/Resources/qt_plugins/imageformats
 cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqjpeg.so dist/Resources/qt_plugins/imageformats
-cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqtiffso dist/Resources/qt_plugins/imageformats
+cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqtiff.so dist/Resources/qt_plugins/imageformats
 cp /usr/local/Trolltech/Qt-4.8.4/plugins/iconengines/libqsvgicon.so dist/Resources/qt_plugins/iconengines
 cp qt.conf dist
 mkdir dist/translations
