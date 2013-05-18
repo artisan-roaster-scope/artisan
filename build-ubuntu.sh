@@ -7,6 +7,8 @@ lrelease -verbose artisan.pro
 # distribution
 rm -rf dist
 bbfreeze artisan.py
+cp -L /usr/lib/i386-linux-gnu/libz.so dist
+cp -L /usr/lib/i386-linux-gnu/libxml2.so.2 dist
 cp -L /usr/lib/libicudata.so.48 dist
 cp -L /usr/lib/libicuuc.so.48 dist
 cp -L /usr/lib/libicui18n.so.48 dist
