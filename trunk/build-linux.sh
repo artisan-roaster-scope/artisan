@@ -15,8 +15,7 @@ find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 rm ${NAME}_i386.deb
 dpkg --build debian ${NAME}_i386.deb
 alien -r ${NAME}_i386.deb
-mv ${NAME}-1.i386.rpm ${NAME}_i386.rpm
-mv ${NAME}_i386.deb ${NAME}_i386.deb
+mv ${NAME}-2.i386.rpm ${NAME}_i386.rpm
 
 # build Ubuntu .deb
 
