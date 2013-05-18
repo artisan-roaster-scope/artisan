@@ -8,7 +8,7 @@ lrelease -verbose artisan.pro
 rm -rf dist
 bbfreeze artisan.py
 cp -L /usr/lib/libz.so dist
-cp -L /usr/lib/libxml2.so dist
+cp -L /usr/lib/libxml2.so.2 dist
 cp -L /usr/lib/libicudata.so.42 dist
 cp -L /usr/lib/libicuuc.so.42 dist
 cp -L /usr/lib/libicui18n.so.42 dist
