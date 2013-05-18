@@ -25378,7 +25378,7 @@ def main():
             if locale:
                 if locale == "ar":
                     mpl.rcParams['font.sans-serif'] = ["DejaVu Sans","DejaVu Sans Mono","Times New Roman"]
-                elif locale == "jp":
+                elif locale == "ja":
                     mpl.rcParams['font.sans-serif'] = ["TakaoPGothic"]
                 elif locale == "el":
                     mpl.rcParams['font.sans-serif'] = ["DejaVu Sans","DejaVu Sans Mono"]
