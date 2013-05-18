@@ -882,6 +882,8 @@ class tgraphcanvas(FigureCanvas):
         self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
         self.minmaxLimits = True
         self.dropSpikes = False
+        
+        self.swapETBT = False
 
         ###########################         wheel graph variables     ################################
         self.wheelflag = False
@@ -5302,7 +5304,10 @@ class SampleThread(QThread):
                         raise Exception(errormessage)
                 #read time, ET (t1) and BT (t2) TEMPERATURE
                 try:
-                    tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                    if aw.qmc.swapETBT:
+                        tx,t2,t1 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                    else:
+                        tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
                 except:
                     tx = aw.qmc.timeclock.elapsed()/1000
                     t1 = t2 = -1
@@ -5563,6 +5568,7 @@ class ApplicationWindow(QMainWindow):
         self.defaultAppearance = None
         # matplotlib font properties:
         self.mpl_fontproperties = mpl.font_manager.FontProperties()
+        self.full_screen_mode_active = False
         
         #############################  Define variables that need to exist before calling settingsload()
         self.curFile = None
@@ -6148,7 +6154,6 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setFocusPolicy(Qt.NoFocus)
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None, QApplication.UnicodeUTF8))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
-        #self.button_1.setMinimumHeight(50)
         self.button_1.setMaximumSize(90, 45)
         self.connect(self.button_1, SIGNAL("clicked()"), self.qmc.ToggleMonitor)
 
@@ -6157,7 +6162,6 @@ class ApplicationWindow(QMainWindow):
         self.button_2.setFocusPolicy(Qt.NoFocus)
         self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None, QApplication.UnicodeUTF8))
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
-        #self.button_2.setMinimumHeight(50)
         self.button_2.setMaximumSize(90, 45)
         self.connect(self.button_2, SIGNAL("clicked()"), self.qmc.ToggleRecorder)
 
@@ -6194,7 +6198,7 @@ class ApplicationWindow(QMainWindow):
         self.button_7 = QPushButton(QApplication.translate("Button", "RESET", None, QApplication.UnicodeUTF8))
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
-        self.button_7.setMaximumSize(90, 45)
+        self.button_7.setMaximumSize(120, 45)
         self.button_7.setToolTip(QApplication.translate("Tooltip", "Reset", None, QApplication.UnicodeUTF8))
         self.connect(self.button_7, SIGNAL("clicked()"), self.qmc.reset)
 
@@ -6281,7 +6285,7 @@ class ApplicationWindow(QMainWindow):
         self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None, QApplication.UnicodeUTF8))
         self.button_18.setFocusPolicy(Qt.NoFocus)
         self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
-        self.button_18.setMaximumSize(90, 45)
+        self.button_18.setMaximumSize(120, 45)
         self.button_18.setContentsMargins(0,0,0,0)
         self.connect(self.button_18, SIGNAL("clicked()"), self.qmc.toggleHUD)
         self.button_18.setToolTip(QApplication.translate("Tooltip", "Turns ON/OFF the HUD", None, QApplication.UnicodeUTF8))
@@ -6624,7 +6628,7 @@ class ApplicationWindow(QMainWindow):
         level1layout.addWidget(self.lcd1)
         level1layout.setMargin(0)
         level1layout.setSpacing(0)
-        level1layout.setContentsMargins(0,0,0,0)
+        level1layout.setContentsMargins(0,0,5,0)
 
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
@@ -7166,26 +7170,37 @@ class ApplicationWindow(QMainWindow):
         #print(key)
 
         #keyboard move keys
+        if key == 70: # F SELECTS FULL SCREEN MODE
+            if self.full_screen_mode_active:
+                self.full_screen_mode_active = False
+                self.showNormal()
+            else:
+                self.full_screen_mode_active = True
+                self.showFullScreen()
         if key == 32:                       #SELECTS ACTIVE BUTTON
             self.moveKbutton("space")
         if key == 16777220:                 #TURN ON/OFF KEYBOARD MOVES
             self.releaseminieditor()
             self.moveKbutton("enter")
         if key == 16777216:                 #ESCAPE
-            #if designer ON
-            if self.qmc.designerflag:
-                string = QApplication.translate("Message","Exit Designer?", None, QApplication.UnicodeUTF8)
-                reply = QMessageBox.question(self,QApplication.translate("Message", "Designer Mode ON",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
-                    self.stopdesigner()
-                else:
-                    return
-            #if wheel graph ON
-            elif self.qmc.wheelflag:
-                self.qmc.disconnectWheel()
-                self.qmc.redraw(recomputeAllDeltas=False)
-            if self.minieventsflag:
-                self.releaseminieditor()
+            if self.full_screen_mode_active:
+                self.full_screen_mode_active = False
+                self.showNormal()
+            else:
+                #if designer ON
+                if self.qmc.designerflag:
+                    string = QApplication.translate("Message","Exit Designer?", None, QApplication.UnicodeUTF8)
+                    reply = QMessageBox.question(self,QApplication.translate("Message", "Designer Mode ON",None, QApplication.UnicodeUTF8),string,QMessageBox.Yes|QMessageBox.Cancel)
+                    if reply == QMessageBox.Yes:
+                        self.stopdesigner()
+                    else:
+                        return
+                #if wheel graph ON
+                elif self.qmc.wheelflag:
+                    self.qmc.disconnectWheel()
+                    self.qmc.redraw(recomputeAllDeltas=False)
+                if self.minieventsflag:
+                    self.releaseminieditor()
         elif key == 16777234:               #MOVES CURRENT BUTTON LEFT
             self.moveKbutton("left")
         elif key == 16777236:               #MOVES CURRENT BUTTON RIGHT
@@ -7413,6 +7428,7 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[;]</b> = Application ScreenShot",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[:]</b> = Desktop ScreenShot",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[f]</b> = Full Screen Mode",None, QApplication.UnicodeUTF8))
 
         QMessageBox.information(self,QApplication.translate("Message", "Keyboard Shotcuts",None, QApplication.UnicodeUTF8),string)
 
@@ -9094,6 +9110,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.filterDropOuts = settings.value("filterDropOuts",self.qmc.filterDropOuts).toBool()
             if settings.contains("dropSpikes"):
                 self.qmc.dropSpikes = settings.value("dropSpikes",self.qmc.dropSpikes).toBool()
+            if settings.contains("swapETBT"):
+                self.qmc.swapETBT = settings.value("swapETBT",self.qmc.swapETBT).toBool()
             if settings.contains("minmaxLimits"):
                 self.qmc.minmaxLimits = settings.value("minmaxLimits",self.qmc.minmaxLimits).toBool()
                 self.qmc.filterDropOut_tmin = settings.value("minLimit",self.qmc.filterDropOut_tmin).toInt()[0]
@@ -9722,6 +9740,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             settings.setValue("filterDropOuts",self.qmc.filterDropOuts)
             settings.setValue("dropSpikes",self.qmc.dropSpikes)
+            settings.setValue("swapETBT",self.qmc.swapETBT)
             settings.setValue("minmaxLimits",self.qmc.minmaxLimits)
             settings.setValue("minLimit",self.qmc.filterDropOut_tmin)
             settings.setValue("maxLimit",self.qmc.filterDropOut_tmax)
@@ -10083,6 +10102,8 @@ class ApplicationWindow(QMainWindow):
 
     def fileQuit(self):
         if aw.qmc.checkSaved(): # if not canceled
+            if self.full_screen_mode_active:
+                self.showNormal()
             self.closeEvent(None)
             QApplication.exit()
 
@@ -10825,25 +10846,21 @@ $cupping_notes
         message.show()
 
     def helpAbout(self):
-        coredevelopers = "<br>Rafael Cobo <br> Marko Luther <br> Sebastien Delgrande"
-        contributors =  u("<br>") + u(QApplication.translate("About", "%1, linux binary",None, QApplication.UnicodeUTF8).arg("Lukas Kolbe"))
-        contributors += u("<br>") + u(QApplication.translate("About", "%1, documentation",None, QApplication.UnicodeUTF8).arg("Rich Helms"))
-        contributors += u("<br>") + u(QApplication.translate("About", "%1, TEVA18B, DTA support",None, QApplication.UnicodeUTF8).arg("Markus Wagner"))
-        contributors += u("<br>") + u(QApplication.translate("About", "%1, DTA support",None, QApplication.UnicodeUTF8).arg("Markus Mayr-Svec"))
-        contributors += u("<br>") + u(QApplication.translate("About", "%1, Swedish localization",None, QApplication.UnicodeUTF8).arg("Martin Kral"))
-        contributors += u("<br>") + u(QApplication.translate("About", "%1, Spanish localization",None, QApplication.UnicodeUTF8).arg("Bluequijote"))
-        contributors += u("<br>") + u(QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Jim G."))
-        contributors += u("<br>") + u(QApplication.translate("About", "%1, Arduino/TC4",None, QApplication.UnicodeUTF8).arg("Marcio Carneiro"))
+        coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
+        contributors = u("<br>Cetin Barut, Marcio Carnerio, Bradley Collins,")
+        contributors += u("<br>Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall,")
+        contributors += u("<br>Frans Goddjin, Rich Helms, Kyle Iseminger, Ingo,")
+        contributors += u("<br>Savvas Kiretsis, Lukas Kolbe, David Lahoz,")
+        contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
+        contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
+        contributors += u("<br>Wa'ill")
         box = QMessageBox(self)
         #create a html QString
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
                 u("""<b>{0}</b> {1} ({2})
                 <p>
-                <b>Python:</b> [ {3} ]
-                <b>Qt:</b> [ {4} ]
-                <b>PyQt:</b> [ {5} ]
-                <b>OS:</b/>[ {6} ]
+                Python {3}, PyQt {5}, Qt {4}
                 </p>
                 <p>
                 <b>{7}</b> {8}
@@ -11932,6 +11949,10 @@ class HUDDlg(ArtisanDialog):
         self.MinMaxLimits = QCheckBox(QApplication.translate("CheckBox", "Limits",None, QApplication.UnicodeUTF8))
         self.MinMaxLimits.setChecked(aw.qmc.minmaxLimits)
         self.connect(self.MinMaxLimits,SIGNAL("stateChanged(int)"),lambda i=0:self.changeMinMaxLimits(i))
+        #swapETBT flag
+        self.swapETBT = QCheckBox(QApplication.translate("CheckBox", "ET <-> BT",None, QApplication.UnicodeUTF8))
+        self.swapETBT.setChecked(aw.qmc.swapETBT)
+        self.connect(self.swapETBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeSwapETBT(i))
         #limits
         minlabel = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
         maxlabel = QLabel(QApplication.translate("Label", "max",None, QApplication.UnicodeUTF8))
@@ -12057,7 +12078,8 @@ class HUDDlg(ArtisanDialog):
         inputFilterGrid.addWidget(self.minLimit,0,2)
         inputFilterGrid.addWidget(maxlabel,0,4)
         inputFilterGrid.addWidget(self.maxLimit,0,5)
-        inputFilterGrid.addWidget(self.DropSpikes,2,0)
+        inputFilterGrid.addWidget(self.DropSpikes,1,0)
+        inputFilterGrid.addWidget(self.swapETBT,1,5)
         inputFilterHBox = QHBoxLayout()
         inputFilterHBox.addLayout(inputFilterGrid)
         inputFilterHBox.addStretch()
@@ -12516,6 +12538,9 @@ class HUDDlg(ArtisanDialog):
 
     def changeMinMaxLimits(self,i):
         aw.qmc.minmaxLimits = not aw.qmc.minmaxLimits
+        
+    def changeSwapETBT(self,i):
+        aw.qmc.swapETBT = not aw.qmc.swapETBT
         
     def changeFilter(self,i):
         try:
@@ -14757,7 +14782,7 @@ class EventsDlg(ArtisanDialog):
         restorebutton = QPushButton(QApplication.translate("Button","Load", None, QApplication.UnicodeUTF8))
         restorebutton.setFocusPolicy(Qt.NoFocus)
         backupbutton.setToolTip(QApplication.translate("Tooltip","Backup all palettes to a text file",None, QApplication.UnicodeUTF8))
-        restorebutton.setToolTip(QApplication.translate("Tooltip","Restore all palettes from a text",None, QApplication.UnicodeUTF8))
+        restorebutton.setToolTip(QApplication.translate("Tooltip","Restore all palettes from a text file",None, QApplication.UnicodeUTF8))
         backupbutton.setMaximumWidth(140)
         restorebutton.setMaximumWidth(140)
         self.connect(backupbutton, SIGNAL("clicked()"),aw.backuppaletteeventbuttons)
@@ -23330,7 +23355,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         wlabel.setMargin(10)
         wlabel.setStyleSheet("background-color:'#CCCCCC';")
         wlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None, QApplication.UnicodeUTF8) + "<\b></font>")
-        wlabel.setMaximumSize(50, 42)
+        wlabel.setMaximumSize(100, 42)
         wlabel.setMinimumHeight(50)
         self.p1edit =  QLineEdit(QString(str(aw.fujipid.PXG4["p1"][0])))
         self.p2edit =  QLineEdit(QString(str(aw.fujipid.PXG4["p2"][0])))
@@ -23441,10 +23466,10 @@ class PXG4pidDlgControl(ArtisanDialog):
         #****************************   TAB5 WIDGETS
         ETthermolabel = QLabel(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
         BTthermolabel = QLabel(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
-        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan seetings",None, QApplication.UnicodeUTF8))
+        BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
-        self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
+#        self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
         ## FUJI PXG input types
         ##0 (JPT 100'3f)
         ##1 (PT 100'3f)
@@ -23532,9 +23557,9 @@ class PXG4pidDlgControl(ArtisanDialog):
         PointButtonET = QPushButton(QApplication.translate("Button","Set ET PID to 1 decimal point",None, QApplication.UnicodeUTF8))
         PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None, QApplication.UnicodeUTF8))
         timeunitsbutton = QPushButton(QApplication.translate("Button","Set ET PID to MM:SS time units",None, QApplication.UnicodeUTF8))
-        PointButtonET.setMaximumWidth(180)
-        PointButtonBT.setMaximumWidth(180)
-        timeunitsbutton.setMaximumWidth(180)
+#        PointButtonET.setMaximumWidth(180)
+#        PointButtonBT.setMaximumWidth(180)
+#        timeunitsbutton.setMaximumWidth(180)
         pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None, QApplication.UnicodeUTF8))
         timelabel = QLabel(QApplication.translate("Label","Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks",None, QApplication.UnicodeUTF8))
         self.connect(PointButtonET, SIGNAL("clicked()"), lambda PID="ET": self.setpoint(PID))
@@ -23782,22 +23807,22 @@ class PXG4pidDlgControl(ArtisanDialog):
 
     def paintlabels(self):
         #read values of computer variables (not the actual pid values) to place in buttons
-        str1 = "1 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment1sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment1ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment1soak"][0])))
-        str2 = "2 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment2sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment2ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment2soak"][0])))
-        str3 = "3 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment3sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment3ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment3soak"][0])))
-        str4 = "4 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment4sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment4ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment4soak"][0])))
-        str5 = "5 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment5sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment5ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment5soak"][0])))
-        str6 = "6 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment6sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment6ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment6soak"][0])))
-        str7 = "7 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment7sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment7ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment7soak"][0])))
-        str8 = "8 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment8sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment8ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment8soak"][0])))
-        str9 = "9 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment9sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment9ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment9soak"][0])))
-        str10 = "10 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment10sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment10ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment10soak"][0])))
-        str11 = "11 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment11sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment11ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment11soak"][0])))
-        str12 = "12 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment12sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment12ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment12soak"][0])))
-        str13 = "13 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment13sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment13ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment13soak"][0])))
-        str14 = "14 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment14sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment14ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment14soak"][0])))
-        str15 = "15 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment15sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment15ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment15soak"][0])))
-        str16 = "16 [T %1] [R %2] [S %3]".arg(str(aw.fujipid.PXG4["segment16sv"][0])).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment16ramp"][0]))).arg(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment16soak"][0])))
+        str1 = "1 [T " + str(aw.fujipid.PXG4["segment1sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment1ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment1soak"][0])) + "]"
+        str2 = "2 [T " + str(aw.fujipid.PXG4["segment2sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment2ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment2soak"][0])) + "]"
+        str3 = "3 [T " + str(aw.fujipid.PXG4["segment3sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment3ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment3soak"][0])) + "]"
+        str4 = "4 [T " + str(aw.fujipid.PXG4["segment4sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment4ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment4soak"][0])) + "]"
+        str5 = "5 [T " + str(aw.fujipid.PXG4["segment5sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment5ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment5soak"][0])) + "]"
+        str6 = "6 [T " + str(aw.fujipid.PXG4["segment6sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment6ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment6soak"][0])) + "]"
+        str7 = "7 [T " + str(aw.fujipid.PXG4["segment7sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment7ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment7soak"][0])) + "]"
+        str8 = "8 [T " + str(aw.fujipid.PXG4["segment8sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment8ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment8soak"][0])) + "]"
+        str9 = "9 [T " + str(aw.fujipid.PXG4["segment9sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment8ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment9soak"][0])) + "]"
+        str10 = "10 [T " + str(aw.fujipid.PXG4["segment10sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment10ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment10soak"][0])) + "]"
+        str11 = "11 [T " + str(aw.fujipid.PXG4["segment11sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment11ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment11soak"][0])) + "]"
+        str12 = "12 [T " + str(aw.fujipid.PXG4["segment12sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment12ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment12soak"][0])) + "]"
+        str13 = "13 [T " + str(aw.fujipid.PXG4["segment13sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment13ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment13soak"][0])) + "]"
+        str14 = "14 [T " + str(aw.fujipid.PXG4["segment14sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment14ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment14soak"][0])) + "]"
+        str15 = "15 [T " + str(aw.fujipid.PXG4["segment15sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment15ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment15soak"][0])) + "]"
+        str16 = "16 [T " + str(aw.fujipid.PXG4["segment16sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment16ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment16soak"][0])) + "]"
         self.label_rs1.setText(QString(str1))
         self.label_rs2.setText(QString(str2))
         self.label_rs3.setText(QString(str3))
