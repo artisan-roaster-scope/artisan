@@ -1168,6 +1168,7 @@ class tgraphcanvas(FigureCanvas):
             if aw.qmc.projectFlag:
                 self.viewProjection()
             self.HUDflag = False
+            aw.HUD.clear()
             aw.button_18.setStyleSheet("QPushButton { background-color: #b5baff }")
             aw.stack.setCurrentIndex(0)
             self.resetlines()
@@ -1175,18 +1176,18 @@ class tgraphcanvas(FigureCanvas):
             
         #ON
         else:
-            if len(self.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
-                #load
-                img = QPixmap().grabWidget(self)
-#                img = self.grab()
-                aw.HUD.setPixmap(img)
-                
-                self.HUDflag = True
-                aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
-                aw.stack.setCurrentIndex(1)
-                aw.sendmessage(QApplication.translate("Message","HUD ON", None, QApplication.UnicodeUTF8))
-            else:
-                aw.sendmessage(QApplication.translate("Message","Need some data for HUD to work", None, QApplication.UnicodeUTF8))
+#            if len(self.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
+            #load
+            img = QPixmap().grabWidget(self)
+#            img = self.grab()
+            aw.HUD.setPixmap(img)
+            
+            self.HUDflag = True
+            aw.button_18.setStyleSheet("QPushButton { background-color: #60ffed }")
+            aw.stack.setCurrentIndex(1)
+            aw.sendmessage(QApplication.translate("Message","HUD ON", None, QApplication.UnicodeUTF8))
+#            else:
+#                aw.sendmessage(QApplication.translate("Message","Need some data for HUD to work", None, QApplication.UnicodeUTF8))
 
 
     def timealign(self,redraw=True,recompute=False):
@@ -1363,50 +1364,47 @@ class tgraphcanvas(FigureCanvas):
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
-
-        self.resetlines()
-
-        if self.timeindex[0] != -1:
-            starttime = self.timex[self.timeindex[0]]
-        else:
-            starttime = 0
-
-        if self.projectionmode == 0:
-            #calculate the temperature endpoint at endofx acording to the latest rate of change
-            BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ starttime)/60.
-            ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ starttime)/60.
-            #plot projections
-            self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
-                             linestyle = '-.', linewidth= 8, alpha = .3)
-            self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], ETprojection],color =  self.palette["et"],
-                             linestyle = '-.', linewidth= 8, alpha = .3)
-
-        elif self.projectionmode == 1:
-            # Under Test. Newton's Law of Cooling
-            # This comes from the formula of heating (with ET) a cool (colder) object (BT).
-            # The difference equation (discrete with n elements) is: DeltaT = T(n+1) - T(n) = K*(ET - BT)
-            # The formula is a natural decay towards ET. The closer BT to ET, the smaller the change in DeltaT
-            # projectionconstant is a multiplier factor. It depends on
-            # 1 Damper or fan. Heating by convection is _faster_ than heat by conduction,
-            # 2 Mass of beans. The heavier the mass, the _slower_ the heating of BT
-            # 3 Gas or electric power: gas heats BT _faster_ because of hoter air.
-            # Every roaster will have a different constantN.
-
-            den = self.temp1[-1] - self.temp2[-1]  #denominator ETn - BTn 
-            if den > 0: # if ETn > BTn
-                #get x points
-                xpoints = list(numpy.arange(self.timex[-1],self.endofx + 120, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds)
-                #get y points
-                ypoints = [self.temp2[-1]]                                  # start initializing with last BT
-                K =  self.projectionconstant*self.rateofchange2/den/60.                 # multiplier
-                for _ in range(len(xpoints)-1):                                     # create new points from previous points 
-                    DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
-                    ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
-
-                #plot ET level (straight line) and BT curve
-                self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], self.temp1[-1]],color =  self.palette["et"],
-                             linestyle = '-.', linewidth= 3, alpha = .5)
-                self.ax.plot(xpoints, ypoints, color =  self.palette["bt"],linestyle = '-.', linewidth= 3, alpha = .5)
+        if len(aw.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
+            self.resetlines()
+            if self.timeindex[0] != -1:
+                starttime = self.timex[self.timeindex[0]]
+            else:
+                starttime = 0
+            if self.projectionmode == 0:
+                #calculate the temperature endpoint at endofx acording to the latest rate of change
+                BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ starttime)/60.
+                ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ starttime)/60.
+                #plot projections
+                self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
+                                 linestyle = '-.', linewidth= 8, alpha = .3)
+                self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], ETprojection],color =  self.palette["et"],
+                                 linestyle = '-.', linewidth= 8, alpha = .3)
+            elif self.projectionmode == 1:
+                # Under Test. Newton's Law of Cooling
+                # This comes from the formula of heating (with ET) a cool (colder) object (BT).
+                # The difference equation (discrete with n elements) is: DeltaT = T(n+1) - T(n) = K*(ET - BT)
+                # The formula is a natural decay towards ET. The closer BT to ET, the smaller the change in DeltaT
+                # projectionconstant is a multiplier factor. It depends on
+                # 1 Damper or fan. Heating by convection is _faster_ than heat by conduction,
+                # 2 Mass of beans. The heavier the mass, the _slower_ the heating of BT
+                # 3 Gas or electric power: gas heats BT _faster_ because of hoter air.
+                # Every roaster will have a different constantN.
+    
+                den = self.temp1[-1] - self.temp2[-1]  #denominator ETn - BTn 
+                if den > 0: # if ETn > BTn
+                    #get x points
+                    xpoints = list(numpy.arange(self.timex[-1],self.endofx + 120, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds)
+                    #get y points
+                    ypoints = [self.temp2[-1]]                                  # start initializing with last BT
+                    K =  self.projectionconstant*self.rateofchange2/den/60.                 # multiplier
+                    for _ in range(len(xpoints)-1):                                     # create new points from previous points 
+                        DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
+                        ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
+    
+                    #plot ET level (straight line) and BT curve
+                    self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], self.temp1[-1]],color =  self.palette["et"],
+                                 linestyle = '-.', linewidth= 3, alpha = .5)
+                    self.ax.plot(xpoints, ypoints, color =  self.palette["bt"],linestyle = '-.', linewidth= 3, alpha = .5)
 
     # this function is called from the HUD DLg and reports the linear time (straight line) it would take to reach a temperature target
     # acording to the current rate of change
@@ -5621,6 +5619,7 @@ class ApplicationWindow(QMainWindow):
 
         ####    HUD
         self.HUD = QLabel()  #main canvas for hud widget
+        self.HUD.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
 
         #This is a list of different HUD functions.
         self.showHUD = [self.showHUDmetrics, self.showHUDthermal]
@@ -6909,7 +6908,7 @@ class ApplicationWindow(QMainWindow):
     def sliderLCD(self):
         slcd = QLCDNumber()
         slcd.setSegmentStyle(2)
-        slcd.setNumDigits(3)
+        slcd.setNumDigits(2)
         slcd.setMinimumHeight(35)
         slcd.setMinimumWidth(50)
         slcd.setMaximumWidth(50)
@@ -11455,85 +11454,93 @@ $cupping_notes
             #turn back ON to adquire new size
             self.qmc.toggleHUD()
             self.qmc.hudresizeflag = False
-        ETreachTime,BTreachTime,ET2reachTime,BT2reachTime = self.qmc.getTargetTime()
-        if ETreachTime > 0 and ETreachTime < 2000:
-            text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
-            if self.qmc.timeindex[0]:
-                text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
-        else:
-            text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
-        if ET2reachTime > 0 and ET2reachTime < 2000:
-            text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
-            if self.qmc.timeindex[0]:
-                text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
-        else:
-            text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ET2target) + self.qmc.mode))
-        if BTreachTime > 0 and BTreachTime < 2000:    
-            text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
-            if self.qmc.timeindex[0]:
-                text3 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
-        else:
-            text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
-        if BT2reachTime > 0 and BT2reachTime < 2000:
-            text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
-            if self.qmc.timeindex[0]:
-                text4 = text4 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
-        else:
-            text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BT2target) + self.qmc.mode))
-        ####  Phase Texts #####
-        phasetext1 = u("") # lower textline
-        phasetext2 = u("") # higher textline
-        if self.qmc.timeindex[2]: # after FCs
-            FCs_time = self.qmc.timex[self.qmc.timeindex[2]]
-            afterFCs = self.qmc.timex[-1] - FCs_time
-            phasetext1 = u(QApplication.translate("Label","%1 after FCs", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(afterFCs))))
-        if self.qmc.timeindex[3]: # after FCe
-            FCe_time = self.qmc.timex[self.qmc.timeindex[3]]
-            afterFCe = self.qmc.timex[-1] - FCe_time
-            phasetext2 = u(QApplication.translate("Label","%1 after FCe", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(afterFCe))))
-            if self.qmc.timeindex[2]:
-                phasetext2 = phasetext2 + u(" (") + u(self.qmc.stringfromseconds(int(FCe_time - self.qmc.timex[self.qmc.timeindex[2]]))) + u(" FC)")
-        ####   ET pid    ######
-        error = self.qmc.ETtarget - self.qmc.temp1[-1]
-        differror = error - self.qmc.pidpreviouserror
-        difftime = self.qmc.timex[-1] - self.qmc.timex[-2]
-        if not difftime: difftime = 0.01
-        proportionalterm = self.qmc.hudETpid[0]*error
-        integralterm = self.qmc.hudETpid[1]*differror*difftime
-        derivativeterm = self.qmc.hudETpid[2]*differror/difftime
-        self.qmc.pidpreviouserror = error
-        MV = proportionalterm + integralterm + derivativeterm   # Manipulated Variable
-        if MV > 100.:MV = 100.
-        elif MV < 0.:MV = 0.
-        MVV = int(round(MV))
-        pidstring = "ET pid = %i "%MVV
-        ##### end of ET pid
-        img = QPixmap().grabWidget(self.qmc)
-#        img = self.qmc.grab()
-        Wwidth = self.qmc.size().width()
-        Wheight = self.qmc.size().height()
-        #Draw begins
-        p = QPainter(img)
-        #chose font
-#        font = QFont('Utopia', 14, -1)
-#        p.setFont(font)
-        p.setOpacity(0.8)
-        p.setPen(QColor("slategrey"))
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/4.5),QString(text1))
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/5.3),QString(text2))
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6.6),QString(text3))
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8.5),QString(text4))
-        #draw pid
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3),QString(pidstring))
-        p.drawRect(Wwidth/7+140, Wheight - Wheight/3-12, 100, 12)
-        p.fillRect(Wwidth/7+140, Wheight - Wheight/3-12, MVV, 12, QColor("pink"))
-        delta = u(QApplication.translate("Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])))
-        p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3.5),QString(delta))
-        #draw phase texts
-        p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/6),QString(phasetext1))
-        p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/8),QString(phasetext2))
-        p.end()
-        self.HUD.setPixmap(img)
+        if len(self.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
+            ETreachTime,BTreachTime,ET2reachTime,BT2reachTime = self.qmc.getTargetTime()
+            if ETreachTime > 0 and ETreachTime < 2000:
+                text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
+                if self.qmc.timeindex[0]:
+                    text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
+            else:
+                text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
+            if ET2reachTime > 0 and ET2reachTime < 2000:
+                text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
+                if self.qmc.timeindex[0]:
+                    text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
+            else:
+                text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ET2target) + self.qmc.mode))
+                
+            if BTreachTime > 0 and BTreachTime < 2000:    
+                text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
+                if self.qmc.timeindex[0]:
+                    text3 = text3 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
+            else:
+                text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
+            if BT2reachTime > 0 and BT2reachTime < 2000:
+                text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
+                if self.qmc.timeindex[0]:
+                    text4 = text4 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
+            else:
+                text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BT2target) + self.qmc.mode))
+            ####  Phase Texts #####
+            phasetext1 = u("") # lower textline
+            phasetext2 = u("") # higher textline
+            if self.qmc.timeindex[2]: # after FCs
+                FCs_time = self.qmc.timex[self.qmc.timeindex[2]]
+                if self.qmc.timeindex[6]: # after DROP
+                    afterFCs = self.qmc.timex[self.qmc.timeindex[6]] - FCs_time
+                else:
+                    afterFCs = self.qmc.timex[-1] - FCs_time
+                phasetext1 = u(QApplication.translate("Label","%1 after FCs", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(afterFCs))))
+            if self.qmc.timeindex[3]: # after FCe
+                FCe_time = self.qmc.timex[self.qmc.timeindex[3]]
+                if self.qmc.timeindex[6]: # after DROP
+                    afterFCe = self.qmc.timex[self.qmc.timeindex[6]] - FCe_time
+                else:
+                    afterFCe = self.qmc.timex[-1] - FCe_time
+                phasetext2 = u(QApplication.translate("Label","%1 after FCe", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(afterFCe))))
+                if self.qmc.timeindex[2]:
+                    phasetext2 = phasetext2 + u(" (") + u(self.qmc.stringfromseconds(int(FCe_time - self.qmc.timex[self.qmc.timeindex[2]]))) + u(" FC)")
+            ####   ET pid    ######
+            error = self.qmc.ETtarget - self.qmc.temp1[-1]
+            differror = error - self.qmc.pidpreviouserror
+            difftime = self.qmc.timex[-1] - self.qmc.timex[-2]
+            if not difftime: difftime = 0.01
+            proportionalterm = self.qmc.hudETpid[0]*error
+            integralterm = self.qmc.hudETpid[1]*differror*difftime
+            derivativeterm = self.qmc.hudETpid[2]*differror/difftime
+            self.qmc.pidpreviouserror = error
+            MV = proportionalterm + integralterm + derivativeterm   # Manipulated Variable
+            if MV > 100.:MV = 100.
+            elif MV < 0.:MV = 0.
+            MVV = int(round(MV))
+            pidstring = "ET pid = %i "%MVV
+            ##### end of ET pid
+            img = QPixmap().grabWidget(self.qmc)
+    #        img = self.qmc.grab()
+            Wwidth = self.qmc.size().width()
+            Wheight = self.qmc.size().height()
+            #Draw begins
+            p = QPainter(img)
+            #chose font
+    #        font = QFont('Utopia', 14, -1)
+    #        p.setFont(font)
+            p.setOpacity(0.8)
+            p.setPen(QColor("slategrey"))
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/4.5),QString(text1))
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/5.3),QString(text2))
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/6.6),QString(text3))
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/8.5),QString(text4))
+            #draw pid
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3),QString(pidstring))
+            p.drawRect(Wwidth/7+140, Wheight - Wheight/3-12, 100, 12)
+            p.fillRect(Wwidth/7+140, Wheight - Wheight/3-12, MVV, 12, QColor("pink"))
+            delta = u(QApplication.translate("Label","ET - BT = %1", None, QApplication.UnicodeUTF8).arg("%.1f"%(self.qmc.temp1[-1] - self.qmc.temp2[-1])))
+            p.drawText(QPoint(Wwidth/7,Wheight - Wheight/3.5),QString(delta))
+            #draw phase texts
+            p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/6),QString(phasetext1))
+            p.drawText(QPoint(Wwidth/2 + 100,Wheight - Wheight/8),QString(phasetext2))
+            p.end()
+            self.HUD.setPixmap(img)
 
     def showHUDthermal(self):
         if self.qmc.hudresizeflag:
