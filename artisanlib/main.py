@@ -3789,7 +3789,7 @@ class tgraphcanvas(FigureCanvas):
                     ts,tse,tsb = aw.ts()
     
                     #end temperature
-                    strline = QApplication.translate("Label", "BT=%1-%2 (%3)   ET=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]", None,
+                    strline = QApplication.translate("Label", "ET=%1-%2 (%3)   BT=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]", None,
                               QApplication.UnicodeUTF8).arg("%.1f"%BTmin + self.mode).arg("%.1f"%BTmax + self.mode).arg("%.1f"%abs(BTmax - BTmin)).arg("%.1f"%ETmin + self.mode).arg("%.1f"%ETmax + self.mode).arg("%.1f"%abs(ETmax - ETmin)).arg(timez).arg(ror).arg("%d%sm"%(ts,self.mode)).arg(tse).arg(tsb)
     
                     # even better: use xlabel
@@ -10253,7 +10253,7 @@ th {
 </table>
 </td>
 <td>
-<table width="220">
+<table width="230">
 <tr>
 <th>""" + u(QApplication.translate("HTML Report Template", "CHARGE:", None, QApplication.UnicodeUTF8)) + """</th>
 <td>$charge</td>
