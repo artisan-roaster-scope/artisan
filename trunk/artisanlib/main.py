@@ -880,7 +880,7 @@ class tgraphcanvas(FigureCanvas):
         self.filterDropOut_tmin = self.filterDropOut_tmin_F_default
         self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
         self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
-        self.minmaxLimits = True
+        self.minmaxLimits = False
         self.dropSpikes = False
         
         self.swapETBT = False
