@@ -15428,8 +15428,8 @@ class EventsDlg(ArtisanDialog):
     def createEventbuttonTable(self):
         self.eventbuttontable.clear()
         nbuttons = len(aw.extraeventstypes) 
+        self.eventbuttontable.setRowCount(nbuttons)
         if nbuttons:
-            self.eventbuttontable.setRowCount(nbuttons)
             self.eventbuttontable.setColumnCount(9)
             self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None, QApplication.UnicodeUTF8),
                                                              QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8),
