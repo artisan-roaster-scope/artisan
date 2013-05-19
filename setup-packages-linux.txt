@@ -100,12 +100,32 @@ Download and install distribute for Python 2.7
 
 Download and extract sources
 
+
+PATCH 1:
+
 to avoid the"-fuse-ld=gold' error
 remove the lines:
 linux-g++ {
 ... -fuse-ld=gold
 }
 from src/3rdparty/webkit/Source/common.pri
+
+
+PATCH 2 (fix for the Gtk theme issue on some platforms: "QGtkStyle was unable to detect the current GTK+ theme."):
+(see https://qt.gitorious.org/qt/qt/commit/a9dc50330acee2ac and https://bugzilla.redhat.com/show_bug.cgi?id=702493)
+src/gui/styles/qgtkstyle_p.cpp Line 510-513
+--
+	if (themeName.isEmpty()) {
+	   qWarning("QGtkStyle was unable to detect the current GTK+ theme.");
+	   return;
+	} else if (themeName == QLS("Qt") || themeName == QLS("Qt4")) {
+--
+=>
+--
+        if (themeName == QLS("Qt") || themeName == QLS("Qt4")) {
+--
+
+
 
 # ./configure -opensource -confirm-license -release -nomake tests -nomake examples -nomake demos -gtkstyle
 # make -j3
