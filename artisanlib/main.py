@@ -6178,7 +6178,7 @@ class ApplicationWindow(QMainWindow):
         self.button_1.setFocusPolicy(Qt.NoFocus)
         self.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None, QApplication.UnicodeUTF8))
         self.button_1.setStyleSheet(self.pushbuttonstyles["OFF"])
-        if locale == "el":
+        if locale in ["el", "no"]:
             self.button_1.setMinimumWidth(120)
             self.button_1.setMaximumSize(120, 45)
         else:
@@ -6191,7 +6191,7 @@ class ApplicationWindow(QMainWindow):
         self.button_2.setFocusPolicy(Qt.NoFocus)
         self.button_2.setToolTip(QApplication.translate("Tooltip", "Start recording", None, QApplication.UnicodeUTF8))
         self.button_2.setStyleSheet(self.pushbuttonstyles["STOP"])
-        if locale == "el":
+        if locale in ["el", "no"]:
             self.button_2.setMinimumWidth(120)
             self.button_2.setMaximumSize(120, 45)
         else:
@@ -6232,7 +6232,7 @@ class ApplicationWindow(QMainWindow):
         self.button_7 = QPushButton(QApplication.translate("Button", "RESET", None, QApplication.UnicodeUTF8))
         self.button_7.setFocusPolicy(Qt.NoFocus)
         self.button_7.setStyleSheet(self.pushbuttonstyles["RESET"])
-        if locale == "el":
+        if locale in ["el", "no"]:
             self.button_7.setMinimumWidth(120)
             self.button_7.setMaximumSize(120, 45)
         else:
@@ -6324,9 +6324,9 @@ class ApplicationWindow(QMainWindow):
         self.button_18 = QPushButton(QApplication.translate("Button", "HUD", None, QApplication.UnicodeUTF8))
         self.button_18.setFocusPolicy(Qt.NoFocus)
         self.button_18.setStyleSheet(self.pushbuttonstyles["DISABLED"])
-        if locale == "el":
-            self.button_18.setMinimumWidth(120)
-            self.button_18.setMaximumSize(120, 45)
+        if locale in ["el", "no"]:
+            self.button_18.setMinimumWidth(100)
+            self.button_18.setMaximumSize(100, 45)
         else:
             self.button_18.setMinimumWidth(80)
             self.button_18.setMaximumSize(80, 45)
@@ -6620,7 +6620,7 @@ class ApplicationWindow(QMainWindow):
 
         LCDlayout = QVBoxLayout() 
         LCDlayout.setSpacing(0)
-        LCDlayout.setContentsMargins(0,0,0,0)
+        LCDlayout.setContentsMargins(0,0,5,0)
 
         #place control buttons + LCDs inside vertical button layout manager
         self.LCD2frame = QFrame()
@@ -11515,8 +11515,8 @@ $cupping_notes
         #Draw begins
         p = QPainter(img)
         #chose font
-        font = QFont('Utopia', 14, -1)
-        p.setFont(font)
+#        font = QFont('Utopia', 14, -1)
+#        p.setFont(font)
         p.setOpacity(0.8)
         p.setPen(QColor("slategrey"))
         p.drawText(QPoint(Wwidth/7,Wheight - Wheight/4.5),QString(text1))
@@ -11994,7 +11994,7 @@ class HUDDlg(ArtisanDialog):
         self.MinMaxLimits.setChecked(aw.qmc.minmaxLimits)
         self.connect(self.MinMaxLimits,SIGNAL("stateChanged(int)"),lambda i=0:self.changeMinMaxLimits(i))
         #swapETBT flag
-        self.swapETBT = QCheckBox(QApplication.translate("CheckBox", "ET <-> BT",None, QApplication.UnicodeUTF8))
+        self.swapETBT = QCheckBox("ET <-> BT")
         self.swapETBT.setChecked(aw.qmc.swapETBT)
         self.connect(self.swapETBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeSwapETBT(i))
         #limits
@@ -12117,13 +12117,13 @@ class HUDDlg(ArtisanDialog):
         hudGroupLayout.setLayout(hudLayout)
         inputFilterGrid = QGridLayout()
         inputFilterGrid.setColumnMinimumWidth(3,20)
-        inputFilterGrid.addWidget(self.MinMaxLimits,0,0)
-        inputFilterGrid.addWidget(minlabel,0,1)
-        inputFilterGrid.addWidget(self.minLimit,0,2)
-        inputFilterGrid.addWidget(maxlabel,0,4)
-        inputFilterGrid.addWidget(self.maxLimit,0,5)
-        inputFilterGrid.addWidget(self.DropSpikes,1,0)
-        inputFilterGrid.addWidget(self.swapETBT,1,5)
+        inputFilterGrid.addWidget(self.swapETBT,0,0)
+        inputFilterGrid.addWidget(self.MinMaxLimits,1,0)
+        inputFilterGrid.addWidget(minlabel,1,1)
+        inputFilterGrid.addWidget(self.minLimit,1,2)
+        inputFilterGrid.addWidget(maxlabel,1,4)
+        inputFilterGrid.addWidget(self.maxLimit,1,5)
+        inputFilterGrid.addWidget(self.DropSpikes,2,0)
         inputFilterHBox = QHBoxLayout()
         inputFilterHBox.addLayout(inputFilterGrid)
         inputFilterHBox.addStretch()
