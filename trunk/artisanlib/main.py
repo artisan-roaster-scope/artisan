@@ -17030,7 +17030,7 @@ class modbusport(object):
                 self.master.serial.setParity(self.parity)
                 self.master.serial.setStopbits(self.stopbits)
                 # timeout seems to delay sequential requests in minimalmodbus so keep the default for now
-                #self.master.serial.setTimeout(self.timeout) 
+                self.master.serial.setTimeout(self.timeout) 
                 # configure Instrument:
                 self.master.debug = False
                 # open port
