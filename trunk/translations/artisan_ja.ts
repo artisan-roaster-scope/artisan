@@ -3,6 +3,41 @@
 <context>
     <name>About</name>
     <message>
+        <location filename="artisanlib/main.py" line="10743"/>
+        <source>%1, linux binary</source>
+        <translation type="obsolete">%1, linux バイナリ</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="10744"/>
+        <source>%1, documentation</source>
+        <translation type="obsolete">%1, 関連文章</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="10745"/>
+        <source>%1, TEVA18B, DTA support</source>
+        <translation type="obsolete">%1, TEVA18B, DTA サポート</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="10746"/>
+        <source>%1, DTA support</source>
+        <translation type="obsolete">%1, DTA サポート</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="10747"/>
+        <source>%1, Swedish localization</source>
+        <translation type="obsolete">%1, スウェーデン語ローカライズ対応</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="10748"/>
+        <source>%1, Spanish localization</source>
+        <translation type="obsolete">%1, スペイン語ローカライズ対応</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="10750"/>
+        <source>%1, Arduino/TC4</source>
+        <translation type="obsolete">%1, Arduino/TC4</translation>
+    </message>
+    <message>
         <location filename="artisanlib/main.py" line="10902"/>
         <source>About</source>
         <translation>プログラムについて</translation>
@@ -743,12 +778,12 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="11992"/>
         <source>Smooth Spikes</source>
-        <translation>スパイク波形をスムースにする</translation>
+        <translation>スムーススパイク</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="11996"/>
         <source>Drop Spikes</source>
-        <translation>スパイク波形を裁ち落す</translation>
+        <translation>ドロップスパイク</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12000"/>
@@ -926,22 +961,22 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="654"/>
         <source>Speed</source>
-        <translation>速度</translation>
+        <translation>Speed</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="655"/>
         <source>Power</source>
-        <translation>出力</translation>
+        <translation>Power</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="656"/>
         <source>Damper</source>
-        <translation>ダンパー</translation>
+        <translation>Damper</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="657"/>
         <source>Fan</source>
-        <translation>ファン</translation>
+        <translation>Fan</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12225"/>
@@ -1156,12 +1191,12 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="14594"/>
         <source>Type</source>
-        <translation>タイプ</translation>
+        <translation>タイプ別</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14595"/>
         <source>Value</source>
-        <translation>値</translation>
+        <translation>値別</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15469"/>
@@ -1181,7 +1216,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="22188"/>
         <source>Call Program</source>
-        <translation>プログラムを呼び出す</translation>
+        <translation>プログラム呼び出し</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15448"/>
@@ -1354,12 +1389,12 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="4224"/>
         <source>Create</source>
-        <translation>作成</translation>
+        <translation>プロファイルを作成</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="4228"/>
         <source>Config...</source>
-        <translation>構成...</translation>
+        <translation>プロファイル構成...</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="4238"/>
@@ -1399,12 +1434,12 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="4840"/>
         <source>Edit Mode</source>
-        <translation>編集モード</translation>
+        <translation>編集モードへ</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="4844"/>
         <source>Exit</source>
-        <translation>終了</translation>
+        <translation>ホイールグラフエディタを終了</translation>
     </message>
 </context>
 <context>
@@ -1671,12 +1706,12 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="14035"/>
         <source>AutoSave Path</source>
-        <translation>オートセーブのパス</translation>
+        <translation>オートセーブパスの参照</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14058"/>
         <source>Axes</source>
-        <translation>軸</translation>
+        <translation>グラフパーツ</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14338"/>
@@ -2120,7 +2155,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="2008"/>
         <source>deg/min</source>
-        <translation>deg/min</translation>
+        <translation>度/分</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="18833"/>
@@ -2213,7 +2248,7 @@ END</translation>
         <translation>d/m</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="3794"/>
+        <location filename="artisanlib/main.py" line="3793"/>
         <source>BT=%1-%2 (%3)   ET=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]</source>
         <translation type="obsolete">BT=%1-%2 (%3)   ET=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]</translation>
     </message>
@@ -2360,12 +2395,12 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="16794"/>
         <source>min</source>
-        <translation>最小</translation>
+        <translation>下限</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="16795"/>
         <source>max</source>
-        <translation>最大</translation>
+        <translation>上限</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12147"/>
@@ -2390,27 +2425,27 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="12854"/>
         <source>Beans</source>
-        <translation>豆種</translation>
+        <translation>豆</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12864"/>
         <source>Weight</source>
-        <translation>重量</translation>
+        <translation>重さ</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12899"/>
         <source> in</source>
-        <translation>焙煎前</translation>
+        <translation> 焙煎前</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12900"/>
         <source> out</source>
-        <translation>焙煎後</translation>
+        <translation> 焙煎後</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12913"/>
         <source> %</source>
-        <translation>%</translation>
+        <translation> %</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12898"/>
@@ -2450,7 +2485,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="12996"/>
         <source>Storage Conditions</source>
-        <translation>保管場所の状態</translation>
+        <translation>保管状態</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13016"/>
@@ -2460,7 +2495,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="13014"/>
         <source>Ambient Conditions</source>
-        <translation>周囲の状態</translation>
+        <translation>周囲状態</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13033"/>
@@ -2535,7 +2570,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="14169"/>
         <source>Width</source>
-        <translation>幅</translation>
+        <translation>線幅</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="16334"/>
@@ -2560,12 +2595,12 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="14363"/>
         <source>Fahrenheit</source>
-        <translation>華氏</translation>
+        <translation>華氏 (F)</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14364"/>
         <source>Celsius</source>
-        <translation>摂氏</translation>
+        <translation>摂氏 (C)</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14491"/>
@@ -2580,12 +2615,12 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="14512"/>
         <source>Best approximation was made from %1 to %2</source>
-        <translation>最良近似値を %1 ～ %2 より求めました</translation>
+        <translation>最も近い値: %1 ～ %2 から求めました</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14513"/>
         <source>deg/sec = %1    deg/min = &lt;b&gt;%2&lt;<byte value="x8"/>&gt;</source>
-        <translation>deg/sec = %1    deg/min = &lt;b&gt;%2&lt;<byte value="x8"/>&gt;</translation>
+        <translation>度/秒 = %1    度/分 = &lt;b&gt;%2&lt;<byte value="x8"/>&gt;</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14517"/>
@@ -2610,7 +2645,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="14668"/>
         <source>Thickness</source>
-        <translation>太さ</translation>
+        <translation>線幅</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14670"/>
@@ -2725,7 +2760,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="18832"/>
         <source>Curviness</source>
-        <translation>カーブ精度</translation>
+        <translation>カーブ強度</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="18845"/>
@@ -2780,7 +2815,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="19407"/>
         <source>Float</source>
-        <translation>浮動小数点型</translation>
+        <translation>float型</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19408"/>
@@ -2850,12 +2885,12 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="21400"/>
         <source>Edge</source>
-        <translation>エッジ</translation>
+        <translation>境界</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="21406"/>
         <source>Line</source>
-        <translation>ライン</translation>
+        <translation>線幅</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="21415"/>
@@ -2870,7 +2905,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="21977"/>
         <source>Enter description</source>
-        <translation>説明の入力</translation>
+        <translation>記述の入力</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="22346"/>
@@ -2976,6 +3011,11 @@ END</translation>
         <location filename="artisanlib/main.py" line="23402"/>
         <source>D</source>
         <translation>D</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="23313"/>
+        <source>NOTE: BT Thermocouple type is not stored in the Artisan seetings</source>
+        <translation type="obsolete">注: BT の熱電対タイプが Artisan の設定に保存されていません</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="23615"/>
@@ -3209,7 +3249,7 @@ END</translation>
     <message>
         <location filename="const/UIconst.py" line="72"/>
         <source>Background...</source>
-        <translation>背景...</translation>
+        <translation>プロファイルの背景...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="73"/>
@@ -3219,27 +3259,27 @@ END</translation>
     <message>
         <location filename="const/UIconst.py" line="74"/>
         <source>Temperature</source>
-        <translation>温度</translation>
+        <translation>温度単位</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="75"/>
         <source>Convert to Fahrenheit</source>
-        <translation>華氏へ変換</translation>
+        <translation>華氏 (F) へ変換</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="76"/>
         <source>Convert to Celsius</source>
-        <translation>摂氏へ変換</translation>
+        <translation>摂氏 (C) へ変換</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="77"/>
         <source>Fahrenheit Mode</source>
-        <translation>華氏モード</translation>
+        <translation>華氏 (F) モード</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="78"/>
         <source>Celsius Mode</source>
-        <translation>摂氏モード</translation>
+        <translation>摂氏 (C) モード</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="81"/>
@@ -3259,7 +3299,7 @@ END</translation>
     <message>
         <location filename="const/UIconst.py" line="86"/>
         <source>Sampling Interval...</source>
-        <translation>サンプリングの間隔...</translation>
+        <translation>サンプリング間隔...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="87"/>
@@ -3284,7 +3324,7 @@ END</translation>
     <message>
         <location filename="const/UIconst.py" line="91"/>
         <source>Axes...</source>
-        <translation>軸...</translation>
+        <translation>グラフパーツ...</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="92"/>
@@ -3299,7 +3339,7 @@ END</translation>
     <message>
         <location filename="const/UIconst.py" line="94"/>
         <source>Language</source>
-        <translation>言語</translation>
+        <translation>インターフェースの言語</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="117"/>
@@ -3344,7 +3384,7 @@ END</translation>
     <message>
         <location filename="const/UIconst.py" line="134"/>
         <source>Keyboard Shortcuts</source>
-        <translation>キーボードショートカット</translation>
+        <translation>ショートカット</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="135"/>
@@ -3390,7 +3430,7 @@ END</translation>
         <translation>HUD ON</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="1189"/>
+        <location filename="artisanlib/main.py" line="1191"/>
         <source>Need some data for HUD to work</source>
         <translation type="obsolete">HUD の動作には幾つかのデーターが必要です</translation>
     </message>
@@ -3537,27 +3577,27 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="3033"/>
         <source>[DRY END] recorded at %1 BT = %2</source>
-        <translation>[DRY END] 記録しました %1 BT = %2</translation>
+        <translation>[DRY END] を記録しました %1 BT = %2</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3093"/>
         <source>[FC START] recorded at %1 BT = %2</source>
-        <translation>[FC START] 記録しました %1 BT = %2</translation>
+        <translation>[FC START] を記録しました %1 BT = %2</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3148"/>
         <source>[FC END] recorded at %1 BT = %2</source>
-        <translation>[FC END] 記録しました %1 BT = %2</translation>
+        <translation>[FC END] を記録しました %1 BT = %2</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3207"/>
         <source>[SC START] recorded at %1 BT = %2</source>
-        <translation>[SC START] 記録しました %1 BT = %2</translation>
+        <translation>[SC START] を記録しました %1 BT = %2</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3265"/>
         <source>[SC END] recorded at %1 BT = %2</source>
-        <translation>[SC END] 記録しました %1 BT = %2</translation>
+        <translation>[SC END] を記録しました %1 BT = %2</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3343"/>
@@ -3567,7 +3607,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="3408"/>
         <source>[COOL END] recorded at %1 BT = %2</source>
-        <translation>[COOL END] 記録しました %1 BT = %2</translation>
+        <translation>[COOL END] を記録しました %1 BT = %2</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3535"/>
@@ -3698,12 +3738,12 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="artisanlib/main.py" line="4790"/>
         <source> added to cupping notes</source>
-        <translation>カッピングノートを追加しました</translation>
+        <translation> カッピングノートを追加しました</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="4796"/>
         <source> added to roasting notes</source>
-        <translation>焙煎ノートを追加しました</translation>
+        <translation> 焙煎ノートを追加しました</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="5061"/>
@@ -3970,12 +4010,12 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="11159"/>
         <source>Switch Language</source>
-        <translation>言語の切り替え</translation>
+        <translation>インターフェース言語の切り替え</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="11159"/>
         <source>Language successfully changed. Restart the application.</source>
-        <translation>言語を切り替えました。アプリケーションをリスタートしてください。</translation>
+        <translation>インターフェース言語を切り替えました。アプリケーションをリスタートしてください。</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="11190"/>
@@ -4210,7 +4250,7 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="13570"/>
         <source> Event #%1 deleted</source>
-        <translation>Event #%1 は削除されました</translation>
+        <translation> Event #%1 は削除されました</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13575"/>
@@ -4478,6 +4518,11 @@ Continue?</source>
         <translation>殆どのデバイスは2バイトの整数レジスタにデータを保持します。</translation>
     </message>
     <message>
+        <location filename="artisanlib/main.py" line="19226"/>
+        <source>A temperature of 145.2C is often send as 1452.</source>
+        <translation type="obsolete">温度 145.2℃は、多くの場合 1452 として送信されます。</translation>
+    </message>
+    <message>
         <location filename="artisanlib/main.py" line="19434"/>
         <source>In that case you have to use the symbolic assignment &apos;x/10&apos;.</source>
         <translation>この場合、あなたは記号的な割り当て &apos;x/10&apos; を使わなければなりません。</translation>
@@ -4485,12 +4530,12 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="19435"/>
         <source>Few devices hold data as 4 byte floats in two registers.</source>
-        <translation>少数のデバイスでは二つのレジスタに 4バイト浮動小数点型データーを保持します。</translation>
+        <translation>少数のデバイスでは二つのレジスタに 4 バイト float 型データーを保持します。</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19436"/>
         <source>Tick the Float flag in this case.</source>
-        <translation>この場合は浮動小数点型フラグをチェックします。</translation>
+        <translation>この場合は float型 フラグをチェックします。</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19781"/>
@@ -4840,13 +4885,13 @@ Proceed?</source>
         <translation>新しい sv をセットすることができません</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="19433"/>
-        <source>A temperature of 145.2C is often sent as 1452.</source>
-        <translation>温度 145.2℃は、多くの場合 1452 として送信されます。</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="7474"/>
         <source>&lt;b&gt;[f]&lt;/b&gt; = Full Screen Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="19433"/>
+        <source>A temperature of 145.2C is often sent as 1452.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5092,6 +5137,11 @@ Proceed?</source>
         <translation>pid の値読み込みは終了しました</translation>
     </message>
     <message>
+        <location filename="artisanlib/main.py" line="22912"/>
+        <source>%1 successfully send to pid </source>
+        <translation type="obsolete">%1 を pid に送信 </translation>
+    </message>
+    <message>
         <location filename="artisanlib/main.py" line="23128"/>
         <source>setpid(): There was a problem setting %1</source>
         <translation>setpid(): 設定に問題があります %1</translation>
@@ -5289,7 +5339,7 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="23119"/>
         <source>%1 successfully sent to pid </source>
-        <translation>%1 を pid に送信 </translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5377,7 +5427,7 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="19637"/>
         <source>Scale</source>
-        <translation>スケール</translation>
+        <translation>はかり</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="20126"/>
@@ -5505,7 +5555,7 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="22213"/>
         <source>Description</source>
-        <translation>説明</translation>
+        <translation>記述</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="16617"/>
@@ -6076,12 +6126,12 @@ Pungency</translation>
     <message>
         <location filename="artisanlib/main.py" line="6414"/>
         <source>ET/time (degrees/min)</source>
-        <translation>ET/時間 (degress/min)</translation>
+        <translation>ET/時間 (度/分)</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="6415"/>
         <source>BT/time (degrees/min)</source>
-        <translation>BT/時間 (degress/min)</translation>
+        <translation>BT/時間 (度/分)</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="6416"/>
@@ -6180,7 +6230,7 @@ nearest: 最近傍点の y 値</translation>
     <message>
         <location filename="artisanlib/main.py" line="14589"/>
         <source>Allows to enter a description of the last event</source>
-        <translation>最終イベントの説明の入力を許可</translation>
+        <translation>最終イベントの「記述」の入力を許可</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="14785"/>
@@ -6201,6 +6251,11 @@ nearest: 最近傍点の y 値</translation>
         <location filename="artisanlib/main.py" line="14835"/>
         <source>Backup all palettes to a text file</source>
         <translation>全てのパターンをテキストファイルにバックアップ</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="14629"/>
+        <source>Restore all palettes from a text</source>
+        <translation type="obsolete">全てのパターンをテキストファイルからリストア</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15041"/>
@@ -6305,7 +6360,7 @@ nearest: 最近傍点の y 値</translation>
     <message>
         <location filename="artisanlib/main.py" line="14836"/>
         <source>Restore all palettes from a text file</source>
-        <translation>全てのパターンをテキストファイルからリストア</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
