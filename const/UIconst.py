@@ -110,7 +110,7 @@ CONF_MENU_RUSSIAN = u("\u0440\u0443\u0441\u0441\u043a\u0438\u0439") # Do not tra
 CONF_MENU_ARABIC = u("\u0627\u0644\u0639\u0631\u0628\u064a\u0629") # Do not translate
 CONF_MENU_FINISH = u("Suomalainen") # Do not translate
 CONF_MENU_TURKISH = u("T\xfcrk") # Do not translate
-CONF_MENU_JAPANESE = u("\u65e5\u672c\u4eba") # Do not translate
+CONF_MENU_JAPANESE = u("\u65e5\u672c\u8a9e") # Do not translate
 
 
 #Toolkit menu
