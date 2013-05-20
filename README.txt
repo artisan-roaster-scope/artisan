@@ -275,7 +275,7 @@ v0.3.3 (13.02.2011)
 - added keyboard shortcuts for events and sound feedback
 - initial Linux binary release
 - added axis settings to application preferences
-
+ 
 v0.3.2 (31.01.2011)
 - fixed Center 309 communication
 - fixed serial device scan on Linux
