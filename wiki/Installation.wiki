@@ -12,8 +12,9 @@ There are usually two downloads needed in order to get the `artisan` software up
 
 =Installation Windows=
 
-The main application is called artisan.exe and it is located inside the zip file. To start artisan click on artisan.exe.
-There are three configuration steps needed after downloading and unziping the artisan zip file.  
+For versions before v0.6 the main application is called artisan.exe and it is located inside the zip file. To start artisan click on artisan.exe. There are three configuration steps needed after downloading and unziping the artisan zip file.  
+
+The v0.6 and later versions are distributed with an installer that installs also the Visual C++ runtime library from Microsoft if needed. So the next step can be skipped for those versions.
  
 ===Visual C++ Library Requirement===
 
