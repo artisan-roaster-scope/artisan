@@ -5253,10 +5253,10 @@ class SampleThread(QThread):
                             if extrat1 != -1 or extrat2 != -1:
                                 if len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                                    extrat1 = self.filterDropOuts(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
+                                extrat1 = self.filterDropOuts(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
                                 if len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                                    extrat2 = self.filterDropOuts(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
+                                extrat2 = self.filterDropOuts(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                 if local_flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
                                     aw.qmc.extratemp2[i].append(float(extrat2))
@@ -11433,7 +11433,10 @@ $cupping_notes
     
     def saveVectorGraph(self,extension=".pdf"):
         try: 
-            filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as SVG", None, QApplication.UnicodeUTF8),ext=extension)
+            if extension == ".pdf":
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as PDF", None, QApplication.UnicodeUTF8),ext=extension)
+            else:
+                filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message","Save Graph as SVG", None, QApplication.UnicodeUTF8),ext=extension)
             if filename:
                 if extension not in filename:
                     filename += extension
