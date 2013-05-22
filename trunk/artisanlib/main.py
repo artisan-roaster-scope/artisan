@@ -24037,7 +24037,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                     if r == command:
                         aw.fujipid.PXG4["selectedpid"][0] = pidn
                         key = "sv" + str(pidn)
-                        message = QApplication.translate("StatusBar","pid%1 changed to %2",None,QApplication.UnicodeUTF8).arg(str(pidn)).arg(str(aw.fujipid.PXG4[key][0]))
+                        message = QApplication.translate("StatusBar","pid changed to %1",None,QApplication.UnicodeUTF8).arg(str(pidn))
                         self.status.showMessage(message, 5000)
                     else:
                         mssg = QApplication.translate("StatusBar","setNpid(): bad confirmation",None,QApplication.UnicodeUTF8)
@@ -24157,7 +24157,6 @@ class PXG4pidDlgControl(ArtisanDialog):
                 newPvalue = int(float(str(self.p1edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
                 newIvalue = int(float(str(self.i1edit.text()))*10.)
                 newDvalue = int(float(str(self.d1edit.text()))*10.)
-                
         elif k == 2:
             if self.p2edit.text() != "" and self.i2edit.text() != "" and self.d2edit.text() != "":
                 newPvalue = int(float(str(self.p2edit.text()))*10.) #multiply by 10 because of decimal point. Then convert to int.
@@ -24196,8 +24195,11 @@ class PXG4pidDlgControl(ArtisanDialog):
         commandi = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[ikey][1],newIvalue)
         commandd = aw.fujipid.message2send(aw.ser.controlETpid[1],6,aw.fujipid.PXG4[dkey][1],newDvalue)
         p = aw.ser.sendFUJIcommand(commandp,8)
+        libtime.sleep(0.035) 
         i = aw.ser.sendFUJIcommand(commandi,8)
+        libtime.sleep(0.035) 
         d = aw.ser.sendFUJIcommand(commandd,8)
+        libtime.sleep(0.035) 
         #verify it went ok
         if len(p) == 8 and len(i)==8 and len(d) == 8:
             if k == 1:               
@@ -24269,7 +24271,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         for k in range(1,8):
             pkey = "p" + str(k)
             ikey = "i" + str(k)
-            dkey = "dd" + str(k)
+            dkey = "d" + str(k)
             msg = QApplication.translate("StatusBar","sending commands for p%1 i%2 d%3",None,
                                                    QApplication.UnicodeUTF8).arg(str(k)).arg(str(k)).arg(str(k))
             self.status.showMessage(msg,1000)
@@ -24333,6 +24335,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         #read current pidN
         command = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4["selectedpid"][1],1)
         N = aw.fujipid.readoneword(command)
+        libtime.sleep(0.035) 
         if N != -1:
             aw.fujipid.PXG4["selectedpid"][0] = N
             if N == 1:
@@ -24722,6 +24725,7 @@ class PXG4pidDlgControl(ArtisanDialog):
             soakedit  = QLineEdit(str(aw.qmc.stringfromseconds(aw.fujipid.PXG4[soakkey][0])))
             soakedit.setValidator(QRegExpValidator(regextime,self))    
             setButton = QPushButton(QApplication.translate("Button","Set",None, QApplication.UnicodeUTF8))
+            self.connect(setButton,SIGNAL("clicked()"),lambda kk=i: self.setsegment(kk))
             #add widgets to the table
             self.segmenttable.setCellWidget(i,0,svedit)
             self.segmenttable.setCellWidget(i,1,rampedit)
