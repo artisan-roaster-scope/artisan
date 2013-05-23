@@ -5313,8 +5313,9 @@ class SampleThread(QThread):
                     t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
                 if len(aw.qmc.BTfunction):
                     t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
-                t1 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp1,tx,t1)
-                t2 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
+                if aw.qmc.filterDropOuts:    
+                    t1 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp1,tx,t1)
+                    t2 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
                 length_of_qmc_timex = len(aw.qmc.timex)
                 # ignore reading if both are off, otherwise process them
                 if t1 != -1 or t2 != -1:
@@ -11009,7 +11010,7 @@ $cupping_notes
             self.modbus.input4code = int(str(dialog.modbus_input4code.currentText()))
             self.modbus.input4float = bool(dialog.modbus_input4float.isChecked())
             self.modbus.littleEndianFloats = bool(dialog.modbus_littleEndianFloats.isChecked())
-            # switch to little-endian if needed (HACK!!)
+            # switch to ittle-endian if needed (HACK!!)
             if self.modbus.littleEndianFloats:
                 minimalmodbus._bytestringToFloat = littleEndianBytestringToFloat
             else:
@@ -24898,12 +24899,7 @@ class FujiPID(object):
     #This function reads read-only memory (with 3xxxx memory we need function=4)
     #both PXR3 and PXG4 use the same memory location 31001 (3xxxx = read only)
     def gettemperature(self, stationNo):
-        #we compose a message then we send it by using self.readoneword()
-#        import binascii
-#        try:
-#            print(binascii.hexlify(bytes(self.message2send(stationNo,4,31001,1),"latin1")))
-#        except Exception as ex:
-#            print(ex)
+        #we compose a message then we send it by using self.readoneword()            
         return self.readoneword(self.message2send(stationNo,4,31001,1))
 
     #activates the PID SV buttons in the main window to adjust the SV value. Called from the PID control pannels/SV tab
