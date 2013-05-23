@@ -13462,8 +13462,9 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.clear()
         nevents = len(aw.qmc.specialevents)
         self.eventtable.setRowCount(nevents)
-        self.eventtable.setColumnCount(4)
+        self.eventtable.setColumnCount(5)
         self.eventtable.setHorizontalHeaderLabels([QApplication.translate("Table", "Time", None, QApplication.UnicodeUTF8),
+                                                   QApplication.translate("Table", "BT", None, QApplication.UnicodeUTF8),
                                                    QApplication.translate("Table", "Description", None, QApplication.UnicodeUTF8),
                                                    QApplication.translate("Table", "Type", None, QApplication.UnicodeUTF8),
                                                    QApplication.translate("Table", "Value", None, QApplication.UnicodeUTF8)])
@@ -13482,27 +13483,38 @@ class editGraphDlg(ArtisanDialog):
             typeComboBox = QComboBox()
             typeComboBox.addItems(etypes)
             typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
+
+            btline = QLineEdit()
+            btline.setAlignment(Qt.AlignRight)
+            bttemp = "%.1f"%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
+            self.eventtablecopy.append(btline) 
+            btline.setText(bttemp)
+            
             valueEdit = QLineEdit()
             valueEdit.setAlignment(Qt.AlignRight)
             valueEdit.setValidator(QRegExpValidator(regexvalue,self))
             valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[i]))
+            
             timeline = QLineEdit()
             timeline.setAlignment(Qt.AlignRight)
             timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[i]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
             self.eventtablecopy.append(str(timez)) 
             timeline.setText(timez)
             timeline.setValidator(QRegExpValidator(regextime,self))
+            
             stringline = QLineEdit(aw.qmc.specialeventsStrings[i])
             #add widgets to the table
             self.eventtable.setCellWidget(i,0,timeline)
-            self.eventtable.setCellWidget(i,1,stringline)
-            self.eventtable.setCellWidget(i,2,typeComboBox)
-            self.eventtable.setCellWidget(i,3,valueEdit)
+            self.eventtable.setCellWidget(i,1,btline)
+            self.eventtable.setCellWidget(i,2,stringline)
+            self.eventtable.setCellWidget(i,3,typeComboBox)
+            self.eventtable.setCellWidget(i,4,valueEdit)
         self.eventtable.resizeColumnsToContents()
         # improve width of Time column
         self.eventtable.setColumnWidth(0,65)
-        self.eventtable.setColumnWidth(1,315)
-        self.eventtable.setColumnWidth(3,65)
+        self.eventtable.setColumnWidth(1,65)
+        self.eventtable.setColumnWidth(2,315)
+        self.eventtable.setColumnWidth(4,65)
 
     def saveEventTable(self):
         nevents = self.eventtable.rowCount() 
