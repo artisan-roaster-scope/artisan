@@ -65,7 +65,7 @@ sip.setapi('QVariant', 1)
 from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
                          QInputDialog, QGroupBox, QDialog, QLineEdit, QFontDatabase,
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
-                         QLCDNumber, QKeySequence, QSpinBox, QComboBox,
+                         QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView,
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton,
                          QPixmap, QColor, QColorDialog, QPalette, QFrame, QCheckBox, QDesktopServices, QIcon,
                          QStatusBar, QRegExpValidator, QDoubleValidator, QIntValidator, QPainter, QFont, QFontInfo, QBrush, QRadialGradient,
@@ -384,7 +384,8 @@ class tgraphcanvas(FigureCanvas):
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
         self.statisticsflags = [1,1,0,1,1,0]
         #conditions to estimate bad flavor:dry[min,max],mid[min,max],finish[min,max] in seconds
-        self.statisticsconditions = [180,360,180,600,180,360,180,300]
+        self.defaultstatisticsconditions = [180,360,180,600,180,360,180,300]
+        self.statisticsconditions = self.defaultstatisticsconditions
         #records length in seconds of total time [0], dry phase [1],mid phase[2],finish phase[3], cool phase[4]
         self.statisticstimes = [0,0,0,0,0]
 
@@ -3488,8 +3489,12 @@ class tgraphcanvas(FigureCanvas):
                         #if Event show flag
                         if self.eventsshowflag:
                             index = self.specialevents[-1]
-                            firstletter = self.etypesf(self.specialeventstype[-1])[0]
-                            secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
+                            if self.specialeventstype[-1] < 4:
+                                firstletter = self.etypesf(self.specialeventstype[-1])[0]
+                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
+                            else:
+                                firstletter = "E"
+                                secondletter = ""
                             if self.eventsGraphflag == 0:
                                 if self.mode == "F":
                                     height = 50
@@ -3579,8 +3584,12 @@ class tgraphcanvas(FigureCanvas):
                 #if Event show flag
                 if self.eventsshowflag:
                     index = self.specialevents[-1]
-                    firstletter = self.etypesf(self.specialeventstype[-1])[0]
-                    secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
+                    if self.specialeventstype[-1] < 4:
+                        firstletter = self.etypesf(self.specialeventstype[-1])[0]
+                        secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
+                    else:
+                        firstletter = "E"
+                        secondletter = ""                                
                     if self.eventsGraphflag == 0:
                         if self.mode == "F":
                             height = 50
@@ -5804,9 +5813,11 @@ class ApplicationWindow(QMainWindow):
         SVGAction = QAction("SVG...",self)
         self.connect(SVGAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".svg"))
         self.saveGraphMenu.addAction(SVGAction)
-        PDFAction = QAction("PDF...",self)
-        self.connect(PDFAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".pdf"))
-        self.saveGraphMenu.addAction(PDFAction)
+        
+        if platf != 'Darwin':
+            PDFAction = QAction("PDF...",self)
+            self.connect(PDFAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".pdf"))
+            self.saveGraphMenu.addAction(PDFAction)
 
         self.htmlAction = QAction(UIconst.FILE_MENU_HTMLREPORT,self)
         self.connect(self.htmlAction,SIGNAL("triggered()"),self.htmlReport)
@@ -13401,61 +13412,64 @@ class editGraphDlg(ArtisanDialog):
         self.datatable.setShowGrid(True)
         for i in range(ndata):
             Atime = QTableWidgetItem("%.03f"%aw.qmc.timex[i])
+            Atime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
+            Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             ET = QTableWidgetItem("%.02f"%aw.qmc.temp1[i])
             BT = QTableWidgetItem("%.02f"%aw.qmc.temp2[i])
+            ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             if i > 0 and (aw.qmc.timex[i]-aw.qmc.timex[i-1]):
                 deltaET = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp1[i]-aw.qmc.temp1[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
                 deltaBT = QTableWidgetItem("%.02f"%(60*(aw.qmc.temp2[i]-aw.qmc.temp2[i-1])/(aw.qmc.timex[i]-aw.qmc.timex[i-1])))
             else:
                 deltaET = QTableWidgetItem("--")
                 deltaBT = QTableWidgetItem("--")
+            deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+            deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             if i:                
                     #identify by color and add notation
                 if i == aw.qmc.timeindex[0]:
                     Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = QApplication.translate("Table", "%1 START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                    Rtime.setText(text)
+                    text = QApplication.translate("Table", "START",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[1]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "%1 DRY END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                    Rtime.setText(text)
+                    text = QApplication.translate("Table", "DRY END",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[2]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "%1 FC START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                    Rtime.setText(text)
+                    text = QApplication.translate("Table", "FC START",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[3]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "%1 FC END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                    Rtime.setText(text)
+                    text = QApplication.translate("Table", "FC END",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[4]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "%1 SC START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                    Rtime.setText(text)
+                    text = QApplication.translate("Table", "SC START",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[5]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "%1 SC END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                    Rtime.setText(text)
+                    text = QApplication.translate("Table", "SC END",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[6]:
                     Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = QApplication.translate("Table", "%1 END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                    Rtime.setText(text)
+                    text = QApplication.translate("Table", "END",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[7]:
                     Rtime.setBackgroundColor(QColor('orange'))
-                    text = QApplication.translate("Table", "%1 COOL",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                    Rtime.setText(text)
+                    text = QApplication.translate("Table", "COOL",None, QApplication.UnicodeUTF8)
+                else:
+                    text = u("")
+                Rtime.setText(text + u(" " + Rtime.text()))
                     
             if i in aw.qmc.specialevents:
                 Rtime.setBackgroundColor(QColor('yellow'))
                 index = aw.qmc.specialevents.index(i)
-                text = QApplication.translate("Table", "%1 EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(Rtime.text()).arg(str(index+1)).arg(aw.qmc.etypesf(aw.qmc.specialeventstype[index])[0]).arg(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[index]))
-                Rtime.setText(text)
+                text = QApplication.translate("Table", "EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(str(index+1)).arg(aw.qmc.etypesf(aw.qmc.specialeventstype[index])[0]).arg(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[index]))
+                Rtime.setText(text + u(" " + Rtime.text()))
             self.datatable.setItem(i,0,Atime) 
             self.datatable.setItem(i,1,Rtime)
             self.datatable.setItem(i,2,ET)
             self.datatable.setItem(i,3,BT)
             self.datatable.setItem(i,4,deltaET)
             self.datatable.setItem(i,5,deltaBT)
+        header = self.datatable.horizontalHeader()
+        header.setResizeMode(1, QHeaderView.Stretch)
         self.datatable.resizeColumnsToContents()
 
     def createEventTable(self):
@@ -13485,6 +13499,7 @@ class editGraphDlg(ArtisanDialog):
             typeComboBox.setCurrentIndex(aw.qmc.specialeventstype[i])
 
             btline = QLineEdit()
+            btline.setReadOnly(True)
             btline.setAlignment(Qt.AlignRight)
             bttemp = "%.1f"%(aw.qmc.temp2[aw.qmc.specialevents[i]]) + aw.qmc.mode
             self.eventtablecopy.append(btline) 
@@ -13515,6 +13530,13 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.setColumnWidth(1,65)
         self.eventtable.setColumnWidth(2,315)
         self.eventtable.setColumnWidth(4,65)
+        
+        header = self.eventtable.horizontalHeader()
+        #header.setStretchLastSection(True)
+        header.setResizeMode(2, QHeaderView.Stretch)
+        header.setResizeMode(3, QHeaderView.ResizeToContents)
+        # header.setResizeMode(QHeaderView.Stretch)
+
 
     def saveEventTable(self):
         nevents = self.eventtable.rowCount() 
@@ -13524,9 +13546,9 @@ class editGraphDlg(ArtisanDialog):
                 aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(str(timez.text())))
             description = self.eventtable.cellWidget(i,1)
             aw.qmc.specialeventsStrings[i] = str(description.text())
-            etype = self.eventtable.cellWidget(i,2)
+            etype = self.eventtable.cellWidget(i,3)
             aw.qmc.specialeventstype[i] = etype.currentIndex()
-            evalue = self.eventtable.cellWidget(i,3).text()
+            evalue = self.eventtable.cellWidget(i,4).text()
             aw.qmc.specialeventsvalue[i] = aw.qmc.str2eventsvalue(str(evalue))
 
     def orderEventTable(self):
@@ -15479,6 +15501,7 @@ class EventsDlg(ArtisanDialog):
                 valueEdit = QLineEdit()
                 valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\d?\d?$"),self))
                 valueEdit.setText(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
+                valueEdit.setAlignment(Qt.AlignRight)
                 self.connect(valueEdit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setvalueeventbutton(z,i))
                 #action
                 actionComboBox = QComboBox()
@@ -15517,6 +15540,12 @@ class EventsDlg(ArtisanDialog):
                 self.eventbuttontable.setCellWidget(i,7,colorButton)
                 self.eventbuttontable.setCellWidget(i,8,colorTextButton)
             self.eventbuttontable.resizeColumnsToContents()
+            self.eventbuttontable.setColumnWidth(0,70)
+            self.eventbuttontable.setColumnWidth(1,80)
+            self.eventbuttontable.setColumnWidth(3,50)
+            header = self.eventbuttontable.horizontalHeader()
+            header.setResizeMode(1, QHeaderView.Stretch)
+            header.setResizeMode(5, QHeaderView.Stretch)
 
     def setbuttoncolor(self,x):
         colorf = QColorDialog.getColor(QColor(aw.extraeventbuttoncolor[x]))
@@ -16202,6 +16231,8 @@ class flavorDlg(ArtisanDialog):
                 self.flavortable.setCellWidget(i,0,labeledit)
                 self.flavortable.setCellWidget(i,1,valueSpinBox)
             self.flavortable.resizeColumnsToContents()
+            header = self.flavortable.horizontalHeader()
+            header.setResizeMode(0, QHeaderView.Stretch)
 
     def showbackground(self):
         if self.backgroundCheck.isChecked():
@@ -16900,7 +16931,7 @@ class StatisticsDlg(ArtisanDialog):
             aw.qmc.redraw(recomputeAllDeltas=False)
 
     def initialsettings(self):
-        aw.qmc.statisticsconditions = [180,360,180,600,180,360]
+        aw.qmc.statisticsconditions = aw.qmc.defaultstatisticsconditions
         self.close()
         aw.showstatistics()
 
@@ -17787,6 +17818,7 @@ class serialport(object):
     #returns v1,v2 from a connected MODBUS device
     def MODBUSread(self):
         # slave, register
+        just_send = False
         if aw.modbus.input1slave:
             if aw.modbus.input1float:
                 res1 = aw.modbus.readFloat(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
@@ -17794,33 +17826,43 @@ class serialport(object):
                 res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
             if res1 is None:
                 res1 = -1
+            just_send = True
         else:
             res1 = -1
         if aw.modbus.input2slave:
+            if just_send:
+                libtime.sleep(0.035)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input2float:
                 res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             else:
                 res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             if res2 is None:
                 res2 = -1
+            just_send = True
         else:
             res2 = -1
         if aw.modbus.input3slave:
+            if just_send:
+                libtime.sleep(0.035)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input3float:
                 res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             else:
                 res3 = aw.modbus.readSingleRegister(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             if res3 is None:
                 res3 = -1
+            just_send = True
         else:
             res3 = -1
         if aw.modbus.input4slave:
+            if just_send:
+                libtime.sleep(0.035)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input4float:
                 res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             else:
                 res4 = aw.modbus.readSingleRegister(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             if res4 is None:
                 res4 = -1
+            just_send = True
         else:
             res4 = -1
         aw.qmc.extraMODBUSt3 = res3
@@ -20234,6 +20276,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     self.devicetable.setCellWidget(i,9,Curve1visibilityComboBox)
                     self.devicetable.setCellWidget(i,10,Curve2visibilityComboBox)
                 self.devicetable.resizeColumnsToContents()
+                header = self.devicetable.horizontalHeader()
+                header.setStretchLastSection(True)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " createDeviceTable(): %1").arg(str(e)),exc_tb.tb_lineno)
@@ -22251,6 +22295,8 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.setColumnWidth(1,80)
             self.alarmtable.setColumnWidth(3,50)
             self.alarmtable.setColumnWidth(6,50)
+            header = self.alarmtable.horizontalHeader()
+            header.setStretchLastSection(True)
 
 # UNDER WORK 
 #######################################################################################
