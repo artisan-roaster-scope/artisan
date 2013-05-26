@@ -5132,11 +5132,11 @@ class VMToolbar(NavigationToolbar):
                 title = axes.get_title()
                 ylabel = axes.get_ylabel()
                 if title:
-                    fmt = "Curves"
+                    fmt = u(QApplication.translate("Label","Curves",None, QApplication.UnicodeUTF8))
                     if ylabel:
                         fmt += " (%(ylabel)s)"
                 elif ylabel:
-                    fmt = "Delta Curves (%(ylabel)s)"
+                    fmt = u(QApplication.translate("Label","Delta Curves",None, QApplication.UnicodeUTF8)) + u(" (%(ylabel)s)")
                 else:
                     fmt = "%(axes_repr)s"
                 titles.append(fmt % dict(title = title,
@@ -5322,9 +5322,8 @@ class SampleThread(QThread):
                     t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
                 if len(aw.qmc.BTfunction):
                     t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
-                if aw.qmc.filterDropOuts:    
-                    t1 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp1,tx,t1)
-                    t2 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
+                t1 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp1,tx,t1)
+                t2 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
                 length_of_qmc_timex = len(aw.qmc.timex)
                 # ignore reading if both are off, otherwise process them
                 if t1 != -1 or t2 != -1:
@@ -9522,6 +9521,7 @@ class ApplicationWindow(QMainWindow):
             if aw.qmc.l_temp1:
                 self.qmc.ETlinestyle = aw.qmc.l_temp1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
+                # otherwise the drawingstyle cannot be set back to default!
                 if self.qmc.ETlinestyle == self.qmc.linestyle_default:
                     self.qmc.ETdrawstyle = aw.qmc.l_temp1.get_drawstyle()
                 else:
