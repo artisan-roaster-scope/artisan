@@ -2740,6 +2740,9 @@ class tgraphcanvas(FigureCanvas):
         self.ax1.set_rmax(1.)
         self.ax1.set_autoscale_on(False)
         self.ax1.grid(True,linewidth=1.,color='green', linestyle = "-",alpha=.3)
+        # hack to make flavor labels visible also on top and bottom
+        self.ax1.set_xlabel(" -\n ", alpha=0.0)
+        self.ax1.set_title(" -\n ", alpha=0.0)
 
         #create water marks 6-7 anf 8-9
         self.ax1.bar(.1, .1, width=2.*pi, bottom=.6,color="green",linewidth=0.,alpha = .1)
@@ -2777,7 +2780,7 @@ class tgraphcanvas(FigureCanvas):
                 ha = "left"
             else:
                 ha = "right"
-            self.ax1.annotate(self.flavorlabels[i] + " = " + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
+            self.ax1.annotate(aw.arabicReshape(self.flavorlabels[i]) + " = " + str("%.2f"%self.flavors[i]),xy =(angles[i],.9),
                               xytext=(angles[i],1.1),horizontalalignment=ha,verticalalignment='bottom')
 
         score = 0.
@@ -3798,8 +3801,25 @@ class tgraphcanvas(FigureCanvas):
                     ts,tse,tsb = aw.ts()
     
                     #end temperature
-                    strline = QApplication.translate("Label", "ET=%1-%2 (%3)   BT=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]", None,
-                              QApplication.UnicodeUTF8).arg("%.1f"%BTmin + self.mode).arg("%.1f"%BTmax + self.mode).arg("%.1f"%abs(BTmax - BTmin)).arg("%.1f"%ETmin + self.mode).arg("%.1f"%ETmax + self.mode).arg("%.1f"%abs(ETmax - ETmin)).arg(timez).arg(ror).arg("%d%sm"%(ts,self.mode)).arg(tse).arg(tsb)
+                    strline = QString(aw.arabicReshape(QApplication.translate("Label", "ET", None,QApplication.UnicodeUTF8)) + "=%1-%2 (%3)   " \
+                                + aw.arabicReshape(QApplication.translate("Label", "BT", None,QApplication.UnicodeUTF8)) + "=%4-%5 (%6)   " \
+                                + aw.arabicReshape(QApplication.translate("Label", "T", None,QApplication.UnicodeUTF8)) + "=%7   " \
+                                + aw.arabicReshape(QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8)) + "=%8" \
+                                + aw.arabicReshape(QApplication.translate("Label", "d/m", None,QApplication.UnicodeUTF8)) + "   " \
+                                + aw.arabicReshape(QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8)) + "=%9 [%11-%12]") \
+                                .arg("%.1f"%BTmin) \
+                                .arg("%.1f"%BTmax + self.mode) \
+                                .arg("%.1f"%abs(BTmax - BTmin) + self.mode) \
+                                .arg(u("%.1f"%ETmin)) \
+                                .arg(u("%.1f"%ETmax + self.mode)) \
+                                .arg(u("%.1f"%abs(ETmax - ETmin)  + self.mode)) \
+                                .arg(u(timez)[::-1]) \
+                                .arg(u(ror)) \
+                                .arg(u("%d%sm"%(ts,self.mode))) \
+                                .arg(u(int(tse))) \
+                                .arg(u(int(tsb)))
+#                    strline = QApplication.translate("Label", "ET=%1-%2 (%3)   BT=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]", None,
+#                                QApplication.UnicodeUTF8).arg("%.1f"%BTmin).arg("%.1f"%BTmax + self.mode).arg("%.1f"%abs(BTmax - BTmin) + self.mode).arg("%.1f"%ETmin).arg("%.1f"%ETmax + self.mode).arg("%.1f"%abs(ETmax - ETmin) + self.mode).arg(timez + "min").arg(ror).arg("%d%sm"%(ts,self.mode)).arg(int(tse)).arg(int(tsb))
     
                     # even better: use xlabel
                     self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"],fontproperties=aw.mpl_fontproperties)
