@@ -3,41 +3,6 @@
 <context>
     <name>About</name>
     <message>
-        <location filename="artisanlib/main.py" line="10743"/>
-        <source>%1, linux binary</source>
-        <translation type="obsolete">%1, linux バイナリ</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10744"/>
-        <source>%1, documentation</source>
-        <translation type="obsolete">%1, 関連文章</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10745"/>
-        <source>%1, TEVA18B, DTA support</source>
-        <translation type="obsolete">%1, TEVA18B, DTA サポート</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10746"/>
-        <source>%1, DTA support</source>
-        <translation type="obsolete">%1, DTA サポート</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10747"/>
-        <source>%1, Swedish localization</source>
-        <translation type="obsolete">%1, スウェーデン語ローカライズ対応</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10748"/>
-        <source>%1, Spanish localization</source>
-        <translation type="obsolete">%1, スペイン語ローカライズ対応</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10750"/>
-        <source>%1, Arduino/TC4</source>
-        <translation type="obsolete">%1, Arduino/TC4</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="10934"/>
         <source>About</source>
         <translation>プログラムについて</translation>
@@ -2147,7 +2112,7 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="10294"/>
         <source>TP:</source>
-        <translation type="unfinished"></translation>
+        <translation>TP:</translation>
     </message>
 </context>
 <context>
@@ -2246,11 +2211,6 @@ END</translation>
         <location filename="artisanlib/main.py" line="10444"/>
         <source>d/m</source>
         <translation>d/m</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="3793"/>
-        <source>BT=%1-%2 (%3)   ET=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]</source>
-        <translation type="obsolete">BT=%1-%2 (%3)   ET=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="18768"/>
@@ -3013,11 +2973,6 @@ END</translation>
         <translation>D</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="23313"/>
-        <source>NOTE: BT Thermocouple type is not stored in the Artisan seetings</source>
-        <translation type="obsolete">注: BT の熱電対タイプが Artisan の設定に保存されていません</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="23697"/>
         <source>Artisan Fuji PXG uses MINUTES:SECONDS units in Ramp/Soaks</source>
         <translation>Artisan 富士電気PXG は Ramp/Soaks で「分:秒」単位を使用します</translation>
@@ -3030,27 +2985,27 @@ END</translation>
     <message>
         <location filename="artisanlib/main.py" line="5155"/>
         <source>Curves</source>
-        <translation type="unfinished">カーブ</translation>
+        <translation>カーブ</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="5159"/>
         <source>Delta Curves</source>
-        <translation type="unfinished"></translation>
+        <translation>Delta カーブ</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>T</source>
-        <translation type="unfinished"></translation>
+        <translation>T</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>RoR</source>
-        <translation type="unfinished"></translation>
+        <translation>RoR</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>ETBTa</source>
-        <translation type="unfinished">ETBTa</translation>
+        <translation>ETBTa</translation>
     </message>
 </context>
 <context>
@@ -3237,204 +3192,209 @@ END</translation>
         <translation>印刷...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="60"/>
+        <location filename="const/UIconst.py" line="61"/>
         <source>Edit</source>
         <translation>編集</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="63"/>
+        <location filename="const/UIconst.py" line="64"/>
         <source>Cut</source>
         <translation>切り抜き</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="64"/>
+        <location filename="const/UIconst.py" line="65"/>
         <source>Copy</source>
         <translation>コピー</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="65"/>
+        <location filename="const/UIconst.py" line="66"/>
         <source>Paste</source>
         <translation>貼り付け</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="68"/>
+        <location filename="const/UIconst.py" line="69"/>
         <source>Roast</source>
         <translation>焙煎</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="71"/>
+        <location filename="const/UIconst.py" line="72"/>
         <source>Properties...</source>
         <translation>プロパティ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="72"/>
+        <location filename="const/UIconst.py" line="73"/>
         <source>Background...</source>
         <translation>プロファイルの背景...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="73"/>
+        <location filename="const/UIconst.py" line="74"/>
         <source>Cup Profile...</source>
         <translation>カッププロファイル...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="74"/>
+        <location filename="const/UIconst.py" line="75"/>
         <source>Temperature</source>
         <translation>温度単位</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="75"/>
+        <location filename="const/UIconst.py" line="76"/>
         <source>Convert to Fahrenheit</source>
         <translation>華氏 (F) へ変換</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="76"/>
+        <location filename="const/UIconst.py" line="77"/>
         <source>Convert to Celsius</source>
         <translation>摂氏 (C) へ変換</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="77"/>
+        <location filename="const/UIconst.py" line="78"/>
         <source>Fahrenheit Mode</source>
         <translation>華氏 (F) モード</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="78"/>
+        <location filename="const/UIconst.py" line="79"/>
         <source>Celsius Mode</source>
         <translation>摂氏 (C) モード</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="81"/>
+        <location filename="const/UIconst.py" line="82"/>
         <source>Config</source>
         <translation>構成</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="84"/>
+        <location filename="const/UIconst.py" line="85"/>
         <source>Device...</source>
         <translation>デバイス...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="85"/>
+        <location filename="const/UIconst.py" line="86"/>
         <source>Serial Port...</source>
         <translation>シリアルポート...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="86"/>
+        <location filename="const/UIconst.py" line="87"/>
         <source>Sampling Interval...</source>
         <translation>サンプリング間隔...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="87"/>
+        <location filename="const/UIconst.py" line="88"/>
         <source>Colors...</source>
         <translation>カラー...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="88"/>
+        <location filename="const/UIconst.py" line="89"/>
         <source>Phases...</source>
         <translation>フェーズ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="89"/>
+        <location filename="const/UIconst.py" line="90"/>
         <source>Events...</source>
         <translation>イベント...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="90"/>
+        <location filename="const/UIconst.py" line="91"/>
         <source>Statistics...</source>
         <translation>統計...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="91"/>
+        <location filename="const/UIconst.py" line="92"/>
         <source>Axes...</source>
         <translation>グラフパーツ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="92"/>
+        <location filename="const/UIconst.py" line="93"/>
         <source>Autosave...</source>
         <translation>オートセーブ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="93"/>
+        <location filename="const/UIconst.py" line="94"/>
         <source>Alarms...</source>
         <translation>アラーム...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="94"/>
+        <location filename="const/UIconst.py" line="95"/>
         <source>Language</source>
         <translation>インターフェースの言語</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="117"/>
+        <location filename="const/UIconst.py" line="118"/>
         <source>Tools</source>
         <translation>ツール</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="120"/>
+        <location filename="const/UIconst.py" line="121"/>
         <source>Designer</source>
         <translation>デザイナー</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="121"/>
+        <location filename="const/UIconst.py" line="122"/>
         <source>Calculator</source>
         <translation>計算機</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="122"/>
+        <location filename="const/UIconst.py" line="123"/>
         <source>Wheel Graph</source>
         <translation>ホイールグラフ</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="123"/>
+        <location filename="const/UIconst.py" line="124"/>
         <source>Extras...</source>
         <translation>エクストラ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="127"/>
+        <location filename="const/UIconst.py" line="128"/>
         <source>Help</source>
         <translation>ヘルプ</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="132"/>
+        <location filename="const/UIconst.py" line="133"/>
         <source>Documentation</source>
         <translation>関連文書</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="133"/>
-        <source>Blog</source>
-        <translation>ブログ</translation>
-    </message>
-    <message>
-        <location filename="const/UIconst.py" line="134"/>
+        <location filename="const/UIconst.py" line="135"/>
         <source>Keyboard Shortcuts</source>
         <translation>ショートカット</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="135"/>
+        <location filename="const/UIconst.py" line="136"/>
         <source>Errors</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="136"/>
+        <location filename="const/UIconst.py" line="137"/>
         <source>Messages</source>
         <translation>メッセージ</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="137"/>
+        <location filename="const/UIconst.py" line="138"/>
         <source>Serial</source>
         <translation>シリアル</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="138"/>
+        <location filename="const/UIconst.py" line="139"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="139"/>
+        <location filename="const/UIconst.py" line="140"/>
         <source>Platform</source>
         <translation>実行環境</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="140"/>
+        <location filename="const/UIconst.py" line="141"/>
         <source>Factory Reset</source>
         <translation>ファクトリリセット</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="58"/>
+        <source>Quit</source>
+        <translation>を終了</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="132"/>
+        <source>About...</source>
+        <translation>について...</translation>
     </message>
 </context>
 <context>
@@ -3448,11 +3408,6 @@ END</translation>
         <location filename="artisanlib/main.py" line="1189"/>
         <source>HUD ON</source>
         <translation>HUD ON</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="1191"/>
-        <source>Need some data for HUD to work</source>
-        <translation type="obsolete">HUD の動作にはいくつかのデーターが必要です</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="1255"/>
@@ -4538,11 +4493,6 @@ Continue?</source>
         <translation>殆どのデバイスは2バイトの整数レジスタにデータを保持します。</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="19226"/>
-        <source>A temperature of 145.2C is often send as 1452.</source>
-        <translation type="obsolete">温度 145.2℃は、多くの場合 1452 として送信されます。</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="19512"/>
         <source>In that case you have to use the symbolic assignment &apos;x/10&apos;.</source>
         <translation>この場合、あなたは記号的な割り当て &apos;x/10&apos; を使わなければなりません。</translation>
@@ -4912,12 +4862,12 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="11469"/>
         <source>Save Graph as PDF</source>
-        <translation type="unfinished"></translation>
+        <translation>グラフを PDF 形式で保存</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19511"/>
         <source>A temperature of 145.2C is often sent as 1452.</source>
-        <translation type="unfinished"></translation>
+        <translation>温度 145.2℃は、多くの場合 1452 として送信されます。</translation>
     </message>
 </context>
 <context>
@@ -5162,11 +5112,6 @@ Proceed?</source>
         <translation>pid の値読み込みは終了しました</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="22912"/>
-        <source>%1 successfully send to pid </source>
-        <translation type="obsolete">%1 を pid に送信 </translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="23210"/>
         <source>setpid(): There was a problem setting %1</source>
         <translation>setpid(): 設定に問題があります %1</translation>
@@ -5215,11 +5160,6 @@ Proceed?</source>
         <location filename="artisanlib/main.py" line="24095"/>
         <source>setNsv(): bad response</source>
         <translation>setNsv(): レスポンスが悪い</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="23830"/>
-        <source>pid%1 changed to %2</source>
-        <translation type="obsolete">pid%1 を %2 に変更</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="24122"/>
@@ -5364,12 +5304,12 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="23201"/>
         <source>%1 successfully sent to pid </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 を pid に送信 </translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="24119"/>
         <source>pid changed to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>pid を %1 に変更</translation>
     </message>
 </context>
 <context>
@@ -5566,11 +5506,6 @@ Proceed?</source>
         <location filename="artisanlib/main.py" line="16786"/>
         <source>%1 END</source>
         <translation>%1 END</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="13234"/>
-        <source>%1 COOL</source>
-        <translation type="obsolete">%1 COOL</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="16791"/>
@@ -5820,47 +5755,47 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="13454"/>
         <source>START</source>
-        <translation type="unfinished">START</translation>
+        <translation>START</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13457"/>
         <source>DRY END</source>
-        <translation type="unfinished">DRY END</translation>
+        <translation>DRY END</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13460"/>
         <source>FC START</source>
-        <translation type="unfinished">FC START</translation>
+        <translation>FC START</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13463"/>
         <source>FC END</source>
-        <translation type="unfinished">FC END</translation>
+        <translation>FC END</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13466"/>
         <source>SC START</source>
-        <translation type="unfinished">SC START</translation>
+        <translation>SC START</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13469"/>
         <source>SC END</source>
-        <translation type="unfinished">SC END</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="13472"/>
-        <source>END</source>
-        <translation type="unfinished"></translation>
+        <translation>SC END</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13475"/>
         <source>COOL</source>
-        <translation type="unfinished">COOL</translation>
+        <translation>COOL</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13483"/>
         <source>EVENT #%2 %3%4</source>
-        <translation type="unfinished"></translation>
+        <translation>EVENT #%2 %3%4</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="13472"/>
+        <source>DROP</source>
+        <translation>DROP</translation>
     </message>
 </context>
 <context>
@@ -6328,11 +6263,6 @@ nearest: 最近傍点の y 値</translation>
         <translation>全てのパターンをテキストファイルにバックアップ</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="14629"/>
-        <source>Restore all palettes from a text</source>
-        <translation type="obsolete">全てのパターンをテキストファイルからリストア</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="15099"/>
         <source>Action Type</source>
         <translation>アクションタイプ</translation>
@@ -6435,7 +6365,7 @@ nearest: 最近傍点の y 値</translation>
     <message>
         <location filename="artisanlib/main.py" line="14894"/>
         <source>Restore all palettes from a text file</source>
-        <translation type="unfinished"></translation>
+        <translation>全てのパターンをテキストファイルからリストア</translation>
     </message>
 </context>
 </TS>

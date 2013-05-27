@@ -808,7 +808,7 @@ EIND</translation>
     <message>
         <location filename="artisanlib/main.py" line="15033"/>
         <source>CHARGE</source>
-        <translation type="unfinished">CHARGE</translation>
+        <translation>CHARGE</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="18743"/>
@@ -838,7 +838,7 @@ EIND</translation>
     <message>
         <location filename="artisanlib/main.py" line="15087"/>
         <source>DROP</source>
-        <translation type="unfinished">DROP</translation>
+        <translation>DROP</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15096"/>
@@ -1276,12 +1276,12 @@ EIND</translation>
     <message>
         <location filename="artisanlib/main.py" line="22232"/>
         <source>START</source>
-        <translation type="unfinished">START</translation>
+        <translation>START</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="22232"/>
         <source>CHARGE</source>
-        <translation type="unfinished">CHARGE</translation>
+        <translation>CHARGE</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="22232"/>
@@ -1316,7 +1316,7 @@ EIND</translation>
     <message>
         <location filename="artisanlib/main.py" line="22232"/>
         <source>DROP</source>
-        <translation type="unfinished">DROP</translation>
+        <translation>DROP</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="22232"/>
@@ -2150,7 +2150,7 @@ EIND</translation>
     <message>
         <location filename="artisanlib/main.py" line="18740"/>
         <source>CHARGE</source>
-        <translation type="unfinished">CHARGE</translation>
+        <translation>CHARGE</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12749"/>
@@ -2180,7 +2180,7 @@ EIND</translation>
     <message>
         <location filename="artisanlib/main.py" line="18753"/>
         <source>DROP</source>
-        <translation type="unfinished">DROP</translation>
+        <translation>DROP</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="1077"/>
@@ -2840,7 +2840,7 @@ EIND</translation>
     <message>
         <location filename="artisanlib/main.py" line="21473"/>
         <source>Text</source>
-        <translation type="unfinished">Tekst</translation>
+        <translation>Tekst</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="21480"/>
@@ -2955,7 +2955,7 @@ EIND</translation>
     <message>
         <location filename="artisanlib/main.py" line="23490"/>
         <source>Write</source>
-        <translation type="unfinished">Schrijf</translation>
+        <translation>Schrijf</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="23472"/>
@@ -2985,27 +2985,27 @@ EIND</translation>
     <message>
         <location filename="artisanlib/main.py" line="5155"/>
         <source>Curves</source>
-        <translation type="unfinished">Krommen</translation>
+        <translation>Krommen</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="5159"/>
         <source>Delta Curves</source>
-        <translation type="unfinished"></translation>
+        <translation>Delta Krommen</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>T</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>RoR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>ETBTa</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3184,7 +3184,7 @@ EIND</translation>
     <message>
         <location filename="const/UIconst.py" line="56"/>
         <source>Roasting Report</source>
-        <translation type="unfinished">Brand-verslag</translation>
+        <translation>Brand-verslag</translation>
     </message>
     <message>
         <location filename="const/UIconst.py" line="57"/>
@@ -3192,204 +3192,209 @@ EIND</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="60"/>
+        <location filename="const/UIconst.py" line="61"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="63"/>
+        <location filename="const/UIconst.py" line="64"/>
         <source>Cut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="64"/>
+        <location filename="const/UIconst.py" line="65"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="65"/>
+        <location filename="const/UIconst.py" line="66"/>
         <source>Paste</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="68"/>
+        <location filename="const/UIconst.py" line="69"/>
         <source>Roast</source>
         <translation>Brand</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="71"/>
+        <location filename="const/UIconst.py" line="72"/>
         <source>Properties...</source>
         <translation>Eigenschappen...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="72"/>
+        <location filename="const/UIconst.py" line="73"/>
         <source>Background...</source>
         <translation>Achtergrond...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="73"/>
+        <location filename="const/UIconst.py" line="74"/>
         <source>Cup Profile...</source>
         <translation>Cup Profiel...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="74"/>
+        <location filename="const/UIconst.py" line="75"/>
         <source>Temperature</source>
         <translation>Temperatuur</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="75"/>
+        <location filename="const/UIconst.py" line="76"/>
         <source>Convert to Fahrenheit</source>
         <translation>Omzetten naar Fahrenheit</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="76"/>
+        <location filename="const/UIconst.py" line="77"/>
         <source>Convert to Celsius</source>
         <translation>Omzetten naar Celsius</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="77"/>
+        <location filename="const/UIconst.py" line="78"/>
         <source>Fahrenheit Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="78"/>
+        <location filename="const/UIconst.py" line="79"/>
         <source>Celsius Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="81"/>
+        <location filename="const/UIconst.py" line="82"/>
         <source>Config</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="84"/>
+        <location filename="const/UIconst.py" line="85"/>
         <source>Device...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="85"/>
+        <location filename="const/UIconst.py" line="86"/>
         <source>Serial Port...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="86"/>
+        <location filename="const/UIconst.py" line="87"/>
         <source>Sampling Interval...</source>
         <translation>Meting Interval...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="87"/>
+        <location filename="const/UIconst.py" line="88"/>
         <source>Colors...</source>
         <translation>Kleuren...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="88"/>
+        <location filename="const/UIconst.py" line="89"/>
         <source>Phases...</source>
         <translation>Fases...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="89"/>
+        <location filename="const/UIconst.py" line="90"/>
         <source>Events...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="90"/>
+        <location filename="const/UIconst.py" line="91"/>
         <source>Statistics...</source>
         <translation>Statistieken...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="91"/>
+        <location filename="const/UIconst.py" line="92"/>
         <source>Axes...</source>
         <translation>Assen...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="92"/>
+        <location filename="const/UIconst.py" line="93"/>
         <source>Autosave...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="93"/>
+        <location filename="const/UIconst.py" line="94"/>
         <source>Alarms...</source>
         <translation>Alarmen...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="94"/>
+        <location filename="const/UIconst.py" line="95"/>
         <source>Language</source>
         <translation>Taal</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="117"/>
+        <location filename="const/UIconst.py" line="118"/>
         <source>Tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="120"/>
+        <location filename="const/UIconst.py" line="121"/>
         <source>Designer</source>
         <translation>Ontwerper</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="121"/>
+        <location filename="const/UIconst.py" line="122"/>
         <source>Calculator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="122"/>
+        <location filename="const/UIconst.py" line="123"/>
         <source>Wheel Graph</source>
         <translation>Wiel Grafiek</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="123"/>
+        <location filename="const/UIconst.py" line="124"/>
         <source>Extras...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="127"/>
+        <location filename="const/UIconst.py" line="128"/>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="132"/>
+        <location filename="const/UIconst.py" line="133"/>
         <source>Documentation</source>
         <translation>Documentatie</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="133"/>
-        <source>Blog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="const/UIconst.py" line="134"/>
+        <location filename="const/UIconst.py" line="135"/>
         <source>Keyboard Shortcuts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="135"/>
+        <location filename="const/UIconst.py" line="136"/>
         <source>Errors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="136"/>
+        <location filename="const/UIconst.py" line="137"/>
         <source>Messages</source>
         <translation>Berichten</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="137"/>
+        <location filename="const/UIconst.py" line="138"/>
         <source>Serial</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="138"/>
+        <location filename="const/UIconst.py" line="139"/>
         <source>Settings</source>
         <translation>Instellingen</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="139"/>
+        <location filename="const/UIconst.py" line="140"/>
         <source>Platform</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="140"/>
+        <location filename="const/UIconst.py" line="141"/>
         <source>Factory Reset</source>
         <translation>Fabrieksinstellingen</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="58"/>
+        <source>Quit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="132"/>
+        <source>About...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3403,11 +3408,6 @@ EIND</translation>
         <location filename="artisanlib/main.py" line="1189"/>
         <source>HUD ON</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="1189"/>
-        <source>Need some data for HUD to work</source>
-        <translation type="obsolete">Heb data nodig voor HUD</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="1255"/>
@@ -4661,7 +4661,7 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="24589"/>
         <source>OFF</source>
-        <translation type="unfinished">UIT</translation>
+        <translation>UIT</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="24582"/>
@@ -4671,7 +4671,7 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="24595"/>
         <source>ON</source>
-        <translation type="unfinished">AAN</translation>
+        <translation>AAN</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="24594"/>
@@ -5004,12 +5004,12 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="22879"/>
         <source>PID OFF</source>
-        <translation type="unfinished">PID UIT</translation>
+        <translation>PID UIT</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="22882"/>
         <source>PID ON</source>
-        <translation type="unfinished">PID AAN</translation>
+        <translation>PID AAN</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="22896"/>
@@ -5367,7 +5367,7 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="15265"/>
         <source>Style</source>
-        <translation type="unfinished">Stijl</translation>
+        <translation>Stijl</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="20201"/>
@@ -5530,7 +5530,7 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="22293"/>
         <source>Action</source>
-        <translation type="unfinished">Actie</translation>
+        <translation>Actie</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15492"/>
@@ -5645,7 +5645,7 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="21580"/>
         <source>Width</source>
-        <translation type="unfinished">Breedte</translation>
+        <translation>Breedte</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="21580"/>
@@ -5745,47 +5745,47 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="13454"/>
         <source>START</source>
-        <translation type="unfinished">START</translation>
+        <translation>START</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13457"/>
         <source>DRY END</source>
-        <translation type="unfinished"></translation>
+        <translation>DROGEN EIND</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13460"/>
         <source>FC START</source>
-        <translation type="unfinished"></translation>
+        <translation>FC BEGIN</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13463"/>
         <source>FC END</source>
-        <translation type="unfinished"></translation>
+        <translation>FC EIND</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13466"/>
         <source>SC START</source>
-        <translation type="unfinished"></translation>
+        <translation>SC BEGIN</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13469"/>
         <source>SC END</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="13472"/>
-        <source>END</source>
-        <translation type="unfinished"></translation>
+        <translation>SC EIND</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13475"/>
         <source>COOL</source>
-        <translation type="unfinished"></translation>
+        <translation>KOEL</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13483"/>
         <source>EVENT #%2 %3%4</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="13472"/>
+        <source>DROP</source>
+        <translation>DROP</translation>
     </message>
 </context>
 <context>
@@ -6041,7 +6041,7 @@ Pungency</source>
     <message>
         <location filename="artisanlib/main.py" line="6271"/>
         <source>Reset</source>
-        <translation type="unfinished">Reset</translation>
+        <translation>Reset</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="6279"/>
