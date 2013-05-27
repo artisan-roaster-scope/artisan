@@ -227,10 +227,28 @@ if platf == 'Windows':
 
 #Localization support
 global locale
-locale = QSettings().value('locale').toString()
+            
+if not QSettings().value('resetqsettings').toInt()[0]:
+    locale = QSettings().value('locale').toString()
+    if locale == "en_US":
+        locale == "en"
+else:
+    locale = ""
+supported_languages = [
+    "en"
+    "ar",
+    "de",
+    "el",
+    "es",
+    "ja",
+    "nl",
+    "no",
+    "pt",
+]
 if len(locale) == 0:
     locale = QLocale.system().name()
-    QSettings().setValue('locale', locale)
+    if locale in supported_languages:
+        QSettings().setValue('locale', locale)
 
 qtTranslator = QTranslator()
 #load Qt default translations from QLibrary
@@ -5850,7 +5868,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(self.printAction,SIGNAL("triggered()"),self.filePrint)
         self.fileMenu.addAction(self.printAction)
         
-        self.quitAction = QAction("Quit",self)
+        self.quitAction = QAction(UIconst.FILE_MENU_QUIT,self)
         self.quitAction.setShortcut(QKeySequence.Quit)
         self.connect(self.quitAction,SIGNAL("triggered()"),self.fileQuit)
         self.fileMenu.addAction(self.quitAction)
@@ -5965,7 +5983,7 @@ class ApplicationWindow(QMainWindow):
         self.EnglishLanguage.setCheckable(True)
         self.connect(self.EnglishLanguage,SIGNAL("triggered()"),lambda lang="en":self.changelocale(lang))
         self.languageMenu.addAction(self.EnglishLanguage)
-        if locale == "en":
+        if locale == "en" or locale == "en_US":
             self.EnglishLanguage.setChecked(True)
 
         self.GermanLanguage = QAction(UIconst.CONF_MENU_GERMAN,self)
@@ -6702,7 +6720,7 @@ class ApplicationWindow(QMainWindow):
         level1layout.addWidget(self.lcd1)
         level1layout.setMargin(0)
         level1layout.setSpacing(0)
-        level1layout.setContentsMargins(0,0,5,0)
+        level1layout.setContentsMargins(5,5,5,0)
 
         #level 3
         level3layout.addLayout(pidbuttonLayout,0)
@@ -11141,7 +11159,7 @@ $cupping_notes
                                     QApplication.translate("Message", "Alarms are not available for device None",None, QApplication.UnicodeUTF8))
 
     def switchLanguageFlag(self,locale,value):
-        if locale == "en":
+        if locale == "en" or locale == "en_US":
             self.EnglishLanguage.setChecked(value)
         elif locale == "de":
             self.GermanLanguage.setChecked(value)
@@ -13469,7 +13487,7 @@ class editGraphDlg(ArtisanDialog):
                     text = QApplication.translate("Table", "SC END",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[6]:
                     Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = QApplication.translate("Table", "END",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "DROP",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[7]:
                     Rtime.setBackgroundColor(QColor('orange'))
                     text = QApplication.translate("Table", "COOL",None, QApplication.UnicodeUTF8)

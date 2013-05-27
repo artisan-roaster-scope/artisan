@@ -2106,7 +2106,7 @@ END</source>
     <message>
         <location filename="artisanlib/main.py" line="10294"/>
         <source>TP:</source>
-        <translation type="unfinished"></translation>
+        <translation>نقطة تحول:</translation>
     </message>
 </context>
 <context>
@@ -2205,11 +2205,6 @@ END</source>
         <location filename="artisanlib/main.py" line="10444"/>
         <source>d/m</source>
         <translation>درجة / دقيقة</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="3794"/>
-        <source>BT=%1-%2 (%3)   ET=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]</source>
-        <translation type="obsolete">حرارة البن = %1-%2 (%3)   حرارة المحيط =%4-%5 (%6)   الحرارة=%7   معدّل الصعود=%8درجة\دقيقة   مساحة الفروق ETBTa  = %9[%11-%12]</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="18768"/>
@@ -2982,11 +2977,6 @@ END</source>
         <translation>اس في</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="3814"/>
-        <source>ET=%1-%2 (%3)   BT=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]</source>
-        <translation type="obsolete">حرارة المحيط = %1-%2 (%3)   حرارة البن =%4-%5 (%6)   الحرارة=%7   معدّل الصعود=%8درجة\دقيقة   مساحة الفروق ETBTa  = %9[%11-%12]</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="5155"/>
         <source>Curves</source>
         <translation type="unfinished">منحنيات</translation>
@@ -2999,17 +2989,17 @@ END</source>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>T</source>
-        <translation type="unfinished"></translation>
+        <translation>الحرارة</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>RoR</source>
-        <translation type="unfinished"></translation>
+        <translation>معدّل الصعود</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>ETBTa</source>
-        <translation type="unfinished">المساحة الحرارية بين المحيط والبن</translation>
+        <translation>المساحة الحرارية بين المحيط والبن</translation>
     </message>
 </context>
 <context>
@@ -3196,204 +3186,209 @@ END</source>
         <translation>إطبع ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="60"/>
+        <location filename="const/UIconst.py" line="61"/>
         <source>Edit</source>
         <translation>تحرير</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="63"/>
+        <location filename="const/UIconst.py" line="64"/>
         <source>Cut</source>
         <translation>قص</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="64"/>
+        <location filename="const/UIconst.py" line="65"/>
         <source>Copy</source>
         <translation>نسخ</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="65"/>
+        <location filename="const/UIconst.py" line="66"/>
         <source>Paste</source>
         <translation>لزق</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="68"/>
+        <location filename="const/UIconst.py" line="69"/>
         <source>Roast</source>
         <translation>حمص</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="71"/>
+        <location filename="const/UIconst.py" line="72"/>
         <source>Properties...</source>
         <translation>خصائص ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="72"/>
+        <location filename="const/UIconst.py" line="73"/>
         <source>Background...</source>
         <translation>خلفية ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="73"/>
+        <location filename="const/UIconst.py" line="74"/>
         <source>Cup Profile...</source>
         <translation>ملمح التذوق...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="74"/>
+        <location filename="const/UIconst.py" line="75"/>
         <source>Temperature</source>
         <translation>الحرارة</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="75"/>
+        <location filename="const/UIconst.py" line="76"/>
         <source>Convert to Fahrenheit</source>
         <translation>تحويل لفهرنهايت</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="76"/>
+        <location filename="const/UIconst.py" line="77"/>
         <source>Convert to Celsius</source>
         <translation>تحويل لسلسيوس</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="77"/>
+        <location filename="const/UIconst.py" line="78"/>
         <source>Fahrenheit Mode</source>
         <translation>نظام الفهرنهايت</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="78"/>
+        <location filename="const/UIconst.py" line="79"/>
         <source>Celsius Mode</source>
         <translation>نظام السلسيوس</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="81"/>
+        <location filename="const/UIconst.py" line="82"/>
         <source>Config</source>
         <translation>إعداد</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="84"/>
+        <location filename="const/UIconst.py" line="85"/>
         <source>Device...</source>
         <translation>الجهاز ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="85"/>
+        <location filename="const/UIconst.py" line="86"/>
         <source>Serial Port...</source>
         <translation>منفذ تسلسلي ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="86"/>
+        <location filename="const/UIconst.py" line="87"/>
         <source>Sampling Interval...</source>
         <translation>فترة العينات ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="87"/>
+        <location filename="const/UIconst.py" line="88"/>
         <source>Colors...</source>
         <translation>ألوان ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="88"/>
+        <location filename="const/UIconst.py" line="89"/>
         <source>Phases...</source>
         <translation>مراحل ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="89"/>
+        <location filename="const/UIconst.py" line="90"/>
         <source>Events...</source>
         <translation>أحداث ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="90"/>
+        <location filename="const/UIconst.py" line="91"/>
         <source>Statistics...</source>
         <translation>إحصائيات ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="91"/>
+        <location filename="const/UIconst.py" line="92"/>
         <source>Axes...</source>
         <translation>محاور ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="92"/>
+        <location filename="const/UIconst.py" line="93"/>
         <source>Autosave...</source>
         <translation>حفظ تلقائي ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="93"/>
+        <location filename="const/UIconst.py" line="94"/>
         <source>Alarms...</source>
         <translation>إنذارات ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="94"/>
+        <location filename="const/UIconst.py" line="95"/>
         <source>Language</source>
         <translation>اللغة</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="117"/>
+        <location filename="const/UIconst.py" line="118"/>
         <source>Tools</source>
         <translation>أدوات</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="120"/>
+        <location filename="const/UIconst.py" line="121"/>
         <source>Designer</source>
         <translation>مصمم</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="121"/>
+        <location filename="const/UIconst.py" line="122"/>
         <source>Calculator</source>
         <translation>حاسبة</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="122"/>
+        <location filename="const/UIconst.py" line="123"/>
         <source>Wheel Graph</source>
         <translation>رسم العجلة</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="123"/>
+        <location filename="const/UIconst.py" line="124"/>
         <source>Extras...</source>
         <translation>إضافي ...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="127"/>
+        <location filename="const/UIconst.py" line="128"/>
         <source>Help</source>
         <translation>مساعدة</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="132"/>
+        <location filename="const/UIconst.py" line="133"/>
         <source>Documentation</source>
         <translation>توثيق</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="133"/>
-        <source>Blog</source>
-        <translation>مدونة</translation>
-    </message>
-    <message>
-        <location filename="const/UIconst.py" line="134"/>
+        <location filename="const/UIconst.py" line="135"/>
         <source>Keyboard Shortcuts</source>
         <translation>إختصارات المفاتيح</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="135"/>
+        <location filename="const/UIconst.py" line="136"/>
         <source>Errors</source>
         <translation>أخطاء</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="136"/>
+        <location filename="const/UIconst.py" line="137"/>
         <source>Messages</source>
         <translation>رسائل</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="137"/>
+        <location filename="const/UIconst.py" line="138"/>
         <source>Serial</source>
         <translation>متسلسل</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="138"/>
+        <location filename="const/UIconst.py" line="139"/>
         <source>Settings</source>
         <translation>إعدادات</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="139"/>
+        <location filename="const/UIconst.py" line="140"/>
         <source>Platform</source>
         <translation>منصة</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="140"/>
+        <location filename="const/UIconst.py" line="141"/>
         <source>Factory Reset</source>
         <translation>الإعدادات الأصلية</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="58"/>
+        <source>Quit</source>
+        <translation>توقف</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="132"/>
+        <source>About...</source>
+        <translation>نبذة...</translation>
     </message>
 </context>
 <context>
@@ -4390,7 +4385,7 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="19229"/>
         <source>Designer Config</source>
-        <translation type="unfinished">إعداد المصمم</translation>
+        <translation>إعداد المصمم</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19026"/>
@@ -4400,37 +4395,37 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="19221"/>
         <source>CHARGE</source>
-        <translation type="unfinished">تحميل</translation>
+        <translation>تحميل</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19222"/>
         <source>DRY END</source>
-        <translation type="unfinished">إنتهاء التجفيف</translation>
+        <translation>إنتهاء التجفيف</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19223"/>
         <source>FC START</source>
-        <translation type="unfinished">يدء الصدع الأول</translation>
+        <translation>يدء الصدع الأول</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19224"/>
         <source>FC END</source>
-        <translation type="unfinished">نهاية الصدع الأول</translation>
+        <translation>نهاية الصدع الأول</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19225"/>
         <source>SC START</source>
-        <translation type="unfinished">بدء الصدع الثاني</translation>
+        <translation>بدء الصدع الثاني</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19226"/>
         <source>SC END</source>
-        <translation type="unfinished">نهاية الصدع الثاني</translation>
+        <translation>نهاية الصدع الثاني</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19227"/>
         <source>DROP</source>
-        <translation type="unfinished">إخراج</translation>
+        <translation>إخراج</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19041"/>
@@ -4660,7 +4655,7 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="24589"/>
         <source>OFF</source>
-        <translation type="unfinished">إغلاق</translation>
+        <translation>إغلاق</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="24582"/>
@@ -4670,7 +4665,7 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="24595"/>
         <source>ON</source>
-        <translation type="unfinished">شغّل</translation>
+        <translation>شغّل</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="24594"/>
@@ -5003,12 +4998,12 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="22879"/>
         <source>PID OFF</source>
-        <translation type="unfinished">تشغيل بي آي دي</translation>
+        <translation>تشغيل بي آي دي</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="22882"/>
         <source>PID ON</source>
-        <translation type="unfinished">إيقاف بي آي دي</translation>
+        <translation>إيقاف بي آي دي</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="22896"/>
@@ -5497,11 +5492,6 @@ Proceed?</source>
         <translation>%1 النهاية</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="13441"/>
-        <source>%1 COOL</source>
-        <translation type="obsolete">%1 تبريد</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="16791"/>
         <source>%1 EVENT #%2 %3%4</source>
         <translation>%1 جدث #%2 %3%4</translation>
@@ -5749,47 +5739,47 @@ Proceed?</source>
     <message>
         <location filename="artisanlib/main.py" line="13454"/>
         <source>START</source>
-        <translation type="unfinished">إبدأ</translation>
+        <translation>إبدأ</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13457"/>
         <source>DRY END</source>
-        <translation type="unfinished">إنتهاء التجفيف</translation>
+        <translation>إنتهاء التجفيف</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13460"/>
         <source>FC START</source>
-        <translation type="unfinished">يدء الصدع الأول</translation>
+        <translation>يدء الصدع الأول</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13463"/>
         <source>FC END</source>
-        <translation type="unfinished">نهاية الصدع الأول</translation>
+        <translation>نهاية الصدع الأول</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13466"/>
         <source>SC START</source>
-        <translation type="unfinished">بدء الصدع الثاني</translation>
+        <translation>بدء الصدع الثاني</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13469"/>
         <source>SC END</source>
-        <translation type="unfinished">نهاية الصدع الثاني</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="13472"/>
-        <source>END</source>
-        <translation type="unfinished"></translation>
+        <translation>نهاية الصدع الثاني</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13475"/>
         <source>COOL</source>
-        <translation type="unfinished">تبريد</translation>
+        <translation>تبريد</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13483"/>
         <source>EVENT #%2 %3%4</source>
-        <translation type="unfinished"></translation>
+        <translation>جدث #%2 %3%4</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="13472"/>
+        <source>DROP</source>
+        <translation>إخراج</translation>
     </message>
 </context>
 <context>

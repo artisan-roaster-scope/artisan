@@ -55,6 +55,7 @@ FILE_MENU_SAVEGRAPH = QApplication.translate("Menu", "Save Graph", None, QApplic
 FILE_MENU_SAVEGRAPH_FULL_SIZE = QApplication.translate("Menu", "Full Size...", None, QApplication.UnicodeUTF8)
 FILE_MENU_HTMLREPORT = QApplication.translate("Menu", "Roasting Report", None, QApplication.UnicodeUTF8)
 FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None, QApplication.UnicodeUTF8)
+FILE_MENU_QUIT = QApplication.translate("Menu", "Quit", None, QApplication.UnicodeUTF8)
 
 #Edit menu items
 EDIT_MENU = QApplication.translate("Menu", "Edit", None, QApplication.UnicodeUTF8)
@@ -127,10 +128,10 @@ TOOLKIT_MENU_EXTRAS = QApplication.translate("Menu", "Extras...", None, QApplica
 HELP_MENU = QApplication.translate("Menu", "Help", None, QApplication.UnicodeUTF8)
 if platf != 'Darwin':
     HELP_MENU = "&" + HELP_MENU
-#note that the "About" menu item is recognized only if it is named "About", but automatically translated by the Qt standard tranlators
-HELP_MENU_ABOUT = "About" #QApplication.translate("Menu", "About", None, QApplication.UnicodeUTF8)
+#note that the "About" menu item is recognized only if it is named "About...", but automatically translated by the Qt standard tranlators
+HELP_MENU_ABOUT = QApplication.translate("Menu", "About...", None, QApplication.UnicodeUTF8)
 HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None, QApplication.UnicodeUTF8)
-HELP_MENU_BLOG = QApplication.translate("Menu", "Blog", None, QApplication.UnicodeUTF8)
+#HELP_MENU_BLOG = QApplication.translate("Menu", "Blog", None, QApplication.UnicodeUTF8)
 HELP_MENU_KEYBOARDSHORTCUTS = QApplication.translate("Menu", "Keyboard Shortcuts", None, QApplication.UnicodeUTF8)
 HELP_MENU_ERRORS = QApplication.translate("Menu", "Errors", None, QApplication.UnicodeUTF8)
 HELP_MENU_MESSAGES = QApplication.translate("Menu", "Messages", None, QApplication.UnicodeUTF8)

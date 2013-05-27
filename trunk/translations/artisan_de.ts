@@ -3,26 +3,6 @@
 <context>
     <name>About</name>
     <message>
-        <location filename="artisanlib/main.py" line="10829"/>
-        <source>%1, linux binary</source>
-        <translation type="obsolete">%1, linux Version</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10830"/>
-        <source>%1, documentation</source>
-        <translation type="obsolete">%1, Dokumentation</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10833"/>
-        <source>%1, Swedish localization</source>
-        <translation type="obsolete">%1, Lokalisierung Schwedisch</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10834"/>
-        <source>%1, Spanish localization</source>
-        <translation type="obsolete">%1, Lokalisierung Spanisch</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="10934"/>
         <source>About</source>
         <translation>Über</translation>
@@ -41,16 +21,6 @@
         <location filename="artisanlib/main.py" line="10934"/>
         <source>Contributors:</source>
         <translation>Beitragende:</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10831"/>
-        <source>%1, TEVA18B, DTA support</source>
-        <translation type="obsolete">%1, TEVA18B, DTA Unterstüzung</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="10832"/>
-        <source>%1, DTA support</source>
-        <translation type="obsolete">%1, DTA Unterstützung</translation>
     </message>
 </context>
 <context>
@@ -2702,11 +2672,6 @@ END</source>
         <translation>BT Messfühler Typ</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="23444"/>
-        <source>NOTE: BT Thermocouple type is not stored in the Artisan seetings</source>
-        <translation type="obsolete">HINWEIS: BT Messfühler Typ wird nicht in den Programmeinstellungen gespeichert</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="23696"/>
         <source>Artisan uses 1 decimal point</source>
         <translation>Artisan nutzt eine Nachkommastelle</translation>
@@ -3014,27 +2979,27 @@ END</source>
     <message>
         <location filename="artisanlib/main.py" line="5155"/>
         <source>Curves</source>
-        <translation type="unfinished">Kurven</translation>
+        <translation>Kurven</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="5159"/>
         <source>Delta Curves</source>
-        <translation type="unfinished"></translation>
+        <translation>Delta Kurven</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>T</source>
-        <translation type="unfinished"></translation>
+        <translation>T</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>RoR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="3804"/>
         <source>ETBTa</source>
-        <translation type="unfinished">ETBTa</translation>
+        <translation>ETBTa</translation>
     </message>
 </context>
 <context>
@@ -3171,87 +3136,87 @@ END</source>
         <translation>Drucken...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="68"/>
+        <location filename="const/UIconst.py" line="69"/>
         <source>Roast</source>
         <translation>Röstung</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="71"/>
+        <location filename="const/UIconst.py" line="72"/>
         <source>Properties...</source>
         <translation>Eigenschaften...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="72"/>
+        <location filename="const/UIconst.py" line="73"/>
         <source>Background...</source>
         <translation>Profilvorlage...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="73"/>
+        <location filename="const/UIconst.py" line="74"/>
         <source>Cup Profile...</source>
         <translation>Verkostung...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="74"/>
+        <location filename="const/UIconst.py" line="75"/>
         <source>Temperature</source>
         <translation>Temperatur</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="121"/>
+        <location filename="const/UIconst.py" line="122"/>
         <source>Calculator</source>
         <translation>Rechner</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="84"/>
+        <location filename="const/UIconst.py" line="85"/>
         <source>Device...</source>
         <translation>Meßgerät...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="85"/>
+        <location filename="const/UIconst.py" line="86"/>
         <source>Serial Port...</source>
         <translation>Serieller Anschluss...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="86"/>
+        <location filename="const/UIconst.py" line="87"/>
         <source>Sampling Interval...</source>
         <translation>Abtastintervall...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="87"/>
+        <location filename="const/UIconst.py" line="88"/>
         <source>Colors...</source>
         <translation>Farben...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="88"/>
+        <location filename="const/UIconst.py" line="89"/>
         <source>Phases...</source>
         <translation>Phasen...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="89"/>
+        <location filename="const/UIconst.py" line="90"/>
         <source>Events...</source>
         <translation>Ereignisse...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="90"/>
+        <location filename="const/UIconst.py" line="91"/>
         <source>Statistics...</source>
         <translation>Statistiken...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="92"/>
+        <location filename="const/UIconst.py" line="93"/>
         <source>Autosave...</source>
         <translation>Automatisches Speichern...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="123"/>
+        <location filename="const/UIconst.py" line="124"/>
         <source>Extras...</source>
         <translation>Erweiterungen...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="127"/>
+        <location filename="const/UIconst.py" line="128"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="132"/>
+        <location filename="const/UIconst.py" line="133"/>
         <source>Documentation</source>
         <translation>Dokumentation</translation>
     </message>
@@ -3261,52 +3226,52 @@ END</source>
         <translation>Diagramm speichern</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="81"/>
+        <location filename="const/UIconst.py" line="82"/>
         <source>Config</source>
         <translation>Konfiguration</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="91"/>
+        <location filename="const/UIconst.py" line="92"/>
         <source>Axes...</source>
         <translation>Achsen...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="135"/>
+        <location filename="const/UIconst.py" line="136"/>
         <source>Errors</source>
         <translation>Fehlermeldungen</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="134"/>
+        <location filename="const/UIconst.py" line="135"/>
         <source>Keyboard Shortcuts</source>
         <translation>Tastaturkürzel</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="136"/>
+        <location filename="const/UIconst.py" line="137"/>
         <source>Messages</source>
         <translation>System Meldungen</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="93"/>
+        <location filename="const/UIconst.py" line="94"/>
         <source>Alarms...</source>
         <translation>Alarme...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="60"/>
+        <location filename="const/UIconst.py" line="61"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="63"/>
+        <location filename="const/UIconst.py" line="64"/>
         <source>Cut</source>
         <translation>Ausschneiden</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="64"/>
+        <location filename="const/UIconst.py" line="65"/>
         <source>Copy</source>
         <translation>Kopieren</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="65"/>
+        <location filename="const/UIconst.py" line="66"/>
         <source>Paste</source>
         <translation>Einfügen</translation>
     </message>
@@ -3316,52 +3281,52 @@ END</source>
         <translation>Volle Größe...</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="120"/>
+        <location filename="const/UIconst.py" line="121"/>
         <source>Designer</source>
         <translation>Designer</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="75"/>
+        <location filename="const/UIconst.py" line="76"/>
         <source>Convert to Fahrenheit</source>
         <translation>Nach Fahrenheit Umrechnen</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="76"/>
+        <location filename="const/UIconst.py" line="77"/>
         <source>Convert to Celsius</source>
         <translation>Nach Celsius Umrechnen</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="77"/>
+        <location filename="const/UIconst.py" line="78"/>
         <source>Fahrenheit Mode</source>
         <translation>Fahrenheit Modus</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="78"/>
+        <location filename="const/UIconst.py" line="79"/>
         <source>Celsius Mode</source>
         <translation>Celsius Modus</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="117"/>
+        <location filename="const/UIconst.py" line="118"/>
         <source>Tools</source>
         <translation>Extras</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="122"/>
+        <location filename="const/UIconst.py" line="123"/>
         <source>Wheel Graph</source>
         <translation>Kreisdiagramm</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="140"/>
+        <location filename="const/UIconst.py" line="141"/>
         <source>Factory Reset</source>
         <translation>Werkseinstellungen</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="94"/>
+        <location filename="const/UIconst.py" line="95"/>
         <source>Language</source>
         <translation>Sprache</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="137"/>
+        <location filename="const/UIconst.py" line="138"/>
         <source>Serial</source>
         <translation></translation>
     </message>
@@ -3371,12 +3336,12 @@ END</source>
         <translation>Röstprotokoll</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="138"/>
+        <location filename="const/UIconst.py" line="139"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="139"/>
+        <location filename="const/UIconst.py" line="140"/>
         <source>Platform</source>
         <translation>Plattform</translation>
     </message>
@@ -3411,14 +3376,19 @@ END</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="const/UIconst.py" line="133"/>
-        <source>Blog</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="const/UIconst.py" line="53"/>
         <source>Export</source>
         <translation>Exportieren</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="58"/>
+        <source>Quit</source>
+        <translation>Beenden</translation>
+    </message>
+    <message>
+        <location filename="const/UIconst.py" line="132"/>
+        <source>About...</source>
+        <translation>Über...</translation>
     </message>
 </context>
 <context>
@@ -3442,11 +3412,6 @@ END</source>
         <location filename="artisanlib/main.py" line="1189"/>
         <source>HUD ON</source>
         <translation>HUD EIN</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="1189"/>
-        <source>Need some data for HUD to work</source>
-        <translation type="obsolete">HUD benötigt mehr Messpunkte</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="1255"/>
@@ -4014,7 +3979,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="artisanlib/main.py" line="11455"/>
         <source>Save Graph as PNG</source>
-        <translation>Diagramm als PNG gespeichert</translation>
+        <translation>Diagramm als PNG speichern</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="11462"/>
@@ -4024,7 +3989,7 @@ Profile missing [CHARGE] or [DROP]</source>
     <message>
         <location filename="artisanlib/main.py" line="11471"/>
         <source>Save Graph as SVG</source>
-        <translation>Diagramm als SVG gespeichert</translation>
+        <translation>Diagramm als SVG speichern</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="11476"/>
@@ -4307,11 +4272,6 @@ Profile missing [CHARGE] or [DROP]</source>
         <translation>&lt;b&gt;Tastenkürzel: &lt;/b&gt; [b] Anzeigen/Ausblenden der Benutzerdefinierten Tastenreihen</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="15797"/>
-        <source>Phases changed to %1 default: %2)</source>
-        <translation type="obsolete">Phases changed to %1 default: %2)</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="16265"/>
         <source>Background does not match number of labels</source>
         <translation>Profilevorlage entspricht nicht der Anzahl der Kurven</translation>
@@ -4455,11 +4415,6 @@ Profile missing [CHARGE] or [DROP]</source>
         <location filename="artisanlib/main.py" line="20831"/>
         <source>Device set to %1, which is equivalent to CENTER 302. Now, chose serial port</source>
         <translation>Gerät %1 ausgewählt, equivalent zum CENTER 302. Serielleeinstellungen vornehmen</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="20548"/>
-        <source>Device set to %1, which is equivalent to HH806AU. Now, chose serial port</source>
-        <translation type="obsolete">Gerät %1 ausgewählt, equivalent zum Omega HH806AU. Serielleeinstellungen vornehmen</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="21436"/>
@@ -4822,11 +4777,6 @@ Fortfahren?</translation>
         <translation>Die meisten Geräte haben 2 byte Integer Register.</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="19254"/>
-        <source>A temperature of 145.2C is often send as 1452.</source>
-        <translation type="obsolete">Ein Temperaturwert wie 145.2C wird oft als 1452 abgelegt.</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="19512"/>
         <source>In that case you have to use the symbolic assignment &apos;x/10&apos;.</source>
         <translation>In diesem Fall muss die Symbolische Funktion &apos;x/10&apos;.</translation>
@@ -4905,7 +4855,7 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="11469"/>
         <source>Save Graph as PDF</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagramm als PDF gespeichern</translation>
     </message>
 </context>
 <context>
@@ -5125,11 +5075,6 @@ Continue?</source>
         <translation>PID Werte erfolgreich gelesen</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="22940"/>
-        <source>%1 successfully send to pid </source>
-        <translation type="obsolete">%1 korrekt an PID übertragen </translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="23210"/>
         <source>setpid(): There was a problem setting %1</source>
         <translation>setpid(): Ein Problem ist aufgetreten %1</translation>
@@ -5180,11 +5125,6 @@ Continue?</source>
         <translation>setNsv(): fehlerhafte Antwort</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="24037"/>
-        <source>pid%1 changed to %2</source>
-        <translation type="obsolete">pid%1 geändert auf %2</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="24122"/>
         <source>setNpid(): bad confirmation</source>
         <translation>setNpid(): fehlerhafter Bestätigung</translation>
@@ -5218,11 +5158,6 @@ Continue?</source>
         <location filename="artisanlib/main.py" line="24344"/>
         <source>pid command failed. Bad data at pid%1 (8,8,8): (%2,%3,%4) </source>
         <translation>pid Befehl fehlgeschlagen. Fehlerhafte Daten bei pid%1 (8,8,8): (%2,%3,%4)</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="24058"/>
-        <source>sending commands for p%1 i%2 dd%3</source>
-        <translation type="obsolete">Befehle für p%1 i%2 dd%3 werden gesendet</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="24434"/>
@@ -5362,7 +5297,7 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="24119"/>
         <source>pid changed to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>pid geändert auf %1</translation>
     </message>
 </context>
 <context>
@@ -5656,11 +5591,6 @@ Continue?</source>
         <translation>%1 SC START</translation>
     </message>
     <message>
-        <location filename="artisanlib/main.py" line="13441"/>
-        <source>%1 COOL</source>
-        <translation type="obsolete">%1 KÜHL</translation>
-    </message>
-    <message>
         <location filename="artisanlib/main.py" line="16791"/>
         <source>%1 EVENT #%2 %3%4</source>
         <translation>%1 EREIGNIS #%2 %3%4</translation>
@@ -5813,47 +5743,47 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="13454"/>
         <source>START</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13457"/>
         <source>DRY END</source>
-        <translation type="unfinished"></translation>
+        <translation>TROCKEN</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13460"/>
         <source>FC START</source>
-        <translation type="unfinished">FC START</translation>
+        <translation>FC START</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13463"/>
         <source>FC END</source>
-        <translation type="unfinished">FC ENDE</translation>
+        <translation>FC ENDE</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13466"/>
         <source>SC START</source>
-        <translation type="unfinished">SC START</translation>
+        <translation>SC START</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13469"/>
         <source>SC END</source>
-        <translation type="unfinished">SC ENDE</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="13472"/>
-        <source>END</source>
-        <translation type="unfinished"></translation>
+        <translation>SC ENDE</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13475"/>
         <source>COOL</source>
-        <translation type="unfinished">KÜHL</translation>
+        <translation>KÜHL</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13483"/>
         <source>EVENT #%2 %3%4</source>
-        <translation type="unfinished"></translation>
+        <translation>EREIGNIS #%2 %3%4</translation>
+    </message>
+    <message>
+        <location filename="artisanlib/main.py" line="13472"/>
+        <source>DROP</source>
+        <translation>LEEREN</translation>
     </message>
 </context>
 <context>
@@ -6229,11 +6159,6 @@ nearest: y-Wert des nächstliegenden Punkt</translation>
         <location filename="artisanlib/main.py" line="14893"/>
         <source>Backup all palettes to a text file</source>
         <translation>Speichert alle Paletten in eine Datei</translation>
-    </message>
-    <message>
-        <location filename="artisanlib/main.py" line="14760"/>
-        <source>Restore all palettes from a text</source>
-        <translation type="obsolete">Läd alle Paletten von einer Datei</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="15099"/>
