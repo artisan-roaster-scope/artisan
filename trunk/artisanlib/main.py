@@ -1283,7 +1283,7 @@ class tgraphcanvas(FigureCanvas):
                 try:
                     button_number = int(str(self.alarmstrings[alarmnumber])) - 1 # the event buttons presented to the user are numbered from 1 on                
                 except:
-                    aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '%1' not a number",None, QApplication.UnicodeUTF8).arg(str(self.alarmstrings[alarmnumber])))
+                    aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '%1' not a number",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
                 if button_number:
                     if button_number > -1 and button_number < len(aw.buttonlist):
                         aw.recordextraevent(button_number)
@@ -1310,7 +1310,7 @@ class tgraphcanvas(FigureCanvas):
                             aw.moveslider(slidernr,slidervalue)
                             aw.fireslideraction(slidernr)
                 except:
-                    aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(str(self.alarmstrings[alarmnumber])))
+                    aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setalarm() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -10107,7 +10107,7 @@ class ApplicationWindow(QMainWindow):
         roast["operator"]= u(self.qmc.operator)
         roast["roastertype"] = u(self.qmc.roastertype)
         roast["densitySampleVolume"] = str(self.qmc.density[2])
-        roast["densitySampleVolumeUnit"]= str(self.qmc.density[3])
+        roast["densitySampleVolumeUnit"]= u(self.qmc.density[3])
         roast["beansize"]= str(self.qmc.beansize)
         alarms["alarmflag"]= str(self.qmc.alarmflag) 
         alarms["alarmguard"]= str(self.qmc.alarmguard)
@@ -13976,7 +13976,7 @@ class artisansettingsDlg(ArtisanDialog):
             self.htmlsettings += "<p><b><font color=\"orange\">%s </font></b></p>"%settingsnameslist[n].upper()
             self.htmlsettings += "<p style=\"background-color: %s\">"%pcolors[n%2]
             for keys in sorted(settingsdictlist[n]):
-                self.htmlsettings += "<b>&nbsp;&nbsp;" + keys + " = </b> <i>" + str(settingsdictlist[n][keys]) + "</i><br><br>"
+                self.htmlsettings += "<b>&nbsp;&nbsp;" + keys + " = </b> <i>" + u(settingsdictlist[n][keys]) + "</i><br><br>"
             self.htmlsettings += "</p>"
         self.htmlsettings += "<\body><\font>"
         self.settingsEdit.setHtml(self.htmlsettings)
@@ -22217,7 +22217,7 @@ class AlarmDlg(ArtisanDialog):
             action = self.alarmtable.cellWidget(i,7)
             aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
             description = self.alarmtable.cellWidget(i,8)
-            aw.qmc.alarmstrings[i] = str(description.text())
+            aw.qmc.alarmstrings[i] = u(description.text())
         aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
 
     def buildAlarmSourceList(self):
@@ -22293,7 +22293,7 @@ class AlarmDlg(ArtisanDialog):
                                  QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(3))])
         actionComboBox.setCurrentIndex(self.alarmaction[i] + 1)
         #text description
-        descriptionedit = QLineEdit(str(self.alarmstrings[i]))
+        descriptionedit = QLineEdit(u(self.alarmstrings[i]))
         self.alarmtable.setCellWidget(i,0,flagComboBox)
         self.alarmtable.setCellWidget(i,1,guardedit)
         self.alarmtable.setCellWidget(i,2,timeComboBox)
@@ -22305,36 +22305,41 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setCellWidget(i,8,descriptionedit)
 
     def createalarmtable(self):
-        self.alarmtable.clear()
-        self.alarmtable.setTabKeyNavigation(True)
-        self.alarmtable.setColumnCount(9)
-        self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Temp",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
-                                                       QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8)])
-        self.alarmtable.setAlternatingRowColors(True)
-        self.alarmtable.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.alarmtable.setSelectionBehavior(QTableWidget.SelectRows)
-        self.alarmtable.setSelectionMode(QTableWidget.SingleSelection)
-        self.alarmtable.setShowGrid(True)
-        nalarms = len(self.alarmtemperature)
-        if nalarms:
-            self.alarmtable.setRowCount(nalarms)
-            #populate table
-            for i in range(nalarms):
-                self.setalarmtablerow(i)
-            self.alarmtable.resizeColumnsToContents()
-            # improve width of Qlineedit columns
-            self.alarmtable.setColumnWidth(1,80)
-            self.alarmtable.setColumnWidth(3,50)
-            self.alarmtable.setColumnWidth(6,50)
-            header = self.alarmtable.horizontalHeader()
-            header.setStretchLastSection(True)
+        try:
+            self.alarmtable.clear()
+            self.alarmtable.setTabKeyNavigation(True)
+            self.alarmtable.setColumnCount(9)
+            self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","Temp",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8)])
+            self.alarmtable.setAlternatingRowColors(True)
+            self.alarmtable.setEditTriggers(QTableWidget.NoEditTriggers)
+            self.alarmtable.setSelectionBehavior(QTableWidget.SelectRows)
+            self.alarmtable.setSelectionMode(QTableWidget.SingleSelection)
+            self.alarmtable.setShowGrid(True)
+            nalarms = len(self.alarmtemperature)
+            if nalarms:
+                self.alarmtable.setRowCount(nalarms)
+                #populate table
+                for i in range(nalarms):
+                    self.setalarmtablerow(i)
+                self.alarmtable.resizeColumnsToContents()
+                # improve width of Qlineedit columns
+                self.alarmtable.setColumnWidth(1,80)
+                self.alarmtable.setColumnWidth(3,50)
+                self.alarmtable.setColumnWidth(6,50)
+                header = self.alarmtable.horizontalHeader()
+                header.setStretchLastSection(True)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " createalarmtable() %1").arg(str(ex)),exc_tb.tb_lineno)
+                
 
 # UNDER WORK 
 #######################################################################################
