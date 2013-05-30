@@ -15528,7 +15528,7 @@ class EventsDlg(ArtisanDialog):
                 labeledit = QLineEdit(str(aw.extraeventslabels[i]))
                 self.connect(labeledit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setlabeleventbutton(z,i))
                 #description
-                descriptionedit = QLineEdit(str(aw.extraeventsdescriptions[i]))
+                descriptionedit = QLineEdit(u(aw.extraeventsdescriptions[i]))
                 self.connect(descriptionedit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setdescriptioneventbutton(z,i))
                 #type
                 typeComboBox = QComboBox()
@@ -15611,7 +15611,7 @@ class EventsDlg(ArtisanDialog):
             aw.extraeventslabels[i] = label
             aw.buttonlist[i].setText(aw.extraeventslabels[i])
             descriptionedit = self.eventbuttontable.cellWidget(i,1)
-            aw.extraeventsdescriptions[i] = str(descriptionedit.text())
+            aw.extraeventsdescriptions[i] = u(descriptionedit.text())
             typecombobox = self.eventbuttontable.cellWidget(i,2)
             aw.extraeventstypes[i] = typecombobox.currentIndex()
             valueedit = self.eventbuttontable.cellWidget(i,3)
@@ -15906,14 +15906,14 @@ class EventsDlg(ArtisanDialog):
             aw.qmc.buttonactions[5] = self.SCEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[6] = self.DROPbuttonActionType.currentIndex()
             aw.qmc.buttonactions[7] = self.COOLbuttonActionType.currentIndex()
-            aw.qmc.buttonactionstrings[0] = self.CHARGEbuttonActionString.text()
-            aw.qmc.buttonactionstrings[1] = self.DRYbuttonActionString.text()
-            aw.qmc.buttonactionstrings[2] = self.FCSbuttonActionString.text()
-            aw.qmc.buttonactionstrings[3] = self.FCEbuttonActionString.text()
-            aw.qmc.buttonactionstrings[4] = self.SCSbuttonActionString.text()
-            aw.qmc.buttonactionstrings[5] = self.SCEbuttonActionString.text()
-            aw.qmc.buttonactionstrings[6] = self.DROPbuttonActionString.text()
-            aw.qmc.buttonactionstrings[7] = self.COOLbuttonActionString.text()
+            aw.qmc.buttonactionstrings[0] = u(self.CHARGEbuttonActionString.text())
+            aw.qmc.buttonactionstrings[1] = u(self.DRYbuttonActionString.text())
+            aw.qmc.buttonactionstrings[2] = u(self.FCSbuttonActionString.text())
+            aw.qmc.buttonactionstrings[3] = u(self.FCEbuttonActionString.text())
+            aw.qmc.buttonactionstrings[4] = u(self.SCSbuttonActionString.text())
+            aw.qmc.buttonactionstrings[5] = u(self.SCEbuttonActionString.text())
+            aw.qmc.buttonactionstrings[6] = u(self.DROPbuttonActionString.text())
+            aw.qmc.buttonactionstrings[7] = u(self.COOLbuttonActionString.text())
             #save etypes
             if len(u(self.etype0.text())) and len(u(self.etype1.text())) and len(u(self.etype2.text())) and len(u(self.etype3.text())):
                 aw.qmc.etypes[0] = u(self.etype0.text())
