@@ -25564,26 +25564,28 @@ def main():
         pass
     aw.settingsLoad()
     
-    
     try:
-        argv_file = sys.argv[1]
-        qfile = QFileInfo(u(argv_file))
-        file_suffix = u(qfile.suffix())
-        if file_suffix == "alog":
-            # load Artisan profile on double-click on *.alog file
-            aw.loadFile(u(argv_file))
-        elif file_suffix == "alrm":
-            # load Artisan alarms on double-click on *.alrm file
-            aw.loadAlarms(u(argv_file))
-        elif file_suffix == "apal":
-            # load Artisan palettes on double-click on *.apal file
-            aw.loadPalettes(u(argv_file))
+        if sys.argv and len(sys.argv) > 1:
+            argv_file = sys.argv[1]
+            qfile = QFileInfo(u(argv_file))
+            file_suffix = u(qfile.suffix())
+            if file_suffix == "alog":
+                # load Artisan profile on double-click on *.alog file
+                aw.loadFile(u(argv_file))
+            elif file_suffix == "alrm":
+                # load Artisan alarms on double-click on *.alrm file
+                aw.loadAlarms(u(argv_file))
+            elif file_suffix == "apal":
+                # load Artisan palettes on double-click on *.apal file
+                aw.loadPalettes(u(argv_file))
     except Exception:
         pass
+
     aw.show()
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
     with numpy.errstate(invalid='ignore'):
         app.exec_()
+            
 
 ##############################################################################################################################################
 ##############################################################################################################################################
