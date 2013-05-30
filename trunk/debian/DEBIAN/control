@@ -1,7 +1,8 @@
 Source: artisan
 Package: artisan
 Version: _VERSION_
-Section: unknown
+Section: misc
+Depends: 
 Priority: extra
 Architecture: i386
 Installed-Size: 67510
