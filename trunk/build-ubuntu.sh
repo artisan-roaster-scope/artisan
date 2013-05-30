@@ -29,8 +29,8 @@ cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqsvg.so dist/Resources/
 patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/Resources/qt_plugins/imageformats/libqsvg.so
 cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqgif.so dist/Resources/qt_plugins/imageformats
 patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/Resources/qt_plugins/imageformats/libqgif.so
-cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqjpeg.so dist/Resources/qt_plugins/imageformats
-patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/Resources/qt_plugins/imageformats/libqjpeg.so
+#cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqjpeg.so dist/Resources/qt_plugins/imageformats
+#patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/Resources/qt_plugins/imageformats/libqjpeg.so
 #cp /usr/local/Trolltech/Qt-4.8.4/plugins/imageformats/libqtiff.so dist/Resources/qt_plugins/imageformats
 #patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/Resources/qt_plugins/imageformats/libqtiff.so
 cp /usr/local/Trolltech/Qt-4.8.4/plugins/iconengines/libqsvgicon.so dist/Resources/qt_plugins/iconengines

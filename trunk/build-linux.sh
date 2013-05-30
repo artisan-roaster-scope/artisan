@@ -14,6 +14,7 @@ mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 chown -R root:root debian
 chmod -R g-w debian
+chmod 0644 debian/usr/share/artisan/*.so*
 rm ${NAME}_i386.deb
 fakeroot dpkg --build debian ${NAME}_i386.deb
 alien -r ${NAME}_i386.deb
@@ -27,6 +28,7 @@ mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 chown -R root:root debian
 chmod -R g-w debian
+chmod 0644 debian/usr/share/artisan/*.so*
 rm ${NAME}_i386-glibc2.4.deb
 fakeroot dpkg --build debian ${NAME}_i386-glibc2.4.deb
 
@@ -40,6 +42,7 @@ mv debian/usr/share/dist debian/usr/share/artisan
 find debian -name .svn -exec rm -rf {} \; > /dev/null 2>&1
 chown -R root:root debian
 chmod -R g-w debian
+chmod 0644 debian/usr/share/artisan/*.so*
 rm ${NAME}_amd64.deb
 fakeroot dpkg --build debian ${NAME}_amd64.deb
 alien -r ${NAME}_amd64.deb
