@@ -3831,7 +3831,7 @@ class tgraphcanvas(FigureCanvas):
                                 .arg(u("%.1f"%ETmin)) \
                                 .arg(u("%.1f"%ETmax + self.mode)) \
                                 .arg(u("%.1f"%abs(ETmax - ETmin)  + self.mode)) \
-                                .arg(u(timez)[::-1]) \
+                                .arg(u(timez)) \
                                 .arg(u(ror)) \
                                 .arg(u("%d%sm"%(ts,self.mode))) \
                                 .arg(u(int(tse))) \
