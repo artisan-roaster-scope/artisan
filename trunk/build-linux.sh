@@ -6,6 +6,13 @@ NAME=artisan-linux-${VERSION}
 # fix debian/DEBIAN/control _VERSION_
 sed -i "s/_VERSION_/${VERSION}/g" debian/DEBIAN/control
 
+
+# prepare debian directory
+
+gzip -9 debian/usr/share/man/man1/artisan.1
+gzip -9 debian/usr/share/doc/artisan/changelog
+
+
 # build CentOS i386 .rpm
 
 rm -rf debian/usr/share/artisan
