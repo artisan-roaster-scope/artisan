@@ -1,5 +1,84 @@
 #summary Detailed Release History
 
+==v0.6.0 (x.6.2013)==
+
+ * Events
+  * adds COOL event recording the time the beans were cooled down
+  * adds event sliders e.g. to control the Hottop heater and fan via the HT Roaster Interface
+  * adds substitution of '{}' in event button/slider actions by button value
+  * adds Modbus and DTA send command support attached to button events
+  * adds ordering of events in events tab of Roast Properties dialog
+  * event value range extended from [0-10] to [0-100]
+  * allows events like FCs, FCe,.. (but for CHARGE) to be removed by inserting 0:00 as event time
+ * Alarms
+  * adds alarm chains via alarms guarded by other alarms added
+  * adds alarms on all logged temperature curves incl. deltaET/deltaBT
+  * adds alarms on rising and falling temperatures
+  * adds SC_END, COOL and TP to the FROM list of alarms
+  * adds an empty alarm action (None)
+  * adds emtpty alarm from-time (START)
+  * adds COOL event trigger as special case (via button #0)
+  * adds slider change actions
+  * adds time-based alarms triggered at the given seconds after the specified event like TP, FCs,..
+  * adds save/load action to alarm table
+ * Curves
+  * adds ET/BT swap configuration
+  * adds ambient temperature routing added
+  * adds background deltaET/deltaBT
+  * adds spike filter and smoothing
+  * adds smoothing of all curves incl. background on load/redraw (not only DeltaET/DeltaBT)
+  * improved and faster DeltaET/BT smoothing (via numpy)
+  * adds customization of line and marker styles via the Figure Options menu (green flag button)
+ * Supported Devices
+  * adds 4 channel MODBUS RTU device support
+  * adds improved Delta DTA/DTB support
+  * adds support for digital scales from KERN
+  * adds support for Amprobe TMD-56
+ * UI
+  * improved main window widget layout
+  * improved dialog layouts
+  * adds colorized LCDs using curve color
+  * forces even x-axis ticks
+  * adds dpi resolution and appearance application settings
+  * adds full-screen support
+  * adds new and improved localizations (Arabic, German, Greek, Spanish, French, Japanese, Norwegian, Portuguese, Turkish, Dutch, and Italian)
+  * adds monitoring-only mode reporting readings on LCDs without recording. To start recording press START
+  * adds customization of visibility of LCDs, curves, and default event buttons
+  * improved label positioning on graphs
+  * improved HTML Report (now called Roast Report)
+  * adds automatic table columns resize to content and to dialog size
+  * adds long cool phase warning (red time LCD)
+  * adds BTETarea statistics per phase
+  * adds user-definable default button actions
+  * adds customization of default button visibility
+  * adds optional hiding of ET/BT curves and ET/BT/DeltaET/BT LCDs
+  * adds line- and marker styles set via the "GreenFlag" menu to application settings
+  * fixed figure options dialog (green flag menu)
+  * adds right-click popup on BT curve to change event time
+ * File Handling
+  * changed default directory on Mac from ~/Library to ~/Documents
+  * changed file extension of profiles from .txt to .alog
+  * adds load-by-double-click (Mac OS X only)
+  * adds JSON import/export
+  * adds RoastLogger import/export
+  * adds PDF/SVG vector graph export
+ * Packaging
+  * removes support for PPC processors on the OS X platform
+  * adds Linux binary builds (32bit and 64bit)
+  * adds Windows installer
+  * adds new app and file icons
+  * upgrades underlying libs (Python, Qt, PyQt, numpy, scipy, matplotlib)
+ * Others
+  * adds Python 3 support
+  * adds auto align background on CHARGE/autoCharge
+  * improved localization support and unicode character handling
+  * adds a CUSTOM cup profile that is stored in the application settings
+  * adds computation of the area between the BT and ET curves (ETBTa)
+  * adds extended roast characteristics/statistics (incl. ET/BT area abbreviated as ETBTa)
+  * adds roast color and flags to specify roast defects
+  * bug fixes
+
+----
 ==v0.5.6 (8.11.2012)==
 
  * based on r787 (with modbus support removed)
