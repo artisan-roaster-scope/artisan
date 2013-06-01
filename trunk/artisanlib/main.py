@@ -2834,6 +2834,8 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.draw()
 
     def OnMonitor(self):
+        aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+        aw.lcd1.display("00:00")
         self.timeclock.start()   #set time to the current computer time
         self.flagon = True
         if self.designerflag: return
@@ -2875,8 +2877,6 @@ class tgraphcanvas(FigureCanvas):
         aw.sendmessage(QApplication.translate("Message","Scope stopped", None, QApplication.UnicodeUTF8))
         aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
         # reset time LCD color to the default (might have been changed to red due to long cooling!)
-        aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-        aw.lcd1.display("00:00")
         aw.hideLCDs()
         aw.hideSliders()
         aw.hideExtraButtons()
@@ -3819,27 +3819,42 @@ class tgraphcanvas(FigureCanvas):
                     ts,tse,tsb = aw.ts()
     
                     #end temperature
-                    strline = QString(aw.arabicReshape(QApplication.translate("Label", "ET", None,QApplication.UnicodeUTF8)) + "=%1-%2 (%3)   " \
-                                + aw.arabicReshape(QApplication.translate("Label", "BT", None,QApplication.UnicodeUTF8)) + "=%4-%5 (%6)   " \
-                                + aw.arabicReshape(QApplication.translate("Label", "T", None,QApplication.UnicodeUTF8)) + "=%7   " \
-                                + aw.arabicReshape(QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8)) + "=%8" \
-                                + aw.arabicReshape(QApplication.translate("Label", "d/m", None,QApplication.UnicodeUTF8)) + "   " \
-                                + aw.arabicReshape(QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8)) + "=%9 [%11-%12]") \
-                                .arg("%.1f"%BTmin) \
-                                .arg("%.1f"%BTmax + self.mode) \
-                                .arg("%.1f"%abs(BTmax - BTmin) + self.mode) \
-                                .arg(u("%.1f"%ETmin)) \
-                                .arg(u("%.1f"%ETmax + self.mode)) \
-                                .arg(u("%.1f"%abs(ETmax - ETmin)  + self.mode)) \
-                                .arg(u(timez)) \
-                                .arg(u(ror)) \
-                                .arg(u("%d%sm"%(ts,self.mode))) \
-                                .arg(u(int(tse))) \
-                                .arg(u(int(tsb)))
-#                    strline = QApplication.translate("Label", "ET=%1-%2 (%3)   BT=%4-%5 (%6)   T=%7   RoR=%8d/m   ETBTa=%9 [%11-%12]", None,
-#                                QApplication.UnicodeUTF8).arg("%.1f"%BTmin).arg("%.1f"%BTmax + self.mode).arg("%.1f"%abs(BTmax - BTmin) + self.mode).arg("%.1f"%ETmin).arg("%.1f"%ETmax + self.mode).arg("%.1f"%abs(ETmax - ETmin) + self.mode).arg(timez + "min").arg(ror).arg("%d%sm"%(ts,self.mode)).arg(int(tse)).arg(int(tsb))
-    
-                    # even better: use xlabel
+                    if locale == "ar":
+                        strline = QString("[%11-%12] %9=" + aw.arabicReshape(QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8)) \
+                                    + "   " + aw.arabicReshape(QApplication.translate("Label", "d/m", None,QApplication.UnicodeUTF8)) \
+                                    + "%8=" + aw.arabicReshape(QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8)) \
+                                    + "   %7=" + aw.arabicReshape(QApplication.translate("Label", "T", None,QApplication.UnicodeUTF8)) \
+                                    + "   (%6) %4-%5=" + aw.arabicReshape(QApplication.translate("Label", "BT", None,QApplication.UnicodeUTF8)) \
+                                    + "   (%3) %1-%2= " + aw.arabicReshape(QApplication.translate("Label", "ET", None,QApplication.UnicodeUTF8))) \
+                                    .arg("%.1f"%BTmin) \
+                                    .arg("%.1f"%BTmax + self.mode) \
+                                    .arg("%.1f"%abs(BTmax - BTmin) + self.mode) \
+                                    .arg(u("%.1f"%ETmin)) \
+                                    .arg(u("%.1f"%ETmax + self.mode)) \
+                                    .arg(u("%.1f"%abs(ETmax - ETmin)  + self.mode)) \
+                                    .arg(u(timez)) \
+                                    .arg(u(ror)) \
+                                    .arg(u("%d%sm"%(ts,self.mode))) \
+                                    .arg(u(int(tse))) \
+                                    .arg(u(int(tsb)))
+                    else:
+                        strline = QString(QApplication.translate("Label", "ET", None,QApplication.UnicodeUTF8) + "=%1-%2 (%3)   " \
+                                    + QApplication.translate("Label", "BT", None,QApplication.UnicodeUTF8) + "=%4-%5 (%6)   " \
+                                    + QApplication.translate("Label", "T", None,QApplication.UnicodeUTF8) + "=%7   " \
+                                    + QApplication.translate("Label", "RoR", None,QApplication.UnicodeUTF8) + "=%8" \
+                                    + QApplication.translate("Label", "d/m", None,QApplication.UnicodeUTF8) + "   " \
+                                    + QApplication.translate("Label", "ETBTa", None,QApplication.UnicodeUTF8) + "=%9 [%11-%12]") \
+                                    .arg("%.1f"%BTmin) \
+                                    .arg("%.1f"%BTmax + self.mode) \
+                                    .arg("%.1f"%abs(BTmax - BTmin) + self.mode) \
+                                    .arg(u("%.1f"%ETmin)) \
+                                    .arg(u("%.1f"%ETmax + self.mode)) \
+                                    .arg(u("%.1f"%abs(ETmax - ETmin)  + self.mode)) \
+                                    .arg(u(timez)) \
+                                    .arg(u(ror)) \
+                                    .arg(u("%d%sm"%(ts,self.mode))) \
+                                    .arg(u(int(tse))) \
+                                    .arg(u(int(tsb)))
                     self.ax.set_xlabel(strline,size=11,color = aw.qmc.palette["text"],fontproperties=aw.mpl_fontproperties)
                 else:
                     self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
@@ -17911,8 +17926,8 @@ class serialport(object):
     def NONEtmp(self):
         dialogx = nonedevDlg()
         if dialogx.exec_():
-            ET = int(str(dialogx.etEdit.text()))
-            BT = int(str(dialogx.btEdit.text()))
+            ET = (int(str(dialogx.etEdit.text())) * 10)/10.
+            BT = (int(str(dialogx.btEdit.text())) * 10)/10.
             aw.lcd2.display(ET)
             aw.lcd3.display(BT)
             return ET, BT
