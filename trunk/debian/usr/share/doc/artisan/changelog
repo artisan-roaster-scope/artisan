@@ -1,8 +1,13 @@
 artisan (0.6.0-1) precise; urgency=low
 
   * new upstream release
-  * changes since 0.5.2:
-   - added Modbus support
+  * changes since 0.5.6:
+   - adds monitoring-only mode
+   - adds Modbus RTU support
+   - adds event sliders
+   - adds extended alarms
+   - adds spike filter
+   - adds additional localizations
    - bug fixes
 
  --  <marko.luther@gmx.net>  Fri, 31 May 2013 19:32:14 +0200

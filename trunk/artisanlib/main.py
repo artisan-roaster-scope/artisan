@@ -15202,8 +15202,8 @@ class EventsDlg(ArtisanDialog):
         paletteGroupLayout.setLayout(paletteBox)
         paletteButtons = QHBoxLayout()
         paletteButtons.addStretch()
-        paletteButtons.addWidget(backupbutton)
         paletteButtons.addWidget(restorebutton)
+        paletteButtons.addWidget(backupbutton)
         tab3layout = QVBoxLayout()
         tab3layout.addWidget(paletteGroupLayout)
         tab3layout.addLayout(paletteButtons)
@@ -22143,7 +22143,11 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtime = alarms["alarmtimes"]
             self.alarmoffset = alarms["alarmoffsets"]
             self.alarmcond = alarms["alarmconds"]
-            self.alarmsource = alarms["alarmsources"]
+            self.alarmsource = alarms["alarmsources"]  
+            aitems = self.buildAlarmSourceList()
+            for i in range(len(self.alarmsource)):
+                if self.alarmsource[i] + 3 >= len(aitems):
+                    self.alarmsource[i] = 1 # BT
             self.alarmtemperature = alarms["alarmtemperatures"]
             self.alarmaction = alarms["alarmactions"]
             self.alarmstrings = alarms["alarmstrings"]
@@ -22159,6 +22163,34 @@ class AlarmDlg(ArtisanDialog):
         
     def exportalarmsJSON(self,filename):
         try:
+            nalarms = self.alarmtable.rowCount()
+            for i in range(nalarms):
+                flag = self.alarmtable.cellWidget(i,0)
+                self.alarmflag[i] = int(flag.isChecked())
+                guard = self.alarmtable.cellWidget(i,1)
+                guard_value = int(str(guard.text())) - 1
+                if guard_value > -1 and guard_value < nalarms:
+                    self.alarmguard[i] = guard_value
+                else:
+                    self.alarmguard[i] = -1
+                timez =  self.alarmtable.cellWidget(i,2)
+                self.alarmtime[i] = aw.qmc.menuidx2alarmtime[timez.currentIndex()]
+                offset = self.alarmtable.cellWidget(i,3)
+                if offset and offset != "":
+                    self.alarmoffset[i] = max(0,aw.qmc.stringtoseconds(str(offset.text())))
+                atype = self.alarmtable.cellWidget(i,4)
+                self.alarmsource[i] = int(str(atype.currentIndex())) - 3
+                cond = self.alarmtable.cellWidget(i,5)
+                self.alarmcond[i] = int(str(cond.currentIndex())) 
+                temp = self.alarmtable.cellWidget(i,6)
+                try:
+                    self.alarmtemperature[i] = int(str(temp.text()))
+                except:
+                    self.alarmtemperature[i] = 0
+                action = self.alarmtable.cellWidget(i,7)
+                self.alarmaction[i] = int(str(action.currentIndex() - 1))
+                description = self.alarmtable.cellWidget(i,8)
+                self.alarmstrings[i] = u(description.text())
             alarms = {}
             alarms["alarmflags"] = self.alarmflag
             alarms["alarmguards"] = self.alarmguard
@@ -22277,7 +22309,7 @@ class AlarmDlg(ArtisanDialog):
         timeoffsetedit.setAlignment(Qt.AlignRight)
         regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
         timeoffsetedit.setValidator(QRegExpValidator(regextime,self))
-        #type
+        #type/source
         typeComboBox = QComboBox()
         aitems = self.buildAlarmSourceList()
         typeComboBox.addItems(aitems)
