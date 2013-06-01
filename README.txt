@@ -52,13 +52,14 @@ o PID duty cycle
 o profile designer
 o wheel graph editor
 o mathematical plotter
-o localizations (partial translations for German, French, Spanish, Swedish, Italian)
+o localizations (German, French, Spanish, Portuguese, Swedish, Italian, Arabic, Japanese, Dutch, Norsk, Greek, Turkish..)
 o multi-core CPU performance enhancement support
 o template/background reproduction playback aid
 o cascading alarms with programmable outputs
 o automatic CHARGE/DROP event detection
 o support for digital scales (only KERN with serial support for now)
 o event sliders supporting the Hottop Roaster Interface
+o spike filter and curve smoothing
 
 
 
@@ -68,7 +69,7 @@ INSTALLATION
 
 o Windows
 
-Artisan for Windows needs a Visual C++ runtime library (file) from Microsoft. If artisan cannot start it will open a window error. This is because your computer is missing this file. If you get a window error when you try to start artisan, install this program:
+Artisan for Windows needs a Visual C++ runtime library (file) from Microsoft. This is automatically installed from v0.6 on by the Artisan installer. If Artisan cannot start it will open a Windows error. This is because your computer is missing this file. If you get a window error when you try to start Artisan, install this program:
 
 Microsoft Visual C++ 2008 SP1 Redistributable Package (x86)
 
@@ -94,7 +95,7 @@ o Mac OS X (>=10.6.x)
 
 o Linux
 
-The Linux package is compatible with Ubuntu Linux 12.04/12.10 (glibc 2.15) and CentOS 6.3/6.4 (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually. This can be done by either double clicking the package icon from your file viewer or by entering the following commands in a shell.
+The Linux package is compatible with Ubuntu/Debian and CentOS/Redhat (glibc 2.12). For now, we simply offer a .deb Debian package as well as an .rpm Redhat package that you have to install manually. This can be done by either double clicking the package icon from your file viewer or by entering the following commands in a shell.
 
 Installation on Ubuntu/Debian
 # sudo dpkg -i artisan_<version>.deb
@@ -154,9 +155,15 @@ Artisan uses the following libraries in unmodified forms:
 VERSION HISTORY
 
 v0.5.6 (8.11.2012)
-- based on r787 (with modbus support removed)
-- added support for Voltcraft K201 and fixed CENTER 301
+- Monitoring-only mode
+- adds event sliders
+- adds extended alarms
+- adds Modbus RTU support
+- adds Amprobe TMD-56 support
+- adds spike filter
+- adds additional localizations
 - bug fixes
+
 
 v0.5.5 (28.9.2011)
 - fixes ArdruinoTC4 extra devices
