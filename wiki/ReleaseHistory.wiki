@@ -1,5 +1,6 @@
 #summary Detailed Release History
-#sidebar TableOfContents
+
+<wiki:toc max_depth="1" />
 
 ==v0.6.0 (x.6.2013)==
 
