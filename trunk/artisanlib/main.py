@@ -231,7 +231,7 @@ global locale
 if not QSettings().value('resetqsettings').toInt()[0]:
     locale = QSettings().value('locale').toString()
     if locale == "en_US":
-        locale == "en"
+        locale = "en"
 else:
     locale = ""
 supported_languages = [
@@ -3243,49 +3243,49 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.flagon:
                 if len(self.timex) > 0:
-                   aw.soundpop()
-                   #prevents accidentally deleting a modified profile.
-                   self.safesaveflag = True
-                   self.samplingsemaphore.acquire(1)
-                   if self.device != 18:
-                       self.timeindex[5] = len(self.timex)-1
-                   else:
-                       tx,et,bt = aw.ser.NONE()
-                       if et != -1 and bt != -1:
-                           self.drawmanual(et,bt,tx)
-                           self.timeindex[5] = len(self.timex)-1
-                       else:
-                           if self.samplingsemaphore.available() < 1:
-                               self.samplingsemaphore.release(1)
-                           return
-                   st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
-                   d = aw.qmc.ylimit - aw.qmc.ylimit_min  
-                   self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
-                   self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
-                   self.fig.canvas.draw()
-                   st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
-                   st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
-                   if self.samplingsemaphore.available() < 1:
-                       self.samplingsemaphore.release(1)
-                   aw.button_6.setDisabled(True) # deactivate SCe button
-                   aw.button_6.setFlat(True)
-                   aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                   aw.button_8.setFlat(True)
-                   aw.button_19.setDisabled(True) # also deactivate DRY button
-                   aw.button_19.setFlat(True)
-                   aw.button_3.setDisabled(True) # also deactivate FCs button
-                   aw.button_3.setFlat(True)
-                   aw.button_4.setDisabled(True) # also deactivate FCe button
-                   aw.button_4.setFlat(True)
-                   aw.button_5.setDisabled(True) # also deactivate SCs button
-                   aw.button_5.setFlat(True)
-                   try:
-                       a = aw.qmc.buttonactions[5]
-                       aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[5])
-                   except:
-                       pass
-                   message = QApplication.translate("Message","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                   aw.sendmessage(message)
+                    aw.soundpop()
+                    #prevents accidentally deleting a modified profile.
+                    self.safesaveflag = True
+                    self.samplingsemaphore.acquire(1)
+                    if self.device != 18:
+                        self.timeindex[5] = len(self.timex)-1
+                    else:
+                        tx,et,bt = aw.ser.NONE()
+                        if et != -1 and bt != -1:
+                            self.drawmanual(et,bt,tx)
+                            self.timeindex[5] = len(self.timex)-1
+                        else:
+                            if self.samplingsemaphore.available() < 1:
+                                self.samplingsemaphore.release(1)
+                            return
+                    st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
+                    d = aw.qmc.ylimit - aw.qmc.ylimit_min  
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
+                    self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
+                    self.fig.canvas.draw()
+                    st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
+                    st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
+                    if self.samplingsemaphore.available() < 1:
+                        self.samplingsemaphore.release(1)
+                    aw.button_6.setDisabled(True) # deactivate SCe button
+                    aw.button_6.setFlat(True)
+                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
+                    aw.button_8.setFlat(True)
+                    aw.button_19.setDisabled(True) # also deactivate DRY button
+                    aw.button_19.setFlat(True)
+                    aw.button_3.setDisabled(True) # also deactivate FCs button
+                    aw.button_3.setFlat(True)
+                    aw.button_4.setDisabled(True) # also deactivate FCe button
+                    aw.button_4.setFlat(True)
+                    aw.button_5.setDisabled(True) # also deactivate SCs button
+                    aw.button_5.setFlat(True)
+                    try:
+                        a = aw.qmc.buttonactions[5]
+                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[5])
+                    except:
+                        pass
+                    message = QApplication.translate("Message","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -5217,11 +5217,11 @@ class SampleThread(QThread):
         super(SampleThread,self).__init__(parent)
         self.afterTP = False
 
-    # dropout filter
+    # input filter
     # if temp (the actual reading) is outside of the interval [tmin,tmax] or
     # a spike is detected, the previous value is repeated or if that happend already before, -1 is returned
     # note that here we assume that the actual measured temperature time/temp was not already added to the list of previous measurements timex/tempx
-    def filterDropOuts(self,timex,tempx,time,temp,BT=False):
+    def inputFilter(self,timex,tempx,time,temp,BT=False):
         try:
             #########################
             # a) detect overflows
@@ -5315,10 +5315,10 @@ class SampleThread(QThread):
                             if extrat1 != -1 or extrat2 != -1:
                                 if len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                                extrat1 = self.filterDropOuts(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
+                                extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
                                 if len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                                extrat2 = self.filterDropOuts(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
+                                extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                 if local_flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
                                     aw.qmc.extratemp2[i].append(float(extrat2))
@@ -5375,8 +5375,8 @@ class SampleThread(QThread):
                     t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
                 if len(aw.qmc.BTfunction):
                     t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
-                t1 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp1,tx,t1)
-                t2 = self.filterDropOuts(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
+                t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
+                t2 = self.inputFilter(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
                 length_of_qmc_timex = len(aw.qmc.timex)
                 # ignore reading if both are off, otherwise process them
                 if t1 != -1 or t2 != -1:
@@ -9550,7 +9550,6 @@ class ApplicationWindow(QMainWindow):
                 except:
                     pass
         except Exception:
-            pass
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
@@ -10041,7 +10040,7 @@ class ApplicationWindow(QMainWindow):
                 pass
             settings.setValue("dpi",aw.dpi)
             
-        except Exception as e:
+        except Exception:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info() 
@@ -10961,7 +10960,7 @@ $cupping_notes
         contributors += u("<br>Savvas Kiretsis, Lukas Kolbe, David Lahoz,")
         contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
-        contributors += u("<br>Wa'ill")
+        contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli")
         box = QMessageBox(self)
         #create a html QString
         box.about(self,
@@ -11083,7 +11082,7 @@ $cupping_notes
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
             try:
                 self.scale.device_id = list(aw.scale.devicefunctionlist.keys()).index(self.scale.device)
-            except Exception as ex:
+            except Exception:
                 self.scale.device_id = 0
             self.scale.comport = str(dialog.scale_comportEdit.currentText())                #unicode() changes QString to a python string
             self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
@@ -16331,7 +16330,7 @@ class flavorDlg(ArtisanDialog):
         aw.qmc.flavorlabels[x] = labeledit.text()
         aw.qmc.flavorchart()
 
-    def setvalue(self,z,x):
+    def setvalue(self,_,x):
         valueSpinBox = self.flavortable.cellWidget(x,1)
         aw.qmc.flavors[x] = valueSpinBox.value()
         aw.qmc.flavorchart()
@@ -17361,16 +17360,16 @@ class serialport(object):
                     # CHECK FOR RECEIVED ERROR CODES
                     if ord(r[1]) == 128:
                         if ord(r[2]) == 1:
-                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + " 1: A nonexistent function code was specified. Please check the function code."
-                            errorcode += QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " SendFUJIcommand() 1: Illegal Function in unit %1".arg(ord(binstring[0]))
+                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + QString(" 1: A nonexistent function code was specified. Please check the function code.")
+                            errorcode += (QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + QString(" SendFUJIcommand() 1: Illegal Function in unit %1")).arg(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                         if ord(r[2]) == 2:
-                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + " 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code."
-                            errorcode += QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " SendFUJIcommand() 2 Illegal Address for unit %1".arg(ord(binstring[0]))
+                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + QString(" 2: Faulty address for coil or resistor: The specified relative address for the coil number or resistor\n number cannot be used by the specified function code.")
+                            errorcode += (QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + QString(" SendFUJIcommand() 2 Illegal Address for unit %1")).arg(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                         if ord(r[2]) == 3:
-                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + " 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers."
-                            errorcode += QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " SendFUJIcommand() 3 Illegal Data Value for unit %1".arg(ord(binstring[0]))
+                            errorcode = QApplication.translate("Error Message","F80h Error",None, QApplication.UnicodeUTF8) + QString(" 3: Faulty coil or resistor number: The specified number is too large and specifies a range that does not contain\n coil numbers or resistor numbers.")
+                            errorcode += (QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + QString(" SendFUJIcommand() 3 Illegal Data Value for unit %1")).arg(ord(binstring[0]))
                             aw.qmc.adderror(errorcode)
                     else:
                         #Check crc16
@@ -24153,7 +24152,7 @@ class PXG4pidDlgControl(ArtisanDialog):
                     #check response from pid and update message on main window
                     if r == command:
                         aw.fujipid.PXG4["selectedpid"][0] = pidn
-                        key = "sv" + str(pidn)
+                        #key = "sv" + str(pidn)
                         message = QApplication.translate("StatusBar","pid changed to %1",None,QApplication.UnicodeUTF8).arg(str(pidn))
                         self.status.showMessage(message, 5000)
                     else:
