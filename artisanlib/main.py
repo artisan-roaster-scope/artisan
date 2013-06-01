@@ -999,16 +999,22 @@ class tgraphcanvas(FigureCanvas):
     def ambientTempSourceAvg(self):
         res = None
         if self.ambientTempSource:
+            start = 0
+            end = len(aw.qmc.temp1) - 1
+            if self.timeindex[1] > -1: # CHARGE
+                start = self.timeindex[1]
+            if self.timeindex[6] > -1: # DROP
+                end = self.timeindex[6]
             if self.ambientTempSource == 1: # from ET
-                res = numpy.mean(aw.qmc.temp1)
+                res = numpy.mean(aw.qmc.temp1[start:end])
             elif self.ambientTempSource == 2: # from BT
-                res = numpy.mean(aw.qmc.temp2)
+                res = numpy.mean(aw.qmc.temp2[start:end])
             elif self.ambientTempSource > 2 and ((self.ambientTempSource - 3) < (2*len(aw.qmc.extradevices))): 
                 # from an extra device
                 if (self.ambientTempSource)%2==0:
-                    res = numpy.mean(aw.qmc.extratemp2[(self.ambientTempSource - 3)//2])
+                    res = numpy.mean(aw.qmc.extratemp2[(self.ambientTempSource - 3)//2][start:end])
                 else:
-                    res = numpy.mean(aw.qmc.extratemp1[(self.ambientTempSource - 3)//2])
+                    res = numpy.mean(aw.qmc.extratemp1[(self.ambientTempSource - 3)//2][start:end])
         if res:
             res = aw.float2float(res)
         return res
