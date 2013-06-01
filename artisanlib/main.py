@@ -10956,7 +10956,7 @@ $cupping_notes
         coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
         contributors = u("<br>Cetin Barut, Marcio Carnerio, Bradley Collins,")
         contributors += u("<br>Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall,")
-        contributors += u("<br>Frans Goddjin, Rich Helms, Kyle Iseminger, Ingo,")
+        contributors += u("<br>Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo,")
         contributors += u("<br>Savvas Kiretsis, Lukas Kolbe, David Lahoz,")
         contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
