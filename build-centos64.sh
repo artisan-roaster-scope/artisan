@@ -7,18 +7,16 @@ lrelease -verbose artisan.pro
 # distribution
 rm -rf dist
 bbfreeze artisan.py
-#cp -L /usr/lib64/libz.so dist
-#patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libz.so
-#cp -L /usr/lib64/libxml2.so.2 dist
-#patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libxml2.so.2
-#cp -L /usr/lib64/libicudata.so.42 dist
-#patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicudata.so.42
-#cp -L /usr/lib64/libicuuc.so.42 dist
-#patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicuuc.so.42
-#cp -L /usr/lib64/libicui18n.so.42 dist
-#patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicui18n.so.42
-#cp -L /usr/lib64/gnome-keyring/gnome-keyring-pkcs11.so dist
-#patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/gnome-keyring-pkcs11.so
+cp -L /usr/lib64/libxml2.so.2 dist
+patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libxml2.so.2
+cp -L /usr/lib64/libicudata.so.42 dist
+patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicudata.so.42
+cp -L /usr/lib64/libicuuc.so.42 dist
+patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicuuc.so.42
+cp -L /usr/lib64/libicui18n.so.42 dist
+patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicui18n.so.42
+cp -L /usr/lib64/gnome-keyring/gnome-keyring-pkcs11.so dist
+patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/gnome-keyring-pkcs11.so
 cp -R /usr/local/lib/python2.7/site-packages/matplotlib/mpl-data/ dist
 cp artisan-alog.xml dist
 cp artisan-alrm.xml dist
