@@ -10960,7 +10960,8 @@ $cupping_notes
         contributors += u("<br>Savvas Kiretsis, Lukas Kolbe, David Lahoz,")
         contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
-        contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli")
+        contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
+        contributors += u("<br>David Trebilcock")
         box = QMessageBox(self)
         #create a html QString
         box.about(self,
