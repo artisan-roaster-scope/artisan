@@ -240,10 +240,11 @@ supported_languages = [
     "de",
     "el",
     "es",
-    "ja",
     "nl",
     "no",
     "pt",
+    "ja",
+    "hu",
 ]
 if len(locale) == 0:
     locale = QLocale.system().name()
@@ -1067,14 +1068,17 @@ class tgraphcanvas(FigureCanvas):
             return aw.float2float(float(st)/10 + 1.0)
 
     def onclick(self,event):
-        if event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag and not self.flagon:
-            timex = self.time2index(event.xdata)
-            if timex > 0:
-                if (len(self.temp2) > timex and self.temp2[timex] < event.ydata + 20) and (self.temp2[timex] > event.ydata - 20):
+        try:
+            if event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag and not self.flagon:
+                timex = self.time2index(event.xdata)
+                if timex > 0:
                     menu = QMenu(self) 
                     # populate menu
                     ac = QAction(menu)
-                    ac.setText(u(QApplication.translate("Label", "at")) + u(" ") + self.stringfromseconds(event.xdata - + self.timex[self.timeindex[0]]))
+                    if self.timeindex[0] > -1:
+                        ac.setText(u(QApplication.translate("Label", "at")) + u(" ") + self.stringfromseconds(event.xdata - self.timex[self.timeindex[0]]))
+                    else:
+                        ac.setText(u(QApplication.translate("Label", "at")) + u(" ") + self.stringfromseconds(event.xdata))
                     ac.setEnabled(False)
                     menu.addAction(ac)
                     for k in [(u(QApplication.translate("Label","CHARGE")),0),
@@ -1086,10 +1090,10 @@ class tgraphcanvas(FigureCanvas):
                               (u(QApplication.translate("Label","DROP")),6)]:
                         idx_before = idx_after = 0
                         for i in range(k[1]):
-                            if self.timeindex[i]:
+                            if self.timeindex[i] and self.timeindex[i] != -1:
                                 idx_before = self.timeindex[i]
                         for i in range(6,k[1],-1) :
-                            if self.timeindex[i]:
+                            if self.timeindex[i] and self.timeindex[i] != -1:
                                 idx_after = self.timeindex[i]
                         if ((not idx_before) or timex > idx_before) and ((not idx_after) or timex < idx_after):
                             ac = QAction(menu)
@@ -1104,6 +1108,11 @@ class tgraphcanvas(FigureCanvas):
                     # show menu
                     menu.triggered.connect(self.event_popup_action)
                     menu.popup(QCursor.pos())
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " onclick() %1").arg(str(e)),exc_tb.tb_lineno)
 
     def event_popup_action(self,action):
         if action.key[0] >= 0:
@@ -6125,6 +6134,14 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.addAction(self.JapaneseLanguage)
         if locale == "ja":
             self.JapaneseLanguage.setChecked(True)
+
+        self.HungarianLanguage = QAction(UIconst.CONF_MENU_HUNGARIAN,self)
+        self.HungarianLanguage.setCheckable(True)
+        self.connect(self.HungarianLanguage,SIGNAL("triggered()"),lambda lang="hu":self.changelocale(lang))
+        self.languageMenu.addAction(self.HungarianLanguage)
+        if locale == "hu":
+            self.HungarianLanguage.setChecked(True)
+            
         
 
         # TOOLKIT menu
@@ -8881,8 +8898,8 @@ class ApplicationWindow(QMainWindow):
             profile["roastingnotes"] = e(self.qmc.roastingnotes)
             profile["cuppingnotes"] = e(self.qmc.cuppingnotes)
             profile["timex"] = self.qmc.timex
-            profile["temp1"] = self.qmc.temp1
-            profile["temp2"] = self.qmc.temp2
+            profile["temp1"] = [self.float2float(x) for x in self.qmc.temp1]
+            profile["temp2"] = [self.float2float(x) for x in self.qmc.temp2]
             profile["phases"] = self.qmc.phases
             profile["zmax"] = self.qmc.zlimit
             profile["zmin"] = self.qmc.zlimit_min
@@ -8897,8 +8914,8 @@ class ApplicationWindow(QMainWindow):
             profile["extraname1"] = [e(n) for n in self.qmc.extraname1]
             profile["extraname2"] = [e(n) for n in self.qmc.extraname2]
             profile["extratimex"] = self.qmc.extratimex
-            profile["extratemp1"] = self.qmc.extratemp1
-            profile["extratemp2"] = self.qmc.extratemp2      
+            profile["extratemp1"] = [[self.float2float(t) for t in x] for x in self.qmc.extratemp1]
+            profile["extratemp2"] = [[self.float2float(t) for t in x] for x in self.qmc.extratemp2]     
             profile["extramathexpression1"] = self.qmc.extramathexpression1
             profile["extramathexpression2"] = self.qmc.extramathexpression2  
             profile["extradevicecolor1"] = [e(x) for x in self.qmc.extradevicecolor1]
@@ -11218,6 +11235,8 @@ $cupping_notes
             self.TurkishLanguage.setChecked(value)
         elif locale == "ja":
             self.JapaneseLanguage.setChecked(value)
+        elif locale == "hu":
+            self.HungarianLanguage.setChecked(value)
     
     def changelocale(self,languagelocale):
         if locale != languagelocale:
@@ -12552,11 +12571,16 @@ class HUDDlg(ArtisanDialog):
                     else:
                         for i in range(len(Yval)):
                             mathdictionary["Y"+ Yval[i]] = 0
-                return eval(mathexpression,{"__builtins__":None},mathdictionary)
+                res = eval(mathexpression,{"__builtins__":None},mathdictionary)
+                if res == None:
+                    return -1
+                else:
+                    return res
             except Exception as e:
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " Plotter: %1").arg(str(e)),exc_tb.tb_lineno)
-                return 0
+                return -1
+        return -1
 
     def setappearance(self):
         try:
