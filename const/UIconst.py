@@ -58,7 +58,7 @@ FILE_MENU_PRINT = QApplication.translate("Menu", "Print...", None, QApplication.
 if platf == 'Darwin':
     FILE_MENU_QUIT = "Quit"
 else:
-    FILE_MENU_QUIT = QApplication.translate("Menu", "Quit", None, QApplication.UnicodeUTF8)    
+    FILE_MENU_QUIT = QApplication.translate("MAC_APPLICATION_MENU", "Quit %1", None, QApplication.UnicodeUTF8).arg("Artisan")   
 
 #Edit menu items
 EDIT_MENU = QApplication.translate("Menu", "Edit", None, QApplication.UnicodeUTF8)
@@ -115,6 +115,7 @@ CONF_MENU_ARABIC = u("\u0627\u0644\u0639\u0631\u0628\u064a\u0629") # Do not tran
 CONF_MENU_FINISH = u("Suomalainen") # Do not translate
 CONF_MENU_TURKISH = u("T\xfcrk") # Do not translate
 CONF_MENU_JAPANESE = u("\u65e5\u672c\u8a9e") # Do not translate
+CONF_MENU_HUNGARIAN = u("Hungarian") # DO not translatie
 
 
 #Toolkit menu
@@ -135,7 +136,7 @@ if platf != 'Darwin':
 if platf == 'Darwin':
     HELP_MENU_ABOUT = "About"
 else:
-    HELP_MENU_ABOUT = QApplication.translate("Menu", "About...", None, QApplication.UnicodeUTF8)
+    HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About %1", None, QApplication.UnicodeUTF8).arg("Artisan") 
 HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None, QApplication.UnicodeUTF8)
 #HELP_MENU_BLOG = QApplication.translate("Menu", "Blog", None, QApplication.UnicodeUTF8)
 HELP_MENU_KEYBOARDSHORTCUTS = QApplication.translate("Menu", "Keyboard Shortcuts", None, QApplication.UnicodeUTF8)
