@@ -13552,7 +13552,12 @@ class editGraphDlg(ArtisanDialog):
             self.datatable.setItem(i,4,deltaET)
             self.datatable.setItem(i,5,deltaBT)
         header = self.datatable.horizontalHeader()
+        header.setResizeMode(0, QHeaderView.Fixed)
         header.setResizeMode(1, QHeaderView.Stretch)
+        header.setResizeMode(2, QHeaderView.Fixed)
+        header.setResizeMode(3, QHeaderView.Fixed)
+        header.setResizeMode(4, QHeaderView.Fixed)
+        header.setResizeMode(5, QHeaderView.Fixed)
         self.datatable.resizeColumnsToContents()
 
     def createEventTable(self):
@@ -13607,17 +13612,19 @@ class editGraphDlg(ArtisanDialog):
             self.eventtable.setCellWidget(i,2,stringline)
             self.eventtable.setCellWidget(i,3,typeComboBox)
             self.eventtable.setCellWidget(i,4,valueEdit)
-        self.eventtable.resizeColumnsToContents()
-        # improve width of Time column
-        self.eventtable.setColumnWidth(0,65)
-        self.eventtable.setColumnWidth(1,65)
-        self.eventtable.setColumnWidth(2,315)
-        self.eventtable.setColumnWidth(4,65)
-        
+#        self.eventtable.resizeColumnsToContents()       
         header = self.eventtable.horizontalHeader()
         #header.setStretchLastSection(True)
+        header.setResizeMode(0, QHeaderView.Fixed)
+        header.setResizeMode(1, QHeaderView.Fixed)
         header.setResizeMode(2, QHeaderView.Stretch)
         header.setResizeMode(3, QHeaderView.ResizeToContents)
+        header.setResizeMode(4, QHeaderView.Fixed)
+        # improve width of Time column
+        self.eventtable.setColumnWidth(0,60)
+        self.eventtable.setColumnWidth(1,65)
+#        self.eventtable.setColumnWidth(2,315)
+        self.eventtable.setColumnWidth(4,55)
         # header.setResizeMode(QHeaderView.Stretch)
 
 
@@ -15550,85 +15557,89 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.clear()
         nbuttons = len(aw.extraeventstypes) 
         self.eventbuttontable.setRowCount(nbuttons)
-        if nbuttons:
-            self.eventbuttontable.setColumnCount(9)
-            self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Documentation",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Visibility",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Color",None, QApplication.UnicodeUTF8),
-                                                             QApplication.translate("Table","Text Color",None, QApplication.UnicodeUTF8)])
-            self.eventbuttontable.setAlternatingRowColors(True)
-            self.eventbuttontable.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
-            self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
-            self.eventbuttontable.setShowGrid(True)
-            visibility = [QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8),
-                          QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8)]
-            for i in range(nbuttons):
-                #label
-                labeledit = QLineEdit(str(aw.extraeventslabels[i]))
-                self.connect(labeledit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setlabeleventbutton(z,i))
-                #description
-                descriptionedit = QLineEdit(u(aw.extraeventsdescriptions[i]))
-                self.connect(descriptionedit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setdescriptioneventbutton(z,i))
-                #type
-                typeComboBox = QComboBox()
-                typeComboBox.addItems([self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),"--"])
-                typeComboBox.setCurrentIndex(aw.extraeventstypes[i])
-                self.connect(typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.settypeeventbutton(z,i))
-                #value
-                valueEdit = QLineEdit()
-                valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\d?\d?$"),self))
-                valueEdit.setText(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
-                valueEdit.setAlignment(Qt.AlignRight)
-                self.connect(valueEdit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setvalueeventbutton(z,i))
-                #action
-                actionComboBox = QComboBox()
-                actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("ComboBox","Serial Command",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
-                                         QApplication.translate("ComboBox","Multiple Event",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("ComboBox","Modbus Command",None, QApplication.UnicodeUTF8),
-                                        QApplication.translate("ComboBox","DTA Command",None, QApplication.UnicodeUTF8)])
-                actionComboBox.setCurrentIndex(aw.extraeventsactions[i])
-                self.connect(actionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setactioneventbutton(z,i))
-                #action description
-                actiondescriptionedit = QLineEdit(str(aw.extraeventsactionstrings[i]))
-                self.connect(actiondescriptionedit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setactiondescriptioneventbutton(z,i))
-                #visibility
-                visibilityComboBox =  QComboBox()
-                visibilityComboBox.addItems(visibility)
-                visibilityComboBox.setCurrentIndex(aw.extraeventsvisibility[i])
-                self.connect(visibilityComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setvisibilitytyeventbutton(z,i))
-                #Color
-                colorButton = QPushButton("Select")
-                colorButton.setFocusPolicy(Qt.NoFocus)
-                self.connect(colorButton, SIGNAL("clicked()"),lambda i=i: self.setbuttoncolor(i))
-                #Text Color
-                colorTextButton = QPushButton("Select")
-                colorTextButton.setFocusPolicy(Qt.NoFocus)
-                self.connect(colorTextButton, SIGNAL("clicked()"),lambda i=i: self.setbuttontextcolor(i))
-                #add widgets to the table
-                self.eventbuttontable.setCellWidget(i,0,labeledit)
-                self.eventbuttontable.setCellWidget(i,1,descriptionedit)
-                self.eventbuttontable.setCellWidget(i,2,typeComboBox)
-                self.eventbuttontable.setCellWidget(i,3,valueEdit)
-                self.eventbuttontable.setCellWidget(i,4,actionComboBox)
-                self.eventbuttontable.setCellWidget(i,5,actiondescriptionedit)
-                self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
-                self.eventbuttontable.setCellWidget(i,7,colorButton)
-                self.eventbuttontable.setCellWidget(i,8,colorTextButton)
-            self.eventbuttontable.resizeColumnsToContents()
-            self.eventbuttontable.setColumnWidth(0,70)
-            self.eventbuttontable.setColumnWidth(1,80)
-            self.eventbuttontable.setColumnWidth(3,50)
-            header = self.eventbuttontable.horizontalHeader()
-            header.setResizeMode(1, QHeaderView.Stretch)
-            header.setResizeMode(5, QHeaderView.Stretch)
+        self.eventbuttontable.setColumnCount(10)
+        self.eventbuttontable.setHorizontalHeaderLabels([QApplication.translate("Table","Label",None, QApplication.UnicodeUTF8),
+                                                         QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8),
+                                                         QApplication.translate("Table","Type",None, QApplication.UnicodeUTF8),
+                                                         QApplication.translate("Table","Value",None, QApplication.UnicodeUTF8),
+                                                         QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
+                                                         QApplication.translate("Table","Documentation",None, QApplication.UnicodeUTF8),
+                                                         QApplication.translate("Table","Visibility",None, QApplication.UnicodeUTF8),
+                                                         QApplication.translate("Table","Color",None, QApplication.UnicodeUTF8),
+                                                         QApplication.translate("Table","Text Color",None, QApplication.UnicodeUTF8),""])
+        self.eventbuttontable.setAlternatingRowColors(True)
+        self.eventbuttontable.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
+        self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
+        self.eventbuttontable.setShowGrid(True)
+        visibility = [QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8),
+                      QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8)]
+        for i in range(nbuttons):
+            #label
+            labeledit = QLineEdit(str(aw.extraeventslabels[i]))
+            self.connect(labeledit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setlabeleventbutton(z,i))
+            #description
+            descriptionedit = QLineEdit(u(aw.extraeventsdescriptions[i]))
+            self.connect(descriptionedit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setdescriptioneventbutton(z,i))
+            #type
+            typeComboBox = QComboBox()
+            typeComboBox.addItems([self.etype0.text(),self.etype1.text(),self.etype2.text(),self.etype3.text(),"--"])
+            typeComboBox.setCurrentIndex(aw.extraeventstypes[i])
+            self.connect(typeComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.settypeeventbutton(z,i))
+            #value
+            valueEdit = QLineEdit()
+            valueEdit.setValidator(QRegExpValidator(QRegExp(r"^100|\d?\d?$"),self))
+            valueEdit.setText(aw.qmc.eventsvalues(aw.extraeventsvalues[i]))
+            valueEdit.setAlignment(Qt.AlignRight)
+            self.connect(valueEdit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setvalueeventbutton(z,i))
+            #action
+            actionComboBox = QComboBox()
+            actionComboBox.addItems([QApplication.translate("ComboBox","None",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("ComboBox","Serial Command",None, QApplication.UnicodeUTF8),
+                                     QApplication.translate("ComboBox","Call Program",None, QApplication.UnicodeUTF8),
+                                     QApplication.translate("ComboBox","Multiple Event",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("ComboBox","Modbus Command",None, QApplication.UnicodeUTF8),
+                                    QApplication.translate("ComboBox","DTA Command",None, QApplication.UnicodeUTF8)])
+            actionComboBox.setCurrentIndex(aw.extraeventsactions[i])
+            self.connect(actionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setactioneventbutton(z,i))
+            #action description
+            actiondescriptionedit = QLineEdit(str(aw.extraeventsactionstrings[i]))
+            self.connect(actiondescriptionedit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setactiondescriptioneventbutton(z,i))
+            #visibility
+            visibilityComboBox =  QComboBox()
+            visibilityComboBox.addItems(visibility)
+            visibilityComboBox.setCurrentIndex(aw.extraeventsvisibility[i])
+            self.connect(visibilityComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setvisibilitytyeventbutton(z,i))
+            #Color
+            colorButton = QPushButton("Select")
+            colorButton.setFocusPolicy(Qt.NoFocus)
+            self.connect(colorButton, SIGNAL("clicked()"),lambda i=i: self.setbuttoncolor(i))
+            #Text Color
+            colorTextButton = QPushButton("Select")
+            colorTextButton.setFocusPolicy(Qt.NoFocus)
+            self.connect(colorTextButton, SIGNAL("clicked()"),lambda i=i: self.setbuttontextcolor(i))
+            #Empty Cell
+            emptyCell = QLabel("")
+            #add widgets to the table
+            self.eventbuttontable.setCellWidget(i,0,labeledit)
+            self.eventbuttontable.setCellWidget(i,1,descriptionedit)
+            self.eventbuttontable.setCellWidget(i,2,typeComboBox)
+            self.eventbuttontable.setCellWidget(i,3,valueEdit)
+            self.eventbuttontable.setCellWidget(i,4,actionComboBox)
+            self.eventbuttontable.setCellWidget(i,5,actiondescriptionedit)
+            self.eventbuttontable.setCellWidget(i,6,visibilityComboBox)
+            self.eventbuttontable.setCellWidget(i,7,colorButton)
+            self.eventbuttontable.setCellWidget(i,8,colorTextButton)
+            self.eventbuttontable.setCellWidget(i,9,emptyCell)
+        self.eventbuttontable.horizontalHeader().setStretchLastSection(False)
+        self.eventbuttontable.resizeColumnsToContents()
+        self.eventbuttontable.horizontalHeader().setStretchLastSection(True)
+        self.eventbuttontable.setColumnWidth(0,70)
+        self.eventbuttontable.setColumnWidth(1,80)
+        self.eventbuttontable.setColumnWidth(3,50)
+#        header = self.eventbuttontable.horizontalHeader()
+#        header.setResizeMode(1, QHeaderView.Stretch)
+#        header.setResizeMode(5, QHeaderView.Stretch)
 
     def setbuttoncolor(self,x):
         colorf = QColorDialog.getColor(QColor(aw.extraeventbuttoncolor[x]))
