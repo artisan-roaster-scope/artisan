@@ -967,7 +967,6 @@ class tgraphcanvas(FigureCanvas):
         self.extraArduinoT2 = 0.
         self.extraArduinoT3 = 0.
         self.extraArduinoT4 = 0.
-        self.arduino56active = False
 
         #temporary storage to pass values. Holds the power % ducty cycle of Fuji PIDs  and ET-BT
         self.dutycycle = 0.
@@ -9048,8 +9047,6 @@ class ApplicationWindow(QMainWindow):
                 self.ser.arduinoETChannel = str(settings.value("arduinoETChannel").toString())
             if settings.contains("arduinoBTChannel"):
                 self.ser.arduinoBTChannel = str(settings.value("arduinoBTChannel").toString())
-            if settings.contains("arduino56active"):
-                self.qmc.arduino56active = settings.value("arduino56active").toBool()
             settings.endGroup()
             #restore phases
             if settings.contains("Phases"):
@@ -9761,7 +9758,6 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)
             settings.setValue("arduinoBTChannel",self.ser.arduinoBTChannel)
             settings.setValue("arduinoATChannel",self.ser.arduinoATChannel)
-            settings.setValue("arduino56active",self.qmc.arduino56active)
             settings.endGroup()
             #save of phases is done in the phases dialog
             #only if mode was changed (and therefore the phases values have been converted)
@@ -18359,12 +18355,9 @@ class serialport(object):
                         command = "CHAN;" + et_channel + bt_channel + vals[0] + vals[1]
                     else:
                     #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
-                        command = "CHAN;" + et_channel + bt_channel + "0000"
-                    if aw.qmc.arduino56active: # +ArduinoTC4_56
-                        if 32 in aw.qmc.extradevices:
-                            command += "11"
-                        else:
-                            command += "00"
+                        command = "CHAN;" + et_channel + bt_channel + "00"
+                    if 32 in aw.qmc.extradevices: # +ArduinoTC4_56
+                        command += "+"
                     self.SP.write(str2cmd(command + "\n"))       #send command
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
@@ -18396,33 +18389,32 @@ class serialport(object):
                     t2 = -1
                 else:
                     t2 = float(res[2])
-                #if extra device +ArduinoTC4_XX
-                if 28 in aw.qmc.extradevices:
+                #if extra device +ArduinoTC4_34 or +ArduinoTC4_56, but not both
+                if 28 in aw.qmc.extradevices or (32 in aw.qmc.extradevices and not 28 in aw.qmc.extradevices):
                     #set the other values to extra temp variables
                     aw.qmc.extraArduinoT1 = float(res[3])
                     aw.qmc.extraArduinoT2 = float(res[4])
-                if 32 in aw.qmc.extradevices: # +ArduinoTC4_56
-                    if aw.qmc.arduino56active:
-                        try:
-                            aw.qmc.extraArduinoT3 = float(res[5])
-                            aw.qmc.extraArduinoT4 = float(res[6])
-                        except:
-                            pass
-                    else:
-                        aw.qmc.extraArduinoT3 = aw.qmc.extraArduinoT4 = -1
+                if 28 in aw.qmc.extradevices and 32 in aw.qmc.extradevices: # +ArduinoTC4_34 and +ArduinoTC4_56
+                    try:
+                        aw.qmc.extraArduinoT3 = float(res[5])
+                        aw.qmc.extraArduinoT4 = float(res[6])
+                    except:
+                        pass
+                else:
+                    aw.qmc.extraArduinoT3 = aw.qmc.extraArduinoT4 = -1
                 # overwrite temps by AT internal Ambient Temperature
                 if aw.ser.arduinoATChannel != "None":
                     if aw.ser.arduinoATChannel == "T1":
                         t1 = float(res[0])
                     elif aw.ser.arduinoATChannel == "T2":
                         t2 = float(res[0])
-                    elif 28 in aw.qmc.extradevices and aw.ser.arduinoATChannel == "T3":
+                    elif (28 in aw.qmc.extradevices or (32 in aw.qmc.extradevices and not 28 in aw.qmc.extradevices)) and aw.ser.arduinoATChannel == "T3":
                         aw.qmc.extraArduinoT1 = float(res[0])
-                    elif 28 in aw.qmc.extradevices and aw.ser.arduinoATChannel == "T4":
+                    elif (28 in aw.qmc.extradevices or (32 in aw.qmc.extradevices and not 28 in aw.qmc.extradevices)) and aw.ser.arduinoATChannel == "T4":
                         aw.qmc.extraArduinoT2 = float(res[0])
-                    elif 32 in aw.qmc.extradevices and aw.ser.arduinoATChannel == "T5":
+                    elif (28 in aw.qmc.extradevices and 32 in aw.qmc.extradevices) and aw.ser.arduinoATChannel == "T5":
                         aw.qmc.extraArduinoT3 = float(res[0])
-                    elif 32 in aw.qmc.extradevices and aw.ser.arduinoATChannel == "T6":
+                    elif (28 in aw.qmc.extradevices and 32 in aw.qmc.extradevices) and aw.ser.arduinoATChannel == "T6":
                         aw.qmc.extraArduinoT4 = float(res[0])
                 return t1, t2
         except serial.SerialException as e:
@@ -20119,8 +20111,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
         arduinoBTLabel =QLabel(QApplication.translate("Label", "BT Channel",None, QApplication.UnicodeUTF8))
         self.arduinoBTComboBox = QComboBox()
         self.arduinoBTComboBox.addItems(arduinoChannels)
-        self.arduino56 = QCheckBox(QApplication.translate("CheckBox", "TC4_56",None, QApplication.UnicodeUTF8))
-        self.arduino56.setChecked(aw.qmc.arduino56active)
         #check previous settings for radio button
         if aw.qmc.device == 0 or aw.qmc.device == 26:   #if Fuji pid or Delta DTA pid
             self.pidButton.setChecked(True)
@@ -20200,7 +20190,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
         arduinogrid.addWidget(self.arduinoETComboBox,1,1)
         arduinogrid.addWidget(arduinoBTLabel,2,0,Qt.AlignRight)
         arduinogrid.addWidget(self.arduinoBTComboBox,2,1)
-        arduinogrid.addWidget(self.arduino56,1,4)
         arduinogrid.addWidget(self.arduinoATComboBox,2,3)
         arduinogrid.addWidget(arduinoATLabel,2,4)
         arduinoBox = QHBoxLayout()
@@ -20655,7 +20644,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
                 aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
                 aw.ser.arduinoATChannel = str(self.arduinoATComboBox.currentText())
-                aw.qmc.arduino56active = bool(self.arduino56.isChecked())
                 meter = "Arduino (TC4)"
                 aw.qmc.device = 19
                 aw.ser.baudrate = 19200
