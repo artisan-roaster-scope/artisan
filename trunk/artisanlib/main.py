@@ -17921,7 +17921,7 @@ class serialport(object):
             res1 = -1
         if aw.modbus.input2slave:
             if just_send:
-                libtime.sleep(0.035)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.35)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input2float:
                 res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             else:
@@ -17933,7 +17933,7 @@ class serialport(object):
             res2 = -1
         if aw.modbus.input3slave:
             if just_send:
-                libtime.sleep(0.035)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.35)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input3float:
                 res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             else:
@@ -17945,7 +17945,7 @@ class serialport(object):
             res3 = -1
         if aw.modbus.input4slave:
             if just_send:
-                libtime.sleep(0.035)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.35)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input4float:
                 res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             else:
@@ -18332,7 +18332,7 @@ class serialport(object):
             t1,t2 = 0.,0.
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(3)
+                libtime.sleep(2)
                 #Reinitialize Arduino in case communication was interupted
                 self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
@@ -18357,7 +18357,10 @@ class serialport(object):
                     #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
                         command = "CHAN;" + et_channel + bt_channel + "00"
                     if 32 in aw.qmc.extradevices: # +ArduinoTC4_56
-                        command += "+"
+                        self.SP.write(str2cmd("PID XON" + "\n"))       #activate extra PID OT1/OT2 channels
+                    else:
+                        self.SP.write(str2cmd("PID XOFF" + "\n"))       #activate extra PID OT1/OT2 channels
+                    libtime.sleep(0.3)
                     self.SP.write(str2cmd(command + "\n"))       #send command
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
@@ -18742,7 +18745,7 @@ class serialport(object):
         try:
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(3)
+                libtime.sleep(2)
                 #Reinitialize Arduino in case communication was interrupted
                 if aw.qmc.device == 19:
                     self.ArduinoIsInitialized = 0
