@@ -1281,6 +1281,7 @@ class tgraphcanvas(FigureCanvas):
             
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
+        aw.sendmessage(QApplication.translate("Message","Alarm %1 triggered", None, QApplication.UnicodeUTF8).arg(alarmnumber + 1))
         try:
             if self.alarmaction[alarmnumber] == 0:
                 # alarm popup message
@@ -1311,18 +1312,20 @@ class tgraphcanvas(FigureCanvas):
                     slidervalue = int(str(self.alarmstrings[alarmnumber]))
                     if slidervalue < 0 or slidervalue > 100:
                         raise Exception()
-                    if slidervalue:
-                        if self.alarmaction[alarmnumber] == 3:
-                            slidernr = 0
-                        elif self.alarmaction[alarmnumber] == 4:
-                            slidernr = 1
-                        elif self.alarmaction[alarmnumber] == 5:
-                            slidernr = 2
-                        elif self.alarmaction[alarmnumber] == 6:
-                            slidernr = 3
-                        if slidernr:
-                            aw.moveslider(slidernr,slidervalue)
-                            aw.fireslideraction(slidernr)
+                    if self.alarmaction[alarmnumber] == 3:
+                        slidernr = 0
+                    elif self.alarmaction[alarmnumber] == 4:
+                        slidernr = 1
+                    elif self.alarmaction[alarmnumber] == 5:
+                        slidernr = 2
+                    elif self.alarmaction[alarmnumber] == 6:
+                        slidernr = 3
+                    if slidernr:
+                        aw.moveslider(slidernr,slidervalue)
+                        if self.qmc.flagstart:
+                            value = aw.float2float((slidervalue + 10.0) / 10.0)
+                            self.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
+                        aw.fireslideraction(slidernr)
                 except:
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
         except Exception as ex:
@@ -7103,12 +7106,11 @@ class ApplicationWindow(QMainWindow):
                     
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     def moveslider(self,n,v):
-        if v >= 0 and v < 100:
+        if v >= 0 and v <= 100:
             if n == 0:
                 self.slider1.setValue(v)
             elif n == 1:
                 self.slider2.setValue(v)
-                self.slider3.setValue(20)
             elif n == 2:
                 self.slider3.setValue(v)
             elif n == 3:
