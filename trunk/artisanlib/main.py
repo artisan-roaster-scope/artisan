@@ -3527,48 +3527,45 @@ class tgraphcanvas(FigureCanvas):
                             if self.specialeventstype[-1] < 4:
                                 firstletter = self.etypesf(self.specialeventstype[-1])[0]
                                 secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
-                            else:
-                                firstletter = "E"
-                                secondletter = ""
-                            if self.eventsGraphflag == 0:
-                                if self.mode == "F":
-                                    height = 50
-                                else:
-                                    height = 20
-                                #some times ET is not drawn (ET = 0) when using device NONE
-                                if self.temp1[index] > self.temp2[index]:
-                                    temp = self.temp1[index]
-                                else:
-                                    temp = self.temp2[index]
-                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                            #if Event Type-Bars flag
-                            elif self.eventsGraphflag == 1:
-                                char1 = self.etypesf(0)[0]
-                                char2 = self.etypesf(1)[0]
-                                char3 = self.etypesf(2)[0]
-                                char4 = self.etypesf(3)[0]
-                                if self.mode == "F":
-                                    row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
-                                else:
-                                    row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-                                #some times ET is not drawn (ET = 0) when using device NONE
-                                if self.temp1[index] >= self.temp2[index]:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                                else:
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                            elif self.eventsGraphflag == 2:
-                                # update lines data using the lists with new data
-                                if etype == 0:
-                                    self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
-                                elif etype == 1:
-                                    self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
-                                elif etype == 2:
-                                    self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
-                                elif etype == 3:
-                                    self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
+                                if self.eventsGraphflag == 0:
+                                    if self.mode == "F":
+                                        height = 50
+                                    else:
+                                        height = 20
+                                    #some times ET is not drawn (ET = 0) when using device NONE
+                                    if self.temp1[index] > self.temp2[index]:
+                                        temp = self.temp1[index]
+                                    else:
+                                        temp = self.temp2[index]
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                                #if Event Type-Bars flag
+                                elif self.eventsGraphflag == 1:
+                                    char1 = self.etypesf(0)[0]
+                                    char2 = self.etypesf(1)[0]
+                                    char3 = self.etypesf(2)[0]
+                                    char4 = self.etypesf(3)[0]
+                                    if self.mode == "F":
+                                        row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                                    else:
+                                        row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                                    #some times ET is not drawn (ET = 0) when using device NONE
+                                    if self.temp1[index] >= self.temp2[index]:
+                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                                    else:
+                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                                elif self.eventsGraphflag == 2:
+                                    # update lines data using the lists with new data
+                                    if etype == 0:
+                                        self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
+                                    elif etype == 1:
+                                        self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
+                                    elif etype == 2:
+                                        self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
+                                    elif etype == 3:
+                                        self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
                         self.fig.canvas.draw()
                         temp = "%.1f "%self.temp2[i]
                         timed = self.stringfromseconds(self.timex[i])
@@ -3579,6 +3576,8 @@ class tgraphcanvas(FigureCanvas):
             else:
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF", None, QApplication.UnicodeUTF8))
         except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " EventRecordAction() %1").arg(str(e)),exc_tb.tb_lineno)
             return
@@ -3621,50 +3620,47 @@ class tgraphcanvas(FigureCanvas):
                     index = self.specialevents[-1]
                     if self.specialeventstype[-1] < 4:
                         firstletter = self.etypesf(self.specialeventstype[-1])[0]
-                        secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
-                    else:
-                        firstletter = "E"
-                        secondletter = ""                                
-                    if self.eventsGraphflag == 0:
-                        if self.mode == "F":
-                            height = 50
-                        else:
-                            height = 20
-                        #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[index] > self.temp2[index]:
-                            temp = self.temp1[index]
-                        else:
-                            temp = self.temp2[index]
-                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                    #if Event Type-Bars flag
-                    if self.eventsGraphflag == 1:
-                        char1 = self.etypesf(0)[0]
-                        char2 = self.etypesf(1)[0]
-                        char3 = self.etypesf(2)[0]
-                        char4 = self.etypesf(3)[0]
-                        if self.mode == "F":
-                            row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
-                        else:
-                            row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-                        #some times ET is not drawn (ET = 0) when using device NONE
-                        if self.temp1[index] >= self.temp2[index]:
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                        else:
-                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
-                    if self.eventsGraphflag == 2:
-                        # update lines data using the lists with new data
-                        etype = self.specialeventstype[-1]
-                        if etype == 0:
-                            self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
-                        elif etype == 1:
-                            self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
-                        elif etype == 2:
-                            self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
-                        elif etype == 3:
-                            self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
+                        secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])                              
+                        if self.eventsGraphflag == 0:
+                            if self.mode == "F":
+                                height = 50
+                            else:
+                                height = 20
+                            #some times ET is not drawn (ET = 0) when using device NONE
+                            if self.temp1[index] > self.temp2[index]:
+                                temp = self.temp1[index]
+                            else:
+                                temp = self.temp2[index]
+                            self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                        #if Event Type-Bars flag
+                        if self.eventsGraphflag == 1:
+                            char1 = self.etypesf(0)[0]
+                            char2 = self.etypesf(1)[0]
+                            char3 = self.etypesf(2)[0]
+                            char4 = self.etypesf(3)[0]
+                            if self.mode == "F":
+                                row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                            else:
+                                row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                            #some times ET is not drawn (ET = 0) when using device NONE
+                            if self.temp1[index] >= self.temp2[index]:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                            else:
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize=8,backgroundcolor='yellow')
+                        if self.eventsGraphflag == 2:
+                            # update lines data using the lists with new data
+                            etype = self.specialeventstype[-1]
+                            if etype == 0:
+                                self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
+                            elif etype == 1:
+                                self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
+                            elif etype == 2:
+                                self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
+                            elif etype == 3:
+                                self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
                     self.fig.canvas.draw()
                     if aw.qmc.samplingsemaphore.available() < 1:
                         self.samplingsemaphore.release(1)
@@ -6509,23 +6505,23 @@ class ApplicationWindow(QMainWindow):
         #BT
         self.label3 = QLabel()
         self.label3.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label3.setText("<b>" + u(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8)) + "<\b>")
+        self.label3.setText("<b>" + u(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8)) + "</b>")
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label4.setText("<b>" + u(QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8)) + "<\b>")
+        self.label4.setText("<b>" + u(QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8)) + "</b>")
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label5.setText("<b>" + u(QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8)) + "<\b>")
+        self.label5.setText("<b>" + u(QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8)) + "</b>")
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label6.setText("<b>" + u(QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8)) + "<\b>")
+        self.label6.setText("<b>" + u(QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8)) + "</b>")
         # pid power % duty cycle
         self.label7 = QLabel()
         self.label7.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label7.setText("<b>" + u(QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8)) + "<\b>")
+        self.label7.setText("<b>" + u(QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8)) + "</b>")
 
         #extra LCDs
         self.nLCDS = 10 # maximum number of LCDs and extra devices
@@ -7231,11 +7227,11 @@ class ApplicationWindow(QMainWindow):
         for i in range(ndev):
             aw.extraLCDframe1[i].setVisible(bool(aw.extraLCDvisibility1[i]))
             if i < len(aw.qmc.extraname1):
-                aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "<\b>")
+                aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "</b>")
             aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             self.extraLCDframe2[i].setVisible(bool(aw.extraLCDvisibility2[i])) 
             if i < len(aw.qmc.extraname2):
-                aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "<\b>")  
+                aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "</b>")  
             aw.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         #hide the rest (just in case)
         for i in range(ndev,aw.nLCDS):
@@ -10209,14 +10205,14 @@ class ApplicationWindow(QMainWindow):
             if i < aw.nLCDS:
                 if self.extraLCDvisibility1[i]:
                     if i < len(self.qmc.extraname1):
-                        self.extraLCDlabel1[i].setText("<b>" + self.qmc.extraname1[i] + "<\b>")
+                        self.extraLCDlabel1[i].setText("<b>" + self.qmc.extraname1[i] + "</b>")
                     self.extraLCDframe1[i].setVisible(True)
                     self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
                 else:
                     self.extraLCDframe1[i].setVisible(False)
                 if self.extraLCDvisibility2[i]:
                     if i < len(self.qmc.extraname2):
-                        self.extraLCDlabel2[i].setText("<b>" + self.qmc.extraname2[i] + "<\b>")
+                        self.extraLCDlabel2[i].setText("<b>" + self.qmc.extraname2[i] + "</b>")
                     self.extraLCDframe2[i].setVisible(True)
                     self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
                 else:
@@ -12618,7 +12614,7 @@ class HUDDlg(ArtisanDialog):
             if aw.qmc.timeindex[6]:
                 aw.qmc.univariate()
             else:
-                aw.sendmessage(QApplication.translate("Univariate: no profile data available", None, QApplication.UnicodeUTF8))
+                aw.sendmessage(QApplication.translate("Error Message", "Univariate: no profile data available", None, QApplication.UnicodeUTF8))
                 self.univarCheck.setChecked(False)
         else:
             aw.qmc.resetlines()
@@ -14026,7 +14022,7 @@ class artisansettingsDlg(ArtisanDialog):
             for keys in sorted(settingsdictlist[n]):
                 self.htmlsettings += "<b>&nbsp;&nbsp;" + keys + " = </b> <i>" + u(settingsdictlist[n][keys]) + "</i><br><br>"
             self.htmlsettings += "</p>"
-        self.htmlsettings += "<\body><\font>"
+        self.htmlsettings += "</body></font>"
         self.settingsEdit.setHtml(self.htmlsettings)
         return settingsnameslist
 
@@ -14634,7 +14630,7 @@ class calculatorDlg(ArtisanDialog):
                 deltaseconds = deltatemperature/deltatime
             deltaminutes = deltaseconds*60.
             string1 = QApplication.translate("Label", "Best approximation was made from %1 to %2",None, QApplication.UnicodeUTF8).arg(aw.qmc.stringfromseconds(aw.qmc.timex[startindex]- start)).arg(aw.qmc.stringfromseconds(aw.qmc.timex[endindex]- start))
-            string2 = QApplication.translate("Label", "deg/sec = %1    deg/min = <b>%2<\b>",None, QApplication.UnicodeUTF8).arg("%.2f"%(deltaseconds)).arg("%.2f"%(deltaminutes))
+            string2 = QApplication.translate("Label", "<b>%1</b> deg/sec, <b>%2</b> deg/min",None, QApplication.UnicodeUTF8).arg("%.2f"%(deltaseconds)).arg("%.2f"%(deltaminutes))
             self.result1.setText(string1)
             self.result2.setText(string2)
         else:
@@ -20534,8 +20530,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.qmc.extradevices[i] = aw.qmc.devices.index(str(typecombobox.currentText())) + 1
                 aw.qmc.extraname1[i] = str(name1edit.text())
                 aw.qmc.extraname2[i] = str(name2edit.text())
-                aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "<\b>")
-                aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "<\b>")
+                aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "</b>")
+                aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "</b>")
                 aw.qmc.extramathexpression1[i] = str(mexpr1edit.text())
                 aw.qmc.extramathexpression2[i] = str(mexpr2edit.text())
             #update legend with new curves
@@ -22274,7 +22270,10 @@ class AlarmDlg(ArtisanDialog):
             flag = self.alarmtable.cellWidget(i,0)
             aw.qmc.alarmflag[i] = int(flag.isChecked())
             guard = self.alarmtable.cellWidget(i,1)
-            guard_value = int(str(guard.text())) - 1
+            try:
+                guard_value = int(str(guard.text())) - 1
+            except:
+                guard_value = -1
             if guard_value > -1 and guard_value < nalarms:
                 aw.qmc.alarmguard[i] = guard_value
             else:
@@ -22321,7 +22320,11 @@ class AlarmDlg(ArtisanDialog):
         else:
             flagComboBox.setCheckState(Qt.Unchecked)
         #guarded by alarm
-        guardedit = QLineEdit(str(self.alarmguard[i] + 1))
+        if self.alarmguard[i] > -1:
+            guardstr = str(self.alarmguard[i] + 1)
+        else:
+            guardstr = ""
+        guardedit = QLineEdit(guardstr)
         guardedit.setValidator(QIntValidator(0, 30,guardedit))
         guardedit.setAlignment(Qt.AlignRight)
         #Effective time from
@@ -22527,12 +22530,12 @@ class PXRpidDlgControl(ArtisanDialog):
         self.labelrs1 = QLabel()
         self.labelrs1.setMargin(5)
         self.labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(1-4)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(1-4)",None, QApplication.UnicodeUTF8) + "</b></font>")
         self.labelrs1.setMaximumSize(120, 62)
         self.labelrs2 = QLabel()
         self.labelrs2.setMargin(5)
         self.labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(5-8)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        self.labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak HH:MM<br>(5-8)",None, QApplication.UnicodeUTF8) + "</b></font>")
         self.labelrs2.setMaximumSize(120, 62)
         labelpattern = QLabel(QApplication.translate("Label", "Ramp/Soak Pattern",None, QApplication.UnicodeUTF8))
         self.patternComboBox =  QComboBox()
@@ -23391,13 +23394,13 @@ class PXG4pidDlgControl(ArtisanDialog):
         labelrs1 = QLabel()
         labelrs1.setMargin(5)
         labelrs1.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(1-7)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        labelrs1.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(1-7)",None, QApplication.UnicodeUTF8) + "</b></font>")
         #labelrs1.setMaximumSize(90, 42)
         #labelrs1.setMinimumHeight(50)
         labelrs2 = QLabel()
         labelrs2.setMargin(5)
         labelrs2.setStyleSheet("background-color:'#CCCCCC';")
-        labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(8-16)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        labelrs2.setText("<font color='white'><b>" + QApplication.translate("Label", "Ramp Soak (MM:SS)<br>(8-16)",None, QApplication.UnicodeUTF8) + "</b></font>")
         #labelrs2.setMaximumSize(90, 42)
         #labelrs2.setMinimumHeight(50)
         self.label_rs1 =  QLabel()
@@ -23482,13 +23485,13 @@ class PXG4pidDlgControl(ArtisanDialog):
         labelsv = QLabel()
         labelsv.setMargin(10)
         labelsv.setStyleSheet("background-color:'#CCCCCC';")
-        labelsv.setText("<font color='white'><b>" + QApplication.translate("Label", "SV (7-0)",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        labelsv.setText("<font color='white'><b>" + QApplication.translate("Label", "SV (7-0)",None, QApplication.UnicodeUTF8) + "</b></font>")
         labelsv.setMaximumSize(100, 42)
         labelsv.setMinimumHeight(50)
         labelsvedit = QLabel()
         labelsvedit.setMargin(10)
         labelsvedit.setStyleSheet("background-color:'#CCCCCC';")
-        labelsvedit.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        labelsvedit.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None, QApplication.UnicodeUTF8) + "</b></font>")
         labelsvedit.setMaximumSize(100, 42)
         labelsvedit.setMinimumHeight(50)
         button_sv1 =QPushButton(QApplication.translate("Button","Write SV1",None, QApplication.UnicodeUTF8))
@@ -23571,25 +23574,25 @@ class PXG4pidDlgControl(ArtisanDialog):
         plabel = QLabel()
         plabel.setMargin(10)
         plabel.setStyleSheet("background-color:'#CCCCCC';")
-        plabel.setText("<font color='white'><b>" + QApplication.translate("Label", "P",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        plabel.setText("<font color='white'><b>" + QApplication.translate("Label", "P",None, QApplication.UnicodeUTF8) + "</b></font>")
         plabel.setMaximumSize(50, 42)
         plabel.setMinimumHeight(50)
         ilabel = QLabel()
         ilabel.setMargin(10)
         ilabel.setStyleSheet("background-color:'#CCCCCC';")
-        ilabel.setText("<font color='white'><b>" + QApplication.translate("Label", "I",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        ilabel.setText("<font color='white'><b>" + QApplication.translate("Label", "I",None, QApplication.UnicodeUTF8) + "</b></font>")
         ilabel.setMaximumSize(50, 42)
         ilabel.setMinimumHeight(50)
         dlabel = QLabel()
         dlabel.setMargin(10)
         dlabel.setStyleSheet("background-color:'#CCCCCC';")
-        dlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "D",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        dlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "D",None, QApplication.UnicodeUTF8) + "</b></font>")
         dlabel.setMaximumSize(50, 42)
         dlabel.setMinimumHeight(50)
         wlabel = QLabel()
         wlabel.setMargin(10)
         wlabel.setStyleSheet("background-color:'#CCCCCC';")
-        wlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None, QApplication.UnicodeUTF8) + "<\b></font>")
+        wlabel.setText("<font color='white'><b>" + QApplication.translate("Label", "Write",None, QApplication.UnicodeUTF8) + "</b></font>")
         wlabel.setMaximumSize(100, 42)
         wlabel.setMinimumHeight(50)
         self.p1edit =  QLineEdit(QString(str(aw.fujipid.PXG4["p1"][0])))
