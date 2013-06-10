@@ -2012,6 +2012,7 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " place_annotations() %1").arg(str(e)),exc_tb.tb_lineno)
 
+    
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
@@ -4017,6 +4018,17 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " univariateinfo() %1").arg(str(e)),exc_tb.tb_lineno)
             return
 
+
+    def polyfit(self,xarray,yarray,deg,startindex,endindex):
+        z = numpy.polyfit(xarray[startindex:endindex],yarray[startindex:endindex],deg)
+        p = numpy.poly1d(z)
+        x = p(xarray[startindex:endindex])
+        pad = max(0,len(self.timex) - startindex - len(x))
+        xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
+        self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
+        self.fig.canvas.draw()
+        return z
+        
     #interpolation type
     def univariate(self):
         try:
@@ -12066,6 +12078,7 @@ class HUDDlg(ArtisanDialog):
         self.DeltaFilter = QSpinBox()
         self.DeltaFilter.setSingleStep(1)
         self.DeltaFilter.setRange(0,40)
+        self.DeltaFilter.setAlignment(Qt.AlignRight)
         self.DeltaFilter.setValue(aw.qmc.deltafilter - 2)
         self.connect(self.DeltaFilter ,SIGNAL("editingFinished()"),lambda x=0:self.changeDeltaFilter(0))
         curvefilterlabel = QLabel(QApplication.translate("Label", "Smooth Curves",None, QApplication.UnicodeUTF8))
@@ -12073,6 +12086,7 @@ class HUDDlg(ArtisanDialog):
         self.Filter = QSpinBox()
         self.Filter.setSingleStep(1)
         self.Filter.setRange(0,40)
+        self.Filter.setAlignment(Qt.AlignRight)
         self.Filter.setValue(aw.qmc.curvefilter - 2)
         self.connect(self.Filter,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))
         #filterspikes
@@ -12128,20 +12142,27 @@ class HUDDlg(ArtisanDialog):
                                     QApplication.translate("ComboBox","thermal",None, QApplication.UnicodeUTF8)])
         self.modeComboBox.setCurrentIndex(aw.HUDfunction)
         self.ETlineEdit = QLineEdit(str(aw.qmc.ETtarget))
+        self.ETlineEdit.setAlignment(Qt.AlignRight)
         self.BTlineEdit = QLineEdit(str(aw.qmc.BTtarget))
+        self.BTlineEdit.setAlignment(Qt.AlignRight)
         self.ETlineEdit.setValidator(QIntValidator(0, 1000, self.ETlineEdit))
         self.BTlineEdit.setValidator(QIntValidator(0, 1000, self.BTlineEdit))
         self.ETlineEdit.setMaximumWidth(60)
         self.BTlineEdit.setMaximumWidth(60)
         self.ET2lineEdit = QLineEdit(str(aw.qmc.ET2target))
+        self.ET2lineEdit.setAlignment(Qt.AlignRight)
         self.BT2lineEdit = QLineEdit(str(aw.qmc.BT2target))
+        self.BT2lineEdit.setAlignment(Qt.AlignRight)
         self.ET2lineEdit.setValidator(QIntValidator(0, 1000, self.ET2lineEdit))
         self.BT2lineEdit.setValidator(QIntValidator(0, 1000, self.BT2lineEdit))
         self.ET2lineEdit.setMaximumWidth(60)
         self.BT2lineEdit.setMaximumWidth(60)
         self.ETpidP = QLineEdit(str(aw.qmc.hudETpid[0]))
+        self.ETpidP.setAlignment(Qt.AlignRight)
         self.ETpidI = QLineEdit(str(aw.qmc.hudETpid[1]))
+        self.ETpidI.setAlignment(Qt.AlignRight)
         self.ETpidD = QLineEdit(str(aw.qmc.hudETpid[2]))
+        self.ETpidD.setAlignment(Qt.AlignRight)
         self.ETpidP.setValidator(QIntValidator(0, 1000, self.ETpidP))
         self.ETpidI.setValidator(QIntValidator(0, 1000, self.ETpidI))
         self.ETpidD.setValidator(QIntValidator(0, 1000, self.ETpidD))
@@ -12325,7 +12346,53 @@ class HUDDlg(ArtisanDialog):
         univarButton.setFocusPolicy(Qt.NoFocus)
         univarButton.setMaximumSize(univarButton.sizeHint())
         univarButton.setMinimumSize(univarButton.minimumSizeHint()) 
+        polyfitdeglabel = QLabel("deg")
+        self.polyfitdeg = QSpinBox()
+        self.polyfitdeg.setRange(1,4)
+        self.polyfitdeg.setAlignment(Qt.AlignRight)
+        self.polyfitdeg.setMinimumWidth(20)       
+        # build list of available curves
+        self.curves = []
+        self.curvenames = []
+        self.c1ComboBox = QComboBox()
+        self.c2ComboBox = QComboBox()        
         self.connect(univarButton,SIGNAL("clicked()"),self.showunivarinfo)
+        self.polyfitCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None, QApplication.UnicodeUTF8))
+        self.polyfitCheck.setFocusPolicy(Qt.NoFocus)
+        self.connect(self.polyfitCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.polyfit(i)) #toggle
+        self.result = QLabel()
+        self.result.setStyleSheet("background-color:'lightgrey';")
+        startlabel = QLabel(QApplication.translate("Label", "Start",None, QApplication.UnicodeUTF8))
+        endlabel = QLabel(QApplication.translate("Label", "End",None, QApplication.UnicodeUTF8))
+        self.startEdit = QLineEdit()
+        self.startEdit.setMaximumWidth(60)
+        self.startEdit.setAlignment(Qt.AlignRight)
+        self.endEdit = QLineEdit()
+        self.endEdit.setMaximumWidth(60)
+        self.endEdit.setAlignment(Qt.AlignRight)        
+        regextime = QRegExp(r"^[0-5][0-9]:[0-5][0-9]$")
+        self.startEdit.setValidator(QRegExpValidator(regextime,self))
+        self.startEdit.setText("00:00")
+        self.endEdit.setValidator(QRegExpValidator(regextime,self))
+        if len(aw.qmc.timex) > 0:
+            self.endEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[-1]))
+        else:
+            self.endEdit.setText("00:00")
+        self.connect(self.startEdit,SIGNAL("editingFinished()"),lambda i=0:self.polyfitcurveschanged(i))
+        self.connect(self.endEdit,SIGNAL("editingFinished()"),lambda i=0:self.polyfitcurveschanged(i))
+        self.connect(self.polyfitdeg,SIGNAL("valueChanged(int)"),lambda i=0:self.polyfitcurveschanged(i))
+        self.connect(self.c1ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(i))
+        self.connect(self.c2ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(i))
+        # calculate event list
+        self.events = self.eventlist()
+        self.eventAComboBox = QComboBox()
+        self.eventAComboBox.addItems([""] + [i[0] for i in self.events])
+        self.eventAComboBox.setCurrentIndex(0)
+        self.connect(self.eventAComboBox,SIGNAL("currentIndexChanged(int)"),self.calcEventRC)
+        self.eventBComboBox = QComboBox()
+        self.eventBComboBox.addItems([i[0] for i in self.events] + [""])
+        self.eventBComboBox.setCurrentIndex(len(self.events))
+        self.connect(self.eventBComboBox,SIGNAL("currentIndexChanged(int)"),self.calcEventRC)
         tab3Layout = QVBoxLayout()
         interLayout = QHBoxLayout()
         interLayout.addWidget(self.interpCheck)
@@ -12339,8 +12406,36 @@ class HUDDlg(ArtisanDialog):
         uniLayout.addWidget(univarButton)
         univarGroupLayout = QGroupBox(QApplication.translate("GroupBox","Univariate",None, QApplication.UnicodeUTF8))
         univarGroupLayout.setLayout(uniLayout)
+        polytimes = QHBoxLayout()
+        polytimes.addWidget(startlabel)
+        polytimes.addWidget(self.startEdit)
+        polytimes.addStretch()
+        polytimes.addWidget(self.endEdit)
+        polytimes.addWidget(endlabel)
+        polyevents = QHBoxLayout()
+        polyevents.addWidget(self.eventAComboBox)
+        polyevents.addStretch()
+        polyevents.addWidget(self.eventBComboBox)
+        polyCurves = QHBoxLayout()
+        polyCurves.addWidget(self.c1ComboBox)
+        polyCurves.addStretch()
+        polyCurves.addWidget(self.c2ComboBox)
+        polyLayout = QHBoxLayout()
+        polyLayout.addWidget(self.polyfitCheck)
+        polyLayout.addStretch()
+        polyLayout.addWidget(polyfitdeglabel)
+        polyLayout.addWidget(self.polyfitdeg)
+        polyVLayout = QVBoxLayout()
+        polyVLayout.addLayout(polyLayout)
+        polyVLayout.addLayout(polytimes)
+        polyVLayout.addLayout(polyevents)
+        polyVLayout.addLayout(polyCurves)
+        polyVLayout.addWidget(self.result)
+        polyfitGroupLayout = QGroupBox(QApplication.translate("GroupBox","Polyfit",None, QApplication.UnicodeUTF8))
+        polyfitGroupLayout.setLayout(polyVLayout)
         tab3Layout.addWidget(interGroupLayout)
         tab3Layout.addWidget(univarGroupLayout)
+        tab3Layout.addWidget(polyfitGroupLayout)
         tab3Layout.addStretch()
         ##### TAB 4
         #### TAB 5
@@ -12421,6 +12516,7 @@ class HUDDlg(ArtisanDialog):
         Slayout.addStretch()
         Slayout.addLayout(buttonsLayout)
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
+        self.connect(TabWidget,SIGNAL("currentChanged(int)"),lambda i=i:self.tabSwitched(i))
         self.setLayout(Slayout)
 
     def showpidhelp(self):
@@ -12619,6 +12715,144 @@ class HUDDlg(ArtisanDialog):
                 aw.sendmessage(QApplication.translate("Error Message", "Univariate: no profile data available", None, QApplication.UnicodeUTF8))
                 self.univarCheck.setChecked(False)
         else:
+            aw.qmc.resetlines()
+            aw.qmc.redraw(recomputeAllDeltas=False)
+            
+    def calcEventRC(self):
+        if aw.qmc.timeindex[0] != -1:
+            start = aw.qmc.timex[aw.qmc.timeindex[0]]
+        else:
+            start = 0
+        
+        Aevent = int(self.eventAComboBox.currentIndex())
+        if Aevent == 0:
+            a = 0
+        else:
+            a = self.events[Aevent-1][1]
+                        
+        Bevent = int(self.eventBComboBox.currentIndex())
+        if Bevent == len(self.events):
+            b = len(aw.qmc.timex) - 1
+        else:
+            b = self.events[Bevent][1]
+        self.startEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[a] - start))
+        self.endEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[b] - start))
+        self.polyfitcurveschanged(0)        
+
+    def eventlist(self):
+        events = []
+        if aw.qmc.timeindex[0] > -1:
+            events.append(("START",aw.qmc.timeindex[0]))
+        names = ["DRY","FCs","FCe","SCs","SCe","DROP","COOL"]
+        for e in range(len(names)):
+            if aw.qmc.timeindex[e+1]:
+                events.append((names[e],aw.qmc.timeindex[e+1]))
+        for e in range(len(aw.qmc.specialevents)):
+            events.append((str("Event " + str(e+1)),aw.qmc.specialevents[e]))
+        return events
+        
+    def doPolyfit(self):
+        l = min(len(aw.qmc.timex),len(self.curves[self.c1ComboBox.currentIndex()]),len(self.curves[self.c2ComboBox.currentIndex()]))
+        starttime = aw.qmc.stringtoseconds(str(self.startEdit.text()))
+        endtime = aw.qmc.stringtoseconds(str(self.endEdit.text()))
+        if starttime == -1 or endtime == -1:
+            self.result.setText("")
+            return
+        if  endtime > aw.qmc.timex[-1] or endtime < starttime:
+            self.result.setText("")
+            return
+        if aw.qmc.timeindex[0] != -1:
+            start = aw.qmc.timex[aw.qmc.timeindex[0]]
+        else:
+            start = 0
+        startindex = aw.qmc.time2index(starttime + start)
+        endindex = min(l,aw.qmc.time2index(endtime + start))
+        z = aw.qmc.polyfit(self.curves[self.c1ComboBox.currentIndex()],self.curves[self.c2ComboBox.currentIndex()],self.polyfitdeg.value(),startindex,endindex)
+        if z != None:
+            s = ""
+            sign = "+"
+            z = z[::-1]
+            for i in range(len(z)):
+                v = abs(z[i])
+                if round(v,3) != 0.0:
+                    if i == 0:
+                        s = "%.3f" % v
+                    elif i == 1:
+                        if s != "":
+                            s = " " + sign + " " + s
+                        s = "%.3fx" % v + s
+                    else:
+                        if s != "":
+                            s = " " + sign + " " + s
+                        s = "%.3fx^%i" % (v,i) + s
+                    if z[i] < 0:
+                        sign = "-"
+                    else:
+                        sign = "+"
+            if sign == "-":
+                s = sign + s
+            self.result.setText(s)
+        else:
+            self.result.setText("")
+            
+    def polyfitcurveschanged(self,i):
+        self.polyfitdeg.setDisabled(True)
+        if self.polyfitCheck.isChecked() and len(aw.qmc.timex) > 2:
+            aw.qmc.resetlines()
+            aw.qmc.redraw(recomputeAllDeltas=False)
+            self.doPolyfit()
+        else:
+            self.result.setText("")
+        self.polyfitdeg.setDisabled(False)
+        
+    def tabSwitched(self,i):
+        if i != 2:
+            if self.polyfitCheck.isChecked():
+                self.polyfitCheck.setChecked(False)
+                self.polyfit(0)
+        else:
+            self.collectCurves()
+            
+    # TODO: add background curves temp1B, temp2B, timeB, delta1B, delta2B (could be of different size!)
+    def collectCurves(self):
+        idx = 0
+        self.curves = []
+        self.curvenames = []
+        if aw.qmc.DeltaETflag:
+            self.curvenames.append(QApplication.translate("ComboBox","DeltaET",None, QApplication.UnicodeUTF8))
+            self.curves.append(aw.qmc.delta1)
+            idx = idx + 1
+        if aw.qmc.DeltaBTflag:
+            self.curvenames.append(QApplication.translate("ComboBox","DeltaBT",None, QApplication.UnicodeUTF8))
+            self.curves.append(aw.qmc.delta2)
+            idx = idx + 1
+        self.curvenames.append(QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8))
+        self.curvenames.append(QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8))
+        self.curves.append(aw.qmc.temp1)
+        self.curves.append(aw.qmc.temp2)
+        for i in range(len(aw.qmc.extradevices)):
+            self.curvenames.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
+            self.curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
+            self.curves.append(aw.qmc.extratemp1[i])
+            self.curves.append(aw.qmc.extratemp2[i])
+        self.c1ComboBox.clear()
+        self.c1ComboBox.addItems(self.curvenames)
+        self.c2ComboBox.clear()
+        self.c2ComboBox.addItems(self.curvenames)
+        self.c1ComboBox.setCurrentIndex(idx)
+        self.c2ComboBox.setCurrentIndex(idx+1)
+
+        
+    def polyfit(self,i):
+        if self.polyfitCheck.isChecked():
+            #check for finished roast
+            if len(aw.qmc.timex) > 2:                
+                self.doPolyfit()
+            else:
+                aw.sendmessage(QApplication.translate("Error Message", "Polyfit: no profile data available", None, QApplication.UnicodeUTF8))
+                self.polyfitCheck.setChecked(False)
+        else:
+            self.result.setText("")
             aw.qmc.resetlines()
             aw.qmc.redraw(recomputeAllDeltas=False)
 
