@@ -4019,13 +4019,16 @@ class tgraphcanvas(FigureCanvas):
             return
 
 
-    def polyfit(self,xarray,yarray,deg,startindex,endindex):
+    def polyfit(self,xarray,yarray,deg,startindex,endindex,deltacurvep):
         z = numpy.polyfit(xarray[startindex:endindex],yarray[startindex:endindex],deg)
         p = numpy.poly1d(z)
         x = p(xarray[startindex:endindex])
         pad = max(0,len(self.timex) - startindex - len(x))
         xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
-        self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
+        if deltacurvep:
+        	self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
+        else:
+            self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
         self.fig.canvas.draw()
         return z
         
@@ -12767,7 +12770,7 @@ class HUDDlg(ArtisanDialog):
             start = 0
         startindex = aw.qmc.time2index(starttime + start)
         endindex = min(l,aw.qmc.time2index(endtime + start))
-        z = aw.qmc.polyfit(self.curves[self.c1ComboBox.currentIndex()],self.curves[self.c2ComboBox.currentIndex()],self.polyfitdeg.value(),startindex,endindex)
+        z = aw.qmc.polyfit(self.curves[self.c1ComboBox.currentIndex()],self.curves[self.c2ComboBox.currentIndex()],self.polyfitdeg.value(),startindex,endindex,self.deltacurves[self.c2ComboBox.currentIndex()])
         if z != None:
             s = ""
             sign = "+"
@@ -12818,13 +12821,16 @@ class HUDDlg(ArtisanDialog):
         idx = 0
         self.curves = []
         self.curvenames = []
+        self.deltacurves = [] # list of flags. True if delta curve, False otherwise
         if aw.qmc.DeltaETflag:
             self.curvenames.append(QApplication.translate("ComboBox","DeltaET",None, QApplication.UnicodeUTF8))
             self.curves.append(aw.qmc.delta1)
+            self.deltacurves.append(True)
             idx = idx + 1
         if aw.qmc.DeltaBTflag:
             self.curvenames.append(QApplication.translate("ComboBox","DeltaBT",None, QApplication.UnicodeUTF8))
             self.curves.append(aw.qmc.delta2)
+            self.deltacurves.append(True)
             idx = idx + 1
         self.curvenames.append(QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8))
         self.curvenames.append(QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8))
@@ -12835,6 +12841,8 @@ class HUDDlg(ArtisanDialog):
             self.curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
             self.curves.append(aw.qmc.extratemp1[i])
             self.curves.append(aw.qmc.extratemp2[i])
+            self.deltacurves.append(False)
+            self.deltacurves.append(False)
         self.c1ComboBox.clear()
         self.c1ComboBox.addItems(self.curvenames)
         self.c2ComboBox.clear()
