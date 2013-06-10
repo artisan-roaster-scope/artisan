@@ -76,6 +76,7 @@
   * adds computation of the area between the BT and ET curves (ETBTa)
   * adds extended roast characteristics/statistics (incl. ET/BT area abbreviated as ETBTa)
   * adds roast color and flags to specify roast defects
+  * adds polyfits
   * bug fixes
 
 ----
