@@ -12519,7 +12519,7 @@ class HUDDlg(ArtisanDialog):
         Slayout.addStretch()
         Slayout.addLayout(buttonsLayout)
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
-        self.connect(TabWidget,SIGNAL("currentChanged(int)"),lambda i=i:self.tabSwitched(i))
+        self.connect(TabWidget,SIGNAL("currentChanged(int)"),lambda i=0:self.tabSwitched(i))
         self.setLayout(Slayout)
 
     def showpidhelp(self):
