@@ -4020,17 +4020,25 @@ class tgraphcanvas(FigureCanvas):
 
 
     def polyfit(self,xarray,yarray,deg,startindex,endindex,deltacurvep):
-        z = numpy.polyfit(xarray[startindex:endindex],yarray[startindex:endindex],deg)
-        p = numpy.poly1d(z)
-        x = p(xarray[startindex:endindex])
-        pad = max(0,len(self.timex) - startindex - len(x))
-        xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
-        if deltacurvep:
-        	self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
+        xa = xarray[startindex:endindex]
+        ya = yarray[startindex:endindex]
+        if len(xa) > 0 and len(xa) == len(ya):
+            try:
+                z = numpy.polyfit(xa,ya,deg)
+                p = numpy.poly1d(z)
+                x = p(xarray[startindex:endindex])
+                pad = max(0,len(self.timex) - startindex - len(x))
+                xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
+                if deltacurvep:
+                	self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
+                else:
+                    self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
+                self.fig.canvas.draw()
+                return z
+            except:
+                return None
         else:
-            self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
-        self.fig.canvas.draw()
-        return z
+            return None
         
     #interpolation type
     def univariate(self):
@@ -10993,7 +11001,7 @@ $cupping_notes
         contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
-        contributors += u("<br>David Trebilcock")
+        contributors += u("<br>David Trebilcock, Zoltán Kis")
         box = QMessageBox(self)
         #create a html QString
         box.about(self,
