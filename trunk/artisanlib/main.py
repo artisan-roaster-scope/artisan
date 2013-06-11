@@ -10994,19 +10994,19 @@ $cupping_notes
 
     def helpAbout(self):
         coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
-        contributors = u("<br>Cetin Barut, Marcio Carnerio, Bradley Collins,")
+        contributors = u("<br>") + unichr(199) + u("etin Barut, Marcio Carnerio, Bradley Collins,")
         contributors += u("<br>Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall,")
         contributors += u("<br>Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo,")
         contributors += u("<br>Savvas Kiretsis, Lukas Kolbe, David Lahoz,")
         contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
-        contributors += u("<br>David Trebilcock, Zoltán Kis")
+        contributors += u("<br>David Trebilcock, Zolt") + unichr(225) + u("n Kis")
         box = QMessageBox(self)
         #create a html QString
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
-                u("""<b>{0}</b> {1} ({2})
+                u(u("""<b>{0}</b> {1} ({2})
                 <p>
                 Python {3}, PyQt {5}, Qt {4}
                 </p>
@@ -11026,7 +11026,7 @@ $cupping_notes
                 QApplication.translate("About", "Core developers:",None, QApplication.UnicodeUTF8),
                 coredevelopers,
                 QApplication.translate("About", "Contributors:",None, QApplication.UnicodeUTF8),
-                contributors))
+                contributors)))
 
     def helpHelp(self):
         QDesktopServices.openUrl(QUrl("http://coffeetroupe.com/artisandocs/", QUrl.TolerantMode))
