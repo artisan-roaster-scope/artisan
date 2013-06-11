@@ -11006,7 +11006,7 @@ $cupping_notes
         #create a html QString
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
-                u(u("""<b>{0}</b> {1} ({2})
+                u("""<b>{0}</b> {1} ({2})
                 <p>
                 Python {3}, PyQt {5}, Qt {4}
                 </p>
@@ -11026,7 +11026,7 @@ $cupping_notes
                 QApplication.translate("About", "Core developers:",None, QApplication.UnicodeUTF8),
                 coredevelopers,
                 QApplication.translate("About", "Contributors:",None, QApplication.UnicodeUTF8),
-                contributors)))
+                contributors))
 
     def helpHelp(self):
         QDesktopServices.openUrl(QUrl("http://coffeetroupe.com/artisandocs/", QUrl.TolerantMode))
