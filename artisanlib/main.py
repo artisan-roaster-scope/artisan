@@ -11568,26 +11568,26 @@ $cupping_notes
             ETreachTime,BTreachTime,ET2reachTime,BT2reachTime = self.qmc.getTargetTime()
             if ETreachTime > 0 and ETreachTime < 2000:
                 text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ETreachTime))).arg(str(self.qmc.ETtarget) + self.qmc.mode))
-                if self.qmc.timeindex[0]:
+                if self.qmc.timeindex[0] > -1:
                     text1 = text1 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ETreachTime))))
             else:
                 text1 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ETtarget) + self.qmc.mode))
             if ET2reachTime > 0 and ET2reachTime < 2000:
                 text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(ET2reachTime))).arg(str(self.qmc.ET2target) + self.qmc.mode))
-                if self.qmc.timeindex[0]:
+                if self.qmc.timeindex[0] > -1:
                     text2 = text2 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+ET2reachTime))))
             else:
                 text2 = u(QApplication.translate("Label","%1 to reach ET target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.ET2target) + self.qmc.mode))
                 
             if BTreachTime > 0 and BTreachTime < 2000:    
                 text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BTreachTime))).arg(str(self.qmc.BTtarget) + self.qmc.mode))
-                if self.qmc.timeindex[0]:
+                if self.qmc.timeindex[0] > -1:
                     text3 = text3 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BTreachTime))))
             else:
                 text3 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BTtarget) + self.qmc.mode))
             if BT2reachTime > 0 and BT2reachTime < 2000:
                 text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(BT2reachTime))).arg(str(self.qmc.BT2target) + self.qmc.mode))
-                if self.qmc.timeindex[0]:
+                if self.qmc.timeindex[0] > -1:
                     text4 = text4 + u(QApplication.translate("Label"," at %1", None, QApplication.UnicodeUTF8).arg(self.qmc.stringfromseconds(int(self.qmc.timex[-1] - self.qmc.timex[self.qmc.timeindex[0]]+BT2reachTime))))        
             else:
                 text4 = u(QApplication.translate("Label","%1 to reach BT target %2", None, QApplication.UnicodeUTF8).arg("xx:xx").arg(str(self.qmc.BT2target) + self.qmc.mode))
