@@ -18605,9 +18605,9 @@ class serialport(object):
                     #no extra device +ArduinoTC4_XX present. reads ambient T, ET, BT
                         command = "CHAN;" + et_channel + bt_channel + "00"
                     if 32 in aw.qmc.extradevices: # +ArduinoTC4_56
-                        self.SP.write(str2cmd("PID XON" + "\n"))       #activate extra PID OT1/OT2 channels
+                        self.SP.write(str2cmd("PID;XON" + "\n"))       #activate extra PID OT1/OT2 channels
                     else:
-                        self.SP.write(str2cmd("PID XOFF" + "\n"))       #activate extra PID OT1/OT2 channels
+                        self.SP.write(str2cmd("PID;XOFF" + "\n"))       #activate extra PID OT1/OT2 channels
                     libtime.sleep(0.3)
                     self.SP.write(str2cmd(command + "\n"))       #send command
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
@@ -18683,7 +18683,7 @@ class serialport(object):
         finally:
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.1f, %.1f, %.1f, %.1f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2))
+                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.1f, %.1f, %.1f, %.1f, %.1f, %.1f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2,aw.qmc.extraArduinoT3,aw.qmc.extraArduinoT4))
 
     def TEVA18Bconvert(self, seg):
         if seg == 0x7D:
