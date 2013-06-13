@@ -1,6 +1,6 @@
 #summary Detailed Release History
 
-==v0.6.0 (x.6.2013)==
+==v0.6.0 (14.6.2013)==
 
  * Events
   * adds COOL event recording the time the beans were cooled down
