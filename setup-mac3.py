@@ -74,6 +74,7 @@ DATA_FILES = [
     ("../Resources", [r"artisanProfile.icns"]),
     ("../Resources", [r"artisanAlarms.icns"]),
     ("../Resources", [r"artisanPalettes.icns"]),
+    ("../Resources", [r"artisanWheel.icns"]),
   ]
   
 plist = Plist.fromFile('Info3.plist')
