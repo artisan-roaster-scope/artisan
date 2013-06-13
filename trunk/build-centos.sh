@@ -21,6 +21,7 @@ cp -R /usr/local/lib/python2.7/site-packages/matplotlib/mpl-data/ dist
 cp artisan-alog.xml dist
 cp artisan-alrm.xml dist
 cp artisan-apal.xml dist
+cp artisan-wg.xml dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist
@@ -53,4 +54,5 @@ cp /usr/local/Trolltech/Qt-4.8.4/translations/qt_pt.qm dist/translations
 cp /usr/local/Trolltech/Qt-4.8.4/translations/qt_ru.qm dist/translations
 cp /usr/local/Trolltech/Qt-4.8.4/translations/qt_ar.qm dist/translations
 cp /usr/local/Trolltech/Qt-4.8.4/translations/qt_ja.qm dist/translations
+cp /usr/local/Trolltech/Qt-4.8.4/translations/qt_hu.qm dist/translations
 tar -cf dist-centos.tar dist

@@ -46,6 +46,20 @@
 			<key>NSDocumentClass</key>
 			<string>PaletteConfigurations</string>
 		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>wg</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>artisanWheel.icns</string>
+			<key>CFBundleTypeName</key>
+			<string>Artisan Wheel</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>NSDocumentClass</key>
+			<string>PaletteConfigurations</string>
+		</dict>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>

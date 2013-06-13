@@ -28,6 +28,12 @@ set_mime()
    xdg-icon-resource install --context mimetypes --size 64 /usr/share/artisan/icons/artisanPalettes64.png application-x-artisan-apal
    xdg-icon-resource install --context mimetypes --size 128 /usr/share/artisan/icons/artisanPalettes128.png application-x-artisan-apal
    xdg-icon-resource install --context mimetypes --size 256 /usr/share/artisan/icons/artisanPalettes256.png application-x-artisan-apal
+   xdg-mime install /usr/share/artisan/artisan-wg.xml
+   xdg-icon-resource install --context mimetypes --size 16 /usr/share/artisan/icons/artisanWheel16.png application-x-artisan-wg
+   xdg-icon-resource install --context mimetypes --size 32 /usr/share/artisan/icons/artisanWheel32.png application-x-artisan-wg
+   xdg-icon-resource install --context mimetypes --size 64 /usr/share/artisan/icons/artisanWheel64.png application-x-artisan-wg
+   xdg-icon-resource install --context mimetypes --size 128 /usr/share/artisan/icons/artisanWheel128.png application-x-artisan-wg
+   xdg-icon-resource install --context mimetypes --size 256 /usr/share/artisan/icons/artisanWheel256.png application-x-artisan-wg
    return 0
 }
 
