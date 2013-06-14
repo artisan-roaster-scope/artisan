@@ -1,0 +1,81 @@
+Current Versions:
+
+o Python 2.7.4
+o pyserial 2.6
+o QT 4.8.4
+o PyQt 4.10.1
+o numpy 1.7.1
+o scipy 0.12.0
+o matplotlib 1.2.1
+o minimalmodbus 0.4
+
+o py2exe 0.6.9
+o NSIS 2.46
+
+
+Upgrade History:
+
+- 2013-05-02: Started
+
+
+Installation Instructions:
+
+0) Preparation
+
+Install Microsoft Visual C++ 2008 SP1 Redistributable Package (x86)
+http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A40D-3802B2AF5FC2&displaylang=en
+
+vcredist_x86.exe
+
+1) Python 2.7
+
+install python-2.7.4.msi via "Python 3.3.1 Windows x86 MSI Installer" from http://www.python.org
+
+2) pyserial
+
+download pyserial-2.6.tar.gz from http://pyserial.sourceforge.net
+
+unpack and
+> c:\Python27\python setup.py build
+> c:\Python27\python setup.py install
+
+3) QT
+
+qt-win-opensource-4.8.4-vs2008.exe
+
+4) PyQT
+
+download and install PyQt4-4.10-gpl-Py2.7-Qt4.8.4-x32.exe
+
+5) numpy
+
+download numpy-1.7.1-win32-superpack-python2.7.exe from http://www.scipy.org/Download
+
+for noSSE version:
+install via DOS shell "numpy-1.7.1-superpack-win32.exe /arch nosse"
+
+6) scipy
+
+download scipy-0.12.0-win32-superpack-python2.7.exe from http://www.scipy.org/Download
+
+for noSSE version:
+install via DOS shell "scipy-0.12.0-superpack-win32.exe /arch nosse"
+
+7) matplotlib
+
+download matplotlib-1.2.1.win32-py2.7.exe from http://matplotlib.org/downloads.html
+
+for noSSE version:
+install via DOS shell "matplotlib-1.2.1-superpack-win32.exe /arch nosse"
+
+8) MinimalModbus
+
+download and install MinimalModbus-0.4.win32.exe
+
+9) py2exe
+
+download and install py2exe-0.6.9.win32-py2.7.exe
+
+10) NSIS 2.46
+
+download and install from http://nsis.sourceforge.net/Download
