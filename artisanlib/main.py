@@ -12113,7 +12113,7 @@ class HUDDlg(ArtisanDialog):
         self.MinMaxLimits.setChecked(aw.qmc.minmaxLimits)
         self.connect(self.MinMaxLimits,SIGNAL("stateChanged(int)"),lambda i=0:self.changeMinMaxLimits(i))
         #swapETBT flag
-        self.swapETBT = QCheckBox("ET <-> BT")
+        self.swapETBT = QCheckBox(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8) + " <-> " + QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8))
         self.swapETBT.setChecked(aw.qmc.swapETBT)
         self.connect(self.swapETBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeSwapETBT(i))
         #limits
@@ -12754,7 +12754,14 @@ class HUDDlg(ArtisanDialog):
         events = []
         if aw.qmc.timeindex[0] > -1:
             events.append(("START",aw.qmc.timeindex[0]))
-        names = ["DRY","FCs","FCe","SCs","SCe","DROP","COOL"]
+        names = [
+            QApplication.translate("Table", "DRY END",None, QApplication.UnicodeUTF8),
+            QApplication.translate("Table", "FC START",None, QApplication.UnicodeUTF8),
+            QApplication.translate("Table", "FC END",None, QApplication.UnicodeUTF8),
+            QApplication.translate("Table", "SC START",None, QApplication.UnicodeUTF8),
+            QApplication.translate("Table", "SC END",None, QApplication.UnicodeUTF8),
+            QApplication.translate("Table", "DROP",None, QApplication.UnicodeUTF8),
+            QApplication.translate("Table", "COOL",None, QApplication.UnicodeUTF8)]
         for e in range(len(names)):
             if aw.qmc.timeindex[e+1]:
                 events.append((names[e],aw.qmc.timeindex[e+1]))

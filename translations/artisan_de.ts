@@ -2904,7 +2904,7 @@ END</source>
     <message>
         <location filename="artisanlib/main.py" line="11603"/>
         <source>%1 after FCs</source>
-        <translation>%1 mach FCs</translation>
+        <translation>%1 nach FCs</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="11610"/>
