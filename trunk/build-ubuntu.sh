@@ -10,11 +10,11 @@ bbfreeze artisan.py
 cp -L /usr/lib/i386-linux-gnu/libxml2.so.2 dist
 patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libxml2.so.2
 cp -L /usr/lib/libicudata.so.48 dist
-patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicudata.so.42
+patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicudata.so.48
 cp -L /usr/lib/libicuuc.so.48 dist
-patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicuuc.so.42
+patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicuuc.so.48
 cp -L /usr/lib/libicui18n.so.48 dist
-patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicui18n.so.42
+patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/libicui18n.so.48
 cp -L /usr/lib/i386-linux-gnu/pkcs11/gnome-keyring-pkcs11.so dist
 patchelf --set-rpath '${ORIGIN}:${ORIGIN}/../lib' dist/gnome-keyring-pkcs11.so
 cp -R /usr/local/lib/python2.7/dist-packages/matplotlib/mpl-data/ dist
