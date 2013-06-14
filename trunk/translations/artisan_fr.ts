@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="fr_FR" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.0" language="fr_FR">
 <context>
     <name>About</name>
     <message>
@@ -193,7 +194,7 @@
     <message>
         <location filename="artisanlib/main.py" line="21459"/>
         <source>B/W</source>
-        <translation>B/W</translation>
+        <translation>N/B</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="21769"/>
@@ -853,12 +854,12 @@ COOL</translation>
     <message>
         <location filename="artisanlib/main.py" line="13393"/>
         <source>Light Cut</source>
-        <translation>Blond Coupe</translation>
+        <translation>Cut Blond</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13396"/>
         <source>Dark Cut</source>
-        <translation>Sombre Coupe</translation>
+        <translation>Cut Sombre</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13399"/>
@@ -2755,12 +2756,12 @@ COOL</translation>
     <message>
         <location filename="artisanlib/main.py" line="13338"/>
         <source>Storage Conditions</source>
-        <translation>Stockage Conditions</translation>
+        <translation>Conditions Stockage</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13356"/>
         <source>Ambient Conditions</source>
-        <translation>Ambient Conditions</translation>
+        <translation>Conditions Ambientes</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13445"/>
@@ -2810,12 +2811,12 @@ COOL</translation>
     <message>
         <location filename="artisanlib/main.py" line="13321"/>
         <source>Whole Color</source>
-        <translation>Grain Couleur</translation>
+        <translation>Couleur Grain</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="13327"/>
         <source>Ground Color</source>
-        <translation>Moulu Couleur</translation>
+        <translation>Couleur Moulu</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="19802"/>
@@ -5322,7 +5323,7 @@ Continue?</source>
     <message>
         <location filename="artisanlib/main.py" line="12510"/>
         <source>HUD</source>
-        <translation>VTH (HUD)</translation>
+        <translation>VTH</translation>
     </message>
     <message>
         <location filename="artisanlib/main.py" line="12516"/>
