@@ -25879,9 +25879,9 @@ def main():
                 elif locale == "el":
                     mpl.rcParams['font.sans-serif'] = ["DejaVu Sans","DejaVu Sans Mono"]
                 elif locale == "zh_CN":
-                    mpl.rcParams['font.sans-serif'] = ["NanumGothic","DejaVu Sans Mono"]
+                    mpl.rcParams['font.sans-serif'] = ["DejaVu Sans","DejaVu Sans Mono","NanumGothic"]
                 elif locale == "zh_TW":
-                    mpl.rcParams['font.sans-serif'] = ["NanumGothic","DejaVu Sans Mono"]
+                    mpl.rcParams['font.sans-serif'] = ["DejaVu Sans","DejaVu Sans Mono","NanumGothic"]
         else: # Windows:
             # for asian languages on Windows we have to set the parameters directly to *.ttc fonts (mpl supports only *.ttf)
             if locale == "ja":
