@@ -154,6 +154,15 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.6.0 (14.06.2013)
+- Monitoring-only mode reporting readings on LCDs without recording
+- Event sliders e.g. to control the Hottop heater and fan via the HT Roaster Interface
+- Extended alarms triggered by time and temperature on any curve
+- Flexible Modbus RTU support allowing temperature reading and device control
+- Curve smoothing and spike filtering
+- New localizations: Arabic, German, Greek, Spanish, French, Japanese, Norwegian, Portuguese, Turkish, Dutch, Chinese and Hungarian
+- Windows installer, and icons on Windows and Linux
+
 v0.5.6 (8.11.2012)
 - Monitoring-only mode
 - adds event sliders
