@@ -6588,10 +6588,6 @@ class ApplicationWindow(QMainWindow):
         #only leave operational the control button if the device is Fuji PID
         #the SV buttons are activated from the PID control panel 
         self.button_10.setVisible(False)
-        self.label6.setVisible(False)
-        self.lcd6.setVisible(False)
-        self.label7.setVisible(False)
-        self.lcd7.setVisible(False)
 
         self.button_12.setVisible(False)
         self.button_13.setVisible(False)
@@ -6738,9 +6734,11 @@ class ApplicationWindow(QMainWindow):
 
         self.LCD6frame = QFrame()
         LCDlayout.addWidget(self.makeLCDbox(self.label6,self.lcd6,self.LCD6frame))
+        self.LCD6frame.setVisible(False)
 
         self.LCD7frame = QFrame()
         LCDlayout.addWidget(self.makeLCDbox(self.label7,self.lcd7,self.LCD7frame))
+        self.LCD7frame.setVisible(False)
 
         self.LCD4frame = QFrame()
         LCDlayout.addWidget(self.makeLCDbox(self.label4,self.lcd4,self.LCD4frame))
@@ -9053,10 +9051,12 @@ class ApplicationWindow(QMainWindow):
             # activate CONTROL BUTTON
             if self.qmc.device == 0:
                 self.button_10.setVisible(True) #CONTROL BUTTON
-                self.label6.setVisible(True)    #PID SV LABEL
-                self.lcd6.setVisible(True)      #PID SV LCD
-                self.label7.setVisible(True)    #PID DUTYCYLE LABEL
-                self.lcd7.setVisible(True)      #PID DUTYCYCLE LCD
+#                self.label6.setVisible(True)    #PID SV LABEL
+#                self.lcd6.setVisible(True)      #PID SV LCD
+#                self.label7.setVisible(True)    #PID DUTYCYLE LABEL
+#                self.lcd7.setVisible(True)      #PID DUTYCYCLE LCD
+                self.LCD6frame.setVisible(True)
+                self.LCD7frame.setVisible(True)
 # Control button for Arduino does not have any useful function yet, so hide it for now                
             elif self.qmc.device == 26: # or self.qmc.device == 19:   #DEVICE 26 = DTA; DEVICE 19 = ARDUINOTC4
                 self.button_10.setVisible(True) #CONTROL BUTTON
@@ -20843,10 +20843,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
             message = QApplication.translate("Message","Device not set", None, QApplication.UnicodeUTF8)
             # by default switch PID buttons/LCDs off
             aw.button_10.setVisible(False)
-            aw.label6.setVisible(False)
-            aw.lcd6.setVisible(False)
-            aw.label7.setVisible(False)
-            aw.lcd7.setVisible(False)
+#            aw.label6.setVisible(False)
+#            aw.lcd6.setVisible(False)
+#            aw.label7.setVisible(False)
+#            aw.lcd7.setVisible(False)
+            aw.LCD6frame.setVisible(False)
+            aw.LCD7frame.setVisible(False)
             aw.qmc.resetlinecountcaches()
             if self.pidButton.isChecked():
                 #type index[0]: 0 = PXG, 1 = PXR, 2 = DTA
@@ -20894,10 +20896,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 message = QApplication.translate("Message","PID to control ET set to %1 %2" + \
                                                  " ; PID to read BT set to %3 %4", None, QApplication.UnicodeUTF8).arg(str1).arg(str(aw.ser.controlETpid[1])).arg(str2).arg(str(aw.ser.readBTpid[1]))
                 aw.button_10.setVisible(True)
-                aw.label6.setVisible(True)
-                aw.lcd6.setVisible(True)
-                aw.label7.setVisible(True)
-                aw.lcd7.setVisible(True)
+#                aw.label6.setVisible(True)
+#                aw.lcd6.setVisible(True)
+#                aw.label7.setVisible(True)
+#                aw.lcd7.setVisible(True)
+                aw.LCD6frame.setVisible(True)
+                aw.LCD7frame.setVisible(True)
             elif self.arduinoButton.isChecked():
                 aw.ser.arduinoETChannel = str(self.arduinoETComboBox.currentText())
                 aw.ser.arduinoBTChannel = str(self.arduinoBTComboBox.currentText())
@@ -21217,10 +21221,12 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.button_15.setVisible(False)
                 aw.button_16.setVisible(False)
                 aw.button_17.setVisible(False)
-                aw.label6.setVisible(False)
-                aw.lcd6.setVisible(False)
-                aw.label7.setVisible(False)
-                aw.lcd7.setVisible(False)
+#                aw.label6.setVisible(False)
+#                aw.lcd6.setVisible(False)
+#                aw.label7.setVisible(False)
+#                aw.lcd7.setVisible(False)
+                aw.LCD6frame.setVisible(False)
+                aw.LCD7frame.setVisible(False)
             aw.qmc.ETfunction = str(self.ETfunctionedit.text())
             aw.qmc.BTfunction = str(self.BTfunctionedit.text())
             aw.qmc.ETcurve = self.ETcurve.isChecked()
@@ -22512,7 +22518,7 @@ class AlarmDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<b>Action:</b> if all conditions are fulfilled the alarm triggeres the corresponding action",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>Description:</b> the text of the popup, the name of the program, the number of the event button (if 0 the COOL event is triggered ) or the new value of the slider",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>NOTE:</b> each alarm is only triggered once",None, QApplication.UnicodeUTF8))
-        QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
+        QMessageBox.information(self,QApplication.translate("Button", "Help",None, QApplication.UnicodeUTF8),string)
 
     def savealarms(self):
         nalarms = self.alarmtable.rowCount()
