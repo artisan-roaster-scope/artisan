@@ -10994,14 +10994,14 @@ $cupping_notes
 
     def helpAbout(self):
         coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
-        contributors = u("<br>\u00C7etin Barut, Marcio Carnerio, Bradley Collins,")
+        contributors = u("<br>") + unichr(199) + u("etin Barut, Marcio Carnerio, Bradley Collins,")
         contributors += u("<br>Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall,")
         contributors += u("<br>Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo,")
         contributors += u("<br>Savvas Kiretsis, Lukas Kolbe, David Lahoz,")
         contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
-        contributors += u("<br>David Trebilcock, Zolt\u00E1n Kis")
+        contributors += u("<br>David Trebilcock, Zolt") + unichr(225) + u("n Kis")
         box = QMessageBox(self)
         #create a html QString
         box.about(self,
