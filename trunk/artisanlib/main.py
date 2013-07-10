@@ -93,6 +93,8 @@ try:
     import matplotlib.backends.qt4_editor.figureoptions as figureoptions
 except ImportError:
     figureoptions = None
+    
+from Phidgets.Devices.TemperatureSensor import TemperatureSensor as Phidget1048TemperatureSensor
 
 import minimalmodbus
 
@@ -452,7 +454,10 @@ class tgraphcanvas(FigureCanvas):
                        "Amprobe TMD-56",        #31
                        "+ArduinoTC4_56",        #32
                        "+MODBUS_34",            #33
-                       "-Omega HH806W"          #34 NOT WORKING 
+                       "Phidget 1048",          #34
+                       "+Phidget 1048_34",      #35
+                       "+Phidget 1048_AT",      #36
+                       "-Omega HH806W"          #37 NOT WORKING 
                        ]
 
         #extra devices
@@ -2887,6 +2892,7 @@ class tgraphcanvas(FigureCanvas):
         # clear data from monitoring-only mode
         if len(self.timex) == 1:
             aw.qmc.clearMeasurements()
+        self.disconnectProbes()
         #enable RESET button:
         aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
         aw.button_7.setEnabled(True)
@@ -2899,6 +2905,13 @@ class tgraphcanvas(FigureCanvas):
         aw.hideSliders()
         aw.hideExtraButtons()
         aw.enableEditMenus()
+        
+    def disconnectProbes(self):
+        if aw.ser.PhidgetTemperatureSensor:
+            try:
+                self.PhidgetTemperatureSensor.closePhidget()
+            except:
+                pass
 
     #Turns ON/OFF flag self.flagon to read and print values. Called from push button_1.
     def ToggleMonitor(self):
@@ -5414,167 +5427,165 @@ class SampleThread(QThread):
                 t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
                 t2 = self.inputFilter(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
                 length_of_qmc_timex = len(aw.qmc.timex)
-                # ignore reading if both are off, otherwise process them
-                if t1 != -1 or t2 != -1:
-                    t1_final = t1
-                    t2_final = t2
-                    if local_flagstart:
+                t1_final = t1
+                t2_final = t2
+                if local_flagstart:
+                    aw.qmc.temp2.append(t2_final)
+                    aw.qmc.temp1.append(t1_final)
+                    aw.qmc.timex.append(tx)
+                    length_of_qmc_timex += 1
+                else:
+                    if len(aw.qmc.temp2) > 0:
+                        aw.qmc.temp2[-1] = t2_final
+                    else:                            
                         aw.qmc.temp2.append(t2_final)
+                    if len(aw.qmc.temp1) > 0:
+                        aw.qmc.temp1[-1] = t1_final
+                    else:                            
                         aw.qmc.temp1.append(t1_final)
+                    if length_of_qmc_timex <= 0:
                         aw.qmc.timex.append(tx)
                         length_of_qmc_timex += 1
                     else:
-                        if len(aw.qmc.temp2) > 0:
-                            aw.qmc.temp2[-1] = t2_final
-                        else:                            
-                            aw.qmc.temp2.append(t2_final)
-                        if len(aw.qmc.temp1) > 0:
-                            aw.qmc.temp1[-1] = t1_final
-                        else:                            
-                            aw.qmc.temp1.append(t1_final)
-                        if length_of_qmc_timex <= 0:
-                            aw.qmc.timex.append(tx)
-                            length_of_qmc_timex += 1
-                        else:
-                            aw.qmc.timex[-1] = tx
-                    # update lines data using the lists with new data
+                        aw.qmc.timex[-1] = tx
+                # update lines data using the lists with new data
+                if local_flagstart:
+                    aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
+                    aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+                #we need a minimum of two readings to calculate rate of change
+                if local_flagstart and length_of_qmc_timex > 2:
+                    timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
+                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
+                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
+                    aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
+                    aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
+                    #######   filter deltaBT deltaET
+                    if aw.qmc.deltafilter:
+                        if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
+                            if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
+                                a1,a2 = 0.,0.
+                                for k in range(aw.qmc.deltafilter):
+                                    a1 += aw.qmc.unfiltereddelta1[-(k+1)]
+                                    a2 += aw.qmc.unfiltereddelta2[-(k+1)]
+                                aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
+                                aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
+                    rateofchange1plot = aw.qmc.rateofchange1
+                    rateofchange2plot = aw.qmc.rateofchange2
+                else:
                     if local_flagstart:
-                        aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
-                        aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
-                    #we need a minimum of two readings to calculate rate of change
-                    if local_flagstart and length_of_qmc_timex > 2:
-                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
-                        #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                        aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
-                        aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
-                        aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
-                        aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
-                        #######   filter deltaBT deltaET
-                        if aw.qmc.deltafilter:
-                            if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
-                                if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
-                                    a1,a2 = 0.,0.
-                                    for k in range(aw.qmc.deltafilter):
-                                        a1 += aw.qmc.unfiltereddelta1[-(k+1)]
-                                        a2 += aw.qmc.unfiltereddelta2[-(k+1)]
-                                    aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
-                                    aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
-                        rateofchange1plot = aw.qmc.rateofchange1
-                        rateofchange2plot = aw.qmc.rateofchange2
+                        aw.qmc.unfiltereddelta1.append(0.)
+                        aw.qmc.unfiltereddelta2.append(0.)
                     else:
-                        if local_flagstart:
+                        if len(aw.qmc.unfiltereddelta1) > 0:
+                            aw.qmc.unfiltereddelta1[-1] = 0.
+                        else:
                             aw.qmc.unfiltereddelta1.append(0.)
+                        if len(aw.qmc.unfiltereddelta2) > 0:
+                            aw.qmc.unfiltereddelta2[-1] = 0.
+                        else:
                             aw.qmc.unfiltereddelta2.append(0.)
-                        else:
-                            if len(aw.qmc.unfiltereddelta1) > 0:
-                                aw.qmc.unfiltereddelta1[-1] = 0.
-                            else:
-                                aw.qmc.unfiltereddelta1.append(0.)
-                            if len(aw.qmc.unfiltereddelta2) > 0:
-                                aw.qmc.unfiltereddelta2[-1] = 0.
-                            else:
-                                aw.qmc.unfiltereddelta2.append(0.)
-                        aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
-                    # append new data to the rateofchange
-                    if local_flagstart:
-                        aw.qmc.delta1.append(rateofchange1plot)
-                        aw.qmc.delta2.append(rateofchange2plot)
+                    aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+                # append new data to the rateofchange
+                if local_flagstart:
+                    aw.qmc.delta1.append(rateofchange1plot)
+                    aw.qmc.delta2.append(rateofchange2plot)
+                else:
+                    if len(aw.qmc.delta1) > 0:
+                        aw.qmc.delta1[-1] = rateofchange1plot
                     else:
-                        if len(aw.qmc.delta1) > 0:
-                            aw.qmc.delta1[-1] = rateofchange1plot
-                        else:
-                            aw.qmc.delta1.append(rateofchange1plot)
-                        if len(aw.qmc.delta2) > 0:
-                            aw.qmc.delta2[-1] = rateofchange2plot
-                        else:
-                            aw.qmc.delta2.append(rateofchange2plot)
-                    if local_flagstart:
-                        if aw.qmc.DeltaETflag:
-                            aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
-                        if aw.qmc.DeltaBTflag:
-                            aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
-                        #readjust xlimit of plot if needed
-                        if  not aw.qmc.fixmaxtime and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
-                            aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
-                            aw.qmc.xaxistosm()
-                        if aw.qmc.projectFlag:
-                            aw.qmc.viewProjection()
-                        if aw.qmc.background and aw.qmc.backgroundReproduce:
-                            aw.qmc.playbackevent()
-                        # autodetect CHARGE event
-                        # only if BT > 203F/95C
-                        if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
-                            ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
-                            if aw.BTbreak(length_of_qmc_timex - 1):
-                                # we found a BT break at the current index minus 2
-                                aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
-                        # autodetect DROP event
-                        # only if 9min into roast and BT>180C/356F
-                        elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
-                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
-                            ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
-                            if aw.BTbreak(length_of_qmc_timex - 1):
-                                # we found a BT break at the current index minus 2
-                                aw.qmc.autoDropIdx = length_of_qmc_timex - 3
-                    if local_flagstart:
-                        #check alarms 
-                        # check for TP event if already CHARGEed and not yet recognized
-                        if not aw.qmc.TPalarmtimeindex and len(aw.qmc.alarmflag) > 0 and aw.qmc.timeindex[0] > -1 and self.checkTPalarmtime():
-                            aw.qmc.TPalarmtimeindex = len(aw.qmc.timex)-1
-                        #check for each alarm that was not yet triggered
-                        for i in range(len(aw.qmc.alarmflag)):
-                            #if alarm on, and not triggered, and time is after set time:
-                            # qmc.alarmtime = -1 (None == ON)
-                            # qmc.alarmtime = 0 (CHARGE)
-                            # ..
-                            # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
-                            # 1) the alarm is START
-                            # 2) the alarm was not triggered yet
-                            # 3) the alarm From is ON
-                            # 4) the alarm From is CHARGE
-                            # 5) the alarm From is any other event but TP
-                            # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
-                            if aw.qmc.alarmflag[i] \
-                              and not aw.qmc.alarmstate[i] \
-                              and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
-                              and ((aw.qmc.alarmtime[i] < 0) \
-                              or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
-                              or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                              or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
-                                    and aw.qmc.timeindex[1] < 1 and aw.qmc.TPalarmtimeindex)):
-                                #########
-                                # check alarmoffset (time after From event):
-                                if aw.qmc.alarmoffset[i] > 0:
-                                    alarm_time = aw.qmc.timeclock.elapsed()/1000.
-                                    if aw.qmc.alarmtime[i] < 0: # time after START
-                                        pass # the alarm_time is the clock time
-                                    elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
-                                        alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
-                                    elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
-                                        alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
-                                    elif aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
-                                        alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
-                                    if alarm_time >= aw.qmc.alarmoffset[i]:
-                                        aw.qmc.temporaryalarmflag = i
-                                #########
-                                # check alarmtemp:
-                                alarm_temp = None
-                                if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
-                                    alarm_temp = aw.qmc.delta1[-1]
-                                elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
-                                    alarm_temp = aw.qmc.delta2[-1]
-                                elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                    alarm_temp = aw.qmc.temp1[-1]
-                                elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                    alarm_temp = aw.qmc.temp2[-1]
-                                elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
-                                    if (aw.qmc.alarmsource[i])%2==0:
-                                        alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                    else:
-                                        alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                alarm_limit = aw.qmc.alarmtemperature[i]
-                                if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                        aw.qmc.delta1.append(rateofchange1plot)
+                    if len(aw.qmc.delta2) > 0:
+                        aw.qmc.delta2[-1] = rateofchange2plot
+                    else:
+                        aw.qmc.delta2.append(rateofchange2plot)
+                if local_flagstart:
+                    if aw.qmc.DeltaETflag:
+                        aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
+                    if aw.qmc.DeltaBTflag:
+                        aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
+                    #readjust xlimit of plot if needed
+                    if  not aw.qmc.fixmaxtime and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                        aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
+                        aw.qmc.xaxistosm()
+                    if aw.qmc.projectFlag:
+                        aw.qmc.viewProjection()
+                    if aw.qmc.background and aw.qmc.backgroundReproduce:
+                        aw.qmc.playbackevent()
+                    # autodetect CHARGE event
+                    # only if BT > 203F/95C
+                    if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
+                        ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
+                        if aw.BTbreak(length_of_qmc_timex - 1):
+                            # we found a BT break at the current index minus 2
+                            aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
+                    # autodetect DROP event
+                    # only if 9min into roast and BT>180C/356F
+                    elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                        length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
+                        ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
+                        if aw.BTbreak(length_of_qmc_timex - 1):
+                            # we found a BT break at the current index minus 2
+                            aw.qmc.autoDropIdx = length_of_qmc_timex - 3
+                if local_flagstart:
+                    #check alarms 
+                    # check for TP event if already CHARGEed and not yet recognized
+                    if not aw.qmc.TPalarmtimeindex and len(aw.qmc.alarmflag) > 0 and aw.qmc.timeindex[0] > -1 and self.checkTPalarmtime():
+                        aw.qmc.TPalarmtimeindex = len(aw.qmc.timex)-1
+                    #check for each alarm that was not yet triggered
+                    for i in range(len(aw.qmc.alarmflag)):
+                        #if alarm on, and not triggered, and time is after set time:
+                        # qmc.alarmtime = -1 (None == ON)
+                        # qmc.alarmtime = 0 (CHARGE)
+                        # ..
+                        # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
+                        # 1) the alarm is START
+                        # 2) the alarm was not triggered yet
+                        # 3) the alarm From is ON
+                        # 4) the alarm From is CHARGE
+                        # 5) the alarm From is any other event but TP
+                        # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
+                        if aw.qmc.alarmflag[i] \
+                          and not aw.qmc.alarmstate[i] \
+                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
+                          and ((aw.qmc.alarmtime[i] < 0) \
+                          or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
+                          or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                          or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
+                                and aw.qmc.timeindex[1] < 1 and aw.qmc.TPalarmtimeindex)):
+                            #########
+                            # check alarmoffset (time after From event):
+                            if aw.qmc.alarmoffset[i] > 0:
+                                alarm_time = aw.qmc.timeclock.elapsed()/1000.
+                                if aw.qmc.alarmtime[i] < 0: # time after START
+                                    pass # the alarm_time is the clock time
+                                elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
+                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
+                                elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
+                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
+                                elif aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
+                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
+                                if alarm_time >= aw.qmc.alarmoffset[i]:
                                     aw.qmc.temporaryalarmflag = i
+                            #########
+                            # check alarmtemp:
+                            alarm_temp = None
+                            if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
+                                alarm_temp = aw.qmc.delta1[-1]
+                            elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
+                                alarm_temp = aw.qmc.delta2[-1]
+                            elif aw.qmc.alarmsource[i] == 0:                      #check ET
+                                alarm_temp = aw.qmc.temp1[-1]
+                            elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                                alarm_temp = aw.qmc.temp2[-1]
+                            elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
+                                if (aw.qmc.alarmsource[i])%2==0:
+                                    alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                else:
+                                    alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                            alarm_limit = aw.qmc.alarmtemperature[i]
+                            if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                                aw.qmc.temporaryalarmflag = i
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
             else:
@@ -17568,6 +17579,8 @@ class serialport(object):
         #list of comm ports available after Scan
         self.commavailable = []
         ##### SPECIAL METER FLAGS ########
+        #stores the Phidget TemperatureSensor object (None if not initialized)
+        self.PhidgetTemperatureSensor = None
         #stores the id of the meter HH506RA as a string
         self.HH506RAid = "X"
         #select PID type that controls the roaster.
@@ -17624,7 +17637,10 @@ class serialport(object):
                                    self.AmprobeTMD56,       #31
                                    self.ARDUINOTC4_56,      #32
                                    self.MODBUS_34,          #33
-                                   self.HH806W              #34
+                                   self.PHIDGET1048,        #34
+                                   self.PHIDGET1048_34,     #35
+                                   self.PHIDGET1048_AT,     #36
+                                   self.HH806W              #37
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -17862,6 +17878,21 @@ class serialport(object):
     def HH806W(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.HH806Wtemperature()
+        return tx,t2,t1
+
+    def PHIDGET1048(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.PHIDGET1048temperature(0)
+        return tx,t2,t1
+        
+    def PHIDGET1048_34(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.PHIDGET1048temperature(1)
+        return tx,t2,t1
+
+    def PHIDGET1048_AT(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.PHIDGET1048temperature(2)
         return tx,t2,t1
 
     def MODBUS(self):
@@ -18578,6 +18609,72 @@ class serialport(object):
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("CENTER309 :" + settings + " || Tx = " + cmd2str(binascii.hexlify(command)) + " || Rx = " + cmd2str((binascii.hexlify(r))))
+
+    # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
+    def PHIDGET1048temperature(self,mode=0):
+        try:
+            if self.PhidgetTemperatureSensor == None:
+                self.PhidgetTemperatureSensor = Phidget1048TemperatureSensor()
+                if self.PhidgetTemperatureSensor.isAttached():                    
+                    self.PhidgetTemperatureSensor.openPhidget()
+                else:
+                    try: 
+                        self.PhidgetTemperatureSensor.openPhidget()
+                        self.PhidgetTemperatureSensor.waitForAttach(500) 
+                        aw.sendmessage(QApplication.translate("Message","PHIDGET1048 attached",None, QApplication.UnicodeUTF8))                       
+                    except:
+                        try:
+                            self.PhidgetTemperatureSensor.closePhidget()
+                        except:
+                            pass
+                        aw.sendmessage(QApplication.translate("Message","PHIDGET1048 not attached",None, QApplication.UnicodeUTF8))
+            if self.PhidgetTemperatureSensor and not self.PhidgetTemperatureSensor.isAttached():
+                try:
+                    self.PhidgetTemperatureSensor.closePhidget()
+                except:
+                    pass
+                self.PhidgetTemperatureSensor = None
+            if self.PhidgetTemperatureSensor != None:
+                if mode == 0:
+                    probe1 = probe2 = -1
+                    try:
+                        probe1 = self.PhidgetTemperatureSensor.getTemperature(0)
+                    except:
+                        pass
+                    try:
+                        probe2 = self.PhidgetTemperatureSensor.getTemperature(1)
+                    except:
+                        pass
+                	return probe1, probe2
+                elif mode == 1:
+                    probe3 = probe4 = -1
+                    try:
+                        probe3 = self.PhidgetTemperatureSensor.getTemperature(2)
+                    except:
+                        pass
+                    try:
+                        probe4 = self.PhidgetTemperatureSensor.getTemperature(3)
+                    except:
+                        pass
+                    return probe3, probe4
+                elif mode == 2:
+                    at = self.PhidgetTemperatureSensor.getAmbientTemperature()
+                    return -1, at
+                else:
+                    return -1,-1
+            else:
+                return -1,-1
+        except Exception as ex:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
+            try:
+                self.PhidgetTemperatureSensor.closePhidget()
+            except:
+                pass
+            self.PhidgetTemperatureSensor = None
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
 
     def ARDUINOTC4temperature(self):
         try:
@@ -21168,8 +21265,23 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 33 is +MODBUS_34 but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Omega HH806W":
+                elif meter == "Phidget 1048":
                     aw.qmc.device = 34
+                    #aw.ser.comport = "COM11"
+                    aw.ser.baudrate = 19200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'E'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1
+                    message = QApplication.translate("Message","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                ##########################
+                ####  DEVICE 35 is +Phidget 1048_34 but +DEVICE cannot be set as main device
+                ##########################
+                ##########################
+                ####  DEVICE 36 is +Phidget 1048_AT but +DEVICE cannot be set as main device
+                ##########################
+                elif meter == "Omega HH806W":
+                    aw.qmc.device = 37
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -21179,7 +21291,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
         # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
         # - add an elif entry above to specify the default serial settings                    
-                # ensure that by selecting a real device, the initial sampling rate is set to 5s
+                # ensure that by selecting a real device, the initial sampling rate is set to 3s
                 if meter != "NONE":
                     if aw.qmc.delay < 3000:
                         aw.qmc.delay = 3000
@@ -21190,7 +21302,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 #map device index to a setting mode (chose the one that matches the device)
         # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
         # - add an entry to devsettings below (and potentially to ssettings above)                  
-                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,8]  #0-34
+                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,1,1,1,8]  #0-34
                 #init serial settings of extra devices
                 for i in range(len(aw.qmc.extradevices)):
                     dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
