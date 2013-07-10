@@ -2909,7 +2909,8 @@ class tgraphcanvas(FigureCanvas):
     def disconnectProbes(self):
         if aw.ser.PhidgetTemperatureSensor:
             try:
-                self.PhidgetTemperatureSensor.closePhidget()
+                aw.ser.PhidgetTemperatureSensor.closePhidget()
+                aw.ser.PhidgetTemperatureSensor = None
             except:
                 pass
 
@@ -18613,52 +18614,54 @@ class serialport(object):
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
     def PHIDGET1048temperature(self,mode=0):
         try:
-            if self.PhidgetTemperatureSensor == None:
-                self.PhidgetTemperatureSensor = Phidget1048TemperatureSensor()
-                if self.PhidgetTemperatureSensor.isAttached():                    
-                    self.PhidgetTemperatureSensor.openPhidget()
+            if aw.ser.PhidgetTemperatureSensor == None:
+                aw.ser.PhidgetTemperatureSensor = Phidget1048TemperatureSensor()
+                libtime.sleep(.1)
+                if aw.ser.PhidgetTemperatureSensor.isAttached():
+                    aw.ser.PhidgetTemperatureSensor.openPhidget()
                 else:
                     try: 
-                        self.PhidgetTemperatureSensor.openPhidget()
-                        self.PhidgetTemperatureSensor.waitForAttach(500) 
+                        aw.ser.PhidgetTemperatureSensor.openPhidget()                
+                        libtime.sleep(.1)
+                        aw.ser.PhidgetTemperatureSensor.waitForAttach(500) 
                         aw.sendmessage(QApplication.translate("Message","PHIDGET1048 attached",None, QApplication.UnicodeUTF8))                       
                     except:
                         try:
-                            self.PhidgetTemperatureSensor.closePhidget()
+                            aw.ser.PhidgetTemperatureSensor.closePhidget()
                         except:
                             pass
                         aw.sendmessage(QApplication.translate("Message","PHIDGET1048 not attached",None, QApplication.UnicodeUTF8))
-            if self.PhidgetTemperatureSensor and not self.PhidgetTemperatureSensor.isAttached():
+            if aw.ser.PhidgetTemperatureSensor and not aw.ser.PhidgetTemperatureSensor.isAttached():
                 try:
-                    self.PhidgetTemperatureSensor.closePhidget()
+                    aw.ser.PhidgetTemperatureSensor.closePhidget()
                 except:
                     pass
-                self.PhidgetTemperatureSensor = None
-            if self.PhidgetTemperatureSensor != None:
+                aw.ser.PhidgetTemperatureSensor = None
+            if aw.ser.PhidgetTemperatureSensor != None:
                 if mode == 0:
                     probe1 = probe2 = -1
                     try:
-                        probe1 = self.PhidgetTemperatureSensor.getTemperature(0)
+                        probe1 = aw.ser.PhidgetTemperatureSensor.getTemperature(0)
                     except:
                         pass
                     try:
-                        probe2 = self.PhidgetTemperatureSensor.getTemperature(1)
+                        probe2 = aw.ser.PhidgetTemperatureSensor.getTemperature(1)
                     except:
                         pass
                 	return probe1, probe2
                 elif mode == 1:
                     probe3 = probe4 = -1
                     try:
-                        probe3 = self.PhidgetTemperatureSensor.getTemperature(2)
+                        probe3 = aw.ser.PhidgetTemperatureSensor.getTemperature(2)
                     except:
                         pass
                     try:
-                        probe4 = self.PhidgetTemperatureSensor.getTemperature(3)
+                        probe4 = aw.ser.PhidgetTemperatureSensor.getTemperature(3)
                     except:
                         pass
                     return probe3, probe4
                 elif mode == 2:
-                    at = self.PhidgetTemperatureSensor.getAmbientTemperature()
+                    at = aw.ser.PhidgetTemperatureSensor.getAmbientTemperature()
                     return -1, at
                 else:
                     return -1,-1
@@ -18668,10 +18671,10 @@ class serialport(object):
             #import traceback
             #traceback.print_exc(file=sys.stdout)
             try:
-                self.PhidgetTemperatureSensor.closePhidget()
+                aw.ser.PhidgetTemperatureSensor.closePhidget()
             except:
                 pass
-            self.PhidgetTemperatureSensor = None
+            aw.ser.PhidgetTemperatureSensor = None
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
