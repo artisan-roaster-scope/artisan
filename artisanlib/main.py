@@ -4180,6 +4180,7 @@ class tgraphcanvas(FigureCanvas):
                 self.connect_designer()
                 return
             elif reply == QMessageBox.Cancel:
+                aw.designerAction.setChecked(False)
                 return #exit
 
         #if no profile found
@@ -5362,36 +5363,35 @@ class SampleThread(QThread):
                         for i in range(nxdevices):   
                             extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
                             # ignore reading if both are off, otherwise process them
-                            if extrat1 != -1 or extrat2 != -1:
-                                if len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                                extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
-                                if len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                                extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
-                                if local_flagstart:
-                                    aw.qmc.extratemp1[i].append(float(extrat1))
-                                    aw.qmc.extratemp2[i].append(float(extrat2))
-                                    aw.qmc.extratimex[i].append(extratx)
-                                    # update extra lines
-                                    if aw.extraCurveVisibility1[i]:
-                                        aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
-                                        xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                    if aw.extraCurveVisibility2[i]:
-                                        aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
-                                        xtra_dev_lines2 = xtra_dev_lines2 + 1
+                            if len(aw.qmc.extramathexpression1[i]):
+                                extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                            extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
+                            if len(aw.qmc.extramathexpression2[i]):
+                                extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                            extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
+                            if local_flagstart:
+                                aw.qmc.extratemp1[i].append(float(extrat1))
+                                aw.qmc.extratemp2[i].append(float(extrat2))
+                                aw.qmc.extratimex[i].append(extratx)
+                                # update extra lines
+                                if aw.extraCurveVisibility1[i]:
+                                    aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                if aw.extraCurveVisibility2[i]:
+                                    aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
+                            else:
+                                # we do not record, so we just replace the old last value
+                                if len(aw.qmc.extratemp1[i]) > 0:
+                                    aw.qmc.extratemp1[i][-1] = float(extrat1)
                                 else:
-                                    # we do not record, so we just replace the old last value
-                                    if len(aw.qmc.extratemp1[i]) > 0:
-                                        aw.qmc.extratemp1[i][-1] = float(extrat1)
-                                    else:
-                                        aw.qmc.extratemp1[i].append(float(extrat1))
-                                    if len(aw.qmc.extratemp2[i]) > 0:
-                                        aw.qmc.extratemp2[i][-1] = float(extrat2)
-                                    else:
-                                        aw.qmc.extratemp2[i].append(float(extrat2))
-                                    if len(aw.qmc.extratimex[i]) <= 0:
-                                        aw.qmc.extratimex[i].append(extratx)
+                                    aw.qmc.extratemp1[i].append(float(extrat1))
+                                if len(aw.qmc.extratemp2[i]) > 0:
+                                    aw.qmc.extratemp2[i][-1] = float(extrat2)
+                                else:
+                                    aw.qmc.extratemp2[i].append(float(extrat2))
+                                if len(aw.qmc.extratimex[i]) <= 0:
+                                    aw.qmc.extratimex[i].append(extratx)
                     #ERROR FOUND
                     else:
                         lengths = [les,led,let]
@@ -7088,54 +7088,67 @@ class ApplicationWindow(QMainWindow):
     #actions: 0 = None; 1= Serial Command; 2= Call program; 3= Multiple Event; 4= Modbus Command; 5=DTA Command
     def eventaction(self,action,cmd):
         if action:
-            cmd_str = str(cmd)
-            if action == 1:
-                cmd_str_bin = ""
-                #example a2b_uu("Hello") sends Hello in binary format instead of ASCII
-                if "a2b_uu" in cmd_str:
-                    cmd_str = cmd_str[(len("a2b_uu")+1):][:1]  # removes function-name + char ( and )
-                    cmd_str_bin = binascii.a2b_uu(cmd_str)
-                if cmd_str_bin:
-                    self.ser.sendTXcommand(cmd_str_bin)
-                else:
-                    self.ser.sendTXcommand(cmd_str)
-                    if aw.seriallogflag:
-                        settings = str(self.ser.comport) + "," + str(self.ser.baudrate) + "," + str(self.ser.bytesize)+ "," + str(self.ser.parity) + "," + str(self.ser.stopbits) + "," + str(self.ser.timeout)
-                        aw.addserial("Serial Action :" + settings + " || Tx = " + str(cmd_str))
-            elif action == 2:
-                try:
-                    QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
-                except Exception as e:
-                    _, _, exc_tb = sys.exc_info()
-                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " eventaction() %1").arg(str(e)),exc_tb.tb_lineno)
-            elif action == 3:
-                for i in range(len(cmd_str)):
-                    buttonnumber = int(cmd_str[i])-1
-                    if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
-                        self.recordextraevent(buttonnumber)
-            elif action == 4:
-                if cmd_str.startswith('write'):
+            try:
+                cmd_str = str(cmd)
+                if action == 1:
+                    cmd_str_bin = ""
+                    #example a2b_uu("Hello") sends Hello in binary format instead of ASCII
+                    if "a2b_uu" in cmd_str:
+                        cmd_str = cmd_str[(len("a2b_uu")+1):][:1]  # removes function-name + char ( and )
+                        cmd_str_bin = binascii.a2b_uu(cmd_str)
+                    self.samplingsemaphore.acquire(1)
+                    if cmd_str_bin:
+                        self.ser.sendTXcommand(cmd_str_bin)
+                    else:
+                        self.ser.sendTXcommand(cmd_str)
+                        if aw.seriallogflag:
+                            settings = str(self.ser.comport) + "," + str(self.ser.baudrate) + "," + str(self.ser.bytesize)+ "," + str(self.ser.parity) + "," + str(self.ser.stopbits) + "," + str(self.ser.timeout)
+                            aw.addserial("Serial Action :" + settings + " || Tx = " + str(cmd_str))
+                    if aw.qmc.samplingsemaphore.available() < 1:
+                        aw.qmc.samplingsemaphore.release(1)
+                elif action == 2:
                     try:
-                        cmds = eval(cmd_str[len('write'):])
-                        if isinstance(cmds,tuple):
-                            if len(cmds) == 3 and not isinstance(cmds[0],list):
-                                # cmd has format "write(s,r,v)"
+                        QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
+                    except Exception as e:
+                        _, _, exc_tb = sys.exc_info()
+                        aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " eventaction() %1").arg(str(e)),exc_tb.tb_lineno)
+                elif action == 3:
+                    for i in range(len(cmd_str)):
+                        buttonnumber = int(cmd_str[i])-1
+                        if self.extraeventsactions[buttonnumber] != 3:   #avoid calling other buttons with multiple actions to avoid possible infinite loops
+                            self.recordextraevent(buttonnumber)
+                elif action == 4:
+                    if cmd_str.startswith('write'):
+                        self.samplingsemaphore.acquire(1)
+                        try:
+                            cmds = eval(cmd_str[len('write'):])
+                            if isinstance(cmds,tuple):
+                                if len(cmds) == 3 and not isinstance(cmds[0],list):
+                                    # cmd has format "write(s,r,v)"
+                                    aw.modbus.writeSingleRegister(*cmds)
+                                # cmd has format "write([s,r,v],..,[s,r,v])"
+                                for cmd in cmds:
+                                    aw.modbus.writeSingleRegister(*cmd)
+                            else:
+                                # cmd has format "write([s,r,v])"
                                 aw.modbus.writeSingleRegister(*cmds)
-                            # cmd has format "write([s,r,v],..,[s,r,v])"
-                            for cmd in cmds:
-                                aw.modbus.writeSingleRegister(*cmd)
-                        else:
-                            # cmd has format "write([s,r,v])"
-                            aw.modbus.writeSingleRegister(*cmds)
+                        except:
+                            pass
+                        if aw.qmc.samplingsemaphore.available() < 1:
+                            aw.qmc.samplingsemaphore.release(1)
+                elif action == 5:
+                    self.samplingsemaphore.acquire(1)
+                    try:
+                        DTAvalue=cmd_str.split(':')[1]
+                        DTAaddress=cmd_str.split(':')[0]
+                        aw.dtapid.writeDTE(DTAvalue,DTAaddress)
                     except:
                         pass
-            elif action == 5:
-                try:
-                    DTAvalue=cmd_str.split(':')[1]
-                    DTAaddress=cmd_str.split(':')[0]
-                    aw.dtapid.writeDTE(DTAvalue,DTAaddress)
-                except:
-                    pass
+                    if aw.qmc.samplingsemaphore.available() < 1:
+                        aw.qmc.samplingsemaphore.release(1)
+            finally:
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
                     
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     def moveslider(self,n,v):
@@ -17889,12 +17902,12 @@ class serialport(object):
     def PHIDGET1048_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(1)
-        return tx,t2,t1
+        return tx,t1,t2
 
     def PHIDGET1048_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(2)
-        return tx,t2,t1
+        return tx,t1,t2
 
     def MODBUS(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -18648,7 +18661,7 @@ class serialport(object):
                         probe2 = aw.ser.PhidgetTemperatureSensor.getTemperature(1)
                     except:
                         pass
-                	return probe1, probe2
+                    return probe1, probe2
                 elif mode == 1:
                     probe3 = probe4 = -1
                     try:
@@ -18662,14 +18675,14 @@ class serialport(object):
                     return probe3, probe4
                 elif mode == 2:
                     at = aw.ser.PhidgetTemperatureSensor.getAmbientTemperature()
-                    return -1, at
+                    return at,-1
                 else:
                     return -1,-1
             else:
                 return -1,-1
         except Exception as ex:
-            #import traceback
-            #traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             try:
                 aw.ser.PhidgetTemperatureSensor.closePhidget()
             except:
