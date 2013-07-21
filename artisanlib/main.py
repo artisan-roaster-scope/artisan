@@ -95,6 +95,7 @@ except ImportError:
     figureoptions = None
     
 from Phidgets.Devices.TemperatureSensor import TemperatureSensor as Phidget1048TemperatureSensor
+from Phidgets.Devices.Bridge import Bridge as Phidget1046TemperatureSensor
 
 import minimalmodbus
 
@@ -107,6 +108,8 @@ def dependencies_for_myprogram():
     import PyQt4.QtXml
 
 if sys.version < '3':
+    def uchr(x):
+        return unichr(x)
     def o(x): # converts char to byte
         return ord(x)
     def u(x): # convert to unicode string
@@ -131,6 +134,8 @@ if sys.version < '3':
     def cmd2str(c):
         return c
 else:
+    def uchr(x):
+        return chr(x)
     def o(x): # converts char to byte
         return x
     def u(x): # convert to unicode string
@@ -457,7 +462,9 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget 1048",          #34
                        "+Phidget 1048_34",      #35
                        "+Phidget 1048_AT",      #36
-                       "-Omega HH806W"          #37 NOT WORKING 
+                       "Phidget 1046",          #37
+                       "+Phidget 1046_34",      #38
+                       "-Omega HH806W"          #39 NOT WORKING 
                        ]
 
         #extra devices
@@ -2913,6 +2920,12 @@ class tgraphcanvas(FigureCanvas):
                 aw.ser.PhidgetTemperatureSensor = None
             except:
                 pass
+        if aw.ser.PhidgetBridgeSensor:
+            try:
+                aw.ser.PhidgetBridgeSensor.closePhidget()
+                aw.ser.PhidgetBridgeSensor = None
+            except:
+                pass
 
     #Turns ON/OFF flag self.flagon to read and print values. Called from push button_1.
     def ToggleMonitor(self):
@@ -4044,7 +4057,7 @@ class tgraphcanvas(FigureCanvas):
                 pad = max(0,len(self.timex) - startindex - len(x))
                 xx = numpy.append(numpy.append([None]*max(0,startindex), x), [None]*pad)
                 if deltacurvep:
-                	self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
+                    self.delta_ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 else:
                     self.ax.plot(self.timex, xx, linestyle = '--', linewidth=3)
                 self.fig.canvas.draw()
@@ -7096,7 +7109,7 @@ class ApplicationWindow(QMainWindow):
                     if "a2b_uu" in cmd_str:
                         cmd_str = cmd_str[(len("a2b_uu")+1):][:1]  # removes function-name + char ( and )
                         cmd_str_bin = binascii.a2b_uu(cmd_str)
-                    self.samplingsemaphore.acquire(1)
+#                    self.samplingsemaphore.acquire(1)
                     if cmd_str_bin:
                         self.ser.sendTXcommand(cmd_str_bin)
                     else:
@@ -7104,8 +7117,8 @@ class ApplicationWindow(QMainWindow):
                         if aw.seriallogflag:
                             settings = str(self.ser.comport) + "," + str(self.ser.baudrate) + "," + str(self.ser.bytesize)+ "," + str(self.ser.parity) + "," + str(self.ser.stopbits) + "," + str(self.ser.timeout)
                             aw.addserial("Serial Action :" + settings + " || Tx = " + str(cmd_str))
-                    if aw.qmc.samplingsemaphore.available() < 1:
-                        aw.qmc.samplingsemaphore.release(1)
+#                    if aw.qmc.samplingsemaphore.available() < 1:
+#                        aw.qmc.samplingsemaphore.release(1)
                 elif action == 2:
                     try:
                         QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
@@ -7119,7 +7132,7 @@ class ApplicationWindow(QMainWindow):
                             self.recordextraevent(buttonnumber)
                 elif action == 4:
                     if cmd_str.startswith('write'):
-                        self.samplingsemaphore.acquire(1)
+#                        self.samplingsemaphore.acquire(1)
                         try:
                             cmds = eval(cmd_str[len('write'):])
                             if isinstance(cmds,tuple):
@@ -7134,21 +7147,23 @@ class ApplicationWindow(QMainWindow):
                                 aw.modbus.writeSingleRegister(*cmds)
                         except:
                             pass
-                        if aw.qmc.samplingsemaphore.available() < 1:
-                            aw.qmc.samplingsemaphore.release(1)
+#                        if aw.qmc.samplingsemaphore.available() < 1:
+#                            aw.qmc.samplingsemaphore.release(1)
                 elif action == 5:
-                    self.samplingsemaphore.acquire(1)
+#                    self.samplingsemaphore.acquire(1)
                     try:
                         DTAvalue=cmd_str.split(':')[1]
                         DTAaddress=cmd_str.split(':')[0]
                         aw.dtapid.writeDTE(DTAvalue,DTAaddress)
                     except:
                         pass
-                    if aw.qmc.samplingsemaphore.available() < 1:
-                        aw.qmc.samplingsemaphore.release(1)
-            finally:
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
+#                    if aw.qmc.samplingsemaphore.available() < 1:
+#                        aw.qmc.samplingsemaphore.release(1)
+#            finally:
+#                if aw.qmc.samplingsemaphore.available() < 1:
+#                    aw.qmc.samplingsemaphore.release(1)
+            except:
+                pass
                     
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     def moveslider(self,n,v):
@@ -11019,14 +11034,14 @@ $cupping_notes
 
     def helpAbout(self):
         coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
-        contributors = u("<br>") + unichr(199) + u("etin Barut, Marcio Carnerio, Bradley Collins,")
+        contributors = u("<br>") + uchr(199) + u("etin Barut, Marcio Carnerio, Bradley Collins,")
         contributors += u("<br>Sebastien Delgrande, Kalle Deligeorgakis, Jim Gall,")
         contributors += u("<br>Frans Goddijn, Rich Helms, Kyle Iseminger, Ingo,")
         contributors += u("<br>Savvas Kiretsis, Lukas Kolbe, David Lahoz,")
         contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
-        contributors += u("<br>David Trebilcock, Zolt") + unichr(225) + u("n Kis")
+        contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis")
         box = QMessageBox(self)
         #create a html QString
         box.about(self,
@@ -17595,6 +17610,8 @@ class serialport(object):
         ##### SPECIAL METER FLAGS ########
         #stores the Phidget TemperatureSensor object (None if not initialized)
         self.PhidgetTemperatureSensor = None
+        #stores the Phidget BridgeSensor object (None if not initialized)
+        self.PhidgetBridgeSensor = None
         #stores the id of the meter HH506RA as a string
         self.HH506RAid = "X"
         #select PID type that controls the roaster.
@@ -17654,7 +17671,9 @@ class serialport(object):
                                    self.PHIDGET1048,        #34
                                    self.PHIDGET1048_34,     #35
                                    self.PHIDGET1048_AT,     #36
-                                   self.HH806W              #37
+                                   self.PHIDGET1046,        #37
+                                   self.PHIDGET1046_34,     #38
+                                   self.HH806W              #39
                                    ]
         #used only in devices that also control the roaster like PIDs or arduino (possible to recieve asynchrous comands from GUI commands and thread sample()). 
         self.COMsemaphore = QSemaphore(1)
@@ -17907,6 +17926,16 @@ class serialport(object):
     def PHIDGET1048_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(2)
+        return tx,t1,t2
+
+    def PHIDGET1046(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.PHIDGET1046temperature(0)
+        return tx,t2,t1
+        
+    def PHIDGET1046_34(self):
+        tx = aw.qmc.timeclock.elapsed()/1000.
+        t2,t1 = self.PHIDGET1046temperature(1)
         return tx,t1,t2
 
     def MODBUS(self):
@@ -18637,13 +18666,13 @@ class serialport(object):
                         aw.ser.PhidgetTemperatureSensor.openPhidget()                
                         libtime.sleep(.1)
                         aw.ser.PhidgetTemperatureSensor.waitForAttach(500) 
-                        aw.sendmessage(QApplication.translate("Message","PHIDGET1048 attached",None, QApplication.UnicodeUTF8))                       
+                        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None, QApplication.UnicodeUTF8))                       
                     except:
                         try:
                             aw.ser.PhidgetTemperatureSensor.closePhidget()
                         except:
                             pass
-                        aw.sendmessage(QApplication.translate("Message","PHIDGET1048 not attached",None, QApplication.UnicodeUTF8))
+                        aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input not attached",None, QApplication.UnicodeUTF8))
             if aw.ser.PhidgetTemperatureSensor and not aw.ser.PhidgetTemperatureSensor.isAttached():
                 try:
                     aw.ser.PhidgetTemperatureSensor.closePhidget()
@@ -18681,8 +18710,8 @@ class serialport(object):
             else:
                 return -1,-1
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             try:
                 aw.ser.PhidgetTemperatureSensor.closePhidget()
             except:
@@ -18692,6 +18721,77 @@ class serialport(object):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1048temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
 
+    # convert the BridgeValue given by the PhidgetBridge to a temperature value assuming a PT100 probe
+    # see http://www.phidgets.com/docs/3175_User_Guide
+    def bridgeValue2PT100(self,bv):
+        bvf = bv / (1000 - bv)
+        return 4750.3 * bvf * bvf + 4615,6 * bvf - 242.615
+
+    # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
+    def PHIDGET1046temperature(self,mode=0):
+        try:
+            if aw.ser.PhidgetBridgeSensor == None:
+                aw.ser.PhidgetBridgeSensor = Phidget1046TemperatureSensor()
+                libtime.sleep(.1)
+                if aw.ser.PhidgetBridgeSensor.isAttached():
+                    aw.ser.PhidgetBridgeSensor.openPhidget()
+                else:
+                    try: 
+                        aw.ser.PhidgetBridgeSensor.openPhidget()                
+                        libtime.sleep(.1)
+                        aw.ser.PhidgetBridgeSensor.waitForAttach(500) 
+                        aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))                       
+                    except:
+                        try:
+                            aw.ser.PhidgetBridgeSensor.closePhidget()
+                        except:
+                            pass
+                        aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input not attached",None, QApplication.UnicodeUTF8))
+            if aw.ser.PhidgetBridgeSensor and not aw.ser.PhidgetBridgeSensor.isAttached():
+                try:
+                    aw.ser.PhidgetBridgeSensor.closePhidget()
+                except:
+                    pass
+                aw.ser.PhidgetBridgeSensor = None
+            if aw.ser.PhidgetBridgeSensor != None:
+                if mode == 0:
+                    probe1 = probe2 = -1
+                    try:
+                        probe1 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(0))
+                    except:
+                        pass
+                    try:
+                        probe2 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(1))
+                    except:
+                        pass
+                    return probe1, probe2
+                elif mode == 1:
+                    probe3 = probe4 = -1
+                    try:
+                        probe3 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(2))
+                    except:
+                        pass
+                    try:
+                        probe4 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(3))
+                    except:
+                        pass
+                    return probe3, probe4
+                else:
+                    return -1,-1
+            else:
+                return -1,-1
+        except Exception as ex:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            try:
+                aw.ser.PhidgetBridgeSensor.closePhidget()
+            except:
+                pass
+            aw.ser.PhidgetBridgeSensor = None
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " PHIDGET1046temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
+            return -1,-1
+            
     def ARDUINOTC4temperature(self):
         try:
             command = ""
@@ -20028,7 +20128,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
-        if devid != 29 and devid != 33: # hide serial confs for MODBUS devices
+        if not(devid in [29,33,34,37]): # hide serial confs for MODBUS and Phidget devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -20680,7 +20780,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 for i in range(nddevices):
                     typeComboBox =  QComboBox()
                     typeComboBox.addItems(sorted(devices))
-                    typeComboBox.setCurrentIndex(devices.index(aw.qmc.devices[aw.qmc.extradevices[i]-1]))
+                    try:
+                        typeComboBox.setCurrentIndex(devices.index(aw.qmc.devices[aw.qmc.extradevices[i]-1]))
+                    except:
+                        pass
                     color1Button = QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
                     color1Button.setFocusPolicy(Qt.NoFocus)
                     self.connect(color1Button, SIGNAL("clicked()"),lambda l = 1, c = i: self.setextracolor(l,c))
@@ -20899,7 +21002,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 name2edit = self.devicetable.cellWidget(i,4)
                 mexpr1edit = self.devicetable.cellWidget(i,5)
                 mexpr2edit = self.devicetable.cellWidget(i,6)
-                aw.qmc.extradevices[i] = aw.qmc.devices.index(str(typecombobox.currentText())) + 1
+                try:
+                    aw.qmc.extradevices[i] = aw.qmc.devices.index(str(typecombobox.currentText())) + 1
+                except:
+                    aw.qmc.extradevices[i] = 0
                 aw.qmc.extraname1[i] = str(name1edit.text())
                 aw.qmc.extraname2[i] = str(name2edit.text())
                 aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "</b>")
@@ -21256,7 +21362,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'N'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1. Now, chose Modbus serial port", None, QApplication.UnicodeUTF8).arg(meter)
                 elif meter == "VOLTCRAFT K201":
                     aw.qmc.device = 30
                     #aw.ser.comport = "COM4"
@@ -21289,15 +21395,27 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.parity= 'E'
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
-                    message = QApplication.translate("Message","Device set to %1, which is equivalent to Omega HH806AU. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
                 ####  DEVICE 35 is +Phidget 1048_34 but +DEVICE cannot be set as main device
                 ##########################
                 ##########################
                 ####  DEVICE 36 is +Phidget 1048_AT but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Omega HH806W":
+                elif meter == "Phidget 1046":
                     aw.qmc.device = 37
+                    #aw.ser.comport = "COM11"
+                    aw.ser.baudrate = 19200
+                    aw.ser.bytesize = 8
+                    aw.ser.parity= 'E'
+                    aw.ser.stopbits = 1
+                    aw.ser.timeout = 1
+                    message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
+                ##########################
+                ####  DEVICE 38 is +Phidget 1046_34 but +DEVICE cannot be set as main device
+                ##########################                
+                elif meter == "Omega HH806W":
+                    aw.qmc.device = 39
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 38400
                     aw.ser.bytesize = 8
@@ -21318,30 +21436,31 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 #map device index to a setting mode (chose the one that matches the device)
         # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
         # - add an entry to devsettings below (and potentially to ssettings above)                  
-                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,1,1,1,8]  #0-34
+                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,1,1,1,1,1,8]  #0-39
                 #init serial settings of extra devices
                 for i in range(len(aw.qmc.extradevices)):
-                    dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
-                    if i < len(aw.extrabaudrate):
-                        aw.extrabaudrate[i] = dsettings[0]
-                    else:
-                        aw.extrabaudrate.append(dsettings[0])
-                    if i < len(aw.extrabytesize):
-                        aw.extrabytesize[i] = dsettings[1]
-                    else:
-                        aw.extrabytesize.append(dsettings[1])
-                    if i < len(aw.extraparity): 
-                        aw.extraparity[i] = dsettings[2]
-                    else:
-                        aw.extraparity.append(dsettings[2])
-                    if i < len(aw.extrastopbits):
-                        aw.extrastopbits[i] = dsettings[3]
-                    else:
-                        aw.extrastopbits.append(dsettings[3])
-                    if i < len(aw.extratimeout):
-                        aw.extratimeout[i] = dsettings[4]
-                    else:
-                        aw.extratimeout.append(dsettings[4])
+                    if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
+                        dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
+                        if i < len(aw.extrabaudrate):
+                            aw.extrabaudrate[i] = dsettings[0]
+                        else:
+                            aw.extrabaudrate.append(dsettings[0])
+                        if i < len(aw.extrabytesize):
+                            aw.extrabytesize[i] = dsettings[1]
+                        else:
+                            aw.extrabytesize.append(dsettings[1])
+                        if i < len(aw.extraparity): 
+                            aw.extraparity[i] = dsettings[2]
+                        else:
+                            aw.extraparity.append(dsettings[2])
+                        if i < len(aw.extrastopbits):
+                            aw.extrastopbits[i] = dsettings[3]
+                        else:
+                            aw.extrastopbits.append(dsettings[3])
+                        if i < len(aw.extratimeout):
+                            aw.extratimeout[i] = dsettings[4]
+                        else:
+                            aw.extratimeout.append(dsettings[4])
                 aw.button_10.setVisible(False)
                 aw.button_12.setVisible(False)
                 aw.button_13.setVisible(False)
@@ -21368,7 +21487,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.sendmessage(message)
             #open serial conf Dialog
             #if device is not None or not external-program (don't need serial settings config)
-            if aw.qmc.device != 18 and aw.qmc.device != 27:
+            if not(aw.qmc.device in [18,27,34,37]):
                 aw.setcommport()
             self.close()
         except Exception as e:

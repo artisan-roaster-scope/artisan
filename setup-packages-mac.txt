@@ -11,6 +11,7 @@ o scipy 0.12.0
 o matplotlib 1.2.1
 o pyaudio 0.2.7
 o minimalmodbus 0.4
+o Phidgets Python 2.1.8
 
 o modulegraph >0.10.4 trunk (21.4.2013)
 o distribute 0.6.36
@@ -20,6 +21,14 @@ o py2app >0.7.3 trunk (21.4.2013)
 
 Upgrade History:
 
+- 2013-07-20:
+ . XCode 4.5.2 => 4.6.3
+ . Python 2.7.4 => 2.7.5
+ . Python 3.3.1 => 3.3.2
+ . Qt 4.8.4 => 4.8.5
+ . SIP 4.14.5 => 4.14.7
+ . PyQt 4.10.0 => 4.10.2
+ . Phidgets Python 2.1.8
 - 2013-04-21:
  . distribute 0.6.29 => 0.6.36
  . macholib 1.5 => 1.5.1
@@ -159,7 +168,7 @@ new to v2.6:
 
 download and install (only Mac OS X 10.5 - 10.6, 32-bit and 64-bit Intel!!):
 
-qt-mac-opensource-4.8.4.dmg (OS X 10.6+, Cocoa, 64bit only)
+qt-mac-opensource-4.8.5.dmg (OS X 10.6+, Cocoa, 64bit only)
 or
 qt-mac-opensource-5.0.1-clang-offline.dmg (OS X 10.6+, Cocoa, 64bit only)
 
@@ -424,4 +433,11 @@ x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g'
 
 # python3 setup.py build
 # python3 setup.py install
+
+19) Install Phidgets Python
+
+# unzip PhidgetsPython_2.1.8.20130618.zip
+# cd PhidgetsPython
+# python setup.py build
+# python setup.py install
 
