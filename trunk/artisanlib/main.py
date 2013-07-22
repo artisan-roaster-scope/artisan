@@ -18725,7 +18725,7 @@ class serialport(object):
     # see http://www.phidgets.com/docs/3175_User_Guide
     def bridgeValue2PT100(self,bv):
         bvf = bv / (1000 - bv)
-        return 4750.3 * bvf * bvf + 4615,6 * bvf - 242.615
+        return 4750.3 * bvf * bvf + 4615.6 * bvf - 242.615
 
     # mode = 0 for probe 1 and 2; mode = 1 for probe 3 and 4; mode 2 for Ambient Temperature
     def PHIDGET1046temperature(self,mode=0):
@@ -18737,7 +18737,7 @@ class serialport(object):
                     aw.ser.PhidgetBridgeSensor.openPhidget()
                 else:
                     try: 
-                        aw.ser.PhidgetBridgeSensor.openPhidget()                
+                        aw.ser.PhidgetBridgeSensor.openPhidget()
                         libtime.sleep(.1)
                         aw.ser.PhidgetBridgeSensor.waitForAttach(500) 
                         aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input attached",None, QApplication.UnicodeUTF8))                       
@@ -18747,6 +18747,16 @@ class serialport(object):
                         except:
                             pass
                         aw.sendmessage(QApplication.translate("Message","Phidget Bridge 4-input not attached",None, QApplication.UnicodeUTF8))
+                try:
+                    if aw.ser.PhidgetBridgeSensor and aw.ser.PhidgetBridgeSensor.isAttached():
+                        aw.ser.PhidgetBridgeSensor.setEnabled(0, True)
+                        aw.ser.PhidgetBridgeSensor.setEnabled(1, True)
+                        if 38 in aw.qmc.extradevices:
+                            aw.ser.PhidgetBridgeSensor.setEnabled(2, True)
+                            aw.ser.PhidgetBridgeSensor.setEnabled(3, True)
+                        libtime.sleep(.1)
+                except:
+                    pass
             if aw.ser.PhidgetBridgeSensor and not aw.ser.PhidgetBridgeSensor.isAttached():
                 try:
                     aw.ser.PhidgetBridgeSensor.closePhidget()
