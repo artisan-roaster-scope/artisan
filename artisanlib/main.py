@@ -6187,6 +6187,13 @@ class ApplicationWindow(QMainWindow):
         self.languageMenu.addAction(self.HungarianLanguage)
         if locale == "hu":
             self.HungarianLanguage.setChecked(True)
+
+        self.HebrewLanguage = QAction(UIconst.CONF_MENU_HEBREW,self)
+        self.HebrewLanguage.setCheckable(True)
+        self.connect(self.HebrewLanguage,SIGNAL("triggered()"),lambda lang="he":self.changelocale(lang))
+        self.languageMenu.addAction(self.HebrewLanguage)
+        if locale == "he":
+            self.HebrewLanguage.setChecked(True)
             
         
 
