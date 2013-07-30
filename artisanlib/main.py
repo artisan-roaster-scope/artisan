@@ -2142,19 +2142,19 @@ class tgraphcanvas(FigureCanvas):
                         jump -= 10
 
             ##### ET,BT curves
+            if smooth or len(self.stemp1) != len(self.timex):
+                self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
+                if smooth or len(self.stemp2) != len(self.timex):
+                    self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
             if aw.qmc.ETcurve:
                 if aw.qmc.flagon:
                     self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
                 else:
-                    if smooth or len(self.stemp1) != len(self.timex):
-                        self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
                     self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
             if aw.qmc.BTcurve:
                 if aw.qmc.flagon:
                     self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
                 else:
-                    if smooth or len(self.stemp2) != len(self.timex):
-                        self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
                     self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
 
             ##### Extra devices-curves
@@ -2287,14 +2287,16 @@ class tgraphcanvas(FigureCanvas):
                 if recomputeAllDeltas:  
                     tx = numpy.array(self.timex)
                     dtx = numpy.diff(self.timex) / 60.
-                    if aw.qmc.flagon:
+                    if aw.qmc.flagon or len(dtx) + 1 != len(self.stemp1):
                         with numpy.errstate(divide='ignore'):
                             z1 = numpy.diff(self.temp1) / dtx
-                        with numpy.errstate(divide='ignore'):
-                            z2 = numpy.diff(self.temp2) / dtx
                     else:
                         with numpy.errstate(divide='ignore'):
                             z1 = numpy.diff(self.stemp1) / dtx
+                    if aw.qmc.flagon or len(dtx) + 1 != len(self.stemp2):
+                        with numpy.errstate(divide='ignore'):
+                            z2 = numpy.diff(self.temp2) / dtx
+                    else:
                         with numpy.errstate(divide='ignore'):
                             z2 = numpy.diff(self.stemp2) / dtx
                     lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
@@ -17923,7 +17925,7 @@ class serialport(object):
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(0)
-        return tx,t2,t1
+        return tx,t1,t2
         
     def PHIDGET1048_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -17938,7 +17940,7 @@ class serialport(object):
     def PHIDGET1046(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1046temperature(0)
-        return tx,t2,t1
+        return tx,t1,t2
         
     def PHIDGET1046_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
@@ -18691,10 +18693,14 @@ class serialport(object):
                     probe1 = probe2 = -1
                     try:
                         probe1 = aw.ser.PhidgetTemperatureSensor.getTemperature(0)
+                        if aw.qmc.mode == "F":
+                            probe1 = aw.qmc.fromCtoF(probe1)
                     except:
                         pass
                     try:
                         probe2 = aw.ser.PhidgetTemperatureSensor.getTemperature(1)
+                        if aw.qmc.mode == "F":
+                            probe2 = aw.qmc.fromCtoF(probe2)
                     except:
                         pass
                     return probe1, probe2
@@ -18702,15 +18708,21 @@ class serialport(object):
                     probe3 = probe4 = -1
                     try:
                         probe3 = aw.ser.PhidgetTemperatureSensor.getTemperature(2)
+                        if aw.qmc.mode == "F":
+                            probe3 = aw.qmc.fromCtoF(probe3)
                     except:
                         pass
                     try:
                         probe4 = aw.ser.PhidgetTemperatureSensor.getTemperature(3)
+                        if aw.qmc.mode == "F":
+                            probe4 = aw.qmc.fromCtoF(probe4)
                     except:
                         pass
                     return probe3, probe4
                 elif mode == 2:
                     at = aw.ser.PhidgetTemperatureSensor.getAmbientTemperature()
+                    if aw.qmc.mode == "F":
+                        at = aw.qmc.fromCtoF(at)
                     return at,-1
                 else:
                     return -1,-1
@@ -18775,10 +18787,14 @@ class serialport(object):
                     probe1 = probe2 = -1
                     try:
                         probe1 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(0))
+                        if aw.qmc.mode == "F":
+                            probe1 = aw.qmc.fromCtoF(probe1)
                     except:
                         pass
                     try:
                         probe2 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(1))
+                        if aw.qmc.mode == "F":
+                            probe2 = aw.qmc.fromCtoF(probe2)
                     except:
                         pass
                     return probe1, probe2
@@ -18786,10 +18802,14 @@ class serialport(object):
                     probe3 = probe4 = -1
                     try:
                         probe3 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(2))
+                        if aw.qmc.mode == "F":
+                            probe3 = aw.qmc.fromCtoF(probe3)
                     except:
                         pass
                     try:
                         probe4 = self.bridgeValue2PT100(aw.ser.PhidgetBridgeSensor.getBridgeValue(3))
+                        if aw.qmc.mode == "F":
+                            probe4 = aw.qmc.fromCtoF(probe4)
                     except:
                         pass
                     return probe3, probe4
@@ -20313,7 +20333,7 @@ class comportDlg(ArtisanDialog):
                     devicename = aw.qmc.devices[devid-1]
                     device = QTableWidgetItem(devicename)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
-                    if devid != 29 and devid != 33 and devicename[0] != "+": # hide serial confs for MODBUS and "+X" extra devices
+                    if not (devid in [29,33,34,37]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
                         comportComboBox =  QComboBox()
                         comportComboBox.addItems(xports)
                         comportComboBox.setCurrentIndex(xports.index(aw.extracomport[i]))
