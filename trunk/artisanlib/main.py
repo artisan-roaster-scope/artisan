@@ -5869,7 +5869,6 @@ class ApplicationWindow(QMainWindow):
         self.connect(importK204Action,SIGNAL("triggered()"),self.importK204)
         self.importMenu.addAction(importK204Action)
 
-        self.fileMenu.addMenu(self.importMenu)
         self.fileMenu.addSeparator()
 
         self.fileSaveAction = QAction(UIconst.FILE_MENU_SAVE,self)
@@ -5929,7 +5928,7 @@ class ApplicationWindow(QMainWindow):
         self.connect(SVGAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".svg"))
         self.saveGraphMenu.addAction(SVGAction)
         
-        if platf != 'Darwin':
+        if platf != 'Darwin' or not mpl.__version__.startswith("1.2"):
             PDFAction = QAction("PDF...",self)
             self.connect(PDFAction,SIGNAL("triggered()"),lambda _=None : self.saveVectorGraph(".pdf"))
             self.saveGraphMenu.addAction(PDFAction)
@@ -5947,6 +5946,7 @@ class ApplicationWindow(QMainWindow):
         self.fileMenu.addAction(self.printAction)
         
         self.quitAction = QAction(UIconst.FILE_MENU_QUIT,self)
+        self.quitAction.setMenuRole(QAction.QuitRole)
         self.quitAction.setShortcut(QKeySequence.Quit)
         self.connect(self.quitAction,SIGNAL("triggered()"),self.fileQuit)
         self.fileMenu.addAction(self.quitAction)
@@ -6222,6 +6222,7 @@ class ApplicationWindow(QMainWindow):
 
         # HELP menu
         helpAboutAction = QAction(UIconst.HELP_MENU_ABOUT,self)
+        helpAboutAction.setMenuRole(QAction.AboutRole)
         self.connect(helpAboutAction,SIGNAL("triggered()"),self.helpAbout)
         self.helpMenu.addAction(helpAboutAction)
 
@@ -7368,7 +7369,7 @@ class ApplicationWindow(QMainWindow):
 
         #keyboard move keys
         if key == 70: # F SELECTS FULL SCREEN MODE
-            if self.full_screen_mode_active:
+            if self.full_screen_mode_active or self.isFullScreen():
                 self.full_screen_mode_active = False
                 self.showNormal()
             else:
@@ -7380,7 +7381,7 @@ class ApplicationWindow(QMainWindow):
             self.releaseminieditor()
             self.moveKbutton("enter")
         if key == 16777216:                 #ESCAPE
-            if self.full_screen_mode_active:
+            if self.full_screen_mode_active or self.isFullScreen():
                 self.full_screen_mode_active = False
                 self.showNormal()
             else:
@@ -11053,17 +11054,18 @@ $cupping_notes
         contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis")
         box = QMessageBox(self)
         #create a html QString
+        from scipy import __version__ as SCIPY_VERSION_STR
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
                 u("""<b>{0}</b> {1} ({2})
                 <p>
-                Python {3}, PyQt {5}, Qt {4}
-                </p>
-                <p>
-                <b>{7}</b> {8}
+                Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}
                 </p>
                 <p>
                 <b>{9}</b> {10}
+                </p>
+                <p>
+                <b>{11}</b> {12}
                 </p>""").format(
                 QApplication.translate("About", "Version:",None, QApplication.UnicodeUTF8),
                 str(__version__),
@@ -11071,7 +11073,9 @@ $cupping_notes
                 platform.python_version(),
                 QT_VERSION_STR,
                 PYQT_VERSION_STR,
-                platf,
+                mpl.__version__,
+                numpy.__version__,
+                SCIPY_VERSION_STR,
                 QApplication.translate("About", "Core developers:",None, QApplication.UnicodeUTF8),
                 coredevelopers,
                 QApplication.translate("About", "Contributors:",None, QApplication.UnicodeUTF8),
