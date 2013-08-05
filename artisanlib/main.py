@@ -21350,6 +21350,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.eventsbuttonflag = 1
                     aw.button_11.setVisible(True)
                     message = QApplication.translate("Message","Device set to %1%2", None, QApplication.UnicodeUTF8).arg(meter).arg(st)
+                ##########################
+                ####  DEVICE 19 is the Arduino/TC4
+                ##########################                    
                 elif meter == "TE VA18B":
                     aw.qmc.device = 20
                     #aw.ser.comport = "COM7"
