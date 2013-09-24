@@ -95,7 +95,7 @@ OPTIONS = {
     'argv_emulation': True,
     'semi_standalone': False,
     'site_packages': True,
-    'packages': ['matplotlib'],
+#    'packages': ['matplotlib'],
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',

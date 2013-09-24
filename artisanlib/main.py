@@ -9085,7 +9085,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.redraw()
                     return  #don't load any more settings. They could be bad (corrupted). Stop here.
             #restore geometry
-            self.restoreGeometry(settings.value("Geometry").toByteArray())
+            if settings.contains("Geometry"):
+                self.restoreGeometry(settings.value("Geometry").toByteArray())
             #restore mode
             old_mode = self.qmc.mode
             self.qmc.mode = str(settings.value("Mode",self.qmc.mode).toString())
@@ -17542,9 +17543,6 @@ class scaleport(object):
         self.device = None
         self.device_id = 0
         self.SP = None
-
-    def isConnected(self):
-        return (self.SP == None)
 
     def confport(self):
         self.SP.setPort(self.comport)
