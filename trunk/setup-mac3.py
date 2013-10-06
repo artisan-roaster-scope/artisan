@@ -95,12 +95,12 @@ OPTIONS = {
     'argv_emulation': True,
     'semi_standalone': False,
     'site_packages': True,
-    'packages': ['matplotlib'],
+#    'packages': ['matplotlib'], # with this the full pkg is copied to Resources/lib/python3.3
     'optimize':  2,
     'compressed': True,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
-    'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'
+    'matplotlib_backends': '-', # '-' for only-imported or explicit 'qt4agg'; without this the full pkg is copied to Resources/lib/python3.3
     'includes': ['serial',
                  'PyQt4',
                  'PyQt4.QtCore',

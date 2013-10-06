@@ -81,6 +81,7 @@ mpl.use('qt4agg')
 
 from matplotlib.figure import Figure
 from matplotlib.colors import cnames as cnames
+from matplotlib import rcParams
 import matplotlib.patches as patches
 import matplotlib.transforms as transforms
 import matplotlib.font_manager as font_manager
@@ -462,8 +463,8 @@ class tgraphcanvas(FigureCanvas):
                        "Phidget 1048",          #34
                        "+Phidget 1048_34",      #35
                        "+Phidget 1048_AT",      #36
-                       "Phidget 1046",          #37
-                       "+Phidget 1046_34",      #38
+                       "Phidget 1046 RTD",      #37
+                       "+Phidget 1046_34 RTD",  #38
                        "-Omega HH806W"          #39 NOT WORKING 
                        ]
 
@@ -803,7 +804,7 @@ class tgraphcanvas(FigureCanvas):
         self.gridstyles =    ["-","--","-.",":"," "]  #solid,dashed,dash-dot,dotted,None
         self.gridlinestyle = 0
         self.gridthickness = 1
-        self.gridalpha = .3
+        self.gridalpha = .2
         self.xrotation = 0
         
         #height of statistics bar
@@ -1332,11 +1333,11 @@ class tgraphcanvas(FigureCanvas):
                         slidernr = 2
                     elif self.alarmaction[alarmnumber] == 6:
                         slidernr = 3
-                    if slidernr:
+                    if slidernr != None:
                         aw.moveslider(slidernr,slidervalue)
-                        if self.qmc.flagstart:
+                        if aw.qmc.flagstart:
                             value = aw.float2float((slidervalue + 10.0) / 10.0)
-                            self.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
+                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
                         aw.fireslideraction(slidernr)
                 except:
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
@@ -1542,7 +1543,6 @@ class tgraphcanvas(FigureCanvas):
         endtime = self.endofx + starttime
         self.ax.set_xlim(self.startofx,endtime)
 
-
         if not self.xgrid:
             self.xgrid = 60.
 
@@ -1560,20 +1560,21 @@ class tgraphcanvas(FigureCanvas):
         majorlocator = ticker.FixedLocator(majorloc)   
         minorlocator = ticker.FixedLocator(minorloc)
 
-        self.ax.xaxis.set_minor_locator(minorlocator)
         self.ax.xaxis.set_major_locator(majorlocator)
+        self.ax.xaxis.set_minor_locator(minorlocator)
 
         formatter = ticker.FuncFormatter(self.formtime)
         self.ax.xaxis.set_major_formatter(formatter)
+
+        #adjust the length of the minor ticks
+        for i in self.ax.xaxis.get_minorticklines() + self.ax.yaxis.get_minorticklines():
+            i.set_markersize(5)
 
         #adjust the length of the major ticks
         for i in self.ax.get_xticklines() + self.ax.get_yticklines():
             i.set_markersize(10)
             #i.set_markeredgewidth(2)   #adjust the width
 
-        #adjust the length of the minor ticks
-        for i in self.ax.xaxis.get_minorticklines() + self.ax.yaxis.get_minorticklines():
-            i.set_markersize(5)
 
         # check x labels rotation
         if self.xrotation:     
@@ -2033,7 +2034,32 @@ class tgraphcanvas(FigureCanvas):
         try:
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
-
+   
+            scale = 0 # 1 # if 0 xkcd turn off
+            length = 700 # 100 (128 the default)
+            randomness = 12 # 2 (16 default)
+            rcParams['path.sketch'] = (scale, length, randomness)
+            from matplotlib import patheffects  
+            pe = True
+            rcParams['path.effects'] = [] #[patheffects.withStroke(linewidth=1, foreground="w")]
+            
+#            rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
+#            rcParams['font.size'] = 13.0
+##            rcParams['axes.linewidth'] = 1.5
+##            rcParams['lines.linewidth'] = 2.0
+            rcParams['figure.facecolor'] = 'white'
+##            rcParams['grid.linewidth'] = 0.0
+            rcParams['axes.unicode_minus'] = False
+            rcParams['xtick.major.size'] = 8
+            rcParams['xtick.major.width'] = 1
+            rcParams['xtick.minor.width'] = 1
+            rcParams['ytick.major.size'] = 8
+            rcParams['ytick.major.width'] = 1
+            rcParams['ytick.minor.width'] = 1
+            rcParams['xtick.color'] = '0.25'
+            rcParams['ytick.color'] = '0.25'
+            
+            
             self.fig.clf()   #wipe out figure. keep_observers=False
 
             self.ax = self.fig.add_subplot(111,axisbg=self.palette["background"])
@@ -2043,12 +2069,20 @@ class tgraphcanvas(FigureCanvas):
                 self.endofx = 60
             self.ax.set_ylim(self.ylimit_min, self.ylimit)
             self.ax.set_autoscale_on(False)
-            self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha)
+            self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
             self.ax.set_ylabel(self.mode,size=16,color =self.palette["ylabel"],rotation=0)
             self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
-            self.ax.set_title(aw.arabicReshape(self.title),size=20,color=self.palette["title"],fontproperties=aw.mpl_fontproperties)
+            self.ax.set_title(aw.arabicReshape(self.title) + "\n", size=20,color=self.palette["title"])
+#            self.ax.set_title(aw.arabicReshape(self.title),size=20,color=self.palette["title"],fontproperties=aw.mpl_fontproperties)
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag
+            #self.ax.spines['top'].set_color('none')
+            self.ax.tick_params(\
+                axis='x',           # changes apply to the x-axis
+                which='both',       # both major and minor ticks are affected
+                bottom='on',        # ticks along the bottom edge are on
+                top='off',          # ticks along the top edge are off
+                labelbottom='on')   # labels along the bottom edge are on
             if two_ax_mode:
                 #create a second set of axes in the same position as self.ax
                 self.delta_ax = self.ax.twinx()
@@ -2064,8 +2098,14 @@ class tgraphcanvas(FigureCanvas):
                     i.set_markersize(5)
             #put a right tick on the graph
             else:
-                for tick in self.ax.yaxis.get_major_ticks():
-                    tick.label2On = True
+#                for tick in self.ax.yaxis.get_major_ticks():
+#                    tick.label2On = True
+                self.ax.tick_params(\
+                    axis='y', 
+                    which='both',
+                    right='off',
+                    labelright='off') 
+                    
             self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
             self.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
             for i in self.ax.get_yticklines():
@@ -2076,26 +2116,24 @@ class tgraphcanvas(FigureCanvas):
             #update X ticks, labels, and colors
             self.xaxistosm()
 
+            rcParams['path.sketch'] = (0,0,0)
             trans = transforms.blended_transform_factory(self.ax.transAxes,self.ax.transData)
+
             
             #draw water marks for dry phase region, mid phase region, and finish phase region
             if aw.qmc.watermarksflag:
                 rect1 = patches.Rectangle((0,self.phases[0]), width=1, height=(self.phases[1]-self.phases[0]),
-                                          transform=trans, color=self.palette["rect1"],alpha=0.3)
+                                          transform=trans, color=self.palette["rect1"],alpha=0.15)
                 rect2 = patches.Rectangle((0,self.phases[1]), width=1, height=(self.phases[2]-self.phases[1]),
-                                          transform=trans, color=self.palette["rect2"],alpha=0.3)
+                                          transform=trans, color=self.palette["rect2"],alpha=0.15)
                 rect3 = patches.Rectangle((0,self.phases[2]), width=1, height=(self.phases[3] - self.phases[2]),
-                                          transform=trans, color=self.palette["rect3"],alpha=0.3)
-                if (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag:
-                    self.delta_ax.add_patch(rect1)
-                    self.delta_ax.add_patch(rect2)
-                    self.delta_ax.add_patch(rect3)
-                else:
-                    self.ax.add_patch(rect1)
-                    self.ax.add_patch(rect2)
-                    self.ax.add_patch(rect3)
+                                          transform=trans, color=self.palette["rect3"],alpha=0.15)
+                self.ax.add_patch(rect1)
+                self.ax.add_patch(rect2)
+                self.ax.add_patch(rect3)
 
             #if self.eventsGraphflag == 0 then that means don't plot event bars
+
 
             if self.eventsGraphflag == 1: #plot event bars by type
                 # make blended transformations to help identify EVENT types
@@ -2107,7 +2145,7 @@ class tgraphcanvas(FigureCanvas):
                     start = 60
                 jump = 20
                 for i in range(4):
-                    rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.3)
+                    rectEvent = patches.Rectangle((0,self.phases[0]-start-jump), width=1, height = step, transform=trans, color=self.palette["rect1"],alpha=.15)
                     self.ax.add_patch(rectEvent)
                     if self.mode == "C":
                         jump -= 10
@@ -2133,7 +2171,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         color = self.palette["rect1"]
                     barposition = self.phases[0]-start-jump    
-                    rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.2)
+                    rectEvent = patches.Rectangle((0,barposition), width=1, height = step, transform=trans, color=color,alpha=.15)
                     self.ax.add_patch(rectEvent)
                     self.eventpositionbars[i] = barposition
                     if self.mode == "C":
@@ -2141,39 +2179,10 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         jump -= 10
 
-            ##### ET,BT curves
-            if smooth or len(self.stemp1) != len(self.timex):
-                self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
-                if smooth or len(self.stemp2) != len(self.timex):
-                    self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
-            if aw.qmc.ETcurve:
-                if aw.qmc.flagon:
-                    self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
-                else:
-                    self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
-            if aw.qmc.BTcurve:
-                if aw.qmc.flagon:
-                    self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
-                else:
-                    self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
-
-            ##### Extra devices-curves
-            self.extratemp1lines,self.extratemp2lines = [],[]
-            for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                if aw.extraCurveVisibility1[i]:
-                    if aw.qmc.flagon:
-                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
-                    else:                    
-                        if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
-                            self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
-                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
-                if aw.extraCurveVisibility2[i]:
-                    if aw.qmc.flagon:
-                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
-                    else:
-                        if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
-                            self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
-                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+            rcParams['path.sketch'] = (scale, length, randomness)
+            if pe:
+                rcParams['path.effects'] = [patheffects.withStroke(linewidth=5, foreground="w")]
+            
 
             #check BACKGROUND flag
             if self.background: 
@@ -2272,6 +2281,42 @@ class tgraphcanvas(FigureCanvas):
                     self.place_annotations(d,self.timeB,self.timeindexB,self.temp2B,self.temp2B,startB,self.timex,self.timeindex)
                     
                 #END of Background
+
+            ##### Extra devices-curves
+            self.extratemp1lines,self.extratemp2lines = [],[]
+            for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                if aw.extraCurveVisibility1[i]:
+                    if aw.qmc.flagon:
+                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
+                    else:                    
+                        if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
+                            self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
+                        self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
+                if aw.extraCurveVisibility2[i]:
+                    if aw.qmc.flagon:
+                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extratemp2[i],color=self.extradevicecolor2[i],markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+                    else:
+                        if smooth or len(self.extrastemp2[i]) != len(self.extratimex[i]):
+                            self.extrastemp2[i] = self.smooth_list(self.extratimex[i],self.extratemp2[i],window_len=self.curvefilter)
+                        self.extratemp2lines.append(self.ax.plot(self.extratimex[i], self.extrastemp2[i],color=self.extradevicecolor2[i],markersize=self.extramarkersizes2[i],marker=self.extramarkers2[i],linewidth=self.extralinewidths2[i],linestyle=self.extralinestyles2[i],drawstyle=self.extradrawstyles2[i],label= self.extraname2[i])[0])
+
+
+            ##### ET,BT curves
+            if smooth or len(self.stemp1) != len(self.timex):
+                self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
+                if smooth or len(self.stemp2) != len(self.timex):
+                    self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
+            if aw.qmc.ETcurve:
+                if aw.qmc.flagon:
+                    self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+                else:
+                    self.l_temp1, = self.ax.plot(self.timex,self.stemp1,markersize=self.ETmarkersize,marker=self.ETmarker,linewidth=self.ETlinewidth,linestyle=self.ETlinestyle,drawstyle=self.ETdrawstyle,color=self.palette["et"],label=aw.arabicReshape(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8)))
+            if aw.qmc.BTcurve:
+                if aw.qmc.flagon:
+                    self.l_temp2, = self.ax.plot(self.timex,self.temp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+                else:
+                    self.l_temp2, = self.ax.plot(self.timex,self.stemp2,markersize=self.BTmarkersize,marker=self.BTmarker,linewidth=self.BTlinewidth,linestyle=self.BTlinestyle,drawstyle=self.BTdrawstyle,color=self.palette["bt"],label=aw.arabicReshape(QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8)))
+
 
             handles = []
             labels = []
@@ -3754,17 +3799,17 @@ class tgraphcanvas(FigureCanvas):
     
                 #calculate the positions for the statistics elements
                 ydist = self.ylimit - self.ylimit_min
-                statisticsbarheight = ydist/80
+                statisticsbarheight = ydist/70
     
                 if aw.qmc.legendloc in [1,2,9]:
                     # legend on top
                     statisticsheight = self.ylimit - (0.13 * ydist) # standard positioning
                 else:
                     # legend not on top
-                    statisticsheight = self.ylimit - (0.06 * ydist) 
+                    statisticsheight = self.ylimit - (0.08 * ydist) 
                 
-                statisticsupper = statisticsheight + statisticsbarheight + 2
-                statisticslower = statisticsheight - 2.3*statisticsbarheight
+                statisticsupper = statisticsheight + statisticsbarheight + 4
+                statisticslower = statisticsheight - 3.5*statisticsbarheight
     
                 if self.statisticsflags[1]:
     
@@ -5095,7 +5140,7 @@ class tgraphcanvas(FigureCanvas):
                 #set color, alpha, and text
                 for _,bar[z] in zip(radii, bar[z]):
                     bar[z].set_facecolor(self.wheelcolor[z][count])
-                    bar[z].set_alpha(self.segmentsalpha[z][count])
+                    bar[z].set_alpha(min(self.segmentsalpha[z][count],1))
                     bar[z].set_url(str(z) + "-" + str(count))
                     self.ax2.annotate(names[z][count],xy=(textloc[z][count],Wradiitext[z]),xytext=(textloc[z][count],Wradiitext[z]),
                         rotation=textangles[z][count],horizontalalignment="center",verticalalignment="center",fontsize=self.wheeltextsize[z])
@@ -6225,6 +6270,11 @@ class ApplicationWindow(QMainWindow):
         helpAboutAction.setMenuRole(QAction.AboutRole)
         self.connect(helpAboutAction,SIGNAL("triggered()"),self.helpAbout)
         self.helpMenu.addAction(helpAboutAction)
+        
+        aboutQtAction = QAction(UIconst.HELP_MENU_ABOUTQT,self)
+        aboutQtAction.setMenuRole(QAction.AboutRole)
+        self.connect(aboutQtAction,SIGNAL("triggered()"),self.showAboutQt)
+        self.helpMenu.addAction(aboutQtAction)
 
         helpDocumentationAction = QAction(UIconst.HELP_MENU_DOCUMENTATION,self)
         self.connect(helpDocumentationAction,SIGNAL("triggered()"),self.helpHelp)
@@ -6514,19 +6564,26 @@ class ApplicationWindow(QMainWindow):
         self.lcd1.setSegmentStyle(2)
         self.lcd1.setMinimumHeight(40)
         self.lcd1.setMinimumWidth(100)
+        self.lcd1.setFrameStyle(QFrame.Plain)
 
         self.lcd2 = QLCDNumber() # Temperature MET
         self.lcd2.setSegmentStyle(2)   
+        self.lcd2.setFrameStyle(QFrame.Plain)
         self.lcd3 = QLCDNumber() # Temperature BT
+        self.lcd3.setFrameStyle(QFrame.Plain)
         self.lcd3.setSegmentStyle(2)
         self.lcd4 = QLCDNumber() # rate of change MET
         self.lcd4.setSegmentStyle(2)
+        self.lcd4.setFrameStyle(QFrame.Plain)
         self.lcd5 = QLCDNumber() # rate of change BT
         self.lcd5.setSegmentStyle(2)
+        self.lcd5.setFrameStyle(QFrame.Plain)
         self.lcd6 = QLCDNumber() # pid sv
         self.lcd6.setSegmentStyle(2)
+        self.lcd6.setFrameStyle(QFrame.Plain)
         self.lcd7 = QLCDNumber() # pid power % duty cycle
         self.lcd7.setSegmentStyle(2)
+        self.lcd7.setFrameStyle(QFrame.Plain)
 
         self.lcd1.display("00:00")
         self.lcd2.display("0.0")
@@ -6561,28 +6618,28 @@ class ApplicationWindow(QMainWindow):
 
         #MET
         self.label2 = QLabel()
-        self.label2.setText(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8))
         self.label2.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        self.label2.setText("<big><b>" + u(QApplication.translate("Label", "ET",None, QApplication.UnicodeUTF8)) + "</b></big>")
         #BT
         self.label3 = QLabel()
         self.label3.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label3.setText("<b>" + u(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8)) + "</b>")
+        self.label3.setText("<big><b>" + u(QApplication.translate("Label", "BT",None, QApplication.UnicodeUTF8)) + "</b></big>")
         #DELTA MET
         self.label4 = QLabel()
         self.label4.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label4.setText("<b>" + u(QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8)) + "</b>")
+        self.label4.setText("<big><b>" + u(QApplication.translate("Label", "DeltaET",None, QApplication.UnicodeUTF8)) + "</b></big>")
         # DELTA BT
         self.label5 = QLabel()
         self.label5.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label5.setText("<b>" + u(QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8)) + "</b>")
+        self.label5.setText("<big><b>" + u(QApplication.translate("Label", "DeltaBT",None, QApplication.UnicodeUTF8)) + "</b></big>")
         # pid sv
         self.label6 = QLabel()
         self.label6.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label6.setText("<b>" + u(QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8)) + "</b>")
+        self.label6.setText("<big><b>" + u(QApplication.translate("Label", "PID SV",None, QApplication.UnicodeUTF8)) + "</b></big>")
         # pid power % duty cycle
         self.label7 = QLabel()
         self.label7.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-        self.label7.setText("<b>" + u(QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8)) + "</b>")
+        self.label7.setText("<big><b>" + u(QApplication.translate("Label", "PID %",None, QApplication.UnicodeUTF8)) + "</b></big>")
 
         #extra LCDs
         self.nLCDS = 10 # maximum number of LCDs and extra devices
@@ -6600,9 +6657,13 @@ class ApplicationWindow(QMainWindow):
             self.extraLCD2.append(QLCDNumber())
             self.extraLCDlabel2.append(QLabel())
             self.extraLCD1[i].setSegmentStyle(2)
-            self.extraLCD1[i].display("0.0")
+            self.extraLCD1[i].setFrameStyle(QFrame.Plain)
+            self.extraLCD1[i].setMinimumSize(80,30)
+            self.extraLCD1[i].display("0.0")        
             self.extraLCDframe1[i].setVisible(False)
             self.extraLCD2[i].setSegmentStyle(2)
+            self.extraLCD2[i].setFrameStyle(QFrame.Plain)
+            self.extraLCD2[i].setMinimumSize(80,30)
             self.extraLCD2[i].display("0.0")
             self.extraLCDframe2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -6612,9 +6673,9 @@ class ApplicationWindow(QMainWindow):
             #configure Labels
             self.extraLCDlabel1[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
-            self.extraLCDlabel1[i].setText("<b>" + string1 + "</b>")
+            self.extraLCDlabel1[i].setText("<big><b>" + string1 + "</b></big>")
             self.extraLCDlabel1[i].setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-            self.extraLCDlabel2[i].setText("<b>" + string2 + "</b>")
+            self.extraLCDlabel2[i].setText("<big><b>" + string2 + "</b></big>")
             self.extraLCDlabel2[i].setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
 
         # Stores messages up to 500
@@ -6995,7 +7056,7 @@ class ApplicationWindow(QMainWindow):
         LCDbox.addWidget(label)
         LCDbox.addWidget(lcd)
         LCDbox.setContentsMargins(0, 0, 0, 0)
-        lcdframe.setContentsMargins(0, 10, 0, 0)
+        lcdframe.setContentsMargins(0, 10, 0, 5)
         lcdframe.setLayout(LCDbox)
         return lcdframe
 
@@ -7053,7 +7114,7 @@ class ApplicationWindow(QMainWindow):
         slcd.setMinimumHeight(35)
         slcd.setMinimumWidth(50)
         slcd.setMaximumWidth(50)
-        slcd.setFrameStyle(QFrame.Panel | QFrame.Sunken)
+        slcd.setFrameStyle(QFrame.Panel | QFrame.Plain)
         slcd.setLineWidth(0)
         slcd.setContentsMargins(0,0,0,0)
         return slcd
@@ -7300,11 +7361,11 @@ class ApplicationWindow(QMainWindow):
         for i in range(ndev):
             aw.extraLCDframe1[i].setVisible(bool(aw.extraLCDvisibility1[i]))
             if i < len(aw.qmc.extraname1):
-                aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "</b>")
+                aw.extraLCDlabel1[i].setText("<big><b>" + aw.qmc.extraname1[i] + "</b></big>")
             aw.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
             self.extraLCDframe2[i].setVisible(bool(aw.extraLCDvisibility2[i])) 
             if i < len(aw.qmc.extraname2):
-                aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "</b>")  
+                aw.extraLCDlabel2[i].setText("<big><b>" + aw.qmc.extraname2[i] + "</b></big>")
             aw.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["sv"],aw.lcdpaletteB["sv"]))
         #hide the rest (just in case)
         for i in range(ndev,aw.nLCDS):
@@ -7637,6 +7698,7 @@ class ApplicationWindow(QMainWindow):
         #check
         lenevents = len(self.qmc.specialevents)
         currentevent = self.eNumberSpinBox.value()
+        self.eNumberSpinBox.setDisabled(True)
         self.eventlabel.setText(QApplication.translate("Label", "Event #<b>%1 </b>",None, QApplication.UnicodeUTF8).arg(currentevent))
         if currentevent == 0:
             self.lineEvent.setText("")
@@ -7663,6 +7725,9 @@ class ApplicationWindow(QMainWindow):
                 y = [(self.qmc.ylimit_min-100),self.qmc.temp2[etimeindex],self.qmc.temp1[etimeindex],(self.qmc.ylimit+100)]
                 self.qmc.ax.plot(x,y,marker ="o",markersize=12,color ="yellow",linestyle="-",linewidth = 7,alpha=.4)
                 self.qmc.fig.canvas.draw()
+        self.eNumberSpinBox.setDisabled(False)
+        self.eNumberSpinBox.setFocus()
+
 
     #updates events from mini edtitor
     def miniEventRecord(self):
@@ -7876,8 +7941,6 @@ class ApplicationWindow(QMainWindow):
                     res = False
                 if res:
                     self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-                    #change Title
-                    self.qmc.ax.set_title(aw.arabicReshape(self.qmc.title), size=20, color= self.qmc.palette["title"])
                     #update etypes combo box
                     self.etypeComboBox.clear()
                     self.etypeComboBox.addItems(self.qmc.etypes)
@@ -8144,11 +8207,13 @@ class ApplicationWindow(QMainWindow):
             json.dump(self.getProfile(), outfile, ensure_ascii=True)
             outfile.write('\n')
             outfile.close()
+            return True
         except Exception as ex:
 #            import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
+            return False
 
     #Write readings to RoastLogger CSV file
     def exportRoastLogger(self,filename):
@@ -8220,11 +8285,13 @@ class ApplicationWindow(QMainWindow):
             outfile.write("146\n")
             outfile.write("\n")
             outfile.close()
+            return True
         except Exception as ex:
 #           import traceback
 #           traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportRoastLogger() %1").arg(str(ex)),exc_tb.tb_lineno)
+            return False
         finally:
             outfile.close()
 
@@ -8249,70 +8316,72 @@ class ApplicationWindow(QMainWindow):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
 
+
     def importRoastLogger(self,filename):
+        # the RoastLogger file might be in utf-8 or latin1 encoding, we cannot know so let's test both
         try:
-            # use io.open instead of open to have encoding support on Python 2
-            import io
-            infile = io.open(filename, 'r', encoding='utf-8')
-            obj = {}
-            obj["mode"] = "C"
-            obj["title"] = u(QFileInfo(filename).fileName())
-            import csv
-            obj["roastdate"] = e(QDate.currentDate().toString())
-            # read roastdate from file
-            while True:
-                l = infile.readline()
-                if l.startswith("Roast started at "):
-                    #extract roast date
-                    roastdate = QDate.fromString(l.split(" ")[-1][0:10],"dd'/'MM'/'yyyy")
-                    if not roastdate.isNull():
-                        obj["roastdate"] = e(roastdate.toString())
-                    break
-                if l == '':
-                    break
-            timeindex = [-1,0,0,0,0,0,0,0]
-            timex = []
-            temp1 = []
-            temp2 = []
-            data = csv.reader(infile,delimiter=',')
-            #read file header
-            next(data) # we do not use the labels
-            #header = list(map(lambda s:s.strip(),next(data)))
-            while True:
-                fields = next(data)
-                if len(fields) == 0:
-                    break
-                else:
-                    timex.append(float(self.qmc.stringtoseconds(fields[0])))
-                    temp1.append(float(fields[1]))
-                    temp2.append(float(fields[2]))
-                    event = fields[3]
-                    if event == "Beans loaded":
-                        timeindex[0] = len(timex) - 1
-                    elif event == "First crack start":
-                        timeindex[2] = len(timex) - 1
-                    elif event == "First crack end":
-                        timeindex[3] = len(timex) - 1
-                    elif event == "Second crack start":
-                        timeindex[4] = len(timex) - 1
-                    elif event == "Beans ejected":
-                        timeindex[6] = len(timex) - 1
-            obj["timeindex"] = timeindex
-            obj["timex"] = timex
-            obj["temp1"] = temp2
-            obj["temp2"] = temp1
-            res = self.setProfile(obj)
-            infile.close()
-            if res:
-                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-                #change Title
-                self.qmc.ax.set_title(aw.arabicReshape(self.qmc.title), size=20, color= self.qmc.palette["title"])
-                self.qmc.redraw()
-        except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importRoastLogger() %1").arg(str(ex)),exc_tb.tb_lineno)
+            self.importRoastLoggerEnc(filename,'utf-8')
+        except:
+            self.importRoastLoggerEnc(filename,'latin1')
+            
+    def importRoastLoggerEnc(self,filename,enc='utf-8'):
+        # use io.open instead of open to have encoding support on Python 2
+        import io
+        infile = io.open(filename, 'r', encoding=enc)
+        obj = {}
+        obj["mode"] = "C"
+        obj["title"] = u(QFileInfo(filename).fileName())
+        import csv
+        obj["roastdate"] = e(QDate.currentDate().toString())
+        # read roastdate from file
+        while True:
+            l = infile.readline()
+            if l.startswith("Roast started at "):
+                #extract roast date
+                roastdate = QDate.fromString(l.split(" ")[-1][0:10],"dd'/'MM'/'yyyy")
+                if not roastdate.isNull():
+                    obj["roastdate"] = e(roastdate.toString())
+                break
+            if l == '':
+                break
+        timeindex = [-1,0,0,0,0,0,0,0]
+        timex = []
+        temp1 = []
+        temp2 = []
+        data = csv.reader(infile,delimiter=',')
+        #read file header
+        next(data) # we do not use the labels
+        #header = list(map(lambda s:s.strip(),next(data)))
+        while True:
+            fields = next(data)
+            if len(fields) == 0:
+                break
+            else:
+                timex.append(float(self.qmc.stringtoseconds(fields[0])))
+                temp1.append(float(fields[1]))
+                temp2.append(float(fields[2]))
+                event = fields[3]
+                if event == "Beans loaded":
+                    timeindex[0] = len(timex) - 1
+                elif event == "First crack start":
+                    timeindex[2] = len(timex) - 1
+                elif event == "First crack end":
+                    timeindex[3] = len(timex) - 1
+                elif event == "Second crack start":
+                    timeindex[4] = len(timex) - 1
+                elif event == "Beans ejected":
+                    timeindex[6] = len(timex) - 1
+        obj["timeindex"] = timeindex
+        obj["timex"] = timex
+        obj["temp1"] = temp2
+        obj["temp2"] = temp1
+        res = self.setProfile(obj)
+        infile.close()
+        if res:
+            self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+            #change Title
+            self.qmc.ax.set_title(aw.arabicReshape(self.qmc.title), size=20, color= self.qmc.palette["title"])
+            self.qmc.redraw()
 
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
@@ -8405,11 +8474,15 @@ class ApplicationWindow(QMainWindow):
                         writer.writerow([u(time1),u(time2),u(self.qmc.temp2[i]),u(self.qmc.temp1[i]),u(event)] + extratemps)
                     last_time = time1
                 outfile.close()
+                return True
+            else:
+                return False
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " exportCSV() %1").arg(str(ex)),exc_tb.tb_lineno)
+            return False
 
     #Write object to file
     def serialize(self,filename,obj):
@@ -9036,8 +9109,9 @@ class ApplicationWindow(QMainWindow):
         try:
             filename = self.ArtisanSaveFileDialog(msg=msg,ext=ext)
             if filename:
-                dumper(filename)
-                self.sendmessage(QApplication.translate("Message","Readings exported", None, QApplication.UnicodeUTF8))
+                res = dumper(filename)
+                if res:
+                    self.sendmessage(QApplication.translate("Message","Readings exported", None, QApplication.UnicodeUTF8))
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
         except Exception as ex:
@@ -10328,6 +10402,7 @@ class ApplicationWindow(QMainWindow):
                 painter.drawImage(0, 0, image)
 
     def htmlReport(self):
+        rcParams['path.effects'] = []
         HTML_REPORT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -10532,10 +10607,9 @@ $cupping_notes
                 pass
             self.qmc.fig.savefig(graph_image)
         else:
-            #resize GRAPH image to 650 pixels width
             image = QPixmap.grabWidget(aw.qmc).toImage()
-#            image = aw.qmc.grab().toImage()
-            image = image.scaledToWidth(650,1)
+#            #resize GRAPH image to 650 pixels width
+#            image = image.scaledToWidth(650,1)
             #save GRAPH image
             graph_image = graph_image + ".png"
             try:
@@ -10552,10 +10626,9 @@ $cupping_notes
             flavor_image = flavor_image + ".svg"
             self.qmc.fig.savefig(flavor_image)
         else:
-            #resize FLAVOR image to 550 pixels width
             image = QPixmap.grabWidget(aw.qmc).toImage()
-#            image = aw.qmc.grab().toImage()
-            image = image.scaledToWidth(550,1)
+            #resize FLAVOR image to 550 pixels width
+#            image = image.scaledToWidth(550,1)
             #save GRAPH image
             flavor_image = flavor_image + ".png"
             image.save(flavor_image)
@@ -11058,9 +11131,9 @@ $cupping_notes
         from scipy import __version__ as SCIPY_VERSION_STR
         box.about(self,
                 QApplication.translate("About", "About",None, QApplication.UnicodeUTF8),
-                u("""<b>{0}</b> {1} ({2})
+                u("""<big><b>{0}</b> {1}</big> ({2})
                 <p>
-                Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}
+                <b>Based on:</b><br>Python {3}, Qt {4}, PyQt {5}, Matplotlib {6}, NumPy {7}, SciPy {8}
                 </p>
                 <p>
                 <b>{9}</b> {10}
@@ -11068,7 +11141,7 @@ $cupping_notes
                 <p>
                 <b>{11}</b> {12}
                 </p>""").format(
-                QApplication.translate("About", "Version:",None, QApplication.UnicodeUTF8),
+                QApplication.translate("About", "Artisan",None, QApplication.UnicodeUTF8),
                 str(__version__),
                 str(__revision__),
                 platform.python_version(),
@@ -11082,6 +11155,9 @@ $cupping_notes
                 QApplication.translate("About", "Contributors:",None, QApplication.UnicodeUTF8),
                 contributors))
 
+    def showAboutQt(self):
+        QApplication.instance().aboutQt()
+        
     def helpHelp(self):
         QDesktopServices.openUrl(QUrl("http://coffeetroupe.com/artisandocs/", QUrl.TolerantMode))
 
@@ -12876,6 +12952,7 @@ class HUDDlg(ArtisanDialog):
         else:
             self.result.setText("")
         self.polyfitdeg.setDisabled(False)
+        self.polyfitdeg.setFocus()
         
     def tabSwitched(self,i):
         if i != 2:
@@ -12979,6 +13056,7 @@ class HUDDlg(ArtisanDialog):
                 aw.qmc.deltafilter = v
                 aw.qmc.redraw(recomputeAllDeltas=True)
                 self.DeltaFilter.setDisabled(False)
+                self.DeltaFilter.setFocus()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + "changeDeltaFilter(): %1").arg(str(e)),exc_tb.tb_lineno)
@@ -13004,6 +13082,7 @@ class HUDDlg(ArtisanDialog):
                 aw.qmc.curvefilter = v
                 aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
                 self.Filter.setDisabled(False)
+                self.Filter.setFocus()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " changeFilter(): %1").arg(str(e)),exc_tb.tb_lineno)
@@ -14681,16 +14760,25 @@ class WindowsDlg(ArtisanDialog):
 
     def changexrotation(self):
         aw.qmc.xrotation = self.xrotationSpinBox.value()
+        self.xrotationSpinBox.setDisabled(True)
         aw.qmc.xaxistosm()
         aw.qmc.redraw(recomputeAllDeltas=False)
+        self.xrotationSpinBox.setDisabled(False)
+        self.xrotationSpinBox.setFocus()
 
     def changegridalpha(self):
         aw.qmc.gridalpha = self.gridalphaSpinBox.value()/10.
+        self.gridalphaSpinBox.setDisabled(True)
         aw.qmc.redraw(recomputeAllDeltas=False)
+        self.gridalphaSpinBox.setDisabled(False)
+        self.gridalphaSpinBox.setFocus()
         
     def changegridwidth(self):
         aw.qmc.gridthickness = self.gridwidthSpinBox.value()
+        self.gridwidthSpinBox.setDisabled(True)
         aw.qmc.redraw(recomputeAllDeltas=False)
+        self.gridwidthSpinBox.setDisabled(False)
+        self.gridwidthSpinBox.setFocus()
 
     def changegridstyle(self):
         aw.qmc.gridlinestyle = self.gridstylecombobox.currentIndex()
@@ -14707,11 +14795,17 @@ class WindowsDlg(ArtisanDialog):
 
     def changeygrid(self):
         aw.qmc.ygrid = self.ygridSpinBox.value()
+        self.ygridSpinBox.setDisabled(True)
         aw.qmc.redraw(recomputeAllDeltas=False)
+        self.ygridSpinBox.setDisabled(False)
+        self.ygridSpinBox.setFocus()
 
     def changezgrid(self):
         aw.qmc.zgrid = self.zgridSpinBox.value()
+        self.zgridSpinBox.setDisabled(True)
         aw.qmc.redraw(recomputeAllDeltas=False)
+        self.zgridSpinBox.setDisabled(False)
+        self.zgridSpinBox.setFocus()
 
     # exit dialog with OK
     def updatewindow(self):
@@ -16513,6 +16607,9 @@ class phasesGraphDlg(ArtisanDialog):
 class flavorDlg(ArtisanDialog):   
     def __init__(self, parent = None):
         super(flavorDlg,self).__init__(parent)
+        
+        rcParams['path.effects'] = []
+        
         #avoid questionm mark context help
         flags = self.windowFlags()
         helpFlag = Qt.WindowContextHelpButtonHint
@@ -18371,7 +18468,7 @@ class serialport(object):
                 r = self.SP.read(14)
                 if len(r) == 14:
                     #we convert the hex strings to integers. Divide by 10.0 (decimal position)
-                    r = r.replace(' ','0')
+                    r = r.replace(str2cmd(' '),str2cmd('0'))
                     return int(r[1:5],16)/10., int(r[7:11],16)/10.
                 else:
                     nbytes = len(r)
@@ -22058,6 +22155,9 @@ class graphColorDlg(ArtisanDialog):
 class WheelDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(WheelDlg,self).__init__(parent)
+        
+        rcParams['path.effects'] = []
+            
         self.setModal(False)
         self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None, QApplication.UnicodeUTF8))
         self.viewmodeflag = False
@@ -22788,9 +22888,11 @@ class AlarmDlg(ArtisanDialog):
             json.dump(alarms, outfile, ensure_ascii=True)
             outfile.write('\n')
             outfile.close()
+            return True
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " exportalarmsJSON(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            return False
 
     def closealarms(self):
         self.savealarms()
@@ -22877,7 +22979,7 @@ class AlarmDlg(ArtisanDialog):
         if self.alarmguard[i] > -1:
             guardstr = str(self.alarmguard[i] + 1)
         else:
-            guardstr = ""
+            guardstr = "0"
         guardedit = QLineEdit(guardstr)
         guardedit.setValidator(QIntValidator(0, 30,guardedit))
         guardedit.setAlignment(Qt.AlignRight)
