@@ -97,7 +97,7 @@ OPTIONS = {
     'site_packages': True,
 #    'packages': ['matplotlib'],
     'optimize':  2,
-    'compressed': True,
+    'compressed': False,
     'iconfile': 'artisan.icns',
     'arch': 'x86_64',
     'matplotlib_backends': '-', # '-' for imported or explicit 'qt4agg'

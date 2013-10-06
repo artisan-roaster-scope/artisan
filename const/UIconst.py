@@ -137,6 +137,7 @@ if platf == 'Darwin':
     HELP_MENU_ABOUT = "About"
 else:
     HELP_MENU_ABOUT = QApplication.translate("MAC_APPLICATION_MENU", "About %1", None, QApplication.UnicodeUTF8).arg("Artisan") 
+HELP_MENU_ABOUTQT = QApplication.translate("Menu", "About Qt", None, QApplication.UnicodeUTF8)
 HELP_MENU_DOCUMENTATION = QApplication.translate("Menu", "Documentation", None, QApplication.UnicodeUTF8)
 #HELP_MENU_BLOG = QApplication.translate("Menu", "Blog", None, QApplication.UnicodeUTF8)
 HELP_MENU_KEYBOARDSHORTCUTS = QApplication.translate("Menu", "Keyboard Shortcuts", None, QApplication.UnicodeUTF8)

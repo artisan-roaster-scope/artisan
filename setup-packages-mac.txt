@@ -436,7 +436,7 @@ x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g'
 
 19) Install Phidgets Python
 
-# unzip PhidgetsPython_2.1.8.20130618.zip
+# unzip PhidgetsPython_2.1.8.20130820.zip
 # cd PhidgetsPython
 # python setup.py build
 # python setup.py install
