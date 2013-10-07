@@ -773,6 +773,7 @@ class tgraphcanvas(FigureCanvas):
         #Temperature Alarms lists. Data is writen in  alarmDlg 
         self.alarmflag = []    # 0 = OFF; 1 = ON flags
         self.alarmguard = []   # points to another alarm by index that has to be triggered before; -1 indicates no guard
+        self.alarmnegguard = []   # points to another alarm by index that should not has been triggered before; -1 indicates no guard
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
 #                              # -1 equals None
         self.alarmoffset = []  # the for timed alarms, the seconds after alarmtime the alarm is triggered
@@ -5610,6 +5611,7 @@ class SampleThread(QThread):
                         if aw.qmc.alarmflag[i] \
                           and not aw.qmc.alarmstate[i] \
                           and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
+                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmnegflag) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
                           and ((aw.qmc.alarmtime[i] < 0) \
                           or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
                           or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
@@ -8000,6 +8002,8 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.alarmflag = profile["alarmflag"]
                     if "alarmguard" in profile:
                         self.qmc.alarmguard = profile["alarmguard"]
+                    if "alarmnegguard" in profile:
+                        self.qmc.alarmnegguard = profile["alarmnegguard"]
                     if "alarmtime" in profile:
                         self.qmc.alarmtime = profile["alarmtime"]
                     if "alarmoffset" in profile:
@@ -8785,6 +8789,8 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmflag = profile["alarmflag"]
                 if "alarmguard" in profile:
                     self.qmc.alarmguard = profile["alarmguard"]
+                if "alarmnegguard" in profile:
+                    self.qmc.alarmnegguard = profile["alarmnegguard"]
                 if "alarmtime" in profile:
                     self.qmc.alarmtime = profile["alarmtime"]
                 if "alarmoffset" in profile:
@@ -9120,6 +9126,7 @@ class ApplicationWindow(QMainWindow):
             #alarms
             profile["alarmflag"] = self.qmc.alarmflag
             profile["alarmguard"] = self.qmc.alarmguard
+            profile["alarmnegguard"] = self.qmc.alarmnegguard
             profile["alarmtime"] = self.qmc.alarmtime
             profile["alarmoffset"] = self.qmc.alarmoffset
             profile["alarmcond"] = self.qmc.alarmcond
@@ -9396,6 +9403,10 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmguard = [x.toInt()[0] for x in settings.value("alarmguard").toList()]
                 else:
                     self.qmc.alarmguard = [-1]*len(self.qmc.alarmflag)
+                if settings.contains("alarmnegguard"):
+                    self.qmc.alarmnegguard = [x.toInt()[0] for x in settings.value("alarmnegguard").toList()]
+                else:
+                    self.qmc.alarmnegguard = [-1]*len(self.qmc.alarmflag)
                 self.qmc.alarmtime = [x.toInt()[0] for x in settings.value("alarmtime").toList()]  
                 if settings.contains("alarmoffset"):
                     self.qmc.alarmoffset = [max(0,x.toInt()[0]) for x in settings.value("alarmoffset").toList()]
@@ -9404,7 +9415,7 @@ class ApplicationWindow(QMainWindow):
                 if settings.contains("alarmcond"):
                     self.qmc.alarmcond = [x.toInt()[0] for x in settings.value("alarmcond").toList()]
                 else:
-                    self.qmc.alarmguard = [1]*len(self.qmc.alarmflag)
+                    self.qmc.alarmcond = [1]*len(self.qmc.alarmflag)
                 self.qmc.alarmsource = [x.toInt()[0] for x in settings.value("alarmsource").toList()]
                 self.qmc.alarmtemperature = [x.toInt()[0] for x in settings.value("alarmtemperature").toList()]
                 self.qmc.alarmaction = [x.toInt()[0] for x in settings.value("alarmaction").toList()]
@@ -10125,6 +10136,7 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("Alarms")
             settings.setValue("alarmflag",self.qmc.alarmflag)  
             settings.setValue("alarmguard",self.qmc.alarmguard)
+            settings.setValue("alarmnegguard",self.qmc.alarmnegguard)
             settings.setValue("alarmtime",self.qmc.alarmtime)
             settings.setValue("alarmoffset",self.qmc.alarmoffset)
             settings.setValue("alarmcond",self.qmc.alarmcond)
@@ -10348,6 +10360,7 @@ class ApplicationWindow(QMainWindow):
         roast["beansize"]= str(self.qmc.beansize)
         alarms["alarmflag"]= str(self.qmc.alarmflag) 
         alarms["alarmguard"]= str(self.qmc.alarmguard)
+        alarms["alarmnegguard"]= str(self.qmc.alarmnegguard)
         alarms["alarmtime"]= str(self.qmc.alarmtime)
         alarms["alarmoffset"]= str(self.qmc.alarmoffset)
         alarms["alarmcond"]= str(self.qmc.alarmcond)
@@ -12213,6 +12226,7 @@ $cupping_notes
             infile.close()
             aw.qmc.alarmflag = alarms["alarmflags"]
             aw.qmc.alarmguard = alarms["alarmguards"]
+            aw.qmc.alarmnegguard = alarms["alarmnegguards"]
             aw.qmc.alarmtime = alarms["alarmtimes"]
             aw.qmc.alarmoffset = alarms["alarmoffsets"]
             aw.qmc.alarmcond = alarms["alarmconds"]
@@ -22759,6 +22773,7 @@ class AlarmDlg(ArtisanDialog):
         #local alarm variables
         self.alarmflag = aw.qmc.alarmflag
         self.alarmguard = aw.qmc.alarmguard
+        self.alarmnegguard = aw.qmc.alarmnegguard
         self.alarmtime = aw.qmc.alarmtime
         self.alarmoffset = aw.qmc.alarmoffset
         self.alarmcond = aw.qmc.alarmcond
@@ -22838,6 +22853,7 @@ class AlarmDlg(ArtisanDialog):
     def clearalarms(self):
         self.alarmflag = []
         self.alarmguard = []
+        self.alarmnegguard = []
         self.alarmtime = []
         self.alarmoffset = []
         self.alarmcond = []
@@ -22858,6 +22874,7 @@ class AlarmDlg(ArtisanDialog):
     def addalarm(self):
         self.alarmflag.append(1)
         self.alarmguard.append(-1)
+        self.alarmnegguard.append(-1)
         self.alarmtime.append(-1)
         self.alarmoffset.append(0)
         self.alarmcond.append(1)
@@ -22871,9 +22888,11 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.resizeColumnsToContents()
         if nalarms < 1:            
             # improve width of Qlineedit columns
-            self.alarmtable.setColumnWidth(1,65)
-            self.alarmtable.setColumnWidth(3,50)
-            self.alarmtable.setColumnWidth(6,50)
+            self.alarmtable.setColumnWidth(1,50)
+            self.alarmtable.setColumnWidth(2,50)
+            self.alarmtable.setColumnWidth(4,50)
+            self.alarmtable.setColumnWidth(5,80)
+            self.alarmtable.setColumnWidth(7,40)
 
 
     def deletealarm(self):
@@ -22886,6 +22905,7 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmtable.removeRow(selected_row)
                 self.alarmflag = self.alarmflag[0:selected_row] + self.alarmflag[selected_row + 1:]
                 self.alarmguard = self.alarmguard[0:selected_row] + self.alarmguard[selected_row + 1:]
+                self.alarmnegguard = self.alarmnegguard[0:selected_row] + self.alarmnegguard[selected_row + 1:]
                 self.alarmtime = self.alarmtime[0:selected_row] + self.alarmtime[selected_row + 1:]
                 self.alarmoffset = self.alarmoffset[0:selected_row] + self.alarmoffset[selected_row + 1:]
                 self.alarmcond = self.alarmcond[0:selected_row] + self.alarmcond[selected_row + 1:]
@@ -22898,6 +22918,7 @@ class AlarmDlg(ArtisanDialog):
                 # nothing selected, we pop the last element
                 self.alarmflag.pop()
                 self.alarmguard.pop()
+                self.alarmnegguard.pop()
                 self.alarmtime.pop()
                 self.alarmoffset.pop()
                 self.alarmcond.pop()
@@ -22918,6 +22939,7 @@ class AlarmDlg(ArtisanDialog):
             infile.close()
             self.alarmflag = alarms["alarmflags"]
             self.alarmguard = alarms["alarmguards"]
+            self.alarmnegguard = alarms["alarmnegguards"]
             self.alarmtime = alarms["alarmtimes"]
             self.alarmoffset = alarms["alarmoffsets"]
             self.alarmcond = alarms["alarmconds"]
@@ -22951,27 +22973,34 @@ class AlarmDlg(ArtisanDialog):
                     self.alarmguard[i] = guard_value
                 else:
                     self.alarmguard[i] = -1
-                timez =  self.alarmtable.cellWidget(i,2)
+                negguard = self.alarmtable.cellWidget(i,2)
+                negguard_value = int(str(guard.text())) - 1
+                if negguard_value > -1 and negguard_value < nalarms:
+                    self.alarmnegguard[i] = negguard_value
+                else:
+                    self.alarmnegguard[i] = -1                    
+                timez =  self.alarmtable.cellWidget(i,3)
                 self.alarmtime[i] = aw.qmc.menuidx2alarmtime[timez.currentIndex()]
-                offset = self.alarmtable.cellWidget(i,3)
+                offset = self.alarmtable.cellWidget(i,4)
                 if offset and offset != "":
                     self.alarmoffset[i] = max(0,aw.qmc.stringtoseconds(str(offset.text())))
-                atype = self.alarmtable.cellWidget(i,4)
+                atype = self.alarmtable.cellWidget(i,5)
                 self.alarmsource[i] = int(str(atype.currentIndex())) - 3
-                cond = self.alarmtable.cellWidget(i,5)
+                cond = self.alarmtable.cellWidget(i,6)
                 self.alarmcond[i] = int(str(cond.currentIndex())) 
-                temp = self.alarmtable.cellWidget(i,6)
+                temp = self.alarmtable.cellWidget(i,7)
                 try:
                     self.alarmtemperature[i] = int(str(temp.text()))
                 except:
                     self.alarmtemperature[i] = 0
-                action = self.alarmtable.cellWidget(i,7)
+                action = self.alarmtable.cellWidget(i,8)
                 self.alarmaction[i] = int(str(action.currentIndex() - 1))
-                description = self.alarmtable.cellWidget(i,8)
+                description = self.alarmtable.cellWidget(i,9)
                 self.alarmstrings[i] = u(description.text())
             alarms = {}
             alarms["alarmflags"] = self.alarmflag
             alarms["alarmguards"] = self.alarmguard
+            alarms["alarmnegguards"] = self.alarmnegguard
             alarms["alarmtimes"] = self.alarmtime
             alarms["alarmoffsets"] = self.alarmoffset
             alarms["alarmconds"] = self.alarmcond
@@ -22996,6 +23025,7 @@ class AlarmDlg(ArtisanDialog):
     def showAlarmbuttonhelp(self):
         string  = u(QApplication.translate("Message", "<b>Status:</b> activate or deactive alarm",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>If Alarm:</b> alarm triggered only if the alarm with the given number was triggered before. Use 0 for no guard.",None, QApplication.UnicodeUTF8)) + "<br><br>"  
+        string += u(QApplication.translate("Message", "<b>But Not:</b> alarm triggered only if the alarm with the given number was not triggered before. Use 0 for no guard.",None, QApplication.UnicodeUTF8)) + "<br><br>"  
         string += u(QApplication.translate("Message", "<b>From:</b> alarm only triggered after the given event",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>Time:</b> if not 00:00, alarm is triggered mm:ss after the event 'From' happend",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>Source:</b> the temperature source that is observed",None, QApplication.UnicodeUTF8)) + "<br><br>"
@@ -23011,6 +23041,7 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.loadalarmsfromprofile = self.loadAlarmsFromProfile.isChecked()
         aw.qmc.alarmflag = [1]*nalarms
         aw.qmc.alarmguard = [-1]*nalarms
+        aw.qmc.alarmnegguard = [-1]*nalarms
         aw.qmc.alarmtime = [-1]*nalarms
         aw.qmc.alarmoffset = [0]*nalarms
         aw.qmc.alarmcond = [1]*nalarms
@@ -23030,23 +23061,32 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmguard[i] = guard_value
             else:
                 aw.qmc.alarmguard[i] = -1
-            timez =  self.alarmtable.cellWidget(i,2)
+            negguard = self.alarmtable.cellWidget(i,2)
+            try:
+                negguard_value = int(str(negguard.text())) - 1
+            except:
+                negguard_value = -1
+            if negguard_value > -1 and negguard_value < nalarms:
+                aw.qmc.alarmnegguard[i] = negguard_value
+            else:
+                aw.qmc.alarmnegguard[i] = -1
+            timez =  self.alarmtable.cellWidget(i,3)
             aw.qmc.alarmtime[i] = aw.qmc.menuidx2alarmtime[timez.currentIndex()]
-            offset =  self.alarmtable.cellWidget(i,3)
+            offset =  self.alarmtable.cellWidget(i,4)
             if offset and offset != "":
                 aw.qmc.alarmoffset[i] = max(0,aw.qmc.stringtoseconds(str(offset.text())))
-            atype = self.alarmtable.cellWidget(i,4)
+            atype = self.alarmtable.cellWidget(i,5)
             aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3
-            cond = self.alarmtable.cellWidget(i,5)
+            cond = self.alarmtable.cellWidget(i,6)
             aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
-            temp = self.alarmtable.cellWidget(i,6)
+            temp = self.alarmtable.cellWidget(i,7)
             try:
                 aw.qmc.alarmtemperature[i] = int(str(temp.text()))
             except:
                 aw.qmc.alarmtemperature[i] = 0
-            action = self.alarmtable.cellWidget(i,7)
+            action = self.alarmtable.cellWidget(i,8)
             aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
-            description = self.alarmtable.cellWidget(i,8)
+            description = self.alarmtable.cellWidget(i,9)
             aw.qmc.alarmstrings[i] = u(description.text())
         aw.qmc.alarmstate = [0]*len(aw.qmc.alarmflag)    # 0 = not triggered
 
@@ -23078,7 +23118,15 @@ class AlarmDlg(ArtisanDialog):
             guardstr = "0"
         guardedit = QLineEdit(guardstr)
         guardedit.setValidator(QIntValidator(0, 30,guardedit))
-        guardedit.setAlignment(Qt.AlignRight)
+        guardedit.setAlignment(Qt.AlignRight)        
+        #neg guarded by alarm
+        if self.alarmnegguard[i] > -1:
+            negguardstr = str(self.alarmnegguard[i] + 1)
+        else:
+            negguardstr = "0"
+        negguardedit = QLineEdit(negguardstr)
+        negguardedit.setValidator(QIntValidator(0, 30,negguardedit))
+        negguardedit.setAlignment(Qt.AlignRight)                
         #Effective time from
         timeComboBox = QComboBox()
         timeComboBox.addItems([QApplication.translate("ComboBox","START",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
@@ -23130,21 +23178,23 @@ class AlarmDlg(ArtisanDialog):
         descriptionedit = QLineEdit(u(self.alarmstrings[i]))
         self.alarmtable.setCellWidget(i,0,flagComboBox)
         self.alarmtable.setCellWidget(i,1,guardedit)
-        self.alarmtable.setCellWidget(i,2,timeComboBox)
-        self.alarmtable.setCellWidget(i,3,timeoffsetedit)
-        self.alarmtable.setCellWidget(i,4,typeComboBox)
-        self.alarmtable.setCellWidget(i,5,condComboBox)
-        self.alarmtable.setCellWidget(i,6,tempedit)
-        self.alarmtable.setCellWidget(i,7,actionComboBox)
-        self.alarmtable.setCellWidget(i,8,descriptionedit)
+        self.alarmtable.setCellWidget(i,2,negguardedit)
+        self.alarmtable.setCellWidget(i,3,timeComboBox)
+        self.alarmtable.setCellWidget(i,4,timeoffsetedit)
+        self.alarmtable.setCellWidget(i,5,typeComboBox)
+        self.alarmtable.setCellWidget(i,6,condComboBox)
+        self.alarmtable.setCellWidget(i,7,tempedit)
+        self.alarmtable.setCellWidget(i,8,actionComboBox)
+        self.alarmtable.setCellWidget(i,9,descriptionedit)
 
     def createalarmtable(self):
         try:
             self.alarmtable.clear()
             self.alarmtable.setTabKeyNavigation(True)
-            self.alarmtable.setColumnCount(9)
+            self.alarmtable.setColumnCount(10)
             self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","But Not",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","From",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","Source",None, QApplication.UnicodeUTF8),
@@ -23165,9 +23215,11 @@ class AlarmDlg(ArtisanDialog):
                     self.setalarmtablerow(i)
                 self.alarmtable.resizeColumnsToContents()
                 # improve width of Qlineedit columns
-                self.alarmtable.setColumnWidth(1,80)
-                self.alarmtable.setColumnWidth(3,50)
-                self.alarmtable.setColumnWidth(6,50)
+                self.alarmtable.setColumnWidth(1,50)
+                self.alarmtable.setColumnWidth(2,50)
+                self.alarmtable.setColumnWidth(4,50)
+                self.alarmtable.setColumnWidth(5,80)
+                self.alarmtable.setColumnWidth(7,40)
                 header = self.alarmtable.horizontalHeader()
                 header.setStretchLastSection(True)
         except Exception as ex:
