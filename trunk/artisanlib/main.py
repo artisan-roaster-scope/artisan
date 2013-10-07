@@ -786,6 +786,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmaction = []       # -1 = no action; 0 = open a window; 1 = call program with a filepath equal to alarmstring; 2 = activate button with number given in description; 
                                     # 3,4,5,6 = move slider with value given in description
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
+        self.loadalarmsfromprofile = False # if set, alarms are loaded from profile (even background profiles)
         self.temporaryalarmflag = -3 #holds temporary index value of triggered alarm in updategraphics()
         self.TPalarmtimeindex = None # is set to the current  aw.qmc.timeindex by sample(), if alarms are defined and once the TP is detected
 
@@ -7993,6 +7994,26 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
                 self.qmc.backgroundEStrings = profile["specialeventsStrings"]
                 self.qmc.backgroundFlavors = profile["flavors"]
+                # alarms
+                if self.qmc.loadalarmsfromprofile:
+                    if "alarmflag" in profile:
+                        self.qmc.alarmflag = profile["alarmflag"]
+                    if "alarmguard" in profile:
+                        self.qmc.alarmguard = profile["alarmguard"]
+                    if "alarmtime" in profile:
+                        self.qmc.alarmtime = profile["alarmtime"]
+                    if "alarmoffset" in profile:
+                        self.qmc.alarmoffset = profile["alarmoffset"]
+                    if "alarmcond" in profile:
+                        self.qmc.alarmcond = profile["alarmcond"]
+                    if "alarmsource" in profile:
+                        self.qmc.alarmsource = profile["alarmsource"]
+                    if "alarmtemperature" in profile:
+                        self.qmc.alarmtemperature = profile["alarmtemperature"]
+                    if "alarmaction" in profile:
+                        self.qmc.alarmaction = profile["alarmaction"]
+                    if "alarmstrings" in profile:
+                        self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
                 #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
                 if self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
                     l = len(self.qmc.backgroundFlavors)
@@ -8021,7 +8042,11 @@ class ApplicationWindow(QMainWindow):
                         times.append(startendB[2])
                         self.qmc.timebackgroundindexupdate(times[:])
                 self.qmc.timeindexB = self.qmc.timeindexB + [0 for i in range(8-len(self.qmc.timeindexB))]
-                message =  u(QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(u(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))))
+                backgroundDrop = self.qmc.timeindexB[6]
+                if len(self.qmc.timeB) > backgroundDrop:
+                    message =  u(QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(u(filename)).arg(str(self.qmc.stringfromseconds(self.qmc.timeB[self.qmc.timeindexB[6]]))))
+                else:
+                    message =  u(QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(u(filename)).arg(""))                    
                 self.sendmessage(message)
             else:
                 self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None, QApplication.UnicodeUTF8))
@@ -8754,6 +8779,26 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.extraname1 = [d(n) for n in profile["extraname1"]]
             if "extraname2" in profile:
                 self.qmc.extraname2 = [d(n) for n in profile["extraname2"]]
+            # alarms
+            if self.qmc.loadalarmsfromprofile:
+                if "alarmflag" in profile:
+                    self.qmc.alarmflag = profile["alarmflag"]
+                if "alarmguard" in profile:
+                    self.qmc.alarmguard = profile["alarmguard"]
+                if "alarmtime" in profile:
+                    self.qmc.alarmtime = profile["alarmtime"]
+                if "alarmoffset" in profile:
+                    self.qmc.alarmoffset = profile["alarmoffset"]
+                if "alarmcond" in profile:
+                    self.qmc.alarmcond = profile["alarmcond"]
+                if "alarmsource" in profile:
+                    self.qmc.alarmsource = profile["alarmsource"]
+                if "alarmtemperature" in profile:
+                    self.qmc.alarmtemperature = profile["alarmtemperature"]
+                if "alarmaction" in profile:
+                    self.qmc.alarmaction = profile["alarmaction"]
+                if "alarmstrings" in profile:
+                    self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
             if "timeindex" in profile:
                 self.qmc.timeindex = profile["timeindex"]
             else:
@@ -9072,6 +9117,16 @@ class ApplicationWindow(QMainWindow):
             profile["extradrawstyles1"] = [e(x) for x in self.qmc.extradrawstyles1]
             profile["extradrawstyles2"] = [e(x) for x in self.qmc.extradrawstyles2]
             profile["externalprogram"] = e(self.ser.externalprogram)
+            #alarms
+            profile["alarmflag"] = self.qmc.alarmflag
+            profile["alarmguard"] = self.qmc.alarmguard
+            profile["alarmtime"] = self.qmc.alarmtime
+            profile["alarmoffset"] = self.qmc.alarmoffset
+            profile["alarmcond"] = self.qmc.alarmcond
+            profile["alarmsource"] = self.qmc.alarmsource
+            profile["alarmtemperature"] = self.qmc.alarmtemperature
+            profile["alarmaction"] = self.qmc.alarmaction
+            profile["alarmstrings"] = [e(x) for x in self.qmc.alarmstrings]
             #write only:
             profile["samplinginterval"] = self.qmc.delay / 1000.
             try:
@@ -9355,6 +9410,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.alarmaction = [x.toInt()[0] for x in settings.value("alarmaction").toList()]
                 self.qmc.alarmstrings = list(settings.value("alarmstrings",self.qmc.alarmstrings).toStringList())
                 self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)
+                if settings.contains("loadAlarmsFromProfile"):
+                    self.qmc.loadalarmsfromprofile = settings.value("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile).toBool()
             settings.endGroup()
             #restore pid settings
             settings.beginGroup("PXR")
@@ -10075,6 +10132,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("alarmtemperature",self.qmc.alarmtemperature)
             settings.setValue("alarmaction",self.qmc.alarmaction)
             settings.setValue("alarmstrings",self.qmc.alarmstrings)
+            settings.setValue("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
             #save extra devices
@@ -10624,6 +10682,10 @@ $cupping_notes
         flavor_image = "roastlog-flavor"
         if platf == 'Darwin':
             flavor_image = flavor_image + ".svg"
+            try:
+                os.remove(flavor_image)
+            except OSError:
+                pass
             self.qmc.fig.savefig(flavor_image)
         else:
             image = QPixmap.grabWidget(aw.qmc).toImage()
@@ -10631,6 +10693,10 @@ $cupping_notes
 #            image = image.scaledToWidth(550,1)
             #save GRAPH image
             flavor_image = flavor_image + ".png"
+            try:
+                os.remove(flavor_image)
+            except OSError:
+                pass
             image.save(flavor_image)
         flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
         #return screen to GRAPH profile mode
@@ -10717,6 +10783,10 @@ $cupping_notes
         f = None
         try:              
             filename = "Roastlog.html"
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
             f = codecs.open(filename, 'w', encoding='utf-8')
             for i in range(len(html)):
                 f.write(html[i])
@@ -22728,8 +22798,16 @@ class AlarmDlg(ArtisanDialog):
         helpButton.setFocusPolicy(Qt.NoFocus)
         helpButton.setMinimumWidth(80)
         self.connect(helpButton, SIGNAL("clicked()"),self.showAlarmbuttonhelp)
+        clearButton = QPushButton(QApplication.translate("Button","Clear",None, QApplication.UnicodeUTF8))
+        clearButton.setToolTip(QApplication.translate("Tooltip","Clear alarms table",None, QApplication.UnicodeUTF8))
+        clearButton.setFocusPolicy(Qt.NoFocus)
+        clearButton.setMinimumWidth(80)
+        self.loadAlarmsFromProfile = QCheckBox(QApplication.translate("CheckBox", "Load alarms from profile",None, QApplication.UnicodeUTF8))
+        self.loadAlarmsFromProfile.setChecked(aw.qmc.loadalarmsfromprofile)
+        self.connect(clearButton, SIGNAL("clicked()"),self.clearalarms)
         tablelayout = QVBoxLayout()
         buttonlayout = QHBoxLayout()
+        okbuttonlayout = QHBoxLayout()
         mainlayout = QVBoxLayout()
         tablelayout.addWidget(self.alarmtable)
         buttonlayout.addWidget(addButton)
@@ -22744,14 +22822,31 @@ class AlarmDlg(ArtisanDialog):
         buttonlayout.addWidget(exportButton)
         buttonlayout.addStretch()
         buttonlayout.addSpacing(15)
-        buttonlayout.addWidget(helpButton)
+        buttonlayout.addWidget(clearButton)
         buttonlayout.addStretch()
         buttonlayout.addSpacing(15)
-        buttonlayout.addWidget(okButton)
+        buttonlayout.addWidget(helpButton)
+        okbuttonlayout.addWidget(self.loadAlarmsFromProfile)
+        okbuttonlayout.addStretch()
+        okbuttonlayout.addSpacing(15)
+        okbuttonlayout.addWidget(okButton)
         mainlayout.addLayout(tablelayout)
         mainlayout.addLayout(buttonlayout)
+        mainlayout.addLayout(okbuttonlayout)
         self.setLayout(mainlayout)
 
+    def clearalarms(self):
+        self.alarmflag = []
+        self.alarmguard = []
+        self.alarmtime = []
+        self.alarmoffset = []
+        self.alarmcond = []
+        self.alarmsource = []
+        self.alarmtemperature = []
+        self.alarmaction = []
+        self.alarmstrings = []
+        self.alarmtable.setRowCount(0)
+    
     def alarmson(self,flag):
         for i in range(len(aw.qmc.alarmflag)):
             if flag == 1:
@@ -22913,6 +23008,7 @@ class AlarmDlg(ArtisanDialog):
 
     def savealarms(self):
         nalarms = self.alarmtable.rowCount()
+        aw.qmc.loadalarmsfromprofile = self.loadAlarmsFromProfile.isChecked()
         aw.qmc.alarmflag = [1]*nalarms
         aw.qmc.alarmguard = [-1]*nalarms
         aw.qmc.alarmtime = [-1]*nalarms
@@ -22921,7 +23017,7 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmsource = [1]*nalarms
         aw.qmc.alarmtemperature = [500]*nalarms
         aw.qmc.alarmaction = [0]*nalarms
-        aw.qmc.alarmstrings = [0]*nalarms
+        aw.qmc.alarmstrings = [""]*nalarms
         for i in range(nalarms):
             flag = self.alarmtable.cellWidget(i,0)
             aw.qmc.alarmflag[i] = int(flag.isChecked())
