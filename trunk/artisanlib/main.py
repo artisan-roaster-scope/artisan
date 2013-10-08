@@ -5611,7 +5611,7 @@ class SampleThread(QThread):
                         if aw.qmc.alarmflag[i] \
                           and not aw.qmc.alarmstate[i] \
                           and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
-                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmnegflag) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
+                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmnflag) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
                           and ((aw.qmc.alarmtime[i] < 0) \
                           or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
                           or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
@@ -10669,9 +10669,10 @@ $cupping_notes
             etbta = "%d %sm"%(cp["total_ts"],self.qmc.mode) 
             if "total_ts_ET" in cp and "total_ts_BT" in cp:
                 etbta += " [%d-%d]"%(cp["total_ts_ET"],cp["total_ts_BT"])
+        tmpdir = str(QDir.tempPath() + "/")
         graph_image = "roastlog-graph"
         if platf == 'Darwin':
-            graph_image = graph_image + ".svg"
+            graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
             try:
                 os.remove(graph_image)
             except OSError:
@@ -10682,7 +10683,7 @@ $cupping_notes
 #            #resize GRAPH image to 650 pixels width
 #            image = image.scaledToWidth(650,1)
             #save GRAPH image
-            graph_image = graph_image + ".png"
+            graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
             try:
                 os.remove(graph_image)
             except OSError:
@@ -10694,7 +10695,7 @@ $cupping_notes
         self.qmc.flavorchart()
         flavor_image = "roastlog-flavor"
         if platf == 'Darwin':
-            flavor_image = flavor_image + ".svg"
+            flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".svg"))
             try:
                 os.remove(flavor_image)
             except OSError:
@@ -10705,7 +10706,7 @@ $cupping_notes
             #resize FLAVOR image to 550 pixels width
 #            image = image.scaledToWidth(550,1)
             #save GRAPH image
-            flavor_image = flavor_image + ".png"
+            flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".png"))
             try:
                 os.remove(flavor_image)
             except OSError:
@@ -10795,7 +10796,7 @@ $cupping_notes
             cupping_notes=self.note2html(self.qmc.cuppingnotes))
         f = None
         try:              
-            filename = "Roastlog.html"
+            filename = u(QDir(tmpdir).filePath("Roastlog.html"))
             try:
                 os.remove(filename)
             except OSError:
@@ -10804,7 +10805,7 @@ $cupping_notes
             for i in range(len(html)):
                 f.write(html[i])
             f.close()
-            full_path = "file:///" + u(QDir().current().absolutePath()) + "/" + filename
+            full_path = "file:///" + filename
             QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
             
         except IOError as e:
