@@ -1339,7 +1339,7 @@ class tgraphcanvas(FigureCanvas):
                         aw.moveslider(slidernr,slidervalue)
                         if aw.qmc.flagstart:
                             value = aw.float2float((slidervalue + 10.0) / 10.0)
-                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value)
+                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription="A%n (S%n)"%(alarmnumber,slidernr))
                         aw.fireslideraction(slidernr)
                 except:
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
@@ -1915,7 +1915,7 @@ class tgraphcanvas(FigureCanvas):
                     e = 40
                     a = 0.4
                 else:
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE 00:00", None, QApplication.UnicodeUTF8))
                     e = 0
                     a = 1.                
 
@@ -3075,7 +3075,7 @@ class tgraphcanvas(FigureCanvas):
                         return
                 self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
-                st1 = QApplication.translate("Scope Annotation", "START 00:00", None, QApplication.UnicodeUTF8)
+                st1 = QApplication.translate("Scope Annotation", "CHARGE 00:00", None, QApplication.UnicodeUTF8)
                 t2 = self.temp2[self.timeindex[0]]
                 tx = self.timex[self.timeindex[0]]
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
@@ -12968,7 +12968,7 @@ class HUDDlg(ArtisanDialog):
     def eventlist(self):
         events = []
         if aw.qmc.timeindex[0] > -1:
-            events.append(("START",aw.qmc.timeindex[0]))
+            events.append(("CHARGE",aw.qmc.timeindex[0]))
         names = [
             QApplication.translate("Table", "DRY END",None, QApplication.UnicodeUTF8),
             QApplication.translate("Table", "FC START",None, QApplication.UnicodeUTF8),
@@ -13983,7 +13983,7 @@ class editGraphDlg(ArtisanDialog):
                     #identify by color and add notation
                 if i == aw.qmc.timeindex[0]:
                     Rtime.setBackgroundColor(QColor('#f07800'))
-                    text = QApplication.translate("Table", "START",None, QApplication.UnicodeUTF8)
+                    text = QApplication.translate("Table", "CHARGE",None, QApplication.UnicodeUTF8)
                 elif i == aw.qmc.timeindex[1]:
                     Rtime.setBackgroundColor(QColor('orange'))
                     text = QApplication.translate("Table", "DRY END",None, QApplication.UnicodeUTF8)
