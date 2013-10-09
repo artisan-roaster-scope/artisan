@@ -21363,7 +21363,6 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
             elif self.nonpidButton.isChecked():
                 meter = str(self.devicetypeComboBox.currentText())
-                message = QApplication.translate("Error Message","Device error",None,QApplication.UnicodeUTF8)
                 if meter == "Omega HH806AU":
                     aw.qmc.device = 1
                     #aw.ser.comport = "COM11"
@@ -21626,7 +21625,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 ##########################
                 ####  DEVICE 36 is +Phidget 1048_AT but +DEVICE cannot be set as main device
                 ##########################
-                elif meter == "Phidget 1046":
+                elif meter == "Phidget 1046 RTD":
                     aw.qmc.device = 37
                     #aw.ser.comport = "COM11"
                     aw.ser.baudrate = 19200
@@ -21636,7 +21635,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
-                ####  DEVICE 38 is +Phidget 1046_34 but +DEVICE cannot be set as main device
+                ####  DEVICE 38 is +Phidget 1046_34 RTD but +DEVICE cannot be set as main device
                 ##########################                
                 elif meter == "Omega HH806W":
                     aw.qmc.device = 39
