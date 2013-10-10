@@ -903,9 +903,9 @@ class tgraphcanvas(FigureCanvas):
         # defaults
         
         self.filterDropOut_tmin_C_default = 10
-        self.filterDropOut_tmax_C_default = 300
+        self.filterDropOut_tmax_C_default = 700
         self.filterDropOut_tmin_F_default = 50
-        self.filterDropOut_tmax_F_default = 572
+        self.filterDropOut_tmax_F_default = 1292
         self.filterDropOut_spikeRoR_dRoR_limit_C_default = 4.2
         self.filterDropOut_spikeRoR_dRoR_limit_F_default = 7
         
@@ -915,7 +915,7 @@ class tgraphcanvas(FigureCanvas):
         self.filterDropOut_tmin = self.filterDropOut_tmin_F_default
         self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
         self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
-        self.minmaxLimits = False
+        self.minmaxLimits = True
         self.dropSpikes = False
         
         self.swapETBT = False
@@ -1339,9 +1339,11 @@ class tgraphcanvas(FigureCanvas):
                         aw.moveslider(slidernr,slidervalue)
                         if aw.qmc.flagstart:
                             value = aw.float2float((slidervalue + 10.0) / 10.0)
-                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription="A%n (S%n)"%(alarmnumber,slidernr))
+                            aw.qmc.EventRecordAction(extraevent = 1,eventtype=slidernr,eventvalue=value,eventdescription=str("A%d (S%d)"%(alarmnumber,slidernr)))
                         aw.fireslideraction(slidernr)
-                except:
+                except Exception as e:
+                    _, _, exc_tb = sys.exc_info()
+                    aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setalarm() %1").arg(str(e)),exc_tb.tb_lineno)
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
@@ -2008,7 +2010,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         tx = t0idx
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
-                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8),str(self.stringfromseconds(timex[tidx]-t0)))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP %1", None, QApplication.UnicodeUTF8),str(self.stringfromseconds(timex[tidx]-t0)))
                     if timeindex2 and timeindex2[6] and timex[timeindex[6]] < time2[timeindex2[6]]:
                         e = -80
                         a = 0.4
@@ -2491,19 +2493,24 @@ class tgraphcanvas(FigureCanvas):
                 elif self.eventsGraphflag == 2:
                     self.E1timex,self.E2timex,self.E3timex,self.E4timex = [],[],[],[]
                     self.E1values,self.E2values,self.E3values,self.E4values = [],[],[],[]
+                    E1_nonempty = E2_nonempty = E3_nonempty = E4_nonempty = False
                     for i in range(Nevents):
                         if self.specialeventstype[i] == 0:           
                             self.E1timex.append(self.timex[self.specialevents[i]])
                             self.E1values.append(self.eventpositionbars[int(self.specialeventsvalue[i])])
+                            E1_nonempty = True
                         elif self.specialeventstype[i] == 1:
                             self.E2timex.append(self.timex[self.specialevents[i]])
                             self.E2values.append(self.eventpositionbars[int(self.specialeventsvalue[i])])
+                            E2_nonempty = True
                         elif self.specialeventstype[i] == 2:
                             self.E3timex.append(self.timex[self.specialevents[i]])
                             self.E3values.append(self.eventpositionbars[int(self.specialeventsvalue[i])])
+                            E3_nonempty = True
                         elif self.specialeventstype[i] == 3:
                             self.E4timex.append(self.timex[self.specialevents[i]])
                             self.E4values.append(self.eventpositionbars[int(self.specialeventsvalue[i])])
+                            E4_nonempty = True
 
                     self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
                                                           linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0],label=self.etypesf(0))
@@ -2514,8 +2521,18 @@ class tgraphcanvas(FigureCanvas):
                     self.l_eventtype4dots, = self.ax.plot(self.E4timex, self.E4values, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
                                                           linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3],label=self.etypesf(3))
 
-                    handles.extend([self.l_eventtype1dots,self.l_eventtype2dots,self.l_eventtype3dots,self.l_eventtype4dots])
-                    labels.extend([aw.arabicReshape(self.etypesf(0)),aw.arabicReshape(self.etypesf(1)),aw.arabicReshape(self.etypesf(2)),aw.arabicReshape(self.etypesf(3))])
+                    if E1_nonempty:
+                        handles.append(self.l_eventtype1dots)
+                        labels.append(aw.arabicReshape(self.etypesf(0)))
+                    if E2_nonempty:
+                        handles.append(self.l_eventtype2dots)
+                        labels.append(aw.arabicReshape(self.etypesf(1)))
+                    if E3_nonempty:
+                        handles.append(self.l_eventtype3dots)
+                        labels.append(aw.arabicReshape(self.etypesf(2)))
+                    if E4_nonempty:
+                        handles.append(self.l_eventtype4dots)
+                        labels.append(aw.arabicReshape(self.etypesf(3)))
 
                 #if recorder on
                 if self.flagon:
@@ -3413,7 +3430,7 @@ class tgraphcanvas(FigureCanvas):
                             if self.samplingsemaphore.available() < 1:
                                 self.samplingsemaphore.release(1)
                             return
-                    st1 = QApplication.translate("Scope Annotation","END %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
+                    st1 = QApplication.translate("Scope Annotation","DROP %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     if self.timeindex[5]:
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
@@ -7086,13 +7103,16 @@ class ApplicationWindow(QMainWindow):
         action = self.eventslideractions[n]   
         if action:
             try:
+                # action =0 (None), =1 (Serial), =2 (Modbus), =3 (DTA Command)
                 action = (action+2 if action > 1 else action)
                 value = int(round((self.eventsliderfactors[n] * self.eventslidervalues[n]) + self.eventslideroffsets[n]))
                 cmd = self.eventslidercommands[n]
                 cmd = cmd.format(value)
                 self.eventaction(action,cmd)
-            except:
-                pass
+            except Exception as e:
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " fireslideraction() %1").arg(str(e)),exc_tb.tb_lineno)
+
             
     def recordsliderevent(self,n):
         if self.qmc.flagstart:
@@ -22886,13 +22906,14 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setRowCount(nalarms + 1)
         self.setalarmtablerow(nalarms)
         self.alarmtable.resizeColumnsToContents()
-        if nalarms < 1:            
-            # improve width of Qlineedit columns
-            self.alarmtable.setColumnWidth(1,50)
-            self.alarmtable.setColumnWidth(2,50)
-            self.alarmtable.setColumnWidth(4,50)
-            self.alarmtable.setColumnWidth(5,80)
-            self.alarmtable.setColumnWidth(7,40)
+        # improve width of Qlineedit columns
+        self.alarmtable.setColumnWidth(1,50)
+        self.alarmtable.setColumnWidth(2,50)
+        self.alarmtable.setColumnWidth(4,50)
+        self.alarmtable.setColumnWidth(5,80)
+        self.alarmtable.setColumnWidth(7,40)
+        header = self.alarmtable.horizontalHeader()
+        header.setStretchLastSection(False)
 
 
     def deletealarm(self):
@@ -23221,7 +23242,7 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmtable.setColumnWidth(5,80)
                 self.alarmtable.setColumnWidth(7,40)
                 header = self.alarmtable.horizontalHeader()
-                header.setStretchLastSection(True)
+                header.setStretchLastSection(False)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " createalarmtable() %1").arg(str(ex)),exc_tb.tb_lineno)
