@@ -7208,9 +7208,6 @@ class ApplicationWindow(QMainWindow):
                         self.ser.sendTXcommand(cmd_str_bin)
                     else:
                         self.ser.sendTXcommand(cmd_str)
-                        if aw.seriallogflag:
-                            settings = str(self.ser.comport) + "," + str(self.ser.baudrate) + "," + str(self.ser.bytesize)+ "," + str(self.ser.parity) + "," + str(self.ser.stopbits) + "," + str(self.ser.timeout)
-                            aw.addserial("Serial Action :" + settings + " || Tx = " + str(cmd_str))
 #                    if aw.qmc.samplingsemaphore.available() < 1:
 #                        aw.qmc.samplingsemaphore.release(1)
                 elif action == 2:
@@ -19069,8 +19066,10 @@ class serialport(object):
                         self.SP.write(str2cmd("PID;XON" + "\n"))       #activate extra PID OT1/OT2 channels
                     else:
                         self.SP.write(str2cmd("PID;XOFF" + "\n"))       #activate extra PID OT1/OT2 channels
+                    self.SP.flush()
                     libtime.sleep(0.3)
                     self.SP.write(str2cmd(command + "\n"))       #send command
+                    self.SP.flush()
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
                         raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None, QApplication.UnicodeUTF8))
@@ -19080,6 +19079,7 @@ class serialport(object):
                         self.SP.flushOutput()
                         command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
                         self.SP.write(str2cmd(command))
+                        self.SP.flush()
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
                             raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None, QApplication.UnicodeUTF8))
@@ -19130,14 +19130,14 @@ class serialport(object):
                         aw.qmc.extraArduinoT4 = float(res[0])
                 return t1, t2
         except serial.SerialException as e:
-            self.closeport()
+            #self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.ARDUINOTC4temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1.,-1.
         except Exception as e:
-            self.closeport()
+            # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " ser.ARDUINOTC4temperature(): %1").arg(str(e)),exc_tb.tb_lineno)
             return -1.,-1.
@@ -19459,51 +19459,54 @@ class serialport(object):
                 if aw.qmc.device == 19:
                     self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
+                self.SP.flushInput()
+                self.SP.flushOutput()
                 if (aw.qmc.device == 19 and not command.endswith("\n")):
                     command += "\n"
                 self.SP.write(str2cmd(command))
+                self.SP.flush()
         except serial.SerialException:
-            self.closeport()
+            #self.closeport() # do not close the serial port as reopening might take too long
             error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
         except Exception as ex:
-            self.closeport()
+            #self.closeport() # do not close the serial port as reopening might take too long
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             #note: logged chars should not be binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("Arduinocommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
+                aw.addserial("Serial Ccommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
 
     #Example function
     #NOT USED YET, maybe FUTURE Arduino?
     #sends a command to the ET/BT device and receives data of length nbytes 
-    def sendTXRXcommand(self,command,nbytes):
-        try:
-            self.SP.write(str2cmd(command))
-            r = self.SP.read(nbytes)
-            if len(r) == nbytes:
-                return r
-            else:
-                return "ERR"
-        except serial.SerialException:
-            self.closeport()
-            error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXRXcommand()"
-            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
-        except Exception as ex:
-            self.closeport()
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXRXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
-        finally:
-            #note: logged chars should not be binary
-            if aw.seriallogflag:
-                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("FutureArduinocommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
+#    def sendTXRXcommand(self,command,nbytes):
+#        try:
+#            self.SP.write(str2cmd(command))
+#            r = self.SP.read(nbytes)
+#            if len(r) == nbytes:
+#                return r
+#            else:
+#                return "ERR"
+#        except serial.SerialException:
+#            self.closeport()
+#            error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXRXcommand()"
+#            timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+#        except Exception as ex:
+#            self.closeport()
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXRXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
+#        finally:
+#            #note: logged chars should not be binary
+#            if aw.seriallogflag:
+#                settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
+#                aw.addserial("FutureArduinocommand :" + settings + " || Tx = " + command + " || Rx = " + "No answer needed")
 
 #########################################################################
 #############  DESIGNER CONFIG DIALOG ###################################
