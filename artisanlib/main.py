@@ -7215,13 +7215,10 @@ class ApplicationWindow(QMainWindow):
                     if "a2b_uu" in cmd_str:
                         cmd_str = cmd_str[(len("a2b_uu")+1):][:1]  # removes function-name + char ( and )
                         cmd_str_bin = binascii.a2b_uu(cmd_str)
-#                    self.samplingsemaphore.acquire(1)
                     if cmd_str_bin:
                         self.ser.sendTXcommand(cmd_str_bin)
                     else:
                         self.ser.sendTXcommand(cmd_str)
-#                    if aw.qmc.samplingsemaphore.available() < 1:
-#                        aw.qmc.samplingsemaphore.release(1)
                 elif action == 2:
                     try:
                         QDesktopServices.openUrl(QUrl("file:///" + u(QDir().current().absolutePath()) + "/" + cmd_str, QUrl.TolerantMode))
@@ -7235,7 +7232,6 @@ class ApplicationWindow(QMainWindow):
                             self.recordextraevent(buttonnumber)
                 elif action == 4:
                     if cmd_str.startswith('write'):
-#                        self.samplingsemaphore.acquire(1)
                         try:
                             cmds = eval(cmd_str[len('write'):])
                             if isinstance(cmds,tuple):
@@ -7250,21 +7246,13 @@ class ApplicationWindow(QMainWindow):
                                 aw.modbus.writeSingleRegister(*cmds)
                         except:
                             pass
-#                        if aw.qmc.samplingsemaphore.available() < 1:
-#                            aw.qmc.samplingsemaphore.release(1)
                 elif action == 5:
-#                    self.samplingsemaphore.acquire(1)
                     try:
                         DTAvalue=cmd_str.split(':')[1]
                         DTAaddress=cmd_str.split(':')[0]
                         aw.dtapid.writeDTE(DTAvalue,DTAaddress)
                     except:
                         pass
-#                    if aw.qmc.samplingsemaphore.available() < 1:
-#                        aw.qmc.samplingsemaphore.release(1)
-#            finally:
-#                if aw.qmc.samplingsemaphore.available() < 1:
-#                    aw.qmc.samplingsemaphore.release(1)
             except:
                 pass
                     
@@ -17756,12 +17744,17 @@ class modbusport(object):
 
     def writeSingleRegister(self,slave,register,value):
         try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
             self.connect()
             self.master.address = int(slave)
             self.master.write_register(int(register),int(value),0,6)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)   
 
     def readFloat(self,slave,register,code=3):
         try:
@@ -19527,6 +19520,8 @@ class serialport(object):
     #sends a command to the ET/BT device. (used by eventaction to send serial command to e.g. Arduino)
     def sendTXcommand(self,command):
         try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
             if not self.SP.isOpen():
                 self.openport()
                 libtime.sleep(2)
@@ -19551,6 +19546,8 @@ class serialport(object):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)        
             #note: logged chars should not be binary
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
