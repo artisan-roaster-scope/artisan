@@ -22865,20 +22865,9 @@ class AlarmDlg(ArtisanDialog):
         super(AlarmDlg,self).__init__(parent)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Alarms",None, QApplication.UnicodeUTF8))
-#        #local alarm variables
-#        self.alarmflag = aw.qmc.alarmflag
-#        self.alarmguard = aw.qmc.alarmguard
-#        self.alarmnegguard = aw.qmc.alarmnegguard
-#        self.alarmtime = aw.qmc.alarmtime
-#        self.alarmoffset = aw.qmc.alarmoffset
-#        self.alarmcond = aw.qmc.alarmcond
-#        self.alarmstate = aw.qmc.alarmstate
-#        self.alarmsource = aw.qmc.alarmsource
-#        self.alarmtemperature = aw.qmc.alarmtemperature
-#        self.alarmaction = aw.qmc.alarmaction
-#        self.alarmstrings = aw.qmc.alarmstrings
         #table for alarms
         self.alarmtable = QTableWidget()
+        self.connect(self.alarmtable, SIGNAL("itemSelectionChanged()"),self.selectionChanged)
         self.createalarmtable()
         allonButton = QPushButton(QApplication.translate("Button","All On",None, QApplication.UnicodeUTF8))
         self.connect(allonButton,  SIGNAL("clicked()"), lambda flag=1: self.alarmson(flag))
@@ -22890,6 +22879,11 @@ class AlarmDlg(ArtisanDialog):
         self.connect(addButton, SIGNAL("clicked()"),self.addalarm)
         addButton.setMinimumWidth(80)
         addButton.setFocusPolicy(Qt.NoFocus)
+        self.insertButton = QPushButton(QApplication.translate("Button","Insert",None, QApplication.UnicodeUTF8))
+        self.connect(self.insertButton, SIGNAL("clicked()"),self.insertalarm)
+        self.insertButton.setMinimumWidth(80)
+        self.insertButton.setFocusPolicy(Qt.NoFocus)
+        self.insertButton.setEnabled(False)
         deleteButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
         self.connect(deleteButton, SIGNAL("clicked()"),self.deletealarm)
         deleteButton.setMinimumWidth(80)
@@ -22922,11 +22916,12 @@ class AlarmDlg(ArtisanDialog):
         mainlayout = QVBoxLayout()
         tablelayout.addWidget(self.alarmtable)
         buttonlayout.addWidget(addButton)
+        buttonlayout.addWidget(self.insertButton)
         buttonlayout.addWidget(deleteButton)
         buttonlayout.addStretch()
         buttonlayout.addSpacing(10)
-        buttonlayout.addWidget(alloffButton)
         buttonlayout.addWidget(allonButton)
+        buttonlayout.addWidget(alloffButton)
         buttonlayout.addStretch()
         buttonlayout.addSpacing(10)
         buttonlayout.addWidget(importButton)
@@ -22945,6 +22940,19 @@ class AlarmDlg(ArtisanDialog):
         mainlayout.addLayout(buttonlayout)
         mainlayout.addLayout(okbuttonlayout)
         self.setLayout(mainlayout)
+        
+    def deselectAll(self):
+        selected = self.alarmtable.selectedRanges()
+        if selected and len(selected) > 0:
+            self.alarmtable.setRangeSelected(selected[0],False)
+        
+    def selectionChanged(self):
+        selected = self.alarmtable.selectedRanges()
+        if selected and len(selected) > 0:
+            selected_row = selected[0].topRow()
+            self.insertButton.setEnabled(True)
+        else:
+            self.insertButton.setEnabled(False)
 
     def clearalarms(self):
         aw.qmc.alarmflag = []
@@ -22992,8 +23000,39 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setColumnWidth(7,40)
         header = self.alarmtable.horizontalHeader()
         header.setStretchLastSection(False)
+        self.deselectAll()
 
-
+    def insertalarm(self):
+        nalarms = self.alarmtable.rowCount()
+        if nalarms:
+            # check for selection
+            selected = self.alarmtable.selectedRanges()
+            if selected and len(selected) > 0:
+                selected_row = selected[0].topRow()
+                aw.qmc.alarmflag.insert(selected_row,1)
+                aw.qmc.alarmguard.insert(selected_row,-1)
+                aw.qmc.alarmnegguard.insert(selected_row,-1)
+                aw.qmc.alarmtime.insert(selected_row,-1)
+                aw.qmc.alarmoffset.insert(selected_row,0)
+                aw.qmc.alarmcond.insert(selected_row,1)
+                aw.qmc.alarmstate.insert(selected_row,0)
+                aw.qmc.alarmsource.insert(selected_row,1)
+                aw.qmc.alarmtemperature.insert(selected_row,500)
+                aw.qmc.alarmaction.insert(selected_row,0)
+                aw.qmc.alarmstrings.insert(selected_row,QApplication.translate("Label","Enter description",None, QApplication.UnicodeUTF8))
+                self.alarmtable.insertRow(selected_row)
+                self.setalarmtablerow(selected_row)
+                self.alarmtable.resizeColumnsToContents()
+                #  improve width of Qlineedit columns
+                self.alarmtable.setColumnWidth(1,50)
+                self.alarmtable.setColumnWidth(2,50)
+                self.alarmtable.setColumnWidth(4,50)
+                self.alarmtable.setColumnWidth(5,80)
+                self.alarmtable.setColumnWidth(7,40)
+                header = self.alarmtable.horizontalHeader()
+                header.setStretchLastSection(False)
+        self.deselectAll()
+        
     def deletealarm(self):
         nalarms = self.alarmtable.rowCount()
         if nalarms:
@@ -23028,6 +23067,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmaction.pop()
                 aw.qmc.alarmstrings.pop()
             self.alarmtable.setRowCount(nalarms - 1)
+        self.deselectAll()
 
     def importalarms(self):
         aw.fileImport(QApplication.translate("Message", "Load Alarms",None, QApplication.UnicodeUTF8),self.importalarmsJSON)
