@@ -545,7 +545,7 @@ class tgraphcanvas(FigureCanvas):
         
         self.whole_color = 0
         self.ground_color = 0
-        self.color_systems = ["","Moppette","Colorette","ColorTrack","Agtron"]
+        self.color_systems = ["","Tonino","Colorette","ColorTrack","Agtron"]
         self.color_system_idx = 0
         
         # roast property flags
@@ -1641,7 +1641,7 @@ class tgraphcanvas(FigureCanvas):
             # nothing to be saved
             return True
 
-    def clearMeasurements(self):
+    def clearMeasurements(self,andLCDs=True):
         try:
             #### lock shared resources #####
             self.samplingsemaphore.acquire(1)
@@ -1656,15 +1656,16 @@ class tgraphcanvas(FigureCanvas):
                 self.extratimex[i],self.extratemp1[i],self.extratemp2[i],self.extrastemp1[i],self.extrastemp2[i] = [],[],[],[],[]            #reset all variables that need to be reset (but for the actually measurements that will be treated separately at the end of this function)
             self.specialevents=[]
             aw.lcd1.display("00:00")
-            aw.lcd2.display("0.0")
-            aw.lcd3.display("0.0")
-            aw.lcd4.display("0.0")
-            aw.lcd5.display("0.0")
-            aw.lcd6.display("0.0")
-            aw.lcd7.display("0.0")
-            for i in range(aw.nLCDS):
-                aw.extraLCD1[i].display("0.0")
-                aw.extraLCD2[i].display("0.0")
+            if andLCDs:
+                aw.lcd2.display("0.0")
+                aw.lcd3.display("0.0")
+                aw.lcd4.display("0.0")
+                aw.lcd5.display("0.0")
+                aw.lcd6.display("0.0")
+                aw.lcd7.display("0.0")
+                for i in range(aw.nLCDS):
+                    aw.extraLCD1[i].display("0.0")
+                    aw.extraLCD2[i].display("0.0")
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -3066,7 +3067,7 @@ class tgraphcanvas(FigureCanvas):
             aw.soundpop()
             if self.flagon and len(self.timex) == 1:
                 # we are already in monitoring mode, we just clear this first measurement and go
-                aw.qmc.clearMeasurements()
+                aw.qmc.clearMeasurements(andLCDs=False)
             elif self.timex != []: # there is a profile loaded, we have to reset
                 aw.qmc.reset(True,False)
             self.OnRecorder()
@@ -3623,12 +3624,6 @@ class tgraphcanvas(FigureCanvas):
                         elif etype == 3:
                             self.E4timex.append(self.timex[self.specialevents[-1]])
                             self.E4values.append(self.eventpositionbars[int(self.specialeventsvalue[-1])])
-                        #write label in mini recorder if flag checked
-                        if aw.minieventsflag:
-                            aw.eNumberSpinBox.setValue(Nevents+1)
-                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
-                            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
                         #if Event show flag
                         if self.eventsshowflag:
                             index = self.specialevents[-1]
@@ -3679,6 +3674,15 @@ class tgraphcanvas(FigureCanvas):
                         timed = self.stringfromseconds(self.timex[i])
                         message = QApplication.translate("Message","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
                         aw.sendmessage(message)
+                        #write label in mini recorder if flag checked
+                        if aw.minieventsflag:
+                            aw.eNumberSpinBox.blockSignals(True)
+                            aw.eNumberSpinBox.setValue(Nevents+1)
+                            aw.eNumberSpinBox.blockSignals(False)
+                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
+                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
+                            aw.lineEvent.setText(self.specialeventsStrings[Nevents])
+
                 if self.samplingsemaphore.available() < 1:
                     self.samplingsemaphore.release(1)
             else:
@@ -7545,9 +7549,11 @@ class ApplicationWindow(QMainWindow):
             self.etimeline.releaseKeyboard()
             self.etypeComboBox.releaseKeyboard()
             self.valueEdit.releaseKeyboard()
+            self.eNumberSpinBox.releaseKeyboard()
             self.lineEvent.clearFocus()
             self.valueEdit.clearFocus()
             self.etimeline.clearFocus()
+            self.eNumberSpinBox.clearFocus()
 
     # this function respects the button visibility via aw.qmc.buttonvisibility and if button.isDisabled()
     # ON/OFF (2,self.button_1) -> CHARGE (3,self.button_8) -> DRYEND (4,self.button_19) -> FCs (5,self.button_3)
@@ -7639,9 +7645,10 @@ class ApplicationWindow(QMainWindow):
                     self.keyboardmove[self.keyboardmoveindex]()   #apply button command
                     #behaviour rules after pressing a button
                     #if less than EVENT jump forward to the right once automatically
-                    if self.keyboardmoveindex > 1:
+                    if self.keyboardmoveindex > 1 and self.keyboardmoveindex < 11:
                         self.moveKbutton("right")
                     self.lastkeyboardcmd = now
+                    self.releaseminieditor()
                 else: # we ignore this event
                     return
             else:
@@ -13102,14 +13109,14 @@ class HUDDlg(ArtisanDialog):
             self.result.setText("")
             
     def polyfitcurveschanged(self,i):
-        self.polyfitdeg.setDisabled(True)
+        self.polyfitdeg.blockSignals(True)
         if self.polyfitCheck.isChecked() and len(aw.qmc.timex) > 2:
             aw.qmc.resetlines()
             aw.qmc.redraw(recomputeAllDeltas=False)
             self.doPolyfit()
         else:
             self.result.setText("")
-        self.polyfitdeg.setDisabled(False)
+        self.polyfitdeg.blockSignals(False)
         self.polyfitdeg.setFocus()
         
     def tabSwitched(self,i):
@@ -13147,13 +13154,16 @@ class HUDDlg(ArtisanDialog):
             self.curves.append(aw.qmc.extratemp2[i])
             self.deltacurves.append(False)
             self.deltacurves.append(False)
+        self.c1ComboBox.blockSignals(True)
+        self.c2ComboBox.blockSignals(True)
         self.c1ComboBox.clear()
         self.c1ComboBox.addItems(self.curvenames)
         self.c2ComboBox.clear()
-        self.c2ComboBox.addItems(self.curvenames)
+        self.c2ComboBox.addItems(self.curvenames)  
+        self.c1ComboBox.blockSignals(False)
+        self.c2ComboBox.blockSignals(False)   
         self.c1ComboBox.setCurrentIndex(idx)
         self.c2ComboBox.setCurrentIndex(idx+1)
-
         
     def polyfit(self,i):
         if self.polyfitCheck.isChecked():
@@ -18563,8 +18573,14 @@ class serialport(object):
     def NONEtmp(self):
         dialogx = nonedevDlg()
         if dialogx.exec_():
-            ET = (int(str(dialogx.etEdit.text())) * 10)/10.
-            BT = (int(str(dialogx.btEdit.text())) * 10)/10.
+            try:
+                ET = (int(str(dialogx.etEdit.text())) * 10)/10.
+            except:
+                ET = 0
+            try:
+                BT = (int(str(dialogx.btEdit.text())) * 10)/10.
+            except:
+                BT = 0
             aw.lcd2.display(ET)
             aw.lcd3.display(BT)
             return ET, BT
@@ -20141,6 +20157,7 @@ class nonedevDlg(QDialog):
         self.btEdit = QLineEdit(btval)
         self.etEdit.setValidator(QIntValidator(0, 1000, self.etEdit))
         self.btEdit.setValidator(QIntValidator(0, 1000, self.btEdit))
+        self.btEdit.setFocus()
         self.ETbox = QCheckBox(QApplication.translate("CheckBox","ET",None, QApplication.UnicodeUTF8))
         if aw.qmc.manuallogETflag == True:
             self.ETbox.setChecked(True)
@@ -20172,9 +20189,11 @@ class nonedevDlg(QDialog):
         if self.ETbox.isChecked():
             aw.qmc.manuallogETflag = 1
             self.etEdit.setVisible(True)
+            self.etEdit.setFocus()
         else:
             aw.qmc.manuallogETflag = 0
             self.etEdit.setVisible(False)
+            self.btEdit.setFocus()
 
 #########################################################################
 #############  SERIAL PORT CONFIGURATION DIALOG #########################
