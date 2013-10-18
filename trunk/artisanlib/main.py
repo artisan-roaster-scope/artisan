@@ -6963,6 +6963,7 @@ class ApplicationWindow(QMainWindow):
         self.slider1.setTracking(False)
         self.connect(self.slider1, SIGNAL("sliderMoved(int)"), lambda v=0:self.updateSliderLCD(0,v))
         self.connect(self.slider1, SIGNAL("valueChanged(int)"), lambda v=0:self.sliderReleased(0) or self.updateSliderLCD(0,v))
+        self.slider1.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
         
         self.slider2 = self.slider()
         self.sliderLCD2 = self.sliderLCD() 
@@ -6982,6 +6983,7 @@ class ApplicationWindow(QMainWindow):
         self.slider2.setTracking(False)
         self.connect(self.slider2, SIGNAL("sliderMoved(int)"), lambda v=0:self.updateSliderLCD(1,v))
         self.connect(self.slider2, SIGNAL("valueChanged(int)"), lambda v=0:self.sliderReleased(1) or self.updateSliderLCD(1,v))
+        self.slider2.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.slider3 = self.slider()
         self.sliderLCD3 = self.sliderLCD()
@@ -7001,6 +7003,7 @@ class ApplicationWindow(QMainWindow):
         self.slider3.setTracking(False)
         self.connect(self.slider3, SIGNAL("sliderMoved(int)"), lambda v=0:self.updateSliderLCD(2,v))
         self.connect(self.slider3, SIGNAL("valueChanged(int)"), lambda v=0:self.sliderReleased(2) or self.updateSliderLCD(2,v))
+        self.slider3.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         self.slider4 = self.slider()
         self.sliderLCD4 = self.sliderLCD()
@@ -7020,6 +7023,7 @@ class ApplicationWindow(QMainWindow):
         self.slider4.setTracking(False)
         self.connect(self.slider4, SIGNAL("sliderMoved(int)"), lambda v=0:self.updateSliderLCD(3,v))
         self.connect(self.slider4, SIGNAL("valueChanged(int)"), lambda v=0:self.sliderReleased(3) or self.updateSliderLCD(3,v))
+        self.slider4.setFocusPolicy(Qt.StrongFocus) # ClickFocus TabFocus StrongFocus
 
         sliderGrp12 = QVBoxLayout()
         sliderGrp12.setSpacing(0)
