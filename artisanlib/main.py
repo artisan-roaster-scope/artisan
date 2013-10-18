@@ -6960,9 +6960,10 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox1.setMinimumWidth(55) 
         self.sliderGrpBox1.setMaximumWidth(55)
         self.sliderGrpBox1.setVisible(False)
-        self.connect(self.slider1, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(0,v))
-        self.connect(self.slider1, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(0))
-
+        self.slider1.setTracking(False)
+        self.connect(self.slider1, SIGNAL("sliderMoved(int)"), lambda v=0:self.updateSliderLCD(0,v))
+        self.connect(self.slider1, SIGNAL("valueChanged(int)"), lambda v=0:self.sliderReleased(0) or self.updateSliderLCD(0,v))
+        
         self.slider2 = self.slider()
         self.sliderLCD2 = self.sliderLCD() 
         self.sliderLCD2.setStyleSheet("font-weight: bold; color: %s;"%self.qmc.EvalueColor[1])
@@ -6978,8 +6979,9 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox2.setMinimumWidth(55) 
         self.sliderGrpBox2.setMaximumWidth(55) 
         self.sliderGrpBox2.setVisible(False)
-        self.connect(self.slider2, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(1,v))
-        self.connect(self.slider2, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(1))
+        self.slider2.setTracking(False)
+        self.connect(self.slider2, SIGNAL("sliderMoved(int)"), lambda v=0:self.updateSliderLCD(1,v))
+        self.connect(self.slider2, SIGNAL("valueChanged(int)"), lambda v=0:self.sliderReleased(1) or self.updateSliderLCD(1,v))
 
         self.slider3 = self.slider()
         self.sliderLCD3 = self.sliderLCD()
@@ -6996,8 +6998,9 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox3.setMinimumWidth(55) 
         self.sliderGrpBox3.setMaximumWidth(55) 
         self.sliderGrpBox3.setVisible(False)
-        self.connect(self.slider3, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(2,v))
-        self.connect(self.slider3, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(2))
+        self.slider3.setTracking(False)
+        self.connect(self.slider3, SIGNAL("sliderMoved(int)"), lambda v=0:self.updateSliderLCD(2,v))
+        self.connect(self.slider3, SIGNAL("valueChanged(int)"), lambda v=0:self.sliderReleased(2) or self.updateSliderLCD(2,v))
 
         self.slider4 = self.slider()
         self.sliderLCD4 = self.sliderLCD()
@@ -7014,8 +7017,9 @@ class ApplicationWindow(QMainWindow):
         self.sliderGrpBox4.setMinimumWidth(55) 
         self.sliderGrpBox4.setMaximumWidth(55) 
         self.sliderGrpBox4.setVisible(False)
-        self.connect(self.slider4, SIGNAL("valueChanged(int)"), lambda v=0:self.updateSliderLCD(3,v))
-        self.connect(self.slider4, SIGNAL("sliderReleased()"), lambda:self.sliderReleased(3))
+        self.slider4.setTracking(False)
+        self.connect(self.slider4, SIGNAL("sliderMoved(int)"), lambda v=0:self.updateSliderLCD(3,v))
+        self.connect(self.slider4, SIGNAL("valueChanged(int)"), lambda v=0:self.sliderReleased(3) or self.updateSliderLCD(3,v))
 
         sliderGrp12 = QVBoxLayout()
         sliderGrp12.setSpacing(0)
@@ -7096,6 +7100,16 @@ class ApplicationWindow(QMainWindow):
         lcdframe.setLayout(LCDbox)
         return lcdframe
 
+    def updateSliderLCD(self,n,v):
+        if n == 0:
+            self.sliderLCD1.display(v)
+        elif n == 1:
+            self.sliderLCD2.display(v)
+        elif n == 2:
+            self.sliderLCD3.display(v)
+        elif n == 3:
+            self.sliderLCD4.display(v)
+
     def sliderReleased(self,n):
         if n == 0:
             if self.slider1.value() != self.eventslidervalues[0]:
@@ -7135,16 +7149,6 @@ class ApplicationWindow(QMainWindow):
             value = aw.float2float((self.eventslidervalues[n] + 10.0) / 10.0)
             self.qmc.EventRecordAction(extraevent = 1,eventtype=n,eventvalue=value)
         self.fireslideraction(n)
-
-    def updateSliderLCD(self,n,v):
-        if n == 0:
-            self.sliderLCD1.display(v)
-        elif n == 1:
-            self.sliderLCD2.display(v)
-        elif n == 2:
-            self.sliderLCD3.display(v)
-        elif n == 3:
-            self.sliderLCD4.display(v)
 
     def sliderLCD(self):
         slcd = QLCDNumber()
