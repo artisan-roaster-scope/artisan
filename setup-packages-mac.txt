@@ -12,6 +12,7 @@ o matplotlib 1.3.1
 o pyaudio 0.2.7
 o minimalmodbus 0.4
 o Phidgets Python 2.1.8
+o phyobjc 2.5.1
 
 o modulegraph >0.10.4 trunk (21.4.2013)
 o distribute 0.6.36
@@ -21,6 +22,8 @@ o py2app >0.7.3 trunk (21.4.2013)
 
 Upgrade History:
 
+- 2013-10-19:
+ . pyobjc 2.5.1 added
 - 2013-10-17:
  . matplotlib 1.2.1 => 1.3.1
 - 2013-07-20:
@@ -442,4 +445,26 @@ x86_64 -isysroot /Developer/SDKs/MacOSX10.6.sdk -g'
 # cd PhidgetsPython
 # python setup.py build
 # python setup.py install
+
+20) Install pyobjc
+
+(see http://www.albrecht.lt/2013/09/nsconcretemaptable-error/ and http://meme.biology.tohoku.ac.jp/students/iwasaki/python/pyqt.html)
+
+Download pyobjc-core-2.5.1.tar.gz, pyobjc-framework-Cocoa-2.5.1.tar.gz, pyobjc-framework-Quartz-2.5.1.tar.gz
+from http://pythonhosted.org/pyobjc/
+
+a) install pyobjc-core
+
+# python setup.py build
+# sudo python setup.py install
+
+b) install pyobjc-framework-Cocoa
+
+# python setup.py build
+# sudo python setup.py install
+
+c) install pyobjc-framework-Quartz
+
+# python setup.py build
+# sudo python setup.py install
 
