@@ -63,7 +63,7 @@ sip.setapi('QString', 1)
 sip.setapi('QVariant', 1)
 
 from PyQt4.QtGui import (QLayout, QAction, QApplication, QWidget, QMessageBox, QLabel, QMainWindow, QFileDialog,
-                         QInputDialog, QGroupBox, QDialog, QLineEdit, QFontDatabase,
+                         QInputDialog, QGroupBox, QDialog, QLineEdit, QFontDatabase,QTableWidgetSelectionRange,
                          QSizePolicy, QGridLayout, QVBoxLayout, QHBoxLayout, QPushButton, QDialogButtonBox,
                          QLCDNumber, QKeySequence, QSpinBox, QComboBox, QHeaderView,
                          QSlider, QTabWidget, QStackedWidget, QTextEdit, QPrinter, QPrintDialog, QRadioButton,
@@ -780,8 +780,8 @@ class tgraphcanvas(FigureCanvas):
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
 #                              # -1 equals None
         self.alarmoffset = []  # the for timed alarms, the seconds after alarmtime the alarm is triggered
-        self.alarmtime2menuidx = [1,3,4,5,6,7,8,9,2,0] # maps menu idx to self.alarmtime index (to move TP in menu from index 9 to 2)
-        self.menuidx2alarmtime = [-1,0,8,1,2,3,4,5,6,7] # inverse of above (note that those two are only inverse in one direction!)
+        self.alarmtime2menuidx = [2,4,5,6,7,8,9,10,3,0,1] # maps self.alarmtime index to menu idx (to move TP in menu from index 9 to 3)
+        self.menuidx2alarmtime = [9,-1,0,8,1,2,3,4,5,6,7] # inverse of above (note that those two are only inverse in one direction!)
         self.alarmcond = []    # 0 = falls below; 1 = rises above
         # alarmstate is set to 'not triggered' on reset()
         self.alarmstate = []   # 1=triggered, 0=not triggered. Needed so that the user does not have to turn the alarms ON next roast after alarm being used once.
@@ -1184,11 +1184,11 @@ class tgraphcanvas(FigureCanvas):
                         self.markDrop()
                         self.autoDropIdx = 0
 
-                    #check triggered alarms
-                    if self.temporaryalarmflag > -3:
-                        i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
-                        self.temporaryalarmflag = -3 # self.setalarm(i) can take longer to run than the sampling interval 
-                        self.setalarm(i)
+                #check triggered alarms
+                if self.temporaryalarmflag > -3:
+                    i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
+                    self.temporaryalarmflag = -3 # self.setalarm(i) can take longer to run than the sampling interval 
+                    self.setalarm(i)
 
         except Exception as e:
             self.flagon = False
@@ -1816,7 +1816,13 @@ class tgraphcanvas(FigureCanvas):
                     aw.lastbuttonpressed = -1
                 except:
                     pass
-
+                    
+                # reset sliders
+                aw.moveslider(0,0)
+                aw.moveslider(1,0)
+                aw.moveslider(2,0)
+                aw.moveslider(3,0)
+                
                 #autodetected CHARGE and DROP index
                 self.autoChargeIdx = 0
                 self.autoDropIdx = 0
@@ -2054,9 +2060,9 @@ class tgraphcanvas(FigureCanvas):
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
 
-            pe = True # activate path effects
+            pe = False # activate path effects
             pe_width = 3 # 0-5 (default 3)
-            xkcd = True # activate xkcd effect
+            xkcd = False # activate xkcd effect
             
             rcParams['path.effects'] = [] #[PathEffects.withStroke(linewidth=1, foreground="w")]
             
@@ -5688,61 +5694,70 @@ class SampleThread(QThread):
                     # check for TP event if already CHARGEed and not yet recognized
                     if not aw.qmc.TPalarmtimeindex and len(aw.qmc.alarmflag) > 0 and aw.qmc.timeindex[0] > -1 and self.checkTPalarmtime():
                         aw.qmc.TPalarmtimeindex = len(aw.qmc.timex)-1
-                    #check for each alarm that was not yet triggered
-                    for i in range(len(aw.qmc.alarmflag)):
-                        #if alarm on, and not triggered, and time is after set time:
-                        # qmc.alarmtime = -1 (None == ON)
-                        # qmc.alarmtime = 0 (CHARGE)
-                        # ..
-                        # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
-                        # 1) the alarm is START
-                        # 2) the alarm was not triggered yet
-                        # 3) the alarm From is ON
-                        # 4) the alarm From is CHARGE
-                        # 5) the alarm From is any other event but TP
-                        # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
-                        if aw.qmc.alarmflag[i] \
-                          and not aw.qmc.alarmstate[i] \
-                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
-                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmnflag) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
-                          and ((aw.qmc.alarmtime[i] < 0) \
-                          or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
-                          or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                          or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
-                                and aw.qmc.timeindex[1] < 1 and aw.qmc.TPalarmtimeindex)):
-                            #########
-                            # check alarmoffset (time after From event):
-                            if aw.qmc.alarmoffset[i] > 0:
-                                alarm_time = aw.qmc.timeclock.elapsed()/1000.
-                                if aw.qmc.alarmtime[i] < 0: # time after START
-                                    pass # the alarm_time is the clock time
-                                elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
-                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
-                                elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
-                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
-                                elif aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
-                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
-                                if alarm_time >= aw.qmc.alarmoffset[i]:
-                                    aw.qmc.temporaryalarmflag = i
-                            #########
-                            # check alarmtemp:
-                            alarm_temp = None
-                            if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
-                                alarm_temp = aw.qmc.delta1[-1]
-                            elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
-                                alarm_temp = aw.qmc.delta2[-1]
-                            elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                                alarm_temp = aw.qmc.temp1[-1]
-                            elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                                alarm_temp = aw.qmc.temp2[-1]
-                            elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
-                                if (aw.qmc.alarmsource[i])%2==0:
-                                    alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                                else:
-                                    alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                            alarm_limit = aw.qmc.alarmtemperature[i]
-                            if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                #check for each alarm that was not yet triggered
+                for i in range(len(aw.qmc.alarmflag)):
+                    #if alarm on, and not triggered, and time is after set time:
+                    # menu: 0:ON, 1:START, 2:CHARGE, 3:TP, 4:DRY, 5:FCs, 6:FCe, 7:SCs, 8:SCe, 9:DROP, 10:COOL
+                    # qmc.alarmtime = -1 (None == START)
+                    # qmc.alarmtime = 0 (CHARGE)
+                    # qmc.alarmtime = 1 (DRY)
+                    # qmc.alarmtime = 2 (FCs)
+                    # qmc.alarmtime = 3 (FCe)
+                    # qmc.alarmtime = 4 (SCs)
+                    # qmc.alarmtime = 5 (SCe)
+                    # qmc.alarmtime = 6 (DROP)
+                    # qmc.alarmtime = 7 (COOL)
+                    # qmc.alarmtime = 8 (TP)
+                    # qmc.alarmtime = 9 (ON)
+                    # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
+                    # 1) the alarm is START
+                    # 2) the alarm was not triggered yet
+                    # 3) the alarm From is ON
+                    # 4) the alarm From is CHARGE
+                    # 5) the alarm From is any other event but TP
+                    # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
+                    if aw.qmc.alarmflag[i] \
+                      and not aw.qmc.alarmstate[i] \
+                      and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
+                      and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmnflag) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
+                      and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
+                      or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
+                      or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                      or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
+                            and aw.qmc.timeindex[1] < 1 and aw.qmc.TPalarmtimeindex)):
+                        #########
+                        # check alarmoffset (time after From event):
+                        if aw.qmc.alarmoffset[i] > 0:
+                            alarm_time = aw.qmc.timeclock.elapsed()/1000.
+                            if aw.qmc.alarmtime[i] < 0: # time after START
+                                pass # the alarm_time is the clock time
+                            elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
+                                alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
+                            elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
+                                alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
+                            elif aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
+                                alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
+                            if alarm_time >= aw.qmc.alarmoffset[i]:
                                 aw.qmc.temporaryalarmflag = i
+                        #########
+                        # check alarmtemp:
+                        alarm_temp = None
+                        if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
+                            alarm_temp = aw.qmc.delta1[-1]
+                        elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
+                            alarm_temp = aw.qmc.delta2[-1]
+                        elif aw.qmc.alarmsource[i] == 0:                      #check ET
+                            alarm_temp = aw.qmc.temp1[-1]
+                        elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                            alarm_temp = aw.qmc.temp2[-1]
+                        elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
+                            if (aw.qmc.alarmsource[i])%2==0:
+                                alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                            else:
+                                alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                        alarm_limit = aw.qmc.alarmtemperature[i]
+                        if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                            aw.qmc.temporaryalarmflag = i
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
             else:
@@ -7343,12 +7358,16 @@ class ApplicationWindow(QMainWindow):
             self.eventslidervalues[n] = v
             if n == 0:
                 self.slider1.setValue(v)
+                self.updateSliderLCD(0,v)
             elif n == 1:
                 self.slider2.setValue(v)
+                self.updateSliderLCD(1,v)
             elif n == 2:
                 self.slider3.setValue(v)
+                self.updateSliderLCD(2,v)
             elif n == 3:
                 self.slider4.setValue(v)
+                self.updateSliderLCD(3,v)
 
     #call from user configured event buttons
     def recordextraevent(self,ee):
@@ -23096,6 +23115,9 @@ class AlarmDlg(ArtisanDialog):
         header = self.alarmtable.horizontalHeader()
         header.setStretchLastSection(False)
         self.deselectAll()
+        # select newly added row i.e. the last one
+        self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(nalarms,0,nalarms,self.alarmtable.columnCount()-1),True)
+
 
     def insertalarm(self):
         nalarms = self.alarmtable.rowCount()
@@ -23126,7 +23148,9 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmtable.setColumnWidth(7,40)
                 header = self.alarmtable.horizontalHeader()
                 header.setStretchLastSection(False)
-        self.deselectAll()
+                self.deselectAll()
+                # select newly inserted item
+                self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(selected_row,0,selected_row,self.alarmtable.columnCount()-1),True)
         
     def deletealarm(self):
         nalarms = self.alarmtable.rowCount()
@@ -23147,6 +23171,10 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmtemperature = aw.qmc.alarmtemperature[0:selected_row] + aw.qmc.alarmtemperature[selected_row + 1:]
                 aw.qmc.alarmaction = aw.qmc.alarmaction[0:selected_row] + aw.qmc.alarmaction[selected_row + 1:]
                 aw.qmc.alarmstrings = aw.qmc.alarmstrings[0:selected_row] + aw.qmc.alarmstrings[selected_row + 1:]
+                self.alarmtable.setRowCount(nalarms - 1)
+                self.deselectAll()
+                # select row number that was just deleted
+                self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(selected_row,0,selected_row,self.alarmtable.columnCount()-1),True)
             else:
                 self.alarmtable.removeRow(self.alarmtable.rowCount() - 1)
                 # nothing selected, we pop the last element
@@ -23161,8 +23189,8 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmtemperature.pop()
                 aw.qmc.alarmaction.pop()
                 aw.qmc.alarmstrings.pop()
-            self.alarmtable.setRowCount(nalarms - 1)
-        self.deselectAll()
+                self.alarmtable.setRowCount(nalarms - 1)
+                self.deselectAll()
 
     def importalarms(self):
         aw.fileImport(QApplication.translate("Message", "Load Alarms",None, QApplication.UnicodeUTF8),self.importalarmsJSON)
@@ -23333,7 +23361,8 @@ class AlarmDlg(ArtisanDialog):
         negguardedit.setAlignment(Qt.AlignRight)                
         #Effective time from
         timeComboBox = QComboBox()
-        timeComboBox.addItems([QApplication.translate("ComboBox","START",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
+        timeComboBox.addItems([QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8), # qmc.alarmtime 9
+                               QApplication.translate("ComboBox","START",None, QApplication.UnicodeUTF8), # qmc.alarmtime -1
                                QApplication.translate("ComboBox","CHARGE",None, QApplication.UnicodeUTF8), # qmc.alarmtime 0
                                QApplication.translate("ComboBox","TP",None, QApplication.UnicodeUTF8), # qmc.alarmtime 8
                                QApplication.translate("ComboBox","DRY END",None, QApplication.UnicodeUTF8), # qmc.alarmtime 1
