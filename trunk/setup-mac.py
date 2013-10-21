@@ -75,6 +75,7 @@ DATA_FILES = [
     ("../Resources", [r"artisanAlarms.icns"]),
     ("../Resources", [r"artisanPalettes.icns"]),
     ("../Resources", [r"artisanWheel.icns"]),
+    ("../Resources", [r"includes/Humor-Sans.ttf"]),
   ]
   
 plist = Plist.fromFile('Info.plist')

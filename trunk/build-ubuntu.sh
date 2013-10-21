@@ -22,6 +22,7 @@ cp artisan-alog.xml dist
 cp artisan-alrm.xml dist
 cp artisan-apal.xml dist
 cp artisan-wg.xml dist
+cp includes/Humor-Sans.ttf dist
 cp -R icons dist
 cp -R Wheels dist
 cp README.txt dist

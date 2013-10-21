@@ -249,6 +249,7 @@ Section Uninstall
   Delete "$INSTDIR\artisanProfile.ico"
   Delete "$INSTDIR\artisanPalettes.ico"
   Delete "$INSTDIR\artisanWheel.ico"
+  Delete "$INSTDIR\Humor-Sans.ttf"
   Delete "$INSTDIR\qt.conf"
   Delete "$INSTDIR\vcredist_x86.exe"
 
