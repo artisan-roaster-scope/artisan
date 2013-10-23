@@ -35,6 +35,7 @@ from artisanlib import __revision__
 import sys
 import platform
 import serial
+import serial.tools.list_ports
 import math
 import binascii
 import time as libtime
@@ -102,8 +103,18 @@ from Phidgets.Devices.Bridge import Bridge as Phidget1046TemperatureSensor
 import minimalmodbus
 import json
 
+
+# platform dependent imports:
 if sys.platform.startswith("darwin"):
+    # to establish a thread pool on OS X
     import Foundation
+    # on OS X load the Makerbot modified list_ports module patched for P3k
+    from artisanlib.list_ports_osx import comports
+    serial.tools.list_ports.comports = comports
+    from artisanlib.list_ports_vid_pid_osx_posix import *
+elif os.name == 'posix':
+    from artisanlib.list_ports_vid_pid_osx_posix import *
+
 
 # to make py2exe happy with scipy >0.11
 def dependencies_for_myprogram():
@@ -2064,13 +2075,11 @@ class tgraphcanvas(FigureCanvas):
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
             
-            rcParams['path.effects'] = []
-            
+            rcParams['path.effects'] = []            
             if aw.qmc.graphstyle == 1:
                 scale = 1
             else:
-                scale = 0
-            
+                scale = 0            
             length = 700 # 100 (128 the default)
             randomness = 12 # 2 (16 default)
             rcParams['path.sketch'] = (scale, length, randomness)
@@ -2084,9 +2093,6 @@ class tgraphcanvas(FigureCanvas):
             rcParams['ytick.minor.width'] = 1
             rcParams['xtick.color'] = '0.25'
             rcParams['ytick.color'] = '0.25'
-            
-
-            
             
             self.fig.clf()   #wipe out figure. keep_observers=False
 
@@ -6112,7 +6118,6 @@ class ApplicationWindow(QMainWindow):
         self.quitAction.setShortcut(QKeySequence.Quit)
         self.connect(self.quitAction,SIGNAL("triggered()"),self.fileQuit)
         self.fileMenu.addAction(self.quitAction)
-        
 
         # EDIT menu
         self.cutAction = QAction(UIconst.EDIT_MENU_CUT,self)
@@ -11500,7 +11505,7 @@ $cupping_notes
                 <p>
                 <b>{11}</b> {12}
                 </p>""").format(
-                QApplication.translate("About", "Artisan",None, QApplication.UnicodeUTF8),
+                "Artisan",
                 str(__version__),
                 str(__revision__),
                 platform.python_version(),
@@ -20464,17 +20469,71 @@ class nonedevDlg(QDialog):
 #############  SERIAL PORT CONFIGURATION DIALOG #########################
 #########################################################################
 
+
+class PortComboBox(QComboBox):
+    def __init__(self, parent = None, selection = None):
+        super(PortComboBox, self).__init__(parent)
+        self.installEventFilter(self)
+        self.selection = u(selection) # just the port name (first element of one of the triples in self.ports)
+        # a list of triples as returned by serial.tools.list_ports
+        self.ports = []
+        self.updateMenu()
+
+    def setSelection(self,i):
+        if i >= 0:
+            try:
+                self.blockSignals(True)
+                self.clear()
+                self.addItems([p[0] for p in self.ports])
+                try:
+                    self.setCurrentIndex(i)
+                except:
+                    pass
+                self.selection = self.ports[i][0]
+            except:
+                pass
+            finally:
+                self.blockSignals(False)
+            
+    def eventFilter(self, object, event):
+        if event.type() == QEvent.FocusIn:
+            self.setSelection(self.currentIndex())
+        if event.type() == QEvent.MouseButtonPress:
+            self.updateMenu(niceNames=True)
+        return False
+    
+    def updateMenu(self,niceNames=False):
+        self.blockSignals(True)
+        if platf == 'Darwin':
+            self.ports = [p for p in serial.tools.list_ports.comports() if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync','/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem'])]
+        else:
+            self.ports = serial.tools.list_ports.comports()
+        if self.selection not in [p[0] for p in self.ports]:
+        	self.ports.append([self.selection,"",""])
+        self.ports = sorted(self.ports,key=lambda p: p[0])
+        self.clear()
+        if niceNames:
+            items = [(p[1] if p[1] else p[0]) for p in self.ports]
+        else:
+            items = [p[0] for p in self.ports]
+        self.addItems(items)
+        try:
+            pos = [p[0] for p in self.ports].index(self.selection)
+            self.setCurrentIndex(pos)
+        except:
+            pass
+        self.blockSignals(False)
+        
+        
 class comportDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(comportDlg,self).__init__(parent)
         self.setWindowTitle(QApplication.translate("Form Caption","Serial Ports Configuration",None, QApplication.UnicodeUTF8))
         self.setModal(True)
-        xports = self.portlist()
         ##########################    TAB 1 WIDGETS
         comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
-        self.comportEdit = QComboBox()
-        self.comportEdit.addItems(xports)
-        self.comportEdit.setCurrentIndex(xports.index(aw.ser.comport))
+        self.comportEdit = PortComboBox(selection = aw.ser.comport)
+        self.connect(self.comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.comportEdit,i)) 
         self.comportEdit.setEditable(True)
         comportlabel.setBuddy(self.comportEdit)
         baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
@@ -20512,9 +20571,8 @@ class comportDlg(ArtisanDialog):
         self.createserialTable()
         ##########################    TAB 3 WIDGETS   MODBUS
         modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
-        self.modbus_comportEdit = QComboBox()
-        self.modbus_comportEdit.addItems(xports)
-        self.modbus_comportEdit.setCurrentIndex(xports.index(aw.modbus.comport))
+        self.modbus_comportEdit = PortComboBox(selection = aw.modbus.comport)
+        self.connect(self.modbus_comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.modbus_comportEdit,i)) 
         self.modbus_comportEdit.setEditable(True)
         modbus_comportlabel.setBuddy(self.modbus_comportEdit)
         modbus_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
@@ -20561,7 +20619,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_input1float = QCheckBox()
         self.modbus_input1float.setChecked(aw.modbus.input1float)
         self.modbus_input1float.setFocusPolicy(Qt.NoFocus) 
-        self.connect(self.modbus_input1float, SIGNAL("stateChanged(int)"),lambda i=0:self.changeEndianVisibility())       
+        self.connect(self.modbus_input1float, SIGNAL("stateChanged(int)"),lambda i=0:self.changeEndianVisibility())  
         self.modbus_input1code = QComboBox()
         self.modbus_input1code.setFocusPolicy(Qt.NoFocus)
         self.modbus_input1code.addItems(modbus_function_codes)
@@ -20661,8 +20719,8 @@ class comportDlg(ArtisanDialog):
         self.scale_deviceEdit.setEditable(False)
         scale_devicelabel.setBuddy(self.scale_deviceEdit)
         scale_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
-        self.scale_comportEdit = QComboBox()
-        self.scale_comportEdit.addItems([aw.scale.comport])
+        self.scale_comportEdit = PortComboBox(selection = aw.scale.comport)
+        self.connect(self.scale_comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.scale_comportEdit,i))
         self.scale_comportEdit.setEditable(True)
         scale_comportlabel.setBuddy(self.scale_comportEdit)
         scale_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
@@ -20697,14 +20755,14 @@ class comportDlg(ArtisanDialog):
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
-        scanButton = QPushButton(QApplication.translate("Button","Scan for Ports",None, QApplication.UnicodeUTF8))
-        scanButton.setFocusPolicy(Qt.NoFocus)
+#        scanButton = QPushButton(QApplication.translate("Button","Scan for Ports",None, QApplication.UnicodeUTF8))
+#        scanButton.setFocusPolicy(Qt.NoFocus)
         self.connect(okButton, SIGNAL("clicked()"),self, SLOT("accept()"))
         self.connect(cancelButton, SIGNAL("clicked()"),self, SLOT("reject()"))
-        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)
+#        self.connect(scanButton, SIGNAL("clicked()"), self.scanforport)
         #button layout
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(scanButton)
+#        buttonLayout.addWidget(scanButton)
         buttonLayout.addStretch()  
         buttonLayout.addWidget(cancelButton)
         buttonLayout.addWidget(okButton)
@@ -20857,19 +20915,15 @@ class comportDlg(ArtisanDialog):
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(buttonLayout)
         self.setLayout(Mlayout)
-
+        
+    def portComboBoxIndexChanged(self,portComboBox,i):
+        portComboBox.setSelection(i)
+        
     def changeEndianVisibility(self):
         if self.modbus_input1float.isChecked() or self.modbus_input2float.isChecked() or self.modbus_input3float.isChecked() or self.modbus_input4float.isChecked():
             self.modbus_littleEndianFloats.setEnabled(True)
         else:
             self.modbus_littleEndianFloats.setEnabled(False)
-        
-    def portlist(self):
-        xports = list(aw.extracomport)
-        xports.append(aw.ser.comport)
-        xports.append(aw.modbus.comport)
-        xports.append(aw.scale.comport)
-        return sorted(list(set(xports)))
 
     def createserialTable(self):
         try:
@@ -20890,16 +20944,14 @@ class comportDlg(ArtisanDialog):
                 self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
                 self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
                 self.serialtable.setShowGrid(True)
-                xports = self.portlist()
                 for i in range(nssdevices):
                     devid = aw.qmc.extradevices[i]
                     devicename = aw.qmc.devices[devid-1]
                     device = QTableWidgetItem(devicename)    #type identification of the device. Non editable
                     self.serialtable.setItem(i,0,device)
                     if not (devid in [29,33,34,37]) and devicename[0] != "+": # hide serial confs for MODBUS, Phidgets and "+X" extra devices
-                        comportComboBox =  QComboBox()
-                        comportComboBox.addItems(xports)
-                        comportComboBox.setCurrentIndex(xports.index(aw.extracomport[i]))
+                        comportComboBox = PortComboBox(selection = aw.extracomport[i])
+                        self.connect(comportComboBox, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(comportComboBox,i))
                         comportComboBox.setFixedWidth(200)
                         baudComboBox =  QComboBox()
                         baudComboBox.addItems(self.bauds)
@@ -21006,87 +21058,108 @@ class comportDlg(ArtisanDialog):
             return
         QDialog.accept(self)
 
-    # returns a list of strings indicating available serial ports
-    def serialports(self):
-        available = []
-        if platf in ('Windows', 'Microsoft'):
-            #scans serial ports in Windows computer
-            for i in range(100):
-                try:
-                    s = serial.Serial(i)
-                    available.append(s.portstr)
-                    s.close()
-                except serial.SerialException:
-                    pass
-        elif platf == 'Darwin':
-            if float(serial.VERSION) < 2.6:
-                #scans serial ports in Mac computer
-                for name in glob.glob("/dev/cu.*"):
-                    if name.upper().rfind("MODEM") < 0:
-                        try:  
-                            f = open(name, "r+")
-                            f.close()
-                            available.append(name)
-                        except Exception:
-                            pass
-            else:
-                from serial.tools import list_ports
-                available = list([port[0] for port in list_ports.comports() if not(port[0] in ['/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem'])])
-        elif platf == 'Linux':
-            if float(serial.VERSION) < 2.6:
-                maxnum=9
-                for prefix in ["/dev/ttyS", "/dev/cua", "/dev/ttyUSB","/dev/usb/ttyUSB", "/dev/usb/tts/"]:
-                    for num in range(maxnum+1):
-                        name=prefix+repr(num)
-                        if not os.path.exists(name):
-                            continue
-                        try:
-                            f = open(name, "r+")
-                            f.close()
-                            available.append(name)
-                        except Exception:
-                            pass
-            else:
-                from serial.tools import list_ports
-                available = list([port[0] for port in list_ports.comports()])
-        else:
-            self.sendmessage(QApplication.translate("Message","Port scan on this platform not yet supported", None, QApplication.UnicodeUTF8))
-        return available
+#    # returns a list of strings indicating available serial ports
+#    def serialports(self):
+#        available = []
+#        if platf in ('Windows', 'Microsoft'):
+#            #scans serial ports in Windows computer
+#            for i in range(100):
+#                try:
+#                    s = serial.Serial(i)
+#                    available.append(s.portstr)
+#                    s.close()
+#                except serial.SerialException:
+#                    pass
+#        elif platf == 'Darwin':
+#            if float(serial.VERSION[:3]) < 2.6:
+#                #scans serial ports in Mac computer
+#                for name in glob.glob("/dev/cu.*"):
+#                    if name.upper().rfind("MODEM") < 0:
+#                        try:  
+#                            f = open(name, "r+")
+#                            f.close()
+#                            available.append(name)
+#                        except Exception:
+#                            pass
+#            else:
+#                from serial.tools import list_ports
+#                available = list([port[0] for port in list_ports.comports() if not(port[0] in ['/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem'])])
+#        elif platf == 'Linux':
+#            if float(serial.VERSION[:3]) < 2.6:
+#                maxnum=9
+#                for prefix in ["/dev/ttyS", "/dev/cua", "/dev/ttyUSB","/dev/usb/ttyUSB", "/dev/usb/tts/"]:
+#                    for num in range(maxnum+1):
+#                        name=prefix+repr(num)
+#                        if not os.path.exists(name):
+#                            continue
+#                        try:
+#                            f = open(name, "r+")
+#                            f.close()
+#                            available.append(name)
+#                        except Exception:
+#                            pass
+#            else:
+#                from serial.tools import list_ports
+#                available = list([port[0] for port in list_ports.comports()])
+#        else:
+#            self.sendmessage(QApplication.translate("Message","Port scan on this platform not yet supported", None, QApplication.UnicodeUTF8))
+#        return available
+#
 
-
-    def scanforport(self):
-        try:
-            available = self.serialports()
-            aw.ser.closeport()            #set comboBoxes
-            self.comportEdit.clear()
-            self.comportEdit.addItems(available)
-            self.modbus_comportEdit.clear()
-            self.modbus_comportEdit.addItems(available)
-            if len(available):
-                if aw.ser.comport in available:
-                    self.comportEdit.setCurrentIndex(available.index(aw.ser.comport))
-                else:
-                    self.comportEdit.setCurrentIndex(len(available)-1)
-                aw.ser.commavailable = available[:]
-                for i in range(len(aw.qmc.extradevices)):
-                    comportComboBox =  self.serialtable.cellWidget(i,1)
-                    if comportComboBox != None:
-                        comportComboBox.clear()
-                        comportComboBox.addItems(aw.ser.commavailable)
-                        if aw.extracomport[i] in aw.ser.commavailable:
-                            comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.extracomport[i]))
-                        else:
-                            comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)
-        except Exception as e:
-            _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " scanforport(): %1").arg(str(e)),exc_tb.tb_lineno)
+#    def scanforport(self):
+#        try:
+#            available = self.serialports()
+#            aw.ser.closeport()            #set comboBoxes
+#            self.comportEdit.clear()
+#            self.comportEdit.addItems(available)
+#            self.modbus_comportEdit.clear()
+#            self.modbus_comportEdit.addItems(available)
+#            if len(available):
+#                if aw.ser.comport in available:
+#                    self.comportEdit.setCurrentIndex(available.index(aw.ser.comport))
+#                else:
+#                    self.comportEdit.setCurrentIndex(len(available)-1)
+#                aw.ser.commavailable = available[:]
+#                for i in range(len(aw.qmc.extradevices)):
+#                    comportComboBox =  self.serialtable.cellWidget(i,1)
+#                    if comportComboBox != None:
+#                        comportComboBox.clear()
+#                        comportComboBox.addItems(aw.ser.commavailable)
+#                        if aw.extracomport[i] in aw.ser.commavailable:
+#                            comportComboBox.setCurrentIndex(aw.ser.commavailable.index(aw.extracomport[i]))
+#                        else:
+#                            comportComboBox.setCurrentIndex(len(aw.ser.commavailable)-1)
+#        except Exception as e:
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " scanforport(): %1").arg(str(e)),exc_tb.tb_lineno)
 
     def closeserialports(self):
-        if aw.ser.SP.isOpen():
-            aw.ser.SP.close()
-        for i in range(len(aw.extraser)):
-            if aw.extraser[i].SP.isOpen():
-                aw.extraser[i].SP.close()
+        # close main instrument port
+        try:
+            if aw.ser.SP.isOpen():
+                aw.ser.SP.close()
+        except:
+            pass
+        # close extra device ports
+        try:
+            for i in range(len(aw.extraser)):
+                if aw.extraser[i].SP.isOpen():
+                    aw.extraser[i].SP.close()
+        except:
+            pass
+        # close modbus port
+        try:
+            if aw.modbus.master != None and aw.modbus.master.serial and aw.modbus.master.serial.isOpen():
+                aw.modbus.master.serial.close()
+        except:
+            pass
+        # close scale port
+        try:
+            if aw.scale.SP.isOpen():
+                aw.scale.SP.close()
+        except:
+            pass
+        
 
 #################################################################################
 ##################   Device assignments DIALOG for reading temperature   ########
