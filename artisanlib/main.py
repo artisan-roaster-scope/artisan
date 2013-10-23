@@ -2347,7 +2347,7 @@ class tgraphcanvas(FigureCanvas):
                         self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extratemp1[i],color=self.extradevicecolor1[i],
                         sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.extralinewidths1[i]+aw.qmc.patheffects,foreground="w")],
                         markersize=self.extramarkersizes1[i],marker=self.extramarkers1[i],linewidth=self.extralinewidths1[i],linestyle=self.extralinestyles1[i],drawstyle=self.extradrawstyles1[i],label= self.extraname1[i])[0])
-                    else:                    
+                    else:
                         if smooth or len(self.extrastemp1[i]) != len(self.extratimex[i]):
                             self.extrastemp1[i] = self.smooth_list(self.extratimex[i],self.extratemp1[i],window_len=self.curvefilter)
                         self.extratemp1lines.append(self.ax.plot(self.extratimex[i], self.extrastemp1[i],color=self.extradevicecolor1[i],
@@ -7194,8 +7194,12 @@ class ApplicationWindow(QMainWindow):
     
     def setFonts(self):
         # try to select the right font for matplotlib according to the given locale and plattform
-        if self.qmc.graphfont == 0:
+        if self.qmc.graphfont == 0:                
+            rcParams['font.size'] = 12.0
             try:
+                mpl.rcParams['font.family'] = "sans-serif"
+                mpl.rcParams['font.sans-serif'] = ["Microsoft Sans Serif", "Arial"] # works for Greek and Arabic
+                self.mpl_fontproperties = mpl.font_manager.FontProperties()
                 if platf == "Darwin":
                     mpl.rcParams['font.family'] = "Arial Unicode MS"
                     self.mpl_fontproperties = mpl.font_manager.FontProperties()
@@ -7211,7 +7215,7 @@ class ApplicationWindow(QMainWindow):
                             mpl.rcParams['font.sans-serif'] = ["NanumGothic","DejaVu Sans Mono"]
                         elif locale == "zh_TW":
                             mpl.rcParams['font.sans-serif'] = ["NanumGothic","DejaVu Sans Mono"]
-                    self.mpl_fontproperties = mpl.font_manager.FontProperties()
+                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
                 else: # Windows:
                     # for asian languages on Windows we have to set the parameters directly to *.ttc fonts (mpl supports only *.ttf)
                     if locale == "ja":
@@ -7222,25 +7226,21 @@ class ApplicationWindow(QMainWindow):
                         aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\mingliu.ttc")
                     elif locale == "ko":
                         aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\batang.ttc")
-                    elif locale == "en":
-                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
-                    else:
-                        mpl.rcParams['font.sans-serif'] = ["Microsoft Sans Serif", "Arial"] # works for Greek and Arabic
-                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
-                rcParams['font.size'] = 12.0
+#                    elif locale == "ar":
+#                        mpl.rcParams['font.family'] = "TraditionalArabic"
+#                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
             except:
                 pass
         elif self.qmc.graphfont == 1:
             # font Humor selected
             rcParams['font.size'] = 16.0
-#            rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
-#            self.mpl_fontproperties = mpl.font_manager.FontProperties()
+            rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
             aw.set_mpl_fontproperties(self.getResourcePath() + "Humor-Sans.ttf")
         elif self.qmc.graphfont == 2:
             # font Comic selected
             rcParams['font.family'] = ['Comic Sans MS','Humor Sans']
-            self.mpl_fontproperties = mpl.font_manager.FontProperties()
             rcParams['font.size'] = 12.0
+            self.mpl_fontproperties = mpl.font_manager.FontProperties()
         self.qmc.redraw(recomputeAllDeltas=False)
     
     def set_mpl_fontproperties(self,fontpath):  
@@ -11578,14 +11578,16 @@ $cupping_notes
         dialog = comportDlg(self)
         if dialog.exec_():
             # set serial port
-            self.ser.comport = str(dialog.comportEdit.currentText())                #unicode() changes QString to a python string
+#            self.ser.comport = str(dialog.comportEdit.currentText())                #unicode() changes QString to a python string
+            self.ser.comport = str(dialog.comportEdit.getSelection())
             self.ser.baudrate = int(str(dialog.baudrateComboBox.currentText()))              #int changes QString to int
             self.ser.bytesize = int(str(dialog.bytesizeComboBox.currentText()))
             self.ser.stopbits = int(str(dialog.stopbitsComboBox.currentText()))
             self.ser.parity = str(dialog.parityComboBox.currentText())
             self.ser.timeout = int(str(dialog.timeoutEdit.text()))
             # set modbus port
-            self.modbus.comport = str(dialog.modbus_comportEdit.currentText())                #unicode() changes QString to a python string
+#            self.modbus.comport = str(dialog.modbus_comportEdit.currentText())                #unicode() changes QString to a python string
+            self.modbus.comport = str(dialog.modbus_comportEdit.getSelection())
             self.modbus.baudrate = int(str(dialog.modbus_baudrateComboBox.currentText()))              #int changes QString to int
             self.modbus.bytesize = int(str(dialog.modbus_bytesizeComboBox.currentText()))
             self.modbus.stopbits = int(str(dialog.modbus_stopbitsComboBox.currentText()))
@@ -11619,7 +11621,8 @@ $cupping_notes
                 self.scale.device_id = list(aw.scale.devicefunctionlist.keys()).index(self.scale.device)
             except Exception:
                 self.scale.device_id = 0
-            self.scale.comport = str(dialog.scale_comportEdit.currentText())                #unicode() changes QString to a python string
+#            self.scale.comport = str(dialog.scale_comportEdit.currentText())                #unicode() changes QString to a python string
+            self.scale.comport = str(dialog.scale_comportEdit.getSelection())
             self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
             self.scale.bytesize = int(str(dialog.scale_bytesizeComboBox.currentText()))
             self.scale.stopbits = int(str(dialog.scale_stopbitsComboBox.currentText()))
@@ -20479,44 +20482,47 @@ class PortComboBox(QComboBox):
         self.ports = []
         self.updateMenu()
 
+    def getSelection(self):
+        return self.selection
+
     def setSelection(self,i):
         if i >= 0:
             try:
-                self.blockSignals(True)
-                self.clear()
-                self.addItems([p[0] for p in self.ports])
-                try:
-                    self.setCurrentIndex(i)
-                except:
-                    pass
-                self.selection = self.ports[i][0]
+#                self.blockSignals(True)
+                #self.clear()
+                #self.addItems(list([p[0] for p in self.ports]))
+                
+#                for p, item in enumerate(self.ports):
+#                    self.setItemText(p,item[0])
+#                try:
+#                    self.setCurrentIndex(i)
+#                except:
+#                    pass
+                self.selection = u(self.ports[i][0])
             except:
                 pass
-            finally:
-                self.blockSignals(False)
+#            finally:
+#                self.blockSignals(False)
             
     def eventFilter(self, object, event):
-        if event.type() == QEvent.FocusIn:
-            self.setSelection(self.currentIndex())
+# the next prevents correct setSelection on Windows
+#        if event.type() == QEvent.FocusIn:
+#            self.setSelection(self.currentIndex())
         if event.type() == QEvent.MouseButtonPress:
-            self.updateMenu(niceNames=True)
+            self.updateMenu()
         return False
     
-    def updateMenu(self,niceNames=False):
+    def updateMenu(self):
         self.blockSignals(True)
         if platf == 'Darwin':
-            self.ports = [p for p in serial.tools.list_ports.comports() if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync','/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem'])]
+            self.ports = list([p for p in serial.tools.list_ports.comports() if not(p[0] in ['/dev/cu.Bluetooth-PDA-Sync','/dev/cu.Bluetooth-Modem','/dev/tty.Bluetooth-PDA-Sync','/dev/tty.Bluetooth-Modem'])])
         else:
-            self.ports = serial.tools.list_ports.comports()
+            self.ports = list(serial.tools.list_ports.comports())
         if self.selection not in [p[0] for p in self.ports]:
         	self.ports.append([self.selection,"",""])
         self.ports = sorted(self.ports,key=lambda p: p[0])
         self.clear()
-        if niceNames:
-            items = [(p[1] if p[1] else p[0]) for p in self.ports]
-        else:
-            items = [p[0] for p in self.ports]
-        self.addItems(items)
+        self.addItems([(p[1] if p[1] else p[0]) for p in self.ports])
         try:
             pos = [p[0] for p in self.ports].index(self.selection)
             self.setCurrentIndex(pos)
@@ -20996,7 +21002,8 @@ class comportDlg(ArtisanDialog):
                 devicename = aw.qmc.devices[devid-1]    #type identification of the device. Non editable
                 if devid != 29 and devid != 33 and devicename[0] != "+": # hide serial confs for MODBUS and "+XX" extra devices
                     comportComboBox =  self.serialtable.cellWidget(i,1)
-                    aw.extracomport[i] = str(comportComboBox.currentText())
+#                    aw.extracomport[i] = str(comportComboBox.currentText())
+                    aw.extracomport[i] = str(comportComboBox.getSelection())
                     baudComboBox =  self.serialtable.cellWidget(i,2)
                     aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
                     byteComboBox =  self.serialtable.cellWidget(i,3)
@@ -21030,7 +21037,8 @@ class comportDlg(ArtisanDialog):
 #        class parityError(Exception): pass
 #        class stopbitsError(Exception): pass
         class timeoutError(Exception): pass
-        comport = str(self.comportEdit.currentText())
+#        comport = str(self.comportEdit.currentText())
+        comport = str(self.comportEdit.getSelection())
         baudrate = str(self.baudrateComboBox.currentText())
         bytesize = str(self.bytesizeComboBox.currentText())
         parity = str(self.parityComboBox.currentText())
@@ -26886,15 +26894,14 @@ def main():
         QApplication.setLayoutDirection(Qt.RightToLeft)
     else:
         QApplication.setLayoutDirection(Qt.LeftToRight)
-    
-
-    
+   
     try:
         aw.defaultAppearance = str(aw.style().objectName()).lower()
     except:
         pass
     aw.settingsLoad()
     aw.setFonts()
+    
     
     try:
         if sys.argv and len(sys.argv) > 1:
