@@ -2103,10 +2103,14 @@ class tgraphcanvas(FigureCanvas):
                 self.endofx = 60
             self.ax.set_ylim(self.ylimit_min, self.ylimit)
             self.ax.set_autoscale_on(False)
+            fontprop_large = aw.mpl_fontproperties.copy()            
+            fontprop_large.set_size("large")
+            fontprop_xlarge = aw.mpl_fontproperties.copy()            
+            fontprop_xlarge.set_size("x-large")
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
-            self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,fontsize="large",labelpad=10,fontproperties=aw.mpl_fontproperties)
-            self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),color = self.palette["xlabel"],fontsize="large",fontproperties=aw.mpl_fontproperties)
-            self.ax.set_title(aw.arabicReshape(self.title), color=self.palette["title"],fontsize="x-large",fontproperties=aw.mpl_fontproperties)
+            self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
+            self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),color = self.palette["xlabel"],fontproperties=fontprop_large)
+            self.ax.set_title(aw.arabicReshape(self.title), color=self.palette["title"],fontproperties=fontprop_xlarge)
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
             two_ax_mode = (self.DeltaETflag or self.DeltaBTflag or (aw.qmc.background and (self.DeltaETBflag or self.DeltaBTBflag))) and not self.designerflag
             #self.ax.spines['top'].set_color('none')
@@ -2129,7 +2133,7 @@ class tgraphcanvas(FigureCanvas):
                 self.delta_ax = self.ax.twinx()
                 self.ax.set_zorder(self.delta_ax.get_zorder()-1) # put ax in front of delta_ax
                 self.ax.patch.set_visible(True)
-                self.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),fontsize="large",color = self.palette["ylabel"],fontproperties=aw.mpl_fontproperties)
+                self.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)),color = self.palette["ylabel"],fontproperties=fontprop_large)
                 self.delta_ax.set_ylim(self.zlimit_min,self.zlimit)
                 self.delta_ax.yaxis.set_major_locator(ticker.MultipleLocator(self.zgrid))
                 self.delta_ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -7194,15 +7198,15 @@ class ApplicationWindow(QMainWindow):
     
     def setFonts(self):
         # try to select the right font for matplotlib according to the given locale and plattform
-        if self.qmc.graphfont == 0:                
-            rcParams['font.size'] = 12.0
-            try:
+        if self.qmc.graphfont == 0:     
+            try:                    
+                rcParams['font.size'] = 12.0
                 mpl.rcParams['font.family'] = "sans-serif"
                 mpl.rcParams['font.sans-serif'] = ["Microsoft Sans Serif", "Arial"] # works for Greek and Arabic
-                self.mpl_fontproperties = mpl.font_manager.FontProperties()
+                self.mpl_fontproperties = mpl.font_manager.FontProperties()           
                 if platf == "Darwin":
                     mpl.rcParams['font.family'] = "Arial Unicode MS"
-                    self.mpl_fontproperties = mpl.font_manager.FontProperties()
+                    self.mpl_fontproperties = mpl.font_manager.FontProperties()           
                 elif platf == "Linux":
                     if locale:
                         if locale == "ar":
@@ -7228,7 +7232,7 @@ class ApplicationWindow(QMainWindow):
                         aw.set_mpl_fontproperties("C:\\Windows\\Fonts\\batang.ttc")
 #                    elif locale == "ar":
 #                        mpl.rcParams['font.family'] = "TraditionalArabic"
-#                        self.mpl_fontproperties = mpl.font_manager.FontProperties()
+#                        self.mpl_fontproperties = mpl.font_manager.FontProperties()         
             except:
                 pass
         elif self.qmc.graphfont == 1:
@@ -7238,8 +7242,8 @@ class ApplicationWindow(QMainWindow):
             aw.set_mpl_fontproperties(self.getResourcePath() + "Humor-Sans.ttf")
         elif self.qmc.graphfont == 2:
             # font Comic selected
-            rcParams['font.family'] = ['Comic Sans MS','Humor Sans']
             rcParams['font.size'] = 12.0
+            rcParams['font.family'] = ['Comic Sans MS','Humor Sans']
             self.mpl_fontproperties = mpl.font_manager.FontProperties()
         self.qmc.redraw(recomputeAllDeltas=False)
     
