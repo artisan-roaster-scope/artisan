@@ -8651,12 +8651,164 @@ class ApplicationWindow(QMainWindow):
         obj["temp1"] = temp2
         obj["temp2"] = temp1
         res = self.setProfile(obj)
-        infile.close()
-        if res:
-            self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
-            #change Title
-#            self.qmc.ax.set_title(aw.arabicReshape(self.qmc.title), size=18, color= self.qmc.palette["title"])
-            self.qmc.redraw()
+        
+        error_msg = ""
+        try:
+            if aw.qmc.loadalarmsfromprofile:
+                roastlogger_action_section = "No actions loaded"
+    
+            	#Find sliders - exact names of the sliders must be defined
+                slider_power=aw.qmc.etypes.indexOf("Power")
+                slider_fan=aw.qmc.etypes.indexOf("Fan")
+                #load only "Power" and "Fan" events
+                if slider_power != -1 and slider_fan != -1:
+                    data_action = csv.reader(infile,delimiter='|')
+    
+                    aw.qmc.alarmflag = []
+                    aw.qmc.alarmguard = []
+                    aw.qmc.alarmnegguard = []
+                    aw.qmc.alarmtime = []
+                    aw.qmc.alarmoffset = []
+                    aw.qmc.alarmcond = []
+                    aw.qmc.alarmstate = []
+                    aw.qmc.alarmsource = []
+                    aw.qmc.alarmtemperature = []
+                    aw.qmc.alarmaction = []
+                    aw.qmc.alarmstrings = []
+    
+                    while True:
+                        fields_action = next(data_action)
+                        if len(fields_action) == 0:
+                            eat_it_up=1
+                        elif len(fields_action) == 1 and fields_action[0].startswith("@"):
+                            roastlogger_action_section=fields_action[0]
+                        else:
+                            #process items in the section
+                            if roastlogger_action_section.startswith("@actionT1Table"):
+                                if len(fields_action) == 3 and fields_action[0] != "null":
+                                    #add temp alarm - POWER
+                                    aw.qmc.alarmflag.append(1)
+                                    aw.qmc.alarmguard.append(-1)
+                                    aw.qmc.alarmnegguard.append(-1)
+                                    aw.qmc.alarmtime.append(8)        #after TP
+                                    aw.qmc.alarmoffset.append(0)
+                                    aw.qmc.alarmcond.append(1)
+                                    aw.qmc.alarmstate.append(0)
+                                    aw.qmc.alarmsource.append(1)    #BT
+                                    aw.qmc.alarmtemperature.append(fields_action[0])
+                                    aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
+                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None, QApplication.UnicodeUTF8))
+    
+    
+                                    #add temp alarm - FAN
+                                    aw.qmc.alarmflag.append(1)
+                                    aw.qmc.alarmguard.append(-1)
+                                    aw.qmc.alarmnegguard.append(-1)
+                                    aw.qmc.alarmtime.append(8)        #after TP
+                                    aw.qmc.alarmoffset.append(0)
+                                    aw.qmc.alarmcond.append(1)
+                                    aw.qmc.alarmstate.append(0)
+                                    aw.qmc.alarmsource.append(1)    #BT
+                                    aw.qmc.alarmtemperature.append(fields_action[0])
+                                    aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
+                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None, QApplication.UnicodeUTF8))
+    
+                            elif roastlogger_action_section.startswith("@actionSecsFCTable"):
+                                if len(fields_action) == 3 and fields_action[0] != "null":
+    
+                                    #add time alarm - POWER
+                                    aw.qmc.alarmflag.append(1)
+                                    aw.qmc.alarmguard.append(-1)
+                                    aw.qmc.alarmnegguard.append(-1)
+                                    aw.qmc.alarmtime.append(2)        #after FC
+                                    aw.qmc.alarmoffset.append(int(fields_action[0]))
+                                    aw.qmc.alarmcond.append(1)
+                                    aw.qmc.alarmstate.append(0)
+                                    aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
+                                    aw.qmc.alarmtemperature.append(0)
+                                    aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
+                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None, QApplication.UnicodeUTF8))
+    
+                                    #add time alarm - FAN
+                                    aw.qmc.alarmflag.append(1)
+                                    aw.qmc.alarmguard.append(-1)
+                                    aw.qmc.alarmnegguard.append(-1)
+                                    aw.qmc.alarmtime.append(2)        #after FC
+                                    aw.qmc.alarmoffset.append(int(fields_action[0]))
+                                    aw.qmc.alarmcond.append(1)
+                                    aw.qmc.alarmstate.append(0)
+                                    aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
+                                    aw.qmc.alarmtemperature.append(0)
+                                    aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
+                                    aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None, QApplication.UnicodeUTF8))
+    
+    
+                            elif roastlogger_action_section.startswith("@actionResetTable"):
+                                if len(fields_action) == 2 and fields_action[0] != "null":
+    
+                                    #add temp alarm - POWER
+                                    aw.qmc.alarmflag.insert(0,1)
+                                    aw.qmc.alarmguard.insert(0,-1)
+                                    aw.qmc.alarmnegguard.insert(0,-1)
+                                    aw.qmc.alarmtime.insert(0,9)        #after ON
+                                    aw.qmc.alarmoffset.insert(0,0)
+                                    aw.qmc.alarmcond.insert(0,1)
+                                    aw.qmc.alarmstate.insert(0,0)
+                                    aw.qmc.alarmsource.insert(0,1)    #BT
+                                    aw.qmc.alarmtemperature.insert(0,0)
+                                    aw.qmc.alarmaction.insert(0,3+slider_power)    #SLIDER POWER
+                                    aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[0],None, QApplication.UnicodeUTF8))
+    
+    
+                                    #add temp alarm - FAN
+                                    aw.qmc.alarmflag.insert(0,1)
+                                    aw.qmc.alarmguard.insert(0,-1)
+                                    aw.qmc.alarmnegguard.insert(0,-1)
+                                    aw.qmc.alarmtime.insert(0,9)        #after ON
+                                    aw.qmc.alarmoffset.insert(0,0)
+                                    aw.qmc.alarmcond.insert(0,1)
+                                    aw.qmc.alarmstate.insert(0,0)
+                                    aw.qmc.alarmsource.insert(0,1)    #BT
+                                    aw.qmc.alarmtemperature.insert(0,0)
+                                    aw.qmc.alarmaction.insert(0,3+slider_fan)    #SLIDER POWER
+                                    aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[1],None, QApplication.UnicodeUTF8))
+    
+    
+                            elif roastlogger_action_section.startswith("@loadBeansTable"):
+                                if len(fields_action) == 1 and fields_action[0] != "null":
+                                    #add CHARGE alarm
+                                    aw.qmc.alarmflag.insert(2,1)
+                                    aw.qmc.alarmguard.insert(2,-1)
+                                    aw.qmc.alarmnegguard.insert(2,-1)
+                                    aw.qmc.alarmtime.insert(2,-1)        #after START
+                                    aw.qmc.alarmoffset.insert(2,0)
+                                    aw.qmc.alarmcond.insert(2,1)
+                                    aw.qmc.alarmstate.insert(2,0)
+                                    aw.qmc.alarmsource.insert(2,1)    #BT
+                                    aw.qmc.alarmtemperature.insert(2,fields_action[0])
+                                    aw.qmc.alarmaction.insert(2,0)    #POPUP
+                                    aw.qmc.alarmstrings.insert(2,QApplication.translate("Label","Charge the beans",None, QApplication.UnicodeUTF8))
+                                break;
+                    else:
+                        if slider_power == -1: error_msg += "Could not find slider named 'Power' "
+                        if slider_fan == -1: error_msg += "Could not find slider named 'Fan' "
+                        error_msg += "Please rename sliders in Config - Events menu"
+
+        except:
+            if roastlogger_action_section == "No actions loaded":
+                error_msg += "Roastlogger file does not contain actions.  Alarms will not be loaded."
+            else:
+                error_msg += "Roastlogger actions are not complete. Last loaded section is '" + roastlogger_action_section + "'"
+
+        finally:
+            infile.close()
+            if res:
+                self.qmc.backmoveflag = 1 # this ensures that an already loaded profile gets aligned to the one just loading
+                self.qmc.redraw()
+
+        if error_msg: 
+            aw.qmc.adderror(QApplication.translate("Error Message","Roastlogger log file exception: " + error_msg,None, QApplication.UnicodeUTF8))
+
 
     #Write readings to Artisan csv file
     def exportCSV(self,filename):
@@ -11489,7 +11641,7 @@ $cupping_notes
         contributors += u("<br>Runar Ostnes, Carlos Pascual, Claudia Raddatz,")
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
-        contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis")
+        contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis, Miroslav Stankovic")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -23368,6 +23520,7 @@ class AlarmDlg(ArtisanDialog):
         self.deselectAll()
         # select newly added row i.e. the last one
         self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(nalarms,0,nalarms,self.alarmtable.columnCount()-1),True)
+        header.setStretchLastSection(True)
 
 
     def insertalarm(self):
@@ -23402,6 +23555,7 @@ class AlarmDlg(ArtisanDialog):
                 self.deselectAll()
                 # select newly inserted item
                 self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(selected_row,0,selected_row,self.alarmtable.columnCount()-1),True)
+                header.setStretchLastSection(True)
         
     def deletealarm(self):
         nalarms = self.alarmtable.rowCount()
@@ -23705,7 +23859,7 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmtable.setColumnWidth(5,80)
                 self.alarmtable.setColumnWidth(7,40)
                 header = self.alarmtable.horizontalHeader()
-                header.setStretchLastSection(False)
+                header.setStretchLastSection(True)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " createalarmtable() %1").arg(str(ex)),exc_tb.tb_lineno)
