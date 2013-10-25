@@ -583,7 +583,7 @@ class tgraphcanvas(FigureCanvas):
         self.stemp1,self.stemp2 = [],[] # smoothed versions of temp1/temp2 usind in redraw()
         self.unfiltereddelta1, self.unfiltereddelta2 = [],[] # used in sample()
 
-        #indexes for START[0],DRYe[1],FCs[2],FCe[3],SCs[4],SCe[5],DROP[6] and COOLe[7]
+        #indexes for CHARGE[0],DRYe[1],FCs[2],FCe[3],SCs[4],SCe[5],DROP[6] and COOLe[7]
         #Example: Use as self.timex[self.timeindex[1]] to get the time of DryEnd
         #Example: Use self.temp2[self.timeindex[4]] to get the BT temperature of SCs
 
@@ -794,7 +794,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmnegguard = []   # points to another alarm by index that should not has been triggered before; -1 indicates no guard
         self.alarmtime = []    # times after which each alarm becomes efective. Usage: self.timeindex[self.alarmtime[i]]
 #                              # -1 equals None
-        self.alarmoffset = []  # the for timed alarms, the seconds after alarmtime the alarm is triggered
+        self.alarmoffset = []  # for timed alarms, the seconds after alarmtime the alarm is triggered
         self.alarmtime2menuidx = [2,4,5,6,7,8,9,10,3,0,1] # maps self.alarmtime index to menu idx (to move TP in menu from index 9 to 3)
         self.menuidx2alarmtime = [9,-1,0,8,1,2,3,4,5,6,7] # inverse of above (note that those two are only inverse in one direction!)
         self.alarmcond = []    # 0 = falls below; 1 = rises above
@@ -5733,7 +5733,7 @@ class SampleThread(QThread):
                       or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
                       or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
                       or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
-                            and aw.qmc.timeindex[1] < 1 and aw.qmc.TPalarmtimeindex)):
+                            and aw.qmc.TPalarmtimeindex)):
                         #########
                         # check alarmoffset (time after From event):
                         if aw.qmc.alarmoffset[i] > 0:
@@ -5765,7 +5765,7 @@ class SampleThread(QThread):
                             else:
                                 alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
                         alarm_limit = aw.qmc.alarmtemperature[i]
-                        if alarm_temp and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                        if alarm_temp != None and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
                             aw.qmc.temporaryalarmflag = i
             #############    if using DEVICE 18 (no device). Manual mode
             # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
@@ -5943,6 +5943,8 @@ class ApplicationWindow(QMainWindow):
         self.modbus = modbusport()
         #create scale port object
         self.scale = scaleport()
+        #create color port object
+        self.color = colorport()
         #list with extra serial ports (extra devices)
         self.extraser = []
         #extra comm port settings 
@@ -7310,6 +7312,7 @@ class ApplicationWindow(QMainWindow):
             if self.slider4.value() != self.eventslidervalues[3]:
                 self.eventslidervalues[3] = self.slider4.value()
                 self.recordsliderevent(n)
+        return False
 
     # n=0 : slider1; n=1 : slider2; n=2 : slider3; n=3 : slider4
     def fireslideraction(self,n):
@@ -9809,7 +9812,6 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #restore scale port
             settings.beginGroup("Scale")
-#            self.scale.device = str(settings.value("device",self.scale.device).toString())
             self.scale.device_id = settings.value("device_id",self.scale.device_id).toInt()[0]
             self.scale.comport = str(settings.value("comport",self.scale.comport).toString())
             self.scale.baudrate = settings.value("baudrate",int(self.scale.baudrate)).toInt()[0]
@@ -9817,6 +9819,16 @@ class ApplicationWindow(QMainWindow):
             self.scale.stopbits = settings.value("stopbits",self.scale.stopbits).toInt()[0]
             self.scale.parity = str(settings.value("parity",self.scale.parity).toString())
             self.scale.timeout = settings.value("timeout",self.scale.timeout).toInt()[0]
+            settings.endGroup()
+            #restore color port
+            settings.beginGroup("Color")
+            self.color.device_id = settings.value("device_id",self.color.device_id).toInt()[0]
+            self.color.comport = str(settings.value("comport",self.color.comport).toString())
+            self.color.baudrate = settings.value("baudrate",int(self.color.baudrate)).toInt()[0]
+            self.color.bytesize = settings.value("bytesize",self.color.bytesize).toInt()[0]
+            self.color.stopbits = settings.value("stopbits",self.color.stopbits).toInt()[0]
+            self.color.parity = str(settings.value("parity",self.color.parity).toString())
+            self.color.timeout = settings.value("timeout",self.color.timeout).toInt()[0]
             settings.endGroup()
             #restore alarms
             settings.beginGroup("Alarms")
@@ -10487,7 +10499,6 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #save scale port
             settings.beginGroup("Scale")
-#            settings.setValue("device",self.scale.device)
             settings.setValue("device_id",self.scale.device_id)
             settings.setValue("comport",self.scale.comport)
             settings.setValue("baudrate",self.scale.baudrate)
@@ -10495,6 +10506,16 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("stopbits",self.scale.stopbits)
             settings.setValue("parity",self.scale.parity)
             settings.setValue("timeout",self.scale.timeout)
+            settings.endGroup()
+            #save color port
+            settings.beginGroup("Color")
+            settings.setValue("device_id",self.color.device_id)
+            settings.setValue("comport",self.color.comport)
+            settings.setValue("baudrate",self.color.baudrate)
+            settings.setValue("bytesize",self.color.bytesize)
+            settings.setValue("stopbits",self.color.stopbits)
+            settings.setValue("parity",self.color.parity)
+            settings.setValue("timeout",self.color.timeout)
             settings.endGroup()
             #save pid settings (only key and value[0])
             settings.beginGroup("PXR")
@@ -11777,13 +11798,24 @@ $cupping_notes
                 self.scale.device_id = list(aw.scale.devicefunctionlist.keys()).index(self.scale.device)
             except Exception:
                 self.scale.device_id = 0
-#            self.scale.comport = str(dialog.scale_comportEdit.currentText())                #unicode() changes QString to a python string
             self.scale.comport = str(dialog.scale_comportEdit.getSelection())
             self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
             self.scale.bytesize = int(str(dialog.scale_bytesizeComboBox.currentText()))
             self.scale.stopbits = int(str(dialog.scale_stopbitsComboBox.currentText()))
             self.scale.parity = str(dialog.scale_parityComboBox.currentText())
             self.scale.timeout = int(str(dialog.scale_timeoutEdit.text()))
+            # set color port
+            self.color.device = str(dialog.color_deviceEdit.currentText())                #unicode() changes QString to a python string
+            try:
+                self.color.device_id = list(aw.color.devicefunctionlist.keys()).index(self.color.device)
+            except Exception:
+                self.color.device_id = 0
+            self.color.comport = str(dialog.color_comportEdit.getSelection())
+            self.color.baudrate = int(str(dialog.color_baudrateComboBox.currentText()))              #int changes QString to int
+            self.color.bytesize = int(str(dialog.color_bytesizeComboBox.currentText()))
+            self.color.stopbits = int(str(dialog.color_stopbitsComboBox.currentText()))
+            self.color.parity = str(dialog.color_parityComboBox.currentText())
+            self.color.timeout = int(str(dialog.color_timeoutEdit.text()))
 
     def PIDcontrol(self):
         #pid
@@ -11823,6 +11855,8 @@ $cupping_notes
         dialog.show()
 
     def graphwheel(self):
+        if self.qmc.designerflag:
+            self.stopdesigner()
         wheeldialog = WheelDlg(self)
         wheeldialog.show()
 
@@ -18225,8 +18259,8 @@ class modbusport(object):
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
                 aw.addserial("MODBUS readSingleRegister :" + settings + " || Slave = " + str(slave) + " || Register = " + str(register) + " || Code = " + str(code) + " || Rx = " + str(r))
 
-class scaleport(object):
-    """ this class handles the communications with the scale"""
+
+class extraserialport(object):
     def __init__(self):
         #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
         self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated.
@@ -18235,10 +18269,7 @@ class scaleport(object):
         self.parity= 'N'
         self.stopbits = 1
         self.timeout = 1
-        self.devicefunctionlist = {
-            "None" : None,
-            "KERN NDE" : self.readKERN_NDE
-        }
+        self.devicefunctionlist = {}
         self.device = None
         self.device_id = 0
         self.SP = None
@@ -18277,7 +18308,24 @@ class scaleport(object):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(e)),exc_tb.tb_lineno)
 
-    # returns weight as float in g or -1 if something went wrong
+
+class scaleport(extraserialport):
+    """ this class handles the communications with the scale"""
+    def __init__(self):
+        super(scaleport, self).__init__()
+        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated.
+        self.baudrate = 19200
+        self.bytesize = 8
+        self.parity= 'N'
+        self.stopbits = 1
+        self.timeout = 1
+        self.devicefunctionlist = {
+            "None" : None,
+            "KERN NDE" : self.readKERN_NDE
+        }
+        
+    # returns weight as int in g or -1 if something went wrong
     def readWeight(self):
         if self.device != "None":
             return self.devicefunctionlist[self.device]()
@@ -18296,8 +18344,42 @@ class scaleport(object):
             else:
                 return -1 
         except Exception:
-            pass
+            return -1
 
+
+class colorport(extraserialport):
+    """ this class handles the communications with the color meter"""
+    def __init__(self):
+        super(colorport, self).__init__()
+        #default initial settings. They are changed by settingsload() at initiation of program acording to the device chosen
+        self.comport = "/dev/cu.usbserial-FTFKDA5O"      #NOTE: this string should not be translated.
+        self.baudrate = 115200
+        self.bytesize = 8
+        self.parity= 'N'
+        self.stopbits = 1
+        self.timeout = 1
+        self.devicefunctionlist = {
+            "None" : None,
+            "Tonino" : self.readTonino
+        }
+            
+    # returns color as int or -1 if something went wrong
+    def readColor(self):
+        if self.device != "None":
+            return self.devicefunctionlist[self.device]()
+        else:
+            return -1
+
+    def readTonino(self):
+        try:
+            self.connect()
+            self.SP.write(str2cmd('SCAN'))
+            v = self.SP.readline()
+            return int(v.decode('ascii'))
+        except Exception:
+            return -1
+            
+            
 ###########################################################################################
 ##################### SERIAL PORT #########################################################
 ###########################################################################################
@@ -20913,6 +20995,49 @@ class comportDlg(ArtisanDialog):
         scale_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
         self.scale_timeoutEdit = QLineEdit(str(aw.scale.timeout))
         self.scale_timeoutEdit.setValidator(QIntValidator(1,5,self.scale_timeoutEdit))
+        ##########################    TAB 5 WIDGETS   COLOR
+        color_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
+        self.color_deviceEdit = QComboBox()
+        self.color_deviceEdit.addItems(list(aw.color.devicefunctionlist.keys()))
+        try:
+            self.color_deviceEdit.setCurrentIndex(aw.color.device_id)
+        except:
+            self.color_deviceEdit.setCurrentIndex(0)
+        self.color_deviceEdit.setEditable(False)
+        color_devicelabel.setBuddy(self.color_deviceEdit)
+        color_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
+        self.color_comportEdit = PortComboBox(selection = aw.color.comport)
+        self.connect(self.color_comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.color_comportEdit,i))
+        self.color_comportEdit.setEditable(True)
+        color_comportlabel.setBuddy(self.color_comportEdit)
+        color_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
+        self.color_baudrateComboBox = QComboBox()
+        color_baudratelabel.setBuddy(self.color_baudrateComboBox)
+        self.color_bauds = ["1200","2400","4800","9600","19200","38400","57600","115200"]
+        self.color_baudrateComboBox.addItems(self.color_bauds)
+        self.color_baudrateComboBox.setCurrentIndex(self.color_bauds.index(str(aw.color.baudrate)))
+        color_bytesizelabel = QLabel(QApplication.translate("Label", "Byte Size",None, QApplication.UnicodeUTF8))
+        self.color_bytesizeComboBox = QComboBox()
+        color_bytesizelabel.setBuddy(self.color_bytesizeComboBox)
+        self.color_bytesizes = ["7","8"]
+        self.color_bytesizeComboBox.addItems(self.color_bytesizes)
+        self.color_bytesizeComboBox.setCurrentIndex(self.color_bytesizes.index(str(aw.color.bytesize)))
+        color_paritylabel = QLabel(QApplication.translate("Label", "Parity",None, QApplication.UnicodeUTF8))
+        self.color_parityComboBox = QComboBox()
+        color_paritylabel.setBuddy(self.color_parityComboBox)
+        #0 = Odd, E = Even, N = None. NOTE: These strings cannot be translated as they are arguments to the lib pyserial.
+        self.color_parity = ["O","E","N"]
+        self.color_parityComboBox.addItems(self.color_parity)
+        self.color_parityComboBox.setCurrentIndex(self.color_parity.index(aw.color.parity))
+        color_stopbitslabel = QLabel(QApplication.translate("Label", "Stopbits",None, QApplication.UnicodeUTF8))
+        self.color_stopbitsComboBox = QComboBox()
+        color_stopbitslabel.setBuddy(self.color_stopbitsComboBox)
+        self.color_stopbits = ["0","1","2"]
+        self.color_stopbitsComboBox.addItems(self.stopbits)
+        self.color_stopbitsComboBox.setCurrentIndex(aw.color.stopbits)
+        color_timeoutlabel = QLabel(QApplication.translate("Label", "Timeout",None, QApplication.UnicodeUTF8))
+        self.color_timeoutEdit = QLineEdit(str(aw.color.timeout))
+        self.color_timeoutEdit.setValidator(QIntValidator(1,5,self.color_timeoutEdit))
         #### dialog buttons
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
@@ -21056,6 +21181,28 @@ class comportDlg(ArtisanDialog):
         tab4Layout = QVBoxLayout()
         tab4Layout.addLayout(scaleH)
         tab4Layout.addStretch()
+        #LAYOUT TAB 5
+        color_grid = QGridLayout()
+        color_grid.addWidget(color_devicelabel,0,0,Qt.AlignRight)
+        color_grid.addWidget(self.color_deviceEdit,0,1)
+        color_grid.addWidget(color_comportlabel,1,0,Qt.AlignRight)
+        color_grid.addWidget(self.color_comportEdit,1,1)
+        color_grid.addWidget(color_baudratelabel,2,0,Qt.AlignRight)
+        color_grid.addWidget(self.color_baudrateComboBox,2,1)
+        color_grid.addWidget(color_bytesizelabel,3,0,Qt.AlignRight)
+        color_grid.addWidget(self.color_bytesizeComboBox,3,1)
+        color_grid.addWidget(color_paritylabel,4,0,Qt.AlignRight)
+        color_grid.addWidget(self.color_parityComboBox,4,1)
+        color_grid.addWidget(color_stopbitslabel,5,0,Qt.AlignRight)
+        color_grid.addWidget(self.color_stopbitsComboBox,5,1)
+        color_grid.addWidget(color_timeoutlabel,6,0,Qt.AlignRight)
+        color_grid.addWidget(self.color_timeoutEdit,6,1)
+        colorH = QHBoxLayout()
+        colorH.addLayout(color_grid)
+        colorH.addStretch()
+        tab5Layout = QVBoxLayout()
+        tab5Layout.addLayout(colorH)
+        tab5Layout.addStretch()
         #tab widget
         TabWidget = QTabWidget()
         C1Widget = QWidget()
@@ -21070,6 +21217,9 @@ class comportDlg(ArtisanDialog):
         C4Widget = QWidget()
         C4Widget.setLayout(tab4Layout)
         TabWidget.addTab(C4Widget,QApplication.translate("Tab","Scale",None, QApplication.UnicodeUTF8))
+        C5Widget = QWidget()
+        C5Widget.setLayout(tab5Layout)
+        TabWidget.addTab(C5Widget,QApplication.translate("Tab","Color",None, QApplication.UnicodeUTF8))
         if devid == 29: # switch to MODBUS tab if MODBUS device was selected as main device
             TabWidget.setCurrentIndex(2)
         #incorporate layouts
@@ -22858,7 +23008,7 @@ class WheelDlg(ArtisanDialog):
         
         rcParams['path.effects'] = []
             
-        self.setModal(False)
+        self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Wheel Graph Editor",None, QApplication.UnicodeUTF8))
         self.viewmodeflag = False
         #table for alarms
@@ -23525,6 +23675,7 @@ class AlarmDlg(ArtisanDialog):
         # select newly added row i.e. the last one
         self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(nalarms,0,nalarms,self.alarmtable.columnCount()-1),True)
         header.setStretchLastSection(True)
+        self.markNotEnabledAlarmRows()
 
 
     def insertalarm(self):
@@ -23560,6 +23711,7 @@ class AlarmDlg(ArtisanDialog):
                 # select newly inserted item
                 self.alarmtable.setRangeSelected(QTableWidgetSelectionRange(selected_row,0,selected_row,self.alarmtable.columnCount()-1),True)
                 header.setStretchLastSection(True)
+                self.markNotEnabledAlarmRows()
         
     def deletealarm(self):
         nalarms = self.alarmtable.rowCount()
@@ -23599,7 +23751,8 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmaction.pop()
                 aw.qmc.alarmstrings.pop()
                 self.alarmtable.setRowCount(nalarms - 1)
-                self.deselectAll()
+                self.deselectAll()                
+            self.markNotEnabledAlarmRows()
 
     def importalarms(self):
         aw.fileImport(QApplication.translate("Message", "Load Alarms",None, QApplication.UnicodeUTF8),self.importalarmsJSON)
@@ -23686,7 +23839,6 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmtime = [-1]*nalarms
         aw.qmc.alarmoffset = [0]*nalarms
         aw.qmc.alarmcond = [1]*nalarms
-        aw.qmc.alarmstate = [0]*nalarms
         aw.qmc.alarmsource = [1]*nalarms
         aw.qmc.alarmtemperature = [500]*nalarms
         aw.qmc.alarmaction = [0]*nalarms
@@ -23828,6 +23980,14 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setCellWidget(i,7,tempedit)
         self.alarmtable.setCellWidget(i,8,actionComboBox)
         self.alarmtable.setCellWidget(i,9,descriptionedit)
+        
+    # puts a gray background on alarm rows that have already been fired
+    def markNotEnabledAlarmRows(self):
+        for i in range(nalarms):
+            for j in range(10):
+                if aw.qmc.alarmstate[i]:
+                    self.alarmtable.setItem(i,j,QTableWidgetItem())
+                    self.alarmtable.item(i,j).setBackgroundColor(QColor(191, 191, 191))
 
     def createalarmtable(self):
         try:
@@ -23864,6 +24024,7 @@ class AlarmDlg(ArtisanDialog):
                 self.alarmtable.setColumnWidth(7,40)
                 header = self.alarmtable.horizontalHeader()
                 header.setStretchLastSection(True)
+                self.markNotEnabledAlarmRows()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " createalarmtable() %1").arg(str(ex)),exc_tb.tb_lineno)
