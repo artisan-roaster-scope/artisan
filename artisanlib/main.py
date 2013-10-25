@@ -13124,11 +13124,6 @@ class HUDDlg(ArtisanDialog):
             self.endEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[-1]))
         else:
             self.endEdit.setText("00:00")
-        self.connect(self.startEdit,SIGNAL("editingFinished()"),lambda i=0:self.polyfitcurveschanged(i))
-        self.connect(self.endEdit,SIGNAL("editingFinished()"),lambda i=0:self.polyfitcurveschanged(i))
-        self.connect(self.polyfitdeg,SIGNAL("valueChanged(int)"),lambda i=0:self.polyfitcurveschanged(i))
-        self.connect(self.c1ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(i))
-        self.connect(self.c2ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(i))
         # calculate event list
         self.events = self.eventlist()
         self.eventAComboBox = QComboBox()
@@ -13264,7 +13259,13 @@ class HUDDlg(ArtisanDialog):
         Slayout.addLayout(buttonsLayout)
         Slayout.setSizeConstraint(QLayout.SetFixedSize)
         self.connect(TabWidget,SIGNAL("currentChanged(int)"),lambda i=0:self.tabSwitched(i))
-        self.setLayout(Slayout)
+        self.setLayout(Slayout)        
+        self.connect(self.startEdit,SIGNAL("editingFinished()"),lambda i=0:self.polyfitcurveschanged(1))
+        self.connect(self.endEdit,SIGNAL("editingFinished()"),lambda i=0:self.polyfitcurveschanged(2))
+        self.connect(self.polyfitdeg,SIGNAL("valueChanged(int)"),lambda i=0:self.polyfitcurveschanged(3))
+        self.connect(self.c1ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c1ComboBox.currentIndex() :self.polyfitcurveschanged(4))
+        self.connect(self.c2ComboBox,SIGNAL("currentIndexChanged(int)"),lambda i=self.c2ComboBox.currentIndex() :self.polyfitcurveschanged(5))
+
 
     def showpidhelp(self):
         QDesktopServices.openUrl(QUrl("http://en.wikipedia.org/wiki/PID_controller", QUrl.TolerantMode))
@@ -13482,8 +13483,12 @@ class HUDDlg(ArtisanDialog):
             b = len(aw.qmc.timex) - 1
         else:
             b = self.events[Bevent][1]
+        self.startEdit.setDisabled(True)
         self.startEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[a] - start))
+        self.startEdit.setDisabled(False)
+        self.endEdit.setDisabled(True)
         self.endEdit.setText(aw.qmc.stringfromseconds(aw.qmc.timex[b] - start))
+        self.endEdit.setDisabled(False)
         self.polyfitcurveschanged(0)        
 
     def eventlist(self):
@@ -13551,20 +13556,31 @@ class HUDDlg(ArtisanDialog):
             
     def polyfitcurveschanged(self,i):
         self.polyfitdeg.blockSignals(True)
+        self.polyfitdeg.setDisabled(True)
+        self.startEdit.blockSignals(True)
+        self.startEdit.setDisabled(True)
+        self.endEdit.blockSignals(True)
+        self.endEdit.setDisabled(True)
         if self.polyfitCheck.isChecked() and len(aw.qmc.timex) > 2:
             aw.qmc.resetlines()
             aw.qmc.redraw(recomputeAllDeltas=False)
             self.doPolyfit()
         else:
             self.result.setText("")
+        self.polyfitdeg.setDisabled(False) #blockSignals(False)
+        self.startEdit.setDisabled(False)
+        self.startEdit.blockSignals(False)
+        self.endEdit.setDisabled(False)
+        self.endEdit.blockSignals(False)
+        self.polyfitdeg.setDisabled(False)
         self.polyfitdeg.blockSignals(False)
         self.polyfitdeg.setFocus()
         
     def tabSwitched(self,i):
-        if i != 2:
+        if i != 3:
             if self.polyfitCheck.isChecked():
                 self.polyfitCheck.setChecked(False)
-                self.polyfit(0)
+#                self.polyfit(0)
         else:
             self.collectCurves()
             
@@ -13595,14 +13611,14 @@ class HUDDlg(ArtisanDialog):
             self.curves.append(aw.qmc.extratemp2[i])
             self.deltacurves.append(False)
             self.deltacurves.append(False)
-        self.c1ComboBox.blockSignals(True)
-        self.c2ComboBox.blockSignals(True)
+        self.c1ComboBox.setDisabled(True) #blockSignals(True)
+        self.c2ComboBox.setDisabled(True) #blockSignals(True)
         self.c1ComboBox.clear()
         self.c1ComboBox.addItems(self.curvenames)
         self.c2ComboBox.clear()
         self.c2ComboBox.addItems(self.curvenames)  
-        self.c1ComboBox.blockSignals(False)
-        self.c2ComboBox.blockSignals(False)   
+        self.c1ComboBox.setDisabled(False) #blockSignals(False)
+        self.c2ComboBox.setDisabled(False) #blockSignals(False)   
         self.c1ComboBox.setCurrentIndex(idx)
         self.c2ComboBox.setCurrentIndex(idx+1)
         
@@ -13613,7 +13629,11 @@ class HUDDlg(ArtisanDialog):
                 self.doPolyfit()
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "Polyfit: no profile data available", None, QApplication.UnicodeUTF8))
+                self.polyfitCheck.blockSignals(True)
+                self.polyfitCheck.setDisabled(True)
                 self.polyfitCheck.setChecked(False)
+                self.polyfitCheck.setDisabled(False)
+                self.polyfitCheck.blockSignals(False)
         else:
             self.result.setText("")
             aw.qmc.resetlines()
