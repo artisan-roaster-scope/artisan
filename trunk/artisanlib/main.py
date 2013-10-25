@@ -23983,7 +23983,7 @@ class AlarmDlg(ArtisanDialog):
         
     # puts a gray background on alarm rows that have already been fired
     def markNotEnabledAlarmRows(self):
-        for i in range(nalarms):
+        for i in range(self.alarmtable.rowCount()):
             for j in range(10):
                 if aw.qmc.alarmstate[i]:
                     self.alarmtable.setItem(i,j,QTableWidgetItem())
