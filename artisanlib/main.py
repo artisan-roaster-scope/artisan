@@ -804,6 +804,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmtemperature = []  # set temperature number (example 500)
         self.alarmaction = []       # -1 = no action; 0 = open a window; 1 = call program with a filepath equal to alarmstring; 2 = activate button with number given in description; 
                                     # 3,4,5,6 = move slider with value given in description
+                                    # 7 (START), 8 (COOL), 9 (OFF)
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
         
         self.loadalarmsfromprofile = False # if set, alarms are loaded from profile (even background profiles)
@@ -1339,11 +1340,11 @@ class tgraphcanvas(FigureCanvas):
                     elif button_number == 0:
                         # special case: trigger build-in COOL event
                         aw.qmc.markCoolEnd()
-            else:
+            elif self.alarmaction[alarmnumber] in [3,4,5,6]:
                 # alarm slider 1-4
                 slidernr = None
                 try:
-                    slidervalue = max(0,min(99,int(str(self.alarmstrings[alarmnumber]))))
+                    slidervalue = max(0,min(100,int(str(self.alarmstrings[alarmnumber]))))
                     if slidervalue < 0 or slidervalue > 100:
                         raise Exception()
                     if self.alarmaction[alarmnumber] == 3:
@@ -1364,6 +1365,16 @@ class tgraphcanvas(FigureCanvas):
                     _, _, exc_tb = sys.exc_info()
                     aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setalarm() %1").arg(str(e)),exc_tb.tb_lineno)
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger slider error, description '%1' not a valid number [0-100]",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
+                    
+            elif self.alarmaction[alarmnumber] == 7:
+                # START
+                aw.qmc.ToggleRecorder()
+            elif self.alarmaction[alarmnumber] == 8:
+                # COOL
+                aw.qmc.markCoolEnd()
+            elif self.alarmaction[alarmnumber] == 9:
+                # OFF
+                aw.qmc.ToggleMonitor()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setalarm() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -7161,7 +7172,18 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
     
-    
+    # set slider focus to Qt.StrongFocus to allow keyboard control and
+    # Qt.NoFocus to deactivate it
+    def setSliderFocusPolicy(self,focus):
+        self.slider1.setFocusPolicy(focus)
+        self.slider1.clearFocus()
+        self.slider2.setFocusPolicy(focus)
+        self.slider2.clearFocus()
+        self.slider3.setFocusPolicy(focus)
+        self.slider3.clearFocus()
+        self.slider4.setFocusPolicy(focus)
+        self.slider4.clearFocus()
+            
     def appFrozen(self):     
         ib = False
         try:
@@ -7805,6 +7827,8 @@ class ApplicationWindow(QMainWindow):
             if self.keyboardmoveflag == 0:
                 #turn on
                 self.keyboardmoveflag = 1
+                # deactivate slider keyboard control
+                self.setSliderFocusPolicy(Qt.NoFocus)
                 self.keyboardmoveindex = 2
                 self.sendmessage(QApplication.translate("Message","Keyboard moves turned ON", None, QApplication.UnicodeUTF8))
                 self.button_1.setStyleSheet(self.pushbuttonstyles["SELECTED"])
@@ -7812,6 +7836,8 @@ class ApplicationWindow(QMainWindow):
             elif self.keyboardmoveflag == 1:
                 # turn off 
                 self.keyboardmoveflag = 0
+                # activate slider keyboard control
+                self.setSliderFocusPolicy(Qt.StrongFocus)
                 # clear all
                 self.sendmessage(QApplication.translate("Message","Keyboard moves turned OFF", None, QApplication.UnicodeUTF8))
                 if self.qmc.flagon:    
@@ -24038,7 +24064,10 @@ class AlarmDlg(ArtisanDialog):
                                  QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(0)),
                                  QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(1)),
                                  QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(2)),
-                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(3))])
+                                 QApplication.translate("ComboBox","Slider",None, QApplication.UnicodeUTF8) + " " + u(aw.qmc.etypesf(3)),
+                                 QApplication.translate("ComboBox","START",None, QApplication.UnicodeUTF8),
+                                 QApplication.translate("ComboBox","COOL END",None, QApplication.UnicodeUTF8),
+                                 QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8)])
         actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i] + 1)
         #text description
         descriptionedit = QLineEdit(u(aw.qmc.alarmstrings[i]))
