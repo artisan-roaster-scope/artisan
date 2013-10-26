@@ -1343,7 +1343,7 @@ class tgraphcanvas(FigureCanvas):
                 # alarm slider 1-4
                 slidernr = None
                 try:
-                    slidervalue = int(str(self.alarmstrings[alarmnumber]))
+                    slidervalue = max(0,min(99,int(str(self.alarmstrings[alarmnumber]))))
                     if slidervalue < 0 or slidervalue > 100:
                         raise Exception()
                     if self.alarmaction[alarmnumber] == 3:
@@ -7286,6 +7286,10 @@ class ApplicationWindow(QMainWindow):
         return lcdframe
 
     def updateSliderLCD(self,n,v):
+        if v > 99:
+            v = 99
+        elif v < 0:
+            v = 0
         if n == 0:
             self.sliderLCD1.display(v)
         elif n == 1:
