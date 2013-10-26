@@ -9816,7 +9816,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #restore scale port
             settings.beginGroup("Scale")
-            self.scale.device_id = settings.value("device_id",self.scale.device_id).toInt()[0]
+            self.scale.device = u(settings.value("device",self.scale.device).toString())
             self.scale.comport = str(settings.value("comport",self.scale.comport).toString())
             self.scale.baudrate = settings.value("baudrate",int(self.scale.baudrate)).toInt()[0]
             self.scale.bytesize = settings.value("bytesize",self.scale.bytesize).toInt()[0]
@@ -9826,7 +9826,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #restore color port
             settings.beginGroup("Color")
-            self.color.device_id = settings.value("device_id",self.color.device_id).toInt()[0]
+            self.color.device = u(settings.value("device",self.color.device).toString())
             self.color.comport = str(settings.value("comport",self.color.comport).toString())
             self.color.baudrate = settings.value("baudrate",int(self.color.baudrate)).toInt()[0]
             self.color.bytesize = settings.value("bytesize",self.color.bytesize).toInt()[0]
@@ -10503,7 +10503,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #save scale port
             settings.beginGroup("Scale")
-            settings.setValue("device_id",self.scale.device_id)
+            settings.setValue("device",self.scale.device)
             settings.setValue("comport",self.scale.comport)
             settings.setValue("baudrate",self.scale.baudrate)
             settings.setValue("bytesize",self.scale.bytesize)
@@ -10513,7 +10513,7 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #save color port
             settings.beginGroup("Color")
-            settings.setValue("device_id",self.color.device_id)
+            settings.setValue("device",self.color.device)
             settings.setValue("comport",self.color.comport)
             settings.setValue("baudrate",self.color.baudrate)
             settings.setValue("bytesize",self.color.bytesize)
@@ -11798,10 +11798,6 @@ $cupping_notes
                 minimalmodbus._bytestringToFloat = bigEndianBytestringToFloat
             # set scale port
             self.scale.device = str(dialog.scale_deviceEdit.currentText())                #unicode() changes QString to a python string
-            try:
-                self.scale.device_id = list(aw.scale.devicefunctionlist.keys()).index(self.scale.device)
-            except Exception:
-                self.scale.device_id = 0
             self.scale.comport = str(dialog.scale_comportEdit.getSelection())
             self.scale.baudrate = int(str(dialog.scale_baudrateComboBox.currentText()))              #int changes QString to int
             self.scale.bytesize = int(str(dialog.scale_bytesizeComboBox.currentText()))
@@ -11810,10 +11806,6 @@ $cupping_notes
             self.scale.timeout = int(str(dialog.scale_timeoutEdit.text()))
             # set color port
             self.color.device = str(dialog.color_deviceEdit.currentText())                #unicode() changes QString to a python string
-            try:
-                self.color.device_id = list(aw.color.devicefunctionlist.keys()).index(self.color.device)
-            except Exception:
-                self.color.device_id = 0
             self.color.comport = str(dialog.color_comportEdit.getSelection())
             self.color.baudrate = int(str(dialog.color_baudrateComboBox.currentText()))              #int changes QString to int
             self.color.bytesize = int(str(dialog.color_bytesizeComboBox.currentText()))
@@ -14232,6 +14224,20 @@ class editGraphDlg(ArtisanDialog):
         outButton.setMaximumSize(60,35)
         outButton.setMinimumSize(60,35) 
         outButton.setFocusPolicy(Qt.NoFocus)
+        # scan whole button
+        scanWholeButton = QPushButton(QApplication.translate("Button", "scan",None, QApplication.UnicodeUTF8))
+        self.connect(scanWholeButton, SIGNAL("clicked()"),self.scanWholeColor)
+        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
+        scanWholeButton.setMaximumSize(60,35)
+        scanWholeButton.setMinimumSize(60,35) 
+        scanWholeButton.setFocusPolicy(Qt.NoFocus)
+        # scan ground button
+        scanGroundButton = QPushButton(QApplication.translate("Button", "scan",None, QApplication.UnicodeUTF8))
+        self.connect(scanGroundButton, SIGNAL("clicked()"),self.scanGroundColor)
+        #the size of Buttons on the Mac is too small with 70,30 and ok with sizeHint/minimumSizeHint
+        scanGroundButton.setMaximumSize(60,35)
+        scanGroundButton.setMinimumSize(60,35) 
+        scanGroundButton.setFocusPolicy(Qt.NoFocus)
         # Ambient Temperature Source Selector
         self.ambientComboBox = QComboBox()
         self.ambientComboBox.addItems(self.buildAmbientTemperatureSourceList())
@@ -14290,7 +14296,7 @@ class editGraphDlg(ArtisanDialog):
         weightLayout.addWidget(self.weightpercentlabel)
         weightLayout.addSpacing(10)
         weightLayout.addWidget(self.roastdegreelabel)
-        if aw.scale.device_id != 0:
+        if aw.scale.device != None and aw.scale.device != "":
             weightLayout.addWidget(inButton) 
             weightLayout.addSpacing(10)
             weightLayout.addWidget(outButton) 
@@ -14340,10 +14346,16 @@ class editGraphDlg(ArtisanDialog):
         colorLayout.addWidget(whole_color_label)
         colorLayout.addSpacing(15)
         colorLayout.addWidget(self.whole_color_edit)
+        if aw.color.device != None and aw.color.device != "":
+            colorLayout.addSpacing(5)
+            colorLayout.addWidget(scanWholeButton)
         colorLayout.addSpacing(25)
         colorLayout.addWidget(ground_color_label)
         colorLayout.addSpacing(15)
         colorLayout.addWidget(self.ground_color_edit)
+        if aw.color.device != None and aw.color.device != "":
+            colorLayout.addSpacing(5)
+            colorLayout.addWidget(scanGroundButton)
         colorLayout.addStretch()
         colorLayout.addWidget(self.colorSystemComboBox)
         humidityLayout = QHBoxLayout()
@@ -14499,6 +14511,18 @@ class editGraphDlg(ArtisanDialog):
     def updateAmbientTemp(self):
         aw.qmc.updateAmbientTemp()
         self.ambientedit.setText(str(aw.qmc.ambientTemp))
+
+    def scanWholeColor(self):
+        v = aw.color.readColor()
+        if v >= 0 and v <= 250:
+            aw.qmc.whole_color = v
+            self.whole_color_edit.setText(str(v))
+
+    def scanGroundColor(self):
+        v = aw.color.readColor()
+        v = max(0,min(250,v))
+        aw.qmc.ground_color = v
+        self.ground_color_edit.setText(str(v))
 
     def outWeight(self):
         aw.retrieveWeightOut()
@@ -18295,7 +18319,6 @@ class extraserialport(object):
         self.timeout = 1
         self.devicefunctionlist = {}
         self.device = None
-        self.device_id = 0
         self.SP = None
 
     def confport(self):
@@ -18351,22 +18374,27 @@ class scaleport(extraserialport):
         
     # returns weight as int in g or -1 if something went wrong
     def readWeight(self):
-        if self.device != "None":
-            return self.devicefunctionlist[self.device]()
+        if self.device != None and self.device != "None" and self.device != "":
+            return self.devicefunctionlist[u(self.device)]()
         else:
             return -1
 
     def readKERN_NDE(self):
         try:
-            self.connect()
-            #self.SP.write(str2cmd('s')) # only stable
-            self.SP.write(str2cmd('w')) # any weight
-            v = self.SP.readline()
-            sa = v.decode('ascii').split('g')
-            if len(sa) == 2:
-                return int(sa[0])
-            else:
-                return -1 
+            if not self.SP:
+                self.connect()
+            if self.SP:
+                if not self.SP.isOpen():
+                    self.openportnport()
+                if self.SP.isOpen():
+                    #self.SP.write(str2cmd('s')) # only stable
+                    self.SP.write(str2cmd('w')) # any weight
+                    v = self.SP.readline()
+                    sa = v.decode('ascii').split('g')
+                    if len(sa) == 2:
+                        return int(sa[0])
+                    else:
+                        return -1 
         except Exception:
             return -1
 
@@ -18381,7 +18409,7 @@ class colorport(extraserialport):
         self.bytesize = 8
         self.parity= 'N'
         self.stopbits = 1
-        self.timeout = 1
+        self.timeout = 3
         self.devicefunctionlist = {
             "None" : None,
             "Tonino" : self.readTonino
@@ -18389,19 +18417,31 @@ class colorport(extraserialport):
             
     # returns color as int or -1 if something went wrong
     def readColor(self):
-        if self.device != "None":
-            return self.devicefunctionlist[self.device]()
+        if self.device != None and self.device != "None" and self.device != "":
+            return self.devicefunctionlist[u(self.device)]()
         else:
             return -1
 
     def readTonino(self):
         try:
-            self.connect()
-            self.SP.write(str2cmd('SCAN'))
-            v = self.SP.readline()
-            return int(v.decode('ascii'))
-        except Exception:
+            if not self.SP:
+                self.connect()
+                libtime.sleep(3)
+            if self.SP:
+                if not self.SP.isOpen():
+                    self.openport()
+                if self.SP.isOpen():
+                    self.SP.flushInput()
+                    self.SP.flushOutput()
+                    self.SP.write(str2cmd('SCAN\n'))
+                    self.SP.flush()
+                    libtime.sleep(1.5)
+                    v = self.SP.readline()
+                    n = int(v.decode('ascii').split(":")[1]) # response should have format "SCAN:128"
+                    return n
+        except:
             return -1
+
             
             
 ###########################################################################################
@@ -20979,9 +21019,10 @@ class comportDlg(ArtisanDialog):
         ##########################    TAB 4 WIDGETS   SCALE
         scale_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
         self.scale_deviceEdit = QComboBox()
-        self.scale_deviceEdit.addItems(list(aw.scale.devicefunctionlist.keys()))
+        supported_scales = list(aw.scale.devicefunctionlist.keys())
+        self.scale_deviceEdit.addItems(supported_scales)
         try:
-            self.scale_deviceEdit.setCurrentIndex(aw.scale.device_id)
+            self.scale_deviceEdit.setCurrentIndex(supported_scales.index(aw.scale.device))
         except:
             self.scale_deviceEdit.setCurrentIndex(0)
         self.scale_deviceEdit.setEditable(False)
@@ -21022,9 +21063,10 @@ class comportDlg(ArtisanDialog):
         ##########################    TAB 5 WIDGETS   COLOR
         color_devicelabel = QLabel(QApplication.translate("Label", "Device", None, QApplication.UnicodeUTF8))
         self.color_deviceEdit = QComboBox()
-        self.color_deviceEdit.addItems(list(aw.color.devicefunctionlist.keys()))
+        supported_color_meters = list(aw.color.devicefunctionlist.keys())
+        self.color_deviceEdit.addItems(supported_color_meters)
         try:
-            self.color_deviceEdit.setCurrentIndex(aw.color.device_id)
+            self.color_deviceEdit.setCurrentIndex(supported_color_meters.index(aw.color.device))
         except:
             self.color_deviceEdit.setCurrentIndex(0)
         self.color_deviceEdit.setEditable(False)
