@@ -13090,6 +13090,7 @@ class HUDDlg(ArtisanDialog):
         univarButton.setMinimumSize(univarButton.minimumSizeHint()) 
         polyfitdeglabel = QLabel("deg")
         self.polyfitdeg = QSpinBox()
+        self.polyfitdeg.setFocusPolicy(Qt.NoFocus)
         self.polyfitdeg.setRange(1,4)
         self.polyfitdeg.setAlignment(Qt.AlignRight)
         self.polyfitdeg.setMinimumWidth(20)       
@@ -13101,7 +13102,7 @@ class HUDDlg(ArtisanDialog):
         self.connect(univarButton,SIGNAL("clicked()"),self.showunivarinfo)
         self.polyfitCheck = QCheckBox(QApplication.translate("CheckBox", "Show",None, QApplication.UnicodeUTF8))
         self.polyfitCheck.setFocusPolicy(Qt.NoFocus)
-        self.connect(self.polyfitCheck,SIGNAL("stateChanged(int)"),lambda i=0:self.polyfit(i)) #toggle
+        self.connect(self.polyfitCheck,SIGNAL("clicked(bool)"),lambda i=0:self.polyfit(i)) #toggle
         self.result = QLabel()
         self.result.setStyleSheet("background-color:'lightgrey';")
         startlabel = QLabel(QApplication.translate("Label", "Start",None, QApplication.UnicodeUTF8))
@@ -13625,11 +13626,7 @@ class HUDDlg(ArtisanDialog):
                 self.doPolyfit()
             else:
                 aw.sendmessage(QApplication.translate("Error Message", "Polyfit: no profile data available", None, QApplication.UnicodeUTF8))
-                self.polyfitCheck.blockSignals(True)
-                self.polyfitCheck.setDisabled(True)
                 self.polyfitCheck.setChecked(False)
-                self.polyfitCheck.setDisabled(False)
-                self.polyfitCheck.blockSignals(False)
         else:
             self.result.setText("")
             aw.qmc.resetlines()
