@@ -1368,13 +1368,16 @@ class tgraphcanvas(FigureCanvas):
                     
             elif self.alarmaction[alarmnumber] == 7:
                 # START
-                aw.qmc.ToggleRecorder()
+                if aw.button_2.isEnabled():
+                    aw.qmc.ToggleRecorder()
             elif self.alarmaction[alarmnumber] == 8:
                 # COOL
-                aw.qmc.markCoolEnd()
+                if aw.button_20.isEnabled():
+                    aw.qmc.markCoolEnd()
             elif self.alarmaction[alarmnumber] == 9:
                 # OFF
-                aw.qmc.ToggleMonitor()
+                if aw.button_1.isEnabled():
+                    aw.qmc.ToggleMonitor()
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " setalarm() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -18450,6 +18453,10 @@ class colorport(extraserialport):
             if not self.SP:
                 self.connect()
                 libtime.sleep(3)
+                # put Tonino into PC mode on first connect
+                self.SP.write(str2cmd('TONINO\n'))
+                self.SP.flush()
+                self.SP.readline()
             if self.SP:
                 if not self.SP.isOpen():
                     self.openport()
