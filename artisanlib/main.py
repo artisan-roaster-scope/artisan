@@ -462,7 +462,7 @@ class tgraphcanvas(FigureCanvas):
                        "-ARDUINOTC4",           #19
                        "TE VA18B",              #20
                        "+309_34",               #21
-                       "+FUJI DUTY %",          #22
+                       "+FUJI DUTY %/SV",       #22
                        "Omega HHM28[6]",        #23
                        "+204_34",               #24
                        "+Virtual",              #25
@@ -1947,12 +1947,12 @@ class tgraphcanvas(FigureCanvas):
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):
         #annotate temp
         self.ax.annotate("%.1f"%(temp), xy=(x,y),xytext=(x+e,y + yup),
-                            color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
+                            color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
         #anotate time
         self.ax.annotate(time_str,xy=(x,y),xytext=(x+e,y - ydown),
-                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=0.4),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
+                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
 
-    def place_annotations(self,d,timex,timeindex,temp,stemp,startB=0,time2=None,timeindex2=None,path_effects=None):
+    def place_annotations(self,d,timex,timeindex,temp,stemp,startB=None,time2=None,timeindex2=None,path_effects=None):
         ystep_down = ystep_up = 0
         #Add markers for CHARGE
         try: 
@@ -1961,28 +1961,29 @@ class tgraphcanvas(FigureCanvas):
                 t0 = timex[t0idx]
                 y = stemp[t0idx]
                 ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,y,y,d)
-                if startB:
+                if startB != None:
                     st1 = str(self.stringfromseconds(t0 - startB))
                     t0 = startB
                     e = 40
-                    a = 0.4
+                    a = aw.qmc.backgroundalpha
                 else:
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE 00:00", None, QApplication.UnicodeUTF8))
                     e = 0
-                    a = 1.                
-
+                    a = 1.  
                 self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
                 #Add Dry End markers
                 if timeindex[1]:
                     tidx = timeindex[1]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
+                    if timeindex2:
+                        a = aw.qmc.backgroundalpha
+                    else:
+                        a = 1.
                     if timeindex2 and timeindex2[1] and timex[timeindex[1]] < time2[timeindex2[1]]:
                         e = -80
-                        a = 0.4
                     else:
                         e = 0
-                        a = 1.
                     self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                 #Add 1Cs markers            
                 if timeindex[2]:
@@ -1992,54 +1993,62 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
+                    if timeindex2:
+                        a = aw.qmc.backgroundalpha
+                    else:
+                        a = 1.
                     if timeindex2 and timeindex2[2] and timex[timeindex[2]] < time2[timeindex2[2]]:
                         e = -80
-                        a = 0.4
                     else:
                         e = 0
-                        a = 1.
                     self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                 #Add 1Ce markers
                 if timeindex[3]:
-                    tidx = self.timeindex[3]
-                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[self.timeindex[2]],stemp[tidx],d)
+                    tidx = timeindex[3]
+                    ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[2]],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
+                    if timeindex2:
+                        a = aw.qmc.backgroundalpha
+                    else:
+                        a = 1.
                     if timeindex2 and timeindex2[3] and timex[timeindex[3]] < time2[timeindex2[3]]:
                         e = -80
-                        a = 0.4
                     else:
                         e = 0
-                        a = 1.
                     self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                     #add a water mark if FCs
                     if timeindex[2] and not timeindex2:
                         self.ax.axvspan(timex[timeindex[2]],timex[tidx], facecolor=self.palette["watermarks"], alpha=0.2)
                 #Add 2Cs markers
                 if timeindex[4]:
-                    tidx = self.timeindex[4]
+                    tidx = timeindex[4]
                     if timeindex[3]:
                         ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[3]],stemp[tidx],d)
                     else:
                         ystep_down,ystep_up = self.findtextgap(0,0,stemp[tidx],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
+                    if timeindex2:
+                        a = aw.qmc.backgroundalpha
+                    else:
+                        a = 1.
                     if timeindex2 and timeindex2[4] and timex[timeindex[4]] < time2[timeindex2[4]]:
                         e = -80
-                        a = 0.4
                     else:
                         e = 0
-                        a = 1.
                     self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                 #Add 2Ce markers
                 if timeindex[5]:
-                    tidx = self.timeindex[5]
+                    tidx = timeindex[5]
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[timeindex[4]],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[tidx]-t0)))
+                    if timeindex2:
+                        a = aw.qmc.backgroundalpha
+                    else:
+                        a = 1.
                     if timeindex2 and timeindex2[5] and timex[timeindex[5]] < time2[timeindex2[5]]:
                         e = -80
-                        a = 0.4
                     else:
                         e = 0
-                        a = 1.
                     self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                     #do water mark if SCs
                     if timeindex[4] and not timeindex2:
@@ -2047,26 +2056,28 @@ class tgraphcanvas(FigureCanvas):
                 #Add DROP markers
                 if timeindex[6]:
                     tidx = timeindex[6]
-                    if self.timeindex[5]:
-                        tx = self.timeindex[5]
-                    elif self.timeindex[4]:
-                        tx = self.timeindex[4]
-                    elif self.timeindex[3]:
-                        tx = self.timeindex[3]
-                    elif self.timeindex[2]:
-                        tx = self.timeindex[2]
-                    elif self.timeindex[1]:
-                        tx = self.timeindex[1]
+                    if timeindex[5]:
+                        tx = timeindex[5]
+                    elif timeindex[4]:
+                        tx = timeindex[4]
+                    elif timeindex[3]:
+                        tx = timeindex[3]
+                    elif timeindex[2]:
+                        tx = timeindex[2]
+                    elif timeindex[1]:
+                        tx = timeindex[1]
                     else:
                         tx = t0idx
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[tx],stemp[tidx],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP %1", None, QApplication.UnicodeUTF8),str(self.stringfromseconds(timex[tidx]-t0)))
+                    if timeindex2:
+                        a = aw.qmc.backgroundalpha
+                    else:
+                        a = 1.
                     if timeindex2 and timeindex2[6] and timex[timeindex[6]] < time2[timeindex2[6]]:
                         e = -80
-                        a = 0.4
                     else:
                         e = 0
-                        a = 1.
                     self.annotate(temp[tidx],st1,timex[tidx],stemp[tidx],ystep_up,ystep_down,e,a)
                 # add COOL mark
                 if timeindex[7] and not timeindex2:
@@ -2331,15 +2342,14 @@ class tgraphcanvas(FigureCanvas):
                                 self.E4backgroundtimex.append(self.timeB[self.backgroundEvents[i]])
                                 self.E4backgroundvalues.append(self.eventpositionbars[int(self.backgroundEvalues[i])])
 
-                        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color="slateblue", marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
-                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = self.Evaluealpha[0])
-                        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color="slategrey", marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
-                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = self.Evaluealpha[1])
-                        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color="grey", marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
-                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = self.Evaluealpha[2])
-                        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color="darkgrey", marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
-                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = self.Evaluealpha[3])
-
+                        self.l_backgroundeventtype1dots, = self.ax.plot(self.E1backgroundtimex, self.E1backgroundvalues, color=self.EvalueColor[0], marker=self.EvalueMarker[0],markersize = self.EvalueMarkerSize[0],
+                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[0],alpha = aw.qmc.backgroundalpha)
+                        self.l_backgroundeventtype2dots, = self.ax.plot(self.E2backgroundtimex, self.E2backgroundvalues, color=self.EvalueColor[1], marker=self.EvalueMarker[1],markersize = self.EvalueMarkerSize[1],
+                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[1],alpha = aw.qmc.backgroundalpha)
+                        self.l_backgroundeventtype3dots, = self.ax.plot(self.E3backgroundtimex, self.E3backgroundvalues, color=self.EvalueColor[2], marker=self.EvalueMarker[2],markersize = self.EvalueMarkerSize[2],
+                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[2],alpha = aw.qmc.backgroundalpha)
+                        self.l_backgroundeventtype4dots, = self.ax.plot(self.E4backgroundtimex, self.E4backgroundvalues, color=self.EvalueColor[3], marker=self.EvalueMarker[3],markersize = self.EvalueMarkerSize[3],
+                                                                        linestyle="steps-post",linewidth = self.Evaluelinethickness[3],alpha = aw.qmc.backgroundalpha)
                 #check backgroundDetails flag
                 if self.backgroundDetails:
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min 
@@ -2348,8 +2358,8 @@ class tgraphcanvas(FigureCanvas):
                     if self.timeindex[0] != -1:   #verify it exists before loading it, otherwise the list could go out of index
                         startB = self.timex[self.timeindex[0]]
                     else:
-                        startB = 0
-                    self.place_annotations(d,self.timeB,self.timeindexB,self.temp2B,self.temp2B,startB,self.timex,self.timeindex,[])
+                        startB = self.timeB[self.timeindexB[0]] # 0
+                    self.place_annotations(d,self.timeB,self.timeindexB,self.temp2B,self.temp2B,startB,self.timex,self.timeindex)
                     
                 #END of Background
                 
@@ -2475,9 +2485,9 @@ class tgraphcanvas(FigureCanvas):
                     
             if not self.designerflag and aw.qmc.BTcurve:
                 if self.flagon: # no smoothed lines in this case, pass normal BT
-                    self.place_annotations(aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2,0)
+                    self.place_annotations(aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
                 else:
-                    self.place_annotations(aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2,0)
+                    self.place_annotations(aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
                     if self.timeindex[6]:
                         self.writestatistics()
 
@@ -7266,7 +7276,7 @@ class ApplicationWindow(QMainWindow):
             # font Humor selected
             rcParams['font.size'] = 16.0
             rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
-            aw.set_mpl_fontproperties(self.getResourcePath() + "Humor-Sans.ttf")
+            aw.set_mpl_fontproperties(u(self.getResourcePath() + "Humor-Sans.ttf"))
         elif self.qmc.graphfont == 2:
             # font Comic selected
             rcParams['font.size'] = 12.0
@@ -9294,6 +9304,13 @@ class ApplicationWindow(QMainWindow):
             self.qmc.timeindex = self.qmc.timeindex + [0 for i in range(8-len(self.qmc.timeindex))]
             # reset linecount caches
             aw.qmc.resetlinecountcaches()
+            # try to reload background profile
+            if "backgroundpath" in profile:
+                self.qmc.backgroundpath = d(profile["backgroundpath"])
+                if os.path.isfile(self.qmc.backgroundpath):
+                    aw.loadbackground(u(self.qmc.backgroundpath))      
+                    aw.qmc.background = True
+                    aw.qmc.timealign()
             return True
         except Exception as ex:
 #            import traceback
@@ -9593,6 +9610,8 @@ class ApplicationWindow(QMainWindow):
             profile["alarmtemperature"] = self.qmc.alarmtemperature
             profile["alarmaction"] = self.qmc.alarmaction
             profile["alarmstrings"] = [e(x) for x in self.qmc.alarmstrings]
+            # remember background profile path
+            profile["backgroundpath"] = e(self.qmc.backgroundpath)
             #write only:
             profile["samplinginterval"] = self.qmc.delay / 1000.
             try:
@@ -17585,7 +17604,7 @@ class backgroundDlg(ArtisanDialog):
         self.intensitySpinBox.setAlignment(Qt.AlignRight)
         self.intensitySpinBox.setRange(1,9)
         self.intensitySpinBox.setSingleStep(1)
-        self.intensitySpinBox.setValue(3)
+        self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
         colors = [""]
         for key in cnames:
             colors.append(str(key))
@@ -18665,7 +18684,7 @@ class serialport(object):
     #especial function that collects extra duty cycle % and ET minus BT while keeping compatibility
     def fujidutycycle(self):
         #return saved readings from device 0
-        return aw.qmc.dutycycleTX, aw.qmc.dutycycle, aw.qmc.fujiETBT
+        return aw.qmc.dutycycleTX, aw.qmc.dutycycle, aw.qmc.currentpidsv
 
     def DTAtemperature(self):
         ###########################################################
@@ -22498,7 +22517,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     message = QApplication.translate("Message","Device set to %1", None, QApplication.UnicodeUTF8).arg(meter)
                 ##########################
                 ####  DEVICE 38 is +Phidget 1046_34 RTD but +DEVICE cannot be set as main device
-                ##########################                
+                ##########################              
                 elif meter == "Omega HH806W":
                     aw.qmc.device = 39
                     #aw.ser.comport = "COM11"
