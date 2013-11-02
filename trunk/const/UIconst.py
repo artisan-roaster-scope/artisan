@@ -80,6 +80,7 @@ ROAST_MENU_CONVERT_TO_FAHRENHEIT = QApplication.translate("Menu", "Convert to Fa
 ROAST_MENU_CONVERT_TO_CELSIUS = QApplication.translate("Menu", "Convert to Celsius", None, QApplication.UnicodeUTF8)
 ROAST_MENU_FAHRENHEIT_MODE = QApplication.translate("Menu", "Fahrenheit Mode", None, QApplication.UnicodeUTF8)
 ROAST_MENU_CELSIUS_MODE = QApplication.translate("Menu", "Celsius Mode", None, QApplication.UnicodeUTF8)
+ROAST_MENU_SWITCH = QApplication.translate("Menu", "Switch Profiles", None, QApplication.UnicodeUTF8)
 
 #Conf menu items
 CONF_MENU = QApplication.translate("Menu", "Config", None, QApplication.UnicodeUTF8)

@@ -251,9 +251,14 @@ if platf == 'Windows':
 global locale
             
 if not QSettings().value('resetqsettings').toInt()[0]:
-    locale = QSettings().value('locale').toString()
-    if locale == "en_US":
-        locale = "en"
+    if platform.system() == 'Darwin':
+        import objc
+        from Cocoa import NSUserDefaults
+        defs = NSUserDefaults.standardUserDefaults() 
+        langs = defs.objectForKey_("AppleLanguages")
+        locale = langs.objectAtIndex_(0)
+    else:
+        locale = QSettings().value('locale').toString()[:2]
 else:
     locale = ""
 supported_languages = [
@@ -269,7 +274,14 @@ supported_languages = [
     "hu",
 ]
 if len(locale) == 0:
-    locale = QLocale.system().name()
+    if platform.system() == 'Darwin':
+        import objc
+        from Cocoa import NSUserDefaults
+        defs = NSUserDefaults.standardUserDefaults() 
+        langs = defs.objectForKey_("AppleLanguages")
+        locale = langs.objectAtIndex_(0)
+    else:
+        locale = QLocale.system().name()[:2]
     if locale in supported_languages:
         QSettings().setValue('locale', locale)
 
@@ -2358,7 +2370,10 @@ class tgraphcanvas(FigureCanvas):
                     if self.timeindex[0] != -1:   #verify it exists before loading it, otherwise the list could go out of index
                         startB = self.timex[self.timeindex[0]]
                     else:
-                        startB = self.timeB[self.timeindexB[0]] # 0
+                        if self.timeindexB[0] > 0:
+                            startB = self.timeB[self.timeindexB[0]]
+                        else:
+                            startB = 0
                     self.place_annotations(d,self.timeB,self.timeindexB,self.temp2B,self.temp2B,startB,self.timex,self.timeindex)
                     
                 #END of Background
@@ -6203,6 +6218,13 @@ class ApplicationWindow(QMainWindow):
             self.CelsiusAction.setDisabled(True)
             self.ConvertToCelsiusAction.setDisabled(True)
 
+        self.GraphMenu.addSeparator()
+
+        switchAction = QAction(UIconst.ROAST_MENU_SWITCH,self)
+        switchAction.setShortcut(QKeySequence.Close)
+        self.connect(switchAction,SIGNAL("triggered()"),self.switch)
+        self.GraphMenu.addAction(switchAction)  
+
         # CONFIGURATION menu
         deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
         self.connect(deviceAction,SIGNAL("triggered()"),self.deviceassigment)
@@ -8348,6 +8370,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     message =  u(QApplication.translate("Message", "Background %1 loaded successfully %2",None, QApplication.UnicodeUTF8).arg(u(filename)).arg(""))                    
                 self.sendmessage(message)
+                self.qmc.backgroundpath = u(filename)
             else:
                 self.sendmessage(QApplication.translate("Message", "Invalid artisan format",None, QApplication.UnicodeUTF8))
         except IOError as e:
@@ -11907,6 +11930,32 @@ $cupping_notes
     def background(self):
         dialog = backgroundDlg(self)
         dialog.show()
+        
+    def deleteBackground(self):                
+        self.qmc.backgroundpath = ""
+        self.qmc.temp1B, self.qmc.temp2B, self.qmc.timeB = [],[],[]
+        self.qmc.backgroundEvents, self.qmc.backgroundEtypes = [],[]
+        self.qmc.backgroundEvalues, self.qmc.backgroundEStrings,self.qmc.backgroundFlavors = [],[],[]
+        self.qmc.timeindexB = [-1,0,0,0,0,0,0]
+        self.qmc.backmoveflag = 1
+
+        
+    def switch(self):
+        foreground_profile_path = aw.curFile
+        background_profile_path = aw.qmc.backgroundpath
+        if foreground_profile_path:
+            # reset
+            aw.qmc.reset(soundOn=False)
+        if background_profile_path:
+            # load background into foreground
+            aw.loadFile(background_profile_path)
+            # delete background
+            self.deleteBackground()
+        if foreground_profile_path:
+            # load foreground into background
+            aw.loadbackground(u(foreground_profile_path))
+        if foreground_profile_path or background_profile_path:
+            aw.qmc.redraw(recomputeAllDeltas=False)
 
     def flavorchart(self):
         dialog = flavorDlg(self)
@@ -17817,13 +17866,9 @@ class backgroundDlg(ArtisanDialog):
 #        aw.qmc.background = False
 #        aw.qmc.backgroundDetails = False
 #        aw.qmc.backgroundeventsflag = False
-        aw.qmc.temp1B, aw.qmc.temp2B, aw.qmc.timeB = [],[],[]
-        aw.qmc.backgroundEvents, aw.qmc.backgroundEtypes = [],[]
-        aw.qmc.backgroundEvalues, aw.qmc.backgroundEStrings,aw.qmc.backgroundFlavors = [],[],[]
-        aw.qmc.timeindexB = [-1,0,0,0,0,0,0]
+        aw.deleteBackground()
         self.eventtable.clear()
         self.datatable.clear()
-        aw.qmc.backmoveflag = 1
         aw.qmc.resetlinecountcaches()
         aw.qmc.redraw(recomputeAllDeltas=False)
 
@@ -17865,7 +17910,6 @@ class backgroundDlg(ArtisanDialog):
         if len(u(self.filename)) == 0:
             return
         aw.sendmessage(QApplication.translate("Message","Reading background profile...",None, QApplication.UnicodeUTF8))
-        aw.qmc.backgroundpath = u(self.filename)
         aw.qmc.resetlinecountcaches()
         aw.loadbackground(u(self.filename))
         self.pathedit.setText(u(self.filename))
