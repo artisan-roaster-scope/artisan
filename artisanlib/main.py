@@ -1917,7 +1917,6 @@ class tgraphcanvas(FigureCanvas):
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
     # 'flat' results in moving average
     # window_len should be odd
-    # first applies a median filter to remove spikes if filterDropOuts is True
     def smooth(self, x, y, window_len=15, window='hanning'):
         try:
             if len(x) == len(y) and len(x) > 1:
@@ -1934,7 +1933,6 @@ class tgraphcanvas(FigureCanvas):
                     ys = numpy.convolve(w/w.sum(),s,mode='same')
                     res = (ys[window_len-1:-window_len+1])
     #                res = (ys[window_len-2:-window_len]) # this one seems to move the curve slightly to the right
-                    res = numpy.concatenate((y[:window_len/2],res[window_len/2:]))
                     if len(res) != len(y):
                         return y
                     else:
@@ -1950,13 +1948,14 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
             return x
 
-    def smooth_list(self, a, b, window_len=7, window='hanning'):
+    def smooth_list(self, a, b, window_len=7, window='hanning',splitp=True):
         #pylint: disable=E1103
-        if aw.qmc.timeindex[0] != -1: # if CHARGE is set, filter before and after CHARGE parts separately
-            return numpy.concatenate((self.smooth(numpy.array(a[:aw.qmc.timeindex[0]]),numpy.array(b[:aw.qmc.timeindex[0]]),window_len,window),
-                self.smooth(numpy.array(a[aw.qmc.timeindex[0]:]),numpy.array(b[aw.qmc.timeindex[0]:]),window_len,window))).tolist()
+        win_len = max(0,(window_len * 2) - 1)
+        if splitp and aw.qmc.timeindex[0] != -1: # if CHARGE is set, filter before and after CHARGE parts separately
+            return numpy.concatenate((self.smooth(numpy.array(a[:aw.qmc.timeindex[0]]),numpy.array(b[:aw.qmc.timeindex[0]]),win_len,window),
+                self.smooth(numpy.array(a[aw.qmc.timeindex[0]:]),numpy.array(b[aw.qmc.timeindex[0]:]),win_len,window))).tolist()
         else:
-            return self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()
+            return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):
         #annotate temp
@@ -2308,8 +2307,8 @@ class tgraphcanvas(FigureCanvas):
                             z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                         if lt > ld2:
                             z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                        self.delta1B = self.smooth(tx,z1,window_len=self.deltafilter).tolist()
-                        self.delta2B = self.smooth(tx,z2,window_len=self.deltafilter).tolist()
+                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,splitp=False)
+                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,splitp=False)
                     ##### DeltaETB,DeltaBTB curves
                     if self.DeltaETBflag:
                         self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,
@@ -2467,8 +2466,8 @@ class tgraphcanvas(FigureCanvas):
                         z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                     if lt > ld2:
                         z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                    self.delta1 = self.smooth(tx,z1,window_len=self.deltafilter).tolist()
-                    self.delta2 = self.smooth(tx,z2,window_len=self.deltafilter).tolist()
+                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,splitp=False)
+                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,splitp=False)
 
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag:
@@ -13799,14 +13798,16 @@ class HUDDlg(ArtisanDialog):
     def changeGraphFont(self,n):
         aw.qmc.graphfont = n
         aw.setFonts()
-
+        
     def changeDeltaFilter(self,i):
         try:
             v = self.DeltaFilter.value() + 2
-            if v != aw.qmc.patheffects:
+            if v != aw.qmc.deltafilter:
+                self.DeltaFilter.setDisabled(True)
                 self.DeltaFilter.blockSignals(True)
-                aw.qmc.patheffects = v
+                aw.qmc.deltafilter = v
                 aw.qmc.redraw(recomputeAllDeltas=True)
+                self.DeltaFilter.setDisabled(False)
                 self.DeltaFilter.blockSignals(False)
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
