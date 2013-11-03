@@ -688,7 +688,9 @@ class tgraphcanvas(FigureCanvas):
         self.buttonactionstrings = [""]*8
 
         #flag to activate the automatic marking of the CHARGE and DROP events
-        self.autoChargeDropFlag = False
+        #self.autoChargeDropFlag = False # has been replaced by the following two separate flags
+        self.autoChargeFlag = False
+        self.autoDropFlag = False
         #autodetected CHARGE and DROP index
         self.autoChargeIdx = 0
         self.autoDropIdx = 0
@@ -5489,10 +5491,10 @@ class SampleThread(QThread):
             if aw.qmc.minmaxLimits and temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax:
                 wrong_reading = 1
             #########################
-            # b) detect spikes (on BT only after CHARGE if autoChargeDropFlag=True not to have a conflict here)
+            # b) detect spikes (on BT only after CHARGE if autoChargeFlag=True not to have a conflict here)
             n = aw.qmc.filterDropOut_spikeRoR_period
             dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
-            if aw.qmc.dropSpikes and ((not aw.qmc.autoChargeDropFlag) or (not BT) or (aw.qmc.timeindex[0] != -1 and aw.qmc.timeindex[0] + n > len(timex))) and not wrong_reading and len(tempx) >= n:
+            if aw.qmc.dropSpikes and ((not aw.qmc.autoChargeFlag) or (not BT) or (aw.qmc.timeindex[0] != -1 and aw.qmc.timeindex[0] + n > len(timex))) and not wrong_reading and len(tempx) >= n:
                 # no min/max overflow detected
                 # check if RoR caused by actual measurement is way higher then the previous one
                 # calc previous RoR (pRoR) taking the last n samples into account
@@ -5724,14 +5726,14 @@ class SampleThread(QThread):
                         aw.qmc.playbackevent()
                     # autodetect CHARGE event
                     # only if BT > 203F/95C
-                    if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
+                    if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
                         ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
                         if aw.BTbreak(length_of_qmc_timex - 1):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                     # autodetect DROP event
                     # only if 9min into roast and BT>180C/356F
-                    elif not aw.qmc.autoDropIdx and aw.qmc.autoChargeDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                    elif not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
                         length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
                         ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
                         if aw.BTbreak(length_of_qmc_timex - 1):
@@ -9774,7 +9776,12 @@ class ApplicationWindow(QMainWindow):
             if settings.contains("eventsshowflag"):
                 self.qmc.eventsshowflag = settings.value("eventsshowflag",int(self.qmc.eventsshowflag)).toInt()[0]
             if settings.contains("autoChargeDrop"):
-                self.qmc.autoChargeDropFlag = settings.value("autoChargeDrop",self.qmc.autoChargeDropFlag).toBool()
+                self.qmc.autoChargeFlag = settings.value("autoChargeDrop",False).toBool()
+                self.qmc.autoDropFlag = self.qmc.autoChargeFlag
+            if settings.contains("autoCharge"):
+                self.qmc.autoChargeFlag = settings.value("autoCharge",self.qmc.autoChargeFlag).toBool()
+            if settings.contains("autoDrop"):
+                self.qmc.autoDropFlag = settings.value("autoDrop",self.qmc.autoDropFlag).toBool()
             if settings.contains("EvalueColor"):
                 self.qmc.EvalueColor = list(map(str,list(settings.value("EvalueColor",self.qmc.EvalueColor).toStringList())))
                 self.qmc.EvalueMarker = list(map(str,list(settings.value("EvalueMarker",self.qmc.EvalueMarker).toStringList())))
@@ -10511,7 +10518,8 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("eventsGraphflag",self.qmc.eventsGraphflag)
             settings.setValue("etypes",self.qmc.etypes)
             settings.setValue("eventsshowflag",self.qmc.eventsshowflag)
-            settings.setValue("autoChargeDrop",self.qmc.autoChargeDropFlag)
+            settings.setValue("autoCharge",self.qmc.autoChargeFlag)
+            settings.setValue("autoDrop",self.qmc.autoDropFlag)
             settings.setValue("EvalueColor",self.qmc.EvalueColor)
             settings.setValue("EvalueMarker",self.qmc.EvalueMarker)
             settings.setValue("Evaluelinethickness",self.qmc.Evaluelinethickness)
@@ -10838,7 +10846,8 @@ class ApplicationWindow(QMainWindow):
         events["eventsGraphflag"] = str(self.qmc.eventsGraphflag)
         events["etypes"] = u(list(map(u,self.qmc.etypes)))
         events["eventsshowflag"] = str(self.qmc.eventsshowflag)
-        events["autoChargeDrop"] = str(self.qmc.autoChargeDropFlag)
+        events["autoCharge"] = str(self.qmc.autoChargeFlag)
+        events["autoDrop"] = str(self.qmc.autoDropFlag)
         events["EvalueColor"] = str(self.qmc.EvalueColor)
         events["EvalueMarker"] = str(self.qmc.EvalueMarker)
         events["Evaluelinethickness"] = str(self.qmc.Evaluelinethickness)
@@ -16067,9 +16076,15 @@ class EventsDlg(ArtisanDialog):
         self.E4sizeSpinBox.setRange(1,14)
         self.E4sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[3])
         self.connect(self.E4sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=3:self.setEmarkersize(w,x))
-        self.autoChargeDrop = QCheckBox(QApplication.translate("CheckBox","Automatic CHARGE/DROP",None, QApplication.UnicodeUTF8))
-        self.autoChargeDrop.setChecked(aw.qmc.autoChargeDropFlag)
-        self.autoChargeDrop.setFocusPolicy(Qt.NoFocus)
+#        self.autoChargeDrop = QCheckBox(QApplication.translate("CheckBox","Automatic CHARGE/DROP",None, QApplication.UnicodeUTF8))
+#        self.autoChargeDrop.setChecked(aw.qmc.autoChargeDropFlag)
+#        self.autoChargeDrop.setFocusPolicy(Qt.NoFocus)
+        self.autoCharge = QCheckBox(QApplication.translate("CheckBox","Automatic CHARGE",None, QApplication.UnicodeUTF8))
+        self.autoCharge.setChecked(aw.qmc.autoChargeFlag)
+        self.autoCharge.setFocusPolicy(Qt.NoFocus)
+        self.autoDrop = QCheckBox(QApplication.translate("CheckBox","Automatic DROP",None, QApplication.UnicodeUTF8))
+        self.autoDrop.setChecked(aw.qmc.autoDropFlag)
+        self.autoDrop.setFocusPolicy(Qt.NoFocus)
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
@@ -16376,11 +16391,16 @@ class EventsDlg(ArtisanDialog):
         defaultButtonsLayout.setVerticalSpacing(7)
         ButtonGroupLayout = QGroupBox(QApplication.translate("GroupBox","Default Buttons",None, QApplication.UnicodeUTF8))
         ButtonGroupLayout.setLayout(defaultButtonsLayout)
+        autoLayout = QHBoxLayout()
+        autoLayout.addWidget(self.autoCharge)
+        autoLayout.addSpacing(20)
+        autoLayout.addWidget(self.autoDrop)
+        autoLayout.addStretch()
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(FlagsLayout)
         tab1layout.addWidget(TypeGroupLayout)
         tab1layout.addWidget(ButtonGroupLayout)
-        tab1layout.addWidget(self.autoChargeDrop)
+        tab1layout.addLayout(autoLayout)
         tab1layout.addStretch()
         tab1layout.setContentsMargins(5,5,5,5)
         nbuttonslayout = QHBoxLayout()
@@ -17040,7 +17060,8 @@ class EventsDlg(ArtisanDialog):
         self.eventsGraphflagstored = aw.qmc.eventsGraphflag
         self.etypesstored = aw.qmc.etypes
         self.etypeComboBoxstored = aw.etypeComboBox
-        self.autoChargeDropFlagstored = aw.qmc.autoChargeDropFlag
+        self.autoChargeFlagstored = aw.qmc.autoChargeFlag
+        self.autoDropFlagstored = aw.qmc.autoDropFlag
         # buttons
         self.extraeventslabels = aw.extraeventslabels
         self.extraeventsdescriptions = aw.extraeventsdescriptions
@@ -17076,7 +17097,8 @@ class EventsDlg(ArtisanDialog):
         aw.qmc.eventsGraphflag = self.eventsGraphflagstored
         aw.qmc.etypes = self.etypesstored
         aw.etypeComboBox = self.etypeComboBoxstored
-        aw.qmc.autoChargeDropFlag = self.autoChargeDropFlagstored
+        aw.qmc.autoChargeFlag = self.autoChargeFlagstored
+        aw.qmc.autoDropFlag = self.autoDropFlagstored
         # buttons
         aw.extraeventslabels = self.extraeventslabels
         aw.extraeventsdescriptions = self.extraeventsdescriptions
@@ -17153,8 +17175,9 @@ class EventsDlg(ArtisanDialog):
                 #update mini editor
                 aw.etypeComboBox.clear()
                 aw.etypeComboBox.addItems(aw.qmc.etypes)
-                #update autoChargeDrop flag
-                aw.qmc.autoChargeDropFlag = self.autoChargeDrop.isChecked()
+                #update autoCharge/Drop flag
+                aw.qmc.autoChargeFlag = self.autoCharge.isChecked()
+                aw.qmc.autoDropFlag = self.autoDrop.isChecked()
                 self.savetableextraeventbutton()
                 aw.realignbuttons()
                 aw.qmc.redraw(recomputeAllDeltas=False)
@@ -22282,7 +22305,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
                 aw.ser.timeout = 1
                 aw.ser.ArduinoIsInitialized = 0 # ensure the Arduino gets reinitalized if settings changed
                 message = QApplication.translate("Message","Device set to %1. Now, check Serial Port settings", None, QApplication.UnicodeUTF8).arg(meter)
-                aw.button_10.setVisible(True)
+                #aw.button_10.setVisible(True)
             elif self.programButton.isChecked():
                 meter = str(self.programedit.text())
                 aw.ser.externalprogram = meter
