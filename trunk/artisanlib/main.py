@@ -11943,17 +11943,19 @@ $cupping_notes
     def switch(self):
         foreground_profile_path = aw.curFile
         background_profile_path = aw.qmc.backgroundpath
-        if foreground_profile_path:
-            # reset
-            aw.qmc.reset(soundOn=False)
         if background_profile_path:
             # load background into foreground
             aw.loadFile(background_profile_path)
-            # delete background
-            self.deleteBackground()
+        else:
+            # reset
+            aw.qmc.reset(soundOn=False)
         if foreground_profile_path:
             # load foreground into background
             aw.loadbackground(u(foreground_profile_path))
+            aw.qmc.background = True
+        else:
+            # delete background
+            self.deleteBackground()
         if foreground_profile_path or background_profile_path:
             aw.qmc.redraw(recomputeAllDeltas=False)
 
