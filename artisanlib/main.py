@@ -1954,6 +1954,9 @@ class tgraphcanvas(FigureCanvas):
         if fromCHARGEonly and aw.qmc.timeindex[0] != -1: # if CHARGE is set, replace start by None
             return numpy.concatenate(([None]*(aw.qmc.timeindex[0]),
                 self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[aw.qmc.timeindex[0]:])).tolist()
+        elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
+            return numpy.concatenate((b[:aw.qmc.timeindex[0]],
+                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[aw.qmc.timeindex[0]:])).tolist()            
         else:
             return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
 
