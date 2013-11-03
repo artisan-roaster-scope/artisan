@@ -1948,10 +1948,14 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
             return x
 
-    def smooth_list(self, a, b, window_len=7, window='hanning'):
+    def smooth_list(self, a, b, window_len=7, window='hanning',fromCHARGEonly=False):
         #pylint: disable=E1103
-        win_len = max(0,(window_len * 2) - 1)
-        return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
+        win_len = max(0,(window_len * 2) - 1)        
+        if fromCHARGEonly and aw.qmc.timeindex[0] != -1: # if CHARGE is set, replace start by None
+            return numpy.concatenate(([None]*(aw.qmc.timeindex[0]),
+                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[aw.qmc.timeindex[0]:])).tolist()
+        else:
+            return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):
         #annotate temp
@@ -2303,8 +2307,8 @@ class tgraphcanvas(FigureCanvas):
                             z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                         if lt > ld2:
                             z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter)
-                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter)
+                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromCHARGEonly=True)
+                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromCHARGEonly=True)
                     ##### DeltaETB,DeltaBTB curves
                     if self.DeltaETBflag:
                         self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,
@@ -2462,8 +2466,8 @@ class tgraphcanvas(FigureCanvas):
                         z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                     if lt > ld2:
                         z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter)
-                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter)
+                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromCHARGEonly=True)
+                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromCHARGEonly=True)
 
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag:
