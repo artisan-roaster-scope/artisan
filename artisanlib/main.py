@@ -674,8 +674,8 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaBTflag = False
         self.DeltaETlcdflag = True
         self.DeltaBTlcdflag = True
-        self.deltafilter = 9
-        self.curvefilter = 7
+        self.deltafilter = 3
+        self.curvefilter = 1
         
         self.patheffects = 3
         self.graphstyle = 0
@@ -1948,14 +1948,10 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
             return x
 
-    def smooth_list(self, a, b, window_len=7, window='hanning',splitp=True):
+    def smooth_list(self, a, b, window_len=7, window='hanning'):
         #pylint: disable=E1103
         win_len = max(0,(window_len * 2) - 1)
-        if splitp and aw.qmc.timeindex[0] != -1: # if CHARGE is set, filter before and after CHARGE parts separately
-            return numpy.concatenate((self.smooth(numpy.array(a[:aw.qmc.timeindex[0]]),numpy.array(b[:aw.qmc.timeindex[0]]),win_len,window),
-                self.smooth(numpy.array(a[aw.qmc.timeindex[0]:]),numpy.array(b[aw.qmc.timeindex[0]:]),win_len,window))).tolist()
-        else:
-            return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
+        return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):
         #annotate temp
@@ -2307,8 +2303,8 @@ class tgraphcanvas(FigureCanvas):
                             z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                         if lt > ld2:
                             z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,splitp=False)
-                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,splitp=False)
+                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter)
+                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter)
                     ##### DeltaETB,DeltaBTB curves
                     if self.DeltaETBflag:
                         self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,
@@ -2466,8 +2462,8 @@ class tgraphcanvas(FigureCanvas):
                         z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                     if lt > ld2:
                         z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,splitp=False)
-                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,splitp=False)
+                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter)
+                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter)
 
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag:
