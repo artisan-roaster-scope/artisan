@@ -6222,10 +6222,10 @@ class ApplicationWindow(QMainWindow):
 
         self.GraphMenu.addSeparator()
 
-        switchAction = QAction(UIconst.ROAST_MENU_SWITCH,self)
-        switchAction.setShortcut(QKeySequence.Close)
-        self.connect(switchAction,SIGNAL("triggered()"),self.switch)
-        self.GraphMenu.addAction(switchAction)  
+        self.switchAction = QAction(UIconst.ROAST_MENU_SWITCH,self)
+        self.switchAction.setShortcut(QKeySequence.Close)
+        self.connect(self.switchAction,SIGNAL("triggered()"),self.switch)
+        self.GraphMenu.addAction(self.switchAction)  
 
         # CONFIGURATION menu
         deviceAction = QAction(UIconst.CONF_MENU_DEVICE, self)
@@ -7693,6 +7693,7 @@ class ApplicationWindow(QMainWindow):
         self.designerAction.setEnabled(True)
         self.wheeleditorAction.setEnabled(True)
         self.resetAction.setEnabled(True)
+        self.switchAction.setEnabled(True)
 
     def disableEditMenus(self):
         self.fileLoadAction.setEnabled(False) # open
@@ -7710,6 +7711,7 @@ class ApplicationWindow(QMainWindow):
         self.designerAction.setEnabled(False)
         self.wheeleditorAction.setEnabled(False)
         self.resetAction.setEnabled(False)
+        self.switchAction.setEnabled(False)
 
     def update_minieventline_visibility(self):
         if self.minieventsflag:
