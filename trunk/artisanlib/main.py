@@ -5669,9 +5669,19 @@ class SampleThread(QThread):
                 #we need a minimum of two readings to calculate rate of change
                 if local_flagstart and length_of_qmc_timex > 2:
                     timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
+#                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+#                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
+#                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)                    
+                    
+                    # smooth BT and ET a bit for delta computations
+                    ETm1 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*2. + aw.qmc.temp1[-1]*4.) / 7.
+                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*3. + aw.qmc.temp1[-1]) / 5.
+                    BTm1 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*2. + aw.qmc.temp2[-1]*4.) / 7.
+                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*3. + aw.qmc.temp2[-1]) / 5.                    
                     #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
-                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
+                    aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
+                    aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
+                    
                     aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                     aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
                     #######   filter deltaBT deltaET
