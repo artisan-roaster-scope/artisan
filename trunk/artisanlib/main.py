@@ -7530,8 +7530,11 @@ class ApplicationWindow(QMainWindow):
                         drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
                     else:
                         drytarget = self.qmc.phases[1] # Drying max phases definition
-                    dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                    self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(dryexpectedtime))))
+                    if drytarget > self.qmc.temp2[-1]:
+                        dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
+                        self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(dryexpectedtime))))
+                    else:
+                        self.DRYlcd.display(QString("--:--"))                        
                 else:
                     self.DRYlcd.display(QString("--:--"))
                 self.TP2DRYlabel.setText("")
@@ -7559,8 +7562,12 @@ class ApplicationWindow(QMainWindow):
                         fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
                     else:
                         fcstarget = self.qmc.phases[2] # FCs min phases definition
-                    fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                    self.FCslcd.display(QString(self.qmc.stringfromseconds(int(fcsexpectedtime))))
+                        
+                    if fcstarget > self.qmc.temp2[-1]:
+                        fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
+                        self.FCslcd.display(QString(self.qmc.stringfromseconds(int(fcsexpectedtime))))
+                    else:
+                        self.FCslcd.display(QString("--:--"))
                 else:
                     self.FCslcd.display(QString("--:--"))
                 self.DRY2FCslabel.setText("")
