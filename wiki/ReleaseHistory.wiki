@@ -1,5 +1,59 @@
 #summary Detailed Release History
 
+==v0.7.0 (11/2013)==
+
+ * New Features
+  * adds support for the [http://www.phidgets.com/products.php?product_id=1046_0 Phidget 1046 4-Input PT100/RTD  Bridge] and for the [http://www.phidgets.com/products.php?product_id=1048 Phidget 1048 4-Input Temperature Sensor J/K/E/T-Type] devices
+  * adds TP event marks (show on graph and in the message log)
+  * adds phase LCDs (TP, DRY, FCs) estimating time to the event and counting time after the event
+  * keeps a link to the loaded background file on saving a profile and automatically re-loads the background with the actual profile
+  * allows ETBTa and RoR statistics to be displayed together
+  * adds xkcd, path effects and Humor/Comic font incl. GUI
+  * alarms
+    * option load/save alarms along (background-) profiles
+    * adds negative alarm guards "But not"
+    * adds insert alarm button
+    * adds new alarm actions to trigger default event actions like START, FCs,..
+    * triggered alarms hold a gray background in the alarms dialog
+  * adds support for the Tonino roast color meter
+  * the last used extra event button is marked
+  * adds extra device data to Roast Properties data table
+  * adds "cool end" event to the event popup menu on right mouse click on the BT
+  * adds "Fuji SV" as second channel to the +Fuji DUTY %
+  * adds load/save and read/write all actions to Fuji control
+  * adds keyboard control for sliders
+  * adds translation support for Hebrew
+ * Changes
+  * autosave now takes the roast name from the roast properties and autosaves on OFF. Further, the date is now written as prefix
+  * x/y mouse pointer coordinate display now always displays temperatures and not temperature deltas if the RoR axis is active
+  * reorganized tabs in Extras dialog
+  * removes axis labels during recording
+  * alarms guarded by TP event are now active beyond the DRY event
+  * removed scan for ports button
+  * legend only shows extra event types that are in use
+  * alarm dialog edits directly the active alarm table with the consequence that alarms are not retriggered if
+  * alarms are edited during roasting
+  * right axis removed if DeltaET/BT is not active
+  * extra courve LCDs are now of the same size as the ET/BT LCDs
+  * updated underlying libs (Python, Qt, PyQt, matplotlib)
+ * Bug Fixes
+  * fixes issues with the "Drop Spikes" filter
+  * fixes "import profile into designer" action
+  * fixes default directory in wheelgraph open file dialog
+  * various fixes to the rendering of background profile annotations
+  * fixes an issue that allowed alarms to be trigger several times
+  * Windows font fixes
+  * fixed events-by value redraw if minieditor is open
+  * fixed a conflict between manual device ENTER key action and manual temperature input dialog
+  * improved reliability of serial and modbus commands
+  * fixes issue with Roast Reports on Windows
+  * several fixes to alarm system
+  * fixes the RoastLogger import of latin1 encoded files
+  * PID LCD visibility
+  * scan for ports on Linux
+  * better error handling on exporting data
+  * updates translations (JP, NL)
+
 ==v0.6.0 (14.6.2013)==
 
  * Events
