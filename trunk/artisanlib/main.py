@@ -251,14 +251,9 @@ if platf == 'Windows':
 global locale
             
 if not QSettings().value('resetqsettings').toInt()[0]:
-    if platform.system() == 'Darwin':
-        import objc
-        from Cocoa import NSUserDefaults
-        defs = NSUserDefaults.standardUserDefaults() 
-        langs = defs.objectForKey_("AppleLanguages")
-        locale = langs.objectAtIndex_(0)
-    else:
-        locale = QSettings().value('locale').toString()[:2]
+    locale = QSettings().value('locale').toString()
+    if locale == "en_US":
+        locale = "en"
 else:
     locale = ""
 supported_languages = [
