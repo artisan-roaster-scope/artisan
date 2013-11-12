@@ -7,8 +7,7 @@
   * adds TP event marks (show on graph and in the message log)
   * adds phase LCDs (TP, DRY, FCs) estimating time to the event and counting time after the event
   * keeps a link to the loaded background file on saving a profile and automatically re-loads the background with the actual profile
-  * allows ETBTa and RoR statistics to be displayed together
-  * adds xkcd, path effects and Humor/Comic font incl. GUI
+  * adds a new graph style using xkcd, path effects and the Humor or Comic font
   * alarms
     * option load/save alarms along (background-) profiles
     * adds negative alarm guards "But not"
@@ -16,6 +15,7 @@
     * adds new alarm actions to trigger default event actions like START, FCs,..
     * triggered alarms hold a gray background in the alarms dialog
     * imports alarms from [http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm RoastLogger] profiles (thanks to Miroslav)
+  * allows ETBTa and RoR statistics to be displayed together
   * adds support for the Tonino roast color meter
   * the last used extra event button is marked
   * adds extra device data to Roast Properties data table
