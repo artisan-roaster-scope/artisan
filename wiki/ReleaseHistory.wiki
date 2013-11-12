@@ -25,6 +25,7 @@
   * adds keyboard control for sliders
   * adds translation support for Hebrew
  * Changes
+  * curve smoothing settings sensitivity has been doubled (for some internal reasons). So a value of 6 on Artisan v0.6 should be adjusted to 3 to have roughly the same effect. 
   * autosave now takes the roast name from the roast properties and autosaves on OFF. Further, the date is now written as prefix
   * x/y mouse pointer coordinate display now always displays temperatures and not temperature deltas if the RoR axis is active
   * reorganized tabs in Extras dialog
