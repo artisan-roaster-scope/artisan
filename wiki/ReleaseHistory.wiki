@@ -15,6 +15,7 @@
     * adds insert alarm button
     * adds new alarm actions to trigger default event actions like START, FCs,..
     * triggered alarms hold a gray background in the alarms dialog
+    * imports alarms from [http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm RoastLogger] profiles (thanks to Miroslav)
   * adds support for the Tonino roast color meter
   * the last used extra event button is marked
   * adds extra device data to Roast Properties data table
@@ -48,7 +49,7 @@
   * improved reliability of serial and modbus commands
   * fixes issue with Roast Reports on Windows
   * several fixes to alarm system
-  * fixes the RoastLogger import of latin1 encoded files
+  * fixes the [http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm RoastLogger] import of latin1 encoded files
   * PID LCD visibility
   * scan for ports on Linux
   * better error handling on exporting data
