@@ -1,11 +1,11 @@
 Current Versions:
 
 o XCode 4.5.2 + command line tools
-o Python 2.7.4 or 3.3.1 (change "python3" to "python" in all commands below for python 2.x)
+o Python 2.7.6 or 3.3.2 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial
-o QT 4.8.4
-o SIP 4.14.5
-o PyQt 4.10.0
+o QT 4.8.5
+o SIP 4.15.3
+o PyQt 4.10.3
 o numpy 1.7.1
 o scipy 0.12.0
 o matplotlib 1.3.1
@@ -22,6 +22,11 @@ o py2app >0.7.3 trunk (21.4.2013)
 
 Upgrade History:
 
+- 2013-11-12:
+ . Python 2.7.4 => 2.7.6
+ . QT 4.8.4 => 4.8.5
+ . PyQt 4.10.0 => 4.10.3
+ . SIP 4.14.5 => 4.15.3
 - 2013-10-19:
  . pyobjc 2.5.1 added
 - 2013-10-17:
@@ -144,7 +149,7 @@ not needed anymore:
 install command line tools via Preferences/Downloads/Components
 
 
-2) Install Python 3.3.1
+2) Install Python 3.3.2
 
 download and install:
 
@@ -180,8 +185,8 @@ qt-mac-opensource-5.0.1-clang-offline.dmg (OS X 10.6+, Cocoa, 64bit only)
 
 5) Install SIP
 
-# tar xzf sip-4.14.4.tar.gz
-# cd sip-4.14.4
+# tar xzf sip-4.15.3.tar.gz
+# cd sip-4.15.3
 # python3 configure.py
 # make
 # sudo make install
@@ -189,8 +194,8 @@ qt-mac-opensource-5.0.1-clang-offline.dmg (OS X 10.6+, Cocoa, 64bit only)
 
 6) Install PyQt
 
-# tar xzf PyQt-mac-gpl-4.9.6.tar.gz 
-# cd PyQt-mac-gpl-4.9.6
+# tar xzf PyQt-mac-gpl-4.10.3.tar.gz 
+# cd PyQt-mac-gpl-4.10.3
 # python3 configure.py
 use: "python3 configure.py -q /Users/<username>/Qt5.0.1/5.0.1/clang_64/bin/qmake"
 # make
@@ -281,7 +286,7 @@ to avoid conflicts with py2app
 
 ---
 Using matplotlib 1.2 within pyqt on Python 3.3 I receive (on click on the greenflag button and leaving the dialog with OK)
-NOTE: not fix in Python 3.3.1 either (despite my report)
+NOTE: this is fixed in matplotlib 1.3.1
 
 
 formlayout.py", line 343, in get
