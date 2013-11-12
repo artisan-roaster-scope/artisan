@@ -36,7 +36,7 @@
   * alarms are edited during roasting
   * right axis removed if DeltaET/BT is not active
   * extra courve LCDs are now of the same size as the ET/BT LCDs
-  * updated underlying libs (Python, Qt, PyQt, matplotlib)
+  * updated underlying libs (Python, Qt, matplotlib)
  * Bug Fixes
   * fixes issues with the "Drop Spikes" filter
   * fixes "import profile into designer" action
