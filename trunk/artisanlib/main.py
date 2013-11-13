@@ -5745,10 +5745,10 @@ class SampleThread(QThread):
 #                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)                    
                     
                     # smooth BT and ET a bit for delta computations
-                    ETm1 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*2. + aw.qmc.temp1[-1]*4.) / 7.
-                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*3. + aw.qmc.temp1[-1]) / 5.
-                    BTm1 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*2. + aw.qmc.temp2[-1]*4.) / 7.
-                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*3. + aw.qmc.temp2[-1]) / 5.                    
+                    ETm1 = aw.qmc.temp1[-1]
+                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*5. + aw.qmc.temp1[-1]) / 7.
+                    BTm1 = aw.qmc.temp2[-1]
+                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*5. + aw.qmc.temp2[-1]) / 7.                    
                     #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                     aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
                     aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
@@ -7508,7 +7508,7 @@ class ApplicationWindow(QMainWindow):
         
     def updatePhasesLCDs(self):
         try:
-            tx = self.qmc.timeclock.elapsed()/1000.
+            tx = self.qmc.timex[-1]            
             
             # TP phase LCD
             if self.qmc.TPalarmtimeindex:
@@ -7535,7 +7535,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 # before DRY
                 self.DRYlabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b><")
-                if self.qmc.TPalarmtimeindex and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
+                if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
                     # display expected time to reach DRY as defined in the background profile or the phases dialog
                     if self.qmc.background and self.qmc.timeindexB[1]:
                         drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
@@ -7543,7 +7543,7 @@ class ApplicationWindow(QMainWindow):
                         drytarget = self.qmc.phases[1] # Drying max phases definition
                     if drytarget > self.qmc.temp2[-1]:
                         dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                        self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(dryexpectedtime))))
+                        self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + dryexpectedtime))))
                     else:
                         self.DRYlcd.display(QString("--:--"))                        
                 else:
@@ -7565,7 +7565,7 @@ class ApplicationWindow(QMainWindow):
             else:
                 # before FCs
                 self.FCslabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b><")
-                if self.qmc.timeindex[1] and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
+                if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
                     ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                     self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))))
                     # display expected time to reach FCs as defined in the background profile or the phases dialog
@@ -7576,7 +7576,7 @@ class ApplicationWindow(QMainWindow):
                         
                     if fcstarget > self.qmc.temp2[-1]:
                         fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                        self.FCslcd.display(QString(self.qmc.stringfromseconds(int(fcsexpectedtime))))
+                        self.FCslcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + fcsexpectedtime))))
                     else:
                         self.FCslcd.display(QString("--:--"))
                 else:
@@ -11980,24 +11980,29 @@ $cupping_notes
         return (rc1,rc2,rc3)
 
     def viewErrorLog(self):
-        error = errorDlg(self)
-        error.show()
+        self.error = errorDlg(self)
+        self.error.show()
+        self.error.setModal(False)
 
     def viewSerialLog(self):
-        serialDLG = serialLogDlg(self)
-        serialDLG.show()
+        self.serialDLG = serialLogDlg(self)
+        self.serialDLG.show()
+        self.serialDLG.setModal(False)
+        
         
     def viewartisansettings(self):
         settingsDLG = artisansettingsDlg(self)
         settingsDLG.show()
 
     def viewplatform(self):
-        platformDLG = platformDlg(self)
-        platformDLG.show()
+        self.platformDLG = platformDlg(self)
+        self.platformDLG.show()
+        self.platformDlg.setModal(False)
 
     def viewMessageLog(self):
-        message = messageDlg(self)
-        message.show()
+        self.message = messageDlg(self)
+        self.message.show()
+        self.message.setModal(False)
 
     def helpAbout(self):
         coredevelopers = "<br>Rafael Cobo &amp; Marko Luther"
@@ -12162,6 +12167,7 @@ $cupping_notes
                 dialog = DTApidDlgControl(self)
             #modeless style dialog 
             dialog.show()
+            dialog.setModal(False)
         #arduino
 #        elif self.qmc.device == 19:
 #            dialog = ArduinoDlgControl(self)
@@ -12185,8 +12191,9 @@ $cupping_notes
         dialog.show()
 
     def calculator(self):
-        dialog = calculatorDlg(self)
-        dialog.show()
+        self.dialog = calculatorDlg(self)
+        self.dialog.show()
+        self.dialog.setModal(False)
 
     def graphwheel(self):
         if self.qmc.designerflag:
@@ -15384,6 +15391,7 @@ class editGraphDlg(ArtisanDialog):
 class platformDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(platformDlg,self).__init__(parent)
+        self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Artisan Platform", None, QApplication.UnicodeUTF8))
         platformdic = {}
         platformdic["Architecture"] = str(platform.architecture())
@@ -15481,6 +15489,7 @@ class artisansettingsDlg(ArtisanDialog):
 class serialLogDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(serialLogDlg,self).__init__(parent)
+        self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Serial Log", None, QApplication.UnicodeUTF8))
         self.serialcheckbox = QCheckBox(QApplication.translate("CheckBox","Serial Log ON/OFF", None, QApplication.UnicodeUTF8))
         self.serialcheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF logs serial communication",None, QApplication.UnicodeUTF8))
@@ -15524,6 +15533,7 @@ class serialLogDlg(ArtisanDialog):
 class errorDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(errorDlg,self).__init__(parent)
+        self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Error Log", None, QApplication.UnicodeUTF8))
         #convert list of errors to an html string
         htmlerr = "version = " +__version__ +"<br><br>"
@@ -15548,6 +15558,7 @@ class errorDlg(ArtisanDialog):
 class messageDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(messageDlg,self).__init__(parent)
+        self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Message History", None, QApplication.UnicodeUTF8))
         #convert list of messages to an html string
         htmlmessage = ""
@@ -15920,6 +15931,7 @@ class WindowsDlg(ArtisanDialog):
 class calculatorDlg(ArtisanDialog):
     def __init__(self, parent = None):
         super(calculatorDlg,self).__init__(parent)
+        self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Roast Calculator",None, QApplication.UnicodeUTF8))
         #RATE OF CHANGE
         self.result1 = QLabel(QApplication.translate("Label", "Enter two times along profile",None, QApplication.UnicodeUTF8))
@@ -17679,16 +17691,14 @@ class phasesGraphDlg(ArtisanDialog):
 class flavorDlg(ArtisanDialog):   
     def __init__(self, parent = None):
         super(flavorDlg,self).__init__(parent)
-        
+        self.setModal(True)        
         rcParams['path.effects'] = []
-        
         #avoid questionm mark context help
         flags = self.windowFlags()
         helpFlag = Qt.WindowContextHelpButtonHint
         flags = flags & (~helpFlag)
         self.setWindowFlags(flags)
         self.setWindowTitle(QApplication.translate("Form Caption","Cup Profile",None, QApplication.UnicodeUTF8))
-        self.setModal(True)
         defaultlabel = QLabel(QApplication.translate("Label","Default",None, QApplication.UnicodeUTF8))
         self.defaultcombobox = QComboBox()
         self.defaultcombobox.addItems(["","Artisan","SCCA","CQI","SweetMarias","C","E","CoffeeGeek","Intelligentsia","IIAC","*CUSTOM*"])
@@ -19747,6 +19757,7 @@ class serialport(object):
                 return -1,-1 
         except serial.SerialException:
             self.closeport()
+            _, _, exc_tb = sys.exc_info()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER303temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
@@ -24609,6 +24620,7 @@ class AlarmDlg(ArtisanDialog):
 class PXRpidDlgControl(ArtisanDialog):
     def __init__(self, parent = None):
         super(PXRpidDlgControl,self).__init__(parent)
+        self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXR PID Control",None, QApplication.UnicodeUTF8))
         #create Ramp Soak control button colums
@@ -25472,6 +25484,7 @@ class PXRpidDlgControl(ArtisanDialog):
 class PXG4pidDlgControl(ArtisanDialog):
     def __init__(self, parent = None):
         super(PXG4pidDlgControl,self).__init__(parent)
+        self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(QApplication.translate("Form Caption","Fuji PXG PID Control",None, QApplication.UnicodeUTF8))
         self.status = QStatusBar()
@@ -27717,6 +27730,7 @@ class FujiPID(object):
 #class ArduinoDlgControl(ArtisanDialog):
 #    def __init__(self, parent = None):
 #        super(ArduinoDlgControl,self).__init__(parent)
+#        self.setModal(True)
 #        self.setAttribute(Qt.WA_DeleteOnClose)
 #        self.setWindowTitle(QApplication.translate("Form Caption","Arduino Control",None, QApplication.UnicodeUTF8))
 #        self.status = QStatusBar()
@@ -27748,6 +27762,7 @@ class FujiPID(object):
 class DTApidDlgControl(ArtisanDialog):
     def __init__(self, parent = None):
         super(DTApidDlgControl,self).__init__(parent)
+        self.setModal(True)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setWindowTitle(QApplication.translate("Form Caption","Delta DTA PID Control",None, QApplication.UnicodeUTF8))
         self.status = QStatusBar()
