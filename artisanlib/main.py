@@ -7416,8 +7416,7 @@ class ApplicationWindow(QMainWindow):
         if self.qmc.graphfont == 0:     
             try:                    
                 rcParams['font.size'] = 12.0
-                mpl.rcParams['font.family'] = "sans-serif"
-                mpl.rcParams['font.sans-serif'] = ["Microsoft Sans Serif", "Arial"] # works for Greek and Arabic
+                mpl.rcParams['font.family'] = ["Microsoft Sans Serif", "Arial"] # works for Greek and Arabic
                 self.mpl_fontproperties = mpl.font_manager.FontProperties()           
                 if platf == "Darwin":
                     mpl.rcParams['font.family'] = "Arial Unicode MS"
@@ -7425,15 +7424,15 @@ class ApplicationWindow(QMainWindow):
                 elif platf == "Linux":
                     if locale:
                         if locale == "ar":
-                            mpl.rcParams['font.sans-serif'] = ["DejaVu Sans","DejaVu Sans Mono","Times New Roman"]
+                            mpl.rcParams['font.family'] = ["DejaVu Sans","DejaVu Sans Mono","Times New Roman"]
                         elif locale == "ja":
-                            mpl.rcParams['font.sans-serif'] = ["TakaoPGothic"]
+                            mpl.rcParams['font.family'] = ["TakaoPGothic"]
                         elif locale == "el":
-                            mpl.rcParams['font.sans-serif'] = ["DejaVu Sans","DejaVu Sans Mono"]
+                            mpl.rcParams['font.family'] = ["DejaVu Sans","DejaVu Sans Mono"]
                         elif locale == "zh_CN":
-                            mpl.rcParams['font.sans-serif'] = ["NanumGothic","DejaVu Sans Mono"]
+                            mpl.rcParams['font.family'] = ["NanumGothic","DejaVu Sans Mono"]
                         elif locale == "zh_TW":
-                            mpl.rcParams['font.sans-serif'] = ["NanumGothic","DejaVu Sans Mono"]
+                            mpl.rcParams['font.family'] = ["NanumGothic","DejaVu Sans Mono"]
                         self.mpl_fontproperties = mpl.font_manager.FontProperties()
                 else: # Windows:
                     # for asian languages on Windows we have to set the parameters directly to *.ttc fonts (mpl supports only *.ttf)
@@ -7583,10 +7582,12 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.FCslcd.display(QString("--:--"))
                 self.DRY2FCslabel.setText("")
-        except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
-            print(e)
+        except Exception as e:            
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " updatePhasesLCDs() %1").arg(str(e)),exc_tb.tb_lineno)
+
 
     def makeLCDbox(self,label,lcd,lcdframe):
         LCDbox = QVBoxLayout()
