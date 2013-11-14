@@ -669,8 +669,8 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaBTflag = False
         self.DeltaETlcdflag = True
         self.DeltaBTlcdflag = True
-        self.deltafilter = 3
-        self.curvefilter = 1
+        self.deltafilter = 5
+        self.curvefilter = 5
         
         self.patheffects = 3
         self.graphstyle = 0
@@ -2340,7 +2340,7 @@ class tgraphcanvas(FigureCanvas):
 
                 #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
                 if self.DeltaETBflag or self.DeltaBTBflag:
-                    if True or recomputeAllDeltas:
+                    if recomputeAllDeltas:
                         tx = numpy.array(self.timeB)
                         dtx = numpy.diff(self.timeB) / 60.
                         with numpy.errstate(divide='ignore'):
@@ -2353,6 +2353,7 @@ class tgraphcanvas(FigureCanvas):
                             z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
                         self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromCHARGEonly=True)
                         self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromCHARGEonly=True)
+                    
                     ##### DeltaETB,DeltaBTB curves
                     if self.DeltaETBflag:
                         self.l_delta1B, = self.delta_ax.plot(self.timeB, self.delta1B,markersize=self.ETBdeltamarkersize,
@@ -2512,7 +2513,7 @@ class tgraphcanvas(FigureCanvas):
                         z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
                     self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromCHARGEonly=True)
                     self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromCHARGEonly=True)
-
+                    
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag:
                     self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
@@ -2527,7 +2528,6 @@ class tgraphcanvas(FigureCanvas):
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
                     handles.append(self.l_delta2)
                     labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
-
 
             nrdevices = len(self.extradevices)
             if nrdevices:
@@ -5744,11 +5744,11 @@ class SampleThread(QThread):
 #                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
 #                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)                    
                     
-                    # smooth BT and ET a bit for delta computations
+                    # smooth BT and ET a bit for delta computations (replacing the above code without smoothing)
                     ETm1 = aw.qmc.temp1[-1]
-                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*5. + aw.qmc.temp1[-1]) / 7.
+                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*3. + aw.qmc.temp1[-1]) / 5.
                     BTm1 = aw.qmc.temp2[-1]
-                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*5. + aw.qmc.temp2[-1]) / 7.                    
+                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*3. + aw.qmc.temp2[-1]) / 5.                    
                     #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                     aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
                     aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
@@ -5756,8 +5756,9 @@ class SampleThread(QThread):
                     aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                     aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
                     #######   filter deltaBT deltaET
-                    if aw.qmc.deltafilter:
-                        if length_of_qmc_timex > aw.qmc.deltafilter:   #detafilter is an int = number of pads
+                    # (deactivated due to the huge time lag)
+                    if False and aw.qmc.deltafilter:
+                        if length_of_qmc_timex > aw.qmc.deltafilter:   #deltafilter is an int = number of pads
                             if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
                                 a1,a2 = 0.,0.
                                 for k in range(aw.qmc.deltafilter):
@@ -5944,11 +5945,15 @@ class SampleThread(QThread):
         try:
             while True:
                 if aw.qmc.flagon:
+                    start = libtime.clock()
+                    #tx = aw.qmc.timeclock.elapsed()
+                    
                     #collect information
-                    tx = aw.qmc.timeclock.elapsed()
                     self.sample()
+                    
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    dt = (max(1,(aw.qmc.delay - tx + aw.qmc.timeclock.elapsed()))) /1000.
+                    #dt = (max(1,(aw.qmc.delay - tx + aw.qmc.timeclock.elapsed()))) /1000.
+                    dt = (max(1,(aw.qmc.delay - libtime.clock()))/1000.)
                     #apply sampling interval here
                     libtime.sleep(dt)
                 else:
@@ -5964,7 +5969,8 @@ class SampleThread(QThread):
         except:
             pass
         finally:
-            del pool
+            if sys.platform.startswith("darwin"):
+                del pool
 
 #########################################################################################################
 ###     Artisan thread Server
@@ -8209,8 +8215,8 @@ class ApplicationWindow(QMainWindow):
     def automaticsave(self):
         try:
             if self.qmc.autosavepath and self.qmc.autosaveflag:
-                filename = str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
-                filename += "-" + self.qmc.autosaveprefix
+                filename = self.qmc.autosaveprefix
+                filename += "-" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
                 filename += ".alog"
                 oldDir = u(QDir.current())
                 QDir.setCurrent(self.qmc.autosavepath)
@@ -10472,6 +10478,8 @@ class ApplicationWindow(QMainWindow):
                 aw.qmc.DeltaETBflag = settings.value("DeltaETB",aw.qmc.DeltaETBflag).toBool()
                 aw.qmc.DeltaBTBflag = settings.value("DeltaBTB",aw.qmc.DeltaBTBflag).toBool()
             settings.endGroup()
+            if settings.contains("autosaveflag"):
+                self.qmc.autosaveflag = settings.value("autosaveflag",self.qmc.autosaveflag).toInt()[0]
             #restore buttons
             settings.beginGroup("ExtraEventButtons")
             if settings.contains("extraeventsactions"):
@@ -10574,19 +10582,20 @@ class ApplicationWindow(QMainWindow):
 
     def fetchCurveStyles(self):
         try:
-            # get and set axis y limits
-            yrange = aw.qmc.ax.get_ylim()
-            yl_min = int(yrange[0])
-            yl = int(yrange[1])
-            if yl > yl_min + 10:
-                aw.qmc.ylimit = yl
-                aw.qmc.ylimit_min = yl_min
-            delta_yrange = aw.qmc.delta_ax.get_ylim()
-            zl_min = int(delta_yrange[0])
-            zl = int(delta_yrange[1])
-            if zl > zl_min + 5:
-                aw.qmc.zlimit = zl
-                aw.qmc.zlimit_min = zl_min
+# this conflicts in GreenFlag zoom mode!
+#            # get and set axis y limits
+#            yrange = aw.qmc.ax.get_ylim()
+#            yl_min = int(yrange[0])
+#            yl = int(yrange[1])
+#            if yl > yl_min + 10:
+#                aw.qmc.ylimit = yl
+#                aw.qmc.ylimit_min = yl_min
+#            delta_yrange = aw.qmc.delta_ax.get_ylim()
+#            zl_min = int(delta_yrange[0])
+#            zl = int(delta_yrange[1])
+#            if zl > zl_min + 5:
+#                aw.qmc.zlimit = zl
+#                aw.qmc.zlimit_min = zl_min
             if aw.qmc.l_temp1:
                 self.qmc.ETlinestyle = aw.qmc.l_temp1.get_linestyle()
                 #hack: set all drawing styles to default as those can not be edited by the user directly (only via "steps")
@@ -11033,6 +11042,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaETB",aw.qmc.DeltaETBflag)
             settings.setValue("DeltaBTB",aw.qmc.DeltaBTBflag)
             settings.endGroup()
+            settings.setValue("autosaveflag",self.qmc.autosaveflag)
             #custom event buttons
             settings.beginGroup("ExtraEventButtons")
             settings.setValue("buttonlistmaxlen",self.buttonlistmaxlen)
@@ -13149,7 +13159,7 @@ class HUDDlg(ArtisanDialog):
         self.DeltaFilter.setSingleStep(1)
         self.DeltaFilter.setRange(0,40)
         self.DeltaFilter.setAlignment(Qt.AlignRight)
-        self.DeltaFilter.setValue(aw.qmc.deltafilter - 2)
+        self.DeltaFilter.setValue(aw.qmc.deltafilter/2 - 1)
         self.connect(self.DeltaFilter ,SIGNAL("editingFinished()"),lambda x=0:self.changeDeltaFilter(0))
         curvefilterlabel = QLabel(QApplication.translate("Label", "Smooth Curves",None, QApplication.UnicodeUTF8))
         #Filter holds the number of pads in filter
@@ -13157,7 +13167,7 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setSingleStep(1)
         self.Filter.setRange(0,40)
         self.Filter.setAlignment(Qt.AlignRight)
-        self.Filter.setValue(aw.qmc.curvefilter - 2)
+        self.Filter.setValue(aw.qmc.curvefilter/2 - 1)
         self.connect(self.Filter,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))
         #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None, QApplication.UnicodeUTF8))
@@ -14065,7 +14075,7 @@ class HUDDlg(ArtisanDialog):
         
     def changeDeltaFilter(self,i):
         try:
-            v = self.DeltaFilter.value() + 2
+            v = self.DeltaFilter.value()*2 + 3
             if v != aw.qmc.deltafilter:
                 self.DeltaFilter.setDisabled(True)
                 self.DeltaFilter.blockSignals(True)
@@ -14092,7 +14102,7 @@ class HUDDlg(ArtisanDialog):
         
     def changeFilter(self,i):
         try:
-            v = self.Filter.value() + 2
+            v = self.Filter.value()*2 + 3
             if v != aw.qmc.curvefilter:
                 self.Filter.setDisabled(True)
                 aw.qmc.curvefilter = v
@@ -17472,8 +17482,8 @@ class EventsDlg(ArtisanDialog):
             else:
                 aw.sendmessage(QApplication.translate("Message","Found empty event type box", None, QApplication.UnicodeUTF8))
         except Exception as e:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " updatetypes(): %1").arg(str(e)),exc_tb.tb_lineno)
 
