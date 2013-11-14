@@ -127,10 +127,10 @@ Installation Instructions:
 
 *) ensure to switch back to gcc-4.2 if you have a XCode 3/4 setup
 
-sudo rm /usr/bin/cc
-sudo rm /usr/bin/gcc
-sudo rm /usr/bin/c++
-sudo rm /usr/bin/g++
+sudo mv /usr/bin/cc /usr/bin/cc.off
+sudo mv /usr/bin/gcc /usr/bin/gcc.off
+sudo mv /usr/bin/c++ /usr/bin/c++.off
+sudo mv /usr/bin/g++ /usr/bin/g++.off
 sudo ln -s /usr/bin/gcc-4.2 /usr/bin/cc
 sudo ln -s /usr/bin/gcc-4.2 /usr/bin/gcc
 sudo ln -s /usr/bin/c++-4.2 /usr/bin/c++
