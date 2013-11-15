@@ -60,6 +60,7 @@ o automatic CHARGE/DROP event detection
 o support for digital scales (only KERN with serial support for now)
 o event sliders supporting the Hottop Roaster Interface
 o spike filter and curve smoothing
+o color input from color meters
 
 
 
@@ -132,15 +133,15 @@ LIBRARIES
 
 Artisan uses the following libraries in unmodified forms:
 
-- Python 2.6.x, 2.7.x and 3.3.x released under the PSF licence http://www.python.org/psf/
+- Python 2.7.x and 3.3.x released under the PSF licence http://www.python.org/psf/
   http://www.python.org/
 - QT 4.10.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
   http://qt-project.org/products/licensing
 - Numpy 1.7.x and Scipy 0.12.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
-- PyQt 4.8.x and SIP 4.14.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
+- PyQt 4.10.x and SIP 4.15.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
-- matplotlib 1.2.x, Copyright (c) 2002-2012 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
+- matplotlib 1.3.x, Copyright (c) 2002-2013 John D. Hunter; All Rights Reserved. Distributed under a licence based on PSF.
   http://matplotlib.sourceforge.net
 - py2app 0.7.x under the PSF open source licence; Copyright (c) 2004-2006 Bob Ippolito <bob at redivi.com>
   Copyright (c) 2010-2012 Ronald Oussoren <ronaldoussoren at mac.com>.
@@ -154,13 +155,29 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+
+v0.7.0 (19.11.2013)
+- support for the Phidget 1046/1048 devices
+- TP event marks (show on graph and in the message log)
+- phase LCDs (TP, DRY, FCs) estimating time to the event and counting time after the event (aka a roast development counter)
+- adds autoDRY and autoFCs
+- links profiles to background profiles
+- new graph style using xkcd, path effects and the Humor or Comic font
+- allows ETBTa and RoR statistics to be displayed together
+- various extensions to the alarms system
+- keyboard control for sliders
+- adds support for the (to be released) Tonino roast color meter
+- some Fuji PID control enhancements
+- improved manual mode
+- bug fixes
+
 v0.6.0 (14.06.2013)
-- Monitoring-only mode reporting readings on LCDs without recording
-- Event sliders e.g. to control the Hottop heater and fan via the HT Roaster Interface
-- Extended alarms triggered by time and temperature on any curve
-- Flexible Modbus RTU support allowing temperature reading and device control
-- Curve smoothing and spike filtering
-- New localizations: Arabic, German, Greek, Spanish, French, Japanese, Norwegian, Portuguese, Turkish, Dutch, Chinese and Hungarian
+- monitoring-only mode reporting readings on LCDs without recording
+- event sliders e.g. to control the Hottop heater and fan via the HT Roaster Interface
+- extended alarms triggered by time and temperature on any curve
+- flexible Modbus RTU support allowing temperature reading and device control
+- curve smoothing and spike filtering
+- new localizations: Arabic, German, Greek, Spanish, French, Japanese, Norwegian, Portuguese, Turkish, Dutch, Chinese and Hungarian
 - Windows installer, and icons on Windows and Linux
 
 v0.5.6 (8.11.2012)
