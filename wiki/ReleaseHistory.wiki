@@ -5,7 +5,10 @@
  * New Features
   * adds support for the [http://www.phidgets.com/products.php?product_id=1046_0 Phidget 1046 4-Input PT100/RTD  Bridge] and for the [http://www.phidgets.com/products.php?product_id=1048 Phidget 1048 4-Input Temperature Sensor J/K/E/T-Type] devices
   * adds TP event marks (show on graph and in the message log)
+  * adds flag in events dialog to control the display of the TP mark
+  * adds autoDRY and autoFCs to phases dialog
   * adds phase LCDs (TP, DRY, FCs) estimating time to the event and counting time after the event
+  * adds flag in phases dialog to deactivate phases LCDs
   * keeps a link to the loaded background file on saving a profile and automatically re-loads the background with the actual profile
   * adds a new graph style using xkcd, path effects and the Humor or Comic font
   * alarms
@@ -27,6 +30,7 @@
  * Changes
   * curve smoothing settings sensitivity has been doubled (for some internal reasons). So a value of 6 on Artisan v0.6 should be adjusted to 3 to have roughly the same effect. 
   * autosave now takes the roast name from the roast properties and autosaves on OFF. Further, the date is now written as prefix
+  * preserves autosave ON/OFF state over app restarts
   * x/y mouse pointer coordinate display now always displays temperatures and not temperature deltas if the RoR axis is active
   * reorganized tabs in Extras dialog
   * removes axis labels during recording
@@ -54,6 +58,8 @@
   * PID LCD visibility
   * scan for ports on Linux
   * better error handling on exporting data
+  * improved sample time accuracy
+  * now. fixes wrong segment 4 soak time reported by "Read RS values"
   * updates translations (JP, NL)
 
 ==v0.6.0 (14.6.2013)==
