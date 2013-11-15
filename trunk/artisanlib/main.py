@@ -3140,7 +3140,7 @@ class tgraphcanvas(FigureCanvas):
         self.flagon = False
         # now wait until the sampling thread successfully terminates
         while self.flagstopping:
-            libtime.sleep(.3)
+            libtime.sleep(.01)
         # clear data from monitoring-only mode
         if len(self.timex) == 1:
             aw.qmc.clearMeasurements()
@@ -5657,7 +5657,7 @@ class SampleThread(QThread):
                     if les == led == let:
                         xtra_dev_lines1 = 0
                         xtra_dev_lines2 = 0
-                        for i in range(nxdevices):   
+                        for i in range(nxdevices):  
                             extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
                             # ignore reading if both are off, otherwise process them
                             if len(aw.qmc.extramathexpression1[i]):
@@ -5977,15 +5977,16 @@ class SampleThread(QThread):
         try:
             while True:
                 if aw.qmc.flagon:
-                    start = libtime.clock()
+                    start = libtime.time()
                     #tx = aw.qmc.timeclock.elapsed()
                     
                     #collect information
                     self.sample()
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    #dt = (max(1,(aw.qmc.delay - tx + aw.qmc.timeclock.elapsed()))) /1000.
-                    dt = (max(1,(aw.qmc.delay - libtime.clock()))/1000.)
+                    #dt = (max(1,(aw.qmc.delay + tx - aw.qmc.timeclock.elapsed()))) /1000.
+                    dt = max(1,aw.qmc.delay/1000. - libtime.time() + start)
+                    #dt = aw.qmc.delay/1000.1
                     #apply sampling interval here
                     libtime.sleep(dt)
                 else:
@@ -19458,7 +19459,7 @@ class serialport(object):
             #open port
             if not self.SP.isOpen():
                 self.SP.open()
-                libtime.sleep(.5) # avoid possible hickups on startup
+                libtime.sleep(.2) # avoid possible hickups on startup
         except serial.SerialException:
             self.SP.close()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + QApplication.translate("Error Message","Unable to open serial port",None, QApplication.UnicodeUTF8)
@@ -19538,7 +19539,7 @@ class serialport(object):
                 self.SP.write(str2cmd("#0A0000RA6\r\n"))
                 libtime.sleep(.3)
                 self.SP.write(str2cmd("\x21\x05\x00\x58\x7E"))
-                libtime.sleep(2.)
+                libtime.sleep(.2)
                 self.HH806Winitflag = 1
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -19613,7 +19614,7 @@ class serialport(object):
             res1 = -1
         if aw.modbus.input2slave:
             if just_send:
-                libtime.sleep(0.35)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.05)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input2float:
                 res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             else:
@@ -19625,7 +19626,7 @@ class serialport(object):
             res2 = -1
         if aw.modbus.input3slave:
             if just_send:
-                libtime.sleep(0.35)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.05)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input3float:
                 res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             else:
@@ -19637,7 +19638,7 @@ class serialport(object):
             res3 = -1
         if aw.modbus.input4slave:
             if just_send:
-                libtime.sleep(0.35)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.05)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input4float:
                 res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             else:
@@ -19682,7 +19683,7 @@ class serialport(object):
                 while sync != b"Err\r\n":
                     self.SP.write(b"\r\n")
                     sync = self.SP.read(5)
-                    libtime.sleep(1)
+                    libtime.sleep(.3)
                 self.SP.write(b"%000R")
                 ID = self.SP.read(5)
                 if len(ID) == 5:
@@ -20206,7 +20207,7 @@ class serialport(object):
             t1,t2 = 0.,0.
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(2)
+                libtime.sleep(1)
                 #Reinitialize Arduino in case communication was interupted
                 self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
@@ -20355,7 +20356,7 @@ class serialport(object):
                 counter = counter + 1
                 if not self.SP.isOpen():
                     self.openport()    
-                    libtime.sleep(2)
+                    libtime.sleep(1)
                 if self.SP.isOpen():
                     self.SP.flushInput()
                     r = self.SP.read(14)
@@ -20624,7 +20625,7 @@ class serialport(object):
             aw.qmc.samplingsemaphore.acquire(1)
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(2)
+                libtime.sleep(.5)
                 #Reinitialize Arduino in case communication was interrupted
                 if aw.qmc.device == 19:
                     self.ArduinoIsInitialized = 0
@@ -21883,18 +21884,23 @@ class comportDlg(ArtisanDialog):
                 devicename = aw.qmc.devices[devid-1]    #type identification of the device. Non editable
                 if devid != 29 and devid != 33 and devicename[0] != "+": # hide serial confs for MODBUS and "+XX" extra devices
                     comportComboBox =  self.serialtable.cellWidget(i,1)
-#                    aw.extracomport[i] = str(comportComboBox.currentText())
-                    aw.extracomport[i] = str(comportComboBox.getSelection())
+                    if comportComboBox:
+                        aw.extracomport[i] = str(comportComboBox.getSelection())
                     baudComboBox =  self.serialtable.cellWidget(i,2)
-                    aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
+                    if baudComboBox:
+                        aw.extrabaudrate[i] = int(str(baudComboBox.currentText()))
                     byteComboBox =  self.serialtable.cellWidget(i,3)
-                    aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
+                    if byteComboBox:
+                        aw.extrabytesize[i] = int(str(byteComboBox.currentText()))
                     parityComboBox =  self.serialtable.cellWidget(i,4)
-                    aw.extraparity[i] = str(parityComboBox.currentText())
+                    if parityComboBox:
+                        aw.extraparity[i] = str(parityComboBox.currentText())
                     stopbitsComboBox =  self.serialtable.cellWidget(i,5)
-                    aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
+                    if stopbitsComboBox:
+                        aw.extrastopbits[i] = int(str(stopbitsComboBox.currentText()))
                     timeoutEdit = self.serialtable.cellWidget(i,6)
-                    aw.extratimeout[i] = int(str(timeoutEdit.text()))
+                    if timeoutEdit:
+                        aw.extratimeout[i] = int(str(timeoutEdit.text()))
             #create serial ports for each extra device
             aw.extraser = [None]*ser_ports
             #load the settings for the extra serial ports found
