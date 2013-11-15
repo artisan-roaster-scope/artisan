@@ -428,6 +428,9 @@ class tgraphcanvas(FigureCanvas):
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
         self.phasesbuttonflag = False #False no change; True make the DRY and FC buttons change the phases during roast automatically
         self.watermarksflag = True
+        
+        #show phases LCDs during roasts
+        self.phasesLCDflag = True
 
         #statistics flags selects to display: stat. time, stat. bar, stat. flavors, stat. area, stat. deg/min, stat. ETBTarea
         self.statisticsflags = [1,1,0,1,1,0]
@@ -669,8 +672,10 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaBTflag = False
         self.DeltaETlcdflag = True
         self.DeltaBTlcdflag = True
-        self.deltafilter = 5
-        self.curvefilter = 5
+        # user filter values x are translated as follows to internal filter values: y = x*2 + 3 (to go the other direction: x = y/2 - 1)
+        # this is to ensure, that only uneven window values are used and no wrong shift is happening through smooting
+        self.deltafilter = 7 # => corresponds to 2 on the user interface
+        self.curvefilter = 5 # => corresponds to 1 on the user interface
         
         self.patheffects = 3
         self.graphstyle = 0
@@ -689,6 +694,12 @@ class tgraphcanvas(FigureCanvas):
         #autodetected CHARGE and DROP index
         self.autoChargeIdx = 0
         self.autoDropIdx = 0
+        
+        self.markTPflag = True
+        
+        # flags to control automatic DRY and FCs events based on phases limits
+        self.autoDRYflag = False
+        self.autoFCsFlag = False
 
         # projection variables of change of rate
         self.projectionconstant = 1
@@ -1196,7 +1207,8 @@ class tgraphcanvas(FigureCanvas):
 
                 if self.flagstart:
                     #update phase lcds
-                    aw.updatePhasesLCDs()
+                    if aw.qmc.phasesLCDflag:
+                        aw.updatePhasesLCDs()
                     
                     #updated canvas
                     self.fig.canvas.draw()
@@ -2008,7 +2020,7 @@ class tgraphcanvas(FigureCanvas):
                     a = 1.  
                 self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
                 #Add TP marker
-                if TP_index > 0:
+                if self.markTPflag and TP_index > 0:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[TP_index]-t0)))
                     a = 1.
@@ -2340,7 +2352,7 @@ class tgraphcanvas(FigureCanvas):
 
                 #populate background delta ET (self.delta1B) and delta BT (self.delta2B)
                 if self.DeltaETBflag or self.DeltaBTBflag:
-                    if recomputeAllDeltas:
+                    if True: #recomputeAllDeltas:
                         tx = numpy.array(self.timeB)
                         dtx = numpy.diff(self.timeB) / 60.
                         with numpy.errstate(divide='ignore'):
@@ -3193,8 +3205,9 @@ class tgraphcanvas(FigureCanvas):
         aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
         self.updateLCDtime()
         aw.lowerbuttondialog.setVisible(True)
-        aw.ntb.hide()
-        aw.phasesLCDs.show()
+        if aw.qmc.phasesLCDflag:
+            aw.ntb.hide()
+            aw.phasesLCDs.show()
         aw.update_minieventline_visibility()
         aw.qmc.ax.set_xlabel("")
         aw.qmc.ax.set_ylabel("")
@@ -3245,7 +3258,7 @@ class tgraphcanvas(FigureCanvas):
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
         try:
-            if self.flagon:
+            if self.flagstart:
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
@@ -3302,7 +3315,7 @@ class tgraphcanvas(FigureCanvas):
     # called from sample() and marks the autodetected TP visually on the graph
     def markTP(self):
         try:
-            if self.flagon:
+            if self.flagstart and self.markTPflag:
                 if aw.qmc.TPalarmtimeindex and self.timeindex[0] != -1 and len(self.timex) > aw.qmc.TPalarmtimeindex:
                     st = self.stringfromseconds(self.timex[aw.qmc.TPalarmtimeindex]-self.timex[self.timeindex[0]])
                     st1 = QApplication.translate("Scope Annotation","TP %1", None, QApplication.UnicodeUTF8).arg(st)
@@ -3322,7 +3335,7 @@ class tgraphcanvas(FigureCanvas):
 
     def markDryEnd(self):
         try:
-            if self.flagon:
+            if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
@@ -3377,7 +3390,7 @@ class tgraphcanvas(FigureCanvas):
     #record 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
         try:
-            if self.flagon:
+            if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
@@ -3436,7 +3449,7 @@ class tgraphcanvas(FigureCanvas):
     #record 1C end markers of BT. called from button_4 of application window
     def mark1Cend(self):
         try:
-            if self.flagon:
+            if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
@@ -3491,7 +3504,7 @@ class tgraphcanvas(FigureCanvas):
     #record 2C start markers of BT. Called from button_5 of application window
     def mark2Cstart(self):
         try:
-            if self.flagon:
+            if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile. 
@@ -3550,7 +3563,7 @@ class tgraphcanvas(FigureCanvas):
     #record 2C end markers of BT. Called from button_6  of application window
     def mark2Cend(self):
         try:
-            if self.flagon:
+            if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
@@ -3608,7 +3621,7 @@ class tgraphcanvas(FigureCanvas):
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
         try:
-            if self.flagon:
+            if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
@@ -3685,7 +3698,7 @@ class tgraphcanvas(FigureCanvas):
 
     def markCoolEnd(self):
         try:
-            if self.flagon:
+            if self.flagstart:
                 if len(self.timex) > 0:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
@@ -3768,7 +3781,7 @@ class tgraphcanvas(FigureCanvas):
     # extraevent is given when called from aw.recordextraevent() from an extra Event Button
     def EventRecordAction(self,extraevent=None,eventtype=None,eventvalue=None,eventdescription=""):
         try:
-            if self.flagon:
+            if self.flagstart:
                 if len(self.timex) > 0 or self.device == 18:
                     aw.soundpop()
                     #prevents accidentally deleting a modified profile.
@@ -3886,7 +3899,7 @@ class tgraphcanvas(FigureCanvas):
     #called from controlling devices when roasting to record steps (commands) and produce a profile later
     def DeviceEventRecord(self,command):
         try:
-            if self.flagon:
+            if self.flagstart:
                 #prevents accidentally deleting a modified profile.
                 self.safesaveflag = True
                 self.samplingsemaphore.acquire(1)
@@ -5746,9 +5759,9 @@ class SampleThread(QThread):
                     
                     # smooth BT and ET a bit for delta computations (replacing the above code without smoothing)
                     ETm1 = aw.qmc.temp1[-1]
-                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*3. + aw.qmc.temp1[-1]) / 5.
+                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*5. + aw.qmc.temp1[-1]) / 7.
                     BTm1 = aw.qmc.temp2[-1]
-                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*3. + aw.qmc.temp2[-1]) / 5.                    
+                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*5. + aw.qmc.temp2[-1]) / 7.                    
                     #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
                     aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
                     aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
@@ -5756,16 +5769,24 @@ class SampleThread(QThread):
                     aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                     aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
                     #######   filter deltaBT deltaET
-                    # (deactivated due to the huge time lag)
-                    if False and aw.qmc.deltafilter:
-                        if length_of_qmc_timex > aw.qmc.deltafilter:   #deltafilter is an int = number of pads
-                            if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
-                                a1,a2 = 0.,0.
-                                for k in range(aw.qmc.deltafilter):
-                                    a1 += aw.qmc.unfiltereddelta1[-(k+1)]
-                                    a2 += aw.qmc.unfiltereddelta2[-(k+1)]
-                                aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
-                                aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
+                    # decay smoothing
+                    if aw.qmc.deltafilter:
+                        user_filter = aw.qmc.deltafilter/2 # we use the one set by the user (+ 1) not to produce a hugh shift
+                        if length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
+                            aw.qmc.rateofchange1 = numpy.average(aw.qmc.unfiltereddelta1[-user_filter:],weights=numpy.arange(1,user_filter+1))
+                            aw.qmc.rateofchange2 = numpy.average(aw.qmc.unfiltereddelta2[-user_filter:],weights=numpy.arange(1,user_filter+1))
+                            
+                    # (deactivated due to the huge time lag and replaced by the above)
+#                    if aw.qmc.deltafilter:
+#                        if length_of_qmc_timex > aw.qmc.deltafilter:   #deltafilter is an int = number of pads
+#                            if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
+#                                a1,a2 = 0.,0.
+#                                for k in range(aw.qmc.deltafilter):
+#                                    a1 += aw.qmc.unfiltereddelta1[-(k+1)]
+#                                    a2 += aw.qmc.unfiltereddelta2[-(k+1)]
+#                                aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
+#                                aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
+                                
                     rateofchange1plot = aw.qmc.rateofchange1
                     rateofchange2plot = aw.qmc.rateofchange2
                 else:
@@ -5829,6 +5850,17 @@ class SampleThread(QThread):
                     if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and self.checkTPalarmtime():
                         aw.qmc.TPalarmtimeindex = aw.findTP() #len(aw.qmc.timex)-1
                         aw.qmc.markTP()
+                    #check for autoDRY:
+                    if aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and not self.timeindex[1]:
+                        # after TP (if DRY event not yet set) check for BT exceeding Dry-max as specified in the phases dialog
+                        if aw.qmc.temp2[-1] > aw.qmc.phases[1]:
+                            aw.qmc.markDryEnd()
+                    #check for autoFCs:
+                    if aw.qmc.autoFCsFlag and self.timeindex[1] and not self.timeindex[2]:
+                        # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
+                        if aw.qmc.temp2[-1] > aw.qmc.phases[2]:
+                            aw.qmc.mark1Cstart()
+                        
                 #check for each alarm that was not yet triggered
                 for i in range(len(aw.qmc.alarmflag)):
                     #if alarm on, and not triggered, and time is after set time:
@@ -7514,80 +7546,81 @@ class ApplicationWindow(QMainWindow):
         
     def updatePhasesLCDs(self):
         try:
-            tx = self.qmc.timex[-1]            
-            
-            # TP phase LCD
-            if self.qmc.TPalarmtimeindex:
-                # after TP
-                self.TPlabel.setText("<b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")            
-                ts = tx - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                self.TPlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
-            else:
-                # before TP
-                self.TPlcd.display(QString("--:--"))
-            
-            # DRY phase LCD
-            if self.qmc.timeindex[1]:
-                # after DRY
-                self.DRYlabel.setText("<b>" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")         
-                ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
-                self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
-                # TP2DRY
+            if self.qmc.timex: # requires at least some recordings
+                tx = self.qmc.timex[-1]            
+                
+                # TP phase LCD
                 if self.qmc.TPalarmtimeindex:
-                    t = self.qmc.timex[self.qmc.timeindex[1]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                    self.TP2DRYlabel.setText(QString(self.qmc.stringfromseconds(int(t))))
+                    # after TP
+                    self.TPlabel.setText("<b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")            
+                    ts = tx - self.qmc.timex[self.qmc.TPalarmtimeindex]
+                    self.TPlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
                 else:
-                    self.TP2DRYlabel.setText("")
-            else:
-                # before DRY
-                self.DRYlabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b><")
-                if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
-                    # display expected time to reach DRY as defined in the background profile or the phases dialog
-                    if self.qmc.background and self.qmc.timeindexB[1]:
-                        drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
-                    else:
-                        drytarget = self.qmc.phases[1] # Drying max phases definition
-                    if drytarget > self.qmc.temp2[-1]:
-                        dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                        self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + dryexpectedtime))))
-                    else:
-                        self.DRYlcd.display(QString("--:--"))                        
-                else:
-                    self.DRYlcd.display(QString("--:--"))
-                self.TP2DRYlabel.setText("")
-    
-            # FCs phase LCD  
-            if self.qmc.timeindex[2]:
-                # after FCs
-                self.FCslabel.setText("<b>" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")            
-                ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
-                self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))))            
-                # DRY2FCs
+                    # before TP
+                    self.TPlcd.display(QString("--:--"))
+                
+                # DRY phase LCD
                 if self.qmc.timeindex[1]:
-                    t = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
-                    self.DRY2FCslabel.setText(QString(self.qmc.stringfromseconds(int(t))))
-                else:
-                    self.DRY2FCslabel.setText("")
-            else:
-                # before FCs
-                self.FCslabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b><")
-                if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
+                    # after DRY
+                    self.DRYlabel.setText("<b>" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")         
                     ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
-                    self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))))
-                    # display expected time to reach FCs as defined in the background profile or the phases dialog
-                    if self.qmc.background and self.qmc.timeindexB[2]:
-                        fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
+                    self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
+                    # TP2DRY
+                    if self.qmc.TPalarmtimeindex:
+                        t = self.qmc.timex[self.qmc.timeindex[1]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
+                        self.TP2DRYlabel.setText(QString(self.qmc.stringfromseconds(int(t))))
                     else:
-                        fcstarget = self.qmc.phases[2] # FCs min phases definition
-                        
-                    if fcstarget > self.qmc.temp2[-1]:
-                        fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                        self.FCslcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + fcsexpectedtime))))
+                        self.TP2DRYlabel.setText("")
+                else:
+                    # before DRY
+                    self.DRYlabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b><")
+                    if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
+                        # display expected time to reach DRY as defined in the background profile or the phases dialog
+                        if self.qmc.background and self.qmc.timeindexB[1]:
+                            drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
+                        else:
+                            drytarget = self.qmc.phases[1] # Drying max phases definition
+                        if drytarget > self.qmc.temp2[-1]:
+                            dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
+                            self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + dryexpectedtime))))
+                        else:
+                            self.DRYlcd.display(QString("--:--"))                        
+                    else:
+                        self.DRYlcd.display(QString("--:--"))
+                    self.TP2DRYlabel.setText("")
+        
+                # FCs phase LCD  
+                if self.qmc.timeindex[2]:
+                    # after FCs
+                    self.FCslabel.setText("<b>" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")            
+                    ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
+                    self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))))            
+                    # DRY2FCs
+                    if self.qmc.timeindex[1]:
+                        t = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
+                        self.DRY2FCslabel.setText(QString(self.qmc.stringfromseconds(int(t))))
+                    else:
+                        self.DRY2FCslabel.setText("")
+                else:
+                    # before FCs
+                    self.FCslabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b><")
+                    if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
+                        ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
+                        self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))))
+                        # display expected time to reach FCs as defined in the background profile or the phases dialog
+                        if self.qmc.background and self.qmc.timeindexB[2]:
+                            fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
+                        else:
+                            fcstarget = self.qmc.phases[2] # FCs min phases definition
+                            
+                        if fcstarget > self.qmc.temp2[-1]:
+                            fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
+                            self.FCslcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + fcsexpectedtime))))
+                        else:
+                            self.FCslcd.display(QString("--:--"))
                     else:
                         self.FCslcd.display(QString("--:--"))
-                else:
-                    self.FCslcd.display(QString("--:--"))
-                self.DRY2FCslabel.setText("")
+                    self.DRY2FCslabel.setText("")
         except Exception as e:            
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -10030,6 +10063,12 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.phasesbuttonflag = settings.value("phasesbuttonflag",self.qmc.phasesbuttonflag).toBool()
             if settings.contains("watermarks"):
                 self.qmc.watermarksflag = settings.value("watermarks",self.qmc.watermarksflag).toBool()
+            if settings.contains("phasesLCDs"):
+                self.qmc.phasesLCDflag = settings.value("phasesLCDs",self.qmc.phasesLCDflag).toBool()
+            if settings.contains("autoDry"):
+                self.qmc.autoDRYflag = settings.value("autoDry",self.qmc.autoDRYflag).toBool()
+            if settings.contains("autoFCs"):
+                self.qmc.autoFCsFlag = settings.value("autoFCs",self.qmc.autoFCsFlag).toBool()
             #restore Events settings
             settings.beginGroup("events")
             self.eventsbuttonflag = settings.value("eventsbuttonflag",int(self.eventsbuttonflag)).toInt()[0]
@@ -10046,6 +10085,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.autoChargeFlag = settings.value("autoCharge",self.qmc.autoChargeFlag).toBool()
             if settings.contains("autoDrop"):
                 self.qmc.autoDropFlag = settings.value("autoDrop",self.qmc.autoDropFlag).toBool()
+            if settings.contains("markTP"):
+                self.qmc.markTPflag = settings.value("markTP",self.qmc.markTPflag).toBool()
             if settings.contains("EvalueColor"):
                 self.qmc.EvalueColor = list(map(str,list(settings.value("EvalueColor",self.qmc.EvalueColor).toStringList())))
                 self.qmc.EvalueMarker = list(map(str,list(settings.value("EvalueMarker",self.qmc.EvalueMarker).toStringList())))
@@ -10775,6 +10816,11 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("phasesbuttonflag",self.qmc.phasesbuttonflag)
             #save phases watermarks flag
             settings.setValue("watermarks",self.qmc.watermarksflag)
+            #save phases LCDs on recording flag
+            settings.setValue("phasesLCDs",self.qmc.phasesLCDflag)
+            #phase triggered DRY and FCs
+            settings.setValue("autoDry",self.qmc.autoDRYflag)
+            settings.setValue("autoFCs",self.qmc.autoFCsFlag)
             #save statistics
             settings.setValue("Statistics",self.qmc.statisticsflags)
             settings.setValue("StatisticsConds",self.qmc.statisticsconditions)
@@ -10787,6 +10833,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("eventsshowflag",self.qmc.eventsshowflag)
             settings.setValue("autoCharge",self.qmc.autoChargeFlag)
             settings.setValue("autoDrop",self.qmc.autoDropFlag)
+            settings.setValue("markTP",self.qmc.markTPflag)
             settings.setValue("EvalueColor",self.qmc.EvalueColor)
             settings.setValue("EvalueMarker",self.qmc.EvalueMarker)
             settings.setValue("Evaluelinethickness",self.qmc.Evaluelinethickness)
@@ -11107,6 +11154,10 @@ class ApplicationWindow(QMainWindow):
         device["arduinoATChannel"] = str(self.ser.arduinoATChannel)
         phases["Phases"] = str(self.qmc.phases)
         phases["phasesbuttonflag"] = str(self.qmc.phasesbuttonflag)
+        phases["watermarks"] = str(self.qmc.watermarksflag)
+        phases["phasesLCDs"] = str(self.qmc.phasesLCDflag)
+        phases["autoDry"] = str(self.qmc.autoDRYflag)
+        phases["autoFCs"] = str(self.qmc.autoFCsFlag)
         statistics["Statistics"] = str(self.qmc.statisticsflags)
         statistics["StatisticsConds"] = str(self.qmc.statisticsconditions)
         events["eventsbuttonflag"] = str(self.eventsbuttonflag)
@@ -11116,6 +11167,7 @@ class ApplicationWindow(QMainWindow):
         events["eventsshowflag"] = str(self.qmc.eventsshowflag)
         events["autoCharge"] = str(self.qmc.autoChargeFlag)
         events["autoDrop"] = str(self.qmc.autoDropFlag)
+        events["markTP"] = str(self.qmc.markTPflag)
         events["EvalueColor"] = str(self.qmc.EvalueColor)
         events["EvalueMarker"] = str(self.qmc.EvalueMarker)
         events["Evaluelinethickness"] = str(self.qmc.Evaluelinethickness)
@@ -12007,7 +12059,7 @@ $cupping_notes
     def viewplatform(self):
         self.platformDLG = platformDlg(self)
         self.platformDLG.show()
-        self.platformDlg.setModal(False)
+        self.platformDLG.setModal(False)
 
     def viewMessageLog(self):
         self.message = messageDlg(self)
@@ -16372,15 +16424,15 @@ class EventsDlg(ArtisanDialog):
         self.E4sizeSpinBox.setRange(1,14)
         self.E4sizeSpinBox.setValue(aw.qmc.EvalueMarkerSize[3])
         self.connect(self.E4sizeSpinBox, SIGNAL("valueChanged(int)"),lambda w=1,x=3:self.setEmarkersize(w,x))
-#        self.autoChargeDrop = QCheckBox(QApplication.translate("CheckBox","Automatic CHARGE/DROP",None, QApplication.UnicodeUTF8))
-#        self.autoChargeDrop.setChecked(aw.qmc.autoChargeDropFlag)
-#        self.autoChargeDrop.setFocusPolicy(Qt.NoFocus)
-        self.autoCharge = QCheckBox(QApplication.translate("CheckBox","Automatic CHARGE",None, QApplication.UnicodeUTF8))
+        self.autoCharge = QCheckBox(QApplication.translate("CheckBox","Auto CHARGE",None, QApplication.UnicodeUTF8))
         self.autoCharge.setChecked(aw.qmc.autoChargeFlag)
         self.autoCharge.setFocusPolicy(Qt.NoFocus)
-        self.autoDrop = QCheckBox(QApplication.translate("CheckBox","Automatic DROP",None, QApplication.UnicodeUTF8))
+        self.autoDrop = QCheckBox(QApplication.translate("CheckBox","Auto DROP",None, QApplication.UnicodeUTF8))
         self.autoDrop.setChecked(aw.qmc.autoDropFlag)
         self.autoDrop.setFocusPolicy(Qt.NoFocus)
+        self.markTP = QCheckBox(QApplication.translate("CheckBox","Mark TP",None, QApplication.UnicodeUTF8))
+        self.markTP.setChecked(aw.qmc.markTPflag)
+        self.markTP.setFocusPolicy(Qt.NoFocus)
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         closeButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         defaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
@@ -16691,6 +16743,8 @@ class EventsDlg(ArtisanDialog):
         autoLayout.addWidget(self.autoCharge)
         autoLayout.addSpacing(20)
         autoLayout.addWidget(self.autoDrop)
+        autoLayout.addSpacing(20)
+        autoLayout.addWidget(self.markTP)
         autoLayout.addStretch()
         tab1layout = QVBoxLayout()
         tab1layout.addLayout(FlagsLayout)
@@ -17358,6 +17412,7 @@ class EventsDlg(ArtisanDialog):
         self.etypeComboBoxstored = aw.etypeComboBox
         self.autoChargeFlagstored = aw.qmc.autoChargeFlag
         self.autoDropFlagstored = aw.qmc.autoDropFlag
+        self.markTPFlagstored = aw.qmc.markTPflag
         # buttons
         self.extraeventslabels = aw.extraeventslabels
         self.extraeventsdescriptions = aw.extraeventsdescriptions
@@ -17395,6 +17450,7 @@ class EventsDlg(ArtisanDialog):
         aw.etypeComboBox = self.etypeComboBoxstored
         aw.qmc.autoChargeFlag = self.autoChargeFlagstored
         aw.qmc.autoDropFlag = self.autoDropFlagstored
+        aw.qmc.markTPflag = self.markTPFlagstored
         # buttons
         aw.extraeventslabels = self.extraeventslabels
         aw.extraeventsdescriptions = self.extraeventsdescriptions
@@ -17474,6 +17530,7 @@ class EventsDlg(ArtisanDialog):
                 #update autoCharge/Drop flag
                 aw.qmc.autoChargeFlag = self.autoCharge.isChecked()
                 aw.qmc.autoDropFlag = self.autoDrop.isChecked()
+                aw.qmc.markTPflag = self.markTP.isChecked()
                 self.savetableextraeventbutton()
                 aw.realignbuttons()
                 aw.qmc.redraw(recomputeAllDeltas=False)
@@ -17579,7 +17636,16 @@ class phasesGraphDlg(ArtisanDialog):
         self.connect(self.pushbuttonflag,SIGNAL("stateChanged(int)"),self.pushbuttonflagChanged)
         self.watermarksflag = QCheckBox(QApplication.translate("CheckBox","Watermarks",None, QApplication.UnicodeUTF8))
         self.watermarksflag.setChecked(bool(aw.qmc.watermarksflag))
+        self.phasesLCDflag = QCheckBox(QApplication.translate("CheckBox","Phases LCDs",None, QApplication.UnicodeUTF8))
+        self.phasesLCDflag.setChecked(bool(aw.qmc.phasesLCDflag))
+        self.autoDRYflag = QCheckBox(QApplication.translate("CheckBox","Auto DRY",None, QApplication.UnicodeUTF8))
+        self.autoDRYflag.setChecked(bool(aw.qmc.autoDRYflag))
+        self.autoFCsFlag = QCheckBox(QApplication.translate("CheckBox","Auto FCs",None, QApplication.UnicodeUTF8))
+        self.autoFCsFlag.setChecked(bool(aw.qmc.autoFCsFlag))
         self.connect(self.watermarksflag,SIGNAL("stateChanged(int)"),self.watermarksflagChanged)
+        self.connect(self.phasesLCDflag,SIGNAL("stateChanged(int)"),self.phasesLCDsflagChanged)
+        self.connect(self.autoDRYflag,SIGNAL("stateChanged(int)"),self.autoDRYflagChanged)
+        self.connect(self.autoFCsFlag,SIGNAL("stateChanged(int)"),self.autoFCsFlagChanged)
         okButton = QPushButton(QApplication.translate("Button","OK",None, QApplication.UnicodeUTF8))
         cancelButton = QPushButton(QApplication.translate("Button","Cancel",None, QApplication.UnicodeUTF8))
         setDefaultButton = QPushButton(QApplication.translate("Button","Defaults",None, QApplication.UnicodeUTF8))
@@ -17604,10 +17670,15 @@ class phasesGraphDlg(ArtisanDialog):
         boxedPhaseLayout.addStretch()
         boxedPhaseLayout.addLayout(phaseLayout)
         boxedPhaseLayout.addStretch()
+        boxedPhaseFlagGrid = QGridLayout()
+        boxedPhaseFlagGrid.addWidget(self.pushbuttonflag,0,0)
+        boxedPhaseFlagGrid.addWidget(self.autoDRYflag,1,0)
+        boxedPhaseFlagGrid.addWidget(self.autoFCsFlag,1,1)
+        boxedPhaseFlagGrid.addWidget(self.watermarksflag,2,0)
+        boxedPhaseFlagGrid.addWidget(self.phasesLCDflag,2,1)
         boxedPhaseFlagLayout = QHBoxLayout()
         boxedPhaseFlagLayout.addStretch()
-        boxedPhaseFlagLayout.addWidget(self.pushbuttonflag)
-        boxedPhaseFlagLayout.addWidget(self.watermarksflag)
+        boxedPhaseFlagLayout.addLayout(boxedPhaseFlagGrid)
         boxedPhaseFlagLayout.addStretch()
         buttonsLayout = QHBoxLayout()
         buttonsLayout.addWidget(setDefaultButton)
@@ -17641,10 +17712,30 @@ class phasesGraphDlg(ArtisanDialog):
                 self.endmid.setDisabled(True)
                 self.startfinish.setDisabled(True)
 
-
     def watermarksflagChanged(self,_):
         aw.qmc.watermarksflag = not aw.qmc.watermarksflag
         aw.qmc.redraw(recomputeAllDeltas=False)
+
+    def phasesLCDsflagChanged(self,_):
+        aw.qmc.phasesLCDflag = not aw.qmc.phasesLCDflag
+        if aw.qmc.flagstart:
+            if aw.qmc.phasesLCDflag:
+                aw.ntb.hide()
+                aw.phasesLCDs.show()
+            else:
+                aw.phasesLCDs.hide()
+                aw.ntb.show()
+        aw.qmc.redraw(recomputeAllDeltas=False)
+
+    def autoDRYflagChanged(self,_):
+        aw.qmc.autoDRYflag = not aw.qmc.autoDRYflag
+        if aw.qmc.autoDRYflag:
+            self.pushbuttonflag.setChecked(False)
+        
+    def autoFCsFlagChanged(self,_):
+        aw.qmc.autoFCsFlag = not aw.qmc.autoFCsFlag
+        if aw.qmc.autoFCsFlag:
+            self.pushbuttonflag.setChecked(False)
 
     def pushbuttonflagChanged(self,i):
         if i:
@@ -17658,6 +17749,9 @@ class phasesGraphDlg(ArtisanDialog):
             self.startmid.setEnabled(True)
             self.endmid.setEnabled(True)
             self.startfinish.setEnabled(True)
+        if aw.qmc.phasesbuttonflag:
+            self.autoDRYflag.setChecked(False)
+            self.autoFCsFlag.setChecked(False)
 
     def updatephases(self):
         aw.qmc.phases[0] = self.startdry.value()
@@ -26355,7 +26449,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         str6 = "6 [T " + str(aw.fujipid.PXG4["segment6sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment6ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment6soak"][0])) + "]"
         str7 = "7 [T " + str(aw.fujipid.PXG4["segment7sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment7ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment7soak"][0])) + "]"
         str8 = "8 [T " + str(aw.fujipid.PXG4["segment8sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment8ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment8soak"][0])) + "]"
-        str9 = "9 [T " + str(aw.fujipid.PXG4["segment9sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment8ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment9soak"][0])) + "]"
+        str9 = "9 [T " + str(aw.fujipid.PXG4["segment9sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment9ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment9soak"][0])) + "]"
         str10 = "10 [T " + str(aw.fujipid.PXG4["segment10sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment10ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment10soak"][0])) + "]"
         str11 = "11 [T " + str(aw.fujipid.PXG4["segment11sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment11ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment11soak"][0])) + "]"
         str12 = "12 [T " + str(aw.fujipid.PXG4["segment12sv"][0]) + "] [R " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment12ramp"][0])) + "] [S " + str(aw.qmc.stringfromseconds(aw.fujipid.PXG4["segment12soak"][0])) + "]"
@@ -27128,18 +27222,19 @@ class PXG4pidDlgControl(ArtisanDialog):
 
     def getsegment(self, idn):
         svkey = "segment" + str(idn) + "sv"
-        svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[svkey][1],1)
-        
+        svcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[svkey][1],1)        
         sv = aw.fujipid.readoneword(svcommand)
         if sv == -1:
             return -1
         aw.fujipid.PXG4[svkey][0] = sv/10.              #divide by 10 because the decimal point is not sent by the PID
+        
         rampkey = "segment" + str(idn) + "ramp"
         rampcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[rampkey][1],1)
         ramp = aw.fujipid.readoneword(rampcommand)
         if ramp == -1:
             return -1
         aw.fujipid.PXG4[rampkey][0] = ramp
+        
         soakkey = "segment" + str(idn) + "soak"
         soakcommand = aw.fujipid.message2send(aw.ser.controlETpid[1],3,aw.fujipid.PXG4[soakkey][1],1)
         soak = aw.fujipid.readoneword(soakcommand)
@@ -27303,7 +27398,7 @@ class FujiPID(object):
                   "segment1sv": [270.0,41581],"segment1ramp": [180,41582],"segment1soak": [0,41583],          # See PXG Manual chapter 6: Ramp/Soak Time Units to set the parameter TIMU    
                   "segment2sv": [300.0,41584],"segment2ramp": [180,41585],"segment2soak": [0,41586],
                   "segment3sv": [350.0,41587],"segment3ramp": [180,41588],"segment3soak": [0,41589],
-                  "segment4sv": [400.0,41590],"segment4ramp": [180,41591],"segment4soak": [0,41591],
+                  "segment4sv": [400.0,41590],"segment4ramp": [180,41591],"segment4soak": [0,41592],
                   # Example. Phase to 1C. selects 6 or 8 mins
                   "segment5sv": [530.0,41593],"segment5ramp": [180,41594],"segment5soak": [0,41595],
                   "segment6sv": [530.0,41596],"segment6ramp": [180,41597],"segment6soak": [0,41598],
