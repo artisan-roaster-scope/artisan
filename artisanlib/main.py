@@ -421,7 +421,10 @@ class tgraphcanvas(FigureCanvas):
         # default delay between readings in miliseconds
         self.default_delay = 3000 # default 3s
         self.delay = self.default_delay
-        self.min_delay = 3000
+        if platf == "Windows":
+            self.min_delay = 3000
+        else:
+            self.min_delay = 1000
 
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases_fahrenheit_defaults = [200,300,390,450]
@@ -670,6 +673,7 @@ class tgraphcanvas(FigureCanvas):
         self.BTcurve = True
         self.ETlcd = True
         self.BTlcd = True
+        self.LCDdecimalplaces = 1
         self.DeltaETflag = False
         self.DeltaBTflag = False
         self.DeltaETlcdflag = True
@@ -1194,11 +1198,16 @@ class tgraphcanvas(FigureCanvas):
     def updategraphics(self):
         try:
             if self.flagon:
-                if len(self.timex):        
-                    aw.lcd2.display("%.1f"%float(self.temp1[-1]))            # ET
-                    aw.lcd3.display("%.1f"%float(self.temp2[-1]))            # BT
-                    aw.lcd4.display("%.1f"%float(self.rateofchange1))        # rate of change MET (degress per minute)
-                    aw.lcd5.display("%.1f"%float(self.rateofchange2))        # rate of change BT (degrees per minute)
+                if len(self.timex):
+                    lcdformat = "%."
+                    if self.LCDdecimalplaces:
+                        lcdformat = "%.1f"
+                    else:
+                        lcdformat = "%.0f"    
+                    aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
+                    aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
+                    aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
+                    aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
                     
                     if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid  
                         aw.lcd6.display(self.currentpidsv)
@@ -1208,9 +1217,9 @@ class tgraphcanvas(FigureCanvas):
                     for i in range(ndev):
                         if i < aw.nLCDS:
                             if self.extratemp1[i]:
-                                aw.extraLCD1[i].display("%.1f"%float(self.extratemp1[i][-1]))
+                                aw.extraLCD1[i].display(lcdformat%float(self.extratemp1[i][-1]))
                             if self.extratemp2[i]:
-                                aw.extraLCD2[i].display("%.1f"%float(self.extratemp2[i][-1]))
+                                aw.extraLCD2[i].display(lcdformat%float(self.extratemp2[i][-1]))
 
                 if self.flagstart:
                     #update phase lcds
@@ -1226,17 +1235,17 @@ class tgraphcanvas(FigureCanvas):
 
                     #auto mark CHARGE/TP/DRY/FCs/DROP
                     if self.autoChargeIdx:
-                        self.markCharge()
                         self.autoChargeIdx = 0 #otherwise it keeps calling CHARGE
+                        self.markCharge()
                     elif self.autoTPIdx:
-                        self.markTP()
                         self.autoTPIdx = 0
+                        self.markTP()
                     elif self.autoDryIdx:
-                        self.markDryEnd()
                         self.autoDryIdx = 0
+                        self.markDryEnd()
                     elif self.autoDropIdx:
-                        self.markDrop()
                         self.autoDropIdx = 0
+                        self.markDrop()
 
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
@@ -1748,15 +1757,19 @@ class tgraphcanvas(FigureCanvas):
             self.specialevents=[]
             aw.lcd1.display("00:00")
             if andLCDs:
-                aw.lcd2.display("0.0")
-                aw.lcd3.display("0.0")
-                aw.lcd4.display("0.0")
-                aw.lcd5.display("0.0")
-                aw.lcd6.display("0.0")
-                aw.lcd7.display("0.0")
+                if self.LCDdecimalplaces:
+                    zz = "0.0"
+                else:
+                    zz = "0"
+                aw.lcd2.display(zz)
+                aw.lcd3.display(zz)
+                aw.lcd4.display(zz)
+                aw.lcd5.display(zz)
+                aw.lcd6.display(zz)
+                aw.lcd7.display(zz)
                 for i in range(aw.nLCDS):
-                    aw.extraLCD1[i].display("0.0")
-                    aw.extraLCD2[i].display("0.0")
+                    aw.extraLCD1[i].display(zz)
+                    aw.extraLCD2[i].display(zz)
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -2170,7 +2183,6 @@ class tgraphcanvas(FigureCanvas):
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
     def redraw(self, recomputeAllDeltas=True, smooth=False):
-#        print("redraw",recomputeAllDeltas,smooth)
         try:
             #### lock shared resources   ####
             self.samplingsemaphore.acquire(1)
@@ -3141,55 +3153,64 @@ class tgraphcanvas(FigureCanvas):
         self.fig.canvas.draw()
 
     def OnMonitor(self):
-        aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-        aw.lcd1.display("00:00")
-        self.timeclock.start()   #set time to the current computer time
-        self.flagon = True
-        if self.designerflag: return
-        aw.sendmessage(QApplication.translate("Message","Scope monitoring...", None, QApplication.UnicodeUTF8))
-        #disable RESET button:
-        aw.button_7.setEnabled(False)
-        aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
-        aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])
-        aw.button_1.setText(QApplication.translate("Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
-        aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None, QApplication.UnicodeUTF8))
-        aw.button_2.setEnabled(True) # ensure that the START button is enabled
-        aw.showLCDs()
-        aw.showSliders()
-        aw.disableEditMenus()
-        if aw.extraeventsbuttonsflag:
-            aw.showExtraButtons()
-        self.threadserver.createSampleThread()
+        try:
+            aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
+            aw.lcd1.display("00:00")
+            self.timeclock.start()   #set time to the current computer time
+            self.flagon = True
+            if self.designerflag: return
+            aw.sendmessage(QApplication.translate("Message","Scope monitoring...", None, QApplication.UnicodeUTF8))
+            #disable RESET button:
+            aw.button_7.setEnabled(False)
+            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            aw.button_1.setStyleSheet(aw.pushbuttonstyles["ON"])
+            aw.button_1.setText(QApplication.translate("Button", "OFF",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
+            aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop monitoring", None, QApplication.UnicodeUTF8))
+            aw.button_2.setEnabled(True) # ensure that the START button is enabled
+            aw.showLCDs()
+            aw.showSliders()
+            aw.disableEditMenus()
+            if aw.extraeventsbuttonsflag:
+                aw.showExtraButtons()
+            self.threadserver.createSampleThread()
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def OffMonitor(self):
-        # first activate "Stopping Mode" to ensure that sample() is not reseting the timer now (independent of the flagstart state)
-        if self.HUDflag:
-            self.toggleHUD()
-        # stop Recorder if still running
-        if self.flagstart:
-            self.OffRecorder()
-        self.flagstopping = True
-        self.flagon = False
-        # now wait until the sampling thread successfully terminates
-        while self.flagstopping:
-            libtime.sleep(.01)
-        # clear data from monitoring-only mode
-        if len(self.timex) == 1:
-            aw.qmc.clearMeasurements()
-        self.disconnectProbes()
-        #enable RESET button:
-        aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
-        aw.button_7.setEnabled(True)
-        aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
-        aw.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None, QApplication.UnicodeUTF8))
-        aw.sendmessage(QApplication.translate("Message","Scope stopped", None, QApplication.UnicodeUTF8))
-        aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
-        # reset time LCD color to the default (might have been changed to red due to long cooling!)
-        aw.hideLCDs()
-        aw.hideSliders()
-        aw.hideExtraButtons()
-        aw.enableEditMenus()
-        
+        try:
+            # first activate "Stopping Mode" to ensure that sample() is not reseting the timer now (independent of the flagstart state)
+            if self.HUDflag:
+                self.toggleHUD()
+            # stop Recorder if still running
+            if self.flagstart:
+                self.OffRecorder()
+            self.flagstopping = True
+            self.flagon = False
+            # now wait until the sampling thread successfully terminates
+            while self.flagstopping:
+                libtime.sleep(.01)
+            # clear data from monitoring-only mode
+            if len(self.timex) == 1:
+                aw.qmc.clearMeasurements()
+            self.disconnectProbes()
+            #enable RESET button:
+            aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"])
+            aw.button_7.setEnabled(True)
+            aw.button_1.setStyleSheet(aw.pushbuttonstyles["OFF"])
+            aw.button_1.setToolTip(QApplication.translate("Tooltip", "Start monitoring", None, QApplication.UnicodeUTF8))
+            aw.sendmessage(QApplication.translate("Message","Scope stopped", None, QApplication.UnicodeUTF8))
+            aw.button_1.setText(QApplication.translate("Button", "ON",None, QApplication.UnicodeUTF8)) # text means click to turn OFF (it is ON)
+            # reset time LCD color to the default (might have been changed to red due to long cooling!)
+            aw.hideLCDs()
+            aw.hideSliders()
+            aw.hideExtraButtons()
+            aw.enableEditMenus()
+            aw.qmc.redraw(recomputeAllDeltas=True,smooth=True)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
+
     def disconnectProbes(self):
         if aw.ser.PhidgetTemperatureSensor:
             try:
@@ -3218,56 +3239,64 @@ class tgraphcanvas(FigureCanvas):
             self.OffMonitor()
 
     def OnRecorder(self):
-        # start Monitor if not yet running
-        if not self.flagon:
-            self.OnMonitor()
-        self.flagstart = True
-
-        aw.disableSaveActions()
-
-        aw.sendmessage(QApplication.translate("Message","Scope recording...", None, QApplication.UnicodeUTF8))
-        aw.button_2.setEnabled(False)
-        aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
-        aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None, QApplication.UnicodeUTF8))
-        aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
-        #disable RESET button:
-        aw.button_7.setEnabled(False)
-        aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
-        aw.button_18.setEnabled(True)
-        aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
-        self.updateLCDtime()
-        aw.lowerbuttondialog.setVisible(True)
-        aw.applyStandardButtonVisibility()
-        if aw.qmc.phasesLCDflag:
-            aw.phasesLCDs.show()
-        aw.update_minieventline_visibility()
-        aw.qmc.ax.set_xlabel("")
-        aw.qmc.ax.set_ylabel("")
-        aw.qmc.delta_ax.set_ylabel("")
+        try:
+            # start Monitor if not yet running
+            if not self.flagon:
+                self.OnMonitor()
+            self.flagstart = True
+    
+            aw.disableSaveActions()
+    
+            aw.sendmessage(QApplication.translate("Message","Scope recording...", None, QApplication.UnicodeUTF8))
+            aw.button_2.setEnabled(False)
+            aw.button_2.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            aw.button_1.setToolTip(QApplication.translate("Tooltip", "Stop recording", None, QApplication.UnicodeUTF8))
+            aw.button_1.setEnabled(True) # ensure that the OFF button is enabled
+            #disable RESET button:
+            aw.button_7.setEnabled(False)
+            aw.button_7.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            aw.button_18.setEnabled(True)
+            aw.button_18.setStyleSheet(aw.pushbuttonstyles["HUD_OFF"])
+            self.updateLCDtime()
+            aw.lowerbuttondialog.setVisible(True)
+            aw.applyStandardButtonVisibility()
+            if aw.qmc.phasesLCDflag:
+                aw.phasesLCDs.show()
+            aw.update_minieventline_visibility()
+            aw.qmc.ax.set_xlabel("")
+            aw.qmc.ax.set_ylabel("")
+            aw.qmc.delta_ax.set_ylabel("")
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
         
 
     def OffRecorder(self):
-        aw.enableSaveActions()
-        self.flagstart = False
-        aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
-        aw.button_2.setEnabled(True)   
-        #enable RESET button:
-        aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"]) 
-        aw.button_7.setEnabled(True)
-        aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
-        aw.button_18.setEnabled(False)
-        self.updateLCDtime()
-        self.redraw(smooth=True)
-        #prevents accidentally deleting a modified profile.
-        if len(self.timex) > 2:
-            self.safesaveflag = True
-        aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None, QApplication.UnicodeUTF8))
-        aw.button_2.setText(QApplication.translate("Button", "START",None, QApplication.UnicodeUTF8))
-        aw.lowerbuttondialog.setVisible(False)
-        aw.phasesLCDs.hide()
-        aw.hideEventsMinieditor()
-        if aw.qmc.autosaveflag and aw.qmc.autosavepath:
-            aw.automaticsave()
+        try:
+            aw.enableSaveActions()
+            self.flagstart = False
+            aw.button_2.setStyleSheet(aw.pushbuttonstyles["STOP"])
+            aw.button_2.setEnabled(True)   
+            #enable RESET button:
+            aw.button_7.setStyleSheet(aw.pushbuttonstyles["RESET"]) 
+            aw.button_7.setEnabled(True)
+            aw.button_18.setStyleSheet(aw.pushbuttonstyles["DISABLED"])
+            aw.button_18.setEnabled(False)
+            self.updateLCDtime()
+            self.redraw(smooth=True)
+            #prevents accidentally deleting a modified profile.
+            if len(self.timex) > 2:
+                self.safesaveflag = True
+            aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None, QApplication.UnicodeUTF8))
+            aw.button_2.setText(QApplication.translate("Button", "START",None, QApplication.UnicodeUTF8))
+            aw.lowerbuttondialog.setVisible(False)
+            aw.phasesLCDs.hide()
+            aw.hideEventsMinieditor()
+            if aw.qmc.autosaveflag and aw.qmc.autosavepath:
+                aw.automaticsave()
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " OffMonitor() %1").arg(str(ex)),exc_tb.tb_lineno)
             
 
     #Turns START/STOP flag self.flagon to read and plot. Called from push button_2.
@@ -6941,32 +6970,24 @@ class ApplicationWindow(QMainWindow):
         self.lcd1.setMinimumWidth(100)
         self.lcd1.setFrameStyle(QFrame.Plain)
 
-        self.lcd2 = QLCDNumber() # Temperature MET
-        self.lcd2.setSegmentStyle(2)   
-        self.lcd2.setFrameStyle(QFrame.Plain)
-        self.lcd3 = QLCDNumber() # Temperature BT
-        self.lcd3.setFrameStyle(QFrame.Plain)
-        self.lcd3.setSegmentStyle(2)
-        self.lcd4 = QLCDNumber() # rate of change MET
-        self.lcd4.setSegmentStyle(2)
-        self.lcd4.setFrameStyle(QFrame.Plain)
-        self.lcd5 = QLCDNumber() # rate of change BT
-        self.lcd5.setSegmentStyle(2)
-        self.lcd5.setFrameStyle(QFrame.Plain)
-        self.lcd6 = QLCDNumber() # pid sv
-        self.lcd6.setSegmentStyle(2)
-        self.lcd6.setFrameStyle(QFrame.Plain)
-        self.lcd7 = QLCDNumber() # pid power % duty cycle
-        self.lcd7.setSegmentStyle(2)
-        self.lcd7.setFrameStyle(QFrame.Plain)
+        self.lcd2 = self.ArtisanLCD() # Temperature MET
+        self.lcd3 = self.ArtisanLCD() # Temperature BT
+        self.lcd4 = self.ArtisanLCD() # rate of change MET
+        self.lcd5 = self.ArtisanLCD() # rate of change BT
+        self.lcd6 = self.ArtisanLCD() # pid sv
+        self.lcd7 = self.ArtisanLCD() # pid power % duty cycle
 
         self.lcd1.display("00:00")
-        self.lcd2.display("0.0")
-        self.lcd3.display("0.0")
-        self.lcd4.display("0.0")
-        self.lcd5.display("0.0")
-        self.lcd6.display("0.0")
-        self.lcd7.display("0.0")
+        if self.qmc.LCDdecimalplaces:
+            zz = "0.0"
+        else:
+            zz = "0"
+        self.lcd2.display(zz)
+        self.lcd3.display(zz)
+        self.lcd4.display(zz)
+        self.lcd5.display(zz)
+        self.lcd6.display(zz)
+        self.lcd7.display(zz)
 
         self.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["timer"],self.lcdpaletteB["timer"]))
         self.lcd2.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["et"],self.lcdpaletteB["et"]))
@@ -6975,13 +6996,6 @@ class ApplicationWindow(QMainWindow):
         self.lcd5.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["deltabt"],self.lcdpaletteB["deltabt"]))
         self.lcd6.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
         self.lcd7.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-        
-        self.lcd2.setMinimumSize(80,30)
-        self.lcd3.setMinimumSize(80,30)
-        self.lcd4.setMinimumSize(80,30)
-        self.lcd5.setMinimumSize(80,30)
-        self.lcd6.setMinimumSize(80,30)
-        self.lcd7.setMinimumSize(80,30)
 
         self.lcd1.setToolTip(QApplication.translate("Tooltip", "Timer",None, QApplication.UnicodeUTF8))
         self.lcd2.setToolTip(QApplication.translate("Tooltip", "ET Temperature",None, QApplication.UnicodeUTF8))
@@ -7026,20 +7040,18 @@ class ApplicationWindow(QMainWindow):
         for i in range(self.nLCDS):
             #configure LCDs
             self.extraLCDframe1.append(QFrame())
-            self.extraLCD1.append(QLCDNumber())
+            self.extraLCD1.append(self.ArtisanLCD())
             self.extraLCDlabel1.append(QLabel())
             self.extraLCDframe2.append(QFrame())
-            self.extraLCD2.append(QLCDNumber())
+            self.extraLCD2.append(self.ArtisanLCD())
             self.extraLCDlabel2.append(QLabel())
-            self.extraLCD1[i].setSegmentStyle(2)
-            self.extraLCD1[i].setFrameStyle(QFrame.Plain)
-            self.extraLCD1[i].setMinimumSize(80,30)
-            self.extraLCD1[i].display("0.0")        
             self.extraLCDframe1[i].setVisible(False)
-            self.extraLCD2[i].setSegmentStyle(2)
-            self.extraLCD2[i].setFrameStyle(QFrame.Plain)
-            self.extraLCD2[i].setMinimumSize(80,30)
-            self.extraLCD2[i].display("0.0")
+            if self.qmc.LCDdecimalplaces:
+                self.extraLCD1[i].display("0.0")        
+                self.extraLCD2[i].display("0.0")
+            else:
+                self.extraLCD1[i].display("0")        
+                self.extraLCD2[i].display("0")
             self.extraLCDframe2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
@@ -7048,10 +7060,12 @@ class ApplicationWindow(QMainWindow):
             #configure Labels
             self.extraLCDlabel1[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
-            self.extraLCDlabel1[i].setText("<big><b>" + string1 + "</b></big>")
+#            self.extraLCDlabel1[i].setText("<big><b>" + string1 + "</b></big>")
             self.extraLCDlabel1[i].setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
-            self.extraLCDlabel2[i].setText("<big><b>" + string2 + "</b></big>")
+ #           self.extraLCDlabel2[i].setText("<big><b>" + string2 + "</b></big>")
             self.extraLCDlabel2[i].setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+
+            
 
         # Stores messages up to 500
         self.messagehist = []
@@ -7462,6 +7476,48 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
     
+    def setLCDsDigitCount(self,n):
+        self.lcd2.setDigitCount(n)
+        self.lcd2.setMinimumWidth(n*16)
+        self.lcd2.setMaximumWidth(n*16)
+        self.lcd3.setDigitCount(n)
+        self.lcd3.setMinimumWidth(n*16)
+        self.lcd3.setMaximumWidth(n*16)
+        self.lcd4.setDigitCount(n)
+        self.lcd4.setMinimumWidth(n*16)
+        self.lcd4.setMaximumWidth(n*16)
+        self.lcd5.setDigitCount(n)
+        self.lcd5.setMinimumWidth(n*16)
+        self.lcd5.setMaximumWidth(n*16)
+        self.lcd6.setDigitCount(n)
+        self.lcd6.setMinimumWidth(n*16)
+        self.lcd6.setMaximumWidth(n*16)
+        self.lcd7.setDigitCount(n)
+        self.lcd7.setMinimumWidth(n*16)
+        self.lcd7.setMaximumWidth(n*16)
+        for i in range(self.nLCDS):
+            self.extraLCD1[i].setDigitCount(n)
+            self.extraLCD1[i].setMinimumWidth(n*16)
+            self.extraLCD1[i].setMaximumWidth(n*16)
+            self.extraLCD2[i].setDigitCount(n)
+            self.extraLCD2[i].setMinimumWidth(n*16)
+            self.extraLCD2[i].setMaximumWidth(n*16)
+            
+    def ArtisanLCD(self):
+        lcd = QLCDNumber()
+        lcd.setSegmentStyle(2)
+        lcd.setFrameStyle(QFrame.Plain)
+        lcd.setMinimumHeight(35)
+        if self.qmc.LCDdecimalplaces:
+            lcd.setDigitCount(5) # default is 5
+            lcd.setMinimumWidth(5*16)     
+            lcd.setMaximumWidth(5*16)
+        else:
+            lcd.setDigitCount(3) # default is 5
+            lcd.setMinimumWidth(3*16)
+            lcd.setMaximumWidth(3*16)
+        return lcd
+        
     # set slider focus to Qt.StrongFocus to allow keyboard control and
     # Qt.NoFocus to deactivate it
     def setSliderFocusPolicy(self,focus):
@@ -7698,9 +7754,13 @@ class ApplicationWindow(QMainWindow):
         LCDbox = QVBoxLayout()
         LCDbox.setSpacing(0)
         LCDbox.addWidget(label)
-        LCDbox.addWidget(lcd)
+        LCDhBox = QHBoxLayout()
+        LCDhBox.addStretch()
+        LCDhBox.addWidget(lcd)
+        LCDbox.addLayout(LCDhBox)
+        LCDhBox.setContentsMargins(0, 0, 0, 0)
         LCDbox.setContentsMargins(0, 0, 0, 0)
-        lcdframe.setContentsMargins(0, 10, 0, 5)
+        lcdframe.setContentsMargins(0, 10, 0, 3)
         lcdframe.setLayout(LCDbox)
         return lcdframe
 
@@ -8035,7 +8095,11 @@ class ApplicationWindow(QMainWindow):
             aw.LCD7frame.setVisible(True)
         else:
             aw.LCD6frame.setVisible(False) 
-            aw.LCD7frame.setVisible(False)
+            aw.LCD7frame.setVisible(False)                    
+        if self.qmc.LCDdecimalplaces:
+            self.setLCDsDigitCount(5)         
+        else:
+            self.setLCDsDigitCount(3)
 
     def enableEditMenus(self):
         self.fileLoadAction.setEnabled(True) # open
@@ -9872,9 +9936,9 @@ class ApplicationWindow(QMainWindow):
                     weightout = weightout * 1000.0
                 din = (weightin / volumein) 
                 dout = (weightout / volumeout)
-            if din > 1:
+            if din > 0.:
                 computedProfile["green_density"] = self.float2float(din)
-            if din > 1:
+            if dout > 0.:
                 computedProfile["roasted_density"] = self.float2float(dout)
                 
             if (aw.qmc.density[0] != 0.0 and aw.qmc.density[2] != 0.0):
@@ -10350,6 +10414,7 @@ class ApplicationWindow(QMainWindow):
             self.qmc.DeltaETflag = settings.value("DeltaET",self.qmc.DeltaETflag).toBool()
             self.qmc.DeltaBTflag = settings.value("DeltaBT",self.qmc.DeltaBTflag).toBool()
             self.qmc.deltafilter = settings.value("deltafilter",self.qmc.deltafilter).toInt()[0]
+            self.qmc.LCDdecimalplaces = settings.value("LCDdecimalplaces",self.qmc.LCDdecimalplaces).toInt()[0]
             if settings.contains("DeltaETlcd"):
                 self.qmc.DeltaETlcdflag = settings.value("DeltaETlcd",self.qmc.DeltaETlcdflag).toBool()
             if settings.contains("DeltaBTlcd"):
@@ -11010,6 +11075,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaETlcd",self.qmc.DeltaETlcdflag)
             settings.setValue("DeltaBTlcd",self.qmc.DeltaBTlcdflag)
             settings.setValue("deltafilter",self.qmc.deltafilter)
+            settings.setValue("LCDdecimalplaces",self.qmc.LCDdecimalplaces)
             settings.endGroup()
             settings.setValue("curvefilter",self.qmc.curvefilter)
             settings.setValue("ETcurve",self.qmc.ETcurve)
@@ -11358,14 +11424,14 @@ class ApplicationWindow(QMainWindow):
             if i < aw.nLCDS:
                 if self.extraLCDvisibility1[i]:
                     if i < len(self.qmc.extraname1):
-                        self.extraLCDlabel1[i].setText("<b>" + self.qmc.extraname1[i] + "</b>")
+                        self.extraLCDlabel1[i].setText("<big><b>" + self.qmc.extraname1[i] + "</b></big>")
                     self.extraLCDframe1[i].setVisible(True)
                     self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
                 else:
                     self.extraLCDframe1[i].setVisible(False)
                 if self.extraLCDvisibility2[i]:
                     if i < len(self.qmc.extraname2):
-                        self.extraLCDlabel2[i].setText("<b>" + self.qmc.extraname2[i] + "</b>")
+                        self.extraLCDlabel2[i].setText("<big><b>" + self.qmc.extraname2[i] + "</b></big>")
                     self.extraLCDframe2[i].setVisible(True)
                     self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
                 else:
@@ -11405,8 +11471,9 @@ class ApplicationWindow(QMainWindow):
                 painter.drawImage(0, 0, image)
 
     def htmlReport(self):
-        rcParams['path.effects'] = []
-        HTML_REPORT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
+        try:
+            rcParams['path.effects'] = []
+            HTML_REPORT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -11582,170 +11649,176 @@ $cupping_notes
 </body>
 </html>
         """
-        beans = cgi.escape(self.qmc.beans)
-        if len(beans) > 43:
-            beans = beans[:41] + "&hellip;"
+            beans = cgi.escape(self.qmc.beans)
+            if len(beans) > 43:
+                beans = beans[:41] + "&hellip;"
+                
+            cp = aw.computedProfileInformation()
             
-        cp = aw.computedProfileInformation()
-        
-        if "CHARGE_ET" in cp and "CHARGE_BT" in cp:
-            if self.qmc.mode == "F":
-                charge = "BT %.0fF <br/>ET %.0fF"%(cp["CHARGE_BT"],cp["CHARGE_ET"])
+            if "CHARGE_ET" in cp and "CHARGE_BT" in cp:
+                if self.qmc.mode == "F":
+                    charge = "BT %.0fF <br/>ET %.0fF"%(cp["CHARGE_BT"],cp["CHARGE_ET"])
+                else:
+                    charge = "BT %.0f&deg;C <br/>ET %.0f&deg;C"%(cp["CHARGE_BT"],cp["CHARGE_ET"])
             else:
-                charge = "BT %.0f&deg;C <br/>ET %.0f&deg;C"%(cp["CHARGE_BT"],cp["CHARGE_ET"])
-        else:
-            charge = "--"
-        dryphase, midphase, finishphase, coolphase = self.phases2html(cp)
-        etbta = "--"
-        if "total_ts" in cp and cp["total_ts"] != 0:
-            etbta = "%d %sm"%(cp["total_ts"],self.qmc.mode) 
-            if "total_ts_ET" in cp and "total_ts_BT" in cp:
-                etbta += " [%d-%d]"%(cp["total_ts_ET"],cp["total_ts_BT"])
-        tmpdir = str(QDir.tempPath() + "/")
-        graph_image = "roastlog-graph"
-        if platf == 'Darwin':
-            graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
-            try:
-                os.remove(graph_image)
-            except OSError:
-                pass
-            self.qmc.fig.savefig(graph_image)
-        else:
-            image = QPixmap.grabWidget(aw.qmc).toImage()
-#            #resize GRAPH image to 650 pixels width
-#            image = image.scaledToWidth(650,1)
-            #save GRAPH image
-            graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
-            try:
-                os.remove(graph_image)
-            except OSError:
-                pass
-            image.save(graph_image)
-        #add some random number to force HTML reloading
-        graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
-        #obtain flavor chart image
-        self.qmc.flavorchart()
-        flavor_image = "roastlog-flavor"
-        if platf == 'Darwin':
-            flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".svg"))
-            try:
-                os.remove(flavor_image)
-            except OSError:
-                pass
-            self.qmc.fig.savefig(flavor_image)
-        else:
-            image = QPixmap.grabWidget(aw.qmc).toImage()
-            #resize FLAVOR image to 550 pixels width
-#            image = image.scaledToWidth(550,1)
-            #save GRAPH image
-            flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".png"))
-            try:
-                os.remove(flavor_image)
-            except OSError:
-                pass
-            image.save(flavor_image)
-        flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
-        #return screen to GRAPH profile mode
-        self.qmc.redraw(recomputeAllDeltas=False)
-        ror = "--"
-        if "total_ror" in cp:
-            ror = "%d%s"%(cp["total_ror"],QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
-        if "set_density" in cp:
-            density = "%.1fg/l (set)"%cp["set_density"]
-        else:
-            density = "--"
-        if  self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
-            weight = self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],cp["weight_loss"])
-        else:
-            weight = "--"
-        if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0:
-            volume = self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp["volume_gain"])
-        else:
-            volume = "--"
-        if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
-            degree = self.roast_degree(cp["weight_loss"])
+                charge = "--"
+            dryphase, midphase, finishphase, coolphase = self.phases2html(cp)
+            etbta = "--"
+            if "total_ts" in cp and cp["total_ts"] != 0:
+                etbta = "%d %sm"%(cp["total_ts"],self.qmc.mode) 
+                if "total_ts_ET" in cp and "total_ts_BT" in cp:
+                    etbta += " [%d-%d]"%(cp["total_ts_ET"],cp["total_ts_BT"])
+            tmpdir = str(QDir.tempPath() + "/")
+            graph_image = "roastlog-graph"
+            if platf == 'Darwin':
+                graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
+                try:
+                    os.remove(graph_image)
+                except OSError:
+                    pass
+                self.qmc.fig.savefig(graph_image)
+            else:
+                image = QPixmap.grabWidget(aw.qmc).toImage()
+    #            #resize GRAPH image to 650 pixels width
+    #            image = image.scaledToWidth(650,1)
+                #save GRAPH image
+                graph_image = u(QDir(tmpdir).filePath(graph_image + ".png"))
+                try:
+                    os.remove(graph_image)
+                except OSError:
+                    pass
+                image.save(graph_image)
+            #add some random number to force HTML reloading
+            graph_image = graph_image + "?dummy=" + str(int(libtime.time()))
+            #obtain flavor chart image
+            self.qmc.flavorchart()
+            flavor_image = "roastlog-flavor"
+            if platf == 'Darwin':
+                flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".svg"))
+                try:
+                    os.remove(flavor_image)
+                except OSError:
+                    pass
+                self.qmc.fig.savefig(flavor_image)
+            else:
+                image = QPixmap.grabWidget(aw.qmc).toImage()
+                #resize FLAVOR image to 550 pixels width
+    #            image = image.scaledToWidth(550,1)
+                #save GRAPH image
+                flavor_image = u(QDir(tmpdir).filePath(flavor_image + ".png"))
+                try:
+                    os.remove(flavor_image)
+                except OSError:
+                    pass
+                image.save(flavor_image)
+            flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
+            #return screen to GRAPH profile mode
+            self.qmc.redraw(recomputeAllDeltas=False)
+            ror = "--"
+            if "total_ror" in cp:
+                ror = "%d%s"%(cp["total_ror"],QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
             if "set_density" in cp:
-                density = "%.1fg/l (set)<br/>%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["set_density"],cp["green_density"],cp["roasted_density"])
+                density = "%.1fg/l (set)"%cp["set_density"]
             else:
-                density = "%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"])
-        else:
-            degree = "--"
-        humidity = ""
-        if "bag_humidity" in cp:
-            humidity = "%d%%"%cp["bag_humidity"]
-            if "bag_temperature" in cp:
-                humidity += " at %d%s"%(cp["bag_temperature"],self.qmc.mode)
-            humidity += " (bag)"
-        if "ambient_humidity" in cp:
-            if humidity != "":
-                humidity += "<br/>"
-            humidity += "%d%%"%cp["ambient_humidity"]
-            if "ambient_temperature" in cp:
-                humidity += " at %d%s"%(cp["ambient_temperature"],self.qmc.mode)
-            humidity += " (ambient)"
-        if len(humidity) == 0:
-            humidity = "--"
-        if self.qmc.whole_color or self.qmc.ground_color:
-            color = str(self.qmc.whole_color) + "/" + str(self.qmc.ground_color)
-            if self.qmc.color_system_idx:
-                color = color + " (" + self.qmc.color_systems[self.qmc.color_system_idx] + ")"
-        else:
-            color = "--"
-        html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
-            title=cgi.escape(self.qmc.title),
-            datetime=u(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
-            beans=beans,
-            weight=weight,
-            degree=degree,
-            volume=volume,
-            roaster=cgi.escape(self.qmc.roastertype),
-            operator=cgi.escape(self.qmc.operator),
-            cup=str(self.cuppingSum()),
-            color=color,
-            charge=charge,            
-            size=("--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm"),
-            density=density,
-            humidity=humidity,
-            TP=self.event2html(cp,"TP_time","TP_BT"),
-            DRY=self.event2html(cp,"DRY_time","DRY_BT"),
-            FCs=self.event2html(cp,"FCs_time","FCs_BT"),
-            FCe=self.event2html(cp,"FCe_time","FCe_BT"),
-            SCs=self.event2html(cp,"SCs_time","SCs_BT"),
-            SCe=self.event2html(cp,"SCe_time","SCe_BT"),
-            drop=self.event2html(cp,"DROP_time","DROP_BT"),
-            cool=self.event2html(cp,"COOL_time",None,"DROP_time"),
-            dry_phase=dryphase,
-            mid_phase=midphase,
-            finish_phase=finishphase,
-            cool_phase=coolphase,
-            ror= ror,
-            etbta=etbta,
-            roasting_notes=self.note2html(self.qmc.roastingnotes),
-            roast_attributes=self.roastattributes(),
-            graph_image=graph_image,
-            flavor_image=flavor_image,
-            specialevents=self.specialevents2html(),
-            cupping_notes=self.note2html(self.qmc.cuppingnotes))
-        f = None
-        try:              
-            filename = u(QDir(tmpdir).filePath("Roastlog.html"))
-            try:
-                os.remove(filename)
-            except OSError:
-                pass
-            f = codecs.open(filename, 'w', encoding='utf-8')
-            for i in range(len(html)):
-                f.write(html[i])
-            f.close()
-            full_path = "file:///" + filename
-            QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
-            
-        except IOError as e:
-            aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " htmlReport() %1").arg(str(e)))
-            return
-        finally:
-            if f:
+                density = "--"
+            if  self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
+                weight = self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],cp["weight_loss"])
+            else:
+                weight = "--"
+            if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0:
+                volume = self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp["volume_gain"])
+            else:
+                volume = "--"
+            if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
+                degree = self.roast_degree(cp["weight_loss"])
+                if "set_density" in cp:
+                    if "green_density" in cp and "roasted_density" in cp:
+                        density = "%.1fg/l (set)<br/>%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["set_density"],cp["green_density"],cp["roasted_density"])
+                elif "green_density" in cp and "roasted_density" in cp:
+                    density = "%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"])
+            else:
+                degree = "--"
+            humidity = ""
+            if "bag_humidity" in cp:
+                humidity = "%d%%"%cp["bag_humidity"]
+                if "bag_temperature" in cp:
+                    humidity += " at %d%s"%(cp["bag_temperature"],self.qmc.mode)
+                humidity += " (bag)"
+            if "ambient_humidity" in cp:
+                if humidity != "":
+                    humidity += "<br/>"
+                humidity += "%d%%"%cp["ambient_humidity"]
+                if "ambient_temperature" in cp:
+                    humidity += " at %d%s"%(cp["ambient_temperature"],self.qmc.mode)
+                humidity += " (ambient)"
+            if len(humidity) == 0:
+                humidity = "--"
+            if self.qmc.whole_color or self.qmc.ground_color:
+                color = str(self.qmc.whole_color) + "/" + str(self.qmc.ground_color)
+                if self.qmc.color_system_idx:
+                    color = color + " (" + self.qmc.color_systems[self.qmc.color_system_idx] + ")"
+            else:
+                color = "--"
+            html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
+                title=cgi.escape(self.qmc.title),
+                datetime=u(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
+                beans=beans,
+                weight=weight,
+                degree=degree,
+                volume=volume,
+                roaster=cgi.escape(self.qmc.roastertype),
+                operator=cgi.escape(self.qmc.operator),
+                cup=str(self.cuppingSum()),
+                color=color,
+                charge=charge,            
+                size=("--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm"),
+                density=density,
+                humidity=humidity,
+                TP=self.event2html(cp,"TP_time","TP_BT"),
+                DRY=self.event2html(cp,"DRY_time","DRY_BT"),
+                FCs=self.event2html(cp,"FCs_time","FCs_BT"),
+                FCe=self.event2html(cp,"FCe_time","FCe_BT"),
+                SCs=self.event2html(cp,"SCs_time","SCs_BT"),
+                SCe=self.event2html(cp,"SCe_time","SCe_BT"),
+                drop=self.event2html(cp,"DROP_time","DROP_BT"),
+                cool=self.event2html(cp,"COOL_time",None,"DROP_time"),
+                dry_phase=dryphase,
+                mid_phase=midphase,
+                finish_phase=finishphase,
+                cool_phase=coolphase,
+                ror= ror,
+                etbta=etbta,
+                roasting_notes=self.note2html(self.qmc.roastingnotes),
+                roast_attributes=self.roastattributes(),
+                graph_image=graph_image,
+                flavor_image=flavor_image,
+                specialevents=self.specialevents2html(),
+                cupping_notes=self.note2html(self.qmc.cuppingnotes))
+            f = None
+            try:              
+                filename = u(QDir(tmpdir).filePath("Roastlog.html"))
+                try:
+                    os.remove(filename)
+                except OSError:
+                    pass
+                f = codecs.open(filename, 'w', encoding='utf-8')
+                for i in range(len(html)):
+                    f.write(html[i])
                 f.close()
+                full_path = "file:///" + filename
+                QDesktopServices.openUrl(QUrl(full_path, QUrl.TolerantMode)) 
+                
+            except IOError as e:
+                aw.qmc.adderror((QApplication.translate("Error Message", "IO Error:",None, QApplication.UnicodeUTF8) + " htmlReport() %1").arg(str(e)))
+            finally:
+                if f:
+                    f.close()
+        except Exception as e:
+#                import traceback
+#                traceback.print_exc(file=sys.stdout)
+                _, _, exc_tb = sys.exc_info()
+                aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " htmlReport() %1").arg(str(e)),exc_tb.tb_lineno)
+
                 
     # returns a string with all the activated roast attributes
     def roastattributes(self):
@@ -13406,12 +13479,17 @@ class HUDDlg(ArtisanDialog):
         self.DeltaETlcd.setChecked(aw.qmc.DeltaETlcdflag)
         self.DeltaBTlcd = QCheckBox(QApplication.translate("CheckBox", "DeltaBT",None, QApplication.UnicodeUTF8))
         self.DeltaBTlcd.setChecked(aw.qmc.DeltaBTlcdflag)
+        self.DecimalPlaceslcd = QCheckBox(QApplication.translate("CheckBox", "Decimal Places",None, QApplication.UnicodeUTF8))
+        self.DecimalPlaceslcd.setChecked(aw.qmc.LCDdecimalplaces)
         self.connect(self.DeltaETlcd,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaETlcd(i))         #toggle
         self.connect(self.DeltaBTlcd,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDeltaBTlcd(i))         #toggle
+        self.connect(self.DecimalPlaceslcd,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDecimalPlaceslcd(i))         #toggle
         lcdsLayout = QHBoxLayout()
         lcdsLayout.addWidget(self.DeltaETlcd)
         lcdsLayout.addSpacing(15)
         lcdsLayout.addWidget(self.DeltaBTlcd)
+        lcdsLayout.addSpacing(15)
+        lcdsLayout.addWidget(self.DecimalPlaceslcd)
         lcdsLayout.addStretch()
         sensitivityLayout = QHBoxLayout()
         sensitivityLayout.addWidget(curvefilterlabel)
@@ -14169,7 +14247,15 @@ class HUDDlg(ArtisanDialog):
     def changeDeltaET(self,i):
         aw.qmc.DeltaETflag = not aw.qmc.DeltaETflag
         aw.qmc.redraw(recomputeAllDeltas=True)
-
+        
+    def changeDecimalPlaceslcd(self,i):
+        if self.DecimalPlaceslcd.isChecked():
+            aw.qmc.LCDdecimalplaces = 1   
+            aw.setLCDsDigitCount(5)         
+        else:
+            aw.qmc.LCDdecimalplaces = 0
+            aw.setLCDsDigitCount(3)
+        
     def changeDeltaBT(self,i):
         aw.qmc.DeltaBTflag = not aw.qmc.DeltaBTflag
         aw.qmc.redraw(recomputeAllDeltas=True)
@@ -14493,7 +14579,7 @@ class editGraphDlg(ArtisanDialog):
         #Beans
         beanslabel = QLabel("<b>" + u(QApplication.translate("Label", "Beans",None, QApplication.UnicodeUTF8)) + "</b>")
         self.beansedit = QTextEdit()
-        self.beansedit.setMaximumHeight(60)
+        self.beansedit.setMaximumHeight(45)
         if aw.qmc.beans is not None:
             self.beansedit.setPlainText(QString(aw.qmc.beans))
         #roaster
@@ -14760,6 +14846,7 @@ class editGraphDlg(ArtisanDialog):
         self.connect(updateAmbientTemp, SIGNAL("clicked()"),self.updateAmbientTemp)
         ##### LAYOUTS
         timeLayout = QGridLayout()
+        timeLayout.setVerticalSpacing(3)
         timeLayout.addWidget(chargelabel,0,0)
         timeLayout.addWidget(drylabel,0,1)
         timeLayout.addWidget(Cstartlabel,0,2)
@@ -14829,6 +14916,7 @@ class editGraphDlg(ArtisanDialog):
         volumeLayout.addWidget(self.volumepercentlabel)
         volumeLayout.addStretch()
         densityLayout = QHBoxLayout()
+        densityLayout.setContentsMargins(0,0,0,0)
         densityLayout.setSpacing(0)
         densityLayout.addWidget(bean_density_label)
         densityLayout.addSpacing(13)
@@ -14845,6 +14933,7 @@ class editGraphDlg(ArtisanDialog):
         densityLayout.addWidget(self.standarddensitylabel)
         densityLayout.addStretch()
         beansizeLayout = QHBoxLayout()
+        beansizeLayout.setContentsMargins(0,0,0,0)
         beansizeLayout.setSpacing(0)
         beansizeLayout.addWidget(bean_size_label)
         beansizeLayout.addSpacing(15)
@@ -14918,10 +15007,14 @@ class editGraphDlg(ArtisanDialog):
         okLayout.addWidget(saveButton,1)
         okLayout.setContentsMargins(0, 0, 0, 0) # left, top, right, bottom
         timeLayoutBox = QHBoxLayout()
+#        timeLayout.setSpacing(3)
+#        timeLayout.setContentsMargins(0, 0, 0, 0)
         timeLayoutBox.addLayout(timeLayout)
         timeLayoutBox.addStretch()
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(timeLayoutBox)
+#        mainLayout.setSpacing(3)
+        mainLayout.setContentsMargins(3, 3, 3, 3)
         timeGroupLayout = QGroupBox(QApplication.translate("GroupBox", "Times",None, QApplication.UnicodeUTF8))
         timeGroupLayout.setLayout(mainLayout)
         eventbuttonLayout = QHBoxLayout()
@@ -14931,14 +15024,18 @@ class editGraphDlg(ArtisanDialog):
         eventbuttonLayout.addWidget(self.neweventTableButton)
         #tab 1
         self.tab1aLayout = QVBoxLayout()
+        self.tab1aLayout.setMargin(0)
+        self.tab1aLayout.setSpacing(2)
         self.tab1aLayout.addWidget(timeGroupLayout)
         self.tab1aLayout.addLayout(textLayout)
         self.tab1aLayout.addLayout(weightLayout)
         self.tab1aLayout.addLayout(volumeLayout)
         self.tab1aLayout.addLayout(densityLayout)
-        self.tab1aLayout.addLayout(beansizeLayout)
-        self.tab1aLayout.addLayout(colorLayout)
         tab1bLayout = QVBoxLayout()
+        tab1bLayout.setMargin(0)
+        tab1bLayout.setSpacing(2)
+        tab1bLayout.addLayout(beansizeLayout)
+        tab1bLayout.addLayout(colorLayout)
         tab1bLayout.addLayout(humidityLayout)
         tab1bLayout.addLayout(ambientLayout)
         tab1bLayout.addStretch()
@@ -14971,6 +15068,7 @@ class editGraphDlg(ArtisanDialog):
         tab4Layout.setMargin(0)
         #tabwidget
         self.TabWidget = QTabWidget()
+        self.TabWidget.setContentsMargins(0,0,0,0)
         C1Widget = QWidget()
         C1Widget.setLayout(tab1Layout)
         self.TabWidget.addTab(C1Widget,QApplication.translate("Tab", "General",None, QApplication.UnicodeUTF8))
@@ -14987,7 +15085,8 @@ class editGraphDlg(ArtisanDialog):
         totallayout = QVBoxLayout()
         totallayout.addWidget(self.TabWidget)
         totallayout.addLayout(okLayout)
-        totallayout.setMargin(10)
+#        totallayout.setMargin(5)
+        totallayout.setContentsMargins(10,10,10,0)
         #totallayout.addStretch()
         #totallayout.addLayout(buttonsLayout)
         self.setLayout(totallayout)
@@ -15329,7 +15428,7 @@ class editGraphDlg(ArtisanDialog):
 
     def calculated_density(self):
         din, dout = self.calc_density()
-        if din > 1 and dout > 1:
+        if din > 0. and dout > 0.:
             self.calculateddensitylabel.setText(QApplication.translate("Label","                 Density in: %1  g/l   =>   Density out: %2 g/l", None, QApplication.UnicodeUTF8).arg(din).arg(dout))
             self.tab1aLayout.addWidget(self.calculateddensitylabel)
         else:
@@ -19743,8 +19842,6 @@ class serialport(object):
                 BT = (int(str(dialogx.btEdit.text())) * 10)/10.
             except:
                 BT = 0
-            aw.lcd2.display(ET)
-            aw.lcd3.display(BT)
             return ET, BT
         else:
             return -1, -1
