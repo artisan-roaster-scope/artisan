@@ -312,7 +312,7 @@ class tgraphcanvas(FigureCanvas):
     def __init__(self,parent):
 
         #default palette of colors
-        self.palette = {"background":'white',"grid":'green',"ylabel":'black',"xlabel":'black',"title":'black',"rect1":'green',
+        self.palette = {"background":'white',"grid":'green',"ylabel":'0.20',"xlabel":'0.20',"title":'0.20',"rect1":'green',
                         "rect2":'orange',"rect3":'#996633',"rect4":'lightblue',"et":'red',"bt":'#00007f',"deltaet":'orange',
                         "deltabt":'blue',"markers":'black',"text":'black',"watermarks":'yellow',"Cline":'blue'}
 
@@ -2191,8 +2191,8 @@ class tgraphcanvas(FigureCanvas):
             rcParams['ytick.major.size'] = 8
             rcParams['ytick.major.width'] = 1.5
             rcParams['ytick.minor.width'] = 1
-            rcParams['xtick.color'] = '0.25'
-            rcParams['ytick.color'] = '0.25'
+            rcParams['xtick.color'] = self.palette["xlabel"]
+            rcParams['ytick.color'] = self.palette["ylabel"]
             
             self.fig.clf()   #wipe out figure. keep_observers=False
 
@@ -2208,13 +2208,11 @@ class tgraphcanvas(FigureCanvas):
             fontprop_xlarge = aw.mpl_fontproperties.copy()            
             fontprop_xlarge.set_size("x-large")
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
-            if aw.qmc.flagstart:
+            if aw.qmc.flagon:
                 self.ax.set_ylabel("")
-            else:
-                self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
-            if aw.qmc.flagstart:
                 self.ax.set_xlabel("")
             else:
+                self.ax.set_ylabel(self.mode,color=self.palette["ylabel"],rotation=0,labelpad=10,fontproperties=fontprop_large)
                 self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),color = self.palette["xlabel"],fontproperties=fontprop_large)
             self.ax.set_title(aw.arabicReshape(self.title), color=self.palette["title"],fontproperties=fontprop_xlarge)
 #            self.fig.patch.set_facecolor(self.palette["background"]) # facecolor='lightgrey'
@@ -2271,6 +2269,12 @@ class tgraphcanvas(FigureCanvas):
                     which='both',
                     right='off',
                     labelright='off') 
+                    
+                    
+            self.ax.spines['top'].set_color("0.40")
+            self.ax.spines['bottom'].set_color("0.40")
+            self.ax.spines['left'].set_color("0.40")
+            self.ax.spines['right'].set_color("0.40")
                     
             self.ax.yaxis.set_major_locator(ticker.MultipleLocator(self.ygrid))
             self.ax.yaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -2741,9 +2745,14 @@ class tgraphcanvas(FigureCanvas):
                         aw.valueEdit.setText("")
                     aw.eNumberSpinBox.setValue(Nevents)
 
-            #update Y label colors
+            #update label colors
+            for label in self.ax.xaxis.get_ticklabels():
+                label.set_color(self.palette["xlabel"])
             for label in self.ax.yaxis.get_ticklabels():
                 label.set_color(self.palette["ylabel"])
+            if two_ax_mode:
+                for label in self.delta_ax.yaxis.get_ticklabels():
+                    label.set_color(self.palette["ylabel"])
 
             #write legend
             if self.legendloc:
@@ -3230,7 +3239,6 @@ class tgraphcanvas(FigureCanvas):
         aw.lowerbuttondialog.setVisible(True)
         aw.applyStandardButtonVisibility()
         if aw.qmc.phasesLCDflag:
-            aw.ntb.hide()
             aw.phasesLCDs.show()
         aw.update_minieventline_visibility()
         aw.qmc.ax.set_xlabel("")
@@ -3256,11 +3264,10 @@ class tgraphcanvas(FigureCanvas):
         aw.sendmessage(QApplication.translate("Message","Scope recording stopped", None, QApplication.UnicodeUTF8))
         aw.button_2.setText(QApplication.translate("Button", "START",None, QApplication.UnicodeUTF8))
         aw.lowerbuttondialog.setVisible(False)
-        aw.ntb.show()
         aw.phasesLCDs.hide()
         aw.hideEventsMinieditor()
         if aw.qmc.autosaveflag and aw.qmc.autosavepath:
-            aw.qmc.automaticsave()
+            aw.automaticsave()
             
 
     #Turns START/STOP flag self.flagon to read and plot. Called from push button_2.
@@ -5914,7 +5921,7 @@ class SampleThread(QThread):
                     # check for TP event if already CHARGEed and not yet recognized
                     if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and self.checkTPalarmtime():
                         aw.qmc.autoTPIdx = 1
-                        aw.qmc.TPalarmtimeindex = aw.findTP() #len(aw.qmc.timex)-1
+                        aw.qmc.TPalarmtimeindex = aw.findTP()
                     #check for autoDRY:
                     if aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
                         # after TP (if DRY event not yet set) check for BT exceeding Dry-max as specified in the phases dialog
@@ -6002,7 +6009,9 @@ class SampleThread(QThread):
                 aw.qmc.resetlines()
                 #add to plot a vertical time line
                 aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
-                # also in the manual case we check for TP
+                # also in the manual case we check for TP, however we have to release the semaphore before
+                if aw.qmc.samplingsemaphore.available() < 1:
+                    aw.qmc.samplingsemaphore.release(1)
                 if local_flagstart:
                     #check alarms 
                     # check for TP event if already CHARGEed and not yet recognized
@@ -6682,7 +6691,7 @@ class ApplicationWindow(QMainWindow):
 
         #create a Label object to display program status information
         self.messagelabel = QLabel()
-        self.messagelabel.setIndent(10)
+        self.messagelabel.setIndent(2)
 
         if locale == "es":
             self.pushbuttonstyles = {"DISABLED":"QPushButton {font-size: 12pt; font-weight: normal; color: darkgrey; background-color: lightgrey}",
@@ -7227,61 +7236,52 @@ class ApplicationWindow(QMainWindow):
         
         # TP
         self.TPlabel = QLabel()
-        self.TPlabel.setText("<b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")
+        self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
         self.TPlcd = QLCDNumber()
-        self.TPlcd.display("--:--")
+        self.TPlcd.display("-:--")
         self.TPlcdFrame = self.makePhasesLCDbox(self.TPlabel,self.TPlcd)
         
         # TP2DRY
-        self.TP2DRYlabel = QLabel()
+        self.TP2DRYlabel = QLabel("")
         TP2DRYlayout = QHBoxLayout()
         TP2DRYlayout.addWidget(self.TP2DRYlabel)
+        TP2DRYlayout.setContentsMargins(3,0,3,0)
         TP2DRYframe = QFrame()
         TP2DRYframe.setLayout(TP2DRYlayout)
-        TP2DRYframe.setMinimumWidth(50)
         
         # DRY
         self.DRYlabel = QLabel()
-        self.DRYlabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b><")
+        self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b></small>")
         self.DRYlcd = QLCDNumber()
-        self.DRYlcd.display("--:--")
+        self.DRYlcd.display("-:--")
         self.DRYlcdFrame = self.makePhasesLCDbox(self.DRYlabel,self.DRYlcd)
         
         # DRY2FCs
-        self.DRY2FCslabel = QLabel()
+        self.DRY2FCslabel = QLabel("")
         DRY2FCslayout = QHBoxLayout()
         DRY2FCslayout.addWidget(self.DRY2FCslabel)
+        DRY2FCslayout.setContentsMargins(3,0,3,0)
         DRY2FCsframe = QFrame()
         DRY2FCsframe.setLayout(DRY2FCslayout)
-        DRY2FCsframe.setMinimumWidth(50)
         
         # FCs
         self.FCslabel = QLabel()
-        self.FCslabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b>")
+        self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b></small>")
         self.FCslcd = QLCDNumber()
-        self.FCslcd.display("--:--")
+        self.FCslcd.display("-:--")
         self.FCslcdFrame = self.makePhasesLCDbox(self.FCslabel,self.FCslcd)
         
         self.phasesLCDs = QFrame()
         self.phasesLCDs.setContentsMargins(0, 0, 0, 0)
         phasesLCDlayout = QHBoxLayout()
         phasesLCDlayout.addWidget(self.TPlcdFrame)
-        phasesLCDlayout.addStretch()
-        phasesLCDlayout.addSpacing(15)
         phasesLCDlayout.addWidget(TP2DRYframe)
-        phasesLCDlayout.addSpacing(15)
-        phasesLCDlayout.addStretch()
         phasesLCDlayout.addWidget(self.DRYlcdFrame)
-        phasesLCDlayout.addStretch()
-        phasesLCDlayout.addSpacing(15)
         phasesLCDlayout.addWidget(DRY2FCsframe)
-        phasesLCDlayout.addSpacing(15)
-        phasesLCDlayout.addStretch()
         phasesLCDlayout.addWidget(self.FCslcdFrame)
         phasesLCDlayout.setContentsMargins(0, 0, 0, 0)
         phasesLCDlayout.setSpacing(0)
         self.phasesLCDs.setLayout(phasesLCDlayout)
-        self.phasesLCDs.setMinimumWidth(480)
         self.phasesLCDs.hide()
         
         #level 1
@@ -7548,12 +7548,16 @@ class ApplicationWindow(QMainWindow):
 #                        self.mpl_fontproperties = mpl.font_manager.FontProperties()         
             except:
                 pass
-        elif self.qmc.graphfont == 1:
+        # no Comic on Linux!
+        elif self.qmc.graphfont == 1 or platf == "Linux":
             # font Humor selected
             rcParams['font.size'] = 16.0
-            rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
+            if platf == 'Linux':
+                rcParams['font.family'] = ['Humor Sans']
+            else:
+                rcParams['font.family'] = ['Humor Sans', 'Comic Sans MS']
             aw.set_mpl_fontproperties(u(self.getResourcePath() + "Humor-Sans.ttf"))
-        elif self.qmc.graphfont == 2:
+        elif self.qmc.graphfont == 2 and not platf == "Linux":
             # font Comic selected
             rcParams['font.size'] = 12.0
             rcParams['font.family'] = ['Comic Sans MS','Humor Sans']
@@ -7589,9 +7593,10 @@ class ApplicationWindow(QMainWindow):
     def makePhasesLCDbox(self,label,lcd):
         label.setAlignment(Qt.Alignment(Qt.AlignRight | Qt.AlignVCenter))
         lcd.setMinimumHeight(40)
-        lcd.setMinimumWidth(80)
+        lcd.setMinimumWidth(50)
         lcd.setSegmentStyle(2)
         lcd.setFrameStyle(QFrame.Plain)
+        lcd.setNumDigits(4)
         frame = QFrame()
         LCDHbox = QHBoxLayout()
         LCDHbox.addWidget(label)
@@ -7613,28 +7618,28 @@ class ApplicationWindow(QMainWindow):
                 # TP phase LCD
                 if self.qmc.TPalarmtimeindex:
                     # after TP
-                    self.TPlabel.setText("<b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")            
+                    self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
                     ts = tx - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                    self.TPlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
+                    self.TPlcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
                 else:
                     # before TP
-                    self.TPlcd.display(QString("--:--"))
+                    self.TPlcd.display(QString("-:--"))
                 
                 # DRY phase LCD
                 if self.qmc.timeindex[1]:
                     # after DRY
-                    self.DRYlabel.setText("<b>" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")         
+                    self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
                     ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
-                    self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
+                    self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
                     # TP2DRY
                     if self.qmc.TPalarmtimeindex:
                         t = self.qmc.timex[self.qmc.timeindex[1]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                        self.TP2DRYlabel.setText(QString(self.qmc.stringfromseconds(int(t))))
+                        self.TP2DRYlabel.setText(QString(self.qmc.stringfromseconds(int(t))[1:]))
                     else:
                         self.TP2DRYlabel.setText("")
                 else:
                     # before DRY
-                    self.DRYlabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b><")
+                    self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b></small>")
                     if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
                         # display expected time to reach DRY as defined in the background profile or the phases dialog
                         if self.qmc.background and self.qmc.timeindexB[1]:
@@ -7643,31 +7648,31 @@ class ApplicationWindow(QMainWindow):
                             drytarget = self.qmc.phases[1] # Drying max phases definition
                         if drytarget > self.qmc.temp2[-1]:
                             dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                            self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + dryexpectedtime))))
+                            self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + dryexpectedtime))[1:]))
                         else:
-                            self.DRYlcd.display(QString("--:--"))                        
+                            self.DRYlcd.display(QString("-:--"))                        
                     else:
-                        self.DRYlcd.display(QString("--:--"))
+                        self.DRYlcd.display(QString("-:--"))
                     self.TP2DRYlabel.setText("")
         
                 # FCs phase LCD  
                 if self.qmc.timeindex[2]:
                     # after FCs
-                    self.FCslabel.setText("<b>" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "&raquo;</b><")            
+                    self.FCslabel.setText("<small><b>" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
                     ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
-                    self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))))            
+                    self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))            
                     # DRY2FCs
                     if self.qmc.timeindex[1]:
                         t = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
-                        self.DRY2FCslabel.setText(QString(self.qmc.stringfromseconds(int(t))))
+                        self.DRY2FCslabel.setText(QString(self.qmc.stringfromseconds(int(t))[1:]))
                     else:
                         self.DRY2FCslabel.setText("")
                 else:
                     # before FCs
-                    self.FCslabel.setText("<b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b><")
+                    self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b></small>")
                     if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
-                        self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))))
+                        self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
                         # display expected time to reach FCs as defined in the background profile or the phases dialog
                         if self.qmc.background and self.qmc.timeindexB[2]:
                             fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
@@ -7676,11 +7681,11 @@ class ApplicationWindow(QMainWindow):
                             
                         if fcstarget > self.qmc.temp2[-1]:
                             fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                            self.FCslcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + fcsexpectedtime))))
+                            self.FCslcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + fcsexpectedtime))[1:]))
                         else:
-                            self.FCslcd.display(QString("--:--"))
+                            self.FCslcd.display(QString("-:--"))
                     else:
-                        self.FCslcd.display(QString("--:--"))
+                        self.FCslcd.display(QString("-:--"))
                     self.DRY2FCslabel.setText("")
         except Exception as e:            
 #            import traceback
@@ -7904,7 +7909,7 @@ class ApplicationWindow(QMainWindow):
         if eventtype < 4:  ## if eventtype == 4 we have an button event of type "--" that does not add an event
             if self.qmc.flagstart:
                 self.qmc.EventRecord(extraevent = ee)
-            value = (self.extraeventsvalues[ee] - 1)
+            value = (self.extraeventsvalues[ee] - 1) # TODO: why "-1" here??
             cmdvalue = int(round((self.eventsliderfactors[eventtype] * value) + self.eventslideroffsets[eventtype]))
             self.eventaction(self.extraeventsactions[ee],self.extraeventsactionstrings[ee].format(cmdvalue))
             # move corresponding slider to new value:
@@ -13466,9 +13471,14 @@ class HUDDlg(ArtisanDialog):
         # graph font
         fontlabel = QLabel(QApplication.translate("Label", "Font",None, QApplication.UnicodeUTF8))
         self.GraphFont = QComboBox()
-        self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None, QApplication.UnicodeUTF8),
-                                  QApplication.translate("ComboBox","Humor",None, QApplication.UnicodeUTF8),
-                                  QApplication.translate("ComboBox","Comic",None, QApplication.UnicodeUTF8)])
+        # no Comic on Linux!
+        if platf == "Linux":
+            self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None, QApplication.UnicodeUTF8),
+                                      QApplication.translate("ComboBox","Humor",None, QApplication.UnicodeUTF8)])
+        else:
+            self.GraphFont.addItems([QApplication.translate("ComboBox","Default",None, QApplication.UnicodeUTF8),
+                                      QApplication.translate("ComboBox","Humor",None, QApplication.UnicodeUTF8),
+                                      QApplication.translate("ComboBox","Comic",None, QApplication.UnicodeUTF8)])
         self.GraphFont.setCurrentIndex(aw.qmc.graphfont)
         self.connect(self.GraphFont,SIGNAL("currentIndexChanged(int)"),lambda i=self.GraphFont.currentIndex():self.changeGraphFont(i))
         graphLayout = QHBoxLayout()
@@ -28107,6 +28117,12 @@ def main():
                 aw.loadPalettes(u(argv_file))
     except Exception:
         pass
+        
+    if platf == 'Windows' and aw.appFrozen():
+        try:
+            sys.stderr = sys.stdout
+        except:
+            pass
 
     aw.show()
     #the following line is to trap numpy warnings that occure in the Cup Profile dialog if all values are set to 0
