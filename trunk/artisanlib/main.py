@@ -421,10 +421,7 @@ class tgraphcanvas(FigureCanvas):
         # default delay between readings in miliseconds
         self.default_delay = 3000 # default 3s
         self.delay = self.default_delay
-        if platf == "Windows":
-            self.min_delay = 3000
-        else:
-            self.min_delay = 1000
+        self.min_delay = 1000
 
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases_fahrenheit_defaults = [200,300,390,450]
@@ -5874,7 +5871,7 @@ class SampleThread(QThread):
                     #######   filter deltaBT deltaET
                     # decay smoothing
                     if aw.qmc.deltafilter:
-                        user_filter = (aw.qmc.deltafilter/2) # we use the one set by the user (+ 1) not to produce a hugh shift
+                        user_filter = int(aw.qmc.deltafilter/2) # we use the one set by the user (+ 1) not to produce a hugh shift
                         if length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
                             aw.qmc.rateofchange1 = numpy.average(aw.qmc.unfiltereddelta1[-user_filter:],weights=numpy.arange(1,user_filter+1))
                             aw.qmc.rateofchange2 = numpy.average(aw.qmc.unfiltereddelta2[-user_filter:],weights=numpy.arange(1,user_filter+1))
@@ -12304,6 +12301,9 @@ $cupping_notes
                 calSpinBox.value(),aw.qmc.min_delay/1000.,30.)
         if ok:
             self.qmc.delay = int(secondsdelay*1000.)
+            if self.qmc.delay <= self.qmc.min_delay + 1000:
+                QMessageBox.warning(self,QApplication.translate("Message", "Warning",None, QApplication.UnicodeUTF8),QApplication.translate("Message", "A tight sampling interval might lead to instability on some machines. We suggest a minimum of 3s.",None, QApplication.UnicodeUTF8))
+                
 
     def setcommport(self):
         dialog = comportDlg(self)
