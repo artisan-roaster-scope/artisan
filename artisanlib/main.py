@@ -1196,11 +1196,10 @@ class tgraphcanvas(FigureCanvas):
         try:
             if self.flagon:
                 if len(self.timex):
-                    lcdformat = "%."
                     if self.LCDdecimalplaces:
                         lcdformat = "%.1f"
                     else:
-                        lcdformat = "%.0f"    
+                        lcdformat = "%.0f"
                     aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
                     aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
                     aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
@@ -3152,7 +3151,7 @@ class tgraphcanvas(FigureCanvas):
     def OnMonitor(self):
         try:
             aw.lcd1.setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(aw.lcdpaletteF["timer"],aw.lcdpaletteB["timer"]))
-            aw.lcd1.display("00:00")
+            aw.qmc.clearMeasurements()
             self.timeclock.start()   #set time to the current computer time
             self.flagon = True
             if self.designerflag: return
