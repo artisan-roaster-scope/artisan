@@ -1239,6 +1239,9 @@ class tgraphcanvas(FigureCanvas):
                     elif self.autoDryIdx:
                         self.autoDryIdx = 0
                         self.markDryEnd()
+                    elif self.autoFCsIdx:
+                        self.autoFCsIdx = 0
+                        self.mark1Cstart()
                     elif self.autoDropIdx:
                         self.autoDropIdx = 0
                         self.markDrop()
