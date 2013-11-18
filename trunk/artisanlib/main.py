@@ -7664,6 +7664,7 @@ class ApplicationWindow(QMainWindow):
         
     def updatePhasesLCDs(self):
         try:
+            window_width = aw.width()
             if self.qmc.timex: # requires at least some recordings
                 tx = self.qmc.timex[-1]            
                 
@@ -7684,7 +7685,7 @@ class ApplicationWindow(QMainWindow):
                     ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                     self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
                     # TP2DRY
-                    if self.qmc.TPalarmtimeindex:
+                    if window_width > 950 and self.qmc.TPalarmtimeindex:
                         t = self.qmc.timex[self.qmc.timeindex[1]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
                         self.TP2DRYlabel.setText(QString(self.qmc.stringfromseconds(int(t))[1:]))
                     else:
@@ -7714,7 +7715,7 @@ class ApplicationWindow(QMainWindow):
                     ts = tx - self.qmc.timex[self.qmc.timeindex[2]]
                     self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))            
                     # DRY2FCs
-                    if self.qmc.timeindex[1]:
+                    if  window_width > 950 and self.qmc.timeindex[1]:
                         t = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
                         self.DRY2FCslabel.setText(QString(self.qmc.stringfromseconds(int(t))[1:]))
                     else:
