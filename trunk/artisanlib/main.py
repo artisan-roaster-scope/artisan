@@ -514,7 +514,7 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=["", "", "", "", "", ""]
         self.plotcurvecolor = ["black","black","black","black","black","black"]
  
-        self.fig = Figure(tight_layout=True,frameon=True)
+        self.fig = Figure(tight_layout={"pad":.3},frameon=False) # ,"h_pad":0.0,"w_pad":0.0
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
 
         #figure back color
@@ -1230,9 +1230,8 @@ class tgraphcanvas(FigureCanvas):
                         aw.showHUD[aw.HUDfunction]()
 
                     #auto mark CHARGE/TP/DRY/FCs/DROP
-                    if self.autoChargeIdx:
-                        self.autoChargeIdx = 0 #otherwise it keeps calling CHARGE
-                        self.markCharge()
+                    if self.autoChargeIdx and aw.qmc.timeindex[0] < 0:
+                        self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
                     elif self.autoTPIdx:
                         self.autoTPIdx = 0
                         self.markTP()
@@ -1242,9 +1241,8 @@ class tgraphcanvas(FigureCanvas):
                     elif self.autoFCsIdx:
                         self.autoFCsIdx = 0
                         self.mark1Cstart()
-                    elif self.autoDropIdx:
-                        self.autoDropIdx = 0
-                        self.markDrop()
+                    elif self.autoDropIdx and aw.qmc.timeindex[0] < 0 and not aw.qmc.timeindex[6]:
+                        self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
 
                 #check triggered alarms
                 if self.temporaryalarmflag > -3:
@@ -5940,7 +5938,7 @@ class SampleThread(QThread):
                             aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                     # autodetect DROP event
                     # only if 9min into roast and BT>180C/356F
-                    elif not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                    if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
                         length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
                         ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
                         if aw.BTbreak(length_of_qmc_timex - 1):
@@ -7458,6 +7456,8 @@ class ApplicationWindow(QMainWindow):
         self.lcdFrame = QFrame()
         self.lcdFrame.setLayout(LCDlayout)
         self.lcdFrame.setVisible(False)
+        self.lcdFrame.setContentsMargins(0,0,0,0)
+        self.lcdFrame.setSizePolicy(QSizePolicy.Maximum,QSizePolicy.Expanding) # prevent horizontal expansion (graph might not maximize otherwise)
 
         self.midlayout = QHBoxLayout()
         self.midlayout.addWidget(self.sliderFrame)
@@ -7696,15 +7696,19 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # before DRY
                     self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b></small>")
-                    if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
+                    if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2[-1]) > 0 and self.qmc.delta2[-1] > 0:
                         # display expected time to reach DRY as defined in the background profile or the phases dialog
                         if self.qmc.background and self.qmc.timeindexB[1]:
                             drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
                         else:
                             drytarget = self.qmc.phases[1] # Drying max phases definition
                         if drytarget > self.qmc.temp2[-1]:
-                            dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                            self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + dryexpectedtime))[1:]))
+                            dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
+                            tstring = QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + dryexpectedtime)))
+                            if tstring[0] == "0":
+                                self.DRYlcd.display(tstring[1:])
+                            else:
+                                self.DRYlcd.display("-:--")
                         else:
                             self.DRYlcd.display(QString("-:--"))                        
                     else:
@@ -7726,18 +7730,21 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # before FCs
                     self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b></small>")
-                    if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and self.qmc.rateofchange2 and self.qmc.rateofchange2 > 0:
+                    if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2[-1]) > 0 and self.qmc.delta2[-1] > 0:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                         self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
                         # display expected time to reach FCs as defined in the background profile or the phases dialog
                         if self.qmc.background and self.qmc.timeindexB[2]:
                             fcstarget = self.qmc.temp2B[self.qmc.timeindexB[2]] # Background FCs BT temperature
                         else:
-                            fcstarget = self.qmc.phases[2] # FCs min phases definition
-                            
+                            fcstarget = self.qmc.phases[2] # FCs min phases definition                            
                         if fcstarget > self.qmc.temp2[-1]:
-                            fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.rateofchange2/60.)
-                            self.FCslcd.display(QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + fcsexpectedtime))[1:]))
+                            fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
+                            tstring = QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + fcsexpectedtime)))
+                            if tstring[0] == "0":
+                                self.FCslcd.display(tstring[1:])
+                            else:
+                                self.FCslcd.display(QString("-:--"))
                         else:
                             self.FCslcd.display(QString("-:--"))
                     else:
@@ -17075,7 +17082,9 @@ class EventsDlg(ArtisanDialog):
         QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
 
     def tabSwitched(self,i):
-        if i == 1: # switched to Button tab
+        if i == 0:
+            self.saveSliderSettings()
+        elif i == 1: # switched to Button tab
             self.createEventbuttonTable()
             self.saveSliderSettings()
         elif i == 2: # switched to Slider tab
