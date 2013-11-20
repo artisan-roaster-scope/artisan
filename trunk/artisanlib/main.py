@@ -5826,47 +5826,29 @@ class SampleThread(QThread):
                     
                     # we limit the RoR to +/-35C (RoRlimitC) resp. +/-50F (RoRlimitF):
                     if aw.qmc.mode == "C":
-                        if aw.qmc.rateofchange1 > aw.qmc.RoRlimitC or aw.qmc.rateofchange1 < -aw.qmc.RoRlimitC:
-                            if aw.qmc.unfiltereddelta1 and len(aw.qmc.unfiltereddelta1) > 0:
-                                # double the previous one 
-                                aw.qmc.rateofchange1 = aw.qmc.unfiltereddelta1[-1]
-                            else:
-                                # or return RoRlimitC
-                                if aw.qmc.rateofchange1 > 0:
-                                    aw.qmc.rateofchange1 = aw.qmc.RoRlimitC  
-                                else:
-                                    aw.qmc.rateofchange1 = - aw.qmc.RoRlimitC  
-                        if aw.qmc.rateofchange2 > aw.qmc.RoRlimitC or aw.qmc.rateofchange2 < -aw.qmc.RoRlimitC:
-                            if aw.qmc.unfiltereddelta2 and len(aw.qmc.unfiltereddelta2) > 0:
-                                # double the previous one 
-                                aw.qmc.rateofchange2 = aw.qmc.unfiltereddelta2[-1]
-                            else:
-                                # or return RoRlimitC
-                                if aw.qmc.rateofchange2 > 0:
-                                    aw.qmc.rateofchange2 = aw.qmc.RoRlimitC                                
-                                else:
-                                    aw.qmc.rateofchange2 = - aw.qmc.RoRlimitC                                
+                        limit = aw.qmc.RoRlimitC
                     else:
-                        if aw.qmc.rateofchange1 > aw.qmc.RoRlimitF or aw.qmc.rateofchange1 < -aw.qmc.RoRlimitF:
-                            if aw.qmc.unfiltereddelta1 and len(aw.qmc.unfiltereddelta1) > 0:
-                                # double the previous one 
-                                aw.qmc.rateofchange1 = aw.qmc.unfiltereddelta1[-1]
+                        limit = aw.qmc.RoRlimitF                        
+                    if aw.qmc.rateofchange1 > limit or aw.qmc.rateofchange1 < -limit:
+                        if aw.qmc.unfiltereddelta1 and len(aw.qmc.unfiltereddelta1) > 0:
+                            # repeate the previous one 
+                            aw.qmc.rateofchange1 = aw.qmc.unfiltereddelta1[-1]
+                        else:
+                            # or return limit
+                            if aw.qmc.rateofchange1 > 0:
+                                aw.qmc.rateofchange1 = limit  
                             else:
-                                # or return RoRlimitF
-                                if aw.qmc.rateofchange1 > 0:
-                                    aw.qmc.rateofchange1 = aw.qmc.RoRlimitF
-                                else:
-                                    aw.qmc.rateofchange1 = - aw.qmc.RoRlimitF
-                        if aw.qmc.rateofchange2 > aw.qmc.RoRlimitF or aw.qmc.rateofchange2 < -aw.qmc.RoRlimitF:
-                            if aw.qmc.unfiltereddelta2 and len(aw.qmc.unfiltereddelta2) > 0:
-                                # double the previous one 
-                                aw.qmc.rateofchange2 = aw.qmc.unfiltereddelta2[-1]
+                                aw.qmcmc.rateofchange1 = - limit
+                    if aw.qmc.rateofchange2 > limit or aw.qmc.rateofchange2 < -limit:
+                        if aw.qmc.unfiltereddelta2 and len(aw.qmc.unfiltereddelta2) > 0:
+                            # double the previous one 
+                            aw.qmc.rateofchange2 = aw.qmc.unfiltereddelta2[-1]
+                        else:
+                            # or return limit
+                            if aw.qmc.rateofchange2 > 0:
+                                aw.qmc.rateofchange2 = limit
                             else:
-                                # or return RoRlimitF
-                                if aw.qmc.rateofchange2 > 0:
-                                    aw.qmc.rateofchange2 = aw.qmc.RoRlimitF                           
-                                else:
-                                    aw.qmc.rateofchange2 = - aw.qmc.RoRlimitF
+                                aw.qmc.rateofchange2 = - limit
 
                     aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                     aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
