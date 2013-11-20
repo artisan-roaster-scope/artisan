@@ -514,7 +514,7 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=["", "", "", "", "", ""]
         self.plotcurvecolor = ["black","black","black","black","black","black"]
  
-        self.fig = Figure(tight_layout={"pad":.3},frameon=False) # ,"h_pad":0.0,"w_pad":0.0
+        self.fig = Figure(tight_layout={"pad":.2},frameon=False) # ,"h_pad":0.0,"w_pad":0.0
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
 
         #figure back color
@@ -1218,13 +1218,13 @@ class tgraphcanvas(FigureCanvas):
                                 aw.extraLCD2[i].display(lcdformat%float(self.extratemp2[i][-1]))
 
                 if self.flagstart:
+                    #updated canvas
+                    self.fig.canvas.draw()
+                    
                     #update phase lcds
                     if aw.qmc.phasesLCDflag:
                         aw.updatePhasesLCDs()
                     
-                    #updated canvas
-                    self.fig.canvas.draw()
-
                     #check if HUD is ON (done after self.fig.canvas.draw())
                     if self.HUDflag:
                         aw.showHUD[aw.HUDfunction]()
@@ -1523,12 +1523,14 @@ class tgraphcanvas(FigureCanvas):
                 starttime = 0
             if self.projectionmode == 0:
                 #calculate the temperature endpoint at endofx acording to the latest rate of change
-                BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ starttime)/60.
-                ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ starttime)/60.
-                #plot projections
-                self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
-                                 linestyle = '-.', linewidth= 8, alpha = .3)
-                self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], ETprojection],color =  self.palette["et"],
+                if aw.qmc.BTcurve:
+                    BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ starttime)/60.
+                    #plot projections
+                    self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
+                                    linestyle = '-.', linewidth= 8, alpha = .3)
+                if aw.qmc.ETcurve:
+                    ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ starttime)/60.
+                    self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], ETprojection],color =  self.palette["et"],
                                  linestyle = '-.', linewidth= 8, alpha = .3)
             elif self.projectionmode == 1:
                 # Under Test. Newton's Law of Cooling
@@ -3369,7 +3371,7 @@ class tgraphcanvas(FigureCanvas):
                 self.samplingsemaphore.release(1)                        
 
     # called from sample() and marks the autodetected TP visually on the graph
-    def markTP(self):        
+    def markTP(self):
         try:
             self.samplingsemaphore.acquire(1)
             if self.flagstart and self.markTPflag:
@@ -5936,25 +5938,25 @@ class SampleThread(QThread):
                         if aw.BTbreak(length_of_qmc_timex - 1):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
+                    # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
+                    elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+2 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                        aw.qmc.autoTPIdx = 1
+                        aw.qmc.TPalarmtimeindex = aw.findTP()                            
                     # autodetect DROP event
                     # only if 9min into roast and BT>180C/356F
-                    if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                    elif not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
                         length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
                         ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
                         if aw.BTbreak(length_of_qmc_timex - 1):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoDropIdx = length_of_qmc_timex - 3                            
-                    # check for TP event if already CHARGEed and not yet recognized
-                    if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and self.checkTPalarmtime():
-                        aw.qmc.autoTPIdx = 1
-                        aw.qmc.TPalarmtimeindex = aw.findTP()
                     #check for autoDRY:
-                    if aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
+                    elif aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
                         # after TP (if DRY event not yet set) check for BT exceeding Dry-max as specified in the phases dialog
                         if aw.qmc.temp2[-1] > aw.qmc.phases[1]:
                             aw.qmc.autoDryIdx = 1
                     #check for autoFCs:
-                    if aw.qmc.autoFCsFlag and aw.qmc.timeindex[1] and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
+                    elif aw.qmc.autoFCsFlag and aw.qmc.timeindex[1] and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
                         # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
                         if aw.qmc.temp2[-1] > aw.qmc.phases[2]:
                             aw.qmc.autoFCsIdx = 1
@@ -6041,11 +6043,9 @@ class SampleThread(QThread):
                 if local_flagstart:
                     #check alarms 
                     # check for TP event if already CHARGEed and not yet recognized
-                    if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and self.checkTPalarmtime():
-                        aw.qmc.TPalarmtimeindex = aw.findTP() #len(aw.qmc.timex)-1
+                    if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+2 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                        aw.qmc.TPalarmtimeindex = aw.findTP()
                         aw.qmc.markTP()
-            #update screen in main GUI thread
-            self.emit(SIGNAL("updategraphics"))
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -6054,6 +6054,8 @@ class SampleThread(QThread):
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
+            #update screen in main GUI thread
+            self.emit(SIGNAL("updategraphics"))
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
@@ -7696,7 +7698,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # before DRY
                     self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b></small>")
-                    if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2[-1]) > 0 and self.qmc.delta2[-1] > 0:
+                    if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] > 0:
                         # display expected time to reach DRY as defined in the background profile or the phases dialog
                         if self.qmc.background and self.qmc.timeindexB[1]:
                             drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
@@ -7730,7 +7732,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # before FCs
                     self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b></small>")
-                    if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2[-1]) > 0 and self.qmc.delta2[-1] > 0:
+                    if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] > 0:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                         self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
                         # display expected time to reach FCs as defined in the background profile or the phases dialog
