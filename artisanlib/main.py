@@ -514,7 +514,7 @@ class tgraphcanvas(FigureCanvas):
         self.plotcurves=["", "", "", "", "", ""]
         self.plotcurvecolor = ["black","black","black","black","black","black"]
  
-        self.fig = Figure(tight_layout={"pad":.2},frameon=False) # ,"h_pad":0.0,"w_pad":0.0
+        self.fig = Figure(tight_layout={"pad":.2},frameon=True) # ,"h_pad":0.0,"w_pad":0.0
         # with tight_layout=True, the matplotlib canvas expands to the maximum using figure.autolayout
 
         #figure back color
@@ -10649,6 +10649,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = settings.value("autosaveflag",self.qmc.autosaveflag).toInt()[0]
+            if settings.contains("autosavepath"):
+                self.qmc.autosavepath = settings.value("autosavepath",self.qmc.autosavepath).toString()
             #restore buttons
             settings.beginGroup("ExtraEventButtons")
             if settings.contains("extraeventsactions"):
@@ -11223,6 +11225,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaBTB",aw.qmc.DeltaBTBflag)
             settings.endGroup()
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
+            settings.setValue("autosavepath",self.qmc.autosavepath)
             #custom event buttons
             settings.beginGroup("ExtraEventButtons")
             settings.setValue("buttonlistmaxlen",self.buttonlistmaxlen)
