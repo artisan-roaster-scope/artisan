@@ -1449,69 +1449,74 @@ class tgraphcanvas(FigureCanvas):
                 
 
     def playbackevent(self):
-        #needed when using device NONE
-        if len(self.timex):
-            #find time distances
-            for i in range(len(self.backgroundEvents)):
-                timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)                 
-                if  timed > 0 and timed < self.detectBackgroundEventTime:
-                    #write text message
-                    message = "> " +  self.stringfromseconds(timed) + " [" + u(self.Betypesf(self.backgroundEtypes[i]))
-                    message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " + self.backgroundEStrings[i]
-                    #rotate colors to get attention
-                    if timed%2:
-                        aw.messagelabel.setStyleSheet("background-color:'transparent';")
-                    else:
-                        aw.messagelabel.setStyleSheet("background-color:'yellow';")
-                        
-                    aw.sendmessage(message)
-                    break
-
-                elif timed == 0:
-                    #for devices that support automatic roaster control
-                    #if Fuji PID
-                    if self.device == 0:
-
-                        # COMMAND SET STRINGS
-                        #  (adjust the SV PID to the float VALUE1)
-                        # SETRS::VALUE1::VALUE2::VALUE3  (VALUE1 = target SV. float VALUE2 = time to reach int VALUE 1 (ramp) in minutes. int VALUE3 = hold (soak) time in minutes)
-
-                        # IMPORTANT: VALUES are for controlling ET only (not BT). The PID should control ET not BT. The PID should be connected to ET only.
-                        # Therefore, these values don't reflect a BT defined profile. They define an ET profile.
-                        # They reflect the changes in ET, which indirectly define BT after some time lag
-
-                        # There are two ways to record a roast. One is by changing Set Values (SV) during the roast,
-                        # the other is by using ramp/soaks segments (RS). 
-                        # Examples:
-
-                        # SETSV::560.3           sets an SV value of 560.3F in the PID at the time of the recorded background event
-
-                        # SETRS::440.2::2::0     starts Ramp Soak mode so that it reaches 440.2F in 2 minutes and holds (soaks) 440.2F for zero minutes
-
-                        # SETRS::300.0::2::3::SETRS::540.0::6::0::SETRS::560.0::4::0::SETRS::560::0::0
-                        #       this command has 4 comsecutive commands inside (4 segments)
-                        #       1 SETRS::300.0::2::3 reach 300.0F in 2 minutes and hold it for 3 minutes (ie. total dry phase time = 5 minutes)
-                        #       2 SETRS::540.0::6::0 then reach 540.0F in 6 minutes and hold it there 0 minutes (ie. total mid phase time = 6 minutes )
-                        #       3 SETRS::560.0::4::0 then reach 560.0F in 4 minutes and hold it there 0 minutes (ie. total finish phase time = 4 minutes)
-                        #       4 SETRS::560::0::0 then do nothing (because ramp time and soak time are both 0)
-                        #       END ramp soak mode
-                        
-                        
-                        if "::" in self.backgroundEStrings[i]:
-                            aw.fujipid.replay(self.backgroundEStrings[i])
-                            libtime.sleep(.5)  #avoid possible close times (rounding off)
-
-                    #future Arduino
-                    #if self.device == 19:
-
-
-                #delete message
-                else:
-                    text = str(aw.messagelabel.text())
-                    if len(text):
-                        if text[0] == ">":
-                            aw.sendmessage("")
+        try:
+            #needed when using device NONE
+            if len(self.timex):
+                #find time distances
+                for i in range(len(self.backgroundEvents)):
+                    timed = int(self.timeB[self.backgroundEvents[i]] - self.timeclock.elapsed()/1000.)                 
+                    if  timed > 0 and timed < self.detectBackgroundEventTime:
+                        #write text message
+                        message = "> " +  self.stringfromseconds(timed) + " [" + u(self.Betypesf(self.backgroundEtypes[i]))
+                        message += "] [" + self.eventsvalues(self.backgroundEvalues[i]) + "] : " + self.backgroundEStrings[i]
+                        #rotate colors to get attention
+                        if timed%2:
                             aw.messagelabel.setStyleSheet("background-color:'transparent';")
+                        else:
+                            aw.messagelabel.setStyleSheet("background-color:'yellow';")
+                            
+                        aw.sendmessage(message)
+                        break
+    
+                    elif timed == 0:
+                        #for devices that support automatic roaster control
+                        #if Fuji PID
+                        if self.device == 0:
+    
+                            # COMMAND SET STRINGS
+                            #  (adjust the SV PID to the float VALUE1)
+                            # SETRS::VALUE1::VALUE2::VALUE3  (VALUE1 = target SV. float VALUE2 = time to reach int VALUE 1 (ramp) in minutes. int VALUE3 = hold (soak) time in minutes)
+    
+                            # IMPORTANT: VALUES are for controlling ET only (not BT). The PID should control ET not BT. The PID should be connected to ET only.
+                            # Therefore, these values don't reflect a BT defined profile. They define an ET profile.
+                            # They reflect the changes in ET, which indirectly define BT after some time lag
+    
+                            # There are two ways to record a roast. One is by changing Set Values (SV) during the roast,
+                            # the other is by using ramp/soaks segments (RS). 
+                            # Examples:
+    
+                            # SETSV::560.3           sets an SV value of 560.3F in the PID at the time of the recorded background event
+    
+                            # SETRS::440.2::2::0     starts Ramp Soak mode so that it reaches 440.2F in 2 minutes and holds (soaks) 440.2F for zero minutes
+    
+                            # SETRS::300.0::2::3::SETRS::540.0::6::0::SETRS::560.0::4::0::SETRS::560::0::0
+                            #       this command has 4 comsecutive commands inside (4 segments)
+                            #       1 SETRS::300.0::2::3 reach 300.0F in 2 minutes and hold it for 3 minutes (ie. total dry phase time = 5 minutes)
+                            #       2 SETRS::540.0::6::0 then reach 540.0F in 6 minutes and hold it there 0 minutes (ie. total mid phase time = 6 minutes )
+                            #       3 SETRS::560.0::4::0 then reach 560.0F in 4 minutes and hold it there 0 minutes (ie. total finish phase time = 4 minutes)
+                            #       4 SETRS::560::0::0 then do nothing (because ramp time and soak time are both 0)
+                            #       END ramp soak mode
+                            
+                            
+                            if "::" in self.backgroundEStrings[i]:
+                                aw.fujipid.replay(self.backgroundEStrings[i])
+                                libtime.sleep(.5)  #avoid possible close times (rounding off)
+    
+                        #future Arduino
+                        #if self.device == 19:
+    
+    
+                    #delete message
+                    else:
+                        text = str(aw.messagelabel.text())
+                        if len(text):
+                            if text[0] == ">":
+                                aw.sendmessage("")
+                                aw.messagelabel.setStyleSheet("background-color:'transparent';")
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " playbackevent() %1").arg(str(ex)),exc_tb.tb_lineno)
+
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
