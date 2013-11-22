@@ -7540,7 +7540,7 @@ class ApplicationWindow(QMainWindow):
         
     def getResourcePath(self):
         res = ""
-        if platform.system() == 'Darwin':
+        if platf in ['Darwin',"Linux']:
             if self.appFrozen():
                 res = QApplication.applicationDirPath() + "/../Resources/"
             else:
