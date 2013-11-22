@@ -1520,49 +1520,53 @@ class tgraphcanvas(FigureCanvas):
 
     #make a projection of change of rate of BT on the graph
     def viewProjection(self):
-        if len(aw.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
-            self.resetlines()
-            if self.timeindex[0] != -1:
-                starttime = self.timex[self.timeindex[0]]
-            else:
-                starttime = 0
-            if self.projectionmode == 0:
-                #calculate the temperature endpoint at endofx acording to the latest rate of change
-                if aw.qmc.BTcurve:
-                    BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ starttime)/60.
-                    #plot projections
-                    self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
-                                    linestyle = '-.', linewidth= 8, alpha = .3)
-                if aw.qmc.ETcurve:
-                    ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ starttime)/60.
-                    self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], ETprojection],color =  self.palette["et"],
-                                 linestyle = '-.', linewidth= 8, alpha = .3)
-            elif self.projectionmode == 1:
-                # Under Test. Newton's Law of Cooling
-                # This comes from the formula of heating (with ET) a cool (colder) object (BT).
-                # The difference equation (discrete with n elements) is: DeltaT = T(n+1) - T(n) = K*(ET - BT)
-                # The formula is a natural decay towards ET. The closer BT to ET, the smaller the change in DeltaT
-                # projectionconstant is a multiplier factor. It depends on
-                # 1 Damper or fan. Heating by convection is _faster_ than heat by conduction,
-                # 2 Mass of beans. The heavier the mass, the _slower_ the heating of BT
-                # 3 Gas or electric power: gas heats BT _faster_ because of hoter air.
-                # Every roaster will have a different constantN.
-    
-                den = self.temp1[-1] - self.temp2[-1]  #denominator ETn - BTn 
-                if den > 0: # if ETn > BTn
-                    #get x points
-                    xpoints = list(numpy.arange(self.timex[-1],self.endofx + 120, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds)
-                    #get y points
-                    ypoints = [self.temp2[-1]]                                  # start initializing with last BT
-                    K =  self.projectionconstant*self.rateofchange2/den/60.                 # multiplier
-                    for _ in range(len(xpoints)-1):                                     # create new points from previous points 
-                        DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
-                        ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
-    
-                    #plot ET level (straight line) and BT curve
-                    self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], self.temp1[-1]],color =  self.palette["et"],
-                                 linestyle = '-.', linewidth= 3, alpha = .5)
-                    self.ax.plot(xpoints, ypoints, color =  self.palette["bt"],linestyle = '-.', linewidth= 3, alpha = .5)
+        try:
+            if len(aw.qmc.temp2) > 1:  #Need this because viewProjections use rate of change (two values needed)
+                self.resetlines()
+                if self.timeindex[0] != -1:
+                    starttime = self.timex[self.timeindex[0]]
+                else:
+                    starttime = 0
+                if self.projectionmode == 0:
+                    #calculate the temperature endpoint at endofx acording to the latest rate of change
+                    if aw.qmc.BTcurve:
+                        BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ starttime)/60.
+                        #plot projections
+                        self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
+                                        linestyle = '-.', linewidth= 8, alpha = .3)
+                    if aw.qmc.ETcurve:
+                        ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ starttime)/60.
+                        self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], ETprojection],color =  self.palette["et"],
+                                     linestyle = '-.', linewidth= 8, alpha = .3)
+                elif self.projectionmode == 1:
+                    # Under Test. Newton's Law of Cooling
+                    # This comes from the formula of heating (with ET) a cool (colder) object (BT).
+                    # The difference equation (discrete with n elements) is: DeltaT = T(n+1) - T(n) = K*(ET - BT)
+                    # The formula is a natural decay towards ET. The closer BT to ET, the smaller the change in DeltaT
+                    # projectionconstant is a multiplier factor. It depends on
+                    # 1 Damper or fan. Heating by convection is _faster_ than heat by conduction,
+                    # 2 Mass of beans. The heavier the mass, the _slower_ the heating of BT
+                    # 3 Gas or electric power: gas heats BT _faster_ because of hoter air.
+                    # Every roaster will have a different constantN.
+        
+                    den = self.temp1[-1] - self.temp2[-1]  #denominator ETn - BTn 
+                    if den > 0: # if ETn > BTn
+                        #get x points
+                        xpoints = list(numpy.arange(self.timex[-1],self.endofx + 120, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds)
+                        #get y points
+                        ypoints = [self.temp2[-1]]                                  # start initializing with last BT
+                        K =  self.projectionconstant*self.rateofchange2/den/60.                 # multiplier
+                        for _ in range(len(xpoints)-1):                                     # create new points from previous points 
+                            DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
+                            ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
+        
+                        #plot ET level (straight line) and BT curve
+                        self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], self.temp1[-1]],color =  self.palette["et"],
+                                     linestyle = '-.', linewidth= 3, alpha = .5)
+                        self.ax.plot(xpoints, ypoints, color =  self.palette["bt"],linestyle = '-.', linewidth= 3, alpha = .5)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " viewProjection() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     # this function is called from the HUD DLg and reports the linear time (straight line) it would take to reach a temperature target
     # acording to the current rate of change
@@ -6039,10 +6043,10 @@ class SampleThread(QThread):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " sample() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
-            if aw.qmc.samplingsemaphore.available() < 1:
-                aw.qmc.samplingsemaphore.release(1)
             #update screen in main GUI thread
             self.emit(SIGNAL("updategraphics"))
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
@@ -6069,7 +6073,7 @@ class SampleThread(QThread):
                     self.sample()
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    dt = max(aw.qmc.min_delay/1000. - 1.,aw.qmc.delay/1000. - libtime.time() + start) # min of 2sec (works with a 3sec min sampling interval)
+                    dt = max(0.5,aw.qmc.delay/1000. - libtime.time() + start) # min of 0.5sec to allow for refresh the display
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     libtime.sleep(dt)
@@ -12147,8 +12151,15 @@ $cupping_notes
         else:
             try:
                 for i in range((start or self.qmc.timeindex[0]),min(len(self.qmc.timex)-1,(end or self.qmc.timeindex[6]))):
-                    e = (self.qmc.temp1[i] + self.qmc.temp1[i+1]) / 2.0
-                    b = (self.qmc.temp2[i] + self.qmc.temp2[i+1]) / 2.0
+                    # eliminate wrong readings
+                    e1 = self.qmc.temp1[i]
+                    if e1 > 500:
+                        e1 = 0                    
+                    e2 = self.qmc.temp1[i]
+                    if e2 > 500:
+                        e2 = 0
+                    e = (max(0,e1) + max(0,e2)) / 2.0
+                    b = (max(0,self.qmc.temp2[i]) + max(0,self.qmc.temp2[i+1])) / 2.0
                     dt = (self.qmc.timex[i+1] - self.qmc.timex[i])
                     delta += (e - b) * dt
                     ET += e * dt
