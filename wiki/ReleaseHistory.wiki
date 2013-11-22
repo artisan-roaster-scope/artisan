@@ -26,7 +26,8 @@
   * adds "Fuji SV" as second channel to the +Fuji DUTY %
   * adds load/save and read/write all actions to Fuji control
   * adds keyboard control for sliders
-  * adds translation support for Hebrew
+  * adds an option to remove digits from temperature LCDs (extras dialog)
+  * adds Hebrew localization
  * Changes
   * curve smoothing settings sensitivity has been doubled (for some internal reasons). So a value of 6 on Artisan v0.6 should be adjusted to 3 to have roughly the same effect. 
   * autosave now takes the roast name from the roast properties and autosaves on OFF. Further, the date is now written as prefix
