@@ -1232,16 +1232,16 @@ class tgraphcanvas(FigureCanvas):
                     #auto mark CHARGE/TP/DRY/FCs/DROP
                     if self.autoChargeIdx and aw.qmc.timeindex[0] < 0:
                         self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
-                    elif self.autoTPIdx:
+                    if self.autoTPIdx:
                         self.autoTPIdx = 0
                         self.markTP()
-                    elif self.autoDryIdx:
+                    if self.autoDryIdx:
                         self.autoDryIdx = 0
                         self.markDryEnd()
-                    elif self.autoFCsIdx:
+                    if self.autoFCsIdx:
                         self.autoFCsIdx = 0
                         self.mark1Cstart()
-                    elif self.autoDropIdx and aw.qmc.timeindex[0] < 0 and not aw.qmc.timeindex[6]:
+                    if self.autoDropIdx and aw.qmc.timeindex[0] < 0 and not aw.qmc.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
 
                 #check triggered alarms
@@ -5930,26 +5930,26 @@ class SampleThread(QThread):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                     # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
-                    elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+2 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                    if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+2 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                         aw.qmc.autoTPIdx = 1
                         aw.qmc.TPalarmtimeindex = aw.findTP()                            
                     # autodetect DROP event
                     # only if 9min into roast and BT>180C/356F
-                    elif not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                    if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
                         length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
                         ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
                         if aw.BTbreak(length_of_qmc_timex - 1):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoDropIdx = length_of_qmc_timex - 3                            
                     #check for autoDRY:
-                    elif aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
+                    if aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
                         # after TP (if DRY event not yet set) check for BT exceeding Dry-max as specified in the phases dialog
-                        if aw.qmc.temp2[-1] > aw.qmc.phases[1]:
+                        if aw.qmc.temp2[-1] >= aw.qmc.phases[1]:
                             aw.qmc.autoDryIdx = 1
                     #check for autoFCs:
-                    elif aw.qmc.autoFCsFlag and aw.qmc.timeindex[1] and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
+                    if aw.qmc.autoFCsFlag and aw.qmc.timeindex[1] and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
                         # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
-                        if aw.qmc.temp2[-1] > aw.qmc.phases[2]:
+                        if aw.qmc.temp2[-1] >= aw.qmc.phases[2]:
                             aw.qmc.autoFCsIdx = 1
                         
                 #check for each alarm that was not yet triggered
@@ -7697,7 +7697,7 @@ class ApplicationWindow(QMainWindow):
                             drytarget = self.qmc.phases[1] # Drying max phases definition
                         if drytarget > self.qmc.temp2[-1]:
                             dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
-                            tstring = QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + dryexpectedtime)))
+                            tstring = QString(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime)))
                             if tstring[0] == "0":
                                 self.DRYlcd.display(tstring[1:])
                             else:
@@ -7733,7 +7733,7 @@ class ApplicationWindow(QMainWindow):
                             fcstarget = self.qmc.phases[2] # FCs min phases definition                            
                         if fcstarget > self.qmc.temp2[-1]:
                             fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
-                            tstring = QString(self.qmc.stringfromseconds(int(tx - self.qmc.timeindex[0] + fcsexpectedtime)))
+                            tstring = QString(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime)))
                             if tstring[0] == "0":
                                 self.FCslcd.display(tstring[1:])
                             else:
@@ -12230,7 +12230,7 @@ $cupping_notes
         contributors += u("<br>Matthew Sewell, Bertrand Souville, Minoru Yoshida,")
         contributors += u("<br>Wa'ill, Alex Fan, Piet Dijk, Rubens Gardelli,")
         contributors += u("<br>David Trebilcock, Zolt") + uchr(225) + u("n Kis, Miroslav Stankovic,")
-        contributors += u("<br>Barrie Fairley")
+        contributors += u("<br>Barrie Fairley, Ziv Sade")
         box = QMessageBox(self)
         #create a html QString
         from scipy import __version__ as SCIPY_VERSION_STR
@@ -12426,7 +12426,6 @@ $cupping_notes
         dialog.show()
         
     def deleteBackground(self):
-        print("deleteBackground")               
         self.qmc.backgroundpath = ""
         self.qmc.temp1B, self.qmc.temp2B, self.qmc.timeB = [],[],[]
         self.qmc.backgroundEvents, self.qmc.backgroundEtypes = [],[]
@@ -12436,7 +12435,6 @@ $cupping_notes
 
         
     def switch(self):
-        print("switch")
         foreground_profile_path = aw.curFile
         background_profile_path = aw.qmc.backgroundpath
         if background_profile_path:
