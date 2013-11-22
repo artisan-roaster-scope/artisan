@@ -2409,8 +2409,8 @@ class tgraphcanvas(FigureCanvas):
                             z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                         if lt > ld2:
                             z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromCHARGEonly=True)
-                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromCHARGEonly=True)
+                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromCHARGEonly=False) # CHARGE is the charge for the foreground, so we have to disable this here
+                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromCHARGEonly=False)
                     
                     ##### DeltaETB,DeltaBTB curves
                     if self.DeltaETBflag:
@@ -12425,7 +12425,8 @@ $cupping_notes
         dialog = backgroundDlg(self)
         dialog.show()
         
-    def deleteBackground(self):                
+    def deleteBackground(self):
+        print("deleteBackground")               
         self.qmc.backgroundpath = ""
         self.qmc.temp1B, self.qmc.temp2B, self.qmc.timeB = [],[],[]
         self.qmc.backgroundEvents, self.qmc.backgroundEtypes = [],[]
@@ -12435,6 +12436,7 @@ $cupping_notes
 
         
     def switch(self):
+        print("switch")
         foreground_profile_path = aw.curFile
         background_profile_path = aw.qmc.backgroundpath
         if background_profile_path:
