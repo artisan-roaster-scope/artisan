@@ -5930,7 +5930,7 @@ class SampleThread(QThread):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                     # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
-                    if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+2 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                    elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+2 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                         aw.qmc.autoTPIdx = 1
                         aw.qmc.TPalarmtimeindex = aw.findTP()                            
                     # autodetect DROP event
@@ -5947,7 +5947,7 @@ class SampleThread(QThread):
                         if aw.qmc.temp2[-1] >= aw.qmc.phases[1]:
                             aw.qmc.autoDryIdx = 1
                     #check for autoFCs:
-                    if aw.qmc.autoFCsFlag and aw.qmc.timeindex[1] and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
+                    if aw.qmc.autoFCsFlag and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
                         # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
                         if aw.qmc.temp2[-1] >= aw.qmc.phases[2]:
                             aw.qmc.autoFCsIdx = 1
