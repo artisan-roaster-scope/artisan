@@ -5646,7 +5646,7 @@ class VMToolbar(NavigationToolbar):
                                                   'Select axes:', titles,
                                                   0, False)
             if ok:
-                axes = allaxes[titles.index(str(item))]
+                axes = allaxes[titles.index(u(item))]
             else:
                 return
         figureoptions.figure_edit(axes, self)
@@ -6072,10 +6072,10 @@ class SampleThread(QThread):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " sample() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
-            #update screen in main GUI thread
-            self.emit(SIGNAL("updategraphics"))
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
+            #update screen in main GUI thread
+            self.emit(SIGNAL("updategraphics"))
 
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
@@ -6102,7 +6102,7 @@ class SampleThread(QThread):
                     self.sample()
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    dt = max(0.5,aw.qmc.delay/1000. - libtime.time() + start) # min of 0.5sec to allow for refresh the display
+                    dt = max(1,aw.qmc.delay/1000. - libtime.time() + start) # min of 0.5sec to allow for refresh the display
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     libtime.sleep(dt)
@@ -7271,7 +7271,7 @@ class ApplicationWindow(QMainWindow):
         self.TPlabel = QLabel()
         self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
         self.TPlcd = QLCDNumber()
-        self.TPlcd.display("-:--")
+        self.TPlcd.display("--:--")
         self.TPlcdFrame = self.makePhasesLCDbox(self.TPlabel,self.TPlcd)
         
         # TP2DRY
@@ -7286,7 +7286,7 @@ class ApplicationWindow(QMainWindow):
         self.DRYlabel = QLabel()
         self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b></small>")
         self.DRYlcd = QLCDNumber()
-        self.DRYlcd.display("-:--")
+        self.DRYlcd.display("--:--")
         self.DRYlcdFrame = self.makePhasesLCDbox(self.DRYlabel,self.DRYlcd)
         
         # DRY2FCs
@@ -7301,7 +7301,7 @@ class ApplicationWindow(QMainWindow):
         self.FCslabel = QLabel()
         self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b></small>")
         self.FCslcd = QLCDNumber()
-        self.FCslcd.display("-:--")
+        self.FCslcd.display("--:--")
         self.FCslcdFrame = self.makePhasesLCDbox(self.FCslabel,self.FCslcd)
         
         self.phasesLCDs = QFrame()
@@ -7667,15 +7667,37 @@ class ApplicationWindow(QMainWindow):
             else:
                 return u(s)
                 
+#    def makePhasesLCDbox(self,label,lcd):
+#        label.setAlignment(Qt.Alignment(Qt.AlignRight | Qt.AlignVCenter))
+#        lcd.setMinimumHeight(40)
+#        lcd.setMinimumWidth(50)
+#        lcd.setSegmentStyle(2)
+#        lcd.setFrameStyle(QFrame.Plain)
+#        lcd.setNumDigits(5)
+#        frame = QFrame()
+#        LCDHbox = QHBoxLayout()
+#        LCDHbox.addWidget(label)
+#        LCDHbox.addWidget(lcd)
+#        LCDHbox.setSpacing(0)
+#        LCDHbox.setContentsMargins(0, 0, 0, 0)
+#        frame.setStyleSheet("background-color: rgb(230,230,230);")
+#        frame.setFrameShadow(QFrame.Sunken)
+#        frame.setLineWidth(1)
+#        frame.setFrameShape(QFrame.Panel)
+#        frame.setLayout(LCDHbox)
+#        return frame
+
     def makePhasesLCDbox(self,label,lcd):
         label.setAlignment(Qt.Alignment(Qt.AlignRight | Qt.AlignVCenter))
-        lcd.setMinimumHeight(40)
-        lcd.setMinimumWidth(50)
+        lcd.setMinimumHeight(30)
+        lcd.setMinimumWidth(60)
         lcd.setSegmentStyle(2)
         lcd.setFrameStyle(QFrame.Plain)
-        lcd.setNumDigits(4)
+        lcd.setNumDigits(5)
+        lcd.setLineWidth(0)
+        lcd.setContentsMargins(0, 0, 0, 0)
         frame = QFrame()
-        LCDHbox = QHBoxLayout()
+        LCDHbox = QVBoxLayout()
         LCDHbox.addWidget(label)
         LCDHbox.addWidget(lcd)
         LCDHbox.setSpacing(0)
@@ -7698,21 +7720,22 @@ class ApplicationWindow(QMainWindow):
                     # after TP
                     self.TPlabel.setText("<small><b>" + u(QApplication.translate("Label", "TP",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
                     ts = tx - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                    self.TPlcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
+                    tss = QString(self.qmc.stringfromseconds(int(ts)))
+                    self.TPlcd.display(tss)
                 else:
                     # before TP
-                    self.TPlcd.display(QString("-:--"))
+                    self.TPlcd.display(QString("--:--"))
                 
                 # DRY phase LCD
                 if self.qmc.timeindex[1]:
                     # after DRY
                     self.DRYlabel.setText("<small><b>" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "&raquo;</b></small>")
                     ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
-                    self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
+                    self.DRYlcd.display(QString(self.qmc.stringfromseconds(int(ts))))
                     # TP2DRY
                     if window_width > 950 and self.qmc.TPalarmtimeindex:
                         t = self.qmc.timex[self.qmc.timeindex[1]] - self.qmc.timex[self.qmc.TPalarmtimeindex]
-                        self.TP2DRYlabel.setText(QString(self.qmc.stringfromseconds(int(t))[1:]))
+                        self.TP2DRYlabel.setText(QString(self.qmc.stringfromseconds(int(t))))
                     else:
                         self.TP2DRYlabel.setText("")
                 else:
@@ -7727,14 +7750,11 @@ class ApplicationWindow(QMainWindow):
                         if drytarget > self.qmc.temp2[-1]:
                             dryexpectedtime = (drytarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
                             tstring = QString(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + dryexpectedtime)))
-                            if tstring[0] == "0":
-                                self.DRYlcd.display(tstring[1:])
-                            else:
-                                self.DRYlcd.display("-:--")
+                            self.DRYlcd.display(tstring)
                         else:
-                            self.DRYlcd.display(QString("-:--"))                        
+                            self.DRYlcd.display(QString("--:--"))                        
                     else:
-                        self.DRYlcd.display(QString("-:--"))
+                        self.DRYlcd.display(QString("--:--"))
                     self.TP2DRYlabel.setText("")
         
                 # FCs phase LCD  
@@ -7746,7 +7766,7 @@ class ApplicationWindow(QMainWindow):
                     # DRY2FCs
                     if  window_width > 950 and self.qmc.timeindex[1]:
                         t = self.qmc.timex[self.qmc.timeindex[2]] - self.qmc.timex[self.qmc.timeindex[1]]
-                        self.DRY2FCslabel.setText(QString(self.qmc.stringfromseconds(int(t))[1:]))
+                        self.DRY2FCslabel.setText(QString(self.qmc.stringfromseconds(int(t))))
                     else:
                         self.DRY2FCslabel.setText("")
                 else:
@@ -7763,14 +7783,11 @@ class ApplicationWindow(QMainWindow):
                         if fcstarget > self.qmc.temp2[-1]:
                             fcsexpectedtime = (fcstarget - self.qmc.temp2[-1])/(self.qmc.delta2[-1]/60.)
                             tstring = QString(self.qmc.stringfromseconds(int(tx - self.qmc.timex[self.qmc.timeindex[0]] + fcsexpectedtime)))
-                            if tstring[0] == "0":
-                                self.FCslcd.display(tstring[1:])
-                            else:
-                                self.FCslcd.display(QString("-:--"))
+                            self.FCslcd.display(tstring)
                         else:
-                            self.FCslcd.display(QString("-:--"))
+                            self.FCslcd.display(QString("--:--"))
                     else:
-                        self.FCslcd.display(QString("-:--"))
+                        self.FCslcd.display(QString("--:--"))
                     self.DRY2FCslabel.setText("")
         except Exception as e:            
 #            import traceback
