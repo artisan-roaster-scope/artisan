@@ -262,11 +262,20 @@ supported_languages = [
     "de",
     "el",
     "es",
+    "fi",
+    "fr",
+    "he",
+    "hu",
+    "it",
+    "ja",
+    "ko",
     "nl",
     "no",
     "pt",
-    "ja",
-    "hu",
+    "ru",
+    "sv",
+    "tr",
+    "zh",
 ]
 if len(locale) == 0:
     if platform.system() == 'Darwin':
@@ -1217,7 +1226,11 @@ class tgraphcanvas(FigureCanvas):
                             if self.extratemp2[i]:
                                 aw.extraLCD2[i].display(lcdformat%float(self.extratemp2[i][-1]))
 
-                if self.flagstart:
+                if self.flagstart:          
+                    if aw.qmc.patheffects:
+                        rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
+                    else:
+                        rcParams['path.effects'] = []
                     #updated canvas
                     self.fig.canvas.draw()
                     
@@ -1241,7 +1254,7 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoFCsIdx:
                         self.autoFCsIdx = 0
                         self.mark1Cstart()
-                    if self.autoDropIdx and aw.qmc.timeindex[0] < 0 and not aw.qmc.timeindex[6]:
+                    if self.autoDropIdx and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
 
                 #check triggered alarms
@@ -2026,7 +2039,11 @@ class tgraphcanvas(FigureCanvas):
         else:
             return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
 
-    def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):
+    def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):                
+        if aw.qmc.patheffects:
+            rcParams['path.effects'] = [PathEffects.withStroke(linewidth=aw.qmc.patheffects, foreground="w")]
+        else:
+            rcParams['path.effects'] = []
         #annotate temp
         self.ax.annotate("%.0f"%(temp), xy=(x,y),xytext=(x+e,y + yup),
                             color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["text"],alpha=a),fontsize="x-small",alpha=a,fontproperties=aw.mpl_fontproperties)
@@ -2228,7 +2245,7 @@ class tgraphcanvas(FigureCanvas):
             fontprop_xlarge = aw.mpl_fontproperties.copy()            
             fontprop_xlarge.set_size("x-large")
             self.ax.grid(True,color=self.palette["grid"],linestyle=self.gridstyles[self.gridlinestyle],linewidth = self.gridthickness,alpha = self.gridalpha,sketch_params=0,path_effects=[])
-            if aw.qmc.flagon:
+            if aw.qmc.flagstart:
                 self.ax.set_ylabel("")
                 self.ax.set_xlabel("")
             else:
@@ -2785,6 +2802,7 @@ class tgraphcanvas(FigureCanvas):
                     leg = self.ax.legend(handles,labels,loc=self.legendloc,ncol=4,fancybox=True,prop=prop)
                 if aw.qmc.graphstyle == 1:
                     leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
+
 
             ############  ready to plot ############
             self.fig.canvas.draw()
@@ -5599,6 +5617,13 @@ class VMToolbar(NavigationToolbar):
             axes = allaxes[0]
         else:
             titles = []
+            two_ax_mode = (aw.qmc.DeltaETflag or aw.qmc.DeltaBTflag or (aw.qmc.background and (aw.qmc.DeltaETBflag or aw.qmc.DeltaBTBflag))) and not aw.qmc.designerflag
+            if aw.qmc.flagstart:
+                # temporary set the axis to get proper menu items (same code as in redraw)
+                aw.qmc.ax.set_ylabel(aw.qmc.mode)
+                aw.qmc.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)))
+                if two_ax_mode:
+                    aw.qmc.delta_ax.set_ylabel(aw.arabicReshape(QApplication.translate("Label", "deg/min", None, QApplication.UnicodeUTF8)))
             for axes in allaxes:
                 title = axes.get_title()
                 ylabel = axes.get_ylabel()
@@ -5613,6 +5638,10 @@ class VMToolbar(NavigationToolbar):
                 titles.append(fmt % dict(title = title,
                                      ylabel = ylabel,
                                      axes_repr = repr(axes)))
+            if aw.qmc.flagstart:
+                aw.qmc.ax.set_ylabel("")
+                aw.qmc.ax.set_xlabel("")
+                aw.qmc.delta_ax.set_ylabel("")                                     
             item, ok = QInputDialog.getItem(self, 'Customize',
                                                   'Select axes:', titles,
                                                   0, False)
@@ -5935,9 +5964,9 @@ class SampleThread(QThread):
                         aw.qmc.TPalarmtimeindex = aw.findTP()                            
                     # autodetect DROP event
                     # only if 9min into roast and BT>180C/356F
-                    if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > 0 and not aw.qmc.timeindex[6] and \
+                    if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
                         length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
-                        ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 540):
+                        ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 480):
                         if aw.BTbreak(length_of_qmc_timex - 1):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoDropIdx = length_of_qmc_timex - 3                            
