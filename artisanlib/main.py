@@ -11533,10 +11533,11 @@ class ApplicationWindow(QMainWindow):
         try:
             rcParams['path.effects'] = []
             HTML_REPORT_TEMPLATE = u("""<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
 <head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
 <title>""") + u(QApplication.translate("HTML Report Template", "Roasting Report", None, QApplication.UnicodeUTF8)) + u("""</title>
 <style type="text/css">
 td { 
@@ -11685,7 +11686,7 @@ th {
 </td>
 </tr>
 <tr>
-<td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='$graph_image'/></td>
+<td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='$graph_image'></td>
 </tr>
 <tr>
 <td>
@@ -11696,7 +11697,7 @@ $roasting_notes$roast_attributes
 </table>
 <table border="1" cellpadding="10" style="page-break-inside:avoid"  width="80%">
 <tr>
-<td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'/></td>
+<td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'></td>
 </tr>
 <tr>
 <td><center><b>""") + u(QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8)) + u("""</b></center>
