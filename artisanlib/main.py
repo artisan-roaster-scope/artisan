@@ -4284,10 +4284,10 @@ class tgraphcanvas(FigureCanvas):
 
     #called from markdryen(), markcharge(), mark1Cstart(), etc when using device 18 (manual mode)
     def drawmanual(self,et,bt,tx):
+        self.timex.append(tx)
         self.temp1.append(et)
         self.l_temp1.set_data(self.timex, self.temp1)
         self.temp2.append(bt)
-        self.timex.append(tx)
         self.l_temp2.set_data(self.timex, self.temp2)
 
     def movebackground(self,direction,step):
