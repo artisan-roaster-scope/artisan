@@ -437,7 +437,7 @@ class tgraphcanvas(FigureCanvas):
         self.phases_celsius_defaults = [95,150,200,230]
         self.phases = list(self.phases_fahrenheit_defaults)
         #this flag makes the main push buttons DryEnd, and FCstart change the phases[1] and phases[2] respectively
-        self.phasesbuttonflag = False #False no change; True make the DRY and FC buttons change the phases during roast automatically
+        self.phasesbuttonflag = True #False no change; True make the DRY and FC buttons change the phases during roast automatically
         self.watermarksflag = True
         
         #show phases LCDs during roasts
@@ -1140,7 +1140,7 @@ class tgraphcanvas(FigureCanvas):
 
     def onclick(self,event):
         try:
-            if event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag and not self.flagon:
+            if event.button==3 and event.inaxes and not self.designerflag and not self.wheelflag:# and not self.flagon:
                 timex = self.time2index(event.xdata)
                 if timex > 0:
                     menu = QMenu(self) 
@@ -1246,13 +1246,13 @@ class tgraphcanvas(FigureCanvas):
                     if self.autoChargeIdx and aw.qmc.timeindex[0] < 0:
                         self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
                     if self.autoTPIdx:
-                        self.autoTPIdx = 0
+                        aw.qmc.autoTPIdx = 0
                         self.markTP()
                     if self.autoDryIdx:
-                        self.autoDryIdx = 0
+                        aw.qmc.autoDryIdx = 0
                         self.markDryEnd()
                     if self.autoFCsIdx:
-                        self.autoFCsIdx = 0
+                        aw.qmc.autoFCsIdx = 0
                         self.mark1Cstart()
                     if self.autoDropIdx and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
@@ -2619,10 +2619,10 @@ class tgraphcanvas(FigureCanvas):
                         labels.append(aw.arabicReshape(self.extraname2[i]))
                     
             if not self.designerflag and aw.qmc.BTcurve:
-                TP_index = aw.findTP()
                 if self.flagon: # no smoothed lines in this case, pass normal BT
-                    self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
+                    self.place_annotations(aw.qmc.TPalarmtimeindex,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.temp2)
                 else:
+                    TP_index = aw.findTP()
                     self.place_annotations(TP_index,aw.qmc.ylimit - aw.qmc.ylimit_min,self.timex,self.timeindex,self.temp2,self.stemp2)
                     if self.timeindex[6]:
                         self.writestatistics(TP_index)
@@ -3367,7 +3367,7 @@ class tgraphcanvas(FigureCanvas):
                         return
                 self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
-                st1 = QApplication.translate("Scope Annotation", "CHARGE 00:00", None, QApplication.UnicodeUTF8)
+                st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE 00:00", None, QApplication.UnicodeUTF8))
                 t2 = self.temp2[self.timeindex[0]]
                 tx = self.timex[self.timeindex[0]]
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
@@ -3404,7 +3404,7 @@ class tgraphcanvas(FigureCanvas):
             if self.flagstart and self.markTPflag:
                 if aw.qmc.TPalarmtimeindex and self.timeindex[0] != -1 and len(self.timex) > aw.qmc.TPalarmtimeindex:
                         st = self.stringfromseconds(self.timex[aw.qmc.TPalarmtimeindex]-self.timex[self.timeindex[0]])
-                        st1 = QApplication.translate("Scope Annotation","TP %1", None, QApplication.UnicodeUTF8).arg(st)
+                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP %1", None, QApplication.UnicodeUTF8).arg(st))
                         #anotate temperature
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
@@ -3445,7 +3445,7 @@ class tgraphcanvas(FigureCanvas):
                         self.phases[1] = int(round(self.temp2[self.timeindex[1]]))
                     #calculate time elapsed since charge time
                     st = self.stringfromseconds(self.timex[self.timeindex[1]]-self.timex[self.timeindex[0]])
-                    st1 = QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(st)
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DE %1", None, QApplication.UnicodeUTF8).arg(st))
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
@@ -3499,7 +3499,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.phasesbuttonflag:
                         self.phases[2] = int(round(self.temp2[self.timeindex[2]]))
                     #calculate time elapsed since charge time
-                    st1 = QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]]))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     if self.timeindex[1]:
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[2]],d)
@@ -3554,7 +3554,7 @@ class tgraphcanvas(FigureCanvas):
                         else:
                             return
                     #calculate time elapsed since charge time
-                    st1 = QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]]))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","FCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                     self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
@@ -3607,7 +3607,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[4] = len(self.timex)-1
                         else:
                             return
-                    st1 = QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]]))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCs %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     if self.timeindex[3]:
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[3]],self.temp2[self.timeindex[4]],d)
@@ -3665,7 +3665,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[5] = len(self.timex)-1
                         else:
                             return
-                    st1 =  QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]]))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","SCe %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                     self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
@@ -3725,7 +3725,7 @@ class tgraphcanvas(FigureCanvas):
                             self.timeindex[6] = len(self.timex)-1
                         else:
                             return
-                    st1 = QApplication.translate("Scope Annotation","DROP %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","DROP %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])))
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     if self.timeindex[5]:
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[5]],self.temp2[self.timeindex[6]],d)
@@ -3801,7 +3801,7 @@ class tgraphcanvas(FigureCanvas):
                     if aw.qmc.phasesbuttonflag:
                         self.phases[1] = int(round(self.temp2[self.timeindex[7]]))
                     #calculate time elapsed since charge time
-                    st1 = QApplication.translate("Scope Annotation","CE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]]))
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","CE %1", None, QApplication.UnicodeUTF8).arg(self.stringfromseconds(self.timex[self.timeindex[7]] - self.timex[self.timeindex[0]])))
                     #anotate temperature
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
@@ -5862,31 +5862,32 @@ class SampleThread(QThread):
 #                    aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
 #                    aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
                     
-                    # we limit the RoR to +/-35C (RoRlimitC) resp. +/-50F (RoRlimitF):
-                    if aw.qmc.mode == "C":
-                        limit = aw.qmc.RoRlimitC
-                    else:
-                        limit = aw.qmc.RoRlimitF                        
-                    if aw.qmc.rateofchange1 > limit or aw.qmc.rateofchange1 < -limit:
-                        if aw.qmc.unfiltereddelta1 and len(aw.qmc.unfiltereddelta1) > 0:
-                            # repeate the previous one 
-                            aw.qmc.rateofchange1 = aw.qmc.unfiltereddelta1[-1]
-                        else:
-                            # or return limit
-                            if aw.qmc.rateofchange1 > 0:
-                                aw.qmc.rateofchange1 = limit  
-                            else:
-                                aw.qmcmc.rateofchange1 = - limit
-                    if aw.qmc.rateofchange2 > limit or aw.qmc.rateofchange2 < -limit:
-                        if aw.qmc.unfiltereddelta2 and len(aw.qmc.unfiltereddelta2) > 0:
-                            # double the previous one 
-                            aw.qmc.rateofchange2 = aw.qmc.unfiltereddelta2[-1]
-                        else:
-                            # or return limit
-                            if aw.qmc.rateofchange2 > 0:
-                                aw.qmc.rateofchange2 = limit
-                            else:
-                                aw.qmc.rateofchange2 = - limit
+# not for now                    
+#                    # we limit the RoR to +/-35C (RoRlimitC) resp. +/-50F (RoRlimitF):
+#                    if aw.qmc.mode == "C":
+#                        limit = aw.qmc.RoRlimitC
+#                    else:
+#                        limit = aw.qmc.RoRlimitF                        
+#                    if aw.qmc.rateofchange1 > limit or aw.qmc.rateofchange1 < -limit:
+#                        if aw.qmc.unfiltereddelta1 and len(aw.qmc.unfiltereddelta1) > 0:
+#                            # repeate the previous one 
+#                            aw.qmc.rateofchange1 = aw.qmc.unfiltereddelta1[-1]
+#                        else:
+#                            # or return limit
+#                            if aw.qmc.rateofchange1 > 0:
+#                                aw.qmc.rateofchange1 = limit  
+#                            else:
+#                                aw.qmcmc.rateofchange1 = - limit
+#                    if aw.qmc.rateofchange2 > limit or aw.qmc.rateofchange2 < -limit:
+#                        if aw.qmc.unfiltereddelta2 and len(aw.qmc.unfiltereddelta2) > 0:
+#                            # double the previous one 
+#                            aw.qmc.rateofchange2 = aw.qmc.unfiltereddelta2[-1]
+#                        else:
+#                            # or return limit
+#                            if aw.qmc.rateofchange2 > 0:
+#                                aw.qmc.rateofchange2 = limit
+#                            else:
+#                                aw.qmc.rateofchange2 = - limit
 
                     aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                     aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
@@ -5959,7 +5960,7 @@ class SampleThread(QThread):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                     # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
-                    elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+2 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                    elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                         aw.qmc.autoTPIdx = 1
                         aw.qmc.TPalarmtimeindex = aw.findTP()                            
                     # autodetect DROP event
@@ -6063,7 +6064,7 @@ class SampleThread(QThread):
                 if local_flagstart:
                     #check alarms 
                     # check for TP event if already CHARGEed and not yet recognized
-                    if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+2 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                    if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                         aw.qmc.TPalarmtimeindex = aw.findTP()
                         aw.qmc.markTP()
         except Exception as e:
@@ -8054,6 +8055,7 @@ class ApplicationWindow(QMainWindow):
             pass
 
     def sendmessage(self,message):
+        message = aw.arabicReshape(message)
         #keep a max of 100 messages
         if len(self.messagehist) > 99:
             self.messagehist = self.messagehist[1:]
@@ -9696,8 +9698,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.temp1 = profile["temp1"]
             if "temp2" in profile:
                 self.qmc.temp2 = profile["temp2"]
-            if "phases" in profile:
-                self.qmc.phases = profile["phases"]
+# we do not load phases from the profile, but compute them automatically below
+#            if "phases" in profile:
+#                self.qmc.phases = profile["phases"]
     # don't let the users y/z min/max axis limits be overwritten by loading a profile
     #        if "zmax" in profile:
     #            self.qmc.zlimit = min(int(profile["zmax"]),500)
@@ -9798,6 +9801,13 @@ class ApplicationWindow(QMainWindow):
                 times.append(startend[2])
                 #convert to new profile
                 self.qmc.timeindexupdate(times)
+            # update phases if phases are set to auto ajusted        
+            if aw.qmc.phasesbuttonflag:
+                # adjust phases by DryEnd and FCs events
+                if aw.qmc.timeindex[1]:
+                    aw.qmc.phases[1] = int(round(aw.qmc.temp2[aw.qmc.timeindex[1]]))
+                if aw.qmc.timeindex[2]:
+                    aw.qmc.phases[2] = int(round(aw.qmc.temp2[aw.qmc.timeindex[2]]))
             # ensure that timeindex has the proper length
             self.qmc.timeindex = self.qmc.timeindex + [0 for i in range(8-len(self.qmc.timeindex))]
             # reset linecount caches
@@ -10537,8 +10547,8 @@ class ApplicationWindow(QMainWindow):
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
                 self.qmc.extradevices = [x.toInt()[0] for x in settings.value("extradevices").toList()]
-                self.qmc.extraname1 = list(map(str,list(settings.value("extraname1",self.qmc.extraname1).toStringList())))
-                self.qmc.extraname2 = list(map(str,list(settings.value("extraname2",self.qmc.extraname2).toStringList())))
+                self.qmc.extraname1 = list(map(u,list(settings.value("extraname1",self.qmc.extraname1).toStringList())))
+                self.qmc.extraname2 = list(map(u,list(settings.value("extraname2",self.qmc.extraname2).toStringList())))
                 self.qmc.extramathexpression1 = list(map(str,list(settings.value("extramathexpression1",self.qmc.extramathexpression1).toStringList())))
                 self.qmc.extramathexpression2 = list(map(str,list(settings.value("extramathexpression2",self.qmc.extramathexpression2).toStringList())))
                 self.qmc.extradevicecolor1 = list(map(str,list(settings.value("extradevicecolor1",self.qmc.extradevicecolor1).toStringList())))
@@ -17357,7 +17367,7 @@ class EventsDlg(ArtisanDialog):
                       QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8)]
         for i in range(nbuttons):
             #label
-            labeledit = QLineEdit(str(aw.extraeventslabels[i]))
+            labeledit = QLineEdit(u(aw.extraeventslabels[i]))
             self.connect(labeledit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setlabeleventbutton(z,i))
             #description
             descriptionedit = QLineEdit(u(aw.extraeventsdescriptions[i]))
@@ -17384,7 +17394,7 @@ class EventsDlg(ArtisanDialog):
             actionComboBox.setCurrentIndex(aw.extraeventsactions[i])
             self.connect(actionComboBox,SIGNAL("currentIndexChanged(int)"),lambda z=1,i=i:self.setactioneventbutton(z,i))
             #action description
-            actiondescriptionedit = QLineEdit(str(aw.extraeventsactionstrings[i]))
+            actiondescriptionedit = QLineEdit(u(aw.extraeventsactionstrings[i]))
             self.connect(actiondescriptionedit,SIGNAL("editingFinished()"),lambda z=1,i=i:self.setactiondescriptioneventbutton(z,i))
             #visibility
             visibilityComboBox =  QComboBox()
@@ -17456,7 +17466,7 @@ class EventsDlg(ArtisanDialog):
             actioncombobox = self.eventbuttontable.cellWidget(i,4)
             aw.extraeventsactions[i] = actioncombobox.currentIndex()
             actiondescriptionedit = self.eventbuttontable.cellWidget(i,5)
-            ades = str(actiondescriptionedit.text())
+            ades = u(actiondescriptionedit.text())
             aw.extraeventsactionstrings[i] = ades
             aw.update_extraeventbuttons_visibility()
 
@@ -20499,6 +20509,7 @@ class serialport(object):
                 self.SP.flushOutput()
                 command = "READ\n"  #Read command.
                 self.SP.write(str2cmd(command))
+                self.SP.flush()
                 rl = self.SP.readline().decode('utf-8')[:-2]
                 res = rl.rsplit(',')  #response: list ["t0","t1","t2"] with t0 = internal temp; t1 = ET; t2 = BT
                 if self.arduinoETChannel == "None":
@@ -22597,10 +22608,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     color2Button = QPushButton(QApplication.translate("Button","Select",None, QApplication.UnicodeUTF8))
                     color2Button.setFocusPolicy(Qt.NoFocus)
                     self.connect(color2Button, SIGNAL("clicked()"),lambda l = 2, c = i: self.setextracolor(l,c))
-                    name1edit = QLineEdit(str(aw.qmc.extraname1[i]))
-                    name2edit = QLineEdit(str(aw.qmc.extraname2[i]))
-                    mexpr1edit = QLineEdit(str(aw.qmc.extramathexpression1[i]))
-                    mexpr2edit = QLineEdit(str(aw.qmc.extramathexpression2[i]))
+                    name1edit = QLineEdit(u(aw.qmc.extraname1[i]))
+                    name2edit = QLineEdit(u(aw.qmc.extraname2[i]))
+                    mexpr1edit = QLineEdit(u(aw.qmc.extramathexpression1[i]))
+                    mexpr2edit = QLineEdit(u(aw.qmc.extramathexpression2[i]))
                     mexpr1edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + 2*x",None, QApplication.UnicodeUTF8))
                     mexpr2edit.setToolTip(QApplication.translate("Tooltip","Example: 100 + x",None, QApplication.UnicodeUTF8))
                     LCD1visibilityComboBox =  QCheckBox()
@@ -22813,12 +22824,24 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.qmc.extradevices[i] = aw.qmc.devices.index(str(typecombobox.currentText())) + 1
                 except:
                     aw.qmc.extradevices[i] = 0
-                aw.qmc.extraname1[i] = str(name1edit.text())
-                aw.qmc.extraname2[i] = str(name2edit.text())
+                if name1edit:
+                    aw.qmc.extraname1[i] = u(name1edit.text())
+                else:
+                    aw.qmc.extraname1[i] = u("")
+                if name2edit:
+                    aw.qmc.extraname2[i] = u(name2edit.text())
+                else:
+                    aw.qmc.extraname2[i] = u("")
                 aw.extraLCDlabel1[i].setText("<b>" + aw.qmc.extraname1[i] + "</b>")
                 aw.extraLCDlabel2[i].setText("<b>" + aw.qmc.extraname2[i] + "</b>")
-                aw.qmc.extramathexpression1[i] = str(mexpr1edit.text())
-                aw.qmc.extramathexpression2[i] = str(mexpr2edit.text())
+                if mexpr2edit:
+                    aw.qmc.extramathexpression1[i] = u(mexpr1edit.text())
+                else:
+                    aw.qmc.extramathexpression1[i] = u("")
+                if mexpr2edit:
+                    aw.qmc.extramathexpression2[i] = u(mexpr2edit.text())
+                else:
+                    aw.qmc.extramathexpression2[i] = u("")
             #update legend with new curves
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as ex:
