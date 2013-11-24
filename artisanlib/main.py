@@ -19708,7 +19708,7 @@ class serialport(object):
             #open port
             if not self.SP.isOpen():
                 self.SP.open()
-                libtime.sleep(.2) # avoid possible hickups on startup
+                libtime.sleep(.5) # avoid possible hickups on startup
         except serial.SerialException:
             self.SP.close()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + QApplication.translate("Error Message","Unable to open serial port",None, QApplication.UnicodeUTF8)
@@ -19788,7 +19788,7 @@ class serialport(object):
                 self.SP.write(str2cmd("#0A0000RA6\r\n"))
                 libtime.sleep(.3)
                 self.SP.write(str2cmd("\x21\x05\x00\x58\x7E"))
-                libtime.sleep(.2)
+                libtime.sleep(2.)
                 self.HH806Winitflag = 1
         except serial.SerialException:
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -20456,7 +20456,7 @@ class serialport(object):
             t1,t2 = 0.,0.
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(1)
+                libtime.sleep(2)
                 #Reinitialize Arduino in case communication was interupted
                 self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
@@ -20606,7 +20606,7 @@ class serialport(object):
                 counter = counter + 1
                 if not self.SP.isOpen():
                     self.openport()    
-                    libtime.sleep(1)
+                    libtime.sleep(2)
                 if self.SP.isOpen():
                     self.SP.flushInput()
                     r = self.SP.read(14)
@@ -20875,7 +20875,7 @@ class serialport(object):
             aw.qmc.samplingsemaphore.acquire(1)
             if not self.SP.isOpen():
                 self.openport()
-                libtime.sleep(.5)
+                libtime.sleep(2)
                 #Reinitialize Arduino in case communication was interrupted
                 if aw.qmc.device == 19:
                     self.ArduinoIsInitialized = 0
