@@ -2533,8 +2533,8 @@ class tgraphcanvas(FigureCanvas):
             ##### ET,BT curves
             if smooth or len(self.stemp1) != len(self.timex):
                 self.stemp1 = self.smooth_list(self.timex,self.temp1,window_len=self.curvefilter)
-                if smooth or len(self.stemp2) != len(self.timex):
-                    self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
+            if smooth or len(self.stemp2) != len(self.timex):
+                self.stemp2 = self.smooth_list(self.timex,self.temp2,window_len=self.curvefilter)
             if aw.qmc.ETcurve:
                 if aw.qmc.flagon:
                     self.l_temp1, = self.ax.plot(self.timex,self.temp1,markersize=self.ETmarkersize,marker=self.ETmarker,
@@ -5843,8 +5843,10 @@ class SampleThread(QThread):
                         aw.qmc.timex[-1] = tx
                 # update lines data using the lists with new data
                 if local_flagstart:
-                    aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
-                    aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+                    if aw.qmc.ETcurve:
+                        aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
+                    if aw.qmc.BTcurve:
+                        aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
                 #we need a minimum of two readings to calculate rate of change
                 if local_flagstart and length_of_qmc_timex > 2:
                     timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
