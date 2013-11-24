@@ -1,5 +1,7 @@
 #!/bin/sh
 
+QT=/usr/local/Trolltech/Qt-4.8.5/
+
 # translations
 pylupdate4 artisan.pro
 lrelease -verbose artisan.pro
@@ -31,29 +33,29 @@ mkdir dist/Resources
 mkdir dist/Resources/qt_plugins
 mkdir dist/Resources/qt_plugins/imageformats
 mkdir dist/Resources/qt_plugins/iconengines
-cp /usr/local/Trolltech/Qt-4.8.5/plugins/imageformats/libqsvg.so dist/Resources/qt_plugins/imageformats
+cp $QT/plugins/imageformats/libqsvg.so dist/Resources/qt_plugins/imageformats
 patchelf --set-rpath '${ORIGIN}/../../..:${ORIGIN}/../../../../lib' dist/Resources/qt_plugins/imageformats/libqsvg.so
-cp /usr/local/Trolltech/Qt-4.8.5/plugins/imageformats/libqgif.so dist/Resources/qt_plugins/imageformats
+cp $QT/plugins/imageformats/libqgif.so dist/Resources/qt_plugins/imageformats
 patchelf --set-rpath '${ORIGIN}/../../..:${ORIGIN}/../../../../lib' dist/Resources/qt_plugins/imageformats/libqgif.so
-#cp /usr/local/Trolltech/Qt-4.8.5/plugins/imageformats/libqjpeg.so dist/Resources/qt_plugins/imageformats
+#cp $QT/plugins/imageformats/libqjpeg.so dist/Resources/qt_plugins/imageformats
 #patchelf --set-rpath '/../../..${ORIGIN}:${ORIGIN}/../../../../lib' dist/Resources/qt_plugins/imageformats/libqjpeg.so
-#cp /usr/local/Trolltech/Qt-4.8.5/plugins/imageformats/libqtiff.so dist/Resources/qt_plugins/imageformats
+#cp $QT/plugins/imageformats/libqtiff.so dist/Resources/qt_plugins/imageformats
 #patchelf --set-rpath '/../../..${ORIGIN}:${ORIGIN}/../../../../lib' dist/Resources/qt_plugins/imageformats/libqtiff.so
-cp /usr/local/Trolltech/Qt-4.8.5/plugins/iconengines/libqsvgicon.so dist/Resources/qt_plugins/iconengines
+cp $QT/plugins/iconengines/libqsvgicon.so dist/Resources/qt_plugins/iconengines
 patchelf --set-rpath '/../../..${ORIGIN}:${ORIGIN}/../../../../lib' dist/Resources/qt_plugins/iconengines/libqsvgicon.so
 cp qt.conf dist
 mkdir dist/translations
 cp translations/*.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_de.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_es.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_fr.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_sv.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_zh_CN.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_zh_TW.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_ko.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_pt.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_ru.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_ar.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_ja.qm dist/translations
-cp /usr/local/Trolltech/Qt-4.8.5/translations/qt_hu.qm dist/translations
+cp $QT/translations/qt_de.qm dist/translations
+cp $QT/translations/qt_es.qm dist/translations
+cp $QT/translations/qt_fr.qm dist/translations
+cp $QT/translations/qt_sv.qm dist/translations
+cp $QT/translations/qt_zh_CN.qm dist/translations
+cp $QT/translations/qt_zh_TW.qm dist/translations
+cp $QT/translations/qt_ko.qm dist/translations
+cp $QT/translations/qt_pt.qm dist/translations
+cp $QT/translations/qt_ru.qm dist/translations
+cp $QT/translations/qt_ar.qm dist/translations
+cp $QT/translations/qt_ja.qm dist/translations
+cp $QT/translations/qt_hu.qm dist/translations
 tar -cf dist-centos.tar dist

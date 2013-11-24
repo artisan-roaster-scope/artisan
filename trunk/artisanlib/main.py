@@ -6103,7 +6103,7 @@ class SampleThread(QThread):
                     self.sample()
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    dt = max(1,aw.qmc.delay/1000. - libtime.time() + start) # min of 0.5sec to allow for refresh the display
+                    dt = max(1,aw.qmc.delay/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     libtime.sleep(dt)
@@ -20506,11 +20506,11 @@ class serialport(object):
                             ### EVERYTHING OK  ###
                             self.ArduinoIsInitialized = 1
                 #READ TEMPERATURE
-                self.SP.flushInput()
-                self.SP.flushOutput()
                 command = "READ\n"  #Read command.
+                self.SP.flushInput()
+#                self.SP.flushOutput()
                 self.SP.write(str2cmd(command))
-                self.SP.flush()
+#                self.SP.flush()
                 rl = self.SP.readline().decode('utf-8')[:-2]
                 res = rl.rsplit(',')  #response: list ["t0","t1","t2"] with t0 = internal temp; t1 = ET; t2 = BT
                 if self.arduinoETChannel == "None":
@@ -20881,12 +20881,12 @@ class serialport(object):
                 if aw.qmc.device == 19:
                     self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
-                self.SP.flushInput()
-                self.SP.flushOutput()
+#                self.SP.flushInput()
+#                self.SP.flushOutput()
                 if (aw.qmc.device == 19 and not command.endswith("\n")):
                     command += "\n"
                 self.SP.write(str2cmd(command))
-                self.SP.flush()
+#                self.SP.flush()
         except serial.SerialException:
             #self.closeport() # do not close the serial port as reopening might take too long
             error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand()"

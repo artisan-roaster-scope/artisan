@@ -9,7 +9,7 @@ import time
 def main():
     
     print("use CTRL + C to interrupt program\n")
-    delay = 5           # set interval of seconds between each reading
+    delay = 1           # set interval of seconds between each reading
     port = '/dev/cu.usbserial-AH01B8JA'
     
     
