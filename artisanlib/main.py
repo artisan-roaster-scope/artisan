@@ -11532,12 +11532,12 @@ class ApplicationWindow(QMainWindow):
     def htmlReport(self):
         try:
             rcParams['path.effects'] = []
-            HTML_REPORT_TEMPLATE = """<?xml version="1.0" encoding="UTF-8"?>
+            HTML_REPORT_TEMPLATE = u("""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<title>""" + u(QApplication.translate("HTML Report Template", "Roasting Report", None, QApplication.UnicodeUTF8)) + """</title>
+<title>""") + u(QApplication.translate("HTML Report Template", "Roasting Report", None, QApplication.UnicodeUTF8)) + u("""</title>
 <style type="text/css">
 td { 
   vertical-align: top;
@@ -11562,51 +11562,51 @@ th {
 <td>
 <table width="230">
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Date:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Date:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$datetime</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Beans:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Beans:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$beans</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Size:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Size:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$size</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Weight:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Weight:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$weight</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Degree:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Degree:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$degree</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Volume:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Volume:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$volume</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Density:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Density:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$density</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Humidity:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Humidity:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$humidity</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Roaster:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Roaster:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$roaster</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Operator:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Operator:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$operator</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Cupping:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Cupping:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$cup</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Color:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Color:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$color</td>
 </tr>
 </table>
@@ -11614,47 +11614,47 @@ th {
 <td>
 <table width="230">
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "CHARGE:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "CHARGE:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$charge</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "TP:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "TP:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$TP</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "DRY:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "DRY:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$DRY</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "FCs:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "FCs:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$FCs</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "FCe:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "FCe:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$FCe</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "SCs:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "SCs:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$SCs</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "SCe:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "SCe:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$SCe</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "DROP:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "DROP:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$drop</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "COOL:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "COOL:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$cool</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "RoR:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "RoR:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$ror</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "ETBTa:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "ETBTa:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$etbta</td>
 </tr>
 </table>
@@ -11662,19 +11662,19 @@ th {
 <td>
 <table width="250">
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Drying:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Drying:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$dry_phase</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Maillard:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Maillard:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$mid_phase</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Development:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Development:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$finish_phase</td>
 </tr>
 <tr>
-<th>""" + u(QApplication.translate("HTML Report Template", "Cooling:", None, QApplication.UnicodeUTF8)) + """</th>
+<th>""") + u(QApplication.translate("HTML Report Template", "Cooling:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$cool_phase</td>
 </tr>
 </table>
@@ -11689,7 +11689,7 @@ th {
 </tr>
 <tr>
 <td>
-<center><b>""" + u(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
+<center><b>""") + u(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + u("""</b></center>
 $roasting_notes$roast_attributes
 </td>
 </tr>
@@ -11699,7 +11699,7 @@ $roasting_notes$roast_attributes
 <td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'/></td>
 </tr>
 <tr>
-<td><center><b>""" + u(QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8)) + """</b></center>
+<td><center><b>""") + u(QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8)) + u("""</b></center>
 $cupping_notes
 </td>
 </tr>
@@ -11707,27 +11707,27 @@ $cupping_notes
 </center>
 </body>
 </html>
-        """
-            beans = cgi.escape(self.qmc.beans)
+        """)
+            beans = u(cgi.escape(self.qmc.beans))
             if len(beans) > 43:
-                beans = beans[:41] + "&hellip;"
+                beans = u(beans[:41] + "&hellip;")
                 
             cp = aw.computedProfileInformation()
             
             if "CHARGE_ET" in cp and "CHARGE_BT" in cp:
                 if self.qmc.mode == "F":
-                    charge = "BT %.0fF <br/>ET %.0fF"%(cp["CHARGE_BT"],cp["CHARGE_ET"])
+                    charge = u("BT %.0fF <br/>ET %.0fF"%(cp["CHARGE_BT"],cp["CHARGE_ET"]))
                 else:
-                    charge = "BT %.0f&deg;C <br/>ET %.0f&deg;C"%(cp["CHARGE_BT"],cp["CHARGE_ET"])
+                    charge = u("BT %.0f&deg;C <br/>ET %.0f&deg;C"%(cp["CHARGE_BT"],cp["CHARGE_ET"]))
             else:
-                charge = "--"
+                charge = u("--")
             dryphase, midphase, finishphase, coolphase = self.phases2html(cp)
-            etbta = "--"
+            etbta = u("--")
             if "total_ts" in cp and cp["total_ts"] != 0:
-                etbta = "%d %sm"%(cp["total_ts"],self.qmc.mode) 
+                etbta = u("%d %sm"%(cp["total_ts"],self.qmc.mode))
                 if "total_ts_ET" in cp and "total_ts_BT" in cp:
-                    etbta += " [%d-%d]"%(cp["total_ts_ET"],cp["total_ts_BT"])
-            tmpdir = str(QDir.tempPath() + "/")
+                    etbta += u(" [%d-%d]"%(cp["total_ts_ET"],cp["total_ts_BT"]))
+            tmpdir = u(QDir.tempPath() + "/")
             graph_image = "roastlog-graph"
             if platf == 'Darwin':
                 graph_image = u(QDir(tmpdir).filePath(graph_image + ".svg"))
@@ -11773,64 +11773,64 @@ $cupping_notes
             flavor_image = flavor_image + "?dummy=" + str(int(libtime.time()))
             #return screen to GRAPH profile mode
             self.qmc.redraw(recomputeAllDeltas=False)
-            ror = "--"
+            ror = u("--")
             if "total_ror" in cp:
-                ror = "%d%s"%(cp["total_ror"],QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8))
+                ror = u("%d%s"%(cp["total_ror"],QApplication.translate("Label", "d/m",None, QApplication.UnicodeUTF8)))
             if "set_density" in cp:
-                density = "%.1fg/l (set)"%cp["set_density"]
+                density = u("%.1fg/l (set)"%cp["set_density"])
             else:
-                density = "--"
+                density = u("--")
             if  self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
-                weight = self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],cp["weight_loss"])
+                weight = u(self.volume_weight2html(self.qmc.weight[0],self.qmc.weight[1],self.qmc.weight[2],cp["weight_loss"]))
             else:
-                weight = "--"
+                weight = u("--")
             if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0:
-                volume = self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp["volume_gain"])
+                volume = u(self.volume_weight2html(self.qmc.volume[0],self.qmc.volume[1],self.qmc.volume[2],cp["volume_gain"]))
             else:
-                volume = "--"
+                volume = u("--")
             if self.qmc.volume[0] != 0.0 and self.qmc.volume[1] != 0.0 and self.qmc.weight[0] != 0.0 and self.qmc.weight[1] != 0.0:
-                degree = self.roast_degree(cp["weight_loss"])
+                degree = u(self.roast_degree(cp["weight_loss"]))
                 if "set_density" in cp:
                     if "green_density" in cp and "roasted_density" in cp:
-                        density = "%.1fg/l (set)<br/>%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["set_density"],cp["green_density"],cp["roasted_density"])
+                        density = u("%.1fg/l (set)<br/>%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["set_density"],cp["green_density"],cp["roasted_density"]))
                 elif "green_density" in cp and "roasted_density" in cp:
-                    density = "%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"])
+                    density = u("%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"]))
             else:
-                degree = "--"
-            humidity = ""
+                degree = u("--")
+            humidity = u("")
             if "bag_humidity" in cp:
-                humidity = "%d%%"%cp["bag_humidity"]
+                humidity = u("%d%%"%cp["bag_humidity"])
                 if "bag_temperature" in cp:
-                    humidity += " at %d%s"%(cp["bag_temperature"],self.qmc.mode)
+                    humidity += u(" at %d%s"%(cp["bag_temperature"],self.qmc.mode))
                 humidity += " (bag)"
             if "ambient_humidity" in cp:
                 if humidity != "":
-                    humidity += "<br/>"
-                humidity += "%d%%"%cp["ambient_humidity"]
+                    humidity += u("<br/>")
+                humidity += u("%d%%"%cp["ambient_humidity"])
                 if "ambient_temperature" in cp:
-                    humidity += " at %d%s"%(cp["ambient_temperature"],self.qmc.mode)
-                humidity += " (ambient)"
+                    humidity += u(" at %d%s"%(cp["ambient_temperature"],self.qmc.mode))
+                humidity += u(" (ambient)")
             if len(humidity) == 0:
-                humidity = "--"
+                humidity = u("--")
             if self.qmc.whole_color or self.qmc.ground_color:
-                color = str(self.qmc.whole_color) + "/" + str(self.qmc.ground_color)
+                color = u(str(self.qmc.whole_color) + "/" + str(self.qmc.ground_color))
                 if self.qmc.color_system_idx:
-                    color = color + " (" + self.qmc.color_systems[self.qmc.color_system_idx] + ")"
+                    color = color + u(" (" + self.qmc.color_systems[self.qmc.color_system_idx] + ")")
             else:
-                color = "--"
+                color = u("--")
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
-                title=cgi.escape(self.qmc.title),
+                title=u(cgi.escape(self.qmc.title)),
                 datetime=u(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
                 beans=beans,
                 weight=weight,
                 degree=degree,
                 volume=volume,
-                roaster=cgi.escape(self.qmc.roastertype),
-                operator=cgi.escape(self.qmc.operator),
-                cup=str(self.cuppingSum()),
+                roaster=u(cgi.escape(self.qmc.roastertype)),
+                operator=u(cgi.escape(self.qmc.operator)),
+                cup=u(str(self.cuppingSum())),
                 color=color,
                 charge=charge,            
-                size=("--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm"),
+                size=u("--" if aw.qmc.beansize == 0.0 else str(aw.qmc.beansize) + "mm"),
                 density=density,
                 humidity=humidity,
                 TP=self.event2html(cp,"TP_time","TP_BT"),
@@ -11903,9 +11903,9 @@ $cupping_notes
         if aw.qmc.divots_flag:
             res.append(u(QApplication.translate("CheckBox","Divots", None, QApplication.UnicodeUTF8)))
         if len(res) > 0:
-            return "\n<center><pre>" + ', '.join(res) + "</pre></center>"
+            return u("\n<center><pre>" + ', '.join(res) + "</pre></center>")
         else:
-            return ""
+            return u("")
 
     def cuppingSum(self):
         score = 0.
@@ -11976,12 +11976,12 @@ $cupping_notes
             res = self.qmc.stringfromseconds(cp[time_key]) + " (" + self.qmc.stringfromseconds(cp[time_key] - cp[prev_time_key]) + "m)"
         elif time_key in cp and BT_key in cp:
             res = self.qmc.stringfromseconds(cp[time_key])+ " (%.0f"%cp[BT_key] + "&deg;" + self.qmc.mode + ")"
-        return res
+        return u(res)
 
     def specialevents2html(self):
-        html = ""  
+        html = u("")
         if self.qmc.specialevents and len(self.qmc.specialevents) > 0:
-            html += '<center>\n<table cellpadding="2">\n'
+            html += u('<center>\n<table cellpadding="2">\n')
             if self.qmc.timeindex[0] != -1:
                 start = self.qmc.timex[self.qmc.timeindex[0]]
             else:
@@ -12003,15 +12003,15 @@ $cupping_notes
                      "</td><td>at " + "%.1f"%self.qmc.temp2[sevents[i]] + self.qmc.mode +
                      "]</td><td>" + seventsString[i] + "</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")
             html += '</table>\n</center>'
-        return html
+        return u(html)
 
     def note2html(self,notes):
-        notes_html = ""
+        notes_html = u("")
         for i in range(len(notes)):
             if ord(u(notes[i])) == 9:
-                notes_html += " &nbsp&nbsp&nbsp&nbsp "
+                notes_html += u(" &nbsp&nbsp&nbsp&nbsp ")
             elif u(notes[i]) == "\n":
-                notes_html += "<br/>\n"
+                notes_html += u("<br/>\n")
             else:           
                 notes_html += u(notes[i])
         return notes_html
