@@ -88,6 +88,7 @@ import matplotlib.transforms as transforms
 import matplotlib.font_manager as font_manager
 import matplotlib.ticker as ticker
 import matplotlib.patheffects as PathEffects
+import matplotlib.dates as md
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
@@ -1245,16 +1246,16 @@ class tgraphcanvas(FigureCanvas):
                     #auto mark CHARGE/TP/DRY/FCs/DROP
                     if self.autoChargeIdx and aw.qmc.timeindex[0] < 0:
                         self.markCharge() # we do not reset the autoChargeIdx to avoid another trigger
-                    if self.autoTPIdx:
-                        aw.qmc.autoTPIdx = 0
+                    if self.autoTPIdx != 0:
+                        self.autoTPIdx = 0
                         self.markTP()
-                    if self.autoDryIdx:
-                        aw.qmc.autoDryIdx = 0
+                    if self.autoDryIdx != 0:
+                        self.autoDryIdx = 0
                         self.markDryEnd()
-                    if self.autoFCsIdx:
-                        aw.qmc.autoFCsIdx = 0
+                    if self.autoFCsIdx != 0:
+                        self.autoFCsIdx = 0
                         self.mark1Cstart()
-                    if self.autoDropIdx and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
+                    if self.autoDropIdx != 0 and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6]:
                         self.markDrop() # we do not reset the autoDropIdx to avoid another trigger
 
                 #check triggered alarms
@@ -1707,6 +1708,20 @@ class tgraphcanvas(FigureCanvas):
             for label in self.ax.xaxis.get_ticklabels():
                 label.set_rotation(self.xrotation)
 
+    def fmt_timedata(self,x):
+        if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
+            starttime = self.timex[self.timeindex[0]]
+        else:
+            starttime = 0
+        if x >=  starttime:
+            sign = ""
+        else:
+            sign = "-"
+        m,s = divmod(abs(x - round(starttime)), 60)
+        s = int(round(s))
+        m = int(m)
+        return '%s%d:%02d'%(sign,m,s)
+
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -1948,6 +1963,9 @@ class tgraphcanvas(FigureCanvas):
                 #autodetected CHARGE and DROP index
                 self.autoChargeIdx = 0
                 self.autoDropIdx = 0
+                self.autoTPIdx = 0
+                self.autoDryIdx = 0
+                self.autoFCsIdx = 0
         
                 aw.hideDefaultButtons()
                 aw.hideExtraButtons()
@@ -2196,14 +2214,6 @@ class tgraphcanvas(FigureCanvas):
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " place_annotations() %1").arg(str(e)),exc_tb.tb_lineno)
 
-    
-    def test(self,x,y):
-        #inv = self.delta_ax.transData.inverted()
-        #xx, yy = inv.transform((x, y))
-        xx, yy = self.delta_ax.transData.transform((x, y))
-        inv = self.ax.transData.inverted()
-        xxx, yyy = inv.transform((xx,yy))
-        return "({0:f}, ".format(yyy) +  "{0:f})".format(xxx) 
 
     #Redraws data
     # if recomputeAllDeltas, the delta arrays; if smooth the smoothed line arrays are recomputed
@@ -2272,6 +2282,7 @@ class tgraphcanvas(FigureCanvas):
                 
             # format temperature as int, not float in the cursor position coordinate indicator
             self.ax.fmt_ydata = lambda x:int(round(x))
+            self.ax.fmt_xdata = self.fmt_timedata
             
             if two_ax_mode:
                 #create a second set of axes in the same position as self.ax
@@ -2294,6 +2305,7 @@ class tgraphcanvas(FigureCanvas):
 
                 # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
                 self.delta_ax.fmt_ydata = lambda y: int(round(self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,y))[1]))[1]))
+                self.delta_ax.fmt_xdata = self.fmt_timedata
             #put a right tick on the graph
             else:
 #                if aw.qmc.graphstyle:
@@ -3908,49 +3920,51 @@ class tgraphcanvas(FigureCanvas):
                         #if Event show flag
                         if self.eventsshowflag:
                             index = self.specialevents[-1]
-                            if self.specialeventstype[-1] < 4:
+                            if etype < 4:
                                 firstletter = self.etypesf(self.specialeventstype[-1])[0]
-                                secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
-                                if self.eventsGraphflag == 0:
-                                    if self.mode == "F":
-                                        height = 50
-                                    else:
-                                        height = 20
-                                    #some times ET is not drawn (ET = 0) when using device NONE
-                                    if self.temp1[index] > self.temp2[index]:
-                                        temp = self.temp1[index]
-                                    else:
-                                        temp = self.temp2[index]
-                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
-                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
-                                #if Event Type-Bars flag
-                                elif self.eventsGraphflag == 1:
-                                    char1 = self.etypesf(0)[0]
-                                    char2 = self.etypesf(1)[0]
-                                    char3 = self.etypesf(2)[0]
-                                    char4 = self.etypesf(3)[0]
-                                    if self.mode == "F":
-                                        row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
-                                    else:
-                                        row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
-                                    #some times ET is not drawn (ET = 0) when using device NONE
-                                    if self.temp1[index] >= self.temp2[index]:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                         color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
-                                    else:
-                                        self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
-                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
-                                elif self.eventsGraphflag == 2:
-                                    # update lines data using the lists with new data
-                                    if etype == 0:
-                                        self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
-                                    elif etype == 1:
-                                        self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
-                                    elif etype == 2:
-                                        self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
-                                    elif etype == 3:
-                                        self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
-                        self.fig.canvas.draw()
+                            else:
+                                firstletter = "E"
+                            secondletter = self.eventsvaluesShort(self.specialeventsvalue[-1])
+                            if self.eventsGraphflag == 0:
+                                if self.mode == "F":
+                                    height = 50
+                                else:
+                                    height = 20
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                if self.temp1[index] > self.temp2[index]:
+                                    temp = self.temp1[index]
+                                else:
+                                    temp = self.temp2[index]
+                                self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], temp),xytext=(self.timex[index],temp+height),alpha=0.9,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                            #if Event Type-Bars flag
+                            elif self.eventsGraphflag == 1 and etype < 4:
+                                char1 = self.etypesf(0)[0]
+                                char2 = self.etypesf(1)[0]
+                                char3 = self.etypesf(2)[0]
+                                char4 = self.etypesf(3)[0]
+                                if self.mode == "F":
+                                    row = {char1:self.phases[0]-20,char2:self.phases[0]-40,char3:self.phases[0]-60,char4:self.phases[0]-80}
+                                else:
+                                    row = {char1:self.phases[0]-10,char2:self.phases[0]-20,char3:self.phases[0]-30,char4:self.phases[0]-40}
+                                #some times ET is not drawn (ET = 0) when using device NONE
+                                if self.temp1[index] >= self.temp2[index]:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp1[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                     color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["et"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                                else:
+                                    self.ax.annotate(firstletter + secondletter, xy=(self.timex[index], self.temp2[index]),xytext=(self.timex[index],row[firstletter]),alpha=1.,
+                                                 color=self.palette["text"],arrowprops=dict(arrowstyle='-',color=self.palette["bt"],alpha=0.4,relpos=(0,0)),fontsize="x-small",fontproperties=aw.mpl_fontproperties,backgroundcolor='yellow')
+                            elif self.eventsGraphflag == 2 and etype < 4:
+                                # update lines data using the lists with new data
+                                if etype == 0:
+                                    self.l_eventtype1dots.set_data(self.E1timex, self.E1values)
+                                elif etype == 1:
+                                    self.l_eventtype2dots.set_data(self.E2timex, self.E2values)
+                                elif etype == 2:
+                                    self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
+                                elif etype == 3:
+                                    self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
+#                        self.fig.canvas.draw()
                         temp = "%.1f "%self.temp2[i]
                         timed = self.stringfromseconds(self.timex[i])
                         if self.samplingsemaphore.available() < 1:
@@ -3968,8 +3982,8 @@ class tgraphcanvas(FigureCanvas):
             else:
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF", None, QApplication.UnicodeUTF8))
         except Exception as e:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " EventRecordAction() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
@@ -5974,8 +5988,8 @@ class SampleThread(QThread):
                             # we found a BT break at the current index minus 2
                             aw.qmc.autoDropIdx = length_of_qmc_timex - 3                            
                     #check for autoDRY:
-                    if aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
-                        # after TP (if DRY event not yet set) check for BT exceeding Dry-max as specified in the phases dialog
+                    if aw.qmc.autoDRYflag and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
+                        # if DRY event not yet set check for BT exceeding Dry-max as specified in the phases dialog
                         if aw.qmc.temp2[-1] >= aw.qmc.phases[1]:
                             aw.qmc.autoDryIdx = 1
                     #check for autoFCs:
@@ -19346,8 +19360,6 @@ class serialport(object):
             else:
                 return "0"
         except serial.SerialException:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendFUJIcommand()"
             _, _, exc_tb = sys.exc_info()
@@ -19477,8 +19489,6 @@ class serialport(object):
                     else:
                         return -1.
         except serial.SerialException:
-            if self.COMsemaphore.available() < 1:
-                self.COMsemaphore.release(1)
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendDTAcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds            
             _, _, exc_tb = sys.exc_info()
@@ -20510,9 +20520,9 @@ class serialport(object):
                 #READ TEMPERATURE
                 command = "READ\n"  #Read command.
                 self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.flushOutput()
                 self.SP.write(str2cmd(command))
-#                self.SP.flush()
+                self.SP.flush()
                 rl = self.SP.readline().decode('utf-8')[:-2]
                 res = rl.rsplit(',')  #response: list ["t0","t1","t2"] with t0 = internal temp; t1 = ET; t2 = BT
                 if self.arduinoETChannel == "None":
@@ -20556,7 +20566,7 @@ class serialport(object):
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.ARDUINOTC4temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + str(e),exc_tb.tb_lineno)
             return -1.,-1.
         except Exception as e:
             # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
@@ -20883,18 +20893,18 @@ class serialport(object):
                 if aw.qmc.device == 19:
                     self.ArduinoIsInitialized = 0
             if self.SP.isOpen():
-#                self.SP.flushInput()
-#                self.SP.flushOutput()
+                self.SP.flushInput()
+                self.SP.flushOutput()
                 if (aw.qmc.device == 19 and not command.endswith("\n")):
                     command += "\n"
                 self.SP.write(str2cmd(command))
-#                self.SP.flush()
+                self.SP.flush()
         except serial.SerialException:
             #self.closeport() # do not close the serial port as reopening might take too long
             error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
+            aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + str(e),exc_tb.tb_lineno)
         except Exception as ex:
             #self.closeport() # do not close the serial port as reopening might take too long
             _, _, exc_tb = sys.exc_info()
