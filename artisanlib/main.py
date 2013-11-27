@@ -11732,7 +11732,7 @@ th {
 </td>
 </tr>
 <tr>
-<td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='$graph_image'></td>
+<td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='file:///$graph_image'></td>
 </tr>
 <tr>
 <td>
@@ -11743,7 +11743,7 @@ $roasting_notes$roast_attributes
 </table>
 <table border="1" cellpadding="10" style="page-break-inside:avoid"  width="80%">
 <tr>
-<td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='$flavor_image'></td>
+<td style="vertical-align:middle" align="center"><img alt='flavor graph' width="550" src='file:///$flavor_image'></td>
 </tr>
 <tr>
 <td><center><b>""") + u(QApplication.translate("HTML Report Template", "Cupping Notes", None, QApplication.UnicodeUTF8)) + u("""</b></center>
