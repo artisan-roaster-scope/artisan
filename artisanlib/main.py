@@ -11735,7 +11735,7 @@ th {
 <td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='file:///$graph_image'></td>
 </tr>
 <tr>
-<td><center><b>""" + unicode(QApplication.translate("HTML Report Template", "Events", None, QApplication.UnicodeUTF8)) + """</b></center><br/>
+<td><center><b>""" + unicode(QApplication.translate("HTML Report Template", "Events", None, QApplication.UnicodeUTF8)) + """</b></center><br>
 $specialevents
 </td>
 </tr>
@@ -11768,9 +11768,9 @@ $cupping_notes
             
             if "CHARGE_ET" in cp and "CHARGE_BT" in cp:
                 if self.qmc.mode == "F":
-                    charge = u("BT %.0fF <br/>ET %.0fF"%(cp["CHARGE_BT"],cp["CHARGE_ET"]))
+                    charge = u("BT %.0fF <br>ET %.0fF"%(cp["CHARGE_BT"],cp["CHARGE_ET"]))
                 else:
-                    charge = u("BT %.0f&deg;C <br/>ET %.0f&deg;C"%(cp["CHARGE_BT"],cp["CHARGE_ET"]))
+                    charge = u("BT %.0f&deg;C <br>ET %.0f&deg;C"%(cp["CHARGE_BT"],cp["CHARGE_ET"]))
             else:
                 charge = u("--")
             dryphase, midphase, finishphase, coolphase = self.phases2html(cp)
@@ -11844,9 +11844,9 @@ $cupping_notes
                 degree = u(self.roast_degree(cp["weight_loss"]))
                 if "set_density" in cp:
                     if "green_density" in cp and "roasted_density" in cp:
-                        density = u("%.1fg/l (set)<br/>%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["set_density"],cp["green_density"],cp["roasted_density"]))
+                        density = u("%.1fg/l (set)<br>%.1fg/l (green)<br>%.1fg/l (roasted)"%(cp["set_density"],cp["green_density"],cp["roasted_density"]))
                 elif "green_density" in cp and "roasted_density" in cp:
-                    density = u("%.1fg/l (green)<br/>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"]))
+                    density = u("%.1fg/l (green)<br>%.1fg/l (roasted)"%(cp["green_density"],cp["roasted_density"]))
             else:
                 degree = u("--")
             humidity = u("")
@@ -11857,7 +11857,7 @@ $cupping_notes
                 humidity += " (bag)"
             if "ambient_humidity" in cp:
                 if humidity != "":
-                    humidity += u("<br/>")
+                    humidity += u("<br>")
                 humidity += u("%d%%"%cp["ambient_humidity"])
                 if "ambient_temperature" in cp:
                     humidity += u(" at %d%s"%(cp["ambient_temperature"],self.qmc.mode))
@@ -11970,7 +11970,7 @@ $cupping_notes
 
     def volume_weight2html(self,amount,out,unit,change):
         if amount:
-            return str(amount) + unit + "<br/>" + str(out) + unit + " (" + "%.1f"%change + "%)"
+            return str(amount) + unit + "<br>" + str(out) + unit + " (" + "%.1f"%change + "%)"
         else:
             return "--"
 
@@ -11983,43 +11983,43 @@ $cupping_notes
                 dryphasetime = cp["dryphasetime"]
                 dryphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["dryphasetime"]),int(round(dryphasetime*100./totaltime)))
                 if "dry_phase_ror" in cp:
-                    dryphase += "<br/>%.1f deg/min"%cp["dry_phase_ror"]
+                    dryphase += "<br>%.1f deg/min"%cp["dry_phase_ror"]
                 if "dry_phase_ts" in cp:
-                    dryphase += "<br/>%d %sm"%(cp["dry_phase_ts"],self.qmc.mode)
+                    dryphase += "<br>%d %sm"%(cp["dry_phase_ts"],self.qmc.mode)
                     if "dry_phase_ts_ET" in cp and "dry_phase_ts_BT" in cp:
                         dryphase += " [%d-%d]"%(cp["dry_phase_ts_ET"],cp["dry_phase_ts_BT"])
                     if "dryphaseeval" in cp:
-                        dryphase += "<br/>" + cp["dryphaseeval"]
+                        dryphase += "<br>" + cp["dryphaseeval"]
             #midphase
             if "midphasetime" in cp:
                 midphasetime = cp["midphasetime"]
                 midphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["midphasetime"]),int(round(midphasetime*100./totaltime)))
                 if "mid_phase_ror" in cp:
-                    midphase += "<br/>%.1f deg/min"%cp["mid_phase_ror"]
+                    midphase += "<br>%.1f deg/min"%cp["mid_phase_ror"]
                 if "mid_phase_ts" in cp:
-                    midphase += "<br/>%d %sm"%(cp["mid_phase_ts"],self.qmc.mode)
+                    midphase += "<br>%d %sm"%(cp["mid_phase_ts"],self.qmc.mode)
                     if "mid_phase_ts_ET" in cp and "mid_phase_ts_BT" in cp:
                         midphase += " [%d-%d]"%(cp["mid_phase_ts_ET"],cp["mid_phase_ts_BT"])
                 if "midphaseeval" in cp:
-                    midphase += "<br/>" + cp["midphaseeval"]
+                    midphase += "<br>" + cp["midphaseeval"]
             #finishphase
             if "finishphasetime" in cp:
                 finishphasetime = cp["finishphasetime"]
                 finishphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["finishphasetime"]),int(round(finishphasetime*100./totaltime)))
                 if "finish_phase_ror" in cp:
-                    finishphase += "<br/>%.1f deg/min"%cp["finish_phase_ror"]
+                    finishphase += "<br>%.1f deg/min"%cp["finish_phase_ror"]
                 if "finish_phase_ts" in cp:
-                    finishphase += "<br/>%d %sm"%(cp["finish_phase_ts"],self.qmc.mode)
+                    finishphase += "<br>%d %sm"%(cp["finish_phase_ts"],self.qmc.mode)
                     if "finish_phase_ts_ET" in cp and "finish_phase_ts_BT" in cp:
                         finishphase += " [%d-%d]"%(cp["finish_phase_ts_ET"],cp["finish_phase_ts_BT"])
                 if "finishphaseeval" in cp:
-                    finishphase += "<br/>" + cp["finishphaseeval"]
+                    finishphase += "<br>" + cp["finishphaseeval"]
             #coolphase
             if "coolphasetime" in cp:
                 coolphasetime = cp["coolphasetime"]
                 coolphase = "%s (%d%%)"%(self.qmc.stringfromseconds(cp["coolphasetime"]),int(round(coolphasetime*100./totaltime)))
                 if "coolphaseeval" in cp:
-                    coolphase += "<br/>" + cp["coolphaseeval"]
+                    coolphase += "<br>" + cp["coolphaseeval"]
         return dryphase, midphase, finishphase, coolphase
 
     def event2html(self,cp,time_key,BT_key=None,prev_time_key=None):
@@ -12064,7 +12064,7 @@ $cupping_notes
             if ord(u(notes[i])) == 9:
                 notes_html += u(" &nbsp&nbsp&nbsp&nbsp ")
             elif u(notes[i]) == "\n":
-                notes_html += u("<br/>\n")
+                notes_html += u("<br>\n")
             else:           
                 notes_html += u(notes[i])
         return notes_html
