@@ -3982,8 +3982,8 @@ class tgraphcanvas(FigureCanvas):
             else:
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF", None, QApplication.UnicodeUTF8))
         except Exception as e:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " EventRecordAction() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
@@ -19352,6 +19352,7 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(binstring)
+                self.SP.flush()
                 r = self.SP.read(nbytes)
                 ###  release resources  ###
                 self.COMsemaphore.release(1)
@@ -19481,6 +19482,7 @@ class serialport(object):
                 self.SP.flushOutput()
                 #SEND (tx)
                 self.SP.write(str2cmd(command))
+                self.SP.flush()
                 #READ n bytes(rx)
                 r = self.SP.read(nrxbytes).decode('utf-8')
                 ###  release resources  ###
@@ -19790,6 +19792,7 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
+                self.SP.flush()
                 r = self.SP.read(16)
                 if len(r) == 16:
                     #convert to binary to hex string
@@ -20058,6 +20061,7 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
+                self.SP.flush()
                 r = self.SP.read(7)                                   #NOTE: different
                 if len(r) == 7:
                     #DECIMAL POINT
@@ -20113,6 +20117,7 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
+                self.SP.flush()
                 r = self.SP.read(8) #NOTE: different to CENTER306
                 if len(r) == 8:
                     #DECIMAL POINT
@@ -20181,6 +20186,7 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
+                self.SP.flush()
                 r = self.SP.read(10) #NOTE: different to CENTER303
                 if len(r) == 10:
                     #DECIMAL POINT
@@ -20269,6 +20275,7 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
+                self.SP.flush()
                 r = self.SP.read(45)
                 if len(r) == 45:
                     T1 = T2 = T3 = T3 = -1
