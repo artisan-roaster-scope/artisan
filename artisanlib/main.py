@@ -3384,7 +3384,7 @@ class tgraphcanvas(FigureCanvas):
                 tx = self.timex[self.timeindex[0]]
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                 self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
-                self.fig.canvas.draw()               
+#                self.fig.canvas.draw()           
                 # redraw (within timealign) should not be called if semaphore is hold!
                 # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
                 if self.samplingsemaphore.available() < 1:
@@ -3421,7 +3421,7 @@ class tgraphcanvas(FigureCanvas):
                         d = aw.qmc.ylimit - aw.qmc.ylimit_min
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
                         self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down)
-                        self.fig.canvas.draw()
+#                        self.fig.canvas.draw()
                         st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
                         if self.samplingsemaphore.available() < 1:
                             self.samplingsemaphore.release(1) 
@@ -3462,7 +3462,7 @@ class tgraphcanvas(FigureCanvas):
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[1]],d)
                     self.annotate(self.temp2[self.timeindex[1]],st1,self.timex[self.timeindex[1]],self.temp2[self.timeindex[1]],self.ystep_up,self.ystep_down)
-                    self.fig.canvas.draw()
+#                    self.fig.canvas.draw()
                     st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
                     # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
                     if self.samplingsemaphore.available() < 1:
@@ -3518,7 +3518,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[self.timeindex[2]],d)
                     self.annotate(self.temp2[self.timeindex[2]],st1,self.timex[self.timeindex[2]],self.temp2[self.timeindex[2]],self.ystep_up,self.ystep_down)
-                    self.fig.canvas.draw()
+#                    self.fig.canvas.draw()
                     st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
                     # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
@@ -3570,7 +3570,7 @@ class tgraphcanvas(FigureCanvas):
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[2]],self.temp2[self.timeindex[3]],d)
                     self.annotate(self.temp2[self.timeindex[3]],st1,self.timex[self.timeindex[3]],self.temp2[self.timeindex[3]],self.ystep_up,self.ystep_down)
-                    self.fig.canvas.draw()
+#                    self.fig.canvas.draw()
                     st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
                     # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
@@ -3626,7 +3626,7 @@ class tgraphcanvas(FigureCanvas):
                     else:
                         self.ystep_down,self.ystep_up = self.findtextgap(0,0,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[4]],d)
                     self.annotate(self.temp2[self.timeindex[4]],st1,self.timex[self.timeindex[4]],self.temp2[self.timeindex[4]],self.ystep_up,self.ystep_down)
-                    self.fig.canvas.draw()
+#                    self.fig.canvas.draw()
                     st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
                     # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
@@ -3681,7 +3681,7 @@ class tgraphcanvas(FigureCanvas):
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[4]],self.temp2[self.timeindex[5]],d)
                     self.annotate(self.temp2[self.timeindex[5]],st1,self.timex[self.timeindex[5]],self.temp2[self.timeindex[5]],self.ystep_up,self.ystep_down)
-                    self.fig.canvas.draw()
+#                    self.fig.canvas.draw()
                     st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
                     # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
@@ -3750,7 +3750,7 @@ class tgraphcanvas(FigureCanvas):
                     elif self.timeindex[1]:
                         self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[1]],self.temp2[self.timeindex[6]],d)
                     self.annotate(self.temp2[self.timeindex[6]],st1,self.timex[self.timeindex[6]],self.temp2[self.timeindex[6]],self.ystep_up,self.ystep_down)
-                    self.fig.canvas.draw()
+#                    self.fig.canvas.draw()
                     st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
                     # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
@@ -3818,7 +3818,7 @@ class tgraphcanvas(FigureCanvas):
                     d = aw.qmc.ylimit - aw.qmc.ylimit_min  
                     self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[6]],self.temp2[self.timeindex[7]],d)
                     self.annotate(self.temp2[self.timeindex[7]],st1,self.timex[self.timeindex[7]],self.temp2[self.timeindex[7]],self.ystep_up,self.ystep_down)
-                    self.fig.canvas.draw()
+#                    self.fig.canvas.draw()
                     st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
                     # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
@@ -4066,7 +4066,7 @@ class tgraphcanvas(FigureCanvas):
                                 self.l_eventtype3dots.set_data(self.E3timex, self.E3values)
                             elif etype == 3:
                                 self.l_eventtype4dots.set_data(self.E4timex, self.E4values)
-                    self.fig.canvas.draw()
+#                    self.fig.canvas.draw()
         except Exception as e:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " DeviceEventRecord() %1").arg(str(e)),exc_tb.tb_lineno)
@@ -8498,7 +8498,8 @@ class ApplicationWindow(QMainWindow):
             self.etypeComboBox.setCurrentIndex(0)
             self.etimeline.setText("")
             self.qmc.resetlines()
-            self.qmc.fig.canvas.draw()
+            if not aw.qmc.flagstart:
+                self.qmc.fig.canvas.draw()
             return
         if currentevent > lenevents:
             self.eNumberSpinBox.setValue(lenevents)
@@ -8516,7 +8517,8 @@ class ApplicationWindow(QMainWindow):
                 x = [self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex]]
                 y = [(self.qmc.ylimit_min-100),self.qmc.temp2[etimeindex],self.qmc.temp1[etimeindex],(self.qmc.ylimit+100)]
                 self.qmc.ax.plot(x,y,marker ="o",markersize=12,color ="yellow",linestyle="-",linewidth = 7,alpha=.4)
-                self.qmc.fig.canvas.draw()
+                if not aw.qmc.flagstart:
+                    self.qmc.fig.canvas.draw()
         self.eNumberSpinBox.setDisabled(False)
         self.eNumberSpinBox.setFocus()
 
@@ -8542,8 +8544,9 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp1[etimeindex], "o", color = self.qmc.palette["et"])
             else:
                 self.qmc.ax.plot(self.qmc.timex[etimeindex], self.qmc.temp2[etimeindex], "o", color = self.qmc.palette["bt"])
-
-            self.qmc.fig.canvas.draw()
+            
+            if not aw.qmc.flagstart:
+                self.qmc.fig.canvas.draw()
 
             string = ""
             if len(self.qmc.specialeventsStrings[lenevents-1]) > 5:
@@ -10856,8 +10859,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.ETdrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETlinewidth = aw.qmc.l_temp1.get_linewidth()
-                self.qmc.ETmarker = aw.qmc.l_temp1.get_marker()
-                self.qmc.ETmarkersize = aw.qmc.l_temp1.get_markersize()
+                m = aw.qmc.l_temp1.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.ETmarker = m
                 self.qmc.palette["et"] = aw.qmc.l_temp1.get_color()
             if aw.qmc.l_temp2:
                 self.qmc.BTlinestyle = aw.qmc.l_temp2.get_linestyle()
@@ -10867,7 +10871,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.BTdrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTlinewidth = aw.qmc.l_temp2.get_linewidth()
-                self.qmc.BTmarker = aw.qmc.l_temp2.get_marker()
+                m = aw.qmc.l_temp2.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.BTmarker = m
                 self.qmc.BTmarkersize = aw.qmc.l_temp2.get_markersize()
                 self.qmc.palette["bt"] = aw.qmc.l_temp2.get_color()
             if aw.qmc.l_delta1:
@@ -10878,7 +10884,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETdeltalinewidth = aw.qmc.l_delta1.get_linewidth()
-                self.qmc.ETdeltamarker = aw.qmc.l_delta1.get_marker()
+                m = aw.qmc.l_delta1.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.ETdeltamarker = m
                 self.qmc.ETdeltamarkersize = aw.qmc.l_delta1.get_markersize()
                 self.qmc.palette["deltaet"] = aw.qmc.l_delta1.get_color()
             if aw.qmc.l_delta2:
@@ -10889,7 +10897,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTdeltalinewidth = aw.qmc.l_delta2.get_linewidth()
-                self.qmc.BTdeltamarker = aw.qmc.l_delta2.get_marker()
+                m = aw.qmc.l_delta2.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.BTdeltamarker = m
                 self.qmc.BTdeltamarkersize = aw.qmc.l_delta2.get_markersize()  
                 self.qmc.palette["deltabt"] = aw.qmc.l_delta2.get_color()
             if aw.qmc.l_back1:
@@ -10900,7 +10910,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETbacklinewidth = aw.qmc.l_back1.get_linewidth()
-                self.qmc.ETbackmarker = aw.qmc.l_back1.get_marker()
+                m = aw.qmc.l_back1.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.ETbackmarker = m                
                 self.qmc.ETbackmarkersize = aw.qmc.l_back1.get_markersize()
                 self.qmc.backgroundmetcolor = aw.qmc.l_back1.get_color()
             if aw.qmc.l_back2:
@@ -10911,7 +10923,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTbacklinewidth = aw.qmc.l_back2.get_linewidth()
-                self.qmc.BTbackmarker = aw.qmc.l_back2.get_marker()
+                m = aw.qmc.l_back2.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.BTbackmarker = m                                
                 self.qmc.BTbackmarkersize = aw.qmc.l_back2.get_markersize()
                 self.qmc.backgroundbtcolor = aw.qmc.l_back2.get_color()
             if aw.qmc.l_delta1B:
@@ -10922,7 +10936,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.ETBdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETBdeltalinewidth = aw.qmc.l_delta1B.get_linewidth()
-                self.qmc.ETBdeltamarker = aw.qmc.l_delta1B.get_marker()
+                m = aw.qmc.l_delta1B.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.ETBdeltamarker = m                                
                 self.qmc.ETBdeltamarkersize = aw.qmc.l_delta1B.get_markersize()
                 self.qmc.backgrounddeltaetcolor = aw.qmc.l_delta1B.get_color()
             if aw.qmc.l_delta2B:
@@ -10933,7 +10949,9 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.BTBdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTBdeltalinewidth = aw.qmc.l_delta2B.get_linewidth()
-                self.qmc.BTBdeltamarker = aw.qmc.l_delta2B.get_marker()
+                m = aw.qmc.l_delta2B.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.BTBdeltamarker = m                                
                 self.qmc.BTBdeltamarkersize = aw.qmc.l_delta2B.get_markersize()  
                 self.qmc.backgrounddeltabtcolor = aw.qmc.l_delta2B.get_color()                
             x1 = x2 = 0
@@ -10946,7 +10964,9 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.qmc.extradrawstyles1[i] = self.qmc.drawstyle_default
                     self.qmc.extralinewidths1[i] = l1.get_linewidth()
-                    self.qmc.extramarkers1[i] = l1.get_marker()
+                    m = l1.get_marker()
+                    if not isinstance(m, (int, long)):
+                        self.qmc.extramarkers1[i] = m                    
                     self.qmc.extramarkersizes1[i] = l1.get_markersize()
                     aw.qmc.extradevicecolor1[i] = l1.get_color()
                     aw.setLabelColor(aw.extraLCDlabel1[i],QColor(l1.get_color()))
@@ -10960,33 +10980,43 @@ class ApplicationWindow(QMainWindow):
                     else:
                         self.qmc.extradrawstyles2[i] = self.qmc.drawstyle_default
                     self.qmc.extralinewidths2[i] = l2.get_linewidth()
-                    self.qmc.extramarkers2[i] = l2.get_marker()
+                    m = l2.get_marker()
+                    if not isinstance(m, (int, long)):
+                        self.qmc.extramarkers2[i] = m                    
                     self.qmc.extramarkersizes2[i] = l2.get_markersize()
                     aw.qmc.extradevicecolor2[i] = l2.get_color()
                     aw.setLabelColor(aw.extraLCDlabel2[i],QColor(l2.get_color()))
                     aw.qmc.extraname2[i] = l2.get_label()
                     x2 = x2 + 1
-                if self.qmc.eventsGraphflag == 2:
-                    self.qmc.EvalueMarker[0] = self.qmc.l_eventtype1dots.get_marker()
-                    self.qmc.EvalueMarker[1] = self.qmc.l_eventtype2dots.get_marker()
-                    self.qmc.EvalueMarker[2] = self.qmc.l_eventtype3dots.get_marker()
-                    self.qmc.EvalueMarker[3] = self.qmc.l_eventtype4dots.get_marker()
-                    self.qmc.EvalueMarkerSize[0] = self.qmc.l_eventtype1dots.get_markersize()
-                    self.qmc.EvalueMarkerSize[1] = self.qmc.l_eventtype2dots.get_markersize()
-                    self.qmc.EvalueMarkerSize[2] = self.qmc.l_eventtype3dots.get_markersize()
-                    self.qmc.EvalueMarkerSize[3] = self.qmc.l_eventtype4dots.get_markersize()
-                    self.qmc.EvalueColor[0] = self.qmc.l_eventtype1dots.get_color()
-                    self.qmc.EvalueColor[1] = self.qmc.l_eventtype2dots.get_color()
-                    self.qmc.EvalueColor[2] = self.qmc.l_eventtype3dots.get_color()
-                    self.qmc.EvalueColor[3] = self.qmc.l_eventtype4dots.get_color()
-                    self.qmc.Evaluelinethickness[0] = self.qmc.l_eventtype1dots.get_linewidth()
-                    self.qmc.Evaluelinethickness[1] = self.qmc.l_eventtype2dots.get_linewidth()
-                    self.qmc.Evaluelinethickness[2] = self.qmc.l_eventtype3dots.get_linewidth()
-                    self.qmc.Evaluelinethickness[3] = self.qmc.l_eventtype4dots.get_linewidth()
-                    self.qmc.etypes[0] = self.qmc.l_eventtype1dots.get_label()
-                    self.qmc.etypes[1] = self.qmc.l_eventtype2dots.get_label()
-                    self.qmc.etypes[2] = self.qmc.l_eventtype3dots.get_label()
-                    self.qmc.etypes[3] = self.qmc.l_eventtype4dots.get_label()
+            if self.qmc.eventsGraphflag == 2:
+                m = self.qmc.l_eventtype1dots.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.EvalueMarker[0] = m
+                m = self.qmc.l_eventtype2dots.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.EvalueMarker[1] = m
+                m = self.qmc.l_eventtype3dots.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.EvalueMarker[2] = m
+                m = self.qmc.l_eventtype4dots.get_marker()
+                if not isinstance(m, (int, long)):
+                    self.qmc.EvalueMarker[3] = m
+                self.qmc.EvalueMarkerSize[0] = self.qmc.l_eventtype1dots.get_markersize()
+                self.qmc.EvalueMarkerSize[1] = self.qmc.l_eventtype2dots.get_markersize()
+                self.qmc.EvalueMarkerSize[2] = self.qmc.l_eventtype3dots.get_markersize()
+                self.qmc.EvalueMarkerSize[3] = self.qmc.l_eventtype4dots.get_markersize()
+                self.qmc.EvalueColor[0] = self.qmc.l_eventtype1dots.get_color()
+                self.qmc.EvalueColor[1] = self.qmc.l_eventtype2dots.get_color()
+                self.qmc.EvalueColor[2] = self.qmc.l_eventtype3dots.get_color()
+                self.qmc.EvalueColor[3] = self.qmc.l_eventtype4dots.get_color()
+                self.qmc.Evaluelinethickness[0] = self.qmc.l_eventtype1dots.get_linewidth()
+                self.qmc.Evaluelinethickness[1] = self.qmc.l_eventtype2dots.get_linewidth()
+                self.qmc.Evaluelinethickness[2] = self.qmc.l_eventtype3dots.get_linewidth()
+                self.qmc.Evaluelinethickness[3] = self.qmc.l_eventtype4dots.get_linewidth()
+                self.qmc.etypes[0] = self.qmc.l_eventtype1dots.get_label()
+                self.qmc.etypes[1] = self.qmc.l_eventtype2dots.get_label()
+                self.qmc.etypes[2] = self.qmc.l_eventtype3dots.get_label()
+                self.qmc.etypes[3] = self.qmc.l_eventtype4dots.get_label()
         except Exception as e:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -20566,7 +20596,7 @@ class serialport(object):
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.ARDUINOTC4temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + str(e),exc_tb.tb_lineno)
+            aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + " " + str(e),exc_tb.tb_lineno)
             return -1.,-1.
         except Exception as e:
             # self.closeport() # closing the port on error is to serve as the Arduino needs time to restart and has to be reinitialized!
@@ -20904,7 +20934,7 @@ class serialport(object):
             error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
-            aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + str(e),exc_tb.tb_lineno)
+            aw.qmc.adderror(timez + " " + error + " " + str(aw.qmc.samplingsemaphore.available()) + " " + str(e),exc_tb.tb_lineno)
         except Exception as ex:
             #self.closeport() # do not close the serial port as reopening might take too long
             _, _, exc_tb = sys.exc_info()
