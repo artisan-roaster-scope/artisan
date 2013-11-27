@@ -5870,15 +5870,15 @@ class SampleThread(QThread):
                     
                     # smooth BT and ET a bit for delta computations (replacing the above code without smoothing)
                     # this might be not overly precise as time intervals between samples are not constant
-#                    ETm1 = aw.qmc.temp1[-1]
-#                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2]*5. + aw.qmc.temp1[-1]) / 7.
-#                    BTm1 = aw.qmc.temp2[-1]
-#                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2]*5. + aw.qmc.temp2[-1]) / 7.                    
-#                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-#                    aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
-#                    aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
-                    
-# not for now                    
+                    ETm1 = aw.qmc.temp1[-1]
+                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2] + aw.qmc.temp1[-1]) / 3.
+                    BTm1 = aw.qmc.temp2[-1]
+                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2] + aw.qmc.temp2[-1]) / 3.
+                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                    aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
+                    aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
+
+                  
 #                    # we limit the RoR to +/-35C (RoRlimitC) resp. +/-50F (RoRlimitF):
 #                    if aw.qmc.mode == "C":
 #                        limit = aw.qmc.RoRlimitC
@@ -11735,6 +11735,11 @@ th {
 <td style="vertical-align:middle" align="center"><img alt='roast graph' width="650" src='file:///$graph_image'></td>
 </tr>
 <tr>
+<td><center><b>""" + unicode(QApplication.translate("HTML Report Template", "Events", None, QApplication.UnicodeUTF8)) + """</b></center><br/>
+$specialevents
+</td>
+</tr>
+<tr>
 <td>
 <center><b>""") + u(QApplication.translate("HTML Report Template", "Roasting Notes", None, QApplication.UnicodeUTF8)) + u("""</b></center>
 $roasting_notes$roast_attributes
@@ -12048,7 +12053,8 @@ $cupping_notes
                      "\n<td>" + str(i+1) + "</td><td>[" +
                      self.qmc.stringfromseconds(int(self.qmc.timex[sevents[i]] - start)) +
                      "</td><td>at " + "%.1f"%self.qmc.temp2[sevents[i]] + self.qmc.mode +
-                     "]</td><td>" + seventsString[i] + "</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")
+#                     "]</td><td>" + seventsString[i] + "</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")
+                     "]</td><td>" + seventsString[i] + ("</td></tr>\n" if seventsType[i] == 4 else ("</td><td>(" + u(self.qmc.etypesf(seventsType[i])) + " to " + self.qmc.eventsvalues(seventsValue[i]) + ")</td></tr>\n")))
             html += '</table>\n</center>'
         return u(html)
 
@@ -15435,7 +15441,7 @@ class editGraphDlg(ArtisanDialog):
             timez = self.eventtable.cellWidget(i,0)
             if self.eventtablecopy[i] !=  str(timez.text()):
                 aw.qmc.specialevents[i] = aw.qmc.time2index(aw.qmc.timex[aw.qmc.timeindex[0]]+ aw.qmc.stringtoseconds(str(timez.text())))
-            description = self.eventtable.cellWidget(i,1)
+            description = self.eventtable.cellWidget(i,2)
             aw.qmc.specialeventsStrings[i] = str(description.text())
             etype = self.eventtable.cellWidget(i,3)
             aw.qmc.specialeventstype[i] = etype.currentIndex()
