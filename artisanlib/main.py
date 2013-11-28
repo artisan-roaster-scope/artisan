@@ -1210,10 +1210,22 @@ class tgraphcanvas(FigureCanvas):
                         lcdformat = "%.1f"
                     else:
                         lcdformat = "%.0f"
-                    aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
-                    aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
-                    aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
-                    aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
+                    if -100 < self.temp1[-1] < 1000:
+                        aw.lcd2.display(lcdformat%float(self.temp1[-1]))            # ET
+                    else:
+                        aw.lcd2.display("--")
+                    if -100 < self.temp2[-1] < 1000:
+                        aw.lcd3.display(lcdformat%float(self.temp2[-1]))            # BT
+                    else:
+                        aw.lcd3.display("--")
+                    if -100 < self.rateofchange1 < 100:
+                        aw.lcd4.display(lcdformat%float(self.rateofchange1))        # rate of change MET (degress per minute)
+                    else:
+                        aw.lcd4.display("--")
+                    if -100 < self.rateofchange2 < 1000:
+                        aw.lcd5.display(lcdformat%float(self.rateofchange2))        # rate of change BT (degrees per minute)
+                    else:
+                        aw.lcd5.display("--")
                     
                     if self.device == 0 or self.device == 26:         #extra LCDs for Fuji or DTA pid  
                         aw.lcd6.display(self.currentpidsv)
@@ -1543,13 +1555,13 @@ class tgraphcanvas(FigureCanvas):
                     starttime = 0
                 if self.projectionmode == 0:
                     #calculate the temperature endpoint at endofx acording to the latest rate of change
-                    if aw.qmc.BTcurve:
-                        BTprojection = self.temp2[-1] + self.rateofchange2*(self.endofx - self.timex[-1]+ starttime)/60.
+                    if aw.qmc.BTcurve and len(aw.qmc.delta2) > 0 and aw.qmc.delta2[-1]:
+                        BTprojection = self.temp2[-1] + aw.qmc.delta2[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
                         #plot projections
                         self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
                                         linestyle = '-.', linewidth= 8, alpha = .3)
-                    if aw.qmc.ETcurve:
-                        ETprojection = self.temp1[-1] + self.rateofchange1*(self.endofx - self.timex[-1]+ starttime)/60.
+                    if aw.qmc.ETcurve and len(aw.qmc.delta1) > 0 and aw.qmc.delta1[-1]:
+                        ETprojection = self.temp1[-1] + aw.qmc.delta1[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
                         self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], ETprojection],color =  self.palette["et"],
                                      linestyle = '-.', linewidth= 8, alpha = .3)
                 elif self.projectionmode == 1:
@@ -1564,12 +1576,12 @@ class tgraphcanvas(FigureCanvas):
                     # Every roaster will have a different constantN.
         
                     den = self.temp1[-1] - self.temp2[-1]  #denominator ETn - BTn 
-                    if den > 0: # if ETn > BTn
+                    if den > 0 and len(aw.qmc.delta2)>0 and aw.qmc.delta2[-1]: # if ETn > BTn
                         #get x points
                         xpoints = list(numpy.arange(self.timex[-1],self.endofx + 120, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds)
                         #get y points
                         ypoints = [self.temp2[-1]]                                  # start initializing with last BT
-                        K =  self.projectionconstant*self.rateofchange2/den/60.                 # multiplier
+                        K =  self.projectionconstant*aw.qmc.delta2[-1]/den/60.                 # multiplier
                         for _ in range(len(xpoints)-1):                                     # create new points from previous points 
                             DeltaT = K*(self.temp1[-1]- ypoints[-1])                        # DeltaT = K*(ET - BT)
                             ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
@@ -2045,15 +2057,15 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
             return x
 
-    def smooth_list(self, a, b, window_len=7, window='hanning',fromCHARGEonly=False):
+    def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1):
         #pylint: disable=E1103
-        win_len = max(0,(window_len * 2) - 1)        
-        if fromCHARGEonly and aw.qmc.timeindex[0] != -1: # if CHARGE is set, replace start by None
-            return numpy.concatenate(([None]*(aw.qmc.timeindex[0]),
-                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[aw.qmc.timeindex[0]:])).tolist()
-        elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
-            return numpy.concatenate((b[:aw.qmc.timeindex[0]],
-                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[aw.qmc.timeindex[0]:])).tolist()            
+        win_len = max(0,(window_len * 2) - 1) 
+        if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
+            return numpy.concatenate(([None]*(fromIndex),
+                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[fromIndex:])).tolist()
+#        elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
+#            return numpy.concatenate((b[:aw.qmc.timeindex[0]],
+#                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[aw.qmc.timeindex[0]:])).tolist()            
         else:
             return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
 
@@ -2438,8 +2450,15 @@ class tgraphcanvas(FigureCanvas):
                             z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                         if lt > ld2:
                             z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromCHARGEonly=False) # CHARGE is the charge for the foreground, so we have to disable this here
-                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromCHARGEonly=False)
+                        self.delta1B = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=self.timeindexB[0]) # CHARGE is the charge for the foreground, so we have to disable this here
+                        self.delta2B = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=self.timeindexB[0])
+                        # filter out values beyond the delta limits
+                        if aw.qmc.mode == "C":
+                            rorlimit = aw.qmc.RoRlimitC
+                        else:
+                            rorlimit = aw.qmc.RoRlimitF
+                        self.delta1B = [d if -rorlimit < d < rorlimit else None for d in self.delta1B]
+                        self.delta2B = [d if -rorlimit < d < rorlimit else None for d in self.delta2B]
                     
                     ##### DeltaETB,DeltaBTB curves
                     if self.DeltaETBflag:
@@ -2594,12 +2613,20 @@ class tgraphcanvas(FigureCanvas):
                         with numpy.errstate(divide='ignore'):
                             z2 = numpy.diff(self.stemp2) / dtx
                     lt,ld1,ld2 = len(self.timex),len(z1),len(z2)
+                    # make lists equal in length
                     if lt > ld1:
                         z1 = numpy.append(z1,[z1[-1] if ld1 else 0.]*(lt - ld1))
                     if lt > ld2:
                         z2 = numpy.append(z2,[z2[-1] if ld2 else 0.]*(lt - ld2))
-                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromCHARGEonly=True)
-                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromCHARGEonly=True)
+                    self.delta1 = self.smooth_list(tx,z1,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
+                    self.delta2 = self.smooth_list(tx,z2,window_len=self.deltafilter,fromIndex=aw.qmc.timeindex[0])
+                    # filter out values beyond the delta limits
+                    if aw.qmc.mode == "C":
+                        rorlimit = aw.qmc.RoRlimitC
+                    else:
+                        rorlimit = aw.qmc.RoRlimitF
+                    self.delta1 = [d if -rorlimit < d < rorlimit else None for d in self.delta1]
+                    self.delta2 = [d if -rorlimit < d < rorlimit else None for d in self.delta2]
                     
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag:
@@ -3225,9 +3252,9 @@ class tgraphcanvas(FigureCanvas):
                 self.OffRecorder()
             self.flagstopping = True
             self.flagon = False
-            # now wait until the sampling thread successfully terminates
-            while self.flagstopping:
-                libtime.sleep(.01)
+            # now wait until the sampling thread successfully terminates (not needed anymore!?)
+#            while self.flagstopping:
+#                libtime.sleep(.01)
             # clear data from monitoring-only mode
             if len(self.timex) == 1:
                 aw.qmc.clearMeasurements()
@@ -5748,341 +5775,334 @@ class SampleThread(QThread):
     def sample(self):
         try:
             ##### lock resources  #########
-            aw.qmc.samplingsemaphore.acquire(1)
-            
-            # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
-            local_flagstart = aw.qmc.flagstart
-            
-            # if we are not yet recording, but sampling we keep on reseting the timer (only if not already a profile was recorded)
-            if not local_flagstart and len(aw.qmc.timex) < 2:
-                aw.qmc.timeclock.start()
+            #aw.qmc.samplingsemaphore.acquire(1)
+            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,500) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+            if gotlock:
                 
-            #if using a meter (thermocouple device)
-            if aw.qmc.device != 18: # not NONE device
-                ##############  if using Extra devices
-                nxdevices = len(aw.qmc.extradevices)
-                if nxdevices:
-                    les,led,let =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1)
-                    if les == led == let:
-                        xtra_dev_lines1 = 0
-                        xtra_dev_lines2 = 0
-                        for i in range(nxdevices):  
-                            extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                            # ignore reading if both are off, otherwise process them
-                            if len(aw.qmc.extramathexpression1[i]):
-                                extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
-                            extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
-                            if len(aw.qmc.extramathexpression2[i]):
-                                extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
-                            extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
-                            if local_flagstart:
-                                aw.qmc.extratemp1[i].append(float(extrat1))
-                                aw.qmc.extratemp2[i].append(float(extrat2))
-                                aw.qmc.extratimex[i].append(extratx)
-                                # update extra lines
-                                if aw.extraCurveVisibility1[i]:
-                                    aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
-                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                if aw.extraCurveVisibility2[i]:
-                                    aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
-                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
-                            else:
-                                # we do not record, so we just replace the old last value
-                                if len(aw.qmc.extratemp1[i]) > 0:
-                                    aw.qmc.extratemp1[i][-1] = float(extrat1)
-                                else:
+                # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
+                local_flagstart = aw.qmc.flagstart
+                
+                # if we are not yet recording, but sampling we keep on reseting the timer (only if not already a profile was recorded)
+                if not local_flagstart and len(aw.qmc.timex) < 2:
+                    aw.qmc.timeclock.start()
+                    
+                #if using a meter (thermocouple device)
+                if aw.qmc.device != 18: # not NONE device
+                    ##############  if using Extra devices
+                    nxdevices = len(aw.qmc.extradevices)
+                    if nxdevices:
+                        les,led,let =  len(aw.extraser),len(aw.qmc.extradevices),len(aw.qmc.extratemp1)
+                        if les == led == let:
+                            xtra_dev_lines1 = 0
+                            xtra_dev_lines2 = 0
+                            for i in range(nxdevices):  
+                                extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                                # ignore reading if both are off, otherwise process them
+                                if len(aw.qmc.extramathexpression1[i]):
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                                extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
+                                if len(aw.qmc.extramathexpression2[i]):
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                                extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
+                                if local_flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
-                                if len(aw.qmc.extratemp2[i]) > 0:
-                                    aw.qmc.extratemp2[i][-1] = float(extrat2)
-                                else:
                                     aw.qmc.extratemp2[i].append(float(extrat2))
-                                if len(aw.qmc.extratimex[i]) <= 0:
                                     aw.qmc.extratimex[i].append(extratx)
-                    #ERROR FOUND
-                    else:
-                        lengths = [les,led,let]
-                        location = ["Extra-Serial","Extra-Devices","Extra-Temp"]
-                        #find error
-                        if (nxdevices-1) in lengths:
-                            indexerror =  lengths.index(nxdevices-1)
-                        elif (nxdevices+1) in lengths:
-                            indexerror =  lengths.index(nxdevices+1)
+                                    # update extra lines
+                                    if aw.extraCurveVisibility1[i]:
+                                        aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
+                                        xtra_dev_lines1 = xtra_dev_lines1 + 1
+                                    if aw.extraCurveVisibility2[i]:
+                                        aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
+                                        xtra_dev_lines2 = xtra_dev_lines2 + 1
+                                else:
+                                    # we do not record, so we just replace the old last value
+                                    if len(aw.qmc.extratemp1[i]) > 0:
+                                        aw.qmc.extratemp1[i][-1] = float(extrat1)
+                                    else:
+                                        aw.qmc.extratemp1[i].append(float(extrat1))
+                                    if len(aw.qmc.extratemp2[i]) > 0:
+                                        aw.qmc.extratemp2[i][-1] = float(extrat2)
+                                    else:
+                                        aw.qmc.extratemp2[i].append(float(extrat2))
+                                    if len(aw.qmc.extratimex[i]) <= 0:
+                                        aw.qmc.extratimex[i].append(extratx)
+                        #ERROR FOUND
                         else:
-                            indexerror = 1000
-                        if indexerror != 1000:
-                            errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
-                            errormessage += "\nPlease Reset: Extra devices"
+                            lengths = [les,led,let]
+                            location = ["Extra-Serial","Extra-Devices","Extra-Temp"]
+                            #find error
+                            if (nxdevices-1) in lengths:
+                                indexerror =  lengths.index(nxdevices-1)
+                            elif (nxdevices+1) in lengths:
+                                indexerror =  lengths.index(nxdevices+1)
+                            else:
+                                indexerror = 1000
+                            if indexerror != 1000:
+                                errormessage = "ERROR: length of %s (=%i) does not have the necessary length (=%i)"%(location[indexerror],lengths[indexerror],nxdevices)
+                                errormessage += "\nPlease Reset: Extra devices"
+                            else:
+                                string = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
+                                string += location[2] + "= " + str(lengths[2])
+                                errormessage = "ERROR: extra devices lengths don't match: %s"%string
+                                errormessage += "\nPlease Reset: Extra devices"
+                            raise Exception(errormessage)
+                    #read time, ET (t1) and BT (t2) TEMPERATURE
+                    try:
+                        if aw.qmc.swapETBT:
+                            tx,t2,t1 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
                         else:
-                            string = location[0] + "= " + str(lengths[0]) + " " + location[1] + "= " + str(lengths[1]) + " "
-                            string += location[2] + "= " + str(lengths[2])
-                            errormessage = "ERROR: extra devices lengths don't match: %s"%string
-                            errormessage += "\nPlease Reset: Extra devices"
-                        raise Exception(errormessage)
-                #read time, ET (t1) and BT (t2) TEMPERATURE
-                try:
-                    if aw.qmc.swapETBT:
-                        tx,t2,t1 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
-                    else:
-                        tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
-                except:
-                    tx = aw.qmc.timeclock.elapsed()/1000
-                    t1 = t2 = -1
-                if len(aw.qmc.ETfunction):
-                    t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
-                if len(aw.qmc.BTfunction):
-                    t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
-                t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
-                t2 = self.inputFilter(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
-                length_of_qmc_timex = len(aw.qmc.timex)
-                t1_final = t1
-                t2_final = t2
-                if local_flagstart:
-                    aw.qmc.temp2.append(t2_final)
-                    aw.qmc.temp1.append(t1_final)
-                    aw.qmc.timex.append(tx)
-                    length_of_qmc_timex += 1
-                else:
-                    if len(aw.qmc.temp2) > 0:
-                        aw.qmc.temp2[-1] = t2_final
-                    else:                            
+                            tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                    except:
+                        tx = aw.qmc.timeclock.elapsed()/1000
+                        t1 = t2 = -1
+                    if len(aw.qmc.ETfunction):
+                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
+                    if len(aw.qmc.BTfunction):
+                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
+                    t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
+                    t2 = self.inputFilter(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
+                    length_of_qmc_timex = len(aw.qmc.timex)
+                    t1_final = t1
+                    t2_final = t2
+                    if local_flagstart:
                         aw.qmc.temp2.append(t2_final)
-                    if len(aw.qmc.temp1) > 0:
-                        aw.qmc.temp1[-1] = t1_final
-                    else:                            
                         aw.qmc.temp1.append(t1_final)
-                    if length_of_qmc_timex <= 0:
                         aw.qmc.timex.append(tx)
                         length_of_qmc_timex += 1
                     else:
-                        aw.qmc.timex[-1] = tx
-                # update lines data using the lists with new data
-                if local_flagstart:
-                    if aw.qmc.ETcurve:
-                        aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
-                    if aw.qmc.BTcurve:
-                        aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
-                #we need a minimum of two readings to calculate rate of change
-                if local_flagstart and length_of_qmc_timex > 2:
-                    timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
-#                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
-                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)                    
-                    
-                    # smooth BT and ET a bit for delta computations (replacing the above code without smoothing)
-                    # this might be not overly precise as time intervals between samples are not constant
-                    ETm1 = aw.qmc.temp1[-1]
-                    ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2] + aw.qmc.temp1[-1]) / 3.
-                    BTm1 = aw.qmc.temp2[-1]
-                    BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2] + aw.qmc.temp2[-1]) / 3.
-                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                    aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
-                    aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
-
-                  
-#                    # we limit the RoR to +/-35C (RoRlimitC) resp. +/-50F (RoRlimitF):
-#                    if aw.qmc.mode == "C":
-#                        limit = aw.qmc.RoRlimitC
-#                    else:
-#                        limit = aw.qmc.RoRlimitF                        
-#                    if aw.qmc.rateofchange1 > limit or aw.qmc.rateofchange1 < -limit:
-#                        if aw.qmc.unfiltereddelta1 and len(aw.qmc.unfiltereddelta1) > 0:
-#                            # repeate the previous one 
-#                            aw.qmc.rateofchange1 = aw.qmc.unfiltereddelta1[-1]
-#                        else:
-#                            # or return limit
-#                            if aw.qmc.rateofchange1 > 0:
-#                                aw.qmc.rateofchange1 = limit  
-#                            else:
-#                                aw.qmcmc.rateofchange1 = - limit
-#                    if aw.qmc.rateofchange2 > limit or aw.qmc.rateofchange2 < -limit:
-#                        if aw.qmc.unfiltereddelta2 and len(aw.qmc.unfiltereddelta2) > 0:
-#                            # double the previous one 
-#                            aw.qmc.rateofchange2 = aw.qmc.unfiltereddelta2[-1]
-#                        else:
-#                            # or return limit
-#                            if aw.qmc.rateofchange2 > 0:
-#                                aw.qmc.rateofchange2 = limit
-#                            else:
-#                                aw.qmc.rateofchange2 = - limit
-
-                    aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
-                    aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
-                    #######   filter deltaBT deltaET
-                    # decay smoothing
-                    if aw.qmc.deltafilter:
-                        user_filter = int(aw.qmc.deltafilter/2) # we use the one set by the user (+ 1) not to produce a hugh shift
-                        if length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
-                            aw.qmc.rateofchange1 = numpy.average(aw.qmc.unfiltereddelta1[-user_filter:],weights=numpy.arange(1,user_filter+1))
-                            aw.qmc.rateofchange2 = numpy.average(aw.qmc.unfiltereddelta2[-user_filter:],weights=numpy.arange(1,user_filter+1))
-                            
-                    # (deactivated due to the huge time lag and replaced by the above)
-#                    if aw.qmc.deltafilter:
-#                        if length_of_qmc_timex > aw.qmc.deltafilter:   #deltafilter is an int = number of pads
-#                            if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
-#                                a1,a2 = 0.,0.
-#                                for k in range(aw.qmc.deltafilter):
-#                                    a1 += aw.qmc.unfiltereddelta1[-(k+1)]
-#                                    a2 += aw.qmc.unfiltereddelta2[-(k+1)]
-#                                aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
-#                                aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
-                                
-                    rateofchange1plot = aw.qmc.rateofchange1
-                    rateofchange2plot = aw.qmc.rateofchange2
-                else:
+                        if len(aw.qmc.temp2) > 0:
+                            aw.qmc.temp2[-1] = t2_final
+                        else:                            
+                            aw.qmc.temp2.append(t2_final)
+                        if len(aw.qmc.temp1) > 0:
+                            aw.qmc.temp1[-1] = t1_final
+                        else:                            
+                            aw.qmc.temp1.append(t1_final)
+                        if length_of_qmc_timex <= 0:
+                            aw.qmc.timex.append(tx)
+                            length_of_qmc_timex += 1
+                        else:
+                            aw.qmc.timex[-1] = tx
+                    # update lines data using the lists with new data
                     if local_flagstart:
-                        aw.qmc.unfiltereddelta1.append(0.)
-                        aw.qmc.unfiltereddelta2.append(0.)
-                    else:
-                        if len(aw.qmc.unfiltereddelta1) > 0:
-                            aw.qmc.unfiltereddelta1[-1] = 0.
-                        else:
-                            aw.qmc.unfiltereddelta1.append(0.)
-                        if len(aw.qmc.unfiltereddelta2) > 0:
-                            aw.qmc.unfiltereddelta2[-1] = 0.
-                        else:
-                            aw.qmc.unfiltereddelta2.append(0.)
-                    aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
-                # append new data to the rateofchange
-                if local_flagstart:
-                    aw.qmc.delta1.append(rateofchange1plot)
-                    aw.qmc.delta2.append(rateofchange2plot)
-                else:
-                    if len(aw.qmc.delta1) > 0:
-                        aw.qmc.delta1[-1] = rateofchange1plot
-                    else:
-                        aw.qmc.delta1.append(rateofchange1plot)
-                    if len(aw.qmc.delta2) > 0:
-                        aw.qmc.delta2[-1] = rateofchange2plot
-                    else:
-                        aw.qmc.delta2.append(rateofchange2plot)
-                if local_flagstart:
-                    if aw.qmc.DeltaETflag:
-                        aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
-                    if aw.qmc.DeltaBTflag:
-                        aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
-                    #readjust xlimit of plot if needed
-                    if  not aw.qmc.fixmaxtime and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
-                        aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
-                        aw.qmc.xaxistosm()
-                    if aw.qmc.projectFlag:
-                        aw.qmc.viewProjection()
-                    if aw.qmc.background and aw.qmc.backgroundReproduce:
-                        aw.qmc.playbackevent()
-                    # autodetect CHARGE event
-                    # only if BT > 203F/95C
-                    if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
-                        ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
-                        if aw.BTbreak(length_of_qmc_timex - 1):
-                            # we found a BT break at the current index minus 2
-                            aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
-                    # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
-                    elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
-                        aw.qmc.autoTPIdx = 1
-                        aw.qmc.TPalarmtimeindex = aw.findTP()                            
-                    # autodetect DROP event
-                    # only if 9min into roast and BT>180C/356F
-                    if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
-                        length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
-                        ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 480):
-                        if aw.BTbreak(length_of_qmc_timex - 1):
-                            # we found a BT break at the current index minus 2
-                            aw.qmc.autoDropIdx = length_of_qmc_timex - 3                            
-                    #check for autoDRY:
-                    if aw.qmc.autoDRYflag and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
-                        # if DRY event not yet set check for BT exceeding Dry-max as specified in the phases dialog
-                        if aw.qmc.temp2[-1] >= aw.qmc.phases[1]:
-                            aw.qmc.autoDryIdx = 1
-                    #check for autoFCs:
-                    if aw.qmc.autoFCsFlag and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
-                        # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
-                        if aw.qmc.temp2[-1] >= aw.qmc.phases[2]:
-                            aw.qmc.autoFCsIdx = 1
+                        if aw.qmc.ETcurve:
+                            aw.qmc.l_temp1.set_data(aw.qmc.timex, aw.qmc.temp1)
+                        if aw.qmc.BTcurve:
+                            aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
+                    #we need a minimum of two readings to calculate rate of change
+                    if local_flagstart and length_of_qmc_timex > 5: # > 2
+                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
+    #                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+    #                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
+    #                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
                         
-                #check for each alarm that was not yet triggered
-                for i in range(len(aw.qmc.alarmflag)):
-                    #if alarm on, and not triggered, and time is after set time:
-                    # menu: 0:ON, 1:START, 2:CHARGE, 3:TP, 4:DRY, 5:FCs, 6:FCe, 7:SCs, 8:SCe, 9:DROP, 10:COOL
-                    # qmc.alarmtime = -1 (None == START)
-                    # qmc.alarmtime = 0 (CHARGE)
-                    # qmc.alarmtime = 1 (DRY)
-                    # qmc.alarmtime = 2 (FCs)
-                    # qmc.alarmtime = 3 (FCe)
-                    # qmc.alarmtime = 4 (SCs)
-                    # qmc.alarmtime = 5 (SCe)
-                    # qmc.alarmtime = 6 (DROP)
-                    # qmc.alarmtime = 7 (COOL)
-                    # qmc.alarmtime = 8 (TP)
-                    # qmc.alarmtime = 9 (ON)
-                    # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
-                    # 1) the alarm is START
-                    # 2) the alarm was not triggered yet
-                    # 3) the alarm From is ON
-                    # 4) the alarm From is CHARGE
-                    # 5) the alarm From is any other event but TP
-                    # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
-                    if aw.qmc.alarmflag[i] \
-                      and not aw.qmc.alarmstate[i] \
-                      and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
-                      and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmnflag) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
-                      and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
-                      or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
-                      or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
-                      or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
-                            and aw.qmc.TPalarmtimeindex)):
-                        #########
-                        # check alarmoffset (time after From event):
-                        if aw.qmc.alarmoffset[i] > 0:
-                            alarm_time = aw.qmc.timeclock.elapsed()/1000.
-                            if aw.qmc.alarmtime[i] < 0: # time after START
-                                pass # the alarm_time is the clock time
-                            elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
-                                alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
-                            elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
-                                alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
-                            elif aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
-                                alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
-                            if alarm_time >= aw.qmc.alarmoffset[i]:
-                                aw.qmc.temporaryalarmflag = i
-                        #########
-                        # check alarmtemp:
-                        alarm_temp = None
-                        if aw.qmc.alarmsource[i] == -2:                       #check DeltaET
-                            alarm_temp = aw.qmc.delta1[-1]
-                        elif aw.qmc.alarmsource[i] == -1:                     #check DeltaBT
-                            alarm_temp = aw.qmc.delta2[-1]
-                        elif aw.qmc.alarmsource[i] == 0:                      #check ET
-                            alarm_temp = aw.qmc.temp1[-1]
-                        elif aw.qmc.alarmsource[i] == 1:                      #check BT
-                            alarm_temp = aw.qmc.temp2[-1]
-                        elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
-                            if (aw.qmc.alarmsource[i])%2==0:
-                                alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                        # smooth BT and ET a bit for delta computations (replacing the above code without smoothing)
+                        # this might be not overly precise as time intervals between samples are not constant
+                        ETm1 = aw.qmc.temp1[-1]
+                        ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2] + aw.qmc.temp1[-1]) / 3.
+                        BTm1 = aw.qmc.temp2[-1]
+                        BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2] + aw.qmc.temp2[-1]) / 3.
+                        
+                        #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+                        aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
+                        aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
+    
+    
+                        aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
+                        aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)                    
+                        
+                        
+                        #######   filter deltaBT deltaET
+                        # decay smoothing
+                        if aw.qmc.deltafilter:
+                            user_filter = int(round(aw.qmc.deltafilter/2))
+                            if length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
+                                if self.decay_weights == None or len(self.decay_weights) != user_filter: # recompute only on changes
+                                    self.decay_weights = numpy.arange(1,user_filter+1)
+                                aw.qmc.rateofchange1 = numpy.average(aw.qmc.unfiltereddelta1[-user_filter:],weights=self.decay_weights)
+                                aw.qmc.rateofchange2 = numpy.average(aw.qmc.unfiltereddelta2[-user_filter:],weights=self.decay_weights)
+                                
+                                
+    #                    # (deactivated due to the huge time lag and replaced by the above)
+    #                    if aw.qmc.deltafilter:
+    #                        if length_of_qmc_timex > aw.qmc.deltafilter:   #deltafilter is an int = number of pads
+    #                            if (len(aw.qmc.unfiltereddelta1) > aw.qmc.deltafilter) and (len(aw.qmc.unfiltereddelta2) > aw.qmc.deltafilter):
+    #                                a1,a2 = 0.,0.
+    #                                for k in range(aw.qmc.deltafilter):
+    #                                    a1 += aw.qmc.unfiltereddelta1[-(k+1)]
+    #                                    a2 += aw.qmc.unfiltereddelta2[-(k+1)]
+    #                                aw.qmc.rateofchange1 = a1/float(aw.qmc.deltafilter)
+    #                                aw.qmc.rateofchange2 = a2/float(aw.qmc.deltafilter)
+    #                                
+                        #if within limits append to RoR delta1 array, otherwise append None
+                        if aw.qmc.mode == "C":
+                            rorlimit = aw.qmc.RoRlimitC
+                        else:
+                            rorlimit = aw.qmc.RoRlimitF
+                        if -rorlimit < aw.qmc.rateofchange1 < rorlimit:
+                            rateofchange1plot = aw.qmc.rateofchange1
+                        else:
+                            rateofchange1plot = None
+                        if -rorlimit < aw.qmc.rateofchange2 < rorlimit:                    
+                            rateofchange2plot = aw.qmc.rateofchange2
+                        else:
+                            rateofchange2plot = None
+                    else:
+                        if local_flagstart:
+                            aw.qmc.unfiltereddelta1.append(0.)
+                            aw.qmc.unfiltereddelta2.append(0.)
+                        else:
+                            if len(aw.qmc.unfiltereddelta1) > 0:
+                                aw.qmc.unfiltereddelta1[-1] = 0.
                             else:
-                                alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
-                        alarm_limit = aw.qmc.alarmtemperature[i]
-                        if alarm_temp != None and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
-                            aw.qmc.temporaryalarmflag = i
-            #############    if using DEVICE 18 (no device). Manual mode
-            # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
-            else:
-                tx = int(aw.qmc.timeclock.elapsed()/1000.)
-                #readjust xlimit of plot if needed
-                if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
-                    aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
-                    aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
-                    aw.qmc.xaxistosm()
-                aw.qmc.resetlines()
-                #add to plot a vertical time line
-                aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
-                # also in the manual case we check for TP, however we have to release the semaphore before
-                if aw.qmc.samplingsemaphore.available() < 1:
-                    aw.qmc.samplingsemaphore.release(1)
-                if local_flagstart:
-                    #check alarms 
-                    # check for TP event if already CHARGEed and not yet recognized
-                    if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
-                        aw.qmc.TPalarmtimeindex = aw.findTP()
-                        aw.qmc.markTP()
+                                aw.qmc.unfiltereddelta1.append(0.)
+                            if len(aw.qmc.unfiltereddelta2) > 0:
+                                aw.qmc.unfiltereddelta2[-1] = 0.
+                            else:
+                                aw.qmc.unfiltereddelta2.append(0.)
+                        aw.qmc.rateofchange1,aw.qmc.rateofchange2,rateofchange1plot,rateofchange2plot = 0.,0.,0.,0.
+                    # append new data to the rateofchange
+                    if local_flagstart:
+                        aw.qmc.delta1.append(rateofchange1plot)
+                        aw.qmc.delta2.append(rateofchange2plot)                    
+                    else:
+                        if len(aw.qmc.delta1) > 0:
+                            aw.qmc.delta1[-1] = rateofchange1plot
+                        else:
+                            aw.qmc.delta1.append(rateofchange1plot)
+                        if len(aw.qmc.delta2) > 0:
+                            aw.qmc.delta2[-1] = rateofchange2plot
+                        else:
+                            aw.qmc.delta2.append(rateofchange2plot)
+                    if local_flagstart:
+                        if aw.qmc.DeltaETflag:
+                            aw.qmc.l_delta1.set_data(aw.qmc.timex, aw.qmc.delta1)
+                        if aw.qmc.DeltaBTflag:
+                            aw.qmc.l_delta2.set_data(aw.qmc.timex, aw.qmc.delta2)
+                        #readjust xlimit of plot if needed
+                        if  not aw.qmc.fixmaxtime and aw.qmc.timex[-1] > (aw.qmc.endofx - 45):            # if difference is smaller than 30 seconds
+                            aw.qmc.endofx = int(aw.qmc.timex[-1] + 180.)         # increase x limit by 3 minutes
+                            aw.qmc.xaxistosm()
+                        if aw.qmc.projectFlag:
+                            aw.qmc.viewProjection()
+                        if aw.qmc.background and aw.qmc.backgroundReproduce:
+                            aw.qmc.playbackevent()
+                        # autodetect CHARGE event
+                        # only if BT > 203F/95C
+                        if not aw.qmc.autoChargeIdx and aw.qmc.autoChargeFlag and aw.qmc.timeindex[0] < 0 and length_of_qmc_timex >= 5 and \
+                            ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 95) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 203)):
+                            if aw.BTbreak(length_of_qmc_timex - 1):
+                                # we found a BT break at the current index minus 2
+                                aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
+                        # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
+                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                            aw.qmc.autoTPIdx = 1
+                            aw.qmc.TPalarmtimeindex = aw.findTP()                            
+                        # autodetect DROP event
+                        # only if 9min into roast and BT>180C/356F
+                        if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
+                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
+                            ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 480):
+                            if aw.BTbreak(length_of_qmc_timex - 1):
+                                # we found a BT break at the current index minus 2
+                                aw.qmc.autoDropIdx = length_of_qmc_timex - 3                            
+                        #check for autoDRY:
+                        if aw.qmc.autoDRYflag and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
+                            # if DRY event not yet set check for BT exceeding Dry-max as specified in the phases dialog
+                            if aw.qmc.temp2[-1] >= aw.qmc.phases[1]:
+                                aw.qmc.autoDryIdx = 1
+                        #check for autoFCs:
+                        if aw.qmc.autoFCsFlag and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
+                            # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
+                            if aw.qmc.temp2[-1] >= aw.qmc.phases[2]:
+                                aw.qmc.autoFCsIdx = 1
+                            
+                    #check for each alarm that was not yet triggered
+                    for i in range(len(aw.qmc.alarmflag)):
+                        #if alarm on, and not triggered, and time is after set time:
+                        # menu: 0:ON, 1:START, 2:CHARGE, 3:TP, 4:DRY, 5:FCs, 6:FCe, 7:SCs, 8:SCe, 9:DROP, 10:COOL
+                        # qmc.alarmtime = -1 (None == START)
+                        # qmc.alarmtime = 0 (CHARGE)
+                        # qmc.alarmtime = 1 (DRY)
+                        # qmc.alarmtime = 2 (FCs)
+                        # qmc.alarmtime = 3 (FCe)
+                        # qmc.alarmtime = 4 (SCs)
+                        # qmc.alarmtime = 5 (SCe)
+                        # qmc.alarmtime = 6 (DROP)
+                        # qmc.alarmtime = 7 (COOL)
+                        # qmc.alarmtime = 8 (TP)
+                        # qmc.alarmtime = 9 (ON)
+                        # Cases: (only between CHARGE and DRY we check for TP if alarmtime[i]=8)
+                        # 1) the alarm is START
+                        # 2) the alarm was not triggered yet
+                        # 3) the alarm From is ON
+                        # 4) the alarm From is CHARGE
+                        # 5) the alarm From is any other event but TP
+                        # 6) the alarm From is TP, it is CHARGED and the TP pattern is recognized
+                        if aw.qmc.alarmflag[i] \
+                          and not aw.qmc.alarmstate[i] \
+                          and (aw.qmc.alarmguard[i] < 0 or (0 <= aw.qmc.alarmguard[i] < len(aw.qmc.alarmflag) and aw.qmc.alarmstate[aw.qmc.alarmguard[i]])) \
+                          and (aw.qmc.alarmnegguard[i] < 0 or (0 <= aw.qmc.alarmnegguard[i] < len(aw.qmc.alarmnflag) and not aw.qmc.alarmstate[aw.qmc.alarmnegguard[i]])) \
+                          and ((aw.qmc.alarmtime[i] == 9) or (aw.qmc.alarmtime[i] < 0 and local_flagstart) \
+                          or (aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1) \
+                          or (aw.qmc.alarmtime[i] > 0 and aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0) \
+                          or (aw.qmc.alarmtime[i]==8 and aw.qmc.timeindex[0] > -1 \
+                                and aw.qmc.TPalarmtimeindex)):
+                            #########
+                            # check alarmoffset (time after From event):
+                            if aw.qmc.alarmoffset[i] > 0:
+                                alarm_time = aw.qmc.timeclock.elapsed()/1000.
+                                if aw.qmc.alarmtime[i] < 0: # time after START
+                                    pass # the alarm_time is the clock time
+                                elif aw.qmc.alarmtime[i] == 0 and aw.qmc.timeindex[0] > -1: # time after CHARGE
+                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[0]]
+                                elif aw.qmc.alarmtime[i] == 8 and aw.qmc.TPalarmtimeindex: # time after TP
+                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.TPalarmtimeindex]
+                                elif aw.qmc.alarmtime[i] < 8 and aw.qmc.timeindex[aw.qmc.alarmtime[i]] > 0: # time after any other event
+                                    alarm_time = alarm_time - aw.qmc.timex[aw.qmc.timeindex[aw.qmc.alarmtime[i]]]
+                                if alarm_time >= aw.qmc.alarmoffset[i]:
+                                    aw.qmc.temporaryalarmflag = i
+                            #########
+                            # check alarmtemp:
+                            alarm_temp = None
+                            if aw.qmc.alarmsource[i] == -2 and aw.qmc.delta1[-1]:  #check DeltaET (might be None)
+                                alarm_temp = aw.qmc.delta1[-1]
+                            elif aw.qmc.alarmsource[i] == -1 and aw.qmc.delta2[-1]: #check DeltaBT (might be None
+                                alarm_temp = aw.qmc.delta2[-1]
+                            elif aw.qmc.alarmsource[i] == 0:                      #check ET
+                                alarm_temp = aw.qmc.temp1[-1]
+                            elif aw.qmc.alarmsource[i] == 1:                      #check BT
+                                alarm_temp = aw.qmc.temp2[-1]
+                            elif aw.qmc.alarmsource[i] > 1 and ((aw.qmc.alarmsource[i] - 2) < (2*len(aw.qmc.extradevices))):
+                                if (aw.qmc.alarmsource[i])%2==0:
+                                    alarm_temp = aw.qmc.extratemp1[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                                else:
+                                    alarm_temp = aw.qmc.extratemp2[(aw.qmc.alarmsource[i] - 2)//2][-1]
+                            alarm_limit = aw.qmc.alarmtemperature[i]
+                            if alarm_temp != None and ((aw.qmc.alarmcond[i] == 1 and alarm_temp > alarm_limit) or (aw.qmc.alarmcond[i] == 0 and alarm_temp < alarm_limit)):
+                                aw.qmc.temporaryalarmflag = i
+                #############    if using DEVICE 18 (no device). Manual mode
+                # temperatures are entered when pressing push buttons like for example at aw.qmc.markDryEnd()
+                else:
+                    tx = int(aw.qmc.timeclock.elapsed()/1000.)
+                    #readjust xlimit of plot if needed
+                    if  tx > (aw.qmc.endofx - 45):            # if difference is smaller than 45 seconds
+                        aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
+                        aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
+                        aw.qmc.xaxistosm()
+                    aw.qmc.resetlines()
+                    #add to plot a vertical time line
+                    aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
+                    # also in the manual case we check for TP, however we have to release the semaphore before
+                    if aw.qmc.samplingsemaphore.available() < 1:
+                        aw.qmc.samplingsemaphore.release(1)
+                    if local_flagstart:
+                        #check alarms 
+                        # check for TP event if already CHARGEed and not yet recognized
+                        if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                            aw.qmc.TPalarmtimeindex = aw.findTP()
+                            aw.qmc.markTP()
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -6099,7 +6119,7 @@ class SampleThread(QThread):
         # if v[-1] is the current temperature then check if
         #   len(BT) > 4
         # BT[-4] <= BT[-3] <= BT[-2] <= BT[-1] and BT[-4] < BT[-1]
-        if not self.afterTP and len(aw.qmc.temp2) > 3 and aw.qmc.temp2[-4] <= aw.qmc.temp2[-3] <= aw.qmc.temp2[-2] <= aw.qmc.temp2[-1] and aw.qmc.temp2[-4] < aw.qmc.temp2[-1]:
+        if not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-4] >= aw.qmc.temp2[-3] or aw.qmc.temp2[-4] >= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-3] <= aw.qmc.temp2[-2] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-3] < aw.qmc.temp2[-1]):
             self.afterTP = True
         return self.afterTP
 
@@ -6119,10 +6139,11 @@ class SampleThread(QThread):
                     self.sample()
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    dt = max(1,aw.qmc.delay/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
+                    dt = max(0.3,aw.qmc.delay/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
-                    libtime.sleep(dt)
+                    if aw.qmc.flagon:
+                        libtime.sleep(dt)
                 else:
                     aw.qmc.flagstopping = False # we signal that we stopped sampling
                     try:
@@ -6149,6 +6170,7 @@ class Athreadserver(QWidget):
 
     def createSampleThread(self):
         sthread = SampleThread(self)
+        sthread.decay_weights = None
         #QApplication.processEvents()
 
         #delete when finished to save memory 
@@ -15283,7 +15305,8 @@ class editGraphDlg(ArtisanDialog):
                                                   QApplication.translate("Table", "DeltaBT",None, QApplication.UnicodeUTF8)]
         for i in range(len(aw.qmc.extratimex)):
             columns.append(aw.qmc.extraname1[i])
-            columns.append(aw.qmc.extraname2[i])            
+            columns.append(aw.qmc.extraname2[i])
+        columns.append("") # add a last dummy table that extends
         self.datatable.setColumnCount(len(columns))
         self.datatable.setHorizontalHeaderLabels(columns)
         self.datatable.setAlternatingRowColors(True)
@@ -15292,8 +15315,6 @@ class editGraphDlg(ArtisanDialog):
         self.datatable.setSelectionMode(QTableWidget.SingleSelection)
         self.datatable.setShowGrid(True)
         for i in range(ndata):
-#            Atime = QTableWidgetItem("%.03f"%aw.qmc.timex[i])
-#            Atime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
             ET = QTableWidgetItem("%.0f"%aw.qmc.temp1[i])
@@ -15359,12 +15380,12 @@ class editGraphDlg(ArtisanDialog):
                 self.datatable.setItem(i,j+1,extra_qtw2)
                 j = j + 2
         header = self.datatable.horizontalHeader()
-#        header.setResizeMode(0, QHeaderView.Fixed)
-        header.setResizeMode(0, QHeaderView.Stretch)
+        header.setResizeMode(0, QHeaderView.Fixed)
         header.setResizeMode(1, QHeaderView.Fixed)
         header.setResizeMode(2, QHeaderView.Fixed)
         header.setResizeMode(3, QHeaderView.Fixed)
         header.setResizeMode(4, QHeaderView.Fixed)
+        header.setResizeMode(len(columns) - 1, QHeaderView.Stretch)
         self.datatable.resizeColumnsToContents()
 
     def createEventTable(self):
@@ -18678,25 +18699,25 @@ class backgroundDlg(ArtisanDialog):
         if ndata:
             self.datatable.setRowCount(ndata)
             self.datatable.setColumnCount(6)
-            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Abs Time",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","Rel Time",None, QApplication.UnicodeUTF8),
+            self.datatable.setHorizontalHeaderLabels([QApplication.translate("Table","Time",None, QApplication.UnicodeUTF8),
                                                       QApplication.translate("Table","ET",None, QApplication.UnicodeUTF8),
                                                       QApplication.translate("Table","BT",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","DeltaBT (d/m)",None, QApplication.UnicodeUTF8),
-                                                      QApplication.translate("Table","DeltaET (d/m)",None, QApplication.UnicodeUTF8)])
+                                                      QApplication.translate("Table","DeltaBT",None, QApplication.UnicodeUTF8),
+                                                      QApplication.translate("Table","DeltaET",None, QApplication.UnicodeUTF8),
+                                                      ""], # dummy column that stretches
+                                                      )
             self.datatable.setAlternatingRowColors(True)
             self.datatable.setEditTriggers(QTableWidget.NoEditTriggers)
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
             self.datatable.setSelectionMode(QTableWidget.SingleSelection)
             self.datatable.setShowGrid(True)
             for i in range(ndata):
-                Atime = QTableWidgetItem("%.03f"%aw.qmc.timeB[i])                
-                Atime.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
                 Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
-                ET = QTableWidgetItem("%.02f"%aw.qmc.temp1B[i])
-                ET.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
-                BT = QTableWidgetItem("%.02f"%aw.qmc.temp2B[i])
-                BT.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+                Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                ET = QTableWidgetItem("%.0f"%aw.qmc.temp1B[i])
+                BT = QTableWidgetItem("%.0f"%aw.qmc.temp2B[i])
+                ET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                BT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                 if i:
                     d = (aw.qmc.timeB[i]-aw.qmc.timeB[i-1])
                     if d == 0:
@@ -18705,55 +18726,58 @@ class backgroundDlg(ArtisanDialog):
                     else:
                         dET = (60*(aw.qmc.temp1B[i]-aw.qmc.temp1B[i-1])/d)
                         dBT = (60*(aw.qmc.temp2B[i]-aw.qmc.temp2B[i-1])/d)
-                    deltaET = QTableWidgetItem("%.02f"%dET)
-                    deltaBT = QTableWidgetItem("%.02f"%dBT)
+                    deltaET = QTableWidgetItem("%.1f"%dET)
+                    deltaBT = QTableWidgetItem("%.1f"%dBT)
                 else:
                     deltaET = QTableWidgetItem("--")
                     deltaBT = QTableWidgetItem("--")                
-                deltaET.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
-                deltaBT.setTextAlignment(Qt.AlignRight + Qt.AlignVCenter)
+                deltaET.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
+                deltaBT.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
                 if i:
                     #identify by color and add notation
                     if i == aw.qmc.timeindexB[0] != -1:
                         Rtime.setBackgroundColor(QColor('#f07800'))
-                        text = QApplication.translate("Table", "%1 START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                        Rtime.setText(text)
+                        text = QApplication.translate("Table", "CHARGE",None, QApplication.UnicodeUTF8)
                     elif i == aw.qmc.timeindexB[1]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = QApplication.translate("Table", "%1 DRY END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                        Rtime.setText(text)
+                        text = QApplication.translate("Table", "DRY END",None, QApplication.UnicodeUTF8)
                     elif i == aw.qmc.timeindexB[2]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = Rtime.text()
-                        text = QApplication.translate("Table", "%1 FC START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                        Rtime.setText(text)
+                        text = QApplication.translate("Table", "FC START",None, QApplication.UnicodeUTF8)
                     elif i == aw.qmc.timeindexB[3]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = QApplication.translate("Table", "%1 FC END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                        Rtime.setText(text)
+                        text = QApplication.translate("Table", "FC END",None, QApplication.UnicodeUTF8)
                     elif i == aw.qmc.timeindexB[4]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = QApplication.translate("Table", "%1 SC START",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                        Rtime.setText(text)
+                        text = QApplication.translate("Table", "SC START",None, QApplication.UnicodeUTF8)
                     elif i == aw.qmc.timeindexB[5]:
                         Rtime.setBackgroundColor(QColor('orange'))
-                        text = QApplication.translate("Table", "%1 SC END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                        Rtime.setText(text)
+                        text = QApplication.translate("Table", "SC END",None, QApplication.UnicodeUTF8)
                     elif i == aw.qmc.timeindexB[6]:
                         Rtime.setBackgroundColor(QColor('#f07800'))
-                        text = QApplication.translate("Table", "%1 END",None, QApplication.UnicodeUTF8).arg(Rtime.text())
-                        Rtime.setText(text)
+                        text = QApplication.translate("Table", "DROP",None, QApplication.UnicodeUTF8)
+                    elif i == aw.qmc.timeindexB[7]:
+                        Rtime.setBackgroundColor(QColor('#f07800'))
+                        text = QApplication.translate("Table", "COOL",None, QApplication.UnicodeUTF8)
                     elif i in aw.qmc.backgroundEvents:
                         Rtime.setBackgroundColor(QColor('yellow'))
                         index = aw.qmc.backgroundEvents.index(i)
-                        text = QApplication.translate("Table", "%1 EVENT #%2 %3%4",None, QApplication.UnicodeUTF8).arg(Rtime.text()).arg(str(index+1)).arg(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0]).arg(str(aw.qmc.backgroundEvalues[index]-1))
-                        Rtime.setText(text)
-                self.datatable.setItem(i,0,Atime)
-                self.datatable.setItem(i,1,Rtime)
-                self.datatable.setItem(i,2,ET)
-                self.datatable.setItem(i,3,BT)
-                self.datatable.setItem(i,4,deltaBT)
-                self.datatable.setItem(i,5,deltaET)
+                        text = QApplication.translate("Table", "EVENT #%1 %2%3",None, QApplication.UnicodeUTF8).arg(str(index+1)).arg(aw.qmc.Betypesf(aw.qmc.backgroundEtypes[index])[0]).arg(str(aw.qmc.backgroundEvalues[index]-1))
+                    else:
+                        text = u("")
+                    Rtime.setText(text + u(" " + Rtime.text()))
+                self.datatable.setItem(i,0,Rtime)
+                self.datatable.setItem(i,1,ET)
+                self.datatable.setItem(i,2,BT)
+                self.datatable.setItem(i,3,deltaBT)
+                self.datatable.setItem(i,4,deltaET)
+            header = self.datatable.horizontalHeader()
+            header.setResizeMode(0, QHeaderView.Fixed)
+            header.setResizeMode(1, QHeaderView.Fixed)
+            header.setResizeMode(2, QHeaderView.Fixed)
+            header.setResizeMode(3, QHeaderView.Fixed)
+            header.setResizeMode(4, QHeaderView.Fixed)
+            header.setResizeMode(5, QHeaderView.Stretch)
             self.datatable.resizeColumnsToContents()
 
 #############################################################################
@@ -21599,9 +21623,14 @@ class PortComboBox(QComboBox):
         # a list of triples as returned by serial.tools.list_ports
         self.ports = []
         self.updateMenu()
+        self.edited = None
+        self.connect(self, SIGNAL("editTextChanged(QString)"),lambda txt="":self.textEdited(txt)) 
 
+    def textEdited(self,txt):
+        self.edited = txt
+        
     def getSelection(self):
-        return self.selection
+        return self.edited or self.selection
 
     def setSelection(self,i):
         if i >= 0:
@@ -21617,6 +21646,7 @@ class PortComboBox(QComboBox):
 #                except:
 #                    pass
                 self.selection = u(self.ports[i][0])
+                self.edited = None # reset the user text editing
             except:
                 pass
 #            finally:
