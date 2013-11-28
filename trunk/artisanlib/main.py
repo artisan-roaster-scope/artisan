@@ -7700,6 +7700,11 @@ class ApplicationWindow(QMainWindow):
                     return u(s.arg(a))
                 else:
                     return u(s)
+        elif locale and locale == "he":
+            if a:
+                return u(s[::-1].arg(a[::-1]))
+            else:
+                return u(s[::-1])
         else:
             if a:
                 return u(s.arg(a))
