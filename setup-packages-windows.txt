@@ -1,12 +1,12 @@
 Current Versions:
 
-o Python 2.7.5
-o pyserial 2.6
+o Python 2.7.6
+o pyserial 2.7
 o QT 4.8.5
 o PyQt 4.10.3
-o numpy 1.7.1
-o scipy 0.12.0
-o matplotlib 1.3.0
+o numpy 1.8.0
+o scipy 0.13.1
+o matplotlib 1.3.1
 o pyparsing 2.0.1
 o dateutil 1.5
 o pytz 2013d
@@ -20,6 +20,11 @@ o NSIS 2.46
 
 Upgrade History:
 
+- 2013-11-12:
+ . Python 2.7.5 => 2.7.6
+ . matplotlib 1.3.0 => 1.3.1
+ . scipy 0.12.0 => 0.13.1
+ . numpy 1.7.0 => 1.8.0
 - 2013-10-07:
  . Python 2.7.4 => 2.7.5
  . matplotlib 1.2.1 => 1.3.0

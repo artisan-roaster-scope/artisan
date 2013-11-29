@@ -2,12 +2,12 @@ Current Versions:
 
 o XCode 4.5.2 + command line tools
 o Python 2.7.6 or 3.3.2 (change "python3" to "python" in all commands below for python 2.x)
-o pyserial
+o pyserial 2.7
 o QT 4.8.5
 o SIP 4.15.3
 o PyQt 4.10.3
-o numpy 1.7.1
-o scipy 0.12.0
+o numpy 1.8.0
+o scipy 0.13.1
 o matplotlib 1.3.1
 o pyaudio 0.2.7
 o minimalmodbus 0.4
@@ -23,6 +23,8 @@ o py2app >0.7.3 trunk (21.4.2013)
 Upgrade History:
 
 - 2013-11-12:
+ . scipy 0.13.1
+ . numpy 1.8.0
  . Python 2.7.4 => 2.7.6
  . QT 4.8.4 => 4.8.5
  . PyQt 4.10.0 => 4.10.3

@@ -30,6 +30,7 @@ o ET/BT logging and PID control supporting the following devices
  - TE VA18B
  - HHM28 multimeter
  - non-wireless Amprobe TMD-56 (same as Omega HH806AU)
+ - Phidget 1046 and 1048
  - virtual devices (symbolic devices)
  - device None (no device)
  - external program 
@@ -137,7 +138,7 @@ Artisan uses the following libraries in unmodified forms:
   http://www.python.org/
 - QT 4.10.x under the Qt GNU Lesser General Public License version 2.1 (LGPL)
   http://qt-project.org/products/licensing
-- Numpy 1.7.x and Scipy 0.12.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
+- Numpy 1.8.x and Scipy 0.13.x, Copyright (c) 2005, NumPy Developers; All Rights Reserved
   http://www.scipy.org/
 - PyQt 4.10.x and SIP 4.15.x under the Qt GNU GPL v. 3.0 licence; Copyright (c) 2010 Riverbank Computing Limited
   http://www.riverbankcomputing.co.uk/software/pyqt/
@@ -156,7 +157,7 @@ Artisan uses the following libraries in unmodified forms:
 VERSION HISTORY
 
 
-v0.7.0 (19.11.2013)
+v0.7.0 (30.11.2013)
 - support for the Phidget 1046/1048 devices
 - TP event marks (show on graph and in the message log)
 - phase LCDs (TP, DRY, FCs) estimating time to the event and counting time after the event (aka a roast development counter)
