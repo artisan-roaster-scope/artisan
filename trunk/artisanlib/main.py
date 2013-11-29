@@ -916,6 +916,8 @@ class tgraphcanvas(FigureCanvas):
 
         self.l_horizontalcrossline = None
         self.l_verticalcrossline = None
+        
+        self.l_timeline = None
 
         self.l_eventtype1dots, = self.ax.plot(self.E1timex, self.E1values, color=self.EvalueColor[0], marker=self.EvalueMarker[0])
         self.l_eventtype2dots, = self.ax.plot(self.E2timex, self.E2values, color=self.EvalueColor[1], marker=self.EvalueMarker[1])
@@ -1299,7 +1301,10 @@ class tgraphcanvas(FigureCanvas):
 #                                # we do not redraw the background curves nor the projection (drawn separately)
 #                                if not l in [self.l_BTprojection,self.l_ETprojection,self.l_back1,self.l_back2,self.l_delta1B,self.l_delta2B,self.l_backgroundeventtype1dots,self.l_backgroundeventtype2dots,self.l_backgroundeventtype3dots,self.l_backgroundeventtype4dots]:
 #                                    aw.qmc.ax.draw_artist(l)
-                                    
+
+                            if aw.qmc.device == 18 and aw.qmc.l_timeline != None: # not NONE device
+                                aw.qmc.ax.draw_artist(aw.qmc.l_timeline)
+                                
                             if aw.qmc.projectFlag:
                                 if self.l_BTprojection != None:
                                     aw.qmc.ax.draw_artist(self.l_BTprojection)
@@ -6228,14 +6233,13 @@ class SampleThread(QThread):
                         aw.qmc.endofx = tx + 180              # increase x limit by 3 minutes (180)
                         aw.qmc.ax.set_xlim(aw.qmc.startofx,aw.qmc.endofx)
                         aw.qmc.xaxistosm()
-                    aw.qmc.resetlines()
+                    #aw.qmc.resetlines()
                     #add to plot a vertical time line
-                    aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
+                    aw.qmc.l_timeline, = aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
                     # also in the manual case we check for TP, however we have to release the semaphore before
                     if aw.qmc.samplingsemaphore.available() < 1:
                         aw.qmc.samplingsemaphore.release(1)
                     if local_flagstart:
-                        #check alarms 
                         # check for TP event if already CHARGEed and not yet recognized
                         if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                             aw.qmc.TPalarmtimeindex = aw.findTP()
