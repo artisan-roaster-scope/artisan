@@ -1643,19 +1643,19 @@ class tgraphcanvas(FigureCanvas):
                         BTprojection = self.temp2[-1] + aw.qmc.delta2[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
                         #plot projections
                         if self.l_BTprojection == None:
-                            self.l_BTprojection, = self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
+                            self.l_BTprojection, = self.ax.plot([self.timex[-1],self.endofx], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
                                             linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                         else:
-                            self.l_BTprojection.set_data([self.timex[-1],self.endofx + 120], [self.temp2[-1], BTprojection])
+                            self.l_BTprojection.set_data([self.timex[-1],self.endofx], [self.temp2[-1], BTprojection])
                     elif self.l_BTprojection:
                         self.l_BTprojection.set_data([],[])
                     if aw.qmc.ETcurve and len(aw.qmc.delta1) > 0 and aw.qmc.delta1[-1] != None:
                         ETprojection = self.temp1[-1] + aw.qmc.delta1[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
                         if self.l_ETprojection == None:
-                            self.l_ETprojection, = self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], ETprojection],color =  self.palette["et"],
+                            self.l_ETprojection, = self.ax.plot([self.timex[-1],self.endofx], [self.temp1[-1], ETprojection],color =  self.palette["et"],
                                      linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
                         else:
-                            self.l_ETprojection.set_data([self.timex[-1],self.endofx + 120], [self.temp1[-1], ETprojection])
+                            self.l_ETprojection.set_data([self.timex[-1],self.endofx], [self.temp1[-1], ETprojection])
                     elif self.l_ETprojection:
                         self.l_ETprojection.set_data([],[])
                 elif self.projectionmode == 1:
@@ -3491,11 +3491,11 @@ class tgraphcanvas(FigureCanvas):
     #Records charge (put beans in) marker. called from push button 'Charge'
     def markCharge(self):
         try:
+            self.samplingsemaphore.acquire(1) 
             if self.flagstart:
                 aw.soundpop()
                 #prevents accidentally deleting a modified profile.
-                self.safesaveflag = True     
-                self.samplingsemaphore.acquire(1)           
+                self.safesaveflag = True               
                 if self.device != 18:
                     if self.autoChargeIdx:
                         self.timeindex[0] = self.autoChargeIdx
@@ -3519,20 +3519,6 @@ class tgraphcanvas(FigureCanvas):
                 tx = self.timex[self.timeindex[0]]
                 self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,t2,t2,d)
                 self.annotate(t2,st1,tx,t2,self.ystep_up,self.ystep_down)
-                # redraw (within timealign) should not be called if semaphore is hold!
-                # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
-                if self.samplingsemaphore.available() < 1:
-                    self.samplingsemaphore.release(1) 
-                aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
-                try:
-                    a = aw.qmc.buttonactions[0]
-                    aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[0])
-                except:
-                    pass
-                aw.button_8.setDisabled(True)
-                aw.button_8.setFlat(True)
-                message = QApplication.translate("Message","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(str(self.temp2[self.timeindex[0]]) + self.mode)
-                aw.sendmessage(message) 
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3541,7 +3527,21 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markCharge() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)                        
+                self.samplingsemaphore.release(1)
+        if self.flagstart:
+            # redraw (within timealign) should not be called if semaphore is hold!
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            aw.qmc.timealign(redraw=True,recompute=False) # redraws at least the canvas if redraw=True, so no need here for doing another canvas.draw()
+            try:
+                a = aw.qmc.buttonactions[0]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[0])
+            except:
+                pass
+            aw.button_8.setDisabled(True)
+            aw.button_8.setFlat(True)
+            message = QApplication.translate("Message","Roast time starts now 00:00 BT = %1",None, QApplication.UnicodeUTF8).arg(str(self.temp2[self.timeindex[0]]) + self.mode)
+            aw.sendmessage(message) 
+        
 
     # called from sample() and marks the autodetected TP visually on the graph
     def markTP(self):
@@ -3549,20 +3549,18 @@ class tgraphcanvas(FigureCanvas):
             self.samplingsemaphore.acquire(1)
             if self.flagstart and self.markTPflag:
                 if aw.qmc.TPalarmtimeindex and self.timeindex[0] != -1 and len(self.timex) > aw.qmc.TPalarmtimeindex:
-                        st = self.stringfromseconds(self.timex[aw.qmc.TPalarmtimeindex]-self.timex[self.timeindex[0]])
-                        st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP %1", None, QApplication.UnicodeUTF8).arg(st))
-                        #anotate temperature
-                        d = aw.qmc.ylimit - aw.qmc.ylimit_min
-                        self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
-                        anno_artist = self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down)
-                        #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
-                        self.updateBackground() # but we need
-                        st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1) 
-                        message = QApplication.translate("Message","[TP] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st).arg(st2)
-                        #set message at bottom
-                        aw.sendmessage(message)
+                    st = self.stringfromseconds(self.timex[aw.qmc.TPalarmtimeindex]-self.timex[self.timeindex[0]])
+                    st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP %1", None, QApplication.UnicodeUTF8).arg(st))
+                    #anotate temperature
+                    d = aw.qmc.ylimit - aw.qmc.ylimit_min
+                    self.ystep_down,self.ystep_up = self.findtextgap(self.ystep_down,self.ystep_up,self.temp2[self.timeindex[0]],self.temp2[aw.qmc.TPalarmtimeindex],d)
+                    self.annotate(self.temp2[aw.qmc.TPalarmtimeindex],st1,self.timex[aw.qmc.TPalarmtimeindex],self.temp2[aw.qmc.TPalarmtimeindex],self.ystep_up,self.ystep_down)
+                    #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
+                    self.updateBackground() # but we need
+                    st2 = "%.1f "%self.temp2[aw.qmc.TPalarmtimeindex] + self.mode
+                    message = QApplication.translate("Message","[TP] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st).arg(st2)
+                    #set message at bottom
+                    aw.sendmessage(message)
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markTP() %1").arg(str(ex)),exc_tb.tb_lineno)
@@ -3600,21 +3598,7 @@ class tgraphcanvas(FigureCanvas):
                     #self.fig.canvas.draw() # not needed as self.annotate does the (partial) redraw
                     self.updateBackground() # but we need
                     st2 = "%.1f "%self.temp2[self.timeindex[1]] + self.mode
-                    # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
-                    if self.samplingsemaphore.available() < 1:
-                        self.samplingsemaphore.release(1)
-                    aw.button_19.setDisabled(True) # deactivate DRY button
-                    aw.button_19.setFlat(True)
-                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                    aw.button_8.setFlat(True)
-                    try:
-                        a = aw.qmc.buttonactions[1]
-                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[1])
-                    except:
-                        pass
-                    message = QApplication.translate("Message","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st).arg(st2)
-                    #set message at bottom
-                    aw.sendmessage(message)
+
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3623,7 +3607,22 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markDryEnd() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)                        
+                self.samplingsemaphore.release(1)
+        if self.flagstart:                
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            aw.button_19.setDisabled(True) # deactivate DRY button
+            aw.button_19.setFlat(True)
+            aw.button_8.setDisabled(True) # also deactivate CHARGE button
+            aw.button_8.setFlat(True)
+            try:
+                a = aw.qmc.buttonactions[1]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[1])
+            except:
+                pass
+            message = QApplication.translate("Message","[DRY END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st).arg(st2)
+            #set message at bottom
+            aw.sendmessage(message)
+                                                      
 
     #record 1C start markers of BT. called from push button_3 of application window
     def mark1Cstart(self):
@@ -3658,22 +3657,6 @@ class tgraphcanvas(FigureCanvas):
                     self.updateBackground() # but we need
                     st1 = self.stringfromseconds(self.timex[self.timeindex[2]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[2]] + self.mode
-                    # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
-                    if self.samplingsemaphore.available() < 1:
-                        self.samplingsemaphore.release(1)
-                    aw.button_3.setDisabled(True) # deactivate FCs button
-                    aw.button_3.setFlat(True)
-                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                    aw.button_8.setFlat(True)
-                    aw.button_19.setDisabled(True) # also deactivate DRY button
-                    aw.button_19.setFlat(True)
-                    try:
-                        a = aw.qmc.buttonactions[2]
-                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[2])
-                    except:
-                        pass
-                    message = QApplication.translate("Message","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3682,7 +3665,23 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark1Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)                        
+                self.samplingsemaphore.release(1)
+        if self.flagstart:
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            aw.button_3.setDisabled(True) # deactivate FCs button
+            aw.button_3.setFlat(True)
+            aw.button_8.setDisabled(True) # also deactivate CHARGE button
+            aw.button_8.setFlat(True)
+            aw.button_19.setDisabled(True) # also deactivate DRY button
+            aw.button_19.setFlat(True)
+            try:
+                a = aw.qmc.buttonactions[2]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[2])
+            except:
+                pass
+            message = QApplication.translate("Message","[FC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            aw.sendmessage(message)
+        
 
     #record 1C end markers of BT. called from button_4 of application window
     def mark1Cend(self):
@@ -3711,24 +3710,6 @@ class tgraphcanvas(FigureCanvas):
                     self.updateBackground() # but we need
                     st1 = self.stringfromseconds(self.timex[self.timeindex[3]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[3]] + self.mode
-                    # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
-                    if self.samplingsemaphore.available() < 1:
-                        self.samplingsemaphore.release(1)
-                    aw.button_4.setDisabled(True) # deactivate FCe button
-                    aw.button_4.setFlat(True)
-                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                    aw.button_8.setFlat(True)
-                    aw.button_19.setDisabled(True) # also deactivate DRY button
-                    aw.button_19.setFlat(True)
-                    aw.button_3.setDisabled(True) # also deactivate FCs button
-                    aw.button_3.setFlat(True)
-                    try:
-                        a = aw.qmc.buttonactions[3]
-                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[3])
-                    except:
-                        pass
-                    message = QApplication.translate("Message","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3737,7 +3718,24 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark1Cend() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)                        
+                self.samplingsemaphore.release(1)    
+        if self.flagstart:                    
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            aw.button_4.setDisabled(True) # deactivate FCe button
+            aw.button_4.setFlat(True)
+            aw.button_8.setDisabled(True) # also deactivate CHARGE button
+            aw.button_8.setFlat(True)
+            aw.button_19.setDisabled(True) # also deactivate DRY button
+            aw.button_19.setFlat(True)
+            aw.button_3.setDisabled(True) # also deactivate FCs button
+            aw.button_3.setFlat(True)
+            try:
+                a = aw.qmc.buttonactions[3]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[3])
+            except:
+                pass
+            message = QApplication.translate("Message","[FC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            aw.sendmessage(message)
 
     #record 2C start markers of BT. Called from button_5 of application window
     def mark2Cstart(self):
@@ -3768,26 +3766,6 @@ class tgraphcanvas(FigureCanvas):
                     self.updateBackground() # but we need
                     st1 = self.stringfromseconds(self.timex[self.timeindex[4]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[4]] + self.mode
-                    # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
-                    if self.samplingsemaphore.available() < 1:
-                        self.samplingsemaphore.release(1)
-                    aw.button_5.setDisabled(True) # deactivate SCs button
-                    aw.button_5.setFlat(True)
-                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                    aw.button_8.setFlat(True)
-                    aw.button_19.setDisabled(True) # also deactivate DRY button
-                    aw.button_19.setFlat(True)
-                    aw.button_3.setDisabled(True) # also deactivate FCs button
-                    aw.button_3.setFlat(True)
-                    aw.button_4.setDisabled(True) # also deactivate FCe button
-                    aw.button_4.setFlat(True)
-                    try:
-                        a = aw.qmc.buttonactions[4]
-                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[4])
-                    except:
-                        pass
-                    message = QApplication.translate("Message","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3796,7 +3774,26 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark2Cstart() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)                        
+                self.samplingsemaphore.release(1)
+        if self.flagstart:
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            aw.button_5.setDisabled(True) # deactivate SCs button
+            aw.button_5.setFlat(True)
+            aw.button_8.setDisabled(True) # also deactivate CHARGE button
+            aw.button_8.setFlat(True)
+            aw.button_19.setDisabled(True) # also deactivate DRY button
+            aw.button_19.setFlat(True)
+            aw.button_3.setDisabled(True) # also deactivate FCs button
+            aw.button_3.setFlat(True)
+            aw.button_4.setDisabled(True) # also deactivate FCe button
+            aw.button_4.setFlat(True)
+            try:
+                a = aw.qmc.buttonactions[4]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[4])
+            except:
+                pass
+            message = QApplication.translate("Message","[SC START] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            aw.sendmessage(message)
 
     #record 2C end markers of BT. Called from button_6  of application window
     def mark2Cend(self):
@@ -3824,28 +3821,6 @@ class tgraphcanvas(FigureCanvas):
                     self.updateBackground() # but we need
                     st1 = self.stringfromseconds(self.timex[self.timeindex[5]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[5]] + self.mode
-                    # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
-                    if self.samplingsemaphore.available() < 1:
-                        self.samplingsemaphore.release(1)
-                    aw.button_6.setDisabled(True) # deactivate SCe button
-                    aw.button_6.setFlat(True)
-                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                    aw.button_8.setFlat(True)
-                    aw.button_19.setDisabled(True) # also deactivate DRY button
-                    aw.button_19.setFlat(True)
-                    aw.button_3.setDisabled(True) # also deactivate FCs button
-                    aw.button_3.setFlat(True)
-                    aw.button_4.setDisabled(True) # also deactivate FCe button
-                    aw.button_4.setFlat(True)
-                    aw.button_5.setDisabled(True) # also deactivate SCs button
-                    aw.button_5.setFlat(True)
-                    try:
-                        a = aw.qmc.buttonactions[5]
-                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[5])
-                    except:
-                        pass
-                    message = QApplication.translate("Message","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3854,7 +3829,28 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " mark2Cend() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)                        
+                self.samplingsemaphore.release(1)  
+        if self.flagstart:                      
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            aw.button_6.setDisabled(True) # deactivate SCe button
+            aw.button_6.setFlat(True)
+            aw.button_8.setDisabled(True) # also deactivate CHARGE button
+            aw.button_8.setFlat(True)
+            aw.button_19.setDisabled(True) # also deactivate DRY button
+            aw.button_19.setFlat(True)
+            aw.button_3.setDisabled(True) # also deactivate FCs button
+            aw.button_3.setFlat(True)
+            aw.button_4.setDisabled(True) # also deactivate FCe button
+            aw.button_4.setFlat(True)
+            aw.button_5.setDisabled(True) # also deactivate SCs button
+            aw.button_5.setFlat(True)
+            try:
+                a = aw.qmc.buttonactions[5]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[5])
+            except:
+                pass
+            message = QApplication.translate("Message","[SC END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            aw.sendmessage(message)
 
     #record end of roast (drop of beans). Called from push button 'Drop'
     def markDrop(self):
@@ -3894,36 +3890,6 @@ class tgraphcanvas(FigureCanvas):
                     self.updateBackground() # but we need
                     st1 = self.stringfromseconds(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[6]] + self.mode
-                    # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
-                    if self.samplingsemaphore.available() < 1:
-                        self.samplingsemaphore.release(1)
-                    aw.button_9.setDisabled(True) # deactivate DROP button
-                    aw.button_9.setFlat(True)
-                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                    aw.button_8.setFlat(True)
-                    aw.button_19.setDisabled(True) # also deactivate DRY button
-                    aw.button_19.setFlat(True)
-                    aw.button_3.setDisabled(True) # also deactivate FCs button
-                    aw.button_3.setFlat(True)
-                    aw.button_4.setDisabled(True) # also deactivate FCe button
-                    aw.button_4.setFlat(True)
-                    aw.button_5.setDisabled(True) # also deactivate SCs button
-                    aw.button_5.setFlat(True)
-                    aw.button_6.setDisabled(True) # also deactivate SCe button
-                    aw.button_6.setFlat(True)
-                    try:
-                        # update ambient temperature if a ambient temperature source is configured and no value yet established
-                        if aw.qmc.ambientTemp == 0.0:
-                            aw.qmc.updateAmbientTemp()
-                    except:
-                        pass
-                    try:
-                        a = aw.qmc.buttonactions[6]
-                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[6])
-                    except:
-                        pass
-                    message = QApplication.translate("Message","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3932,7 +3898,36 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markDrop() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)                        
+                self.samplingsemaphore.release(1)
+        if self.flagstart:
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            aw.button_9.setDisabled(True) # deactivate DROP button
+            aw.button_9.setFlat(True)
+            aw.button_8.setDisabled(True) # also deactivate CHARGE button
+            aw.button_8.setFlat(True)
+            aw.button_19.setDisabled(True) # also deactivate DRY button
+            aw.button_19.setFlat(True)
+            aw.button_3.setDisabled(True) # also deactivate FCs button
+            aw.button_3.setFlat(True)
+            aw.button_4.setDisabled(True) # also deactivate FCe button
+            aw.button_4.setFlat(True)
+            aw.button_5.setDisabled(True) # also deactivate SCs button
+            aw.button_5.setFlat(True)
+            aw.button_6.setDisabled(True) # also deactivate SCe button
+            aw.button_6.setFlat(True)
+            try:
+                # update ambient temperature if a ambient temperature source is configured and no value yet established
+                if aw.qmc.ambientTemp == 0.0:
+                    aw.qmc.updateAmbientTemp()
+            except:
+                pass
+            try:
+                a = aw.qmc.buttonactions[6]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[6])
+            except:
+                pass
+            message = QApplication.translate("Message","Roast ended at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            aw.sendmessage(message)
 
     def markCoolEnd(self):
         try:
@@ -3963,33 +3958,6 @@ class tgraphcanvas(FigureCanvas):
                     self.updateBackground() # but we need
                     st1 = self.stringfromseconds(self.timex[self.timeindex[7]]-self.timex[self.timeindex[0]])
                     st2 = "%.1f "%self.temp2[self.timeindex[7]] + self.mode
-                    # NOTE: the following aw.eventaction might do serial communication that accires a log, so release it here
-                    if self.samplingsemaphore.available() < 1:
-                        self.samplingsemaphore.release(1)
-                    aw.button_20.setDisabled(True) # deactivate COOL button
-                    aw.button_20.setFlat(True)
-                    aw.button_8.setDisabled(True) # also deactivate CHARGE button
-                    aw.button_8.setFlat(True)
-                    aw.button_19.setDisabled(True) # also deactivate DRY button
-                    aw.button_19.setFlat(True)
-                    aw.button_3.setDisabled(True) # also deactivate FCs button
-                    aw.button_3.setFlat(True)
-                    aw.button_4.setDisabled(True) # also deactivate FCe button
-                    aw.button_4.setFlat(True)
-                    aw.button_5.setDisabled(True) # also deactivate SCs button
-                    aw.button_5.setFlat(True)
-                    aw.button_6.setDisabled(True) # also deactivate SCe button
-                    aw.button_6.setFlat(True)
-                    aw.button_9.setDisabled(True) # also deactivate DROP button
-                    aw.button_9.setFlat(True)
-                    try:
-                        a = aw.qmc.buttonactions[7]
-                        aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[7])
-                    except:
-                        pass
-                    message = QApplication.translate("Message","[COOL END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
-                    #set message at bottom
-                    aw.sendmessage(message)
             else:
                 message = QApplication.translate("Message","Scope is OFF", None, QApplication.UnicodeUTF8)
                 aw.sendmessage(message)
@@ -3998,7 +3966,33 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " markCoolEnd() %1").arg(str(e)),exc_tb.tb_lineno)
         finally:
             if self.samplingsemaphore.available() < 1:
-                self.samplingsemaphore.release(1)                        
+                self.samplingsemaphore.release(1)
+        if self.flagstart:
+            # NOTE: the following aw.eventaction might do serial communication that accires a lock, so release it here
+            aw.button_20.setDisabled(True) # deactivate COOL button
+            aw.button_20.setFlat(True)
+            aw.button_8.setDisabled(True) # also deactivate CHARGE button
+            aw.button_8.setFlat(True)
+            aw.button_19.setDisabled(True) # also deactivate DRY button
+            aw.button_19.setFlat(True)
+            aw.button_3.setDisabled(True) # also deactivate FCs button
+            aw.button_3.setFlat(True)
+            aw.button_4.setDisabled(True) # also deactivate FCe button
+            aw.button_4.setFlat(True)
+            aw.button_5.setDisabled(True) # also deactivate SCs button
+            aw.button_5.setFlat(True)
+            aw.button_6.setDisabled(True) # also deactivate SCe button
+            aw.button_6.setFlat(True)
+            aw.button_9.setDisabled(True) # also deactivate DROP button
+            aw.button_9.setFlat(True)
+            try:
+                a = aw.qmc.buttonactions[7]
+                aw.eventaction((a if (a < 3) else a + 1),aw.qmc.buttonactionstrings[7])
+            except:
+                pass
+            message = QApplication.translate("Message","[COOL END] recorded at %1 BT = %2", None, QApplication.UnicodeUTF8).arg(st1).arg(st2)
+            #set message at bottom
+            aw.sendmessage(message)
 
     def EventRecord(self,extraevent=None):
         try:
@@ -4110,8 +4104,6 @@ class tgraphcanvas(FigureCanvas):
                         self.updateBackground() # but we need
                         temp = "%.1f "%self.temp2[i]
                         timed = self.stringfromseconds(self.timex[i])
-                        if self.samplingsemaphore.available() < 1:
-                            self.samplingsemaphore.release(1)
                         message = QApplication.translate("Message","Event # %1 recorded at BT = %2 Time = %3", None, QApplication.UnicodeUTF8).arg(str(Nevents+1)).arg(temp).arg(timed)
                         aw.sendmessage(message)
                         #write label in mini recorder if flag checked
@@ -6240,14 +6232,12 @@ class SampleThread(QThread):
                     #aw.qmc.resetlines()
                     #add to plot a vertical time line
                     aw.qmc.l_timeline, = aw.qmc.ax.plot([tx,tx], [aw.qmc.ylimit_min,aw.qmc.ylimit],color = aw.qmc.palette["Cline"],linestyle = '-', linewidth= 1, alpha = .7,sketch_params=None,path_effects=[])
-                    # also in the manual case we check for TP, however we have to release the semaphore before
-                    if aw.qmc.samplingsemaphore.available() < 1:
-                        aw.qmc.samplingsemaphore.release(1)
+                    # also in the manual case we check for TP
                     if local_flagstart:
                         # check for TP event if already CHARGEed and not yet recognized
                         if not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                            aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()
-                            aw.qmc.markTP()
         except Exception as e:
             #import traceback
             #traceback.print_exc(file=sys.stdout)
@@ -6264,7 +6254,7 @@ class SampleThread(QThread):
         # if v[-1] is the current temperature then check if
         #   len(BT) > 4
         # BT[-4] <= BT[-3] <= BT[-2] <= BT[-1] and BT[-4] < BT[-1]
-        if not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-4] >= aw.qmc.temp2[-3] or aw.qmc.temp2[-4] >= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-3] <= aw.qmc.temp2[-2] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-3] < aw.qmc.temp2[-1]):
+        if not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-4] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-4] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-4] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-4] < aw.qmc.temp2[-1]):
             self.afterTP = True
         return self.afterTP
 
@@ -12298,7 +12288,7 @@ $cupping_notes
         if SOR_index > start and SOR_index < end:
             start = SOR_index
         for i in range(end - 1, start -1, -1):
-            if self.qmc.temp2[i] < TP:
+            if self.qmc.temp2[i] > 0 and self.qmc.temp2[i] < TP:
                 TP = self.qmc.temp2[i]
                 idx = i
         return idx
@@ -21127,7 +21117,7 @@ class serialport(object):
                     command += "\n"
                 self.SP.write(str2cmd(command))
                 self.SP.flush()
-        except serial.SerialException:
+        except serial.SerialException as e:
             #self.closeport() # do not close the serial port as reopening might take too long
             error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
