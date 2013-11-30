@@ -2564,8 +2564,8 @@ class tgraphcanvas(FigureCanvas):
                             rorlimit = aw.qmc.RoRlimitC
                         else:
                             rorlimit = aw.qmc.RoRlimitF
-                        self.delta1B = [d if -rorlimit < d < rorlimit else None for d in self.delta1B]
-                        self.delta2B = [d if -rorlimit < d < rorlimit else None for d in self.delta2B]
+                        self.delta1B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1B]
+                        self.delta2B = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2B]
                     
                     ##### DeltaETB,DeltaBTB curves
                     if self.DeltaETBflag:
@@ -2732,8 +2732,8 @@ class tgraphcanvas(FigureCanvas):
                         rorlimit = aw.qmc.RoRlimitC
                     else:
                         rorlimit = aw.qmc.RoRlimitF
-                    self.delta1 = [d if -rorlimit < d < rorlimit else None for d in self.delta1]
-                    self.delta2 = [d if -rorlimit < d < rorlimit else None for d in self.delta2]
+                    self.delta1 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta1]
+                    self.delta2 = [d if d and (-rorlimit < d < rorlimit) else None for d in self.delta2]
                     
                 ##### DeltaET,DeltaBT curves
                 if self.DeltaETflag and not self.designerflag:
@@ -2964,8 +2964,8 @@ class tgraphcanvas(FigureCanvas):
                     self.redrawdesigner()
 
         except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            import traceback
+            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()    
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " redraw() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
