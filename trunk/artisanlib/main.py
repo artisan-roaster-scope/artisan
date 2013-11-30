@@ -2964,8 +2964,8 @@ class tgraphcanvas(FigureCanvas):
                     self.redrawdesigner()
 
         except Exception as ex:
-            import traceback
-            traceback.print_exc(file=sys.stdout)
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()    
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " redraw() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -6252,8 +6252,8 @@ class SampleThread(QThread):
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
         # if v[-1] is the current temperature then check if
-        #   len(BT) > 4
-        # BT[-4] <= BT[-3] <= BT[-2] <= BT[-1] and BT[-4] < BT[-1]
+        #   len(BT) > 3
+        # BT[-4] <= BT[-3] and BT[-4] <= BT[-2] and BT[-4] <= BT[-1] and BT[-4] < BT[-1]
         if not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-4] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-4] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-4] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-4] < aw.qmc.temp2[-1]):
             self.afterTP = True
         return self.afterTP
