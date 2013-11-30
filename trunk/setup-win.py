@@ -11,9 +11,12 @@ import py2exe
 
 import os
 
+
+
 INCLUDES = [
             "sip",
-            "serial"
+            "serial",
+            "scipy.special._ufuncs_cxx"
             ]
 
 EXCLUDES = ['_tkagg',

@@ -90,6 +90,7 @@ import matplotlib.ticker as ticker
 import matplotlib.patheffects as PathEffects
 import matplotlib.dates as md
 
+
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 
@@ -4617,8 +4618,11 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror(QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " univariate()")
             return
 
-        except Exception:
-            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " univariate()")
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror(QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " univariate() " + str(e),exc_tb.tb_lineno)
             return
 
     def drawinterp(self,mode):
@@ -10002,11 +10006,13 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.resetlinecountcaches()
             # try to reload background profile
             if "backgroundpath" in profile:
+                self.qmc.backgroundpath = d(profile["backgroundpath"])
                 if os.path.isfile(self.qmc.backgroundpath):
-                    self.qmc.backgroundpath = d(profile["backgroundpath"])
-                    aw.loadbackground(u(self.qmc.backgroundpath))      
+                    aw.loadbackground(u(self.qmc.backgroundpath))                          
                     aw.qmc.background = True
-                    aw.qmc.timealign()
+                    aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
+                else:
+                    self.qmc.backgroundpath = ""
             return True
         except Exception as ex:
 #            import traceback
