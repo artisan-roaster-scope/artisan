@@ -1417,9 +1417,9 @@ class tgraphcanvas(FigureCanvas):
                     if redraw:
                         self.redraw(recompute)
                 elif redraw: # ensure that we at least readraw the canvas
-                    self.fig.canvas.draw()
+                    self.updateBackground()
             elif redraw:
-                    self.fig.canvas.draw()
+                    self.updateBackground()
         except Exception as ex:
 #            import traceback
 #            traceback.print_exc(file=sys.stdout)
@@ -9730,11 +9730,11 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.extramarkers2 = [self.qmc.marker_default]*len(self.qmc.extratemp2)
                 if "extralinewidths1" in profile:
-                    self.qmc.extralinewidths1 = profile["extralinewidths1"]
+                    self.qmc.extralinewidths1 = [int(w) for w in profile["extralinewidths1"]]
                 else:
                     self.qmc.extralinewidths1 = [self.qmc.linewidth_default]*len(self.qmc.extratemp1)
                 if "extralinewidths2" in profile:
-                    self.qmc.extralinewidths2 = profile["extralinewidths2"]
+                    self.qmc.extralinewidths2 = [int(w) for w in profile["extralinewidths2"]]
                 else:
                     self.qmc.extralinewidths2 = [self.qmc.linewidth_default]*len(self.qmc.extratemp2)
                 if "extralinestyles1" in profile:
@@ -12725,6 +12725,7 @@ $cupping_notes
             # load foreground into background
             aw.loadbackground(u(foreground_profile_path))
             aw.qmc.background = True
+            aw.qmc.timealign(redraw=False)
         else:
             # delete background
             self.deleteBackground()
@@ -18806,7 +18807,7 @@ class backgroundDlg(ArtisanDialog):
         self.readChecks()
         self.createEventTable()
         self.createDataTable()
-        aw.qmc.timealign()
+        aw.qmc.timealign(redraw=True)
 
     def createEventTable(self):
         self.eventtable.clear()
