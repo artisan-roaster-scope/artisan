@@ -120,6 +120,7 @@ elif os.name == 'posix':
 # to make py2exe happy with scipy >0.11
 def dependencies_for_myprogram():
     from scipy.sparse.csgraph import _validation
+    from scipy.interpolate import UnivariateSpline
     import PyQt4.QtSvg
     import PyQt4.QtXml
 
@@ -2734,14 +2735,14 @@ class tgraphcanvas(FigureCanvas):
                     self.delta2 = [d if -rorlimit < d < rorlimit else None for d in self.delta2]
                     
                 ##### DeltaET,DeltaBT curves
-                if self.DeltaETflag:
+                if self.DeltaETflag and not self.designerflag:
                     self.l_delta1, = self.delta_ax.plot(self.timex, self.delta1,markersize=self.ETdeltamarkersize,marker=self.ETdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.ETdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                     linewidth=self.ETdeltalinewidth,linestyle=self.ETdeltalinestyle,drawstyle=self.ETdeltadrawstyle,color=self.palette["deltaet"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                     handles.append(self.l_delta1)
                     labels.append(aw.arabicReshape(QApplication.translate("Label", "DeltaET", None, QApplication.UnicodeUTF8)))
                     
-                if self.DeltaBTflag:
+                if self.DeltaBTflag and not self.designerflag:
                     self.l_delta2, = self.delta_ax.plot(self.timex, self.delta2,markersize=self.BTdeltamarkersize,marker=self.BTdeltamarker,
                     sketch_params=None,path_effects=[PathEffects.withStroke(linewidth=self.BTdeltalinewidth+aw.qmc.patheffects,foreground="w")],
                     linewidth=self.BTdeltalinewidth,linestyle=self.BTdeltalinestyle,drawstyle=self.BTdeltadrawstyle,color=self.palette["deltabt"],label=aw.arabicReshape(QApplication.translate("Label", "DeltaBT", None, QApplication.UnicodeUTF8)))
@@ -4719,13 +4720,13 @@ class tgraphcanvas(FigureCanvas):
             if reply == QMessageBox.Yes:
                 self.initfromprofile()
                 self.connect_designer()
+                self.redraw(False)
             elif reply == QMessageBox.Cancel:
                 aw.designerAction.setChecked(False)
         else:
             #if no profile found
             self.reset(redraw=False,soundOn=False)
             self.connect_designer()
-            self.redraw(False)
             self.designerinit()
         
     #used to start designer from scratch (not from a loaded profile)
@@ -4801,7 +4802,6 @@ class tgraphcanvas(FigureCanvas):
             self.addpoint()
 
         self.xaxistosm()
-        aw.qmc.designerflag = True
         self.redrawdesigner()                                   #redraw the designer screen
 
     #redraws designer
@@ -10002,8 +10002,8 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.resetlinecountcaches()
             # try to reload background profile
             if "backgroundpath" in profile:
-                self.qmc.backgroundpath = d(profile["backgroundpath"])
                 if os.path.isfile(self.qmc.backgroundpath):
+                    self.qmc.backgroundpath = d(profile["backgroundpath"])
                     aw.loadbackground(u(self.qmc.backgroundpath))      
                     aw.qmc.background = True
                     aw.qmc.timealign()
