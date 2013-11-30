@@ -60,7 +60,7 @@
   * scan for ports on Linux
   * better error handling on exporting data
   * improved sample time accuracy
-  * now. fixes wrong segment 4 soak time reported by "Read RS values"
+  * fixes wrong segment 4 soak time reported by "Read RS values"
   * updates translations (JP, NL)
 
 ==v0.6.0 (14.6.2013)==
