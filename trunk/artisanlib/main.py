@@ -12472,11 +12472,13 @@ $cupping_notes
     def viewErrorLog(self):
         self.error = errorDlg(self)
         self.error.show()
+        QApplication.processEvents()
         self.error.setModal(False)
 
     def viewSerialLog(self):
         self.serialDLG = serialLogDlg(self)
         self.serialDLG.show()
+        QApplication.processEvents()
         self.serialDLG.setModal(False)
         
         
@@ -12487,11 +12489,13 @@ $cupping_notes
     def viewplatform(self):
         self.platformDLG = platformDlg(self)
         self.platformDLG.show()
+        QApplication.processEvents()
         self.platformDLG.setModal(False)
 
     def viewMessageLog(self):
         self.message = messageDlg(self)
         self.message.show()
+        QApplication.processEvents()
         self.message.setModal(False)
 
     def helpAbout(self):
@@ -12661,6 +12665,7 @@ $cupping_notes
                 dialog = DTApidDlgControl(self)
             #modeless style dialog 
             dialog.show()
+            QApplication.processEvents()
             dialog.setModal(False)
         #arduino
 #        elif self.qmc.device == 19:
@@ -12687,6 +12692,7 @@ $cupping_notes
     def calculator(self):
         self.dialog = calculatorDlg(self)
         self.dialog.show()
+        QApplication.processEvents()
         self.dialog.setModal(False)
 
     def graphwheel(self):
