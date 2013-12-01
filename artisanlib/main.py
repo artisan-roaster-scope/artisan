@@ -1639,25 +1639,19 @@ class tgraphcanvas(FigureCanvas):
                     starttime = 0
                 if self.projectionmode == 0:
                     #calculate the temperature endpoint at endofx acording to the latest rate of change
-                    if aw.qmc.BTcurve and len(aw.qmc.delta2) > 0 and aw.qmc.delta2[-1] != None:
-                        BTprojection = self.temp2[-1] + aw.qmc.delta2[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
-                        #plot projections
-                        if self.l_BTprojection == None:
-                            self.l_BTprojection, = self.ax.plot([self.timex[-1],self.endofx], [self.temp2[-1], BTprojection],color =  self.palette["bt"],
-                                            linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
-                        else:
-                            self.l_BTprojection.set_data([self.timex[-1],self.endofx], [self.temp2[-1], BTprojection])
-                    elif self.l_BTprojection:
-                        self.l_BTprojection.set_data([],[])
-                    if aw.qmc.ETcurve and len(aw.qmc.delta1) > 0 and aw.qmc.delta1[-1] != None:
-                        ETprojection = self.temp1[-1] + aw.qmc.delta1[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
-                        if self.l_ETprojection == None:
-                            self.l_ETprojection, = self.ax.plot([self.timex[-1],self.endofx], [self.temp1[-1], ETprojection],color =  self.palette["et"],
-                                     linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
-                        else:
-                            self.l_ETprojection.set_data([self.timex[-1],self.endofx], [self.temp1[-1], ETprojection])
-                    elif self.l_ETprojection:
-                        self.l_ETprojection.set_data([],[])
+                    if self.l_BTprojection != None:
+                        if aw.qmc.BTcurve and len(aw.qmc.delta2) > 0 and aw.qmc.delta2[-1] != None:
+                            BTprojection = self.temp2[-1] + aw.qmc.delta2[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
+                            #plot projections
+                            self.l_BTprojection.set_data([self.timex[-1],self.endofx+starttime], [self.temp2[-1], BTprojection])
+                        elif self.l_BTprojection:
+                            self.l_BTprojection.set_data([],[])
+                    if self.l_ETprojection != None:
+                        if aw.qmc.ETcurve and len(aw.qmc.delta1) > 0 and aw.qmc.delta1[-1] != None:
+                            ETprojection = self.temp1[-1] + aw.qmc.delta1[-1]*(self.endofx - self.timex[-1]+ starttime)/60.
+                            self.l_ETprojection.set_data([self.timex[-1],self.endofx+starttime], [self.temp1[-1], ETprojection])
+                        elif self.l_ETprojection:
+                            self.l_ETprojection.set_data([],[])
                 elif self.projectionmode == 1:
                     # Under Test. Newton's Law of Cooling
                     # This comes from the formula of heating (with ET) a cool (colder) object (BT).
@@ -1672,7 +1666,7 @@ class tgraphcanvas(FigureCanvas):
                     den = self.temp1[-1] - self.temp2[-1]  #denominator ETn - BTn 
                     if den > 0 and len(aw.qmc.delta2)>0 and aw.qmc.delta2[-1]: # if ETn > BTn
                         #get x points
-                        xpoints = list(numpy.arange(self.timex[-1],self.endofx + 120, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds)
+                        xpoints = list(numpy.arange(self.timex[-1],self.endofx + starttime, self.delay/1000.))  #do two minutes after endofx (+ 120 seconds); why? now +starttime
                         #get y points
                         ypoints = [self.temp2[-1]]                                  # start initializing with last BT
                         K =  self.projectionconstant*aw.qmc.delta2[-1]/den/60.                 # multiplier
@@ -1681,14 +1675,9 @@ class tgraphcanvas(FigureCanvas):
                             ypoints.append(ypoints[-1]+ DeltaT)                             # add DeltaT to the next ypoint
         
                         #plot ET level (straight line) and BT curve
-                        if self.l_ETprojection == None:
-                            self.l_ETprojection, = self.ax.plot([self.timex[-1],self.endofx + 120], [self.temp1[-1], self.temp1[-1]],color =  self.palette["et"],
-                                     linestyle = '-.', linewidth= 3, alpha = .5,sketch_params=None,path_effects=[])
-                        else:
-                            self.l_ETprojection.set_data([self.timex[-1],self.endofx + 120], [self.temp1[-1], self.temp1[-1]])
-                        if self.l_BTprojection == None:
-                            self.l_BTprojection, = self.ax.plot(xpoints, ypoints, color =  self.palette["bt"],linestyle = '-.', linewidth= 3, alpha = .5,sketch_params=None,path_effects=[])
-                        else:
+                        if self.l_ETprojection != None:
+                            self.l_ETprojection.set_data([self.timex[-1],self.endofx + starttime], [self.temp1[-1], self.temp1[-1]])
+                        if self.l_BTprojection != None:
                             self.l_BTprojection.set_data(xpoints, ypoints)
                     else:
                         if self.l_ETprojection:
@@ -1800,7 +1789,7 @@ class tgraphcanvas(FigureCanvas):
         list(map(round,minorloc))
 
         #majorlocator = ticker.IndexLocator(self.xgrid, starttime)  #IndexLocator does not work right when updating (new value)self.endofx
-        #majorlocator = ticker.MultipleLocator(self.xgrid)          #MultipleLocator does not provide an offset for startime
+        #majorlocator = ticker.MultipleLocator(self.xgrid)          #MultipleLocator does not provide an offset for starttime
         majorlocator = ticker.FixedLocator(majorloc)   
         minorlocator = ticker.FixedLocator(minorloc)
 
@@ -2949,6 +2938,11 @@ class tgraphcanvas(FigureCanvas):
                 if aw.qmc.graphstyle == 1:
                     leg.legendPatch.set_path_effects([PathEffects.withSimplePatchShadow(offset_xy=(8,-8),patch_alpha=0.9, shadow_rgbFace=(0.25,0.25,0.25))])
 
+            # we create here the project line plots to have the accurate time axis after CHARGE
+            self.l_BTprojection, = self.ax.plot([], [],color = self.palette["bt"],
+                                            linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
+            self.l_ETprojection, = self.ax.plot([], [],color = self.palette["et"],
+                                            linestyle = '-.', linewidth= 8, alpha = .3,sketch_params=None,path_effects=[])
 
             ############  ready to plot ############
             #self.fig.canvas.draw() # done by updateBackground()
@@ -3512,7 +3506,7 @@ class tgraphcanvas(FigureCanvas):
                         self.timeindex[0] = len(self.timex)-1
                     else:
                         return
-                self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
+                #self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
                 st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE 00:00", None, QApplication.UnicodeUTF8))
                 t2 = self.temp2[self.timeindex[0]]
