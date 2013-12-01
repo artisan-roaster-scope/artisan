@@ -8648,36 +8648,43 @@ class ApplicationWindow(QMainWindow):
         lenevents = len(self.qmc.specialevents)
         currentevent = self.eNumberSpinBox.value()
         self.eNumberSpinBox.setDisabled(True)
-        self.eventlabel.setText(QApplication.translate("Label", "Event #<b>%1 </b>",None, QApplication.UnicodeUTF8).arg(currentevent))
-        if currentevent == 0:
-            self.lineEvent.setText("")
-            self.valueEdit.setText("")
-            self.etypeComboBox.setCurrentIndex(0)
-            self.etimeline.setText("")
-            self.qmc.resetlines()
-            if not aw.qmc.flagstart:
-                self.qmc.fig.canvas.draw()
-            return
-        if currentevent > lenevents:
-            self.eNumberSpinBox.setValue(lenevents)
-            return
-        else:
-            self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
-            timez = self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.qmc.timeindex[0]]))
-            self.etimeline.setText(timez)
-            self.valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[currentevent-1]))
-            self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
-            #plot little dot lines
-            self.qmc.resetlines() #clear old
-            etimeindex = self.qmc.specialevents[currentevent-1]
-            if currentevent:
-                x = [self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex]]
-                y = [(self.qmc.ylimit_min-100),self.qmc.temp2[etimeindex],self.qmc.temp1[etimeindex],(self.qmc.ylimit+100)]
-                self.qmc.ax.plot(x,y,marker ="o",markersize=12,color ="yellow",linestyle="-",linewidth = 7,alpha=.4)
+        try:
+            self.eventlabel.setText(QApplication.translate("Label", "Event #<b>%1 </b>",None, QApplication.UnicodeUTF8).arg(currentevent))
+            if currentevent == 0:
+                self.lineEvent.setText("")
+                self.valueEdit.setText("")
+                self.etypeComboBox.setCurrentIndex(0)
+                self.etimeline.setText("")
+                self.qmc.resetlines()
                 if not aw.qmc.flagstart:
                     self.qmc.fig.canvas.draw()
-        self.eNumberSpinBox.setDisabled(False)
-        self.eNumberSpinBox.setFocus()
+                return
+            if currentevent > lenevents:
+                self.eNumberSpinBox.setValue(lenevents)
+                return
+            else:
+                self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
+                timez = self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.qmc.timeindex[0]]))
+                self.etimeline.setText(timez)
+                self.valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[currentevent-1]))
+                self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
+                #plot little dot lines
+                self.qmc.resetlines() #clear old
+                etimeindex = self.qmc.specialevents[currentevent-1]
+                if currentevent:
+                    x = [self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex],self.qmc.timex[etimeindex]]
+                    y = [(self.qmc.ylimit_min-100),self.qmc.temp2[etimeindex],self.qmc.temp1[etimeindex],(self.qmc.ylimit+100)]
+                    self.qmc.ax.plot(x,y,marker ="o",markersize=12,color ="yellow",linestyle="-",linewidth = 7,alpha=.4)
+                    if not aw.qmc.flagstart:
+                        self.qmc.fig.canvas.draw()
+        except Exception as e:
+#            import traceback
+#            traceback.print_exc(file=sys.stdout)
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " changeEventNumber() %1").arg(str(e)),exc_tb.tb_lineno)        
+        finally:
+            self.eNumberSpinBox.setDisabled(False)
+            self.eNumberSpinBox.setFocus()
 
 
     #updates events from mini edtitor
