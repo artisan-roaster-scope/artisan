@@ -1287,7 +1287,7 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.ax.draw_artist(self.l_eventtype3dots)
                                 aw.qmc.ax.draw_artist(self.l_eventtype4dots)                            
                             # draw extra curves
-                            for i in range(min(len(self.extratemp1lines),len(self.extraCurveVisibility1),len(self.extratemp2lines),len(self.extraCurveVisibility2))):
+                            for i in range(min(len(self.extratemp1lines),len(aw.extraCurveVisibility1),len(self.extratemp2lines),len(aw.extraCurveVisibility2))):
                                 if aw.extraCurveVisibility1[i]:
                                     aw.qmc.ax.draw_artist(self.extratemp1lines[i]) # index out of range!?
                                 if aw.extraCurveVisibility2[i]:
@@ -1313,9 +1313,9 @@ class tgraphcanvas(FigureCanvas):
                                 if self.l_ETprojection != None:
                                     aw.qmc.ax.draw_artist(self.l_ETprojection)
                             # draw delta lines
-                            if self.DeltaETflag:
+                            if self.DeltaETflag and self.l_delta1 != None:
                                 aw.qmc.delta_ax.draw_artist(self.l_delta1)
-                            if self.DeltaBTflag:
+                            if self.DeltaBTflag and self.l_delta2 != None:
                                 aw.qmc.delta_ax.draw_artist(self.l_delta2)
                                     
                             self.fig.canvas.blit(aw.qmc.ax.bbox)
@@ -6144,13 +6144,13 @@ class SampleThread(QThread):
                             if aw.BTbreak(length_of_qmc_timex - 1):
                                 # we found a BT break at the current index minus 2
                                 aw.qmc.autoDropIdx = length_of_qmc_timex - 3                            
-                        #check for autoDRY:
-                        if aw.qmc.autoDRYflag and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
+                        #check for autoDRY: # only after CHARGE and TP and before FCs if not yet set
+                        if aw.qmc.autoDRYflag and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and not aw.qmc.timeindex[2]:
                             # if DRY event not yet set check for BT exceeding Dry-max as specified in the phases dialog
                             if aw.qmc.temp2[-1] >= aw.qmc.phases[1]:
                                 aw.qmc.autoDryIdx = 1
-                        #check for autoFCs:
-                        if aw.qmc.autoFCsFlag and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
+                        #check for autoFCs: # only after CHARGE and TP and before FCe if not yet set
+                        if aw.qmc.autoFCsFlag and aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[2] and not aw.qmc.timeindex[3]:
                             # after DRY (if FCs event not yet set) check for BT exceeding FC-min as specified in the phases dialog
                             if aw.qmc.temp2[-1] >= aw.qmc.phases[2]:
                                 aw.qmc.autoFCsIdx = 1

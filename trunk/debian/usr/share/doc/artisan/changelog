@@ -5,6 +5,7 @@ artisan (0.7.1-1) precise; urgency=low
    - lock up due to extra devices
    - serial default configurations for extra devices
    - fixes minieditor navigation
+   - fixes early autoDRY and autoFCs
  --  <marko.luther@gmx.net>  Mo, 1 Dez 2013 19:32:14 +0200
 
 artisan (0.7.0-1) precise; urgency=low
