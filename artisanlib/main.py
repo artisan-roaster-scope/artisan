@@ -1813,6 +1813,8 @@ class tgraphcanvas(FigureCanvas):
         if self.xrotation:     
             for label in self.ax.xaxis.get_ticklabels():
                 label.set_rotation(self.xrotation)
+        # we have to update the canvas cache
+        self.updateBackground()
 
     def fmt_timedata(self,x):
         if self.timeindex[0] != -1 and self.timeindex[0] < len(self.timex):
@@ -1862,7 +1864,10 @@ class tgraphcanvas(FigureCanvas):
             elif s > 1:
                 return  '-%d:%02d'%(m,s)
             else:
-                return '-%d'%m
+                if m == 0:
+                    return '0'
+                else:
+                	return '-%d'%m
 
     # returns True if nothing to save, discard or save was selected and False if canceled by the user
     def checkSaved(self):
@@ -19542,8 +19547,6 @@ class serialport(object):
                 self.SP.write(binstring)
                 self.SP.flush()
                 r = self.SP.read(nbytes)
-                ###  release resources  ###
-                self.COMsemaphore.release(1)
                 #serTX.close()
                 libtime.sleep(0.035)                     #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
                 lenstring = len(r)
@@ -19572,8 +19575,6 @@ class serialport(object):
                             aw.qmc.adderror(QApplication.translate("Error Message","CRC16 data corruption ERROR. TX does not match RX. Check wiring",None, QApplication.UnicodeUTF8))
                             return "0"
                 else:
-                    if self.COMsemaphore.available() < 1:
-                        self.COMsemaphore.release(1)
                     aw.qmc.adderror(QApplication.translate("Error Message","No RX data received",None, QApplication.UnicodeUTF8))
                     return "0"
             else:
@@ -19673,8 +19674,6 @@ class serialport(object):
                 self.SP.flush()
                 #READ n bytes(rx)
                 r = self.SP.read(nrxbytes).decode('utf-8')
-                ###  release resources  ###
-                self.COMsemaphore.release(1) 
 ##                command = ":010347000001B4"
 ##                r =       ":01030401900067"
                 if len(r) == nrxbytes:
