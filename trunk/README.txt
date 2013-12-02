@@ -157,6 +157,11 @@ Artisan uses the following libraries in unmodified forms:
 VERSION HISTORY
 
 
+v0.7.1 (2.12.2013)
+- fixes lockup on extra device use
+- fixes redraw artifact on axis changes
+- fixes minieditor navigation
+
 v0.7.0 (30.11.2013)
 - support for the Phidget 1046/1048 devices
 - TP event marks (show on graph and in the message log)
