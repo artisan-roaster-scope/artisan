@@ -161,6 +161,7 @@ v0.7.1 (2.12.2013)
 - fixes lockup on extra device use
 - fixes redraw artifact on axis changes
 - fixes minieditor navigation
+- fixes early autoDRY and autoFCs
 
 v0.7.0 (30.11.2013)
 - support for the Phidget 1046/1048 devices
