@@ -23498,11 +23498,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                # ensure that by selecting a real device, the initial sampling rate is set to 3s
+                if meter != "NONE":
+                    aw.qmc.delay = max(aw.qmc.delay,aw.qmc.min_delay)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an elif entry above to specify the default serial settings                    
-            # ensure that by selecting a real device, the initial sampling rate is set to 3s
-            if meter != "NONE":
-                aw.qmc.delay = max(aw.qmc.delay,aw.qmc.min_delay)
             #extra devices serial config
             #set of different serial settings modes options
             ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
