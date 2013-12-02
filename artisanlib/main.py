@@ -6023,7 +6023,7 @@ class SampleThread(QThread):
                         if aw.qmc.BTcurve:
                             aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
                     #we need a minimum of two readings to calculate rate of change
-                    if local_flagstart and length_of_qmc_timex > 5: # > 2
+                    if local_flagstart and length_of_qmc_timex > 2:
                         timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
     #                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
     #                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
@@ -23499,43 +23499,44 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
-        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
-        # - add an elif entry above to specify the default serial settings                    
-                # ensure that by selecting a real device, the initial sampling rate is set to 3s
-                if meter != "NONE":
-                    aw.qmc.delay = max(aw.qmc.delay,aw.qmc.min_delay)
-                #extra devices serial config
-                #set of different serial settings modes options
-                ssettings = [[9600,8,'O',1,2],[19200,8,'E',1,2],[2400,7,'E',1,2],[9600,8,'N',1,2],
-                             [19200,8,'N',1,2],[2400,8,'N',1,2],[9600,8,'E',1,2],[38400,8,'E',1,2],[115200,8,'N',1,2]]
-                #map device index to a setting mode (chose the one that matches the device)
-        # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
-        # - add an entry to devsettings below (and potentially to ssettings above)                  
-                devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,1,1,1,1,1,8]  #0-39
-                #init serial settings of extra devices
-                for i in range(len(aw.qmc.extradevices)):
-                    if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
-                        dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
-                        if i < len(aw.extrabaudrate):
-                            aw.extrabaudrate[i] = dsettings[0]
-                        else:
-                            aw.extrabaudrate.append(dsettings[0])
-                        if i < len(aw.extrabytesize):
-                            aw.extrabytesize[i] = dsettings[1]
-                        else:
-                            aw.extrabytesize.append(dsettings[1])
-                        if i < len(aw.extraparity): 
-                            aw.extraparity[i] = dsettings[2]
-                        else:
-                            aw.extraparity.append(dsettings[2])
-                        if i < len(aw.extrastopbits):
-                            aw.extrastopbits[i] = dsettings[3]
-                        else:
-                            aw.extrastopbits.append(dsettings[3])
-                        if i < len(aw.extratimeout):
-                            aw.extratimeout[i] = dsettings[4]
-                        else:
-                            aw.extratimeout.append(dsettings[4])
+    # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
+    # - add an elif entry above to specify the default serial settings                    
+            # ensure that by selecting a real device, the initial sampling rate is set to 3s
+            if meter != "NONE":
+                aw.qmc.delay = max(aw.qmc.delay,aw.qmc.min_delay)
+            #extra devices serial config
+            #set of different serial settings modes options
+            ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
+                         [19200,8,'N',1,1],[2400,8,'N',1,1],[9600,8,'E',1,1],[38400,8,'E',1,1],[115200,8,'N',1,1]]
+            #map device index to a setting mode (chose the one that matches the device)
+    # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
+    # - add an entry to devsettings below (and potentially to ssettings above)                  
+            devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,1,1,1,1,1,8]  #0-39
+            #init serial settings of extra devices
+            for i in range(len(aw.qmc.extradevices)):
+                if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
+                    dsettings = ssettings[devssettings[aw.qmc.extradevices[i]]]
+                    if i < len(aw.extrabaudrate):
+                        aw.extrabaudrate[i] = dsettings[0]
+                    else:
+                        aw.extrabaudrate.append(dsettings[0])
+                    if i < len(aw.extrabytesize):
+                        aw.extrabytesize[i] = dsettings[1]
+                    else:
+                        aw.extrabytesize.append(dsettings[1])
+                    if i < len(aw.extraparity): 
+                        aw.extraparity[i] = dsettings[2]
+                    else:
+                        aw.extraparity.append(dsettings[2])
+                    if i < len(aw.extrastopbits):
+                        aw.extrastopbits[i] = dsettings[3]
+                    else:
+                        aw.extrastopbits.append(dsettings[3])
+                    if i < len(aw.extratimeout):
+                        aw.extratimeout[i] = dsettings[4]
+                    else:
+                        aw.extratimeout.append(dsettings[4])
+            if self.nonpidButton.isChecked():
                 aw.button_10.setVisible(False)
                 aw.button_12.setVisible(False)
                 aw.button_13.setVisible(False)
