@@ -1287,9 +1287,9 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.ax.draw_artist(self.l_eventtype3dots)
                                 aw.qmc.ax.draw_artist(self.l_eventtype4dots)                            
                             # draw extra curves
-                            for i in range(min(len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
+                            for i in range(min(len(self.extratemp1lines),len(self.extraCurveVisibility1),len(self.extratemp2lines),len(self.extraCurveVisibility2))):
                                 if aw.extraCurveVisibility1[i]:
-                                    aw.qmc.ax.draw_artist(self.extratemp1lines[i])
+                                    aw.qmc.ax.draw_artist(self.extratemp1lines[i]) # index out of range!?
                                 if aw.extraCurveVisibility2[i]:
                                     aw.qmc.ax.draw_artist(self.extratemp2lines[i])
                             # draw ET
@@ -20221,14 +20221,14 @@ class serialport(object):
             else:
                 return -1,-1
         except serial.SerialException:
-            self.closeport()
+            #self.closeport()
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAtemperature()"
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            self.closeport()
+            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HH506RAtemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
@@ -20277,14 +20277,14 @@ class serialport(object):
             else:
                 return -1,-1 
         except serial.SerialException:
-            self.closeport()
+            #self.closeport()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER302temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            self.closeport()
+            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER302temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
@@ -20345,7 +20345,7 @@ class serialport(object):
             else:
                 return -1,-1 
         except serial.SerialException:
-            self.closeport()
+            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER303temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
@@ -20353,7 +20353,7 @@ class serialport(object):
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            self.closeport()
+            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER303temperature() %1").arg(str(ex)),exc_tb.tb_lineno)            
             return -1,-1
@@ -20413,14 +20413,14 @@ class serialport(object):
             else:
                 return -1,-1
         except serial.SerialException:
-            self.closeport()
+            #self.closeport()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER306temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            self.closeport()
+            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER306temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
@@ -20494,14 +20494,14 @@ class serialport(object):
             else:
                 return -1,-1
         except serial.SerialException:
-            self.closeport()
+            #self.closeport()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " CENTER309temperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1
         except Exception as ex:
-            self.closeport()
+            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " CENTER309temperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
@@ -20962,21 +20962,21 @@ class serialport(object):
             else:
                 raise ValueError
         except ValueError:
-            self.closeport()
+            #self.closeport()
             error = QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " ser.TEVA18Btemperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1 
         except serial.SerialException:
-            self.closeport()
+            #self.closeport()
             error = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.TEVA18Btemperature()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return -1,-1 
         except Exception as ex:
-            self.closeport()
+            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.TEVA18Btemperature() %1").arg(str(ex)),exc_tb.tb_lineno)
             return -1,-1
@@ -21070,7 +21070,7 @@ class serialport(object):
             else:
                 raise ValueError(str("Needed 14 bytes but only received %i"%(len(frame))))
         except ValueError:
-            self.closeport()
+            #self.closeport()
             error  = QApplication.translate("Error Message","Value Error:",None, QApplication.UnicodeUTF8) + " ser.HHM28multimeter()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
@@ -21088,14 +21088,14 @@ class serialport(object):
                 else:
                     return "0","0"
         except serial.SerialException:
-            self.closeport()
+            #self.closeport()
             error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.HHM28multimeter()"
             timez = str(QDateTime.currentDateTime().toString(QString("hh:mm:ss.zzz")))    #zzz = miliseconds
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror(timez + " " + error,exc_tb.tb_lineno)
             return "0",""
         except Exception as ex:
-            self.closeport()
+            #self.closeport()
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " ser.HHM28multimeter() %1").arg(str(ex)),exc_tb.tb_lineno)
             return "0"""
