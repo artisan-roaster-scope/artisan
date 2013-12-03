@@ -162,6 +162,7 @@ v0.7.1 (2.12.2013)
 - fixes redraw artifact on axis changes
 - fixes minieditor navigation
 - fixes early autoDRY and autoFCs
+- fixes extra lines drawing
 
 v0.7.0 (30.11.2013)
 - support for the Phidget 1046/1048 devices
