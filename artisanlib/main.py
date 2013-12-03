@@ -1287,11 +1287,15 @@ class tgraphcanvas(FigureCanvas):
                                 aw.qmc.ax.draw_artist(self.l_eventtype3dots)
                                 aw.qmc.ax.draw_artist(self.l_eventtype4dots)                            
                             # draw extra curves
-                            for i in range(min(len(self.extratemp1lines),len(aw.extraCurveVisibility1),len(self.extratemp2lines),len(aw.extraCurveVisibility2))):
+                            xtra_dev_lines1 = 0
+                            xtra_dev_lines2 = 0
+                            for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
                                 if aw.extraCurveVisibility1[i]:
-                                    aw.qmc.ax.draw_artist(self.extratemp1lines[i]) # index out of range!?
+                                    aw.qmc.ax.draw_artist(self.extratemp1lines[i])
+                                    xtra_dev_lines1 = xtra_dev_lines1 + 1
                                 if aw.extraCurveVisibility2[i]:
                                     aw.qmc.ax.draw_artist(self.extratemp2lines[i])
+                                    xtra_dev_lines2 = xtra_dev_lines2 + 1
                             # draw ET
                             if aw.qmc.ETcurve:
                                 aw.qmc.ax.draw_artist(self.l_temp1)
@@ -5934,7 +5938,6 @@ class SampleThread(QThread):
                             xtra_dev_lines2 = 0
                             for i in range(nxdevices):  
                                 extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
-                                # ignore reading if both are off, otherwise process them
                                 if len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
                                 extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
@@ -23498,11 +23501,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.stopbits = 1
                     aw.ser.timeout = 1
                     message = QApplication.translate("Message","Device set to %1. Now, chose serial port", None, QApplication.UnicodeUTF8).arg(meter)
+                # ensure that by selecting a real device, the initial sampling rate is set to 3s
+                if meter != "NONE":
+                    aw.qmc.delay = max(aw.qmc.delay,aw.qmc.min_delay)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an elif entry above to specify the default serial settings                    
-            # ensure that by selecting a real device, the initial sampling rate is set to 3s
-            if meter != "NONE":
-                aw.qmc.delay = max(aw.qmc.delay,aw.qmc.min_delay)
             #extra devices serial config
             #set of different serial settings modes options
             ssettings = [[9600,8,'O',1,1],[19200,8,'E',1,1],[2400,7,'E',1,1],[9600,8,'N',1,1],
