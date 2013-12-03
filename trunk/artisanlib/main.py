@@ -1291,10 +1291,10 @@ class tgraphcanvas(FigureCanvas):
                             xtra_dev_lines2 = 0
                             for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
                                 if aw.extraCurveVisibility1[i]:
-                                    aw.qmc.ax.draw_artist(self.extratemp1lines[i])
+                                    aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
                                     xtra_dev_lines1 = xtra_dev_lines1 + 1
                                 if aw.extraCurveVisibility2[i]:
-                                    aw.qmc.ax.draw_artist(self.extratemp2lines[i])
+                                    aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
                                     xtra_dev_lines2 = xtra_dev_lines2 + 1
                             # draw ET
                             if aw.qmc.ETcurve:
@@ -15204,7 +15204,7 @@ class editGraphDlg(ArtisanDialog):
         weightLayout.addWidget(self.weightpercentlabel)
         weightLayout.addSpacing(10)
         weightLayout.addWidget(self.roastdegreelabel)
-        if aw.scale.device != None and aw.scale.device != "":
+        if aw.scale.device != None and aw.scale.device != "" and aw.color.device != "None":
             weightLayout.addWidget(inButton) 
             weightLayout.addSpacing(10)
             weightLayout.addWidget(outButton) 
@@ -15256,14 +15256,14 @@ class editGraphDlg(ArtisanDialog):
         colorLayout.addWidget(whole_color_label)
         colorLayout.addSpacing(15)
         colorLayout.addWidget(self.whole_color_edit)
-        if aw.color.device != None and aw.color.device != "":
+        if aw.color.device != None and aw.color.device != "" and aw.color.device != "None":
             colorLayout.addSpacing(5)
             colorLayout.addWidget(scanWholeButton)
         colorLayout.addSpacing(25)
         colorLayout.addWidget(ground_color_label)
         colorLayout.addSpacing(15)
         colorLayout.addWidget(self.ground_color_edit)
-        if aw.color.device != None and aw.color.device != "":
+        if aw.color.device != None and aw.color.device != "" and aw.color.device != "None":
             colorLayout.addSpacing(5)
             colorLayout.addWidget(scanGroundButton)
         colorLayout.addStretch()
