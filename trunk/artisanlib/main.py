@@ -875,7 +875,7 @@ class tgraphcanvas(FigureCanvas):
 
         # autosave
         self.autosaveflag = 0
-        self.autosaveprefix = QApplication.translate("Directory", "edit text",None, QApplication.UnicodeUTF8)
+        self.autosaveprefix = ""
         self.autosavepath = ""
 
         #used to place correct height of text to avoid placing text over text (annotations)
@@ -1290,10 +1290,10 @@ class tgraphcanvas(FigureCanvas):
                             xtra_dev_lines1 = 0
                             xtra_dev_lines2 = 0
                             for i in range(min(len(aw.extraCurveVisibility1),len(aw.extraCurveVisibility1),len(self.extratimex),len(self.extratemp1),len(self.extradevicecolor1),len(self.extraname1),len(self.extratemp2),len(self.extradevicecolor2),len(self.extraname2))):
-                                if aw.extraCurveVisibility1[i]:
+                                if aw.extraCurveVisibility1[i] and len(self.extratemp1lines) > xtra_dev_lines1:
                                     aw.qmc.ax.draw_artist(self.extratemp1lines[xtra_dev_lines1])
                                     xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                if aw.extraCurveVisibility2[i]:
+                                if aw.extraCurveVisibility2[i] and len(self.extratemp2lines) > xtra_dev_lines2:
                                     aw.qmc.ax.draw_artist(self.extratemp2lines[xtra_dev_lines2])
                                     xtra_dev_lines2 = xtra_dev_lines2 + 1
                             # draw ET
@@ -1474,7 +1474,9 @@ class tgraphcanvas(FigureCanvas):
             
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
-        aw.sendmessage(QApplication.translate("Message","Alarm %1 triggered", None, QApplication.UnicodeUTF8).arg(alarmnumber + 1))
+        aw.sendmessage(QApplication.translate("Message","Alarm %1 triggered", None, QApplication.UnicodeUTF8).arg(alarmnumber + 1))        
+        if aw.soundflag:
+            QApplication.beep()
         try:
             if self.alarmaction[alarmnumber] == 0:
                 # alarm popup message
@@ -1492,7 +1494,7 @@ class tgraphcanvas(FigureCanvas):
                     button_number = int(str(self.alarmstrings[alarmnumber])) - 1 # the event buttons presented to the user are numbered from 1 on                
                 except:
                     aw.sendmessage(QApplication.translate("Message","Alarm trigger button error, description '%1' not a number",None, QApplication.UnicodeUTF8).arg(u(self.alarmstrings[alarmnumber])))
-                if button_number:
+                if button_number != None:
                     if button_number > -1 and button_number < len(aw.buttonlist):
                         aw.recordextraevent(button_number)
             elif self.alarmaction[alarmnumber] in [3,4,5,6]:
@@ -3515,7 +3517,7 @@ class tgraphcanvas(FigureCanvas):
                         self.timeindex[0] = len(self.timex)-1
                     else:
                         return
-                #self.xaxistosm() # not needed here? eventuell integrate this into timealign if shift happend
+                self.xaxistosm() # need to fix uneven x-axis labels like -0:13
                 d = aw.qmc.ylimit - aw.qmc.ylimit_min
                 st1 = aw.arabicReshape(QApplication.translate("Scope Annotation", "CHARGE 00:00", None, QApplication.UnicodeUTF8))
                 t2 = self.temp2[self.timeindex[0]]
@@ -4114,6 +4116,9 @@ class tgraphcanvas(FigureCanvas):
                             aw.eNumberSpinBox.blockSignals(True)
                             aw.eNumberSpinBox.setValue(Nevents+1)
                             aw.eNumberSpinBox.blockSignals(False)
+                            if aw.qmc.timeindex[0] > -1:
+                                timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
+                                aw.etimeline.setText(timez)                            
                             aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
                             aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
                             aw.lineEvent.setText(self.specialeventsStrings[Nevents])
@@ -5855,13 +5860,13 @@ class SampleThread(QThread):
             #########################
             # a) detect overflows
             wrong_reading = 0
-            if aw.qmc.minmaxLimits and temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax:
+            if aw.qmc.minmaxLimits and (temp < aw.qmc.filterDropOut_tmin or temp > aw.qmc.filterDropOut_tmax):
                 wrong_reading = 1
             #########################
             # b) detect spikes (on BT only after CHARGE if autoChargeFlag=True not to have a conflict here)
             n = aw.qmc.filterDropOut_spikeRoR_period
             dRoR_limit = aw.qmc.filterDropOut_spikeRoR_dRoR_limit # the limit of additional RoR in temp/sec (4C for C / 7F for F) compared to previous readings
-            if aw.qmc.dropSpikes and ((not aw.qmc.autoChargeFlag) or (not BT) or (aw.qmc.timeindex[0] != -1 and aw.qmc.timeindex[0] + n > len(timex))) and not wrong_reading and len(tempx) >= n:
+            if aw.qmc.dropSpikes and ((not aw.qmc.autoChargeFlag) or (not BT) or (aw.qmc.timeindex[0] != -1 and (aw.qmc.timeindex[0] + n) < len(timex))) and not wrong_reading and len(tempx) >= n:
                 # no min/max overflow detected
                 # check if RoR caused by actual measurement is way higher then the previous one
                 # calc previous RoR (pRoR) taking the last n samples into account
@@ -5871,7 +5876,7 @@ class SampleThread(QThread):
                 dtemp = tempx[-1] - temp
                 dtime = timex[-1] - time
                 RoR = abs(dtemp/dtime)
-                if RoR > pRoR + dRoR_limit:
+                if RoR > (pRoR + dRoR_limit):
                     wrong_reading = 2
 #            #########################
 #            # c) handle outliers if it could be detected
@@ -5885,7 +5890,7 @@ class SampleThread(QThread):
                 #m = aw.qmc.filterDropOut_replaceRoR_period
                 if len(tempx) > 0 and tempx[-1] != -1:
                     # repeate last correct reading if not done before in the last two fixes (min/max violation are always filtered)
-                    if len(tempx) == 1 or (len(tempx) > 3 and tempx[-1] != tempx[-2] and tempx[-2] != tempx[-3]):
+                    if len(tempx) == 1 or (len(tempx) > 3 and (tempx[-1] != tempx[-2] or tempx[-2] != tempx[-3])):
                         return tempx[-1]
                     else:
                         if wrong_reading == 1:
@@ -5901,7 +5906,7 @@ class SampleThread(QThread):
                         return temp
             else:
                 # try to improve a previously corrected reading timex/temp[-1] based on the current reading time/temp (just in this case the actual reading is not a drop)
-                if len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-2] != tempx[-3]: # previous reading was a drop and replaced by reading[-2], but -3 reading was different
+                if len(tempx) > 2 and tempx[-1] == tempx[-2] and tempx[-1] != temp: # previous reading was a drop and replaced by reading[-2]
                     tempx[-1] = (tempx[-2] + temp) / 2.0
                 return temp                
         except Exception as e:
@@ -5949,10 +5954,10 @@ class SampleThread(QThread):
                                     aw.qmc.extratemp2[i].append(float(extrat2))
                                     aw.qmc.extratimex[i].append(extratx)
                                     # update extra lines
-                                    if aw.extraCurveVisibility1[i]:
+                                    if aw.extraCurveVisibility1[i] and len(aw.qmc.extratemp1lines) > xtra_dev_lines1:
                                         aw.qmc.extratemp1lines[xtra_dev_lines1].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp1[i])
                                         xtra_dev_lines1 = xtra_dev_lines1 + 1
-                                    if aw.extraCurveVisibility2[i]:
+                                    if aw.extraCurveVisibility2[i] and len(aw.qmc.extratemp2lines) > xtra_dev_lines2:
                                         aw.qmc.extratemp2lines[xtra_dev_lines2].set_data(aw.qmc.extratimex[i], aw.qmc.extratemp2[i])
                                         xtra_dev_lines2 = xtra_dev_lines2 + 1
                                 else:
@@ -8606,9 +8611,18 @@ class ApplicationWindow(QMainWindow):
     #automatation of filename when saving a file through keyboard shortcut. Speeds things up for batch roasting.
     def automaticsave(self):
         try:
+            title = None
+            if  aw.qmc.title != "" and aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
+                title = aw.qmc.title
             if self.qmc.autosavepath and self.qmc.autosaveflag:
-                filename = self.qmc.autosaveprefix
-                filename += "-" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
+                if self.qmc.autosaveprefix == "" and title:
+                    filename = title
+                else:
+                    filename = self.qmc.autosaveprefix
+                if filename != "":                
+                    filename += "-" + str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))
+                else:
+                    filename += str(QDateTime.currentDateTime().toString(QString("yy-MM-dd_hhmm")))                    
                 filename += ".alog"
                 oldDir = u(QDir.current())
                 QDir.setCurrent(self.qmc.autosavepath)
@@ -8672,8 +8686,9 @@ class ApplicationWindow(QMainWindow):
                 return
             else:
                 self.lineEvent.setText(self.qmc.specialeventsStrings[currentevent-1])
-                timez = self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.qmc.timeindex[0]]))
-                self.etimeline.setText(timez)
+                if aw.qmc.timeindex[0] > -1:
+                    timez = self.qmc.stringfromseconds(int(self.qmc.timex[self.qmc.specialevents[currentevent-1]]-self.qmc.timex[self.qmc.timeindex[0]]))
+                    self.etimeline.setText(timez)
                 self.valueEdit.setText(aw.qmc.eventsvalues(aw.qmc.specialeventsvalue[currentevent-1]))
                 self.etypeComboBox.setCurrentIndex(self.qmc.specialeventstype[currentevent-1])
                 #plot little dot lines
@@ -10737,6 +10752,8 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.beansize = settings.value("beansize",self.qmc.beansize).toDouble()[0]
             settings.endGroup()
             self.userprofilepath = u(settings.value("profilepath",self.userprofilepath).toString())
+            if settings.contains("externalprogram"):
+                self.ser.externalprogram = u(settings.value("externalprogram",self.ser.externalprogram).toString())
             settings.beginGroup("ExtraDev")
             if settings.contains("extradevices"):
                 self.qmc.extradevices = [x.toInt()[0] for x in settings.value("extradevices").toList()]
@@ -10902,8 +10919,8 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             if settings.contains("autosaveflag"):
                 self.qmc.autosaveflag = settings.value("autosaveflag",self.qmc.autosaveflag).toInt()[0]
-            if settings.contains("autosavepath"):
-                self.qmc.autosavepath = settings.value("autosavepath",self.qmc.autosavepath).toString()
+            if settings.contains("autosaveprefix"):
+                self.qmc.autosaveprefix = settings.value("autosaveprefix",self.qmc.autosaveprefix).toString()
             #restore buttons
             settings.beginGroup("ExtraEventButtons")
             if settings.contains("extraeventsactions"):
@@ -11416,6 +11433,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)
             settings.endGroup()
             settings.setValue("profilepath",self.userprofilepath)
+            settings.setValue("externalprogram",self.ser.externalprogram)
             #save extra devices
             settings.beginGroup("ExtraDev")
             settings.setValue("extradevices",self.qmc.extradevices)
@@ -11505,7 +11523,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("DeltaBTB",aw.qmc.DeltaBTBflag)
             settings.endGroup()
             settings.setValue("autosaveflag",self.qmc.autosaveflag)
-            settings.setValue("autosavepath",self.qmc.autosavepath)
+            settings.setValue("autosaveprefix",self.qmc.autosaveprefix)
             #custom event buttons
             settings.beginGroup("ExtraEventButtons")
             settings.setValue("buttonlistmaxlen",self.buttonlistmaxlen)
@@ -16127,13 +16145,15 @@ class autosaveDlg(ArtisanDialog):
         super(autosaveDlg,self).__init__(parent)
         self.setModal(True)
         self.setWindowTitle(QApplication.translate("Form Caption","Keyboard Autosave [a]", None, QApplication.UnicodeUTF8))
-        if aw.qmc.title != QApplication.translate("Scope Title", "Roaster Scope",None, QApplication.UnicodeUTF8):
-            aw.qmc.autosaveprefix = aw.qmc.title
         self.prefixEdit = QLineEdit(aw.qmc.autosaveprefix)
         self.prefixEdit.setToolTip(QApplication.translate("Tooltip", "Automatic generated name = This text + date + time",None, QApplication.UnicodeUTF8))
-        self.autocheckbox = QCheckBox(QApplication.translate("CheckBox","Autosave [a]", None, QApplication.UnicodeUTF8))
+        autochecklabel = QLabel(QApplication.translate("CheckBox","Autosave [a]", None, QApplication.UnicodeUTF8))
+        self.autocheckbox = QCheckBox()
         self.autocheckbox.setToolTip(QApplication.translate("Tooltip", "ON/OFF of automatic saving when pressing keyboard letter [a]",None, QApplication.UnicodeUTF8))
         self.autocheckbox.setChecked(aw.qmc.autosaveflag)
+        prefixlabel = QLabel()
+        prefixlabel.setAlignment(Qt.Alignment(Qt.AlignBottom | Qt.AlignRight))
+        prefixlabel.setText(u(QApplication.translate("Label", "Prefix",None, QApplication.UnicodeUTF8)))        
         okButton = QPushButton(QApplication.translate("Button","OK", None, QApplication.UnicodeUTF8))  
         cancelButton = QPushButton(QApplication.translate("Button","Cancel", None, QApplication.UnicodeUTF8))
         cancelButton.setFocusPolicy(Qt.NoFocus)
@@ -16149,10 +16169,12 @@ class autosaveDlg(ArtisanDialog):
         buttonLayout.addWidget(cancelButton)
         buttonLayout.addWidget(okButton)
         autolayout = QGridLayout()
-        autolayout.addWidget(self.autocheckbox,0,0)
-        autolayout.addWidget(self.prefixEdit,0,1)
-        autolayout.addWidget(pathButton,1,0)
-        autolayout.addWidget(self.pathEdit,1,1)
+        autolayout.addWidget(self.autocheckbox,0,0,Qt.AlignRight)
+        autolayout.addWidget(autochecklabel,0,1)
+        autolayout.addWidget(prefixlabel,1,0)
+        autolayout.addWidget(self.prefixEdit,1,1)
+        autolayout.addWidget(pathButton,2,0)
+        autolayout.addWidget(self.pathEdit,2,1)
         mainLayout = QVBoxLayout()
         mainLayout.addLayout(autolayout)
         mainLayout.addStretch()

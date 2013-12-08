@@ -1,23 +1,33 @@
 Current Versions:
 
-o Python 2.7.3 (Ubuntu default; 2.7.4 install on CentOS)
-o pyserial 2.6
-o QT 4.8.4
+o Python 2.7.6
+o pyserial 2.7
+o QT 4.8.5
 o SIP 4.14.6
 o PyQt 4.10.1
-o numpy 1.7.1
-o scipy 0.12.0
-o matplotlib 1.2.1
+o numpy 1.8.0
+o scipy 0.13.1
+o matplotlib 1.3.1
 o MinimalModbus 0.4
 o pyemf 2.0.0
 
 o cx_freeze (tip from 2013-03-26)
 o patchelf
-o bbfreeze 1.1.0
+o bbfreeze 1.2.0
 
 
 Upgrade History:
 
+- 2013-11-29:
+ . Python 2.7.3 => 2.7.6
+ . pyserial 2.6 => 2.7
+ . QT 4.8.4 => 4.8.5
+ . SIP 4.14.6 => 4.15.3
+ . PyQt 4.10.1 => 4.10.3
+ . numpy 1.7.1 => 1.8.0
+ . scipy 0.12.0 => 0.13.1
+ . matplotlib 1.2.1 => 1.3.1
+ . bbfreeze 1.1.0 => 1.2.0
 - 2013-05-14: Added pyemf 2.0.0
 - 2013-05-02: Started
 
@@ -69,9 +79,9 @@ On Ubuntu:
 # sudo apt-get build-dep python2.7 python-gdbm python-bsddb3
 
 
-# wget http://python.org/ftp/python/2.7.4/Python-2.7.4.tar.bz2
-# tar xf Python-2.7.4.tar.bz2
-# cd Python-2.7.4
+# wget http://python.org/ftp/python/2.7.6/Python-2.7.6.tar.bz2
+# tar xf Python-2.7.6.tar.bz2
+# cd Python-2.7.6
 # ./configure --prefix=/usr/local
 # make
 # sudo make altinstall
@@ -103,7 +113,7 @@ Download and install distribute for Python 2.7
 Download and extract sources
 
 
-PATCH 1:
+PATCH 1 (not needed anymore for 4.8.5):
 
 to avoid the"-fuse-ld=gold' error
 remove the lines:
@@ -113,7 +123,7 @@ linux-g++ {
 from src/3rdparty/webkit/Source/common.pri
 
 
-PATCH 2 (fix for the Gtk theme issue on some platforms: "QGtkStyle was unable to detect the current GTK+ theme."):
+PATCH 2 (not needed anymore for >4.8.5; fix for the Gtk theme issue on some platforms: "QGtkStyle was unable to detect the current GTK+ theme."):
 (see https://qt.gitorious.org/qt/qt/commit/a9dc50330acee2ac and https://bugzilla.redhat.com/show_bug.cgi?id=702493)
 src/gui/styles/qgtkstyle_p.cpp Line 510-513
 --
@@ -136,7 +146,7 @@ src/gui/styles/qgtkstyle_p.cpp Line 510-513
 
 Add path to your environment (eg. .bashrc)
 
-PATH=/usr/local/Trolltech/Qt-4.8.4/bin:$PATH
+PATH=/usr/local/Trolltech/Qt-4.8.5/bin:$PATH
 export PATH
 
 test correct path
@@ -160,10 +170,10 @@ test correct path
 
 to avoid error: /usr/lib/python2.7/dist-packages/PyQt4/plugins/imageformats: No such file or directory
 
-# sudo ln -s /usr/local/Trolltech/Qt-4.8.4/plugins /usr/local/lib/python2.7/site-packages/PyQt4
+# sudo ln -s /usr/local/Trolltech/Qt-4.8.5/plugins /usr/local/lib/python2.7/site-packages/PyQt4
 
 on Ubuntu with  the system Python 2.7.3:
-# sudo ln -s /usr/local/Trolltech/Qt-4.8.4/plugins /usr/lib/python2.7/dist-packages/PyQt4
+# sudo ln -s /usr/local/Trolltech/Qt-4.8.5/plugins /usr/lib/python2.7/dist-packages/PyQt4
 
 
 6) numpy
@@ -206,12 +216,6 @@ NOTE: replace site-packages by dist-packages if using the default Ubuntu python 
 # sudo python setup.py install
 
 
-#XX) cx_freeze
-#
-## python2.7 setup.py build
-## sudo python2.7 setup.py install
-
-
 11) patchelf
 
 # ./configure
@@ -228,7 +232,11 @@ comment out the line refering to matplotlib.numerix
 # sudo python2.7 setup.py install
 
 
+
+On compile error, install the underlying bbfreeze-loader
 wget http://pypi.python.org/packages/source/b/bbfreeze-loader/bbfreeze-loader-1.1.0.zip
+
+on error copy the failing gcc line and add "-ldl -lutil" at the very end of the failing compile command (after the last object file)
 
 
 13) alien
