@@ -842,6 +842,7 @@ class tgraphcanvas(FigureCanvas):
         self.alarmaction = []       # -1 = no action; 0 = open a window; 1 = call program with a filepath equal to alarmstring; 2 = activate button with number given in description; 
                                     # 3,4,5,6 = move slider with value given in description
                                     # 7 (START), 8 (DRY), 9 (FCs), 10 (FCe), 11 (SCs), 12 (SCe), 13 (DROP), 14 (COOL), 15 (OFF)
+        self.alarmbeep = []    # 0 = OFF; 1 = ON flags
         self.alarmstrings = []      # text descriptions, action to take, or filepath to call another program
         
         self.loadalarmsfromprofile = False # if set, alarms are loaded from profile (even background profiles)
@@ -1475,13 +1476,12 @@ class tgraphcanvas(FigureCanvas):
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
         aw.sendmessage(QApplication.translate("Message","Alarm %1 triggered", None, QApplication.UnicodeUTF8).arg(alarmnumber + 1))        
-        if aw.soundflag:
+        if len(self.alarmbeep) > alarmnumber and self.alarmbeep[alarmnumber]:
             QApplication.beep()
         try:
             if self.alarmaction[alarmnumber] == 0:
                 # alarm popup message
                 QMessageBox.information(self,QApplication.translate("Message", "Alarm notice",None, QApplication.UnicodeUTF8),self.alarmstrings[alarmnumber])
-                aw.soundpop()
             elif self.alarmaction[alarmnumber] == 1:
                 # alarm call program
                 fname = u(self.alarmstrings[alarmnumber])
@@ -9014,6 +9014,10 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.alarmaction = profile["alarmaction"]
                     else:
                         self.qmc.alarmaction = []
+                    if "alarmbeep" in profile:
+                        self.qmc.alarmbeep = profile["alarmbeep"]
+                    else:
+                        self.qmc.alarmbeep = []
                     if "alarmstrings" in profile:
                         self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
                     else:
@@ -9430,6 +9434,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.alarmsource = []
                     aw.qmc.alarmtemperature = []
                     aw.qmc.alarmaction = []
+                    aw.qmc.alarmbeep = []
                     aw.qmc.alarmstrings = []
     
                     while True:
@@ -9453,6 +9458,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmsource.append(1)    #BT
                                     aw.qmc.alarmtemperature.append(fields_action[0])
                                     aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
+                                    aw.qmc.alarmbeep.append(0)
                                     aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None, QApplication.UnicodeUTF8))
     
     
@@ -9467,6 +9473,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmsource.append(1)    #BT
                                     aw.qmc.alarmtemperature.append(fields_action[0])
                                     aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
+                                    aw.qmc.alarmbeep.append(0)
                                     aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None, QApplication.UnicodeUTF8))
     
                             elif roastlogger_action_section.startswith("@actionSecsFCTable"):
@@ -9483,6 +9490,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
                                     aw.qmc.alarmtemperature.append(0)
                                     aw.qmc.alarmaction.append(3+slider_power)    #SLIDER POWER
+                                    aw.qmc.alarmbeep.append(0)
                                     aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[1],None, QApplication.UnicodeUTF8))
     
                                     #add time alarm - FAN
@@ -9496,6 +9504,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmsource.append(-3)       #no source - this is time alarm
                                     aw.qmc.alarmtemperature.append(0)
                                     aw.qmc.alarmaction.append(3+slider_fan)    #SLIDER FAN
+                                    aw.qmc.alarmbeep.append(0)
                                     aw.qmc.alarmstrings.append(QApplication.translate("Label",fields_action[2],None, QApplication.UnicodeUTF8))
     
     
@@ -9513,6 +9522,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmsource.insert(0,1)    #BT
                                     aw.qmc.alarmtemperature.insert(0,0)
                                     aw.qmc.alarmaction.insert(0,3+slider_power)    #SLIDER POWER
+                                    aw.qmc.alarmbeep.append(0)
                                     aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[0],None, QApplication.UnicodeUTF8))
     
     
@@ -9527,6 +9537,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmsource.insert(0,1)    #BT
                                     aw.qmc.alarmtemperature.insert(0,0)
                                     aw.qmc.alarmaction.insert(0,3+slider_fan)    #SLIDER POWER
+                                    aw.qmc.alarmbeep.append(0)
                                     aw.qmc.alarmstrings.insert(0,QApplication.translate("Label",fields_action[1],None, QApplication.UnicodeUTF8))
     
     
@@ -9543,6 +9554,7 @@ class ApplicationWindow(QMainWindow):
                                     aw.qmc.alarmsource.insert(2,1)    #BT
                                     aw.qmc.alarmtemperature.insert(2,fields_action[0])
                                     aw.qmc.alarmaction.insert(2,0)    #POPUP
+                                    aw.qmc.alarmbeep.append(0)
                                     aw.qmc.alarmstrings.insert(2,QApplication.translate("Label","Charge the beans",None, QApplication.UnicodeUTF8))
                                 break;
                     else:
@@ -9947,39 +9959,43 @@ class ApplicationWindow(QMainWindow):
                 if "alarmguard" in profile:
                     self.qmc.alarmguard = profile["alarmguard"]
                 else:
-                    self.qmc.alarmguard = []
+                    self.qmc.alarmguard = [0]*len(self.qmc.alarmflag)
                 if "alarmnegguard" in profile:
                     self.qmc.alarmnegguard = profile["alarmnegguard"]
                 else:
-                    self.qmc.alarmnegguard = []
+                    self.qmc.alarmnegguard = [0]*len(self.qmc.alarmflag)
                 if "alarmtime" in profile:
                     self.qmc.alarmtime = profile["alarmtime"]
                 else:
-                    self.qmc.alarmtime = []
+                    self.qmc.alarmtime = [-1]*len(self.qmc.alarmflag)
                 if "alarmoffset" in profile:
                     self.qmc.alarmoffset = profile["alarmoffset"]
                 else:
-                    self.qmc.alarmoffset = []
+                    self.qmc.alarmoffset = [0]*len(self.qmc.alarmflag)
                 if "alarmcond" in profile:
                     self.qmc.alarmcond = profile["alarmcond"]
                 else:
-                    self.qmc.alarmcond = []
+                    self.qmc.alarmcond = [1]*len(self.qmc.alarmflag)
                 if "alarmsource" in profile:
                     self.qmc.alarmsource = profile["alarmsource"]
                 else:
-                    self.qmc.alarmsource = []
+                    self.qmc.alarmsource = [1]*len(self.qmc.alarmflag)
                 if "alarmtemperature" in profile:
                     self.qmc.alarmtemperature = profile["alarmtemperature"]
                 else:
-                    self.qmc.alarmtemperature = []
+                    self.qmc.alarmtemperature = [500]*len(self.qmc.alarmflag)
                 if "alarmaction" in profile:
                     self.qmc.alarmaction = profile["alarmaction"]
                 else:
-                    self.qmc.alarmaction = []
+                    self.qmc.alarmaction = [0]*len(self.qmc.alarmflag)
+                if "alarmbeep" in profile:
+                    self.qmc.alarmbeep = profile["alarmbeep"]
+                else:
+                    self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
                 if "alarmstrings" in profile:
                     self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
                 else:
-                    self.qmc.alarmstrings = []
+                    self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
                 self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered
             if "timeindex" in profile:
                 self.qmc.timeindex = profile["timeindex"]
@@ -10325,6 +10341,7 @@ class ApplicationWindow(QMainWindow):
             profile["alarmsource"] = self.qmc.alarmsource
             profile["alarmtemperature"] = self.qmc.alarmtemperature
             profile["alarmaction"] = self.qmc.alarmaction
+            profile["alarmbeep"] = self.qmc.alarmbeep
             profile["alarmstrings"] = [e(x) for x in self.qmc.alarmstrings]
             # remember background profile path
             profile["backgroundpath"] = e(self.qmc.backgroundpath)
@@ -10636,6 +10653,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.alarmsource = [x.toInt()[0] for x in settings.value("alarmsource").toList()]
                 self.qmc.alarmtemperature = [x.toInt()[0] for x in settings.value("alarmtemperature").toList()]
                 self.qmc.alarmaction = [x.toInt()[0] for x in settings.value("alarmaction").toList()]
+                if settings.contains("alarmbeep"):
+                    self.qmc.alarmbeep = [x.toInt()[0] for x in settings.value("alarmbeep").toList()]
+                else:
+                    self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
                 self.qmc.alarmstrings = list(settings.value("alarmstrings",self.qmc.alarmstrings).toStringList())
                 self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)
                 if settings.contains("loadAlarmsFromProfile"):
@@ -11429,6 +11450,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("alarmsource",self.qmc.alarmsource)
             settings.setValue("alarmtemperature",self.qmc.alarmtemperature)
             settings.setValue("alarmaction",self.qmc.alarmaction)
+            settings.setValue("alarmbeep",self.qmc.alarmbeep)
             settings.setValue("alarmstrings",self.qmc.alarmstrings)
             settings.setValue("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile)
             settings.endGroup()
@@ -11661,6 +11683,7 @@ class ApplicationWindow(QMainWindow):
         alarms["alarmcond"]= str(self.qmc.alarmcond)
         alarms["alarmsource"]= u(self.qmc.alarmsource)
         alarms["alarmaction"]= u(self.qmc.alarmaction)
+        alarms["alarmbeep"]= str(self.qmc.alarmbeep)
         alarms["alarmstrings"]= list(map(u,list(self.qmc.alarmstrings)))
         general["profilepath"]= u(self.userprofilepath)
         #save extra devices
@@ -13607,6 +13630,7 @@ $cupping_notes
             aw.qmc.alarmsource = alarms["alarmsources"]
             aw.qmc.alarmtemperature = alarms["alarmtemperatures"]
             aw.qmc.alarmaction = alarms["alarmactions"]
+            aw.qmc.alarmbeep = alarms["alarmbeep"]
             aw.qmc.alarmstrings = alarms["alarmstrings"]
             message =QApplication.translate("Message","Alarms loaded", None, QApplication.UnicodeUTF8)
             self.sendmessage(message)
@@ -24756,6 +24780,7 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmsource = []
         aw.qmc.alarmtemperature = []
         aw.qmc.alarmaction = []
+        aw.qmc.alarmbeep = []
         aw.qmc.alarmstrings = []
         self.alarmtable.setRowCount(0)
     
@@ -24778,6 +24803,7 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmsource.append(1)
         aw.qmc.alarmtemperature.append(500)
         aw.qmc.alarmaction.append(0)
+        aw.qmc.alarmbeep.append(0)
         aw.qmc.alarmstrings.append(QApplication.translate("Label","Enter description",None, QApplication.UnicodeUTF8))
         nalarms = self.alarmtable.rowCount()
         self.alarmtable.setRowCount(nalarms + 1)
@@ -24815,6 +24841,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmsource.insert(selected_row,1)
                 aw.qmc.alarmtemperature.insert(selected_row,500)
                 aw.qmc.alarmaction.insert(selected_row,0)
+                aw.qmc.alarmbeep.insert(selected_row,0)
                 aw.qmc.alarmstrings.insert(selected_row,QApplication.translate("Label","Enter description",None, QApplication.UnicodeUTF8))
                 self.alarmtable.insertRow(selected_row)
                 self.setalarmtablerow(selected_row)
@@ -24851,6 +24878,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmsource = aw.qmc.alarmsource[0:selected_row] + aw.qmc.alarmsource[selected_row + 1:]
                 aw.qmc.alarmtemperature = aw.qmc.alarmtemperature[0:selected_row] + aw.qmc.alarmtemperature[selected_row + 1:]
                 aw.qmc.alarmaction = aw.qmc.alarmaction[0:selected_row] + aw.qmc.alarmaction[selected_row + 1:]
+                aw.qmc.alarmbeep = aw.qmc.alarmbeep[0:selected_row] + aw.qmc.alarmbeep[selected_row + 1:]
                 aw.qmc.alarmstrings = aw.qmc.alarmstrings[0:selected_row] + aw.qmc.alarmstrings[selected_row + 1:]
                 self.alarmtable.setRowCount(nalarms - 1)
                 self.deselectAll()
@@ -24869,6 +24897,7 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmsource.pop()
                 aw.qmc.alarmtemperature.pop()
                 aw.qmc.alarmaction.pop()
+                aw.qmc.alarmbeep.pop()
                 aw.qmc.alarmstrings.pop()
                 self.alarmtable.setRowCount(nalarms - 1)
                 self.deselectAll()                
@@ -24885,7 +24914,10 @@ class AlarmDlg(ArtisanDialog):
             infile.close()
             aw.qmc.alarmflag = alarms["alarmflags"]
             aw.qmc.alarmguard = alarms["alarmguards"]
-            aw.qmc.alarmnegguard = alarms["alarmnegguards"]
+            if "alarmnegguards" in alarms:
+                aw.qmc.alarmnegguard = alarms["alarmnegguards"]
+            else:
+                aw.qmc.alarmnegguard = [0]*len(aw.qmc.alarmflag)
             aw.qmc.alarmtime = alarms["alarmtimes"]
             aw.qmc.alarmoffset = alarms["alarmoffsets"]
             aw.qmc.alarmcond = alarms["alarmconds"]
@@ -24897,6 +24929,10 @@ class AlarmDlg(ArtisanDialog):
                     aw.qmc.alarmsource[i] = 1 # BT
             aw.qmc.alarmtemperature = alarms["alarmtemperatures"]
             aw.qmc.alarmaction = alarms["alarmactions"]
+            if "alarmbeep" in alarms:
+                aw.qmc.alarmbeep = alarms["alarmbeep"]
+            else:
+                aw.qmc.alarmbeep = [0]*len(aw.qmc.alarmflag)
             aw.qmc.alarmstrings = alarms["alarmstrings"]
             self.createalarmtable()
         except Exception as ex:
@@ -24921,6 +24957,7 @@ class AlarmDlg(ArtisanDialog):
             alarms["alarmsources"] = aw.qmc.alarmsource
             alarms["alarmtemperatures"] = aw.qmc.alarmtemperature
             alarms["alarmactions"] = aw.qmc.alarmaction
+            alarms["alarmbeep"] = aw.qmc.alarmbeep
             alarms["alarmstrings"] = list(map(lambda s:u(s),aw.qmc.alarmstrings))
             outfile = open(filename, 'w')
             json.dump(alarms, outfile, ensure_ascii=True)
@@ -24962,6 +24999,7 @@ class AlarmDlg(ArtisanDialog):
         aw.qmc.alarmsource = [1]*nalarms
         aw.qmc.alarmtemperature = [500]*nalarms
         aw.qmc.alarmaction = [0]*nalarms
+        aw.qmc.alarmbeep = [0]*nalarms
         aw.qmc.alarmstrings = [""]*nalarms
         for i in range(nalarms):
             flag = self.alarmtable.cellWidget(i,0)
@@ -25000,7 +25038,9 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmtemperature[i] = 0
             action = self.alarmtable.cellWidget(i,8)
             aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
-            description = self.alarmtable.cellWidget(i,9)
+            beep = self.alarmtable.cellWidget(i,9)
+            aw.qmc.alarmbeep[i] = int(beep.isChecked())
+            description = self.alarmtable.cellWidget(i,10)
             aw.qmc.alarmstrings[i] = u(description.text())
 
     def buildAlarmSourceList(self):
@@ -25097,8 +25137,16 @@ class AlarmDlg(ArtisanDialog):
                                  QApplication.translate("ComboBox","COOL END",None, QApplication.UnicodeUTF8),
                                  QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8)])
         actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i] + 1)
+        #beep
+        beepComboBox = QCheckBox()
+        beepComboBox.setFocusPolicy(Qt.NoFocus)
+        if aw.qmc.alarmbeep[i]:
+            beepComboBox.setCheckState(Qt.Checked)
+        else:
+            beepComboBox.setCheckState(Qt.Unchecked)
         #text description
         descriptionedit = QLineEdit(u(aw.qmc.alarmstrings[i]))
+        descriptionedit.setCursorPosition(0)
         self.alarmtable.setCellWidget(i,0,flagComboBox)
         self.alarmtable.setCellWidget(i,1,guardedit)
         self.alarmtable.setCellWidget(i,2,negguardedit)
@@ -25108,7 +25156,8 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setCellWidget(i,6,condComboBox)
         self.alarmtable.setCellWidget(i,7,tempedit)
         self.alarmtable.setCellWidget(i,8,actionComboBox)
-        self.alarmtable.setCellWidget(i,9,descriptionedit)
+        self.alarmtable.setCellWidget(i,9,beepComboBox)
+        self.alarmtable.setCellWidget(i,10,descriptionedit)
         
     # puts a gray background on alarm rows that have already been fired
     def markNotEnabledAlarmRows(self):
@@ -25122,7 +25171,7 @@ class AlarmDlg(ArtisanDialog):
         try:
             self.alarmtable.clear()
             self.alarmtable.setTabKeyNavigation(True)
-            self.alarmtable.setColumnCount(10)
+            self.alarmtable.setColumnCount(11)
             self.alarmtable.setHorizontalHeaderLabels([QApplication.translate("Table","Status",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","If Alarm",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","But Not",None, QApplication.UnicodeUTF8),
@@ -25132,6 +25181,7 @@ class AlarmDlg(ArtisanDialog):
                                                            QApplication.translate("Table","Condition",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","Temp",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","Action",None, QApplication.UnicodeUTF8),
+                                                           QApplication.translate("Table","Beep",None, QApplication.UnicodeUTF8),
                                                            QApplication.translate("Table","Description",None, QApplication.UnicodeUTF8)])
             self.alarmtable.setAlternatingRowColors(True)
             self.alarmtable.setEditTriggers(QTableWidget.NoEditTriggers)
