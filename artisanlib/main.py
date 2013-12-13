@@ -2208,7 +2208,7 @@ class tgraphcanvas(FigureCanvas):
                     a = 1.  
                 self.annotate(temp[t0idx],st1,t0,y,ystep_up,ystep_down,e,a)
                 #Add TP marker
-                if self.markTPflag and TP_index > 0:
+                if self.markTPflag and TP_index and TP_index > 0:
                     ystep_down,ystep_up = self.findtextgap(ystep_down,ystep_up,stemp[t0idx],stemp[TP_index],d)
                     st1 = aw.arabicReshape(QApplication.translate("Scope Annotation","TP %1", None, QApplication.UnicodeUTF8),u(self.stringfromseconds(timex[TP_index]-t0)))
                     a = 1.
@@ -5922,7 +5922,7 @@ class SampleThread(QThread):
         try:
             ##### lock resources  #########
             #aw.qmc.samplingsemaphore.acquire(1)
-            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,500) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
+            gotlock = aw.qmc.samplingsemaphore.tryAcquire(1,200) # we try to catch a lock for 200ms, if we fail we just skip this sampling round (prevents stacking of waiting calls)
             if gotlock:
                 
                 # duplicate system state flag flagstart locally and only refer to this copies within this function to make it behaving uniquely (either append or overwrite mode)
@@ -6141,13 +6141,13 @@ class SampleThread(QThread):
                                 # we found a BT break at the current index minus 2
                                 aw.qmc.autoChargeIdx = length_of_qmc_timex - 3
                         # check for TP event if already CHARGEed and not yet recognized (earliest in the next call to sample())
-                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+5 < len(aw.qmc.temp2) and self.checkTPalarmtime():
+                        elif not aw.qmc.TPalarmtimeindex and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[1] and aw.qmc.timeindex[0]+8 < len(aw.qmc.temp2) and self.checkTPalarmtime():
                             aw.qmc.autoTPIdx = 1
                             aw.qmc.TPalarmtimeindex = aw.findTP()                            
                         # autodetect DROP event
                         # only if 9min into roast and BT>180C/356F
                         if not aw.qmc.autoDropIdx and aw.qmc.autoDropFlag and aw.qmc.timeindex[0] > -1 and not aw.qmc.timeindex[6] and \
-                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 190) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 356)) and\
+                            length_of_qmc_timex >= 5 and ((aw.qmc.mode == "C" and aw.qmc.temp2[-1] > 170) or (aw.qmc.mode == "F" and aw.qmc.temp2[-1] > 338)) and\
                             ((aw.qmc.timex[-1] - aw.qmc.timex[aw.qmc.timeindex[0]]) > 480):
                             if aw.BTbreak(length_of_qmc_timex - 1):
                                 # we found a BT break at the current index minus 2
@@ -6259,9 +6259,9 @@ class SampleThread(QThread):
     # returns true after BT passed the TP
     def checkTPalarmtime(self):
         # if v[-1] is the current temperature then check if
-        #   len(BT) > 3
-        # BT[-4] <= BT[-3] and BT[-4] <= BT[-2] and BT[-4] <= BT[-1] and BT[-4] < BT[-1]
-        if not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-4] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-4] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-4] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-4] < aw.qmc.temp2[-1]):
+        #   len(BT) > 4
+        # BT[-5] <= BT[-4] abd BT[-5] <= BT[-3] and BT[-5] <= BT[-2] and BT[-5] <= BT[-1] and BT[-5] < BT[-1]
+        if not self.afterTP and len(aw.qmc.temp2) > 3 and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-4]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-3]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-2]) and (aw.qmc.temp2[-5] <= aw.qmc.temp2[-1]) and (aw.qmc.temp2[-5] < aw.qmc.temp2[-1]):
             self.afterTP = True
         return self.afterTP
 
@@ -6281,7 +6281,7 @@ class SampleThread(QThread):
                     self.sample()
                     
                     # calculate the time still to sleep based on the time the sampling took and the requested sampling interval (qmc.delay)
-                    dt = max(0.2,aw.qmc.delay/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
+                    dt = max(0.05,aw.qmc.delay/1000. - libtime.time() + start) # min of 1sec to allow for refresh the display
                     #dt = aw.qmc.delay/1000. # use this for fixed intervals
                     #apply sampling interval here
                     if aw.qmc.flagon:
@@ -7927,7 +7927,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # before DRY
                     self.DRYlabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "DRY",None, QApplication.UnicodeUTF8)) + "</b></small>")
-                    if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] > 0:
+                    if self.qmc.timeindex[0] > -1 and self.qmc.TPalarmtimeindex and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         # display expected time to reach DRY as defined in the background profile or the phases dialog
                         if self.qmc.background and self.qmc.timeindexB[1]:
                             drytarget = self.qmc.temp2B[self.qmc.timeindexB[1]] # Background DRY BT temperature
@@ -7958,7 +7958,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     # before FCs
                     self.FCslabel.setText("<small><b>&raquo;" + u(QApplication.translate("Label", "FCs",None, QApplication.UnicodeUTF8)) + "</b></small>")
-                    if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] > 0:
+                    if self.qmc.timeindex[0] > -1 and self.qmc.timeindex[1] and len(self.qmc.delta2) > 0 and self.qmc.delta2[-1] and self.qmc.delta2[-1] > 0:
                         ts = tx - self.qmc.timex[self.qmc.timeindex[1]]
                         self.FCslcd.display(QString(self.qmc.stringfromseconds(int(ts))[1:]))
                         # display expected time to reach FCs as defined in the background profile or the phases dialog
@@ -8985,43 +8985,43 @@ class ApplicationWindow(QMainWindow):
                     if "alarmguard" in profile:
                         self.qmc.alarmguard = profile["alarmguard"]
                     else:
-                        self.qmc.alarmguard = []
+                        self.qmc.alarmguard = [-1]*len(self.qmc.alarmflag)
                     if "alarmnegguard" in profile:
                         self.qmc.alarmnegguard = profile["alarmnegguard"]
                     else:
-                        self.qmc.alarmnegguard = []
+                        self.qmc.alarmnegguard = [-1]*len(self.qmc.alarmflag)
                     if "alarmtime" in profile:
                         self.qmc.alarmtime = profile["alarmtime"]
                     else:
-                        self.qmc.alarmtime = []
+                        self.qmc.alarmtime = [-1]*len(self.qmc.alarmflag)
                     if "alarmoffset" in profile:
                         self.qmc.alarmoffset = profile["alarmoffset"]
                     else:
-                        self.qmc.alarmoffset = []
+                        self.qmc.alarmoffset = [0]*len(self.qmc.alarmflag)
                     if "alarmcond" in profile:
                         self.qmc.alarmcond = profile["alarmcond"]
                     else:
-                        self.qmc.alarmcond = []
+                        self.qmc.alarmcond = [1]*len(self.qmc.alarmflag)
                     if "alarmsource" in profile:
                         self.qmc.alarmsource = profile["alarmsource"]
                     else:
-                        self.qmc.alarmsource = []
+                        self.qmc.alarmsource = [1]*len(self.qmc.alarmflag)
                     if "alarmtemperature" in profile:
                         self.qmc.alarmtemperature = profile["alarmtemperature"]
                     else:
-                        self.qmc.alarmtemperature = []
+                        self.qmc.alarmtemperature = [500]*len(self.qmc.alarmflag)
                     if "alarmaction" in profile:
                         self.qmc.alarmaction = profile["alarmaction"]
                     else:
-                        self.qmc.alarmaction = []
+                        self.qmc.alarmaction = [0]*len(self.qmc.alarmflag)
                     if "alarmbeep" in profile:
                         self.qmc.alarmbeep = profile["alarmbeep"]
                     else:
-                        self.qmc.alarmbeep = []
+                        self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
                     if "alarmstrings" in profile:
                         self.qmc.alarmstrings = [d(x) for x in profile["alarmstrings"]]
                     else:
-                        self.qmc.alarmstrings = []
+                        self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
                     self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)  #0 = not triggered; 1 = triggered
                 #if old format < 0.5.0 version  (identified by numbers less than 1.). convert
                 if self.qmc.backgroundFlavors[0] < 1. and self.qmc.backgroundFlavors[-1] < 1.:
@@ -10641,7 +10641,10 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmnegguard = [x.toInt()[0] for x in settings.value("alarmnegguard").toList()]
                 else:
                     self.qmc.alarmnegguard = [-1]*len(self.qmc.alarmflag)
-                self.qmc.alarmtime = [x.toInt()[0] for x in settings.value("alarmtime").toList()]  
+                if settings.contains("alarmtime"):
+                	self.qmc.alarmtime = [x.toInt()[0] for x in settings.value("alarmtime").toList()]  
+                else:
+                    self.qmc.alarmtime = [-1]*len(self.qmc.alarmflag)
                 if settings.contains("alarmoffset"):
                     self.qmc.alarmoffset = [max(0,x.toInt()[0]) for x in settings.value("alarmoffset").toList()]
                 else:
@@ -10650,14 +10653,26 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.alarmcond = [x.toInt()[0] for x in settings.value("alarmcond").toList()]
                 else:
                     self.qmc.alarmcond = [1]*len(self.qmc.alarmflag)
-                self.qmc.alarmsource = [x.toInt()[0] for x in settings.value("alarmsource").toList()]
-                self.qmc.alarmtemperature = [x.toInt()[0] for x in settings.value("alarmtemperature").toList()]
-                self.qmc.alarmaction = [x.toInt()[0] for x in settings.value("alarmaction").toList()]
+                if settings.contains("alarmsource"):
+                    self.qmc.alarmsource = [x.toInt()[0] for x in settings.value("alarmsource").toList()]
+                else:
+                    self.qmc.alarmsource = [1]*len(self.qmc.alarmflag)
+                if settings.contains("alarmtemperature"):
+                    self.qmc.alarmtemperature = [x.toInt()[0] for x in settings.value("alarmtemperature").toList()]
+                else:
+                    self.qmc.alarmtemperature = [500]*len(self.qmc.alarmflag)
+                if settings.contains("alarmaction"):
+                    self.qmc.alarmaction = [x.toInt()[0] for x in settings.value("alarmaction").toList()]
+                else:
+                    self.qmc.alarmaction = [0]*len(self.qmc.alarmflag)
                 if settings.contains("alarmbeep"):
                     self.qmc.alarmbeep = [x.toInt()[0] for x in settings.value("alarmbeep").toList()]
                 else:
                     self.qmc.alarmbeep = [0]*len(self.qmc.alarmflag)
-                self.qmc.alarmstrings = list(settings.value("alarmstrings",self.qmc.alarmstrings).toStringList())
+                if settings.contains("alarmstrings"):
+                    self.qmc.alarmstrings = list(settings.value("alarmstrings",self.qmc.alarmstrings).toStringList())
+                else:
+                    self.qmc.alarmstrings = [""]*len(self.qmc.alarmflag)
                 self.qmc.alarmstate = [0]*len(self.qmc.alarmflag)
                 if settings.contains("loadAlarmsFromProfile"):
                     self.qmc.loadalarmsfromprofile = settings.value("loadAlarmsFromProfile",self.qmc.loadalarmsfromprofile).toBool()
@@ -11072,7 +11087,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ETdrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETlinewidth = aw.qmc.l_temp1.get_linewidth()
                 m = aw.qmc.l_temp1.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.ETmarker = m
                 self.qmc.palette["et"] = aw.qmc.l_temp1.get_color()
             if aw.qmc.l_temp2:
@@ -12437,14 +12452,18 @@ $cupping_notes
         return index
 
     # returns True if a BT break at i-2 is detected
+    # idea:
+    # . average delta before i-2 is not negative
+    # . average delta after i-2 is negative and twice as high (absolute) as the one before
     def BTbreak(self,i):
         if len(self.qmc.timex)>4 and i < len(self.qmc.timex):
             d1 = self.qmc.temp2[i-4] - self.qmc.temp2[i-3]
             d2 = self.qmc.temp2[i-3] - self.qmc.temp2[i-2]
             d3 = self.qmc.temp2[i-1] - self.qmc.temp2[i-2]
             d4 = self.qmc.temp2[i] - self.qmc.temp2[i-1]
-            d = (abs(d1) + abs(d2)) / 2.0
-            if d > 0 and d3 < 0 and d4 < 0 and ((abs(d3) + abs(d4)) / 2.0) > 2.0*d:
+            dpre = (d1 + d2) / 2.0
+            dpost = (d3 + d4) / 2.0
+            if dpost < 0 and (abs(dpost) > (0.5 + (2.5   *abs(dpre)))):
                 return True
             else:
                 return False
@@ -24809,6 +24828,7 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setRowCount(nalarms + 1)
         self.setalarmtablerow(nalarms)
         self.alarmtable.resizeColumnsToContents()
+        self.alarmtable.resizeRowToContents()
         # improve width of Qlineedit columns
         self.alarmtable.setColumnWidth(1,50)
         self.alarmtable.setColumnWidth(2,50)
@@ -25038,7 +25058,8 @@ class AlarmDlg(ArtisanDialog):
                 aw.qmc.alarmtemperature[i] = 0
             action = self.alarmtable.cellWidget(i,8)
             aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
-            beep = self.alarmtable.cellWidget(i,9)
+            beepWidget = self.alarmtable.cellWidget(i,9)
+            beep = beepWidget.layout().takeAt(1).widget()
             aw.qmc.alarmbeep[i] = int(beep.isChecked())
             description = self.alarmtable.cellWidget(i,10)
             aw.qmc.alarmstrings[i] = u(description.text())
@@ -25138,9 +25159,18 @@ class AlarmDlg(ArtisanDialog):
                                  QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8)])
         actionComboBox.setCurrentIndex(aw.qmc.alarmaction[i] + 1)
         #beep
+        beepWidget = QWidget()
         beepComboBox = QCheckBox()
         beepComboBox.setFocusPolicy(Qt.NoFocus)
-        if aw.qmc.alarmbeep[i]:
+        beepLayout = QHBoxLayout()
+        beepLayout.addStretch()
+        beepLayout.addWidget(beepComboBox)
+        beepLayout.addSpacing(6);        
+        beepLayout.addStretch()
+        beepLayout.setContentsMargins(0,0,0,0)
+        beepLayout.setSpacing(0)
+        beepWidget.setLayout(beepLayout)
+        if len(aw.qmc.alarmbeep) > i and aw.qmc.alarmbeep[i]:
             beepComboBox.setCheckState(Qt.Checked)
         else:
             beepComboBox.setCheckState(Qt.Unchecked)
@@ -25156,7 +25186,7 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setCellWidget(i,6,condComboBox)
         self.alarmtable.setCellWidget(i,7,tempedit)
         self.alarmtable.setCellWidget(i,8,actionComboBox)
-        self.alarmtable.setCellWidget(i,9,beepComboBox)
+        self.alarmtable.setCellWidget(i,9,beepWidget)
         self.alarmtable.setCellWidget(i,10,descriptionedit)
         
     # puts a gray background on alarm rows that have already been fired
@@ -25189,6 +25219,7 @@ class AlarmDlg(ArtisanDialog):
             self.alarmtable.setSelectionMode(QTableWidget.SingleSelection)
             self.alarmtable.setShowGrid(True)
             nalarms = len(aw.qmc.alarmtemperature)
+            self.alarmtable.verticalHeader().setResizeMode(2)
             if nalarms:
                 self.alarmtable.setRowCount(nalarms)
                 #populate table
