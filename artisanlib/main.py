@@ -4080,12 +4080,13 @@ class tgraphcanvas(FigureCanvas):
                         aw.sendmessage(message)
                         #write label in mini recorder if flag checked
                         if aw.minieventsflag:
+                            aw.eventlabel.setText(QApplication.translate("Label", "Event #<b>%1 </b>",None, QApplication.UnicodeUTF8).arg(Nevents+1))
                             aw.eNumberSpinBox.blockSignals(True)
                             aw.eNumberSpinBox.setValue(Nevents+1)
                             aw.eNumberSpinBox.blockSignals(False)
                             if aw.qmc.timeindex[0] > -1:
                                 timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
-                                aw.etimeline.setText(timez)                            
+                                aw.etimeline.setText(timez)
                             aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
                             aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
                             aw.lineEvent.setText(self.specialeventsStrings[Nevents])
@@ -10484,6 +10485,9 @@ class ApplicationWindow(QMainWindow):
             self.qmc.eventsGraphflag = settings.value("eventsGraphflag",int(self.qmc.eventsGraphflag)).toInt()[0]
             if settings.contains("etypes"):
                 self.qmc.etypes = settings.value("etypes",self.qmc.etypes).toStringList()
+                # update minieditor event type ComboBox
+                aw.etypeComboBox.clear()
+                aw.etypeComboBox.addItems(self.qmc.etypes)
             if settings.contains("eventsshowflag"):
                 self.qmc.eventsshowflag = settings.value("eventsshowflag",int(self.qmc.eventsshowflag)).toInt()[0]
             if settings.contains("autoChargeDrop"):
@@ -18065,6 +18069,9 @@ class EventsDlg(ArtisanDialog):
                 aw.qmc.etypes[1] = u(self.etype1.text())
                 aw.qmc.etypes[2] = u(self.etype2.text())
                 aw.qmc.etypes[3] = u(self.etype3.text())
+                # update minieditor event type ComboBox
+                aw.etypeComboBox.clear()
+                aw.etypeComboBox.addItems(aw.qmc.etypes)
                 #update mini editor
                 aw.etypeComboBox.clear()
                 aw.etypeComboBox.addItems(aw.qmc.etypes)
