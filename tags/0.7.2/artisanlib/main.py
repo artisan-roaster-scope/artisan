@@ -11063,6 +11063,7 @@ class ApplicationWindow(QMainWindow):
         aw.button_20.setVisible(bool(aw.qmc.buttonvisibility[7]))
 
     def fetchCurveStyles(self):
+        print("fetchCurveStyles")
         try:
 # this conflicts in GreenFlag zoom mode!
 #            # get and set axis y limits
@@ -11100,7 +11101,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTdrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTlinewidth = aw.qmc.l_temp2.get_linewidth()
                 m = aw.qmc.l_temp2.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.BTmarker = m
                 self.qmc.BTmarkersize = aw.qmc.l_temp2.get_markersize()
                 self.qmc.palette["bt"] = aw.qmc.l_temp2.get_color()
@@ -11113,7 +11114,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ETdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETdeltalinewidth = aw.qmc.l_delta1.get_linewidth()
                 m = aw.qmc.l_delta1.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.ETdeltamarker = m
                 self.qmc.ETdeltamarkersize = aw.qmc.l_delta1.get_markersize()
                 self.qmc.palette["deltaet"] = aw.qmc.l_delta1.get_color()
@@ -11126,7 +11127,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTdeltalinewidth = aw.qmc.l_delta2.get_linewidth()
                 m = aw.qmc.l_delta2.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.BTdeltamarker = m
                 self.qmc.BTdeltamarkersize = aw.qmc.l_delta2.get_markersize()  
                 self.qmc.palette["deltabt"] = aw.qmc.l_delta2.get_color()
@@ -11139,7 +11140,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ETbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETbacklinewidth = aw.qmc.l_back1.get_linewidth()
                 m = aw.qmc.l_back1.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.ETbackmarker = m                
                 self.qmc.ETbackmarkersize = aw.qmc.l_back1.get_markersize()
                 self.qmc.backgroundmetcolor = aw.qmc.l_back1.get_color()
@@ -11152,7 +11153,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTbackdrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTbacklinewidth = aw.qmc.l_back2.get_linewidth()
                 m = aw.qmc.l_back2.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.BTbackmarker = m                                
                 self.qmc.BTbackmarkersize = aw.qmc.l_back2.get_markersize()
                 self.qmc.backgroundbtcolor = aw.qmc.l_back2.get_color()
@@ -11165,7 +11166,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.ETBdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.ETBdeltalinewidth = aw.qmc.l_delta1B.get_linewidth()
                 m = aw.qmc.l_delta1B.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.ETBdeltamarker = m                                
                 self.qmc.ETBdeltamarkersize = aw.qmc.l_delta1B.get_markersize()
                 self.qmc.backgrounddeltaetcolor = aw.qmc.l_delta1B.get_color()
@@ -11178,7 +11179,7 @@ class ApplicationWindow(QMainWindow):
                     self.qmc.BTBdeltadrawstyle = self.qmc.drawstyle_default
                 self.qmc.BTBdeltalinewidth = aw.qmc.l_delta2B.get_linewidth()
                 m = aw.qmc.l_delta2B.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.BTBdeltamarker = m
                 self.qmc.BTBdeltamarkersize = aw.qmc.l_delta2B.get_markersize()
                 self.qmc.backgrounddeltabtcolor = aw.qmc.l_delta2B.get_color()
@@ -11193,7 +11194,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.extradrawstyles1[i] = self.qmc.drawstyle_default
                     self.qmc.extralinewidths1[i] = l1.get_linewidth()
                     m = l1.get_marker()
-                    if not isinstance(m, (int, long)):
+                    if not isinstance(m, (int)):
                         self.qmc.extramarkers1[i] = m
                     self.qmc.extramarkersizes1[i] = l1.get_markersize()
                     aw.qmc.extradevicecolor1[i] = l1.get_color()
@@ -11209,7 +11210,7 @@ class ApplicationWindow(QMainWindow):
                         self.qmc.extradrawstyles2[i] = self.qmc.drawstyle_default
                     self.qmc.extralinewidths2[i] = l2.get_linewidth()
                     m = l2.get_marker()
-                    if not isinstance(m, (int, long)):
+                    if not isinstance(m, (int)):
                         self.qmc.extramarkers2[i] = m
                     self.qmc.extramarkersizes2[i] = l2.get_markersize()
                     aw.qmc.extradevicecolor2[i] = l2.get_color()
@@ -11218,16 +11219,16 @@ class ApplicationWindow(QMainWindow):
                     x2 = x2 + 1
             if self.qmc.eventsGraphflag == 2:
                 m = self.qmc.l_eventtype1dots.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.EvalueMarker[0] = m
                 m = self.qmc.l_eventtype2dots.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.EvalueMarker[1] = m
                 m = self.qmc.l_eventtype3dots.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.EvalueMarker[2] = m
                 m = self.qmc.l_eventtype4dots.get_marker()
-                if not isinstance(m, (int, long)):
+                if not isinstance(m, (int)):
                     self.qmc.EvalueMarker[3] = m
                 self.qmc.EvalueMarkerSize[0] = self.qmc.l_eventtype1dots.get_markersize()
                 self.qmc.EvalueMarkerSize[1] = self.qmc.l_eventtype2dots.get_markersize()
@@ -12666,7 +12667,6 @@ $cupping_notes
         dialog = comportDlg(self)
         if dialog.exec_():
             # set serial port
-#            self.ser.comport = str(dialog.comportEdit.currentText())                #unicode() changes QString to a python string
             self.ser.comport = str(dialog.comportEdit.getSelection())
             self.ser.baudrate = int(str(dialog.baudrateComboBox.currentText()))              #int changes QString to int
             self.ser.bytesize = int(str(dialog.bytesizeComboBox.currentText()))
@@ -12674,7 +12674,6 @@ $cupping_notes
             self.ser.parity = str(dialog.parityComboBox.currentText())
             self.ser.timeout = int(str(dialog.timeoutEdit.text()))
             # set modbus port
-#            self.modbus.comport = str(dialog.modbus_comportEdit.currentText())                #unicode() changes QString to a python string
             self.modbus.comport = str(dialog.modbus_comportEdit.getSelection())
             self.modbus.baudrate = int(str(dialog.modbus_baudrateComboBox.currentText()))              #int changes QString to int
             self.modbus.bytesize = int(str(dialog.modbus_bytesizeComboBox.currentText()))
@@ -21844,6 +21843,7 @@ class PortComboBox(QComboBox):
         self.updateMenu()
         self.edited = None
         self.connect(self, SIGNAL("editTextChanged(QString)"),lambda txt="":self.textEdited(txt)) 
+        self.setEditable(True)
 
     def textEdited(self,txt):
         self.edited = txt
@@ -21907,7 +21907,6 @@ class comportDlg(ArtisanDialog):
         comportlabel =QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.comportEdit = PortComboBox(selection = aw.ser.comport)
         self.connect(self.comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.comportEdit,i)) 
-        self.comportEdit.setEditable(True)
         comportlabel.setBuddy(self.comportEdit)
         baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.baudrateComboBox = QComboBox()
@@ -21946,7 +21945,6 @@ class comportDlg(ArtisanDialog):
         modbus_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.modbus_comportEdit = PortComboBox(selection = aw.modbus.comport)
         self.connect(self.modbus_comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.modbus_comportEdit,i)) 
-        self.modbus_comportEdit.setEditable(True)
         modbus_comportlabel.setBuddy(self.modbus_comportEdit)
         modbus_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.modbus_baudrateComboBox = QComboBox()
@@ -22095,7 +22093,6 @@ class comportDlg(ArtisanDialog):
         scale_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.scale_comportEdit = PortComboBox(selection = aw.scale.comport)
         self.connect(self.scale_comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.scale_comportEdit,i))
-        self.scale_comportEdit.setEditable(True)
         scale_comportlabel.setBuddy(self.scale_comportEdit)
         scale_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.scale_baudrateComboBox = QComboBox()
@@ -22139,7 +22136,6 @@ class comportDlg(ArtisanDialog):
         color_comportlabel = QLabel(QApplication.translate("Label", "Comm Port", None, QApplication.UnicodeUTF8))
         self.color_comportEdit = PortComboBox(selection = aw.color.comport)
         self.connect(self.color_comportEdit, SIGNAL("activated(int)"),lambda i=0:self.portComboBoxIndexChanged(self.color_comportEdit,i))
-        self.color_comportEdit.setEditable(True)
         color_comportlabel.setBuddy(self.color_comportEdit)
         color_baudratelabel = QLabel(QApplication.translate("Label", "Baud Rate", None, QApplication.UnicodeUTF8))
         self.color_baudrateComboBox = QComboBox()
