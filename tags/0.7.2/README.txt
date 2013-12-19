@@ -156,6 +156,18 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.7.2 (19.12.2013)
+- fixed always active min/max filter
+- spike filter improvements
+- beep after an alarm trigger if sound is on and beep flag is set
+- fixes time axis labels on CHARGE
+- fixed alarm trigger for button 1
+- autosave with empty prefix takes roast name as prefix if available
+- external program path added to program settings
+- improved autoCHARGE and autoDROP recognizers
+- fixes minieditor event type handling
+- fixes and improvements to RoastLogger import
+- makes the extra serial ports widget editable
 
 v0.7.1 (2.12.2013)
 - fixes lockup on extra device use
