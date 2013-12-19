@@ -1,6 +1,23 @@
 #summary Detailed Release History
 
 
+==v0.7.2 (19.12.2013)==
+
+ * Changes
+  * beep after an alarm trigger if sound is on and beep flag is set
+  * autosave with empty prefix takes roast name as prefix if available
+  * external program path added to program settings
+ * Bug Fixes
+  * fixed always active min/max filter
+  * spike filter improvements
+  * fixes time axis labels on CHARGE
+  * fixed alarm trigger for button 1
+  * improved autoCHARGE and autoDROP recognizers
+  * fixes minieditor event type handling
+  * fixes and improvements to RoastLogger import
+  * makes the extra serial ports widget editable
+
+
 ==v0.7.1 (02.12.2013)==
 
  * Bug Fixes
