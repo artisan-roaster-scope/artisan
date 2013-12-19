@@ -1,3 +1,19 @@
+artisan (0.7.2-1) precise; urgency=low
+  * new upstream release
+  * fixes since 0.7.1:
+   - fixed always active min/max filter
+   - spike filter improvements
+   - beep after an alarm trigger if sound is on and beep flag is set
+   - fixes time axis labels on CHARGE
+   - fixed alarm trigger for button 1
+   - autosave with empty prefix takes roast name as prefix if available
+   - external program path added to program settings
+   - improved autoCHARGE and autoDROP recognizers
+   - fixes minieditor event type handling
+   - fixes and improvements to RoastLogger import
+   - makes the extra serial ports widget editable
+ --  <marko.luther@gmx.net>  Thu, 19 Dec 2013 19:32:14 +0200
+
 artisan (0.7.1-1) precise; urgency=low
   * new upstream release
   * fixes since 0.7.0:
@@ -6,7 +22,7 @@ artisan (0.7.1-1) precise; urgency=low
    - serial default configurations for extra devices
    - fixes minieditor navigation
    - fixes early autoDRY and autoFCs
- --  <marko.luther@gmx.net>  Mo, 1 Dez 2013 19:32:14 +0200
+ --  <marko.luther@gmx.net>  Mo, 1 Dec 2013 19:32:14 +0200
 
 artisan (0.7.0-1) precise; urgency=low
 
