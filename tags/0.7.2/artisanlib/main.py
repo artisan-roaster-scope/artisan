@@ -9342,11 +9342,42 @@ class ApplicationWindow(QMainWindow):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " importJSON() %1").arg(str(ex)),exc_tb.tb_lineno)
 
     def importRoastLogger(self,filename):
+        self.resetExtraDevices()
         # the RoastLogger file might be in utf-8 or latin1 encoding, we cannot know so let's test both
         try:
             self.importRoastLoggerEnc(filename,'utf-8')
         except:
             self.importRoastLoggerEnc(filename,'latin1')
+        aw.qmc.safesaveflag = True
+            
+    def resetExtraDevices(self):
+        try:
+            #delete extra devices
+            aw.qmc.extradevices = []
+            #delete extra curves variables
+            aw.qmc.extratimex = []
+            aw.qmc.extradevicecolor1 = []
+            aw.qmc.extradevicecolor2 = []
+            aw.qmc.extratemp1,aw.qmc.extratemp2 = [],[]
+            aw.qmc.extrastemp1,aw.qmc.extrastemp2 = [],[]
+            aw.qmc.extratemp1lines,aw.qmc.extratemp2lines = [],[]
+            aw.qmc.extralinestyles1,aw.qmc.extralinestyles2 = [],[]
+            aw.qmc.extradrawstyles1,aw.qmc.extradrawstyles2 = [],[]
+            aw.qmc.extralinewidths1,aw.qmc.extralinewidths2 = [],[]
+            aw.qmc.extramarkers1,aw.qmc.extramarkers2 = [],[]
+            aw.qmc.extramarkersizes1,aw.qmc.extramarkersizes2 = [],[]
+            aw.qmc.extraname1,aw.qmc.extraname2 = [],[]
+            aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]
+            for i in range(len(aw.extraLCDlabel1)):
+                aw.extraLCDframe1[i].setVisible(False)
+                aw.extraLCDframe2[i].setVisible(False)
+            #delete EXTRA COMM PORTS VARIABLES
+            aw.extraser = []
+            aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
+            aw.qmc.resetlinecountcaches()
+        except Exception as e:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " resetExtraDevices(): %1").arg(str(e)),exc_tb.tb_lineno)
             
     def importRoastLoggerEnc(self,filename,enc='utf-8'):
         # use io.open instead of open to have encoding support on Python 2
@@ -11063,7 +11094,6 @@ class ApplicationWindow(QMainWindow):
         aw.button_20.setVisible(bool(aw.qmc.buttonvisibility[7]))
 
     def fetchCurveStyles(self):
-        print("fetchCurveStyles")
         try:
 # this conflicts in GreenFlag zoom mode!
 #            # get and set axis y limits
@@ -12779,24 +12809,25 @@ $cupping_notes
         self.qmc.backmoveflag = 1
 
     def switch(self):
-        foreground_profile_path = aw.curFile
-        background_profile_path = aw.qmc.backgroundpath
-        if background_profile_path:
-            # load background into foreground
-            aw.loadFile(background_profile_path)
-        else:
-            # reset
-            aw.qmc.reset(soundOn=False)
-        if foreground_profile_path:
-            # load foreground into background
-            aw.loadbackground(u(foreground_profile_path))
-            aw.qmc.background = True
-            aw.qmc.timealign(redraw=False)
-        else:
-            # delete background
-            self.deleteBackground()
-        if foreground_profile_path or background_profile_path:
-            aw.qmc.redraw(recomputeAllDeltas=False)
+        if aw.qmc.checkSaved():
+            foreground_profile_path = aw.curFile
+            background_profile_path = aw.qmc.backgroundpath
+            if background_profile_path:
+                # load background into foreground
+                aw.loadFile(background_profile_path)
+            else:
+                # reset
+                aw.qmc.reset(soundOn=False)
+            if foreground_profile_path:
+                # load foreground into background
+                aw.loadbackground(u(foreground_profile_path))
+                aw.qmc.background = True
+                aw.qmc.timealign(redraw=False)
+            else:
+                # delete background
+                self.deleteBackground()
+            if foreground_profile_path or background_profile_path:
+                aw.qmc.redraw(recomputeAllDeltas=False)
 
     def flavorchart(self):
         dialog = flavorDlg(self)
@@ -23017,33 +23048,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
 
     def resetextradevices(self):
         try:
-            #delete extra devices
-            aw.qmc.extradevices = []
-            #delete extra curves variables
-            aw.qmc.extratimex = []
-            aw.qmc.extradevicecolor1 = []
-            aw.qmc.extradevicecolor2 = []
-            aw.qmc.extratemp1,aw.qmc.extratemp2 = [],[]
-            aw.qmc.extrastemp1,aw.qmc.extrastemp2 = [],[]
-            aw.qmc.extratemp1lines,aw.qmc.extratemp2lines = [],[]
-            aw.qmc.extralinestyles1,aw.qmc.extralinestyles2 = [],[]
-            aw.qmc.extradrawstyles1,aw.qmc.extradrawstyles2 = [],[]
-            aw.qmc.extralinewidths1,aw.qmc.extralinewidths2 = [],[]
-            aw.qmc.extramarkers1,aw.qmc.extramarkers2 = [],[]
-            aw.qmc.extramarkersizes1,aw.qmc.extramarkersizes2 = [],[]
-            aw.qmc.extraname1,aw.qmc.extraname2 = [],[]
-            aw.qmc.extramathexpression1,aw.qmc.extramathexpression2 = [],[]
-            for i in range(len(aw.extraLCDlabel1)):
-                aw.extraLCDframe1[i].setVisible(False)
-                aw.extraLCDframe2[i].setVisible(False)
-            #delete EXTRA COMM PORTS VARIABLES
-            aw.extraser = []
-            aw.extracomport,aw.extrabaudrate,aw.extrabytesize,aw.extraparity,aw.extrastopbits,aw.extratimeout = [],[],[],[],[],[]
+            aw.resetExtraDevices()
             #update table
             self.createDeviceTable()
             #enable/disable buttons
             self.enableDisableAddDeleteButtons()
-            aw.qmc.resetlinecountcaches()
             #redraw
             aw.qmc.redraw(recomputeAllDeltas=False)
         except Exception as e:
