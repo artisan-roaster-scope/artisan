@@ -684,10 +684,10 @@ class tgraphcanvas(FigureCanvas):
         self.DeltaBTflag = False
         self.DeltaETlcdflag = True
         self.DeltaBTlcdflag = True
-        # user filter values x are translated as follows to internal filter values: y = x*2 + 3 (to go the other direction: x = y/2 - 1)
-        # this is to ensure, that only uneven window values are used and no wrong shift is happening through smooting
-        self.deltafilter = 7 # => corresponds to 2 on the user interface
-        self.curvefilter = 5 # => corresponds to 1 on the user interface
+        # user filter values x are translated as follows to internal filter values: y = x*2 + 1 (to go the other direction: x = y/2)
+        # this is to ensure, that only uneven window values are used and no wrong shift is happening through smoothing
+        self.deltafilter = 5 # => corresponds to 2 on the user interface
+        self.curvefilter = 3 # => corresponds to 1 on the user interface
 
         self.patheffects = 3
         self.graphstyle = 0
@@ -2120,6 +2120,38 @@ class tgraphcanvas(FigureCanvas):
     # 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'
     # 'flat' results in moving average
     # window_len should be odd
+    # based on http://wiki.scipy.org/Cookbook/SignalSmooth
+#    def smooth(self, x, y, window_len=15, window='hanning'):
+#        try:
+#            if len(x) == len(y) and len(x) > 1:
+#                # filter spikes
+#                if aw.qmc.filterDropOuts:
+#                    y = self.medfilt(y,5) # k=3 seems not to catch all spikes in all cases
+#                if window_len > 2 and len(x) == len(y) and len(x) > 1:
+#                    # smooth curves
+#                    s = numpy.r_[2*x[0]-y[window_len:1:-1],y,2*y[-1]-y[-1:-window_len:-1]]
+#                    if window == 'flat': #moving average
+#                        w = numpy.ones(window_len,'d')
+#                    else:
+#                        w = eval('numpy.'+window+'(window_len)')
+#                    ys = numpy.convolve(w/w.sum(),s,mode='same')
+#                    res = (ys[window_len-1:-window_len+1])
+#    #                res = (ys[window_len-2:-window_len]) # this one seems to move the curve slightly to the right
+#                    if len(res) != len(y):
+#                        return y
+#                    else:
+#                        return res
+#                else:
+#                    return y
+#            else:
+#                return y
+#        except Exception as ex:
+##            import traceback
+##            traceback.print_exc(file=sys.stdout)
+#            _, _, exc_tb = sys.exc_info()
+#            aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
+#            return x
+
     def smooth(self, x, y, window_len=15, window='hanning'):
         try:
             if len(x) == len(y) and len(x) > 1:
@@ -2128,14 +2160,14 @@ class tgraphcanvas(FigureCanvas):
                     y = self.medfilt(y,5) # k=3 seems not to catch all spikes in all cases
                 if window_len > 2 and len(x) == len(y) and len(x) > 1:
                     # smooth curves
-                    s = numpy.r_[2*x[0]-y[window_len:1:-1],y,2*y[-1]-y[-1:-window_len:-1]]
+                    #s = numpy.r_[2*x[0]-y[window_len:1:-1],y,2*y[-1]-y[-1:-window_len:-1]]
+                    s=numpy.r_[y[window_len-1:0:-1],y,y[-1:-window_len:-1]]
                     if window == 'flat': #moving average
                         w = numpy.ones(window_len,'d')
                     else:
                         w = eval('numpy.'+window+'(window_len)')
-                    ys = numpy.convolve(w/w.sum(),s,mode='same')
-                    res = (ys[window_len-1:-window_len+1])
-    #                res = (ys[window_len-2:-window_len]) # this one seems to move the curve slightly to the right
+                    ys = numpy.convolve(w/w.sum(),s,mode='valid')
+                    res = ys[(window_len/2):-(window_len/2)]
                     if len(res) != len(y):
                         return y
                     else:
@@ -2151,15 +2183,15 @@ class tgraphcanvas(FigureCanvas):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " smooth() %1").arg(str(ex)),exc_tb.tb_lineno)
             return x
 
-    def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1):
+    def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1):  # default 'hanning'
         #pylint: disable=E1103
-        win_len = max(0,(window_len * 2) - 1) 
+        win_len = max(0,window_len) 
         if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
             return numpy.concatenate(([None]*(fromIndex),
                 self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[fromIndex:])).tolist()
-#        elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
-#            return numpy.concatenate((b[:aw.qmc.timeindex[0]],
-#                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[aw.qmc.timeindex[0]:])).tolist()            
+        elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
+            return numpy.concatenate((b[:aw.qmc.timeindex[0]+1],
+                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[aw.qmc.timeindex[0]+1:])).tolist()            
         else:
             return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
 
@@ -4087,8 +4119,8 @@ class tgraphcanvas(FigureCanvas):
                             if aw.qmc.timeindex[0] > -1:
                                 timez = aw.qmc.stringfromseconds(int(aw.qmc.timex[aw.qmc.specialevents[Nevents]]-aw.qmc.timex[aw.qmc.timeindex[0]]))
                                 aw.etimeline.setText(timez)
-                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents-1])
-                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents-1]))
+                            aw.etypeComboBox.setCurrentIndex(self.specialeventstype[Nevents])
+                            aw.valueEdit.setText(aw.qmc.eventsvalues(self.specialeventsvalue[Nevents]))
                             aw.lineEvent.setText(self.specialeventsStrings[Nevents])
             else:
                 aw.sendmessage(QApplication.translate("Message","Timer is OFF", None, QApplication.UnicodeUTF8))
@@ -8419,7 +8451,7 @@ class ApplicationWindow(QMainWindow):
             if aw.qmc.flagon:
                 self.toggleextraeventrows()
             else:
-                # allow to use 'b' key als if OFF
+                # allow to use 'b' key also if OFF
                 if aw.extrabuttondialogs.isVisible():
                     aw.hideExtraButtons()
                     aw.extraeventsbuttonsflag = False
@@ -12492,7 +12524,7 @@ $cupping_notes
             d4 = self.qmc.temp2[i] - self.qmc.temp2[i-1]
             dpre = (d1 + d2) / 2.0
             dpost = (d3 + d4) / 2.0
-            if dpost < 0 and (abs(dpost) > (0.5 + (2.5   *abs(dpre)))):
+            if d3 < .0 and d4 < .0 and (abs(dpost) > (0.5 + (2.5 * abs(dpre)))):
                 return True
             else:
                 return False
@@ -13748,7 +13780,7 @@ class HUDDlg(ArtisanDialog):
         self.DeltaFilter.setSingleStep(1)
         self.DeltaFilter.setRange(0,40)
         self.DeltaFilter.setAlignment(Qt.AlignRight)
-        self.DeltaFilter.setValue(aw.qmc.deltafilter/2 - 1)
+        self.DeltaFilter.setValue(aw.qmc.deltafilter/2)
         self.connect(self.DeltaFilter ,SIGNAL("editingFinished()"),lambda x=0:self.changeDeltaFilter(0))
         curvefilterlabel = QLabel(QApplication.translate("Label", "Smooth Curves",None, QApplication.UnicodeUTF8))
         #Filter holds the number of pads in filter
@@ -13756,7 +13788,7 @@ class HUDDlg(ArtisanDialog):
         self.Filter.setSingleStep(1)
         self.Filter.setRange(0,40)
         self.Filter.setAlignment(Qt.AlignRight)
-        self.Filter.setValue(aw.qmc.curvefilter/2 - 1)
+        self.Filter.setValue(aw.qmc.curvefilter/2)
         self.connect(self.Filter,SIGNAL("editingFinished()"),lambda x=0:self.changeFilter(0))
         #filterspikes
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None, QApplication.UnicodeUTF8))
@@ -14685,7 +14717,7 @@ class HUDDlg(ArtisanDialog):
 
     def changeDeltaFilter(self,i):
         try:
-            v = self.DeltaFilter.value()*2 + 3
+            v = self.DeltaFilter.value()*2 + 1
             if v != aw.qmc.deltafilter:
                 self.DeltaFilter.setDisabled(True)
                 self.DeltaFilter.blockSignals(True)
@@ -14712,7 +14744,7 @@ class HUDDlg(ArtisanDialog):
         
     def changeFilter(self,i):
         try:
-            v = self.Filter.value()*2 + 3
+            v = self.Filter.value()*2 + 1
             if v != aw.qmc.curvefilter:
                 self.Filter.setDisabled(True)
                 aw.qmc.curvefilter = v
