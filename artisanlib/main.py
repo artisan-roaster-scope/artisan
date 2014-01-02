@@ -126,6 +126,8 @@ def dependencies_for_myprogram():
     import PyQt4.QtXml
 
 if sys.version < '3':
+    def stringp(x):
+        return isinstance(s, basestring)
     def uchr(x):
         return unichr(x)
     def o(x): # converts char to byte
@@ -152,6 +154,8 @@ if sys.version < '3':
     def cmd2str(c):
         return c
 else:
+    def stringp(x):
+        return isinstance(s, str)
     def uchr(x):
         return chr(x)
     def o(x): # converts char to byte
@@ -8169,13 +8173,13 @@ class ApplicationWindow(QMainWindow):
                             if isinstance(cmds,tuple):
                                 if len(cmds) == 3 and not isinstance(cmds[0],list):
                                     # cmd has format "write(s,r,v)"
-                                    aw.modbus.writeSingleRegister(*cmds)
+                                    aw.modbus.writeRegister(*cmds)
                                 # cmd has format "write([s,r,v],..,[s,r,v])"
                                 for cmd in cmds:
-                                    aw.modbus.writeSingleRegister(*cmd)
+                                    aw.modbus.writeRegister(*cmd)
                             else:
                                 # cmd has format "write([s,r,v])"
-                                aw.modbus.writeSingleRegister(*cmds)
+                                aw.modbus.writeRegister(*cmds)
                         except:
                             pass
                 elif action == 5:
@@ -19382,6 +19386,19 @@ class modbusport(object):
                 _, _, exc_tb = sys.exc_info()
                 aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " connect() %1").arg(str(ex)),exc_tb.tb_lineno)
 
+    # write value to register on slave
+    # value can be one of string (containing an int or float), an int or a float
+    def writeRegister(self,slave,register,value):
+        if stringp(value):
+            if "." in value:
+                self.writeWord(slave,register,value)
+            else:
+                self.writeSingleRegister(slave,register,value)
+        elif isinstance(value, int):
+            self.writeSingleRegister(slave,register,value)
+        elif isinstance(value, float):
+            self.writeWord(slave,register,value)
+
     def writeSingleRegister(self,slave,register,value):
         try:
             #### lock shared resources #####
@@ -19392,6 +19409,22 @@ class modbusport(object):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeSingleRegister() %1").arg(str(ex)),exc_tb.tb_lineno)
+        finally:
+            if aw.qmc.samplingsemaphore.available() < 1:
+                aw.qmc.samplingsemaphore.release(1)
+
+    # value=int or float
+    # writes a single precision 32bit float (2-registers)
+    def writeWord(self,slave,register,value):
+        try:
+            #### lock shared resources #####
+            aw.qmc.samplingsemaphore.acquire(1)
+            self.connect()
+            self.master.address = int(slave)
+            self.master.write_float(int(register),float(value),2)
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message","Modbus Error:",None, QApplication.UnicodeUTF8) + " writeWord() %1").arg(str(ex)),exc_tb.tb_lineno)
         finally:
             if aw.qmc.samplingsemaphore.available() < 1:
                 aw.qmc.samplingsemaphore.release(1)
@@ -19547,7 +19580,7 @@ class colorport(extraserialport):
                 self.connect()
                 libtime.sleep(3)
                 # put Tonino into PC mode on first connect
-                self.SP.write(str2cmd('TONINO\n'))
+                self.SP.write(str2cmd('\nTONINO\n'))
                 self.SP.flush()
                 self.SP.readline()
             if self.SP:
@@ -19556,7 +19589,7 @@ class colorport(extraserialport):
                 if self.SP.isOpen():
                     self.SP.flushInput()
                     self.SP.flushOutput()
-                    self.SP.write(str2cmd('SCAN\n'))
+                    self.SP.write(str2cmd('\nSCAN\n'))
                     self.SP.flush()
                     libtime.sleep(1.5)
                     v = self.SP.readline()
