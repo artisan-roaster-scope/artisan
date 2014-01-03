@@ -127,7 +127,7 @@ def dependencies_for_myprogram():
 
 if sys.version < '3':
     def stringp(x):
-        return isinstance(s, basestring)
+        return isinstance(x, basestring)
     def uchr(x):
         return unichr(x)
     def o(x): # converts char to byte
@@ -155,7 +155,7 @@ if sys.version < '3':
         return c
 else:
     def stringp(x):
-        return isinstance(s, str)
+        return isinstance(x, str)
     def uchr(x):
         return chr(x)
     def o(x): # converts char to byte
@@ -8174,9 +8174,10 @@ class ApplicationWindow(QMainWindow):
                                 if len(cmds) == 3 and not isinstance(cmds[0],list):
                                     # cmd has format "write(s,r,v)"
                                     aw.modbus.writeRegister(*cmds)
+                                else:
                                 # cmd has format "write([s,r,v],..,[s,r,v])"
-                                for cmd in cmds:
-                                    aw.modbus.writeRegister(*cmd)
+                                    for cmd in cmds:
+                                        aw.modbus.writeRegister(*cmd)
                             else:
                                 # cmd has format "write([s,r,v])"
                                 aw.modbus.writeRegister(*cmds)
@@ -13798,17 +13799,21 @@ class HUDDlg(ArtisanDialog):
         self.FilterSpikes = QCheckBox(QApplication.translate("CheckBox", "Smooth Spikes",None, QApplication.UnicodeUTF8))
         self.FilterSpikes.setChecked(aw.qmc.filterDropOuts)
         self.connect(self.FilterSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeDropFilter(i))
+        self.FilterSpikes.setFocusPolicy(Qt.NoFocus)
         #dropspikes
         self.DropSpikes = QCheckBox(QApplication.translate("CheckBox", "Drop Spikes",None, QApplication.UnicodeUTF8))
         self.DropSpikes.setChecked(aw.qmc.dropSpikes)
         self.connect(self.DropSpikes,SIGNAL("stateChanged(int)"),lambda i=0:self.changeSpikeFilter(i))
+        self.DropSpikes.setFocusPolicy(Qt.NoFocus)
         #min-max-limits
         self.MinMaxLimits = QCheckBox(QApplication.translate("CheckBox", "Limits",None, QApplication.UnicodeUTF8))
         self.MinMaxLimits.setChecked(aw.qmc.minmaxLimits)
         self.connect(self.MinMaxLimits,SIGNAL("stateChanged(int)"),lambda i=0:self.changeMinMaxLimits(i))
+        self.MinMaxLimits.setFocusPolicy(Qt.NoFocus)
         #swapETBT flag
         self.swapETBT = QCheckBox(QApplication.translate("Label", "ET", None, QApplication.UnicodeUTF8) + " <-> " + QApplication.translate("Label", "BT", None, QApplication.UnicodeUTF8))
         self.swapETBT.setChecked(aw.qmc.swapETBT)
+        self.swapETBT.setFocusPolicy(Qt.NoFocus)
         self.connect(self.swapETBT,SIGNAL("stateChanged(int)"),lambda i=0:self.changeSwapETBT(i))
         #limits
         minlabel = QLabel(QApplication.translate("Label", "min",None, QApplication.UnicodeUTF8))
@@ -14205,7 +14210,7 @@ class HUDDlg(ArtisanDialog):
             pass
         self.connect(self.styleComboBox,SIGNAL("currentIndexChanged(int)"),lambda i:self.setappearance())
         self.resolutionSpinBox = QSpinBox()
-        self.resolutionSpinBox.setRange(40,120)
+        self.resolutionSpinBox.setRange(40,200)
         self.resolutionSpinBox.setSingleStep(5)
         self.resolutionSpinBox.setValue(aw.dpi)
         self.resolutionSpinBox.setFocusPolicy(Qt.NoFocus)
@@ -24892,7 +24897,7 @@ class AlarmDlg(ArtisanDialog):
         self.alarmtable.setRowCount(nalarms + 1)
         self.setalarmtablerow(nalarms)
         self.alarmtable.resizeColumnsToContents()
-        self.alarmtable.resizeRowToContents()
+        self.alarmtable.resizeRowsToContents()
         # improve width of Qlineedit columns
         self.alarmtable.setColumnWidth(1,50)
         self.alarmtable.setColumnWidth(2,50)
