@@ -46,7 +46,7 @@
     * triggered alarms hold a gray background in the alarms dialog
     * imports alarms from [http://homepage.ntlworld.com/green_bean/coffee/roastlogger/roastlogger.htm RoastLogger] profiles (thanks to Miroslav)
   * allows ETBTa and RoR statistics to be displayed together
-  * adds support for the Tonino roast color meter
+  * adds support for the [http://my-tonino.com Tonino roast color meter]
   * the last used extra event button is marked
   * adds extra device data to Roast Properties data table
   * adds "cool end" event to the event popup menu on right mouse click on the BT
