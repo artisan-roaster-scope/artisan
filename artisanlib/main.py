@@ -6083,8 +6083,8 @@ class SampleThread(QThread):
                         #######   filter deltaBT deltaET
                         # decay smoothing
                         if aw.qmc.deltafilter:
-                            user_filter = int(round(aw.qmc.deltafilter/2))
-                            if length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
+                            user_filter = int(round(aw.qmc.deltafilter/2))                            
+                            if user_filter and length_of_qmc_timex > user_filter and (len(aw.qmc.unfiltereddelta1) > user_filter) and (len(aw.qmc.unfiltereddelta2) > user_filter):
                                 if self.decay_weights == None or len(self.decay_weights) != user_filter: # recompute only on changes
                                     self.decay_weights = numpy.arange(1,user_filter+1)
                                 aw.qmc.rateofchange1 = numpy.average(aw.qmc.unfiltereddelta1[-user_filter:],weights=self.decay_weights)
@@ -7346,7 +7346,7 @@ class ApplicationWindow(QMainWindow):
 
         #create EVENT mini button
         self.buttonminiEvent = QPushButton(QApplication.translate("Button", "Update", None, QApplication.UnicodeUTF8))
-#        self.buttonminiEvent.setFocusPolicy(Qt.NoFocus)
+        self.buttonminiEvent.setFocusPolicy(Qt.StrongFocus)
         self.connect(self.buttonminiEvent, SIGNAL("clicked()"), self.miniEventRecord)
         self.buttonminiEvent.setToolTip(QApplication.translate("Tooltip", "Updates the event", None, QApplication.UnicodeUTF8))
 
@@ -8409,8 +8409,7 @@ class ApplicationWindow(QMainWindow):
         key = int(event.key())
         #uncomment next line to find the integer value of a key
         #print(key)
-
-        #keyboard move keys
+        
         if key == 70: # F SELECTS FULL SCREEN MODE
             if self.full_screen_mode_active or self.isFullScreen():
                 self.full_screen_mode_active = False
@@ -12522,13 +12521,14 @@ $cupping_notes
     # . average delta before i-2 is not negative
     # . average delta after i-2 is negative and twice as high (absolute) as the one before
     def BTbreak(self,i):
-        if len(self.qmc.timex)>4 and i < len(self.qmc.timex):
-            d1 = self.qmc.temp2[i-4] - self.qmc.temp2[i-3]
-            d2 = self.qmc.temp2[i-3] - self.qmc.temp2[i-2]
+        if len(self.qmc.timex)>5 and i < len(self.qmc.timex):
+            d1 = self.qmc.temp2[i-5] - self.qmc.temp2[i-4]
+            d2 = self.qmc.temp2[i-4] - self.qmc.temp2[i-3]
             d3 = self.qmc.temp2[i-1] - self.qmc.temp2[i-2]
             d4 = self.qmc.temp2[i] - self.qmc.temp2[i-1]
             dpre = (d1 + d2) / 2.0
             dpost = (d3 + d4) / 2.0
+            #print("BTbreak",self.qmc.temp2[i],d3 < .0,d4 < .0,abs(dpost),(0.5 + (2.5 * abs(dpre))))
             if d3 < .0 and d4 < .0 and (abs(dpost) > (0.5 + (2.5 * abs(dpre)))):
                 return True
             else:
