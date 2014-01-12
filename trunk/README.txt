@@ -156,6 +156,13 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.7.3 (12.01.2014)
+- improved curve and RoR smoothing
+- adds oversampling
+- adds support for floats to the Modbus write command
+- improved autoCharge/autoDrop recognizer
+- updated Phidget library
+
 v0.7.2 (19.12.2013)
 - fixed always active min/max filter
 - spike filter improvements
