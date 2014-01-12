@@ -1,5 +1,14 @@
 #summary Detailed Release History
 
+==v0.7.3 (12.01.2014)==
+
+ * New Features
+  * adds oversampling
+  * adds support for floats to the Modbus write command
+ * Changes
+  * improved curve and RoR smoothing
+  * improved autoCharge/autoDrop recognizer
+  * updated Phidget library
 
 ==v0.7.2 (19.12.2013)==
 
