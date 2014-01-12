@@ -1,3 +1,13 @@
+artisan (0.7.3-1) precise; urgency=low
+  * new upstream release
+  * fixes since 0.7.2:
+   - improved curve and RoR smoothing
+   - adds oversampling
+   - adds support for floats to the Modbus write command
+   - improved autoCharge/autoDrop recognizer
+   - updated Phidget library
+ --  <marko.luther@gmx.net>  Sun, 12 Jan 2014 19:32:14 +0200
+
 artisan (0.7.2-1) precise; urgency=low
   * new upstream release
   * fixes since 0.7.1:

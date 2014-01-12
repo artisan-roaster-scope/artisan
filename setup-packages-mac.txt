@@ -22,6 +22,8 @@ o py2app >0.7.3 trunk (21.4.2013)
 
 Upgrade History:
 
+- 2014-01-11:
+ . Phidgets Python 2.1.8 6/2013 => 2.1.8 7/2013
 - 2013-11-12:
  . scipy 0.13.1
  . numpy 1.8.0
