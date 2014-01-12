@@ -89,6 +89,7 @@ if platf != 'Darwin':
 CONF_MENU_DEVICE = QApplication.translate("Menu", "Device...", None, QApplication.UnicodeUTF8)
 CONF_MENU_SERIALPORT = QApplication.translate("Menu", "Serial Port...", None, QApplication.UnicodeUTF8)
 CONF_MENU_SAMPLING = QApplication.translate("Menu", "Sampling Interval...", None, QApplication.UnicodeUTF8)
+CONF_MENU_OVERSAMPLING = QApplication.translate("Menu", "Oversampling", None, QApplication.UnicodeUTF8)
 CONF_MENU_COLORS = QApplication.translate("Menu", "Colors...", None, QApplication.UnicodeUTF8)
 CONF_MENU_PHASES = QApplication.translate("Menu", "Phases...", None, QApplication.UnicodeUTF8)
 CONF_MENU_EVENTS = QApplication.translate("Menu", "Events...", None, QApplication.UnicodeUTF8)
