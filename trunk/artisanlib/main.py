@@ -435,6 +435,10 @@ class tgraphcanvas(FigureCanvas):
         self.default_delay = 3000 # default 3s
         self.delay = self.default_delay
         self.min_delay = 1000
+        
+        # oversampling flag
+        self.oversampling = False
+        self.oversampling_min_delay = 3000
 
         #watermarks limits: dryphase1, dryphase2, midphase, and finish phase Y limits
         self.phases_fahrenheit_defaults = [200,300,390,450]
@@ -5940,6 +5944,24 @@ class SampleThread(QThread):
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " filterDropOuts() %1").arg(str(e)),exc_tb.tb_lineno)            
             return temp
 
+    def sample_main_device(self):
+        #read time, ET (t1) and BT (t2) TEMPERATURE
+        try:
+            if aw.qmc.swapETBT:
+                return aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+            else:
+                return aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+        except:
+            tx = aw.qmc.timeclock.elapsed()/1000
+            return tx,-1,-1
+    
+    def sample_extra_device(self,i):
+        try:
+            return aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+        except:
+            tx = aw.qmc.timeclock.elapsed()/1000
+            return tx,-1,-1
+
     # sample devices at interval self.delay miliseconds.
     # we can assume within the processing of sample() that flagon=True
     def sample(self):
@@ -5966,7 +5988,13 @@ class SampleThread(QThread):
                             xtra_dev_lines1 = 0
                             xtra_dev_lines2 = 0
                             for i in range(nxdevices):
-                                extratx,extrat2,extrat1 = aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
+                                extratx,extrat2,extrat1 = self.sample_extra_device(i)
+                                if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
+                                    libtime.sleep(0.1)
+                                    extratx_2,extrat2_2,extrat1_2 = self.sample_extra_device(i)
+                                    extratx = extratx + (extratx_2 - extratx) / 2.0
+                                    extrat2 = (extrat2 + extrat2_2) / 2.0
+                                    extrat1 = (extrat1 + extrat1_2) / 2.0                                
                                 if len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
                                 extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
@@ -6017,14 +6045,13 @@ class SampleThread(QThread):
                                 errormessage += "\nPlease Reset: Extra devices"
                             raise Exception(errormessage)
                     #read time, ET (t1) and BT (t2) TEMPERATURE
-                    try:
-                        if aw.qmc.swapETBT:
-                            tx,t2,t1 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
-                        else:
-                            tx,t1,t2 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
-                    except:
-                        tx = aw.qmc.timeclock.elapsed()/1000
-                        t1 = t2 = -1
+                    tx,t1,t2 = self.sample_main_device()
+                    if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
+                        libtime.sleep(0.1)
+                        tx_2,t1_2,t2_2 = self.sample_main_device()
+                        tx = tx + (tx_2 - tx) / 2.0
+                        t2 = (t2 + t2_2) / 2.0
+                        t1 = (t1 + t1_2) / 2.0
                     if len(aw.qmc.ETfunction):
                         t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
                     if len(aw.qmc.BTfunction):
@@ -6700,6 +6727,12 @@ class ApplicationWindow(QMainWindow):
         calibrateDelayAction = QAction(UIconst.CONF_MENU_SAMPLING,self)
         self.connect(calibrateDelayAction,SIGNAL("triggered()"),self.calibratedelay)
         self.ConfMenu.addAction(calibrateDelayAction)
+
+        self.oversamplingAction = QAction(UIconst.CONF_MENU_OVERSAMPLING,self)
+        self.connect(self.oversamplingAction,SIGNAL("triggered()"),self.oversampling)
+        self.oversamplingAction.setCheckable(True)
+        self.oversamplingAction.setChecked(self.qmc.oversampling)
+        self.ConfMenu.addAction(self.oversamplingAction)
 
         self.ConfMenu.addSeparator()
 
@@ -10413,6 +10446,7 @@ class ApplicationWindow(QMainWindow):
             profile["backgroundpath"] = e(self.qmc.backgroundpath)
             #write only:
             profile["samplinginterval"] = self.qmc.delay / 1000.
+            profile["oversampling"] = self.qmc.oversampling
             try:
                 ds = list(self.qmc.extradevices)
                 ds.insert(0,self.qmc.device)
@@ -10594,6 +10628,10 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.delay = max(self.qmc.min_delay,settings.value("Delay",int(self.qmc.delay)).toInt()[0])
             else:
                 self.qmc.delay = self.qmc.default_delay
+            # restore oversampling
+            if settings.contains("Oversampling"):
+                self.qmc.oversampling = settings.value("Oversampling",self.qmc.oversampling).toBool()
+                aw.oversamplingAction.setChecked(aw.qmc.oversampling)
             #restore colors
             for (k, v) in list(settings.value("Colors").toMap().items()):
                 self.qmc.palette[str(k)] = str(v.toString())
@@ -11376,8 +11414,10 @@ class ApplicationWindow(QMainWindow):
             settings.endGroup()
             #save ambient temperature source
             settings.setValue("AmbientTempSource",aw.qmc.ambientTempSource)
-            #save delay
+            #save delay (sampling interval)
             settings.setValue("Delay",self.qmc.delay)
+            # save oversampling
+            settings.setValue("Oversampling",self.qmc.oversampling)
             #save colors
             settings.setValue("Colors",self.qmc.palette)
             settings.setValue("LCDColors",self.lcdpaletteB)
@@ -12715,6 +12755,15 @@ $cupping_notes
                 "%s Files (*.%s);;All Files (*)"%(fmt.upper(),fmt))
         if fileName:
             imag.save(fileName, fmt)
+            
+    def oversampling(self):
+        aw.qmc.oversampling = not aw.qmc.oversampling
+        aw.oversamplingAction.setChecked(aw.qmc.oversampling)
+        if aw.qmc.oversampling and self.qmc.delay < aw.qmc.oversampling_min_delay:
+            QMessageBox.warning(self,QApplication.translate("Message", "Warning",None, 
+            QApplication.UnicodeUTF8),QApplication.translate("Message", 
+            "Oversampling is only active with a sampling interval equal or larger than 3s.",None, QApplication.UnicodeUTF8))
+
 
     def calibratedelay(self):
         calSpinBox = QDoubleSpinBox()
@@ -19921,29 +19970,60 @@ class serialport(object):
         t2,t1 = self.HH806Wtemperature()
         return tx,t2,t1
 
+    # For Phidgets we do always one additional oversampling as they are that fast
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(0)
+        libtime.sleep(0.1)
+        t2_2,t1_2 = self.PHIDGET1048temperature(0)
+        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+        tx = tx + (tx_2 - tx) / 2.0
+        t1 = (t1 + t1_2) / 2.0
+        t2 = (t2 + t2_2) / 2.0                        
         return tx,t1,t2
 
     def PHIDGET1048_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(1)
+        libtime.sleep(0.1)
+        t2_2,t1_2 = self.PHIDGET1048temperature(1)
+        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+        tx = tx + (tx_2 - tx) / 2.0
+        t1 = (t1 + t1_2) / 2.0
+        t2 = (t2 + t2_2) / 2.0    
         return tx,t1,t2
 
     def PHIDGET1048_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(2)
+        libtime.sleep(0.1)
+        t2_2,t1_2 = self.PHIDGET1048temperature(2)
+        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+        tx = tx + (tx_2 - tx) / 2.0
+        t1 = (t1 + t1_2) / 2.0
+        t2 = (t2 + t2_2) / 2.0
         return tx,t1,t2
 
     def PHIDGET1046(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1046temperature(0)
+        libtime.sleep(0.1)
+        t2_2,t1_2 = self.PHIDGET1046temperature(0)
+        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+        tx = tx + (tx_2 - tx) / 2.0
+        t1 = (t1 + t1_2) / 2.0
+        t2 = (t2 + t2_2) / 2.0
         return tx,t1,t2
 
     def PHIDGET1046_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1046temperature(1)
+        libtime.sleep(0.1)
+        t2_2,t1_2 = self.PHIDGET1046temperature(1)
+        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+        tx = tx + (tx_2 - tx) / 2.0
+        t1 = (t1 + t1_2) / 2.0
+        t2 = (t2 + t2_2) / 2.0
         return tx,t1,t2
 
     def MODBUS(self):
