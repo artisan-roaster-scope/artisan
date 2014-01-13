@@ -156,6 +156,9 @@ Artisan uses the following libraries in unmodified forms:
 
 VERSION HISTORY
 
+v0.7.4 (13.01.2014)
+- fixes ETBT swap functionality
+
 v0.7.3 (12.01.2014)
 - improved curve and RoR smoothing
 - adds oversampling
