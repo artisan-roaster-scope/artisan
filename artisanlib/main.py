@@ -5948,7 +5948,8 @@ class SampleThread(QThread):
         #read time, ET (t1) and BT (t2) TEMPERATURE
         try:
             if aw.qmc.swapETBT:
-                return aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                tx,t2,t1 = aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
+                return tx,t1,t2
             else:
                 return aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
         except:
