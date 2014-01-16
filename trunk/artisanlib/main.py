@@ -5981,6 +5981,12 @@ class SampleThread(QThread):
                     
                 #if using a meter (thermocouple device)
                 if aw.qmc.device != 18: # not NONE device
+                
+                    #### first retrieve readings from the main device
+                    timeBeforeETBT = libtime.time() # the time before sending the request to the main device
+                    #read time, ET (t1) and BT (t2) TEMPERATURE
+                    tx,t1,t2 = self.sample_main_device()
+                    timeAfterETBT = libtime.time() # the time the data of the main device was received
                     ##############  if using Extra devices
                     nxdevices = len(aw.qmc.extradevices)
                     if nxdevices:
@@ -5989,13 +5995,7 @@ class SampleThread(QThread):
                             xtra_dev_lines1 = 0
                             xtra_dev_lines2 = 0
                             for i in range(nxdevices):
-                                extratx,extrat2,extrat1 = self.sample_extra_device(i)
-                                if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
-                                    libtime.sleep(0.1)
-                                    extratx_2,extrat2_2,extrat1_2 = self.sample_extra_device(i)
-                                    extratx = extratx + (extratx_2 - extratx) / 2.0
-                                    extrat2 = (extrat2 + extrat2_2) / 2.0
-                                    extrat1 = (extrat1 + extrat1_2) / 2.0                                
+                                extratx,extrat2,extrat1 = self.sample_extra_device(i)                               
                                 if len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
                                 extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
@@ -6045,14 +6045,23 @@ class SampleThread(QThread):
                                 errormessage = "ERROR: extra devices lengths don't match: %s"%string
                                 errormessage += "\nPlease Reset: Extra devices"
                             raise Exception(errormessage)
-                    #read time, ET (t1) and BT (t2) TEMPERATURE
-                    tx,t1,t2 = self.sample_main_device()
+                    timeAfterExtra = libtime.time() # the time the data of all extra devices was received
                     if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
-                        libtime.sleep(0.1)
-                        tx_2,t1_2,t2_2 = self.sample_main_device()
-                        tx = tx + (tx_2 - tx) / 2.0
-                        t2 = (t2 + t2_2) / 2.0
-                        t1 = (t1 + t1_2) / 2.0
+                        # let's do the oversampling thing and take a second reading from the main device
+                        sampling_interval = aw.qmc.delay/1000
+                        remaining_time = sampling_interval - (timeAfterExtra - timeBeforeETBT)
+                        etbt_time = timeAfterETBT - timeBeforeETBT
+                        gone = timeAfterExtra - timeBeforeETBT
+                        # only do it if there is enough time to do the ET/BT sampling (which takes etbt_time) 
+                        # and only half of the sampling interval is gone
+                        if (sampling_interval - gone) > etbt_time and gone < (sampling_interval / 2.0):
+                            # place the second ET/BT sampling in the middle of the sampling interval
+                            libtime.sleep((sampling_interval / 2.0) - gone)
+                            tx_2,t1_2,t2_2 = self.sample_main_device()
+                            tx = tx + (tx_2 - tx) / 2.0
+                            t2 = (t2 + t2_2) / 2.0
+                            t1 = (t1 + t1_2) / 2.0
+                    ####### all values retrieved
                     if len(aw.qmc.ETfunction):
                         t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
                     if len(aw.qmc.BTfunction):
@@ -19975,56 +19984,56 @@ class serialport(object):
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(0)
-        libtime.sleep(0.1)
-        t2_2,t1_2 = self.PHIDGET1048temperature(0)
-        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-        tx = tx + (tx_2 - tx) / 2.0
-        t1 = (t1 + t1_2) / 2.0
-        t2 = (t2 + t2_2) / 2.0                        
+#        libtime.sleep(0.1)
+#        t2_2,t1_2 = self.PHIDGET1048temperature(0)
+#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+#        tx = tx + (tx_2 - tx) / 2.0
+#        t1 = (t1 + t1_2) / 2.0
+#        t2 = (t2 + t2_2) / 2.0                        
         return tx,t1,t2
 
     def PHIDGET1048_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(1)
-        libtime.sleep(0.1)
-        t2_2,t1_2 = self.PHIDGET1048temperature(1)
-        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-        tx = tx + (tx_2 - tx) / 2.0
-        t1 = (t1 + t1_2) / 2.0
-        t2 = (t2 + t2_2) / 2.0    
+#        libtime.sleep(0.1)
+#        t2_2,t1_2 = self.PHIDGET1048temperature(1)
+#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+#        tx = tx + (tx_2 - tx) / 2.0
+#        t1 = (t1 + t1_2) / 2.0
+#        t2 = (t2 + t2_2) / 2.0    
         return tx,t1,t2
 
     def PHIDGET1048_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(2)
-        libtime.sleep(0.1)
-        t2_2,t1_2 = self.PHIDGET1048temperature(2)
-        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-        tx = tx + (tx_2 - tx) / 2.0
-        t1 = (t1 + t1_2) / 2.0
-        t2 = (t2 + t2_2) / 2.0
+#        libtime.sleep(0.1)
+#        t2_2,t1_2 = self.PHIDGET1048temperature(2)
+#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+#        tx = tx + (tx_2 - tx) / 2.0
+#        t1 = (t1 + t1_2) / 2.0
+#        t2 = (t2 + t2_2) / 2.0
         return tx,t1,t2
 
     def PHIDGET1046(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1046temperature(0)
-        libtime.sleep(0.1)
-        t2_2,t1_2 = self.PHIDGET1046temperature(0)
-        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-        tx = tx + (tx_2 - tx) / 2.0
-        t1 = (t1 + t1_2) / 2.0
-        t2 = (t2 + t2_2) / 2.0
+#        libtime.sleep(0.1)
+#        t2_2,t1_2 = self.PHIDGET1046temperature(0)
+#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+#        tx = tx + (tx_2 - tx) / 2.0
+#        t1 = (t1 + t1_2) / 2.0
+#        t2 = (t2 + t2_2) / 2.0
         return tx,t1,t2
 
     def PHIDGET1046_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1046temperature(1)
-        libtime.sleep(0.1)
-        t2_2,t1_2 = self.PHIDGET1046temperature(1)
-        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-        tx = tx + (tx_2 - tx) / 2.0
-        t1 = (t1 + t1_2) / 2.0
-        t2 = (t2 + t2_2) / 2.0
+#        libtime.sleep(0.1)
+#        t2_2,t1_2 = self.PHIDGET1046temperature(1)
+#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
+#        tx = tx + (tx_2 - tx) / 2.0
+#        t1 = (t1 + t1_2) / 2.0
+#        t2 = (t2 + t2_2) / 2.0
         return tx,t1,t2
 
     def MODBUS(self):
@@ -25157,62 +25166,66 @@ class AlarmDlg(ArtisanDialog):
         QMessageBox.information(self,QApplication.translate("Button", "Help",None, QApplication.UnicodeUTF8),string)
 
     def savealarms(self):
-        nalarms = self.alarmtable.rowCount()
-        aw.qmc.loadalarmsfromprofile = self.loadAlarmsFromProfile.isChecked()
-        aw.qmc.alarmflag = [1]*nalarms
-        aw.qmc.alarmguard = [-1]*nalarms
-        aw.qmc.alarmnegguard = [-1]*nalarms
-        aw.qmc.alarmtime = [-1]*nalarms
-        aw.qmc.alarmoffset = [0]*nalarms
-        aw.qmc.alarmcond = [1]*nalarms
-        aw.qmc.alarmsource = [1]*nalarms
-        aw.qmc.alarmtemperature = [500]*nalarms
-        aw.qmc.alarmaction = [0]*nalarms
-        aw.qmc.alarmbeep = [0]*nalarms
-        aw.qmc.alarmstrings = [""]*nalarms
-        for i in range(nalarms):
-            flag = self.alarmtable.cellWidget(i,0)
-            aw.qmc.alarmflag[i] = int(flag.isChecked())
-            guard = self.alarmtable.cellWidget(i,1)
-            try:
-                guard_value = int(str(guard.text())) - 1
-            except:
-                guard_value = -1
-            if guard_value > -1 and guard_value < nalarms:
-                aw.qmc.alarmguard[i] = guard_value
-            else:
-                aw.qmc.alarmguard[i] = -1
-            negguard = self.alarmtable.cellWidget(i,2)
-            try:
-                negguard_value = int(str(negguard.text())) - 1
-            except:
-                negguard_value = -1
-            if negguard_value > -1 and negguard_value < nalarms:
-                aw.qmc.alarmnegguard[i] = negguard_value
-            else:
-                aw.qmc.alarmnegguard[i] = -1
-            timez =  self.alarmtable.cellWidget(i,3)
-            aw.qmc.alarmtime[i] = aw.qmc.menuidx2alarmtime[timez.currentIndex()]
-            offset =  self.alarmtable.cellWidget(i,4)
-            if offset and offset != "":
-                aw.qmc.alarmoffset[i] = max(0,aw.qmc.stringtoseconds(str(offset.text())))
-            atype = self.alarmtable.cellWidget(i,5)
-            aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3
-            cond = self.alarmtable.cellWidget(i,6)
-            aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
-            temp = self.alarmtable.cellWidget(i,7)
-            try:
-                aw.qmc.alarmtemperature[i] = int(str(temp.text()))
-            except:
-                aw.qmc.alarmtemperature[i] = 0
-            action = self.alarmtable.cellWidget(i,8)
-            aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
-            beepWidget = self.alarmtable.cellWidget(i,9)
-            beep = beepWidget.layout().takeAt(1).widget()
-            aw.qmc.alarmbeep[i] = int(beep.isChecked())
-            description = self.alarmtable.cellWidget(i,10)
-            aw.qmc.alarmstrings[i] = u(description.text())
-
+        try:
+            nalarms = self.alarmtable.rowCount()
+            aw.qmc.loadalarmsfromprofile = self.loadAlarmsFromProfile.isChecked()
+            aw.qmc.alarmflag = [1]*nalarms
+            aw.qmc.alarmguard = [-1]*nalarms
+            aw.qmc.alarmnegguard = [-1]*nalarms
+            aw.qmc.alarmtime = [-1]*nalarms
+            aw.qmc.alarmoffset = [0]*nalarms
+            aw.qmc.alarmcond = [1]*nalarms
+            aw.qmc.alarmsource = [1]*nalarms
+            aw.qmc.alarmtemperature = [500]*nalarms
+            aw.qmc.alarmaction = [0]*nalarms
+            aw.qmc.alarmbeep = [0]*nalarms
+            aw.qmc.alarmstrings = [""]*nalarms
+            for i in range(nalarms):
+                flag = self.alarmtable.cellWidget(i,0)
+                aw.qmc.alarmflag[i] = int(flag.isChecked())
+                guard = self.alarmtable.cellWidget(i,1)
+                try:
+                    guard_value = int(str(guard.text())) - 1
+                except:
+                    guard_value = -1
+                if guard_value > -1 and guard_value < nalarms:
+                    aw.qmc.alarmguard[i] = guard_value
+                else:
+                    aw.qmc.alarmguard[i] = -1
+                negguard = self.alarmtable.cellWidget(i,2)
+                try:
+                    negguard_value = int(str(negguard.text())) - 1
+                except:
+                    negguard_value = -1
+                if negguard_value > -1 and negguard_value < nalarms:
+                    aw.qmc.alarmnegguard[i] = negguard_value
+                else:
+                    aw.qmc.alarmnegguard[i] = -1
+                timez =  self.alarmtable.cellWidget(i,3)
+                aw.qmc.alarmtime[i] = aw.qmc.menuidx2alarmtime[timez.currentIndex()]
+                offset =  self.alarmtable.cellWidget(i,4)
+                if offset and offset != "":
+                    aw.qmc.alarmoffset[i] = max(0,aw.qmc.stringtoseconds(str(offset.text())))
+                atype = self.alarmtable.cellWidget(i,5)
+                aw.qmc.alarmsource[i] = int(str(atype.currentIndex())) - 3
+                cond = self.alarmtable.cellWidget(i,6)
+                aw.qmc.alarmcond[i] = int(str(cond.currentIndex())) 
+                temp = self.alarmtable.cellWidget(i,7)
+                try:
+                    aw.qmc.alarmtemperature[i] = int(str(temp.text()))
+                except:
+                    aw.qmc.alarmtemperature[i] = 0
+                action = self.alarmtable.cellWidget(i,8)
+                aw.qmc.alarmaction[i] = int(str(action.currentIndex() - 1))
+                beepWidget = self.alarmtable.cellWidget(i,9)
+                beep = beepWidget.layout().takeAt(1).widget()
+                aw.qmc.alarmbeep[i] = int(beep.isChecked())
+                description = self.alarmtable.cellWidget(i,10)
+                aw.qmc.alarmstrings[i] = u(description.text())
+        except Exception as ex:
+            _, _, exc_tb = sys.exc_info()
+            aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " savealarms(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            
     def buildAlarmSourceList(self):
         extra_names = []
         for i in range(len(aw.qmc.extradevices)):
