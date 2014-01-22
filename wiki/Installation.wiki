@@ -36,7 +36,7 @@ _NOTE: from v0.5.0 on the Systems 10.4.x/10.5.x/10.6.x (eg. Tiger, Leopard, Snow
     ** for Omega HH806AU and HH506RA meters download and run the [http://www.ftdichip.com/Drivers/VCP.htm FTDI VCP OS X installer]
     ** for Omega HH309A meters (with USB cable) download and run the VCP OS X installer to install the [http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx CP210x driver from Silicon Labs]
     ** for the original Voltkraft USB cable it is the [http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx CP210x driver from Silicon Labs]
-   ** some other serial2USB dongles use the [[http://prolificusa.com/pl-2303hx-drivers/ Prolific PL2303 chips]]
+   ** some other serial2USB dongles use the [[http://prolificusa.com/pl-2303hx-drivers/ Prolific PL2303 chips]] (on Mac OS X 10.8 and higher some reported that the org. Profilic driver failed to work, but the [http://sourceforge.net/projects/osx-pl2303/ NoZAP driver] did work)
   # Download and run the [http://code.google.com/p/artisan/downloads/list Artisan OS X installer]
   ## Double click on the `dmg` file you just downloaded
   ## Double click the disk image which appears on your desktop
