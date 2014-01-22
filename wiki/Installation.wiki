@@ -71,7 +71,7 @@ Once Artisan is up, chose your device using the menu *Conf* and then select the 
 
   * [http://www.ftdichip.com/Drivers/VCP.htm VCP from FTDI]
   * [http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx CP210x from Silicon Labs]
-  * [http://prolificusa.com/pl-2303hx-drivers/ PL2303 from Prolific]
+  * [http://prolificusa.com/pl-2303hx-drivers/ PL2303 from Prolific] (on Mac OS X 10.8 and higher some reported that the org. Profilic driver failed to work, but the [http://sourceforge.net/projects/osx-pl2303/ NoZAP driver] did work).
 
 To install a USB driver. Plug the meter in USB port. Let Windows find (for Mac setup see above) and install the driver automatically through the internet. You can also install the driver through manufacturer CD if you have one, or thorugh the manufacturer webpage
 
