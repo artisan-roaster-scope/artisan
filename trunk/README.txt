@@ -88,7 +88,9 @@ o Mac OS X (>=10.6.x)
  . for Voltkraft meters using the original Voltkraft USB cable it is the CP210x driver from Silicon Labs
    http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx
  . some other serial2USB dongles use the Prolific PL2303 chips
-   http://prolificusa.com/pl-2303hx-drivers/
+   http://prolificusa.com/pl-2303hx-drivers
+   (on Mac OS X 10.8 and higher some reported that the org. Profilic driver failed to 
+    work, but the [http://sourceforge.net/projects/osx-pl2303/ NoZAP driver] did work)
 - Download and run the Artisan OS X installer
 - Double click on the dmg file you just downloaded
 - Double click the disk image which appears on your desktop
