@@ -19645,7 +19645,8 @@ class colorport(extraserialport):
                 libtime.sleep(3)
                 # put Tonino into PC mode on first connect
                 self.SP.write(str2cmd('\nTONINO\n'))
-                self.SP.flush()
+                #self.SP.flush()
+                libtime.sleep(.1)
                 self.SP.readline()
             if self.SP:
                 if not self.SP.isOpen():
@@ -19654,8 +19655,9 @@ class colorport(extraserialport):
                     self.SP.flushInput()
                     self.SP.flushOutput()
                     self.SP.write(str2cmd('\nSCAN\n'))
-                    self.SP.flush()
-                    libtime.sleep(1.5)
+                    #self.SP.flush()
+                    libtime.sleep(.1)
+                    libtime.sleep(1.0)
                     v = self.SP.readline()
                     n = int(v.decode('ascii').split(":")[1]) # response should have format "SCAN:128"
                     return n
@@ -19767,7 +19769,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(binstring)
-                self.SP.flush()
+                #self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(nbytes)
                 #serTX.close()
                 libtime.sleep(0.035)                     #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
@@ -19893,7 +19896,8 @@ class serialport(object):
                 self.SP.flushOutput()
                 #SEND (tx)
                 self.SP.write(str2cmd(command))
-                self.SP.flush()
+                #self.SP.flush()
+                libtime.sleep(.1)
                 #READ n bytes(rx)
                 r = self.SP.read(nrxbytes).decode('utf-8')
 ##                command = ":010347000001B4"
@@ -20232,7 +20236,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
+#                self.SP.flush() # was added in 0.7.x but seems to produce problems on some Macs
+                libtime.sleep(.1)
                 r = self.SP.read(16)
                 if len(r) == 16:
                     #convert to binary to hex string
@@ -20415,7 +20420,8 @@ class serialport(object):
                 sync = None
                 while sync != b"Err\r\n":
                     self.SP.write(b"\r\n")
-                    self.SP.flush()
+                    #self.SP.flush()
+                    libtime.sleep(.1)
                     sync = self.SP.read(5)
                     libtime.sleep(1)
                 self.SP.write(b"%000R")
@@ -20500,7 +20506,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
+                #self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(7)                                   #NOTE: different
                 if len(r) == 7:
                     #DECIMAL POINT
@@ -20556,7 +20563,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
+                #self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(8) #NOTE: different to CENTER306
                 if len(r) == 8:
                     #DECIMAL POINT
@@ -20625,7 +20633,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
+                #self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(10) #NOTE: different to CENTER303
                 if len(r) == 10:
                     #DECIMAL POINT
@@ -20714,7 +20723,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(command)
-                self.SP.flush()
+                #self.SP.flush()
+                libtime.sleep(.1)
                 r = self.SP.read(45)
                 if len(r) == 45:
                     T1 = T2 = T3 = T3 = -1
@@ -20973,10 +20983,11 @@ class serialport(object):
                         self.SP.write(str2cmd("PID;XON" + "\n"))       #activate extra PID OT1/OT2 channels
                     else:
                         self.SP.write(str2cmd("PID;XOFF" + "\n"))       #activate extra PID OT1/OT2 channels
-                    self.SP.flush()
+                    #self.SP.flush()
                     libtime.sleep(0.3)
                     self.SP.write(str2cmd(command + "\n"))       #send command
-                    self.SP.flush()
+                    #self.SP.flush()
+                    libtime.sleep(.1)
                     result = self.SP.readline().decode('utf-8')[:-2]  #read
                     if (not len(result) == 0 and not result.startswith("#")):
                         raise Exception(QApplication.translate("Error Message","Arduino could not set channels",None, QApplication.UnicodeUTF8))
@@ -20986,7 +20997,8 @@ class serialport(object):
                         self.SP.flushOutput()
                         command = "UNIT;" + aw.qmc.mode + "\n"   #Set units
                         self.SP.write(str2cmd(command))
-                        self.SP.flush()
+                        #self.SP.flush()
+                        libtime.sleep(.1)
                         result = self.SP.readline().decode('utf-8')[:-2]
                         if (not len(result) == 0 and not result.startswith("#")):
                             raise Exception(QApplication.translate("Error Message","Arduino could not set temperature unit",None, QApplication.UnicodeUTF8))
@@ -20998,7 +21010,8 @@ class serialport(object):
                 self.SP.flushInput()
                 self.SP.flushOutput()
                 self.SP.write(str2cmd(command))
-                self.SP.flush()
+                #self.SP.flush()
+                libtime.sleep(.1)
                 rl = self.SP.readline().decode('utf-8')[:-2]
                 res = rl.rsplit(',')  #response: list ["t0","t1","t2"] with t0 = internal temp; t1 = ET; t2 = BT
                 if self.arduinoETChannel == "None":
@@ -21374,7 +21387,7 @@ class serialport(object):
                 if (aw.qmc.device == 19 and not command.endswith("\n")):
                     command += "\n"
                 self.SP.write(str2cmd(command))
-                self.SP.flush()
+                #self.SP.flush()
         except serial.SerialException as e:
             #self.closeport() # do not close the serial port as reopening might take too long
             error  = QApplication.translate("Error Message","Serial Exception:",None, QApplication.UnicodeUTF8) + " ser.sendTXcommand()"
