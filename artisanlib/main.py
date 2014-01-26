@@ -1174,7 +1174,7 @@ class tgraphcanvas(FigureCanvas):
         if st == None or len(st) == 0:
             return -1
         else:
-            return aw.float2float(float(st)/10 + 1.0)
+            return aw.float2float(float(st)/10. + 1.0)
 
     def onclick(self,event):
         try:
@@ -11081,7 +11081,7 @@ class ApplicationWindow(QMainWindow):
                 if settings.contains("extraeventsbuttonsflag"):
                     self.extraeventsbuttonsflag = settings.value("extraeventsbuttonsflag",self.extraeventsbuttonsflag).toInt()[0]
                 self.extraeventstypes = [x.toInt()[0] for x in settings.value("extraeventstypes").toList()]
-                self.extraeventsvalues = [x.toInt()[0] for x in settings.value("extraeventsvalues").toList()]
+                self.extraeventsvalues = [x.toFloat()[0] for x in settings.value("extraeventsvalues").toList()]
                 self.extraeventsactions = [x.toInt()[0] for x in settings.value("extraeventsactions").toList()]
                 self.extraeventsvisibility = [x.toInt()[0] for x in settings.value("extraeventsvisibility").toList()]
                 self.extraeventsactionstrings = list(settings.value("extraeventsactionstrings",self.extraeventsactionstrings).toStringList())
