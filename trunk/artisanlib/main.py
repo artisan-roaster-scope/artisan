@@ -99,7 +99,7 @@ try:
 except ImportError:
     figureoptions = None
     
-from Phidgets.Devices.TemperatureSensor import TemperatureSensor as Phidget1048TemperatureSensor
+from Phidgets.Devices.TemperatureSensor import TemperatureSensor as Phidget1048TemperatureSensor, ThermocoupleType
 from Phidgets.Devices.Bridge import Bridge as Phidget1046TemperatureSensor
 
 import minimalmodbus
@@ -461,6 +461,12 @@ class tgraphcanvas(FigureCanvas):
 
         #DEVICES
         self.device = 18                                    # default device selected to None (18). Calls appropiate function
+        
+        self.phidget1048_types = [
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE,
+            ThermocoupleType.PHIDGET_TEMPERATURE_SENSOR_K_TYPE] # probe types (ThermocoupleType)
 
         #menu of thermocouple devices
         #device with first letter + only shows in extra device tab
@@ -10555,6 +10561,8 @@ class ApplicationWindow(QMainWindow):
             #restore device
             settings.beginGroup("Device")
             self.qmc.device = settings.value("id",self.qmc.device).toInt()[0]
+            if settings.contains("phidget1048_types"):
+                self.qmc.phidget1048_types = [x.toInt()[0] for x in settings.value("phidget1048_types").toList()]
             # activate CONTROL BUTTON
             if self.qmc.device == 0:
                 self.button_10.setVisible(True) #CONTROL BUTTON
@@ -11382,6 +11390,7 @@ class ApplicationWindow(QMainWindow):
             #save device
             settings.beginGroup("Device")
             settings.setValue("id",self.qmc.device)
+            settings.setValue("phidget1048_types",self.qmc.phidget1048_types)
             settings.setValue("controlETpid",self.ser.controlETpid)
             settings.setValue("readBTpid",self.ser.readBTpid)
             settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)
@@ -19988,56 +19997,26 @@ class serialport(object):
     def PHIDGET1048(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(0)
-#        libtime.sleep(0.1)
-#        t2_2,t1_2 = self.PHIDGET1048temperature(0)
-#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-#        tx = tx + (tx_2 - tx) / 2.0
-#        t1 = (t1 + t1_2) / 2.0
-#        t2 = (t2 + t2_2) / 2.0                        
         return tx,t1,t2
 
     def PHIDGET1048_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(1)
-#        libtime.sleep(0.1)
-#        t2_2,t1_2 = self.PHIDGET1048temperature(1)
-#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-#        tx = tx + (tx_2 - tx) / 2.0
-#        t1 = (t1 + t1_2) / 2.0
-#        t2 = (t2 + t2_2) / 2.0    
         return tx,t1,t2
 
     def PHIDGET1048_AT(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1048temperature(2)
-#        libtime.sleep(0.1)
-#        t2_2,t1_2 = self.PHIDGET1048temperature(2)
-#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-#        tx = tx + (tx_2 - tx) / 2.0
-#        t1 = (t1 + t1_2) / 2.0
-#        t2 = (t2 + t2_2) / 2.0
         return tx,t1,t2
 
     def PHIDGET1046(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1046temperature(0)
-#        libtime.sleep(0.1)
-#        t2_2,t1_2 = self.PHIDGET1046temperature(0)
-#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-#        tx = tx + (tx_2 - tx) / 2.0
-#        t1 = (t1 + t1_2) / 2.0
-#        t2 = (t2 + t2_2) / 2.0
         return tx,t1,t2
 
     def PHIDGET1046_34(self):
         tx = aw.qmc.timeclock.elapsed()/1000.
         t2,t1 = self.PHIDGET1046temperature(1)
-#        libtime.sleep(0.1)
-#        t2_2,t1_2 = self.PHIDGET1046temperature(1)
-#        tx_2 = aw.qmc.timeclock.elapsed()/1000.
-#        tx = tx + (tx_2 - tx) / 2.0
-#        t1 = (t1 + t1_2) / 2.0
-#        t2 = (t2 + t2_2) / 2.0
         return tx,t1,t2
 
     def MODBUS(self):
@@ -20354,7 +20333,7 @@ class serialport(object):
             res1 = -1
         if aw.modbus.input2slave:
             if just_send:
-                libtime.sleep(0.01)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.03)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input2float:
                 res2 = aw.modbus.readFloat(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             else:
@@ -20366,7 +20345,7 @@ class serialport(object):
             res2 = -1
         if aw.modbus.input3slave:
             if just_send:
-                libtime.sleep(0.01)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.03)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input3float:
                 res3 = aw.modbus.readFloat(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             else:
@@ -20378,7 +20357,7 @@ class serialport(object):
             res3 = -1
         if aw.modbus.input4slave:
             if just_send:
-                libtime.sleep(0.01)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
+                libtime.sleep(0.03)   #this garantees a minimum of 35 miliseconds between readings (for all Fujis)
             if aw.modbus.input4float:
                 res4 = aw.modbus.readFloat(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             else:
@@ -20786,6 +20765,22 @@ class serialport(object):
                         aw.ser.PhidgetTemperatureSensor.openPhidget()
                         libtime.sleep(.2)
                         aw.ser.PhidgetTemperatureSensor.waitForAttach(600) 
+                        try:
+                            aw.ser.PhidgetTemperatureSensor.setThermocoupleType(0,aw.qmc.phidget1048_types[0])
+                        except:
+                            pass
+                        try:
+                            aw.ser.PhidgetTemperatureSensor.setThermocoupleType(1,aw.qmc.phidget1048_types[1])
+                        except:
+                            pass
+                        try:
+                            aw.ser.PhidgetTemperatureSensor.setThermocoupleType(2,aw.qmc.phidget1048_types[2])
+                        except:
+                            pass
+                        try:
+                            aw.ser.PhidgetTemperatureSensor.setThermocoupleType(3,aw.qmc.phidget1048_types[3])
+                        except:
+                            pass
                         aw.sendmessage(QApplication.translate("Message","Phidget Temperature Sensor 4-input attached",None, QApplication.UnicodeUTF8))                       
                     except Exception as ex:
                         _, _, exc_tb = sys.exc_info()
@@ -22963,6 +22958,28 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.connect(self.delButton, SIGNAL("clicked()"),self.deldevice) 
         self.enableDisableAddDeleteButtons()
         ##########     LAYOUTS
+        # create Phidget box
+        phidgetItems = ["K-Type", "J-Type", "E-Type", "T-Type"]
+        phidgetBox = QHBoxLayout()
+        self.phidgetProbe1 = QComboBox()
+        self.phidgetProbe1.addItems(phidgetItems)
+        self.phidgetProbe1.setCurrentIndex(aw.qmc.phidget1048_types[0]-1)
+        phidgetBox.addWidget(self.phidgetProbe1)
+        self.phidgetProbe2 = QComboBox()
+        self.phidgetProbe2.addItems(phidgetItems)
+        self.phidgetProbe2.setCurrentIndex(aw.qmc.phidget1048_types[1]-1)
+        phidgetBox.addWidget(self.phidgetProbe2)
+        self.phidgetProbe3 = QComboBox()
+        self.phidgetProbe3.addItems(phidgetItems)
+        self.phidgetProbe3.setCurrentIndex(aw.qmc.phidget1048_types[2]-1)
+        phidgetBox.addWidget(self.phidgetProbe3)
+        self.phidgetProbe4 = QComboBox()
+        self.phidgetProbe4.addItems(phidgetItems)
+        self.phidgetProbe4.setCurrentIndex(aw.qmc.phidget1048_types[3]-1)
+        phidgetBox.addWidget(self.phidgetProbe4)
+        phidgetBox.addStretch()
+        phidgetGroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048 Probe Types",None, QApplication.UnicodeUTF8))
+        phidgetGroupBox.setLayout(phidgetBox)
         # create pid box
         PIDgrid = QGridLayout()
         PIDgrid.addWidget(label1,0,1)
@@ -23019,12 +23036,13 @@ class DeviceAssignmentDlg(ArtisanDialog):
         grid.addLayout(self.curveBox,0,1)
         grid.addWidget(self.nonpidButton,1,0)
         grid.addLayout(deviceSelector,1,1)
-        grid.addWidget(self.pidButton,2,0)
-        grid.addWidget(PIDGroupBox,2,1)
-        grid.addWidget(self.arduinoButton,3,0)
-        grid.addWidget(arduinoGroupBox,3,1)
-        grid.addWidget(self.programButton,4,0)
-        grid.addWidget(programGroupBox,4,1)
+        grid.addWidget(phidgetGroupBox,2,1)
+        grid.addWidget(self.pidButton,3,0)
+        grid.addWidget(PIDGroupBox,3,1)
+        grid.addWidget(self.arduinoButton,4,0)
+        grid.addWidget(arduinoGroupBox,4,1)
+        grid.addWidget(self.programButton,5,0)
+        grid.addWidget(programGroupBox,5,1)
         gridBoxLayout = QHBoxLayout()
         gridBoxLayout.addLayout(grid)
         buttonLayout = QHBoxLayout()
@@ -23750,7 +23768,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             #map device index to a setting mode (chose the one that matches the device)
     # ADD DEVICE: to add a device you have to modify several places. Search for the tag "ADD DEVICE:"in the code
     # - add an entry to devsettings below (and potentially to ssettings above)
-            devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,1,1,1,1,1,8]  #0-39
+            devssettings = [0,1,2,3,3,3,3,3,3,3,3,3,3,3,3,2,1,3,0,4,5,3,6,5,3,3,6,3,4,8,3,1,4,7,1,1,1,1,1,8]  #0-41
             #init serial settings of extra devices
             for i in range(len(aw.qmc.extradevices)):
                 if aw.qmc.extradevices[i] < len(devssettings) and devssettings[aw.qmc.extradevices[i]] < len(ssettings):
@@ -23795,6 +23813,11 @@ class DeviceAssignmentDlg(ArtisanDialog):
             aw.qmc.BTcurve = self.BTcurve.isChecked()
             aw.qmc.ETlcd = self.ETlcd.isChecked()
             aw.qmc.BTlcd = self.BTlcd.isChecked()
+            aw.qmc.phidget1048_types = [
+                self.phidgetProbe1.currentIndex()+1,
+                self.phidgetProbe2.currentIndex()+1,
+                self.phidgetProbe3.currentIndex()+1,
+                self.phidgetProbe4.currentIndex()+1]
             if aw.qmc.flagon:
                 aw.LCD2frame.setVisible(aw.qmc.ETlcd)
                 aw.LCD3frame.setVisible(aw.qmc.BTlcd)
@@ -25709,8 +25732,8 @@ class PXRpidDlgControl(ArtisanDialog):
         PointButtonET.setFocusPolicy(Qt.NoFocus)
         PointButtonBT = QPushButton(QApplication.translate("Button","Set BT PID to 1 decimal point",None, QApplication.UnicodeUTF8))
         PointButtonBT.setFocusPolicy(Qt.NoFocus)
-        PointButtonET.setMaximumWidth(180)
-        PointButtonBT.setMaximumWidth(180)
+        PointButtonET.setMaximumWidth(250)
+        PointButtonBT.setMaximumWidth(250)
         pointlabel = QLabel(QApplication.translate("Label","Artisan uses 1 decimal point",None, QApplication.UnicodeUTF8))
         self.connect(PointButtonET, SIGNAL("clicked()"), lambda PID="ET": self.setpoint(PID))
         self.connect(PointButtonBT, SIGNAL("clicked()"), lambda PID="BT": self.setpoint(PID))
