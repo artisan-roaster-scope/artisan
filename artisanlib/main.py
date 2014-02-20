@@ -31,7 +31,7 @@ from artisanlib import __revision__
 # WARNING: If an ascii str contains characters outside the 7 bit range, Python raises UnicodeEncodeError exception.
 #################################################################################################################
 
-
+import ast
 import sys
 import platform
 import serial
@@ -9805,7 +9805,7 @@ class ApplicationWindow(QMainWindow):
         obj = None
         if os.path.exists(u(filename)):
             f = codecs.open(u(filename), 'rb', encoding='utf-8')
-            obj=eval(f.read())
+            obj=ast.literal_eval(f.read())
             f.close()
         return obj
 
@@ -22960,31 +22960,41 @@ class DeviceAssignmentDlg(ArtisanDialog):
         ##########     LAYOUTS
         # create Phidget box
         phidgetItems = ["K-Type", "J-Type", "E-Type", "T-Type"]
-        phidgetBox = QHBoxLayout()
+        phidgetBox = QGridLayout()
         self.phidgetProbe1 = QComboBox()
         self.phidgetProbe1.addItems(phidgetItems)
-        self.phidgetProbe1.setCurrentIndex(aw.qmc.phidget1048_types[0]-1)
-        phidgetBox.addWidget(self.phidgetProbe1)
+        self.phidgetProbe1.setCurrentIndex(aw.qmc.phidget1048_types[0]-1)        
+        phidgetProbe1label = QLabel(QApplication.translate("Label", "Probe 1",None, QApplication.UnicodeUTF8))
         self.phidgetProbe2 = QComboBox()
         self.phidgetProbe2.addItems(phidgetItems)
         self.phidgetProbe2.setCurrentIndex(aw.qmc.phidget1048_types[1]-1)
-        phidgetBox.addWidget(self.phidgetProbe2)
+        phidgetProbe2label = QLabel(QApplication.translate("Label", "Probe 2",None, QApplication.UnicodeUTF8))
         self.phidgetProbe3 = QComboBox()
         self.phidgetProbe3.addItems(phidgetItems)
         self.phidgetProbe3.setCurrentIndex(aw.qmc.phidget1048_types[2]-1)
-        phidgetBox.addWidget(self.phidgetProbe3)
+        phidgetProbe3label = QLabel(QApplication.translate("Label", "Probe 3",None, QApplication.UnicodeUTF8))
         self.phidgetProbe4 = QComboBox()
         self.phidgetProbe4.addItems(phidgetItems)
         self.phidgetProbe4.setCurrentIndex(aw.qmc.phidget1048_types[3]-1)
-        phidgetBox.addWidget(self.phidgetProbe4)
-        phidgetBox.addStretch()
+        phidgetProbe4label = QLabel(QApplication.translate("Label", "Probe 4",None, QApplication.UnicodeUTF8))
+        phidgetBox.addWidget(phidgetProbe1label,0,0,Qt.AlignCenter)
+        phidgetBox.addWidget(self.phidgetProbe1,1,0)
+        phidgetBox.addWidget(phidgetProbe2label,0,1)
+        phidgetBox.addWidget(self.phidgetProbe2,1,1)
+        phidgetBox.addWidget(phidgetProbe3label,0,2)
+        phidgetBox.addWidget(self.phidgetProbe3,1,2)
+        phidgetBox.addWidget(phidgetProbe4label,0,3)
+        phidgetBox.addWidget(self.phidgetProbe4,1,3)
+        phidgetHBox = QHBoxLayout()
+        phidgetHBox.addLayout(phidgetBox)
+        phidgetHBox.addStretch()
         phidgetGroupBox = QGroupBox(QApplication.translate("GroupBox","Phidgets 1048 Probe Types",None, QApplication.UnicodeUTF8))
-        phidgetGroupBox.setLayout(phidgetBox)
+        phidgetGroupBox.setLayout(phidgetHBox)
         # create pid box
         PIDgrid = QGridLayout()
         PIDgrid.addWidget(label1,0,1)
         PIDgrid.addWidget(label2,0,2)
-        PIDgrid.addWidget(controllabel,1,0,Qt.AlignRight)
+        PIDgrid.addWidget(controllabel,1,0)
         PIDgrid.addWidget(self.controlpidtypeComboBox,1,1)
         PIDgrid.addWidget(self.controlpidunitidComboBox,1,2)
         PIDgrid.addWidget(btlabel,2,0,Qt.AlignRight)
