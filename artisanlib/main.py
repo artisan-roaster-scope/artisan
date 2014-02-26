@@ -2198,14 +2198,14 @@ class tgraphcanvas(FigureCanvas):
             return x
 
     def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1):  # default 'hanning'
-        #pylint: disable=E1103
-        win_len = max(0,window_len) 
+        #pylint: disable=E1103        
+        win_len = max(0,window_len+2)
         if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
             return numpy.concatenate(([None]*(fromIndex),
                 self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[fromIndex:])).tolist()
         elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
             return numpy.concatenate((b[:aw.qmc.timeindex[0]+1],
-                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[aw.qmc.timeindex[0]+1:])).tolist()            
+                self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()[aw.qmc.timeindex[0]+1:])).tolist()            
         else:
             return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
 
@@ -2727,7 +2727,7 @@ class tgraphcanvas(FigureCanvas):
 
             #populate delta ET (self.delta1) and delta BT (self.delta2)
             if self.DeltaETflag or self.DeltaBTflag:
-                if recomputeAllDeltas:  
+                if recomputeAllDeltas:
                     tx = numpy.array(self.timex)
                     dtx = numpy.diff(self.timex) / 60.
                     if aw.qmc.flagon or len(dtx) + 1 != len(self.stemp1):
@@ -3045,13 +3045,13 @@ class tgraphcanvas(FigureCanvas):
                 return seconds    #return negative number
 
     def fromFtoC(self,Ffloat):
-        if Ffloat:
+        if Ffloat != None:
             return (Ffloat-32.0)*(5.0/9.0)
         else:
             return None
 
     def fromCtoF(self,CFloat):
-        if CFloat:
+        if CFloat != None:
             return (CFloat*9.0/5.0)+32.0
         else:
             return None
@@ -5959,14 +5959,14 @@ class SampleThread(QThread):
             else:
                 return aw.ser.devicefunctionlist[aw.qmc.device]()  #use a list of functions (a different one for each device) with index aw.qmc.device
         except:
-            tx = aw.qmc.timeclock.elapsed()/1000
+            tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1,-1
     
     def sample_extra_device(self,i):
         try:
             return aw.extraser[i].devicefunctionlist[aw.qmc.extradevices[i]]()
         except:
-            tx = aw.qmc.timeclock.elapsed()/1000
+            tx = aw.qmc.timeclock.elapsed()/1000.
             return tx,-1,-1
 
     # sample devices at interval self.delay miliseconds.
@@ -6054,7 +6054,7 @@ class SampleThread(QThread):
                     timeAfterExtra = libtime.time() # the time the data of all extra devices was received
                     if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
                         # let's do the oversampling thing and take a second reading from the main device
-                        sampling_interval = aw.qmc.delay/1000
+                        sampling_interval = aw.qmc.delay/1000.
 #                        remaining_time = sampling_interval - (timeAfterExtra - timeBeforeETBT)
                         etbt_time = timeAfterETBT - timeBeforeETBT
                         gone = timeAfterExtra - timeBeforeETBT
@@ -10413,9 +10413,9 @@ class ApplicationWindow(QMainWindow):
             profile["etypes"] = [e(et) for et in self.qmc.etypes]
             profile["roastingnotes"] = e(self.qmc.roastingnotes)
             profile["cuppingnotes"] = e(self.qmc.cuppingnotes)
-            profile["timex"] = self.qmc.timex
-            profile["temp1"] = [self.float2float(x) for x in self.qmc.temp1]
-            profile["temp2"] = [self.float2float(x) for x in self.qmc.temp2]
+            profile["timex"] = [self.float2float(x,5) for x in self.qmc.timex]
+            profile["temp1"] = [self.float2float(x,2) for x in self.qmc.temp1]
+            profile["temp2"] = [self.float2float(x,2) for x in self.qmc.temp2]
             profile["phases"] = self.qmc.phases
             profile["zmax"] = self.qmc.zlimit
             profile["zmin"] = self.qmc.zlimit_min
@@ -10430,8 +10430,8 @@ class ApplicationWindow(QMainWindow):
             profile["extraname1"] = [e(n) for n in self.qmc.extraname1]
             profile["extraname2"] = [e(n) for n in self.qmc.extraname2]
             profile["extratimex"] = self.qmc.extratimex
-            profile["extratemp1"] = [[self.float2float(t) for t in x] for x in self.qmc.extratemp1]
-            profile["extratemp2"] = [[self.float2float(t) for t in x] for x in self.qmc.extratemp2]
+            profile["extratemp1"] = [[self.float2float(t,2) for t in x] for x in self.qmc.extratemp1]
+            profile["extratemp2"] = [[self.float2float(t,2) for t in x] for x in self.qmc.extratemp2]
             profile["extramathexpression1"] = self.qmc.extramathexpression1
             profile["extramathexpression2"] = self.qmc.extramathexpression2  
             profile["extradevicecolor1"] = [e(x) for x in self.qmc.extradevicecolor1]
@@ -20458,7 +20458,7 @@ class serialport(object):
                 aw.qmc.adderror(QApplication.translate("Error Message","HH506RAtemperature(): Unable to get id from HH506RA device ",None, QApplication.UnicodeUTF8))
                 return -1,-1
         try:
-            command = b"#" + self.HH506RAid + b"N\r\n"
+            command = b"#" + self.HH506RAid + b"N" # + "\r\n" this seems not to be needed
             r = ""
             if not self.SP.isOpen():
                 self.openport()
@@ -21081,7 +21081,7 @@ class serialport(object):
         finally:
             if aw.seriallogflag:
                 settings = str(self.comport) + "," + str(self.baudrate) + "," + str(self.bytesize)+ "," + str(self.parity) + "," + str(self.stopbits) + "," + str(self.timeout)
-                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.1f, %.1f, %.1f, %.1f, %.1f, %.1f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2,aw.qmc.extraArduinoT3,aw.qmc.extraArduinoT4))
+                aw.addserial("ArduinoTC4 :" + settings + " || Tx = " + str(command) + " || Rx = " + str(res) + "|| Ts= %.2f, %.2f, %.2f, %.2f, %.2f, %.2f"%(t1,t2,aw.qmc.extraArduinoT1,aw.qmc.extraArduinoT2,aw.qmc.extraArduinoT3,aw.qmc.extraArduinoT4))
 
     def TEVA18Bconvert(self, seg):
         if seg == 0x7D:
