@@ -1879,7 +1879,7 @@ class tgraphcanvas(FigureCanvas):
                 if m == 0:
                     return '0'
                 else:
-                	return '-%d'%m
+                    return '-%d'%m
 
     # returns True if nothing to save, discard or save was selected and False if canceled by the user
     def checkSaved(self):
@@ -6055,7 +6055,7 @@ class SampleThread(QThread):
                     if aw.qmc.oversampling and aw.qmc.delay >= aw.qmc.oversampling_min_delay:
                         # let's do the oversampling thing and take a second reading from the main device
                         sampling_interval = aw.qmc.delay/1000
-                        remaining_time = sampling_interval - (timeAfterExtra - timeBeforeETBT)
+#                        remaining_time = sampling_interval - (timeAfterExtra - timeBeforeETBT)
                         etbt_time = timeAfterETBT - timeBeforeETBT
                         gone = timeAfterExtra - timeBeforeETBT
                         # only do it if there is enough time to do the ET/BT sampling (which takes etbt_time) 
@@ -7333,8 +7333,8 @@ class ApplicationWindow(QMainWindow):
             self.extraLCDframe2[i].setVisible(False)
             self.extraLCD1[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
             self.extraLCD2[i].setStyleSheet("QLCDNumber { color: %s; background-color: %s;}"%(self.lcdpaletteF["sv"],self.lcdpaletteB["sv"]))
-            string1 = u(QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8))
-            string2 = u(QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None, QApplication.UnicodeUTF8))
+#            string1 = u(QApplication.translate("Tooltip", "Extra: %iA"%(i+1),None, QApplication.UnicodeUTF8))
+#            string2 = u(QApplication.translate("Tooltip", "Extra: %iB"%(i+1),None, QApplication.UnicodeUTF8))
             #configure Labels
             self.extraLCDlabel1[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
             self.extraLCDlabel2[i].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred)
@@ -8950,11 +8950,12 @@ class ApplicationWindow(QMainWindow):
             #invoke "OFF"
             self.qmc.OffMonitor()
 
+
+            filename = self.automaticsave()
 # the call to automaticsave() moved to OffRecorder() which is triggered by the above OffMonitor
 #            #store, reset and redraw
 #            if self.qmc.autosavepath and self.qmc.autosaveflag:
 #                #if autosave mode active we just save automatic
-#                filename = self.automaticsave()
 #            else:
 #                self.sendmessage(QApplication.translate("Message","Empty path or box unchecked in Autosave", None, QApplication.UnicodeUTF8))
 #                self.autosaveconf()
@@ -10766,7 +10767,7 @@ class ApplicationWindow(QMainWindow):
                 else:
                     self.qmc.alarmnegguard = [-1]*len(self.qmc.alarmflag)
                 if settings.contains("alarmtime"):
-                	self.qmc.alarmtime = [x.toInt()[0] for x in settings.value("alarmtime").toList()]
+                    self.qmc.alarmtime = [x.toInt()[0] for x in settings.value("alarmtime").toList()]
                 else:
                     self.qmc.alarmtime = [-1]*len(self.qmc.alarmflag)
                 if settings.contains("alarmoffset"):
@@ -18754,34 +18755,40 @@ class backgroundDlg(ArtisanDialog):
         self.intensitySpinBox.setRange(1,9)
         self.intensitySpinBox.setSingleStep(1)
         self.intensitySpinBox.setValue(aw.qmc.backgroundalpha * 10)
-        colors = [""]
+        self.colors = []
         for key in cnames:
-            colors.append(str(key))
-        colors.sort()
-        colors.insert(0,"ET")
-        colors.insert(1,"BT")
-        colors.insert(2,"DeltaET")
-        colors.insert(3,"DeltaBT")
+            self.colors.append(str(key))
+        self.colors.sort()
+        self.defaultcolors = ["ET","BT","DeltaET","DeltaBT"]
+        self.defaultcolorsmapped = [aw.qmc.palette["et"],aw.qmc.palette["bt"],aw.qmc.palette["deltaet"],aw.qmc.palette["deltabt"]]
         metcolorlabel = QLabel(QApplication.translate("Label", "ET Color",None, QApplication.UnicodeUTF8))
         metcolorlabel.setAlignment(Qt.AlignRight)
         self.metcolorComboBox = QComboBox()
-        self.metcolorComboBox.addItems(colors)
-        self.metcolorComboBox.setCurrentIndex(0)
+        self.metcolorComboBox.addItems(self.defaultcolors)
+        self.metcolorComboBox.insertSeparator(4)
+        self.metcolorComboBox.addItems(self.colors)
+        self.metcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundmetcolor))
         btcolorlabel = QLabel(QApplication.translate("Label", "BT Color",None, QApplication.UnicodeUTF8))
         btcolorlabel.setAlignment(Qt.AlignRight)
         self.btcolorComboBox = QComboBox()
-        self.btcolorComboBox.addItems(colors)
-        self.btcolorComboBox.setCurrentIndex(1)
+        self.btcolorComboBox.addItems(self.defaultcolors)
+        self.btcolorComboBox.insertSeparator(4)
+        self.btcolorComboBox.addItems(self.colors)
+        self.btcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgroundbtcolor))
         deltaetcolorlabel = QLabel(QApplication.translate("Label", "DeltaET Color",None, QApplication.UnicodeUTF8))
         deltaetcolorlabel.setAlignment(Qt.AlignRight)
         self.deltaetcolorComboBox = QComboBox()
-        self.deltaetcolorComboBox.addItems(colors)
-        self.deltaetcolorComboBox.setCurrentIndex(2)
+        self.deltaetcolorComboBox.addItems(self.defaultcolors)
+        self.deltaetcolorComboBox.insertSeparator(4)
+        self.deltaetcolorComboBox.addItems(self.colors)
+        self.deltaetcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltaetcolor))
         deltabtcolorlabel = QLabel(QApplication.translate("Label", "DeltaBT Color",None, QApplication.UnicodeUTF8))
         deltabtcolorlabel.setAlignment(Qt.AlignRight)
         self.deltabtcolorComboBox = QComboBox()
-        self.deltabtcolorComboBox.addItems(colors)
-        self.deltabtcolorComboBox.setCurrentIndex(3)
+        self.deltabtcolorComboBox.addItems(self.defaultcolors)
+        self.deltabtcolorComboBox.insertSeparator(4)
+        self.deltabtcolorComboBox.addItems(self.colors)
+        self.deltabtcolorComboBox.setCurrentIndex(self.getColorIdx(aw.qmc.backgrounddeltabtcolor))
         self.upButton = QPushButton(QApplication.translate("Button","Up",None, QApplication.UnicodeUTF8))
         self.upButton.setFocusPolicy(Qt.NoFocus)
         self.downButton = QPushButton(QApplication.translate("Button","Down",None, QApplication.UnicodeUTF8))
@@ -18907,6 +18914,15 @@ class backgroundDlg(ArtisanDialog):
         mainLayout.addLayout(buttonLayout)
         mainLayout.setContentsMargins(5, 15, 5, 10) # left, top, right, bottom 
         self.setLayout(mainLayout)
+        
+    def getColorIdx(self,c):
+        try:
+            return self.defaultcolorsmapped.index(c)
+        except:
+            try:
+                return self.colors.index(c) + 5
+            except: 
+                return 0       
 
     def setreproduce(self):
         if aw.qmc.background:
@@ -18939,11 +18955,16 @@ class backgroundDlg(ArtisanDialog):
             c = aw.qmc.palette["deltabt"]
         else:
             c = color
-        if curve == "et":
-            aw.qmc.backgroundmetcolor = c
-        elif curve == "bt":
-            aw.qmc.backgroundbtcolor = c
-        aw.qmc.redraw(recomputeAllDeltas=False)
+        if c != "":
+            if curve == "et":
+                aw.qmc.backgroundmetcolor = c
+            elif curve == "bt":
+                aw.qmc.backgroundbtcolor = c
+            elif curve == "deltaet":
+                aw.qmc.backgrounddeltaetcolor = c
+            elif curve == "deltabt":
+                aw.qmc.backgrounddeltabtcolor = c
+            aw.qmc.redraw(recomputeAllDeltas=False)
         self.btcolorComboBox.setDisabled(False)
         self.metcolorComboBox.setDisabled(False)
         self.deltabtcolorComboBox.setDisabled(False)
