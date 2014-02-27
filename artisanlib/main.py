@@ -2199,15 +2199,18 @@ class tgraphcanvas(FigureCanvas):
 
     def smooth_list(self, a, b, window_len=7, window='hanning',fromIndex=-1):  # default 'hanning'
         #pylint: disable=E1103        
-        win_len = max(0,window_len+2)
-        if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
-            return numpy.concatenate(([None]*(fromIndex),
-                self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[fromIndex:])).tolist()
-        elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
-            return numpy.concatenate((b[:aw.qmc.timeindex[0]+1],
-                self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()[aw.qmc.timeindex[0]+1:])).tolist()            
+        win_len = max(0,window_len)
+        if win_len != 1: # at the lowest level we turn smoothing completely off
+            if fromIndex > -1: # if fromIndex is set, replace prefix up to fromIndex by None
+                return numpy.concatenate(([None]*(fromIndex),
+                    self.smooth(numpy.array(a),numpy.array(b),window_len,window).tolist()[fromIndex:])).tolist()
+            elif aw.qmc.timeindex[0] != -1: # we do not smooth before CHARGE
+                return numpy.concatenate((b[:aw.qmc.timeindex[0]+1],
+                    self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()[aw.qmc.timeindex[0]+1:])).tolist()            
+            else:
+                return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
         else:
-            return self.smooth(numpy.array(a),numpy.array(b),win_len,window).tolist()
+            return b
 
     def annotate(self, temp, time_str, x, y, yup, ydown,e=0,a=1.):                
         if aw.qmc.patheffects:
