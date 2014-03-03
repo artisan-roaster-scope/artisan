@@ -28,9 +28,7 @@ http://www.microsoft.com/downloads/en/details.aspx?familyid=A5C84275-3B97-4AB7-A
 If artisan starts when clicling on artisan.exe (a window pops open with many buttons), then your computer already have this file and you don't need to install anything.
 Newer OS like Windows 7 come with this file.
 
-=Installation Mac OS X=
-
-_NOTE: from v0.5.0 on the Systems 10.4.x/10.5.x/10.6.x (eg. Tiger, Leopard, Snow Leopard)  on PPC and Intel machines are supported _
+=Installation Mac OS X (>=10.6.x)=
 
   # Install USB/serial driver
     ** for Omega HH806AU and HH506RA meters download and run the [http://www.ftdichip.com/Drivers/VCP.htm FTDI VCP OS X installer]
@@ -38,6 +36,7 @@ _NOTE: from v0.5.0 on the Systems 10.4.x/10.5.x/10.6.x (eg. Tiger, Leopard, Snow
     ** for the original Voltkraft USB cable it is the [http://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx CP210x driver from Silicon Labs]
    ** some other serial2USB dongles use the [[http://prolificusa.com/pl-2303hx-drivers/ Prolific PL2303 chips]] (on Mac OS X 10.8 and higher some reported that the org. Profilic driver failed to work, but the [http://sourceforge.net/projects/osx-pl2303/ NoZAP driver] did work)
   # Download and run the [http://code.google.com/p/artisan/downloads/list Artisan OS X installer]
+  ## on OS X 10.8 Mountain Lion you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app
   ## Double click on the `dmg` file you just downloaded
   ## Double click the disk image which appears on your desktop
   ## Drag the `artisan` application icon to your `Applications` directory.
