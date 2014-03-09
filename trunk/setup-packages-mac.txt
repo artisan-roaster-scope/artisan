@@ -1,7 +1,7 @@
 Current Versions:
 
 o XCode 4.5.2 + command line tools
-o Python 2.7.6 or 3.3.2 (change "python3" to "python" in all commands below for python 2.x)
+o Python 2.7.6 or 3.3.4 (change "python3" to "python" in all commands below for python 2.x)
 o pyserial 2.7
 o QT 4.8.5
 o SIP 4.15.3
@@ -22,6 +22,8 @@ o py2app 0.8
 
 Upgrade History:
 
+- 2014-03-04
+ . Python 3.3.3 => 3.3.4
 - 2014-02-24
  . py2app 0.7.3 => 0.8
 - 2014-01-11:
