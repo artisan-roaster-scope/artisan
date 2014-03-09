@@ -92,6 +92,7 @@ o Mac OS X (>=10.6.x)
    (on Mac OS X 10.8 and higher some reported that the org. Profilic driver failed to 
     work, but the [http://sourceforge.net/projects/osx-pl2303/ NoZAP driver] did work)
 - Download and run the Artisan OS X installer
+(on OS X 10.8 Mountain Lion you need to tick "Allow applications downloaded from Anywhere" in the Security & Privacy Preference Panel to start the app)
 - Double click on the dmg file you just downloaded
 - Double click the disk image which appears on your desktop
 - Drag the artisan application icon to your Applications directory

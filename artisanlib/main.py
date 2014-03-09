@@ -860,6 +860,8 @@ class tgraphcanvas(FigureCanvas):
         self.loadalarmsfromprofile = False # if set, alarms are loaded from profile (even background profiles)
         self.temporaryalarmflag = -3 #holds temporary index value of triggered alarm in updategraphics()
         self.TPalarmtimeindex = None # is set to the current  aw.qmc.timeindex by sample(), if alarms are defined and once the TP is detected
+        
+        self.quantifiedEvent = [] # holds an event quantified during sample(), a tuple [<eventnr>,<value>]
 
         # set initial limits for X and Y axes. But they change after reading the previous seetings at aw.settingsload()
         self.ylimit = 600
@@ -1368,6 +1370,16 @@ class tgraphcanvas(FigureCanvas):
                     i = self.temporaryalarmflag  # reset self.temporaryalarmflag before calling alarm
                     self.temporaryalarmflag = -3 # self.setalarm(i) can take longer to run than the sampling interval 
                     self.setalarm(i)
+                    
+                #check quantified events
+                if self.quantifiedEvent:
+                    aw.moveslider(self.quantifiedEvent[0],self.quantifiedEvent[1])
+                    if aw.qmc.flagstart:
+                        value = aw.float2float((self.quantifiedEvent[1] + 10.0) / 10.0)
+                        aw.qmc.EventRecordAction(extraevent = 1,eventtype=self.quantifiedEvent[0],eventvalue=value,eventdescription=u("Q"))
+                    self.quantifiedEvent = []
+
+                    
 
         except Exception as e:
             self.flagon = False
@@ -6106,22 +6118,28 @@ class SampleThread(QThread):
                         if aw.qmc.BTcurve:
                             aw.qmc.l_temp2.set_data(aw.qmc.timex, aw.qmc.temp2)
                     #we need a minimum of two readings to calculate rate of change
-                    if local_flagstart and length_of_qmc_timex > 2:
-                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
-    #                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-    #                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
-    #                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
-
-                        # smooth BT and ET a bit for delta computations (replacing the above code without smoothing)
-                        # this might be not overly precise as time intervals between samples are not constant
-                        ETm1 = aw.qmc.temp1[-1]
-                        ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2] + aw.qmc.temp1[-1]) / 3.
-                        BTm1 = aw.qmc.temp2[-1]
-                        BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2] + aw.qmc.temp2[-1]) / 3.
-
+                    if local_flagstart and length_of_qmc_timex > 3:
+#                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-2]   #time difference between last two readings
+#    #                    #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+#    #                    aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-2])/timed)*60.  #delta ET (degress/minute)
+#    #                    aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-2])/timed)*60.  #delta  BT (degress/minute)
+#                        # smooth BT and ET a bit for delta computations (replacing the above code without smoothing)
+#                        # this might be not overly precise as time intervals between samples are not constant
+#                        ETm1 = aw.qmc.temp1[-1]
+#                        ETm2 = (aw.qmc.temp1[-3] + aw.qmc.temp1[-2] + aw.qmc.temp1[-1]) / 3.
+#                        BTm1 = aw.qmc.temp2[-1]
+#                        BTm2 = (aw.qmc.temp2[-3] + aw.qmc.temp2[-2] + aw.qmc.temp2[-1]) / 3.
+#                        #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
+#                        aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
+#                        aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
+                        
+                        # replaced above by taking the last and the butbutlast measurements to ensure a higher temperature resolution, reducing fluctuation
+                        timed = aw.qmc.timex[-1] - aw.qmc.timex[-4]   #time difference between last two readings
                         #calculate Delta T = (changeTemp/ChangeTime)*60. =  degress per minute;
-                        aw.qmc.rateofchange1 = ((ETm1 - ETm2)/timed)*60.  #delta ET (degress/minute)
-                        aw.qmc.rateofchange2 = ((BTm1 - BTm2)/timed)*60.  #delta  BT (degress/minute)
+                        aw.qmc.rateofchange1 = ((aw.qmc.temp1[-1] - aw.qmc.temp1[-4])/timed)*60.  #delta ET (degress/minute)
+                        aw.qmc.rateofchange2 = ((aw.qmc.temp2[-1] - aw.qmc.temp2[-4])/timed)*60.  #delta  BT (degress/minute)
+
+
 
                         aw.qmc.unfiltereddelta1.append(aw.qmc.rateofchange1)
                         aw.qmc.unfiltereddelta2.append(aw.qmc.rateofchange2)
@@ -6242,6 +6260,30 @@ class SampleThread(QThread):
                             if aw.qmc.temp2[-1] >= aw.qmc.phases[2]:
                                 aw.qmc.autoFCsIdx = 1
 
+                    #process active quantifiers
+                    try:
+                        for i in range(4):
+                            if aw.eventquantifieractive[i]:
+                                temp,timex = aw.quantifier2tempandtime(i)
+                                if temp: # corresponding curve is available
+                                    linespace = aw.eventquantifierlinspaces[i]
+                                    linespacethreshold = abs(linespace[1] - linespace[0]) / 10.
+                                    t = temp[-1]
+                                    d = aw.digitize(t,linespace)
+                                    ld = aw.lastdigitizedvalue[i]
+                                    lt = aw.lastdigitizedtemp[i]
+                                    if d != None and (ld == None or ld != d):
+                                        # and only if significantly different than previous to avoid fluktuation
+                                        if ld == None or linespacethreshold < abs(t - lt):
+                                            # establish this one
+                                            aw.lastdigitizedvalue[i] = d
+                                            aw.lastdigitizedtemp[i] = t
+                                            # now move corresponding slider and add event
+                                            v = d * 10.
+                                            aw.qmc.quantifiedEvent = [i,v]
+                    except Exception:
+                        pass
+
                     #check for each alarm that was not yet triggered
                     for i in range(len(aw.qmc.alarmflag)):
                         #if alarm on, and not triggered, and time is after set time:
@@ -6351,6 +6393,9 @@ class SampleThread(QThread):
         if not aw.qmc.flagon:
             return
         try:
+            # initialize digitizer
+            aw.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
+            aw.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
             while True:
                 if aw.qmc.flagon:
                     start = libtime.time()
@@ -6522,6 +6567,16 @@ class ApplicationWindow(QMainWindow):
         self.eventslidercommands = ["","","",""]
         self.eventslideroffsets = [0,0,0,0]
         self.eventsliderfactors = [1.0,1.0,1.0,1.0]
+        
+        #event quantifiers        
+        self.eventquantifieractive = [0,0,0,0]
+        self.eventquantifiersource = [0,0,0,0]
+        self.eventquantifiermin = [0,0,0,0]
+        self.eventquantifiermax = [100,100,100,100]
+        self.eventquantifierlinspaces = [self.computeLinespace(0),self.computeLinespace(1),self.computeLinespace(2),self.computeLinespace(3)]
+        self.eventquantifiersteps = 10
+        self.lastdigitizedvalue = [None,None,None,None] # last digitized value per quantifier
+        self.lastdigitizedtemp = [None,None,None,None] # last digitized temp value per quantifier
 
         # set window title
         self.windowTitle = "Artisan %s"%str(__version__)
@@ -7758,6 +7813,43 @@ class ApplicationWindow(QMainWindow):
 
 ###################################   APPLICATION WINDOW (AW) FUNCTIONS  ####################################
 
+    # compute the 12 event quantifier linespace for type n in [0,3]
+    def computeLinespace(self,n):
+        return numpy.linspace(self.eventquantifiermin[n], self.eventquantifiermax[n], num=12)
+        
+    # update all 4 event quantifier linespaces
+    def computeLinespaces(self):
+        for n in range(4):
+            self.eventquantifierlinspaces[n] = self.computeLinespace(n)
+        
+    # returns temp and time arrays corresponding to the quantifier source
+    # temp might be None if there is no corresponding curve
+    def quantifier2tempandtime(self,i):
+        temp = None
+        timex = aw.qmc.timex
+        if aw.eventquantifiersource[i] == 0:
+            temp = aw.qmc.temp1
+        elif aw.eventquantifiersource[i] == 1:
+            temp = aw.qmc.temp2
+        else:
+            x = (aw.eventquantifiersource[i]-2)
+            timex = aw.qmc.extratimex[x / 2]
+            if x % 2 == 0:
+                # even
+                if len(aw.qmc.extratemp1) > (x/2):
+                    temp = aw.qmc.extratemp1[x / 2]
+            else:
+                # odd
+                if len(aw.qmc.extratemp2) > (x/2):
+                    temp = aw.qmc.extratemp2[x / 2]
+        return temp,timex
+        
+    # returns min/max 0/10 for values outside of the given linespace ls defining the interval
+    # otherwise the bin number from [0-self.eventquantifiersteps]
+    def digitize(self,v,ls):
+        r = numpy.digitize([v],ls)[0] - 1
+        return max(0,min(10,r))
+            
     def setLCDsDigitCount(self,n):
         self.lcd2.setDigitCount(n)
         self.lcd2.setMinimumWidth(n*16)
@@ -10432,7 +10524,7 @@ class ApplicationWindow(QMainWindow):
             profile["extradevices"] = self.qmc.extradevices
             profile["extraname1"] = [e(n) for n in self.qmc.extraname1]
             profile["extraname2"] = [e(n) for n in self.qmc.extraname2]
-            profile["extratimex"] = self.qmc.extratimex
+            profile["extratimex"] = [[self.float2float(t,5) for t in x] for x in self.qmc.extratimex]
             profile["extratemp1"] = [[self.float2float(t,2) for t in x] for x in self.qmc.extratemp1]
             profile["extratemp2"] = [[self.float2float(t,2) for t in x] for x in self.qmc.extratemp2]
             profile["extramathexpression1"] = self.qmc.extramathexpression1
@@ -10478,6 +10570,7 @@ class ApplicationWindow(QMainWindow):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " getProfile(): %1").arg(str(ex)),exc_tb.tb_lineno)
+            return None
 
     #saves recorded profile in hard drive. Called from file menu 
     def fileSave(self,fname):
@@ -10487,10 +10580,14 @@ class ApplicationWindow(QMainWindow):
                 filename = self.ArtisanSaveFileDialog(msg=QApplication.translate("Message", "Save Profile",None, QApplication.UnicodeUTF8)) 
             if filename:
                 #write
-                self.serialize(filename,self.getProfile())
-                self.setCurrentFile(filename)
-                self.sendmessage(QApplication.translate("Message","Profile saved", None, QApplication.UnicodeUTF8))
-                self.qmc.safesaveflag = False
+                pf = self.getProfile()
+                if pf:
+                    self.serialize(filename,pf)
+                    self.setCurrentFile(filename)
+                    self.sendmessage(QApplication.translate("Message","Profile saved", None, QApplication.UnicodeUTF8))
+                    self.qmc.safesaveflag = False
+                else:
+                    self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
             else:
                 self.sendmessage(QApplication.translate("Message","Cancelled", None, QApplication.UnicodeUTF8))
         except Exception as ex:
@@ -11072,6 +11169,15 @@ class ApplicationWindow(QMainWindow):
                 self.eventslideroffsets = [x.toInt()[0] for x in settings.value("slideroffsets").toList()]
                 self.eventsliderfactors = [x.toDouble()[0] for x in settings.value("sliderfactors").toList()]
             settings.endGroup()
+            #restore quantifier
+            settings.beginGroup("Quantifiers")
+            if settings.contains("quantifieractive"):
+                self.eventquantifieractive = [x.toInt()[0] for x in settings.value("quantifieractive").toList()]
+                self.eventquantifiersource = [x.toInt()[0] for x in settings.value("quantifiersource").toList()]
+                self.eventquantifiermin = [x.toInt()[0] for x in settings.value("quantifiermin").toList()]
+                self.eventquantifiermax = [x.toInt()[0] for x in settings.value("quantifiermax").toList()]
+            settings.endGroup()
+            self.computeLinespaces()
             self.updateSlidersProperties()
             #restore background profile settings
             settings.beginGroup("background")
@@ -11722,6 +11828,12 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("slidercommands",self.eventslidercommands)
             settings.setValue("slideroffsets",self.eventslideroffsets)
             settings.setValue("sliderfactors",self.eventsliderfactors)
+            settings.endGroup()
+            settings.beginGroup("Quantifiers")
+            settings.setValue("quantifieractive",self.eventquantifieractive)
+            settings.setValue("quantifiersource",self.eventquantifiersource)
+            settings.setValue("quantifiermin",self.eventquantifiermin)
+            settings.setValue("quantifiermax",self.eventquantifiermax)
             settings.endGroup()
             settings.setValue("roastpropertiesflag",self.qmc.roastpropertiesflag)
             settings.setValue("customflavorlabels",self.qmc.customflavorlabels)
@@ -17283,6 +17395,84 @@ class EventsDlg(ArtisanDialog):
         helpsliderbutton =  QPushButton(QApplication.translate("Button","Help",None, QApplication.UnicodeUTF8))
         helpsliderbutton.setFocusPolicy(Qt.NoFocus)
         self.connect(helpsliderbutton, SIGNAL("clicked()"),self.showSliderHelp)
+        ## tab4
+        qeventtitlelabel = QLabel(QApplication.translate("Label","Event", None, QApplication.UnicodeUTF8))
+        qeventtitlelabel.setFont(titlefont)
+        sourcetitlelabel = QLabel(QApplication.translate("Label","Source", None, QApplication.UnicodeUTF8))
+        sourcetitlelabel.setFont(titlefont)
+        mintitlelabel = QLabel(QApplication.translate("Label","Min", None, QApplication.UnicodeUTF8))
+        mintitlelabel.setFont(titlefont)
+        maxtitlelabel = QLabel(QApplication.translate("Label","Max", None, QApplication.UnicodeUTF8))
+        maxtitlelabel.setFont(titlefont)
+        self.E1active = QCheckBox(aw.qmc.etypesf(0))
+        self.E1active.setFocusPolicy(Qt.NoFocus)
+        self.E1active.setChecked(bool(aw.eventquantifieractive[0]))
+        self.E2active = QCheckBox(aw.qmc.etypesf(1))
+        self.E2active.setFocusPolicy(Qt.NoFocus)
+        self.E2active.setChecked(bool(aw.eventquantifieractive[1]))
+        self.E3active = QCheckBox(aw.qmc.etypesf(2))
+        self.E3active.setFocusPolicy(Qt.NoFocus)
+        self.E3active.setChecked(bool(aw.eventquantifieractive[2]))
+        self.E4active = QCheckBox(aw.qmc.etypesf(3))
+        self.E4active.setFocusPolicy(Qt.NoFocus)
+        self.E4active.setChecked(bool(aw.eventquantifieractive[3]))
+        self.curvenames = []
+        self.curvenames.append(QApplication.translate("ComboBox","ET",None, QApplication.UnicodeUTF8))
+        self.curvenames.append(QApplication.translate("ComboBox","BT",None, QApplication.UnicodeUTF8))
+        for i in range(len(aw.qmc.extradevices)):
+            self.curvenames.append(str(i) + "xT1: " + aw.qmc.extraname1[i])
+            self.curvenames.append(str(i) + "xT2: " + aw.qmc.extraname2[i])
+        self.E1SourceComboBox = QComboBox()
+        self.E1SourceComboBox.addItems(self.curvenames)
+        if aw.eventquantifiersource[0] < len(self.curvenames):
+            self.E1SourceComboBox.setCurrentIndex(aw.eventquantifiersource[0])
+        self.E2SourceComboBox = QComboBox()
+        self.E2SourceComboBox.addItems(self.curvenames)
+        if aw.eventquantifiersource[1] < len(self.curvenames):
+            self.E2SourceComboBox.setCurrentIndex(aw.eventquantifiersource[1])
+        self.E3SourceComboBox = QComboBox()
+        self.E3SourceComboBox.addItems(self.curvenames)
+        if aw.eventquantifiersource[2] < len(self.curvenames):
+            self.E3SourceComboBox.setCurrentIndex(aw.eventquantifiersource[2])
+        self.E4SourceComboBox = QComboBox()
+        self.E4SourceComboBox.addItems(self.curvenames)
+        if aw.eventquantifiersource[3] < len(self.curvenames):
+            self.E4SourceComboBox.setCurrentIndex(aw.eventquantifiersource[3])
+        self.E1min = QSpinBox()
+        self.E1min.setAlignment(Qt.AlignRight)
+        self.E1min.setRange(-999,999)
+        self.E1min.setValue(aw.eventquantifiermin[0])
+        self.E2min = QSpinBox()
+        self.E2min.setAlignment(Qt.AlignRight)
+        self.E2min.setRange(-999,999)
+        self.E2min.setValue(aw.eventquantifiermin[1])
+        self.E3min = QSpinBox()
+        self.E3min.setAlignment(Qt.AlignRight)
+        self.E3min.setRange(-999,999)
+        self.E3min.setValue(aw.eventquantifiermin[2])
+        self.E4min = QSpinBox()
+        self.E4min.setAlignment(Qt.AlignRight)
+        self.E4min.setRange(-999,999)
+        self.E4min.setValue(aw.eventquantifiermin[3])
+        self.E1max = QSpinBox()
+        self.E1max.setAlignment(Qt.AlignRight)
+        self.E1max.setRange(-999,999)
+        self.E1max.setValue(aw.eventquantifiermax[0])
+        self.E2max = QSpinBox()
+        self.E2max.setAlignment(Qt.AlignRight)
+        self.E2max.setRange(-999,999)
+        self.E2max.setValue(aw.eventquantifiermax[1])
+        self.E3max = QSpinBox()
+        self.E3max.setAlignment(Qt.AlignRight)
+        self.E3max.setRange(-999,999)
+        self.E3max.setValue(aw.eventquantifiermax[2])
+        self.E4max = QSpinBox()
+        self.E4max.setAlignment(Qt.AlignRight)
+        self.E4max.setRange(-999,999)
+        self.E4max.setValue(aw.eventquantifiermax[3])
+        applyquantifierbutton =  QPushButton(QApplication.translate("Button","Apply",None, QApplication.UnicodeUTF8))
+        applyquantifierbutton.setFocusPolicy(Qt.NoFocus)
+        self.connect(applyquantifierbutton, SIGNAL("clicked()"),self.applyQuantifiers)
         ### LAYOUTS
         #### tab1 layout
         bartypeLayout = QHBoxLayout()
@@ -17541,6 +17731,35 @@ class EventsDlg(ArtisanDialog):
         C5VBox.addLayout(tab5Layout)
         C5VBox.addStretch()
         C5VBox.addLayout(SliderHelpHBox)
+        ### tab4 layout
+        tab6Layout = QGridLayout()
+        tab6Layout.addWidget(qeventtitlelabel,0,0)
+        tab6Layout.addWidget(sourcetitlelabel,0,1)
+        tab6Layout.addWidget(mintitlelabel,0,2)
+        tab6Layout.addWidget(maxtitlelabel,0,3)
+        tab6Layout.addWidget(self.E1active,1,0)
+        tab6Layout.addWidget(self.E2active,2,0)
+        tab6Layout.addWidget(self.E3active,3,0)
+        tab6Layout.addWidget(self.E4active,4,0)
+        tab6Layout.addWidget(self.E1SourceComboBox,1,1)
+        tab6Layout.addWidget(self.E2SourceComboBox,2,1)
+        tab6Layout.addWidget(self.E3SourceComboBox,3,1)
+        tab6Layout.addWidget(self.E4SourceComboBox,4,1)
+        tab6Layout.addWidget(self.E1min,1,2)
+        tab6Layout.addWidget(self.E2min,2,2)
+        tab6Layout.addWidget(self.E3min,3,2)
+        tab6Layout.addWidget(self.E4min,4,2)
+        tab6Layout.addWidget(self.E1max,1,3)
+        tab6Layout.addWidget(self.E2max,2,3)
+        tab6Layout.addWidget(self.E3max,3,3)
+        tab6Layout.addWidget(self.E4max,4,3)
+        QuantifierApplyHBox = QHBoxLayout()
+        QuantifierApplyHBox.addStretch()
+        QuantifierApplyHBox.addWidget(applyquantifierbutton)
+        C6VBox = QVBoxLayout()
+        C6VBox.addLayout(tab6Layout)
+        C6VBox.addStretch()
+        C6VBox.addLayout(QuantifierApplyHBox)
 ###########################################
         #tab layout
         self.TabWidget = QTabWidget()
@@ -17554,6 +17773,9 @@ class EventsDlg(ArtisanDialog):
         C5Widget = QWidget()
         C5Widget.setLayout(C5VBox)
         self.TabWidget.addTab(C5Widget,QApplication.translate("Tab","Sliders",None, QApplication.UnicodeUTF8))
+        C6Widget = QWidget()
+        C6Widget.setLayout(C6VBox)
+        self.TabWidget.addTab(C6Widget,QApplication.translate("Tab","Quantifiers",None, QApplication.UnicodeUTF8))
         C3Widget = QWidget()
         C3Widget.setLayout(tab3layout)
         self.TabWidget.addTab(C3Widget,QApplication.translate("Tab","Palettes",None, QApplication.UnicodeUTF8))
@@ -17569,7 +17791,7 @@ class EventsDlg(ArtisanDialog):
         mainLayout.setContentsMargins(5, 15, 5, 5)
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
-
+        
     def showSliderHelp(self):
         string = u(QApplication.translate("Message", "<b>Event</b> hide or show the corresponding slider",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>Action</b> Perform an action on slider release",None, QApplication.UnicodeUTF8)) + "<br><br>"
@@ -17581,23 +17803,70 @@ class EventsDlg(ArtisanDialog):
         string += u(QApplication.translate("Message", "<b>Factor</b> multiplicator of the slider value",None, QApplication.UnicodeUTF8))
         QMessageBox.information(self,QApplication.translate("Message", "Event custom buttons",None, QApplication.UnicodeUTF8),string)
 
+
+    def applyQuantifiers(self):
+        self.saveQuantifierSettings()
+        # recompute the 4 event quantifier linsapces
+        aw.computeLinespaces()
+        # remove previous quantifier events
+        # recompute quantifier events
+        for i in range(4):
+            if aw.eventquantifieractive[i]:
+                temp,timex = aw.quantifier2tempandtime(i)
+                if temp:
+                    # a temp curve exists
+                    linespace = aw.eventquantifierlinspaces[i]
+                    linespacethreshold = abs(linespace[1] - linespace[0]) / 10.
+                    # loop over that data and classify each value
+                    ld = None # last digitized value
+                    lt = None # last digitized temp value
+                    for ii in range(len(temp)):
+                        t = temp[ii]
+                        d = aw.digitize(t,linespace)
+                        if d != None and (ld == None or ld != d):
+                            # take only changes
+                            # and only if significantly different than previous to avoid fluktuation
+                            if ld == None or linespacethreshold < abs(t - lt):
+                                # establish this one
+                                ld = d
+                                lt = t
+                                # add to event table
+                                aw.qmc.specialevents.append(aw.qmc.time2index(timex[ii]))
+                                aw.qmc.specialeventstype.append(i)
+                                aw.qmc.specialeventsStrings.append("Q")
+                                aw.qmc.specialeventsvalue.append(float(d+1))
+                                aw.qmc.safesaveflag = True
+                                
+                    # redraw                 
+                    aw.qmc.redraw(recomputeAllDeltas=False)
+        # add quantifier events
+                
+        
+
     def tabSwitched(self,i):
         if i == 0:
             self.saveSliderSettings()
+            self.saveQuantifierSettings()
         elif i == 1: # switched to Button tab
             self.createEventbuttonTable()
             self.saveSliderSettings()
+            self.saveQuantifierSettings()
         elif i == 2: # switched to Slider tab
             self.updateSliderTab()
-        elif i==3: # switched to Palette tab
+            self.saveQuantifierSettings()
+        elif i == 3: # switched to Quantifier tab
+            pass
+        elif i == 4: # switched to Palette tab
             # store slider settings from Slider tab to global variables
             # store sliders
             self.saveSliderSettings()
+            self.saveQuantifierSettings()
             # store buttons
             self.savetableextraeventbutton()
         elif i == 4: # switched to Style tab
             self.updateStyleTab()
             self.saveSliderSettings()
+            self.saveQuantifierSettings()
 
     def updateStyleTab(self):
         # update color button texts
@@ -18089,6 +18358,24 @@ class EventsDlg(ArtisanDialog):
         aw.eventsliderfactors[2] = float(self.E3factor.value())
         aw.eventsliderfactors[3] = float(self.E4factor.value())
 
+    def saveQuantifierSettings(self):
+        aw.eventquantifieractive[0] = int(self.E1active.isChecked())
+        aw.eventquantifieractive[1] = int(self.E2active.isChecked())
+        aw.eventquantifieractive[2] = int(self.E3active.isChecked())
+        aw.eventquantifieractive[3] = int(self.E4active.isChecked())
+        aw.eventquantifiersource[0] = int(self.E1SourceComboBox.currentIndex())
+        aw.eventquantifiersource[1] = int(self.E2SourceComboBox.currentIndex())
+        aw.eventquantifiersource[2] = int(self.E3SourceComboBox.currentIndex())
+        aw.eventquantifiersource[3] = int(self.E4SourceComboBox.currentIndex())
+        aw.eventquantifiermin[0] = int(self.E1min.value())
+        aw.eventquantifiermin[1] = int(self.E2min.value())
+        aw.eventquantifiermin[2] = int(self.E3min.value())
+        aw.eventquantifiermin[3] = int(self.E4min.value())
+        aw.eventquantifiermax[0] = int(self.E1max.value())
+        aw.eventquantifiermax[1] = int(self.E2max.value())
+        aw.eventquantifiermax[2] = int(self.E3max.value())
+        aw.eventquantifiermax[3] = int(self.E4max.value())
+
     #the inverse to restoreState
     def storeState(self):
         # event configurations
@@ -18189,6 +18476,8 @@ class EventsDlg(ArtisanDialog):
             aw.button_20.setVisible(bool(aw.qmc.buttonvisibility[7]))
             #save sliders   
             self.saveSliderSettings()
+            self.saveQuantifierSettings()
+            #save quantifiers
             aw.updateSlidersProperties() # set visibility and event names on slider widgets
             aw.qmc.buttonactions[0] = self.CHARGEbuttonActionType.currentIndex()
             aw.qmc.buttonactions[1] = self.DRYbuttonActionType.currentIndex()
