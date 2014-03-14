@@ -4414,6 +4414,9 @@ class tgraphcanvas(FigureCanvas):
                     timez = self.stringfromseconds(dTime)
                     ror = "%.1f"%(((self.temp2[self.timeindex[6]]-LP)/(self.timex[self.timeindex[6]]-self.timex[self.timeindex[0]]))*60.)
                     ts,tse,tsb = aw.ts()
+                    
+                    #curveSimilarity
+                    det,dbt = aw.curveSimilarity(aw.qmc.phases[1]) # we analyze from DRY-END as specified in the phases dialog to DROP
 
                     #end temperature
                     if locale == "ar":
@@ -4434,6 +4437,8 @@ class tgraphcanvas(FigureCanvas):
                                     .arg(u("%d%sm"%(ts,self.mode))) \
                                     .arg(u(int(tse))) \
                                     .arg(u(int(tsb)))
+                        if det:
+                            strline = QString(("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None,QApplication.UnicodeUTF8) + "   ") + strline
                     else:
                         strline = QString(QApplication.translate("Label", "ET", None,QApplication.UnicodeUTF8) + "=%1-%2 (%3)   " \
                                     + QApplication.translate("Label", "BT", None,QApplication.UnicodeUTF8) + "=%4-%5 (%6)   " \
@@ -4452,14 +4457,16 @@ class tgraphcanvas(FigureCanvas):
                                     .arg(u("%d%sm"%(ts,self.mode))) \
                                     .arg(u(int(tse))) \
                                     .arg(u(int(tsb)))
+                        if det:
+                            strline = strline + "   " + QString(QApplication.translate("Label", "CM", None,QApplication.UnicodeUTF8) + ("=%.1f/%.1f" % (det,dbt)) + self.mode)
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(12)
                     self.ax.set_xlabel(strline,color = aw.qmc.palette["text"],fontproperties=statsprop)
                 else:
                     self.ax.set_xlabel(aw.arabicReshape(QApplication.translate("Label", "Time",None, QApplication.UnicodeUTF8)),size=16,color = self.palette["xlabel"],fontproperties=aw.mpl_fontproperties)
         except Exception as ex:
-#            import traceback
-#            traceback.print_exc(file=sys.stdout)
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message","Exception:",None, QApplication.UnicodeUTF8) + " writestatistics() %1").arg(str(ex)),exc_tb.tb_lineno)
 
@@ -6264,7 +6271,7 @@ class SampleThread(QThread):
                     try:
                         for i in range(4):
                             if aw.eventquantifieractive[i]:
-                                temp,timex = aw.quantifier2tempandtime(i)
+                                temp,_ = aw.quantifier2tempandtime(i)
                                 if temp: # corresponding curve is available
                                     linespace = aw.eventquantifierlinspaces[i]
                                     linespacethreshold = abs(linespace[1] - linespace[0]) / 10.
@@ -7849,6 +7856,55 @@ class ApplicationWindow(QMainWindow):
     def digitize(self,v,ls):
         r = numpy.digitize([v],ls)[0] - 1
         return max(0,min(10,r))
+        
+    
+    #CM
+    # computes the similarity between BT and backgroundBT as well as ET and backgroundET
+    # iterates over all BT/ET values backward from DROP to the specified BT temperature
+    # returns None in case no similarity can be computed
+    def curveSimilarity(self,BTlimit=None):
+        try:
+            # if background profile is loaded and both profiles have a DROP even set
+            if aw.qmc.background and aw.qmc.timeindex[6] and aw.qmc.timeindexB[6]:
+                # calculate time delta between background and foreground DROP event
+                dropTimeDelta = aw.qmc.timex[aw.qmc.timeindex[6]] - aw.qmc.timeB[aw.qmc.timeindexB[6]]
+                totalQuadraticDeltaET = 0
+                totalQuadraticDeltaBT = 0
+                count = 0
+                for i in range(aw.qmc.timeindex[6],0,-1):
+                    # iterate backward from DROP to BTlimit
+                    if aw.qmc.stemp1 and len(aw.qmc.stemp1) > i:
+                        # take smoothed data if available
+                        et = aw.qmc.stemp1[i]
+                    else:
+                        et = aw.qmc.temp1[i]
+                    if aw.qmc.stemp2 and len(aw.qmc.stemp2) > i:
+                        # take smoothed data if available
+                        bt = aw.qmc.stemp2[i]
+                    else:
+                        bt = aw.qmc.temp2[i]
+                    if BTlimit and bt > BTlimit:
+                        # still above the limit
+                        # retrieve corresponding values from the background (is always smoothed)
+                        # first compute closest index at that time point in the background data
+                        j = aw.qmc.backgroundtime2index((aw.qmc.timex[i] - dropTimeDelta))
+                        etb = aw.qmc.temp1B[j]
+                        btb = aw.qmc.temp2B[j]
+                        det = (et - etb)
+                        totalQuadraticDeltaET += det * det
+                        dbt = (bt - btb)
+                        totalQuadraticDeltaBT += dbt * dbt
+                        count += 1
+                    else:
+                        break
+                return math.sqrt(totalQuadraticDeltaET/float(count)), math.sqrt(totalQuadraticDeltaBT/float(count))
+            else:
+                # no DROP event registered
+                return None, None
+        except:
+            #import traceback
+            #traceback.print_exc(file=sys.stdout)        
+            return None, None
             
     def setLCDsDigitCount(self,n):
         self.lcd2.setDigitCount(n)
@@ -10293,7 +10349,7 @@ class ApplicationWindow(QMainWindow):
                 computedProfile["TP_ET"] = self.float2float(self.qmc.temp1[TP_time_idx])
                 computedProfile["TP_BT"] = self.float2float(self.qmc.temp2[TP_time_idx])
             ######### DRY #########
-            # calc DRY_time_idx (index of TP; is None if unknown)
+            # calc DRY_time_idx (index of DRY; is None if unknown)
             if self.qmc.timeindex[1] and aw.qmc.phasesbuttonflag:
                 #manual dryend available
                 DRY_time_idx = self.qmc.timeindex[1]
@@ -19241,9 +19297,9 @@ class backgroundDlg(ArtisanDialog):
             c = aw.qmc.palette["et"]
         elif color == "BT":
             c = aw.qmc.palette["bt"]
-        elif color == "BT":
+        elif color == "DeltaET":
             c = aw.qmc.palette["deltaet"]
-        elif color == "BT":
+        elif color == "DeltaBT":
             c = aw.qmc.palette["deltabt"]
         else:
             c = color
