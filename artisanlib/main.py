@@ -29192,6 +29192,14 @@ class DtaPID(object):
 def main():
     global aw
     aw = None # this is to ensure that the variable aw is already defined during application initialization
+    
+    # font fix for OS X 10.9
+    v, _, _ = platform.mac_ver()
+    v = float('.'.join(v.split('.')[:2]))
+    if v >= 10.9:
+        # fix Mac OS X 10.9 (mavericks) font issue
+        # https://bugreports.qt-project.org/browse/QTBUG-32789
+        QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
 
     aw = ApplicationWindow()
 
