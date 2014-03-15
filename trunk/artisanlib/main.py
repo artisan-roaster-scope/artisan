@@ -627,7 +627,7 @@ class tgraphcanvas(FigureCanvas):
         #applies a Y(x) function to ET or BT 
         self.ETfunction,self.BTfunction = "",""
 
-        #put a "self.safesaveflag = True" whenever there is a change of a profile like at [DROP], edit properties Dialog, etc
+        #put a "aw.qmc.safesaveflag = True" whenever there is a change of a profile like at [DROP], edit properties Dialog, etc
         #prevents accidentally deleting a modified profile.
         self.safesaveflag = False
 
@@ -636,6 +636,7 @@ class tgraphcanvas(FigureCanvas):
         self.backgroundDetails = False
         self.backgroundeventsflag = False
         self.backgroundpath = ""
+        self.titleB = ""
         self.temp1B,self.temp2B,self.timeB = [],[],[]
         self.delta1B,self.delta2B = [],[]
         self.timeindexB = [-1,0,0,0,0,0,0,0]
@@ -7858,7 +7859,6 @@ class ApplicationWindow(QMainWindow):
         return max(0,min(10,r))
         
     
-    #CM
     # computes the similarity between BT and backgroundBT as well as ET and backgroundET
     # iterates over all BT/ET values backward from DROP to the specified BT temperature
     # returns None in case no similarity can be computed
@@ -9203,6 +9203,7 @@ class ApplicationWindow(QMainWindow):
                 self.qmc.backgroundEvalues = profile["specialeventsvalue"]
                 self.qmc.backgroundEStrings = profile["specialeventsStrings"]
                 self.qmc.backgroundFlavors = profile["flavors"]
+                self.qmc.titleB = profile["title"]
                 # alarms
                 if self.qmc.loadalarmsfromprofile:
                     if "alarmflag" in profile:
@@ -10310,6 +10311,7 @@ class ApplicationWindow(QMainWindow):
                     aw.qmc.timealign(redraw=False) # there will be a later redraw triggered that also recomputes the deltas
                 else:
                     self.qmc.backgroundpath = ""
+                    self.qmc.titleB = ""
             return True
         except Exception as ex:
 #            import traceback
@@ -10511,6 +10513,15 @@ class ApplicationWindow(QMainWindow):
         except Exception as ex:
             _, _, exc_tb = sys.exc_info()
             aw.qmc.adderror((QApplication.translate("Error Message", "Exception:",None, QApplication.UnicodeUTF8) + " computedProfileInformation() %1").arg(str(ex)),exc_tb.tb_lineno)
+        ######### Similarity #########
+        try:
+            det,dbt = aw.curveSimilarity(aw.qmc.phases[1])
+            if det:
+                computedProfile["det"] = det
+                computedProfile["dbt"] = dbt
+        except:
+            pass
+        ######### RETURN #########
         return computedProfile
 
     #used by filesave()
@@ -12231,6 +12242,10 @@ th {
 <th>""") + u(QApplication.translate("HTML Report Template", "ETBTa:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$etbta</td>
 </tr>
+<tr>
+<th>""") + u(QApplication.translate("HTML Report Template", "CM:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<td>$cm</td>
+</tr>
 </table>
 </td>
 <td>
@@ -12250,6 +12265,12 @@ th {
 <tr>
 <th>""") + u(QApplication.translate("HTML Report Template", "Cooling:", None, QApplication.UnicodeUTF8)) + u("""</th>
 <td>$cool_phase</td>
+</tr>
+<tr><th></th><td></td></tr>
+<tr><th></th><td></td></tr>
+<tr>
+<th>""") + u(QApplication.translate("HTML Report Template", "Background:", None, QApplication.UnicodeUTF8)) + u("""</th>
+<td>$background</td>
 </tr>
 </table>
 </td>
@@ -12397,6 +12418,11 @@ $cupping_notes
                     color = color + u(" (" + self.qmc.color_systems[self.qmc.color_system_idx] + ")")
             else:
                 color = u("--")
+            if "det" in cp:
+                cm = u("%.1f/%.1f" % (cp["det"],cp["dbt"])) + aw.qmc.mode
+            else:
+                cm = u("")
+            background = u(aw.qmc.titleB)
             html = libstring.Template(HTML_REPORT_TEMPLATE).safe_substitute(
                 title=u(cgi.escape(self.qmc.title)),
                 datetime=u(self.qmc.roastdate.toString()), #alt: unicode(self.qmc.roastdate.toString('MM.dd.yyyy')),
@@ -12420,10 +12446,12 @@ $cupping_notes
                 SCe=self.event2html(cp,"SCe_time","SCe_BT"),
                 drop=self.event2html(cp,"DROP_time","DROP_BT"),
                 cool=self.event2html(cp,"COOL_time",None,"DROP_time"),
+                cm=cm,
                 dry_phase=dryphase,
                 mid_phase=midphase,
                 finish_phase=finishphase,
                 cool_phase=coolphase,
+                background=background,
                 ror= ror,
                 etbta=etbta,
                 roasting_notes=self.note2html(self.qmc.roastingnotes),
@@ -13079,6 +13107,7 @@ $cupping_notes
         
     def deleteBackground(self):
         self.qmc.backgroundpath = ""
+        self.qmc.titleB = ""
         self.qmc.temp1B, self.qmc.temp2B, self.qmc.timeB = [],[],[]
         self.qmc.backgroundEvents, self.qmc.backgroundEtypes = [],[]
         self.qmc.backgroundEvalues, self.qmc.backgroundEStrings,self.qmc.backgroundFlavors = [],[],[]
@@ -19388,6 +19417,7 @@ class backgroundDlg(ArtisanDialog):
         self.createEventTable()
         self.createDataTable()
         aw.qmc.timealign(redraw=True)
+        aw.qmc.safesaveflag = True
 
     def createEventTable(self):
         self.eventtable.clear()
