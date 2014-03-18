@@ -4438,7 +4438,7 @@ class tgraphcanvas(FigureCanvas):
                                     .arg(u("%d%sm"%(ts,self.mode))) \
                                     .arg(u(int(tse))) \
                                     .arg(u(int(tsb)))
-                        if det:
+                        if det != None:
                             strline = QString(("%.1f/%.1f" % (det,dbt)) + self.mode + "=" + QApplication.translate("Label", "CM", None,QApplication.UnicodeUTF8) + "   ") + strline
                     else:
                         strline = QString(QApplication.translate("Label", "ET", None,QApplication.UnicodeUTF8) + "=%1-%2 (%3)   " \
@@ -4458,7 +4458,7 @@ class tgraphcanvas(FigureCanvas):
                                     .arg(u("%d%sm"%(ts,self.mode))) \
                                     .arg(u(int(tse))) \
                                     .arg(u(int(tsb)))
-                        if det:
+                        if det != None:
                             strline = strline + "   " + QString(QApplication.translate("Label", "CM", None,QApplication.UnicodeUTF8) + ("=%.1f/%.1f" % (det,dbt)) + self.mode)
                     statsprop = aw.mpl_fontproperties.copy()
                     statsprop.set_size(12)
@@ -10516,7 +10516,7 @@ class ApplicationWindow(QMainWindow):
         ######### Similarity #########
         try:
             det,dbt = aw.curveSimilarity(aw.qmc.phases[1])
-            if det:
+            if det != None:
                 computedProfile["det"] = det
                 computedProfile["dbt"] = dbt
         except:
