@@ -97,6 +97,11 @@ which means that the channel and ID has been set to
 00.
 }}}
 
+==Fuji PXR/PXG 4 & 5 PID==
+
+Artisan uses one decimal point. You have to manually configure your pid so that it outputs one digit after the  decimal point. See page 42 in the instruction manual: http://www.instrumart.com/assets/PXR459_manual.pdf
+
+
 =Serial Configuration=
 
 The serial settings for the meters (devices) are already configured by the artisan software automatically when you select a device for the first time (or when you change devices). Once you have chosen a device, the correct serial configuration is loaded and it will remain in memory. The only setting that is not configured is the serial port number being used. 
