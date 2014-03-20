@@ -1736,7 +1736,7 @@ class tgraphcanvas(FigureCanvas):
 
     #single variable (x) mathematical expression evaluator for user defined functions to convert sensor readings from HHM28 multimeter
     #example: eval_math_expression("pow(e,2*cos(x))",.3) returns 6.75763501
-    def eval_math_expression(self,mathexpression,x):
+    def eval_math_expression(self,mathexpression,x,tx):
         if len(mathexpression) == 0 or x == -1:
             return x
 
@@ -1747,6 +1747,15 @@ class tgraphcanvas(FigureCanvas):
         try:
             x = float(x)
             mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
+            #add ETB and BTB (background ET and BT)
+            etb = btb = 0
+            if aw.qmc.background and ("ETB" in mathexpression or "BTB" in mathexpression):
+                #first compute closest index at that time point in the background data
+                j = aw.qmc.backgroundtime2index(tx)
+                etb = aw.qmc.temp1B[j]
+                btb = aw.qmc.temp2B[j]
+            mathdictionary["ETB"] = etb
+            mathdictionary["BTB"] = btb
             #if Ys in expression
             if "Y" in mathexpression:
                 #extract Ys
@@ -6026,10 +6035,10 @@ class SampleThread(QThread):
                             for i in range(nxdevices):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)                               
                                 if len(aw.qmc.extramathexpression1[i]):
-                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1)
+                                    extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,extratx)
                                 extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
                                 if len(aw.qmc.extramathexpression2[i]):
-                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2)
+                                    extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2,extratx)
                                 extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                 if local_flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
@@ -6092,9 +6101,9 @@ class SampleThread(QThread):
                             t1 = (t1 + t1_2) / 2.0
                     ####### all values retrieved
                     if len(aw.qmc.ETfunction):
-                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1)
+                        t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1,tx)
                     if len(aw.qmc.BTfunction):
-                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2)
+                        t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2,tx)
                     t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
                     t2 = self.inputFilter(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
                     length_of_qmc_timex = len(aw.qmc.timex)
@@ -13757,6 +13766,8 @@ $cupping_notes
         string2 += "<LI><b>Y5</b> " + u(QApplication.translate("Message", "previous Extra #2 T1 value",None, QApplication.UnicodeUTF8))
         string2 += "<LI><b>Y6</b> " + u(QApplication.translate("Message", "previous Extra #2 T2 value",None, QApplication.UnicodeUTF8))
         string2 += "<LI><b>...</b> "
+        string2 += "<LI><b>ETB</b> " + u(QApplication.translate("Message", "current background ET",None, QApplication.UnicodeUTF8))
+        string2 += "<LI><b>BTB</b> " + u(QApplication.translate("Message", "current background BT",None, QApplication.UnicodeUTF8))
         string2 += "</UL>"
         #format help
         string3 = "<TABLE  WIDTH=550><TR><TH>"
