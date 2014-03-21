@@ -1749,11 +1749,14 @@ class tgraphcanvas(FigureCanvas):
             mathdictionary['x'] = x         #add x to the math dictionary assigning the key "x" to its float value
             #add ETB and BTB (background ET and BT)
             etb = btb = 0
-            if aw.qmc.background and ("ETB" in mathexpression or "BTB" in mathexpression):
-                #first compute closest index at that time point in the background data
-                j = aw.qmc.backgroundtime2index(tx)
-                etb = aw.qmc.temp1B[j]
-                btb = aw.qmc.temp2B[j]
+            try:
+                if aw.qmc.background and ("ETB" in mathexpression or "BTB" in mathexpression):
+                    #first compute closest index at that time point in the background data
+                    j = aw.qmc.backgroundtime2index(tx)
+                    etb = aw.qmc.temp1B[j]
+                    btb = aw.qmc.temp2B[j]
+            except:
+                pass
             mathdictionary["ETB"] = etb
             mathdictionary["BTB"] = btb
             #if Ys in expression
@@ -29235,12 +29238,15 @@ def main():
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
     # font fix for OS X 10.9
-    v, _, _ = platform.mac_ver()
-    v = float('.'.join(v.split('.')[:2]))
-    if v >= 10.9:
-        # fix Mac OS X 10.9 (mavericks) font issue
-        # https://bugreports.qt-project.org/browse/QTBUG-32789
-        QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
+    try:
+        v, _, _ = platform.mac_ver()
+        v = float('.'.join(v.split('.')[:2]))
+        if v >= 10.9:
+            # fix Mac OS X 10.9 (mavericks) font issue
+            # https://bugreports.qt-project.org/browse/QTBUG-32789
+            QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
+    except:
+        pass
 
     aw = ApplicationWindow()
 
