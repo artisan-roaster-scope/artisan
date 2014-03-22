@@ -997,7 +997,7 @@ class tgraphcanvas(FigureCanvas):
         self.filterDropOut_tmin = self.filterDropOut_tmin_F_default
         self.filterDropOut_tmax = self.filterDropOut_tmax_F_default
         self.filterDropOut_spikeRoR_dRoR_limit = self.filterDropOut_spikeRoR_dRoR_limit_F_default # the limit of additional RoR in temp/sec compared to previous readings
-        self.minmaxLimits = True
+        self.minmaxLimits = False
         self.dropSpikes = False
 
         self.swapETBT = False
@@ -6287,7 +6287,7 @@ class SampleThread(QThread):
                                 temp,_ = aw.quantifier2tempandtime(i)
                                 if temp: # corresponding curve is available
                                     linespace = aw.eventquantifierlinspaces[i]
-                                    linespacethreshold = abs(linespace[1] - linespace[0]) / 10.
+                                    linespacethreshold = abs(linespace[1] - linespace[0])
                                     t = temp[-1]
                                     d = aw.digitize(t,linespace)
                                     ld = aw.lastdigitizedvalue[i]
@@ -7835,7 +7835,7 @@ class ApplicationWindow(QMainWindow):
 
     # compute the 12 event quantifier linespace for type n in [0,3]
     def computeLinespace(self,n):
-        return numpy.linspace(self.eventquantifiermin[n], self.eventquantifiermax[n], num=12)
+        return numpy.linspace(self.eventquantifiermin[n], self.eventquantifiermax[n], num=102)
         
     # update all 4 event quantifier linespaces
     def computeLinespaces(self):
@@ -7867,7 +7867,7 @@ class ApplicationWindow(QMainWindow):
     # returns min/max 0/10 for values outside of the given linespace ls defining the interval
     # otherwise the bin number from [0-self.eventquantifiersteps]
     def digitize(self,v,ls):
-        r = numpy.digitize([v],ls)[0] - 1
+        r = (numpy.digitize([v],ls)[0] - 1) / 10.
         return max(0,min(10,r))
         
     
@@ -10912,6 +10912,11 @@ class ApplicationWindow(QMainWindow):
                         minimalmodbus._bytestringToFloat = littleEndianBytestringToFloat
                     except:
                         pass
+            if settings.contains("input1mode"):
+                self.modbus.input1mode = str(settings.value("input1mode",self.modbus.input1mode).toString())
+                self.modbus.input2mode = str(settings.value("input2mode",self.modbus.input2mode).toString())
+                self.modbus.input3mode = str(settings.value("input3mode",self.modbus.input3mode).toString())
+                self.modbus.input4mode = str(settings.value("input4mode",self.modbus.input4mode).toString())                
             settings.endGroup()
             #restore scale port
             settings.beginGroup("Scale")
@@ -11662,18 +11667,22 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("input1register",self.modbus.input1register)
             settings.setValue("input1float",self.modbus.input1float)
             settings.setValue("input1code",self.modbus.input1code)
+            settings.setValue("input1mode",self.modbus.input1mode)
             settings.setValue("input2slave",self.modbus.input2slave)
             settings.setValue("input2register",self.modbus.input2register)
             settings.setValue("input2float",self.modbus.input2float)
             settings.setValue("input2code",self.modbus.input2code)
+            settings.setValue("input2mode",self.modbus.input2mode)
             settings.setValue("input3slave",self.modbus.input3slave)
             settings.setValue("input3register",self.modbus.input3register)
             settings.setValue("input3float",self.modbus.input3float)
             settings.setValue("input3code",self.modbus.input3code)
+            settings.setValue("input3mode",self.modbus.input3mode)
             settings.setValue("input4slave",self.modbus.input4slave)
             settings.setValue("input4register",self.modbus.input4register)
             settings.setValue("input4float",self.modbus.input4float)
             settings.setValue("input4code",self.modbus.input4code)
+            settings.setValue("input4mode",self.modbus.input4mode)
             settings.setValue("littleEndianFloats",self.modbus.littleEndianFloats)
             settings.endGroup()
             #save scale port
@@ -13030,19 +13039,23 @@ $cupping_notes
             self.modbus.input1slave = int(str(dialog.modbus_input1slaveEdit.text()))
             self.modbus.input1register = int(str(dialog.modbus_input1registerEdit.text()))
             self.modbus.input1code = int(str(dialog.modbus_input1code.currentText()))
+            self.modbus.input1mode = str(dialog.modbus_input1mode.currentText())
             self.modbus.input1float = bool(dialog.modbus_input1float.isChecked())            
             self.modbus.input2slave = int(str(dialog.modbus_input2slaveEdit.text()))
             self.modbus.input2register = int(str(dialog.modbus_input2registerEdit.text()))
             self.modbus.input2code = int(str(dialog.modbus_input2code.currentText()))
+            self.modbus.input2mode = str(dialog.modbus_input2mode.currentText())
             self.modbus.input2float = bool(dialog.modbus_input2float.isChecked())     
             self.modbus.input3slave = int(str(dialog.modbus_input3slaveEdit.text()))
             self.modbus.input3register = int(str(dialog.modbus_input3registerEdit.text()))
             self.modbus.input3code = int(str(dialog.modbus_input3code.currentText()))
+            self.modbus.input3mode = str(dialog.modbus_input3mode.currentText())
             self.modbus.input3float = bool(dialog.modbus_input3float.isChecked())     
             self.modbus.input4slave = int(str(dialog.modbus_input4slaveEdit.text()))
             self.modbus.input4register = int(str(dialog.modbus_input4registerEdit.text()))
             self.modbus.input4code = int(str(dialog.modbus_input4code.currentText()))
             self.modbus.input4float = bool(dialog.modbus_input4float.isChecked())
+            self.modbus.input4mode = str(dialog.modbus_input4mode.currentText())
             self.modbus.littleEndianFloats = bool(dialog.modbus_littleEndianFloats.isChecked())
             # switch to ittle-endian if needed (HACK!!)
             if self.modbus.littleEndianFloats:
@@ -17915,7 +17928,7 @@ class EventsDlg(ArtisanDialog):
                 if temp:
                     # a temp curve exists
                     linespace = aw.eventquantifierlinspaces[i]
-                    linespacethreshold = abs(linespace[1] - linespace[0]) / 10.
+                    linespacethreshold = abs(linespace[1] - linespace[0])
                     # loop over that data and classify each value
                     ld = None # last digitized value
                     lt = None # last digitized temp value
@@ -18474,6 +18487,7 @@ class EventsDlg(ArtisanDialog):
         aw.eventquantifiermax[1] = int(self.E2max.value())
         aw.eventquantifiermax[2] = int(self.E3max.value())
         aw.eventquantifiermax[3] = int(self.E4max.value())
+        aw.computeLinespaces()
 
     #the inverse to restoreState
     def storeState(self):
@@ -19828,18 +19842,22 @@ class modbusport(object):
         self.input1register = 0
         self.input1float = False
         self.input1code = 3
+        self.input1mode = "C"
         self.input2slave = 0
         self.input2register = 0
         self.input2float = False
         self.input2code = 3
+        self.input2mode = "C"
         self.input3slave = 0
         self.input3register = 0
         self.input3float = False
         self.input3code = 3
+        self.input3mode = "C"
         self.input4slave = 0
         self.input4register = 0
         self.input4float = False
         self.input4code = 3
+        self.input4mode = "C"
         self.littleEndianFloats = False
         self.xonoff=0
         self.master = None
@@ -20741,6 +20759,11 @@ class serialport(object):
                 res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
             if res1 is None:
                 res1 = -1
+            else:
+                if aw.modbus.input1mode == "C" and aw.qmc.mode == "F":
+                    res1 = aw.qmc.fromCtoF(res1)
+                elif aw.modbus.input1mode == "F" and aw.qmc.mode == "C":
+                    res1 = aw.qmc.fromFtoC(res1)                    
             just_send = True
         else:
             res1 = -1
@@ -20753,6 +20776,11 @@ class serialport(object):
                 res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             if res2 is None:
                 res2 = -1
+            else:
+                if aw.modbus.input2mode == "C" and aw.qmc.mode == "F":
+                    res2 = aw.qmc.fromCtoF(res2)
+                elif aw.modbus.input2mode == "F" and aw.qmc.mode == "C":
+                    res2 = aw.qmc.fromFtoC(res2)  
             just_send = True
         else:
             res2 = -1
@@ -20765,6 +20793,11 @@ class serialport(object):
                 res3 = aw.modbus.readSingleRegister(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             if res3 is None:
                 res3 = -1
+            else:
+                if aw.modbus.input3mode == "C" and aw.qmc.mode == "F":
+                    res3 = aw.qmc.fromCtoF(res3)
+                elif aw.modbus.input3mode == "F" and aw.qmc.mode == "C":
+                    res3 = aw.qmc.fromFtoC(res3)
             just_send = True
         else:
             res3 = -1
@@ -20777,6 +20810,11 @@ class serialport(object):
                 res4 = aw.modbus.readSingleRegister(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             if res4 is None:
                 res4 = -1
+            else:
+                if aw.modbus.input4mode == "C" and aw.qmc.mode == "F":
+                    res4 = aw.qmc.fromCtoF(res4)
+                elif aw.modbus.input4mode == "F" and aw.qmc.mode == "C":
+                    res4 = aw.qmc.fromFtoC(res4)
             just_send = True
         else:
             res4 = -1
@@ -22597,6 +22635,7 @@ class comportDlg(ArtisanDialog):
         self.modbus_input1registerEdit.setFixedWidth(50)
         self.modbus_input1registerEdit.setAlignment(Qt.AlignRight)
         modbus_function_codes = ["3","4"]
+        modbus_modes = ["C","F"]
         modbus_input1floatlabel = QLabel(QApplication.translate("Label", "Float",None, QApplication.UnicodeUTF8))
         modbus_input1codelabel = QLabel(QApplication.translate("Label", "Function",None, QApplication.UnicodeUTF8))
         self.modbus_input1float = QCheckBox()
@@ -22608,6 +22647,12 @@ class comportDlg(ArtisanDialog):
         self.modbus_input1code.addItems(modbus_function_codes)
         self.modbus_input1code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input1code)))
         self.modbus_input1code.setFixedWidth(50)
+        modbus_input1modelabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
+        self.modbus_input1mode = QComboBox()
+        self.modbus_input1mode.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input1mode.addItems(modbus_modes)
+        self.modbus_input1mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input1mode)))
+        self.modbus_input1mode.setFixedWidth(50)
         modbus_input2slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
         self.modbus_input2slaveEdit = QLineEdit(str(aw.modbus.input2slave))
         self.modbus_input2slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input2slaveEdit))
@@ -22629,6 +22674,12 @@ class comportDlg(ArtisanDialog):
         self.modbus_input2code.addItems(modbus_function_codes)
         self.modbus_input2code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input2code)))
         self.modbus_input2code.setFixedWidth(50)
+        modbus_input2modelabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
+        self.modbus_input2mode = QComboBox()
+        self.modbus_input2mode.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input2mode.addItems(modbus_modes)
+        self.modbus_input2mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input2mode)))
+        self.modbus_input2mode.setFixedWidth(50)
         modbus_input3slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
         self.modbus_input3slaveEdit = QLineEdit(str(aw.modbus.input3slave))
         self.modbus_input3slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input3slaveEdit))
@@ -22650,6 +22701,12 @@ class comportDlg(ArtisanDialog):
         self.modbus_input3code.addItems(modbus_function_codes)
         self.modbus_input3code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input3code)))
         self.modbus_input3code.setFixedWidth(50)
+        modbus_input3modelabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
+        self.modbus_input3mode = QComboBox()
+        self.modbus_input3mode.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input3mode.addItems(modbus_modes)
+        self.modbus_input3mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input3mode)))
+        self.modbus_input3mode.setFixedWidth(50)
         modbus_input4slavelabel = QLabel(QApplication.translate("Label", "Slave",None, QApplication.UnicodeUTF8))
         self.modbus_input4slaveEdit = QLineEdit(str(aw.modbus.input4slave))
         self.modbus_input4slaveEdit.setValidator(QIntValidator(0,247,self.modbus_input4slaveEdit))
@@ -22671,6 +22728,12 @@ class comportDlg(ArtisanDialog):
         self.modbus_input4code.addItems(modbus_function_codes)
         self.modbus_input4code.setCurrentIndex(modbus_function_codes.index(str(aw.modbus.input4code)))
         self.modbus_input4code.setFixedWidth(50)
+        modbus_input4modelabel = QLabel(QApplication.translate("Label", "Mode",None, QApplication.UnicodeUTF8))
+        self.modbus_input4mode = QComboBox()
+        self.modbus_input4mode.setFocusPolicy(Qt.NoFocus)
+        self.modbus_input4mode.addItems(modbus_modes)
+        self.modbus_input4mode.setCurrentIndex(modbus_modes.index(str(aw.modbus.input4mode)))
+        self.modbus_input4mode.setFixedWidth(50)
         self.modbus_littleEndianFloats = QCheckBox(QApplication.translate("ComboBox","little-endian",None, QApplication.UnicodeUTF8))
         self.modbus_littleEndianFloats.setChecked(aw.modbus.littleEndianFloats)
         self.modbus_littleEndianFloats.setFocusPolicy(Qt.NoFocus)
@@ -22843,8 +22906,10 @@ class comportDlg(ArtisanDialog):
         modbus_input1.addWidget(self.modbus_input1registerEdit,1,1)
         modbus_input1.addWidget(modbus_input1codelabel,2,0,Qt.AlignRight)
         modbus_input1.addWidget(self.modbus_input1code,2,1)
-        modbus_input1.addWidget(modbus_input1floatlabel,3,0,Qt.AlignRight)
-        modbus_input1.addWidget(self.modbus_input1float,3,1)
+        modbus_input1.addWidget(modbus_input1modelabel,3,0,Qt.AlignRight)
+        modbus_input1.addWidget(self.modbus_input1mode,3,1)
+        modbus_input1.addWidget(modbus_input1floatlabel,4,0,Qt.AlignRight)
+        modbus_input1.addWidget(self.modbus_input1float,4,1)
         modbus_input1group = QGroupBox(QApplication.translate("GroupBox", "Input 1",None, QApplication.UnicodeUTF8))
         modbus_input1group.setLayout(modbus_input1)
         modbus_input2 = QGridLayout()
@@ -22854,8 +22919,10 @@ class comportDlg(ArtisanDialog):
         modbus_input2.addWidget(self.modbus_input2registerEdit,1,1)
         modbus_input2.addWidget(modbus_input2codelabel,2,0,Qt.AlignRight)
         modbus_input2.addWidget(self.modbus_input2code,2,1)
-        modbus_input2.addWidget(modbus_input2floatlabel,3,0,Qt.AlignRight)
-        modbus_input2.addWidget(self.modbus_input2float,3,1)        
+        modbus_input2.addWidget(modbus_input2modelabel,3,0,Qt.AlignRight)
+        modbus_input2.addWidget(self.modbus_input2mode,3,1)
+        modbus_input2.addWidget(modbus_input2floatlabel,4,0,Qt.AlignRight)
+        modbus_input2.addWidget(self.modbus_input2float,4,1)
         modbus_input2group = QGroupBox(QApplication.translate("GroupBox", "Input 2",None, QApplication.UnicodeUTF8))
         modbus_input2group.setLayout(modbus_input2)
         modbus_input3 = QGridLayout()
@@ -22865,8 +22932,10 @@ class comportDlg(ArtisanDialog):
         modbus_input3.addWidget(self.modbus_input3registerEdit,1,1)
         modbus_input3.addWidget(modbus_input3codelabel,2,0,Qt.AlignRight)
         modbus_input3.addWidget(self.modbus_input3code,2,1)
-        modbus_input3.addWidget(modbus_input3floatlabel,3,0,Qt.AlignRight)
-        modbus_input3.addWidget(self.modbus_input3float,3,1)
+        modbus_input3.addWidget(modbus_input3modelabel,3,0,Qt.AlignRight)
+        modbus_input3.addWidget(self.modbus_input3mode,3,1)
+        modbus_input3.addWidget(modbus_input3floatlabel,4,0,Qt.AlignRight)
+        modbus_input3.addWidget(self.modbus_input3float,4,1)
         modbus_input3group = QGroupBox(QApplication.translate("GroupBox", "Input 3",None, QApplication.UnicodeUTF8))
         modbus_input3group.setLayout(modbus_input3)
         modbus_input4 = QGridLayout()
@@ -22876,8 +22945,10 @@ class comportDlg(ArtisanDialog):
         modbus_input4.addWidget(self.modbus_input4registerEdit,1,1)
         modbus_input4.addWidget(modbus_input4codelabel,2,0,Qt.AlignRight)
         modbus_input4.addWidget(self.modbus_input4code,2,1)
-        modbus_input4.addWidget(modbus_input4floatlabel,3,0,Qt.AlignRight)
-        modbus_input4.addWidget(self.modbus_input4float,3,1)
+        modbus_input4.addWidget(modbus_input4modelabel,3,0,Qt.AlignRight)
+        modbus_input4.addWidget(self.modbus_input4mode,3,1)
+        modbus_input4.addWidget(modbus_input4floatlabel,4,0,Qt.AlignRight)
+        modbus_input4.addWidget(self.modbus_input4float,4,1)
         modbus_input4group = QGroupBox(QApplication.translate("GroupBox", "Input 4",None, QApplication.UnicodeUTF8))
         modbus_input4group.setLayout(modbus_input4)
         modbus_inputV = QHBoxLayout()
