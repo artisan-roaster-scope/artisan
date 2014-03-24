@@ -29305,6 +29305,9 @@ class DtaPID(object):
 ###########################################################################################################################################
 
 def main():
+    # suppress all warnings
+    warnings.filterwarnings('ignore')
+    
     global aw
     aw = None # this is to ensure that the variable aw is already defined during application initialization
     
