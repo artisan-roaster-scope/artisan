@@ -6039,10 +6039,12 @@ class SampleThread(QThread):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)                               
                                 if len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,extratx)
-                                extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
+                                if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
+                                    extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
                                 if len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2,extratx)
-                                extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
+                                if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
+                                    extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                 if local_flagstart:
                                     aw.qmc.extratemp1[i].append(float(extrat1))
                                     aw.qmc.extratemp2[i].append(float(extrat2))
