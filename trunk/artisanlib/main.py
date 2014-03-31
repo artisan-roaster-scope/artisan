@@ -3093,10 +3093,15 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit = 50
         self.zlimit_min = 0
         self.zgrid = 10
-
-        #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
-        for i in range(4):
-            self.phases[i] = int(round(self.fromCtoF(self.phases[i])))
+        
+        if self.mode == "C":
+            #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
+            for i in range(4):
+                self.phases[i] = int(round(self.fromCtoF(self.phases[i])))
+            self.ETtarget = int(round(self.fromCtoF(self.ETtarget)))
+            self.ET2target = int(round(self.fromCtoF(self.ET2target)))
+            self.BTtarget = int(round(self.fromCtoF(self.BTtarget)))
+            self.BT2target = int(round(self.fromCtoF(self.BT2target)))
         self.ax.set_ylabel("F",size=16,color = self.palette["ylabel"]) #Write "F" on Y axis
         self.mode = "F"
         if aw: # during initialization aw is still None!
@@ -3117,10 +3122,14 @@ class tgraphcanvas(FigureCanvas):
         self.zlimit = 50
         self.zlimit_min = 0
         self.zgrid = 10
-        
-        #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
-        for i in range(4):
-            self.phases[i] = int(round(self.fromFtoC(self.phases[i])))
+        if self.mode == "F":
+            #change watermarks limits. dryphase1, dryphase2, midphase, and finish phase Y limits
+            for i in range(4):
+                self.phases[i] = int(round(self.fromFtoC(self.phases[i])))
+            self.ETtarget = int(round(self.fromFtoC(self.ETtarget)))
+            self.ET2target = int(round(self.fromFtoC(self.ET2target)))
+            self.BTtarget = int(round(self.fromFtoC(self.BTtarget)))
+            self.BT2target = int(round(self.fromFtoC(self.BT2target)))
         self.ax.set_ylabel("C",size=16,color = self.palette["ylabel"]) #Write "C" on Y axis
         self.mode = "C"
         if aw: # during initialization aw is still None
@@ -6039,10 +6048,31 @@ class SampleThread(QThread):
                                 extratx,extrat2,extrat1 = self.sample_extra_device(i)                               
                                 if len(aw.qmc.extramathexpression1[i]):
                                     extrat1 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression1[i],extrat1,extratx)
-                                if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
-                                    extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
                                 if len(aw.qmc.extramathexpression2[i]):
                                     extrat2 = aw.qmc.eval_math_expression(aw.qmc.extramathexpression2[i],extrat2,extratx)
+                                # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
+                                # modbus channel 1+2, respect input temperature scale setting
+                                if aw.qmc.extradevices[i] == 29:
+                                    if aw.modbus.input1mode == "C" and aw.qmc.mode == "F":
+                                        extrat1 = aw.qmc.fromCtoF(extrat1)
+                                    elif aw.modbus.input1mode == "F" and aw.qmc.mode == "C":
+                                        extrat1 = aw.qmc.fromFtoC(extrat1)
+                                    if aw.modbus.input2mode == "C" and aw.qmc.mode == "F":
+                                        extrat2 = aw.qmc.fromCtoF(extrat2)
+                                    elif aw.modbus.input2mode == "F" and aw.qmc.mode == "C":
+                                        extrat2 = aw.qmc.fromFtoC(extrat2) 
+                                # modbus channel 3+4, respect input temperature scale setting
+                                if aw.qmc.extradevices[i] == 33:
+                                    if aw.modbus.input3mode == "C" and aw.qmc.mode == "F":
+                                        extrat1 = aw.qmc.fromCtoF(extrat1)
+                                    elif aw.modbus.input3mode == "F" and aw.qmc.mode == "C":
+                                        extrat1 = aw.qmc.fromFtoC(extrat1)
+                                    if aw.modbus.input4mode == "C" and aw.qmc.mode == "F":
+                                        extrat2 = aw.qmc.fromCtoF(extrat2)
+                                    elif aw.modbus.input4mode == "F" and aw.qmc.mode == "C":
+                                        extrat2 = aw.qmc.fromFtoC(extrat2)                                
+                                if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
+                                    extrat1 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp1[i],extratx,extrat1)
                                 if aw.qmc.extradevices[i] != 25: # don't apply input filters to virtual devices
                                     extrat2 = self.inputFilter(aw.qmc.extratimex[i],aw.qmc.extratemp2[i],extratx,extrat2)
                                 if local_flagstart:
@@ -6109,6 +6139,17 @@ class SampleThread(QThread):
                         t1 = aw.qmc.eval_math_expression(aw.qmc.ETfunction,t1,tx)
                     if len(aw.qmc.BTfunction):
                         t2 = aw.qmc.eval_math_expression(aw.qmc.BTfunction,t2,tx)
+                    # if modbus device do the C/F conversion if needed (done after mathexpression, not to mess up with x/10 formulas)
+                    # modbus channel 1+2, respect input temperature scale setting
+                    if aw.qmc.device == 29:
+                        if aw.modbus.input1mode == "C" and aw.qmc.mode == "F":
+                            t1 = aw.qmc.fromCtoF(t1)
+                        elif aw.modbus.input1mode == "F" and aw.qmc.mode == "C":
+                            t1 = aw.qmc.fromFtoC(t1)
+                        if aw.modbus.input2mode == "C" and aw.qmc.mode == "F":
+                            t2 = aw.qmc.fromCtoF(t2)
+                        elif aw.modbus.input2mode == "F" and aw.qmc.mode == "C":
+                            t2 = aw.qmc.fromFtoC(t2)
                     t1 = self.inputFilter(aw.qmc.timex,aw.qmc.temp1,tx,t1)
                     t2 = self.inputFilter(aw.qmc.timex,aw.qmc.temp2,tx,t2,True)
                     length_of_qmc_timex = len(aw.qmc.timex)
@@ -6524,7 +6565,7 @@ class ApplicationWindow(QMainWindow):
 
         ####      create Matplotlib canvas widget
         #resolution
-        self.defaultdpi = 80
+        self.defaultdpi = 100
         self.dpi = self.defaultdpi
         self.qmc = tgraphcanvas(self.main_widget)
         #self.qmc.setAttribute(Qt.WA_NoSystemBackground)
@@ -10765,6 +10806,8 @@ class ApplicationWindow(QMainWindow):
                 self.ser.arduinoETChannel = str(settings.value("arduinoETChannel").toString())
             if settings.contains("arduinoBTChannel"):
                 self.ser.arduinoBTChannel = str(settings.value("arduinoBTChannel").toString())
+            if settings.contains("useModbusPort"):
+                self.ser.useModbusPort = settings.value("useModbusPort").toBool()
             settings.endGroup()
             #restore phases
             if settings.contains("Phases"):
@@ -11592,6 +11635,7 @@ class ApplicationWindow(QMainWindow):
             settings.setValue("arduinoETChannel",self.ser.arduinoETChannel)
             settings.setValue("arduinoBTChannel",self.ser.arduinoBTChannel)
             settings.setValue("arduinoATChannel",self.ser.arduinoATChannel)
+            settings.setValue("useModbusPort",self.ser.useModbusPort)
             settings.endGroup()
             #save of phases is done in the phases dialog
             #only if mode was changed (and therefore the phases values have been converted)
@@ -20140,6 +20184,8 @@ class serialport(object):
         # Reads BT
         self.readBTpid = [1,2]           # index 0: type: FujiPXG, 1 = FujiPXR3, 2 = None, 3 = DTA 
 #                                        # index 1: RS485 unitID. Can be changed in device menu. 
+        # Reuse Modbus-meter port
+        self.useModbusPort = False
         #Initialization for ARDUINO and TC4 meter
         self.arduinoETChannel = "1"
         self.arduinoBTChannel = "2"
@@ -20761,11 +20807,6 @@ class serialport(object):
                 res1 = aw.modbus.readSingleRegister(aw.modbus.input1slave,aw.modbus.input1register,aw.modbus.input1code)
             if res1 is None:
                 res1 = -1
-            else:
-                if aw.modbus.input1mode == "C" and aw.qmc.mode == "F":
-                    res1 = aw.qmc.fromCtoF(res1)
-                elif aw.modbus.input1mode == "F" and aw.qmc.mode == "C":
-                    res1 = aw.qmc.fromFtoC(res1)                    
             just_send = True
         else:
             res1 = -1
@@ -20778,11 +20819,6 @@ class serialport(object):
                 res2 = aw.modbus.readSingleRegister(aw.modbus.input2slave,aw.modbus.input2register,aw.modbus.input2code)
             if res2 is None:
                 res2 = -1
-            else:
-                if aw.modbus.input2mode == "C" and aw.qmc.mode == "F":
-                    res2 = aw.qmc.fromCtoF(res2)
-                elif aw.modbus.input2mode == "F" and aw.qmc.mode == "C":
-                    res2 = aw.qmc.fromFtoC(res2)  
             just_send = True
         else:
             res2 = -1
@@ -20795,11 +20831,6 @@ class serialport(object):
                 res3 = aw.modbus.readSingleRegister(aw.modbus.input3slave,aw.modbus.input3register,aw.modbus.input3code)
             if res3 is None:
                 res3 = -1
-            else:
-                if aw.modbus.input3mode == "C" and aw.qmc.mode == "F":
-                    res3 = aw.qmc.fromCtoF(res3)
-                elif aw.modbus.input3mode == "F" and aw.qmc.mode == "C":
-                    res3 = aw.qmc.fromFtoC(res3)
             just_send = True
         else:
             res3 = -1
@@ -20812,11 +20843,6 @@ class serialport(object):
                 res4 = aw.modbus.readSingleRegister(aw.modbus.input4slave,aw.modbus.input4register,aw.modbus.input4code)
             if res4 is None:
                 res4 = -1
-            else:
-                if aw.modbus.input4mode == "C" and aw.qmc.mode == "F":
-                    res4 = aw.qmc.fromCtoF(res4)
-                elif aw.modbus.input4mode == "F" and aw.qmc.mode == "C":
-                    res4 = aw.qmc.fromFtoC(res4)
             just_send = True
         else:
             res4 = -1
@@ -22877,7 +22903,7 @@ class comportDlg(ArtisanDialog):
         tab1Layout = QVBoxLayout()
         tab1Layout.addWidget(etbt_help_label)
         devid = aw.qmc.device
-        if not(devid in [29,33,34,37]): # hide serial confs for MODBUS and Phidget devices
+        if not(devid in [29,33,34,37]) and not(devid == 0 and aw.ser.useModbusPort): # hide serial confs for MODBUS and Phidget devices
             tab1Layout.addLayout(gridBoxLayout)
         tab1Layout.addStretch()
         #LAYOUT TAB 2
@@ -23315,6 +23341,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.BTlcd = QCheckBox(QApplication.translate("CheckBox", "BT",None, QApplication.UnicodeUTF8))
         self.BTlcd.setChecked(aw.qmc.BTlcd)
         self.curveHBox = QHBoxLayout()
+        self.curveHBox.setContentsMargins(10,0,10,0)
+        self.curveHBox.setSpacing(5)
         self.curveHBox.addWidget(self.ETcurve)
         self.curveHBox.addSpacing(10)
         self.curveHBox.addWidget(self.BTcurve)
@@ -23322,6 +23350,8 @@ class DeviceAssignmentDlg(ArtisanDialog):
         self.curves = QGroupBox(QApplication.translate("GroupBox","Curves",None, QApplication.UnicodeUTF8))
         self.curves.setLayout(self.curveHBox)
         self.lcdHBox = QHBoxLayout()
+        self.lcdHBox.setContentsMargins(30,0,30,0)
+        self.lcdHBox.setSpacing(5)
         self.lcdHBox.addWidget(self.ETlcd)
         self.lcdHBox.addSpacing(10)
         self.lcdHBox.addWidget(self.BTlcd)
@@ -23377,6 +23407,9 @@ class DeviceAssignmentDlg(ArtisanDialog):
         # index 1 = unitID of the rs485 network
         self.controlpidunitidComboBox.setCurrentIndex(unitids.index(str(aw.ser.controlETpid[1])))
         self.btpidunitidComboBox.setCurrentIndex(unitids.index(str(aw.ser.readBTpid[1])))
+        #Reuse Modbus port
+        self.useModbusPort = QCheckBox(QApplication.translate("CheckBox", "Modbus Port",None, QApplication.UnicodeUTF8))
+        self.useModbusPort.setChecked(aw.ser.useModbusPort)
         ####################################################
         #Arduino TC4 channel config
         arduinoChannels = ["None","1","2","3","4"]
@@ -23486,6 +23519,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         PIDgrid.addWidget(btlabel,2,0,Qt.AlignRight)
         PIDgrid.addWidget(self.btpidtypeComboBox,2,1)
         PIDgrid.addWidget(self.btpidunitidComboBox,2,2)
+        PIDgrid.addWidget(self.useModbusPort,2,3)
         PIDBox = QHBoxLayout()
         PIDBox.addLayout(PIDgrid)
         PIDBox.addStretch()
@@ -23580,6 +23614,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
         Mlayout = QVBoxLayout()
         Mlayout.addWidget(TabWidget)
         Mlayout.addLayout(buttonLayout)
+        Mlayout.setMargin(10)
         self.setLayout(Mlayout)
 
     def createDeviceTable(self):
@@ -23921,6 +23956,10 @@ class DeviceAssignmentDlg(ArtisanDialog):
                     aw.ser.readBTpid[0] = 3
                     str2 = "Delta DTA"
                 aw.ser.readBTpid[1] =  int(str(self.btpidunitidComboBox.currentText()))
+                if self.useModbusPort.isChecked():
+                    aw.ser.useModbusPort = True
+                else:
+                    aw.ser.useModbusPort = False
                 #If fuji pid
                 if str1 != "Delta DTA":
                     aw.qmc.device = 0
