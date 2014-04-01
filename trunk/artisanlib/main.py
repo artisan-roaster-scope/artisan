@@ -313,6 +313,7 @@ elif appTranslator.load("artisan_" + locale, QApplication.applicationDirPath() +
 
 from const import UIconst
 
+# should not be needed anymore for minimalmodbus > v0.4
 if platf == 'Windows':
     minimalmodbus.CLOSE_PORT_AFTER_EACH_CALL=True
 else:
@@ -1080,6 +1081,9 @@ class tgraphcanvas(FigureCanvas):
         self._resizeTimer = QTimer()
         self._resizeTimer.timeout.connect(self.updateBackground)
         self.delayTimeout = 100
+        
+        # flag to toggle between Temp and RoR scale of xy-display
+        self.fmt_data_RoR = True #False
 
     #NOTE: empty Figure is initialy drawn at the end of aw.settingsload()
     #################################    FUNCTIONS    ###################################
@@ -1495,7 +1499,8 @@ class tgraphcanvas(FigureCanvas):
     def resetdeltalines(self):
         if self.deltalinecount == None:
             self.deltalinecount = self.lendeltaaxlines()
-        self.delta_ax.lines = self.delta_ax.lines[0:self.deltalinecount]
+        if self.delta_ax:
+            self.delta_ax.lines = self.delta_ax.lines[0:self.deltalinecount]
 
     def setalarm(self,alarmnumber):
         self.alarmstate[alarmnumber] = 1    #turn off flag as it has been read
@@ -1866,6 +1871,14 @@ class tgraphcanvas(FigureCanvas):
         s = int(round(s))
         m = int(m)
         return '%s%d:%02d'%(sign,m,s)
+        
+    def fmt_data(self,x):
+        if self.fmt_data_RoR and self.delta_ax:
+            try:
+            	return int(round(self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,x))[1]))[1]))
+            except:
+                pass
+        return int(round(x))
 
     #used by xaxistosm(). Provides also negative time
     def formtime(self,x,pos):
@@ -2459,7 +2472,7 @@ class tgraphcanvas(FigureCanvas):
                 label.set_fontproperties(prop)
 
             # format temperature as int, not float in the cursor position coordinate indicator
-            self.ax.fmt_ydata = lambda x:int(round(x))
+            self.ax.fmt_ydata = self.fmt_data
             self.ax.fmt_xdata = self.fmt_timedata
 
             if two_ax_mode:
@@ -2482,10 +2495,11 @@ class tgraphcanvas(FigureCanvas):
                     label.set_fontproperties(prop)
 
                 # translate y-coordinate from delta into temp range to ensure the cursor position display (x,y) coordinate in the temp axis
-                self.delta_ax.fmt_ydata = lambda y: int(round(self.ax.transData.inverted().transform((0,self.delta_ax.transData.transform((0,y))[1]))[1]))
+                self.delta_ax.fmt_ydata = self.fmt_data
                 self.delta_ax.fmt_xdata = self.fmt_timedata
             #put a right tick on the graph
             else:
+                self.delta_ax = None
 #                if aw.qmc.graphstyle:
 #                    self.ax.spines['right'].set_color('none')
 #                    self.ax.spines['top'].set_color('none')
@@ -8702,6 +8716,8 @@ class ApplicationWindow(QMainWindow):
             self.moveKbutton("right")
         elif key == 65:                     #letter A (automatic save)
             self.automaticsave()
+        elif key == 68:                     #letter D (toggle xy between temp and RoR scale)
+            self.qmc.fmt_data_RoR = not (self.qmc.fmt_data_RoR)
         elif key == 83:                     #letter S (sliders)
             self.toggleSlidersVisibility()
         elif key == 84:                     #letter T (mouse cross)
@@ -8932,8 +8948,9 @@ class ApplicationWindow(QMainWindow):
         string += u(QApplication.translate("Message", "<b>[a]</b> = Autosave",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[CRTL N]</b> = Autosave + Reset + START",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[t]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[d]</b> = Mouse cross lines",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[b]</b> = Shows/Hides Extra Event Buttons",None, QApplication.UnicodeUTF8)) + "<br><br>"
-        string += u(QApplication.translate("Message", "<b>[s]</b> = Shows/Hides Event Sliders",None, QApplication.UnicodeUTF8)) + "<br><br>"
+        string += u(QApplication.translate("Message", "<b>[s]</b> = Toggle xy scale (T/Delta)",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[i]</b> = Retrieve Weight In from Scale",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[o]</b> = Retrieve Weight Out from Scale",None, QApplication.UnicodeUTF8)) + "<br><br>"
         string += u(QApplication.translate("Message", "<b>[0-9]</b> = Changes Event Button Palettes",None, QApplication.UnicodeUTF8)) + "<br><br>"
@@ -15948,6 +15965,7 @@ class editGraphDlg(ArtisanDialog):
         self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
         self.datatable.setSelectionMode(QTableWidget.SingleSelection)
         self.datatable.setShowGrid(True)
+        self.datatable.verticalHeader().setResizeMode(2)
         for i in range(ndata):
             Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timex[i]-aw.qmc.timex[aw.qmc.timeindex[0]]))))
             Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
@@ -16037,6 +16055,7 @@ class editGraphDlg(ArtisanDialog):
         self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
         self.eventtable.setShowGrid(True)
+        self.eventtable.verticalHeader().setResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         regexvalue = QRegExp(r"^100|\d?\d?$")
         self.eventtable.setShowGrid(True) 
@@ -18231,6 +18250,7 @@ class EventsDlg(ArtisanDialog):
         self.eventbuttontable.setSelectionBehavior(QTableWidget.SelectRows)
         self.eventbuttontable.setSelectionMode(QTableWidget.SingleSelection)
         self.eventbuttontable.setShowGrid(True)
+        self.eventbuttontable.verticalHeader().setResizeMode(2)
         visibility = [QApplication.translate("ComboBox","OFF",None, QApplication.UnicodeUTF8),
                       QApplication.translate("ComboBox","ON",None, QApplication.UnicodeUTF8)]
         for i in range(nbuttons):
@@ -19036,6 +19056,7 @@ class flavorDlg(ArtisanDialog):
             self.flavortable.setSelectionBehavior(QTableWidget.SelectRows)
             self.flavortable.setSelectionMode(QTableWidget.SingleSelection)
             self.flavortable.setShowGrid(True)
+            self.flavortable.verticalHeader().setResizeMode(2)
             #populate table
             for i in range(nflavors):
                 labeledit = QLineEdit(u(aw.qmc.flavorlabels[i]))
@@ -19508,6 +19529,7 @@ class backgroundDlg(ArtisanDialog):
             self.eventtable.setSelectionBehavior(QTableWidget.SelectRows)
             self.eventtable.setSelectionMode(QTableWidget.SingleSelection)
             self.eventtable.setShowGrid(True)
+            self.eventtable.verticalHeader().setResizeMode(2)
             if aw.qmc.timeindex[0] != -1:
                 start = aw.qmc.timex[aw.qmc.timeindex[0]]
             else:
@@ -19550,6 +19572,7 @@ class backgroundDlg(ArtisanDialog):
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
             self.datatable.setSelectionMode(QTableWidget.SingleSelection)
             self.datatable.setShowGrid(True)
+            self.datatable.verticalHeader().setResizeMode(2)
             for i in range(ndata):
                 Rtime = QTableWidgetItem(aw.qmc.stringfromseconds(int(round(aw.qmc.timeB[i]-start))))
                 Rtime.setTextAlignment(Qt.AlignRight|Qt.AlignVCenter)
@@ -23094,6 +23117,7 @@ class comportDlg(ArtisanDialog):
                 self.serialtable.setSelectionBehavior(QTableWidget.SelectRows)
                 self.serialtable.setSelectionMode(QTableWidget.SingleSelection)
                 self.serialtable.setShowGrid(True)
+                self.serialtable.verticalHeader().setResizeMode(2)
                 for i in range(nssdevices):
                     devid = aw.qmc.extradevices[i]
                     devicename = aw.qmc.devices[devid-1]
@@ -23639,6 +23663,7 @@ class DeviceAssignmentDlg(ArtisanDialog):
             self.devicetable.setSelectionBehavior(QTableWidget.SelectRows)
             self.devicetable.setSelectionMode(QTableWidget.SingleSelection)
             self.devicetable.setShowGrid(True)
+            self.devicetable.verticalHeader().setResizeMode(2)
             if nddevices:
                 dev = aw.qmc.devices[:]             #deep copy
                 limit = len(dev)
@@ -25045,6 +25070,7 @@ class WheelDlg(ArtisanDialog):
             self.labeltable.setSelectionBehavior(QTableWidget.SelectRows)
             self.labeltable.setSelectionMode(QTableWidget.SingleSelection)
             self.labeltable.setShowGrid(True)
+            self.labeltable.verticalHeader().setResizeMode(2)
             #populate table
             for i in range(nlabels):
                 label = QTableWidgetItem(aw.qmc.wheelnames[x][i])
@@ -25213,6 +25239,7 @@ class WheelDlg(ArtisanDialog):
             self.datatable.setSelectionBehavior(QTableWidget.SelectRows)
             self.datatable.setSelectionMode(QTableWidget.SingleSelection)
             self.datatable.setShowGrid(True)
+            self.datatable.verticalHeader().setResizeMode(2)
             #populate table
             for i in range(ndata):
                 delButton = QPushButton(QApplication.translate("Button","Delete",None, QApplication.UnicodeUTF8))
@@ -26173,12 +26200,10 @@ class PXRpidDlgControl(ArtisanDialog):
         self.segmenttable = QTableWidget()
         self.createsegmenttable()
         #****************************   TAB5 WIDGETS
-        ETthermolabel = QLabel(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
-        BTthermolabel = QLabel(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
         BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.BTthermocombobox = QComboBox()
-        self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
+        #self.BTthermocombobox.setStyleSheet("background-color:'lightgrey';")
         ## FUJI PXG input types
         ##0 (JPT 100'3f)
         ##1 (PT 100'3f)
@@ -26328,18 +26353,23 @@ class PXRpidDlgControl(ArtisanDialog):
         tab4layout = QVBoxLayout()
         tab4layout.addWidget(self.segmenttable)
         #tab5
-        thermolayout = QGridLayout()
-        thermolayout.addWidget(ETthermolabel,0,0)
-        thermolayout.addWidget(self.ETthermocombobox,0,1)
-        thermolayout.addWidget(getETthermocouplebutton,0,2)
-        thermolayout.addWidget(setETthermocouplebutton,0,3)
-        thermolayout.addWidget(BTthermolabel,1,0)
-        thermolayout.addWidget(self.BTthermocombobox,1,1)
-        thermolayout.addWidget(getBTthermocouplebutton,1,2)
-        thermolayout.addWidget(setBTthermocouplebutton,1,3)
+        thermolayoutET = QHBoxLayout()
+        thermolayoutET.addWidget(self.ETthermocombobox)
+        thermolayoutET.addStretch()
+        thermolayoutET.addWidget(getETthermocouplebutton)
+        thermolayoutET.addWidget(setETthermocouplebutton)
+        ETGroupBox = QGroupBox(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
+        ETGroupBox.setLayout(thermolayoutET)
+        thermolayoutBT = QHBoxLayout()
+        thermolayoutBT.addWidget(self.BTthermocombobox)
+        thermolayoutBT.addStretch()
+        thermolayoutBT.addWidget(getBTthermocouplebutton)
+        thermolayoutBT.addWidget(setBTthermocouplebutton)
+        BTGroupBox = QGroupBox(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
+        BTGroupBox.setLayout(thermolayoutBT)
         tab5Layout = QVBoxLayout()
-        tab5Layout.addStretch()
-        tab5Layout.addLayout(thermolayout)
+        tab5Layout.addWidget(ETGroupBox)
+        tab5Layout.addWidget(BTGroupBox)
         tab5Layout.addWidget(BTthermolabelnote)
         tab5Layout.addStretch()
         tab5Layout.addWidget(pointlabel)
@@ -26879,6 +26909,7 @@ class PXRpidDlgControl(ArtisanDialog):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
         self.segmenttable.setShowGrid(True)
+        self.segmenttable.verticalHeader().setResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(8):
@@ -27303,8 +27334,6 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.segmenttable = QTableWidget()
         self.createsegmenttable()
         #****************************   TAB5 WIDGETS
-        ETthermolabel = QLabel(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
-        BTthermolabel = QLabel(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
         BTthermolabelnote = QLabel(QApplication.translate("Label","NOTE: BT Thermocouple type is not stored in the Artisan settings",None, QApplication.UnicodeUTF8))
         self.ETthermocombobox = QComboBox()
         self.ETthermocombobox.setFocusPolicy(Qt.NoFocus)
@@ -27510,18 +27539,24 @@ class PXG4pidDlgControl(ArtisanDialog):
         tab4layout = QVBoxLayout()
         tab4layout.addWidget(self.segmenttable)
         #tab5
-        thermolayout = QGridLayout()
-        thermolayout.addWidget(ETthermolabel,0,0)
-        thermolayout.addWidget(self.ETthermocombobox,0,1)
-        thermolayout.addWidget(getETthermocouplebutton,0,2)
-        thermolayout.addWidget(setETthermocouplebutton,0,3)
-        thermolayout.addWidget(BTthermolabel,1,0)
-        thermolayout.addWidget(self.BTthermocombobox,1,1)
-        thermolayout.addWidget(getBTthermocouplebutton,1,2)
-        thermolayout.addWidget(setBTthermocouplebutton,1,3)
+        thermolayoutET = QHBoxLayout()
+        thermolayoutET.addWidget(self.ETthermocombobox)
+        thermolayoutET.addStretch()
+        thermolayoutET.addWidget(getETthermocouplebutton)
+        thermolayoutET.addWidget(setETthermocouplebutton)
+        ETGroupBox = QGroupBox(QApplication.translate("Label","ET Thermocouple type",None, QApplication.UnicodeUTF8))
+        ETGroupBox.setLayout(thermolayoutET)
+        thermolayoutBT = QHBoxLayout()
+        thermolayoutBT.addWidget(self.BTthermocombobox)
+        thermolayoutBT.addStretch()
+        thermolayoutBT.addWidget(getBTthermocouplebutton)
+        thermolayoutBT.addWidget(setBTthermocouplebutton)
+        BTGroupBox = QGroupBox(QApplication.translate("Label","BT Thermocouple type",None, QApplication.UnicodeUTF8))
+        BTGroupBox.setLayout(thermolayoutBT)
         tab5Layout = QVBoxLayout()
         tab5Layout.addStretch()
-        tab5Layout.addLayout(thermolayout)
+        tab5Layout.addWidget(ETGroupBox)
+        tab5Layout.addWidget(BTGroupBox)
         tab5Layout.addWidget(BTthermolabelnote)
         tab5Layout.addStretch()
         tab5Layout.addWidget(pointlabel)
@@ -28641,6 +28676,7 @@ class PXG4pidDlgControl(ArtisanDialog):
         self.segmenttable.setSelectionBehavior(QTableWidget.SelectRows)
         self.segmenttable.setSelectionMode(QTableWidget.SingleSelection)
         self.segmenttable.setShowGrid(True)
+        self.segmenttable.verticalHeader().setResizeMode(2)
         regextime = QRegExp(r"^-?[0-9]?[0-9]?[0-9]:[0-5][0-9]$")
         #populate table
         for i in range(16):
